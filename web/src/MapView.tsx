@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import maplibregl, { type Map as MapInstance, type GeoJSONSource, type StyleSpecification } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import type { Map as MapInstance, GeoJSONSource, StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { CampusData, GpsFix, Place, Route } from './types';
 import type { FeatureCollection } from 'geojson';

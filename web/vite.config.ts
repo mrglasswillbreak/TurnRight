@@ -11,6 +11,6 @@ export default defineConfig({
   })],
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   css: { postcss: { plugins: [tailwindcss()] } },
-  build: { target: 'es2022', rollupOptions: { output: { manualChunks: { map: ['maplibre-gl'], react: ['react', 'react-dom'] } } } },
+  build: { target: 'es2022', rollupOptions: { output: { manualChunks(id) { if (id.includes('node_modules/maplibre-gl')) return 'map'; if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react'; } } } },
   server: { host: '127.0.0.1' },
 });

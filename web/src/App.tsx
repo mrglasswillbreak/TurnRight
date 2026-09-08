@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowLeft, BookOpen, Building2, ChevronRight, Compass, Download, Flag, GraduationCap, Heart, Layers, LocateFixed, MapPin, Moon, Navigation, Plus, Search, Shield, Sun, WifiOff, X, Settings, Info } from 'lucide-react';
+import { ArrowUpRight, ArrowLeft, BookOpen, Building2, ChevronRight, Compass, Download, Flag, GraduationCap, Heart, Layers, LocateFixed, MapPin, Moon, Navigation, Plus, Search, Shield, Sun, WifiOff, X, Settings, Info, Utensils } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { registerSW } from 'virtual:pwa-register';
 import { Button } from '@/components/ui/button';
