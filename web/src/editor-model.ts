@@ -204,10 +204,7 @@ export function applyEdits(
           errors.push(`${props.name}: duplicate adjacent path vertices.`);
           continue;
         }
-        for (const [from, to] of [
-          [a, b],
-          [b, a],
-        ])
+        for (const [from, to] of props.footDirection==='forward'?[[a,b]]:props.footDirection==='reverse'?[[b,a]]:[[a,b],[b,a]])
           data.graph.edges.push({
             id: `${edit.id}:${from.id}>${to.id}`,
             from: from.id,

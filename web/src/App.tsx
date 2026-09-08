@@ -78,6 +78,9 @@ export default function App() {
   const [saved, setSaved] = useState<string[]>([]),
     [recent, setRecent] = useState<string[]>([]),
     [savedOnly, setSavedOnly] = useState(false);
+  const [reportDrafts,setReportDrafts]=useState<{key:string;name:string;placeId?:string;coordinates:Position}[]>([]);
+  const refreshDrafts=()=>{void getPreference<typeof reportDrafts>('report-drafts',[]).then(setReportDrafts);};
+  const startRequested=useRef(false);
   const [dialog, setDialog] = useState<"offline" | "settings" | "report" | null>(null),
     [reportPin, setReportPin] = useState<Position | undefined>();
   const [downloaded, setDownloaded] = useState(false),
@@ -137,6 +140,7 @@ export default function App() {
     getPreference("recent", [] as string[]).then(setRecent);
     getPreference("dark", false).then(setDark);
     getPreference("muted", false).then(setMuted);
+    refreshDrafts();
     if ("serviceWorker" in navigator) {
       updateSW.current = registerSW({
         immediate: true,
@@ -227,7 +231,7 @@ export default function App() {
       if (!announced.current.has("arrive")) {
         announced.current.add("arrive");
         void voice.current
-          .play("arrive", ...(selected?.arrivalKind !== "entrance" ? ["approach"] : []))
+          .playWithName(selected?.name||'',"arrive", ...(selected?.arrivalKind !== "entrance" ? ["approach"] : []))
           .catch(() => {});
         gps.stop();
       }
@@ -290,6 +294,7 @@ export default function App() {
     [data, query, category, saved, savedOnly, recent],
   );
   const selectPlace = (place: Place) => {
+    startRequested.current=false;
     if (navigating) {
       setToast("Finish this walk before choosing a new destination.");
       return;
@@ -314,6 +319,7 @@ export default function App() {
     void setPreference("saved", next);
   };
   const previewRoute = async (from = origin) => {
+    startRequested.current=false;
     if (!data || !selected) return;
     setRouteView(true);
     setBusy(false);
@@ -388,8 +394,9 @@ export default function App() {
       .catch(() => setToast("Audio could not start. On-screen directions remain available."));
     gps.start();
     if (!gps.fix || Date.now() - gps.fix.timestamp > 12000 || gps.fix.accuracy > 35) {
+      startRequested.current=true;
       setRouteError(
-        "A fresh, accurate location is needed to start live navigation. Enable location, then tap Start walking again.",
+        "Waiting for a fresh, accurate location to start navigation. Keep the app visible and allow location access.",
       );
       return;
     }
@@ -412,7 +419,9 @@ export default function App() {
       setBusy(false);
     }
   };
+  useEffect(()=>{if(startRequested.current&&routeView&&gps.fix&&gps.fix.accuracy<=35&&Date.now()-gps.fix.timestamp<12000){startRequested.current=false;void startNavigation();}},[gps.fix?.timestamp]);
   const stopNavigation = async () => {
+    startRequested.current=false;
     routeRequest.current++;
     setNavigating(false);
     setFollow(false);
@@ -569,6 +578,7 @@ export default function App() {
             onStart={startNavigation}
             onStop={stopNavigation}
             onBack={() => {
+              startRequested.current=false;gps.stop();
               setRouteView(false);
               setRoutes([]);
             }}
@@ -827,6 +837,7 @@ export default function App() {
           )}{" "}
           {dialog === "report" && (
             <ReportForm
+              onDraftSaved={refreshDrafts}
               place={selected}
               coordinates={reportPin}
               onDone={() => {
@@ -883,6 +894,7 @@ export default function App() {
               </div>
               <Button
                 variant="outline"
+                disabled={muted}
                 onClick={async () => {
                   try {
                     await voice.current.unlock();
@@ -911,6 +923,7 @@ export default function App() {
                 This source-derived campus map has not been field-verified. Missing entrances and
                 paths are shown in place details.
               </p>
+              {reportDrafts.length>0&&<><h3 className="subheading">Saved report drafts</h3>{reportDrafts.map(draft=><Button key={draft.key} variant="outline" onClick={()=>{setSelected(data.places.find(p=>p.id===draft.placeId)||null);setReportPin(draft.coordinates);setDialog('report');}}>{draft.name} · Resume draft</Button>)}</>}
               <h3 className="subheading">Your privacy</h3>
               <p>
                 Location and navigation history stay on your phone. Student reports only send the

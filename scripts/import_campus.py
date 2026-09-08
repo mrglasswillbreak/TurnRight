@@ -127,7 +127,7 @@ def build():
         if not any(inside(p, ring) for p in coords): continue
         identifier = 'osm:way:' + way.attrib['id']
         if tags.get('highway'):
-            features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], source='osm'))
+            features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], footDirection={'yes':'forward','-1':'reverse'}.get(tags.get('oneway:foot'),'both'), source='osm'))
             walk = tags['highway'] in allowed or tags.get('foot') in ('yes', 'designated', 'permissive')
             walk = walk and tags.get('foot') not in ('no', 'private') and (tags.get('access') not in ('no', 'private') or tags.get('foot') in ('yes', 'designated', 'permissive')) and tags.get('construction') is None
             if not walk: continue
@@ -196,6 +196,7 @@ def build():
                 place['arrivalKind'] = 'entrance'
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     result = {'schemaVersion': 1, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'ArcGIS item is publicly viewable but provides no redistribution license. Confirm permission with the owner before public deployment.', 'retrievedAt': now}]}
+    result['coverage']['notes'].append(f"{sum(bool(e.get('geometryBlocked')) for e in edges)} directed segments excluded due to building or barrier conflicts.")
     digest_input = {k: v for k, v in result.items() if k not in ('version', 'createdAt', 'sources')}
     result['version'] = 'lasu-' + hashlib.sha256(json.dumps(digest_input, sort_keys=True).encode()).hexdigest()[:12]
     if not graph_nodes or not edges or len(places) < 50: raise ValueError('Incomplete import: expected campus places and a nonempty path graph')

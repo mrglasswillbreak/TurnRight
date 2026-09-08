@@ -34,6 +34,7 @@ export function useGps() {
         });
       },
       (failure) => {
+        if(failure.code===1){desired.current=false;clear();setTracking(false);}
         setError(
           failure.code === 1
             ? "Location access is off. Enable it in your browser settings, or choose a starting place."
@@ -42,7 +43,7 @@ export function useGps() {
       },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
     );
-  }, []);
+  }, [clear]);
   const stop = useCallback(() => {
     desired.current = false;
     clear();
