@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.13.0 <23"
   },
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "package": "node ../scripts/package.mjs",
-    "prebuild": "node ../scripts/prebuild.mjs"
+    "prebuild": "node scripts/prebuild.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

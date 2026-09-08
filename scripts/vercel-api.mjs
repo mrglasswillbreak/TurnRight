@@ -32,6 +32,7 @@ export async function uploadSource(root) {
     "web/lib",
     "web/hooks",
     "web/public",
+    "web/scripts",
   ];
   const singles = [
     "web/package.json",
@@ -42,8 +43,6 @@ export async function uploadSource(root) {
     "web/tsconfig.json",
     "web/vercel.json",
     "web/release-build.json",
-    "scripts/prebuild.mjs",
-    "scripts/published-assets.mjs",
   ];
   async function walk(relative) {
     for (const entry of await fs.readdir(path.join(root, relative), { withFileTypes: true })) {

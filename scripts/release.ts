@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { assembleSources, applyEdits } from "../web/src/editor-model";
 import { db } from "./cloud.mjs";
-import { preservePublished } from "./published-assets.mjs";
+import { preservePublished } from "../web/scripts/published-assets.mjs";
 import { vercelApi, uploadSource, waitForDeployment } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");

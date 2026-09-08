@@ -1,10 +1,31 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdtempSync, mkdirSync, cpSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
 // @ts-expect-error Node-only deployment module.
 import { waitForDeployment, vercelApi } from "../../scripts/vercel-api.mjs";
 // @ts-expect-error Node-only release asset validation.
-import { assetTarget } from "../../scripts/published-assets.mjs";
+import { assetTarget } from "../scripts/published-assets.mjs";
 afterEach(() => vi.unstubAllGlobals());
 describe("deployment success gates", () => {
+  it("validates a frozen release with only the frontend deployment directory present", () => {
+    const prefix = path.join(tmpdir(), "turnright-build-");
+    const deployment = mkdtempSync(prefix);
+    try {
+      cpSync(new URL("../scripts", import.meta.url), path.join(deployment, "scripts"), { recursive: true });
+      mkdirSync(path.join(deployment, "public/packages"), { recursive: true });
+      writeFileSync(path.join(deployment, "release-build.json"), JSON.stringify({ version: "lasu-test" }));
+      writeFileSync(path.join(deployment, "public/packages/latest.json"), JSON.stringify({ version: "lasu-test" }));
+      const env = { ...process.env, VERCEL: "1", SOURCE_REDISTRIBUTION_APPROVED: "true" };
+      expect(() => execFileSync(process.execPath, ["scripts/prebuild.mjs"], { cwd: deployment, env, stdio: "pipe" })).not.toThrow();
+      writeFileSync(path.join(deployment, "public/packages/latest.json"), JSON.stringify({ version: "lasu-changed" }));
+      expect(() => execFileSync(process.execPath, ["scripts/prebuild.mjs"], { cwd: deployment, env, stdio: "pipe" })).toThrow();
+    } finally {
+      if (!path.resolve(deployment).startsWith(prefix)) throw new Error("Unexpected temporary build directory");
+      rmSync(deployment, { recursive: true, force: true });
+    }
+  });
   it("rejects failed builds instead of treating the returned ID as a release", async () => {
     vi.stubEnv("VERCEL_TOKEN", "test-token");
     vi.stubGlobal(
