@@ -27,6 +27,7 @@ export interface MapViewProps {
   dark?: boolean;
   threeD?: boolean;
   follow?: boolean;
+  panelBesideMap?: boolean;
   onSelect: (place: Place) => void;
   onManualPan?: () => void;
   onReady?: (map: MapInstance) => void | (() => void);
@@ -40,6 +41,7 @@ export function MapView({
   dark = false,
   threeD = false,
   follow = false,
+  panelBesideMap = false,
   onSelect,
   onManualPan,
   onReady,
@@ -90,7 +92,7 @@ export function MapView({
     mapRef.current = map;
     const frame = () => {
       const mobile = innerWidth < 768,
-        padding = {
+        padding = panelBesideMap ? { top: 60, right: 40, bottom: 60, left: 40 } : {
           top: mobile ? 125 : 85,
           right: 70,
           bottom: mobile ? innerHeight * 0.49 : 65,
@@ -375,7 +377,7 @@ export function MapView({
       map.remove();
       mapRef.current = null;
     };
-  }, [data, dark]);
+  }, [data, dark, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -397,15 +399,15 @@ export function MapView({
       center: selected.coordinates,
       zoom: Math.max(map.getZoom(), 17),
       padding: {
-        left: window.innerWidth > 767 ? 360 : 0,
-        bottom: window.innerWidth < 768 ? 180 : 0,
+        left: panelBesideMap ? 40 : window.innerWidth > 767 ? 360 : 0,
+        bottom: panelBesideMap ? 40 : window.innerWidth < 768 ? 180 : 0,
       },
       duration: 750,
     });
     return () => {
       marker.remove();
     };
-  }, [selected, data, dark]);
+  }, [selected, data, dark, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;

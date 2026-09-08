@@ -1127,7 +1127,7 @@ export default function Admin({ data }: { data: CampusData }) {
           </div>
         </aside>
         <section className="admin-map">
-          <MapView data={visibleData} routes={testRoutes} onSelect={editPlace} onReady={mapReady} />
+          <MapView data={visibleData} routes={testRoutes} panelBesideMap onSelect={editPlace} onReady={mapReady} />
           <div className="editor-map-status">
             <span className="status-dot" />
             {preview ? "Saved draft preview" : "Source map · click to edit"}
