@@ -1,0 +1,45 @@
+name: Build and publish reviewed campus release
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Immutable release snapshot ID
+        required: true
+      operation:
+        description: Release operation
+        type: choice
+        options: [preview, publish, rollback]
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: campus-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      RELEASE_ID: ${{ inputs.release_id }}
+      RELEASE_OPERATION: ${{ inputs.operation }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm test
+        working-directory: web
+      - run: npx tsx ../scripts/release.ts
+        working-directory: web
+      - name: Record failed build
+        if: failure()
+        run: node scripts/record-failure.mjs

@@ -1,0 +1,37 @@
+name: Review campus source updates
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Optional editor job ID
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: campus-source-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JOB_ID: ${{ inputs.job_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download bounded source snapshots
+        run: python scripts/import_campus.py --download --output data/candidates
+      - name: Queue semantic changes for review
+        run: node scripts/sync-sources.mjs
+      - name: Record upstream failure
+        if: failure()
+        run: node scripts/record-failure.mjs
