@@ -76,6 +76,7 @@ export function MapView({
         maxZoom: 20,
         minZoom: 13,
         attributionControl: false,
+        trackResize: false,
         pitch: 0,
       });
       setMapError("");
@@ -120,6 +121,7 @@ export function MapView({
       requestAnimationFrame(() => {
         if (mapRef.current !== map) return;
         map.stop();
+        map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
         map.resize();
         if (ready.current) frame();
       });
