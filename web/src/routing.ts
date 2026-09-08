@@ -1,5 +1,5 @@
 import { bearing, distance } from "./geo";
-import { geometryBlocker } from './spatial';
+import { geometryBlocker } from "./spatial";
 import type {
   CampusData,
   GraphEdge,
@@ -13,9 +13,11 @@ import type {
 export class RoutingError extends Error {}
 export function nearestNode(graph: RoutingGraph, coordinates: Position, limit = 90) {
   let nearest: { id: string; distance: number } | undefined;
-  const connected=new Set(graph.edges.filter(e=>e.accessible&&!e.geometryBlocked).flatMap(e=>[e.from,e.to]));
+  const connected = new Set(
+    graph.edges.filter((e) => e.accessible && !e.geometryBlocked).flatMap((e) => [e.from, e.to]),
+  );
   for (const node of graph.nodes) {
-    if(!connected.has(node.id))continue;
+    if (!connected.has(node.id)) continue;
     const d = distance(coordinates, node.coordinates);
     if (d <= limit && (!nearest || d < nearest.distance)) nearest = { id: node.id, distance: d };
   }
@@ -151,10 +153,16 @@ export function findRoutes(
   origin: Position | string,
   destination: string,
 ): Route[] {
-  const nodeMap=new Map(data.graph.nodes.map(n=>[n.id,n.coordinates]));
+  const nodeMap = new Map(data.graph.nodes.map((n) => [n.id, n.coordinates]));
   const blocked = new Set(data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds));
-  for(const edge of data.graph.edges){if(edge.geometryBlocked||geometryBlocker(nodeMap.get(edge.from)!,nodeMap.get(edge.to)!,data.map))blocked.add(edge.id);}
-  const usableGraph={...data.graph,edges:data.graph.edges.filter(e=>!blocked.has(e.id))};
+  for (const edge of data.graph.edges) {
+    if (
+      edge.geometryBlocked ||
+      geometryBlocker(nodeMap.get(edge.from)!, nodeMap.get(edge.to)!, data.map)
+    )
+      blocked.add(edge.id);
+  }
+  const usableGraph = { ...data.graph, edges: data.graph.edges.filter((e) => !blocked.has(e.id)) };
   const start =
     typeof origin === "string" ? { id: origin, distance: 0 } : nearestNode(usableGraph, origin, 45);
   if (!start)

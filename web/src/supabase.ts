@@ -12,12 +12,10 @@ export async function api<T = unknown>(action: string, payload: unknown = {}): P
     },
     body: JSON.stringify({ action, payload }),
   });
-  const body = await response
-    .json()
-    .catch(() => ({
-      error:
-        "The backend is not configured. Follow the deployment guide to connect Vercel and Supabase.",
-    }));
+  const body = await response.json().catch(() => ({
+    error:
+      "The backend is not configured. Follow the deployment guide to connect Vercel and Supabase.",
+  }));
   if (!response.ok || body.error) throw new Error(body.error || "Request failed");
   return body;
 }

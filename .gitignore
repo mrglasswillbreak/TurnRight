@@ -13,3 +13,5 @@ test-results/
 playwright-report/
 __pycache__/
 *.pyc
+web/lint-results.json
+web/lint-check.txt

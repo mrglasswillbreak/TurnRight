@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft,
   ArrowUpRight,
   Check,
   Download,
@@ -20,7 +19,6 @@ import {
   Upload,
   X,
   LockKeyhole,
-  Building2,
 } from "lucide-react";
 import {
   TerraDraw,
@@ -38,7 +36,6 @@ import { Button } from "@/components/ui/button";
 import { MapView } from "./MapView";
 import { api, supabase } from "./supabase";
 import { applyEdits, assembleSources, validateEdit, type SourceRecord } from "./editor-model";
-import { distance } from "./geo";
 import { findRoutes } from "./routing";
 import type {
   CampusData,
@@ -113,7 +110,7 @@ export default function Admin({ data }: { data: CampusData }) {
   }, []);
   useEffect(() => {
     if (signedIn && !authorized) void refresh();
-  }, [signedIn]);
+  }, [signedIn, authorized]);
   useEffect(() => {
     const beforeUnload = (e: BeforeUnloadEvent) => {
       if (dirty) {
@@ -345,7 +342,11 @@ export default function Admin({ data }: { data: CampusData }) {
             id: String(id),
             kind: "path",
             geometry: source.geometry,
-            properties: { name: source.properties?.name || "Campus path", access: "yes", footDirection:source.properties?.footDirection||"both" },
+            properties: {
+              name: source.properties?.name || "Campus path",
+              access: "yes",
+              footDirection: source.properties?.footDirection || "both",
+            },
           },
         );
     });
@@ -546,7 +547,23 @@ export default function Admin({ data }: { data: CampusData }) {
                     ))}
                   </select>
                 </label>
-                {state.edits.filter(e=>['closure','barrier'].includes(e.kind)&&!e.deleted&&!e.properties.reopenedAt&&e.properties.expectedReopening&&Date.parse(String(e.properties.expectedReopening))<Date.now()).map(e=><p className="notice" key={`${e.kind}:${e.id}`}>Overdue review: {String(e.properties.name)}. This path remains closed. <button className="text-button" onClick={()=>showFeature(e)}>Review closure</button></p>)}
+                {state.edits
+                  .filter(
+                    (e) =>
+                      ["closure", "barrier"].includes(e.kind) &&
+                      !e.deleted &&
+                      !e.properties.reopenedAt &&
+                      e.properties.expectedReopening &&
+                      Date.parse(String(e.properties.expectedReopening)) < Date.now(),
+                  )
+                  .map((e) => (
+                    <p className="notice" key={`${e.kind}:${e.id}`}>
+                      Overdue review: {String(e.properties.name)}. This path remains closed.{" "}
+                      <button className="text-button" onClick={() => showFeature(e)}>
+                        Review closure
+                      </button>
+                    </p>
+                  ))}
                 {current && (
                   <div className="edit-form">
                     <div className="edit-kind">
@@ -646,7 +663,18 @@ export default function Admin({ data }: { data: CampusData }) {
                             <option value="no">No walking access</option>
                           </select>
                         </label>
-                        <label className="field-label">Walking direction<select value={String(current.properties.footDirection||"both")} onChange={e=>changeProperty("footDirection",e.target.value)}><option value="both">Both directions</option><option value="forward">Along the drawn line only</option><option value="reverse">Against the drawn line only</option></select></label>{["connectStart", "connectEnd"].map((key) => (
+                        <label className="field-label">
+                          Walking direction
+                          <select
+                            value={String(current.properties.footDirection || "both")}
+                            onChange={(e) => changeProperty("footDirection", e.target.value)}
+                          >
+                            <option value="both">Both directions</option>
+                            <option value="forward">Along the drawn line only</option>
+                            <option value="reverse">Against the drawn line only</option>
+                          </select>
+                        </label>
+                        {["connectStart", "connectEnd"].map((key) => (
                           <label className="field-label" key={key}>
                             {key === "connectStart"
                               ? "Connect first endpoint"
@@ -1106,12 +1134,12 @@ export default function Admin({ data }: { data: CampusData }) {
             {dirty && <strong>Unsaved feature</strong>}
           </div>
           {message && (
-            <div className="editor-message" role="status">
+            <output className="editor-message">
               {message}
               <button aria-label="Dismiss message" onClick={() => setMessage("")}>
                 <X size={16} />
               </button>
-            </div>
+            </output>
           )}
         </section>
       </div>

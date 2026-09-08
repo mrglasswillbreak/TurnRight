@@ -34,7 +34,11 @@ export function useGps() {
         });
       },
       (failure) => {
-        if(failure.code===1){desired.current=false;clear();setTracking(false);}
+        if (failure.code === 1) {
+          desired.current = false;
+          clear();
+          setTracking(false);
+        }
         setError(
           failure.code === 1
             ? "Location access is off. Enable it in your browser settings, or choose a starting place."

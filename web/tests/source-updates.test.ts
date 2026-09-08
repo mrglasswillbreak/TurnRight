@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 // @ts-expect-error Shared Node pipeline module intentionally uses plain JavaScript.
-import { canonical, compareSources, flatten, hash } from "../../scripts/cloud.mjs";
+import { compareSources, flatten, hash } from "../../scripts/cloud.mjs";
 import { campusFixture } from "./fixture";
 describe("source updates", () => {
   it("ignores retrieval timestamps and JSON key order", () => {

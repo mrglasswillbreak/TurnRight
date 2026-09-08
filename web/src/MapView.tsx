@@ -49,7 +49,8 @@ export function MapView({
   const callbacks = useRef({ onSelect, onManualPan, onReady });
   callbacks.current = { onSelect, onManualPan, onReady };
   const ready = useRef(false);
-  const camera=useRef({selected,routes,activeRoute});camera.current={selected,routes,activeRoute};
+  const camera = useRef({ selected, routes, activeRoute });
+  camera.current = { selected, routes, activeRoute };
   const [mapError, setMapError] = useState("");
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
@@ -85,15 +86,44 @@ export function MapView({
       return;
     }
     mapRef.current = map;
-    const frame=()=>{
-      const mobile=innerWidth<768,padding={top:mobile?125:85,right:70,bottom:mobile?innerHeight*.49:65,left:mobile?25:485};
-      const current=camera.current,route=current.routes[current.activeRoute];
-      if(route?.coordinates.length){const points=route.coordinates;map.fitBounds([[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1]))],[Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))]],{padding,maxZoom:18,duration:0});}
-      else if(current.selected)map.jumpTo({center:current.selected.coordinates,zoom:17,padding});
-      else map.fitBounds([[3.1966,6.4599],[3.2073,6.4702]],{padding,duration:0});
+    const frame = () => {
+      const mobile = innerWidth < 768,
+        padding = {
+          top: mobile ? 125 : 85,
+          right: 70,
+          bottom: mobile ? innerHeight * 0.49 : 65,
+          left: mobile ? 25 : 485,
+        };
+      const current = camera.current,
+        route = current.routes[current.activeRoute];
+      if (route?.coordinates.length) {
+        const points = route.coordinates;
+        map.fitBounds(
+          [
+            [Math.min(...points.map((p) => p[0])), Math.min(...points.map((p) => p[1]))],
+            [Math.max(...points.map((p) => p[0])), Math.max(...points.map((p) => p[1]))],
+          ],
+          { padding, maxZoom: 18, duration: 0 },
+        );
+      } else if (current.selected)
+        map.jumpTo({ center: current.selected.coordinates, zoom: 17, padding });
+      else
+        map.fitBounds(
+          [
+            [3.1966, 6.4599],
+            [3.2073, 6.4702],
+          ],
+          { padding, duration: 0 },
+        );
     };
-    const resize=()=>{requestAnimationFrame(()=>{if(mapRef.current!==map)return;map.resize();if(ready.current)frame();});};
-    window.addEventListener('resize',resize);
+    const resize = () => {
+      requestAnimationFrame(() => {
+        if (mapRef.current !== map) return;
+        map.resize();
+        if (ready.current) frame();
+      });
+    };
+    window.addEventListener("resize", resize);
     map.on("error", (event) => console.error("Campus map:", event.error));
     map.addControl(
       new maplibregl.AttributionControl({
@@ -131,10 +161,10 @@ export function MapView({
         data: {
           type: "FeatureCollection",
           features: data.graph.edges
-            .filter((e) => closedIds.has(e.id)||e.geometryBlocked)
+            .filter((e) => closedIds.has(e.id) || e.geometryBlocked)
             .map((e) => ({
               type: "Feature",
-              properties: {conflict:!!e.geometryBlocked&&!closedIds.has(e.id)},
+              properties: { conflict: !!e.geometryBlocked && !closedIds.has(e.id) },
               geometry: {
                 type: "LineString",
                 coordinates: [nodeCoordinates.get(e.from)!, nodeCoordinates.get(e.to)!],
@@ -238,7 +268,11 @@ export function MapView({
         id: "closed-paths",
         type: "line",
         source: "closures",
-        paint: { "line-color": ["case",["get","conflict"],"#c58937","#d34b4b"], "line-width": 5, "line-dasharray": [2, 2] },
+        paint: {
+          "line-color": ["case", ["get", "conflict"], "#c58937", "#d34b4b"],
+          "line-width": 5,
+          "line-dasharray": [2, 2],
+        },
       });
       map.addLayer({
         id: "routes-case",
@@ -330,7 +364,7 @@ export function MapView({
     });
     map.on("dragstart", () => callbacks.current.onManualPan?.());
     return () => {
-      window.removeEventListener('resize',resize);
+      window.removeEventListener("resize", resize);
       ready.current = false;
       map.remove();
       mapRef.current = null;

@@ -23,9 +23,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (
     url.origin === self.location.origin &&
-    (url.pathname.startsWith('/packages/') ||
-      url.pathname.startsWith('/glyphs/') ||
-      url.pathname.startsWith('/audio/'))
+    (url.pathname.startsWith("/packages/") ||
+      url.pathname.startsWith("/glyphs/") ||
+      url.pathname.startsWith("/audio/"))
   ) {
     event.respondWith(
       (async () => {

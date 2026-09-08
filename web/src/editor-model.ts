@@ -1,5 +1,5 @@
 import { distance, projectSegment } from "./geo";
-import { geometryBlocker } from './spatial';
+import { geometryBlocker } from "./spatial";
 import type { CampusData, GraphNode, MapEdit, Place, Position } from "./types";
 import type { Geometry } from "geojson";
 export interface SourceRecord {
@@ -204,7 +204,14 @@ export function applyEdits(
           errors.push(`${props.name}: duplicate adjacent path vertices.`);
           continue;
         }
-        for (const [from, to] of props.footDirection==='forward'?[[a,b]]:props.footDirection==='reverse'?[[b,a]]:[[a,b],[b,a]])
+        for (const [from, to] of props.footDirection === "forward"
+          ? [[a, b]]
+          : props.footDirection === "reverse"
+            ? [[b, a]]
+            : [
+                [a, b],
+                [b, a],
+              ])
           data.graph.edges.push({
             id: `${edit.id}:${from.id}>${to.id}`,
             from: from.id,
@@ -285,8 +292,15 @@ export function applyEdits(
   }
   const ids = new Set<string>();
   for (const edge of data.graph.edges) {
-    const a=nodes.get(edge.from),b=nodes.get(edge.to);
-    if(a&&b){edge.geometryBlocked=geometryBlocker(a.coordinates,b.coordinates,data.map);if(edge.geometryBlocked)warnings.push(`${edge.sourceId}: segment excluded because it crosses a mapped ${edge.geometryBlocked.split(':')[0]}.`);}
+    const a = nodes.get(edge.from),
+      b = nodes.get(edge.to);
+    if (a && b) {
+      edge.geometryBlocked = geometryBlocker(a.coordinates, b.coordinates, data.map);
+      if (edge.geometryBlocked)
+        warnings.push(
+          `${edge.sourceId}: segment excluded because it crosses a mapped ${edge.geometryBlocked.split(":")[0]}.`,
+        );
+    }
     if (ids.has(edge.id)) errors.push(`Duplicate edge ${edge.id}`);
     ids.add(edge.id);
     if (!nodes.has(edge.from) || !nodes.has(edge.to))
@@ -296,12 +310,20 @@ export function applyEdits(
   }
   const adjacency = new Map<string, string[]>();
   const blocked = new Set(data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds));
-  for (const e of data.graph.edges.filter((e) => e.accessible && !e.geometryBlocked && !blocked.has(e.id))) {
+  for (const e of data.graph.edges.filter(
+    (e) => e.accessible && !e.geometryBlocked && !blocked.has(e.id),
+  )) {
     adjacency.set(e.from, [...(adjacency.get(e.from) || []), e.to]);
     adjacency.set(e.to, [...(adjacency.get(e.to) || []), e.from]);
   }
   const seen = new Set<string>();
-  for(const place of data.places){if(place.graphNode&&!adjacency.has(place.graphNode)){delete place.graphNode;place.arrivalKind='unmapped';warnings.push(`${place.name}: its path connection is currently blocked.`);}}
+  for (const place of data.places) {
+    if (place.graphNode && !adjacency.has(place.graphNode)) {
+      delete place.graphNode;
+      place.arrivalKind = "unmapped";
+      warnings.push(`${place.name}: its path connection is currently blocked.`);
+    }
+  }
   let components = 0;
   for (const id of adjacency.keys()) {
     if (seen.has(id)) continue;

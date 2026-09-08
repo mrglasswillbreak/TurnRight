@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   ArrowLeft,
@@ -78,9 +78,13 @@ export default function App() {
   const [saved, setSaved] = useState<string[]>([]),
     [recent, setRecent] = useState<string[]>([]),
     [savedOnly, setSavedOnly] = useState(false);
-  const [reportDrafts,setReportDrafts]=useState<{key:string;name:string;placeId?:string;coordinates:Position}[]>([]);
-  const refreshDrafts=()=>{void getPreference<typeof reportDrafts>('report-drafts',[]).then(setReportDrafts);};
-  const startRequested=useRef(false);
+  const [reportDrafts, setReportDrafts] = useState<
+    { key: string; name: string; placeId?: string; coordinates: Position }[]
+  >([]);
+  const refreshDrafts = () => {
+    void getPreference<typeof reportDrafts>("report-drafts", []).then(setReportDrafts);
+  };
+  const startRequested = useRef(false);
   const [dialog, setDialog] = useState<"offline" | "settings" | "report" | null>(null),
     [reportPin, setReportPin] = useState<Position | undefined>();
   const [downloaded, setDownloaded] = useState(false),
@@ -131,11 +135,12 @@ export default function App() {
       if (announce) setToast((e as Error).message);
     }
   };
+  const checkUpdatesEvent = useEffectEvent(checkUpdates);
   useEffect(() => {
     void activatePending()
       .catch(() => false)
       .then(reloadData);
-    void checkUpdates();
+    void checkUpdatesEvent();
     getPreference("saved", [] as string[]).then(setSaved);
     getPreference("recent", [] as string[]).then(setRecent);
     getPreference("dark", false).then(setDark);
@@ -159,7 +164,7 @@ export default function App() {
   useEffect(() => {
     const on = () => {
         setOnline(true);
-        void checkUpdates();
+        void checkUpdatesEvent();
       },
       off = () => setOnline(false);
     window.addEventListener("online", on);
@@ -176,9 +181,10 @@ export default function App() {
     voice.current.muted = muted;
     if (muted) voice.current.stop();
   }, [muted]);
+  const packageVersion = manifest?.version;
   useEffect(() => {
-    if (manifest) voice.current.load(manifest.version).catch(() => {});
-  }, [manifest?.version]);
+    if (packageVersion) voice.current.load(packageVersion).catch(() => {});
+  }, [packageVersion]);
   useEffect(() => {
     if (!toast) return;
     const timeout = setTimeout(() => setToast(""), 9000);
@@ -215,7 +221,7 @@ export default function App() {
     if (navigating && currentRoute && gps.fix)
       setNav((previous) => advanceNavigation(currentRoute, gps.fix!, previous, clock));
   }, [gps.fix, clock, navigating, currentRoute]);
-  useEffect(() => {
+  const announceManeuver = useEffectEvent(() => {
     if (!navigating || !currentRoute) return;
     if (nav.quality !== "good") {
       const key = `weak:${nav.quality}`;
@@ -231,7 +237,11 @@ export default function App() {
       if (!announced.current.has("arrive")) {
         announced.current.add("arrive");
         void voice.current
-          .playWithName(selected?.name||'',"arrive", ...(selected?.arrivalKind !== "entrance" ? ["approach"] : []))
+          .playWithName(
+            selected?.name || "",
+            "arrive",
+            ...(selected?.arrivalKind !== "entrance" ? ["approach"] : []),
+          )
           .catch(() => {});
         gps.stop();
       }
@@ -249,7 +259,8 @@ export default function App() {
           .catch(() => setToast("Audio unavailable; follow the on-screen directions."));
       }
     }
-  }, [nav, navigating, currentRoute]);
+  });
+  useEffect(() => announceManeuver(), [nav, navigating, currentRoute]);
   useEffect(() => {
     if (
       !nav.reroute ||
@@ -273,7 +284,7 @@ export default function App() {
         setToast("Walking route updated.");
       })
       .catch((e) => setToast(e.message));
-  }, [nav.reroute, gps.fix]);
+  }, [nav.reroute, gps.fix, navigating, data, selected?.graphNode, calculate]);
   const places = useMemo(
     () =>
       (data?.places || [])
@@ -294,7 +305,7 @@ export default function App() {
     [data, query, category, saved, savedOnly, recent],
   );
   const selectPlace = (place: Place) => {
-    startRequested.current=false;
+    startRequested.current = false;
     if (navigating) {
       setToast("Finish this walk before choosing a new destination.");
       return;
@@ -319,7 +330,7 @@ export default function App() {
     void setPreference("saved", next);
   };
   const previewRoute = async (from = origin) => {
-    startRequested.current=false;
+    startRequested.current = false;
     if (!data || !selected) return;
     setRouteView(true);
     setBusy(false);
@@ -343,7 +354,10 @@ export default function App() {
         );
         return;
       }
-    } else {gps.stop();source = data.places.find((p) => p.id === from)?.graphNode;}
+    } else {
+      gps.stop();
+      source = data.places.find((p) => p.id === from)?.graphNode;
+    }
     if (!source) {
       setRouteError("Choose a mapped starting place.");
       return;
@@ -377,7 +391,7 @@ export default function App() {
       if (request === routeRequest.current) setBusy(false);
     }
   };
-  useEffect(() => {
+  const previewGps = useEffectEvent(() => {
     if (
       routeView &&
       origin === "gps" &&
@@ -387,15 +401,16 @@ export default function App() {
       Date.now() - gps.fix.timestamp < 12000
     )
       void previewRoute("gps");
-  }, [gps.fix?.timestamp]);
+  });
+  useEffect(() => previewGps(), [gps.fix?.timestamp]);
   const startNavigation = async () => {
-    const request=++routeRequest.current;
+    const request = ++routeRequest.current;
     await voice.current
       .unlock()
       .catch(() => setToast("Audio could not start. On-screen directions remain available."));
     gps.start();
     if (!gps.fix || Date.now() - gps.fix.timestamp > 12000 || gps.fix.accuracy > 35) {
-      startRequested.current=true;
+      startRequested.current = true;
       setRouteError(
         "Waiting for a fresh, accurate location to start navigation. Keep the app visible and allow location access.",
       );
@@ -405,7 +420,7 @@ export default function App() {
     setBusy(true);
     try {
       const live = await calculate(data, gps.fix.coordinates, selected.graphNode);
-      if(request!==routeRequest.current)return;
+      if (request !== routeRequest.current) return;
       const matching = live.findIndex((r) => r.id === currentRoute?.id);
       setRoutes(live);
       setChosen(Math.max(0, matching));
@@ -421,9 +436,21 @@ export default function App() {
       setBusy(false);
     }
   };
-  useEffect(()=>{if(startRequested.current&&routeView&&gps.fix&&gps.fix.accuracy<=35&&Date.now()-gps.fix.timestamp<12000){startRequested.current=false;void startNavigation();}},[gps.fix?.timestamp]);
+  const finishStart = useEffectEvent(() => {
+    if (
+      startRequested.current &&
+      routeView &&
+      gps.fix &&
+      gps.fix.accuracy <= 35 &&
+      Date.now() - gps.fix.timestamp < 12000
+    ) {
+      startRequested.current = false;
+      void startNavigation();
+    }
+  });
+  useEffect(() => finishStart(), [gps.fix?.timestamp]);
   const stopNavigation = async () => {
-    startRequested.current=false;
+    startRequested.current = false;
     routeRequest.current++;
     setNavigating(false);
     setFollow(false);
@@ -571,16 +598,21 @@ export default function App() {
             chosen={chosen}
             origin={origin}
             busy={busy}
-            error={routeError || ((origin==='gps'||navigating) ? gps.error : '')}
+            error={routeError || (origin === "gps" || navigating ? gps.error : "")}
             navigating={navigating}
             nav={nav}
             muted={muted}
-            onOrigin={(from) => {if(from==='gps')gps.start();void previewRoute(from);}}
+            onOrigin={(from) => {
+              if (from === "gps") gps.start();
+              void previewRoute(from);
+            }}
             onChoose={setChosen}
             onStart={startNavigation}
             onStop={stopNavigation}
             onBack={() => {
-              routeRequest.current++;startRequested.current=false;gps.stop();
+              routeRequest.current++;
+              startRequested.current = false;
+              gps.stop();
               setRouteView(false);
               setRoutes([]);
             }}
@@ -776,17 +808,17 @@ export default function App() {
       </div>
       {threeD && <div className="map-caption">Floor-based building heights are approximate</div>}
       {gps.error && !routeView && (
-        <div className="gps-status" role="status">
+        <output className="gps-status">
           {gps.error}
-        </div>
+        </output>
       )}
       {toast && (
-        <div className="toast" role="status">
+        <output className="toast">
           <span>{toast}</span>
           <button aria-label="Dismiss" onClick={() => setToast("")}>
             <X size={18} />
           </button>
-        </div>
+        </output>
       )}
       <Dialog
         open={dialog !== null}
@@ -925,7 +957,24 @@ export default function App() {
                 This source-derived campus map has not been field-verified. Missing entrances and
                 paths are shown in place details.
               </p>
-              {reportDrafts.length>0&&<><h3 className="subheading">Saved report drafts</h3>{reportDrafts.map(draft=><Button key={draft.key} variant="outline" onClick={()=>{setSelected(data.places.find(p=>p.id===draft.placeId)||null);setReportPin(draft.coordinates);setDialog('report');}}>{draft.name} · Resume draft</Button>)}</>}
+              {reportDrafts.length > 0 && (
+                <>
+                  <h3 className="subheading">Saved report drafts</h3>
+                  {reportDrafts.map((draft) => (
+                    <Button
+                      key={draft.key}
+                      variant="outline"
+                      onClick={() => {
+                        setSelected(data.places.find((p) => p.id === draft.placeId) || null);
+                        setReportPin(draft.coordinates);
+                        setDialog("report");
+                      }}
+                    >
+                      {draft.name} · Resume draft
+                    </Button>
+                  ))}
+                </>
+              )}
               <h3 className="subheading">Your privacy</h3>
               <p>
                 Location and navigation history stay on your phone. Student reports only send the

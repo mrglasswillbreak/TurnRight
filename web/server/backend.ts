@@ -39,7 +39,7 @@ export async function db<T = any>(
       "Content-Type": "application/json",
       Prefer: prefer,
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    ...(body !== undefined && method !== "GET" ? { body: JSON.stringify(body) } : {}),
     signal: AbortSignal.timeout(20000),
   });
   const result = await response.json().catch(() => null);
@@ -85,14 +85,12 @@ export function bodyOf(req: RequestLike, limit = 100000) {
   return body;
 }
 export function fail(res: ResponseLike, error: unknown) {
-  res
-    .status(error instanceof HttpError ? error.status : 500)
-    .json({
-      error:
-        error instanceof HttpError
-          ? error.message
-          : "The operation failed. Check the server logs and retry.",
-    });
+  res.status(error instanceof HttpError ? error.status : 500).json({
+    error:
+      error instanceof HttpError
+        ? error.message
+        : "The operation failed. Check the server logs and retry.",
+  });
 }
 export function privateHeaders(res: ResponseLike) {
   res.setHeader("Cache-Control", "no-store");

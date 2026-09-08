@@ -134,13 +134,11 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         break;
       }
       case "export":
-        res
-          .status(200)
-          .json({
-            sources: await allRows("source_features"),
-            edits: await allRows("map_edits"),
-            history: await allRows("edit_history"),
-          });
+        res.status(200).json({
+          sources: await allRows("source_features"),
+          edits: await allRows("map_edits"),
+          history: await allRows("edit_history"),
+        });
         break;
       default:
         throw new HttpError(400, "Unknown action");

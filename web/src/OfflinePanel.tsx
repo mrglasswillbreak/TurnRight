@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Download, HardDrive, RefreshCw, Trash2, WifiOff } from "lucide-react";
+import { Check, Download, HardDrive, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deletePackages, installPackage } from "./offline";
 import type { CampusData, CampusPackage } from "./types";
@@ -130,7 +130,15 @@ export function OfflinePanel({
             <Button
               variant="destructive"
               onClick={async () => {
-                try{await deletePackages();onDelete();setConfirmDelete(false);}catch{setError('The browser could not remove this download. Retry or clear this site’s storage in browser settings.');}
+                try {
+                  await deletePackages();
+                  onDelete();
+                  setConfirmDelete(false);
+                } catch {
+                  setError(
+                    "The browser could not remove this download. Retry or clear this site’s storage in browser settings.",
+                  );
+                }
               }}
             >
               Remove download
