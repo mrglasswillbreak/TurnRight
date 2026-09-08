@@ -1,6 +1,5 @@
 import {
   ArrowLeft,
-  ArrowRight,
   ArrowUp,
   CornerUpLeft,
   CornerUpRight,
@@ -66,6 +65,7 @@ export function RoutePanel({
   onRepeat: () => void;
 }) {
   const route = routes[chosen];
+  const originPlace=data.places.find(p=>p.id===origin);
   const next = route?.maneuvers[nav.nextIndex] || route?.maneuvers.at(-1);
   return (
     <div className="route-panel">
@@ -131,6 +131,7 @@ export function RoutePanel({
                 <Navigation size={18} /> Start walking
               </Button>
               <p className="small-note">
+                {originPlace?.arrivalKind==='mapped-approach'&&`Start on the mapped path ${originPlace.approachDistance||0} m from ${originPlace.name}; its entrance link is unverified. `}
                 {destination.arrivalKind === "entrance"
                   ? "Route ends at a mapped entrance."
                   : `Route ends on a mapped path ${destination.approachDistance || 0} m from the place. The final entrance connection is unverified.`}

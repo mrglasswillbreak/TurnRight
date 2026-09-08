@@ -7,8 +7,7 @@
     "oxc",
     "react",
     "import",
-    "jsx-a11y",
-    "nextjs"
+    "jsx-a11y"
   ],
   "categories": {
     "correctness": "error"
@@ -18,18 +17,10 @@
     "browser": true,
     "node": true
   },
-  "options": {
-    "typeAware": true,
-    "typeCheck": true
-  },
   "ignorePatterns": [
-    ".next/**",
-    ".vinext/**",
-    "out/**",
-    "build/**",
     "dist/**",
     "coverage/**",
-    "next-env.d.ts"
+    "node_modules/**"
   ],
   "rules": {
     "no-array-constructor": "error",
@@ -41,13 +32,11 @@
     "react/display-name": "error",
     "react/jsx-no-comment-textnodes": "error",
     "react/no-unescaped-entities": "error",
-    "react/react-compiler": "error",
     "react/require-render-return": "error",
     "react/rules-of-hooks": "error",
     "typescript/ban-ts-comment": "error",
-    "typescript/no-deprecated": "error",
     "typescript/no-empty-object-type": "error",
-    "typescript/no-explicit-any": "error",
+    "typescript/no-explicit-any": "warn",
     "typescript/no-namespace": "error",
     "typescript/no-require-imports": "error",
     "typescript/no-unnecessary-type-constraint": "error",

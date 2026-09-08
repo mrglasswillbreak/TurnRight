@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "start": "vite preview --host 127.0.0.1",
-    "lint": "oxlint",
+    "lint": "tsc --noEmit && oxlint src api server tests vite.config.ts vitest.config.ts",
     "format": "oxfmt",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",

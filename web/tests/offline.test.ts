@@ -2,7 +2,6 @@ import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   activatePending,
-  ASSET_CACHE,
   deletePackages,
   getActivePackage,
   hashBytes,
@@ -45,6 +44,7 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe("offline package transactions", () => {
+  it('rejects a package before writing when device storage is full',async()=>{const p=await pkg('too-large');vi.stubGlobal('navigator',{storage:{estimate:async()=>({quota:10,usage:9})}});await expect(installPackage(p.manifest,()=>{})).rejects.toThrow('Not enough storage');expect(await getActivePackage()).toBeNull();});
   it("keeps the old active map when an update is corrupt", async () => {
     const old = await pkg("old"),
       next = await pkg("next");

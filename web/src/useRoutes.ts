@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { CampusData, Position, Route } from "./types";
 export function useRoutes() {
   const worker = useRef<Worker | null>(null),
@@ -7,6 +7,7 @@ export function useRoutes() {
     new Map<number, { resolve: (routes: Route[]) => void; reject: (error: Error) => void }>(),
   );
   useEffect(() => {
+    const requests=pending.current;
     worker.current = new Worker(new URL("./routing.worker.ts", import.meta.url), {
       type: "module",
     });
@@ -14,9 +15,7 @@ export function useRoutes() {
       const request = pending.current.get(event.data.id);
       if (!request) return;
       pending.current.delete(event.data.id);
-      event.data.error
-        ? request.reject(new Error(event.data.error))
-        : request.resolve(event.data.routes);
+      if(event.data.error)request.reject(new Error(event.data.error));else request.resolve(event.data.routes);
     };
     worker.current.onerror = () => {
       pending.current.forEach((p) =>
@@ -24,13 +23,14 @@ export function useRoutes() {
       );
       pending.current.clear();
     };
+    const instance=worker.current;
     return () => {
-      worker.current?.terminate();
-      pending.current.forEach((p) => p.reject(new Error("Routing cancelled")));
-      pending.current.clear();
+      instance.terminate();
+      requests.forEach((p) => p.reject(new Error("Routing cancelled")));
+      requests.clear();
     };
   }, []);
-  return (data: CampusData, origin: Position | string, destination: string) =>
+  return useCallback((data: CampusData, origin: Position | string, destination: string) =>
     new Promise<Route[]>((resolve, reject) => {
       if (!worker.current) {
         reject(new Error("Routing is starting. Please try again."));
@@ -39,5 +39,5 @@ export function useRoutes() {
       const id = ++counter.current;
       pending.current.set(id, { resolve, reject });
       worker.current.postMessage({ id, data, origin, destination });
-    });
+    }),[]);
 }

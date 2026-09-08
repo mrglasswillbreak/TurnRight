@@ -1,0 +1,15 @@
+npm notice run turnright@0.1.0 lint
+npm notice run tsc --noEmit && oxlint src api server tests vite.config.ts vitest.config.ts
+tests/security.test.ts:7:19: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+tests/security.test.ts:12:16: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+tests/source-updates.test.ts:18:25: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+server/backend.ts:5:10: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+server/backend.ts:27:30: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+server/backend.ts:54:15: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+src/editor-model.ts:9:12: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+src/ReportForm.tsx:56:40: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+src/ReportForm.tsx:102:46: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+src/App.tsx:784:40: error jsx-a11y(no-redundant-roles): The `output` element has an implicit role of `status`. Defining this explicitly is redundant and should be avoided. help: Remove the redundant role `status` from the element `output`.
+src/App.tsx:789:35: error jsx-a11y(no-redundant-roles): The `output` element has an implicit role of `status`. Defining this explicitly is redundant and should be avoided. help: Remove the redundant role `status` from the element `output`.
+src/Admin.tsx:384:33: warning typescript(no-explicit-any): Unexpected `any`. Specify a different type. help: Use `unknown` instead, this will force you to explicitly, and safely, assert the type is correct.
+src/Admin.tsx:1106:45: error jsx-a11y(prefer-tag-over-role): Prefer `output` over `role` attribute `status`. help: Replace HTML elements with `role` attribute `status` to corresponding semantic HTML tag `output`.
