@@ -2,7 +2,7 @@
 
 ## Evidence from implementation
 
-- TypeScript, lint (no errors; remaining explicit-any warnings), all 39 tests across seven files, and production Vite/PWA builds pass. MapLibre's worker and the routing worker are bundled and included in the application precache.
+- TypeScript, lint (no errors; remaining explicit-any warnings), all 40 tests across seven files, and production Vite/PWA builds pass. MapLibre's worker and the routing worker are bundled and included in the application precache. The additional regression test validates frozen releases from an isolated frontend directory. NodeNext compilation also checks the server import graph.
 - Automated tests cover A*, inaccessible/directed/disconnected edges, alternative diversity, closures, turns, sustained deviation, stale/inaccurate GPS, distinct arrival fixes, explicit editor connections, preserved junctions/corrections, footprint/fence crossings, interrupted/corrupt downloads, hash reuse, cache eviction, storage exhaustion, source diffs/incomplete imports, administrator authorization, private report validation/rate limits, and Vercel readiness/promotion failure gates.
 - Production browser testing completed an app update, a 2.15 MiB map download and “Ready offline” state. With the local origin server stopped, a fresh reload rendered the map, local search and saved places worked, a connected route was calculated in the worker, disconnected routes were rejected, and a prerecorded maneuver completed Web Audio playback. This tests loss of access to all same-origin resources; it is not an airplane-mode test on a physical phone.
 - A visual route check revealed an OSM-path/ArcGIS-footprint conflict. Spatial checks now exclude those segments. The final dataset records 28 excluded directed segments. Do not use the earlier unchecked sample route as a field verification.
@@ -10,7 +10,7 @@
 - Browser checks at 390 × 844 and 1440 × 900 covered light/dark appearance, 2D/3D, manual route selection without requesting GPS, and keeping the route visible after resizing. A private report draft survived a reload and resumed from Settings. The unconfigured editor showed its Supabase setup gate.
 - Dependency audit reported zero known vulnerabilities at the implementation check. Repeat before public release; an audit is not a substitute for review.
 
-No Supabase project, Vercel deployment, real GitHub login, live RLS database test, real-phone performance measurement, or campus walk was available. Treat the following checklist as required acceptance work, not completed evidence.
+Live configuration evidence is recorded in `CONFIGURATION.md`: Supabase RLS/grants, source baseline initialization, Vercel preview builds and GitHub OAuth have now been exercised. Physical-phone performance and campus walks remain unverified. Treat the following checklist as acceptance work unless completion is explicitly recorded.
 
 ## Local and desktop browser checks
 

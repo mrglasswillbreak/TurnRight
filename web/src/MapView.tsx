@@ -29,7 +29,7 @@ export interface MapViewProps {
   follow?: boolean;
   onSelect: (place: Place) => void;
   onManualPan?: () => void;
-  onReady?: (map: MapInstance) => void;
+  onReady?: (map: MapInstance) => void | (() => void);
 }
 export function MapView({
   data,
@@ -67,6 +67,7 @@ export function MapView({
   useEffect(() => {
     if (!container.current) return;
     let map: MapInstance;
+    let disposeExtension: void | (() => void);
     try {
       map = new maplibregl.Map({
         container: container.current,
@@ -363,12 +364,14 @@ export function MapView({
       });
       frame();
       ready.current = true;
-      callbacks.current.onReady?.(map);
+      disposeExtension = callbacks.current.onReady?.(map);
     });
     map.on("dragstart", () => callbacks.current.onManualPan?.());
     return () => {
       window.removeEventListener("resize", resize);
       ready.current = false;
+      // Drawing adapters must release their layers while the map still owns its sources.
+      disposeExtension?.();
       map.remove();
       mapRef.current = null;
     };

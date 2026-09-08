@@ -49,9 +49,18 @@ The first preview passed 39 tests but failed because Vercel omitted a sibling
 build script. Build helpers now live inside `web/scripts` and Node is pinned to
 22.x. A regression check covers a standalone frontend deployment directory.
 
-Still pending: successful preview, exact OAuth redirect URL, first owner login,
-administrator allowlist / `ADMIN_USER_ID`, and connected editor checks. Restore
-normal production build behavior only after acceptance.
+The corrected preview built successfully and GitHub login completed. The
+administrator UUID `a1ba436b-bcd3-4e03-8293-f864633bd288` was verified against GitHub
+login `mrglasswillbreak`, inserted into the singleton allowlist, and saved as
+`ADMIN_USER_ID` in Preview and Production. Further signups are now disabled.
+The accepted baseline contains 1,171 source features.
+
+Live API testing exposed extensionless Node ESM imports. Those are corrected;
+`tsconfig.functions.json` now checks server imports using NodeNext resolution.
+Compiled functions were exercised directly: unauthenticated admin requests
+returned 401, invalid reports returned 400. A fresh hosted preview is being
+verified with these fixes and the owner environment. Restore normal production
+build behavior only after acceptance.
 
 Vercel Hobby's default retention is 30 days, with exceptions that retain the most
 recent ready deployments. The preceding release should remain covered by those

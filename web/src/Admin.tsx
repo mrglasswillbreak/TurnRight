@@ -100,7 +100,6 @@ export default function Admin({ data }: { data: CampusData }) {
     if (!supabase) return;
     void supabase.auth.getSession().then(({ data }) => {
       setSignedIn(!!data.session);
-      if (data.session) void refresh();
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(!!session);
@@ -248,10 +247,6 @@ export default function Admin({ data }: { data: CampusData }) {
     instance.start();
     instance.setMode("select");
     restoreDrawing(instance);
-    map.once("remove", () => {
-      instance.stop();
-      if (draw.current === instance) draw.current = null;
-    });
     instance.on("finish", (id) => {
       const feature = instance.getSnapshotFeature(id);
       if (!feature) return;
@@ -376,6 +371,11 @@ export default function Admin({ data }: { data: CampusData }) {
     setMessage(
       "Select a place, building, or path to edit it. Blue dots are explicit routing nodes.",
     );
+    return () => {
+      instance.stop();
+      if (draw.current === instance) draw.current = null;
+      if (mapRef.current === map) mapRef.current = null;
+    };
   };
   useEffect(() => {
     const map = mapRef.current;
