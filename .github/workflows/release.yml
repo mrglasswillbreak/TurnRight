@@ -38,7 +38,7 @@ jobs:
         working-directory: web
       - run: npm test
         working-directory: web
-      - run: npx tsx ../scripts/release.ts
+      - run: npx tsx ../scripts/release.mts
         working-directory: web
       - name: Record failed build
         if: failure()
