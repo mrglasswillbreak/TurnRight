@@ -1,6 +1,6 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
-No hosting accounts or projects were created during implementation. The public map runs locally without Supabase; editor login, submitted reports, daily source checks, and release publication need the setup below. Never put service keys in `VITE_*` variables or commit `.env` files.
+See [the configuration record](CONFIGURATION.md) for the current projects and completed steps. The public map runs locally without Supabase; editor login, submitted reports, daily source checks, and release publication need the setup below. Never put service keys in `VITE_*` variables or commit `.env` files.
 
 ## 1. Resolve the campus source rights
 
@@ -10,7 +10,7 @@ Vercel builds intentionally require `SOURCE_REDISTRIBUTION_APPROVED=true`. Set i
 
 ## 2. Create Supabase Free and configure GitHub login
 
-Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. In the SQL editor run the complete `supabase/migrations/001_campus.sql` once. It creates PostGIS, private source/draft/report tables, auditing, the singleton administrator allowlist, and server-only publication/import functions.
+Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. In the SQL editor run `supabase/migrations/001_campus.sql` once, then `002_explicit_api_grants.sql`. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, and server-only publication/import functions. Do not rerun the first migration on an initialized database.
 
 Enable GitHub under Authentication → Sign In / Providers. Create a GitHub OAuth App with the callback URL shown by Supabase (`https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`), then store its client ID and client secret in the Supabase GitHub provider settings. The OAuth client secret belongs there, not in the PWA. Use the real Supabase callback URL, not the PWA `/admin` URL. [Supabase GitHub login instructions](https://supabase.com/docs/guides/auth/social-login/auth-github).
 
