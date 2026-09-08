@@ -31,14 +31,27 @@ Vercel: `turnright`, in the existing personal Hobby account, repository
 
 ## Remaining setup
 
-Server secret saves have not yet been verified. Complete
-`SUPABASE_SERVICE_ROLE_KEY`, `REPORT_RATE_SALT`, `GITHUB_WORKFLOW_TOKEN`, GitHub OAuth,
-the administrator allowlist and `ADMIN_USER_ID`, Actions secrets, source baseline
-initialization, and a successful preview. Keep production Git builds held during
-acceptance, then restore normal build behavior after acceptance.
+GitHub OAuth is enabled with the TurnRight LASU Editor app; other providers and
+anonymous sign-ins are disabled. Server secrets `SUPABASE_SERVICE_ROLE_KEY`,
+`REPORT_RATE_SALT`, and `GITHUB_WORKFLOW_TOKEN` are saved in both Vercel environments.
+All five Actions secrets are saved. The source baseline workflow succeeded.
+Git builds are set to **Only build pre-production** during acceptance.
 
-The browser automation connection detached during secret configuration. Inspect
-the current environment-variable list before adding anything again.
+The deployment token is scoped to TurnRight and the GitHub workflow token to this
+repository with Actions read/write and mandatory Metadata read-only. Both expire
+on **7 December 2026**; rotate them in the relevant service secret stores before
+then. OAuth client secrets are stored only in Supabase.
+
+Project identifiers (not credentials): Vercel `prj_C4HRU1Wis8DQSfhHVq2hPqrMCwDe`,
+team `team_rlnBERg7tMCZMP9rl2QYsCAN`; GitHub OAuth app `3845767`.
+
+The first preview passed 39 tests but failed because Vercel omitted a sibling
+build script. Build helpers now live inside `web/scripts` and Node is pinned to
+22.x. A regression check covers a standalone frontend deployment directory.
+
+Still pending: successful preview, exact OAuth redirect URL, first owner login,
+administrator allowlist / `ADMIN_USER_ID`, and connected editor checks. Restore
+normal production build behavior only after acceptance.
 
 Vercel Hobby's default retention is 30 days, with exceptions that retain the most
 recent ready deployments. The preceding release should remain covered by those

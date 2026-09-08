@@ -26,7 +26,7 @@ In the project settings set:
 |---|---|
 | Framework | Vite |
 | Root directory | `web` |
-| Include source files outside root directory | Enabled (build scripts are in `scripts/`) |
+| Include source files outside root directory | Enabled for repository tooling; the frontend build is self-contained in `web/` |
 | Node.js | 22.x |
 | Install command | `npm ci` |
 | Build command | `npm run build` |
@@ -96,4 +96,4 @@ Use GitHub's included Actions allowance with a zero spending budget for paid Act
 
 Export backups from the editor after substantial changes. Exports contain accepted source records, corrections and edit history; release snapshots also remain in Supabase. Keep an encrypted copy outside the project. To recover a fresh database, apply the migration and restore these tables using a trusted server-side process, preserving feature IDs. No browser restore endpoint is exposed. Never import untrusted backup files into a privileged database.
 
-Live Vercel deployment, GitHub OAuth, PostGIS/RLS behavior, workflow quotas and rollback must be verified against your projects after setup. They could not be exercised without those projects.
+Record live verification in `docs/CONFIGURATION.md`; do not infer rollback or campus accuracy from a successful build alone.

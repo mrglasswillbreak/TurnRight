@@ -12,6 +12,7 @@ describe("deployment success gates", () => {
   it("validates a frozen release with only the frontend deployment directory present", () => {
     const prefix = path.join(tmpdir(), "turnright-build-");
     const deployment = mkdtempSync(prefix);
+    if (!path.resolve(deployment).startsWith(prefix)) throw new Error("Unexpected temporary build directory");
     try {
       cpSync(new URL("../scripts", import.meta.url), path.join(deployment, "scripts"), { recursive: true });
       mkdirSync(path.join(deployment, "public/packages"), { recursive: true });
@@ -22,7 +23,6 @@ describe("deployment success gates", () => {
       writeFileSync(path.join(deployment, "public/packages/latest.json"), JSON.stringify({ version: "lasu-changed" }));
       expect(() => execFileSync(process.execPath, ["scripts/prebuild.mjs"], { cwd: deployment, env, stdio: "pipe" })).toThrow();
     } finally {
-      if (!path.resolve(deployment).startsWith(prefix)) throw new Error("Unexpected temporary build directory");
       rmSync(deployment, { recursive: true, force: true });
     }
   });

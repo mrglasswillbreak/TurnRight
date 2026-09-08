@@ -33,6 +33,7 @@ const created = await vercelApi("/v13/deployments", {
     },
   }),
 });
+console.log(`Preview deployment created: https://${created.url} (${created.id})`);
 const deployment = await waitForDeployment(created.id),
   url = `https://${deployment.url}`;
 console.log(`Review preview: ${url}`);
