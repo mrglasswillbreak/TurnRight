@@ -7,7 +7,7 @@ import {
   privateHeaders,
   type RequestLike,
   type ResponseLike,
-} from "../server/backend";
+} from "../server/backend.js";
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {

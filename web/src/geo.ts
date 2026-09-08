@@ -1,4 +1,4 @@
-import type { Position } from "./types";
+import type { Position } from "./types.js";
 export const distance = (a: Position, b: Position) => {
   const rad = Math.PI / 180;
   return (

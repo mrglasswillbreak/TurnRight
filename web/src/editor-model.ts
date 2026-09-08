@@ -1,6 +1,6 @@
-import { distance, projectSegment } from "./geo";
-import { geometryBlocker } from "./spatial";
-import type { CampusData, GraphNode, MapEdit, Place, Position } from "./types";
+import { distance, projectSegment } from "./geo.js";
+import { geometryBlocker } from "./spatial.js";
+import type { CampusData, GraphNode, MapEdit, Place, Position } from "./types.js";
 import type { Geometry } from "geojson";
 export interface SourceRecord {
   id: string;

@@ -9,8 +9,8 @@ import {
   requireAdmin,
   type RequestLike,
   type ResponseLike,
-} from "../server/backend";
-import { validateEdit } from "../src/editor-model";
+} from "../server/backend.js";
+import { validateEdit } from "../src/editor-model.js";
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {

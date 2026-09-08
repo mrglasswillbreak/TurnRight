@@ -1,6 +1,6 @@
 import type { FeatureCollection } from "geojson";
-import type { Position } from "./types";
-import { projectSegment } from "./geo";
+import type { Position } from "./types.js";
+import { projectSegment } from "./geo.js";
 function inside(point: Position, rings: number[][][]) {
   const ringContains = (ring: number[][]) => {
     let result = false;

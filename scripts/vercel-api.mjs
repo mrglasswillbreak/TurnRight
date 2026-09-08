@@ -41,6 +41,7 @@ export async function uploadSource(root) {
     "web/vite.config.ts",
     "web/vitest.config.ts",
     "web/tsconfig.json",
+    "web/tsconfig.functions.json",
     "web/vercel.json",
     "web/release-build.json",
   ];
