@@ -1,69 +1,122 @@
 # TurnRight account configuration
 
-Configuration started on 8 September 2026.
+Configured and verified on 8 September 2026. The immutable release preview is
+ready for owner review; production remains unpublished pending acceptance.
+
+## Review this release
+
+- [Campus map](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/)
+- [Protected editor](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/admin)
+- [Successful release workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34286932800)
+- Release: `4c193c03-25da-4237-88c4-f4c41ca52217`; status: `preview`.
+- Package: `lasu-240581101c35`.
+- Application revision: `568f4687967a0b947dcd387c9830859243b928b3`.
+
+The Vercel preview retains deployment protection, so open it while signed into
+the owner's Vercel account. Editor access additionally requires the allowlisted
+GitHub account `mrglasswillbreak`. Later documentation commits do not change this
+immutable application/map preview.
+
+## Accounts and access
+
+Supabase: `TurnRight`, project reference `mrmdfvcztzhypmlfblwh`, London
+(`eu-west-2`), in the existing MRGLASS Free organization. Automatic table exposure
+is disabled and automatic row level security is enabled. Both numbered SQL
+migrations were applied successfully in one transaction.
+
+Live SQL checks returned all nine application tables with RLS enabled, no
+anonymous SELECT privileges, no authenticated INSERT privileges, and server
+INSERT privileges. Direct requests with the public browser key could not read
+`reports`, `map_edits`, or `admin_users` (401 / permission denied).
+
+GitHub OAuth is enabled through **TurnRight LASU Editor** (app `3845767`). Other
+providers and anonymous sign-ins are disabled. After the owner's initial login,
+further signups were disabled. The owner's UUID
+`a1ba436b-bcd3-4e03-8293-f864633bd288` was verified against GitHub identity
+`mrglasswillbreak`, added to the singleton database allowlist, and saved as
+`ADMIN_USER_ID` in both Vercel environments. Existing-owner login was retested.
+Supabase's Site URL and an exact allowed redirect point to this preview's
+`/admin` page. OAuth client secrets remain in Supabase.
+
+Vercel: `turnright`, in the existing personal Hobby account, GitHub repository
+`mrglasswillbreak/TurnRight`, frontend root `web`. Project identifier:
+`prj_C4HRU1Wis8DQSfhHVq2hPqrMCwDe`; team: `team_rlnBERg7tMCZMP9rl2QYsCAN`.
+Build settings are Vite, Node.js 22, `npm ci`, and the free Basic build machine.
+Files outside the root are included; on-demand concurrent builds are disabled.
+No paid upgrades or paid runners were enabled.
+
+## Saved configuration
+
+Preview and Production both have:
+
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (public publishable key)
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- `REPORT_RATE_SALT`, `ADMIN_USER_ID`
+- `GITHUB_REPOSITORY`, `GITHUB_WORKFLOW_TOKEN`
+- `SOURCE_REDISTRIBUTION_APPROVED=true`
+
+GitHub Actions has `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `VERCEL_TOKEN`,
+`VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` saved as secrets. Credentials are not
+included in this repository. The daily source-import workflow runs at 02:17 UTC;
+the editor's **Check now** uses the same workflow.
+
+The deployment token is scoped to TurnRight. The GitHub workflow token is scoped
+to this repository with Actions read/write and mandatory Metadata read-only.
+**Both expire on 7 December 2026.** Rotate them in the relevant service secret
+stores before then. Free-tier quota interruptions still require owner attention;
+no account-wide GitHub spending-budget change was made.
+
+## Live verification
+
+- The source baseline workflow succeeded and initialized 1,171 accepted source
+  features. A subsequent editor **Check now** completed successfully in
+  [run 34286518370](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34286518370).
+- Owner GitHub login, private editor loading, and editor refresh worked. The
+  editor map visibly rendered campus geometry and labels after refresh.
+- A clearly labelled setup-test report was submitted through the public form,
+  appeared in the owner's private inbox, and was dismissed. It did not modify
+  map data or routes. No test map correction was saved.
+- The final immutable release workflow passed validation, tests, package build,
+  and Vercel deployment. The editor exposes its exact preview and a separate
+  publish action. No publish action was taken.
+- The final package `lasu-240581101c35` completed download and hash verification
+  in hosted Chrome, reaching **Ready offline** and retaining readiness after a
+  reload (approximately 2.15 MiB of map and voice assets, plus the separately
+  cached application shell). This is not
+  a physical-phone airplane-mode test.
+- Local checks passed all 40 tests, frontend and NodeNext server compilation,
+  and the Vite/PWA production build. Lint had no errors (eight existing
+  explicit-any warnings). The dependency audit reported zero known
+  vulnerabilities at this check.
+
+Live verification found and fixed Vercel build-helper packaging, Node ESM import
+extensions, editor drawing-tool disposal and map framing, and the release job's
+ESM entry point. The earlier release attempt is correctly recorded as failed;
+the successful retry is a new immutable snapshot. Direct compiled-function
+checks returned 401 for unauthenticated admin access and 400 for invalid reports.
+
+## Before public launch
+
+Git builds remain **Only build pre-production** during acceptance. There is no
+production deployment serving traffic. `PUBLISHED_MAP_URL` is intentionally unset
+until a stable production origin exists. After the relevant checks and owner
+acceptance, publish the reviewed snapshot, configure the production URL and exact
+OAuth redirect, and follow [DEPLOYMENT.md](DEPLOYMENT.md) for production behavior.
+
+Physical Android/iPhone checks, campus field walks, a live non-owner login test,
+and an actual production promotion/rollback rehearsal remain outstanding. See
+[ACCEPTANCE.md](ACCEPTANCE.md); automated tests do not establish campus accuracy.
+The dataset contains 219 places, 54 mapped approaches, zero confirmed connected
+entrances, seven disconnected path components, and 28 excluded directed segments.
+
+Vercel Hobby's default retention is 30 days, with exceptions for the most recent
+ready deployments. Preserve the preceding release and confirm it is retained
+before relying on rollback; do not delete it manually. See
+[Vercel's retention policy](https://vercel.com/docs/deployment-retention).
+
+## Source permission record
 
 The project owner confirmed in this task that permission for the LASU ArcGIS data
 covers offline redistribution. The source item itself has no public license;
 this records the owner's confirmation, not an independent review of the agreement.
 Keep the actual permission correspondence with the project records.
-
-Supabase: `TurnRight`, project reference `mrmdfvcztzhypmlfblwh`, in the existing
-MRGLASS Free organization. Automatic table exposure is disabled; automatic row
-level security is enabled. Apply both numbered SQL migrations in order.
-
-Vercel: `turnright`, in the existing personal Hobby account, repository
-`mrglasswillbreak/TurnRight`, frontend root `web`.
-
-## Verified so far
-
-- Supabase is active in London (`eu-west-2`) on Free.
-- Both SQL migrations were applied in one transaction. A live SQL check returned
-  all nine application tables with RLS enabled, no anonymous SELECT privileges,
-  no authenticated INSERT privileges, and server INSERT privileges enabled.
-- Vercel uses the Vite preset, root `web`, includes files outside that root,
-  Node.js 22, `npm ci`, and the free Basic build machine. On-demand concurrent
-  builds are disabled.
-- Vercel configuration values were saved for Preview and Production:
-  `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable key), `SUPABASE_URL`,
-  `GITHUB_REPOSITORY`, and `SOURCE_REDISTRIBUTION_APPROVED=true`.
-- The initial import build stopped at the source-rights environment check before
-  those variables were set. No production deployment is serving traffic.
-
-## Remaining setup
-
-GitHub OAuth is enabled with the TurnRight LASU Editor app; other providers and
-anonymous sign-ins are disabled. Server secrets `SUPABASE_SERVICE_ROLE_KEY`,
-`REPORT_RATE_SALT`, and `GITHUB_WORKFLOW_TOKEN` are saved in both Vercel environments.
-All five Actions secrets are saved. The source baseline workflow succeeded.
-Git builds are set to **Only build pre-production** during acceptance.
-
-The deployment token is scoped to TurnRight and the GitHub workflow token to this
-repository with Actions read/write and mandatory Metadata read-only. Both expire
-on **7 December 2026**; rotate them in the relevant service secret stores before
-then. OAuth client secrets are stored only in Supabase.
-
-Project identifiers (not credentials): Vercel `prj_C4HRU1Wis8DQSfhHVq2hPqrMCwDe`,
-team `team_rlnBERg7tMCZMP9rl2QYsCAN`; GitHub OAuth app `3845767`.
-
-The first preview passed 39 tests but failed because Vercel omitted a sibling
-build script. Build helpers now live inside `web/scripts` and Node is pinned to
-22.x. A regression check covers a standalone frontend deployment directory.
-
-The corrected preview built successfully and GitHub login completed. The
-administrator UUID `a1ba436b-bcd3-4e03-8293-f864633bd288` was verified against GitHub
-login `mrglasswillbreak`, inserted into the singleton allowlist, and saved as
-`ADMIN_USER_ID` in Preview and Production. Further signups are now disabled.
-The accepted baseline contains 1,171 source features.
-
-Live API testing exposed extensionless Node ESM imports. Those are corrected;
-`tsconfig.functions.json` now checks server imports using NodeNext resolution.
-Compiled functions were exercised directly: unauthenticated admin requests
-returned 401, invalid reports returned 400. A fresh hosted preview is being
-verified with these fixes and the owner environment. Restore normal production
-build behavior only after acceptance.
-
-Vercel Hobby's default retention is 30 days, with exceptions that retain the most
-recent ready deployments. The preceding release should remain covered by those
-exceptions; do not delete it manually. See [Vercel's retention policy](https://vercel.com/docs/deployment-retention).
-
-No deployment acceptance or campus field verification is implied.

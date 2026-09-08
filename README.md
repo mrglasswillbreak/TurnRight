@@ -34,7 +34,7 @@ Open the URL printed by Vite, choose **Offline → Download campus map**, and wa
 
 The seed has **219 source place records, 54 mapped approaches and zero confirmed connected entrances**. It retains duplicate/conflicting source names for review. There are **7 disconnected path components**, and **28 directed segments are excluded** because building or barrier geometry conflicts with the path. A mapped approach ends on a source path near a place; it does not invent the final walk to a door. Unsupported destinations are identified in the interface. This is not a field-verified campus navigation release.
 
-Vercel Hobby and Supabase Free are configured; live preview verification is in progress. The owner confirmed ArcGIS offline redistribution permission on 8 September 2026. See the [configuration record](docs/CONFIGURATION.md) for current deployment status and the remaining acceptance work:
+Vercel Hobby and Supabase Free are configured. The [immutable map preview](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/) and [owner editor](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/admin) are ready for review while signed into the owner's Vercel account. GitHub login, private reporting, source checks, and the release workflow have been exercised. Production remains unpublished pending acceptance and physical phone/campus checks. The owner confirmed ArcGIS offline redistribution permission on 8 September 2026. See the [configuration record](docs/CONFIGURATION.md) for deployment details, credential rotation dates, and remaining acceptance work:
 
 - [Deployment and account setup](docs/DEPLOYMENT.md)
 - [Verification and campus field checks](docs/ACCEPTANCE.md)

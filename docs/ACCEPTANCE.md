@@ -10,7 +10,7 @@
 - Browser checks at 390 × 844 and 1440 × 900 covered light/dark appearance, 2D/3D, manual route selection without requesting GPS, and keeping the route visible after resizing. A private report draft survived a reload and resumed from Settings. The unconfigured editor showed its Supabase setup gate.
 - Dependency audit reported zero known vulnerabilities at the implementation check. Repeat before public release; an audit is not a substitute for review.
 
-Live configuration evidence is recorded in `CONFIGURATION.md`: Supabase RLS/grants, source baseline initialization, Vercel preview builds and GitHub OAuth have now been exercised. Physical-phone performance and campus walks remain unverified. Treat the following checklist as acceptance work unless completion is explicitly recorded.
+Live configuration evidence is recorded in [CONFIGURATION.md](CONFIGURATION.md): Supabase RLS/grants, denied anonymous reads of private tables, source baseline initialization, owner GitHub login, private report submission/dismissal, an editor-triggered source check, and an immutable Vercel release preview have been exercised. The release is `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`, application revision `568f468`. Editor refresh and campus rendering were checked on that preview, and its package downloaded and verified to **Ready offline** in hosted Chrome. No test map correction was saved and no production promotion was performed. Physical-phone performance, campus walks, live non-owner sign-in, and production rollback remain unverified. Treat the following checklist as acceptance work unless completion is explicitly recorded.
 
 ## Local and desktop browser checks
 
