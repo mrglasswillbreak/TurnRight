@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "version": "lasu-d9ffedc338b4",
+  "createdAt": "2026-09-08T19:08:47.316361+00:00",
+  "summary": "LASU Ojo campus · source-derived map and walking approaches",
+  "dataUrl": "/packages/lasu-d9ffedc338b4/campus.json",
+  "bytes": 2256035,
+  "assets": [
+    {
+      "url": "/audio/bcfec5c01109aaec/approach.wav",
+      "sha256": "bcfec5c01109aaec99d83b4c07bf11da1f843329c1906a023ce94fcc03e22a65",
+      "bytes": 194254,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/21073a10d60c5a6c/arrive.wav",
+      "sha256": "21073a10d60c5a6c81ca85324b9369abcb57c6e802d98eb7aa205b22b60ea4ac",
+      "bytes": 112188,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/1558399887f1ce59/depart.wav",
+      "sha256": "1558399887f1ce59caaa3a3fbc2f441a5f27a099d0cff5fafe476e08a8c592dd",
+      "bytes": 124772,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/bbfa7ab08bdeaeb2/in-10.wav",
+      "sha256": "bbfa7ab08bdeaeb256a72f27cebca7c9e142a3c144427ed604dc416436751e22",
+      "bytes": 68946,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/d852a85974acd174/in-100.wav",
+      "sha256": "d852a85974acd1747b1cfd7d43e6b2707d46b4679dbadd68e565f097964a9db3",
+      "bytes": 86258,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/f9284b7005396045/in-20.wav",
+      "sha256": "f9284b700539604535894bab42031cea65be7af62b999d6571c93ea85372d59f",
+      "bytes": 75386,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/9872cce565a5e0eb/in-200.wav",
+      "sha256": "9872cce565a5e0ebae5ec0c1cca63e5ef23405be4a838dc16c34424315cf8487",
+      "bytes": 87010,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/614270441bfe15b0/in-30.wav",
+      "sha256": "614270441bfe15b0ff4564151a2129e2fea08d032523eca637a997a698fca89c",
+      "bytes": 76060,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/d4d06b080fe8dd13/in-50.wav",
+      "sha256": "d4d06b080fe8dd13929507da6d5ad54f07ed4f574786721f9a6388d75fed9aab",
+      "bytes": 75536,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/944bdcdd7c843159/left.wav",
+      "sha256": "944bdcdd7c84315941cbf4e47413596017b09009cb76d973e11aaf6a1d6d52b0",
+      "bytes": 66104,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/1c5608bc02149d9f/ready.wav",
+      "sha256": "1c5608bc02149d9f0f3cd08c2feac59f67c27c855752a9c2b504f7b2f99ef340",
+      "bytes": 92150,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/37072f3fc9a3cb8a/reroute.wav",
+      "sha256": "37072f3fc9a3cb8ab09a99d4f008b173a45e9fb581e8ebabad5a5c3c51a5472c",
+      "bytes": 96786,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/f7f8c0ce19d5562f/right.wav",
+      "sha256": "f7f8c0ce19d5562f9689ce6d7c70db83740fd1830577a38d5ecaa419f36ae330",
+      "bytes": 63878,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/2672084a9a9afba7/slight-left.wav",
+      "sha256": "2672084a9a9afba77859ead5c3d86fd923a9cf19bbe0bedeb7f3a81ab8bcae0f",
+      "bytes": 59950,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/471bc330da7cc08d/slight-right.wav",
+      "sha256": "471bc330da7cc08dc2df0c4df48678baf0c9188472d21c68a81daa962992a5b9",
+      "bytes": 56900,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/a338e16304d5d575/straight.wav",
+      "sha256": "a338e16304d5d57512ee729e32fb97fc5bba77749465c4f7084caf15ff043f8d",
+      "bytes": 76564,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/543362e82666eee6/then.wav",
+      "sha256": "543362e82666eee6c0f4c13ae946ed924475f6952736bb950bbee43f3e418504",
+      "bytes": 49228,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/9857c34323436353/uturn.wav",
+      "sha256": "9857c343234363532dd0a5e2d933559faae1d3c9a519a962f6e1e643696668a3",
+      "bytes": 121528,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/audio/4d341a4a3dcdfc4b/weak.wav",
+      "sha256": "4d341a4a3dcdfc4b42c7e07597cb8e007e27d68040819b5d5760198f9c64ec3e",
+      "bytes": 223864,
+      "contentType": "audio/wav"
+    },
+    {
+      "url": "/glyphs/Open%20Sans%20Semibold/0-255.pbf",
+      "sha256": "64da7011e07531351a249a3d26aad76e2f22e4e321e50833f742697b453e8365",
+      "bytes": 77571,
+      "contentType": "application/x-protobuf"
+    },
+    {
+      "url": "/packages/lasu-d9ffedc338b4/campus.json",
+      "sha256": "187d28463f498d0a86430cd011681ba53e6d82446e8e1d1118ac3458f331769e",
+      "bytes": 370221,
+      "contentType": "application/json"
+    },
+    {
+      "url": "/packages/lasu-d9ffedc338b4/audio.json",
+      "sha256": "a7801c8223633805e656380096aa7744b64db1bcd178828336c80dc875056a66",
+      "bytes": 881,
+      "contentType": "application/json"
+    }
+  ]
+}

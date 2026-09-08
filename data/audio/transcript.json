@@ -1,0 +1,21 @@
+{
+    "depart":  "Start walking along the highlighted route.",
+    "left":  "Turn left.",
+    "right":  "Turn right.",
+    "slight-left":  "Bear left.",
+    "slight-right":  "Bear right.",
+    "uturn":  "Turn around when you can safely do so.",
+    "straight":  "Continue straight.",
+    "arrive":  "You have reached the end of the mapped route.",
+    "approach":  "The building is nearby. Its entrance has not been verified.",
+    "reroute":  "Updating your walking route.",
+    "weak":  "Location signal is weak. Directions will resume when it improves.",
+    "ready":  "Voice directions are on.",
+    "then":  "Then",
+    "in-10":  "In ten metres.",
+    "in-20":  "In twenty metres.",
+    "in-30":  "In thirty metres.",
+    "in-50":  "In fifty metres.",
+    "in-100":  "In one hundred metres.",
+    "in-200":  "In two hundred metres."
+}

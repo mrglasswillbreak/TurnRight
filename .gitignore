@@ -1,0 +1,14 @@
+data/raw/
+data/candidates/
+data/release-input.json
+node_modules/
+.env*
+!.env.example
+**/!.env.example
+.vercel/
+*.tsbuildinfo
+test-results/
+playwright-report/
+__pycache__/
+*.pyc
+
