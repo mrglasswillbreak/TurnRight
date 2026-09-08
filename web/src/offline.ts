@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import type { CampusData, CampusPackage } from "./types";
+import type { CampusData, CampusPackage, ReportDraft } from "./types";
 export const ASSET_CACHE = "turnright-assets-v1";
 let connection: ReturnType<typeof openDB> | undefined;
 const database = () =>
@@ -33,6 +33,13 @@ export async function getPreference<T>(key: string, fallback: T): Promise<T> {
 }
 export async function setPreference(key: string, value: unknown) {
   await (await database()).put("preferences", value, key);
+}
+export async function discardReportDraft(key: string) {
+  const transaction = (await database()).transaction("preferences", "readwrite");
+  const drafts: ReportDraft[] = (await transaction.store.get("report-drafts")) || [];
+  await transaction.store.delete(key);
+  await transaction.store.put(drafts.filter((draft) => draft.key !== key), "report-drafts");
+  await transaction.done;
 }
 export async function latestPackage(): Promise<CampusPackage> {
   const response = await fetch("/packages/latest.json", {

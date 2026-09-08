@@ -119,6 +119,7 @@ export function MapView({
     const resize = () => {
       requestAnimationFrame(() => {
         if (mapRef.current !== map) return;
+        map.stop();
         map.resize();
         if (ready.current) frame();
       });

@@ -162,6 +162,12 @@ export interface StudentReport {
   created_at?: string;
   status?: string;
 }
+export interface ReportDraft {
+  key: string;
+  name: string;
+  placeId?: string;
+  coordinates: Position;
+}
 export interface Release {
   id: string;
   status: "queued" | "building" | "preview" | "published" | "failed";

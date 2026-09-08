@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getPreference, setPreference } from "./offline";
-import type { Place, Position } from "./types";
+import { discardReportDraft, getPreference, setPreference } from "./offline";
+import type { Place, Position, ReportDraft } from "./types";
 export function ReportForm({
   place,
   coordinates,
@@ -51,14 +51,7 @@ export function ReportForm({
           "Report submission needs the Vercel and Supabase setup. You can save a draft on this device.",
       }));
       if (!response.ok || result.error) throw new Error(result.error || "Could not submit report");
-      await setPreference(draftKey, { description: "", category: "incorrect-place" }).catch(
-        () => {},
-      );
-      const drafts = await getPreference<any[]>("report-drafts", []);
-      await setPreference(
-        "report-drafts",
-        drafts.filter((d) => d.key !== draftKey),
-      ).catch(() => {});
+      await discardReportDraft(draftKey).catch(() => {});
       onDraftSaved();
       onDone();
     } catch (e) {
@@ -116,7 +109,7 @@ export function ReportForm({
           onClick={async () => {
             try {
               await setPreference(draftKey, { description, category });
-              const drafts = await getPreference<any[]>("report-drafts", []);
+              const drafts = await getPreference<ReportDraft[]>("report-drafts", []);
               await setPreference(
                 "report-drafts",
                 [
@@ -145,6 +138,21 @@ export function ReportForm({
           {busy ? "Submitting…" : "Submit report"}
         </Button>
       </div>
+      <Button
+        variant="ghost"
+        disabled={busy}
+        onClick={async () => {
+          try {
+            await discardReportDraft(draftKey);
+            onDraftSaved();
+            onDone();
+          } catch {
+            setError("This browser could not delete the draft. Please retry.");
+          }
+        }}
+      >
+        Discard draft
+      </Button>
       {!navigator.onLine && (
         <p className="notice">You’re offline. Save a draft and submit it when connected.</p>
       )}
