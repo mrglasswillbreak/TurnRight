@@ -1,0 +1,58 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { createHash } from "node:crypto";
+
+export function assetTarget(publicDir, url) {
+  const decoded = decodeURIComponent(url);
+  if (
+    !/^\/(packages|audio|glyphs)\//.test(decoded) ||
+    decoded.includes("..") ||
+    decoded.includes("\\") ||
+    decoded.includes("?") ||
+    decoded.includes("#")
+  )
+    throw new Error("Invalid published asset path");
+  const target = path.resolve(publicDir, "." + decoded);
+  if (!target.startsWith(path.resolve(publicDir) + path.sep))
+    throw new Error("Asset escaped public directory");
+  return target;
+}
+export async function preservePublished(publicDir, origin, activate = false) {
+  const base = new URL(origin);
+  if (base.protocol !== "https:" || base.username || base.password)
+    throw new Error("Published map URL must be HTTPS");
+  const response = await fetch(new URL("/packages/latest.json", base), {
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!response.ok)
+    throw new Error("Published map is unavailable. Build stopped to preserve the working release.");
+  const manifest = await response.json();
+  if (
+    manifest.schemaVersion !== 1 ||
+    !/^lasu-[a-f0-9]+$/.test(manifest.version) ||
+    !Array.isArray(manifest.assets) ||
+    manifest.assets.length > 200 ||
+    manifest.bytes > 25 * 1024 * 1024
+  )
+    throw new Error("Unsupported published map manifest");
+  for (const asset of manifest.assets) {
+    const target = assetTarget(publicDir, asset.url);
+    const valid = (bytes) =>
+      bytes.length === asset.bytes &&
+      createHash("sha256").update(bytes).digest("hex") === asset.sha256;
+    let bytes = await fs.readFile(target).catch(() => null);
+    if (bytes && valid(bytes)) continue;
+    const result = await fetch(new URL(asset.url, base), { signal: AbortSignal.timeout(30000) });
+    if (!result.ok) throw new Error("A preceding release asset is unavailable");
+    bytes = Buffer.from(await result.arrayBuffer());
+    if (!valid(bytes)) throw new Error("Published asset checksum mismatch");
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, bytes);
+  }
+  const json = JSON.stringify(manifest, null, 2),
+    versionDir = path.join(publicDir, "packages", manifest.version);
+  await fs.mkdir(versionDir, { recursive: true });
+  await fs.writeFile(path.join(versionDir, "manifest.json"), json);
+  if (activate) await fs.writeFile(path.join(publicDir, "packages/latest.json"), json);
+  return manifest;
+}

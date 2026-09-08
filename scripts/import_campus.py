@@ -5,6 +5,8 @@ python scripts/import_campus.py              (builds from existing snapshots)
 python scripts/import_campus.py --output data/candidates  (review candidate)
 """
 import argparse
+import re
+from spatial import blocker
 import collections
 import datetime as dt
 import hashlib
@@ -62,7 +64,7 @@ def feature(identifier, geometry, **properties):
 def category(name, tags=None):
     text = (name + ' ' + json.dumps(tags or {})).lower()
     for key, terms in [('library', ['library']), ('worship', ['mosque', 'church', 'chapel', 'worship']), ('food', ['restaurant', 'cafeteria', 'canteen', 'food', 'cafe']), ('gate', ['gate', 'entrance']), ('sports', ['sport', 'stadium', 'football', 'basketball']), ('residence', ['hostel', 'quarters', 'residence']), ('academic', ['faculty', 'department', 'lecture', 'science', 'school', 'laborator', 'classroom', 'education', 'college', 'theatre']), ('services', ['bank', 'atm', 'health', 'clinic', 'admin', 'senate', 'bookshop', 'security', 'centre', 'center'])]:
-        if any(word in text for word in terms):
+        if any(re.search(r'\b' + re.escape(word), text) for word in terms):
             return key
     return 'other'
 
@@ -175,12 +177,17 @@ def build():
         for i, (start, end) in enumerate(zip(sequence, sequence[1:])):
             dense_edges.append({**edge, 'id': f'{edge["id"]}:{i}', 'from': start, 'to': end, 'distance': edge['distance'] / steps})
     edges = dense_edges
-    groups = components(graph_nodes, edges)
+    for edge in edges:
+        conflict=blocker(graph_nodes[edge['from']]['coordinates'],graph_nodes[edge['to']]['coordinates'],features)
+        if conflict: edge['geometryBlocked']=conflict
+    allowed_edges=[edge for edge in edges if not edge.get('geometryBlocked')]
+    usable_ids={key for edge in allowed_edges for key in (edge['from'],edge['to'])}
+    groups = components({key:value for key,value in graph_nodes.items() if key in usable_ids}, allowed_edges)
     largest = groups[0] if groups else set()
     for place in places:
         # Approach routing explicitly ends on the actual mapped path. No connector
         # across an unmapped courtyard, wall, or building is inserted into the graph.
-        options = sorted(((distance(place['coordinates'], graph_nodes[k]['coordinates']), k) for k in graph_nodes))
+        options = sorted(((distance(place['coordinates'], graph_nodes[k]['coordinates']), k) for k in usable_ids))
         if options and options[0][0] <= 90:
             meters, key = options[0]
             place.update(graphNode=key, approachDistance=round(meters), arrivalKind='mapped-approach')
@@ -188,7 +195,7 @@ def build():
             if meters <= 15 and osm_nodes.get(osm_id, {}).get('tags', {}).get('entrance') not in (None, 'no'):
                 place['arrivalKind'] = 'entrance'
     now = dt.datetime.now(dt.timezone.utc).isoformat()
-    result = {'schemaVersion': 1, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'Publicly shared ArcGIS item; no item-specific use constraints supplied at retrieval. ArcGIS Online public sharing terms apply; source layers are separately attributed.', 'retrievedAt': now}]}
+    result = {'schemaVersion': 1, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'ArcGIS item is publicly viewable but provides no redistribution license. Confirm permission with the owner before public deployment.', 'retrievedAt': now}]}
     digest_input = {k: v for k, v in result.items() if k not in ('version', 'createdAt', 'sources')}
     result['version'] = 'lasu-' + hashlib.sha256(json.dumps(digest_input, sort_keys=True).encode()).hexdigest()[:12]
     if not graph_nodes or not edges or len(places) < 50: raise ValueError('Incomplete import: expected campus places and a nonempty path graph')

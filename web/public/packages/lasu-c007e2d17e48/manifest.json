@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "version": "lasu-a4525a4c3749",
-  "createdAt": "2026-09-08T20:27:14.506799+00:00",
+  "version": "lasu-c007e2d17e48",
+  "createdAt": "2026-09-08T20:15:37.419901+00:00",
   "summary": "LASU Ojo campus · source-derived map and walking approaches",
-  "dataUrl": "/packages/lasu-a4525a4c3749/campus.json",
-  "bytes": 2257527,
+  "dataUrl": "/packages/lasu-c007e2d17e48/campus.json",
+  "bytes": 2256006,
   "assets": [
     {
       "url": "/audio/bcfec5c01109aaec/approach.wav",
@@ -127,13 +127,13 @@
       "contentType": "application/x-protobuf"
     },
     {
-      "url": "/packages/lasu-a4525a4c3749/campus.json",
-      "sha256": "f21509b57f591cad583c08df6e873e9a6bdb6efcf08e4b5802a91845248be77f",
-      "bytes": 371713,
+      "url": "/packages/lasu-c007e2d17e48/campus.json",
+      "sha256": "11c57f7a0cca3af3047c1f53c5556fea9c5635ff46d918783ca13c70f8af4b6d",
+      "bytes": 370192,
       "contentType": "application/json"
     },
     {
-      "url": "/packages/lasu-a4525a4c3749/audio.json",
+      "url": "/packages/lasu-c007e2d17e48/audio.json",
       "sha256": "a7801c8223633805e656380096aa7744b64db1bcd178828336c80dc875056a66",
       "bytes": 881,
       "contentType": "application/json"

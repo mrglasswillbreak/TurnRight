@@ -4,11 +4,12 @@ data/release-input.json
 node_modules/
 .env*
 !.env.example
-**/!.env.example
+!**/.env.example
+web/release-build.json
+data/runtime-audit.json
 .vercel/
 *.tsbuildinfo
 test-results/
 playwright-report/
 __pycache__/
 *.pyc
-
