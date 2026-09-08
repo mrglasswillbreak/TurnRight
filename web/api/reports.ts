@@ -1,4 +1,4 @@
-import { bodyOf, db, fail, hash, HttpError, privateHeaders, type RequestLike, type ResponseLike } from './_server';
+import { bodyOf, db, fail, hash, HttpError, privateHeaders, type RequestLike, type ResponseLike } from '../server/backend';
 export default async function handler(req: RequestLike, res: ResponseLike) {
  privateHeaders(res);
  try {

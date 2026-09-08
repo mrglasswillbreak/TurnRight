@@ -1,4 +1,4 @@
-import { allRows, bodyOf, db, dispatch, fail, HttpError, privateHeaders, requireAdmin, type RequestLike, type ResponseLike } from './_server';
+import { allRows, bodyOf, db, dispatch, fail, HttpError, privateHeaders, requireAdmin, type RequestLike, type ResponseLike } from '../server/backend';
 import { validateEdit } from '../src/editor-model';
 export default async function handler(req: RequestLike, res: ResponseLike) {
  privateHeaders(res);

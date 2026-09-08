@@ -1,4 +1,4 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash } from 'node:crypto';
 export interface RequestLike { method?: string; headers: Record<string, string | string[] | undefined>; body?: any }
 export interface ResponseLike { status: (code: number) => ResponseLike; json: (body: unknown) => void; setHeader: (name: string, value: string) => void }
 export class HttpError extends Error { constructor(public status: number, message: string) { super(message); } }
