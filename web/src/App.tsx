@@ -389,6 +389,7 @@ export default function App() {
       void previewRoute("gps");
   }, [gps.fix?.timestamp]);
   const startNavigation = async () => {
+    const request=++routeRequest.current;
     await voice.current
       .unlock()
       .catch(() => setToast("Audio could not start. On-screen directions remain available."));
@@ -404,6 +405,7 @@ export default function App() {
     setBusy(true);
     try {
       const live = await calculate(data, gps.fix.coordinates, selected.graphNode);
+      if(request!==routeRequest.current)return;
       const matching = live.findIndex((r) => r.id === currentRoute?.id);
       setRoutes(live);
       setChosen(Math.max(0, matching));
@@ -578,7 +580,7 @@ export default function App() {
             onStart={startNavigation}
             onStop={stopNavigation}
             onBack={() => {
-              startRequested.current=false;gps.stop();
+              routeRequest.current++;startRequested.current=false;gps.stop();
               setRouteView(false);
               setRoutes([]);
             }}

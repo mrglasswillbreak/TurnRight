@@ -546,7 +546,6 @@ export default function Admin({ data }: { data: CampusData }) {
                     ))}
                   </select>
                 </label>
-                {state.edits.length>0&&<label className="field-label">Saved corrections<select value="" onChange={e=>{const edit=state.edits.find(edit=>`${edit.kind}|${edit.id}`===e.target.value);if(edit)showFeature(edit);}}><option value="">Open a saved correction…</option>{state.edits.map(edit=><option key={`${edit.kind}|${edit.id}`} value={`${edit.kind}|${edit.id}`}>{edit.kind}: {String(edit.properties.name)}{edit.deleted?' (deleted)':''}</option>)}</select></label>}
                 {state.edits.filter(e=>['closure','barrier'].includes(e.kind)&&!e.deleted&&!e.properties.reopenedAt&&e.properties.expectedReopening&&Date.parse(String(e.properties.expectedReopening))<Date.now()).map(e=><p className="notice" key={`${e.kind}:${e.id}`}>Overdue review: {String(e.properties.name)}. This path remains closed. <button className="text-button" onClick={()=>showFeature(e)}>Review closure</button></p>)}
                 {current && (
                   <div className="edit-form">
@@ -790,7 +789,7 @@ export default function Admin({ data }: { data: CampusData }) {
                 <h3 className="subheading">Saved corrections ({state.edits.length})</h3>
                 {state.edits.map((edit) => (
                   <button
-                    key={edit.id}
+                    key={`${edit.kind}:${edit.id}`}
                     className="admin-list-row"
                     onClick={() => showFeature(edit)}
                   >

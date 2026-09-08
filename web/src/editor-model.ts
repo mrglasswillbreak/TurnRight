@@ -301,6 +301,7 @@ export function applyEdits(
     adjacency.set(e.to, [...(adjacency.get(e.to) || []), e.from]);
   }
   const seen = new Set<string>();
+  for(const place of data.places){if(place.graphNode&&!adjacency.has(place.graphNode)){delete place.graphNode;place.arrivalKind='unmapped';warnings.push(`${place.name}: its path connection is currently blocked.`);}}
   let components = 0;
   for (const id of adjacency.keys()) {
     if (seen.has(id)) continue;

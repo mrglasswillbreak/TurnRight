@@ -121,10 +121,10 @@ export function MapView({
         data: {
           type: "FeatureCollection",
           features: data.graph.edges
-            .filter((e) => closedIds.has(e.id))
+            .filter((e) => closedIds.has(e.id)||e.geometryBlocked)
             .map((e) => ({
               type: "Feature",
-              properties: {},
+              properties: {conflict:!!e.geometryBlocked&&!closedIds.has(e.id)},
               geometry: {
                 type: "LineString",
                 coordinates: [nodeCoordinates.get(e.from)!, nodeCoordinates.get(e.to)!],
@@ -228,7 +228,7 @@ export function MapView({
         id: "closed-paths",
         type: "line",
         source: "closures",
-        paint: { "line-color": "#d34b4b", "line-width": 5, "line-dasharray": [2, 2] },
+        paint: { "line-color": ["case",["get","conflict"],"#c58937","#d34b4b"], "line-width": 5, "line-dasharray": [2, 2] },
       });
       map.addLayer({
         id: "routes-case",
