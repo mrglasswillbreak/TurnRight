@@ -18,6 +18,7 @@ export function useWebMcp(
   const state = useRef({ data, select, navigating });
   state.current = { data, select, navigating };
   useEffect(() => {
+    if (location.pathname.startsWith("/admin")) return;
     const context = (document as Document & { modelContext?: ModelContext }).modelContext;
     if (!context?.registerTool) return;
     const lifecycle = new AbortController();
