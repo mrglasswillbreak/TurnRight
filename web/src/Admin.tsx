@@ -345,7 +345,7 @@ export default function Admin({ data }: { data: CampusData }) {
             id: String(id),
             kind: "path",
             geometry: source.geometry,
-            properties: { name: source.properties?.name || "Campus path", access: "yes" },
+            properties: { name: source.properties?.name || "Campus path", access: "yes", footDirection:source.properties?.footDirection||"both" },
           },
         );
     });
@@ -539,13 +539,15 @@ export default function Admin({ data }: { data: CampusData }) {
                     }}
                   >
                     <option value="">Choose a campus place…</option>
-                    {base.places.map((p) => (
+                    {validation.data.places.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
                       </option>
                     ))}
                   </select>
                 </label>
+                {state.edits.length>0&&<label className="field-label">Saved corrections<select value="" onChange={e=>{const edit=state.edits.find(edit=>`${edit.kind}|${edit.id}`===e.target.value);if(edit)showFeature(edit);}}><option value="">Open a saved correction…</option>{state.edits.map(edit=><option key={`${edit.kind}|${edit.id}`} value={`${edit.kind}|${edit.id}`}>{edit.kind}: {String(edit.properties.name)}{edit.deleted?' (deleted)':''}</option>)}</select></label>}
+                {state.edits.filter(e=>['closure','barrier'].includes(e.kind)&&!e.deleted&&!e.properties.reopenedAt&&e.properties.expectedReopening&&Date.parse(String(e.properties.expectedReopening))<Date.now()).map(e=><p className="notice" key={`${e.kind}:${e.id}`}>Overdue review: {String(e.properties.name)}. This path remains closed. <button className="text-button" onClick={()=>showFeature(e)}>Review closure</button></p>)}
                 {current && (
                   <div className="edit-form">
                     <div className="edit-kind">
@@ -645,7 +647,7 @@ export default function Admin({ data }: { data: CampusData }) {
                             <option value="no">No walking access</option>
                           </select>
                         </label>
-                        {["connectStart", "connectEnd"].map((key) => (
+                        <label className="field-label">Walking direction<select value={String(current.properties.footDirection||"both")} onChange={e=>changeProperty("footDirection",e.target.value)}><option value="both">Both directions</option><option value="forward">Along the drawn line only</option><option value="reverse">Against the drawn line only</option></select></label>{["connectStart", "connectEnd"].map((key) => (
                           <label className="field-label" key={key}>
                             {key === "connectStart"
                               ? "Connect first endpoint"
@@ -687,7 +689,7 @@ export default function Admin({ data }: { data: CampusData }) {
                             onChange={(e) => changeProperty("placeId", e.target.value)}
                           >
                             <option value="">Choose place</option>
-                            {base.places.map((p) => (
+                            {validation.data.places.map((p) => (
                               <option value={p.id} key={p.id}>
                                 {p.name}
                               </option>

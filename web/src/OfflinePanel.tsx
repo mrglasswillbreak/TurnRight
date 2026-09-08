@@ -72,6 +72,7 @@ export function OfflinePanel({
                 : "Not downloaded"}
           </span>
         </div>
+        <p className="small-note">Version {manifest.version} · LASU Ojo campus only</p>
         {update && <div className="notice">A new map is available. {target.summary}</div>}
         {progress !== null ? (
           <div className="download-progress">
@@ -91,8 +92,7 @@ export function OfflinePanel({
       </div>
       {!swReady && (
         <div className="notice">
-          Offline reopening becomes available after the app’s service worker is ready. The
-          development preview does not install one.
+          Keep this page open while the app finishes saving for offline reopening.
         </div>
       )}
       {navigating && (
@@ -130,9 +130,7 @@ export function OfflinePanel({
             <Button
               variant="destructive"
               onClick={async () => {
-                await deletePackages();
-                onDelete();
-                setConfirmDelete(false);
+                try{await deletePackages();onDelete();setConfirmDelete(false);}catch{setError('The browser could not remove this download. Retry or clear this site’s storage in browser settings.');}
               }}
             >
               Remove download

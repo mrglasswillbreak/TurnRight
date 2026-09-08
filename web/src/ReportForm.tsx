@@ -6,16 +6,18 @@ export function ReportForm({
   place,
   coordinates,
   onDone,
+  onDraftSaved,
 }: {
   place?: Place | null;
   coordinates?: Position;
   onDone: () => void;
+  onDraftSaved: () => void;
 }) {
   const [category, setCategory] = useState("incorrect-place"),
     [description, setDescription] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [saved, setSaved] = useState(false);
+    [saved, setSaved] = useState(false), [website,setWebsite]=useState('');
   const draftKey = `report:${place?.id || coordinates?.join(",") || "general"}`;
   useEffect(() => {
     getPreference(draftKey, { description: "", category: "incorrect-place" }).then((d) => {
@@ -40,7 +42,7 @@ export function ReportForm({
           placeId: place?.id,
           category,
           description,
-          website: "",
+          website,
         }),
       });
       const result = await response
@@ -50,7 +52,8 @@ export function ReportForm({
             "Report submission needs the Vercel and Supabase setup. You can save a draft on this device.",
         }));
       if (!response.ok || result.error) throw new Error(result.error || "Could not submit report");
-      await setPreference(draftKey, { description: "", category: "incorrect-place" });
+      await setPreference(draftKey, { description: "", category: "incorrect-place" }).catch(()=>{});
+      const drafts=await getPreference<any[]>('report-drafts',[]);await setPreference('report-drafts',drafts.filter(d=>d.key!==draftKey)).catch(()=>{});onDraftSaved();
       onDone();
     } catch (e) {
       setError((e as Error).message);
@@ -60,6 +63,7 @@ export function ReportForm({
   };
   return (
     <div className="settings-content">
+      <div aria-hidden="true" style={{position:'absolute',left:-10000}}><label>Website<input tabIndex={-1} autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label></div>
       <p>
         Tell us what needs correcting at <strong>{place?.name || "this map pin"}</strong>. Reports
         are private and reviewed before the map changes.
@@ -94,8 +98,9 @@ export function ReportForm({
         <Button
           variant="outline"
           onClick={async () => {
-            await setPreference(draftKey, { description, category });
-            setSaved(true);
+            try{await setPreference(draftKey, { description, category });
+            const drafts=await getPreference<any[]>('report-drafts',[]);await setPreference('report-drafts',[{key:draftKey,placeId:place?.id,coordinates:place?.coordinates||coordinates,name:place?.name||'Map pin'},...drafts.filter(d=>d.key!==draftKey)].slice(0,30));
+            setSaved(true);onDraftSaved();}catch{setError('This browser could not save the draft. Keep this page open and retry.');}
           }}
         >
           {saved ? "Draft saved" : "Save draft"}

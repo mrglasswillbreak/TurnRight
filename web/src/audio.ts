@@ -18,12 +18,20 @@ export class OfflineVoice {
   }
   stop() {
     this.generation++;
+    if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel();
     try {
       this.current?.stop();
     } catch {
       /* already ended */
     }
     this.current = null;
+  }
+  async playWithName(name:string,...clips:string[]){
+    const playback=this.play(...clips),generation=this.generation;await playback;
+    if(this.muted||generation!==this.generation||typeof speechSynthesis==='undefined')return;
+    const local=speechSynthesis.getVoices().find(voice=>voice.localService&&voice.lang.startsWith('en'));
+    if(!local)return;
+    const utterance=new SpeechSynthesisUtterance(name.slice(0,160));utterance.voice=local;utterance.lang=local.lang;speechSynthesis.speak(utterance);
   }
   async play(...names: string[]) {
     if (this.muted) return;
