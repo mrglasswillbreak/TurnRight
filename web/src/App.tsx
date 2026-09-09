@@ -949,6 +949,13 @@ export default function App() {
                 → Share → Add to Home Screen. Keep the app visible during navigation.
               </p>
               <h3 className="subheading">Map coverage</h3>
+              {data.accessPolicy && (
+                <p className="small-note">
+                  Student walking access on the main internal roads was confirmed by the project
+                  owner on {data.accessPolicy.confirmedAt}. Restricted areas, no-walking paths,
+                  and closures remain excluded.
+                </p>
+              )}
               <p>
                 {data.coverage.placeCount} places · {data.coverage.approachCount} mapped approaches
                 · {data.coverage.routableCount} connected entrances.

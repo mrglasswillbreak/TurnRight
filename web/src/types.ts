@@ -31,6 +31,7 @@ export interface GraphNode {
   id: string;
   coordinates: Position;
 }
+export type WalkingAccess = "yes" | "campus" | "private" | "no";
 export interface GraphEdge {
   id: string;
   from: string;
@@ -38,6 +39,8 @@ export interface GraphEdge {
   distance: number;
   name: string;
   accessible: boolean;
+  walkingAccess?: WalkingAccess;
+  accessReviewId?: string;
   geometryBlocked?: string;
   steps?: boolean;
   sourceId: string;
@@ -63,8 +66,15 @@ export interface CampusData {
   places: Place[];
   graph: RoutingGraph;
   closures: Closure[];
+  accessPolicy?: {
+    id: string;
+    audience: "students";
+    confirmedAt: string;
+    summary: string;
+  };
   coverage: {
     fieldVerified: boolean;
+    campusAccessWayCount?: number;
     placeCount: number;
     routableCount: number;
     approachCount: number;

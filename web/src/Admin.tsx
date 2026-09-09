@@ -35,7 +35,7 @@ import type { Feature, Geometry } from "geojson";
 import { Button } from "@/components/ui/button";
 import { MapView } from "./MapView";
 import { api, supabase } from "./supabase";
-import { applyEdits, assembleSources, validateEdit, type SourceRecord } from "./editor-model";
+import { applyEdits, assembleSources, pathWalkingAccess, validateEdit, type SourceRecord } from "./editor-model";
 import { findRoutes } from "./routing";
 import type {
   CampusData,
@@ -339,7 +339,7 @@ export default function Admin({ data }: { data: CampusData }) {
             geometry: source.geometry,
             properties: {
               name: source.properties?.name || "Campus path",
-              access: "yes",
+              access: pathWalkingAccess(visibleData, String(id)),
               footDirection: source.properties?.footDirection || "both",
             },
           },
@@ -659,10 +659,14 @@ export default function Admin({ data }: { data: CampusData }) {
                             onChange={(e) => changeProperty("access", e.target.value)}
                           >
                             <option value="yes">Public walking permitted</option>
+                            <option value="campus">Student walking permitted on campus</option>
                             <option value="private">Private / restricted</option>
                             <option value="no">No walking access</option>
                           </select>
                         </label>
+                        <p className="small-note">
+                          Campus access applies to students. Private areas and closed paths stay restricted.
+                        </p>
                         <label className="field-label">
                           Walking direction
                           <select

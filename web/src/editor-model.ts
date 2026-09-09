@@ -1,6 +1,6 @@
 import { distance, projectSegment } from "./geo.js";
 import { geometryBlocker } from "./spatial.js";
-import type { CampusData, GraphNode, MapEdit, Place, Position } from "./types.js";
+import type { CampusData, GraphNode, MapEdit, Place, Position, WalkingAccess } from "./types.js";
 import type { Geometry } from "geojson";
 export interface SourceRecord {
   id: string;
@@ -8,6 +8,14 @@ export interface SourceRecord {
   entity: "meta" | "feature" | "place" | "node" | "edge";
   payload: any;
   hash: string;
+}
+const walkingAccessValues = ["yes", "campus", "private", "no"];
+export function pathWalkingAccess(data: CampusData, id: string): WalkingAccess {
+  const declared = data.map.features.find((f) => f.properties?.id === id)?.properties?.walkingAccess;
+  if (walkingAccessValues.includes(declared)) return declared as WalkingAccess;
+  const edges = data.graph.edges.filter((e) => e.sourceId === id);
+  if (!edges.length || edges.some((e) => !e.accessible)) return "private";
+  return edges.some((e) => e.walkingAccess === "campus") ? "campus" : "yes";
 }
 export function validateEdit(edit: MapEdit): string[] {
   const errors: string[] = [];
@@ -21,6 +29,9 @@ export function validateEdit(edit: MapEdit): string[] {
     return ["Feature properties are required."];
   if (edit.kind === "path" && edit.geometry.type !== "LineString")
     errors.push("Walking paths must be lines.");
+  if (edit.kind === "path" && edit.properties.access !== undefined &&
+      !walkingAccessValues.includes(String(edit.properties.access)))
+    errors.push("Choose a supported walking access setting.");
   if (["place", "entrance"].includes(edit.kind) && edit.geometry.type !== "Point")
     errors.push("Places and entrances must be points.");
   if (edit.kind === "building" && edit.geometry.type !== "Polygon")
@@ -137,6 +148,32 @@ export function applyEdits(
           );
       }
     } else if (edit.kind === "path") {
+      const originalFeature = data.map.features.find((f) => f.properties?.id === edit.id);
+      const access = (props.access ?? (originalFeature || data.graph.edges.some((e) => e.sourceId === edit.id)
+        ? pathWalkingAccess(data, edit.id) : "yes")) as WalkingAccess;
+      const pathProperties = {
+        ...originalFeature?.properties,
+        id: edit.id, kind: "path", name: props.name, source: "campus-review",
+        walkingAccess: access,
+        accessReviewId: access === "campus" ? originalFeature?.properties?.accessReviewId : undefined,
+        footDirection: props.footDirection || originalFeature?.properties?.footDirection || "both",
+      };
+      // Metadata-only changes must preserve junction IDs, gaps at restricted gates,
+      // and closure edge references. Rebuilding the full displayed line can reopen gaps.
+      if (!edit.deleted && originalFeature &&
+          JSON.stringify(originalFeature.geometry) === JSON.stringify(edit.geometry) &&
+          pathProperties.footDirection === (originalFeature.properties?.footDirection || "both") &&
+          !props.connectStart && !props.connectEnd &&
+          data.graph.edges.some((e) => e.sourceId === edit.id)) {
+        data.graph.edges = data.graph.edges.map((e) => e.sourceId === edit.id ? {
+          ...e, name: String(props.name), accessible: access === "yes" || access === "campus",
+          walkingAccess: access,
+          accessReviewId: access === "campus" ? e.accessReviewId : undefined,
+          steps: props.steps === undefined ? e.steps : !!props.steps,
+        } : e);
+        originalFeature.properties = pathProperties;
+        continue;
+      }
       const originalNodeIds = new Set(
         data.graph.edges.filter((e) => e.sourceId === edit.id).flatMap((e) => [e.from, e.to]),
       );
@@ -218,7 +255,8 @@ export function applyEdits(
             to: to.id,
             distance: length,
             name: String(props.name),
-            accessible: props.access !== "private" && props.access !== "no",
+            accessible: access === "yes" || access === "campus",
+            walkingAccess: access,
             steps: !!props.steps,
             sourceId: edit.id,
           });
@@ -226,7 +264,7 @@ export function applyEdits(
       data.map.features.push({
         type: "Feature",
         id: edit.id,
-        properties: { id: edit.id, kind: "path", name: props.name, source: "campus-review" },
+        properties: pathProperties,
         geometry: { type: "LineString", coordinates: sequence.map((n) => n.coordinates) },
       });
     } else if (edit.kind === "building") {

@@ -65,6 +65,9 @@ export function RoutePanel({
   onRepeat: () => void;
 }) {
   const route = routes[chosen];
+  const routeEdges = new Set(route?.edgeIds || []);
+  const usesCampusAccess = data.graph.edges.some((edge) =>
+    edge.walkingAccess === "campus" && routeEdges.has(edge.id));
   const originPlace = data.places.find((p) => p.id === origin);
   const next = route?.maneuvers[nav.nextIndex] || route?.maneuvers.at(-1);
   return (
@@ -131,6 +134,9 @@ export function RoutePanel({
           ))}
           {route && (
             <>
+              {usesCampusAccess && (
+                <p className="notice">This route uses campus roads open to students. Campus entry rules apply.</p>
+              )}
               <Button className="primary-action" onClick={onStart} disabled={busy}>
                 <Navigation size={18} /> Start walking
               </Button>
