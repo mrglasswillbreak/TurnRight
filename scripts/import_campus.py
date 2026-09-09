@@ -7,6 +7,7 @@ python scripts/import_campus.py --output data/candidates  (review candidate)
 import argparse
 import re
 from spatial import blocker
+from campus_access import walking_access, node_blocks_walking
 import collections
 import datetime as dt
 import hashlib
@@ -84,7 +85,9 @@ def components(nodes, edges):
             groups.append(group)
     return sorted(groups, key=len, reverse=True)
 
-def build():
+def build(access_policy=None):
+    if access_policy is None:
+        access_policy = json.loads((ROOT / 'data/campus-access.json').read_text(encoding='utf-8'))
     arc = json.loads((RAW / 'arcgis.json').read_text(encoding='utf-8-sig'))
     layers = {x['title']: x['featureCollection']['layers'][0]['featureSet'] for x in arc['operationalLayers']}
     boundary_geom = arc_geometry(layers['Boundary']['features'][0]['geometry'])
@@ -117,8 +120,7 @@ def build():
     for node in tree.findall('node'):
         osm_nodes[node.attrib['id']] = {'coordinates': [float(node.attrib['lon']), float(node.attrib['lat'])], 'tags': {t.attrib['k']: t.attrib['v'] for t in node.findall('tag')}}
     graph_nodes, edges = {}, []
-    allowed = {'footway', 'pedestrian', 'path', 'steps', 'residential', 'service', 'living_street', 'unclassified', 'track', 'tertiary'}
-    blocked_barriers = {'wall', 'fence', 'hedge', 'retaining_wall', 'block'}
+    campus_ways = []
     for way in tree.findall('way'):
         tags = {t.attrib['k']: t.attrib['v'] for t in way.findall('tag')}
         refs = [x.attrib['ref'] for x in way.findall('nd')]
@@ -127,18 +129,21 @@ def build():
         if not any(inside(p, ring) for p in coords): continue
         identifier = 'osm:way:' + way.attrib['id']
         if tags.get('highway'):
-            features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], footDirection={'yes':'forward','-1':'reverse'}.get(tags.get('oneway:foot'),'both'), source='osm'))
-            walk = tags['highway'] in allowed or tags.get('foot') in ('yes', 'designated', 'permissive')
-            walk = walk and tags.get('foot') not in ('no', 'private') and (tags.get('access') not in ('no', 'private') or tags.get('foot') in ('yes', 'designated', 'permissive')) and tags.get('construction') is None
-            if not walk: continue
+            access = walking_access(identifier, tags, access_policy)
+            access_props = {'walkingAccess': access, 'sourceTags': tags}
+            if access == 'campus':
+                access_props['accessReviewId'] = access_policy['id']
+                campus_ways.append(identifier)
+            features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], footDirection={'yes':'forward','-1':'reverse'}.get(tags.get('oneway:foot'),'both'), source='osm', **access_props))
+            if access not in {'yes', 'campus'}: continue
             for i, (a, b) in enumerate(zip(refs, refs[1:])):
                 # Restrict routes to campus. Do not create junctions at visual crossings.
                 if not inside(osm_nodes[a]['coordinates'], ring) or not inside(osm_nodes[b]['coordinates'], ring): continue
-                if any(osm_nodes[r]['tags'].get('barrier') in blocked_barriers or osm_nodes[r]['tags'].get('access') in ('no', 'private') or osm_nodes[r]['tags'].get('foot') == 'no' or (osm_nodes[r]['tags'].get('barrier') == 'gate' and osm_nodes[r]['tags'].get('access') not in ('yes', 'permissive', 'public') and osm_nodes[r]['tags'].get('foot') not in ('yes', 'designated', 'permissive')) for r in (a, b)): continue
+                if any(node_blocks_walking(osm_nodes[r]['tags']) for r in (a, b)): continue
                 for r in (a, b): graph_nodes['osm:node:' + r] = {'id': 'osm:node:' + r, 'coordinates': osm_nodes[r]['coordinates']}
                 directions = [(a, b)] if tags.get('oneway:foot') == 'yes' else ([(b, a)] if tags.get('oneway:foot') == '-1' else [(a, b), (b, a)])
                 for start, end in directions:
-                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'accessible': True, 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
+                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'accessible': True, 'walkingAccess': access, **({'accessReviewId': access_policy['id']} if access == 'campus' else {}), 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
         elif tags.get('barrier'):
             features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='barrier', name=tags.get('barrier'), source='osm'))
         elif tags.get('building') and coords[0] == coords[-1]:
@@ -197,6 +202,10 @@ def build():
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     result = {'schemaVersion': 1, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'ArcGIS item is publicly viewable but provides no redistribution license. Confirm permission with the owner before public deployment.', 'retrievedAt': now}]}
     result['coverage']['notes'].append(f"{sum(bool(e.get('geometryBlocked')) for e in edges)} directed segments excluded due to building or barrier conflicts.")
+    if campus_ways:
+        result['accessPolicy'] = {key: access_policy[key] for key in ('id', 'audience', 'confirmedAt', 'summary')}
+        result['coverage']['campusAccessWayCount'] = len(campus_ways)
+        result['coverage']['notes'].append(f"Student walking on {len(campus_ways)} existing internal roads enabled from the owner's {access_policy['confirmedAt']} confirmation. Raw OSM private tags retained; private driveways, parking aisles, explicit foot restrictions, barriers and closures are not overridden.")
     digest_input = {k: v for k, v in result.items() if k not in ('version', 'createdAt', 'sources')}
     result['version'] = 'lasu-' + hashlib.sha256(json.dumps(digest_input, sort_keys=True).encode()).hexdigest()[:12]
     if not graph_nodes or not edges or len(places) < 50: raise ValueError('Incomplete import: expected campus places and a nonempty path graph')
