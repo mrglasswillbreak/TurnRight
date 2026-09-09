@@ -18,9 +18,11 @@ Workbox precaches the app shell, CSS, icons, interface fonts, MapLibre worker an
 
 The shell and campus package have separate update lifecycles. Opening/reconnecting fetches release metadata; users choose whether to download a new map. The app reports the downloaded version/date, known updates and missing cached files. Service-worker reload is delayed while navigating. An offline device knows only its downloaded closures. A previous version's assets are retained; removal clears campus packages while leaving preferences and report drafts. No auto-submission or background synchronization sends reports.
 
-The initial package is about 2.15 MiB and contains geometry, places/search fields, graph, closure records, map glyphs, audio manifest and clips. Styles/icons/interface fonts are part of the independently precached app shell. Both are needed before Ready offline is shown. App/package `schemaVersion: 1` is the compatibility boundary; unsupported schemas require an app update.
+The local package is about 3.00 MiB and contains geometry, places/search fields, graph, closure records, map glyphs, audio manifest and clips. Styles/icons/interface fonts are part of the independently precached app shell. Both are needed before Ready offline is shown. App/package `schemaVersion: 1` is the compatibility boundary; unsupported schemas require an app update.
 
 ## Sources and corrections
+
+`data/campus-access.json` records the owner's student walking confirmation for 62 specific existing road IDs. `campus_access.py` derives `walkingAccess: campus` without changing the original OSM tags. Explicit restrictions, private gates, construction and conditional access override this permission; future private roads require review. The editor preserves source tags, omitted graph segments and closure IDs during metadata-only path edits, and administrator restrictions take precedence. See [CAMPUS-ACCESS.md](CAMPUS-ACCESS.md) for the correction's scope and coverage.
 
 `scripts/import_campus.py` fetches bounded OSM and ArcGIS snapshots, validates input shape/coverage, normalizes coordinates, derives walking edges, preserves stable IDs, and reports coverage. Raw data and candidates are ignored by Git. `cloud.mjs` splits the dataset into source records and compares semantic hashes, ignoring retrieval timestamps. `sync-sources.mjs` queues additions/modifications/removals; it never applies them to accepted records automatically. A removal set over 20% fails for manual inspection. Initial baseline installation is transactional and refuses to overwrite existing records.
 
@@ -36,4 +38,4 @@ The release RPC snapshots approved sources plus corrections; a trigger prevents 
 
 `PUBLISHED_MAP_URL` protects ordinary code builds from reverting published data to the seed. The build fetches and verifies current map files, failing safely if they are unavailable. Controlled releases freeze their own version and preserve the preceding immutable assets. A rollback serves the preceding deployment's map; a device already holding a newer map keeps it until it consents to the version change.
 
-Setup, live-service acceptance, field surveying and ArcGIS redistribution permission are still required. See `DEPLOYMENT.md` and `ACCEPTANCE.md`.
+Account setup and the owner's ArcGIS redistribution confirmation are recorded in `CONFIGURATION.md` and `data/ATTRIBUTION.md`. Live-service acceptance and field surveying remain in `ACCEPTANCE.md`; `DEPLOYMENT.md` documents reproducible setup.

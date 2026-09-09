@@ -1,5 +1,10 @@
 # LASU Ojo: Overture walking-data comparison
 
+This report captures the dataset **before** the owner's student-access
+confirmation. The subsequent [campus access correction](CAMPUS-ACCESS.md)
+enables 62 existing roads and changes local coverage; counts below describe
+the original `lasu-03bc96e56965` baseline, not the updated map.
+
 Compared on 9 September 2026. **No useful additional campus walkway geometry was
 identified in the Overture extract.** The main finding is that most of the roads
 already drawn in TurnRight are tagged private in OSM and excluded from routing.
@@ -81,13 +86,18 @@ python -m venv data/raw/overture-tools
 & data/raw/overture-tools/Scripts/python.exe -m pip install overturemaps==1.0.2 shapely==2.1.2 pyarrow==25.0.1
 & data/raw/overture-tools/Scripts/python.exe -m overturemaps download --bbox=3.190,6.455,3.215,6.489 --release=2026-08-19.0 --type=segment -f geojson -o data/raw/overture-2026-08-19.0/segments.geojson
 & data/raw/overture-tools/Scripts/python.exe -m overturemaps download --bbox=3.190,6.455,3.215,6.489 --release=2026-08-19.0 --type=connector -f geojson -o data/raw/overture-2026-08-19.0/connectors.geojson
-& data/raw/overture-tools/Scripts/python.exe scripts/compare_overture.py --segments data/raw/overture-2026-08-19.0/segments.geojson --connectors data/raw/overture-2026-08-19.0/connectors.geojson --release=2026-08-19.0
+& data/raw/overture-tools/Scripts/python.exe scripts/compare_overture.py --base data/candidates/overture/baseline-campus.json --segments data/raw/overture-2026-08-19.0/segments.geojson --connectors data/raw/overture-2026-08-19.0/connectors.geojson --release=2026-08-19.0
 ```
 
 Create the download directory before running the two download commands. Older
 Overture releases may cease to be available; retain the raw extracts and their
 `.state` files to reproduce these exact results. Using another release produces
 a new comparison and must not be described as this dated audit.
+
+The original seed is retained locally as
+`data/candidates/overture/baseline-campus.json` (ignored by Git), and in Git
+revision `5472788:data/seed/campus.json`. Use that baseline for these historical
+metrics; omitting `--base` compares against the current seed instead.
 
 - Raw extracts and CLI release metadata: `data/raw/overture-2026-08-19.0/`.
 - Full metrics, source IDs, access rules, and input SHA-256 hashes:
