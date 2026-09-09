@@ -23,6 +23,10 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s scripts/tests
       - run: npm test
         working-directory: web
       - run: node scripts/preview.mjs
