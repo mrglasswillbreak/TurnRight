@@ -41,6 +41,7 @@ Vercel Hobby and Supabase Free are configured. The [immutable map preview](https
 - [Architecture, data and release behavior](docs/ARCHITECTURE.md)
 - [Source attribution and rights status](data/ATTRIBUTION.md)
 - [Machine-readable coverage](data/coverage-report.json)
+- [Overture comparison and campus access findings](docs/OVERTURE-COMPARISON.md)
 
 ## Development checks
 

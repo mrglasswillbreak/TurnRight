@@ -1,0 +1,85 @@
+{
+  "createdAt": "2026-09-09T01:55:28.937230+00:00",
+  "release": "2026-08-19.0",
+  "baseVersion": "lasu-03bc96e56965",
+  "inputsSha256": {
+    "base": "ccb20b261046eb6a30acb196cf9386fadb71618bacf02c3424be9de55fa54d6a",
+    "osm": "be022fc2bc93dce4f731304c16d1dc8fc46770deda97eed4c4bfadfcfad88e7b",
+    "segments": "d260eaba551a280ad1ff83757305a05cf530e71233352bf3dbb8f8c4fb69fdb6",
+    "connectors": "9e9d9ca980fd1392ab9ff94d75f6502efcaea96db6bca7fc76e81558cab6cbba"
+  },
+  "method": "Clip to the ArcGIS campus polygon; local equirectangular metres; union removes duplicate direction/overlapping lines. Compare against ALL mapped paths and separately against permitted unclosed/unblocked routing edges. Buffer proximity is geometry similarity, not proof of equal topology or walking permission.",
+  "invalidBaselineBuildingIdsRepairedForAnalysisOnly": [
+    "arcgis:University_Property:7",
+    "arcgis:University_Property:15",
+    "arcgis:University_Property:30",
+    "arcgis:University_Property:47",
+    "arcgis:University_Property:53",
+    "arcgis:University_Property:78",
+    "arcgis:University_Property:87",
+    "arcgis:University_Property:120",
+    "arcgis:University_Property:121"
+  ],
+  "baseline": {
+    "mapWays": 89,
+    "privateWays": 77,
+    "footNoWays": 4,
+    "allMappedMetres": 13845.2,
+    "routableMetres": 1216.2,
+    "routableSourceWays": 6,
+    "unmappedPlaces": 165,
+    "unmappedWithin90mOfPrivateRoad": 154,
+    "osmEntranceNodesInsideCampus": [
+      {
+        "id": "5482703069",
+        "tags": {
+          "access": "private",
+          "barrier": "gate",
+          "entrance": "main",
+          "wheelchair": "yes"
+        }
+      }
+    ]
+  },
+  "overture": {
+    "bboxSegments": 1107,
+    "bboxConnectors": 1008,
+    "campusSegments": 81,
+    "classes": {
+      "service": 76,
+      "primary": 1,
+      "path": 1,
+      "residential": 2,
+      "footway": 1
+    },
+    "sourceDatasets": {
+      "OpenStreetMap": 91
+    },
+    "campusMetres": 13760.0,
+    "novelMetresByTolerance": {
+      "2": 33.8,
+      "5": 33.8,
+      "10": 33.8
+    },
+    "segmentsWithAtLeast10mNovelGeometryAt5m": 1,
+    "missingFromOvertureAt5mMetres": 113.9,
+    "segmentsWithAccessRules": 75,
+    "segmentsWithPrivateAccessCondition": 74,
+    "segmentsWithFootDenial": 2,
+    "sourceWaysAbsentFromBase": [
+      {
+        "segmentId": "c6c6d709-5957-47b7-aa92-454b5d5e1857",
+        "osmRecord": "w1061552172@11",
+        "class": "primary",
+        "campusMetres": 33.8
+      }
+    ]
+  },
+  "limitations": [
+    "Comparison only: nothing has been added to routing or published.",
+    "Proximity does not establish an entrance or a permitted connection.",
+    "Access rules and connector semantics are retained for review, not simplified into permission.",
+    "Results compare the downloaded release against the local seed, not unsaved or hosted administrator drafts.",
+    "No paths in this audit were field surveyed."
+  ]
+}
