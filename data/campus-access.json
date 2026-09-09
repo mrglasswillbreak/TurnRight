@@ -4,7 +4,28 @@
   "confirmedAt": "2026-09-09",
   "confirmedBy": "project-owner",
   "summary": "The project owner confirmed that LASU main internal roads are open to students on foot, apart from specific restricted areas.",
-  "scope": "Existing ordinary internal service roads. No blanket override for future roads, driveways, parking aisles, gated nodes, explicit foot restrictions, construction, or closures. This confirms campus access, not public access or a field survey.",
+  "scope": "Existing ordinary internal service roads, plus the individually confirmed connections listed below. No blanket override for future roads, other driveways, parking aisles, gated nodes, explicit foot restrictions, construction, or closures. This confirms campus access, not public access or a field survey.",
+  "connectionReviews": [
+    {
+      "id": "lasu-law-driveway-2026-09-09",
+      "featureId": "osm:way:591396656",
+      "name": "Faculty of Law driveway",
+      "confirmedAt": "2026-09-09",
+      "confirmedBy": "project-owner",
+      "summary": "The owner explicitly confirmed that students may walk through this driveway connecting the Law paths to the campus road network.",
+      "expectedTags": { "access": "private", "highway": "service", "service": "driveway" }
+    },
+    {
+      "id": "lasu-library-gate-2026-09-09",
+      "featureId": "osm:node:13774055448",
+      "name": "International Library gate",
+      "coordinates": [3.2008782, 6.4712453],
+      "confirmedAt": "2026-09-09",
+      "confirmedBy": "project-owner",
+      "summary": "The owner explicitly confirmed that students may walk through this gate connecting the International Library paths to the campus road network.",
+      "expectedTags": { "access": "private", "barrier": "gate" }
+    }
+  ],
   "wayIds": [
     "osm:way:1034983058",
     "osm:way:1063153690",

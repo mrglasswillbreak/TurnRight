@@ -30,6 +30,8 @@ export interface Place {
 export interface GraphNode {
   id: string;
   coordinates: Position;
+  sourceTags?: Record<string, string>;
+  accessReviewId?: string;
 }
 export type WalkingAccess = "yes" | "campus" | "private" | "no";
 export interface GraphEdge {
@@ -41,6 +43,7 @@ export interface GraphEdge {
   accessible: boolean;
   walkingAccess?: WalkingAccess;
   accessReviewId?: string;
+  accessReviewIds?: string[];
   geometryBlocked?: string;
   steps?: boolean;
   sourceId: string;
@@ -71,6 +74,16 @@ export interface CampusData {
     audience: "students";
     confirmedAt: string;
     summary: string;
+    connectionReviews?: {
+      id: string;
+      featureId: string;
+      name: string;
+      coordinates?: Position;
+      confirmedAt: string;
+      confirmedBy: string;
+      summary: string;
+      expectedTags: Record<string, string>;
+    }[];
   };
   coverage: {
     fieldVerified: boolean;

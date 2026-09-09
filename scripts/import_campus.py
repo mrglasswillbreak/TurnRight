@@ -7,7 +7,7 @@ python scripts/import_campus.py --output data/candidates  (review candidate)
 import argparse
 import re
 from spatial import blocker
-from campus_access import walking_access, node_blocks_walking
+from campus_access import walking_access, node_blocks_walking, connection_review, access_review_id
 import collections
 import datetime as dt
 import hashlib
@@ -132,18 +132,27 @@ def build(access_policy=None):
             access = walking_access(identifier, tags, access_policy)
             access_props = {'walkingAccess': access, 'sourceTags': tags}
             if access == 'campus':
-                access_props['accessReviewId'] = access_policy['id']
+                access_props['accessReviewId'] = access_review_id(identifier, tags, access_policy)
                 campus_ways.append(identifier)
             features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], footDirection={'yes':'forward','-1':'reverse'}.get(tags.get('oneway:foot'),'both'), source='osm', **access_props))
             if access not in {'yes', 'campus'}: continue
             for i, (a, b) in enumerate(zip(refs, refs[1:])):
                 # Restrict routes to campus. Do not create junctions at visual crossings.
                 if not inside(osm_nodes[a]['coordinates'], ring) or not inside(osm_nodes[b]['coordinates'], ring): continue
-                if any(node_blocks_walking(osm_nodes[r]['tags']) for r in (a, b)): continue
-                for r in (a, b): graph_nodes['osm:node:' + r] = {'id': 'osm:node:' + r, 'coordinates': osm_nodes[r]['coordinates']}
+                if any(node_blocks_walking(osm_nodes[r]['tags'], 'osm:node:' + r, access_policy) for r in (a, b)): continue
+                gate_reviews = []
+                for r in (a, b):
+                    node_key = 'osm:node:' + r
+                    node = {'id': node_key, 'coordinates': osm_nodes[r]['coordinates']}
+                    review = connection_review(node_key, osm_nodes[r]['tags'], access_policy)
+                    if review and osm_nodes[r]['tags'].get('barrier') == 'gate':
+                        node.update(sourceTags=osm_nodes[r]['tags'], accessReviewId=review['id'])
+                        gate_reviews.append(review['id'])
+                    graph_nodes[node_key] = node
+                review_ids = ([access_props['accessReviewId']] if access == 'campus' else []) + gate_reviews
                 directions = [(a, b)] if tags.get('oneway:foot') == 'yes' else ([(b, a)] if tags.get('oneway:foot') == '-1' else [(a, b), (b, a)])
                 for start, end in directions:
-                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'accessible': True, 'walkingAccess': access, **({'accessReviewId': access_policy['id']} if access == 'campus' else {}), 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
+                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'accessible': True, 'walkingAccess': 'campus' if gate_reviews else access, **({'accessReviewId': review_ids[0]} if review_ids else {}), **({'accessReviewIds': list(dict.fromkeys(review_ids))} if gate_reviews else {}), 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
         elif tags.get('barrier'):
             features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='barrier', name=tags.get('barrier'), source='osm'))
         elif tags.get('building') and coords[0] == coords[-1]:
@@ -204,8 +213,9 @@ def build(access_policy=None):
     result['coverage']['notes'].append(f"{sum(bool(e.get('geometryBlocked')) for e in edges)} directed segments excluded due to building or barrier conflicts.")
     if campus_ways:
         result['accessPolicy'] = {key: access_policy[key] for key in ('id', 'audience', 'confirmedAt', 'summary')}
+        result['accessPolicy']['connectionReviews'] = access_policy.get('connectionReviews', [])
         result['coverage']['campusAccessWayCount'] = len(campus_ways)
-        result['coverage']['notes'].append(f"Student walking on {len(campus_ways)} existing internal roads enabled from the owner's {access_policy['confirmedAt']} confirmation. Raw OSM private tags retained; private driveways, parking aisles, explicit foot restrictions, barriers and closures are not overridden.")
+        result['coverage']['notes'].append(f"Student walking on {len(campus_ways)} existing internal roads enabled from the owner's {access_policy['confirmedAt']} confirmation. Original OSM tags retained; only individually reviewed driveways and gates may override private access. Other restrictions, no-foot access, locked gates, construction and closures remain enforced.")
     digest_input = {k: v for k, v in result.items() if k not in ('version', 'createdAt', 'sources')}
     result['version'] = 'lasu-' + hashlib.sha256(json.dumps(digest_input, sort_keys=True).encode()).hexdigest()[:12]
     if not graph_nodes or not edges or len(places) < 50: raise ValueError('Incomplete import: expected campus places and a nonempty path graph')
@@ -222,10 +232,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--download', action='store_true')
     parser.add_argument('--output', default='data/seed')
+    parser.add_argument('--raw-dir', type=pathlib.Path, default=RAW, help='Isolated source snapshot directory for reproducible review')
     args = parser.parse_args()
+    RAW = args.raw_dir.resolve()
     RAW.mkdir(parents=True, exist_ok=True)
     if args.download:
         fetch(f'https://www.arcgis.com/sharing/rest/content/items/{APP_ID}/data?f=json', RAW / 'arcgis.json')
         fetch(f'https://www.arcgis.com/sharing/rest/content/items/{APP_ID}?f=json', RAW / 'arcgis-metadata.json')
-        fetch('https://www.openstreetmap.org/api/0.6/map?bbox=3.190,6.455,3.215,6.485', RAW / 'osm.xml')
+        fetch('https://www.openstreetmap.org/api/0.6/map?bbox=3.190,6.455,3.215,6.489', RAW / 'osm.xml')
     write_data(build(), ROOT / args.output)

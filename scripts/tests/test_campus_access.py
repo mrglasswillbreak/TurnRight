@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from campus_access import walking_access, node_blocks_walking
+from campus_access import walking_access, node_blocks_walking, connection_review
 import import_campus
 
 
@@ -18,8 +18,42 @@ POLICY = {
 }
 PRIVATE_ROAD = {'highway': 'service', 'access': 'private'}
 
+CONNECTION_POLICY = {
+    **POLICY,
+    'connectionReviews': [
+        {'id': 'law-review', 'featureId': 'osm:way:104', 'confirmedAt': '2026-09-09',
+         'expectedTags': {**PRIVATE_ROAD, 'service': 'driveway'}},
+        {'id': 'library-review', 'featureId': 'osm:node:5', 'confirmedAt': '2026-09-09',
+         'expectedTags': {'barrier': 'gate', 'access': 'private'}},
+    ],
+}
+
 
 class CampusAccessTests(unittest.TestCase):
+    def test_individual_driveway_review_only_opens_the_confirmed_connection(self):
+        tags = {**PRIVATE_ROAD, 'service': 'driveway'}
+        self.assertEqual(walking_access('osm:way:104', tags, CONNECTION_POLICY), 'campus')
+        self.assertEqual(walking_access('osm:way:105', tags, CONNECTION_POLICY), 'private')
+        self.assertEqual(walking_access('osm:way:104', tags, POLICY), 'private')
+        self.assertEqual(walking_access('osm:way:104', {**tags, 'service': 'parking_aisle'}, CONNECTION_POLICY), 'private')
+        self.assertEqual(connection_review('osm:way:104', tags, CONNECTION_POLICY)['id'], 'law-review')
+        self.assertEqual(tags, {**PRIVATE_ROAD, 'service': 'driveway'})
+
+    def test_individual_gate_review_does_not_open_other_gates_or_new_restrictions(self):
+        tags = {'barrier': 'gate', 'access': 'private'}
+        self.assertFalse(node_blocks_walking(tags, 'osm:node:5', CONNECTION_POLICY))
+        self.assertTrue(node_blocks_walking(tags, 'osm:node:6', CONNECTION_POLICY))
+        self.assertTrue(node_blocks_walking(tags, 'osm:node:5', POLICY))
+        for change in [{'locked': 'yes'}, {'foot': 'no'}, {'foot': 'private'},
+                       {'access': 'no'}, {'construction': 'yes'}, {'barrier': 'wall'},
+                       {'foot:conditional': 'no @ (Mo-Fr)'}, {'private': 'staff'}]:
+            with self.subTest(change=change):
+                self.assertTrue(node_blocks_walking({**tags, **change}, 'osm:node:5', CONNECTION_POLICY))
+        for change in [{'locked': 'yes'}, {'foot': 'no'}, {'access': 'no'},
+                       {'construction': 'yes'}, {'access:conditional': 'no @ (Mo-Fr)'}]:
+            with self.subTest(change=change):
+                self.assertNotEqual(walking_access('osm:way:104', {**PRIVATE_ROAD, 'service': 'driveway', **change}, CONNECTION_POLICY), 'campus')
+
     def test_only_listed_ordinary_campus_roads_get_student_access(self):
         tags = copy.deepcopy(PRIVATE_ROAD)
         self.assertEqual(walking_access('osm:way:101', tags, POLICY), 'campus')
@@ -90,6 +124,31 @@ class CampusAccessTests(unittest.TestCase):
         self.assertEqual(source['properties']['sourceTags']['access'], 'private')
         self.assertEqual(result['coverage']['campusAccessWayCount'], 2)
         self.assertFalse(result['coverage']['fieldVerified'])
+
+        # Rebuild the same source geometry with explicit access reviews. Shared
+        # OSM nodes must reconnect; no invented junction or footprint bypass.
+        osm = osm.replace('</osm>', '''
+          <way id="104"><nd ref="3"/><nd ref="4"/><tag k="highway" v="service"/><tag k="access" v="private"/><tag k="service" v="driveway"/></way>
+          <node id="6" lon="3.202" lat="6.462"><tag k="barrier" v="gate"/><tag k="access" v="private"/></node>
+          <way id="105"><nd ref="5"/><nd ref="6"/><tag k="highway" v="service"/></way>
+        </osm>''')
+        with tempfile.TemporaryDirectory() as directory:
+            raw = pathlib.Path(directory)
+            (raw / 'arcgis.json').write_text(json.dumps(arc), encoding='utf-8')
+            (raw / 'osm.xml').write_text(osm, encoding='utf-8')
+            with patch.object(import_campus, 'RAW', raw):
+                reviewed = import_campus.build(CONNECTION_POLICY)
+        reviewed_edges = reviewed['graph']['edges']
+        self.assertEqual({e['sourceId'] for e in reviewed_edges}, {'osm:way:101', 'osm:way:102', 'osm:way:104'})
+        self.assertTrue(any(e['to'] == 'osm:node:5' for e in reviewed_edges))
+        self.assertTrue(any(e['from'] == 'osm:node:5' for e in reviewed_edges))
+        self.assertFalse(any('osm:node:6' in [e['from'], e['to']] for e in reviewed_edges))
+        driveway = [e for e in reviewed_edges if e['sourceId'] == 'osm:way:104']
+        self.assertTrue(all(e['accessReviewId'] == 'law-review' for e in driveway))
+        self.assertTrue(any('library-review' in e.get('accessReviewIds', []) for e in reviewed_edges))
+        gate = next(n for n in reviewed['graph']['nodes'] if n['id'] == 'osm:node:5')
+        self.assertEqual(gate['sourceTags'], {'barrier': 'gate', 'access': 'private'})
+        self.assertEqual(gate['accessReviewId'], 'library-review')
 
 
 if __name__ == '__main__':
