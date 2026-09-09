@@ -125,9 +125,9 @@ An initial online visit and completed download are required. TurnRight stores tw
 | Stored content | Mechanism | Measured size, 9 September 2026 |
 | --- | --- | --- |
 | Application shell, styles, icons, interface fonts, map/routing workers | Workbox service-worker precache | Approximately **2.46 MiB**, uncompressed build assets |
-| Campus geometry, search fields, routing graph, closures, map glyphs, audio manifest and recordings | CacheStorage assets with IndexedDB package records | **3.00 MiB** — 3,148,440 bytes across 22 assets |
+| Campus geometry, search fields, routing graph, closures, map glyphs, audio manifest and recordings | CacheStorage assets with IndexedDB package records | **3.01 MiB** — 3,159,499 bytes across 22 assets |
 
-The campus package is `lasu-44f8af5654f1`. Transfer size and browser storage usage differ with compression and browser overhead. No external tile service or satellite imagery is needed.
+The checked-in campus package is `lasu-4e4c8008b38b`. Transfer size and browser storage usage differ with compression and browser overhead. No external tile service or satellite imagery is needed.
 
 - **Download safely:** required files are size/hash verified before the active package changes. Interrupted or corrupt updates retain the working version; valid existing files can be reused.
 - **Choose updates:** opening or reconnecting checks release metadata. A known newer map is displayed for review and download; it is not silently installed.
@@ -169,25 +169,26 @@ Published navigation does not depend on Supabase being available. GPS processing
 
 The map combines **OpenStreetMap** with the **LASU ArcGIS campus layers**. Original source IDs and access tags are retained alongside administrator corrections. A source modification date is not a field-survey date. An [Overture comparison](docs/OVERTURE-COMPARISON.md) did not identify useful additional campus walking geometry in the audited release.
 
-Current checked-in coverage for `lasu-44f8af5654f1`:
+Current checked-in coverage for `lasu-4e4c8008b38b`:
 
 | Metric | Count / status |
 | --- | --- |
 | Source place records, including duplicates awaiting review | 219 |
 | Places with a mapped approach | 206 |
-| Approaches on the largest connected path component | 190 |
+| Approaches on the largest connected path component | 201 |
 | Places without a mapped approach | 13 |
 | Confirmed connected entrances | **0** |
-| Disconnected path components | 8 |
+| Walking graph components | 5 |
 | Directed segments excluded for building/barrier conflicts | 166 |
-| Existing internal roads enabled by the owner's student-access confirmation | 62 |
+| Existing internal roads enabled by the owner's student-access confirmation | 63 |
+| Individually confirmed private gates enabled for student walking | 1 |
 | Campus field verification | **Pending** |
 
 A **mapped approach** ends on an existing source path near a place. It does not draw an assumed final connection through a fence, building, or unmapped area. A destination can have an approach yet remain disconnected from the chosen origin.
 
-The student-access correction applies to reviewed ordinary internal roads. Private driveways, parking aisles, explicit no-walking restrictions, barriers, and closures remain excluded; it does not grant unrestricted public campus access. See [CAMPUS-ACCESS.md](docs/CAMPUS-ACCESS.md) and the [machine-readable coverage report](data/coverage-report.json).
+The student-access correction applies to 62 reviewed ordinary internal roads, the individually confirmed Faculty of Law driveway, and the International Library gate. Other private driveways and gates, parking aisles, explicit no-walking restrictions, barriers, and closures remain excluded; it does not grant unrestricted public campus access. See [CAMPUS-ACCESS.md](docs/CAMPUS-ACCESS.md), the [connection review](docs/CONNECTION-REVIEW.md), and the [machine-readable coverage report](data/coverage-report.json).
 
-Priority survey work includes gate connections, building entrances, disconnected sections near the Faculty of Law and International Library, conflicting source geometry, and duplicate place records. Report and review missing connections before publishing them.
+Law and the International Library now connect to the main network through existing OSM paths. Priority survey work includes their final building entrances, the five approaches still on smaller disconnected sections, conflicting source geometry, and duplicate place records. These are software-checked approaches; campus walks remain unverified. Map publication is separate from a code push; see the [review and rollout record](docs/CONNECTION-REVIEW.md).
 
 ## Administration and publication
 
@@ -265,7 +266,7 @@ python -m unittest discover -s scripts/tests -v
 | `npm run package` | Regenerate the campus package from the checked-in seed |
 | `npm run format -- <path>` | Format selected files with Oxfmt; keep formatting changes focused |
 
-**Verification recorded on 9 September 2026:** 56 Vitest tests across eight files and five Python tests pass. Production build and API compilation pass. Lint has no errors, with eight existing explicit-any warnings. Coverage includes routing/access/closures, alternatives, GPS jitter/staleness/arrival, editor connections, import conflicts, offline transactions/storage failures, private API boundaries, release success gates, and 14 appearance cases.
+**Verification recorded on 9 September 2026:** 61 Vitest tests across nine files and seven Python tests pass. Production build and API compilation pass. Lint has no errors, with eight existing explicit-any warnings. Coverage includes routing/access/closures, alternatives, GPS jitter/staleness/arrival, editor connections, import conflicts, offline transactions/storage failures, private API boundaries, release success gates, and 14 appearance cases. The real campus regression cases check the Law and Library approaches, preserved private source tags, and closures that remain enforced after an expected reopening date.
 
 Appearance checks include device changes, explicit overrides, migration, reopening, cross-tab synchronization, delayed storage hydration, storage failures, and startup-script behavior. Browser checks cover persisted Light mode, returning to Device/Dark, an open route reacting to a change in another tab, and the 390 × 844 settings layout. Automated system-change events do not replace physical OS/device checks.
 

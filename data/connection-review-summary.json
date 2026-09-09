@@ -1,0 +1,264 @@
+{
+  "reviewDate": "2026-09-09",
+  "previousPackage": "lasu-44f8af5654f1",
+  "package": "lasu-4e4c8008b38b",
+  "fieldVerified": false,
+  "sourceBounds": [
+    3.19,
+    6.455,
+    3.215,
+    6.489
+  ],
+  "rawSha256": {
+    "arcgis-metadata.json": "15bc09378d1999d9e749ecde59268a92e688f73e5e841a7f0d381193e292b6d4",
+    "arcgis.json": "148054b1a489f2b65534f7e2bccde6396582f34a74ba68b9d34c302857d552dd",
+    "osm.xml": "574c50d2ad56f3b4a9846ab6eea1b5971b39b2ca4d2bf2e2a2266929ed3cf12a"
+  },
+  "arcgisDataUnchanged": true,
+  "arcgisMetadataChangedFields": [
+    "lastViewed",
+    "numViews"
+  ],
+  "sourceRefreshMapChanges": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "reviewedMapChanges": {
+    "added": [],
+    "removed": [],
+    "changed": [
+      "osm:way:591396656"
+    ]
+  },
+  "before": {
+    "nodes": 1190,
+    "directedEdges": 2426,
+    "components": 8,
+    "approachesInLargestComponent": 190,
+    "approachesInSmallerComponents": [
+      {
+        "id": "arcgis:Infrastructure:56",
+        "name": "Building Underconstruction"
+      },
+      {
+        "id": "arcgis:Infrastructure:5",
+        "name": "Fac. Of Law"
+      },
+      {
+        "id": "arcgis:University_Property:7",
+        "name": "Fac. Office (Law) 1"
+      },
+      {
+        "id": "arcgis:University_Property:6",
+        "name": "Faculty Of Law"
+      },
+      {
+        "id": "arcgis:University_Property:3",
+        "name": "LASU International Library"
+      },
+      {
+        "id": "arcgis:Infrastructure:108",
+        "name": "LASU International Library"
+      },
+      {
+        "id": "arcgis:University_Property:122",
+        "name": "LASU Water Works"
+      },
+      {
+        "id": "arcgis:University_Property:78",
+        "name": "Law Clinic"
+      },
+      {
+        "id": "arcgis:University_Property:76",
+        "name": "Law Library"
+      },
+      {
+        "id": "arcgis:University_Property:77",
+        "name": "Law Office1 2"
+      },
+      {
+        "id": "arcgis:University_Property:30",
+        "name": "New Science Block"
+      },
+      {
+        "id": "arcgis:Infrastructure:70",
+        "name": "Ongoing Construction"
+      },
+      {
+        "id": "arcgis:University_Property:110",
+        "name": "Ongoing Student Village 2"
+      },
+      {
+        "id": "arcgis:University_Property:82",
+        "name": "Staff Quarter Block 3"
+      },
+      {
+        "id": "arcgis:University_Property:5",
+        "name": "Student Center (Law)"
+      },
+      {
+        "id": "arcgis:Infrastructure:9",
+        "name": "Student Union Office"
+      }
+    ],
+    "geometryBlockedDirectedEdges": 166
+  },
+  "after": {
+    "nodes": 1200,
+    "directedEdges": 2452,
+    "components": 5,
+    "approachesInLargestComponent": 201,
+    "approachesInSmallerComponents": [
+      {
+        "id": "arcgis:Infrastructure:56",
+        "name": "Building Underconstruction"
+      },
+      {
+        "id": "arcgis:University_Property:30",
+        "name": "New Science Block"
+      },
+      {
+        "id": "arcgis:Infrastructure:70",
+        "name": "Ongoing Construction"
+      },
+      {
+        "id": "arcgis:University_Property:110",
+        "name": "Ongoing Student Village 2"
+      },
+      {
+        "id": "arcgis:University_Property:82",
+        "name": "Staff Quarter Block 3"
+      }
+    ],
+    "geometryBlockedDirectedEdges": 166
+  },
+  "connectionReviews": [
+    {
+      "id": "lasu-law-driveway-2026-09-09",
+      "featureId": "osm:way:591396656",
+      "name": "Faculty of Law driveway",
+      "confirmedAt": "2026-09-09",
+      "confirmedBy": "project-owner",
+      "summary": "The owner explicitly confirmed that students may walk through this driveway connecting the Law paths to the campus road network.",
+      "expectedTags": {
+        "access": "private",
+        "highway": "service",
+        "service": "driveway"
+      }
+    },
+    {
+      "id": "lasu-library-gate-2026-09-09",
+      "featureId": "osm:node:13774055448",
+      "name": "International Library gate",
+      "coordinates": [
+        3.2008782,
+        6.4712453
+      ],
+      "confirmedAt": "2026-09-09",
+      "confirmedBy": "project-owner",
+      "summary": "The owner explicitly confirmed that students may walk through this gate connecting the International Library paths to the campus road network.",
+      "expectedTags": {
+        "access": "private",
+        "barrier": "gate"
+      }
+    }
+  ],
+  "graphChanges": {
+    "addedDirectedEdges": 26,
+    "removedDirectedEdges": 0,
+    "addedEdgeSourceIds": [
+      "osm:way:1505614007",
+      "osm:way:1505614015",
+      "osm:way:591396656"
+    ]
+  },
+  "routeChecks": {
+    "origin": "arcgis:Infrastructure:17",
+    "destinations": [
+      {
+        "id": "arcgis:University_Property:6",
+        "name": "Faculty Of Law",
+        "arrivalKind": "mapped-approach",
+        "routes": [
+          {
+            "metres": 429.64,
+            "displayDistance": "430 m",
+            "displayTime": "6 min"
+          },
+          {
+            "metres": 663.34,
+            "displayDistance": "665 m",
+            "displayTime": "9 min"
+          }
+        ]
+      },
+      {
+        "id": "arcgis:University_Property:3",
+        "name": "LASU International Library",
+        "arrivalKind": "mapped-approach",
+        "routes": [
+          {
+            "metres": 873.69,
+            "displayDistance": "875 m",
+            "displayTime": "12 min"
+          },
+          {
+            "metres": 1108,
+            "displayDistance": "1.1 km",
+            "displayTime": "15 min"
+          },
+          {
+            "metres": 1265.82,
+            "displayDistance": "1.3 km",
+            "displayTime": "17 min"
+          }
+        ]
+      },
+      {
+        "id": "arcgis:Infrastructure:108",
+        "name": "LASU International Library",
+        "arrivalKind": "mapped-approach",
+        "routes": [
+          {
+            "metres": 869.24,
+            "displayDistance": "870 m",
+            "displayTime": "12 min"
+          },
+          {
+            "metres": 1102.94,
+            "displayDistance": "1.1 km",
+            "displayTime": "15 min"
+          },
+          {
+            "metres": 1334.35,
+            "displayDistance": "1.3 km",
+            "displayTime": "18 min"
+          }
+        ]
+      },
+      {
+        "id": "arcgis:University_Property:120",
+        "name": "LASU Senate Building",
+        "arrivalKind": "mapped-approach",
+        "routes": [
+          {
+            "metres": 1035.89,
+            "displayDistance": "1.0 km",
+            "displayTime": "14 min"
+          },
+          {
+            "metres": 1269.58,
+            "displayDistance": "1.3 km",
+            "displayTime": "17 min"
+          },
+          {
+            "metres": 1425.06,
+            "displayDistance": "1.4 km",
+            "displayTime": "19 min"
+          }
+        ]
+      }
+    ]
+  }
+}

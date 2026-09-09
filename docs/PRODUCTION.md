@@ -5,10 +5,42 @@ requested publishing the latest GitHub revision to production on this date.
 This replaces the earlier preview-only hosting state; it does not establish
 physical-campus or phone verification.
 
-## Deployment and configuration
+## Law and Library connection update
+
+On 9 September 2026 at 22:07 UTC, the public map was verified as
+**`lasu-4e4c8008b38b`** (3,159,499 bytes, 22 required assets). The individually
+confirmed Law driveway and International Library gate connect 201 of the 206
+mapped approaches to the largest network component. Physical walks and final
+building entrances remain unverified.
+
+- Application revision: `1cbdb5db2fa54eff9b71bfd166575ec83ec61f7a`.
+- [Successful preview workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34410023855): seven Python and 61 Vitest tests passed.
+- Preview deployment: `dpl_Jmzi1AGuTVtUqjYnmpNzChX4kk3E`; hosted Law and Library
+  routes and a download to **Ready offline** passed.
+- [Production promotion deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/5DBCHCf9WLfUYbZoxnjrGiR8N89w):
+  `dpl_5DBCHCf9WLfUYbZoxnjrGiR8N89w`, **Ready / Production**, with
+  `turnright.vercel.app` assigned.
+- Immutable production URL:
+  https://turnright-98n7m4mds-muhammed-abdulhadi-s-projects.vercel.app/.
+- All 22 public assets matched their manifest sizes and SHA-256 hashes. `/`,
+  `/admin`, `/sw.js`, and the preceding map manifest returned HTTP 200 without
+  Vercel authentication.
+- A fresh public-browser installation downloaded `lasu-4e4c8008b38b` and
+  reached **Ready offline**.
+- Preceding deployment `dpl_BHn8UFmU8kTbRtmVwRrf4oz6u3GG` and package
+  `lasu-44f8af5654f1` remain available. `PUBLISHED_MAP_URL` remains enabled for
+  subsequent code builds.
+
+This publication used a reviewed, frozen Git package. Vercel rebuilt the
+preview with production environment settings on promotion. Supabase's older
+approved baseline and outstanding source proposals remain separate and must be
+reconciled before an editor-led release. See [CONNECTION-REVIEW.md](CONNECTION-REVIEW.md)
+and the [public asset verification record](../data/connection-release-verification.json).
+
+## Initial deployment and configuration
 
 - Application revision: `0ee315d2e43f5e09c63ca6ebff33fc6e3cf9e538`, branch `main`.
-- Current Vercel deployment: `dpl_CERT4AGSpjC8vQ1wd18Cdq6wNZJw`.
+- Initial Vercel deployment: `dpl_CERT4AGSpjC8vQ1wd18Cdq6wNZJw`.
 - Immutable URL: https://turnright-9tm3sd614-muhammed-abdulhadi-s-projects.vercel.app/.
 - [Vercel deployment details](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/CERT4AGSpjC8vQ1wd18Cdq6wNZJw).
 - Public map package: `lasu-44f8af5654f1`, 3,148,440 bytes, 22 required assets.
@@ -41,7 +73,7 @@ map release, review the source import containing the student-access correction
 and preview its assembled map; publishing the older snapshot would serve the
 older map. `PUBLISHED_MAP_URL` protects code builds, not intentional map releases.
 
-## Observed verification
+## Initial deployment verification
 
 - Vercel shows **Ready**, **Production**, the exact revision above, and the
   `turnright.vercel.app` domain assigned to the current deployment.

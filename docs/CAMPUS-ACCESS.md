@@ -1,5 +1,10 @@
 # Student walking access correction
 
+The sections below record the first ordinary-road correction. A subsequent
+[Law and Library connection review](CONNECTION-REVIEW.md) adds one separately
+confirmed driveway and gate. Current checked-in coverage is 201 approaches on
+the main network and five path components in package `lasu-4e4c8008b38b`.
+
 On 9 September 2026 the project owner confirmed that LASU's main internal roads
 are open to students on foot, except for specific restricted areas. TurnRight
 records this confirmation in `data/campus-access.json` as
@@ -44,8 +49,8 @@ The regenerated local package is `lasu-44f8af5654f1`, totaling 3,148,440 bytes
 Of the 206 approaches, 190 lie in the largest walking component and 16 in
 smaller disconnected components. The increase in components and excluded
 segments reflects evaluation of more road geometry; it does not mean every
-pair of places is now connected. Faculty of Law and the International Library
-still need network connections reviewed. No straight-line shortcuts or assumed
+pair of places was connected. Faculty of Law and the International Library
+still needed network connections reviewed at this stage. No straight-line shortcuts or assumed
 entrances were added. Full metrics are in `data/coverage-report.json`.
 
 ## Verification and rollout

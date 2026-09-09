@@ -1,0 +1,129 @@
+{
+  "verifiedAt": "2026-09-09T22:07:50.637722+00:00",
+  "url": "https://turnright.vercel.app",
+  "deploymentId": "dpl_5DBCHCf9WLfUYbZoxnjrGiR8N89w",
+  "previewDeploymentId": "dpl_Jmzi1AGuTVtUqjYnmpNzChX4kk3E",
+  "workflowRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/34410023855",
+  "applicationCommit": "1cbdb5db2fa54eff9b71bfd166575ec83ec61f7a",
+  "package": "lasu-4e4c8008b38b",
+  "packageBytes": 3159499,
+  "verifiedAssetCount": 22,
+  "httpStatus": {
+    "/": 200,
+    "/admin": 200,
+    "/sw.js": 200,
+    "/packages/lasu-44f8af5654f1/manifest.json": 200
+  },
+  "assets": [
+    {
+      "url": "/audio/bcfec5c01109aaec/approach.wav",
+      "bytes": 194254,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/21073a10d60c5a6c/arrive.wav",
+      "bytes": 112188,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/1558399887f1ce59/depart.wav",
+      "bytes": 124772,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/bbfa7ab08bdeaeb2/in-10.wav",
+      "bytes": 68946,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/d852a85974acd174/in-100.wav",
+      "bytes": 86258,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/f9284b7005396045/in-20.wav",
+      "bytes": 75386,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/9872cce565a5e0eb/in-200.wav",
+      "bytes": 87010,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/614270441bfe15b0/in-30.wav",
+      "bytes": 76060,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/d4d06b080fe8dd13/in-50.wav",
+      "bytes": 75536,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/944bdcdd7c843159/left.wav",
+      "bytes": 66104,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/1c5608bc02149d9f/ready.wav",
+      "bytes": 92150,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/37072f3fc9a3cb8a/reroute.wav",
+      "bytes": 96786,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/f7f8c0ce19d5562f/right.wav",
+      "bytes": 63878,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/2672084a9a9afba7/slight-left.wav",
+      "bytes": 59950,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/471bc330da7cc08d/slight-right.wav",
+      "bytes": 56900,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/a338e16304d5d575/straight.wav",
+      "bytes": 76564,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/543362e82666eee6/then.wav",
+      "bytes": 49228,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/9857c34323436353/uturn.wav",
+      "bytes": 121528,
+      "sha256Matches": true
+    },
+    {
+      "url": "/audio/4d341a4a3dcdfc4b/weak.wav",
+      "bytes": 223864,
+      "sha256Matches": true
+    },
+    {
+      "url": "/glyphs/Open%20Sans%20Semibold/0-255.pbf",
+      "bytes": 77571,
+      "sha256Matches": true
+    },
+    {
+      "url": "/packages/lasu-4e4c8008b38b/campus.json",
+      "bytes": 1273685,
+      "sha256Matches": true
+    },
+    {
+      "url": "/packages/lasu-4e4c8008b38b/audio.json",
+      "bytes": 881,
+      "sha256Matches": true
+    }
+  ]
+}
