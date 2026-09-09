@@ -57,7 +57,7 @@ interface EditorState {
 const empty: EditorState = { edits: [], changes: [], reports: [], jobs: [], releases: [] };
 const geometryMode = (g: Geometry) =>
   g.type === "Point" ? "point" : g.type === "Polygon" ? "polygon" : "linestring";
-export default function Admin({ data }: { data: CampusData }) {
+export default function Admin({ data, dark = false }: { data: CampusData; dark?: boolean }) {
   const [signedIn, setSignedIn] = useState(false),
     [authorized, setAuthorized] = useState(false),
     [state, setState] = useState<EditorState>(empty),
@@ -1131,7 +1131,7 @@ export default function Admin({ data }: { data: CampusData }) {
           </div>
         </aside>
         <section className="admin-map">
-          <MapView data={visibleData} routes={testRoutes} panelBesideMap onSelect={editPlace} onReady={mapReady} />
+          <MapView data={visibleData} dark={dark} routes={testRoutes} panelBesideMap onSelect={editPlace} onReady={mapReady} />
           <div className="editor-map-status">
             <span className="status-dot" />
             {preview ? "Saved draft preview" : "Source map · click to edit"}

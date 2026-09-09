@@ -13,6 +13,7 @@ import {
   Layers,
   LocateFixed,
   MapPin,
+  Monitor,
   Moon,
   Navigation,
   Plus,
@@ -51,6 +52,7 @@ import { advanceNavigation, initialNavigation } from "./navigation";
 import { useGps } from "./useGps";
 import { useRoutes } from "./useRoutes";
 import { useWebMcp } from "./useWebMcp";
+import { useAppearance } from "./useAppearance";
 import type { CampusData, CampusPackage, Category, Place, Position, Route } from "./types";
 const Admin = lazy(() => import("./Admin"));
 const categories: { id: Category | "all"; label: string; Icon: typeof Building2 }[] = [
@@ -64,6 +66,7 @@ const categories: { id: Category | "all"; label: string; Icon: typeof Building2 
   { id: "sports", label: "Sports", Icon: Flag },
 ];
 export default function App() {
+  const { preference: appearance, dark, setAppearance } = useAppearance();
   const [data, setData] = useState<CampusData | null>(null),
     [manifest, setManifest] = useState<CampusPackage | null>(null),
     [latest, setLatest] = useState<CampusPackage | null>(null);
@@ -72,7 +75,6 @@ export default function App() {
     [query, setQuery] = useState(""),
     [category, setCategory] = useState("all");
   const [selected, setSelected] = useState<Place | null>(null),
-    [dark, setDark] = useState(false),
     [threeD, setThreeD] = useState(false),
     [follow, setFollow] = useState(false);
   const [saved, setSaved] = useState<string[]>([]),
@@ -143,7 +145,6 @@ export default function App() {
     void checkUpdatesEvent();
     getPreference("saved", [] as string[]).then(setSaved);
     getPreference("recent", [] as string[]).then(setRecent);
-    getPreference("dark", false).then(setDark);
     getPreference("muted", false).then(setMuted);
     refreshDrafts();
     if ("serviceWorker" in navigator) {
@@ -174,9 +175,6 @@ export default function App() {
       window.removeEventListener("offline", off);
     };
   }, [manifest?.version]);
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
   useEffect(() => {
     voice.current.muted = muted;
     if (muted) voice.current.stop();
@@ -481,7 +479,7 @@ export default function App() {
   if (location.pathname.startsWith("/admin"))
     return (
       <Suspense fallback={<main className="loading-screen">Opening map editor…</main>}>
-        <Admin data={data} />
+        <Admin data={data} dark={dark} />
       </Suspense>
     );
   return (
@@ -882,21 +880,36 @@ export default function App() {
           )}{" "}
           {dialog === "settings" && (
             <div className="settings-content">
-              <div className="settings-row">
-                <span>{dark ? <Moon size={20} /> : <Sun size={20} />} Dark appearance</span>
-                <button
-                  role="switch"
-                  aria-checked={dark}
-                  aria-label="Dark appearance"
-                  className={`toggle ${dark ? "on" : ""}`}
-                  onClick={() => {
-                    setDark(!dark);
-                    void setPreference("dark", !dark);
-                  }}
-                >
-                  <i />
-                </button>
-              </div>
+              <fieldset className="appearance-settings" aria-describedby="appearance-help">
+                <legend>Appearance</legend>
+                <div className="appearance-options">
+                  {([
+                    ["system", "Device", Monitor],
+                    ["light", "Light", Sun],
+                    ["dark", "Dark", Moon],
+                  ] as const).map(([value, label, Icon]) => (
+                    <label key={value}>
+                      <input
+                        type="radio"
+                        name="appearance"
+                        value={value}
+                        checked={appearance === value}
+                        onChange={() => {
+                          void setAppearance(value).then((saved) => {
+                            if (!saved) setToast("Appearance changed for this visit. Your browser could not save the choice.");
+                          });
+                        }}
+                      />
+                      <span><Icon size={19} aria-hidden="true" />{label}</span>
+                    </label>
+                  ))}
+                </div>
+                <p id="appearance-help">
+                  {appearance === "system"
+                    ? `Follows your device automatically. Currently using ${dark ? "dark" : "light"} mode.`
+                    : `Always uses ${appearance} mode. Choose Device to follow your device settings.`}
+                </p>
+              </fieldset>
               <div className="settings-row">
                 <span>Voice directions</span>
                 <button

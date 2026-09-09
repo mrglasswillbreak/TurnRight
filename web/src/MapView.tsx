@@ -51,8 +51,8 @@ export function MapView({
   const callbacks = useRef({ onSelect, onManualPan, onReady });
   callbacks.current = { onSelect, onManualPan, onReady };
   const ready = useRef(false);
-  const camera = useRef({ selected, routes, activeRoute });
-  camera.current = { selected, routes, activeRoute };
+  const camera = useRef({ selected, routes, activeRoute, dark });
+  camera.current = { selected, routes, activeRoute, dark };
   const [mapError, setMapError] = useState("");
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
@@ -68,6 +68,7 @@ export function MapView({
   });
   useEffect(() => {
     if (!container.current) return;
+    const dark = camera.current.dark;
     let map: MapInstance;
     let disposeExtension: void | (() => void);
     try {
@@ -377,7 +378,33 @@ export function MapView({
       map.remove();
       mapRef.current = null;
     };
-  }, [data, dark, panelBesideMap]);
+  }, [data, panelBesideMap]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      // Repaint in place: device changes must not reset a walk, camera or editor.
+      const paint: [string, Parameters<MapInstance["setPaintProperty"]>[1], Parameters<MapInstance["setPaintProperty"]>[2]][] = [
+        ["background", "background-color", dark ? "#172126" : "#edf0eb"],
+        ["campus-fill", "fill-color", dark ? "#243338" : "#f8faf5"],
+        ["land", "fill-color", ["match", ["get", "name"],
+          ["Green Area", "Vegetation", "Forest"], dark ? "#263f36" : "#dbe8cf",
+          ["Water Body", "Water"], "#bddce6", dark ? "#293a3a" : "#ecede1"]],
+        ["roads-case", "line-color", dark ? "#526068" : "#d6d6cf"],
+        ["roads", "line-color", dark ? "#77808a" : "#ffffff"],
+        ["buildings", "fill-color", dark ? "#52616c" : "#dce0e3"],
+        ["buildings", "fill-outline-color", dark ? "#697985" : "#c2cbd0"],
+        ["buildings-3d", "fill-extrusion-color", dark ? "#52616c" : "#d5dce5"],
+        ["places-label", "text-color", dark ? "#d7e3ee" : "#53616b"],
+        ["places-label", "text-halo-color", dark ? "#213039" : "#ffffff"],
+      ];
+      for (const [layer, property, value] of paint)
+        if (map.getLayer(layer)) map.setPaintProperty(layer, property, value);
+    };
+    if (ready.current) apply();
+    else map.once("load", apply);
+    return () => { map.off("load", apply); };
+  }, [dark, data, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -388,7 +415,7 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once("load", apply);
-  }, [threeD, data, dark]);
+  }, [threeD, data, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selected) return;
@@ -407,7 +434,7 @@ export function MapView({
     return () => {
       marker.remove();
     };
-  }, [selected, data, dark, panelBesideMap]);
+  }, [selected, data, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -429,7 +456,7 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once("load", apply);
-  }, [routes, activeRoute, data, dark]);
+  }, [routes, activeRoute, data, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !fix) return;
@@ -464,7 +491,7 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once("load", apply);
-  }, [fix, follow, data, dark]);
+  }, [fix, follow, data, panelBesideMap]);
   return (
     <>
       <div className="map-canvas" ref={container} aria-label="Interactive map of LASU Ojo campus" />
