@@ -71,11 +71,13 @@ Refresh the local application to load the new package. An installation holding
 an older offline package must use **Offline → Download update**. The active
 package changes only after all required assets pass verification.
 
-The hosted immutable preview and Supabase's approved records are separate from
-the local seed. This correction has not been published to them by this local
-change. Import it as review candidates, preserve administrator corrections,
-validate and preview an approved snapshot, then follow the existing release
-process. Physical route/entrance checks remain in `docs/ACCEPTANCE.md`.
+The correction was subsequently deployed to the public production map at the
+owner's request on 9 September; see [PRODUCTION.md](PRODUCTION.md). Supabase's
+approved records and the older immutable preview remain separate from this Git
+publication. Before a future editor map release, import and review the source
+candidates, preserve administrator corrections, and validate the assembled
+snapshot so an older baseline cannot replace this correction. Physical
+route/entrance checks remain in `docs/ACCEPTANCE.md`.
 
 The [Overture comparison](OVERTURE-COMPARISON.md) records the preceding dataset;
 its private-road and coverage counts are historical evidence for this change.

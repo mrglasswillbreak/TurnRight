@@ -1,7 +1,10 @@
 # TurnRight account configuration
 
-Configured and verified on 8 September 2026. The immutable release preview is
-ready for owner review; production remains unpublished pending acceptance.
+Initially configured and verified on 8 September 2026. **Production is now live
+at https://turnright.vercel.app/** following the owner's explicit publication
+request on 9 September. See [PRODUCTION.md](PRODUCTION.md) for the current
+deployment, corrected automatic-build setting, production OAuth redirect and
+verification. The preview details below retain the initial setup history.
 
 ## Review this release
 
@@ -97,11 +100,12 @@ checks returned 401 for unauthenticated admin access and 400 for invalid reports
 
 ## Before public launch
 
-Git builds remain **Only build pre-production** during acceptance. There is no
-production deployment serving traffic. `PUBLISHED_MAP_URL` is intentionally unset
-until a stable production origin exists. After the relevant checks and owner
-acceptance, publish the reviewed snapshot, configure the production URL and exact
-OAuth redirect, and follow [DEPLOYMENT.md](DEPLOYMENT.md) for production behavior.
+The initial **Only build pre-production** rule was changed to **Automatic** on
+9 September at the owner's request. Production now serves the latest requested
+revision, and `PUBLISHED_MAP_URL` points to `https://turnright.vercel.app` in both
+environments. The production `/admin` OAuth redirect is configured and tested.
+See [PRODUCTION.md](PRODUCTION.md) for the current state and the distinction
+between this first Git publication and future reviewed map releases.
 
 Physical Android/iPhone checks, campus field walks, a live non-owner login test,
 and an actual production promotion/rollback rehearsal remain outstanding. See

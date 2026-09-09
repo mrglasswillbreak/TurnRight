@@ -34,6 +34,12 @@ In the project settings set:
 
 Keep the default standard build machine; do not enable paid upgrades, paid add-ons, or usage purchases. Retain the preceding production deployment when configuring deployment retention. Keep preview deployment protection enabled while reviewing the map.
 
+For public launch, set **Build and Deployment → Ignored Build Step → Automatic**.
+The earlier **Only build pre-production** setting deliberately cancels `main`
+production builds, even when GitHub receives the push successfully. The current
+project uses Automatic; see [PRODUCTION.md](PRODUCTION.md). Changes limited to
+files outside `web` may still be skipped by Vercel's unaffected-project check.
+
 Set these environment variables in **both Preview and Production**. The same backend configuration is needed when promoting a preview without rebuilding it.
 
 | Variable | Value / source | Exposure |

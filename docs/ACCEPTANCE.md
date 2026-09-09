@@ -2,6 +2,12 @@
 
 ## Evidence from implementation
 
+Production was published on 9 September 2026 at the owner's explicit request.
+[PRODUCTION.md](PRODUCTION.md) records the public deployment, package checksum
+checks, offline download, route preview and owner login. Outstanding physical
+device/campus checks below remain outstanding; publication does not mark them
+complete.
+
 - TypeScript, lint (no errors; remaining explicit-any warnings), all 42 tests across seven files, five Python campus-access/importer tests, and production Vite/PWA builds pass. MapLibre's worker and the routing worker are bundled and included in the application precache. Regression tests validate frozen releases from an isolated frontend directory and preserve restricted gate gaps during path metadata edits. NodeNext compilation also checks the server import graph.
 - Automated tests cover A*, inaccessible/directed/disconnected edges, alternative diversity, closures, turns, sustained deviation, stale/inaccurate GPS, distinct arrival fixes, explicit editor connections, preserved junctions/corrections, footprint/fence crossings, interrupted/corrupt downloads, hash reuse, cache eviction, storage exhaustion, source diffs/incomplete imports, administrator authorization, private report validation/rate limits, and Vercel readiness/promotion failure gates.
 - Production browser testing completed an app update, a 2.15 MiB map download and “Ready offline” state. With the local origin server stopped, a fresh reload rendered the map, local search and saved places worked, a connected route was calculated in the worker, disconnected routes were rejected, and a prerecorded maneuver completed Web Audio playback. This tests loss of access to all same-origin resources; it is not an airplane-mode test on a physical phone.
