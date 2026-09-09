@@ -18,14 +18,14 @@
     "arcgis:Infrastructure:73",
     "arcgis:Infrastructure:79"
   ],
-  "components": 8,
+  "components": 5,
   "notes": [
     "Source-derived map; campus walks have not been field-verified.",
     "Mapped approach routes stop on an existing path near a building, not at an assumed entrance.",
     "Missing paths and entrances require review in the editor.",
     "3D heights derived from floor counts are approximate (3 m per floor).",
     "166 directed segments excluded due to building or barrier conflicts.",
-    "Student walking on 62 existing internal roads enabled from the owner's 2026-09-09 confirmation. Raw OSM private tags retained; private driveways, parking aisles, explicit foot restrictions, barriers and closures are not overridden."
+    "Student walking on 63 existing internal roads enabled from the owner's 2026-09-09 confirmation. Original OSM tags retained; only individually reviewed driveways and gates may override private access. Other restrictions, no-foot access, locked gates, construction and closures remain enforced."
   ],
-  "campusAccessWayCount": 62
+  "campusAccessWayCount": 63
 }
