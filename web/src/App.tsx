@@ -4,7 +4,9 @@ import {
   ArrowLeft,
   BookOpen,
   Building2,
+  ChevronDown,
   ChevronRight,
+  ChevronUp,
   Compass,
   Download,
   Flag,
@@ -77,6 +79,8 @@ export default function App() {
   const [selected, setSelected] = useState<Place | null>(null),
     [threeD, setThreeD] = useState(false),
     [follow, setFollow] = useState(false);
+  const [panelExpanded, setPanelExpanded] = useState(false);
+  const panelContent = useRef<HTMLDivElement>(null);
   const [saved, setSaved] = useState<string[]>([]),
     [recent, setRecent] = useState<string[]>([]),
     [savedOnly, setSavedOnly] = useState(false);
@@ -114,6 +118,9 @@ export default function App() {
   const gps = useGps(),
     calculate = useRoutes();
   const currentRoute = routes[chosen];
+  useEffect(() => {
+    panelContent.current?.scrollTo(0, 0);
+  }, [selected?.id, routeView, navigating, query, category, savedOnly]);
   const reloadData = () =>
     loadCampus()
       .then((result) => {
@@ -310,6 +317,7 @@ export default function App() {
     }
     routeRequest.current++;
     setSelected(place);
+    setPanelExpanded(true);
     setBusy(false);
     setRouteView(false);
     setRoutes([]);
@@ -483,7 +491,19 @@ export default function App() {
       </Suspense>
     );
   return (
-    <main className={`app-shell ${navigating ? "is-navigating" : ""}`}>
+    <main
+      className={`app-shell ${navigating ? "is-navigating" : ""}`}
+      data-panel-expanded={panelExpanded || navigating}
+      data-panel-view={
+        navigating
+          ? "navigation"
+          : routeView && selected
+            ? "route"
+            : selected
+              ? "detail"
+              : "browse"
+      }
+    >
       <MapView
         data={data}
         selected={selected}
@@ -514,6 +534,7 @@ export default function App() {
           disabled={navigating}
           onClick={() => {
             setSavedOnly(false);
+            setPanelExpanded(true);
             setSelected(null);
             setRouteView(false);
             setRoutes([]);
@@ -527,6 +548,7 @@ export default function App() {
           disabled={navigating}
           onClick={() => {
             setSavedOnly(true);
+            setPanelExpanded(true);
             setSelected(null);
             setRouteView(false);
             setRoutes([]);
@@ -574,6 +596,7 @@ export default function App() {
               aria-label="Search campus"
               placeholder="Where do you want to go?"
               value={query}
+              onFocus={() => setPanelExpanded(true)}
               onChange={(e) => {
                 setQuery(e.target.value);
                 setSelected(null);
@@ -588,175 +611,201 @@ export default function App() {
             )}
           </div>
         )}
-        {routeView && selected ? (
-          <RoutePanel
-            data={data}
-            destination={selected}
-            routes={routes}
-            chosen={chosen}
-            origin={origin}
-            busy={busy}
-            error={routeError || (origin === "gps" || navigating ? gps.error : "")}
-            navigating={navigating}
-            nav={nav}
-            muted={muted}
-            onOrigin={(from) => {
-              if (from === "gps") gps.start();
-              void previewRoute(from);
-            }}
-            onChoose={setChosen}
-            onStart={startNavigation}
-            onStop={stopNavigation}
-            onBack={() => {
-              routeRequest.current++;
-              startRequested.current = false;
-              gps.stop();
-              setRouteView(false);
-              setRoutes([]);
-            }}
-            onMute={() => {
-              setMuted(!muted);
-              void setPreference("muted", !muted);
-            }}
-            onRepeat={() => {
-              const m = currentRoute?.maneuvers[nav.nextIndex];
-              if (m)
-                void voice.current
-                  .maneuver(m.kind, m.at - nav.progress)
-                  .catch(() => setToast("Audio could not play."));
-            }}
-          />
-        ) : !selected ? (
-          <>
-            <div className="category-strip">
-              {categories.map(({ id, label, Icon }) => (
-                <button
-                  key={id}
-                  className={category === id ? "category active" : "category"}
-                  onClick={() => setCategory(id)}
-                >
-                  <Icon size={16} />
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">YOUR CAMPUS, CONNECTED</span>
-                <h1>{savedOnly ? "Saved places" : query ? "Search results" : "Explore campus"}</h1>
-              </div>
-              <span className="count-pill">{places.length}</span>
-            </div>
-            <p className="section-description">
-              {savedOnly
-                ? "Your places, saved on this device."
-                : "Find a building. Pick a path. You’re on your way."}
-            </p>
-            <div className="place-list">
-              {places.map((place) => (
-                <button className="place-row" key={place.id} onClick={() => selectPlace(place)}>
-                  <span className={`place-icon ${place.category}`}>
-                    {place.category === "library" ? (
-                      <BookOpen />
-                    ) : place.category === "academic" ? (
-                      <GraduationCap />
-                    ) : (
-                      <MapPin />
-                    )}
-                  </span>
-                  <span className="place-copy">
-                    <strong>{place.name}</strong>
-                    <span>
-                      {place.category === "academic"
-                        ? "Academic building"
-                        : place.category.charAt(0).toUpperCase() + place.category.slice(1)}{" "}
-                      · Ojo campus
-                    </span>
-                  </span>
-                  <ChevronRight size={17} />
-                </button>
-              ))}
-              {!places.length && (
-                <div className="empty-state">
-                  {savedOnly ? <Heart /> : <Search />}
-                  <h3>{savedOnly ? "Keep your places close" : "No places found"}</h3>
-                  <p>
-                    {savedOnly
-                      ? "Open a place and tap Save to find it here."
-                      : "Try a building name, department, or abbreviation."}
-                  </p>
-                </div>
-              )}
-            </div>
-            <footer className="panel-footer">
-              <span className="status-dot" />
-              {downloaded && swReady ? "Ready offline" : online ? "Campus map" : "Offline"}
-              <button className="text-button" onClick={() => setDialog("offline")}>
-                {downloaded ? "Manage map" : "Download map"}
-              </button>
-            </footer>
-          </>
-        ) : (
-          <div className="place-detail">
-            <button className="text-button" onClick={() => setSelected(null)}>
-              <ArrowLeft size={17} /> Back to places
-            </button>
-            <div className={`detail-icon ${selected.category}`}>
-              <Building2 />
-            </div>
-            <span className="eyebrow">{selected.category.toUpperCase()} · LASU OJO</span>
-            <h1>{selected.name}</h1>
-            <p>{selected.department || selected.faculty || "Lagos State University, Ojo campus"}</p>
-            <Button className="primary-action" onClick={() => void previewRoute()}>
-              <Navigation size={18} /> Directions
-            </Button>
-            <div className="button-row place-actions">
-              <Button variant="outline" onClick={toggleSaved}>
-                <Heart fill={saved.includes(selected.id) ? "currentColor" : "none"} />
-                {saved.includes(selected.id) ? "Saved" : "Save"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setReportPin(undefined);
-                  setDialog("report");
-                }}
-              >
-                <Flag /> Report
-              </Button>
-            </div>
-            <div className="detail-facts">
-              <div>
-                <MapPin />
-                <span>
-                  {selected.coordinates[1].toFixed(5)}, {selected.coordinates[0].toFixed(5)}
-                </span>
-              </div>
-              <div>
-                <Flag />
-                <span>
-                  {selected.arrivalKind === "entrance"
-                    ? "Connected to a mapped entrance."
-                    : selected.graphNode
-                      ? `Mapped path ${selected.approachDistance} m away. Entrance connection unverified.`
-                      : "Walking connection not yet mapped."}
-                </span>
-              </div>
-              <div>
-                <Info />
-                <span>
-                  Source:{" "}
-                  {selected.source === "osm"
-                    ? "OpenStreetMap"
-                    : selected.source === "campus-review"
-                      ? "Campus administrator"
-                      : "LASU ArcGIS campus map"}
-                  . Not field-verified.
-                </span>
-              </div>
-            </div>
-          </div>
+        {!navigating && (
+          <button
+            className="mobile-panel-toggle"
+            aria-expanded={panelExpanded}
+            aria-controls="campus-panel-content"
+            aria-label={panelExpanded ? "Collapse card" : "Expand card"}
+            onClick={() => setPanelExpanded((expanded) => !expanded)}
+          >
+            <span>
+              {selected
+                ? `${routeView ? "Route to " : ""}${selected.name}`
+                : savedOnly
+                  ? "Saved places"
+                  : query
+                    ? "Search results"
+                    : "Browse places"}
+            </span>
+            {panelExpanded ? (
+              <ChevronDown size={20} />
+            ) : (
+              <ChevronUp size={20} />
+            )}
+          </button>
         )}
+        <div id="campus-panel-content" className="panel-content" ref={panelContent}>
+          {routeView && selected ? (
+            <RoutePanel
+              data={data}
+              destination={selected}
+              routes={routes}
+              chosen={chosen}
+              origin={origin}
+              busy={busy}
+              error={routeError || (origin === "gps" || navigating ? gps.error : "")}
+              navigating={navigating}
+              nav={nav}
+              muted={muted}
+              onOrigin={(from) => {
+                if (from === "gps") gps.start();
+                void previewRoute(from);
+              }}
+              onChoose={setChosen}
+              onStart={startNavigation}
+              onStop={stopNavigation}
+              onBack={() => {
+                routeRequest.current++;
+                startRequested.current = false;
+                gps.stop();
+                setRouteView(false);
+                setRoutes([]);
+              }}
+              onMute={() => {
+                setMuted(!muted);
+                void setPreference("muted", !muted);
+              }}
+              onRepeat={() => {
+                const m = currentRoute?.maneuvers[nav.nextIndex];
+                if (m)
+                  void voice.current
+                    .maneuver(m.kind, m.at - nav.progress)
+                    .catch(() => setToast("Audio could not play."));
+              }}
+            />
+          ) : !selected ? (
+            <>
+              <div className="category-strip">
+                {categories.map(({ id, label, Icon }) => (
+                  <button
+                    key={id}
+                    className={category === id ? "category active" : "category"}
+                    onClick={() => setCategory(id)}
+                  >
+                    <Icon size={16} />
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="section-heading">
+                <div>
+                  <span className="eyebrow">YOUR CAMPUS, CONNECTED</span>
+                  <h1>{savedOnly ? "Saved places" : query ? "Search results" : "Explore campus"}</h1>
+                </div>
+                <span className="count-pill">{places.length}</span>
+              </div>
+              <p className="section-description">
+                {savedOnly
+                  ? "Your places, saved on this device."
+                  : "Find a building. Pick a path. You’re on your way."}
+              </p>
+              <div className="place-list">
+                {places.map((place) => (
+                  <button className="place-row" key={place.id} onClick={() => selectPlace(place)}>
+                    <span className={`place-icon ${place.category}`}>
+                      {place.category === "library" ? (
+                        <BookOpen />
+                      ) : place.category === "academic" ? (
+                        <GraduationCap />
+                      ) : (
+                        <MapPin />
+                      )}
+                    </span>
+                    <span className="place-copy">
+                      <strong>{place.name}</strong>
+                      <span>
+                        {place.category === "academic"
+                          ? "Academic building"
+                          : place.category.charAt(0).toUpperCase() + place.category.slice(1)}{" "}
+                        · Ojo campus
+                      </span>
+                    </span>
+                    <ChevronRight size={17} />
+                  </button>
+                ))}
+                {!places.length && (
+                  <div className="empty-state">
+                    {savedOnly ? <Heart /> : <Search />}
+                    <h3>{savedOnly ? "Keep your places close" : "No places found"}</h3>
+                    <p>
+                      {savedOnly
+                        ? "Open a place and tap Save to find it here."
+                        : "Try a building name, department, or abbreviation."}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <footer className="panel-footer">
+                <span className="status-dot" />
+                {downloaded && swReady ? "Ready offline" : online ? "Campus map" : "Offline"}
+                <button className="text-button" onClick={() => setDialog("offline")}>
+                  {downloaded ? "Manage map" : "Download map"}
+                </button>
+              </footer>
+            </>
+          ) : (
+            <div className="place-detail">
+              <button className="text-button" onClick={() => setSelected(null)}>
+                <ArrowLeft size={17} /> Back to places
+              </button>
+              <div className={`detail-icon ${selected.category}`}>
+                <Building2 />
+              </div>
+              <span className="eyebrow">{selected.category.toUpperCase()} · LASU OJO</span>
+              <h1>{selected.name}</h1>
+              <p>{selected.department || selected.faculty || "Lagos State University, Ojo campus"}</p>
+              <Button className="primary-action" onClick={() => void previewRoute()}>
+                <Navigation size={18} /> Directions
+              </Button>
+              <div className="button-row place-actions">
+                <Button variant="outline" onClick={toggleSaved}>
+                  <Heart fill={saved.includes(selected.id) ? "currentColor" : "none"} />
+                  {saved.includes(selected.id) ? "Saved" : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setReportPin(undefined);
+                    setDialog("report");
+                  }}
+                >
+                  <Flag /> Report
+                </Button>
+              </div>
+              <div className="detail-facts">
+                <div>
+                  <MapPin />
+                  <span>
+                    {selected.coordinates[1].toFixed(5)}, {selected.coordinates[0].toFixed(5)}
+                  </span>
+                </div>
+                <div>
+                  <Flag />
+                  <span>
+                    {selected.arrivalKind === "entrance"
+                      ? "Connected to a mapped entrance."
+                      : selected.graphNode
+                        ? `Mapped path ${selected.approachDistance} m away. Entrance connection unverified.`
+                        : "Walking connection not yet mapped."}
+                  </span>
+                </div>
+                <div>
+                  <Info />
+                  <span>
+                    Source:{" "}
+                    {selected.source === "osm"
+                      ? "OpenStreetMap"
+                      : selected.source === "campus-review"
+                        ? "Campus administrator"
+                        : "LASU ArcGIS campus map"}
+                    . Not field-verified.
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
       <div className="map-topbar">
         <button className="location-pill" onClick={() => setDialog("offline")}>
