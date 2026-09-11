@@ -83,7 +83,12 @@ export function featureEdit(
   id: string,
   edits: MapEdit[],
 ): MapEdit | undefined {
-  const saved = edits.find((e) => e.id === id && e.kind === kind);
+  const saved = edits.find(
+    (e) =>
+      e.id === id &&
+      e.kind === kind &&
+      !(e.deleted && e.properties.revertToSource),
+  );
   if (kind === 'entrance') {
     if (saved) return structuredClone(saved);
     const e = data.entrances?.find((e) => e.id === id);

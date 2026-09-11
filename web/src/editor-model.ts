@@ -244,6 +244,7 @@ export function applyEdits(
     (a, b) => rank[a.kind] - rank[b.kind] || a.id.localeCompare(b.id),
   );
   for (const edit of ordered) {
+    if (edit.deleted && edit.properties?.revertToSource === true) continue;
     const invalid = validateEdit(edit);
     if (invalid.length) {
       errors.push(...invalid.map((e) => `${edit.id}: ${e}`));

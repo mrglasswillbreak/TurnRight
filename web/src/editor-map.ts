@@ -540,23 +540,25 @@ export class EditorMap {
       collection(
         compare
           ? []
-          : edits.map((e) => ({
-              type: 'Feature',
-              properties: {
-                id: e.id,
-                kind: e.kind,
-                color: e.deleted
-                  ? '#d55454'
-                  : invalid.has(e.id)
-                    ? '#d99124'
-                    : base.map.features.some(
-                          (f) => f.properties?.id === e.id,
-                        ) || base.places.some((p) => p.id === e.id)
-                      ? '#8b5cc7'
-                      : '#13946b',
-              },
-              geometry: e.geometry,
-            })),
+          : edits
+              .filter((e) => !(e.deleted && e.properties.revertToSource))
+              .map((e) => ({
+                type: 'Feature',
+                properties: {
+                  id: e.id,
+                  kind: e.kind,
+                  color: e.deleted
+                    ? '#d55454'
+                    : invalid.has(e.id)
+                      ? '#d99124'
+                      : base.map.features.some(
+                            (f) => f.properties?.id === e.id,
+                          ) || base.places.some((p) => p.id === e.id)
+                        ? '#8b5cc7'
+                        : '#13946b',
+                },
+                geometry: e.geometry,
+              })),
       ),
     );
   }

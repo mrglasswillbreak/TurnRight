@@ -5,6 +5,9 @@ import {
   type WorkspaceRecovery,
 } from '../src/editor-workspace';
 import type { MapEdit } from '../src/types';
+import { applyEdits } from '../src/editor-model';
+import { featureEdit } from '../src/editor-features';
+import type { CampusData } from '../src/types';
 const edit = (name = 'Library'): MapEdit => ({
   id: 'library',
   kind: 'place',
@@ -14,6 +17,42 @@ const edit = (name = 'Library'): MapEdit => ({
 const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
   batch.edits.map(({ edit }) => ({ ...edit, updated_at: revision }));
 describe('editor autosave and recovery', () => {
+  it('undoes a saved first correction without deleting the approved source place', async () => {
+    const base = {
+      map: { type: 'FeatureCollection', features: [] },
+      places: [
+        {
+          id: 'library',
+          name: 'Approved library',
+          coordinates: [3.201, 6.46],
+          category: 'academic',
+          aliases: [],
+          source: 'test',
+          sourceId: 'library',
+        },
+      ],
+      graph: { nodes: [], edges: [] },
+      closures: [],
+    } as unknown as CampusData;
+    const workspace = new EditorWorkspace(
+      [],
+      async (batch) => ack(batch),
+      async () => {},
+    );
+    workspace.commit([edit('Correction')]);
+    await workspace.flush();
+    workspace.undo();
+    await workspace.flush();
+    const restored = applyEdits(base, workspace.saved).data;
+    expect(restored.places[0].name).toBe('Approved library');
+    expect(
+      featureEdit(restored, 'place', 'library', workspace.saved)?.deleted,
+    ).not.toBe(true);
+    workspace.redo();
+    expect(applyEdits(base, workspace.edits).data.places[0].name).toBe(
+      'Correction',
+    );
+  });
   it('keeps server autosave available when browser recovery storage fails', async () => {
     const send = vi.fn(async (batch: SaveBatch) => ack(batch));
     const workspace = new EditorWorkspace([], send, async () => {

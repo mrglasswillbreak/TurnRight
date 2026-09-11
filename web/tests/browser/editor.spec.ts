@@ -352,6 +352,39 @@ for (const threeD of [false, true])
     expect(errors).toEqual([]);
   });
 
+test('undoes the first saved source correction and keeps its building after reload', async ({
+  page,
+}) => {
+  await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  const name = page
+    .getByRole('complementary', { name: 'Feature properties' })
+    .getByLabel('Name', { exact: true });
+  const original = await name.inputValue();
+  const camera = await page.evaluate(() => {
+    const m = window.editorTestMap;
+    return [m.getCenter().lng, m.getCenter().lat, m.getZoom(), m.getPitch()];
+  });
+  await name.fill('Temporary label');
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  expect(
+    await page.evaluate(() => {
+      const m = window.editorTestMap;
+      return [m.getCenter().lng, m.getCenter().lat, m.getZoom(), m.getPitch()];
+    }),
+  ).toEqual(camera);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.reload();
+  await attachMap(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await expect(name).toHaveValue(original);
+});
+
 test('edits a path vertex in 3D with undo and redo across autosave', async ({
   page,
 }) => {

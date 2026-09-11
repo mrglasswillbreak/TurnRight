@@ -208,6 +208,8 @@ export interface MapEdit {
     vertexIds?: string[];
     connections?: PathConnection[];
     connection?: ConnectionTarget;
+    /** A retained undo receipt that removes a correction, leaving approved source data intact. */
+    revertToSource?: boolean;
   };
   deleted?: boolean;
   updated_at?: string;

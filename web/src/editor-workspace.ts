@@ -175,12 +175,18 @@ export class EditorWorkspace {
   }
   private restore(snapshot: WorkspaceSnapshot) {
     const next = new Map(snapshot.edits.map((e) => [editKey(e), e]));
-    // Undoing a creation that reached the server needs an explicit tombstone.
+    // Retain a receipt for undo without confusing removal of a correction with
+    // deletion of its approved source feature.
     for (const e of [
       ...this.saved,
       ...(this.pending?.edits.map((p) => p.edit) || []),
     ])
-      if (!next.has(editKey(e))) next.set(editKey(e), { ...e, deleted: true });
+      if (!next.has(editKey(e)))
+        next.set(editKey(e), {
+          ...e,
+          deleted: true,
+          properties: { ...e.properties, revertToSource: true },
+        });
     this.edits = [...next.values()];
     this.unfinished = snapshot.unfinished;
     this.changed();

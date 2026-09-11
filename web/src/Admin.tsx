@@ -758,7 +758,12 @@ function Editor({
       (filter === 'all' ||
         (filter === 'needs' && !t.reason.startsWith('Mapped')) ||
         (filter === 'drafts' &&
-          workspace.edits.some((e) => e.id === t.id && e.kind === t.kind))),
+          workspace.edits.some(
+            (e) =>
+              e.id === t.id &&
+              e.kind === t.kind &&
+              !(e.deleted && e.properties.revertToSource),
+          ))),
   );
   const toolButtons = [
     { kind: null, name: 'Select', icon: MousePointer2, shortcut: '' },
