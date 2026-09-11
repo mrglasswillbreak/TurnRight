@@ -48,7 +48,7 @@ export class EditorMap {
     this.draw = new TerraDraw({
       adapter: new TerraDrawMapLibreGLAdapter({ map }),
       idStrategy: { getId: () => crypto.randomUUID(), isValidId: (id) => typeof id === "string" },
-      modes: [new TerraDrawPointMode(), this.line, this.polygon, new TerraDrawSelectMode({ flags: { point: flags, linestring: flags, polygon: flags }, pointerDistance: 8 }), new TerraDrawRenderMode()],
+      modes: [new TerraDrawPointMode(), this.line, this.polygon, new TerraDrawSelectMode({ flags: { point: flags, linestring: flags, polygon: flags }, pointerDistance: 8 }), new TerraDrawRenderMode({ styles: {} })],
     });
     for (const id of ["editor-drafts", "editor-entrances", "editor-network", "editor-target", "editor-review"]) map.addSource(id, { type: "geojson", data: collection() });
     map.addLayer({ id: "editor-network", type: "line", source: "editor-network", layout: { visibility: "none" }, paint: { "line-color": "#2563eb", "line-width": 2, "line-opacity": 0.5 } });
@@ -131,7 +131,7 @@ export class EditorMap {
       const f = features.find((f) => f.layer.id === layer);
       if (!f?.properties?.id) continue;
       const kind = layer.startsWith("editor-draft") ? f.properties.kind : layer === "editor-entrances" ? "entrance" : layer.startsWith("places") ? "place" : layer === "roads" ? "path" : "building";
-      if (this.selected?.id === f.properties.id && this.selected.kind === kind) return;
+      if (this.selected && this.selected.id === f.properties.id && this.selected.kind === kind) return;
       this.callbacks.select(kind, String(f.properties.id));
       break;
     }
@@ -150,7 +150,7 @@ export class EditorMap {
     this.setting = false;
     this.targets(false);
   }
-  begin(kind: MapEdit["kind"], properties: MapEdit["properties"], seed?: Position[], id = crypto.randomUUID()) {
+  begin(kind: MapEdit["kind"], properties: MapEdit["properties"], seed?: Position[], id: string = crypto.randomUUID()) {
     this.setting = true;
     this.draw.clear(); this.selected = null; this.kind = kind; this.creationId = id; this.properties = properties;
     this.interaction = "select";
