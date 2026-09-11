@@ -14,6 +14,44 @@ const edit = (name = 'Library'): MapEdit => ({
 const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
   batch.edits.map(({ edit }) => ({ ...edit, updated_at: revision }));
 describe('editor autosave and recovery', () => {
+  it('keeps server autosave available when browser recovery storage fails', async () => {
+    const send = vi.fn(async (batch: SaveBatch) => ack(batch));
+    const workspace = new EditorWorkspace([], send, async () => {
+      throw new Error('Quota exceeded');
+    });
+    workspace.commit([edit()]);
+    await vi.waitFor(() =>
+      expect(workspace.status).toBe('Recovery unavailable'),
+    );
+    expect(workspace.canAutosave).toBe(true);
+    expect(await workspace.flush()).toBe(true);
+    expect(send).toHaveBeenCalledOnce();
+    expect(workspace.status).toBe('Recovery unavailable');
+    expect(workspace.dirty).toBe(false);
+  });
+  it('does not let a refresh replace a pending save', async () => {
+    let finish!: (result: MapEdit[]) => void;
+    let batch!: SaveBatch;
+    const workspace = new EditorWorkspace(
+      [],
+      async (value) => {
+        batch = value;
+        return new Promise((resolve) => {
+          finish = resolve;
+        });
+      },
+      async () => {},
+    );
+    workspace.commit([edit()]);
+    const flight = workspace.flush();
+    await vi.waitFor(() => expect(batch).toBeDefined());
+    expect(() => workspace.reconcile([], true)).toThrow(
+      'save is still running',
+    );
+    finish(ack(batch));
+    expect(await flight).toBe(true);
+    expect(workspace.saved[0].properties.name).toBe('Library');
+  });
   it('saves commands as a batch and keeps newer local work while a request is in flight', async () => {
     let release!: (edits: MapEdit[]) => void;
     const send = vi

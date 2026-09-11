@@ -7,14 +7,7 @@ export function useEditorWorkspace(workspace: EditorWorkspace) {
     workspace.getRevision,
   );
   useEffect(() => {
-    if (
-      !workspace.dirty ||
-      ['Conflict', 'Saving', 'Recovery unavailable'].includes(
-        workspace.status,
-      ) ||
-      workspace.error
-    )
-      return;
+    if (!workspace.canAutosave) return;
     const timer = setTimeout(() => {
       void workspace.flush();
     }, 750);

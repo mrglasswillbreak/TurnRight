@@ -35,6 +35,8 @@ export type SaveStatus =
   | 'Saved locally'
   | 'Conflict'
   | 'Recovery unavailable';
+const recoveryMessage =
+  'Browser storage could not save a recovery copy. Keep this tab open until the draft is saved.';
 
 /** One history entry per user command; the network never replaces newer local commands. */
 export class EditorWorkspace {
@@ -50,6 +52,7 @@ export class EditorWorkspace {
   private listeners = new Set<() => void>();
   private flight: Promise<boolean> | null = null;
   private persistence: Promise<void> = Promise.resolve();
+  private recoveryFailed = false;
   constructor(
     server: MapEdit[],
     private send: (batch: SaveBatch) => Promise<MapEdit[]>,
@@ -112,17 +115,27 @@ export class EditorWorkspace {
     });
     this.persistence = this.persistence
       .catch(() => {})
-      .then(() => this.persist(recovery))
+      .then(async () => {
+        await this.persist(recovery);
+        this.recoveryFailed = false;
+      })
       .catch(() => {
-        this.status = 'Recovery unavailable';
-        this.error =
-          'Browser storage could not save a recovery copy. Keep this tab open until the draft is saved.';
+        this.recoveryFailed = true;
+        if (this.status !== 'Conflict') this.status = 'Recovery unavailable';
+        if (!this.error) this.error = recoveryMessage;
         this.notify();
       });
     return this.persistence;
   }
   get dirty() {
     return this.changes().length > 0 || !!this.pending;
+  }
+  get canAutosave() {
+    return (
+      this.dirty &&
+      !['Conflict', 'Saving'].includes(this.status) &&
+      (!this.error || this.error === recoveryMessage)
+    );
   }
   private changes() {
     const saved = new Map(this.saved.map((e) => [editKey(e), e]));
@@ -187,6 +200,10 @@ export class EditorWorkspace {
     }
   }
   reconcile(server: MapEdit[], keepLocal: boolean) {
+    if (this.flight)
+      throw new Error(
+        'A save is still running. Refresh again when it finishes.',
+      );
     const changes = this.changes();
     this.saved = structuredClone(server);
     const merged = new Map(server.map((e) => [editKey(e), e]));
@@ -249,8 +266,12 @@ export class EditorWorkspace {
         this.pending = null;
         await this.persistNow();
       }
-      this.status = this.unfinished ? 'Saved locally' : 'Saved';
-      this.error = '';
+      this.status = this.recoveryFailed
+        ? 'Recovery unavailable'
+        : this.unfinished
+          ? 'Saved locally'
+          : 'Saved';
+      this.error = this.recoveryFailed ? recoveryMessage : '';
       this.notify();
       return true;
     } catch (error) {

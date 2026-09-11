@@ -52,7 +52,7 @@ Real browser captures from 9 September 2026. Mobile views use a responsive viewp
 | Map display | 2D by default; optional 3D where measured heights or documented floor counts exist. Floor-derived heights are approximate; unknown heights remain flat. |
 | Offline maps | Verified resumable downloads, content-hash reuse, atomic activation, version/coverage information, storage checks, and explicit updates. |
 | Student reports | Place or pin reports with a category and description; private server submission, spam controls, and device-local offline drafts. |
-| Owner editor | GitHub login with one allowlisted administrator, visual geometry/vertex editing, explicit path connections, undo/redo, saved drafts, closures, and route previews. |
+| Owner editor | Map-centered 2D/3D workspace, multiple entrances, snapped path junctions, shared vertex editing, needs-mapping list, undo/redo, automatic draft saving and offline recovery. [Editor guide](docs/EDITOR.md). |
 | Data maintenance | Daily/on-demand source imports, change review separate from corrections, immutable releases, preview/publish/rollback, and backup export. |
 
 Driving, cycling, indoor positioning, satellite imagery, background navigation, public user accounts, and reviews are outside this release.
@@ -198,7 +198,7 @@ The workflow is **review → validate → preview → publish**:
 
 1. Import source candidates daily or through **Check now**. Failed/incomplete imports retain the last successful dataset; candidates do not overwrite approved data.
 2. Review additions, removals, geometry changes, and conflicts. Administrator corrections remain separate from imported source records.
-3. Edit places, outlines, entrances, paths, barriers, restrictions, or closures. Connect path endpoints explicitly, save drafts, and preview routes.
+3. Select a building, place its entrances, draw their approaches and connect to highlighted path segments in 2D or 3D. Drafts save automatically; route tests choose the shortest permitted entrance. Review unresolved items in **Needs mapping**. See the [editor guide](docs/EDITOR.md) for connections, recovery and controls.
 4. Validate an approved revision and create an immutable package/deployment preview.
 5. Review the preview and publish it. Success is recorded only after deployment and production promotion succeed. Retain the preceding release for rollback and export approved data/correction history for recovery.
 
