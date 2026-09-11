@@ -139,12 +139,12 @@ export default function App() {
     announced = useRef(new Set<string>());
   const updateSW = useRef<((reload?: boolean) => Promise<void>) | null>(null),
     navigatingRef = useRef(false);
-  const requestedReload=useRef(false);
-  const installAppUpdate=async()=>{
+  const requestedReload = useRef(false);
+  const installAppUpdate = async () => {
     await flushSurveyRecovery();
-    requestedReload.current=true;
-    const registration=await navigator.serviceWorker.getRegistration();
-    if(registration?.waiting)await updateSW.current?.(true);
+    requestedReload.current = true;
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (registration?.waiting) await updateSW.current?.(true);
     else location.reload();
   };
   navigatingRef.current = navigating;
@@ -191,7 +191,8 @@ export default function App() {
       updateSW.current = registerSW({
         immediate: true,
         onNeedReload() {
-          if(requestedReload.current && !surveyRecordingActive()) location.reload();
+          if (requestedReload.current && !surveyRecordingActive())
+            location.reload();
           else setUpdateReady(true);
         },
         onNeedRefresh() {
@@ -562,7 +563,12 @@ export default function App() {
       <Suspense
         fallback={<main className="loading-screen">Opening map editor…</main>}
       >
-        <Admin data={data} dark={dark} updateReady={updateReady} installUpdate={installAppUpdate} />
+        <Admin
+          data={data}
+          dark={dark}
+          updateReady={updateReady}
+          installUpdate={installAppUpdate}
+        />
       </Suspense>
     );
   return (

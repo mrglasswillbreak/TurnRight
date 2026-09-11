@@ -9,14 +9,17 @@ import {
 const versions = new Map<string, number>();
 const keyFor = (s: SurveySession) => `${s.owner}:${s.id}`;
 const database = () =>
-  openDB('turnright-surveys', 1, {
-    upgrade(db) {
+  openDB('turnright-surveys', 2, {
+    upgrade(db, oldVersion) {
+      if(oldVersion<1){
       db.createObjectStore('sessions', { keyPath: ['owner', 'id'] });
       const samples = db.createObjectStore('samples', {
         keyPath: ['owner', 'surveyId', 'id'],
       });
       samples.createIndex('survey', ['owner', 'surveyId']);
       db.createObjectStore('context');
+      }
+      if(oldVersion<2)db.createObjectStore('uploads');
     },
   });
 export async function saveSurveyLocal(
@@ -25,22 +28,31 @@ export async function saveSurveyLocal(
 ) {
   const db = await database();
   try {
-    const tx = db.transaction(['sessions', 'samples'], 'readwrite', {
+    const tx = db.transaction(['sessions', 'samples','uploads'], 'readwrite', {
       durability: 'strict',
     });
-    const previous = await tx.objectStore('sessions').get([session.owner,session.id]);
+    const previous = await tx
+      .objectStore('sessions')
+      .get([session.owner, session.id]);
     const expected = versions.get(keyFor(session)) ?? session.localVersion ?? 0;
     if ((previous?.localVersion ?? 0) !== expected) {
-      tx.abort(); await tx.done.catch(()=>{});
-      throw new Error('This survey changed in another tab. Your current recording is paused; save a separate recovery copy before reopening it.');
+      tx.abort();
+      await tx.done.catch(() => {});
+      throw new Error(
+        'This survey changed in another tab. Your current recording is paused; save a separate recovery copy before reopening it.',
+      );
     }
-    await tx.objectStore('sessions').put({...session,localVersion:expected+1});
+    const {pendingUpload,...header}=session;
+    if(pendingUpload && previous?.pendingUploadId!==pendingUpload.revisionId)await tx.objectStore('uploads').put(pendingUpload,[session.owner,session.id]);
+    if(!pendingUpload && previous?.pendingUploadId)await tx.objectStore('uploads').delete([session.owner,session.id]);
+    await tx.objectStore('sessions').put({...header,pendingUploadId:pendingUpload?.revisionId,localVersion:expected+1});
     if (sample)
       await tx
         .objectStore('samples')
         .put({ ...sample, owner: session.owner, surveyId: session.id });
     await tx.done;
-    versions.set(keyFor(session),expected+1); session.localVersion=expected+1;
+    versions.set(keyFor(session), expected + 1);
+    session.localVersion = expected + 1;
   } finally {
     db.close();
   }
@@ -48,24 +60,41 @@ export async function saveSurveyLocal(
 export async function storeRecording(recording: SurveyRecording) {
   const db = await database();
   try {
-    const tx = db.transaction(['sessions', 'samples'], 'readwrite', {
+    const tx = db.transaction(['sessions', 'samples','uploads'], 'readwrite', {
       durability: 'strict',
     });
-    const session=recording.session;
-    const previous = await tx.objectStore('sessions').get([session.owner,session.id]);
+    const session = recording.session;
+    const previous = await tx
+      .objectStore('sessions')
+      .get([session.owner, session.id]);
     const expected = versions.get(keyFor(session)) ?? session.localVersion ?? 0;
-    if ((previous?.localVersion ?? 0) !== expected) { tx.abort(); await tx.done.catch(()=>{}); throw new Error('Survey changed in another tab. Save a separate recovery copy.'); }
-    await tx.objectStore('sessions').put({...session,localVersion:expected+1});
+    if ((previous?.localVersion ?? 0) !== expected) {
+      tx.abort();
+      await tx.done.catch(() => {});
+      throw new Error(
+        'Survey changed in another tab. Save a separate recovery copy.',
+      );
+    }
+    const {pendingUpload,...header}=session;
+    if(pendingUpload)await tx.objectStore('uploads').put(pendingUpload,[session.owner,session.id]);
+    else await tx.objectStore('uploads').delete([session.owner,session.id]);
+    await tx.objectStore('sessions').put({...header,pendingUploadId:pendingUpload?.revisionId,localVersion:expected+1});
+    const oldKeys = await tx
+      .objectStore('samples')
+      .index('survey')
+      .getAllKeys([session.owner, session.id]);
+    await Promise.all(
+      oldKeys.map((key) => tx.objectStore('samples').delete(key)),
+    );
     for (const sample of recording.samples)
-      await tx
-        .objectStore('samples')
-        .put({
-          ...sample,
-          owner: recording.session.owner,
-          surveyId: recording.session.id,
-        });
+      await tx.objectStore('samples').put({
+        ...sample,
+        owner: recording.session.owner,
+        surveyId: recording.session.id,
+      });
     await tx.done;
-    versions.set(keyFor(session),expected+1); session.localVersion=expected+1;
+    versions.set(keyFor(session), expected + 1);
+    session.localVersion = expected + 1;
   } finally {
     db.close();
   }
@@ -89,10 +118,12 @@ export async function loadSurveyLocal(
   const db = await database();
   try {
     const session = (await db.get('sessions', [owner, id])) as
-      | SurveySession
+      | (SurveySession & {pendingUploadId?:string})
       | undefined;
     if (!session) return null;
-    versions.set(keyFor(session),session.localVersion??0);
+    if(session.pendingUploadId)session.pendingUpload=await db.get('uploads',[owner,id]);
+    delete session.pendingUploadId;
+    versions.set(keyFor(session), session.localVersion ?? 0);
     const rows = await db.getAllFromIndex('samples', 'survey', [owner, id]);
     const samples: SurveySample[] = rows
       .map(({ owner: _owner, surveyId: _id, ...s }) => s)

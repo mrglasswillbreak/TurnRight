@@ -83,17 +83,19 @@ export default function Admin({
   const generation = useRef(0);
   useEffect(() => {
     if (!supabase) return;
-    if (!navigator.onLine) setOwner(localStorage.getItem('turnright:offline-owner'));
-    else void supabase.auth
-      .getSession()
-      .then(({ data }) =>
-        setOwner(
-          data.session?.user.id ||
-            (!navigator.onLine
-              ? localStorage.getItem('turnright:offline-owner')
-              : null),
-        ),
-      );
+    if (!navigator.onLine)
+      setOwner(localStorage.getItem('turnright:offline-owner'));
+    else
+      void supabase.auth
+        .getSession()
+        .then(({ data }) =>
+          setOwner(
+            data.session?.user.id ||
+              (!navigator.onLine
+                ? localStorage.getItem('turnright:offline-owner')
+                : null),
+          ),
+        );
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_OUT')
@@ -1005,7 +1007,8 @@ function Editor({
           threeD={threeD}
           editor
           buildingOpacity={
-            survey || tool === 'entrance' ||
+            survey ||
+            tool === 'entrance' ||
             tool === 'building' ||
             selected?.kind === 'building'
               ? 0.2
@@ -1028,8 +1031,14 @@ function Editor({
             recordingChanged={setSurveyRecording}
             view2D={() => setThreeD(false)}
             apply={async (edits, previousIds) => {
-              const removed=workspace.edits.filter(e=>previousIds.includes(e.id)&&!edits.some(n=>n.id===e.id)).map(e=>({...e,deleted:true}));
-              edits=[...edits,...removed];
+              const removed = workspace.edits
+                .filter(
+                  (e) =>
+                    previousIds.includes(e.id) &&
+                    !edits.some((n) => n.id === e.id),
+                )
+                .map((e) => ({ ...e, deleted: true }));
+              edits = [...edits, ...removed];
               const next = [
                 ...workspace.edits.filter(
                   (e) => !edits.some((n) => n.kind === e.kind && n.id === e.id),
@@ -1041,17 +1050,44 @@ function Editor({
                 (e) => !validation.errors.includes(e),
               );
               if (addedErrors.length) throw new Error(addedErrors.join(' '));
-              const reachable = new Set(validation.data.graph.nodes.map(n=>n.id));
-              let expanded=true;
-              while(expanded){expanded=false;for(const e of checked.data.graph.edges){if(!e.accessible||e.geometryBlocked)continue;if(reachable.has(e.from)&&!reachable.has(e.to)){reachable.add(e.to);expanded=true;}if(reachable.has(e.to)&&!reachable.has(e.from)){reachable.add(e.from);expanded=true;}}}
-              for(const edit of edits.filter(e=>e.kind==='path'&&!e.deleted)){
-                if(!checked.data.graph.edges.some(e=>e.sourceId===edit.id&&(reachable.has(e.from)||reachable.has(e.to))))throw new Error('This section has no usable connection to the mapped network. Keep it as a saved survey until connected.');
+              const reachable = new Set(
+                validation.data.graph.nodes.map((n) => n.id),
+              );
+              let expanded = true;
+              while (expanded) {
+                expanded = false;
+                for (const e of checked.data.graph.edges) {
+                  if (!e.accessible || e.geometryBlocked) continue;
+                  if (reachable.has(e.from) && !reachable.has(e.to)) {
+                    reachable.add(e.to);
+                    expanded = true;
+                  }
+                  if (reachable.has(e.to) && !reachable.has(e.from)) {
+                    reachable.add(e.from);
+                    expanded = true;
+                  }
+                }
+              }
+              for (const edit of edits.filter(
+                (e) => e.kind === 'path' && !e.deleted,
+              )) {
+                if (
+                  !checked.data.graph.edges.some(
+                    (e) =>
+                      e.sourceId === edit.id &&
+                      (reachable.has(e.from) || reachable.has(e.to)),
+                  )
+                )
+                  throw new Error(
+                    'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                  );
               }
               workspace.commit(next, null);
               if (navigator.onLine && !(await workspace.flush()))
                 throw new Error(
                   'Map changes are saved locally. Resolve the draft save issue before retrying.',
                 );
+              return edits.map(e=>featureEdit(checked.data,e.kind,e.id,store.edits) || e);
             }}
           />
         )}

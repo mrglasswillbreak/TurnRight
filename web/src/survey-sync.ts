@@ -12,7 +12,7 @@ export interface RemoteSurvey {
   head_revision: string | null;
   survey_revisions: {
     id: string;
-    metadata: SurveySession;
+    name: string;
     status: string;
     created_at: string;
   }[];
@@ -26,10 +26,17 @@ export async function openRemoteSurvey(owner: string, revisionId: string) {
   }>('survey-get', { revisionId });
   if (result.revision.owner !== owner)
     throw new Error('Sign in with the survey owner.');
-  while(result.nextOffset!==null){
-    const next=await api<{chunks:{samples:SurveySample[]}[];nextOffset:number|null}>('survey-get',{revisionId,offset:result.nextOffset});
-    if(!next.chunks.length)throw new Error('Private upload is incomplete. Reopen after saving finishes.');
-    result.chunks.push(...next.chunks);result.nextOffset=next.nextOffset;
+  while (result.nextOffset !== null) {
+    const next = await api<{
+      chunks: { samples: SurveySample[] }[];
+      nextOffset: number | null;
+    }>('survey-get', { revisionId, offset: result.nextOffset });
+    if (!next.chunks.length)
+      throw new Error(
+        'Private upload is incomplete. Reopen after saving finishes.',
+      );
+    result.chunks.push(...next.chunks);
+    result.nextOffset = next.nextOffset;
   }
   const recording: SurveyRecording = {
     session: {
@@ -45,12 +52,28 @@ export async function openRemoteSurvey(owner: string, revisionId: string) {
   await storeRecording(recording);
   return recording;
 }
-const flights=new WeakMap<SurveyRecording,Promise<unknown>>();
-export function syncSurvey(recording:SurveyRecording,progress:(s:string)=>void):Promise<unknown>{
-  const running=flights.get(recording);if(running)return running;
-  const flight=performSync(recording,progress).finally(()=>flights.delete(recording));flights.set(recording,flight);return flight;
+const flights = new WeakMap<SurveyRecording, Promise<unknown>>();
+export function syncSurvey(
+  recording: SurveyRecording,
+  progress: (s: string) => void,
+): Promise<unknown> {
+  const running = flights.get(recording);
+  if (running) return running;
+  const flight = performSync(recording, progress).finally(() =>
+    flights.delete(recording),
+  );
+  flights.set(recording, flight);
+  return flight;
 }
-const evidenceSignature=(session:SurveySession)=>JSON.stringify({...session,remoteRevision:null,localVersion:undefined,pendingUpload:undefined,past:[],future:[]});
+const evidenceSignature = (session: SurveySession) =>
+  JSON.stringify({
+    ...session,
+    remoteRevision: null,
+    localVersion: undefined,
+    pendingUpload: undefined,
+    past: [],
+    future: [],
+  });
 async function performSync(
   recording: SurveyRecording,
   progress: (s: string) => void,
@@ -109,9 +132,17 @@ async function performSync(
     throw new Error(
       'Both versions are saved privately. Open Saved surveys to compare, then choose which version to continue.',
     );
-  if(evidenceSignature(session)!==evidenceSignature(upload.metadata)||recording.samples.length!==upload.chunks.reduce((n,c)=>n+c.length,0)){
-    if((recording.session as SurveySession).state==='recording'){progress('Earlier revision saved privately; current recording remains local.');return result;}
-    return performSync(recording,progress);
+  if (
+    evidenceSignature(session) !== evidenceSignature(upload.metadata) ||
+    recording.samples.length !== upload.chunks.reduce((n, c) => n + c.length, 0)
+  ) {
+    if ((recording.session as SurveySession).state === 'recording') {
+      progress(
+        'Earlier revision saved privately; current recording remains local.',
+      );
+      return result;
+    }
+    return performSync(recording, progress);
   }
   progress('Saved privately');
   return result;

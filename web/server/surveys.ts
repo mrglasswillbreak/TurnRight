@@ -11,7 +11,7 @@ export async function surveyAction(
   const actor = encodeURIComponent(owner);
   if (action === 'survey-list')
     return db(
-      `surveys?owner=eq.${actor}&select=*,survey_revisions!survey_revisions_survey_id_fkey(id,metadata,status,created_at)&order=updated_at.desc&limit=100`,
+      `surveys?owner=eq.${actor}&select=*,survey_revisions!survey_revisions_survey_id_fkey(id,name:metadata->>name,status,created_at)&order=updated_at.desc&limit=100&survey_revisions.order=created_at.desc&survey_revisions.limit=20`,
     );
   if (action === 'survey-get') {
     if (!uuid(input.revisionId))
@@ -20,12 +20,20 @@ export async function surveyAction(
       `survey_revisions?id=eq.${input.revisionId}&owner=eq.${actor}`,
     );
     if (!revision) throw new HttpError(404, 'Survey not found.');
-    const offset=Number(input.offset || 0);
-    if(!Number.isInteger(offset)||offset<0||offset>2000)throw new HttpError(400,'Invalid chunk offset.');
+    const offset = Number(input.offset || 0);
+    if (!Number.isInteger(offset) || offset < 0 || offset > 2000)
+      throw new HttpError(400, 'Invalid chunk offset.');
     const chunks = await db(
       `survey_chunks?revision_id=eq.${input.revisionId}&owner=eq.${actor}&order=chunk_index&limit=4&offset=${offset}`,
     );
-    return { revision, chunks, nextOffset: offset+chunks.length<revision.chunk_count?offset+chunks.length:null };
+    return {
+      revision,
+      chunks,
+      nextOffset:
+        offset + chunks.length < revision.chunk_count
+          ? offset + chunks.length
+          : null,
+    };
   }
   if (action !== 'survey-save')
     throw new HttpError(400, 'Unknown survey action.');

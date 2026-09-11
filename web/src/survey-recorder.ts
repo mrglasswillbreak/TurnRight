@@ -26,7 +26,11 @@ export class SurveyRecorder {
     private changed: () => void,
     private persist = saveSurveyLocal,
   ) {
-    this.unregister=registerSurveyRecovery(this,()=>this.recording.session.state==='recording',()=>this.flush());
+    this.unregister = registerSurveyRecovery(
+      this,
+      () => this.recording.session.state === 'recording',
+      () => this.flush(),
+    );
     document.addEventListener('visibilitychange', this.visibility);
     window.addEventListener('pagehide', this.hidden);
   }
@@ -40,7 +44,10 @@ export class SurveyRecorder {
     void this.pause('Recording paused when leaving the page.');
   };
   private save(sample?: SurveySample) {
-    const snapshot = structuredClone(this.recording.session);
+    // The queued upload is immutable; copying its raw chunks on each GPS callback
+    // would turn incremental recording into an ever-growing full-track copy.
+    const {pendingUpload,...header}=this.recording.session;
+    const snapshot = {...structuredClone(header),pendingUpload};
     this.queue = this.queue
       .then(() => this.persist(snapshot, sample))
       .catch((e: Error) => {
@@ -163,12 +170,15 @@ export class SurveyRecorder {
   dispose() {
     this.disposed = true;
     if (this.recording.session.state === 'recording') {
-      pauseSurvey(this.recording.session,'Recording stopped when leaving the editor. Tap Resume.');
-      void this.save().catch(()=>{});
+      pauseSurvey(
+        this.recording.session,
+        'Recording stopped when leaving the editor. Tap Resume.',
+      );
+      void this.save().catch(() => {});
     }
     this.stop();
     document.removeEventListener('visibilitychange', this.visibility);
     window.removeEventListener('pagehide', this.hidden);
-    void this.queue.finally(()=>this.unregister()).catch(()=>{});
+    void this.queue.finally(() => this.unregister()).catch(() => {});
   }
 }

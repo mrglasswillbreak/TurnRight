@@ -122,44 +122,82 @@ test('phone survey records, reviews, connects, applies and recovers without coor
     }),
   ).toBeVisible();
 });
-test('phone survey marks two entrances, connects both approaches and tests their route',async({page})=>{
+test('phone survey marks two entrances, connects both approaches and tests their route', async ({
+  page,
+}) => {
   test.setTimeout(90000);
-  await page.setViewportSize({width:390,height:844});await surveyGps(page);
-  const server=await setup(page);
-  await page.getByRole('button',{name:'Survey',exact:true}).click();
-  await page.getByRole('button',{name:'Record new path',exact:true}).click();
-  let clock=Date.now();
-  for(const [index,x] of [3.20018,3.20033].entries()){
-    if(index) await page.getByRole('button',{name:'Resume',exact:true}).click();
-    for(let step=0;step<=8;step++){
-      clock+=5000;await page.clock.setFixedTime(clock);
-      await pushSurveyFix(page,[x,6.46+step*.000025]);
-      await expect(page.getByRole('button',{name:'Mark entrance here',exact:true})).toBeEnabled();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await surveyGps(page);
+  const server = await setup(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Record new path', exact: true })
+    .click();
+  let clock = Date.now();
+  for (const [index, x] of [3.20018, 3.20033].entries()) {
+    if (index)
+      await page.getByRole('button', { name: 'Resume', exact: true }).click();
+    for (let step = 0; step <= 8; step++) {
+      clock += 5000;
+      await page.clock.setFixedTime(clock);
+      await pushSurveyFix(page, [x, 6.46 + step * 0.000025]);
+      await expect(
+        page.getByRole('button', { name: 'Mark entrance here', exact: true }),
+      ).toBeEnabled();
     }
-    await page.getByRole('button',{name:'Mark entrance here',exact:true}).click();
-    await page.getByLabel('Entrance name',{exact:true}).fill(`Walked entrance ${index+1}`);
-    await page.getByLabel('Entrance place',{exact:true}).selectOption('library');
-    await aimCrosshair(page,[x,6.4602]);
-    await page.getByRole('button',{name:'Place entrance here',exact:true}).click();
-    await page.getByRole('button',{name:'Confirm entrance',exact:true}).click();
+    await page
+      .getByRole('button', { name: 'Mark entrance here', exact: true })
+      .click();
+    await page
+      .getByLabel('Entrance name', { exact: true })
+      .fill(`Walked entrance ${index + 1}`);
+    await page
+      .getByLabel('Entrance place', { exact: true })
+      .selectOption('library');
+    await aimCrosshair(page, [x, 6.4602]);
+    await page
+      .getByRole('button', { name: 'Place entrance here', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: 'Confirm entrance', exact: true })
+      .click();
   }
-  await page.getByRole('button',{name:'Finish',exact:true}).click();
-  for(const [index,x] of [3.20018,3.20033].entries()){
-    await page.getByRole('button',{name:`Section ${index+1} · Needs review`,exact:true}).click();
-    await page.getByRole('checkbox',{name:'Connect to highlighted target'}).check();
-    await aimCrosshair(page,[x,6.46]);
-    await page.getByRole('button',{name:'Place here',exact:true}).click();
-    await page.getByRole('button',{name:'Confirm section reviewed',exact:true}).click();
+  await page.getByRole('button', { name: 'Finish', exact: true }).click();
+  for (const [index, x] of [3.20018, 3.20033].entries()) {
+    await page
+      .getByRole('button', {
+        name: `Section ${index + 1} · Needs review`,
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole('checkbox', { name: 'Connect to highlighted target' })
+      .check();
+    await aimCrosshair(page, [x, 6.46]);
+    await page.getByRole('button', { name: 'Place here', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Confirm section reviewed', exact: true })
+      .click();
   }
-  await page.getByRole('button',{name:'Apply to map draft',exact:true}).click();
-  await expect.poll(()=>server.edits().filter(e=>e.kind==='entrance')).toHaveLength(2);
-  await page.getByRole('button',{name:'Apply to map draft',exact:true}).click();
-  await expect.poll(()=>server.edits().filter(e=>e.kind==='entrance')).toHaveLength(2);
-  await page.getByRole('button',{name:'Close survey',exact:true}).click();
-  await page.getByRole('button',{name:'Test route',exact:true}).click();
+  await page
+    .getByRole('button', { name: 'Apply to map draft', exact: true })
+    .click();
+  await expect
+    .poll(() => server.edits().filter((e) => e.kind === 'entrance'))
+    .toHaveLength(2);
+  await page
+    .getByRole('button', { name: 'Apply to map draft', exact: true })
+    .click();
+  await expect
+    .poll(() => server.edits().filter((e) => e.kind === 'entrance'))
+    .toHaveLength(2);
+  await page.getByRole('button', { name: 'Close survey', exact: true }).click();
+  await page.getByRole('button', { name: 'Test route', exact: true }).click();
   await page.getByLabel('Test route From').selectOption('gate');
   await page.getByLabel('Test route To').selectOption('library');
-  await page.getByRole('button',{name:'Preview route',exact:true}).click();
+  await page
+    .getByRole('button', { name: 'Preview route', exact: true })
+    .click();
   await expect(page.getByText(/Walked entrance 1/).last()).toBeVisible();
 });
 test('phone survey pauses when hidden and requires explicit resume after reload', async ({
