@@ -42,6 +42,8 @@ If another session changes a draft, local work is preserved. Review the conflict
 
 Apply `supabase/migrations/003_editor_batches.sql` once to the existing database **before deploying this editor and API**. For a new database, apply migrations 001, 002, and 003 in order. Migration 003 adds the service-role-only batch function and operation receipts; it does not modify published map packages. Retain operation receipts so delayed retries remain idempotent.
 
+Migration 003 was applied to the TurnRight Supabase project on 11 September 2026. Live verification confirmed that receipt RLS is enabled, anonymous and authenticated roles cannot execute the function, and the service role can. The implementation passed 84 unit/database tests, six real MapLibre/Terra Draw browser tests, seven Python tests, lint (existing warnings), and a production build on Node 22.23.2.
+
 Use Node 22.13 or later in the 22.x line:
 
 ```sh
