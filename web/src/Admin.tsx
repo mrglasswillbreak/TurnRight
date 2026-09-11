@@ -1087,7 +1087,10 @@ function Editor({
                 throw new Error(
                   'Map changes are saved locally. Resolve the draft save issue before retrying.',
                 );
-              return edits.map(e=>featureEdit(checked.data,e.kind,e.id,store.edits) || e);
+              return edits.map(
+                (e) =>
+                  featureEdit(checked.data, e.kind, e.id, store.edits) || e,
+              );
             }}
           />
         )}

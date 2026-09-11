@@ -11,6 +11,7 @@ import type { CampusData, MapEdit, Position, WalkingAccess } from './types';
 import {
   newSurvey,
   surveyId,
+  surveyRecoveryCopy,
   reviewCommand,
   reviewUndo,
   replacementTarget,
@@ -28,6 +29,7 @@ import {
   listLocalSurveys,
   loadSurveyLocal,
   saveSurveyLocal,
+  storeRecording,
 } from './survey-storage';
 import {
   listRemoteSurveys,
@@ -73,7 +75,9 @@ export function SurveyPanel({
   );
   const [selection, setSelection] = useState<Selection | null>(null),
     [marker, setMarker] = useState<SurveyMarker | null>(null);
-  const [reselecting,setReselecting]=useState(false);
+  const [reselecting, setReselecting] = useState(false);
+  const [syncEpoch, setSyncEpoch] = useState(0);
+  const attemptedSync = useRef('');
   const [query, setQuery] = useState(''),
     [message, setMessage] = useState(''),
     [error, setError] = useState(''),
@@ -94,7 +98,18 @@ export function SurveyPanel({
   live.current = { recording, screen, selection, following, path };
   const session = recording?.session;
   const active = session?.state === 'recording';
-  const connectionData=useMemo(()=>({...data,graph:{...data.graph,edges:data.graph.edges.filter(e=>!session?.generatedCorrectionIds.includes(e.sourceId))}}),[data,session?.generatedCorrectionIds]);
+  const connectionData = useMemo(
+    () => ({
+      ...data,
+      graph: {
+        ...data.graph,
+        edges: data.graph.edges.filter(
+          (e) => !session?.generatedCorrectionIds.includes(e.sourceId),
+        ),
+      },
+    }),
+    [data, session?.generatedCorrectionIds],
+  );
   const nodes = useMemo(
     () => new Map(data.graph.nodes.map((n) => [n.id, n])),
     [data.graph.nodes],
@@ -170,18 +185,16 @@ export function SurveyPanel({
   useEffect(() => {
     const recorder = controller.current;
     if (!recorder) return;
+    if (
+      JSON.stringify(recorder.recording.session.pendingMarker) ===
+      JSON.stringify(marker || undefined)
+    )
+      return;
     recorder.recording.session.pendingMarker = marker || undefined;
     void recorder.persistChanges().catch((e: Error) => setError(e.message));
   }, [marker, recording?.session.id]);
   useEffect(() => {
-    const online = () => {
-      const r = live.current.recording;
-      if (r?.session.pendingUpload && r.session.state !== 'recording')
-        void run.current(async () => {
-          await syncSurvey(r, setMessage);
-          changed();
-        });
-    };
+    const online = () => setSyncEpoch((n) => n + 1);
     window.addEventListener('online', online);
     const auth = supabase?.auth.onAuthStateChange((event) => {
       if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN')
@@ -192,6 +205,17 @@ export function SurveyPanel({
       auth?.data.subscription.unsubscribe();
     };
   }, []);
+  useEffect(() => {
+    const pending = recording?.session.pendingUpload;
+    if (!recording || !pending || busy || active || !navigator.onLine) return;
+    const key = `${pending.revisionId}:${syncEpoch}`;
+    if (attemptedSync.current === key) return;
+    attemptedSync.current = key;
+    void run.current(async () => {
+      await syncSurvey(recording, setMessage);
+      changed();
+    });
+  }, [recording, session?.pendingUpload?.revisionId, busy, active, syncEpoch]);
   useEffect(() => {
     const empty: FeatureCollection = {
       type: 'FeatureCollection',
@@ -702,12 +726,30 @@ export function SurveyPanel({
                 <button
                   className="survey-primary"
                   disabled={boundaries.length !== 2}
-                  onClick={() => void attempt(async()=>{
-                    if(reselecting && session && path){session.replacement=replacementTarget(path,data,...[...boundaries].sort((a,b)=>a-b) as [number,number]);delete session.appliedTarget;await persist();setScreen('survey');setMessage('Replacement target updated. Review the fixed anchors before applying.');}
-                    else await start(true);
-                  })}
+                  onClick={() =>
+                    void attempt(async () => {
+                      if (reselecting && session && path) {
+                        session.replacement = replacementTarget(
+                          path,
+                          data,
+                          ...([...boundaries].sort((a, b) => a - b) as [
+                            number,
+                            number,
+                          ]),
+                        );
+                        delete session.appliedTarget;
+                        await persist();
+                        setScreen('survey');
+                        setMessage(
+                          'Replacement target updated. Review the fixed anchors before applying.',
+                        );
+                      } else await start(true);
+                    })
+                  }
                 >
-                  {reselecting?'Use reviewed replacement boundaries':'Record replacement'}
+                  {reselecting
+                    ? 'Use reviewed replacement boundaries'
+                    : 'Record replacement'}
                 </button>
                 <button onClick={() => setScreen('home')}>Back</button>
               </>
@@ -750,15 +792,10 @@ export function SurveyPanel({
                                 s.id,
                               );
                               if (localVersion) {
-                                const copy = structuredClone(localVersion);
-                                copy.session.id = surveyId();
-                                copy.session.name +=
-                                  ' (local copy before opening cloud version)';
-                                copy.session.remoteRevision = null;
-                                copy.session.localVersion = undefined;
-                                copy.session.pendingUpload = undefined;
-                                const { storeRecording } =
-                                  await import('./survey-storage');
+                                const copy = surveyRecoveryCopy(
+                                  localVersion,
+                                  ' (local copy before opening cloud version)',
+                                );
                                 await storeRecording(copy);
                               }
                               open(await openRemoteSurvey(owner, r.id));
@@ -782,15 +819,9 @@ export function SurveyPanel({
                                   s.id,
                                 );
                                 if (current) {
-                                  current.session.id = surveyId();
-                                  current.session.localVersion = undefined;
-                                  current.session.remoteRevision = null;
-                                  current.session.pendingUpload = undefined;
-                                  current.session.name +=
-                                    ' (local recovery copy)';
-                                  const { storeRecording } =
-                                    await import('./survey-storage');
-                                  await storeRecording(current);
+                                  await storeRecording(
+                                    surveyRecoveryCopy(current),
+                                  );
                                 }
                                 const rcd = await openRemoteSurvey(owner, r.id);
                                 rcd.session.remoteRevision = s.head_revision;
@@ -1004,7 +1035,25 @@ export function SurveyPanel({
                       >
                         Rewalk missing section
                       </button>
-                      {session.replacement&&<button onClick={()=>{setReselecting(true);setPath(featureEdit(data,'path',session.replacement!.edit.id,edits)||null);setBoundaries([]);setScreen('replace');}}>Review replacement target</button>}
+                      {session.replacement && (
+                        <button
+                          onClick={() => {
+                            setReselecting(true);
+                            setPath(
+                              featureEdit(
+                                data,
+                                'path',
+                                session.replacement!.edit.id,
+                                edits,
+                              ) || null,
+                            );
+                            setBoundaries([]);
+                            setScreen('replace');
+                          }}
+                        >
+                          Review replacement target
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           command((s) =>
@@ -1104,7 +1153,11 @@ export function SurveyPanel({
                                       id: surveyId(),
                                       coordinates: center,
                                     }),
-                                  );setSelection({line:selectedLine.id,vertex:vertexIndex+1});
+                                  );
+                                  setSelection({
+                                    line: selectedLine.id,
+                                    vertex: vertexIndex + 1,
+                                  });
                                 }}
                               >
                                 Insert vertex after
@@ -1315,7 +1368,19 @@ export function SurveyPanel({
                                   s.markers = s.markers.filter(
                                     (m) => m.id !== selectedMarker.id,
                                   );
-                                  for(const l of s.review)for(const v of l.vertices)if(v.sampleId===selectedMarker.sampleId&&!s.markers.some(m=>m.sampleId===v.sampleId))v.pinned=!!session.replacement?.anchors.some(a=>a.id===v.id);
+                                  for (const l of s.review)
+                                    for (const v of l.vertices)
+                                      if (
+                                        v.sampleId ===
+                                          selectedMarker.sampleId &&
+                                        !s.markers.some(
+                                          (m) => m.sampleId === v.sampleId,
+                                        )
+                                      )
+                                        v.pinned =
+                                          !!session.replacement?.anchors.some(
+                                            (a) => a.id === v.id,
+                                          );
                                 });
                                 setSelection(null);
                               }}
@@ -1363,8 +1428,16 @@ export function SurveyPanel({
                             corrections,
                             session.generatedCorrectionIds,
                           );
-                          const target=applied.find(e=>e.kind==='path'&&e.id===session.replacement?.edit.id);
-                          if(target)session.appliedTarget={fingerprint:geometryFingerprint(target),revision:target.updated_at};
+                          const target = applied.find(
+                            (e) =>
+                              e.kind === 'path' &&
+                              e.id === session.replacement?.edit.id,
+                          );
+                          if (target)
+                            session.appliedTarget = {
+                              fingerprint: geometryFingerprint(target),
+                              revision: target.updated_at,
+                            };
                           session.generatedCorrectionIds = corrections.map(
                             (e) => e.id,
                           );
@@ -1390,7 +1463,7 @@ export function SurveyPanel({
                   </div>
                 )}
                 <output>
-                  {busy
+                  {busy || !!controller.current?.pendingWrites
                     ? 'Saving…'
                     : controller.current?.error
                       ? 'Recovery storage failed'
@@ -1408,15 +1481,7 @@ export function SurveyPanel({
               <button
                 onClick={() =>
                   void attempt(async () => {
-                    const copy = structuredClone(recording);
-                    copy.session.id = surveyId();
-                    copy.session.name += ' (recovery copy)';
-                    copy.session.state = 'paused';
-                    copy.session.localVersion = undefined;
-                    copy.session.remoteRevision = null;
-                    copy.session.pendingUpload = undefined;
-                    copy.session.generatedCorrectionIds = [];
-                    const { storeRecording } = await import('./survey-storage');
+                    const copy = surveyRecoveryCopy(recording);
                     await storeRecording(copy);
                     open(copy);
                     setMessage(

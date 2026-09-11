@@ -333,4 +333,12 @@
   width: 100%;
   margin: 8px 0;
 }
-.survey-sheet .survey-collapse{min-height:44px}.survey-sheet label{display:flex;align-items:center;gap:8px;min-height:44px}
+.survey-sheet .survey-collapse {
+  min-height: 44px;
+}
+.survey-sheet label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}

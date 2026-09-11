@@ -20,6 +20,7 @@ export class SurveyRecorder {
   private unregister: () => void;
   error = '';
   awake = false;
+  pendingWrites = 0;
   latest?: SurveySample;
   constructor(
     public recording: SurveyRecording,
@@ -46,8 +47,10 @@ export class SurveyRecorder {
   private save(sample?: SurveySample) {
     // The queued upload is immutable; copying its raw chunks on each GPS callback
     // would turn incremental recording into an ever-growing full-track copy.
-    const {pendingUpload,...header}=this.recording.session;
-    const snapshot = {...structuredClone(header),pendingUpload};
+    const { pendingUpload, ...header } = this.recording.session;
+    const snapshot = { ...structuredClone(header), pendingUpload };
+    this.pendingWrites++;
+    this.changed();
     this.queue = this.queue
       .then(() => this.persist(snapshot, sample))
       .catch((e: Error) => {
@@ -59,6 +62,10 @@ export class SurveyRecorder {
         this.error = e.message || 'Could not store this recording.';
         this.changed();
         throw e;
+      })
+      .finally(() => {
+        this.pendingWrites--;
+        this.changed();
       });
     return this.queue;
   }

@@ -9,6 +9,7 @@ import {
   reviewUndo,
   surveyCorrections,
   replacementTarget,
+  surveyRecoveryCopy,
   type SurveyRecording,
 } from '../src/survey-model';
 import type { GpsFix, MapEdit, Position } from '../src/types';
@@ -28,6 +29,22 @@ function walk(r: SurveyRecording, coords: Position[], start = 100000) {
   );
 }
 describe('survey recordings', () => {
+  it('keeps recovery copies independent while preserving their evidence', () => {
+    const r = newSurvey('owner', 'source');
+    walk(r, [
+      [3.2, 6.46],
+      [3.20003, 6.46],
+    ]);
+    r.session.review = proposeGeometry(r);
+    const copy = surveyRecoveryCopy(r);
+    expect(copy.session.id).not.toBe(r.session.id);
+    expect(copy.samples).toEqual(r.samples);
+    expect(copy.session.review[0].vertices[0].id).not.toBe(
+      r.session.review[0].vertices[0].id,
+    );
+    expect(copy.session.remoteRevision).toBeNull();
+    expect(copy.session.generatedCorrectionIds).toEqual([]);
+  });
   it('rejects inaccurate, stale, outside, future and out-of-order fixes', () => {
     expect(classifyFix(fix(100000, undefined, 16), undefined, 0, 100000)).toBe(
       'inaccurate',
@@ -224,5 +241,52 @@ describe('survey recordings', () => {
       (e) => !['bc', 'cb'].includes(e.id),
     );
     expect(() => replacementTarget(edit, data, 0, 2)).toThrow(/gap/);
+  });
+  it('retains implicit one-way direction and pins closure boundaries in replacements', () => {
+    const data = campusFixture();
+    data.graph.edges = data.graph.edges
+      .filter((e) => ['ab', 'bc'].includes(e.id))
+      .map((e) => ({ ...e, sourceId: 'road' }));
+    const edit: MapEdit = {
+      id: 'road',
+      kind: 'path',
+      geometry: {
+        type: 'LineString',
+        coordinates: data.graph.nodes.slice(0, 3).map((n) => n.coordinates),
+      },
+      properties: {
+        name: 'One way',
+        vertexIds: ['a', 'b', 'c'],
+        access: 'yes',
+      },
+    };
+    data.map.features.push({
+      type: 'Feature',
+      geometry: edit.geometry,
+      properties: { ...edit.properties, kind: 'path', id: 'road' },
+    });
+    const r = newSurvey('owner', 'source');
+    r.session.replacement = replacementTarget(edit, data, 0, 2);
+    r.session.review = [
+      {
+        id: 'replacement',
+        reviewed: true,
+        vertices: [
+          { id: 'a', coordinates: [3.2, 6.46], pinned: true },
+          { id: 'new', coordinates: [3.2005, 6.45997] },
+          { id: 'c', coordinates: [3.201, 6.46], pinned: true },
+        ],
+      },
+    ];
+    const assembled = applyEdits(data, surveyCorrections(r.session, edit));
+    expect(assembled.errors).toEqual([]);
+    expect(assembled.data.graph.edges.map((e) => [e.from, e.to])).toEqual([
+      ['a', 'new'],
+      ['new', 'c'],
+    ]);
+    data.closures = [{ id: 'closure', edgeIds: ['ab'], reason: 'works' }];
+    expect(
+      replacementTarget(edit, data, 0, 2).anchors.map((a) => a.id),
+    ).toContain('b');
   });
 });

@@ -14,6 +14,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:browser": "playwright test",
+    "test:survey-pwa": "playwright test --config playwright.pwa.config.ts",
+    "test:survey-webkit": "playwright test --config playwright.webkit.config.ts",
     "package": "node ../scripts/package.mjs",
     "prebuild": "node scripts/prebuild.mjs"
   },

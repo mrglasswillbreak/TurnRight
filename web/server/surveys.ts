@@ -77,15 +77,16 @@ export async function surveyAction(
     )
       throw new HttpError(400, 'Invalid recording chunk.');
     for (const sample of payload.samples) {
+      const rejected = !['accepted','duplicate'].includes(sample.status);
       if (
         !uuid(sample.id) ||
         !Array.isArray(sample.coordinates) ||
         sample.coordinates.length !== 2 ||
         !sample.coordinates.every(
-          (v: unknown) => typeof v === 'number' && Number.isFinite(v),
+          (v: unknown) => (typeof v === 'number' && Number.isFinite(v)) || (rejected && v === null),
         ) ||
-        !Number.isFinite(sample.timestamp) ||
-        !Number.isFinite(sample.accuracy) ||
+        (!Number.isFinite(sample.timestamp) && !(rejected && sample.timestamp === null)) ||
+        (!Number.isFinite(sample.accuracy) && !(rejected && sample.accuracy === null)) ||
         ![
           'accepted',
           'duplicate',

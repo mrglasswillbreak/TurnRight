@@ -11,15 +11,15 @@ const keyFor = (s: SurveySession) => `${s.owner}:${s.id}`;
 const database = () =>
   openDB('turnright-surveys', 2, {
     upgrade(db, oldVersion) {
-      if(oldVersion<1){
-      db.createObjectStore('sessions', { keyPath: ['owner', 'id'] });
-      const samples = db.createObjectStore('samples', {
-        keyPath: ['owner', 'surveyId', 'id'],
-      });
-      samples.createIndex('survey', ['owner', 'surveyId']);
-      db.createObjectStore('context');
+      if (oldVersion < 1) {
+        db.createObjectStore('sessions', { keyPath: ['owner', 'id'] });
+        const samples = db.createObjectStore('samples', {
+          keyPath: ['owner', 'surveyId', 'id'],
+        });
+        samples.createIndex('survey', ['owner', 'surveyId']);
+        db.createObjectStore('context');
       }
-      if(oldVersion<2)db.createObjectStore('uploads');
+      if (oldVersion < 2) db.createObjectStore('uploads');
     },
   });
 export async function saveSurveyLocal(
@@ -28,7 +28,7 @@ export async function saveSurveyLocal(
 ) {
   const db = await database();
   try {
-    const tx = db.transaction(['sessions', 'samples','uploads'], 'readwrite', {
+    const tx = db.transaction(['sessions', 'samples', 'uploads'], 'readwrite', {
       durability: 'strict',
     });
     const previous = await tx
@@ -42,10 +42,18 @@ export async function saveSurveyLocal(
         'This survey changed in another tab. Your current recording is paused; save a separate recovery copy before reopening it.',
       );
     }
-    const {pendingUpload,...header}=session;
-    if(pendingUpload && previous?.pendingUploadId!==pendingUpload.revisionId)await tx.objectStore('uploads').put(pendingUpload,[session.owner,session.id]);
-    if(!pendingUpload && previous?.pendingUploadId)await tx.objectStore('uploads').delete([session.owner,session.id]);
-    await tx.objectStore('sessions').put({...header,pendingUploadId:pendingUpload?.revisionId,localVersion:expected+1});
+    const { pendingUpload, ...header } = session;
+    if (pendingUpload && previous?.pendingUploadId !== pendingUpload.revisionId)
+      await tx
+        .objectStore('uploads')
+        .put(pendingUpload, [session.owner, session.id]);
+    if (!pendingUpload && previous?.pendingUploadId)
+      await tx.objectStore('uploads').delete([session.owner, session.id]);
+    await tx.objectStore('sessions').put({
+      ...header,
+      pendingUploadId: pendingUpload?.revisionId,
+      localVersion: expected + 1,
+    });
     if (sample)
       await tx
         .objectStore('samples')
@@ -60,7 +68,7 @@ export async function saveSurveyLocal(
 export async function storeRecording(recording: SurveyRecording) {
   const db = await database();
   try {
-    const tx = db.transaction(['sessions', 'samples','uploads'], 'readwrite', {
+    const tx = db.transaction(['sessions', 'samples', 'uploads'], 'readwrite', {
       durability: 'strict',
     });
     const session = recording.session;
@@ -75,10 +83,17 @@ export async function storeRecording(recording: SurveyRecording) {
         'Survey changed in another tab. Save a separate recovery copy.',
       );
     }
-    const {pendingUpload,...header}=session;
-    if(pendingUpload)await tx.objectStore('uploads').put(pendingUpload,[session.owner,session.id]);
-    else await tx.objectStore('uploads').delete([session.owner,session.id]);
-    await tx.objectStore('sessions').put({...header,pendingUploadId:pendingUpload?.revisionId,localVersion:expected+1});
+    const { pendingUpload, ...header } = session;
+    if (pendingUpload)
+      await tx
+        .objectStore('uploads')
+        .put(pendingUpload, [session.owner, session.id]);
+    else await tx.objectStore('uploads').delete([session.owner, session.id]);
+    await tx.objectStore('sessions').put({
+      ...header,
+      pendingUploadId: pendingUpload?.revisionId,
+      localVersion: expected + 1,
+    });
     const oldKeys = await tx
       .objectStore('samples')
       .index('survey')
@@ -106,6 +121,11 @@ export async function listLocalSurveys(
   try {
     return (await db.getAll('sessions'))
       .filter((s) => s.owner === owner)
+      .map((s: SurveySession) => {
+        if (s.state === 'recording')
+          pauseSurvey(s, 'Recovered recording. Tap Resume when ready.');
+        return s;
+      })
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   } finally {
     db.close();
@@ -118,10 +138,11 @@ export async function loadSurveyLocal(
   const db = await database();
   try {
     const session = (await db.get('sessions', [owner, id])) as
-      | (SurveySession & {pendingUploadId?:string})
+      | (SurveySession & { pendingUploadId?: string })
       | undefined;
     if (!session) return null;
-    if(session.pendingUploadId)session.pendingUpload=await db.get('uploads',[owner,id]);
+    if (session.pendingUploadId)
+      session.pendingUpload = await db.get('uploads', [owner, id]);
     delete session.pendingUploadId;
     versions.set(keyFor(session), session.localVersion ?? 0);
     const rows = await db.getAllFromIndex('samples', 'survey', [owner, id]);

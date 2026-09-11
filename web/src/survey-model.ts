@@ -101,6 +101,54 @@ export interface SurveyRecording {
   samples: SurveySample[];
 }
 export const surveyId = () => crypto.randomUUID();
+export function surveyRecoveryCopy(
+  recording: SurveyRecording,
+  suffix = ' (recovery copy)',
+): SurveyRecording {
+  const copy = structuredClone(recording),
+    s = copy.session;
+  const oldId = s.id;
+  s.id = surveyId();
+  s.name += suffix;
+  s.remoteRevision = null;
+  s.localVersion = undefined;
+  s.pendingUpload = undefined;
+  s.generatedCorrectionIds = [];
+  s.appliedTarget = undefined;
+  if (s.state === 'recording')
+    pauseSurvey(s, 'Recovered copy. Tap Resume to continue.');
+  const snapshots = [s, ...s.past, ...s.future],
+    fixed = new Set(s.replacement?.anchors.map((a) => a.id) || []),
+    ids = new Map<string, string>();
+  for (const state of snapshots)
+    for (const l of state.review)
+      for (const v of l.vertices)
+        if (!fixed.has(v.id) && !ids.has(v.id))
+          ids.set(v.id, `survey:${s.id}:${surveyId()}`);
+  const connection = (target?: ConnectionTarget) => {
+    if (!target) return;
+    if (target.type === 'node')
+      target.nodeId = ids.get(target.nodeId) || target.nodeId;
+    else {
+      target.from = ids.get(target.from) || target.from;
+      target.to = ids.get(target.to) || target.to;
+      target.sourceId = target.sourceId.replace(
+        `survey:${oldId}:`,
+        `survey:${s.id}:`,
+      );
+    }
+  };
+  for (const state of snapshots) {
+    for (const l of state.review)
+      for (const v of l.vertices) {
+        v.id = ids.get(v.id) || v.id;
+        connection(v.connection);
+      }
+    for (const m of state.markers) connection(m.connection);
+  }
+  connection(s.pendingMarker?.connection);
+  return copy;
+}
 export function newSurvey(
   owner: string,
   sourceRevision: string,
@@ -421,11 +469,16 @@ export function surveyCorrections(
   }));
   if (session.replacement) {
     const r = session.replacement;
-    const matchesApplied = currentTarget && session.appliedTarget?.fingerprint === geometryFingerprint(currentTarget) && session.appliedTarget.revision === currentTarget.updated_at;
+    const matchesApplied =
+      currentTarget &&
+      session.appliedTarget?.fingerprint ===
+        geometryFingerprint(currentTarget) &&
+      session.appliedTarget.revision === currentTarget.updated_at;
     if (
       !currentTarget ||
-      (!matchesApplied && (geometryFingerprint(currentTarget) !== r.fingerprint ||
-      currentTarget.updated_at !== r.edit.updated_at))
+      (!matchesApplied &&
+        (geometryFingerprint(currentTarget) !== r.fingerprint ||
+          currentTarget.updated_at !== r.edit.updated_at))
     )
       throw new Error(
         'The target path changed or was removed. Re-select replacement boundaries and review before applying.',
