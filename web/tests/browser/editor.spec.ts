@@ -2,8 +2,209 @@ import type { Map as MapInstance } from 'maplibre-gl';
 declare global {
   interface Window {
     editorTestMap: MapInstance;
+    surveyGps?: (fix: GeolocationPosition) => void;
+    surveyGpsWatchCount: number;
   }
 }
+
+async function surveyGps(page: Page) {
+  await page.addInitScript(() => {
+    window.surveyGpsWatchCount = 0;
+    Object.defineProperty(navigator, 'geolocation', {
+      value: {
+        watchPosition(callback: (p: GeolocationPosition) => void) {
+          window.surveyGps = callback;
+          window.surveyGpsWatchCount++;
+          return 1;
+        },
+        clearWatch() {
+          window.surveyGps = undefined;
+        },
+      },
+    });
+  });
+}
+async function pushSurveyFix(page: Page, coordinates: Position, accuracy = 5) {
+  await page.evaluate(
+    ({ coordinates, accuracy }) => {
+      window.surveyGps?.({
+        coords: {
+          longitude: coordinates[0],
+          latitude: coordinates[1],
+          accuracy,
+          heading: null,
+          speed: null,
+          altitude: null,
+          altitudeAccuracy: null,
+          toJSON() {
+            return {};
+          },
+        },
+        timestamp: Date.now(),
+        toJSON() {
+          return {};
+        },
+      });
+    },
+    { coordinates, accuracy },
+  );
+}
+async function aimCrosshair(page: Page, coordinates: Position) {
+  await page.evaluate((coordinates) => {
+    const map = window.editorTestMap;
+    map.stop();
+    map.easeTo({
+      center: coordinates,
+      offset: [
+        0,
+        map.getCanvas().clientHeight * (innerWidth < 700 ? -0.18 : 0),
+      ],
+      zoom: 20,
+      duration: 0,
+    });
+  }, coordinates);
+}
+test('phone survey records, reviews, connects, applies and recovers without coordinates', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await surveyGps(page);
+  const server = await setup(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await expect(
+    page.getByText('Awaiting field verification', { exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.surveyGpsWatchCount)).toBe(0);
+  await page
+    .getByRole('button', { name: 'Record new path', exact: true })
+    .click();
+  await expect
+    .poll(() => page.evaluate(() => window.surveyGpsWatchCount))
+    .toBe(1);
+  await pushSurveyFix(page, [3.20015, 6.46]);
+  await page.waitForTimeout(1100);
+  await pushSurveyFix(page, [3.20015, 6.459975]);
+  await page.waitForTimeout(1100);
+  await pushSurveyFix(page, [3.20015, 6.45995]);
+  await page.getByRole('button', { name: 'Finish', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Section 1 · Needs review', exact: true })
+    .click();
+  await page
+    .getByRole('checkbox', { name: 'Connect to highlighted target' })
+    .check();
+  await aimCrosshair(page, [3.20015, 6.46]);
+  await page.getByRole('button', { name: 'Place here', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Confirm section reviewed', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Apply to map draft', exact: true })
+    .click();
+  await expect
+    .poll(() => server.edits().filter((e) => e.kind === 'path'))
+    .toHaveLength(1);
+  expect(server.edits()[0].properties.connections).toHaveLength(1);
+  await page.screenshot({
+    path: 'test-results/phone-survey-review.png',
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'Close survey', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Saved surveys', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', {
+      name: /Walking survey · review · On this device/,
+    }),
+  ).toBeVisible();
+});
+test('phone survey marks two entrances, connects both approaches and tests their route',async({page})=>{
+  test.setTimeout(90000);
+  await page.setViewportSize({width:390,height:844});await surveyGps(page);
+  const server=await setup(page);
+  await page.getByRole('button',{name:'Survey',exact:true}).click();
+  await page.getByRole('button',{name:'Record new path',exact:true}).click();
+  let clock=Date.now();
+  for(const [index,x] of [3.20018,3.20033].entries()){
+    if(index) await page.getByRole('button',{name:'Resume',exact:true}).click();
+    for(let step=0;step<=8;step++){
+      clock+=5000;await page.clock.setFixedTime(clock);
+      await pushSurveyFix(page,[x,6.46+step*.000025]);
+      await expect(page.getByRole('button',{name:'Mark entrance here',exact:true})).toBeEnabled();
+    }
+    await page.getByRole('button',{name:'Mark entrance here',exact:true}).click();
+    await page.getByLabel('Entrance name',{exact:true}).fill(`Walked entrance ${index+1}`);
+    await page.getByLabel('Entrance place',{exact:true}).selectOption('library');
+    await aimCrosshair(page,[x,6.4602]);
+    await page.getByRole('button',{name:'Place entrance here',exact:true}).click();
+    await page.getByRole('button',{name:'Confirm entrance',exact:true}).click();
+  }
+  await page.getByRole('button',{name:'Finish',exact:true}).click();
+  for(const [index,x] of [3.20018,3.20033].entries()){
+    await page.getByRole('button',{name:`Section ${index+1} · Needs review`,exact:true}).click();
+    await page.getByRole('checkbox',{name:'Connect to highlighted target'}).check();
+    await aimCrosshair(page,[x,6.46]);
+    await page.getByRole('button',{name:'Place here',exact:true}).click();
+    await page.getByRole('button',{name:'Confirm section reviewed',exact:true}).click();
+  }
+  await page.getByRole('button',{name:'Apply to map draft',exact:true}).click();
+  await expect.poll(()=>server.edits().filter(e=>e.kind==='entrance')).toHaveLength(2);
+  await page.getByRole('button',{name:'Apply to map draft',exact:true}).click();
+  await expect.poll(()=>server.edits().filter(e=>e.kind==='entrance')).toHaveLength(2);
+  await page.getByRole('button',{name:'Close survey',exact:true}).click();
+  await page.getByRole('button',{name:'Test route',exact:true}).click();
+  await page.getByLabel('Test route From').selectOption('gate');
+  await page.getByLabel('Test route To').selectOption('library');
+  await page.getByRole('button',{name:'Preview route',exact:true}).click();
+  await expect(page.getByText(/Walked entrance 1/).last()).toBeVisible();
+});
+test('phone survey pauses when hidden and requires explicit resume after reload', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await surveyGps(page);
+  await setup(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Record new path', exact: true })
+    .click();
+  await pushSurveyFix(page, [3.20015, 6.46]);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      value: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(
+    page.getByRole('button', { name: 'Resume', exact: true }),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      value: false,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  expect(await page.evaluate(() => window.surveyGpsWatchCount)).toBe(1);
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Saved surveys', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: /Walking survey · paused · On this device/ })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Resume', exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.surveyGpsWatchCount)).toBe(0);
+});
 interface RefHook {
   memoizedState?: { current?: unknown };
   next?: RefHook;
@@ -170,6 +371,7 @@ async function setup(page: Page, realCampus = false) {
         json: { edits, reports: [], changes: [], jobs: [], releases: [] },
       });
     if (action === 'sources') return route.fulfill({ json: { features: [] } });
+    if (action === 'survey-list') return route.fulfill({ json: [] });
     if (action === 'save-edits') {
       if (receipts.has(payload.operationId))
         return route.fulfill({ json: receipts.get(payload.operationId) });

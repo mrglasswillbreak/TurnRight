@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { GpsFix } from "./types";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { GpsFix } from './types';
 import { watchGps } from './gps-acquisition';
 export function useGps() {
   const [fix, setFix] = useState<GpsFix | null>(null),
-    [error, setError] = useState(""),
+    [error, setError] = useState(''),
     [tracking, setTracking] = useState(false);
   const watch = useRef<(() => void) | null>(null),
     desired = useRef(false);
@@ -13,11 +13,11 @@ export function useGps() {
   }, []);
   const start = useCallback(() => {
     desired.current = true;
-    setError("");
+    setError('');
     setTracking(true);
     if (!navigator.geolocation) {
       setError(
-        "Location is not supported by this browser. Choose a starting place to preview directions.",
+        'Location is not supported by this browser. Choose a starting place to preview directions.',
       );
       setTracking(false);
       return;
@@ -25,7 +25,7 @@ export function useGps() {
     if (watch.current !== null || document.hidden) return;
     watch.current = watchGps(
       (fix) => {
-        setError("");
+        setError('');
         setFix(fix);
       },
       (failure) => {
@@ -36,8 +36,8 @@ export function useGps() {
         }
         setError(
           failure.code === 1
-            ? "Location access is off. Enable it in your browser settings, or choose a starting place."
-            : "Waiting for a location signal. Try moving to an open area.",
+            ? 'Location access is off. Enable it in your browser settings, or choose a starting place.'
+            : 'Waiting for a location signal. Try moving to an open area.',
         );
       },
     );
@@ -52,10 +52,10 @@ export function useGps() {
       if (document.hidden) clear();
       else if (desired.current) start();
     };
-    document.addEventListener("visibilitychange", visibility);
+    document.addEventListener('visibilitychange', visibility);
     return () => {
       clear();
-      document.removeEventListener("visibilitychange", visibility);
+      document.removeEventListener('visibilitychange', visibility);
     };
   }, [clear, start]);
   return { fix, error, tracking, start, stop };

@@ -130,6 +130,7 @@ export function featureEdit(
   const edit: MapEdit = {
     id,
     kind,
+    updated_at: saved?.updated_at,
     geometry: structuredClone(f.geometry),
     properties: {
       ...f.properties,

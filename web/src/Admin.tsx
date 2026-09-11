@@ -42,7 +42,13 @@ import {
 import { useEditorWorkspace } from './useEditorWorkspace';
 import { EditorInspector } from './EditorInspector';
 import { EditorReview, type ReviewState } from './EditorReview';
-import { getPreference, setPreference, getActivePackage, installPackage, latestPackage } from './offline';
+import {
+  getPreference,
+  setPreference,
+  getActivePackage,
+  installPackage,
+  latestPackage,
+} from './offline';
 import { distance, projectSegment, meters } from './geo';
 import { useRoutes } from './useRoutes';
 import { placeHasConnection } from './routing';
@@ -52,7 +58,12 @@ import './editor.css';
 interface EditorState extends ReviewState {
   edits: MapEdit[];
 }
-interface OfflineEditor { state: EditorState; sources: SourceRecord[]; data: CampusData; prepared: boolean }
+interface OfflineEditor {
+  state: EditorState;
+  sources: SourceRecord[];
+  data: CampusData;
+  prepared: boolean;
+}
 export default function Admin({
   data,
   dark = false,
@@ -72,13 +83,27 @@ export default function Admin({
   const generation = useRef(0);
   useEffect(() => {
     if (!supabase) return;
-    void supabase.auth
+    if (!navigator.onLine) setOwner(localStorage.getItem('turnright:offline-owner'));
+    else void supabase.auth
       .getSession()
-      .then(({ data }) => setOwner(data.session?.user.id || (!navigator.onLine ? localStorage.getItem('turnright:offline-owner') : null)));
+      .then(({ data }) =>
+        setOwner(
+          data.session?.user.id ||
+            (!navigator.onLine
+              ? localStorage.getItem('turnright:offline-owner')
+              : null),
+        ),
+      );
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_OUT') localStorage.removeItem('turnright:offline-owner');
-        setOwner(session?.user.id || (!navigator.onLine && event !== 'SIGNED_OUT' ? localStorage.getItem('turnright:offline-owner') : null));
+        if (event === 'SIGNED_OUT')
+          localStorage.removeItem('turnright:offline-owner');
+        setOwner(
+          session?.user.id ||
+            (!navigator.onLine && event !== 'SIGNED_OUT'
+              ? localStorage.getItem('turnright:offline-owner')
+              : null),
+        );
       },
     );
     return () => subscription.subscription.unsubscribe();
@@ -92,11 +117,17 @@ export default function Admin({
     const load = async () => {
       if (!navigator.onLine) {
         const cached = await readSurveyContext<OfflineEditor>(owner);
-        if (!cached?.prepared) throw new Error('Prepare for offline survey while online before opening the editor offline.');
+        if (!cached?.prepared)
+          throw new Error(
+            'Prepare for offline survey while online before opening the editor offline.',
+          );
         return [cached.state, { features: cached.sources }] as const;
       }
-      const result = await Promise.all([api<EditorState>('state'),api<{ features: SourceRecord[] }>('sources')]);
-      localStorage.setItem('turnright:offline-owner',owner);
+      const result = await Promise.all([
+        api<EditorState>('state'),
+        api<{ features: SourceRecord[] }>('sources'),
+      ]);
+      localStorage.setItem('turnright:offline-owner', owner);
       return result;
     };
     void Promise.all([
@@ -186,14 +217,31 @@ export default function Admin({
       updateReady={updateReady}
       installUpdate={installUpdate}
       prepareOffline={async () => {
-        if (!navigator.onLine) throw new Error('Connect to verify this owner and prepare the offline map.');
-        const [verified, source] = await Promise.all([api<EditorState>('state'), api<{features:SourceRecord[]}>('sources')]);
+        if (!navigator.onLine)
+          throw new Error(
+            'Connect to verify this owner and prepare the offline map.',
+          );
+        const [verified, source] = await Promise.all([
+          api<EditorState>('state'),
+          api<{ features: SourceRecord[] }>('sources'),
+        ]);
         const manifest = await latestPackage();
         await installPackage(manifest, () => {});
-        if (!(await getActivePackage())?.complete) throw new Error('Offline map verification failed. Retry preparation.');
-        if (!navigator.serviceWorker?.controller) throw new Error('The offline app is not ready. Reload once online, then retry preparation.');
-        await writeSurveyContext(owner!, {state:verified,sources:source.features,data,prepared:true} satisfies OfflineEditor);
-        localStorage.setItem('turnright:offline-owner',owner!);
+        if (!(await getActivePackage())?.complete)
+          throw new Error(
+            'Offline map verification failed. Retry preparation.',
+          );
+        if (!navigator.serviceWorker?.controller)
+          throw new Error(
+            'The offline app is not ready. Reload once online, then retry preparation.',
+          );
+        await writeSurveyContext(owner!, {
+          state: verified,
+          sources: source.features,
+          data,
+          prepared: true,
+        } satisfies OfflineEditor);
+        localStorage.setItem('turnright:offline-owner', owner!);
       }}
     />
   );
@@ -223,7 +271,8 @@ function Editor({
   installUpdate?: () => Promise<void>;
 }) {
   const workspace = useEditorWorkspace(store);
-  const [survey, setSurvey] = useState(false), [surveyRecording, setSurveyRecording] = useState(false);
+  const [survey, setSurvey] = useState(false),
+    [surveyRecording, setSurveyRecording] = useState(false);
   const surveying = useRef(false);
   surveying.current = survey;
   const [tab, setTab] = useState('map'),
@@ -845,7 +894,22 @@ function Editor({
   };
   return (
     <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
-      {updateReady && <div className="editor-update" role="status">App update ready. {surveyRecording ? 'Pause recording before updating.' : 'Recovery data will be kept.'}<button disabled={surveyRecording} onClick={async()=>{if(await workspace.flush())await installUpdate?.();}}>Install update</button></div>}
+      {updateReady && (
+        <output className="editor-update">
+          App update ready.{' '}
+          {surveyRecording
+            ? 'Pause recording before updating.'
+            : 'Recovery data will be kept.'}
+          <button
+            disabled={surveyRecording}
+            onClick={async () => {
+              if (await workspace.flush()) await installUpdate?.();
+            }}
+          >
+            Install update
+          </button>
+        </output>
+      )}
       <header className="editor-header">
         <a className="editor-brand" href="/">
           <span className="brandmark">
@@ -874,7 +938,22 @@ function Editor({
             </button>
           ))}
         </nav>
-        {!survey && <button className="editor-survey-entry" onClick={()=>{if(workspace.unfinished){setError('Finish or cancel the drawing before surveying.');return;}setSurvey(true);setTab('map');setPreview(false);}}>Survey</button>}
+        {!survey && (
+          <button
+            className="editor-survey-entry"
+            onClick={() => {
+              if (workspace.unfinished) {
+                setError('Finish or cancel the drawing before surveying.');
+                return;
+              }
+              setSurvey(true);
+              setTab('map');
+              setPreview(false);
+            }}
+          >
+            Survey
+          </button>
+        )}
         <div className="editor-header-right">
           <output
             className={`editor-save-state ${workspace.status === 'Saved' ? 'saved' : ''}`}
@@ -926,7 +1005,7 @@ function Editor({
           threeD={threeD}
           editor
           buildingOpacity={
-            tool === 'entrance' ||
+            survey || tool === 'entrance' ||
             tool === 'building' ||
             selected?.kind === 'building'
               ? 0.2
@@ -937,14 +1016,45 @@ function Editor({
           onSelect={() => {}}
           onReady={mapReady}
         />
-        {survey && ready > 0 && mapRef.current && <SurveyPanel owner={owner} map={mapRef.current} data={validation.data} edits={workspace.edits} selected={selected} close={()=>setSurvey(false)} prepareOffline={prepareOffline} recordingChanged={setSurveyRecording} view2D={()=>setThreeD(false)} apply={async(edits)=>{
-          const next = [...workspace.edits.filter(e=>!edits.some(n=>n.kind===e.kind&&n.id===e.id)),...edits];
-          const checked=applyEdits(base,next);
-          const addedErrors=checked.errors.filter(e=>!validation.errors.includes(e));
-          if(addedErrors.length) throw new Error(addedErrors.join(' '));
-          workspace.commit(next,null);
-          if(navigator.onLine && !await workspace.flush()) throw new Error('Map changes are saved locally. Resolve the draft save issue before retrying.');
-        }}/>} 
+        {survey && ready > 0 && mapRef.current && (
+          <SurveyPanel
+            owner={owner}
+            map={mapRef.current}
+            data={validation.data}
+            edits={workspace.edits}
+            selected={selected}
+            close={() => setSurvey(false)}
+            prepareOffline={prepareOffline}
+            recordingChanged={setSurveyRecording}
+            view2D={() => setThreeD(false)}
+            apply={async (edits, previousIds) => {
+              const removed=workspace.edits.filter(e=>previousIds.includes(e.id)&&!edits.some(n=>n.id===e.id)).map(e=>({...e,deleted:true}));
+              edits=[...edits,...removed];
+              const next = [
+                ...workspace.edits.filter(
+                  (e) => !edits.some((n) => n.kind === e.kind && n.id === e.id),
+                ),
+                ...edits,
+              ];
+              const checked = applyEdits(base, next);
+              const addedErrors = checked.errors.filter(
+                (e) => !validation.errors.includes(e),
+              );
+              if (addedErrors.length) throw new Error(addedErrors.join(' '));
+              const reachable = new Set(validation.data.graph.nodes.map(n=>n.id));
+              let expanded=true;
+              while(expanded){expanded=false;for(const e of checked.data.graph.edges){if(!e.accessible||e.geometryBlocked)continue;if(reachable.has(e.from)&&!reachable.has(e.to)){reachable.add(e.to);expanded=true;}if(reachable.has(e.to)&&!reachable.has(e.from)){reachable.add(e.from);expanded=true;}}}
+              for(const edit of edits.filter(e=>e.kind==='path'&&!e.deleted)){
+                if(!checked.data.graph.edges.some(e=>e.sourceId===edit.id&&(reachable.has(e.from)||reachable.has(e.to))))throw new Error('This section has no usable connection to the mapped network. Keep it as a saved survey until connected.');
+              }
+              workspace.commit(next, null);
+              if (navigator.onLine && !(await workspace.flush()))
+                throw new Error(
+                  'Map changes are saved locally. Resolve the draft save issue before retrying.',
+                );
+            }}
+          />
+        )}
         <div
           className="editor-tools editor-card"
           role="toolbar"

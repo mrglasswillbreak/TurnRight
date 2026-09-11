@@ -42,6 +42,7 @@ beforeAll(async () => {
     '001_campus.sql',
     '002_explicit_api_grants.sql',
     '003_editor_batches.sql',
+    '004_private_surveys.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -61,6 +62,83 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+describe('private survey transactions', () => {
+  const call = async (command: string, payload: unknown, actor = owner) =>
+    (
+      await database.query<{
+        result: { status: string; revisionId: string; headRevision: string };
+      }>('select save_survey_revision($1::uuid,$2::text,$3::jsonb) as result', [
+        actor,
+        command,
+        JSON.stringify(payload),
+      ])
+    ).rows[0].result;
+  const begin = async (
+    surveyId = randomUUID(),
+    revisionId = randomUUID(),
+    expectedRevision: string | null = null,
+    chunkCount = 1,
+  ) => {
+    await call('begin', {
+      surveyId,
+      revisionId,
+      expectedRevision,
+      metadata: { name: 'Private walk' },
+      chunkCount,
+    });
+    return { surveyId, revisionId };
+  };
+  it('finalizes only complete uploads and safely retries lost responses', async () => {
+    const { revisionId } = await begin();
+    await expect(call('finalize', { revisionId })).rejects.toThrow(
+      /incomplete/,
+    );
+    await call('chunk', { revisionId, index: 0, samples: [{ id: 'raw' }] });
+    await call('chunk', { revisionId, index: 0, samples: [{ id: 'raw' }] });
+    await expect(
+      call('chunk', { revisionId, index: 0, samples: [{ id: 'changed' }] }),
+    ).rejects.toThrow(/different/);
+    const result = await call('finalize', { revisionId });
+    expect(result.status).toBe('complete');
+    expect(await call('finalize', { revisionId })).toEqual(result);
+  });
+  it('retains both concurrent versions and permits explicit resolution', async () => {
+    const a = await begin(undefined, undefined, null, 0),
+      b = await begin(a.surveyId, undefined, null, 0);
+    await call('finalize', { revisionId: a.revisionId });
+    const conflict = await call('finalize', { revisionId: b.revisionId });
+    expect(conflict.status).toBe('conflict');
+    expect(conflict.headRevision).toBe(a.revisionId);
+    const resolution = await begin(a.surveyId, undefined, a.revisionId, 0);
+    expect(
+      (await call('finalize', { revisionId: resolution.revisionId })).status,
+    ).toBe('complete');
+    expect(
+      (
+        await database.query(
+          'select * from survey_revisions where survey_id=$1',
+          [a.surveyId],
+        )
+      ).rows,
+    ).toHaveLength(3);
+  });
+  it('denies unauthorized mutations and owner-only reads', async () => {
+    await expect(
+      call('begin', {}, '22222222-2222-4222-8222-222222222222'),
+    ).rejects.toThrow(/Editor access/);
+    await database.exec('set role authenticated;');
+    await expect(call('begin', {})).rejects.toThrow(/permission denied/);
+    expect((await database.query('select * from surveys')).rows).toHaveLength(
+      0,
+    );
+    await expect(
+      database.exec(
+        'insert into surveys(id,owner) values(gen_random_uuid(),gen_random_uuid())',
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await database.exec('reset role;');
+  });
 });
 describe('transactional editor migration', () => {
   it('saves related records atomically and audits each one', async () => {

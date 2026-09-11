@@ -307,6 +307,7 @@ export function applyEdits(
         kind: 'path',
         name: props.name,
         source: 'campus-review',
+        ...(props.surveyProvenance ? {surveyProvenance:'Reviewed walking survey'} : {}),
         walkingAccess: access,
         accessReviewId:
           access === 'campus'
@@ -487,7 +488,17 @@ export function applyEdits(
             : [
                 [a, b],
                 [b, a],
-              ])
+              ]) {
+          // Replacing an unchanged-direction section retains each original directed span.
+          const directionChanged = props.footDirection !== undefined && props.footDirection !== (originalFeature?.properties?.footDirection || 'both');
+          if (!directionChanged && inherited.length) {
+            const wanted = from.id === a.id ? 1 : -1;
+            const permitted = inherited.some(e => {
+              const f = orderedOriginal.findIndex(n=>n.id===e.from), t = orderedOriginal.findIndex(n=>n.id===e.to);
+              return f >= 0 && t >= 0 && Math.sign(t-f) === wanted;
+            });
+            if (!permitted) continue;
+          }
           data.graph.edges.push({
             ...inherited[0],
             parentEdgeIds: [
@@ -514,6 +525,7 @@ export function applyEdits(
                 : !!props.steps,
             sourceId: edit.id,
           });
+        }
       }
       data.map.features.push({
         type: 'Feature',
