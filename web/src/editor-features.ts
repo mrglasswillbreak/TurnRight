@@ -83,6 +83,22 @@ export function featureEdit(data: CampusData, kind: MapEdit["kind"], id: string,
 export function geometryEdits(current: MapEdit, geometry: Geometry, data: CampusData, edits: MapEdit[]): MapEdit[] {
   const next = structuredClone({ ...current, geometry });
   const batch: MapEdit[] = [next];
+  if (current.kind === "entrance" && geometry.type === "Point") {
+    const nodeId = data.entrances?.find((e) => e.id === current.id)?.graphNode;
+    const sourceId = nodeId && data.graph.edges.find((e) => e.from === nodeId || e.to === nodeId)?.sourceId;
+    const path = sourceId && featureEdit(data, "path", sourceId, edits);
+    if (path && path.geometry.type === "LineString") {
+      const index = path.properties.vertexIds?.indexOf(nodeId!);
+      if (index !== undefined && index >= 0) {
+        const moved = structuredClone(path.geometry);
+        moved.coordinates[index] = geometry.coordinates;
+        const linked = geometryEdits(path, moved, data, edits);
+        next.properties.connection = { type: "node", nodeId: nodeId!, coordinates: geometry.coordinates as Position };
+        delete next.properties.connectTo;
+        return [...linked.filter((e) => e.kind !== current.kind || e.id !== current.id), next];
+      }
+    }
+  }
   if (current.geometry.type !== "LineString" || geometry.type !== "LineString") return batch;
   const old = current.geometry.coordinates as Position[], points = geometry.coordinates as Position[];
   const oldIds = current.properties.vertexIds || old.map((_, i) => `${current.id}:vertex:${i}`);

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { campusFixture } from "../fixture";
 import type { CampusData, MapEdit, Position } from "../../src/types";
 
@@ -15,11 +16,12 @@ function browserCampus(): CampusData {
   ];
   return data;
 }
-async function setup(page: Page) {
+async function setup(page: Page, realCampus = false) {
   let edits: MapEdit[] = [];
   let revision = 0;
   const receipts = new Map<string, MapEdit[]>();
-  const campus = browserCampus(), bytes = JSON.stringify(campus);
+  const campus: CampusData = realCampus ? JSON.parse(readFileSync(new URL("../../public/packages/lasu-4e4c8008b38b/campus.json", import.meta.url), "utf8")) : browserCampus();
+  const bytes = JSON.stringify(campus);
   const user = { id: "owner", aud: "authenticated", role: "authenticated", email: "owner@example.test", app_metadata: {}, user_metadata: {}, created_at: "2026-01-01T00:00:00Z" };
   await page.addInitScript(({ user }) => {
     localStorage.setItem("sb-editor-test-auth-token", JSON.stringify({ access_token: "test-token", token_type: "bearer", refresh_token: "test-refresh", expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, user }));
@@ -117,7 +119,41 @@ for (const threeD of [false, true]) test(`map two entrances and their approaches
   await page.getByLabel("Test route To").selectOption("library");
   await page.getByRole("button", { name: "Preview route", exact: true }).click();
   await expect(page.getByText(/Arrive at Library entrance 1/)).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as any).editorTestMap.isMoving())).toBe(false);
   await page.screenshot({ path: `test-results/editor-${threeD ? "3d" : "2d"}.png`, fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test("edits a path vertex in 3D with undo and redo across autosave", async ({ page }) => {
+  const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
+  const server = await setup(page); await focusCampus(page);
+  await page.getByRole("button", { name: "Collapse explorer" }).click();
+  await page.getByRole("button", { name: "3D", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).editorTestMap.isMoving())).toBe(false);
+  await page.getByRole("button", { name: "Draw path", exact: true }).click();
+  await clickMap(page, [3.2006, 6.46]); await clickMap(page, [3.2006, 6.4601]);
+  await page.getByRole("button", { name: "Finish", exact: true }).click();
+  await expect(page.locator(".editor-save-state")).toHaveText("Saved");
+  const original = structuredClone(server.edits().find((e) => e.kind === "path")!.geometry);
+  const from = await position(page, [3.2006, 6.4601]), to = await position(page, [3.20065, 6.46012]);
+  await page.mouse.move(from.x, from.y); await page.mouse.down(); await page.mouse.move(to.x, to.y, { steps: 10 }); await page.mouse.up();
+  await expect.poll(() => JSON.stringify(server.edits().find((e) => e.kind === "path")!.geometry)).not.toBe(JSON.stringify(original));
+  await page.keyboard.press("Control+z");
+  await expect.poll(() => server.edits().find((e) => e.kind === "path")!.geometry).toEqual(original);
+  await page.keyboard.press("Control+Shift+z");
+  await expect.poll(() => JSON.stringify(server.edits().find((e) => e.kind === "path")!.geometry)).not.toBe(JSON.stringify(original));
+  expect(errors).toEqual([]);
+});
+
+test("renders the full campus in both appearances and keeps camera on draft updates", async ({ page }) => {
+  const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
+  await setup(page, true);
+  await page.getByRole("button", { name: "3D", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).editorTestMap.isMoving())).toBe(false);
+  await page.screenshot({ path: "test-results/full-campus-3d-light.png" });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await page.screenshot({ path: "test-results/full-campus-3d-dark.png" });
   expect(errors).toEqual([]);
 });
 

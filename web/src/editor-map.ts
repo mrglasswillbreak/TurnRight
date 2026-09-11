@@ -48,7 +48,7 @@ export class EditorMap {
     this.draw = new TerraDraw({
       adapter: new TerraDrawMapLibreGLAdapter({ map }),
       idStrategy: { getId: () => crypto.randomUUID(), isValidId: (id) => typeof id === "string" },
-      modes: [new TerraDrawPointMode(), this.line, this.polygon, new TerraDrawSelectMode({ flags: { point: flags, linestring: flags, polygon: flags }, pointerDistance: 8 }), new TerraDrawRenderMode({ styles: {} })],
+      modes: [new TerraDrawPointMode(), this.line, this.polygon, new TerraDrawSelectMode({ flags: { point: flags, linestring: flags, polygon: flags }, pointerDistance: 8 }), new TerraDrawRenderMode({ modeName: "render", styles: {} })],
     });
     for (const id of ["editor-drafts", "editor-entrances", "editor-network", "editor-target", "editor-review"]) map.addSource(id, { type: "geojson", data: collection() });
     map.addLayer({ id: "editor-network", type: "line", source: "editor-network", layout: { visibility: "none" }, paint: { "line-color": "#2563eb", "line-width": 2, "line-opacity": 0.5 } });
