@@ -64,6 +64,7 @@ export interface ReplacementTarget {
 }
 export interface SurveySession {
   localVersion?: number;
+  pendingMarker?: SurveyMarker;
   id: string;
   owner: string;
   name: string;
@@ -177,7 +178,15 @@ export function acceptSample(
     session.pauseReason = 'GPS gap';
   }
   const latestTimestamp = samples.reduce(
-    (max, s) => Math.max(max, Number.isFinite(s.timestamp) && s.timestamp <= now && s.status !== 'stale' ? s.timestamp : 0),
+    (max, s) =>
+      Math.max(
+        max,
+        Number.isFinite(s.timestamp) &&
+          s.timestamp <= now &&
+          s.status !== 'stale'
+          ? s.timestamp
+          : 0,
+      ),
     0,
   );
   const status = classifyFix(
@@ -380,6 +389,8 @@ export function surveyCorrections(
   session: SurveySession,
   currentTarget?: MapEdit,
 ): MapEdit[] {
+  if (session.pendingMarker)
+    throw new Error('Confirm or cancel the entrance position before applying.');
   if (
     !session.review.length ||
     session.review.some((l) => !l.reviewed || l.vertices.length < 2)
@@ -469,7 +480,10 @@ export function surveyCorrections(
           ],
           connections: [
             ...(r.edit.properties.connections || []).filter(
-              (c) => (!ids.slice(r.start, r.end + 1).includes(c.vertexId) || line.vertices.some(v=>v.id===c.vertexId)) && !line.vertices.some(v=>v.id===c.vertexId && v.connection),
+              (c) =>
+                (!ids.slice(r.start, r.end + 1).includes(c.vertexId) ||
+                  line.vertices.some((v) => v.id === c.vertexId)) &&
+                !line.vertices.some((v) => v.id === c.vertexId && v.connection),
             ),
             ...(paths[0].properties.connections || []),
           ],

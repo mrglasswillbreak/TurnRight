@@ -92,8 +92,11 @@ export function SurveyPanel({
   live.current = { recording, screen, selection, following, path };
   const session = recording?.session;
   const active = session?.state === 'recording';
-  const nodes=useMemo(()=>new Map(data.graph.nodes.map(n=>[n.id,n])),[data.graph.nodes]);
-  const connectCenter=connect?center:null;
+  const nodes = useMemo(
+    () => new Map(data.graph.nodes.map((n) => [n.id, n])),
+    [data.graph.nodes],
+  );
+  const connectCenter = connect ? center : null;
   const changed = () => redraw((n) => n + 1);
   const crosshair = useCallback((): Position => {
     const canvas = map.getCanvas();
@@ -120,6 +123,8 @@ export function SurveyPanel({
     await controller.current?.persistChanges();
     changed();
   };
+  const run = useRef(attempt);
+  run.current = attempt;
   const command = (work: Parameters<typeof reviewCommand>[1]) => {
     if (!session) return;
     try {
@@ -135,7 +140,7 @@ export function SurveyPanel({
     setRecording(r);
     setScreen('survey');
     setSelection(null);
-    setMarker(null);
+    setMarker(r.session.pendingMarker || null);
     setFollowing(true);
     setError('');
   };
@@ -160,17 +165,29 @@ export function SurveyPanel({
     recordingChanged(!!active);
   }, [active, recordingChanged]);
   useEffect(() => {
+    const recorder = controller.current;
+    if (!recorder) return;
+    recorder.recording.session.pendingMarker = marker || undefined;
+    void recorder.persistChanges().catch((e: Error) => setError(e.message));
+  }, [marker, recording?.session.id]);
+  useEffect(() => {
     const online = () => {
       const r = live.current.recording;
       if (r?.session.pendingUpload && r.session.state !== 'recording')
-        void attempt(async () => {
+        void run.current(async () => {
           await syncSurvey(r, setMessage);
           changed();
         });
     };
     window.addEventListener('online', online);
-    const auth=supabase?.auth.onAuthStateChange((event)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN')queueMicrotask(online);});
-    return () => {window.removeEventListener('online', online);auth?.data.subscription.unsubscribe();};
+    const auth = supabase?.auth.onAuthStateChange((event) => {
+      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN')
+        queueMicrotask(online);
+    });
+    return () => {
+      window.removeEventListener('online', online);
+      auth?.data.subscription.unsubscribe();
+    };
   }, []);
   useEffect(() => {
     const empty: FeatureCollection = {
@@ -362,7 +379,19 @@ export function SurveyPanel({
       type: 'FeatureCollection',
       features,
     });
-  },[version,recording,selection,marker,screen,path,boundaries,connectCenter,data.graph.edges,map,nodes]);
+  }, [
+    version,
+    recording,
+    selection,
+    marker,
+    screen,
+    path,
+    boundaries,
+    connectCenter,
+    data.graph.edges,
+    map,
+    nodes,
+  ]);
   const fix = controller.current?.latest;
   useEffect(() => {
     if (active && following && fix?.status === 'accepted')
@@ -391,7 +420,9 @@ export function SurveyPanel({
     await controller.current!.resume();
   };
   const markEntrance = async () => {
-    const sample = recording?.samples.findLast((s) => s.status === 'accepted' || s.status === 'duplicate');
+    const sample = recording?.samples.findLast(
+      (s) => s.status === 'accepted' || s.status === 'duplicate',
+    );
     if (!sample || Date.now() - sample.timestamp > SURVEY_LIMITS.age)
       throw new Error(
         'Wait for a recent usable GPS fix before marking an entrance.',
@@ -412,7 +443,13 @@ export function SurveyPanel({
             : undefined;
     setMarker({
       id: surveyId(),
-      sampleId: (sample.status === 'duplicate' ? recording?.samples.findLast(s=>s.status==='accepted'&&s.segmentId===sample.segmentId)?.id : sample.id) || sample.id,
+      sampleId:
+        (sample.status === 'duplicate'
+          ? recording?.samples.findLast(
+              (s) =>
+                s.status === 'accepted' && s.segmentId === sample.segmentId,
+            )?.id
+          : sample.id) || sample.id,
       segmentId: sample.segmentId,
       coordinates: sample.coordinates,
       accuracy: sample.accuracy,
@@ -711,6 +748,8 @@ export function SurveyPanel({
                                 copy.session.name +=
                                   ' (local copy before opening cloud version)';
                                 copy.session.remoteRevision = null;
+                                copy.session.localVersion = undefined;
+                                copy.session.pendingUpload = undefined;
                                 const { storeRecording } =
                                   await import('./survey-storage');
                                 await storeRecording(copy);
@@ -724,13 +763,28 @@ export function SurveyPanel({
                             })
                           }
                         >
-                          {r.metadata.name} · {r.status} ·{' '}
+                          {r.name} · {r.status} ·{' '}
                           {new Date(r.created_at).toLocaleString()}
                         </button>
                         {r.id !== s.head_revision && (
                           <button
                             onClick={() =>
                               void attempt(async () => {
+                                const current = await loadSurveyLocal(
+                                  owner,
+                                  s.id,
+                                );
+                                if (current) {
+                                  current.session.id = surveyId();
+                                  current.session.localVersion = undefined;
+                                  current.session.remoteRevision = null;
+                                  current.session.pendingUpload = undefined;
+                                  current.session.name +=
+                                    ' (local recovery copy)';
+                                  const { storeRecording } =
+                                    await import('./survey-storage');
+                                  await storeRecording(current);
+                                }
                                 const rcd = await openRemoteSurvey(owner, r.id);
                                 rcd.session.remoteRevision = s.head_revision;
                                 open(rcd);
@@ -802,6 +856,7 @@ export function SurveyPanel({
                       onClick={() =>
                         void attempt(() => controller.current!.finish())
                       }
+                      disabled={!!marker}
                     >
                       Finish
                     </button>
@@ -1295,7 +1350,10 @@ export function SurveyPanel({
                             session,
                             current,
                           );
-                          await apply(corrections,session.generatedCorrectionIds);
+                          await apply(
+                            corrections,
+                            session.generatedCorrectionIds,
+                          );
                           session.generatedCorrectionIds = corrections.map(
                             (e) => e.id,
                           );
@@ -1335,10 +1393,30 @@ export function SurveyPanel({
                 {error || controller.current?.error}
               </p>
             )}
-            {recording && controller.current?.error && <button onClick={()=>void attempt(async()=>{
-              const copy=structuredClone(recording);copy.session.id=surveyId();copy.session.name+=' (recovery copy)';copy.session.state='paused';copy.session.localVersion=undefined;copy.session.remoteRevision=null;copy.session.pendingUpload=undefined;copy.session.generatedCorrectionIds=[];
-              const {storeRecording}=await import('./survey-storage');await storeRecording(copy);open(copy);setMessage('A separate recovery copy is saved on this device.');
-            })}>Save separate recovery copy</button>}
+            {recording && controller.current?.error && (
+              <button
+                onClick={() =>
+                  void attempt(async () => {
+                    const copy = structuredClone(recording);
+                    copy.session.id = surveyId();
+                    copy.session.name += ' (recovery copy)';
+                    copy.session.state = 'paused';
+                    copy.session.localVersion = undefined;
+                    copy.session.remoteRevision = null;
+                    copy.session.pendingUpload = undefined;
+                    copy.session.generatedCorrectionIds = [];
+                    const { storeRecording } = await import('./survey-storage');
+                    await storeRecording(copy);
+                    open(copy);
+                    setMessage(
+                      'A separate recovery copy is saved on this device.',
+                    );
+                  })
+                }
+              >
+                Save separate recovery copy
+              </button>
+            )}
           </fieldset>
         )}
       </section>
