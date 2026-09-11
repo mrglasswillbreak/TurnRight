@@ -128,6 +128,7 @@ export function SurveyPanel({
   const attempt = async (work: () => Promise<void>) => {
     if (busy) return;
     setError('');
+    setMessage('');
     setBusy(true);
     try {
       await work();
@@ -643,6 +644,7 @@ export function SurveyPanel({
                 <button
                   onClick={() =>
                     void attempt(async () => {
+                      setMessage('Verifying owner and downloading the offline map…');
                       await prepareOffline();
                       setMessage(
                         'Ready for offline surveying on this device. Keep this owner signed in.',

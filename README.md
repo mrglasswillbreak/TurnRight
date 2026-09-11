@@ -20,6 +20,7 @@ TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo. Ex
 - [Technology and architecture](#technology-and-architecture)
 - [Map data and coverage](#map-data-and-coverage)
 - [Administration and publication](#administration-and-publication)
+- [Record paths by walking](#record-paths-by-walking)
 - [Configuration and hosting](#configuration-and-hosting)
 - [Development and verification](#development-and-verification)
 - [Repository structure](#repository-structure)
@@ -53,6 +54,7 @@ Real browser captures from 9 September 2026. Mobile views use a responsive viewp
 | Offline maps | Verified resumable downloads, content-hash reuse, atomic activation, version/coverage information, storage checks, and explicit updates. |
 | Student reports | Place or pin reports with a category and description; private server submission, spam controls, and device-local offline drafts. |
 | Owner editor | Map-centered 2D/3D workspace, multiple entrances, snapped path junctions, shared vertex editing, needs-mapping list, undo/redo, automatic draft saving and offline recovery. [Editor guide](docs/EDITOR.md). |
+| Walking surveys | Owner-only phone recording, entrance markers, touch geometry review, partial path replacement, recoverable offline sessions and private survey sync. **Awaiting physical field verification.** [Survey guide](docs/SURVEY.md). |
 | Data maintenance | Daily/on-demand source imports, change review separate from corrections, immutable releases, preview/publish/rollback, and backup export. |
 
 Driving, cycling, indoor positioning, satellite imagery, background navigation, public user accounts, and reviews are outside this release.
@@ -163,7 +165,7 @@ flowchart LR
     Admin --> Review
 ```
 
-Published navigation does not depend on Supabase being available. GPS processing stays on the device. Report submissions send the selected pin/place and entered description; administrative data is private. Appearance is persisted in IndexedDB with a small localStorage mirror so the first paint can use the saved setting. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for thresholds, schema boundaries, storage transactions and authorization details.
+Published navigation does not depend on Supabase being available. Navigation GPS processing stays on the device. Owner surveys keep recoverable recordings locally and upload evidence privately when saved; public campus packages contain reviewed geometry and coarse provenance, never raw survey tracks or sample timestamps. Report submissions send the selected pin/place and entered description. Appearance is persisted in IndexedDB with a small localStorage mirror so the first paint can use the saved setting. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for thresholds, schema boundaries, storage transactions and authorization details.
 
 ## Map data and coverage
 
@@ -219,9 +221,27 @@ python scripts/import_campus.py --download --output data/candidates
 
 This writes candidates; it does not publish them. `node scripts/package.mjs` builds the checked-in seed package for development. Production map changes use the reviewed release workflow. See the architecture and deployment guides before changing the data pipeline.
 
+## Record paths by walking
+
+Open the [owner editor](https://turnright.vercel.app/admin) on Android Chrome or iPhone Safari, including an installed web app, and choose **Survey**. The workflow is **record → mark entrances → finish → adjust and connect → save map draft**. The feature is labelled **Awaiting field verification** until physical walks pass on both platforms.
+
+1. Choose **Prepare for offline survey** while signed in and online. Wait for the readiness confirmation before starting an offline visit.
+2. Choose **Record new path**, grant location access, and walk with TurnRight visible. Recording starts in north-up 2D; panning suspends following and **Follow me** restores it. **Pause/Resume** controls recording explicitly.
+3. Choose **Mark entrance here** to pause and review a recent usable fix. Position the footprint under the crosshair, select its building/place, and confirm the entrance name and walking access. Resume for the next section.
+4. Choose **Finish** to compare the original trace with proposed geometry. Trim, split, remove sections, move/insert/delete vertices, and undo/redo on the phone. Use **Place here** and highlighted targets to connect endpoints deliberately; a crossing alone does not create a junction.
+5. **Save survey** preserves private evidence and queues an upload if offline. **Apply to map draft** creates editable path/entrance corrections after review and connection checks. Close Survey to test routes. Neither action publishes campus data.
+
+**Correct existing path** replaces a selected section between two boundary vertices. Geometry outside the section, fixed junctions, access/direction metadata and closure coverage are retained. Changed targets require another review. **Saved surveys** opens local recovery and private versions for later phone or desktop editing; conflicting versions remain available for explicit resolution.
+
+Reported accuracy is good through 8 metres and usable through 15 metres; this is a device estimate, not surveyed precision. Stale fixes, implausible jumps and poor accuracy are excluded. Signal gaps become separate sections and are never silently bridged. Locking the screen, switching apps or reopening pauses recording until **Resume**. Wake lock is requested where available, but background recording is outside this release.
+
+Recovery uses owner-scoped IndexedDB with incremental sample writes. Storage failures pause recording; signing out locks cached surveys. Sync requires the same owner to authenticate online. The editor's **Install update** notice requires paused recording and saved recovery/draft work before reloading. See [SURVEY.md](docs/SURVEY.md) for controls, acceptance thresholds, architecture, conflicts and the physical-device test record.
+
 ## Configuration and hosting
 
 Public local exploration needs no credentials. For connected administration and reports, start with [web/.env.example](web/.env.example) and follow [DEPLOYMENT.md](docs/DEPLOYMENT.md), including the Supabase migrations, GitHub OAuth callback, administrator allowlist, workflow secrets and redirect URLs.
+
+Apply migrations in order through [004_private_surveys.sql](supabase/migrations/004_private_surveys.sql) before deploying the survey API/editor. Migration 004 adds owner-readable private survey metadata, immutable recording revisions and bounded chunks; mutations are restricted to the authenticated admin API's service role. Normal editor-state responses do not fetch recordings. Campus package schema version remains 1.
 
 | Variables | Scope / purpose |
 | --- | --- |
@@ -248,6 +268,10 @@ Run frontend checks from `web/`:
 npm test
 npm run lint
 npm run build
+npx playwright install chromium webkit
+npm run test:browser
+npm run test:survey-webkit
+npm run test:survey-pwa
 ```
 
 Run importer/access-policy tests from the repository root:
@@ -260,13 +284,18 @@ python -m unittest discover -s scripts/tests -v
 | --- | --- |
 | `npm run dev` | Vite development server |
 | `npm test` | Vitest regression suite |
+| `npm run test:browser` | Real MapLibre/Terra Draw editor and phone survey browser scenarios in Chromium |
+| `npm run test:survey-webkit` | Phone survey scenarios in WebKit with touch and mobile viewport support |
+| `npm run test:survey-pwa` | Isolated production build: offline preparation/startup, recording recovery and reconnecting private sync |
 | `npm run lint` | TypeScript frontend/API checks and Oxlint |
 | `npm run build` | Preserve/package data, type-check, compile server imports, build application and service worker |
 | `npm run preview` | Serve the production build locally |
 | `npm run package` | Regenerate the campus package from the checked-in seed |
 | `npm run format -- <path>` | Format selected files with Oxfmt; keep formatting changes focused |
 
-**Verification recorded on 9 September 2026:** 61 Vitest tests across nine files and seven Python tests pass. Production build and API compilation pass. Lint has no errors, with eight existing explicit-any warnings. Coverage includes routing/access/closures, alternatives, GPS jitter/staleness/arrival, editor connections, import conflicts, offline transactions/storage failures, private API boundaries, release success gates, and 14 appearance cases. The real campus regression cases check the Law and Library approaches, preserved private source tags, and closures that remain enforced after an expected reopening date.
+**Verification recorded on 12 September 2026, using Node 22:** 109 Vitest tests and seven Python tests pass. Ten Chromium browser scenarios, three WebKit phone scenarios and the production-PWA offline/recovery scenario pass. Production build and API compilation pass. Lint has no errors, with seven existing explicit-any warnings. Coverage includes entrance routing, directed paths and closures, stable editor junctions, noisy/stale GPS, recording interruptions, partial replacement, undo/redo, owner-scoped recovery, storage failures, atomic private uploads, retries/conflicts and exclusion of raw survey evidence from public packages. Browser tests use real MapLibre/Terra Draw and mock GPS, authentication and APIs only in tests.
+
+Migration 004 is applied. Authenticated preview checks verified offline preparation and private save/reopen, and live database checks verified incomplete-upload rejection, idempotent retries, duplicate-chunk prevention and retained concurrent versions inside a rolled-back transaction. These are software checks: physical Android/iPhone walks, accuracy near buildings, battery use and device interruption/offline behavior remain pending in the [survey field record](docs/SURVEY.md#physical-field-record--pending).
 
 Appearance checks include device changes, explicit overrides, migration, reopening, cross-tab synchronization, delayed storage hydration, storage failures, and startup-script behavior. Browser checks cover persisted Light mode, returning to Device/Dark, an open route reacting to a change in another tab, and the 390 × 844 settings layout. Automated system-change events do not replace physical OS/device checks.
 
@@ -305,6 +334,9 @@ TurnRight/
 | Local `/admin` or report submission fails | Vite does not host the Vercel API. Use a configured hosted preview and check environment variables, session and administrator allowlist. |
 | Import/build/publish fails | Inspect the editor's job/release error and the GitHub/Vercel logs. Resolve the failed source, credentials, validation, or quota issue; do not mark a failed deployment published. |
 | Git push succeeds but the approved map is unchanged | App deployments preserve the published package. Review, validate and publish map changes through the release workflow. |
+| Survey is missing from the editor | Install a waiting update from public map **Settings → Install update**, then reopen `/admin`. Subsequent updates also appear inside the editor. |
+| A survey paused or contains gaps | Keep the app visible, check GPS accuracy, and choose **Resume** after backgrounding or reopening. Rewalk the missing section or draw and review an explicit connection. |
+| Survey upload is queued or conflicted | Reconnect as the same owner. Use **Saved surveys** to review retained versions; do not clear browser storage while recovery work is pending. |
 
 ## Documentation
 
@@ -313,6 +345,8 @@ TurnRight/
 | [Architecture](docs/ARCHITECTURE.md) | Device flow, storage, routing thresholds, data model and security boundaries |
 | [Deployment](docs/DEPLOYMENT.md) | Reproducible Vercel, Supabase, GitHub OAuth and workflow setup |
 | [Acceptance](docs/ACCEPTANCE.md) | Automated/browser evidence, physical-device checklist and field-survey log |
+| [Editor](docs/EDITOR.md) | 2D/3D mapping, entrances, connections, draft recovery and review |
+| [Walking surveys](docs/SURVEY.md) | Phone recording/review, private sync, migration 004 and pending physical-device checks |
 | [Configuration record](docs/CONFIGURATION.md) | Configured services and operational setup record |
 | [Production record](docs/PRODUCTION.md) | Publication history, deployment and package verification |
 | [Campus access](docs/CAMPUS-ACCESS.md) | Reviewed student walking correction and remaining path gaps |
