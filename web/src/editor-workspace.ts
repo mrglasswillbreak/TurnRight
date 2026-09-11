@@ -87,7 +87,10 @@ export class EditorWorkspace {
   }
   draft(drawing: UnfinishedDrawing | null) { this.unfinished = drawing; this.changed(); }
   private changed() {
-    if (this.status !== "Conflict" && this.status !== "Recovery unavailable") this.status = this.dirty || this.unfinished ? "Saved locally" : "Saved";
+    if (this.status !== "Conflict" && this.status !== "Recovery unavailable") {
+      this.status = this.dirty || this.unfinished ? "Saved locally" : "Saved";
+      this.error = "";
+    }
     void this.persistNow();
     this.notify();
   }

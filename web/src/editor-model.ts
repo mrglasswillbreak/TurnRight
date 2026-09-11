@@ -324,6 +324,7 @@ export function applyEdits(
             height: props.heightMode === "floors" ? Number(props.floors) * 3 : Number(props.height) || 0,
             floors: props.floors,
             heightMode: props.heightMode,
+            heightSource: props.heightSource,
             heightEstimated: props.heightMode === "floors" || !!props.heightEstimated,
             source: "campus-review",
           },

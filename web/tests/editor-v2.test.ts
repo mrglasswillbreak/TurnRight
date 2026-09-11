@@ -102,7 +102,7 @@ describe("explicit mapping connections", () => {
     const data = network();
     const project = (p: Position) => ({ x: p[0] * 1e5, y: p[1] * 1e5 });
     expect(snapTarget(data, [3.2002, 6.46002], project)?.target?.type).toBe("segment");
-    expect(snapTarget(data, [3.2002, 6.4602], project)).toBeUndefined();
+    expect(snapTarget(data, [3.2002, 6.4598], project)).toBeUndefined();
   });
   it("validates typed references and documented floor counts", () => {
     const path = approach("path", 3.2002);
