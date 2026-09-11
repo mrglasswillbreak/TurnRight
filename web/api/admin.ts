@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   allRows,
   bodyOf,
@@ -33,25 +34,25 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       case "sources":
         res.status(200).json({ features: await allRows("source_features") });
         break;
-      case "save-edit": {
-        const errors = validateEdit(payload);
-        if (errors.length) throw new HttpError(400, errors.join(" "));
-        const { id, kind, geometry, properties, deleted } = payload;
-        const result = await db(
-          "map_edits?on_conflict=id,kind",
-          "POST",
-          {
-            id,
-            kind,
-            geometry,
-            properties,
-            edited_by: user.id,
-            deleted: !!deleted,
-            updated_at: new Date().toISOString(),
-          },
-          "resolution=merge-duplicates,return=representation",
-        );
-        res.status(200).json(result[0]);
+      case "save-edit":
+      case "save-edits": {
+        const items = action === "save-edit" ? [{ edit: payload, expectedUpdatedAt: payload.updated_at || null }] : payload.edits;
+        const operationId = action === "save-edit" ? randomUUID() : payload.operationId;
+        if (typeof operationId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(operationId) || !Array.isArray(items) || !items.length || items.length > 500)
+          throw new HttpError(400, "Invalid edit batch.");
+        const keys = new Set<string>();
+        const clean = items.map((item) => {
+          const errors = validateEdit(item?.edit);
+          if (errors.length) throw new HttpError(400, errors.join(" "));
+          if (item.expectedUpdatedAt !== null && (typeof item.expectedUpdatedAt !== "string" || !Number.isFinite(Date.parse(item.expectedUpdatedAt)))) throw new HttpError(400, "Invalid draft revision.");
+          const { id, kind, geometry, properties, deleted } = item.edit;
+          const key = `${kind}:${id}`;
+          if (keys.has(key)) throw new HttpError(400, "Duplicate edit in batch.");
+          keys.add(key);
+          return { edit: { id, kind, geometry, properties, deleted: !!deleted }, expectedUpdatedAt: item.expectedUpdatedAt };
+        });
+        const result = await db("rpc/save_editor_batch", "POST", { operation_id: operationId, actor_id: user.id, items: clean });
+        res.status(200).json(action === "save-edit" ? result[0] : result);
         break;
       }
       case "review-change": {

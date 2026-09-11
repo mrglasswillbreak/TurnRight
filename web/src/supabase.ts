@@ -16,6 +16,6 @@ export async function api<T = unknown>(action: string, payload: unknown = {}): P
     error:
       "The backend is not configured. Follow the deployment guide to connect Vercel and Supabase.",
   }));
-  if (!response.ok || body.error) throw new Error(body.error || "Request failed");
+  if (!response.ok || body.error) throw Object.assign(new Error(body.error || "Request failed"), { status: response.status });
   return body;
 }

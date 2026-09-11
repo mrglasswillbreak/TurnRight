@@ -45,7 +45,7 @@ export async function db<T = any>(
   const result = await response.json().catch(() => null);
   if (!response.ok)
     throw new HttpError(
-      response.status >= 500 ? 503 : 400,
+      response.status === 409 ? 409 : response.status >= 500 ? 503 : 400,
       result?.message || "Database request failed. Check service availability and quotas.",
     );
   return result;
