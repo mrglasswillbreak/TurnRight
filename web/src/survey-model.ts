@@ -59,7 +59,7 @@ export function pauseSurvey(session: SurveySession, reason: string) { session.st
 function simplify(vertices: SurveyVertex[]): SurveyVertex[] {
   if (vertices.length <= 2) return vertices;
   const forced = vertices.findIndex((v, i) => i > 0 && i < vertices.length - 1 && v.pinned);
-  let index = forced, furthest = SURVEY_LIMITS.simplify;
+  let index = forced, furthest: number = SURVEY_LIMITS.simplify;
   if (index < 0) for (let i = 1; i < vertices.length - 1; i++) {
     const d = projectSegment(vertices[i].coordinates, vertices[0].coordinates, vertices.at(-1)!.coordinates).distance;
     if (d > furthest) { furthest = d; index = i; }
@@ -71,13 +71,15 @@ export function proposeGeometry(recording: SurveyRecording): SurveyLine[] {
 }
 export function surveyDistance(samples: SurveySample[]) {
   let previous: SurveySample | undefined, total = 0;
-  for (const s of samples) if (s.status === 'accepted') { if (previous?.segmentId === s.segmentId) total += distance(previous.coordinates, s.coordinates); previous = s; }
+  for (const s of samples) if (s.status === 'accepted') { if (previous && previous.segmentId === s.segmentId) total += distance(previous.coordinates, s.coordinates); previous = s; }
   return total;
 }
 export function reviewCommand(session: SurveySession, edit: (state: SurveyReview) => void) {
+  const next = structuredClone({ review: session.review, markers: session.markers });
+  edit(next);
   session.past.push(structuredClone({ review: session.review, markers: session.markers }));
   session.past = session.past.slice(-100); session.future = [];
-  edit(session); session.updatedAt = new Date().toISOString();
+  session.review = next.review; session.markers = next.markers; session.updatedAt = new Date().toISOString();
 }
 export function reviewUndo(session: SurveySession, redo = false) {
   const from = redo ? session.future : session.past, to = redo ? session.past : session.future, snapshot = from.pop();

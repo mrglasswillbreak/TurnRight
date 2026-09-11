@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GpsFix } from "./types";
+import { watchGps } from './gps-acquisition';
 export function useGps() {
   const [fix, setFix] = useState<GpsFix | null>(null),
     [error, setError] = useState(""),
     [tracking, setTracking] = useState(false);
-  const watch = useRef<number | null>(null),
+  const watch = useRef<(() => void) | null>(null),
     desired = useRef(false);
   const clear = useCallback(() => {
-    if (watch.current !== null) navigator.geolocation.clearWatch(watch.current);
+    watch.current?.();
     watch.current = null;
   }, []);
   const start = useCallback(() => {
@@ -22,16 +23,10 @@ export function useGps() {
       return;
     }
     if (watch.current !== null || document.hidden) return;
-    watch.current = navigator.geolocation.watchPosition(
-      (position) => {
+    watch.current = watchGps(
+      (fix) => {
         setError("");
-        setFix({
-          coordinates: [position.coords.longitude, position.coords.latitude],
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp,
-          heading: position.coords.heading,
-          speed: position.coords.speed,
-        });
+        setFix(fix);
       },
       (failure) => {
         if (failure.code === 1) {
@@ -45,7 +40,6 @@ export function useGps() {
             : "Waiting for a location signal. Try moving to an open area.",
         );
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
     );
   }, [clear]);
   const stop = useCallback(() => {

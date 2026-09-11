@@ -549,7 +549,7 @@ export default function App() {
       <Suspense
         fallback={<main className="loading-screen">Opening map editor…</main>}
       >
-        <Admin data={data} dark={dark} />
+        <Admin data={data} dark={dark} updateReady={updateReady} installUpdate={async () => { await updateSW.current?.(true); }} />
       </Suspense>
     );
   return (

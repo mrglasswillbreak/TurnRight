@@ -36,7 +36,7 @@ begin
   if not exists(select 1 from admin_users where id = actor_id) then raise exception 'Editor access required'; end if;
   perform pg_advisory_xact_lock(hashtext('turnright-surveys:' || actor_id::text));
   if command = 'begin' then
-    if octet_length(payload->'metadata'::text) > 1000000 then raise exception 'Survey metadata too large'; end if;
+    if octet_length((payload->'metadata')::text) > 1000000 then raise exception 'Survey metadata too large'; end if;
     insert into surveys(id,owner) values((payload->>'surveyId')::uuid,actor_id) on conflict(id) do nothing;
     select * into s from surveys where id=(payload->>'surveyId')::uuid;
     if s.owner <> actor_id then raise exception 'Survey owner mismatch'; end if;

@@ -3,7 +3,7 @@ import { db, HttpError } from './backend.js';
 const uuid = (v: unknown) => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 export async function surveyAction(owner: string, action: string, input: Record<string, unknown>) {
   const actor = encodeURIComponent(owner);
-  if (action === 'survey-list') return db(`surveys?owner=eq.${actor}&select=*,survey_revisions(id,metadata,status,created_at)&order=updated_at.desc&limit=100`);
+  if (action === 'survey-list') return db(`surveys?owner=eq.${actor}&select=*,survey_revisions!survey_revisions_survey_id_fkey(id,metadata,status,created_at)&order=updated_at.desc&limit=100`);
   if (action === 'survey-get') {
     if (!uuid(input.revisionId)) throw new HttpError(400, 'Invalid survey revision.');
     const [revision] = await db(`survey_revisions?id=eq.${input.revisionId}&owner=eq.${actor}`);
