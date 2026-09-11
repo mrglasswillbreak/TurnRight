@@ -42,7 +42,9 @@ The editor's **Install update** notice requires paused recording and flushed rec
 4. Deploy production only after preview verification. Existing installed apps can install the update from their public map settings; subsequent releases expose the notice inside the editor as well.
 5. Run the physical-device checks below. Keep the field-verification label until both platforms pass.
 
-Current rollout gate: migration 004 and authenticated preview verification require restored access to the signed-in Supabase/Vercel browser session. Browser automation returned `Unable to load browser request-header policy`; no production deployment or campus publication has been performed for this update.
+Migration 004 was applied transactionally to project `mrmdfvcztzhypmlfblwh` on 12 September 2026. Browser access recovered after an initial connection-policy failure. Authenticated preview verification and deployment are the remaining rollout steps; campus-data publication stays separate.
+
+Automated checks use Node 22: `npm test`, `npm run lint`, `npm run build`, `npm run test:browser`, `npm run test:survey-pwa`, and `npm run test:survey-webkit`. The PWA test builds an isolated production bundle under ignored `web/work/pwa-preview`, then verifies offline startup, incremental recording, recovery and reconnecting private sync with test-only GPS/auth/API fixtures. The WebKit configuration exercises real MapLibre at phone size with touch support. These checks do not replace the physical walks below.
 
 ## Physical field record — pending
 
