@@ -1,4 +1,5 @@
 import { placeHasConnection } from './routing';
+import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
 import {
   lazy,
   Suspense,
@@ -138,6 +139,14 @@ export default function App() {
     announced = useRef(new Set<string>());
   const updateSW = useRef<((reload?: boolean) => Promise<void>) | null>(null),
     navigatingRef = useRef(false);
+  const requestedReload=useRef(false);
+  const installAppUpdate=async()=>{
+    await flushSurveyRecovery();
+    requestedReload.current=true;
+    const registration=await navigator.serviceWorker.getRegistration();
+    if(registration?.waiting)await updateSW.current?.(true);
+    else location.reload();
+  };
   navigatingRef.current = navigating;
   const gps = useGps(),
     calculate = useRoutes();
@@ -181,6 +190,10 @@ export default function App() {
     if ('serviceWorker' in navigator) {
       updateSW.current = registerSW({
         immediate: true,
+        onNeedReload() {
+          if(requestedReload.current && !surveyRecordingActive()) location.reload();
+          else setUpdateReady(true);
+        },
         onNeedRefresh() {
           setUpdateReady(true);
         },
@@ -549,7 +562,7 @@ export default function App() {
       <Suspense
         fallback={<main className="loading-screen">Opening map editor…</main>}
       >
-        <Admin data={data} dark={dark} updateReady={updateReady} installUpdate={async () => { await updateSW.current?.(true); }} />
+        <Admin data={data} dark={dark} updateReady={updateReady} installUpdate={installAppUpdate} />
       </Suspense>
     );
   return (
@@ -1099,7 +1112,7 @@ export default function App() {
                 <Button
                   variant="outline"
                   disabled={!updateReady || navigating}
-                  onClick={() => updateSW.current?.(true)}
+                  onClick={installAppUpdate}
                 >
                   {updateReady
                     ? navigating

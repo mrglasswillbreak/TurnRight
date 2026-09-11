@@ -210,6 +210,9 @@ export interface MapEdit {
     connection?: ConnectionTarget;
     /** A retained undo receipt that removes a correction, leaving approved source data intact. */
     revertToSource?: boolean;
+    /** Private reference retained in corrections, omitted from public geometry. */
+    surveyEvidence?: { surveyId: string; revisionId: string | null };
+    surveyProvenance?: string;
   };
   deleted?: boolean;
   updated_at?: string;
