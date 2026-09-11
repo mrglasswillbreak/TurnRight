@@ -12,12 +12,18 @@ import {
   type ResponseLike,
 } from '../server/backend.js';
 import { validateEdit } from '../src/editor-model.js';
+import { surveyAction } from '../server/surveys.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {
     const user = await requireAdmin(req);
     const { action, payload = {} } = bodyOf(req, 3_000_000);
     switch (action) {
+      case 'survey-list':
+      case 'survey-get':
+      case 'survey-save':
+        res.status(200).json(await surveyAction(user.id, action, payload));
+        break;
       case 'state': {
         const [edits, changes, reports, jobs, releases] = await Promise.all([
           allRows('map_edits'),
