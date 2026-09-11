@@ -26,6 +26,8 @@ export interface MapViewProps {
   fix?: GpsFix | null;
   dark?: boolean;
   threeD?: boolean;
+  editor?: boolean;
+  buildingOpacity?: number;
   follow?: boolean;
   panelBesideMap?: boolean;
   onSelect: (place: Place) => void;
@@ -40,6 +42,8 @@ export function MapView({
   fix,
   dark = false,
   threeD = false,
+  editor = false,
+  buildingOpacity = 0.92,
   follow = false,
   panelBesideMap = false,
   onSelect,
@@ -51,6 +55,8 @@ export function MapView({
   const callbacks = useRef({ onSelect, onManualPan, onReady });
   callbacks.current = { onSelect, onManualPan, onReady };
   const ready = useRef(false);
+  const latestData = useRef(data);
+  latestData.current = data;
   const camera = useRef({ selected, routes, activeRoute, dark });
   camera.current = { selected, routes, activeRoute, dark };
   const [mapError, setMapError] = useState("");
@@ -127,7 +133,7 @@ export function MapView({
         map.stop();
         map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
         map.resize();
-        if (ready.current) frame();
+        if (ready.current && !editor) frame();
       });
     };
     window.addEventListener("resize", resize);
@@ -351,12 +357,12 @@ export function MapView({
       });
       map.on("click", "places-dot", (event) => {
         const id = event.features?.[0]?.properties?.id;
-        const p = data.places.find((p) => p.id === id);
+        const p = latestData.current.places.find((p) => p.id === id);
         if (p) callbacks.current.onSelect(p);
       });
       map.on("click", "places-label", (event) => {
         const id = event.features?.[0]?.properties?.id;
-        const p = data.places.find((p) => p.id === id);
+        const p = latestData.current.places.find((p) => p.id === id);
         if (p) callbacks.current.onSelect(p);
       });
       map.on("mouseenter", "places-dot", () => {
@@ -377,8 +383,9 @@ export function MapView({
       disposeExtension?.();
       map.remove();
       mapRef.current = null;
+      ready.current = false;
     };
-  }, [data, panelBesideMap]);
+  }, [panelBesideMap, editor]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -404,7 +411,7 @@ export function MapView({
     if (ready.current) apply();
     else map.once("load", apply);
     return () => { map.off("load", apply); };
-  }, [dark, data, panelBesideMap]);
+  }, [dark, panelBesideMap, editor]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -415,7 +422,35 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once("load", apply);
-  }, [threeD, data, panelBesideMap]);
+    return () => { map.off("load", apply); };
+  }, [threeD, panelBesideMap, editor]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      if (!map.getLayer("buildings-3d")) return;
+      map.setFilter("buildings-3d", editor ? ["==", ["get", "kind"], "building"] : ["all", ["==", ["get", "kind"], "building"], [">", ["coalesce", ["get", "height"], 0], 0]]);
+      map.setPaintProperty("buildings-3d", "fill-extrusion-height", editor ? ["case", [">", ["coalesce", ["get", "height"], 0], 0], ["get", "height"], 6] : ["coalesce", ["get", "height"], 0]);
+      map.setPaintProperty("buildings-3d", "fill-extrusion-opacity", buildingOpacity);
+      map.setPaintProperty("buildings-3d", "fill-extrusion-color", editor ? ["case", [">", ["coalesce", ["get", "height"], 0], 0], dark ? "#71889a" : "#b5c7d8", dark ? "#47555b" : "#d6ded8"] : dark ? "#52616c" : "#d5dce5");
+    };
+    if (ready.current) apply(); else map.once("load", apply);
+    return () => { map.off("load", apply); };
+  }, [editor, buildingOpacity, dark]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      (map.getSource("campus") as GeoJSONSource)?.setData(data.map);
+      (map.getSource("boundary") as GeoJSONSource)?.setData(data.boundary);
+      (map.getSource("places") as GeoJSONSource)?.setData({ type: "FeatureCollection", features: data.places.map((p) => ({ type: "Feature", geometry: { type: "Point", coordinates: p.coordinates }, properties: { id: p.id, name: p.name.replace(/[^\x20-\x7E]/g, " "), category: p.category, color: colors[p.category] } })) });
+      const closed = new Set(data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds));
+      const nodes = new Map(data.graph.nodes.map((n) => [n.id, n.coordinates]));
+      (map.getSource("closures") as GeoJSONSource)?.setData({ type: "FeatureCollection", features: data.graph.edges.filter((e) => (closed.has(e.id) || e.geometryBlocked) && nodes.has(e.from) && nodes.has(e.to)).map((e) => ({ type: "Feature", properties: { conflict: !!e.geometryBlocked && !closed.has(e.id) }, geometry: { type: "LineString", coordinates: [nodes.get(e.from)!, nodes.get(e.to)!] } })) });
+    };
+    if (ready.current) apply(); else map.once("load", apply);
+    return () => { map.off("load", apply); };
+  }, [data]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selected) return;

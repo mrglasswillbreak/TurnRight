@@ -1,6 +1,7 @@
+import { applyConnections, resolveConnection, remapClosures, edgeMatches, orderedPathNodes } from "./editor-topology.js";
 import { distance, projectSegment } from "./geo.js";
 import { geometryBlocker } from "./spatial.js";
-import type { CampusData, GraphNode, MapEdit, Place, Position, WalkingAccess } from "./types.js";
+import type { CampusData, GraphNode, MapEdit, Place, Position, WalkingAccess, ConnectionTarget } from "./types.js";
 import type { Geometry } from "geojson";
 export interface SourceRecord {
   id: string;
@@ -38,6 +39,20 @@ export function validateEdit(edit: MapEdit): string[] {
     errors.push("Buildings must be polygons.");
   if (!edit.deleted && typeof edit.properties.name !== "string")
     errors.push("Give the feature a name or description.");
+  const validId = (id: unknown) => typeof id === "string" && id.length > 0 && id.length <= 4000;
+  const validPosition = (p: unknown) => Array.isArray(p) && p.length === 2 && p.every((n) => typeof n === "number" && Number.isFinite(n));
+  const validTarget = (value: unknown) => {
+    if (!value || typeof value !== "object") return false;
+    const t = value as ConnectionTarget;
+    return validPosition(t.coordinates) && (t.type === "node" ? validId(t.nodeId) : t.type === "segment" && validId(t.sourceId) && validId(t.from) && validId(t.to));
+  };
+  const props = edit.properties;
+  if (props.vertexIds !== undefined && (!Array.isArray(props.vertexIds) || !props.vertexIds.every(validId) || new Set(props.vertexIds).size !== props.vertexIds.length || edit.geometry.type !== "LineString" || props.vertexIds.length !== edit.geometry.coordinates.length)) errors.push("Path vertex identities must match its coordinates.");
+  if (props.connections !== undefined && (!Array.isArray(props.connections) || props.connections.length > 2000 || !props.connections.every((c) => c && validId(c.vertexId) && validTarget(c.target) && props.vertexIds?.includes(c.vertexId)))) errors.push("Invalid path connection reference.");
+  if (props.connection !== undefined && !validTarget(props.connection)) errors.push("Invalid entrance connection reference.");
+  if (edit.kind === "entrance" && props.access !== undefined && !walkingAccessValues.includes(String(props.access))) errors.push("Choose a supported walking access setting.");
+  if (props.footDirection !== undefined && !["both", "forward", "reverse"].includes(String(props.footDirection))) errors.push("Choose a supported walking direction.");
+  if (props.heightMode === "floors" && (!Number.isInteger(Number(props.floors)) || Number(props.floors) < 1 || Number(props.floors) > 50)) errors.push("Documented floor count must be between 1 and 50.");
   const geometry = edit.geometry as Exclude<Geometry, { type: "GeometryCollection" }>;
   const positions: number[][] = [];
   function walk(value: unknown) {
@@ -110,8 +125,16 @@ export function applyEdits(
     errors: string[] = [],
     warnings: string[] = [];
   const nodes = new Map(data.graph.nodes.map((n) => [n.id, n]));
-  // Apply paths first so entrances can connect to newly drawn path vertices.
-  const ordered = [...edits].sort((a, b) => Number(b.kind === "path") - Number(a.kind === "path"));
+  data.entrances = [...(data.entrances || [])];
+  let connectedPaths = false;
+  let canonical = (id: string) => id;
+  const connectPaths = () => {
+    if (connectedPaths) return;
+    canonical = applyConnections(data, nodes, edits.filter((e) => !validateEdit(e).length), errors);
+    connectedPaths = true;
+  };
+  const rank = { path: 0, place: 1, building: 2, entrance: 3, barrier: 4, closure: 4 };
+  const ordered = [...edits].sort((a, b) => rank[a.kind] - rank[b.kind] || a.id.localeCompare(b.id));
   for (const edit of ordered) {
     const invalid = validateEdit(edit);
     if (invalid.length) {
@@ -119,6 +142,7 @@ export function applyEdits(
       continue;
     }
     const props = edit.properties;
+    if (["entrance", "barrier", "closure"].includes(edit.kind)) connectPaths();
     if (edit.kind === "place") {
       const previous = data.places.find((p) => p.id === edit.id);
       data.places = data.places.filter((p) => p.id !== edit.id);
@@ -148,7 +172,9 @@ export function applyEdits(
           );
       }
     } else if (edit.kind === "path") {
-      const originalFeature = data.map.features.find((f) => f.properties?.id === edit.id);
+      const originalFeature = data.map.features.find((f) => f.properties?.id === edit.id && f.properties?.kind === "path");
+      const originalEdges = data.graph.edges.filter((e) => e.sourceId === edit.id);
+      const orderedOriginal = orderedPathNodes(data, edit.id);
       const access = (props.access ?? (originalFeature || data.graph.edges.some((e) => e.sourceId === edit.id)
         ? pathWalkingAccess(data, edit.id) : "yes")) as WalkingAccess;
       const pathProperties = {
@@ -163,7 +189,7 @@ export function applyEdits(
       if (!edit.deleted && originalFeature &&
           JSON.stringify(originalFeature.geometry) === JSON.stringify(edit.geometry) &&
           pathProperties.footDirection === (originalFeature.properties?.footDirection || "both") &&
-          !props.connectStart && !props.connectEnd &&
+          !props.connections?.length && !props.connectStart && !props.connectEnd &&
           data.graph.edges.some((e) => e.sourceId === edit.id)) {
         data.graph.edges = data.graph.edges.map((e) => e.sourceId === edit.id ? {
           ...e, name: String(props.name), accessible: access === "yes" || access === "campus",
@@ -203,37 +229,35 @@ export function applyEdits(
       }
       points.push(drawn[drawn.length - 1]);
       const sequence: GraphNode[] = [];
-      points.forEach((point, i) => {
-        const connection =
-          i === 0 ? props.connectStart : i === points.length - 1 ? props.connectEnd : undefined;
-        if (connection && typeof connection === "string") {
-          const linked = nodes.get(connection);
-          if (!linked || distance(linked.coordinates, point) > 5) {
-            errors.push(
-              `${props.name}: the chosen connection must be within 5 m of the drawn endpoint.`,
-            );
-            return;
-          }
-          sequence.push(linked);
-        } else {
-          const node = originalNodes.find((n) => distance(n.coordinates, point) < 0.2) || {
-            id: `${edit.id}:vertex:${i}`,
-            coordinates: point,
-          };
-          nodes.set(node.id, node);
-          sequence.push(node);
-        }
+      points.forEach((point) => {
+        const drawnIndex = drawn.findIndex((p) => distance(p, point) < 0.05);
+        const stableId = drawnIndex >= 0 ? props.vertexIds?.[drawnIndex] : undefined;
+        const original = originalNodes.find((n) => n.id === stableId) || originalNodes.find((n) => distance(n.coordinates, point) < 0.2);
+        const node: GraphNode = { ...original, id: stableId || original?.id || `${edit.id}:vertex:${drawnIndex}`, coordinates: point };
+        nodes.set(node.id, node);
+        sequence.push(node);
       });
       if (sequence.length !== points.length) continue;
       if (
-        !props.connectStart &&
+        !props.connections?.length && !props.connectStart &&
         !props.connectEnd &&
         !sequence.some((n) => originalNodeIds.has(n.id))
       )
         warnings.push(
           `${props.name}: isolated path; explicitly connect an endpoint before routing to the existing network.`,
         );
+      const gaps: [number, number][] = [];
+      let lostRestriction = false;
+      for (let i = 1; i < orderedOriginal.length; i++) {
+        const a = orderedOriginal[i - 1], b = orderedOriginal[i];
+        if (originalEdges.some((e) => (e.from === a.id && e.to === b.id) || (e.from === b.id && e.to === a.id))) continue;
+        const start = sequence.findIndex((n) => n.id === a.id), end = sequence.findIndex((n) => n.id === b.id);
+        if (start < 0 || end < 0 || end < start) lostRestriction = true;
+        else gaps.push([start, end]);
+      }
+      if (lostRestriction) errors.push(`${props.name}: retain the vertices on either side of a restricted gate gap.`);
       for (let i = 1; i < sequence.length; i++) {
+        if (lostRestriction || gaps.some(([a, b]) => i > a && i <= b)) continue;
         const a = sequence[i - 1],
           b = sequence[i],
           length = distance(a.coordinates, b.coordinates);
@@ -241,7 +265,22 @@ export function applyEdits(
           errors.push(`${props.name}: duplicate adjacent path vertices.`);
           continue;
         }
-        for (const [from, to] of props.footDirection === "forward"
+        const positions = new Map(sequence.map((n, index) => [n.id, index]));
+        const inherited = originalEdges.filter((e) => {
+          const start = positions.get(e.from), end = positions.get(e.to);
+          return start !== undefined && end !== undefined && Math.min(start, end) < i && Math.max(start, end) >= i;
+        });
+        // Deleting an ordinary intermediate vertex inherits restrictions/closures from that original span.
+        if (!inherited.length && originalEdges.length) {
+          const left = [...sequence.slice(0, i)].reverse().find((n) => originalNodeIds.has(n.id));
+          const right = sequence.slice(i).find((n) => originalNodeIds.has(n.id));
+          const lo = orderedOriginal.findIndex((n) => n.id === left?.id), hi = orderedOriginal.findIndex((n) => n.id === right?.id);
+          if (lo >= 0 && hi >= lo) inherited.push(...originalEdges.filter((e) => {
+            const f = orderedOriginal.findIndex((n) => n.id === e.from), t = orderedOriginal.findIndex((n) => n.id === e.to);
+            return f >= lo && f <= hi && t >= lo && t <= hi;
+          }));
+        }
+        for (const [from, to] of (props.footDirection || pathProperties.footDirection) === "forward"
           ? [[a, b]]
           : props.footDirection === "reverse"
             ? [[b, a]]
@@ -250,6 +289,8 @@ export function applyEdits(
                 [b, a],
               ])
           data.graph.edges.push({
+            ...inherited[0],
+            parentEdgeIds: [...new Set(inherited.flatMap((e) => [e.id, ...(e.parentEdgeIds || [])]))],
             id: `${edit.id}:${from.id}>${to.id}`,
             from: from.id,
             to: to.id,
@@ -257,17 +298,18 @@ export function applyEdits(
             name: String(props.name),
             accessible: access === "yes" || access === "campus",
             walkingAccess: access,
-            steps: !!props.steps,
+            steps: props.steps === undefined ? inherited.some((e) => e.steps) : !!props.steps,
             sourceId: edit.id,
           });
       }
       data.map.features.push({
         type: "Feature",
         id: edit.id,
-        properties: pathProperties,
+        properties: { ...pathProperties, vertexIds: sequence.map((n) => n.id) },
         geometry: { type: "LineString", coordinates: sequence.map((n) => n.coordinates) },
       });
     } else if (edit.kind === "building") {
+      const original = data.map.features.find((f) => f.properties?.id === edit.id && f.properties?.kind === "building");
       data.map.features = data.map.features.filter((f) => f.properties?.id !== edit.id);
       if (!edit.deleted)
         data.map.features.push({
@@ -276,34 +318,44 @@ export function applyEdits(
           geometry: edit.geometry,
           properties: {
             id: edit.id,
+            ...original?.properties,
             kind: "building",
             name: props.name,
-            height: Number(props.height) || 0,
-            heightEstimated: !!props.heightEstimated,
+            height: props.heightMode === "floors" ? Number(props.floors) * 3 : Number(props.height) || 0,
+            floors: props.floors,
+            heightMode: props.heightMode,
+            heightEstimated: props.heightMode === "floors" || !!props.heightEstimated,
             source: "campus-review",
           },
         });
-    } else if (edit.kind === "entrance" && !edit.deleted && edit.geometry.type === "Point") {
-      const place = data.places.find((p) => p.id === props.placeId),
-        node = nodes.get(String(props.connectTo));
-      if (!place || !node || distance(node.coordinates, edit.geometry.coordinates as Position) > 5)
-        errors.push(
-          `${props.name}: choose a place and a path node within 5 m of the entrance. Draw an explicit connecting path if needed.`,
-        );
-      else {
-        place.graphNode = node.id;
-        place.approachDistance = 0;
-        place.arrivalKind = "entrance";
-      }
+    } else if (edit.kind === "entrance" && edit.geometry.type === "Point") {
+      data.entrances = data.entrances.filter((e) => e.id !== edit.id);
+      if (edit.deleted) continue;
+      const coordinates = edit.geometry.coordinates as Position;
+      const placeId = String(props.placeId || "");
+      const target = props.connection;
+      const linked = target ? resolveConnection(data, nodes, target) : nodes.get(canonical(String(props.connectTo || "")));
+      const node = linked && nodes.get(canonical(linked.id));
+      // Typed connections use the exact entrance position. Legacy corrections retain their documented 5 m tolerance.
+      const valid = node && distance(node.coordinates, coordinates) <= (target ? 0.2 : 5);
+      const entrance = {
+        id: edit.id, name: String(props.name), placeId, coordinates,
+        buildingId: props.buildingId ? String(props.buildingId) : undefined,
+        walkingAccess: (props.access || "yes") as WalkingAccess, source: "campus-review",
+        graphNode: valid ? node.id : undefined,
+      };
+      data.entrances.push(entrance);
+      if (!data.places.some((p) => p.id === placeId)) errors.push(`${edit.id}: choose the place served by this entrance.`);
+      if (!valid) errors.push(`${edit.id}: entrance needs a connected path at its position (legacy connections must be within 5 m).`);
     } else if (edit.kind === "barrier" || edit.kind === "closure") {
       const edgeIds = Array.isArray(props.edgeIds)
         ? props.edgeIds.filter((id): id is string => typeof id === "string")
         : [];
-      const missing = edgeIds.filter((id) => !data.graph.edges.some((e) => e.id === id));
+      const missing = edgeIds.filter((id) => !data.graph.edges.some((e) => edgeMatches(e, id)));
       if (!edit.deleted && (!edgeIds.length || missing.length))
         errors.push(`${props.name}: select existing path segments to block.`);
-      const bothDirections = new Set(edgeIds);
-      for (const edge of data.graph.edges.filter((e) => edgeIds.includes(e.id)))
+      const bothDirections = new Set(data.graph.edges.filter((e) => edgeIds.some((id) => edgeMatches(e, id))).map((e) => e.id));
+      for (const edge of data.graph.edges.filter((e) => bothDirections.has(e.id)))
         for (const reverse of data.graph.edges.filter(
           (e) => e.from === edge.to && e.to === edge.from,
         ))
@@ -319,6 +371,8 @@ export function applyEdits(
         });
     }
   }
+  connectPaths();
+  remapClosures(data, errors);
   const connected = new Set(data.graph.edges.flatMap((e) => [e.from, e.to]));
   data.graph.nodes = [...nodes.values()].filter((n) => connected.has(n.id));
   for (const place of data.places) {
@@ -353,6 +407,22 @@ export function applyEdits(
   )) {
     adjacency.set(e.from, [...(adjacency.get(e.from) || []), e.to]);
     adjacency.set(e.to, [...(adjacency.get(e.to) || []), e.from]);
+  }
+  for (const entrance of data.entrances) {
+    if (!data.places.some((p) => p.id === entrance.placeId)) errors.push(`${entrance.id}: its place was removed.`);
+    if (entrance.graphNode) entrance.graphNode = canonical(entrance.graphNode);
+    if (entrance.graphNode && !connected.has(entrance.graphNode)) {
+      delete entrance.graphNode;
+      errors.push(`${entrance.id}: its connecting path was removed.`);
+    }
+  }
+  for (const place of data.places) {
+    const entrances = data.entrances.filter((e) => e.placeId === place.id);
+    if (!entrances.length) continue;
+    const usable = entrances.filter((e) => ["yes", "campus"].includes(e.walkingAccess) && e.graphNode && adjacency.has(e.graphNode)).sort((a, b) => a.id.localeCompare(b.id));
+    place.graphNode = usable[0]?.graphNode;
+    place.arrivalKind = usable.length ? "entrance" : "unmapped";
+    place.approachDistance = usable.length ? 0 : undefined;
   }
   const seen = new Set<string>();
   for (const place of data.places) {
