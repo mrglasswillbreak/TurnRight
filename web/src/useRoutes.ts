@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { CampusData, Position, Route } from "./types";
+import type { CampusData, RouteOrigin, RouteEndpoint, Route } from "./types";
 export function useRoutes() {
   const worker = useRef<Worker | null>(null),
     counter = useRef(0);
@@ -32,7 +32,7 @@ export function useRoutes() {
     };
   }, []);
   return useCallback(
-    (data: CampusData, origin: Position | string, destination: string) =>
+    (data: CampusData, origin: RouteOrigin, destination: RouteEndpoint) =>
       new Promise<Route[]>((resolve, reject) => {
         if (!worker.current) {
           reject(new Error("Routing is starting. Please try again."));

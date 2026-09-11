@@ -1,12 +1,12 @@
 /// <reference lib="webworker" />
 import { findRoutes } from "./routing";
-import type { CampusData, Position } from "./types";
+import type { CampusData, RouteOrigin, RouteEndpoint } from "./types";
 self.onmessage = (
   event: MessageEvent<{
     id: number;
     data: CampusData;
-    origin: Position | string;
-    destination: string;
+    origin: RouteOrigin;
+    destination: RouteEndpoint;
   }>,
 ) => {
   const { id, data, origin, destination } = event.data;

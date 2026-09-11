@@ -1,3 +1,4 @@
+import { placeHasConnection } from "./routing";
 import {
   ArrowLeft,
   ArrowUp,
@@ -87,7 +88,7 @@ export function RoutePanel({
               >
                 <option value="gps">Your location</option>
                 {data.places
-                  .filter((p) => p.graphNode && p.id !== destination.id)
+                  .filter((p) => placeHasConnection(data, p) && p.id !== destination.id)
                   .map((p) => (
                     <option value={p.id} key={p.id}>
                       {p.name}
@@ -143,8 +144,8 @@ export function RoutePanel({
               <p className="small-note">
                 {originPlace?.arrivalKind === "mapped-approach" &&
                   `Start on the mapped path ${originPlace.approachDistance || 0} m from ${originPlace.name}; its entrance link is unverified. `}
-                {destination.arrivalKind === "entrance"
-                  ? "Route ends at a mapped entrance."
+                {(route.arrivalKind || destination.arrivalKind) === "entrance"
+                  ? `Route ends at ${data.entrances?.find((e) => e.id === route.destinationEntranceId)?.name || "a mapped entrance"}.`
                   : `Route ends on a mapped path ${destination.approachDistance || 0} m from the place. The final entrance connection is unverified.`}
               </p>
               {route.startOffset > 10 && (
@@ -189,7 +190,7 @@ export function RoutePanel({
               </span>
             </div>
           </div>
-          {nav.arrived && destination.arrivalKind !== "entrance" && (
+          {nav.arrived && (route.arrivalKind || destination.arrivalKind) !== "entrance" && (
             <p className="notice">
               The building is nearby. Its entrance and the final connection still need verification.
             </p>

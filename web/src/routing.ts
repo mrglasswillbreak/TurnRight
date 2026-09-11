@@ -8,6 +8,9 @@ import type {
   Position,
   Route,
   RoutingGraph,
+  RouteEndpoint,
+  RouteOrigin,
+  Place,
 } from "./types";
 
 export class RoutingError extends Error {}
@@ -148,58 +151,62 @@ export function makeRoute(
     startOffset,
   };
 }
-export function findRoutes(
-  data: CampusData,
-  origin: Position | string,
-  destination: string,
-): Route[] {
+export function placeHasConnection(data: CampusData, place: Place): boolean {
+  const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
+  return entrances.length ? entrances.some((e) => e.graphNode && ["yes", "campus"].includes(e.walkingAccess)) : !!place.graphNode;
+}
+interface EndpointNode { id: string; distance: number; entranceId?: string; arrivalKind?: Place["arrivalKind"]; approachDistance?: number }
+function endpointNodes(data: CampusData, endpoint: RouteEndpoint): EndpointNode[] {
+  if (typeof endpoint === "string") return [{ id: endpoint, distance: 0 }];
+  const place = data.places.find((p) => p.id === endpoint.placeId);
+  if (!place) return [];
+  const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
+  if (entrances.length) return entrances
+    .filter((e) => e.graphNode && ["yes", "campus"].includes(e.walkingAccess))
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map((e) => ({ id: e.graphNode!, distance: 0, entranceId: e.id, arrivalKind: "entrance" }));
+  return place.graphNode ? [{ id: place.graphNode, distance: 0, arrivalKind: place.arrivalKind, approachDistance: place.approachDistance }] : [];
+}
+export function findRoutes(data: CampusData, origin: RouteOrigin, destination: RouteEndpoint): Route[] {
   const nodeMap = new Map(data.graph.nodes.map((n) => [n.id, n.coordinates]));
   const blocked = new Set(data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds));
   for (const edge of data.graph.edges) {
-    if (
-      edge.geometryBlocked ||
-      geometryBlocker(nodeMap.get(edge.from)!, nodeMap.get(edge.to)!, data.map)
-    )
-      blocked.add(edge.id);
+    const a = nodeMap.get(edge.from), b = nodeMap.get(edge.to);
+    if (!a || !b || edge.geometryBlocked || geometryBlocker(a, b, data.map)) blocked.add(edge.id);
   }
   const usableGraph = { ...data.graph, edges: data.graph.edges.filter((e) => !blocked.has(e.id)) };
-  const start =
-    typeof origin === "string" ? { id: origin, distance: 0 } : nearestNode(usableGraph, origin, 45);
-  if (!start)
-    throw new RoutingError(
-      "Your start is too far from a mapped campus path. Choose a mapped starting place.",
-    );
-  if (!data.graph.nodes.some((n) => n.id === destination))
-    throw new RoutingError("This destination has no mapped walking connection yet.");
-  const base = aStar(data.graph, start.id, destination, blocked);
-  if (!base)
-    throw new RoutingError(
-      "No connected walking route is available. A path may be closed or missing from the map.",
-    );
-  const routes = [makeRoute(data.graph, base, start.id, start.distance)];
-  const penalties = new Map<string, number>();
-  // Bounded attempts avoid expensive all-path enumeration. Accept only substantial,
-  // loop-free alternatives with at most 60% extra walking distance.
-  for (let attempt = 0; attempt < 4 && routes.length < 3 && base.length; attempt++) {
-    const previous = routes.at(-1)!;
-    previous.edgeIds.forEach((id) => penalties.set(id, (penalties.get(id) || 1) + 1));
-    const candidate = aStar(data.graph, start.id, destination, blocked, penalties);
-    if (!candidate) break;
-    const route = makeRoute(data.graph, candidate, start.id, start.distance);
-    const substantial = routes.every((existing) => {
-      const ids = new Set(existing.edgeIds);
-      return (
-        candidate.filter((e) => ids.has(e.id)).reduce((sum, e) => sum + e.distance, 0) /
-          (route.distance || 1) <
-        0.8
-      );
-    });
-    if (
-      substantial &&
-      route.distance <= routes[0].distance * 1.6 &&
-      new Set(route.nodeIds).size === route.nodeIds.length
-    )
-      routes.push(route);
+  const nearest = Array.isArray(origin) ? nearestNode(usableGraph, origin, 45) : undefined;
+  const starts: EndpointNode[] = Array.isArray(origin) ? (nearest ? [nearest] : []) : endpointNodes(data, origin);
+  const ends = endpointNodes(data, destination).filter((e) => nodeMap.has(e.id));
+  if (!starts.length) throw new RoutingError("Your start is too far from a mapped campus path or has no available entrance. Choose a mapped starting place.");
+  if (!ends.length) throw new RoutingError("This destination has no available mapped walking connection yet.");
+  const candidates: Route[] = [];
+  for (const start of starts) for (const end of ends) {
+    const penalties = new Map<string, number>();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const edges = aStar(usableGraph, start.id, end.id, blocked, penalties);
+      if (!edges) break;
+      const route = makeRoute(data.graph, edges, start.id, start.distance);
+      route.originEntranceId = start.entranceId;
+      route.destinationEntranceId = end.entranceId;
+      route.arrivalKind = end.arrivalKind;
+      route.approachDistance = end.approachDistance;
+      if (!candidates.some((r) => r.id === route.id)) candidates.push(route);
+      if (!edges.length) break;
+      edges.forEach((e) => penalties.set(e.id, (penalties.get(e.id) || 1) + 1));
+    }
   }
-  return routes.sort((a, b) => a.distance - b.distance);
+  candidates.sort((a, b) => a.distance - b.distance || a.id.localeCompare(b.id));
+  if (!candidates.length) throw new RoutingError("No connected walking route is available. A path may be closed or missing from the map.");
+  const routes = [candidates[0]];
+  const edgeLengths = new Map(data.graph.edges.map((e) => [e.id, e.distance]));
+  for (const candidate of candidates.slice(1)) {
+    if (routes.length === 3) break;
+    if (candidate.distance > routes[0].distance * 1.6 || new Set(candidate.nodeIds).size !== candidate.nodeIds.length) continue;
+    if (routes.every((r) => {
+      const ids = new Set(r.edgeIds);
+      return candidate.edgeIds.filter((id) => ids.has(id)).reduce((sum, id) => sum + (edgeLengths.get(id) || 0), 0) / (candidate.distance || 1) < 0.8;
+    })) routes.push(candidate);
+  }
+  return routes;
 }

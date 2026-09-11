@@ -47,7 +47,25 @@ export interface GraphEdge {
   geometryBlocked?: string;
   steps?: boolean;
   sourceId: string;
+  /** Original edge IDs retained when an explicit junction splits a segment. */
+  parentEdgeIds?: string[];
 }
+export type ConnectionTarget =
+  | { type: "node"; nodeId: string; coordinates: Position }
+  | { type: "segment"; sourceId: string; from: string; to: string; coordinates: Position };
+export interface PathConnection { vertexId: string; target: ConnectionTarget }
+export interface Entrance {
+  id: string;
+  placeId: string;
+  buildingId?: string;
+  name: string;
+  coordinates: Position;
+  walkingAccess: WalkingAccess;
+  source: string;
+  graphNode?: string;
+}
+export type RouteEndpoint = string | { placeId: string };
+export type RouteOrigin = Position | RouteEndpoint;
 export interface RoutingGraph {
   nodes: GraphNode[];
   edges: GraphEdge[];
@@ -67,6 +85,7 @@ export interface CampusData {
   bounds: [Position, Position];
   map: FeatureCollection;
   places: Place[];
+  entrances?: Entrance[];
   graph: RoutingGraph;
   closures: Closure[];
   accessPolicy?: {
@@ -143,6 +162,10 @@ export interface Route {
   seconds: number;
   maneuvers: Maneuver[];
   startOffset: number;
+  originEntranceId?: string;
+  destinationEntranceId?: string;
+  arrivalKind?: Place["arrivalKind"];
+  approachDistance?: number;
 }
 export interface GpsFix {
   coordinates: Position;
@@ -172,7 +195,11 @@ export interface MapEdit {
   id: string;
   kind: "place" | "path" | "building" | "entrance" | "barrier" | "closure";
   geometry: Geometry;
-  properties: Record<string, unknown>;
+  properties: Record<string, unknown> & {
+    vertexIds?: string[];
+    connections?: PathConnection[];
+    connection?: ConnectionTarget;
+  };
   deleted?: boolean;
   updated_at?: string;
 }

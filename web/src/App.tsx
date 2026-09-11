@@ -1,3 +1,4 @@
+import { placeHasConnection } from "./routing";
 import { lazy, Suspense, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
@@ -245,7 +246,7 @@ export default function App() {
           .playWithName(
             selected?.name || "",
             "arrive",
-            ...(selected?.arrivalKind !== "entrance" ? ["approach"] : []),
+            ...((currentRoute.arrivalKind || selected?.arrivalKind) !== "entrance" ? ["approach"] : []),
           )
           .catch(() => {});
         gps.stop();
@@ -271,7 +272,7 @@ export default function App() {
       !nav.reroute ||
       !navigating ||
       !gps.fix ||
-      !selected?.graphNode ||
+      !selected ||
       !data ||
       Date.now() - rerouteAt.current < 15000
     )
@@ -279,7 +280,7 @@ export default function App() {
     rerouteAt.current = Date.now();
     const request = ++routeRequest.current;
     void voice.current.play("reroute").catch(() => {});
-    calculate(data, gps.fix.coordinates, selected.graphNode)
+    calculate(data, gps.fix.coordinates, { placeId: selected.id })
       .then((next) => {
         if (request !== routeRequest.current || !navigatingRef.current) return;
         setRoutes(next);
@@ -345,13 +346,13 @@ export default function App() {
     setRoutes([]);
     setChosen(0);
     const request = ++routeRequest.current;
-    if (!selected.graphNode) {
+    if (!placeHasConnection(data, selected)) {
       setRouteError(
         "A walking connection for this place has not been mapped. You can report a missing path or entrance.",
       );
       return;
     }
-    let source: string | Position | undefined;
+    let source: string | Position | { placeId: string } | undefined;
     if (from === "gps") {
       source = gps.fix?.coordinates;
       if (!source || Date.now() - gps.fix!.timestamp > 12000) {
@@ -362,7 +363,7 @@ export default function App() {
       }
     } else {
       gps.stop();
-      source = data.places.find((p) => p.id === from)?.graphNode;
+      source = data.places.some((p) => p.id === from && placeHasConnection(data, p)) ? { placeId: from } : undefined;
     }
     if (!source) {
       setRouteError("Choose a mapped starting place.");
@@ -370,7 +371,7 @@ export default function App() {
     }
     setBusy(true);
     try {
-      const result = await calculate(data, source, selected.graphNode);
+      const result = await calculate(data, source, { placeId: selected.id });
       if (request !== routeRequest.current) return;
       setRoutes(result);
       setChosen(0);
@@ -422,10 +423,10 @@ export default function App() {
       );
       return;
     }
-    if (!selected?.graphNode || !data) return;
+    if (!selected || !data) return;
     setBusy(true);
     try {
-      const live = await calculate(data, gps.fix.coordinates, selected.graphNode);
+      const live = await calculate(data, gps.fix.coordinates, { placeId: selected.id });
       if (request !== routeRequest.current) return;
       const matching = live.findIndex((r) => r.id === currentRoute?.id);
       setRoutes(live);
