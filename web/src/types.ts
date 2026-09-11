@@ -1,16 +1,16 @@
-import type { Feature, FeatureCollection, Geometry } from "geojson";
+import type { Feature, FeatureCollection, Geometry } from 'geojson';
 
 export type Position = [number, number];
 export type Category =
-  | "academic"
-  | "library"
-  | "food"
-  | "services"
-  | "worship"
-  | "residence"
-  | "sports"
-  | "gate"
-  | "other";
+  | 'academic'
+  | 'library'
+  | 'food'
+  | 'services'
+  | 'worship'
+  | 'residence'
+  | 'sports'
+  | 'gate'
+  | 'other';
 export interface Place {
   id: string;
   name: string;
@@ -23,7 +23,7 @@ export interface Place {
   sourceId: string;
   graphNode?: string;
   approachDistance?: number;
-  arrivalKind: "entrance" | "mapped-approach" | "unmapped";
+  arrivalKind: 'entrance' | 'mapped-approach' | 'unmapped';
   height?: number;
   heightEstimated?: boolean;
 }
@@ -33,7 +33,7 @@ export interface GraphNode {
   sourceTags?: Record<string, string>;
   accessReviewId?: string;
 }
-export type WalkingAccess = "yes" | "campus" | "private" | "no";
+export type WalkingAccess = 'yes' | 'campus' | 'private' | 'no';
 export interface GraphEdge {
   id: string;
   from: string;
@@ -51,9 +51,18 @@ export interface GraphEdge {
   parentEdgeIds?: string[];
 }
 export type ConnectionTarget =
-  | { type: "node"; nodeId: string; coordinates: Position }
-  | { type: "segment"; sourceId: string; from: string; to: string; coordinates: Position };
-export interface PathConnection { vertexId: string; target: ConnectionTarget }
+  | { type: 'node'; nodeId: string; coordinates: Position }
+  | {
+      type: 'segment';
+      sourceId: string;
+      from: string;
+      to: string;
+      coordinates: Position;
+    };
+export interface PathConnection {
+  vertexId: string;
+  target: ConnectionTarget;
+}
 export interface Entrance {
   id: string;
   placeId: string;
@@ -90,7 +99,7 @@ export interface CampusData {
   closures: Closure[];
   accessPolicy?: {
     id: string;
-    audience: "students";
+    audience: 'students';
     confirmedAt: string;
     summary: string;
     connectionReviews?: {
@@ -138,14 +147,14 @@ export interface CampusPackage {
   assets: PackageAsset[];
 }
 export type ManeuverKind =
-  | "depart"
-  | "left"
-  | "right"
-  | "slight-left"
-  | "slight-right"
-  | "uturn"
-  | "straight"
-  | "arrive";
+  | 'depart'
+  | 'left'
+  | 'right'
+  | 'slight-left'
+  | 'slight-right'
+  | 'uturn'
+  | 'straight'
+  | 'arrive';
 export interface Maneuver {
   kind: ManeuverKind;
   instruction: string;
@@ -164,7 +173,7 @@ export interface Route {
   startOffset: number;
   originEntranceId?: string;
   destinationEntranceId?: string;
-  arrivalKind?: Place["arrivalKind"];
+  arrivalKind?: Place['arrivalKind'];
   approachDistance?: number;
 }
 export interface GpsFix {
@@ -185,15 +194,15 @@ export interface SourceFeature {
 export interface MapChange {
   id: string;
   source_id: string;
-  kind: "add" | "modify" | "remove";
+  kind: 'add' | 'modify' | 'remove';
   before: unknown;
   after: unknown;
-  status: "pending" | "accepted" | "rejected";
+  status: 'pending' | 'accepted' | 'rejected';
   summary: string;
 }
 export interface MapEdit {
   id: string;
-  kind: "place" | "path" | "building" | "entrance" | "barrier" | "closure";
+  kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure';
   geometry: Geometry;
   properties: Record<string, unknown> & {
     vertexIds?: string[];
@@ -220,7 +229,7 @@ export interface ReportDraft {
 }
 export interface Release {
   id: string;
-  status: "queued" | "building" | "preview" | "published" | "failed";
+  status: 'queued' | 'building' | 'preview' | 'published' | 'failed';
   summary: string;
   created_at: string;
   preview_url?: string;

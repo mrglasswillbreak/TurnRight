@@ -1,5 +1,13 @@
-import { placeHasConnection } from "./routing";
-import { lazy, Suspense, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { placeHasConnection } from './routing';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ArrowUpRight,
   ArrowLeft,
@@ -28,55 +36,66 @@ import {
   Settings,
   Info,
   Utensils,
-} from "lucide-react";
-import type { Map as MapInstance } from "maplibre-gl";
-import { registerSW } from "virtual:pwa-register";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import type { Map as MapInstance } from 'maplibre-gl';
+import { registerSW } from 'virtual:pwa-register';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { MapView } from "./MapView";
+} from '@/components/ui/dialog';
+import { MapView } from './MapView';
 import {
   activatePending,
   getPreference,
   latestPackage,
   loadCampus,
   setPreference,
-} from "./offline";
-import { OfflinePanel } from "./OfflinePanel";
-import { ReportForm } from "./ReportForm";
-import { RoutePanel } from "./RoutePanel";
-import { OfflineVoice } from "./audio";
-import { advanceNavigation, initialNavigation } from "./navigation";
-import { useGps } from "./useGps";
-import { useRoutes } from "./useRoutes";
-import { useWebMcp } from "./useWebMcp";
-import { useAppearance } from "./useAppearance";
-import type { CampusData, CampusPackage, Category, Place, Position, Route } from "./types";
-const Admin = lazy(() => import("./Admin"));
-const categories: { id: Category | "all"; label: string; Icon: typeof Building2 }[] = [
-  { id: "all", label: "All places", Icon: Compass },
-  { id: "academic", label: "Academics", Icon: GraduationCap },
-  { id: "library", label: "Libraries", Icon: BookOpen },
-  { id: "food", label: "Food", Icon: Utensils },
-  { id: "services", label: "Services", Icon: Building2 },
-  { id: "residence", label: "Residences", Icon: Building2 },
-  { id: "worship", label: "Worship", Icon: MapPin },
-  { id: "sports", label: "Sports", Icon: Flag },
+} from './offline';
+import { OfflinePanel } from './OfflinePanel';
+import { ReportForm } from './ReportForm';
+import { RoutePanel } from './RoutePanel';
+import { OfflineVoice } from './audio';
+import { advanceNavigation, initialNavigation } from './navigation';
+import { useGps } from './useGps';
+import { useRoutes } from './useRoutes';
+import { useWebMcp } from './useWebMcp';
+import { useAppearance } from './useAppearance';
+import type {
+  CampusData,
+  CampusPackage,
+  Category,
+  Place,
+  Position,
+  Route,
+} from './types';
+const Admin = lazy(() => import('./Admin'));
+const categories: {
+  id: Category | 'all';
+  label: string;
+  Icon: typeof Building2;
+}[] = [
+  { id: 'all', label: 'All places', Icon: Compass },
+  { id: 'academic', label: 'Academics', Icon: GraduationCap },
+  { id: 'library', label: 'Libraries', Icon: BookOpen },
+  { id: 'food', label: 'Food', Icon: Utensils },
+  { id: 'services', label: 'Services', Icon: Building2 },
+  { id: 'residence', label: 'Residences', Icon: Building2 },
+  { id: 'worship', label: 'Worship', Icon: MapPin },
+  { id: 'sports', label: 'Sports', Icon: Flag },
 ];
 export default function App() {
   const { preference: appearance, dark, setAppearance } = useAppearance();
   const [data, setData] = useState<CampusData | null>(null),
     [manifest, setManifest] = useState<CampusPackage | null>(null),
     [latest, setLatest] = useState<CampusPackage | null>(null);
-  const [loadError, setLoadError] = useState(""),
-    [toast, setToast] = useState(""),
-    [query, setQuery] = useState(""),
-    [category, setCategory] = useState("all");
+  const [loadError, setLoadError] = useState(''),
+    [toast, setToast] = useState(''),
+    [query, setQuery] = useState(''),
+    [category, setCategory] = useState('all');
   const [selected, setSelected] = useState<Place | null>(null),
     [threeD, setThreeD] = useState(false),
     [follow, setFollow] = useState(false);
@@ -89,10 +108,14 @@ export default function App() {
     { key: string; name: string; placeId?: string; coordinates: Position }[]
   >([]);
   const refreshDrafts = () => {
-    void getPreference<typeof reportDrafts>("report-drafts", []).then(setReportDrafts);
+    void getPreference<typeof reportDrafts>('report-drafts', []).then(
+      setReportDrafts,
+    );
   };
   const startRequested = useRef(false);
-  const [dialog, setDialog] = useState<"offline" | "settings" | "report" | null>(null),
+  const [dialog, setDialog] = useState<
+      'offline' | 'settings' | 'report' | null
+    >(null),
     [reportPin, setReportPin] = useState<Position | undefined>();
   const [downloaded, setDownloaded] = useState(false),
     [online, setOnline] = useState(navigator.onLine),
@@ -101,9 +124,9 @@ export default function App() {
   const [routeView, setRouteView] = useState(false),
     [routes, setRoutes] = useState<Route[]>([]),
     [chosen, setChosen] = useState(0),
-    [origin, setOrigin] = useState("gps"),
+    [origin, setOrigin] = useState('gps'),
     [busy, setBusy] = useState(false),
-    [routeError, setRouteError] = useState("");
+    [routeError, setRouteError] = useState('');
   const [navigating, setNavigating] = useState(false),
     [nav, setNav] = useState(initialNavigation),
     [muted, setMuted] = useState(false),
@@ -128,7 +151,7 @@ export default function App() {
         setData(result.data);
         setManifest(result.manifest);
         setDownloaded(result.downloaded);
-        setLoadError("");
+        setLoadError('');
       })
       .catch((e) => setLoadError(e.message));
   const checkUpdates = async (announce = false) => {
@@ -138,8 +161,8 @@ export default function App() {
       if (announce)
         setToast(
           next.version === manifest?.version
-            ? "Your campus map is up to date."
-            : "A new campus map is available in Offline Maps.",
+            ? 'Your campus map is up to date.'
+            : 'A new campus map is available in Offline Maps.',
         );
     } catch (e) {
       if (announce) setToast((e as Error).message);
@@ -151,11 +174,11 @@ export default function App() {
       .catch(() => false)
       .then(reloadData);
     void checkUpdatesEvent();
-    getPreference("saved", [] as string[]).then(setSaved);
-    getPreference("recent", [] as string[]).then(setRecent);
-    getPreference("muted", false).then(setMuted);
+    getPreference('saved', [] as string[]).then(setSaved);
+    getPreference('recent', [] as string[]).then(setRecent);
+    getPreference('muted', false).then(setMuted);
     refreshDrafts();
-    if ("serviceWorker" in navigator) {
+    if ('serviceWorker' in navigator) {
       updateSW.current = registerSW({
         immediate: true,
         onNeedRefresh() {
@@ -166,8 +189,12 @@ export default function App() {
         },
       });
       const control = () => setSwReady(!!navigator.serviceWorker.controller);
-      navigator.serviceWorker.addEventListener("controllerchange", control);
-      return () => navigator.serviceWorker.removeEventListener("controllerchange", control);
+      navigator.serviceWorker.addEventListener('controllerchange', control);
+      return () =>
+        navigator.serviceWorker.removeEventListener(
+          'controllerchange',
+          control,
+        );
     }
   }, []);
   useEffect(() => {
@@ -176,11 +203,11 @@ export default function App() {
         void checkUpdatesEvent();
       },
       off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
     };
   }, [manifest?.version]);
   useEffect(() => {
@@ -193,7 +220,7 @@ export default function App() {
   }, [packageVersion]);
   useEffect(() => {
     if (!toast) return;
-    const timeout = setTimeout(() => setToast(""), 9000);
+    const timeout = setTimeout(() => setToast(''), 9000);
     return () => clearTimeout(timeout);
   }, [toast]);
   useEffect(() => {
@@ -207,7 +234,7 @@ export default function App() {
         return;
       }
       try {
-        const next = await navigator.wakeLock?.request("screen");
+        const next = await navigator.wakeLock?.request('screen');
         if (disposed) await next?.release();
         else lock = next;
       } catch {
@@ -215,38 +242,45 @@ export default function App() {
       }
     };
     void wake();
-    document.addEventListener("visibilitychange", wake);
+    document.addEventListener('visibilitychange', wake);
     return () => {
       disposed = true;
       clearInterval(interval);
       void lock?.release();
-      document.removeEventListener("visibilitychange", wake);
+      document.removeEventListener('visibilitychange', wake);
     };
   }, [navigating]);
   useEffect(() => {
     if (navigating && currentRoute && gps.fix)
-      setNav((previous) => advanceNavigation(currentRoute, gps.fix!, previous, clock));
+      setNav((previous) =>
+        advanceNavigation(currentRoute, gps.fix!, previous, clock),
+      );
   }, [gps.fix, clock, navigating, currentRoute]);
   const announceManeuver = useEffectEvent(() => {
     if (!navigating || !currentRoute) return;
-    if (nav.quality !== "good") {
+    if (nav.quality !== 'good') {
       const key = `weak:${nav.quality}`;
       if (!announced.current.has(key)) {
         announced.current.add(key);
         void voice.current
-          .play("weak")
-          .catch(() => setToast("Audio unavailable; follow the on-screen directions."));
+          .play('weak')
+          .catch(() =>
+            setToast('Audio unavailable; follow the on-screen directions.'),
+          );
       }
       return;
     }
     if (nav.arrived) {
-      if (!announced.current.has("arrive")) {
-        announced.current.add("arrive");
+      if (!announced.current.has('arrive')) {
+        announced.current.add('arrive');
         void voice.current
           .playWithName(
-            selected?.name || "",
-            "arrive",
-            ...((currentRoute.arrivalKind || selected?.arrivalKind) !== "entrance" ? ["approach"] : []),
+            selected?.name || '',
+            'arrive',
+            ...((currentRoute.arrivalKind || selected?.arrivalKind) !==
+            'entrance'
+              ? ['approach']
+              : []),
           )
           .catch(() => {});
         gps.stop();
@@ -257,12 +291,14 @@ export default function App() {
     if (!next) return;
     const remaining = next.at - nav.progress;
     if (remaining <= 55 && remaining >= -5) {
-      const key = `${currentRoute.id}:${nav.nextIndex}:${remaining < 12 ? "now" : "soon"}`;
+      const key = `${currentRoute.id}:${nav.nextIndex}:${remaining < 12 ? 'now' : 'soon'}`;
       if (!announced.current.has(key)) {
         announced.current.add(key);
         void voice.current
           .maneuver(next.kind, remaining)
-          .catch(() => setToast("Audio unavailable; follow the on-screen directions."));
+          .catch(() =>
+            setToast('Audio unavailable; follow the on-screen directions.'),
+          );
       }
     }
   });
@@ -279,7 +315,7 @@ export default function App() {
       return;
     rerouteAt.current = Date.now();
     const request = ++routeRequest.current;
-    void voice.current.play("reroute").catch(() => {});
+    void voice.current.play('reroute').catch(() => {});
     calculate(data, gps.fix.coordinates, { placeId: selected.id })
       .then((next) => {
         if (request !== routeRequest.current || !navigatingRef.current) return;
@@ -287,18 +323,18 @@ export default function App() {
         setChosen(0);
         setNav(initialNavigation);
         announced.current.clear();
-        setToast("Walking route updated.");
+        setToast('Walking route updated.');
       })
       .catch((e) => setToast(e.message));
-  }, [nav.reroute, gps.fix, navigating, data, selected?.graphNode, calculate]);
+  }, [nav.reroute, gps.fix, navigating, data, selected, calculate]);
   const places = useMemo(
     () =>
       (data?.places || [])
         .filter(
           (p) =>
             (!savedOnly || saved.includes(p.id)) &&
-            (category === "all" || p.category === category) &&
-            `${p.name} ${p.aliases.join(" ")} ${p.department || ""} ${p.faculty || ""}`
+            (category === 'all' || p.category === category) &&
+            `${p.name} ${p.aliases.join(' ')} ${p.department || ''} ${p.faculty || ''}`
               .toLowerCase()
               .includes(query.toLowerCase()),
         )
@@ -313,7 +349,7 @@ export default function App() {
   const selectPlace = (place: Place) => {
     startRequested.current = false;
     if (navigating) {
-      setToast("Finish this walk before choosing a new destination.");
+      setToast('Finish this walk before choosing a new destination.');
       return;
     }
     routeRequest.current++;
@@ -322,10 +358,13 @@ export default function App() {
     setBusy(false);
     setRouteView(false);
     setRoutes([]);
-    setRouteError("");
-    const next = [place.id, ...recent.filter((id) => id !== place.id)].slice(0, 12);
+    setRouteError('');
+    const next = [place.id, ...recent.filter((id) => id !== place.id)].slice(
+      0,
+      12,
+    );
     setRecent(next);
-    void setPreference("recent", next);
+    void setPreference('recent', next);
   };
   useWebMcp(data, selectPlace, navigating);
   const toggleSaved = () => {
@@ -334,39 +373,43 @@ export default function App() {
       ? saved.filter((id) => id !== selected.id)
       : [...saved, selected.id];
     setSaved(next);
-    void setPreference("saved", next);
+    void setPreference('saved', next);
   };
   const previewRoute = async (from = origin) => {
     startRequested.current = false;
     if (!data || !selected) return;
     setRouteView(true);
     setBusy(false);
-    setRouteError("");
+    setRouteError('');
     setOrigin(from);
     setRoutes([]);
     setChosen(0);
     const request = ++routeRequest.current;
     if (!placeHasConnection(data, selected)) {
       setRouteError(
-        "A walking connection for this place has not been mapped. You can report a missing path or entrance.",
+        'A walking connection for this place has not been mapped. You can report a missing path or entrance.',
       );
       return;
     }
     let source: string | Position | { placeId: string } | undefined;
-    if (from === "gps") {
+    if (from === 'gps') {
       source = gps.fix?.coordinates;
       if (!source || Date.now() - gps.fix!.timestamp > 12000) {
         setRouteError(
-          "Waiting for your location. You can also choose a mapped starting place above.",
+          'Waiting for your location. You can also choose a mapped starting place above.',
         );
         return;
       }
     } else {
       gps.stop();
-      source = data.places.some((p) => p.id === from && placeHasConnection(data, p)) ? { placeId: from } : undefined;
+      source = data.places.some(
+        (p) => p.id === from && placeHasConnection(data, p),
+      )
+        ? { placeId: from }
+        : undefined;
     }
     if (!source) {
-      setRouteError("Choose a mapped starting place.");
+      setRouteError('Choose a mapped starting place.');
       return;
     }
     setBusy(true);
@@ -379,8 +422,14 @@ export default function App() {
       if (points.length > 1)
         map.current?.fitBounds(
           [
-            [Math.min(...points.map((p) => p[0])), Math.min(...points.map((p) => p[1]))],
-            [Math.max(...points.map((p) => p[0])), Math.max(...points.map((p) => p[1]))],
+            [
+              Math.min(...points.map((p) => p[0])),
+              Math.min(...points.map((p) => p[1])),
+            ],
+            [
+              Math.max(...points.map((p) => p[0])),
+              Math.max(...points.map((p) => p[1])),
+            ],
           ],
           {
             padding: {
@@ -401,32 +450,42 @@ export default function App() {
   const previewGps = useEffectEvent(() => {
     if (
       routeView &&
-      origin === "gps" &&
+      origin === 'gps' &&
       !routes.length &&
       !busy &&
       gps.fix &&
       Date.now() - gps.fix.timestamp < 12000
     )
-      void previewRoute("gps");
+      void previewRoute('gps');
   });
   useEffect(() => previewGps(), [gps.fix?.timestamp]);
   const startNavigation = async () => {
     const request = ++routeRequest.current;
     await voice.current
       .unlock()
-      .catch(() => setToast("Audio could not start. On-screen directions remain available."));
+      .catch(() =>
+        setToast(
+          'Audio could not start. On-screen directions remain available.',
+        ),
+      );
     gps.start();
-    if (!gps.fix || Date.now() - gps.fix.timestamp > 12000 || gps.fix.accuracy > 35) {
+    if (
+      !gps.fix ||
+      Date.now() - gps.fix.timestamp > 12000 ||
+      gps.fix.accuracy > 35
+    ) {
       startRequested.current = true;
       setRouteError(
-        "Waiting for a fresh, accurate location to start navigation. Keep the app visible and allow location access.",
+        'Waiting for a fresh, accurate location to start navigation. Keep the app visible and allow location access.',
       );
       return;
     }
     if (!selected || !data) return;
     setBusy(true);
     try {
-      const live = await calculate(data, gps.fix.coordinates, { placeId: selected.id });
+      const live = await calculate(data, gps.fix.coordinates, {
+        placeId: selected.id,
+      });
       if (request !== routeRequest.current) return;
       const matching = live.findIndex((r) => r.id === currentRoute?.id);
       setRoutes(live);
@@ -435,8 +494,8 @@ export default function App() {
       setNavigating(true);
       setFollow(true);
       announced.current.clear();
-      setRouteError("");
-      await voice.current.play("depart");
+      setRouteError('');
+      await voice.current.play('depart');
     } catch (e) {
       setRouteError((e as Error).message);
     } finally {
@@ -469,7 +528,7 @@ export default function App() {
       setSelected(null);
       setRouteView(false);
       setRoutes([]);
-      setToast("Your downloaded map update is now active.");
+      setToast('Your downloaded map update is now active.');
     }
   };
   if (!data || !manifest)
@@ -481,28 +540,30 @@ export default function App() {
         <h1>
           TurnRight<span>.</span>
         </h1>
-        <p>{loadError || "Opening LASU campus…"}</p>
+        <p>{loadError || 'Opening LASU campus…'}</p>
         {loadError && <Button onClick={reloadData}>Retry</Button>}
       </main>
     );
-  if (location.pathname.startsWith("/admin"))
+  if (location.pathname.startsWith('/admin'))
     return (
-      <Suspense fallback={<main className="loading-screen">Opening map editor…</main>}>
+      <Suspense
+        fallback={<main className="loading-screen">Opening map editor…</main>}
+      >
         <Admin data={data} dark={dark} />
       </Suspense>
     );
   return (
     <main
-      className={`app-shell ${navigating ? "is-navigating" : ""}`}
+      className={`app-shell ${navigating ? 'is-navigating' : ''}`}
       data-panel-expanded={panelExpanded || navigating}
       data-panel-view={
         navigating
-          ? "navigation"
+          ? 'navigation'
           : routeView && selected
-            ? "route"
+            ? 'route'
             : selected
-              ? "detail"
-              : "browse"
+              ? 'detail'
+              : 'browse'
       }
     >
       <MapView
@@ -518,11 +579,11 @@ export default function App() {
         onManualPan={() => setFollow(false)}
         onReady={(instance) => {
           map.current = instance;
-          instance.on("contextmenu", (e) => {
+          instance.on('contextmenu', (e) => {
             if (navigatingRef.current) return;
             setReportPin([e.lngLat.lng, e.lngLat.lat]);
             setSelected(null);
-            setDialog("report");
+            setDialog('report');
           });
         }}
       />
@@ -531,7 +592,7 @@ export default function App() {
           <ArrowUpRight />
         </a>
         <button
-          className={`rail-item ${!savedOnly ? "active" : ""}`}
+          className={`rail-item ${!savedOnly ? 'active' : ''}`}
           disabled={navigating}
           onClick={() => {
             setSavedOnly(false);
@@ -545,7 +606,7 @@ export default function App() {
           <span>Explore</span>
         </button>
         <button
-          className={`rail-item ${savedOnly ? "active" : ""}`}
+          className={`rail-item ${savedOnly ? 'active' : ''}`}
           disabled={navigating}
           onClick={() => {
             setSavedOnly(true);
@@ -553,20 +614,22 @@ export default function App() {
             setSelected(null);
             setRouteView(false);
             setRoutes([]);
-            setCategory("all");
-            setQuery("");
+            setCategory('all');
+            setQuery('');
           }}
         >
           <Heart />
           <span>Saved</span>
         </button>
-        <button className="rail-item" onClick={() => setDialog("offline")}>
+        <button className="rail-item" onClick={() => setDialog('offline')}>
           <Download />
           <span>Offline</span>
-          {latest && latest.version !== manifest.version && <i className="update-dot" />}
+          {latest && latest.version !== manifest.version && (
+            <i className="update-dot" />
+          )}
         </button>
         <div className="rail-spacer" />
-        <button className="rail-item" onClick={() => setDialog("settings")}>
+        <button className="rail-item" onClick={() => setDialog('settings')}>
           <Settings />
           <span>Settings</span>
         </button>
@@ -577,7 +640,7 @@ export default function App() {
       </nav>
       <section
         className="explore-panel"
-        aria-label={navigating ? "Walking navigation" : "Campus places"}
+        aria-label={navigating ? 'Walking navigation' : 'Campus places'}
       >
         <header className="panel-brand">
           <div>
@@ -606,7 +669,7 @@ export default function App() {
               }}
             />
             {query && (
-              <button aria-label="Clear search" onClick={() => setQuery("")}>
+              <button aria-label="Clear search" onClick={() => setQuery('')}>
                 <X size={17} />
               </button>
             )}
@@ -617,17 +680,17 @@ export default function App() {
             className="mobile-panel-toggle"
             aria-expanded={panelExpanded}
             aria-controls="campus-panel-content"
-            aria-label={panelExpanded ? "Collapse card" : "Expand card"}
+            aria-label={panelExpanded ? 'Collapse card' : 'Expand card'}
             onClick={() => setPanelExpanded((expanded) => !expanded)}
           >
             <span>
               {selected
-                ? `${routeView ? "Route to " : ""}${selected.name}`
+                ? `${routeView ? 'Route to ' : ''}${selected.name}`
                 : savedOnly
-                  ? "Saved places"
+                  ? 'Saved places'
                   : query
-                    ? "Search results"
-                    : "Browse places"}
+                    ? 'Search results'
+                    : 'Browse places'}
             </span>
             {panelExpanded ? (
               <ChevronDown size={20} />
@@ -636,7 +699,11 @@ export default function App() {
             )}
           </button>
         )}
-        <div id="campus-panel-content" className="panel-content" ref={panelContent}>
+        <div
+          id="campus-panel-content"
+          className="panel-content"
+          ref={panelContent}
+        >
           {routeView && selected ? (
             <RoutePanel
               data={data}
@@ -645,12 +712,14 @@ export default function App() {
               chosen={chosen}
               origin={origin}
               busy={busy}
-              error={routeError || (origin === "gps" || navigating ? gps.error : "")}
+              error={
+                routeError || (origin === 'gps' || navigating ? gps.error : '')
+              }
               navigating={navigating}
               nav={nav}
               muted={muted}
               onOrigin={(from) => {
-                if (from === "gps") gps.start();
+                if (from === 'gps') gps.start();
                 void previewRoute(from);
               }}
               onChoose={setChosen}
@@ -665,14 +734,14 @@ export default function App() {
               }}
               onMute={() => {
                 setMuted(!muted);
-                void setPreference("muted", !muted);
+                void setPreference('muted', !muted);
               }}
               onRepeat={() => {
                 const m = currentRoute?.maneuvers[nav.nextIndex];
                 if (m)
                   void voice.current
                     .maneuver(m.kind, m.at - nav.progress)
-                    .catch(() => setToast("Audio could not play."));
+                    .catch(() => setToast('Audio could not play.'));
               }}
             />
           ) : !selected ? (
@@ -681,7 +750,7 @@ export default function App() {
                 {categories.map(({ id, label, Icon }) => (
                   <button
                     key={id}
-                    className={category === id ? "category active" : "category"}
+                    className={category === id ? 'category active' : 'category'}
                     onClick={() => setCategory(id)}
                   >
                     <Icon size={16} />
@@ -692,22 +761,32 @@ export default function App() {
               <div className="section-heading">
                 <div>
                   <span className="eyebrow">YOUR CAMPUS, CONNECTED</span>
-                  <h1>{savedOnly ? "Saved places" : query ? "Search results" : "Explore campus"}</h1>
+                  <h1>
+                    {savedOnly
+                      ? 'Saved places'
+                      : query
+                        ? 'Search results'
+                        : 'Explore campus'}
+                  </h1>
                 </div>
                 <span className="count-pill">{places.length}</span>
               </div>
               <p className="section-description">
                 {savedOnly
-                  ? "Your places, saved on this device."
-                  : "Find a building. Pick a path. You’re on your way."}
+                  ? 'Your places, saved on this device.'
+                  : 'Find a building. Pick a path. You’re on your way.'}
               </p>
               <div className="place-list">
                 {places.map((place) => (
-                  <button className="place-row" key={place.id} onClick={() => selectPlace(place)}>
+                  <button
+                    className="place-row"
+                    key={place.id}
+                    onClick={() => selectPlace(place)}
+                  >
                     <span className={`place-icon ${place.category}`}>
-                      {place.category === "library" ? (
+                      {place.category === 'library' ? (
                         <BookOpen />
-                      ) : place.category === "academic" ? (
+                      ) : place.category === 'academic' ? (
                         <GraduationCap />
                       ) : (
                         <MapPin />
@@ -716,9 +795,10 @@ export default function App() {
                     <span className="place-copy">
                       <strong>{place.name}</strong>
                       <span>
-                        {place.category === "academic"
-                          ? "Academic building"
-                          : place.category.charAt(0).toUpperCase() + place.category.slice(1)}{" "}
+                        {place.category === 'academic'
+                          ? 'Academic building'
+                          : place.category.charAt(0).toUpperCase() +
+                            place.category.slice(1)}{' '}
                         · Ojo campus
                       </span>
                     </span>
@@ -728,20 +808,29 @@ export default function App() {
                 {!places.length && (
                   <div className="empty-state">
                     {savedOnly ? <Heart /> : <Search />}
-                    <h3>{savedOnly ? "Keep your places close" : "No places found"}</h3>
+                    <h3>
+                      {savedOnly ? 'Keep your places close' : 'No places found'}
+                    </h3>
                     <p>
                       {savedOnly
-                        ? "Open a place and tap Save to find it here."
-                        : "Try a building name, department, or abbreviation."}
+                        ? 'Open a place and tap Save to find it here.'
+                        : 'Try a building name, department, or abbreviation.'}
                     </p>
                   </div>
                 )}
               </div>
               <footer className="panel-footer">
                 <span className="status-dot" />
-                {downloaded && swReady ? "Ready offline" : online ? "Campus map" : "Offline"}
-                <button className="text-button" onClick={() => setDialog("offline")}>
-                  {downloaded ? "Manage map" : "Download map"}
+                {downloaded && swReady
+                  ? 'Ready offline'
+                  : online
+                    ? 'Campus map'
+                    : 'Offline'}
+                <button
+                  className="text-button"
+                  onClick={() => setDialog('offline')}
+                >
+                  {downloaded ? 'Manage map' : 'Download map'}
                 </button>
               </footer>
             </>
@@ -753,22 +842,33 @@ export default function App() {
               <div className={`detail-icon ${selected.category}`}>
                 <Building2 />
               </div>
-              <span className="eyebrow">{selected.category.toUpperCase()} · LASU OJO</span>
+              <span className="eyebrow">
+                {selected.category.toUpperCase()} · LASU OJO
+              </span>
               <h1>{selected.name}</h1>
-              <p>{selected.department || selected.faculty || "Lagos State University, Ojo campus"}</p>
-              <Button className="primary-action" onClick={() => void previewRoute()}>
+              <p>
+                {selected.department ||
+                  selected.faculty ||
+                  'Lagos State University, Ojo campus'}
+              </p>
+              <Button
+                className="primary-action"
+                onClick={() => void previewRoute()}
+              >
                 <Navigation size={18} /> Directions
               </Button>
               <div className="button-row place-actions">
                 <Button variant="outline" onClick={toggleSaved}>
-                  <Heart fill={saved.includes(selected.id) ? "currentColor" : "none"} />
-                  {saved.includes(selected.id) ? "Saved" : "Save"}
+                  <Heart
+                    fill={saved.includes(selected.id) ? 'currentColor' : 'none'}
+                  />
+                  {saved.includes(selected.id) ? 'Saved' : 'Save'}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => {
                     setReportPin(undefined);
-                    setDialog("report");
+                    setDialog('report');
                   }}
                 >
                   <Flag /> Report
@@ -778,28 +878,29 @@ export default function App() {
                 <div>
                   <MapPin />
                   <span>
-                    {selected.coordinates[1].toFixed(5)}, {selected.coordinates[0].toFixed(5)}
+                    {selected.coordinates[1].toFixed(5)},{' '}
+                    {selected.coordinates[0].toFixed(5)}
                   </span>
                 </div>
                 <div>
                   <Flag />
                   <span>
-                    {selected.arrivalKind === "entrance"
-                      ? "Connected to a mapped entrance."
+                    {selected.arrivalKind === 'entrance'
+                      ? 'Connected to a mapped entrance.'
                       : selected.graphNode
                         ? `Mapped path ${selected.approachDistance} m away. Entrance connection unverified.`
-                        : "Walking connection not yet mapped."}
+                        : 'Walking connection not yet mapped.'}
                   </span>
                 </div>
                 <div>
                   <Info />
                   <span>
-                    Source:{" "}
-                    {selected.source === "osm"
-                      ? "OpenStreetMap"
-                      : selected.source === "campus-review"
-                        ? "Campus administrator"
-                        : "LASU ArcGIS campus map"}
+                    Source:{' '}
+                    {selected.source === 'osm'
+                      ? 'OpenStreetMap'
+                      : selected.source === 'campus-review'
+                        ? 'Campus administrator'
+                        : 'LASU ArcGIS campus map'}
                     . Not field-verified.
                   </span>
                 </div>
@@ -809,21 +910,21 @@ export default function App() {
         </div>
       </section>
       <div className="map-topbar">
-        <button className="location-pill" onClick={() => setDialog("offline")}>
+        <button className="location-pill" onClick={() => setDialog('offline')}>
           {!online ? <WifiOff size={14} /> : <span className="status-dot" />}
-          <span>{!online ? "Offline" : "Lagos State University"}</span>
+          <span>{!online ? 'Offline' : 'Lagos State University'}</span>
           <span className="pill-divider" />
-          <span>{downloaded && swReady ? "Map downloaded" : "Ojo, Lagos"}</span>
+          <span>{downloaded && swReady ? 'Map downloaded' : 'Ojo, Lagos'}</span>
         </button>
       </div>
       <div className="map-controls">
         <button
-          className={threeD ? "active" : ""}
+          className={threeD ? 'active' : ''}
           onClick={() => setThreeD(!threeD)}
-          aria-label={threeD ? "Switch to 2D" : "Switch to 3D"}
+          aria-label={threeD ? 'Switch to 2D' : 'Switch to 3D'}
         >
           <Layers />
-          <span>{threeD ? "2D" : "3D"}</span>
+          <span>{threeD ? '2D' : '3D'}</span>
         </button>
         <div className="control-group">
           <button aria-label="Zoom in" onClick={() => map.current?.zoomIn()}>
@@ -844,26 +945,31 @@ export default function App() {
         </button>
         <button
           aria-label="Find my location"
-          className={follow ? "active" : ""}
+          className={follow ? 'active' : ''}
           onClick={() => {
             gps.start();
             setFollow(true);
-            if (!gps.fix) setToast("Waiting for your location. Allow location access if prompted.");
+            if (!gps.fix)
+              setToast(
+                'Waiting for your location. Allow location access if prompted.',
+              );
           }}
         >
           <LocateFixed />
         </button>
       </div>
-      {threeD && <div className="map-caption">Floor-based building heights are approximate</div>}
+      {threeD && (
+        <div className="map-caption">
+          Floor-based building heights are approximate
+        </div>
+      )}
       {gps.error && !routeView && (
-        <output className="gps-status">
-          {gps.error}
-        </output>
+        <output className="gps-status">{gps.error}</output>
       )}
       {toast && (
         <output className="toast">
           <span>{toast}</span>
-          <button aria-label="Dismiss" onClick={() => setToast("")}>
+          <button aria-label="Dismiss" onClick={() => setToast('')}>
             <X size={18} />
           </button>
         </output>
@@ -877,21 +983,21 @@ export default function App() {
         <DialogContent className="app-dialog">
           <DialogHeader>
             <DialogTitle>
-              {dialog === "offline"
-                ? "Offline maps"
-                : dialog === "report"
-                  ? "Report a map issue"
-                  : "Settings & map information"}
+              {dialog === 'offline'
+                ? 'Offline maps'
+                : dialog === 'report'
+                  ? 'Report a map issue'
+                  : 'Settings & map information'}
             </DialogTitle>
             <DialogDescription>
-              {dialog === "offline"
-                ? "Take LASU campus with you."
-                : dialog === "report"
-                  ? "Help make campus easier to navigate."
-                  : "Make TurnRight work for you."}
+              {dialog === 'offline'
+                ? 'Take LASU campus with you.'
+                : dialog === 'report'
+                  ? 'Help make campus easier to navigate.'
+                  : 'Make TurnRight work for you.'}
             </DialogDescription>
           </DialogHeader>
-          {dialog === "offline" && (
+          {dialog === 'offline' && (
             <OfflinePanel
               manifest={manifest}
               latest={latest}
@@ -911,33 +1017,40 @@ export default function App() {
                 }
                 setToast(
                   pending
-                    ? "Download complete. It will activate after your walk."
-                    : "Campus map downloaded and verified.",
+                    ? 'Download complete. It will activate after your walk.'
+                    : 'Campus map downloaded and verified.',
                 );
               }}
             />
-          )}{" "}
-          {dialog === "report" && (
+          )}{' '}
+          {dialog === 'report' && (
             <ReportForm
               onDraftSaved={refreshDrafts}
               place={selected}
               coordinates={reportPin}
               onDone={() => {
                 setDialog(null);
-                setToast("Report submitted. Thank you for helping improve the map.");
+                setToast(
+                  'Report submitted. Thank you for helping improve the map.',
+                );
               }}
             />
-          )}{" "}
-          {dialog === "settings" && (
+          )}{' '}
+          {dialog === 'settings' && (
             <div className="settings-content">
-              <fieldset className="appearance-settings" aria-describedby="appearance-help">
+              <fieldset
+                className="appearance-settings"
+                aria-describedby="appearance-help"
+              >
                 <legend>Appearance</legend>
                 <div className="appearance-options">
-                  {([
-                    ["system", "Device", Monitor],
-                    ["light", "Light", Sun],
-                    ["dark", "Dark", Moon],
-                  ] as const).map(([value, label, Icon]) => (
+                  {(
+                    [
+                      ['system', 'Device', Monitor],
+                      ['light', 'Light', Sun],
+                      ['dark', 'Dark', Moon],
+                    ] as const
+                  ).map(([value, label, Icon]) => (
                     <label key={value}>
                       <input
                         type="radio"
@@ -946,17 +1059,23 @@ export default function App() {
                         checked={appearance === value}
                         onChange={() => {
                           void setAppearance(value).then((saved) => {
-                            if (!saved) setToast("Appearance changed for this visit. Your browser could not save the choice.");
+                            if (!saved)
+                              setToast(
+                                'Appearance changed for this visit. Your browser could not save the choice.',
+                              );
                           });
                         }}
                       />
-                      <span><Icon size={19} aria-hidden="true" />{label}</span>
+                      <span>
+                        <Icon size={19} aria-hidden="true" />
+                        {label}
+                      </span>
                     </label>
                   ))}
                 </div>
                 <p id="appearance-help">
-                  {appearance === "system"
-                    ? `Follows your device automatically. Currently using ${dark ? "dark" : "light"} mode.`
+                  {appearance === 'system'
+                    ? `Follows your device automatically. Currently using ${dark ? 'dark' : 'light'} mode.`
                     : `Always uses ${appearance} mode. Choose Device to follow your device settings.`}
                 </p>
               </fieldset>
@@ -966,10 +1085,10 @@ export default function App() {
                   role="switch"
                   aria-checked={!muted}
                   aria-label="Voice directions"
-                  className={`toggle ${!muted ? "on" : ""}`}
+                  className={`toggle ${!muted ? 'on' : ''}`}
                   onClick={() => {
                     setMuted(!muted);
-                    void setPreference("muted", !muted);
+                    void setPreference('muted', !muted);
                   }}
                 >
                   <i />
@@ -984,9 +1103,9 @@ export default function App() {
                 >
                   {updateReady
                     ? navigating
-                      ? "After navigation"
-                      : "Install update"
-                    : "Up to date"}
+                      ? 'After navigation'
+                      : 'Install update'
+                    : 'Up to date'}
                 </Button>
               </div>
               <Button
@@ -996,11 +1115,11 @@ export default function App() {
                   try {
                     await voice.current.unlock();
                     await voice.current.load(manifest.version);
-                    await voice.current.play("depart");
-                    setToast("Offline voice test played.");
+                    await voice.current.play('depart');
+                    setToast('Offline voice test played.');
                   } catch {
                     setToast(
-                      "Audio is unavailable. Check device volume and download the campus map.",
+                      'Audio is unavailable. Check device volume and download the campus map.',
                     );
                   }
                 }}
@@ -1008,24 +1127,27 @@ export default function App() {
                 Test spoken directions
               </Button>
               <p className="small-note">
-                Install: in Android Chrome, choose Install app from the menu. On iPhone, use Safari
-                → Share → Add to Home Screen. Keep the app visible during navigation.
+                Install: in Android Chrome, choose Install app from the menu. On
+                iPhone, use Safari → Share → Add to Home Screen. Keep the app
+                visible during navigation.
               </p>
               <h3 className="subheading">Map coverage</h3>
               {data.accessPolicy && (
                 <p className="small-note">
-                  Student walking access on the main internal roads was confirmed by the project
-                  owner on {data.accessPolicy.confirmedAt}. Restricted areas, no-walking paths,
-                  and closures remain excluded.
+                  Student walking access on the main internal roads was
+                  confirmed by the project owner on{' '}
+                  {data.accessPolicy.confirmedAt}. Restricted areas, no-walking
+                  paths, and closures remain excluded.
                 </p>
               )}
               <p>
-                {data.coverage.placeCount} places · {data.coverage.approachCount} mapped approaches
-                · {data.coverage.routableCount} connected entrances.
+                {data.coverage.placeCount} places ·{' '}
+                {data.coverage.approachCount} mapped approaches ·{' '}
+                {data.coverage.routableCount} connected entrances.
               </p>
               <p className="notice">
-                This source-derived campus map has not been field-verified. Missing entrances and
-                paths are shown in place details.
+                This source-derived campus map has not been field-verified.
+                Missing entrances and paths are shown in place details.
               </p>
               {reportDrafts.length > 0 && (
                 <>
@@ -1035,9 +1157,12 @@ export default function App() {
                       key={draft.key}
                       variant="outline"
                       onClick={() => {
-                        setSelected(data.places.find((p) => p.id === draft.placeId) || null);
+                        setSelected(
+                          data.places.find((p) => p.id === draft.placeId) ||
+                            null,
+                        );
                         setReportPin(draft.coordinates);
-                        setDialog("report");
+                        setDialog('report');
                       }}
                     >
                       {draft.name} · Resume draft
@@ -1047,14 +1172,20 @@ export default function App() {
               )}
               <h3 className="subheading">Your privacy</h3>
               <p>
-                Location and navigation history stay on your phone. Student reports only send the
-                pin and description you submit. TurnRight is an independent personal project, not an
-                official LASU service.
+                Location and navigation history stay on your phone. Student
+                reports only send the pin and description you submit. TurnRight
+                is an independent personal project, not an official LASU
+                service.
               </p>
               <h3 className="subheading">Sources & attribution</h3>
               {data.sources.map((source) => (
                 <p key={source.id}>
-                  <a className="source-link" href={source.url} target="_blank" rel="noreferrer">
+                  <a
+                    className="source-link"
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {source.attribution}
                   </a>
                   <br />
@@ -1065,8 +1196,9 @@ export default function App() {
                 Download source-derived campus database
               </a>
               <p className="small-note">
-                English voice directions · Walking only · Updated{" "}
-                {new Date(manifest.createdAt).toLocaleDateString()} · {manifest.version}
+                English voice directions · Walking only · Updated{' '}
+                {new Date(manifest.createdAt).toLocaleDateString()} ·{' '}
+                {manifest.version}
               </p>
             </div>
           )}

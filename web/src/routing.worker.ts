@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
-import { findRoutes } from "./routing";
-import type { CampusData, RouteOrigin, RouteEndpoint } from "./types";
+import { findRoutes } from './routing';
+import type { CampusData, RouteOrigin, RouteEndpoint } from './types';
 self.onmessage = (
   event: MessageEvent<{
     id: number;
@@ -15,7 +15,8 @@ self.onmessage = (
   } catch (error) {
     self.postMessage({
       id,
-      error: error instanceof Error ? error.message : "Could not calculate route",
+      error:
+        error instanceof Error ? error.message : 'Could not calculate route',
     });
   }
 };

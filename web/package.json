@@ -9,10 +9,11 @@
     "dev": "vite",
     "build": "tsc --noEmit && tsc --project tsconfig.functions.json && vite build",
     "start": "vite preview --host 127.0.0.1",
-    "lint": "tsc --noEmit && tsc --project tsconfig.functions.json && oxlint src api server tests vite.config.ts vitest.config.ts",
+    "lint": "tsc --noEmit && tsc --project tsconfig.functions.json && oxlint src api server tests vite.config.ts vitest.config.ts playwright.config.ts",
     "format": "oxfmt",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
+    "test:browser": "playwright test",
     "package": "node ../scripts/package.mjs",
     "prebuild": "node scripts/prebuild.mjs"
   },
