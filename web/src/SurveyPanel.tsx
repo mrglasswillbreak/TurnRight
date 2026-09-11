@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   Map as MapInstance,
   GeoJSONSource,
@@ -35,6 +35,7 @@ import {
   type RemoteSurvey,
 } from './survey-sync';
 import { api } from './supabase';
+import { supabase } from './supabase';
 import './survey.css';
 
 interface Props {
@@ -63,7 +64,7 @@ export function SurveyPanel({
   view2D,
 }: Props) {
   const [recording, setRecording] = useState<SurveyRecording | null>(null),
-    [, redraw] = useState(0);
+    [version, redraw] = useState(0);
   const [local, setLocal] = useState<SurveySession[]>([]),
     [remote, setRemote] = useState<RemoteSurvey[]>([]);
   const [screen, setScreen] = useState<'home' | 'saved' | 'survey' | 'replace'>(
@@ -91,6 +92,8 @@ export function SurveyPanel({
   live.current = { recording, screen, selection, following, path };
   const session = recording?.session;
   const active = session?.state === 'recording';
+  const nodes=useMemo(()=>new Map(data.graph.nodes.map(n=>[n.id,n])),[data.graph.nodes]);
+  const connectCenter=connect?center:null;
   const changed = () => redraw((n) => n + 1);
   const crosshair = useCallback((): Position => {
     const canvas = map.getCanvas();
@@ -166,7 +169,8 @@ export function SurveyPanel({
         });
     };
     window.addEventListener('online', online);
-    return () => window.removeEventListener('online', online);
+    const auth=supabase?.auth.onAuthStateChange((event)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN')queueMicrotask(online);});
+    return () => {window.removeEventListener('online', online);auth?.data.subscription.unsubscribe();};
   }, []);
   useEffect(() => {
     const empty: FeatureCollection = {
@@ -338,15 +342,15 @@ export function SurveyPanel({
       line(ring, '#538cdb', true);
       point(accuracyMarker.coordinates, '#307ede');
     }
-    if (connect) {
+    if (connectCenter) {
       for (const edge of data.graph.edges) {
-        const a = data.graph.nodes.find((n) => n.id === edge.from),
-          b = data.graph.nodes.find((n) => n.id === edge.to);
+        const a = nodes.get(edge.from),
+          b = nodes.get(edge.to);
         if (
           a &&
           b &&
-          (distance(center, a.coordinates) < 30 ||
-            distance(center, b.coordinates) < 30)
+          (distance(connectCenter, a.coordinates) < 30 ||
+            distance(connectCenter, b.coordinates) < 30)
         ) {
           line([a.coordinates, b.coordinates], '#4b83dd');
           point(a.coordinates, '#4b83dd');
@@ -358,7 +362,7 @@ export function SurveyPanel({
       type: 'FeatureCollection',
       features,
     });
-  });
+  },[version,recording,selection,marker,screen,path,boundaries,connectCenter,data.graph.edges,map,nodes]);
   const fix = controller.current?.latest;
   useEffect(() => {
     if (active && following && fix?.status === 'accepted')

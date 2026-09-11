@@ -110,7 +110,7 @@ async function performSync(
       'Both versions are saved privately. Open Saved surveys to compare, then choose which version to continue.',
     );
   if(evidenceSignature(session)!==evidenceSignature(upload.metadata)||recording.samples.length!==upload.chunks.reduce((n,c)=>n+c.length,0)){
-    if(session.state==='recording'){progress('Earlier revision saved privately; current recording remains local.');return result;}
+    if((recording.session as SurveySession).state==='recording'){progress('Earlier revision saved privately; current recording remains local.');return result;}
     return performSync(recording,progress);
   }
   progress('Saved privately');
