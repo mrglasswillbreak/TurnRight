@@ -564,14 +564,15 @@ export function SurveyPanel({
       }
     });
   const archive = async (s: SurveySession) => {
-    s.archived = !s.archived;
+    const archived = !s.archived;
     if (s.remoteRevision)
       await api('survey-save', {
         command: 'archive',
         surveyId: s.id,
         expectedRevision: s.remoteRevision,
-        archived: s.archived,
+        archived,
       });
+    s.archived = archived;
     await saveSurveyLocal(s);
     await saved();
   };
@@ -644,7 +645,9 @@ export function SurveyPanel({
                 <button
                   onClick={() =>
                     void attempt(async () => {
-                      setMessage('Verifying owner and downloading the offline map…');
+                      setMessage(
+                        'Verifying owner and downloading the offline map…',
+                      );
                       await prepareOffline();
                       setMessage(
                         'Ready for offline surveying on this device. Keep this owner signed in.',
@@ -800,7 +803,9 @@ export function SurveyPanel({
                                 );
                                 await storeRecording(copy);
                               }
-                              open(await openRemoteSurvey(owner, r.id));
+                              open(
+                                await openRemoteSurvey(owner, r.id, s.archived),
+                              );
                               setMessage(
                                 r.status === 'conflict'
                                   ? 'Conflicting version opened. Compare with the current version before choosing which to continue.'
@@ -809,9 +814,37 @@ export function SurveyPanel({
                             })
                           }
                         >
-                          {r.name} · {r.status} ·{' '}
+                          {r.name} · {s.archived ? 'Archived' : r.status} ·{' '}
                           {new Date(r.created_at).toLocaleString()}
                         </button>
+                        {r.id === s.head_revision && (
+                          <button
+                            onClick={() =>
+                              void attempt(async () => {
+                                const archived = !s.archived;
+                                await api('survey-save', {
+                                  command: 'archive',
+                                  surveyId: s.id,
+                                  expectedRevision: s.head_revision,
+                                  archived,
+                                });
+                                const cached = await loadSurveyLocal(
+                                  owner,
+                                  s.id,
+                                );
+                                if (cached) {
+                                  cached.session.archived = archived;
+                                  await saveSurveyLocal(cached.session);
+                                }
+                                await saved();
+                              })
+                            }
+                          >
+                            {s.archived
+                              ? 'Restore private survey'
+                              : 'Archive private survey'}
+                          </button>
+                        )}
                         {r.id !== s.head_revision && (
                           <button
                             onClick={() =>
@@ -825,7 +858,11 @@ export function SurveyPanel({
                                     surveyRecoveryCopy(current),
                                   );
                                 }
-                                const rcd = await openRemoteSurvey(owner, r.id);
+                                const rcd = await openRemoteSurvey(
+                                  owner,
+                                  r.id,
+                                  s.archived,
+                                );
                                 rcd.session.remoteRevision = s.head_revision;
                                 open(rcd);
                                 setMessage(

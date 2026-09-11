@@ -18,7 +18,11 @@ export interface RemoteSurvey {
   }[];
 }
 export const listRemoteSurveys = () => api<RemoteSurvey[]>('survey-list');
-export async function openRemoteSurvey(owner: string, revisionId: string) {
+export async function openRemoteSurvey(
+  owner: string,
+  revisionId: string,
+  archived?: boolean,
+) {
   const result = await api<{
     revision: { owner: string; metadata: SurveySession };
     chunks: { samples: SurveySample[] }[];
@@ -43,6 +47,7 @@ export async function openRemoteSurvey(owner: string, revisionId: string) {
       ...result.revision.metadata,
       owner,
       remoteRevision: revisionId,
+      archived: archived ?? result.revision.metadata.archived,
       state: result.revision.metadata.state === 'review' ? 'review' : 'paused',
       activeSegment: undefined,
       pendingUpload: undefined,

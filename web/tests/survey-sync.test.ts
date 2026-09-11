@@ -2,7 +2,7 @@ import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import 'fake-indexeddb/auto';
 import { newSurvey, acceptSample } from '../src/survey-model';
 import { loadSurveyLocal, saveSurveyLocal } from '../src/survey-storage';
-import { syncSurvey } from '../src/survey-sync';
+import { syncSurvey, openRemoteSurvey } from '../src/survey-sync';
 import { api } from '../src/supabase';
 import { openDB } from 'idb';
 vi.mock('../src/supabase', () => ({ api: vi.fn() }));
@@ -22,6 +22,22 @@ beforeEach(() => {
   });
 });
 afterEach(() => vi.unstubAllGlobals());
+it('restores current archive state when reopening older private evidence', async () => {
+  const r = newSurvey('owner', 'source');
+  r.session.state = 'review';
+  r.session.archived = false;
+  call.mockResolvedValue({
+    revision: { owner: 'owner', metadata: r.session },
+    chunks: [],
+    nextOffset: null,
+  });
+  const opened = await openRemoteSurvey('owner', 'saved-revision', true);
+  expect(opened.session.archived).toBe(true);
+  expect((await loadSurveyLocal('owner', r.session.id))?.session.archived).toBe(
+    true,
+  );
+  expect(r.session.archived).toBe(false);
+});
 it('queues offline saves and resumes the identical operation', async () => {
   const r = newSurvey('owner', 'source');
   r.session.state = 'review';
