@@ -65,6 +65,7 @@ export interface ReplacementTarget {
 export interface SurveySession {
   localVersion?: number;
   pendingMarker?: SurveyMarker;
+  appliedTarget?: { fingerprint: string; revision?: string };
   id: string;
   owner: string;
   name: string;
@@ -420,10 +421,11 @@ export function surveyCorrections(
   }));
   if (session.replacement) {
     const r = session.replacement;
+    const matchesApplied = currentTarget && session.appliedTarget?.fingerprint === geometryFingerprint(currentTarget) && session.appliedTarget.revision === currentTarget.updated_at;
     if (
       !currentTarget ||
-      geometryFingerprint(currentTarget) !== r.fingerprint ||
-      currentTarget.updated_at !== r.edit.updated_at
+      (!matchesApplied && (geometryFingerprint(currentTarget) !== r.fingerprint ||
+      currentTarget.updated_at !== r.edit.updated_at))
     )
       throw new Error(
         'The target path changed or was removed. Re-select replacement boundaries and review before applying.',

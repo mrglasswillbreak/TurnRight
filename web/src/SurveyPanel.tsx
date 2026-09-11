@@ -15,6 +15,7 @@ import {
   reviewUndo,
   replacementTarget,
   surveyCorrections,
+  geometryFingerprint,
   surveyDistance,
   SURVEY_LIMITS,
   type SurveyRecording,
@@ -44,7 +45,7 @@ interface Props {
   data: CampusData;
   edits: MapEdit[];
   selected: MapEdit | null;
-  apply: (edits: MapEdit[], previousIds: string[]) => Promise<void>;
+  apply: (edits: MapEdit[], previousIds: string[]) => Promise<MapEdit[]>;
   close: () => void;
   prepareOffline: () => Promise<void>;
   recordingChanged: (recording: boolean) => void;
@@ -72,6 +73,7 @@ export function SurveyPanel({
   );
   const [selection, setSelection] = useState<Selection | null>(null),
     [marker, setMarker] = useState<SurveyMarker | null>(null);
+  const [reselecting,setReselecting]=useState(false);
   const [query, setQuery] = useState(''),
     [message, setMessage] = useState(''),
     [error, setError] = useState(''),
@@ -92,6 +94,7 @@ export function SurveyPanel({
   live.current = { recording, screen, selection, following, path };
   const session = recording?.session;
   const active = session?.state === 'recording';
+  const connectionData=useMemo(()=>({...data,graph:{...data.graph,edges:data.graph.edges.filter(e=>!session?.generatedCorrectionIds.includes(e.sourceId))}}),[data,session?.generatedCorrectionIds]);
   const nodes = useMemo(
     () => new Map(data.graph.nodes.map((n) => [n.id, n])),
     [data.graph.nodes],
@@ -472,7 +475,7 @@ export function SurveyPanel({
       : undefined;
   const snap = connect
     ? snapTarget(
-        data,
+        connectionData,
         center,
         (p) => map.project(p),
         session?.replacement?.edit.id,
@@ -601,6 +604,7 @@ export function SurveyPanel({
                 </button>
                 <button
                   onClick={() => {
+                    setReselecting(false);
                     setScreen('replace');
                     setMessage(
                       'Select a mapped path, then its two boundary vertices.',
@@ -698,9 +702,12 @@ export function SurveyPanel({
                 <button
                   className="survey-primary"
                   disabled={boundaries.length !== 2}
-                  onClick={() => void attempt(() => start(true))}
+                  onClick={() => void attempt(async()=>{
+                    if(reselecting && session && path){session.replacement=replacementTarget(path,data,...[...boundaries].sort((a,b)=>a-b) as [number,number]);delete session.appliedTarget;await persist();setScreen('survey');setMessage('Replacement target updated. Review the fixed anchors before applying.');}
+                    else await start(true);
+                  })}
                 >
-                  Record replacement
+                  {reselecting?'Use reviewed replacement boundaries':'Record replacement'}
                 </button>
                 <button onClick={() => setScreen('home')}>Back</button>
               </>
@@ -997,6 +1004,7 @@ export function SurveyPanel({
                       >
                         Rewalk missing section
                       </button>
+                      {session.replacement&&<button onClick={()=>{setReselecting(true);setPath(featureEdit(data,'path',session.replacement!.edit.id,edits)||null);setBoundaries([]);setScreen('replace');}}>Review replacement target</button>}
                       <button
                         onClick={() => {
                           command((s) =>
@@ -1090,14 +1098,14 @@ export function SurveyPanel({
                                 Next vertex
                               </button>
                               <button
-                                onClick={() =>
+                                onClick={() => {
                                   editLine((l) =>
                                     l.vertices.splice(vertexIndex + 1, 0, {
                                       id: surveyId(),
                                       coordinates: center,
                                     }),
-                                  )
-                                }
+                                  );setSelection({line:selectedLine.id,vertex:vertexIndex+1});
+                                }}
                               >
                                 Insert vertex after
                               </button>
@@ -1307,6 +1315,7 @@ export function SurveyPanel({
                                   s.markers = s.markers.filter(
                                     (m) => m.id !== selectedMarker.id,
                                   );
+                                  for(const l of s.review)for(const v of l.vertices)if(v.sampleId===selectedMarker.sampleId&&!s.markers.some(m=>m.sampleId===v.sampleId))v.pinned=!!session.replacement?.anchors.some(a=>a.id===v.id);
                                 });
                                 setSelection(null);
                               }}
@@ -1350,10 +1359,12 @@ export function SurveyPanel({
                             session,
                             current,
                           );
-                          await apply(
+                          const applied = await apply(
                             corrections,
                             session.generatedCorrectionIds,
                           );
+                          const target=applied.find(e=>e.kind==='path'&&e.id===session.replacement?.edit.id);
+                          if(target)session.appliedTarget={fingerprint:geometryFingerprint(target),revision:target.updated_at};
                           session.generatedCorrectionIds = corrections.map(
                             (e) => e.id,
                           );

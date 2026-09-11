@@ -139,6 +139,22 @@ describe('private survey transactions', () => {
     ).rejects.toThrow(/permission denied/);
     await database.exec('reset role;');
   });
+  it('allows only the verified owner to read and archives reversibly with a head revision check',async()=>{
+    const s=await begin(undefined,undefined,null,0);await call('finalize',{revisionId:s.revisionId});
+    await expect(call('archive',{surveyId:s.surveyId,expectedRevision:null,archived:true})).rejects.toThrow(/changed/);
+    await call('archive',{surveyId:s.surveyId,expectedRevision:s.revisionId,archived:true});
+    expect((await database.query<{archived:boolean}>('select archived from surveys where id=$1',[s.surveyId])).rows[0].archived).toBe(true);
+    await call('archive',{surveyId:s.surveyId,expectedRevision:s.revisionId,archived:false});
+    await database.exec("create or replace function auth.uid() returns uuid language sql as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;");
+    await database.query("select set_config('request.jwt.claim.sub',$1,false)",[owner]);
+    await database.exec('set role authenticated;');
+    expect((await database.query('select * from surveys where id=$1',[s.surveyId])).rows).toHaveLength(1);
+    await database.exec('reset role;');
+    await database.query("select set_config('request.jwt.claim.sub',$1,false)",['22222222-2222-4222-8222-222222222222']);
+    await database.exec('set role authenticated;');
+    expect((await database.query('select * from surveys')).rows).toHaveLength(0);
+    await database.exec('reset role;');
+  });
 });
 describe('transactional editor migration', () => {
   it('saves related records atomically and audits each one', async () => {
