@@ -44,6 +44,10 @@ Apply `supabase/migrations/003_editor_batches.sql` once to the existing database
 
 Migration 003 was applied to the TurnRight Supabase project on 11 September 2026. Live verification confirmed that receipt RLS is enabled, anonymous and authenticated roles cannot execute the function, and the service role can. The implementation passed 85 unit/database tests, seven real MapLibre/Terra Draw browser tests, seven Python tests, lint (existing warnings), and a production build on Node 22.23.2. Browser coverage includes undoing the first saved correction to a source building and retaining that building after reload.
 
+The editor/API revision `562fa4d8931f5355b53656bf233026d54d443343` was verified in [Vercel preview](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/AfnjaqHZRmqSXx2WZTrVvxkbSzVM), then deployed to [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/3ym4sa7Z4h3Novt781vUUYw5Tgay). Live owner login, source loading, 3D building selection, an authenticated metadata autosave and its saved undo passed in preview. The temporary verification note was reverted; only audit/undo receipts remain. Production `/admin` returned 200 and an unauthenticated admin request returned 401. The published campus package remains `lasu-4e4c8008b38b`, schema version 1. No source proposals or campus-data releases were published by this rollout.
+
+The existing approved database baseline predates some corrections in the published campus package. Review those pending source proposals before an editor-led map release, as documented in [PRODUCTION.md](PRODUCTION.md). This code deployment preserves the currently published package.
+
 Use Node 22.13 or later in the 22.x line:
 
 ```sh
