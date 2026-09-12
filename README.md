@@ -295,8 +295,8 @@ python -m unittest discover -s scripts/tests -v
 | --- | --- |
 | `npm run dev` | Vite development server |
 | `npm test` | Vitest regression suite |
-| `npm run test:browser` | Real MapLibre/Terra Draw editor and phone survey browser scenarios in Chromium |
-| `npm run test:survey-webkit` | Phone survey scenarios in WebKit with touch and mobile viewport support |
+| `npm run test:browser` | Real MapLibre/Terra Draw editor, survey and motion-assistance scenarios in Chromium |
+| `npm run test:survey-webkit` | Phone survey and public motion-assistance scenarios in WebKit with touch/mobile support |
 | `npm run test:survey-pwa` | Isolated production build: offline preparation/startup, recording recovery and reconnecting private sync |
 | `npm run lint` | TypeScript frontend/API checks and Oxlint |
 | `npm run build` | Preserve/package data, type-check, compile server imports, build application and service worker |
@@ -304,7 +304,7 @@ python -m unittest discover -s scripts/tests -v
 | `npm run package` | Regenerate the campus package from the checked-in seed |
 | `npm run format -- <path>` | Format selected files with Oxfmt; keep formatting changes focused |
 
-**Verification recorded on 12 September 2026, using Node 22:** 110 Vitest tests and seven Python tests pass. Ten Chromium browser scenarios, three WebKit phone scenarios and the production-PWA offline/recovery scenario pass. Production build and API compilation pass. Lint has no errors, with seven existing explicit-any warnings. Coverage includes entrance routing, directed paths and closures, stable editor junctions, noisy/stale GPS, recording interruptions, partial replacement, undo/redo, owner-scoped recovery, storage failures, atomic private uploads, retries/conflicts, cross-device archive recovery and exclusion of raw survey evidence from public packages. Browser tests use real MapLibre/Terra Draw and mock GPS, authentication and APIs only in tests.
+**Verification recorded on 12 September 2026, using Node 22:** 135 Vitest tests and seven Python tests pass. Twelve Chromium browser scenarios, five WebKit phone scenarios and the production-PWA offline/recovery scenario pass. Production build and API compilation pass. Lint has no errors, with seven existing explicit-any warnings. Coverage includes entrance routing, directed paths and closures, stable editor junctions, noisy/stale GPS, recording interruptions, partial replacement, undo/redo, owner-scoped recovery, storage failures, atomic private uploads, retries/conflicts, cross-device archive recovery and exclusion of raw survey evidence from public packages. Motion tests cover angle/tilt normalization, independent permissions, sparse readings, lifecycle cleanup, rate limits, GPS invariance, camera control and preference-only persistence. Browser tests use real MapLibre/Terra Draw with GPS, sensor, authentication and API fixtures only in tests.
 
 Migration 004 is applied. Authenticated preview checks verified offline preparation and private save/reopen, and live database checks verified incomplete-upload rejection, idempotent retries, duplicate-chunk prevention and retained concurrent versions inside a rolled-back transaction. These are software checks: physical Android/iPhone walks, accuracy near buildings, battery use and device interruption/offline behavior remain pending in the [survey field record](docs/SURVEY.md#physical-field-record--pending).
 
@@ -358,6 +358,7 @@ TurnRight/
 | [Acceptance](docs/ACCEPTANCE.md) | Automated/browser evidence, physical-device checklist and field-survey log |
 | [Editor](docs/EDITOR.md) | 2D/3D mapping, entrances, connections, draft recovery and review |
 | [Walking surveys](docs/SURVEY.md) | Phone recording/review, private sync, migration 004 and pending physical-device checks |
+| [Compass and motion](docs/MOTION.md) | Sensor permissions, heading/motion quality, orientation controls, privacy and pending device checks |
 | [Configuration record](docs/CONFIGURATION.md) | Configured services and operational setup record |
 | [Production record](docs/PRODUCTION.md) | Publication history, deployment and package verification |
 | [Campus access](docs/CAMPUS-ACCESS.md) | Reviewed student walking correction and remaining path gaps |

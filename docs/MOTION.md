@@ -36,6 +36,8 @@ Unit coverage includes angle wrap, cardinal screen rotations, tilt singularities
 
 Phone browser tests use real MapLibre with controlled sensors/GPS and test-only authentication/APIs. They cover first-tap permission timing, denial/retry, travel-up default, mode switching, camera gestures, fallback, paused survey recovery, stable entrance placement and absence of sensor data in recovery/upload payloads. The isolated production-PWA scenario also exercises sensors during prepared offline recording, reopening and private sync. Physical checks below remain necessary even when these tests pass.
 
+Software verification on 12 September 2026 used Node 22.23.2: 135 Vitest tests, seven Python tests, 12 Chromium scenarios, five WebKit scenarios and the production-PWA offline scenario pass. Lint passes with seven pre-existing warnings; application/API compilation and production build pass. The authenticated preview verified survey start/pause/finish with denied sensor permission, recoverable empty review, public Travel-up default, permission controls and dark appearance. The empty local preview survey is named “Motion preview check — no field recording”; it was not applied to the map or published.
+
 ## Physical device record — pending
 
 Record device model, OS/browser versions, installed-app status, test date, results and threshold adjustments for each platform. No physical verification has been recorded yet.
