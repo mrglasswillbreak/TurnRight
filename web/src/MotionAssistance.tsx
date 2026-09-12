@@ -1,0 +1,107 @@
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { Marker, type Map as MapInstance } from 'maplibre-gl';
+import type { GpsFix } from './types';
+import { motionService } from './motion-service';
+import { angleDelta, cameraDirection, travelHeading, usableGps, type MapOrientationMode, type SensorCapability } from './motion-model';
+import './motion.css';
+
+export function useMotionSession(active: boolean) {
+  useEffect(() => active ? motionService().acquire() : undefined, [active]);
+}
+function useMotion() {
+  const service = motionService();
+  return useSyncExternalStore(service.subscribe, service.getSnapshot);
+}
+const capability: Record<SensorCapability, string> = {
+  inactive: 'Inactive', requesting: 'Waiting for permission or readings', available: 'Available',
+  denied: 'Permission denied', unavailable: 'Unavailable on this device', missing: 'Readings temporarily missing',
+};
+const activity = { still: 'Likely still', moving: 'Motion detected', uncertain: 'Uncertain' };
+export function MotionStatus({ compact = false, modes = false, fix, following = true }: { compact?: boolean; modes?: boolean; fix?: GpsFix | null; following?: boolean }) {
+  const state = useMotion();
+  const service = motionService();
+  const direction = cameraDirection(state.preferences.mode, state.heading, fix);
+  const details = <>
+    <span className="motion-verification">Awaiting device verification</span>
+    <p>Compass: {capability[state.orientation]}. Motion sensors: {capability[state.motion]}.</p>
+    {state.heading && <p>Phone direction ≈{Math.round(state.heading.degrees)}° · {state.heading.reference === 'magnetic' ? 'magnetic north' : 'absolute orientation'}{state.heading.accuracy !== null ? ` · reported ±${Math.round(state.heading.accuracy)}°` : ' · accuracy not reported'}</p>}
+    {state.reason && <p>{state.reason}</p>}
+    {!state.active && <p>Readings run only during an active walk or survey recording.</p>}
+    <p className="motion-explanation">Purple cone: approximate phone direction. Blue arrow: GPS travel direction. Motion hints do not determine your position or whether you are walking.</p>
+    <div className="motion-actions">
+      <button type="button" onClick={() => { void service.requestFromGesture(true); }}>Enable/Retry sensors</button>
+      <button type="button" disabled={!state.preferences.enabled} onClick={service.turnOff}>Turn off sensors</button>
+    </div>
+    {state.storageError && <p role="alert">{state.storageError}</p>}
+  </>;
+  return <section className="motion-assistance" aria-label="Compass and motion">
+    {modes && <label>Map orientation
+      <select aria-label="Map orientation" value={state.preferences.mode} onChange={(event) => service.setMode(event.target.value as MapOrientationMode)}>
+        <option value="travel">Travel-up</option><option value="north">North-up</option><option value="phone">Phone-up</option>
+      </select>
+    </label>}
+    <div className="motion-summary" data-motion-activity={state.activity}>
+      <strong>{state.preferences.enabled ? `Motion: ${activity[state.activity]}` : 'Compass & motion off'}</strong>
+      <span>{state.heading ? 'Approximate compass available' : 'GPS remains the position source'}</span>
+    </div>
+    {modes && following && direction.fallback && <p role="status">{direction.fallback}</p>}
+    {modes && !following && <p>Map following paused. Use Follow me to restore it.</p>}
+    {compact ? <details><summary>Compass & motion controls</summary>{details}</details> : details}
+  </section>;
+}
+
+/** This subscription is confined to the map overlay; it cannot rerender the app
+ * or change navigation/survey state. Markers are display-only HTML overlays. */
+export function MotionMap({ map, fix, follow = false, active = false, survey = false }: {
+  map: MapInstance; fix?: GpsFix | null; follow?: boolean; active?: boolean; survey?: boolean;
+}) {
+  const state = useMotion();
+  const markers = useRef<{ phone: Marker; travel: Marker } | null>(null);
+  const camera = useRef({ following: false, timestamp: -1, hadPosition: false, lastBearingUpdate: -Infinity });
+  useEffect(() => {
+    const element = (kind: 'phone' | 'travel') => {
+      const e = document.createElement('div');
+      e.className = `motion-marker motion-${kind}`;
+      e.setAttribute('aria-hidden', 'true');
+      e.innerHTML = kind === 'phone'
+        ? '<svg width="72" height="72" viewBox="0 0 72 72"><path d="M36 36 L16 3 Q36 -3 56 3 Z" fill="#985cd9" fill-opacity=".3" stroke="#985cd9" stroke-width="1.5"/></svg>'
+        : '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 1 L22 12 L16 9 L10 12 Z" fill="#1764ed" stroke="white" stroke-width="1.5"/></svg>';
+      e.style.display = 'none';
+      return new Marker({ element: e, rotationAlignment: 'map', pitchAlignment: 'map' }).setLngLat([0, 0]).addTo(map);
+    };
+    markers.current = { phone: element('phone'), travel: element('travel') };
+    return () => { markers.current?.phone.remove(); markers.current?.travel.remove(); markers.current = null; };
+  }, [map]);
+  useEffect(() => {
+    const overlay = markers.current;
+    if (!overlay) return;
+    const valid = usableGps(fix, Date.now(), survey ? 15 : 35, survey ? 10000 : 12000);
+    const phone = active ? state.heading : null;
+    const travel = valid ? travelHeading(fix) : null;
+    overlay.phone.getElement().style.display = valid && phone ? '' : 'none';
+    overlay.travel.getElement().style.display = valid && travel !== null ? '' : 'none';
+    if (valid && fix) {
+      if (phone) overlay.phone.setLngLat(fix.coordinates).setRotation(phone.degrees);
+      if (travel !== null) overlay.travel.setLngLat(fix.coordinates).setRotation(travel);
+    }
+    if (survey) return; // Survey recording owns GPS following; review never follows sensors.
+    const previous = camera.current;
+    const beganFollowing = follow && !previous.following;
+    previous.following = follow;
+    if (!follow || !valid || !fix) return;
+    const direction = cameraDirection(state.preferences.mode, phone, fix);
+    const recenter = beganFollowing || fix.timestamp !== previous.timestamp;
+    const bearingChanged = direction.bearing !== null && Math.abs(angleDelta(map.getBearing(), direction.bearing)) > 1;
+    const now = performance.now();
+    if (recenter || (bearingChanged && now - previous.lastBearingUpdate >= 100)) {
+      map.easeTo({
+        ...(recenter ? { center: fix.coordinates } : {}),
+        ...(!previous.hadPosition ? { zoom: 18 } : {}),
+        ...(direction.bearing !== null ? { bearing: direction.bearing } : {}),
+        duration: 250,
+      });
+      previous.timestamp = fix.timestamp; previous.hadPosition = true; previous.lastBearingUpdate = now;
+    }
+  }, [map, fix, follow, active, survey, state]);
+  return null;
+}

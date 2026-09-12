@@ -62,6 +62,8 @@ import { RoutePanel } from './RoutePanel';
 import { OfflineVoice } from './audio';
 import { advanceNavigation, initialNavigation } from './navigation';
 import { useGps } from './useGps';
+import { MotionStatus, useMotionSession } from './MotionAssistance';
+import { motionService } from './motion-service';
 import { useRoutes } from './useRoutes';
 import { useWebMcp } from './useWebMcp';
 import { useAppearance } from './useAppearance';
@@ -151,6 +153,7 @@ export default function App() {
   const gps = useGps(),
     calculate = useRoutes();
   const currentRoute = routes[chosen];
+  useMotionSession(navigating && !nav.arrived);
   useEffect(() => {
     panelContent.current?.scrollTo(0, 0);
   }, [selected?.id, routeView, navigating, query, category, savedOnly]);
@@ -594,6 +597,7 @@ export default function App() {
         dark={dark}
         threeD={threeD}
         follow={follow}
+        motionActive={navigating && !nav.arrived}
         onSelect={selectPlace}
         onManualPan={() => setFollow(false)}
         onReady={(instance) => {
@@ -742,7 +746,12 @@ export default function App() {
                 void previewRoute(from);
               }}
               onChoose={setChosen}
-              onStart={startNavigation}
+              onStart={() => {
+                void motionService().requestFromGesture();
+                void startNavigation();
+              }}
+              fix={gps.fix}
+              following={follow}
               onStop={stopNavigation}
               onBack={() => {
                 routeRequest.current++;
@@ -956,6 +965,7 @@ export default function App() {
         <button
           aria-label="North up"
           onClick={() => {
+            motionService().setMode('north');
             setFollow(false);
             map.current?.resetNorth();
           }}
@@ -963,7 +973,7 @@ export default function App() {
           <Compass />
         </button>
         <button
-          aria-label="Find my location"
+          aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
           className={follow ? 'active' : ''}
           onClick={() => {
             gps.start();
@@ -1127,6 +1137,7 @@ export default function App() {
                     : 'Up to date'}
                 </Button>
               </div>
+              <MotionStatus modes fix={gps.fix} following={follow} />
               <Button
                 variant="outline"
                 disabled={muted}

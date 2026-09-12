@@ -25,6 +25,8 @@ import {
   type SurveyLine,
 } from './survey-model';
 import { SurveyRecorder } from './survey-recorder';
+import { MotionMap, MotionStatus, useMotionSession } from './MotionAssistance';
+import { motionService } from './motion-service';
 import {
   listLocalSurveys,
   loadSurveyLocal,
@@ -98,6 +100,7 @@ export function SurveyPanel({
   live.current = { recording, screen, selection, following, path };
   const session = recording?.session;
   const active = session?.state === 'recording';
+  useMotionSession(active);
   const connectionData = useMemo(
     () => ({
       ...data,
@@ -430,6 +433,7 @@ export function SurveyPanel({
       });
   }, [fix, following, active, map]);
   const start = async (replace = false) => {
+    void motionService().requestFromGesture();
     const r = newSurvey(owner, data.version);
     if (replace) {
       if (!path || boundaries.length !== 2)
@@ -446,6 +450,10 @@ export function SurveyPanel({
     view2D();
     map.easeTo({ pitch: 0, bearing: 0, duration: 250 });
     await controller.current!.resume();
+  };
+  const resume = () => {
+    void motionService().requestFromGesture();
+    return controller.current!.resume();
   };
   const markEntrance = async () => {
     const sample = recording?.samples.findLast(
@@ -585,6 +593,7 @@ export function SurveyPanel({
     : 'Waiting for GPS';
   return (
     <div className="survey-workspace">
+      <MotionMap map={map} fix={fix && ['accepted', 'duplicate'].includes(fix.status) ? fix : null} active={active} survey />
       <div className="survey-crosshair" aria-hidden="true">
         +
       </div>
@@ -628,6 +637,7 @@ export function SurveyPanel({
                 >
                   Record new path
                 </button>
+                <p>Starting requests optional compass and motion access. GPS recording works if you decline.</p>
                 <button
                   onClick={() => {
                     setReselecting(false);
@@ -898,6 +908,7 @@ export function SurveyPanel({
                     {fix ? ` · ±${Math.round(fix.accuracy)} m` : ''}
                   </span>
                 </div>
+                <MotionStatus compact />
                 <small>
                   Accuracy is the phone’s reported estimate, not surveyed
                   precision.
@@ -917,7 +928,7 @@ export function SurveyPanel({
                         void attempt(() =>
                           active
                             ? controller.current!.pause()
-                            : controller.current!.resume(),
+                            : resume(),
                         )
                       }
                     >
@@ -1069,7 +1080,7 @@ export function SurveyPanel({
                       </button>
                       <button
                         onClick={() =>
-                          void attempt(() => controller.current!.resume())
+                          void attempt(resume)
                         }
                       >
                         Rewalk missing section

@@ -1,4 +1,5 @@
 import { placeHasConnection } from './routing';
+import { MotionStatus } from './MotionAssistance';
 import {
   ArrowLeft,
   ArrowUp,
@@ -15,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { meters, minutes } from './geo';
 import type { NavigationState } from './navigation';
-import type { CampusData, ManeuverKind, Place, Route } from './types';
+import type { CampusData, GpsFix, ManeuverKind, Place, Route } from './types';
 export function TurnIcon({
   kind,
   size = 26,
@@ -52,6 +53,8 @@ export function RoutePanel({
   onBack,
   onMute,
   onRepeat,
+  fix,
+  following,
 }: {
   data: CampusData;
   destination: Place;
@@ -70,6 +73,8 @@ export function RoutePanel({
   onBack: () => void;
   onMute: () => void;
   onRepeat: () => void;
+  fix?: GpsFix | null;
+  following?: boolean;
 }) {
   const route = routes[chosen];
   const routeEdges = new Set(route?.edgeIds || []);
@@ -160,6 +165,7 @@ export function RoutePanel({
               >
                 <Navigation size={18} /> Start walking
               </Button>
+              <p className="small-note">The first start requests optional compass and motion access. GPS works if you decline.</p>
               <p className="small-note">
                 {originPlace?.arrivalKind === 'mapped-approach' &&
                   `Start on the mapped path ${originPlace.approachDistance || 0} m from ${originPlace.name}; its entrance link is unverified. `}
@@ -246,6 +252,7 @@ export function RoutePanel({
               <span>arrival</span>
             </div>
           </div>
+          <MotionStatus compact modes fix={fix} following={following} />
           <progress
             className="journey-progress"
             value={nav.progress}

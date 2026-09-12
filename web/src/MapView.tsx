@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { MotionMap } from './MotionAssistance';
 import * as maplibregl from 'maplibre-gl';
 import type {
   Map as MapInstance,
@@ -33,6 +34,7 @@ export interface MapViewProps {
   editor?: boolean;
   buildingOpacity?: number;
   follow?: boolean;
+  motionActive?: boolean;
   panelBesideMap?: boolean;
   onSelect: (place: Place) => void;
   onManualPan?: () => void;
@@ -49,6 +51,7 @@ export function MapView({
   editor = false,
   buildingOpacity = 0.92,
   follow = false,
+  motionActive = false,
   panelBesideMap = false,
   onSelect,
   onManualPan,
@@ -64,6 +67,7 @@ export function MapView({
   const camera = useRef({ selected, routes, activeRoute, dark });
   camera.current = { selected, routes, activeRoute, dark };
   const [mapError, setMapError] = useState('');
+  const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
     glyphs: '/glyphs/{fontstack}/{range}.pbf',
@@ -403,12 +407,16 @@ export function MapView({
       });
       frame();
       ready.current = true;
+      setMotionMap(map);
       disposeExtension = callbacks.current.onReady?.(map);
     });
     map.on('dragstart', () => callbacks.current.onManualPan?.());
+    for (const type of ['rotatestart', 'pitchstart', 'zoomstart'] as const)
+      map.on(type, (event) => { if (event.originalEvent) callbacks.current.onManualPan?.(); });
     return () => {
       window.removeEventListener('resize', resize);
       ready.current = false;
+      setMotionMap(null);
       // Drawing adapters must release their layers while the map still owns its sources.
       disposeExtension?.();
       map.remove();
@@ -650,22 +658,13 @@ export function MapView({
           },
         ],
       });
-      if (follow)
-        map.easeTo({
-          center: fix.coordinates,
-          zoom: 18,
-          bearing:
-            fix.heading !== null && (fix.speed || 0) > 0.7
-              ? fix.heading
-              : map.getBearing(),
-          duration: 750,
-        });
     };
     if (ready.current) apply();
     else map.once('load', apply);
   }, [fix, follow, data, panelBesideMap]);
   return (
     <>
+      {motionMap && !editor && <MotionMap map={motionMap} fix={fix} follow={follow} active={motionActive} />}
       <div
         className="map-canvas"
         ref={container}
