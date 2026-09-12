@@ -108,8 +108,11 @@ export class MotionService {
       requests.push(result.then((permission) => {
         if (generation !== this.generation) return;
         if (permission !== 'granted') this.save({ ...this.state.preferences, denied: [...new Set([...this.state.preferences.denied, channel])] });
-      }).catch(() => {
-        if (generation === this.generation) this.failures.add(channel);
+      }).catch((error: unknown) => {
+        if (generation !== this.generation) return;
+        if (error instanceof Error && error.name === 'NotAllowedError')
+          this.save({ ...this.state.preferences, denied: [...new Set([...this.state.preferences.denied, channel])] });
+        else this.failures.add(channel);
       }).finally(() => {
         if (generation !== this.generation) return;
         this.pending.delete(channel); this.reconcile();
@@ -127,7 +130,7 @@ export class MotionService {
     return () => { this.clients.delete(client); this.reconcile(); };
   };
   private permitted(channel: Channel) {
-    return !this.pending.has(channel) && !this.failures.has(channel) && !this.state.preferences.denied.includes(channel) && (!this.env.permissions[channel] || this.attempted.has(channel));
+    return this.env.supported[channel] && !this.pending.has(channel) && !this.failures.has(channel) && !this.state.preferences.denied.includes(channel) && (!this.env.permissions[channel] || this.attempted.has(channel));
   }
   private orientation = (event: Event) => {
     if (!this.attached || this.env.document.hidden || !this.permitted('orientation')) return;

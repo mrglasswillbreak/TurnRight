@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Marker, type Map as MapInstance } from 'maplibre-gl';
 import type { GpsFix } from './types';
 import { motionService } from './motion-service';
@@ -12,6 +12,17 @@ function useMotion() {
   const service = motionService();
   return useSyncExternalStore(service.subscribe, service.getSnapshot);
 }
+// Expire a displayed GPS direction even when sensors are off and GPS stops
+// delivering callbacks. This timer updates only the overlay/status consumer.
+function useGpsExpiry(fix: GpsFix | null | undefined, age: number) {
+  const [expiry, setExpiry] = useState(0);
+  useEffect(() => {
+    if (!fix || fix.timestamp + age < Date.now()) return;
+    const timer = setTimeout(() => setExpiry((value) => value + 1), fix.timestamp + age - Date.now() + 1);
+    return () => clearTimeout(timer);
+  }, [fix?.timestamp, age]);
+  return expiry;
+}
 const capability: Record<SensorCapability, string> = {
   inactive: 'Inactive', requesting: 'Waiting for permission or readings', available: 'Available',
   denied: 'Permission denied', unavailable: 'Unavailable on this device', missing: 'Readings temporarily missing',
@@ -19,6 +30,7 @@ const capability: Record<SensorCapability, string> = {
 const activity = { still: 'Likely still', moving: 'Motion detected', uncertain: 'Uncertain' };
 export function MotionStatus({ compact = false, modes = false, fix, following = true }: { compact?: boolean; modes?: boolean; fix?: GpsFix | null; following?: boolean }) {
   const state = useMotion();
+  useGpsExpiry(fix, 12000);
   const service = motionService();
   const direction = cameraDirection(state.preferences.mode, state.heading, fix);
   const details = <>
@@ -44,7 +56,7 @@ export function MotionStatus({ compact = false, modes = false, fix, following = 
       <strong>{state.preferences.enabled ? `Motion: ${activity[state.activity]}` : 'Compass & motion off'}</strong>
       <span>{state.heading ? 'Approximate compass available' : 'GPS remains the position source'}</span>
     </div>
-    {modes && following && direction.fallback && <p role="status">{direction.fallback}</p>}
+    {modes && following && direction.fallback && <output>{direction.fallback}</output>}
     {modes && !following && <p>Map following paused. Use Follow me to restore it.</p>}
     {compact ? <details><summary>Compass & motion controls</summary>{details}</details> : details}
   </section>;
@@ -56,9 +68,11 @@ export function MotionMap({ map, fix, follow = false, active = false, survey = f
   map: MapInstance; fix?: GpsFix | null; follow?: boolean; active?: boolean; survey?: boolean;
 }) {
   const state = useMotion();
+  const expiry = useGpsExpiry(fix, survey ? 10000 : 12000);
   const markers = useRef<{ phone: Marker; travel: Marker } | null>(null);
   const camera = useRef({ following: false, timestamp: -1, hadPosition: false, lastBearingUpdate: -Infinity });
   useEffect(() => {
+    camera.current = { following: false, timestamp: -1, hadPosition: false, lastBearingUpdate: -Infinity };
     const element = (kind: 'phone' | 'travel') => {
       const e = document.createElement('div');
       e.className = `motion-marker motion-${kind}`;
@@ -102,6 +116,6 @@ export function MotionMap({ map, fix, follow = false, active = false, survey = f
       });
       previous.timestamp = fix.timestamp; previous.hadPosition = true; previous.lastBearingUpdate = now;
     }
-  }, [map, fix, follow, active, survey, state]);
+  }, [map, fix, follow, active, survey, state, expiry]);
   return null;
 }

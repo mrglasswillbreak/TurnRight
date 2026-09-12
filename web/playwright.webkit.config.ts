@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
-  grep: /phone survey/,
+  grep: /phone survey|motion assistance/,
   use: {
     ...base.use,
     browserName: 'webkit',
