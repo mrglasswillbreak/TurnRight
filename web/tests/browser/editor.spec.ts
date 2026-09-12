@@ -22,6 +22,19 @@ async function sensorHardware(
   permission: 'granted' | 'denied' = 'granted',
 ) {
   await page.addInitScript((permission) => {
+    // A phone-sized WebKit viewport can retain the host's landscape screen
+    // angle. Make the simulated hardware orientation match the portrait trace.
+    Object.defineProperty(screen, 'orientation', {
+      configurable: true,
+      value: Object.assign(new EventTarget(), {
+        angle: 0,
+        type: 'portrait-primary',
+      }),
+    });
+    Object.defineProperty(window, 'orientation', {
+      configurable: true,
+      value: 0,
+    });
     const listeners = new Set<EventListenerOrEventListenerObject>();
     const add = window.addEventListener.bind(window);
     const remove = window.removeEventListener.bind(window);
@@ -282,6 +295,7 @@ test('motion assistance survey denial retry, stable entrance crosshair and pause
   await page
     .getByRole('button', { name: 'Mark entrance here', exact: true })
     .click();
+  await expect(page.getByLabel('Entrance name', { exact: true })).toBeVisible();
   await expect
     .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
     .toBe(0);

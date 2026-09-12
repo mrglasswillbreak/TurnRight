@@ -106,6 +106,7 @@ it('retains denied permission across starts and reloads while allowing the other
   expect(h.orientation).toHaveBeenCalledTimes(1);
   s.dispose();
   const reopened = make(h.env);
+  expect(reopened.getSnapshot().orientation).toBe('denied');
   await reopened.requestFromGesture();
   expect(h.orientation).toHaveBeenCalledTimes(1);
   h.orientation.mockResolvedValue('granted');
@@ -262,4 +263,26 @@ it('does not let relative orientation events starve absolute readings', async ()
   h.send('deviceorientationabsolute', heading);
   vi.advanceTimersByTime(100);
   expect(s.getSnapshot().heading?.degrees).toBeCloseTo(330);
+});
+it('invalidates an invalid Apple compass even when quiet motion continues', async () => {
+  const h = environment(),
+    s = make(h.env);
+  await s.requestFromGesture();
+  s.acquire();
+  h.send('deviceorientation', {
+    ...heading,
+    absolute: false,
+    webkitCompassHeading: 45,
+  });
+  h.send('devicemotion', motionReading);
+  vi.advanceTimersByTime(100);
+  expect(s.getSnapshot().heading?.degrees).toBe(45);
+  h.send('deviceorientation', {
+    ...heading,
+    absolute: false,
+    webkitCompassHeading: NaN,
+  });
+  h.send('devicemotion', motionReading);
+  vi.advanceTimersByTime(100);
+  expect(s.getSnapshot().heading).toBeNull();
 });

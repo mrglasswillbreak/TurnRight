@@ -103,6 +103,7 @@ export class MotionService {
     env.events.addEventListener('pagehide', this.pagehide);
     env.events.addEventListener('pageshow', this.visibility);
     env.events.addEventListener('storage', this.storage);
+    this.publish();
   }
   getSnapshot = () => this.state;
   subscribe = (listener: () => void) => {
@@ -267,7 +268,7 @@ export class MotionService {
       return;
     const reading = event as unknown as OrientationReading;
     // A relative event must not replace a separately supplied absolute event.
-    if (!reading.absolute && !Number.isFinite(reading.webkitCompassHeading)) {
+    if (!reading.absolute && reading.webkitCompassHeading === undefined) {
       this.heard.orientation = true;
       if (!this.processor.heading)
         this.processor.reason =
