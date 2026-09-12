@@ -165,7 +165,10 @@ export function RoutePanel({
               >
                 <Navigation size={18} /> Start walking
               </Button>
-              <p className="small-note">The first start requests optional compass and motion access. GPS works if you decline.</p>
+              <p className="small-note">
+                The first start requests optional compass and motion access. GPS
+                works if you decline.
+              </p>
               <p className="small-note">
                 {originPlace?.arrivalKind === 'mapped-approach' &&
                   `Start on the mapped path ${originPlace.approachDistance || 0} m from ${originPlace.name}; its entrance link is unverified. `}

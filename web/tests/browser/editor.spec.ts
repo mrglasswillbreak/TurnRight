@@ -17,51 +17,93 @@ declare global {
 
 // Controlled hardware/permissions only. MapLibre and its pointer/camera behavior
 // are real in both Chromium and WebKit.
-async function sensorHardware(page: Page, permission: 'granted' | 'denied' = 'granted') {
+async function sensorHardware(
+  page: Page,
+  permission: 'granted' | 'denied' = 'granted',
+) {
   await page.addInitScript((permission) => {
     const listeners = new Set<EventListenerOrEventListenerObject>();
     const add = window.addEventListener.bind(window);
     const remove = window.removeEventListener.bind(window);
-    window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: AddEventListenerOptions) => {
+    window.addEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: AddEventListenerOptions,
+    ) => {
       if (type === 'devicemotion') listeners.add(listener);
       add(type, listener, options);
     }) as typeof window.addEventListener;
-    window.removeEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: EventListenerOptions) => {
+    window.removeEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: EventListenerOptions,
+    ) => {
       if (type === 'devicemotion') listeners.delete(listener);
       remove(type, listener, options);
     }) as typeof window.removeEventListener;
-    window.motionTest = { permission, requests: [], heading: 270, rotation: 0, emit: true, listenerCount: () => listeners.size };
-    for (const [name, channel] of [['DeviceOrientationEvent', 'orientation'], ['DeviceMotionEvent', 'motion']] as const) {
-      Object.defineProperty(window, name, { configurable: true, value: class extends Event {
-        static requestPermission() {
-          window.motionTest.requests.push({ channel, activated: navigator.userActivation.isActive, gpsWatches: window.surveyGpsWatchCount });
-          return Promise.resolve(window.motionTest.permission);
-        }
-      } });
+    window.motionTest = {
+      permission,
+      requests: [],
+      heading: 270,
+      rotation: 0,
+      emit: true,
+      listenerCount: () => listeners.size,
+    };
+    for (const [name, channel] of [
+      ['DeviceOrientationEvent', 'orientation'],
+      ['DeviceMotionEvent', 'motion'],
+    ] as const) {
+      Object.defineProperty(window, name, {
+        configurable: true,
+        value: class extends Event {
+          static requestPermission() {
+            window.motionTest.requests.push({
+              channel,
+              activated: navigator.userActivation.isActive,
+              gpsWatches: window.surveyGpsWatchCount,
+            });
+            return Promise.resolve(window.motionTest.permission);
+          }
+        },
+      });
     }
     setInterval(() => {
       const state = window.motionTest;
       if (!state.emit) return;
-      window.dispatchEvent(Object.assign(new Event('deviceorientation'), {
-        alpha: 90, beta: 20, gamma: 0, absolute: false,
-        webkitCompassHeading: state.heading, webkitCompassAccuracy: 5,
-      }));
-      window.dispatchEvent(Object.assign(new Event('devicemotion'), {
-        acceleration: { x: 0, y: 0, z: 0 }, accelerationIncludingGravity: null,
-        rotationRate: { alpha: state.rotation, beta: 0, gamma: 0 },
-      }));
+      window.dispatchEvent(
+        Object.assign(new Event('deviceorientation'), {
+          alpha: 90,
+          beta: 20,
+          gamma: 0,
+          absolute: false,
+          webkitCompassHeading: state.heading,
+          webkitCompassAccuracy: 5,
+        }),
+      );
+      window.dispatchEvent(
+        Object.assign(new Event('devicemotion'), {
+          acceleration: { x: 0, y: 0, z: 0 },
+          accelerationIncludingGravity: null,
+          rotationRate: { alpha: state.rotation, beta: 0, gamma: 0 },
+        }),
+      );
     }, 50);
   }, permission);
 }
 
 async function setPageHidden(page: Page, hidden: boolean) {
   await page.evaluate((hidden) => {
-    Object.defineProperty(document, 'hidden', { configurable: true, value: hidden });
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      value: hidden,
+    });
     document.dispatchEvent(new Event('visibilitychange'));
   }, hidden);
 }
 
-test('motion assistance public permission timing, orientation modes, fallback and manual follow', async ({ page }) => {
+test('motion assistance public permission timing, orientation modes, fallback and manual follow', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await surveyGps(page);
   await sensorHardware(page);
@@ -69,69 +111,146 @@ test('motion assistance public permission timing, orientation modes, fallback an
   await page.goto('/');
   await attachMap(page);
   await page.getByRole('textbox', { name: 'Search campus' }).fill('Library');
-  await page.getByRole('button', { name: /Library/ }).first().click();
+  await page
+    .getByRole('button', { name: /Library/ })
+    .first()
+    .click();
   await page.getByRole('button', { name: 'Directions', exact: true }).click();
   await page.getByLabel('Starting place').selectOption('gate');
-  await expect(page.getByRole('button', { name: 'Start walking', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Start walking', exact: true }),
+  ).toBeVisible();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
-  await page.getByRole('button', { name: 'Start walking', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Start walking', exact: true })
+    .click();
   await page.waitForFunction(() => !!window.surveyGps);
   await page.evaluate(() => {
-    const update = () => window.surveyGps?.({ coords: { longitude: 3.20002, latitude: 6.46, accuracy: 5, heading: 90, speed: 1 } as GeolocationCoordinates, timestamp: Date.now() } as GeolocationPosition);
+    const update = () =>
+      window.surveyGps?.({
+        coords: {
+          longitude: 3.20002,
+          latitude: 6.46,
+          accuracy: 5,
+          heading: 90,
+          speed: 1,
+        } as GeolocationCoordinates,
+        timestamp: Date.now(),
+      } as GeolocationPosition);
     update();
     setInterval(update, 1000);
   });
-  await expect(page.getByRole('button', { name: 'Stop navigation', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Stop navigation', exact: true }),
+  ).toBeVisible();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([
-    { channel: 'orientation', activated: true, gpsWatches: 1 },
-    { channel: 'motion', activated: true, gpsWatches: 1 },
+    { channel: 'orientation', activated: true, gpsWatches: 0 },
+    { channel: 'motion', activated: true, gpsWatches: 0 },
   ]);
   const mode = page.getByLabel('Map orientation', { exact: true });
   await expect(mode).toHaveValue('travel');
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(90);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(90);
   await expect(page.locator('.motion-phone')).toBeVisible();
   await expect(page.locator('.motion-travel')).toBeVisible();
   await mode.selectOption('phone');
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(-90);
-  await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 19, pitch: 40 }));
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(-90);
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({ zoom: 19, pitch: 40 }),
+  );
   await mode.selectOption('north');
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(0);
-  expect(await page.evaluate(() => [window.editorTestMap.getZoom(), window.editorTestMap.getPitch()])).toEqual([19, 40]);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(0);
+  expect(
+    await page.evaluate(() => [
+      window.editorTestMap.getZoom(),
+      window.editorTestMap.getPitch(),
+    ]),
+  ).toEqual([19, 40]);
   await mode.selectOption('phone');
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(-90);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(-90);
   await page.mouse.move(210, 220);
   await page.mouse.down();
   await page.mouse.move(280, 250, { steps: 8 });
   await page.mouse.up();
-  await expect(page.getByText('Map following paused. Use Follow me to restore it.')).toBeVisible();
-  await page.evaluate(() => { window.motionTest.heading = 180; });
+  await expect(
+    page.getByText('Map following paused. Use Follow me to restore it.'),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    window.motionTest.heading = 180;
+  });
   await page.waitForTimeout(700);
-  expect(Math.round(await page.evaluate(() => window.editorTestMap.getBearing()))).toBe(-90);
+  expect(
+    Math.round(await page.evaluate(() => window.editorTestMap.getBearing())),
+  ).toBe(-90);
   await page.getByRole('button', { name: 'Follow me', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => Math.abs(Math.round(window.editorTestMap.getBearing())))).toBe(180);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Math.abs(Math.round(window.editorTestMap.getBearing())),
+      ),
+    )
+    .toBe(180);
   await page.getByText('Compass & motion controls', { exact: true }).click();
-  await page.getByRole('button', { name: 'Turn off sensors', exact: true }).click();
-  await expect(page.getByText(/Phone-up: using GPS travel direction/)).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
+  await page
+    .getByRole('button', { name: 'Turn off sensors', exact: true })
+    .click();
+  await expect(
+    page.getByText(/Phone-up: using GPS travel direction/),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
   await expect(page.locator('.motion-phone')).toBeHidden();
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(90);
-  await page.screenshot({ path: 'test-results/motion-public-phone.png', fullPage: true });
-  await page.getByRole('button', { name: 'Stop navigation', exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(90);
+  await page.screenshot({
+    path: 'test-results/motion-public-phone.png',
+    fullPage: true,
+  });
+  await page
+    .getByRole('button', { name: 'Stop navigation', exact: true })
+    .click();
   await page.reload();
   await page.getByRole('button', { name: /Settings/ }).click();
-  await expect(page.getByLabel('Map orientation', { exact: true })).toHaveValue('phone');
-  await expect(page.getByText('Compass & motion off', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Map orientation', { exact: true })).toHaveValue(
+    'phone',
+  );
+  await expect(
+    page.getByText('Compass & motion off', { exact: true }),
+  ).toBeVisible();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
 });
 
-test('motion assistance survey denial retry, stable entrance crosshair and paused recovery', async ({ page }) => {
+test('motion assistance survey denial retry, stable entrance crosshair and paused recovery', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await surveyGps(page);
   await sensorHardware(page, 'denied');
   await setup(page);
   await page.getByRole('button', { name: 'Survey', exact: true }).click();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
-  await page.getByRole('button', { name: 'Record new path', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Record new path', exact: true })
+    .click();
   await pushSurveyFix(page, [3.20015, 6.46]);
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([
     { channel: 'orientation', activated: true, gpsWatches: 0 },
@@ -139,49 +258,117 @@ test('motion assistance survey denial retry, stable entrance crosshair and pause
   ]);
   await page.getByText('Compass & motion controls', { exact: true }).click();
   await expect(page.getByText(/Compass: Permission denied/)).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeEnabled();
-  await page.evaluate(() => { window.motionTest.permission = 'granted'; });
-  await page.getByRole('button', { name: 'Enable/Retry sensors', exact: true }).click();
-  await expect(page.getByText('Approximate compass available', { exact: true })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(1);
-  await expect.poll(() => page.evaluate(() => Math.round(window.editorTestMap.getBearing()))).toBe(0);
+  await expect(
+    page.getByRole('button', { name: 'Pause', exact: true }),
+  ).toBeEnabled();
+  await page.evaluate(() => {
+    window.motionTest.permission = 'granted';
+  });
+  await page
+    .getByRole('button', { name: 'Enable/Retry sensors', exact: true })
+    .click();
+  await expect(
+    page.getByText('Approximate compass available', { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(1);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
+    )
+    .toBe(0);
   await page.getByText('Compass & motion controls', { exact: true }).click();
-  await page.getByRole('button', { name: 'Mark entrance here', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
+  await page
+    .getByRole('button', { name: 'Mark entrance here', exact: true })
+    .click();
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
   await aimCrosshair(page, [3.20015, 6.4602]);
-  const camera = await page.evaluate(() => [window.editorTestMap.getCenter().toArray(), window.editorTestMap.getBearing()]);
-  await page.evaluate(() => { window.motionTest.heading = 15; window.motionTest.rotation = 90; });
+  const camera = await page.evaluate(() => [
+    window.editorTestMap.getCenter().toArray(),
+    window.editorTestMap.getBearing(),
+  ]);
+  await page.evaluate(() => {
+    window.motionTest.heading = 15;
+    window.motionTest.rotation = 90;
+  });
   await page.waitForTimeout(700);
-  expect(await page.evaluate(() => [window.editorTestMap.getCenter().toArray(), window.editorTestMap.getBearing()])).toEqual(camera);
-  await page.getByLabel('Entrance place', { exact: true }).selectOption('library');
-  await page.getByRole('button', { name: 'Place entrance here', exact: true }).click();
-  await page.getByRole('button', { name: 'Confirm entrance', exact: true }).click();
+  expect(
+    await page.evaluate(() => [
+      window.editorTestMap.getCenter().toArray(),
+      window.editorTestMap.getBearing(),
+    ]),
+  ).toEqual(camera);
+  await page
+    .getByLabel('Entrance place', { exact: true })
+    .selectOption('library');
+  await page
+    .getByRole('button', { name: 'Place entrance here', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Confirm entrance', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Resume', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(1);
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(1);
   await setPageHidden(page, true);
-  await expect(page.getByRole('button', { name: 'Resume', exact: true })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
+  await expect(
+    page.getByRole('button', { name: 'Resume', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
   await setPageHidden(page, false);
   expect(await page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page.getByRole('button', { name: 'Saved surveys', exact: true }).click();
-  await page.getByRole('button', { name: /Walking survey · paused · On this device/ }).click();
+  await page
+    .getByRole('button', { name: 'Saved surveys', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: /Walking survey · paused · On this device/ })
+    .click();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
   expect(await page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
+  await page.evaluate(() => {
+    window.motionTest.permission = 'granted';
+  });
   await page.getByRole('button', { name: 'Resume', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(1);
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(1);
   await page.getByRole('button', { name: 'Finish', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => window.motionTest.listenerCount())).toBe(0);
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
   const persisted = await page.evaluate(async () => {
-    const db = await new Promise<IDBDatabase>((resolve) => { const r = indexedDB.open('turnright-surveys'); r.onsuccess = () => resolve(r.result); });
-    const rows = await Promise.all(['sessions', 'samples', 'uploads'].map((store) => new Promise<unknown[]>((resolve) => { const r = db.transaction(store).objectStore(store).getAll(); r.onsuccess = () => resolve(r.result); })));
+    const db = await new Promise<IDBDatabase>((resolve) => {
+      const r = indexedDB.open('turnright-surveys');
+      r.onsuccess = () => resolve(r.result);
+    });
+    const rows = await Promise.all(
+      ['sessions', 'samples', 'uploads'].map(
+        (store) =>
+          new Promise<unknown[]>((resolve) => {
+            const r = db.transaction(store).objectStore(store).getAll();
+            r.onsuccess = () => resolve(r.result);
+          }),
+      ),
+    );
     db.close();
     return JSON.stringify(rows);
   });
-  expect(persisted).not.toMatch(/webkitCompass|rotationRate|acceleration|phoneHeading|motion-assistance/);
-  await page.screenshot({ path: 'test-results/motion-survey-phone.png', fullPage: true });
+  expect(persisted).not.toMatch(
+    /webkitCompass|rotationRate|acceleration|phoneHeading|motion-assistance/,
+  );
+  await page.screenshot({
+    path: 'test-results/motion-survey-phone.png',
+    fullPage: true,
+  });
 });
 
 async function surveyGps(page: Page) {
@@ -388,6 +575,7 @@ test('prepared offline survey cold-starts, records, recovers and privately syncs
   );
   await page.setViewportSize({ width: 390, height: 844 });
   await surveyGps(page);
+  await sensorHardware(page);
   await setup(page);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   const commands: {
@@ -423,9 +611,15 @@ test('prepared offline survey cold-starts, records, recovers and privately syncs
     .getByRole('button', { name: 'Record new path', exact: true })
     .click();
   await pushSurveyFix(page, [3.20015, 6.46]);
+  await expect(
+    page.getByText('Approximate compass available', { exact: true }),
+  ).toBeVisible();
   await page.waitForTimeout(1100);
   await pushSurveyFix(page, [3.20015, 6.459975]);
   await page.getByRole('button', { name: 'Finish', exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
   await page.getByRole('button', { name: 'Save survey', exact: true }).click();
   await expect(page.getByText(/private upload queued/)).toBeVisible();
   expect(commands).toHaveLength(0);
@@ -450,6 +644,10 @@ test('prepared offline survey cold-starts, records, recovers and privately syncs
   await expect(
     page.getByText('Saved privately', { exact: true }),
   ).toBeVisible();
+  expect(JSON.stringify(commands)).not.toMatch(
+    /webkitCompass|rotationRate|acceleration|phoneHeading|motion-assistance/,
+  );
+  expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
 });
 test('phone survey pauses when hidden and requires explicit resume after reload', async ({
   page,

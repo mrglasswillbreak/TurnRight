@@ -1,12 +1,70 @@
-.motion-assistance { margin: 12px 0; padding: 12px; border: 1px solid #879b9b55; border-radius: 12px; font-size: 12px; color: inherit; }
-.motion-summary { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
-.motion-summary span, .motion-explanation { opacity: .8; }
-.motion-assistance p { margin: 8px 0; line-height: 1.5; }
-.motion-verification { display: inline-block; color: #a46b20; margin-top: 8px; }
-.motion-assistance summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; text-decoration: underline; }
-.motion-assistance select { display: block; width: 100%; min-height: 44px; border: 1px solid #879b9b66; border-radius: 8px; background: var(--panel, #fff); color: inherit; margin: 6px 0 10px; padding: 8px; }
-.motion-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.motion-actions button { min-height: 44px; border: 1px solid #879b9b66; background: transparent; color: inherit; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
-.motion-actions button:disabled { opacity: .5; cursor: default; }
-.motion-marker { pointer-events: none !important; }
-.motion-marker svg { display: block; overflow: visible; }
+.motion-assistance {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #879b9b55;
+  border-radius: 12px;
+  font-size: 12px;
+  color: inherit;
+}
+.motion-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+.motion-summary span,
+.motion-explanation {
+  opacity: 0.8;
+}
+.motion-assistance p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+.motion-verification {
+  display: inline-block;
+  color: #a46b20;
+  margin-top: 8px;
+}
+.motion-assistance summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+}
+.motion-assistance select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #879b9b66;
+  border-radius: 8px;
+  background: var(--background, #fff);
+  color: inherit;
+  margin: 6px 0 10px;
+  padding: 8px;
+}
+.motion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.motion-actions button {
+  min-height: 44px;
+  border: 1px solid #879b9b66;
+  background: transparent;
+  color: inherit;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.motion-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.motion-marker {
+  pointer-events: none !important;
+}
+.motion-marker svg {
+  display: block;
+  overflow: visible;
+}

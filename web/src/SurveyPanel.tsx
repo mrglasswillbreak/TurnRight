@@ -593,7 +593,12 @@ export function SurveyPanel({
     : 'Waiting for GPS';
   return (
     <div className="survey-workspace">
-      <MotionMap map={map} fix={fix && ['accepted', 'duplicate'].includes(fix.status) ? fix : null} active={active} survey />
+      <MotionMap
+        map={map}
+        fix={fix && ['accepted', 'duplicate'].includes(fix.status) ? fix : null}
+        active={active}
+        survey
+      />
       <div className="survey-crosshair" aria-hidden="true">
         +
       </div>
@@ -637,7 +642,10 @@ export function SurveyPanel({
                 >
                   Record new path
                 </button>
-                <p>Starting requests optional compass and motion access. GPS recording works if you decline.</p>
+                <p>
+                  Starting requests optional compass and motion access. GPS
+                  recording works if you decline.
+                </p>
                 <button
                   onClick={() => {
                     setReselecting(false);
@@ -926,9 +934,7 @@ export function SurveyPanel({
                       className="survey-primary"
                       onClick={() =>
                         void attempt(() =>
-                          active
-                            ? controller.current!.pause()
-                            : resume(),
+                          active ? controller.current!.pause() : resume(),
                         )
                       }
                     >
@@ -1078,11 +1084,7 @@ export function SurveyPanel({
                       >
                         Redo survey edit
                       </button>
-                      <button
-                        onClick={() =>
-                          void attempt(resume)
-                        }
-                      >
+                      <button onClick={() => void attempt(resume)}>
                         Rewalk missing section
                       </button>
                       {session.replacement && (
