@@ -112,6 +112,8 @@ Survey recording starts north-up in 2D. Sensor readings stop on pause, finish, s
 
 Motion hints (**Likely still**, **Motion detected**, **Uncertain**) are advisory. GPS remains authoritative for position, route progress and survey geometry. Only assistance/orientation preferences are saved; sensor readings stay in memory and never enter surveys, backups or network payloads. No step counting or dead reckoning is performed. Physical Android/iPhone and installed-app checks remain pending: see [sensor behavior and field record](docs/MOTION.md).
 
+The compass/motion update was deployed to [production](https://turnright.vercel.app/) on **12 September 2026**, following automated and authenticated preview verification (release commit `37c8cbe`). Existing installations can use **Settings → Install update** after the new version is detected. The campus package remains `lasu-4e4c8008b38b`, schema 1; this application rollout did not publish campus data.
+
 ### Appearance
 
 Open **Settings → Appearance**:

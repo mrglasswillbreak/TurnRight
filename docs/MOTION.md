@@ -38,6 +38,8 @@ Phone browser tests use real MapLibre with controlled sensors/GPS and test-only 
 
 Software verification on 12 September 2026 used Node 22.23.2: 135 Vitest tests, seven Python tests, 12 Chromium scenarios, five WebKit scenarios and the production-PWA offline scenario pass. Lint passes with seven pre-existing warnings; application/API compilation and production build pass. The authenticated preview verified survey start/pause/finish with denied sensor permission, recoverable empty review, public Travel-up default, permission controls and dark appearance. The empty local preview survey is named “Motion preview check — no field recording”; it was not applied to the map or published.
 
+The final preview also verified remembered denials after an application update and retention of the local recovery record. Release commit `37c8cbe` reached production on 12 September 2026 ([Vercel deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/CXCRtcwa8u8LQuKdU85opEArGGq8)). Live responses include the same-origin sensor policy, deny camera/microphone, return 401 with `no-store` for unauthenticated survey listing, and retain public package `lasu-4e4c8008b38b` / schema 1. This deployment did not publish campus data or establish physical-device verification.
+
 ## Physical device record — pending
 
 Record device model, OS/browser versions, installed-app status, test date, results and threshold adjustments for each platform. No physical verification has been recorded yet.
