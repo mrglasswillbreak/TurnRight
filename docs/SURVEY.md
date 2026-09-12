@@ -14,6 +14,16 @@ Enable **Connect to highlighted target** to connect to a mapped path segment, ju
 
 **Save survey** preserves evidence on the phone and queues a private upload when offline. **Apply to map draft** creates editable map corrections through the existing atomic batch API. Connections must be usable and topology must validate. Applying the same survey again uses the same correction identities, including deletions from a previously applied survey. Close the survey panel to use the editor's route tester. Publication remains a separate reviewed release.
 
+## Compass and motion assistance
+
+The first **Record new path** or correction-recording tap requests optional orientation and motion permissions before asynchronous recovery/GPS work. **Resume** can reacquire already permitted sensors; remembered denials require **Enable/Retry sensors**. Use **Compass & motion controls** to view each capability or **Turn off sensors**. Declining permission leaves GPS recording available.
+
+While recording, a purple cone at an acceptable GPS location shows approximate phone direction. The blue arrow, when present, is GPS travel direction. Compact **Likely still**, **Motion detected** and **Uncertain** hints are advisory and do not alter sample acceptance, recorded distance, geometry, gap handling or pause/resume decisions. Recording starts north-up in 2D. Sensors cannot rotate the review or entrance crosshair.
+
+Sensing stops on pause, marking an entrance, finish, backgrounding, sign-out and exit. Returning from background or reopening recovery requires explicit **Resume**. Offline recording uses the same device preference and available sensor permissions. Only preferences persist; readings and processing windows never enter IndexedDB, private uploads or published geometry. An app update must still wait for paused recording and saved recovery/drafts.
+
+Assistance is **Awaiting device verification**. See [MOTION.md](MOTION.md) for permission states, heading quality, fallback behavior, provisional thresholds and the Android/iPhone/installed-app field checklist. No additional migration is required.
+
 ## Correcting a path
 
 Choose **Correct existing path**, select a mapped path and two boundary vertices, then record. Review shows the previous path beneath the proposed section. Shared junctions, restricted edges and closure boundaries are pinned; the new line must meet these anchors in order. Geometry outside the section, source metadata, access, directed edges and closure ancestry are retained. A restricted gap cannot be included in a replacement.

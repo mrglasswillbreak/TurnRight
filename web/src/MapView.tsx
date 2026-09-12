@@ -411,8 +411,14 @@ export function MapView({
       disposeExtension = callbacks.current.onReady?.(map);
     });
     map.on('dragstart', () => callbacks.current.onManualPan?.());
+    // Suspend following as soon as a gesture begins, before sensor camera
+    // updates can interrupt MapLibre's first drag/rotation frame.
+    for (const type of ['mousedown', 'touchstart', 'wheel'] as const)
+      map.on(type, () => callbacks.current.onManualPan?.());
     for (const type of ['rotatestart', 'pitchstart', 'zoomstart'] as const)
-      map.on(type, (event) => { if (event.originalEvent) callbacks.current.onManualPan?.(); });
+      map.on(type, (event) => {
+        if (event.originalEvent) callbacks.current.onManualPan?.();
+      });
     return () => {
       window.removeEventListener('resize', resize);
       ready.current = false;
@@ -664,7 +670,14 @@ export function MapView({
   }, [fix, follow, data, panelBesideMap]);
   return (
     <>
-      {motionMap && !editor && <MotionMap map={motionMap} fix={fix} follow={follow} active={motionActive} />}
+      {motionMap && !editor && (
+        <MotionMap
+          map={motionMap}
+          fix={fix}
+          follow={follow}
+          active={motionActive}
+        />
+      )}
       <div
         className="map-canvas"
         ref={container}

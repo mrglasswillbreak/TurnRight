@@ -955,10 +955,22 @@ export default function App() {
           <span>{threeD ? '2D' : '3D'}</span>
         </button>
         <div className="control-group">
-          <button aria-label="Zoom in" onClick={() => map.current?.zoomIn()}>
+          <button
+            aria-label="Zoom in"
+            onClick={() => {
+              setFollow(false);
+              map.current?.zoomIn();
+            }}
+          >
             <Plus />
           </button>
-          <button aria-label="Zoom out" onClick={() => map.current?.zoomOut()}>
+          <button
+            aria-label="Zoom out"
+            onClick={() => {
+              setFollow(false);
+              map.current?.zoomOut();
+            }}
+          >
             <span className="minus">−</span>
           </button>
         </div>

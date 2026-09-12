@@ -1,0 +1,58 @@
+# Compass and motion assistance
+
+Status: **Awaiting device verification**. Browser simulations are software checks; they do not establish physical sensor accuracy or battery performance.
+
+## Permissions and controls
+
+The shared page service uses `deviceorientation`, `deviceorientationabsolute` and `devicemotion`. It does not require the Generic Sensor API. Where supported, orientation and motion `requestPermission` methods are invoked independently and synchronously from the first Start tap, before audio, storage or GPS awaits. HTTPS is required. Denials and the assistance preference are remembered on this device; an explicit **Enable/Retry sensors** action retries. **Turn off sensors** stops acquisition. A denied or absent sensor never blocks GPS.
+
+Public Settings and active navigation offer **Travel-up** (default), **North-up** and **Phone-up**. The active walk and Survey have expandable **Compass & motion controls**. Each capability reports inactive, requesting, available, denied, unavailable or temporarily missing readings. An exposed API is insufficient: usable readings must arrive. If no data arrives within five seconds, the capability is unavailable; interrupted data is shown as missing. Missing permission or readings can require browser/site settings before Retry succeeds.
+
+The response Permissions-Policy permits accelerometer, gyroscope and magnetometer for the same origin, while retaining same-origin geolocation and denying camera/microphone. No database, admin API or campus schema change is needed.
+
+## Direction and movement
+
+Phone direction and GPS course remain separate. A purple cone shows approximate phone direction at a usable GPS fix; a blue arrow shows GPS travel direction when speed/course are usable. Without usable GPS, only compass status is shown. Apple compass readings reference magnetic north and are labelled approximate. Otherwise only explicitly absolute orientation can supply north; relative alpha is never a compass.
+
+Heading normalization projects the screen's top edge onto the ground using device tilt and screen rotation. Near-vertical singularities hide the heading and suggest holding the phone flatter. Invalid readings or Apple reported compass error above 30 degrees hide it; absent accuracy is labelled unreported. Circular smoothing handles 359/0 degrees. Fresh quiet gyroscope readings may corroborate an unchanged sparse compass; rotation without a corresponding orientation update invalidates it. Interruptions reset filters.
+
+Travel-up uses the existing GPS course rule. North-up uses zero bearing. Phone-up uses the approximate compass, then usable GPS course, then holds the current bearing with a visible fallback explanation. Manual map gestures suspend following immediately; **Follow me** restores the selected mode without resetting zoom or pitch after the first location focus. Surveys own their existing north-up GPS following, and sensor updates never move review/entrance crosshairs.
+
+Initial thresholds in `motion-model.ts` are provisional: acceleration RMS below 0.2 m/s² and rotation RMS below 3°/s for three seconds produce **Likely still**; acceleration RMS above 0.8 m/s² for one second produces **Motion detected**; other evidence is **Uncertain**. Missing rotation cannot confirm stillness, and rotation alone cannot imply walking. Linear acceleration is preferred; gravity-inclusive readings use a warmed-up gravity filter. These hints never drive GPS acceptance, navigation progress, arrival, rerouting, recording state or geometry.
+
+## Ownership and privacy
+
+`motion-service.ts` owns one listener set for active consumers. `motion-model.ts` normalizes readings and maintains transient filters. `MotionAssistance.tsx` confines subscriptions to status/overlays instead of rerendering the application for each event. Processing is capped at 30 Hz per input stream and sensor UI notifications at 10 Hz.
+
+Hidden pages and inactive consumers stop sensor listeners and clear readings. An existing navigation session may reacquire on returning. Survey pause, entrance capture, finish, exit and sign-out release acquisition; backgrounded/recovered surveys require explicit Resume. Installing an app update retains existing survey/editor recovery rules and never reloads an active recording automatically.
+
+Only `turnright:motion-assistance:v1` preferences are saved: enabled/asked flags, denied channels and map orientation. Raw events, heading, motion windows and device identifiers stay out of storage, surveys, analytics, backups and public packages. Source geometry and GPS types are unchanged.
+
+## Verification
+
+Run with Node 22 from `web`: `npm test`, `npm run lint`, `npm run build`, `npm run test:browser`, `npm run test:survey-webkit`, and `npm run test:survey-pwa`.
+
+Unit coverage includes angle wrap, cardinal screen rotations, tilt singularities, magnetic/absolute/relative readings, invalid/missing data, motion hysteresis, gravity filtering, sparse callbacks, permission timing and denial, shared listener ownership, interruption resets, rate limits and preference-only persistence. A GPS replay compares navigation decisions and survey geometry with assistance absent, working and malfunctioning.
+
+Phone browser tests use real MapLibre with controlled sensors/GPS and test-only authentication/APIs. They cover first-tap permission timing, denial/retry, travel-up default, mode switching, camera gestures, fallback, paused survey recovery, stable entrance placement and absence of sensor data in recovery/upload payloads. The isolated production-PWA scenario also exercises sensors during prepared offline recording, reopening and private sync. Physical checks below remain necessary even when these tests pass.
+
+## Physical device record — pending
+
+Record device model, OS/browser versions, installed-app status, test date, results and threshold adjustments for each platform. No physical verification has been recorded yet.
+
+| Check | Android Chrome | iPhone Safari | Installed apps |
+| --- | --- | --- | --- |
+| First start, partial denial, retry and permission revocation | Pending | Pending | Pending |
+| Standing turns and walking with phone pointed sideways | Pending | Pending | Pending |
+| Portrait/landscape, steep tilt and magnetic interference | Pending | Pending | Pending |
+| Weak GPS, sparse orientation and unavailable hardware | Pending | Pending | Pending |
+| Screen lock/app switching, survey explicit Resume | Pending | Pending | Pending |
+| Prepared offline startup, recovery and app update | Pending | Pending | Pending |
+| Thirty-minute battery use and motion threshold tuning | Pending | Pending | Pending |
+
+Keep this label until Android and iPhone checks, including installed apps, pass. Do not interpret these checks as campus route field verification or publish campus data as part of an application deployment.
+
+## References
+
+- [W3C Device Orientation and Motion](https://www.w3.org/TR/orientation-event/) — event coordinates, absolute references, permissions and lifecycle requirements.
+- [Apple DeviceOrientationEvent](https://developer.apple.com/documentation/webkitjs/deviceorientationevent) — WebKit compass properties.

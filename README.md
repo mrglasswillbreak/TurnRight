@@ -48,6 +48,7 @@ Real browser captures from 9 September 2026. Mobile views use a responsive viewp
 | Campus exploration | Local search, categories, source-supported aliases, saved places, recent selections, readable labels, and place provenance. |
 | Walking directions | A* routing in a dedicated worker; shortest permitted walk and up to two sufficiently different alternatives when available. |
 | Navigation | Foreground GPS tracking, next maneuver, remaining distance, ETA, instruction list, recentering, map following, north-up orientation, sustained-deviation rerouting, and arrival detection. |
+| Compass and motion | Optional phone-direction cone and advisory movement status for navigation and walking surveys; Travel-up, North-up and Phone-up navigation with GPS-only fallback. **Awaiting device verification.** [Sensor guide](docs/MOTION.md). |
 | Spoken guidance | 19 packaged English maneuver/distance clips, mute, repeat, and optional device-local speech for place names. |
 | Appearance | Device light/dark preference by default, live system changes, persistent Light/Dark overrides, and an accessible three-option selector. |
 | Map display | 2D by default; optional 3D where measured heights or documented floor counts exist. Floor-derived heights are approximate; unknown heights remain flat. |
@@ -100,6 +101,16 @@ Vite's local servers do not serve the Vercel `/api` functions. Use a configured 
 4. **Start walking:** grant location access and allow audio through the Start walking action. Keep the app visible. Use mute/repeat, recenter, or the instruction list as needed.
 
 Poor or stale location fixes pause maneuver progression. Rerouting requires sustained deviation to reduce false wrong turns from GPS jitter. Navigation ends at the mapped endpoint; an approach endpoint is not a surveyed building entrance.
+
+### Compass and motion assistance
+
+The first **Start walking** or **Record new path** tap requests optional compass and motion permission where the browser requires it. Orientation and motion permissions are independent. Declining does not prevent GPS navigation or surveying, and remembered denials are retried only through **Enable/Retry sensors**. **Turn off sensors** remembers your choice on this device. Controls are in public **Settings**, the active walk, and **Survey → Compass & motion controls**.
+
+**Travel-up** remains the default and uses GPS direction of travel. **North-up** fixes north at the top. **Phone-up** uses approximate phone direction, falls back to usable GPS travel direction, then holds the map bearing with an explanation. Touching or dragging the map suspends following; **Follow me** restores the selected mode. The purple cone indicates phone direction; the blue arrow indicates GPS travel direction. Neither creates a location when GPS is unavailable.
+
+Survey recording starts north-up in 2D. Sensor readings stop on pause, finish, sign-out, exit and backgrounding; a backgrounded survey requires explicit **Resume**. Entrance placement and review never move the camera in response to sensors. Navigation can reacquire sensors when its active session returns to the foreground.
+
+Motion hints (**Likely still**, **Motion detected**, **Uncertain**) are advisory. GPS remains authoritative for position, route progress and survey geometry. Only assistance/orientation preferences are saved; sensor readings stay in memory and never enter surveys, backups or network payloads. No step counting or dead reckoning is performed. Physical Android/iPhone and installed-app checks remain pending: see [sensor behavior and field record](docs/MOTION.md).
 
 ### Appearance
 
