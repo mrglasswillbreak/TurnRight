@@ -116,7 +116,8 @@ export class EditorWorkspace {
       future: this.future,
     };
     const signature = JSON.stringify(snapshot);
-    if (signature === this.recoverySignature && !this.recoveryFailed) return this.persistence;
+    if (signature === this.recoverySignature && !this.recoveryFailed)
+      return this.persistence;
     this.recoverySignature = signature;
     const recovery = structuredClone(snapshot);
     this.persistence = this.persistence

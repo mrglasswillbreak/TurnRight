@@ -1,5 +1,5 @@
-@import "tailwindcss" source(".");
-@import "tw-animate-css";
+@import 'tailwindcss' source(".");
+@import 'tw-animate-css';
 /* Only these scaffold components are used by the application. */
 @source "../components/ui/button.tsx";
 @source "../components/ui/dialog.tsx";
@@ -391,11 +391,11 @@
   --color-popover: var(--background);
   --color-popover-foreground: var(--foreground);
   --color-destructive: #bc4242;
-  --font-sans: "Inter Variable", sans-serif;
+  --font-sans: 'Inter Variable', sans-serif;
   --radius-lg: 12px;
 }
 :root {
-  font-family: "Inter Variable", sans-serif;
+  font-family: 'Inter Variable', sans-serif;
   --background: #fff;
   --foreground: #243448;
   --muted: #8390a1;
@@ -1017,16 +1017,16 @@ svg {
     --mobile-panel-height: 36dvh;
     --mobile-panel-bottom: calc(77px + env(safe-area-inset-bottom));
   }
-  .app-shell[data-panel-view="detail"] {
+  .app-shell[data-panel-view='detail'] {
     --mobile-panel-height: 39dvh;
   }
-  .app-shell[data-panel-view="route"] {
+  .app-shell[data-panel-view='route'] {
     --mobile-panel-height: 40dvh;
   }
-  .app-shell[data-panel-view="navigation"] {
+  .app-shell[data-panel-view='navigation'] {
     --mobile-panel-height: 45dvh;
   }
-  .app-shell[data-panel-expanded="false"] {
+  .app-shell[data-panel-expanded='false'] {
     --mobile-panel-height: 56px;
   }
   .app-rail {
@@ -1099,10 +1099,10 @@ svg {
     min-height: 0;
     overflow: visible;
   }
-  .app-shell[data-panel-expanded="false"] .panel-content {
+  .app-shell[data-panel-expanded='false'] .panel-content {
     display: none;
   }
-  .app-shell[data-panel-expanded="false"] .mobile-panel-toggle {
+  .app-shell[data-panel-expanded='false'] .mobile-panel-toggle {
     flex-basis: 56px;
     border-radius: 18px;
   }
@@ -1319,12 +1319,12 @@ svg {
   overflow-y: auto;
   border-radius: 20px !important;
 }
-.app-dialog [data-slot="dialog-title"] {
+.app-dialog [data-slot='dialog-title'] {
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
-.app-dialog [data-slot="dialog-description"] {
+.app-dialog [data-slot='dialog-description'] {
   font-size: 14px;
   color: var(--muted);
   line-height: 1.6;
@@ -1822,7 +1822,7 @@ progress::-webkit-progress-value {
   .app-dialog {
     padding: 20px !important;
   }
-  .app-dialog [data-slot="dialog-title"] {
+  .app-dialog [data-slot='dialog-title'] {
     font-size: 20px;
   }
   .route-panel {

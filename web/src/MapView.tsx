@@ -54,13 +54,32 @@ export function MapView({
 }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null),
     mapRef = useRef<MapInstance | null>(null);
-  const callbacks = useRef({ onSelect, onBuildingSelect, onManualPan, onReady });
+  const callbacks = useRef({
+    onSelect,
+    onBuildingSelect,
+    onManualPan,
+    onReady,
+  });
   callbacks.current = { onSelect, onBuildingSelect, onManualPan, onReady };
   const ready = useRef(false);
   const campusGeometry = useMemo(() => displayGeometry(data.map), [data.map]);
-  const placesGeometry = useMemo(() => placeFeatures(data.places), [data.places]);
-  const closuresGeometry = useMemo(() => closureFeatures(data.graph, data.closures), [data.graph, data.closures]);
-  const sourceData = useMemo(() => ({ campus: campusGeometry, boundary: data.boundary, places: placesGeometry, closures: closuresGeometry }), [campusGeometry, data.boundary, placesGeometry, closuresGeometry]);
+  const placesGeometry = useMemo(
+    () => placeFeatures(data.places),
+    [data.places],
+  );
+  const closuresGeometry = useMemo(
+    () => closureFeatures(data.graph, data.closures),
+    [data.graph, data.closures],
+  );
+  const sourceData = useMemo(
+    () => ({
+      campus: campusGeometry,
+      boundary: data.boundary,
+      places: placesGeometry,
+      closures: closuresGeometry,
+    }),
+    [campusGeometry, data.boundary, placesGeometry, closuresGeometry],
+  );
   const latestSources = useRef(sourceData);
   latestSources.current = sourceData;
   const appliedSources = useRef<Record<string, unknown>>({});
@@ -71,12 +90,28 @@ export function MapView({
   const [mapError, setMapError] = useState('');
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
   const selectedId = selected?.id || '';
-  const selectedLng = selected?.coordinates[0], selectedLat = selected?.coordinates[1];
-  const selectedBuildingId = useMemo(() => String(data.map.features.find(f => f.properties?.kind === 'building' && buildingPlace(data, f)?.id === selectedId)?.properties?.id || ''), [data, selectedId]);
+  const selectedLng = selected?.coordinates[0],
+    selectedLat = selected?.coordinates[1];
+  const selectedBuildingId = useMemo(
+    () =>
+      String(
+        data.map.features.find(
+          (f) =>
+            f.properties?.kind === 'building' &&
+            buildingPlace(data, f)?.id === selectedId,
+        )?.properties?.id || '',
+      ),
+    [data, selectedId],
+  );
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
     glyphs: '/glyphs/{fontstack}/{range}.pbf',
-    light: { anchor: 'viewport', color: theme ? '#becfe0' : '#ffffff', intensity: theme ? 0.35 : 0.45, position: [1.5, 210, 40] },
+    light: {
+      anchor: 'viewport',
+      color: theme ? '#becfe0' : '#ffffff',
+      intensity: theme ? 0.35 : 0.45,
+      position: [1.5, 210, 40],
+    },
     sources: {},
     layers: [
       {
@@ -101,7 +136,13 @@ export function MapView({
         minZoom: 12,
         attributionControl: false,
         trackResize: false,
-        pitch: camera.current.threeD ? (editor ? 50 : innerWidth < 768 ? 40 : 45) : 0,
+        pitch: camera.current.threeD
+          ? editor
+            ? 50
+            : innerWidth < 768
+              ? 40
+              : 45
+          : 0,
         maxPitch: 60,
       });
       setMapError('');
@@ -115,13 +156,13 @@ export function MapView({
     const mapPadding = () => {
       const mobile = innerWidth < 768;
       return panelBesideMap
-          ? { top: 60, right: 40, bottom: 60, left: 40 }
-          : {
-              top: mobile ? 125 : 85,
-              right: 70,
-              bottom: mobile ? innerHeight * 0.49 : 65,
-              left: mobile ? 25 : 485,
-            };
+        ? { top: 60, right: 40, bottom: 60, left: 40 }
+        : {
+            top: mobile ? 125 : 85,
+            right: 70,
+            bottom: mobile ? innerHeight * 0.49 : 65,
+            left: mobile ? 25 : 485,
+          };
     };
     const frame = () => {
       const padding = mapPadding();
@@ -145,10 +186,11 @@ export function MapView({
       } else if (current.selected)
         map.jumpTo({ center: current.selected.coordinates, zoom: 17, padding });
       else
-        map.fitBounds(
-          latestData.current.bounds,
-          { padding, duration: 0, pitch: map.getPitch() },
-        );
+        map.fitBounds(latestData.current.bounds, {
+          padding,
+          duration: 0,
+          pitch: map.getPitch(),
+        });
     };
     const resize = () => {
       requestAnimationFrame(() => {
@@ -161,7 +203,11 @@ export function MapView({
     };
     window.addEventListener('resize', resize);
     map.on('error', (event) => console.error('Campus map:', event.error));
-    map.on('webglcontextlost', () => setMapError('Map graphics paused. Restore this tab or reload to retry. Place search remains available.'));
+    map.on('webglcontextlost', () =>
+      setMapError(
+        'Map graphics paused. Restore this tab or reload to retry. Place search remains available.',
+      ),
+    );
     map.on('webglcontextrestored', () => setMapError(''));
     map.addControl(
       new maplibregl.AttributionControl({
@@ -270,9 +316,14 @@ export function MapView({
       });
       map.addLayer({
         id: 'building-outlines',
-        type: 'line', source: 'campus',
+        type: 'line',
+        source: 'campus',
         filter: ['==', ['get', 'kind'], 'building'],
-        paint: { 'line-color': dark ? '#9aabb3' : '#8094a1', 'line-width': ['interpolate', ['linear'], ['zoom'], 15, 0.5, 19, 1.4], 'line-opacity': 0.7 },
+        paint: {
+          'line-color': dark ? '#9aabb3' : '#8094a1',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 15, 0.5, 19, 1.4],
+          'line-opacity': 0.7,
+        },
       });
       map.addLayer({
         id: 'barriers',
@@ -300,7 +351,10 @@ export function MapView({
         type: 'line',
         source: 'routes',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#ffffff', 'line-width': ['case', ['get', 'active'], 10, 6] },
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': ['case', ['get', 'active'], 10, 6],
+        },
       });
       map.addLayer({
         id: 'routes-line',
@@ -319,9 +373,27 @@ export function MapView({
         minzoom: 14.5,
         paint: {
           'circle-color': ['get', 'color'],
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 14.5, ['case', ['<=', ['get', 'priority'], 1], 3, 1.3], 17, 4, 19, 5],
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            14.5,
+            ['case', ['<=', ['get', 'priority'], 1], 3, 1.3],
+            17,
+            4,
+            19,
+            5,
+          ],
           'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 14.5, 0.7, 18, 1.5],
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            14.5,
+            0.7,
+            18,
+            1.5,
+          ],
         },
       });
       map.addLayer({
@@ -365,30 +437,101 @@ export function MapView({
           'circle-stroke-width': 3,
         },
       });
-      const label = map.getStyle().layers.find(l => l.id === 'places-label') as SymbolLayerSpecification;
-      map.addLayer({ ...label, id: 'places-label-detail', minzoom: 16.8, filter: ['>', ['get', 'priority'], 1] });
-      map.addLayer({ ...label, id: 'places-label-selected', minzoom: 13, filter: ['==', ['get', 'id'], ''], layout: { ...label.layout, 'text-size': 14, 'text-allow-overlap': true } }, 'places-label');
-      map.addLayer({ ...label, id: 'route-end-labels', source: 'route-labels', minzoom: 13, filter: ['has', 'name'],
-        layout: { ...label.layout, 'symbol-sort-key': 0, 'text-size': 13, 'text-offset': [0, -1], 'text-anchor': 'bottom', 'text-allow-overlap': true },
-        paint: { ...label.paint, 'text-color': '#085adb', 'text-halo-color': '#ffffff', 'text-halo-width': 2 },
-      }, 'places-label-selected');
+      const label = map
+        .getStyle()
+        .layers.find(
+          (l) => l.id === 'places-label',
+        ) as SymbolLayerSpecification;
+      map.addLayer({
+        ...label,
+        id: 'places-label-detail',
+        minzoom: 16.8,
+        filter: ['>', ['get', 'priority'], 1],
+      });
+      map.addLayer(
+        {
+          ...label,
+          id: 'places-label-selected',
+          minzoom: 13,
+          filter: ['==', ['get', 'id'], ''],
+          layout: {
+            ...label.layout,
+            'text-size': 14,
+            'text-allow-overlap': true,
+          },
+        },
+        'places-label',
+      );
+      map.addLayer(
+        {
+          ...label,
+          id: 'route-end-labels',
+          source: 'route-labels',
+          minzoom: 13,
+          filter: ['has', 'name'],
+          layout: {
+            ...label.layout,
+            'symbol-sort-key': 0,
+            'text-size': 13,
+            'text-offset': [0, -1],
+            'text-anchor': 'bottom',
+            'text-allow-overlap': true,
+          },
+          paint: {
+            ...label.paint,
+            'text-color': '#085adb',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        },
+        'places-label-selected',
+      );
       if (!editor) {
-        map.on('click', event => {
-          const hits = map.queryRenderedFeatures(event.point, { layers: ['places-dot', 'places-label', 'places-label-detail', 'buildings-3d', 'buildings'] });
-          const placeHit = hits.find(f => f.layer.id.startsWith('places'));
-          const place = latestData.current.places.find(p => p.id === placeHit?.properties?.id);
-          if (place) { callbacks.current.onSelect(place); return; }
-          const hit = hits.find(f => f.layer.id.startsWith('buildings'));
-          const building = hit && latestData.current.map.features.find(f => f.properties?.kind === 'building' && f.properties.id === hit.properties?.id);
+        map.on('click', (event) => {
+          const hits = map.queryRenderedFeatures(event.point, {
+            layers: [
+              'places-dot',
+              'places-label',
+              'places-label-detail',
+              'buildings-3d',
+              'buildings',
+            ],
+          });
+          const placeHit = hits.find((f) => f.layer.id.startsWith('places'));
+          const place = latestData.current.places.find(
+            (p) => p.id === placeHit?.properties?.id,
+          );
+          if (place) {
+            callbacks.current.onSelect(place);
+            return;
+          }
+          const hit = hits.find((f) => f.layer.id.startsWith('buildings'));
+          const building =
+            hit &&
+            latestData.current.map.features.find(
+              (f) =>
+                f.properties?.kind === 'building' &&
+                f.properties.id === hit.properties?.id,
+            );
           if (building) {
             const linked = buildingPlace(latestData.current, building);
             if (linked) callbacks.current.onSelect(linked);
             else callbacks.current.onBuildingSelect?.(building);
           }
         });
-        for (const layer of ['places-dot', 'places-label', 'places-label-detail', 'buildings-3d', 'buildings']) {
-          map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
-          map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
+        for (const layer of [
+          'places-dot',
+          'places-label',
+          'places-label-detail',
+          'buildings-3d',
+          'buildings',
+        ]) {
+          map.on('mouseenter', layer, () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          map.on('mouseleave', layer, () => {
+            map.getCanvas().style.cursor = '';
+          });
         }
       }
       frame();
@@ -484,21 +627,55 @@ export function MapView({
     const apply = () => {
       if (!map.getLayer('buildings-3d')) return;
       map.setFilter('buildings-3d', ['==', ['get', 'kind'], 'building']);
-      map.setPaintProperty('buildings-3d', 'fill-extrusion-height', ['get', 'displayHeight']);
-      map.setPaintProperty('buildings-3d', 'fill-extrusion-opacity', buildingOpacity);
+      map.setPaintProperty('buildings-3d', 'fill-extrusion-height', [
+        'get',
+        'displayHeight',
+      ]);
+      map.setPaintProperty(
+        'buildings-3d',
+        'fill-extrusion-opacity',
+        buildingOpacity,
+      );
       map.setPaintProperty('buildings-3d', 'fill-extrusion-color', [
-        'case', ['==', ['get', 'id'], selectedBuildingId], dark ? '#5799e5' : '#6ca2da',
-        ['==', ['get', 'heightKind'], 'illustrative'], dark ? '#475b56' : '#c5d2cb',
+        'case',
+        ['==', ['get', 'id'], selectedBuildingId],
+        dark ? '#5799e5' : '#6ca2da',
+        ['==', ['get', 'heightKind'], 'illustrative'],
+        dark ? '#475b56' : '#c5d2cb',
         dark ? '#728b9e' : '#b3c6d8',
       ]);
-      map.setLight({ color: dark ? '#becfe0' : '#ffffff', intensity: dark ? 0.35 : 0.45 });
+      map.setLight({
+        color: dark ? '#becfe0' : '#ffffff',
+        intensity: dark ? 0.35 : 0.45,
+      });
       map.setFilter('places-label-selected', ['==', ['get', 'id'], selectedId]);
-      map.setFilter('places-label', ['all', ['<=', ['get', 'priority'], 1], ['!=', ['get', 'id'], selectedId]]);
-      map.setFilter('places-label-detail', ['all', ['>', ['get', 'priority'], 1], ['!=', ['get', 'id'], selectedId]]);
-      for (const layer of ['places-label', 'places-label-detail', 'places-label-selected']) {
+      map.setFilter('places-label', [
+        'all',
+        ['<=', ['get', 'priority'], 1],
+        ['!=', ['get', 'id'], selectedId],
+      ]);
+      map.setFilter('places-label-detail', [
+        'all',
+        ['>', ['get', 'priority'], 1],
+        ['!=', ['get', 'id'], selectedId],
+      ]);
+      for (const layer of [
+        'places-label',
+        'places-label-detail',
+        'places-label-selected',
+      ]) {
         map.setPaintProperty(layer, 'text-color', dark ? '#d7e3ee' : '#53616b');
-        map.setPaintProperty(layer, 'text-halo-color', dark ? '#213039' : '#ffffff');
-        map.setLayoutProperty(layer, 'symbol-sort-key', ['case', ['==', ['get', 'id'], selectedId], 0, ['get', 'priority']]);
+        map.setPaintProperty(
+          layer,
+          'text-halo-color',
+          dark ? '#213039' : '#ffffff',
+        );
+        map.setLayoutProperty(layer, 'symbol-sort-key', [
+          'case',
+          ['==', ['get', 'id'], selectedId],
+          0,
+          ['get', 'priority'],
+        ]);
       }
     };
     if (ready.current) apply();
@@ -525,7 +702,13 @@ export function MapView({
   }, [sourceData]);
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !selectedId || selectedLng === undefined || selectedLat === undefined) return;
+    if (
+      !map ||
+      !selectedId ||
+      selectedLng === undefined ||
+      selectedLat === undefined
+    )
+      return;
     const marker = new maplibregl.Marker({ color: '#1764ed', scale: 0.85 })
       .setLngLat([selectedLng, selectedLat])
       .addTo(map);
@@ -547,10 +730,31 @@ export function MapView({
     if (!map) return;
     const apply = () => {
       const route = routes[activeRoute];
-      (map.getSource('route-labels') as GeoJSONSource)?.setData({ type: 'FeatureCollection', features: route ? [
-        { type: 'Feature', properties: { name: 'Start' }, geometry: { type: 'Point', coordinates: route.coordinates[0] } },
-        { type: 'Feature', properties: { name: (selected?.name || 'Destination').replace(/[^\x20-\x7E]/g, ' ') }, geometry: { type: 'Point', coordinates: route.coordinates.at(-1)! } },
-      ] : [] });
+      (map.getSource('route-labels') as GeoJSONSource)?.setData({
+        type: 'FeatureCollection',
+        features: route
+          ? [
+              {
+                type: 'Feature',
+                properties: { name: 'Start' },
+                geometry: { type: 'Point', coordinates: route.coordinates[0] },
+              },
+              {
+                type: 'Feature',
+                properties: {
+                  name: (selected?.name || 'Destination').replace(
+                    /[^\x20-\x7E]/g,
+                    ' ',
+                  ),
+                },
+                geometry: {
+                  type: 'Point',
+                  coordinates: route.coordinates.at(-1)!,
+                },
+              },
+            ]
+          : [],
+      });
       (map.getSource('routes') as GeoJSONSource)?.setData({
         type: 'FeatureCollection',
         features: [...routes.entries()]
@@ -572,13 +776,18 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once('load', apply);
-    return () => { map.off('load', apply); };
+    return () => {
+      map.off('load', apply);
+    };
   }, [routes, activeRoute, panelBesideMap, selected?.name]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
     const apply = () => {
-      if (!fix) { (map.getSource('position') as GeoJSONSource)?.setData(empty); return; }
+      if (!fix) {
+        (map.getSource('position') as GeoJSONSource)?.setData(empty);
+        return;
+      }
       const ring = Array.from({ length: 49 }, (_, i) => {
         const angle = (i / 48) * Math.PI * 2;
         return [
@@ -606,7 +815,9 @@ export function MapView({
     };
     if (ready.current) apply();
     else map.once('load', apply);
-    return () => { map.off('load', apply); };
+    return () => {
+      map.off('load', apply);
+    };
   }, [fix, panelBesideMap]);
   return (
     <>

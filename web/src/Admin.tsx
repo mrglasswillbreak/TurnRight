@@ -33,7 +33,11 @@ import { assembleSources, type SourceRecord } from './editor-model';
 import { useEditorValidation } from './useEditorValidation';
 import { DuplicateReview } from './DuplicateReview';
 import { buildingPlace } from './map-display';
-import { duplicateDecision, exactDuplicateEdits, type DuplicateCandidate } from './duplicates';
+import {
+  duplicateDecision,
+  exactDuplicateEdits,
+  type DuplicateCandidate,
+} from './duplicates';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
 import { drawingProgress } from './drawing-state';
@@ -314,7 +318,9 @@ function Editor({
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const routeRequest = useRef(0);
-  const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(null);
+  const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(
+    null,
+  );
   const restoreDrawingPanels = () => {
     if (!drawingPanels.current) return;
     setExplorer(drawingPanels.current.explorer);
@@ -326,36 +332,91 @@ function Editor({
   const base = useMemo(() => assembleSources(sources, data), [sources, data]);
   const validation = useEditorValidation(base, workspace.edits);
   const autoReviewed = useRef(new WeakSet<CampusData>());
-  const mergeBatch = useCallback(async (batch: MapEdit[], success: string) => {
-    if (!batch.length || tool || workspace.unfinished || validation.pending) return;
-    setBusy(true);
-    const original = workspace.edits;
+  const mergeBatch = useCallback(
+    async (batch: MapEdit[], success: string) => {
+      if (!batch.length || tool || workspace.unfinished || validation.pending)
+        return;
+      setBusy(true);
+      const original = workspace.edits;
+      try {
+        const next = [
+          ...original.filter(
+            (e) => !batch.some((b) => editKey(b) === editKey(e)),
+          ),
+          ...batch,
+        ];
+        const checked = await validation.check(next);
+        if (workspace.edits !== original)
+          throw new Error('The draft changed. Review this pair again.');
+        const newErrors = checked.errors.filter(
+          (e) => !validation.errors.includes(e),
+        );
+        if (newErrors.length) throw new Error(newErrors.join(' '));
+        workspace.commit(batch, null);
+        setSelected(null);
+        selectedRef.current = null;
+        controller.current?.select(null);
+        setRoutes([]);
+        setMessage(success);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setBusy(false);
+      }
+    },
+    [tool, workspace, validation],
+  );
+  const decideDuplicate = async (
+    candidate: DuplicateCandidate,
+    survivor?: string,
+  ) => {
     try {
-      const next = [...original.filter(e => !batch.some(b => editKey(b) === editKey(e))), ...batch];
-      const checked = await validation.check(next);
-      if (workspace.edits !== original) throw new Error('The draft changed. Review this pair again.');
-      const newErrors = checked.errors.filter(e => !validation.errors.includes(e));
-      if (newErrors.length) throw new Error(newErrors.join(' '));
-      workspace.commit(batch, null);
-      setSelected(null);
-      selectedRef.current = null;
-      controller.current?.select(null);
-      setRoutes([]);
-      setMessage(success);
-    } catch (error) { setError((error as Error).message); }
-    finally { setBusy(false); }
-  }, [tool, workspace, validation]);
-  const decideDuplicate = async (candidate: DuplicateCandidate, survivor?: string) => {
-    try {
-      await mergeBatch(duplicateDecision(validation.data, workspace.edits, candidate, survivor), survivor ? 'Records merged. Saved place references and entrances now use the survivor. Undo restores both.' : 'Records kept separate. This decision is retained through source refreshes.');
-    } catch (error) { setError((error as Error).message); }
+      await mergeBatch(
+        duplicateDecision(
+          validation.data,
+          workspace.edits,
+          candidate,
+          survivor,
+        ),
+        survivor
+          ? 'Records merged. Saved place references and entrances now use the survivor. Undo restores both.'
+          : 'Records kept separate. This decision is retained through source refreshes.',
+      );
+    } catch (error) {
+      setError((error as Error).message);
+    }
   };
   useEffect(() => {
-    if (tab !== 'duplicates' || validation.pending || busy || tool || workspace.unfinished || autoReviewed.current.has(base)) return;
+    if (
+      tab !== 'duplicates' ||
+      validation.pending ||
+      busy ||
+      tool ||
+      workspace.unfinished ||
+      autoReviewed.current.has(base)
+    )
+      return;
     autoReviewed.current.add(base);
-    const batch = exactDuplicateEdits(validation.data, workspace.edits, validation.duplicates);
-    if (batch.length) void mergeBatch(batch, `${batch.filter(e => e.deleted).length} exact duplicate records consolidated. Undo is available.`);
-  }, [tab, validation, base, busy, tool, workspace.edits, workspace.unfinished, mergeBatch]);
+    const batch = exactDuplicateEdits(
+      validation.data,
+      workspace.edits,
+      validation.duplicates,
+    );
+    if (batch.length)
+      void mergeBatch(
+        batch,
+        `${batch.filter((e) => e.deleted).length} exact duplicate records consolidated. Undo is available.`,
+      );
+  }, [
+    tab,
+    validation,
+    base,
+    busy,
+    tool,
+    workspace.edits,
+    workspace.unfinished,
+    mergeBatch,
+  ]);
   const visible = preview ? base : validation.data;
   const invalid = useMemo(
     () =>
@@ -463,10 +524,19 @@ function Editor({
   const addEntrance = () => {
     const edit = selectedRef.current;
     if (!edit) return;
-    const building = validation.data.map.features.find(f => f.properties?.kind === 'building' &&
-      (edit.kind === 'building' ? f.properties.id === edit.id : buildingPlace(validation.data, f)?.id === edit.id));
-    const place = edit.kind === 'place' ? validation.data.places.find(p => p.id === edit.id)
-      : building ? buildingPlace(validation.data, building) : undefined;
+    const building = validation.data.map.features.find(
+      (f) =>
+        f.properties?.kind === 'building' &&
+        (edit.kind === 'building'
+          ? f.properties.id === edit.id
+          : buildingPlace(validation.data, f)?.id === edit.id),
+    );
+    const place =
+      edit.kind === 'place'
+        ? validation.data.places.find((p) => p.id === edit.id)
+        : building
+          ? buildingPlace(validation.data, building)
+          : undefined;
     const buildingId = building?.properties?.id;
     begin('entrance', {
       name: `${place?.name || edit.properties.name || 'Building'} entrance`,
@@ -887,11 +957,24 @@ function Editor({
           name: String(edit.properties.name),
           reason: invalid.has(edit.id) ? 'Needs repair' : 'Review connection',
         });
-    const grouped = new Map<string, typeof result[number]>();
+    const grouped = new Map<string, (typeof result)[number]>();
     for (const task of result) {
-      const key = `${task.kind}:${task.id}`, previous = grouped.get(key);
-      const reasons = issues.filter(issue => issue.startsWith(`${task.id}:`) || issue.startsWith(`${task.name}:`)).map(issue => issue.slice(issue.indexOf(':') + 1).trim());
-      const combined = [...new Set([...(previous ? previous.reason.split(' · ') : []), task.reason, ...reasons])];
+      const key = `${task.kind}:${task.id}`,
+        previous = grouped.get(key);
+      const reasons = issues
+        .filter(
+          (issue) =>
+            issue.startsWith(`${task.id}:`) ||
+            issue.startsWith(`${task.name}:`),
+        )
+        .map((issue) => issue.slice(issue.indexOf(':') + 1).trim());
+      const combined = [
+        ...new Set([
+          ...(previous ? previous.reason.split(' · ') : []),
+          task.reason,
+          ...reasons,
+        ]),
+      ];
       grouped.set(key, { ...task, reason: combined.join(' · ') });
     }
     return [...grouped.values()];
@@ -900,7 +983,8 @@ function Editor({
     (t) =>
       `${t.name} ${t.reason}`.toLowerCase().includes(search.toLowerCase()) &&
       (filter === 'all' ||
-        (filter === 'needs' && (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||
+        (filter === 'needs' &&
+          (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||
         (filter === 'drafts' &&
           workspace.edits.some(
             (e) =>
@@ -985,7 +1069,10 @@ function Editor({
               key={id}
               className={tab === id ? 'active' : ''}
               disabled={!!tool || !!workspace.unfinished}
-              onClick={() => { setTab(id); if (id !== 'map') setExplorer(false); }}
+              onClick={() => {
+                setTab(id);
+                if (id !== 'map') setExplorer(false);
+              }}
             >
               {label}
               {id === 'reports' && state.reports.length > 0 && (
@@ -1041,7 +1128,11 @@ function Editor({
           >
             <RefreshCw size={17} />
           </button>
-          <button className="editor-publish" disabled={!!tool || !!workspace.unfinished} onClick={() => setTab('releases')}>
+          <button
+            className="editor-publish"
+            disabled={!!tool || !!workspace.unfinished}
+            onClick={() => setTab('releases')}
+          >
             Review changes <ArrowUpRight size={15} />
           </button>
           <button
@@ -1162,7 +1253,11 @@ function Editor({
               aria-label={name}
               aria-pressed={tool === kind}
               title={`${name}${shortcut ? ` (${shortcut})` : ''}`}
-              disabled={preview || !ready || (!!kind && (!!tool || !!workspace.unfinished))}
+              disabled={
+                preview ||
+                !ready ||
+                (!!kind && (!!tool || !!workspace.unfinished))
+              }
               onClick={() => (kind ? begin(kind) : cancel())}
             >
               <Icon size={20} />
@@ -1391,27 +1486,31 @@ function Editor({
                 <X size={18} />
               </button>
             </div>
-            {tab === 'duplicates' ? <DuplicateReview
-              data={validation.data}
-              candidates={validation.duplicates}
-              pending={validation.pending || busy}
-              decide={decideDuplicate}
-              inspect={(kind, id) => selectId(kind, id, true)}
-              undo={() => undo()}
-              canUndo={!!workspace.past.length}
-            /> : <EditorReview
-              tab={tab}
-              state={state}
-              workspace={workspace}
-              validation={validation}
-              busy={busy}
-              action={action}
-              mapRef={mapRef}
-              preview={preview}
-              setPreview={setPreview}
-              review={review}
-              setReview={setReview}
-            />}
+            {tab === 'duplicates' ? (
+              <DuplicateReview
+                data={validation.data}
+                candidates={validation.duplicates}
+                pending={validation.pending || busy}
+                decide={decideDuplicate}
+                inspect={(kind, id) => selectId(kind, id, true)}
+                undo={() => undo()}
+                canUndo={!!workspace.past.length}
+              />
+            ) : (
+              <EditorReview
+                tab={tab}
+                state={state}
+                workspace={workspace}
+                validation={validation}
+                busy={busy}
+                action={action}
+                mapRef={mapRef}
+                preview={preview}
+                setPreview={setPreview}
+                review={review}
+                setReview={setReview}
+              />
+            )}
           </aside>
         ) : selected && !preview ? (
           <EditorInspector
@@ -1604,11 +1703,15 @@ function Editor({
               : hint || message}
             {tool && (
               <span className="editor-finish-controls">
-                <span aria-live="polite" className="drawing-progress">{progress.message}</span>
+                <span aria-live="polite" className="drawing-progress">
+                  {progress.message}
+                </span>
                 <button
                   className="editor-primary"
                   disabled={!progress.canFinish}
-                  title={progress.canFinish ? 'Finish drawing' : progress.message}
+                  title={
+                    progress.canFinish ? 'Finish drawing' : progress.message
+                  }
                   onClick={() => controller.current?.finish()}
                 >
                   <Check size={15} /> Finish

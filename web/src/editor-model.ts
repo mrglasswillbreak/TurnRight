@@ -51,7 +51,9 @@ export function validateEdit(edit: MapEdit): string[] {
     return ['Choose a supported feature type.'];
   if (
     !edit.geometry ||
-    !['Point', 'LineString', 'Polygon', 'MultiPolygon'].includes(edit.geometry.type)
+    !['Point', 'LineString', 'Polygon', 'MultiPolygon'].includes(
+      edit.geometry.type,
+    )
   )
     return ['Draw a point, path, or building outline.'];
   if (!edit.properties || typeof edit.properties !== 'object')
@@ -69,7 +71,10 @@ export function validateEdit(edit: MapEdit): string[] {
     edit.geometry.type !== 'Point'
   )
     errors.push('Places and entrances must be points.');
-  if (edit.kind === 'building' && !['Polygon', 'MultiPolygon'].includes(edit.geometry.type))
+  if (
+    edit.kind === 'building' &&
+    !['Polygon', 'MultiPolygon'].includes(edit.geometry.type)
+  )
     errors.push('Buildings must be polygons.');
   if (!edit.deleted && typeof edit.properties.name !== 'string')
     errors.push('Give the feature a name or description.');
@@ -93,9 +98,22 @@ export function validateEdit(edit: MapEdit): string[] {
     );
   };
   const props = edit.properties;
-  if (props.mergedInto !== undefined && (!['place', 'building'].includes(edit.kind) || !edit.deleted || !validId(props.mergedInto) || props.mergedInto === edit.id))
-    errors.push('A merge must remove a place or building in favour of another valid ID.');
-  if (props.duplicateKeepSeparate !== undefined && (!Array.isArray(props.duplicateKeepSeparate) || props.duplicateKeepSeparate.length > 2000 || !props.duplicateKeepSeparate.every(validId)))
+  if (
+    props.mergedInto !== undefined &&
+    (!['place', 'building'].includes(edit.kind) ||
+      !edit.deleted ||
+      !validId(props.mergedInto) ||
+      props.mergedInto === edit.id)
+  )
+    errors.push(
+      'A merge must remove a place or building in favour of another valid ID.',
+    );
+  if (
+    props.duplicateKeepSeparate !== undefined &&
+    (!Array.isArray(props.duplicateKeepSeparate) ||
+      props.duplicateKeepSeparate.length > 2000 ||
+      !props.duplicateKeepSeparate.every(validId))
+  )
     errors.push('Invalid duplicate review decision.');
   if (
     props.vertexIds !== undefined &&
@@ -171,7 +189,10 @@ export function validateEdit(edit: MapEdit): string[] {
     errors.push('A path needs at least two points.');
   if (
     (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') &&
-    (geometry.type === 'Polygon' ? geometry.coordinates : geometry.coordinates.flat()).some(
+    (geometry.type === 'Polygon'
+      ? geometry.coordinates
+      : geometry.coordinates.flat()
+    ).some(
       (r) => r.length < 4 || JSON.stringify(r[0]) !== JSON.stringify(r.at(-1)),
     )
   )
@@ -223,11 +244,28 @@ export function applyEdits(
   const data = structuredClone(base),
     errors: string[] = [],
     warnings: string[] = [];
-  const validMerges = edits.filter(e => e.deleted && !e.properties.revertToSource && e.properties.mergedInto && !validateEdit(e).length);
-  data.placeIdAliases = Object.fromEntries([...Object.entries(data.placeIdAliases || {}), ...validMerges.filter(e => e.kind === 'place').map(e => [e.id, e.properties.mergedInto!] as const)]);
-  const buildingAliases = Object.fromEntries([...Object.entries(data.buildingIdAliases || {}), ...validMerges.filter(e => e.kind === 'building').map(e => [e.id, e.properties.mergedInto!] as const)]);
+  const validMerges = edits.filter(
+    (e) =>
+      e.deleted &&
+      !e.properties.revertToSource &&
+      e.properties.mergedInto &&
+      !validateEdit(e).length,
+  );
+  data.placeIdAliases = Object.fromEntries([
+    ...Object.entries(data.placeIdAliases || {}),
+    ...validMerges
+      .filter((e) => e.kind === 'place')
+      .map((e) => [e.id, e.properties.mergedInto!] as const),
+  ]);
+  const buildingAliases = Object.fromEntries([
+    ...Object.entries(data.buildingIdAliases || {}),
+    ...validMerges
+      .filter((e) => e.kind === 'building')
+      .map((e) => [e.id, e.properties.mergedInto!] as const),
+  ]);
   data.buildingIdAliases = buildingAliases;
-  const buildingId = (id: string) => resolvePlaceId({ placeIdAliases: buildingAliases }, id);
+  const buildingId = (id: string) =>
+    resolvePlaceId({ placeIdAliases: buildingAliases }, id);
   const nodes = new Map(data.graph.nodes.map((n) => [n.id, n]));
   data.entrances = [...(data.entrances || [])];
   let connectedPaths = false;
@@ -291,8 +329,12 @@ export function applyEdits(
           source: 'campus-review',
           sourceId: edit.id,
           graphNode: moved ? undefined : previous?.graphNode,
-          buildingId: props.buildingId ? buildingId(String(props.buildingId)) : previous?.buildingId,
-          sourceRefs: Array.isArray(props.sourceRefs) ? props.sourceRefs.filter((v): v is string => typeof v === 'string') : previous?.sourceRefs,
+          buildingId: props.buildingId
+            ? buildingId(String(props.buildingId))
+            : previous?.buildingId,
+          sourceRefs: Array.isArray(props.sourceRefs)
+            ? props.sourceRefs.filter((v): v is string => typeof v === 'string')
+            : previous?.sourceRefs,
           arrivalKind: moved ? 'unmapped' : previous?.arrivalKind || 'unmapped',
         });
         if (moved)
@@ -321,7 +363,9 @@ export function applyEdits(
         kind: 'path',
         name: props.name,
         source: 'campus-review',
-        ...(props.surveyProvenance ? {surveyProvenance:'Reviewed walking survey'} : {}),
+        ...(props.surveyProvenance
+          ? { surveyProvenance: 'Reviewed walking survey' }
+          : {}),
         walkingAccess: access,
         accessReviewId:
           access === 'campus'
@@ -504,12 +548,16 @@ export function applyEdits(
                 [b, a],
               ]) {
           // Replacing an unchanged-direction section retains each original directed span.
-          const directionChanged = props.footDirection !== undefined && props.footDirection !== (originalFeature?.properties?.footDirection || 'both');
+          const directionChanged =
+            props.footDirection !== undefined &&
+            props.footDirection !==
+              (originalFeature?.properties?.footDirection || 'both');
           if (!directionChanged && inherited.length) {
             const wanted = from.id === a.id ? 1 : -1;
-            const permitted = inherited.some(e => {
-              const f = orderedOriginal.findIndex(n=>n.id===e.from), t = orderedOriginal.findIndex(n=>n.id===e.to);
-              return f >= 0 && t >= 0 && Math.sign(t-f) === wanted;
+            const permitted = inherited.some((e) => {
+              const f = orderedOriginal.findIndex((n) => n.id === e.from),
+                t = orderedOriginal.findIndex((n) => n.id === e.to);
+              return f >= 0 && t >= 0 && Math.sign(t - f) === wanted;
             });
             if (!permitted) continue;
           }
@@ -556,7 +604,8 @@ export function applyEdits(
           f.properties?.id === edit.id && f.properties?.kind === 'building',
       );
       data.map.features = data.map.features.filter(
-        (f) => f.properties?.id !== edit.id || f.properties?.kind !== 'building',
+        (f) =>
+          f.properties?.id !== edit.id || f.properties?.kind !== 'building',
       );
       if (!edit.deleted)
         data.map.features.push({
@@ -601,7 +650,9 @@ export function applyEdits(
         name: String(props.name),
         placeId,
         coordinates,
-        buildingId: props.buildingId ? buildingId(String(props.buildingId)) : undefined,
+        buildingId: props.buildingId
+          ? buildingId(String(props.buildingId))
+          : undefined,
         walkingAccess: (props.access || 'yes') as WalkingAccess,
         source: 'campus-review',
         graphNode: valid ? node.id : undefined,
@@ -647,26 +698,44 @@ export function applyEdits(
         });
     }
   }
-  for (const [kind, aliases] of [['place', data.placeIdAliases], ['building', buildingAliases]] as const) {
+  for (const [kind, aliases] of [
+    ['place', data.placeIdAliases],
+    ['building', buildingAliases],
+  ] as const) {
     for (const from of Object.keys(aliases)) {
       const to = resolvePlaceId({ placeIdAliases: aliases }, from);
-      const exists = kind === 'place' ? data.places.some(p => p.id === to) : data.map.features.some(f => f.properties?.kind === 'building' && f.properties.id === to);
-      if (to === from || !exists) errors.push(`${from}: duplicate merge has a missing or cyclic target.`);
+      const exists =
+        kind === 'place'
+          ? data.places.some((p) => p.id === to)
+          : data.map.features.some(
+              (f) =>
+                f.properties?.kind === 'building' && f.properties.id === to,
+            );
+      if (to === from || !exists)
+        errors.push(`${from}: duplicate merge has a missing or cyclic target.`);
       else aliases[from] = to;
     }
   }
   for (const entrance of data.entrances) {
     entrance.placeId = resolvePlaceId(data, entrance.placeId);
-    if (entrance.buildingId) entrance.buildingId = buildingId(entrance.buildingId);
+    if (entrance.buildingId)
+      entrance.buildingId = buildingId(entrance.buildingId);
   }
   for (const place of data.places) {
     if (place.buildingId) place.buildingId = buildingId(place.buildingId);
-    else if (Object.hasOwn(buildingAliases, place.id)) place.buildingId = buildingId(place.id);
+    else if (Object.hasOwn(buildingAliases, place.id))
+      place.buildingId = buildingId(place.id);
   }
-  for (const feature of data.map.features) if (feature.properties?.kind === 'building') {
-    const linked = feature.properties.placeId || (Object.hasOwn(data.placeIdAliases, feature.properties.id) ? feature.properties.id : undefined);
-    if (linked) feature.properties.placeId = resolvePlaceId(data, String(linked));
-  }
+  for (const feature of data.map.features)
+    if (feature.properties?.kind === 'building') {
+      const linked =
+        feature.properties.placeId ||
+        (Object.hasOwn(data.placeIdAliases, feature.properties.id)
+          ? feature.properties.id
+          : undefined);
+      if (linked)
+        feature.properties.placeId = resolvePlaceId(data, String(linked));
+    }
   connectPaths();
   remapClosures(data, errors);
   const connected = new Set(data.graph.edges.flatMap((e) => [e.from, e.to]));
@@ -684,10 +753,7 @@ export function applyEdits(
     const a = nodes.get(edge.from),
       b = nodes.get(edge.to);
     if (a && b) {
-      edge.geometryBlocked = blockedGeometry(
-        a.coordinates,
-        b.coordinates,
-      );
+      edge.geometryBlocked = blockedGeometry(a.coordinates, b.coordinates);
       if (edge.geometryBlocked)
         warnings.push(
           `${edge.sourceId}: segment excluded because it crosses a mapped ${edge.geometryBlocked.split(':')[0]}.`,

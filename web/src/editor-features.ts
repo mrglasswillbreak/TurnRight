@@ -2,16 +2,28 @@ import type { Geometry } from 'geojson';
 import { distance, projectSegment } from './geo';
 import { pathWalkingAccess } from './editor-model';
 import { BoundsIndex, boundsOf, nearbyBounds } from './spatial-index';
-import type { CampusData, ConnectionTarget, MapEdit, Position, GraphEdge, GraphNode, RoutingGraph } from './types';
+import type {
+  CampusData,
+  ConnectionTarget,
+  MapEdit,
+  Position,
+  GraphEdge,
+  GraphNode,
+  RoutingGraph,
+} from './types';
 
-const snapIndexes = new WeakMap<RoutingGraph, { nodes: Map<string, GraphNode>; edges: BoundsIndex<GraphEdge> }>();
+const snapIndexes = new WeakMap<
+  RoutingGraph,
+  { nodes: Map<string, GraphNode>; edges: BoundsIndex<GraphEdge> }
+>();
 function snapIndex(graph: RoutingGraph) {
   let index = snapIndexes.get(graph);
   if (!index) {
-    const nodes = new Map(graph.nodes.map(n => [n.id, n]));
+    const nodes = new Map(graph.nodes.map((n) => [n.id, n]));
     const edges = new BoundsIndex<GraphEdge>();
     for (const edge of graph.edges) {
-      const a = nodes.get(edge.from), b = nodes.get(edge.to);
+      const a = nodes.get(edge.from),
+        b = nodes.get(edge.to);
       if (a && b) edges.add(boundsOf([a.coordinates, b.coordinates]), edge);
     }
     index = { nodes, edges };
@@ -60,8 +72,11 @@ export function snapTarget(
         }
     return best;
   }
-  const index = snapIndex(data.graph), nodes = index.nodes;
-  const edges = index.edges.query(nearbyBounds(point, 5.1)).filter(e => e.sourceId !== excludePath);
+  const index = snapIndex(data.graph),
+    nodes = index.nodes;
+  const edges = index.edges
+    .query(nearbyBounds(point, 5.1))
+    .filter((e) => e.sourceId !== excludePath);
   const seen = new Set<string>();
   for (const edge of edges) {
     const key = [edge.from, edge.to].sort().join('|');

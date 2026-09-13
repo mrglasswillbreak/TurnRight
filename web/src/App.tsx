@@ -50,7 +50,12 @@ import {
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
 import type { Feature } from 'geojson';
-import { buildingDisplay, buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
+import {
+  buildingDisplay,
+  buildingPlace,
+  resolvePlaceId,
+  resolvePlaceIds,
+} from './map-display';
 import { useMapViewPreference } from './useMapViewPreference';
 import {
   activatePending,
@@ -103,7 +108,9 @@ export default function App() {
     [query, setQuery] = useState(''),
     [category, setCategory] = useState('all');
   const [threeD, setThreeD] = useMapViewPreference();
-  const [unlinkedBuilding, setUnlinkedBuilding] = useState<Feature | null>(null);
+  const [unlinkedBuilding, setUnlinkedBuilding] = useState<Feature | null>(
+    null,
+  );
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
@@ -238,11 +245,18 @@ export default function App() {
   const packageVersion = manifest?.version;
   useEffect(() => {
     if (!data) return;
-    for (const [key, ids, set] of [['saved', saved, setSaved], ['recent', recent, setRecent]] as const) {
+    for (const [key, ids, set] of [
+      ['saved', saved, setSaved],
+      ['recent', recent, setRecent],
+    ] as const) {
       const next = resolvePlaceIds(data, ids);
       if (JSON.stringify(next) !== JSON.stringify(ids)) {
         set(next);
-        void setPreference(key, next).catch(() => setToast('Place links updated for this session. Storage could not save the change.'));
+        void setPreference(key, next).catch(() =>
+          setToast(
+            'Place links updated for this session. Storage could not save the change.',
+          ),
+        );
       }
     }
   }, [data, saved, recent]);
@@ -896,8 +910,18 @@ export default function App() {
               </span>
               <h1>{selected.name}</h1>
               {(() => {
-                const building = data.map.features.find(f => f.properties?.kind === 'building' && buildingPlace(data, f)?.id === selected.id);
-                return building && <p className="building-height-note">{buildingDisplay(building.properties || {}).description}</p>;
+                const building = data.map.features.find(
+                  (f) =>
+                    f.properties?.kind === 'building' &&
+                    buildingPlace(data, f)?.id === selected.id,
+                );
+                return (
+                  building && (
+                    <p className="building-height-note">
+                      {buildingDisplay(building.properties || {}).description}
+                    </p>
+                  )
+                );
               })()}
               <p>
                 {selected.department ||
@@ -974,7 +998,10 @@ export default function App() {
         <button
           className={threeD ? 'active' : ''}
           onClick={() => {
-            if (!setThreeD(!threeD)) setToast('Map view changed for this session. Storage could not save your preference.');
+            if (!setThreeD(!threeD))
+              setToast(
+                'Map view changed for this session. Storage could not save your preference.',
+              );
           }}
           aria-label={threeD ? 'Switch to 2D' : 'Switch to 3D'}
         >
@@ -1028,7 +1055,8 @@ export default function App() {
       </div>
       {threeD && (
         <div className="map-caption">
-          3D heights: floor-derived estimates · muted blocks have unknown heights
+          3D heights: floor-derived estimates · muted blocks have unknown
+          heights
         </div>
       )}
       {gps.error && !routeView && (
@@ -1051,30 +1079,52 @@ export default function App() {
         <DialogContent className="app-dialog">
           <DialogHeader>
             <DialogTitle>
-              {dialog === 'building' ? String(unlinkedBuilding?.properties?.name || 'Campus building') : dialog === 'offline'
-                ? 'Offline maps'
-                : dialog === 'report'
-                  ? 'Report a map issue'
-                  : 'Settings & map information'}
+              {dialog === 'building'
+                ? String(
+                    unlinkedBuilding?.properties?.name || 'Campus building',
+                  )
+                : dialog === 'offline'
+                  ? 'Offline maps'
+                  : dialog === 'report'
+                    ? 'Report a map issue'
+                    : 'Settings & map information'}
             </DialogTitle>
             <DialogDescription>
-              {dialog === 'building' ? 'Building footprint and source information.' : dialog === 'offline'
-                ? 'Take LASU campus with you.'
-                : dialog === 'report'
-                  ? 'Help make campus easier to navigate.'
-                  : 'Make TurnRight work for you.'}
+              {dialog === 'building'
+                ? 'Building footprint and source information.'
+                : dialog === 'offline'
+                  ? 'Take LASU campus with you.'
+                  : dialog === 'report'
+                    ? 'Help make campus easier to navigate.'
+                    : 'Make TurnRight work for you.'}
             </DialogDescription>
           </DialogHeader>
           {dialog === 'building' && unlinkedBuilding && (
             <div className="settings-content">
-              <p>{buildingDisplay(unlinkedBuilding.properties || {}).description}</p>
-              <p>Source: {String(unlinkedBuilding.properties?.source || 'Campus map')}. This footprint is not yet linked to a named destination.</p>
-              <Button variant="outline" onClick={() => {
-                const g = unlinkedBuilding.geometry;
-                const point = g.type === 'Polygon' ? g.coordinates[0][0] : g.type === 'MultiPolygon' ? g.coordinates[0][0][0] : undefined;
-                if (point) setReportPin(point as Position);
-                setDialog('report');
-              }}><Flag /> Report building details</Button>
+              <p>
+                {buildingDisplay(unlinkedBuilding.properties || {}).description}
+              </p>
+              <p>
+                Source:{' '}
+                {String(unlinkedBuilding.properties?.source || 'Campus map')}.
+                This footprint is not yet linked to a named destination.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const g = unlinkedBuilding.geometry;
+                  const point =
+                    g.type === 'Polygon'
+                      ? g.coordinates[0][0]
+                      : g.type === 'MultiPolygon'
+                        ? g.coordinates[0][0][0]
+                        : undefined;
+                  if (point) setReportPin(point as Position);
+                  setDialog('report');
+                }}
+              >
+                <Flag /> Report building details
+              </Button>
             </div>
           )}
           {dialog === 'offline' && (
@@ -1239,8 +1289,11 @@ export default function App() {
                       variant="outline"
                       onClick={() => {
                         setSelected(
-                          data.places.find((p) => p.id === resolvePlaceId(data, draft.placeId || '')) ||
-                            null,
+                          data.places.find(
+                            (p) =>
+                              p.id ===
+                              resolvePlaceId(data, draft.placeId || ''),
+                          ) || null,
                         );
                         setReportPin(draft.coordinates);
                         setDialog('report');

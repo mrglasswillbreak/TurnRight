@@ -41,7 +41,12 @@ export function EditorReview({
   tab: string;
   state: ReviewState;
   workspace: EditorWorkspace;
-  validation: { data: CampusData; errors: string[]; warnings: string[]; pending?: boolean };
+  validation: {
+    data: CampusData;
+    errors: string[];
+    warnings: string[];
+    pending?: boolean;
+  };
   busy: boolean;
   action: (name: string, payload: unknown, success: string) => Promise<boolean>;
   mapRef: RefObject<MapInstance | null>;
@@ -205,9 +210,11 @@ export function EditorReview({
           <h2>Review, then publish</h2>
           <div className="validation-card">
             <strong>
-              {validation.pending ? 'Checking the latest draft…' : validation.errors.length
-                ? 'Validation needs attention'
-                : 'Draft validation passed'}
+              {validation.pending
+                ? 'Checking the latest draft…'
+                : validation.errors.length
+                  ? 'Validation needs attention'
+                  : 'Draft validation passed'}
             </strong>
             <p>
               {validation.data.places.length} places ·{' '}

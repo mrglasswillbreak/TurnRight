@@ -188,7 +188,9 @@ function endpointNodes(
   endpoint: RouteEndpoint,
 ): EndpointNode[] {
   if (typeof endpoint === 'string') return [{ id: endpoint, distance: 0 }];
-  const place = data.places.find((p) => p.id === resolvePlaceId(data, endpoint.placeId));
+  const place = data.places.find(
+    (p) => p.id === resolvePlaceId(data, endpoint.placeId),
+  );
   if (!place) return [];
   const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
   if (entrances.length)

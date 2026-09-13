@@ -452,10 +452,15 @@ export class EditorMap {
     this.setting = false;
     this.targets(kind === 'path');
     this.lastDraft = {
-      id, kind, properties,
-      geometry: kind === 'building' ? { type: 'Polygon', coordinates: [[]] }
-        : kind === 'path' || kind === 'barrier' ? { type: 'LineString', coordinates: [] }
-          : { type: 'Point', coordinates: [] },
+      id,
+      kind,
+      properties,
+      geometry:
+        kind === 'building'
+          ? { type: 'Polygon', coordinates: [[]] }
+          : kind === 'path' || kind === 'barrier'
+            ? { type: 'LineString', coordinates: [] }
+            : { type: 'Point', coordinates: [] },
     };
     this.callbacks.draft(this.lastDraft);
     this.captureDraft();
