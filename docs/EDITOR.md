@@ -24,7 +24,17 @@ Use the inspector to change access, direction, steps, building heights, labels, 
 | Enter / Escape | Finish / cancel a drawing. |
 | Ctrl+Z / Ctrl+Shift+Z | Undo / redo a complete edit, including properties and connections. Cmd works on macOS. |
 
-Known heights are rendered normally. Unknown heights use muted illustrative 6 m blocks **only in the editor**. These placeholders are never stored as measurements or exported into campus packages. Documented floor counts use the existing estimate of 3 m per floor. This editor models outdoor ground-level geometry, not building interiors or terrain.
+Public and editor views share the same height rules. Recorded heights take precedence, documented floor counts use 3 m per floor, and unknown heights use muted illustrative 6 m blocks. The illustrative heights are never stored as measurements or exported into campus packages. The public map defaults to 3D and remembers a visitor's 2D/3D choice. Building details explain height provenance. This editor models outdoor ground-level geometry, not building interiors or terrain.
+
+Starting a drawing immediately collapses the explorer and route panel. Finish or cancel before selecting another feature, changing tools, or entering another review section. The prompt shows the first-point instruction and vertex count; Finish requires two distinct path points or three distinct building points. View changes and autosaves retain the drawing, including an empty session before the first point. Finish/Cancel restore the prior panel layout. Paths and barriers temporarily reduce building opacity to expose ground geometry.
+
+## Duplicate review
+
+Open **Duplicates** to review repeated names, nearby matching places and overlapping footprints. On opening the queue, exact matches with equivalent attributes, connections and associations are consolidated in a single undoable batch. Approximate or conflicting matches remain for individual review. Inspect either record on the map, select its survivor, or keep the pair separate. The survivor retains its geometry and direct path connection; useful names/provenance are combined and entrance associations are redirected. Saved/recent public place references resolve through published ID aliases.
+
+Decisions autosave through the existing batch API. Keep-separate decisions do not freeze source geometry; both kinds of decision survive source refreshes. Use **Undo last edit** or the standard undo/redo controls to reverse a decision. Nothing is removed from directed routing merely because its visual overlay overlaps another segment. Review access and closures before publishing any merged records.
+
+Topology and duplicate checks run in a worker. Geometry and property feedback remain immediate, and route previews wait for the current validation result. Repeated issue rows are grouped by feature identity, with all reasons shown together.
 
 The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
 

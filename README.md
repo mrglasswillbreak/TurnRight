@@ -51,10 +51,10 @@ Real browser captures from 9 September 2026. Mobile views use a responsive viewp
 | Compass and motion | Optional phone-direction cone and advisory movement status for navigation and walking surveys; Travel-up, North-up and Phone-up navigation with GPS-only fallback. **Awaiting device verification.** [Sensor guide](docs/MOTION.md). |
 | Spoken guidance | 19 packaged English maneuver/distance clips, mute, repeat, and optional device-local speech for place names. |
 | Appearance | Device light/dark preference by default, live system changes, persistent Light/Dark overrides, and an accessible three-option selector. |
-| Map display | 2D by default; optional 3D where measured heights or documented floor counts exist. Floor-derived heights are approximate; unknown heights remain flat. |
+| Map display | 3D by default with a remembered 2D/3D toggle, full-campus framing and selectable building surfaces. Recorded heights take precedence over floor-derived estimates; muted 6 m blocks illustrate unknown heights without changing source data. |
 | Offline maps | Verified resumable downloads, content-hash reuse, atomic activation, version/coverage information, storage checks, and explicit updates. |
 | Student reports | Place or pin reports with a category and description; private server submission, spam controls, and device-local offline drafts. |
-| Owner editor | Map-centered 2D/3D workspace, multiple entrances, snapped path junctions, shared vertex editing, needs-mapping list, undo/redo, automatic draft saving and offline recovery. [Editor guide](docs/EDITOR.md). |
+| Owner editor | Map-centered 2D/3D workspace, protected mouse/touch drawing sessions, snapped junctions, entrance routing, duplicate review, worker validation, undo/redo, automatic draft saving and offline recovery. [Editor guide](docs/EDITOR.md). |
 | Walking surveys | Owner-only phone recording, entrance markers, touch geometry review, partial path replacement, recoverable offline sessions and private survey sync. **Awaiting physical field verification.** [Survey guide](docs/SURVEY.md). |
 | Data maintenance | Daily/on-demand source imports, change review separate from corrections, immutable releases, preview/publish/rollback, and backup export. |
 
