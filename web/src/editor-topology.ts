@@ -1,4 +1,5 @@
 import { distance, projectSegment } from './geo.js';
+import { finitePosition } from './validation.js';
 import type {
   CampusData,
   ConnectionTarget,
@@ -140,15 +141,25 @@ export function applyConnections(
         aliases.set(from.id, to.id);
         // Keep aliases during assembly so references to new path vertices remain valid.
         nodes.set(from.id, { ...to, id: from.id });
-        data.graph.edges = data.graph.edges.map((e) => ({
-          ...e,
-          from: canonical(e.from),
-          to: canonical(e.to),
-          distance: distance(
-            nodes.get(canonical(e.from))!.coordinates,
-            nodes.get(canonical(e.to))!.coordinates,
-          ),
-        }));
+        data.graph.edges = data.graph.edges.map((e) => {
+          const start = nodes.get(canonical(e.from)),
+            end = nodes.get(canonical(e.to));
+          if (
+            !finitePosition(start?.coordinates) ||
+            !finitePosition(end?.coordinates)
+          ) {
+            errors.push(
+              `Path ${e.id} has a missing or invalid endpoint (${e.from}, ${e.to}).`,
+            );
+            return e;
+          }
+          return {
+            ...e,
+            from: start!.id,
+            to: end!.id,
+            distance: distance(start!.coordinates, end!.coordinates),
+          };
+        });
       }
       pending.splice(i, 1);
       progressed = true;
@@ -165,11 +176,9 @@ export function applyConnections(
       feature.geometry.type === 'LineString' &&
       ids?.length === feature.geometry.coordinates.length
     ) {
+      const original = feature.geometry.coordinates;
       feature.geometry.coordinates = ids.map(
-        (id, i) =>
-          nodes.get(canonical(id))?.coordinates ||
-          (feature.geometry.type === 'LineString' &&
-            feature.geometry.coordinates[i]) || [0, 0],
+        (id, i) => nodes.get(canonical(id))?.coordinates || original[i],
       );
       feature.properties!.vertexIds = ids.map(canonical);
     }

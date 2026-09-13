@@ -8,6 +8,7 @@ import {
 import { distance, projectSegment } from './geo.js';
 import { cachedGeometryBlocker } from './spatial.js';
 import { resolvePlaceId } from './map-display.js';
+import { structuralIssues, type ValidationPhase } from './validation.js';
 import type {
   CampusData,
   GraphNode,
@@ -240,7 +241,17 @@ export function assembleSources(
 export function applyEdits(
   base: CampusData,
   edits: MapEdit[],
+  phase?: (phase: ValidationPhase) => void,
 ): { data: CampusData; errors: string[]; warnings: string[] } {
+  phase?.('sources');
+  const structural = structuralIssues(base);
+  if (structural.length)
+    return {
+      data: base,
+      errors: structural.map((issue) => issue.message),
+      warnings: [],
+    };
+  phase?.('edits');
   const data = structuredClone(base),
     errors: string[] = [],
     warnings: string[] = [];
@@ -272,6 +283,7 @@ export function applyEdits(
   let canonical = (id: string) => id;
   const connectPaths = () => {
     if (connectedPaths) return;
+    phase?.('topology');
     canonical = applyConnections(
       data,
       nodes,
@@ -279,6 +291,7 @@ export function applyEdits(
       errors,
     );
     connectedPaths = true;
+    phase?.('edits');
   };
   const rank = {
     path: 0,
@@ -748,6 +761,7 @@ export function applyEdits(
     }
   }
   const ids = new Set<string>();
+  phase?.('geometry');
   const blockedGeometry = cachedGeometryBlocker(data.map);
   for (const edge of data.graph.edges) {
     const a = nodes.get(edge.from),
