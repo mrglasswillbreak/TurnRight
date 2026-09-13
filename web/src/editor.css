@@ -1067,8 +1067,16 @@
 .drawing-progress { flex-basis: 100%; color: var(--ed-text); }
 .editor-finish-controls button { min-height: 40px; }
 @media (max-width: 767px) {
-  .editor-navigation { gap: 7px; }
+  .editor-navigation { gap: 7px; overflow-x: auto; min-width: 0; }
   .editor-brand strong { font-size: 13px; }
   .editor-brand strong span { font-size: 9px; }
   .editor-header .editor-primary { padding: 9px; }
 }
+.duplicate-review { font-size: 12px; }
+.duplicate-pair { border-top: 1px solid var(--ed-line); padding: 14px 0; }
+.duplicate-pair h3 { font-size: 14px; margin: 0 0 6px; }
+.duplicate-record { padding: 12px; margin: 8px 0; border: 1px solid var(--ed-line); border-radius: 10px; background: var(--ed-soft); }
+.duplicate-record strong, .duplicate-record small, .duplicate-record code { display: block; margin-bottom: 6px; overflow-wrap: anywhere; }
+.duplicate-record code { font-size: 10px; color: var(--ed-muted); }
+.duplicate-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.duplicate-actions button { font-size: 11px !important; }

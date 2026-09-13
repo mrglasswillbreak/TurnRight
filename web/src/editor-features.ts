@@ -100,12 +100,13 @@ export function featureEdit(
   id: string,
   edits: MapEdit[],
 ): MapEdit | undefined {
-  const saved = edits.find(
+  const stored = edits.find(
     (e) =>
       e.id === id &&
       e.kind === kind &&
       !(e.deleted && e.properties.revertToSource),
   );
+  const saved = stored?.properties.duplicateReviewOnly ? undefined : stored;
   if (kind === 'entrance') {
     if (saved) return structuredClone(saved);
     const e = data.entrances?.find((e) => e.id === id);
@@ -139,6 +140,7 @@ export function featureEdit(
           faculty: p.faculty,
           buildingId: p.buildingId,
           sourceRefs: p.sourceRefs,
+          duplicateKeepSeparate: stored?.properties.duplicateKeepSeparate,
         },
       };
   }
@@ -154,6 +156,7 @@ export function featureEdit(
     properties: {
       ...f.properties,
       ...saved?.properties,
+      duplicateKeepSeparate: stored?.properties.duplicateKeepSeparate,
       name:
         f.properties?.name || (kind === 'path' ? 'Campus path' : 'Building'),
     },

@@ -1048,6 +1048,30 @@ test('public initial camera includes the northern campus', async ({ page }) => {
   }
 });
 
+test('duplicate queue keeps same-name campus records separate and supports undo and reload', async ({ page }) => {
+  const server = await setup(page, true);
+  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Duplicate review', exact: true })).toBeVisible();
+  const pair = page.locator('.duplicate-pair').first();
+  await expect(pair).toBeVisible();
+  const original = await page.locator('.duplicate-review [role=status]').textContent();
+  await pair.getByRole('button', { name: 'Keep these records separate' }).click();
+  await expect(page.locator('.duplicate-review [role=status]')).not.toHaveText(original!);
+  await expect.poll(() => server.edits().filter(e => e.properties.duplicateKeepSeparate).length).toBe(2);
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.getByRole('button', { name: 'Undo last edit' }).click();
+  await expect(page.locator('.duplicate-review [role=status]')).toHaveText(original!);
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.locator('.duplicate-pair').first().getByRole('button', { name: 'Keep record 1 and merge' }).click();
+  await expect.poll(() => server.edits().filter(e => e.deleted && e.properties.mergedInto && !e.properties.revertToSource).length).toBe(1);
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  const count = await page.locator('.duplicate-review [role=status]').textContent();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await expect(page.locator('.duplicate-review [role=status]')).toHaveText(count!);
+});
+
 for (const threeD of [false, true])
   test(`map two entrances and their approaches in ${threeD ? '3D' : '2D'}, save and reload`, async ({
     page,

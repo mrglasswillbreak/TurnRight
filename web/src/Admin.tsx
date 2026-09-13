@@ -31,6 +31,8 @@ import { MapView } from './MapView';
 import { api, supabase } from './supabase';
 import { assembleSources, type SourceRecord } from './editor-model';
 import { useEditorValidation } from './useEditorValidation';
+import { DuplicateReview } from './DuplicateReview';
+import { duplicateDecision, exactDuplicateEdits, type DuplicateCandidate } from './duplicates';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
 import { drawingProgress } from './drawing-state';
@@ -322,6 +324,37 @@ function Editor({
   const calculate = useRoutes();
   const base = useMemo(() => assembleSources(sources, data), [sources, data]);
   const validation = useEditorValidation(base, workspace.edits);
+  const autoReviewed = useRef(new WeakSet<CampusData>());
+  const mergeBatch = async (batch: MapEdit[], success: string) => {
+    if (!batch.length || tool || workspace.unfinished || validation.pending) return;
+    setBusy(true);
+    const original = workspace.edits;
+    try {
+      const next = [...original.filter(e => !batch.some(b => editKey(b) === editKey(e))), ...batch];
+      const checked = await validation.check(next);
+      if (workspace.edits !== original) throw new Error('The draft changed. Review this pair again.');
+      const newErrors = checked.errors.filter(e => !validation.errors.includes(e));
+      if (newErrors.length) throw new Error(newErrors.join(' '));
+      workspace.commit(batch, null);
+      setSelected(null);
+      selectedRef.current = null;
+      controller.current?.select(null);
+      setRoutes([]);
+      setMessage(success);
+    } catch (error) { setError((error as Error).message); }
+    finally { setBusy(false); }
+  };
+  const decideDuplicate = async (candidate: DuplicateCandidate, survivor?: string) => {
+    try {
+      await mergeBatch(duplicateDecision(validation.data, workspace.edits, candidate, survivor), survivor ? 'Records merged. Saved place references and entrances now use the survivor. Undo restores both.' : 'Records kept separate. This decision is retained through source refreshes.');
+    } catch (error) { setError((error as Error).message); }
+  };
+  useEffect(() => {
+    if (tab !== 'duplicates' || validation.pending || busy || tool || workspace.unfinished || autoReviewed.current.has(base)) return;
+    autoReviewed.current.add(base);
+    const batch = exactDuplicateEdits(validation.data, workspace.edits, validation.duplicates);
+    if (batch.length) void mergeBatch(batch, `${batch.filter(e => e.deleted).length} exact duplicate records consolidated. Undo is available.`);
+  }, [tab, validation, base, busy, tool, workspace.edits]);
   const visible = preview ? base : validation.data;
   const invalid = useMemo(
     () =>
@@ -860,13 +893,20 @@ function Editor({
           name: String(edit.properties.name),
           reason: invalid.has(edit.id) ? 'Needs repair' : 'Review connection',
         });
-    return result;
+    const grouped = new Map<string, typeof result[number]>();
+    for (const task of result) {
+      const key = `${task.kind}:${task.id}`, previous = grouped.get(key);
+      const reasons = issues.filter(issue => issue.startsWith(`${task.id}:`) || issue.startsWith(`${task.name}:`)).map(issue => issue.slice(issue.indexOf(':') + 1).trim());
+      const combined = [...new Set([...(previous ? previous.reason.split(' · ') : []), task.reason, ...reasons])];
+      grouped.set(key, { ...task, reason: combined.join(' · ') });
+    }
+    return [...grouped.values()];
   }, [validation, workspace.edits, invalid, issues]);
   const visibleTasks = tasks.filter(
     (t) =>
       `${t.name} ${t.reason}`.toLowerCase().includes(search.toLowerCase()) &&
       (filter === 'all' ||
-        (filter === 'needs' && !t.reason.startsWith('Mapped')) ||
+        (filter === 'needs' && (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||
         (filter === 'drafts' &&
           workspace.edits.some(
             (e) =>
@@ -943,6 +983,7 @@ function Editor({
           {[
             ['map', 'Workspace'],
             ['changes', 'Sources'],
+            ['duplicates', 'Duplicates'],
             ['reports', 'Reports'],
             ['releases', 'Releases'],
           ].map(([id, label]) => (
@@ -950,7 +991,7 @@ function Editor({
               key={id}
               className={tab === id ? 'active' : ''}
               disabled={!!tool || !!workspace.unfinished}
-              onClick={() => setTab(id)}
+              onClick={() => { setTab(id); if (id !== 'map') setExplorer(false); }}
             >
               {label}
               {id === 'reports' && state.reports.length > 0 && (
@@ -1356,7 +1397,15 @@ function Editor({
                 <X size={18} />
               </button>
             </div>
-            <EditorReview
+            {tab === 'duplicates' ? <DuplicateReview
+              data={validation.data}
+              candidates={validation.duplicates}
+              pending={validation.pending || busy}
+              decide={decideDuplicate}
+              inspect={(kind, id) => selectId(kind, id, true)}
+              undo={() => undo()}
+              canUndo={!!workspace.past.length}
+            /> : <EditorReview
               tab={tab}
               state={state}
               workspace={workspace}
@@ -1368,7 +1417,7 @@ function Editor({
               setPreview={setPreview}
               review={review}
               setReview={setReview}
-            />
+            />}
           </aside>
         ) : selected && !preview ? (
           <EditorInspector

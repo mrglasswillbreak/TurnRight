@@ -111,19 +111,22 @@ export function findDuplicateCandidates(data: CampusData, edits: MapEdit[] = [])
 }
 function editable(data: CampusData, edits: MapEdit[], kind: DuplicateKind, id: string): MapEdit {
   const saved = edits.find(e => e.kind === kind && e.id === id && !e.deleted);
-  if (saved) return structuredClone(saved);
+  if (saved && !saved.properties.duplicateReviewOnly) return structuredClone(saved);
   if (kind === 'place') {
     const p = data.places.find(p => p.id === id);
     if (!p) throw new Error('This place changed. Refresh duplicate review.');
-    return { id, kind, geometry: { type: 'Point', coordinates: p.coordinates }, properties: { ...p, aliases: p.aliases.join(', ') } };
+    return { id, kind, geometry: { type: 'Point', coordinates: p.coordinates }, properties: { ...p, aliases: p.aliases.join(', '), duplicateKeepSeparate: saved?.properties.duplicateKeepSeparate } };
   }
   const f = data.map.features.find(f => f.properties?.kind === kind && f.properties.id === id);
   if (!f) throw new Error('This building changed. Refresh duplicate review.');
-  return { id, kind, geometry: structuredClone(f.geometry), properties: { ...f.properties, name: String(f.properties?.name || 'Unnamed building') } };
+  return { id, kind, geometry: structuredClone(f.geometry), properties: { ...f.properties, name: String(f.properties?.name || 'Unnamed building'), duplicateKeepSeparate: saved?.properties.duplicateKeepSeparate } };
 }
 export function duplicateDecision(data: CampusData, edits: MapEdit[], candidate: DuplicateCandidate, survivor?: string): MapEdit[] {
   const [a, b] = candidate.ids.map(id => editable(data, edits, candidate.kind, id));
-  if (!survivor) return [a, b].map((e, i) => ({ ...e, properties: { ...e.properties, duplicateKeepSeparate: [...new Set([...(e.properties.duplicateKeepSeparate || []), candidate.ids[1 - i]])] } }));
+  if (!survivor) return [a, b].map((e, i) => {
+    const saved = edits.find(previous => previous.id === e.id && previous.kind === e.kind && !previous.deleted);
+    return { ...e, properties: { ...e.properties, duplicateReviewOnly: !saved || !!saved.properties.duplicateReviewOnly, duplicateKeepSeparate: [...new Set([...(e.properties.duplicateKeepSeparate || []), candidate.ids[1 - i]])] } };
+  });
   if (!candidate.ids.includes(survivor)) throw new Error('Choose one of these records to keep.');
   const keep = survivor === a.id ? a : b, remove = survivor === a.id ? b : a;
   const aliases = [...new Set([String(remove.properties.name || ''), ...String(keep.properties.aliases || '').split(','), ...String(remove.properties.aliases || '').split(',')].map(s => s.trim()).filter(s => s && s !== keep.properties.name))];
@@ -134,11 +137,21 @@ export function duplicateDecision(data: CampusData, edits: MapEdit[], candidate:
   ];
 }
 export function exactDuplicateEdits(data: CampusData, edits: MapEdit[], candidates: DuplicateCandidate[]) {
-  const used = new Set<string>(), batch: MapEdit[] = [];
-  for (const candidate of candidates.filter(c => c.exact)) {
-    if (candidate.ids.some(id => used.has(`${candidate.kind}:${id}`))) continue;
-    batch.push(...duplicateDecision(data, edits, candidate, [...candidate.ids].sort()[0]));
-    candidate.ids.forEach(id => used.add(`${candidate.kind}:${id}`));
+  const parents = new Map<string, string>();
+  const root = (id: string): string => parents.has(id) ? root(parents.get(id)!) : id;
+  const batch = new Map<string, MapEdit>();
+  const current = new Map(edits.map(e => [`${e.kind}:${e.id}`, e]));
+  for (const candidate of candidates.filter(c => c.exact).sort((a, b) => a.key.localeCompare(b.key))) {
+    const ids = candidate.ids.map(id => root(`${candidate.kind}:${id}`));
+    if (ids[0] === ids[1]) continue;
+    const [keep, remove] = ids.sort();
+    const plain = (key: string) => key.slice(candidate.kind.length + 1);
+    for (const edit of duplicateDecision(data, [...current.values()], { ...candidate, ids: [plain(keep), plain(remove)] }, plain(keep))) {
+      const key = `${edit.kind}:${edit.id}`;
+      batch.set(key, edit);
+      current.set(key, edit);
+    }
+    parents.set(remove, keep);
   }
-  return batch;
+  return [...batch.values()];
 }

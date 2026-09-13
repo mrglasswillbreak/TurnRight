@@ -16,6 +16,15 @@ function building(id: string): Feature<Polygon> {
   return { type: 'Feature', properties: { id, kind: 'building', name: 'Hall', height: 0 }, geometry: { type: 'Polygon', coordinates: [[[3.2001, 6.461], [3.2003, 6.461], [3.2003, 6.4612], [3.2001, 6.4612], [3.2001, 6.461]]] } };
 }
 describe('duplicate review', () => {
+  it('consolidates every member of an exact group in one undoable batch', () => {
+    const data = duplicatePlaces();
+    data.places.push({ ...data.places[0], id: 'library-third', sourceId: 'third' });
+    const result = applyEdits(data, exactDuplicateEdits(data, [], findDuplicateCandidates(data)));
+    expect(result.errors).toEqual([]);
+    expect(result.data.places).toHaveLength(1);
+    expect(result.data.places[0].sourceRefs).toEqual(expect.arrayContaining(['library-copy', 'library-third']));
+    expect(resolvePlaceIds(result.data, ['library-copy', 'library-third'])).toEqual(['library']);
+  });
   it('consolidates exact equivalent places and resolves saved IDs and routes', () => {
     const data = duplicatePlaces(), candidates = findDuplicateCandidates(data);
     expect(candidates).toHaveLength(1);
@@ -35,8 +44,13 @@ describe('duplicate review', () => {
     expect(candidates[0].exact).toBe(false);
     expect(exactDuplicateEdits(data, [], candidates)).toEqual([]);
     const edits = duplicateDecision(data, [], candidates[0]);
-    const kept = applyEdits(structuredClone(data), edits);
+    const refreshed = structuredClone(data);
+    refreshed.places[1].name = 'Renamed by source';
+    refreshed.places[1].coordinates = [3.204, 6.462];
+    const kept = applyEdits(refreshed, edits);
     expect(kept.data.places).toHaveLength(2);
+    expect(kept.data.places[1].name).toBe('Renamed by source');
+    expect(kept.data.places[1].coordinates).toEqual([3.204, 6.462]);
     expect(findDuplicateCandidates(kept.data, edits)).toEqual([]);
   });
   it('preserves directed access, closures and entrances through a merge and undo', async () => {

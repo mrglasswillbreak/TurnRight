@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { applyEdits } from './editor-model';
 import type { CampusData, MapEdit } from './types';
 import { RevisionWorker } from './revision-worker';
+import type { DuplicateCandidate } from './duplicates';
 
-type Validation = ReturnType<typeof applyEdits>;
+type Validation = ReturnType<typeof applyEdits> & { duplicates: DuplicateCandidate[] };
 export function retainCampusSources(previous: CampusData, next: CampusData): CampusData {
   // Worker replies have new identities even when only a place name changed.
   for (const key of ['map', 'graph', 'boundary', 'places', 'closures', 'entrances'] as const) {
@@ -13,7 +14,7 @@ export function retainCampusSources(previous: CampusData, next: CampusData): Cam
 }
 export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
   const worker = useRef<RevisionWorker<CampusData, MapEdit[], Validation> | null>(null);
-  const [state, setState] = useState<{ base: CampusData; edits: MapEdit[] | null; result: Validation }>({ base, edits: null, result: { data: base, errors: [], warnings: [] } });
+  const [state, setState] = useState<{ base: CampusData; edits: MapEdit[] | null; result: Validation }>({ base, edits: null, result: { data: base, errors: [], warnings: [], duplicates: [] } });
   useEffect(() => {
     const client = new RevisionWorker<CampusData, MapEdit[], Validation>(new Worker(new URL('./editor-validation.worker.ts', import.meta.url), { type: 'module' }));
     worker.current = client;
@@ -28,7 +29,7 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
     void check(edits).then(result => {
       if (!cancelled) setState(previous => ({ base, edits, result: { ...result, data: retainCampusSources(previous.result.data, result.data) } }));
     }).catch(error => {
-      if (!cancelled) setState({ base, edits, result: { data: base, errors: [(error as Error).message], warnings: [] } });
+      if (!cancelled) setState({ base, edits, result: { data: base, errors: [(error as Error).message], warnings: [], duplicates: [] } });
     });
     return () => { cancelled = true; };
   }, [base, edits, check]);

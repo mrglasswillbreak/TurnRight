@@ -261,6 +261,8 @@ export function applyEdits(
       continue;
     }
     const props = edit.properties;
+    // A keep-separate decision must not freeze source geometry or metadata.
+    if (props.duplicateReviewOnly && !edit.deleted) continue;
     if (['entrance', 'barrier', 'closure'].includes(edit.kind)) connectPaths();
     if (edit.kind === 'place') {
       const previous = data.places.find((p) => p.id === edit.id);
