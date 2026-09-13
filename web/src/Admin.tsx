@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowUp,
@@ -32,6 +32,7 @@ import { api, supabase } from './supabase';
 import { assembleSources, type SourceRecord } from './editor-model';
 import { useEditorValidation } from './useEditorValidation';
 import { DuplicateReview } from './DuplicateReview';
+import { buildingPlace } from './map-display';
 import { duplicateDecision, exactDuplicateEdits, type DuplicateCandidate } from './duplicates';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
@@ -325,7 +326,7 @@ function Editor({
   const base = useMemo(() => assembleSources(sources, data), [sources, data]);
   const validation = useEditorValidation(base, workspace.edits);
   const autoReviewed = useRef(new WeakSet<CampusData>());
-  const mergeBatch = async (batch: MapEdit[], success: string) => {
+  const mergeBatch = useCallback(async (batch: MapEdit[], success: string) => {
     if (!batch.length || tool || workspace.unfinished || validation.pending) return;
     setBusy(true);
     const original = workspace.edits;
@@ -343,7 +344,7 @@ function Editor({
       setMessage(success);
     } catch (error) { setError((error as Error).message); }
     finally { setBusy(false); }
-  };
+  }, [tool, workspace, validation]);
   const decideDuplicate = async (candidate: DuplicateCandidate, survivor?: string) => {
     try {
       await mergeBatch(duplicateDecision(validation.data, workspace.edits, candidate, survivor), survivor ? 'Records merged. Saved place references and entrances now use the survivor. Undo restores both.' : 'Records kept separate. This decision is retained through source refreshes.');
@@ -354,7 +355,7 @@ function Editor({
     autoReviewed.current.add(base);
     const batch = exactDuplicateEdits(validation.data, workspace.edits, validation.duplicates);
     if (batch.length) void mergeBatch(batch, `${batch.filter(e => e.deleted).length} exact duplicate records consolidated. Undo is available.`);
-  }, [tab, validation, base, busy, tool, workspace.edits]);
+  }, [tab, validation, base, busy, tool, workspace.edits, workspace.unfinished, mergeBatch]);
   const visible = preview ? base : validation.data;
   const invalid = useMemo(
     () =>
@@ -462,18 +463,11 @@ function Editor({
   const addEntrance = () => {
     const edit = selectedRef.current;
     if (!edit) return;
-    const place = validation.data.places.find(
-      (p) =>
-        p.id ===
-        (edit.kind === 'place' ? edit.id : edit.properties.placeId || edit.id),
-    );
-    const buildingId =
-      edit.kind === 'building'
-        ? edit.id
-        : validation.data.map.features.find(
-            (f) =>
-              f.properties?.id === edit.id && f.properties?.kind === 'building',
-          )?.properties?.id;
+    const building = validation.data.map.features.find(f => f.properties?.kind === 'building' &&
+      (edit.kind === 'building' ? f.properties.id === edit.id : buildingPlace(validation.data, f)?.id === edit.id));
+    const place = edit.kind === 'place' ? validation.data.places.find(p => p.id === edit.id)
+      : building ? buildingPlace(validation.data, building) : undefined;
+    const buildingId = building?.properties?.id;
     begin('entrance', {
       name: `${place?.name || edit.properties.name || 'Building'} entrance`,
       placeId: place?.id || '',

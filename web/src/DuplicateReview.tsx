@@ -16,7 +16,7 @@ export function DuplicateReview({ data, candidates, pending, decide, inspect, un
     <p className="small-note">Exact matches with equivalent attributes and connections are consolidated when this queue opens. Review the remaining pairs individually. A repeated name can belong to separate buildings.</p>
     <button className="editor-text" disabled={!canUndo || pending} onClick={undo}>Undo last edit</button>
     <label className="field-label">Find a pair<input value={search} onChange={e => setSearch(e.target.value)} placeholder="Name or record ID" /></label>
-    <p role="status">{pending ? 'Checking the latest draft…' : `${filtered.length} pairs to review`}</p>
+    <output>{pending ? 'Checking the latest draft…' : `${filtered.length} pairs to review`}</output>
     {!pending && !filtered.length && <p className="small-note">No unresolved pairs match this view.</p>}
     {filtered.slice(0, 50).map(candidate => <article className="duplicate-pair" key={candidate.key}>
       <h3>{candidate.reason}</h3>
