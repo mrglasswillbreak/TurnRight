@@ -663,6 +663,51 @@ test('prepared offline survey cold-starts, records, recovers and privately syncs
   );
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
 });
+test('prepared public map reopens in 3D offline with its saved view preference', async ({
+  page,
+  context,
+}, testInfo) => {
+  test.skip(
+    !testInfo.config.configFile?.includes('pwa.config'),
+    'Requires the production service worker configuration.',
+  );
+  await setup(page);
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.goto('/');
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Offline', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Download campus map', exact: true })
+    .click();
+  await expect(
+    page.getByText('Ready offline', { exact: true }).first(),
+  ).toBeVisible();
+  await context.setOffline(true);
+  await page.goto('/');
+  await attachMap(page);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBe(45);
+  expect(
+    await page.evaluate(async () => {
+      const data = (await (
+        window.editorTestMap.getSource(
+          'campus',
+        ) as import('maplibre-gl').GeoJSONSource
+      ).getData()) as import('geojson').FeatureCollection;
+      return data.features.find(
+        (f) => f.properties?.heightKind === 'illustrative',
+      )?.properties?.displayHeight;
+    }),
+  ).toBe(6);
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBe(0);
+});
+
 test('phone survey pauses when hidden and requires explicit resume after reload', async ({
   page,
 }) => {
@@ -963,72 +1008,147 @@ async function focusCampus(page: Page) {
 }
 
 for (const touch of [false, true])
-  test(`drawing session protects the first point and restores panels with ${touch ? 'touch' : 'mouse'}`, async ({ browser }) => {
+  test(`drawing session protects the first point and restores panels with ${touch ? 'touch' : 'mouse'}`, async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       baseURL: 'http://127.0.0.1:5183',
-      viewport: touch ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
-      hasTouch: touch, isMobile: touch,
+      viewport: touch
+        ? { width: 390, height: 844 }
+        : { width: 1440, height: 1000 },
+      hasTouch: touch,
+      isMobile: touch,
     });
     const page = await context.newPage();
     try {
       const server = await setup(page);
       await focusCampus(page);
-      await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Draw path', exact: true })
+        .click();
       await expect(page.locator('.editor-explorer')).toHaveClass(/collapsed/);
-      await expect(page.getByText('Click or tap the map to place the first point.')).toBeVisible();
+      await expect(
+        page.getByText('Click or tap the map to place the first point.'),
+      ).toBeVisible();
       const finish = page.getByRole('button', { name: 'Finish', exact: true });
       await expect(finish).toBeDisabled();
-      await expect(page.getByRole('button', { name: 'Draw building', exact: true })).toBeDisabled();
-      await expect(page.getByRole('button', { name: 'Compare base', exact: true })).toBeDisabled();
+      await expect(
+        page.getByRole('button', { name: 'Draw building', exact: true }),
+      ).toBeDisabled();
+      await expect(
+        page.getByRole('button', { name: 'Compare base', exact: true }),
+      ).toBeDisabled();
       const point = await position(page, [3.20015, 6.4601]);
       if (touch) await page.touchscreen.tap(point.x, point.y);
       else await page.mouse.click(point.x, point.y);
-      await expect(page.locator('.drawing-progress')).toContainText('1 point placed');
+      await expect(page.locator('.drawing-progress')).toContainText(
+        '1 point placed',
+      );
       await expect(finish).toBeDisabled();
-      await expect.poll(() => page.evaluate(() => window.editorTestMap.queryRenderedFeatures().filter(f => /td-/.test(f.layer.id) && f.geometry.type === 'Point').length)).toBeGreaterThan(0);
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () =>
+              window.editorTestMap
+                .queryRenderedFeatures()
+                .filter(
+                  (f) => /td-/.test(f.layer.id) && f.geometry.type === 'Point',
+                ).length,
+          ),
+        )
+        .toBeGreaterThan(0);
       await page.getByRole('button', { name: '3D', exact: true }).click();
-      await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBeGreaterThan(45);
-      await expect(page.locator('.drawing-progress')).toContainText('1 point placed');
-      const second = await position(page, [3.2004, 6.4601]);
+      await expect
+        .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+        .toBeGreaterThan(45);
+      await expect(page.locator('.drawing-progress')).toContainText(
+        '1 point placed',
+      );
+      const second = await position(page, [3.2004, 6.46]);
       if (touch) await page.touchscreen.tap(second.x, second.y);
       else await page.mouse.click(second.x, second.y);
       await expect(finish).toBeEnabled();
+      await expect(page.locator('.editor-guidance')).toContainText(
+        'Connect to',
+      );
       await finish.click();
-      await expect(page.locator('.editor-explorer')).not.toHaveClass(/collapsed/);
-      await expect.poll(() => server.edits().filter(e => e.kind === 'path').length).toBe(1);
-      await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+      await expect(page.locator('.editor-explorer')).not.toHaveClass(
+        /collapsed/,
+      );
+      await expect
+        .poll(() => server.edits().filter((e) => e.kind === 'path').length)
+        .toBe(1);
+      expect(
+        server.edits().find((e) => e.kind === 'path')?.properties.connections
+          ?.length,
+      ).toBeGreaterThan(0);
+      await page
+        .getByRole('button', { name: 'Draw path', exact: true })
+        .click();
       await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-      await expect(page.locator('.editor-explorer')).not.toHaveClass(/collapsed/);
-      expect(server.edits().filter(e => e.kind === 'path')).toHaveLength(1);
-    } finally { await context.close(); }
+      await expect(page.locator('.editor-explorer')).not.toHaveClass(
+        /collapsed/,
+      );
+      expect(server.edits().filter((e) => e.kind === 'path')).toHaveLength(1);
+    } finally {
+      await context.close();
+    }
   });
 
-test('public map defaults to 3D, frames campus and opens building details', async ({ page }) => {
+test('public map defaults to 3D, frames campus and opens building details', async ({
+  page,
+}) => {
   const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error' && message.text().includes('Campus map:')) errors.push(message.text()); });
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error' && message.text().includes('Campus map:'))
+      errors.push(message.text());
+  });
   await setup(page);
   await page.goto('/');
   await attachMap(page);
-  await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBe(45);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBe(45);
   const heights = await page.evaluate(async () => {
-    const source = window.editorTestMap.getSource('campus') as import('maplibre-gl').GeoJSONSource;
-    const data = await source.getData() as import('geojson').FeatureCollection;
-    return data.features.filter(f => f.properties?.kind === 'building').map(f => [f.properties?.id, f.properties?.displayHeight, f.properties?.heightKind]);
+    const source = window.editorTestMap.getSource(
+      'campus',
+    ) as import('maplibre-gl').GeoJSONSource;
+    const data =
+      (await source.getData()) as import('geojson').FeatureCollection;
+    return data.features
+      .filter((f) => f.properties?.kind === 'building')
+      .map((f) => [
+        f.properties?.id,
+        f.properties?.displayHeight,
+        f.properties?.heightKind,
+      ]);
   });
   expect(heights).toContainEqual(['unknown-building', 6, 'illustrative']);
   expect(heights).toContainEqual(['library', 15, 'recorded']);
   await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await page.reload();
   await attachMap(page);
-  await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBe(0);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBe(0);
   await focusCampus(page);
   await clickMap(page, [3.20012, 6.46022]);
   await expect(page.getByText('15 m · recorded height')).toBeVisible();
-  await page.evaluate(() => window.editorTestMap.jumpTo({ center: [3.2007, 6.4603], zoom: 19, padding: { top: 0, right: 0, bottom: 0, left: 0 } }));
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.2007, 6.4603],
+      zoom: 19,
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    }),
+  );
   await clickMap(page, [3.2007, 6.4603]);
-  await expect(page.getByRole('dialog')).toContainText('Height unknown · illustrative 6 m block');
-  await expect(page.getByRole('button', { name: 'Report building details' })).toBeVisible();
+  await expect(page.getByRole('dialog')).toContainText(
+    'Height unknown · illustrative 6 m block',
+  );
+  await expect(
+    page.getByRole('button', { name: 'Report building details' }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -1036,9 +1156,14 @@ test('public initial camera includes the northern campus', async ({ page }) => {
   const { campus } = await setup(page, true);
   await page.goto('/');
   await attachMap(page);
-  const corners = await page.evaluate(bounds => {
+  const corners = await page.evaluate((bounds) => {
     const map = window.editorTestMap;
-    return [bounds[0], bounds[1], [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[0][1]]].map(p => map.project(p as Position));
+    return [
+      bounds[0],
+      bounds[1],
+      [bounds[0][0], bounds[1][1]],
+      [bounds[1][0], bounds[0][1]],
+    ].map((p) => map.project(p as Position));
   }, campus.bounds);
   for (const point of corners) {
     expect(point.x).toBeGreaterThan(450);
@@ -1046,30 +1171,117 @@ test('public initial camera includes the northern campus', async ({ page }) => {
     expect(point.y).toBeGreaterThan(0);
     expect(point.y).toBeLessThan(1000);
   }
+  await page.screenshot({ path: 'test-results/public-campus-3d-light.png' });
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.editorTestMap.getPaintProperty('background', 'background-color'),
+      ),
+    )
+    .toBe('#172126');
+  await page.screenshot({ path: 'test-results/public-campus-3d-dark.png' });
 });
 
-test('duplicate queue keeps same-name campus records separate and supports undo and reload', async ({ page }) => {
+test('public phone starts at 40 degrees and frames campus in both preferences', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    baseURL: 'http://127.0.0.1:5183',
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await context.newPage();
+  try {
+    const { campus } = await setup(page, true);
+    await page.goto('/');
+    await attachMap(page);
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+      .toBe(40);
+    await page
+      .getByRole('button', { name: 'Switch to 2D', exact: true })
+      .click();
+    await page.reload();
+    await attachMap(page);
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+      .toBe(0);
+    const points = await page.evaluate(
+      (bounds) =>
+        [bounds[0], bounds[1]].map((p) => window.editorTestMap.project(p)),
+      campus.bounds,
+    );
+    for (const p of points) {
+      expect(p.x).toBeGreaterThan(0);
+      expect(p.x).toBeLessThan(390);
+      expect(p.y).toBeGreaterThan(0);
+      expect(p.y).toBeLessThan(844);
+    }
+  } finally {
+    await context.close();
+  }
+});
+
+test('duplicate queue keeps same-name campus records separate and supports undo and reload', async ({
+  page,
+}) => {
   const server = await setup(page, true);
   await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Duplicate review', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Duplicate review', exact: true }),
+  ).toBeVisible();
   const pair = page.locator('.duplicate-pair').first();
   await expect(pair).toBeVisible();
-  const original = await page.locator('.duplicate-review [role=status]').textContent();
-  await pair.getByRole('button', { name: 'Keep these records separate' }).click();
-  await expect(page.locator('.duplicate-review [role=status]')).not.toHaveText(original!);
-  await expect.poll(() => server.edits().filter(e => e.properties.duplicateKeepSeparate).length).toBe(2);
+  await expect(page.locator('.duplicate-review output')).toHaveText(
+    /\d+ pairs to review/,
+  );
+  const original = await page.locator('.duplicate-review output').textContent();
+  await pair
+    .getByRole('button', { name: 'Keep these records separate' })
+    .click();
+  await expect(page.locator('.duplicate-review output')).not.toHaveText(
+    original!,
+  );
+  await expect
+    .poll(
+      () =>
+        server.edits().filter((e) => e.properties.duplicateKeepSeparate).length,
+    )
+    .toBe(2);
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
   await page.getByRole('button', { name: 'Undo last edit' }).click();
-  await expect(page.locator('.duplicate-review [role=status]')).toHaveText(original!);
+  await expect(page.locator('.duplicate-review output')).toHaveText(original!);
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
-  await page.locator('.duplicate-pair').first().getByRole('button', { name: 'Keep record 1 and merge' }).click();
-  await expect.poll(() => server.edits().filter(e => e.deleted && e.properties.mergedInto && !e.properties.revertToSource).length).toBe(1);
+  await page
+    .locator('.duplicate-pair')
+    .first()
+    .getByRole('button', { name: 'Keep record 1 and merge' })
+    .click();
+  await expect
+    .poll(
+      () =>
+        server
+          .edits()
+          .filter(
+            (e) =>
+              e.deleted &&
+              e.properties.mergedInto &&
+              !e.properties.revertToSource,
+          ).length,
+    )
+    .toBe(1);
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
-  const count = await page.locator('.duplicate-review [role=status]').textContent();
+  await expect(page.locator('.duplicate-review output')).toHaveText(
+    /\d+ pairs to review/,
+  );
+  const count = await page.locator('.duplicate-review output').textContent();
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
-  await expect(page.locator('.duplicate-review [role=status]')).toHaveText(count!);
+  await expect(page.locator('.duplicate-review output')).toHaveText(count!);
 });
 
 for (const threeD of [false, true])
@@ -1265,6 +1477,15 @@ test('recovers unfinished geometry and preserves it when switching 2D/3D', async
   await setup(page);
   await focusCampus(page);
   await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+  await expect(page.locator('.drawing-progress')).toContainText('first point');
+  await page.reload();
+  await attachMap(page);
+  await expect(page.getByText('Unfinished drawing recovered')).toBeVisible();
+  await page.getByRole('button', { name: 'Resume drawing' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Finish', exact: true }),
+  ).toBeDisabled();
+  await focusCampus(page);
   await clickMap(page, [3.2005, 6.4601]);
   await clickMap(page, [3.2006, 6.4601]);
   await page.getByRole('button', { name: '3D', exact: true }).click();

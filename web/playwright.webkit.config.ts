@@ -2,7 +2,10 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
-  grep: /phone survey|motion assistance/,
+  // Windows WebKit's software renderer needs longer for cold map initialization.
+  timeout: 120000,
+  expect: { timeout: 30000 },
+  grep: /phone survey|motion assistance|drawing session.*touch|public phone/,
   use: {
     ...base.use,
     browserName: 'webkit',
