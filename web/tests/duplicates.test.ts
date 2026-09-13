@@ -45,11 +45,11 @@ describe('duplicate review', () => {
     expect(exactDuplicateEdits(data, [], candidates)).toEqual([]);
     const edits = duplicateDecision(data, [], candidates[0]);
     const refreshed = structuredClone(data);
-    refreshed.places[1].name = 'Renamed by source';
+    refreshed.places[1].name = 'LIBRARY';
     refreshed.places[1].coordinates = [3.204, 6.462];
     const kept = applyEdits(refreshed, edits);
     expect(kept.data.places).toHaveLength(2);
-    expect(kept.data.places[1].name).toBe('Renamed by source');
+    expect(kept.data.places[1].name).toBe('LIBRARY');
     expect(kept.data.places[1].coordinates).toEqual([3.204, 6.462]);
     expect(findDuplicateCandidates(kept.data, edits)).toEqual([]);
   });
@@ -105,6 +105,16 @@ describe('duplicate review', () => {
     edits[1].properties.mergedInto = 'library';
     edits[0] = { ...edits[0], deleted: true, properties: { ...edits[0].properties, mergedInto: 'library-copy' } };
     expect(applyEdits(data, edits).errors.join(' ')).toContain('missing or cyclic');
+  });
+  it('does not automatically reapply an undone merge after refresh', async () => {
+    const data = duplicatePlaces();
+    const workspace = new EditorWorkspace([], async batch => batch.edits.map(e => ({ ...e.edit, updated_at: 'saved' })), async () => {});
+    workspace.commit(exactDuplicateEdits(data, [], findDuplicateCandidates(data)));
+    await workspace.flush();
+    workspace.undo();
+    const refreshed = applyEdits(structuredClone(data), workspace.edits).data;
+    expect(findDuplicateCandidates(refreshed, workspace.edits)[0].exact).toBe(true);
+    expect(exactDuplicateEdits(refreshed, workspace.edits, findDuplicateCandidates(refreshed, workspace.edits))).toEqual([]);
   });
   it('retains merges when refreshed source records bring back removed records', () => {
     const data = duplicatePlaces(), edits = exactDuplicateEdits(data, [], findDuplicateCandidates(data));

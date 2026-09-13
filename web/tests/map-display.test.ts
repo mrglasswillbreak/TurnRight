@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { buildingDisplay, displayGeometry, resolvePlaceId, resolvePlaceIds, visualEdges } from '../src/map-display';
+import { buildingDisplay, buildingPlace, displayGeometry, resolvePlaceId, resolvePlaceIds, visualEdges } from '../src/map-display';
 import { closureFeatures } from '../src/map-sources';
 import { campusFixture } from './fixture';
 
 describe('shared map presentation', () => {
+  it('prioritizes explicit building associations and resolves merged place references', () => {
+    const data = campusFixture();
+    data.places.push({ ...data.places[0], id: 'hall', name: 'Hall' });
+    data.placeIdAliases = { 'old-hall': 'hall' };
+    const feature = { type: 'Feature' as const, properties: { id: 'library', placeId: 'old-hall' }, geometry: { type: 'Polygon' as const, coordinates: [] } };
+    expect(buildingPlace(data, feature)?.id).toBe('hall');
+  });
   it('uses recorded, floor-derived, and illustrative heights without mutating source data', () => {
     expect(buildingDisplay({ height: 12 })).toMatchObject({ metres: 12, kind: 'recorded' });
     expect(buildingDisplay({ height: 9, heightEstimated: true })).toMatchObject({ metres: 9, kind: 'floor-derived' });

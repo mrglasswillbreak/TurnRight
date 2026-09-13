@@ -28,8 +28,11 @@ export function displayGeometry(map: FeatureCollection): FeatureCollection {
 }
 export function buildingPlace(data: CampusData, building: Feature): Place | undefined {
   const id = String(building.properties?.id ?? building.id ?? '');
-  const placeId = building.properties?.placeId;
-  return data.places.find(p => p.id === placeId || p.buildingId === id || p.id === id);
+  const placeId = resolvePlaceId(data, String(building.properties?.placeId || ''));
+  const canonicalBuilding = resolvePlaceId({ placeIdAliases: data.buildingIdAliases }, id);
+  return data.places.find(p => p.id === placeId)
+    || data.places.find(p => p.buildingId && resolvePlaceId({ placeIdAliases: data.buildingIdAliases }, p.buildingId) === canonicalBuilding)
+    || data.places.find(p => p.id === resolvePlaceId(data, id));
 }
 export function resolvePlaceId(data: Pick<CampusData, 'placeIdAliases'>, id: string): string {
   const seen = new Set<string>();

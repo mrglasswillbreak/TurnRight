@@ -137,11 +137,14 @@ export function duplicateDecision(data: CampusData, edits: MapEdit[], candidate:
   ];
 }
 export function exactDuplicateEdits(data: CampusData, edits: MapEdit[], candidates: DuplicateCandidate[]) {
+  // Undo is a review decision too; refreshing sources must not silently redo it.
+  const undone = new Set(edits.filter(e => e.deleted && e.properties.revertToSource && e.properties.mergedInto)
+    .flatMap(e => [`${e.kind}:${e.id}`, `${e.kind}:${e.properties.mergedInto}`]));
   const parents = new Map<string, string>();
   const root = (id: string): string => parents.has(id) ? root(parents.get(id)!) : id;
   const batch = new Map<string, MapEdit>();
   const current = new Map(edits.map(e => [`${e.kind}:${e.id}`, e]));
-  for (const candidate of candidates.filter(c => c.exact).sort((a, b) => a.key.localeCompare(b.key))) {
+  for (const candidate of candidates.filter(c => c.exact && !c.ids.some(id => undone.has(`${c.kind}:${id}`))).sort((a, b) => a.key.localeCompare(b.key))) {
     const ids = candidate.ids.map(id => root(`${candidate.kind}:${id}`));
     if (ids[0] === ids[1]) continue;
     const [keep, remove] = ids.sort();
