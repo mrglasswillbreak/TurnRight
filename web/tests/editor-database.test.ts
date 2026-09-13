@@ -43,6 +43,7 @@ beforeAll(async () => {
     '002_explicit_api_grants.sql',
     '003_editor_batches.sql',
     '004_private_surveys.sql',
+    '005_baseline_reconciliation.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -62,6 +63,58 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+
+describe('published baseline reconciliation', () => {
+  it('preserves all drafts and audit history and refuses a stale review', async () => {
+    const beforeEdits = await database.query(
+      'select * from map_edits order by id',
+    );
+    const beforeHistory = await database.query(
+      'select * from edit_history order by id',
+    );
+    const beforeSources = await database.query(
+      'select * from source_features order by id',
+    );
+    const records = [
+      {
+        id: 'meta:campus',
+        source: 'test',
+        entity: 'meta',
+        hash: 'test-hash',
+        payload: { version: 'published-test' },
+      },
+    ];
+    const args = [
+      owner,
+      'published-test',
+      JSON.stringify(beforeSources.rows),
+      JSON.stringify(records),
+    ];
+    await database.query(
+      'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
+      args,
+    );
+    expect(
+      (await database.query('select * from map_edits order by id')).rows,
+    ).toEqual(beforeEdits.rows);
+    expect(
+      (await database.query('select * from edit_history order by id')).rows,
+    ).toEqual(beforeHistory.rows);
+    expect(
+      (
+        await database.query(
+          'select before_sources from baseline_reconciliations',
+        )
+      ).rows,
+    ).toHaveLength(1);
+    await expect(
+      database.query(
+        'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
+        args,
+      ),
+    ).rejects.toThrow('changed');
+  });
 });
 describe('private survey transactions', () => {
   const call = async (command: string, payload: unknown, actor = owner) =>

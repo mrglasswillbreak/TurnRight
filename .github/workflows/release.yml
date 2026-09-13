@@ -27,6 +27,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       RELEASE_ID: ${{ inputs.release_id }}
       RELEASE_OPERATION: ${{ inputs.operation }}
+      PUBLISHED_MAP_URL: ${{ vars.PUBLISHED_MAP_URL || 'https://turnright.vercel.app' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

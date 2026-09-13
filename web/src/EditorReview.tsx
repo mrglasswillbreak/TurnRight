@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import type { MapChange, Release, StudentReport } from './types';
 import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
+import { BaselineReview } from './BaselineReview';
 export interface ReviewState {
   changes: MapChange[];
   reports: StudentReport[];
@@ -208,6 +209,7 @@ export function EditorReview({
       {tab === 'releases' && (
         <>
           <h2>Review, then publish</h2>
+          <BaselineReview busy={busy} action={action} />
           <p className="small-note">
             Editor baseline: {baselineVersion}
             <br />

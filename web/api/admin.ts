@@ -13,6 +13,13 @@ import {
 } from '../server/backend.js';
 import { validateEdit } from '../src/editor-model.js';
 import { surveyAction } from '../server/surveys.js';
+import {
+  publishedCampus,
+  publishedRecords,
+  snapshotHash,
+  validateReleaseSnapshot,
+} from '../server/release-validation.js';
+import { validateWorkspace } from '../src/editor-validation.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {
@@ -40,6 +47,56 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       case 'sources':
         res.status(200).json({ features: await allRows('source_features') });
         break;
+      case 'review-baseline':
+      case 'reconcile-baseline': {
+        const [published, features, edits] = await Promise.all([
+          publishedCampus(),
+          allRows('source_features'),
+          allRows('map_edits'),
+        ]);
+        const expectedHash = snapshotHash(features);
+        const validation = validateWorkspace(published, edits);
+        if (action === 'review-baseline') {
+          res
+            .status(200)
+            .json({
+              version: published.version,
+              expectedHash,
+              before: {
+                places: features.filter((f) => f.entity === 'place').length,
+                edges: features.filter((f) => f.entity === 'edge').length,
+              },
+              after: {
+                places: published.places.length,
+                edges: published.graph.edges.length,
+              },
+              drafts: edits.length,
+              issues: validation.issues,
+              accessReviews:
+                published.accessPolicy?.connectionReviews?.map((r) => ({
+                  id: r.id,
+                  name: r.name,
+                })) || [],
+            });
+        } else {
+          if (
+            payload.version !== published.version ||
+            payload.expectedHash !== expectedHash
+          )
+            throw new HttpError(
+              409,
+              'The published package or source baseline changed. Review again.',
+            );
+          const receipt = await db('rpc/reconcile_published_baseline', 'POST', {
+            actor: user.id,
+            published_version: published.version,
+            expected_sources: features,
+            records: publishedRecords(published),
+          });
+          res.status(200).json({ receipt, version: published.version });
+        }
+        break;
+      }
       case 'save-edit':
       case 'save-edits': {
         const items =
@@ -150,6 +207,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           release_summary: payload.summary.trim(),
         });
         try {
+          const [release] = await db(
+            `releases?id=eq.${encodeURIComponent(id)}&select=snapshot`,
+          );
+          validateReleaseSnapshot(release.snapshot, await publishedCampus());
           await dispatch('release.yml', {
             release_id: id,
             operation: 'preview',
@@ -169,7 +230,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         if (typeof payload.id !== 'string')
           throw new HttpError(400, 'Choose a release');
         const [release] = await db(
-          `releases?id=eq.${encodeURIComponent(payload.id)}&select=id,status,deployment_id`,
+          `releases?id=eq.${encodeURIComponent(payload.id)}&select=id,status,deployment_id,snapshot`,
         );
         if (
           !release?.deployment_id ||
@@ -180,6 +241,22 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             400,
             'This release is not ready for that action.',
           );
+        if (action === 'publish-release') {
+          const [published, features, edits] = await Promise.all([
+            publishedCampus(),
+            allRows('source_features'),
+            allRows('map_edits'),
+          ]);
+          validateReleaseSnapshot(release.snapshot, published);
+          if (
+            snapshotHash(release.snapshot.features, release.snapshot.edits) !==
+            snapshotHash(features, edits)
+          )
+            throw new HttpError(
+              409,
+              'This preview is stale. Build a new preview from the current sources and drafts.',
+            );
+        }
         await dispatch('release.yml', {
           release_id: release.id,
           operation: action === 'rollback' ? 'rollback' : 'publish',

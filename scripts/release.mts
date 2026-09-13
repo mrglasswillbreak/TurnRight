@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
-import { assembleSources, applyEdits } from "../web/src/editor-model";
-import { db } from "./cloud.mjs";
+import { db, allRows } from "./cloud.mjs";
+import { publishedCampus, snapshotHash, validateReleaseSnapshot } from '../web/server/release-validation';
 import { preservePublished } from "../web/scripts/published-assets.mjs";
 import { vercelApi, uploadSource, waitForDeployment } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
@@ -23,16 +23,9 @@ try {
   if (operation === "preview") {
     if (release.status !== "queued") throw new Error("Only queued releases can be built");
     await db(`releases?id=eq.${id}`, "PATCH", { status: "building", error: null });
-    const fallback = JSON.parse(
-      await fs.readFile(path.join(root, "data/seed/campus.json"), "utf8"),
-    );
     if (!release.snapshot.features.length)
       throw new Error("No approved source baseline. Run bootstrap first.");
-    const { data, errors } = applyEdits(
-      assembleSources(release.snapshot.features, fallback),
-      release.snapshot.edits,
-    );
-    if (errors.length) throw new Error(errors.join("\n"));
+    const data = validateReleaseSnapshot(release.snapshot, await publishedCampus());
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
     execFileSync(process.execPath, [path.join(root, "scripts/package.mjs")], {
@@ -92,6 +85,11 @@ try {
     if (operation === "rollback" && release.status !== "published")
       throw new Error("Rollback requires a previously published release");
     if (!release.deployment_id) throw new Error("Deployment is missing");
+    if(operation==='publish') {
+      validateReleaseSnapshot(release.snapshot,await publishedCampus());
+      const [features,edits]=await Promise.all([allRows('source_features'),allRows('map_edits')]);
+      if(snapshotHash(release.snapshot.features,release.snapshot.edits)!==snapshotHash(features,edits)) throw new Error('Preview is stale. Create a fresh reviewed preview.');
+    }
     await vercelApi(
       `/v10/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID!)}/promote/${encodeURIComponent(release.deployment_id)}`,
       { method: "POST" },
