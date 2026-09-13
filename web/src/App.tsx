@@ -49,6 +49,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
+import type { Feature } from 'geojson';
+import { buildingDisplay, buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
+import { useMapViewPreference } from './useMapViewPreference';
 import {
   activatePending,
   getPreference,
@@ -99,8 +102,9 @@ export default function App() {
     [toast, setToast] = useState(''),
     [query, setQuery] = useState(''),
     [category, setCategory] = useState('all');
+  const [threeD, setThreeD] = useMapViewPreference();
+  const [unlinkedBuilding, setUnlinkedBuilding] = useState<Feature | null>(null);
   const [selected, setSelected] = useState<Place | null>(null),
-    [threeD, setThreeD] = useState(false),
     [follow, setFollow] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
   const panelContent = useRef<HTMLDivElement>(null);
@@ -117,7 +121,7 @@ export default function App() {
   };
   const startRequested = useRef(false);
   const [dialog, setDialog] = useState<
-      'offline' | 'settings' | 'report' | null
+      'offline' | 'settings' | 'report' | 'building' | null
     >(null),
     [reportPin, setReportPin] = useState<Position | undefined>();
   const [downloaded, setDownloaded] = useState(false),
@@ -232,6 +236,16 @@ export default function App() {
     if (muted) voice.current.stop();
   }, [muted]);
   const packageVersion = manifest?.version;
+  useEffect(() => {
+    if (!data) return;
+    for (const [key, ids, set] of [['saved', saved, setSaved], ['recent', recent, setRecent]] as const) {
+      const next = resolvePlaceIds(data, ids);
+      if (JSON.stringify(next) !== JSON.stringify(ids)) {
+        set(next);
+        void setPreference(key, next).catch(() => setToast('Place links updated for this session. Storage could not save the change.'));
+      }
+    }
+  }, [data, saved, recent]);
   useEffect(() => {
     if (packageVersion) voice.current.load(packageVersion).catch(() => {});
   }, [packageVersion]);
@@ -596,9 +610,16 @@ export default function App() {
         fix={gps.fix}
         dark={dark}
         threeD={threeD}
+        buildingOpacity={navigating ? 0.65 : 0.92}
         follow={follow}
         motionActive={navigating && !nav.arrived}
         onSelect={selectPlace}
+        onBuildingSelect={(feature) => {
+          if (navigatingRef.current) return;
+          setSelected(null);
+          setUnlinkedBuilding(feature);
+          setDialog('building');
+        }}
         onManualPan={() => setFollow(false)}
         onReady={(instance) => {
           map.current = instance;
@@ -874,6 +895,10 @@ export default function App() {
                 {selected.category.toUpperCase()} · LASU OJO
               </span>
               <h1>{selected.name}</h1>
+              {(() => {
+                const building = data.map.features.find(f => f.properties?.kind === 'building' && buildingPlace(data, f)?.id === selected.id);
+                return building && <p className="building-height-note">{buildingDisplay(building.properties || {}).description}</p>;
+              })()}
               <p>
                 {selected.department ||
                   selected.faculty ||
@@ -948,7 +973,9 @@ export default function App() {
       <div className="map-controls">
         <button
           className={threeD ? 'active' : ''}
-          onClick={() => setThreeD(!threeD)}
+          onClick={() => {
+            if (!setThreeD(!threeD)) setToast('Map view changed for this session. Storage could not save your preference.');
+          }}
           aria-label={threeD ? 'Switch to 2D' : 'Switch to 3D'}
         >
           <Layers />
@@ -1001,7 +1028,7 @@ export default function App() {
       </div>
       {threeD && (
         <div className="map-caption">
-          Floor-based building heights are approximate
+          3D heights: floor-derived estimates · muted blocks have unknown heights
         </div>
       )}
       {gps.error && !routeView && (
@@ -1024,20 +1051,32 @@ export default function App() {
         <DialogContent className="app-dialog">
           <DialogHeader>
             <DialogTitle>
-              {dialog === 'offline'
+              {dialog === 'building' ? String(unlinkedBuilding?.properties?.name || 'Campus building') : dialog === 'offline'
                 ? 'Offline maps'
                 : dialog === 'report'
                   ? 'Report a map issue'
                   : 'Settings & map information'}
             </DialogTitle>
             <DialogDescription>
-              {dialog === 'offline'
+              {dialog === 'building' ? 'Building footprint and source information.' : dialog === 'offline'
                 ? 'Take LASU campus with you.'
                 : dialog === 'report'
                   ? 'Help make campus easier to navigate.'
                   : 'Make TurnRight work for you.'}
             </DialogDescription>
           </DialogHeader>
+          {dialog === 'building' && unlinkedBuilding && (
+            <div className="settings-content">
+              <p>{buildingDisplay(unlinkedBuilding.properties || {}).description}</p>
+              <p>Source: {String(unlinkedBuilding.properties?.source || 'Campus map')}. This footprint is not yet linked to a named destination.</p>
+              <Button variant="outline" onClick={() => {
+                const g = unlinkedBuilding.geometry;
+                const point = g.type === 'Polygon' ? g.coordinates[0][0] : g.type === 'MultiPolygon' ? g.coordinates[0][0][0] : undefined;
+                if (point) setReportPin(point as Position);
+                setDialog('report');
+              }}><Flag /> Report building details</Button>
+            </div>
+          )}
           {dialog === 'offline' && (
             <OfflinePanel
               manifest={manifest}
@@ -1200,7 +1239,7 @@ export default function App() {
                       variant="outline"
                       onClick={() => {
                         setSelected(
-                          data.places.find((p) => p.id === draft.placeId) ||
+                          data.places.find((p) => p.id === resolvePlaceId(data, draft.placeId || '')) ||
                             null,
                         );
                         setReportPin(draft.coordinates);

@@ -1003,6 +1003,51 @@ for (const touch of [false, true])
     } finally { await context.close(); }
   });
 
+test('public map defaults to 3D, frames campus and opens building details', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error' && message.text().includes('Campus map:')) errors.push(message.text()); });
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBe(45);
+  const heights = await page.evaluate(async () => {
+    const source = window.editorTestMap.getSource('campus') as import('maplibre-gl').GeoJSONSource;
+    const data = await source.getData() as import('geojson').FeatureCollection;
+    return data.features.filter(f => f.properties?.kind === 'building').map(f => [f.properties?.id, f.properties?.displayHeight, f.properties?.heightKind]);
+  });
+  expect(heights).toContainEqual(['unknown-building', 6, 'illustrative']);
+  expect(heights).toContainEqual(['library', 15, 'recorded']);
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBe(0);
+  await focusCampus(page);
+  await clickMap(page, [3.20012, 6.46022]);
+  await expect(page.getByText('15 m · recorded height')).toBeVisible();
+  await page.evaluate(() => window.editorTestMap.jumpTo({ center: [3.2007, 6.4603], zoom: 19, padding: { top: 0, right: 0, bottom: 0, left: 0 } }));
+  await clickMap(page, [3.2007, 6.4603]);
+  await expect(page.getByRole('dialog')).toContainText('Height unknown · illustrative 6 m block');
+  await expect(page.getByRole('button', { name: 'Report building details' })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('public initial camera includes the northern campus', async ({ page }) => {
+  const { campus } = await setup(page, true);
+  await page.goto('/');
+  await attachMap(page);
+  const corners = await page.evaluate(bounds => {
+    const map = window.editorTestMap;
+    return [bounds[0], bounds[1], [bounds[0][0], bounds[1][1]], [bounds[1][0], bounds[0][1]]].map(p => map.project(p as Position));
+  }, campus.bounds);
+  for (const point of corners) {
+    expect(point.x).toBeGreaterThan(450);
+    expect(point.x).toBeLessThan(1440);
+    expect(point.y).toBeGreaterThan(0);
+    expect(point.y).toBeLessThan(1000);
+  }
+});
+
 for (const threeD of [false, true])
   test(`map two entrances and their approaches in ${threeD ? '3D' : '2D'}, save and reload`, async ({
     page,
