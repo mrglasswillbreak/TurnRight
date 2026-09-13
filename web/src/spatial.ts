@@ -1,7 +1,7 @@
-import type { Feature, FeatureCollection } from "geojson";
+import type { Feature, FeatureCollection } from 'geojson';
 import { BoundsIndex, boundsOf } from './spatial-index.js';
-import type { Position } from "./types.js";
-import { projectSegment } from "./geo.js";
+import type { Position } from './types.js';
+import { projectSegment } from './geo.js';
 function inside(point: Position, rings: number[][][]) {
   const ringContains = (ring: number[][]) => {
     let result = false;
@@ -38,8 +38,11 @@ function checkGeometry(
   for (const feature of features) {
     const kind = feature.properties?.kind,
       g = feature.geometry;
-    if (kind === "building" && (g.type === "Polygon" || g.type === "MultiPolygon")) {
-      const polygons = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+    if (
+      kind === 'building' &&
+      (g.type === 'Polygon' || g.type === 'MultiPolygon')
+    ) {
+      const polygons = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
       for (const rings of polygons) {
         const outer = rings[0];
         if (
@@ -52,17 +55,24 @@ function checkGeometry(
         const cuts = [0, 1];
         for (const ring of rings)
           for (let i = 1; i < ring.length; i++) {
-            const t = intersection(a, b, ring[i - 1] as Position, ring[i] as Position);
+            const t = intersection(
+              a,
+              b,
+              ring[i - 1] as Position,
+              ring[i] as Position,
+            );
             if (t !== null) cuts.push(t);
           }
         cuts.sort((x, y) => x - y);
         for (let i = 1; i < cuts.length; i++) {
           const t = (cuts[i - 1] + cuts[i]) / 2;
-          if (inside([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], rings))
+          if (
+            inside([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], rings)
+          )
             return `building:${feature.properties?.id || feature.id}`;
         }
       }
-    } else if (kind === "barrier" && g.type === "LineString") {
+    } else if (kind === 'barrier' && g.type === 'LineString') {
       for (let i = 1; i < g.coordinates.length; i++) {
         const t = intersection(
           a,
@@ -81,29 +91,51 @@ export function createGeometryBlocker(map: FeatureCollection) {
   const index = new BoundsIndex<Feature>();
   for (const feature of map.features) {
     const g = feature.geometry;
-    if (feature.properties?.kind === 'building' && (g.type === 'Polygon' || g.type === 'MultiPolygon'))
-      index.add(boundsOf(g.type === 'Polygon' ? g.coordinates.flat() : g.coordinates.flat(2)), feature);
+    if (
+      feature.properties?.kind === 'building' &&
+      (g.type === 'Polygon' || g.type === 'MultiPolygon')
+    )
+      index.add(
+        boundsOf(
+          g.type === 'Polygon' ? g.coordinates.flat() : g.coordinates.flat(2),
+        ),
+        feature,
+      );
     else if (feature.properties?.kind === 'barrier' && g.type === 'LineString')
       index.add(boundsOf(g.coordinates), feature);
   }
   const results = new Map<string, string | undefined>();
   return (a: Position, b: Position) => {
     const key = [a.join(','), b.join(',')].sort().join('|');
-    if (!results.has(key)) results.set(key, checkGeometry(a, b, index.query(boundsOf([a, b]))));
+    if (!results.has(key))
+      results.set(key, checkGeometry(a, b, index.query(boundsOf([a, b]))));
     return results.get(key);
   };
 }
 
-let previous: { signature: string; check: ReturnType<typeof createGeometryBlocker> } | undefined;
+let previous:
+  | { signature: string; check: ReturnType<typeof createGeometryBlocker> }
+  | undefined;
 /** Metadata and height edits reuse obstruction results; geometry edits invalidate them. */
 export function cachedGeometryBlocker(map: FeatureCollection) {
-  const signature = JSON.stringify(map.features
-    .filter(f => ['building', 'barrier'].includes(f.properties?.kind))
-    .map(f => [f.properties?.kind, f.properties?.id || f.id, f.geometry])
-    .sort((a, b) => String(a[0]).localeCompare(String(b[0])) || String(a[1]).localeCompare(String(b[1]))));
-  if (previous?.signature !== signature) previous = { signature, check: createGeometryBlocker(map) };
+  const signature = JSON.stringify(
+    map.features
+      .filter((f) => ['building', 'barrier'].includes(f.properties?.kind))
+      .map((f) => [f.properties?.kind, f.properties?.id || f.id, f.geometry])
+      .sort(
+        (a, b) =>
+          String(a[0]).localeCompare(String(b[0])) ||
+          String(a[1]).localeCompare(String(b[1])),
+      ),
+  );
+  if (previous?.signature !== signature)
+    previous = { signature, check: createGeometryBlocker(map) };
   return previous.check;
 }
-export function geometryBlocker(a: Position, b: Position, map: FeatureCollection) {
+export function geometryBlocker(
+  a: Position,
+  b: Position,
+  map: FeatureCollection,
+) {
   return cachedGeometryBlocker(map)(a, b);
 }

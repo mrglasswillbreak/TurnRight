@@ -13,7 +13,7 @@ export function boundsOf(points: number[][]): Bounds {
 }
 export function nearbyBounds(point: Position, metres: number): Bounds {
   const y = metres / 111000;
-  const x = y / Math.cos(point[1] * Math.PI / 180);
+  const x = y / Math.cos((point[1] * Math.PI) / 180);
   return [point[0] - x, point[1] - y, point[0] + x, point[1] + y];
 }
 export function overlaps(a: Bounds, b: Bounds) {
@@ -28,8 +28,16 @@ export class BoundsIndex<T> {
   private keys(bounds: Bounds) {
     const result: string[] = [];
     if (!bounds.every(Number.isFinite)) return result;
-    for (let x = Math.floor(bounds[0] / this.cellSize); x <= Math.floor(bounds[2] / this.cellSize); x++)
-      for (let y = Math.floor(bounds[1] / this.cellSize); y <= Math.floor(bounds[3] / this.cellSize); y++)
+    for (
+      let x = Math.floor(bounds[0] / this.cellSize);
+      x <= Math.floor(bounds[2] / this.cellSize);
+      x++
+    )
+      for (
+        let y = Math.floor(bounds[1] / this.cellSize);
+        y <= Math.floor(bounds[3] / this.cellSize);
+        y++
+      )
         result.push(`${x}:${y}`);
     return result;
   }
@@ -45,8 +53,9 @@ export class BoundsIndex<T> {
     const ids = new Set<number>();
     for (const key of this.keys(bounds))
       for (const id of this.cells.get(key) || []) ids.add(id);
-    return [...ids].sort((a, b) => a - b)
-      .filter(id => overlaps(this.entries[id].bounds, bounds))
-      .map(id => this.entries[id].value);
+    return [...ids]
+      .sort((a, b) => a - b)
+      .filter((id) => overlaps(this.entries[id].bounds, bounds))
+      .map((id) => this.entries[id].value);
   }
 }
