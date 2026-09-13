@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { geometryBlocker } from "../src/spatial";
+import { geometryBlocker, cachedGeometryBlocker } from "../src/spatial";
+import { BoundsIndex } from '../src/spatial-index';
 import { findRoutes } from "../src/routing";
 import { campusFixture } from "./fixture";
 import type { FeatureCollection } from "geojson";
@@ -25,6 +26,26 @@ const map: FeatureCollection = {
   ],
 };
 describe("building and barrier conflicts", () => {
+  it('reuses obstruction checks for metadata but invalidates changed geometry', () => {
+    const first = cachedGeometryBlocker(map);
+    const renamed = structuredClone(map);
+    renamed.features[0].properties!.name = 'New name';
+    renamed.features[0].properties!.height = 12;
+    expect(cachedGeometryBlocker(renamed)).toBe(first);
+    expect(first([3.201, 6.46], [3.2, 6.46])).toBe('building:outline');
+    renamed.features = [];
+    const changed = cachedGeometryBlocker(renamed);
+    expect(changed).not.toBe(first);
+    expect(changed([3.2, 6.46], [3.201, 6.46])).toBeUndefined();
+  });
+  it('queries cell boundaries without duplicates and retains insertion order', () => {
+    const index = new BoundsIndex<string>(1);
+    index.add([0, 0, 2, 2], 'large');
+    index.add([1, 1, 1, 1], 'junction');
+    index.add([4, 4, 5, 5], 'distant');
+    expect(index.query([1, 1, 2, 2])).toEqual(['large', 'junction']);
+    expect(index.query([3, 3, 3.5, 3.5])).toEqual([]);
+  });
   it("detects a path crossing a footprint even when both endpoints are outside", () =>
     expect(geometryBlocker([3.2, 6.46], [3.201, 6.46], map)).toBe("building:outline"));
   it("permits a path alongside an outline", () =>

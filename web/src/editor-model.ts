@@ -6,7 +6,7 @@ import {
   orderedPathNodes,
 } from './editor-topology.js';
 import { distance, projectSegment } from './geo.js';
-import { geometryBlocker } from './spatial.js';
+import { cachedGeometryBlocker } from './spatial.js';
 import type {
   CampusData,
   GraphNode,
@@ -642,14 +642,14 @@ export function applyEdits(
     }
   }
   const ids = new Set<string>();
+  const blockedGeometry = cachedGeometryBlocker(data.map);
   for (const edge of data.graph.edges) {
     const a = nodes.get(edge.from),
       b = nodes.get(edge.to);
     if (a && b) {
-      edge.geometryBlocked = geometryBlocker(
+      edge.geometryBlocked = blockedGeometry(
         a.coordinates,
         b.coordinates,
-        data.map,
       );
       if (edge.geometryBlocked)
         warnings.push(

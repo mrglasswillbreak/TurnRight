@@ -1,4 +1,5 @@
-import type { FeatureCollection } from "geojson";
+import type { Feature, FeatureCollection } from "geojson";
+import { BoundsIndex, boundsOf } from './spatial-index.js';
 import type { Position } from "./types.js";
 import { projectSegment } from "./geo.js";
 function inside(point: Position, rings: number[][][]) {
@@ -29,12 +30,12 @@ function intersection(a: Position, b: Position, c: Position, d: Position) {
     s = ((c[0] - a[0]) * y - (c[1] - a[1]) * x) / den;
   return t >= 0 && t <= 1 && s >= 0 && s <= 1 ? t : null;
 }
-export function geometryBlocker(
+function checkGeometry(
   a: Position,
   b: Position,
-  map: FeatureCollection,
+  features: Feature[],
 ): string | undefined {
-  for (const feature of map.features) {
+  for (const feature of features) {
     const kind = feature.properties?.kind,
       g = feature.geometry;
     if (kind === "building" && (g.type === "Polygon" || g.type === "MultiPolygon")) {
@@ -74,4 +75,34 @@ export function geometryBlocker(
       }
     }
   }
+}
+
+export function createGeometryBlocker(map: FeatureCollection) {
+  const index = new BoundsIndex<Feature>();
+  for (const feature of map.features) {
+    const g = feature.geometry;
+    if (feature.properties?.kind === 'building' && (g.type === 'Polygon' || g.type === 'MultiPolygon'))
+      index.add(boundsOf(g.type === 'Polygon' ? g.coordinates.flat() : g.coordinates.flat(2)), feature);
+    else if (feature.properties?.kind === 'barrier' && g.type === 'LineString')
+      index.add(boundsOf(g.coordinates), feature);
+  }
+  const results = new Map<string, string | undefined>();
+  return (a: Position, b: Position) => {
+    const key = [a.join(','), b.join(',')].sort().join('|');
+    if (!results.has(key)) results.set(key, checkGeometry(a, b, index.query(boundsOf([a, b]))));
+    return results.get(key);
+  };
+}
+
+let previous: { signature: string; check: ReturnType<typeof createGeometryBlocker> } | undefined;
+/** Metadata and height edits reuse obstruction results; geometry edits invalidate them. */
+export function cachedGeometryBlocker(map: FeatureCollection) {
+  const signature = JSON.stringify(map.features
+    .filter(f => ['building', 'barrier'].includes(f.properties?.kind))
+    .map(f => [f.properties?.kind, f.properties?.id || f.id, f.geometry]));
+  if (previous?.signature !== signature) previous = { signature, check: createGeometryBlocker(map) };
+  return previous.check;
+}
+export function geometryBlocker(a: Position, b: Position, map: FeatureCollection) {
+  return cachedGeometryBlocker(map)(a, b);
 }
