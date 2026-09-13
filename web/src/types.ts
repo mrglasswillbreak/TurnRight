@@ -22,6 +22,8 @@ export interface Place {
   source: string;
   sourceId: string;
   graphNode?: string;
+  buildingId?: string;
+  sourceRefs?: string[];
   approachDistance?: number;
   arrivalKind: 'entrance' | 'mapped-approach' | 'unmapped';
   height?: number;
@@ -94,6 +96,9 @@ export interface CampusData {
   bounds: [Position, Position];
   map: FeatureCollection;
   places: Place[];
+  /** Retained public IDs after a reviewed place merge. */
+  placeIdAliases?: Record<string, string>;
+  buildingIdAliases?: Record<string, string>;
   entrances?: Entrance[];
   graph: RoutingGraph;
   closures: Closure[];
@@ -210,6 +215,8 @@ export interface MapEdit {
     connection?: ConnectionTarget;
     /** A retained undo receipt that removes a correction, leaving approved source data intact. */
     revertToSource?: boolean;
+    mergedInto?: string;
+    duplicateKeepSeparate?: string[];
     /** Private reference retained in corrections, omitted from public geometry. */
     surveyEvidence?: { surveyId: string; revisionId: string | null };
     surveyProvenance?: string;
