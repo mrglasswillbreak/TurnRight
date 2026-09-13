@@ -19,8 +19,16 @@ const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
 describe('editor autosave and recovery', () => {
   it('coalesces identical drawing snapshots and immediately preserves a committed edit', async () => {
     const persist = vi.fn(async () => {});
-    const workspace = new EditorWorkspace([], async batch => ack(batch), persist);
-    const draft = { ...edit(), kind: 'path' as const, geometry: { type: 'LineString' as const, coordinates: [[3.2, 6.46]] } };
+    const workspace = new EditorWorkspace(
+      [],
+      async (batch) => ack(batch),
+      persist,
+    );
+    const draft = {
+      ...edit(),
+      kind: 'path' as const,
+      geometry: { type: 'LineString' as const, coordinates: [[3.2, 6.46]] },
+    };
     workspace.draft(draft);
     workspace.draft(structuredClone(draft));
     await vi.waitFor(() => expect(persist).toHaveBeenCalledTimes(1));
