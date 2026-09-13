@@ -29,7 +29,8 @@ import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
 import { api, supabase } from './supabase';
-import { applyEdits, assembleSources, type SourceRecord } from './editor-model';
+import { assembleSources, type SourceRecord } from './editor-model';
+import { useEditorValidation } from './useEditorValidation';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
 import { drawingProgress } from './drawing-state';
@@ -320,10 +321,7 @@ function Editor({
   const progress = drawingProgress(workspace.unfinished);
   const calculate = useRoutes();
   const base = useMemo(() => assembleSources(sources, data), [sources, data]);
-  const validation = useMemo(
-    () => applyEdits(base, workspace.edits),
-    [base, workspace.edits],
-  );
+  const validation = useEditorValidation(base, workspace.edits);
   const visible = preview ? base : validation.data;
   const invalid = useMemo(
     () =>
@@ -762,7 +760,7 @@ function Editor({
       if (!(await workspace.flush()))
         throw new Error(workspace.error || 'Save or repair the draft first.');
       if (name === 'prepare-release') {
-        const check = applyEdits(base, workspace.saved);
+        const check = await validation.check(workspace.saved);
         if (workspace.unfinished || check.errors.length)
           throw new Error(
             check.errors[0] ||
@@ -1068,7 +1066,7 @@ function Editor({
                 ),
                 ...edits,
               ];
-              const checked = applyEdits(base, next);
+              const checked = await validation.check(next);
               const addedErrors = checked.errors.filter(
                 (e) => !validation.errors.includes(e),
               );
@@ -1479,7 +1477,7 @@ function Editor({
             ))}
             <button
               className="editor-primary"
-              disabled={!testOrigin || !testDest || busy}
+              disabled={!testOrigin || !testDest || busy || validation.pending}
               onClick={async () => {
                 const request = ++routeRequest.current;
                 setBusy(true);

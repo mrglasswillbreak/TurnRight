@@ -1,55 +1,16 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { CampusData, RouteOrigin, RouteEndpoint, Route } from './types';
+import { RevisionWorker } from './revision-worker';
+export type RouteRequest = { origin: RouteOrigin; destination: RouteEndpoint };
 export function useRoutes() {
-  const worker = useRef<Worker | null>(null),
-    counter = useRef(0);
-  const pending = useRef(
-    new Map<
-      number,
-      { resolve: (routes: Route[]) => void; reject: (error: Error) => void }
-    >(),
-  );
+  const worker = useRef<RevisionWorker<CampusData, RouteRequest, Route[]> | null>(null);
   useEffect(() => {
-    const requests = pending.current;
-    worker.current = new Worker(
-      new URL('./routing.worker.ts', import.meta.url),
-      {
-        type: 'module',
-      },
-    );
-    worker.current.onmessage = (event) => {
-      const request = pending.current.get(event.data.id);
-      if (!request) return;
-      pending.current.delete(event.data.id);
-      if (event.data.error) request.reject(new Error(event.data.error));
-      else request.resolve(event.data.routes);
-    };
-    worker.current.onerror = () => {
-      pending.current.forEach((p) =>
-        p.reject(
-          new Error('Routing stopped unexpectedly. Reload the app to retry.'),
-        ),
-      );
-      pending.current.clear();
-    };
-    const instance = worker.current;
-    return () => {
-      instance.terminate();
-      requests.forEach((p) => p.reject(new Error('Routing cancelled')));
-      requests.clear();
-    };
+    const client = new RevisionWorker<CampusData, RouteRequest, Route[]>(new Worker(new URL('./routing.worker.ts', import.meta.url), { type: 'module' }));
+    worker.current = client;
+    return () => { client.close(); worker.current = null; };
   }, []);
-  return useCallback(
-    (data: CampusData, origin: RouteOrigin, destination: RouteEndpoint) =>
-      new Promise<Route[]>((resolve, reject) => {
-        if (!worker.current) {
-          reject(new Error('Routing is starting. Please try again.'));
-          return;
-        }
-        const id = ++counter.current;
-        pending.current.set(id, { resolve, reject });
-        worker.current.postMessage({ id, data, origin, destination });
-      }),
-    [],
-  );
+  return useCallback((data: CampusData, origin: RouteOrigin, destination: RouteEndpoint) => {
+    if (!worker.current) return Promise.reject(new Error('Routing is starting. Please try again.'));
+    return worker.current.request(data, { origin, destination });
+  }, []);
 }
