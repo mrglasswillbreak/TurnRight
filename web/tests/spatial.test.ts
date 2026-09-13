@@ -32,6 +32,12 @@ describe("building and barrier conflicts", () => {
     renamed.features[0].properties!.name = 'New name';
     renamed.features[0].properties!.height = 12;
     expect(cachedGeometryBlocker(renamed)).toBe(first);
+    const second = structuredClone(renamed.features[0]);
+    second.properties!.id = 'other';
+    renamed.features.push(second);
+    const ordered = cachedGeometryBlocker(renamed);
+    renamed.features.reverse();
+    expect(cachedGeometryBlocker(renamed)).toBe(ordered);
     expect(first([3.201, 6.46], [3.2, 6.46])).toBe('building:outline');
     renamed.features = [];
     const changed = cachedGeometryBlocker(renamed);

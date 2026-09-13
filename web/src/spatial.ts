@@ -99,7 +99,8 @@ let previous: { signature: string; check: ReturnType<typeof createGeometryBlocke
 export function cachedGeometryBlocker(map: FeatureCollection) {
   const signature = JSON.stringify(map.features
     .filter(f => ['building', 'barrier'].includes(f.properties?.kind))
-    .map(f => [f.properties?.kind, f.properties?.id || f.id, f.geometry]));
+    .map(f => [f.properties?.kind, f.properties?.id || f.id, f.geometry])
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0])) || String(a[1]).localeCompare(String(b[1]))));
   if (previous?.signature !== signature) previous = { signature, check: createGeometryBlocker(map) };
   return previous.check;
 }
