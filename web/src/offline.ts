@@ -76,7 +76,11 @@ export async function loadCampus(): Promise<{
   const active = await getActivePackage().catch(() => null);
   if (active) return { data: active.data, manifest: active.manifest, downloaded: active.complete };
   const manifest = await latestPackage();
-  const response = await fetch(manifest.dataUrl);
+  const response = await fetch(manifest.dataUrl, { signal: AbortSignal.timeout(20000) }).catch(error => {
+    if (error instanceof DOMException && error.name === 'TimeoutError')
+      throw new Error('Campus data took too long to load. Check your connection and retry.');
+    throw error;
+  });
   if (!response.ok)
     throw new Error("Campus data could not load. Connect to the internet and retry.");
   const bytes = await response.arrayBuffer();
@@ -105,7 +109,8 @@ export async function installPackage(
     let response = await cache.match(asset.url);
     let bytes = response && (await response.clone().arrayBuffer());
     if (!bytes || (await hashBytes(bytes)) !== asset.sha256) {
-      response = await fetch(asset.url, { signal, cache: "no-store" });
+      const timeout = AbortSignal.timeout(30000);
+      response = await fetch(asset.url, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout, cache: "no-store" });
       if (!response.ok) throw new Error("The download was interrupted. Retry to continue.");
       bytes = await response.arrayBuffer();
       if (bytes.byteLength !== asset.bytes || (await hashBytes(bytes)) !== asset.sha256)

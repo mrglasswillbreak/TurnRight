@@ -44,6 +44,16 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe("offline package transactions", () => {
+  it('bounds initial data loading and reports a retryable timeout', async () => {
+    const p = await pkg('slow');
+    vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+      if (url === '/packages/latest.json') return Response.json(p.manifest);
+      expect(options.signal).toBeInstanceOf(AbortSignal);
+      throw new DOMException('Timeout', 'TimeoutError');
+    }));
+    await expect(loadCampus()).rejects.toThrow('too long to load');
+    expect(await getActivePackage()).toBeNull();
+  });
   it("rejects a package before writing when device storage is full", async () => {
     const p = await pkg("too-large");
     vi.stubGlobal("navigator", { storage: { estimate: async () => ({ quota: 10, usage: 9 }) } });
