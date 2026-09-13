@@ -1,4 +1,38 @@
-# Production deployment — 9 September 2026
+# Production deployments
+
+## Map, editor and 3D update — 13 September 2026
+
+The owner requested deployment of the implemented map/editor improvements.
+The 25 implementation commits were fast-forwarded to `main`, and the existing
+Vercel Git integration deployed application revision
+`932a216e93126a967b897e8a22b769dd6bbf2a2a` successfully.
+
+- Public application: [turnright.vercel.app](https://turnright.vercel.app/).
+- [Successful Vercel deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/BARRwm8ZT1HKpmo6cuuzNgiMwNDF).
+- Immutable deployment: [turnright-69xf6nluu](https://turnright-69xf6nluu-muhammed-abdulhadi-s-projects.vercel.app/).
+- GitHub recorded a successful `Production` deployment for that exact commit.
+- At 22:04 UTC, `/`, `/admin` and `/sw.js` returned HTTP 200. The public
+  application bundle was `/assets/index-BPiU5JBC.js`, and the editor bundle was
+  `/assets/Admin-DgO3BZsD.js`. The served code includes shared building heights,
+  the persisted map-view preference and duplicate review. The service worker
+  precaches the new application bundle and retains its no-cache response policy.
+- An unauthenticated `/api/admin` request returned 401 with `no-store`.
+- All 22 published assets matched their pre-deployment byte counts and SHA-256
+  hashes. Package `lasu-4e4c8008b38b`, schema 1, remains 3,159,499 bytes. The
+  preceding `lasu-44f8af5654f1` manifest remains available.
+- An existing installed browser session offered **Settings → Install update**.
+  Installation retained its downloaded map and opened the new 3D presentation.
+  Faculty of Law details showed the rendering-only illustrative 6 m height and
+  retained the existing mapped-approach information.
+
+The application and service worker were validated on Node 22 before deployment;
+see [implementation and test results](MAP-IMPROVEMENTS.md). This deployment did
+not publish editor drafts, consolidate ambiguous campus records or replace the
+reviewed Law/Library access corrections. Reconciliation of the older approved
+editor baseline is still required before a campus-data release. Physical-device
+checks and the original authenticated desktop drawing reproduction remain open.
+
+## Initial public launch — 9 September 2026
 
 TurnRight is public at **https://turnright.vercel.app/**. The owner explicitly
 requested publishing the latest GitHub revision to production on this date.

@@ -2,6 +2,8 @@
 
 Implemented on `codex/map-editor-improvements`, starting from `35afe0f`, in small commits. This is an application change. No campus package, source baseline, access correction or production deployment was changed.
 
+The owner subsequently requested deployment. Application revision `932a216` reached production on 13 September 2026, preserving the published campus package; see the [deployment verification](PRODUCTION.md).
+
 ## Drawing
 
 A drawing session starts when its tool is activated, including before the first vertex. The explorer and route panel collapse; selection, comparison and tool changes cannot silently replace the session. Finish/Cancel restore the panel layout. The prompt, distinct-point count, live Terra Draw segment and mouse/touch snap hint explain what happens next. Paths need two distinct vertices; buildings need three. View changes, autosave and reload recovery preserve unfinished geometry and empty sessions. Ground drawing reduces building opacity.
