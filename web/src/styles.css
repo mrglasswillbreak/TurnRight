@@ -1,5 +1,9 @@
-@import "tailwindcss";
+@import "tailwindcss" source(".");
 @import "tw-animate-css";
+/* Only these scaffold components are used by the application. */
+@source "../components/ui/button.tsx";
+@source "../components/ui/dialog.tsx";
+@source "../index.html";
 @custom-variant dark (&:is(.dark *));
 .app-shell .map-canvas,
 .admin-map .map-canvas {
