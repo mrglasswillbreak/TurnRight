@@ -70,6 +70,9 @@ export function MapView({
   camera.current = { selected, routes, activeRoute, dark, threeD };
   const [mapError, setMapError] = useState('');
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
+  const selectedId = selected?.id || '';
+  const selectedLng = selected?.coordinates[0], selectedLat = selected?.coordinates[1];
+  const selectedBuildingId = useMemo(() => String(data.map.features.find(f => f.properties?.kind === 'building' && buildingPlace(data, f)?.id === selectedId)?.properties?.id || ''), [data, selectedId]);
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
     glyphs: '/glyphs/{fontstack}/{range}.pbf',
@@ -86,7 +89,6 @@ export function MapView({
   useEffect(() => {
     if (!container.current) return;
     const dark = camera.current.dark;
-    const data = latestData.current;
     let map: MapInstance;
     let disposeExtension: void | (() => void);
     try {
@@ -96,7 +98,7 @@ export function MapView({
         center: [3.201, 6.465],
         zoom: 16,
         maxZoom: 20,
-        minZoom: 13,
+        minZoom: 12,
         attributionControl: false,
         trackResize: false,
         pitch: camera.current.threeD ? (editor ? 50 : innerWidth < 768 ? 40 : 45) : 0,
@@ -110,9 +112,9 @@ export function MapView({
       return;
     }
     mapRef.current = map;
-    const frame = () => {
-      const mobile = innerWidth < 768,
-        padding = panelBesideMap
+    const mapPadding = () => {
+      const mobile = innerWidth < 768;
+      return panelBesideMap
           ? { top: 60, right: 40, bottom: 60, left: 40 }
           : {
               top: mobile ? 125 : 85,
@@ -120,6 +122,9 @@ export function MapView({
               bottom: mobile ? innerHeight * 0.49 : 65,
               left: mobile ? 25 : 485,
             };
+    };
+    const frame = () => {
+      const padding = mapPadding();
       const current = camera.current,
         route = current.routes[current.activeRoute];
       if (route?.coordinates.length) {
@@ -151,7 +156,7 @@ export function MapView({
         const center = map.getCenter();
         map.resize();
         // Resizing must not undo a manual pan, tilt, or ongoing edit.
-        map.jumpTo({ center });
+        map.jumpTo({ center, padding: mapPadding() });
       });
     };
     window.addEventListener('resize', resize);
@@ -314,9 +319,9 @@ export function MapView({
         minzoom: 14.5,
         paint: {
           'circle-color': ['get', 'color'],
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 15, 3, 18, 5],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 14.5, ['case', ['<=', ['get', 'priority'], 1], 3, 1.3], 17, 4, 19, 5],
           'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 14.5, 0.7, 18, 1.5],
         },
       });
       map.addLayer({
@@ -481,20 +486,19 @@ export function MapView({
       map.setFilter('buildings-3d', ['==', ['get', 'kind'], 'building']);
       map.setPaintProperty('buildings-3d', 'fill-extrusion-height', ['get', 'displayHeight']);
       map.setPaintProperty('buildings-3d', 'fill-extrusion-opacity', buildingOpacity);
-      const selectedBuilding = selected && data.map.features.find(f => f.properties?.kind === 'building' && buildingPlace(data, f)?.id === selected.id);
       map.setPaintProperty('buildings-3d', 'fill-extrusion-color', [
-        'case', ['==', ['get', 'id'], String(selectedBuilding?.properties?.id || '')], dark ? '#5799e5' : '#6ca2da',
+        'case', ['==', ['get', 'id'], selectedBuildingId], dark ? '#5799e5' : '#6ca2da',
         ['==', ['get', 'heightKind'], 'illustrative'], dark ? '#475b56' : '#c5d2cb',
         dark ? '#728b9e' : '#b3c6d8',
       ]);
       map.setLight({ color: dark ? '#becfe0' : '#ffffff', intensity: dark ? 0.35 : 0.45 });
-      map.setFilter('places-label-selected', ['==', ['get', 'id'], selected?.id || '']);
-      map.setFilter('places-label', ['all', ['<=', ['get', 'priority'], 1], ['!=', ['get', 'id'], selected?.id || '']]);
-      map.setFilter('places-label-detail', ['all', ['>', ['get', 'priority'], 1], ['!=', ['get', 'id'], selected?.id || '']]);
+      map.setFilter('places-label-selected', ['==', ['get', 'id'], selectedId]);
+      map.setFilter('places-label', ['all', ['<=', ['get', 'priority'], 1], ['!=', ['get', 'id'], selectedId]]);
+      map.setFilter('places-label-detail', ['all', ['>', ['get', 'priority'], 1], ['!=', ['get', 'id'], selectedId]]);
       for (const layer of ['places-label', 'places-label-detail', 'places-label-selected']) {
         map.setPaintProperty(layer, 'text-color', dark ? '#d7e3ee' : '#53616b');
         map.setPaintProperty(layer, 'text-halo-color', dark ? '#213039' : '#ffffff');
-        map.setLayoutProperty(layer, 'symbol-sort-key', ['case', ['==', ['get', 'id'], selected?.id || ''], 0, ['get', 'priority']]);
+        map.setLayoutProperty(layer, 'symbol-sort-key', ['case', ['==', ['get', 'id'], selectedId], 0, ['get', 'priority']]);
       }
     };
     if (ready.current) apply();
@@ -502,7 +506,7 @@ export function MapView({
     return () => {
       map.off('load', apply);
     };
-  }, [editor, buildingOpacity, dark, selected?.id, data.map, data.places]);
+  }, [editor, buildingOpacity, dark, selectedId, selectedBuildingId]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -521,12 +525,12 @@ export function MapView({
   }, [sourceData]);
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !selected) return;
+    if (!map || !selectedId || selectedLng === undefined || selectedLat === undefined) return;
     const marker = new maplibregl.Marker({ color: '#1764ed', scale: 0.85 })
-      .setLngLat(selected.coordinates)
+      .setLngLat([selectedLng, selectedLat])
       .addTo(map);
     map.flyTo({
-      center: selected.coordinates,
+      center: [selectedLng, selectedLat],
       zoom: Math.max(map.getZoom(), 17),
       padding: {
         left: panelBesideMap ? 40 : window.innerWidth > 767 ? 360 : 0,
@@ -537,7 +541,7 @@ export function MapView({
     return () => {
       marker.remove();
     };
-  }, [selected?.id, selected?.coordinates, panelBesideMap]);
+  }, [selectedId, selectedLng, selectedLat, panelBesideMap]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -545,7 +549,7 @@ export function MapView({
       const route = routes[activeRoute];
       (map.getSource('route-labels') as GeoJSONSource)?.setData({ type: 'FeatureCollection', features: route ? [
         { type: 'Feature', properties: { name: 'Start' }, geometry: { type: 'Point', coordinates: route.coordinates[0] } },
-        { type: 'Feature', properties: { name: selected?.name || 'Destination' }, geometry: { type: 'Point', coordinates: route.coordinates.at(-1)! } },
+        { type: 'Feature', properties: { name: (selected?.name || 'Destination').replace(/[^\x20-\x7E]/g, ' ') }, geometry: { type: 'Point', coordinates: route.coordinates.at(-1)! } },
       ] : [] });
       (map.getSource('routes') as GeoJSONSource)?.setData({
         type: 'FeatureCollection',
