@@ -8,6 +8,7 @@ describe('drawing progress', () => {
     expect(drawingProgress(draft([]))).toMatchObject({ count: 0, canFinish: false });
     expect(drawingProgress(draft([[3, 6]]))).toMatchObject({ count: 1, canFinish: false });
     expect(drawingProgress(draft([[3, 6], [3, 6]]))).toMatchObject({ canFinish: false });
+    expect(drawingProgress(draft([[3, 6], [3, 6]])).message).toContain('1 more point');
     expect(drawingProgress(draft([[3, 6], [3.1, 6]]))).toMatchObject({ count: 2, canFinish: true });
   });
   it('requires three distinct vertices for buildings', () => {

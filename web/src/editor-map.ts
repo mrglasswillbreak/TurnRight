@@ -76,6 +76,7 @@ export class EditorMap {
       toCustom: (event: TerraDrawMouseEvent) => {
         if (event.heldKeys.includes('Alt')) return undefined;
         const target = this.snap([event.lng, event.lat]);
+        this.showTarget(target);
         return target?.coordinates;
       },
     };
@@ -308,6 +309,9 @@ export class EditorMap {
   private mousemove = (event: MapMouseEvent) => {
     if (this.compare || (!this.kind && this.interaction === 'select')) return;
     const target = this.snap([event.lngLat.lng, event.lngLat.lat]);
+    this.showTarget(target);
+  };
+  private showTarget(target: SnapTarget | undefined) {
     this.setSource(
       'editor-target',
       collection(
@@ -327,7 +331,7 @@ export class EditorMap {
       this.hint = hint;
       this.callbacks.hint(hint);
     }
-  };
+  }
   private click = (event: MapMouseEvent) => {
     if (this.compare || this.kind) return;
     if (this.interaction !== 'select') {
