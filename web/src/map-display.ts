@@ -1,4 +1,5 @@
 import type { Feature, FeatureCollection } from 'geojson';
+import { appearanceColours } from './map-palette.js';
 import type { CampusData, GraphEdge, Place } from './types.js';
 
 export type BuildingDisplay = {
@@ -41,12 +42,15 @@ export function displayGeometry(map: FeatureCollection): FeatureCollection {
     features: map.features.map((feature) => {
       if (feature.properties?.kind !== 'building') return feature;
       const height = buildingDisplay(feature.properties);
+      const colours = appearanceColours(feature.properties || {});
       return {
         ...feature,
         properties: {
           ...feature.properties,
           displayHeight: height.metres,
           heightKind: height.kind,
+          displayWall: colours.wall,
+          displayRoof: colours.roof,
         },
       };
     }),

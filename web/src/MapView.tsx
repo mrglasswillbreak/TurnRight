@@ -12,6 +12,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import type { CampusData, GpsFix, Place, Route } from './types';
 import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
+import { campusPalette } from './map-palette';
 import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
@@ -52,6 +53,7 @@ export function MapView({
   onManualPan,
   onReady,
 }: MapViewProps) {
+  const palette = campusPalette[dark ? 'dark' : 'light'];
   const container = useRef<HTMLDivElement>(null),
     mapRef = useRef<MapInstance | null>(null);
   const callbacks = useRef({
@@ -117,7 +119,7 @@ export function MapView({
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': theme ? '#172126' : '#edf0eb' },
+        paint: { 'background-color': theme ? '#182727' : '#eee9dc' },
       },
     ],
   });
@@ -234,7 +236,7 @@ export function MapView({
         id: 'campus-fill',
         type: 'fill',
         source: 'boundary',
-        paint: { 'fill-color': dark ? '#243338' : '#f8faf5' },
+        paint: { 'fill-color': dark ? '#243632' : '#faf5e8' },
       });
       map.addLayer({
         id: 'land',
@@ -246,10 +248,10 @@ export function MapView({
             'match',
             ['get', 'name'],
             ['Green Area', 'Vegetation', 'Forest'],
-            dark ? '#263f36' : '#dbe8cf',
+            dark ? '#3b5645' : '#c0d0ac',
             ['Water Body', 'Water'],
-            '#bddce6',
-            dark ? '#293a3a' : '#ecede1',
+            '#a7cbd8',
+            dark ? '#34473e' : '#eee4cf',
           ],
           'fill-opacity': 0.65,
         },
@@ -272,7 +274,7 @@ export function MapView({
         filter: ['==', ['get', 'kind'], 'path'],
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
-          'line-color': dark ? '#526068' : '#d6d6cf',
+          'line-color': dark ? '#57665b' : '#cec1a6',
           'line-width': ['interpolate', ['linear'], ['zoom'], 14, 3, 18, 15],
         },
       });
@@ -283,8 +285,20 @@ export function MapView({
         filter: ['==', ['get', 'kind'], 'path'],
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
-          'line-color': dark ? '#77808a' : '#ffffff',
+          'line-color': dark ? '#9c9a7c' : '#ffffff',
           'line-width': ['interpolate', ['linear'], ['zoom'], 14, 2, 18, 12],
+        },
+      });
+      map.addLayer({
+        id: 'building-contact',
+        type: 'fill',
+        source: 'campus',
+        filter: ['==', ['get', 'kind'], 'building'],
+        paint: {
+          'fill-color': '#293329',
+          'fill-opacity': 0.13,
+          'fill-translate': [2, 3],
+          'fill-translate-anchor': 'viewport',
         },
       });
       map.addLayer({
@@ -293,7 +307,7 @@ export function MapView({
         source: 'campus',
         filter: ['==', ['get', 'kind'], 'building'],
         paint: {
-          'fill-color': dark ? '#52616c' : '#dce0e3',
+          'fill-color': ['get', 'displayRoof'],
           'fill-outline-color': dark ? '#697985' : '#c2cbd0',
         },
       });
@@ -312,6 +326,20 @@ export function MapView({
           'fill-extrusion-height': ['get', 'displayHeight'],
           'fill-extrusion-vertical-gradient': true,
           'fill-extrusion-opacity': 0.92,
+        },
+      });
+      map.addLayer({
+        id: 'building-roofs',
+        type: 'fill-extrusion',
+        source: 'campus',
+        filter: ['==', ['get', 'kind'], 'building'],
+        layout: { visibility: 'none' },
+        paint: {
+          'fill-extrusion-color': ['get', 'displayRoof'],
+          'fill-extrusion-base': ['get', 'displayHeight'],
+          'fill-extrusion-height': ['+', ['get', 'displayHeight'], 0.04],
+          'fill-extrusion-opacity': 0.92,
+          'fill-extrusion-vertical-gradient': false,
         },
       });
       map.addLayer({
@@ -569,8 +597,8 @@ export function MapView({
         Parameters<MapInstance['setPaintProperty']>[1],
         Parameters<MapInstance['setPaintProperty']>[2],
       ][] = [
-        ['background', 'background-color', dark ? '#172126' : '#edf0eb'],
-        ['campus-fill', 'fill-color', dark ? '#243338' : '#f8faf5'],
+        ['background', 'background-color', dark ? '#182727' : '#eee9dc'],
+        ['campus-fill', 'fill-color', dark ? '#243632' : '#faf5e8'],
         [
           'land',
           'fill-color',
@@ -578,15 +606,24 @@ export function MapView({
             'match',
             ['get', 'name'],
             ['Green Area', 'Vegetation', 'Forest'],
-            dark ? '#263f36' : '#dbe8cf',
+            dark ? '#3b5645' : '#c0d0ac',
             ['Water Body', 'Water'],
-            '#bddce6',
-            dark ? '#293a3a' : '#ecede1',
+            '#a7cbd8',
+            dark ? '#34473e' : '#eee4cf',
           ],
         ],
-        ['roads-case', 'line-color', dark ? '#526068' : '#d6d6cf'],
-        ['roads', 'line-color', dark ? '#77808a' : '#ffffff'],
-        ['buildings', 'fill-color', dark ? '#52616c' : '#dce0e3'],
+        ['roads-case', 'line-color', dark ? '#57665b' : '#cec1a6'],
+        [
+          'roads',
+          'line-color',
+          [
+            'case',
+            ['==', ['get', 'highway'], 'footway'],
+            palette.path,
+            palette.road,
+          ],
+        ],
+        ['buildings', 'fill-color', ['get', 'displayRoof']],
         ['buildings', 'fill-outline-color', dark ? '#697985' : '#c2cbd0'],
         ['building-outlines', 'line-color', dark ? '#9aabb3' : '#8094a1'],
         ['buildings-3d', 'fill-extrusion-color', dark ? '#52616c' : '#d5dce5'],
@@ -609,6 +646,11 @@ export function MapView({
       if (!map.getLayer('buildings-3d')) return;
       map.setLayoutProperty(
         'buildings-3d',
+        'visibility',
+        threeD ? 'visible' : 'none',
+      );
+      map.setLayoutProperty(
+        'building-roofs',
         'visibility',
         threeD ? 'visible' : 'none',
       );
@@ -636,13 +678,16 @@ export function MapView({
         'fill-extrusion-opacity',
         buildingOpacity,
       );
+      map.setPaintProperty(
+        'building-roofs',
+        'fill-extrusion-opacity',
+        buildingOpacity,
+      );
       map.setPaintProperty('buildings-3d', 'fill-extrusion-color', [
         'case',
         ['==', ['get', 'id'], selectedBuildingId],
         dark ? '#5799e5' : '#6ca2da',
-        ['==', ['get', 'heightKind'], 'illustrative'],
-        dark ? '#475b56' : '#c5d2cb',
-        dark ? '#728b9e' : '#b3c6d8',
+        ['get', 'displayWall'],
       ]);
       map.setLight({
         color: dark ? '#becfe0' : '#ffffff',
