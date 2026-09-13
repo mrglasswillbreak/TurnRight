@@ -14,6 +14,8 @@ export function retainCampusSources(previous: CampusData, next: CampusData): Cam
 }
 export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
   const worker = useRef<RevisionWorker<CampusData, MapEdit[], Validation> | null>(null);
+  const latest = useRef({ base, edits });
+  latest.current = { base, edits };
   const [state, setState] = useState<{ base: CampusData; edits: MapEdit[] | null; result: Validation }>({ base, edits: null, result: { data: base, errors: [], warnings: [], duplicates: [] } });
   useEffect(() => {
     const client = new RevisionWorker<CampusData, MapEdit[], Validation>(new Worker(new URL('./editor-validation.worker.ts', import.meta.url), { type: 'module' }));
@@ -27,9 +29,9 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
   useEffect(() => {
     let cancelled = false;
     void check(edits).then(result => {
-      if (!cancelled) setState(previous => ({ base, edits, result: { ...result, data: retainCampusSources(previous.result.data, result.data) } }));
+      if (!cancelled && latest.current.base === base && latest.current.edits === edits) setState(previous => ({ base, edits, result: { ...result, data: retainCampusSources(previous.result.data, result.data) } }));
     }).catch(error => {
-      if (!cancelled) setState({ base, edits, result: { data: base, errors: [(error as Error).message], warnings: [], duplicates: [] } });
+      if (!cancelled && latest.current.base === base && latest.current.edits === edits) setState({ base, edits, result: { data: base, errors: [(error as Error).message], warnings: [], duplicates: [] } });
     });
     return () => { cancelled = true; };
   }, [base, edits, check]);
