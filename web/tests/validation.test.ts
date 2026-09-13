@@ -5,6 +5,10 @@ import { structuralIssues } from '../src/validation';
 import { applyEdits } from '../src/editor-model';
 import { campusFixture } from './fixture';
 import type { CampusData, MapEdit } from '../src/types';
+import {
+  assembleEditorSources,
+  validateWorkspace,
+} from '../src/editor-validation';
 
 const captured = (): { base: CampusData; edits: MapEdit[] } =>
   JSON.parse(
@@ -15,6 +19,58 @@ const captured = (): { base: CampusData; edits: MapEdit[] } =>
     ).toString(),
   );
 describe('release structural validation', () => {
+  it('keeps assembly failures actionable and rejects stale connection targets', () => {
+    const base = campusFixture();
+    expect(
+      assembleEditorSources(
+        [
+          {
+            id: 'bad',
+            entity: 'edge',
+            source: 'test',
+            hash: 'bad',
+            payload: {},
+          },
+        ],
+        base,
+      ).issues[0].code,
+    ).toBe('source-assembly');
+    const result = validateWorkspace(
+      base,
+      [
+        {
+          id: 'test-path',
+          kind: 'path',
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [3.2, 6.46],
+              [3.201, 6.46],
+            ],
+          },
+          properties: {
+            name: 'Test',
+            vertexIds: ['new-a', 'new-b'],
+            connections: [
+              {
+                vertexId: 'new-a',
+                target: {
+                  type: 'node',
+                  nodeId: 'missing',
+                  coordinates: [3.2, 6.46],
+                },
+              },
+            ],
+          },
+        },
+      ],
+      7,
+    );
+    expect(result.failed).toBe(false);
+    expect(result.revision).toBe(7);
+    expect(result.issues[0].featureId).toBe('test-path');
+    expect(result.errors.join(' ')).toContain('connection target changed');
+  });
   it('identifies the actual broken approved edge without destroying the live drafts', () => {
     const { base, edits } = captured();
     const before = JSON.stringify({ base, edits });

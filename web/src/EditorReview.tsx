@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
-import type { CampusData, MapChange, Release, StudentReport } from './types';
+import type { MapChange, Release, StudentReport } from './types';
 import type { EditorWorkspace } from './editor-workspace';
+import type { EditorValidation } from './editor-validation';
 export interface ReviewState {
   changes: MapChange[];
   reports: StudentReport[];
@@ -30,6 +31,8 @@ export function EditorReview({
   state,
   workspace,
   validation,
+  baselineVersion,
+  publishedVersion,
   busy,
   action,
   mapRef,
@@ -41,12 +44,9 @@ export function EditorReview({
   tab: string;
   state: ReviewState;
   workspace: EditorWorkspace;
-  validation: {
-    data: CampusData;
-    errors: string[];
-    warnings: string[];
-    pending?: boolean;
-  };
+  validation: EditorValidation & { pending?: boolean; retry: () => void };
+  baselineVersion: string;
+  publishedVersion: string;
   busy: boolean;
   action: (name: string, payload: unknown, success: string) => Promise<boolean>;
   mapRef: RefObject<MapInstance | null>;
@@ -208,28 +208,110 @@ export function EditorReview({
       {tab === 'releases' && (
         <>
           <h2>Review, then publish</h2>
+          <p className="small-note">
+            Editor baseline: {baselineVersion}
+            <br />
+            Public package loaded: {publishedVersion}
+          </p>
+          {baselineVersion !== publishedVersion && (
+            <p className="notice">
+              The editor baseline differs from the public map. Reconcile the
+              published baseline before replacing campus geometry; retain the
+              reviewed Law and Library access corrections.
+            </p>
+          )}
           <div className="validation-card">
             <strong>
               {validation.pending
                 ? 'Checking the latest draft…'
-                : validation.errors.length
-                  ? 'Validation needs attention'
-                  : 'Draft validation passed'}
+                : validation.failed
+                  ? 'Validation could not finish'
+                  : validation.errors.length
+                    ? 'Validation needs attention'
+                    : 'Draft validation passed'}
             </strong>
+            {!validation.usable && (
+              <p className="notice">
+                Showing the last usable map. The current draft has not passed
+                validation.
+              </p>
+            )}
             <p>
               {validation.data.places.length} places ·{' '}
               {validation.data.graph.edges.length} path segments
             </p>
-            {validation.errors.map((e) => (
-              <p className="form-error" key={e}>
-                {e}
-              </p>
+            {validation.issues.map((issue, index) => (
+              <div className="form-error" key={`${issue.code}:${index}`}>
+                <p>{issue.message}</p>
+                <small>
+                  {issue.phase} · revision {validation.revision}
+                  {issue.featureId ? ` · ${issue.featureId}` : ''}
+                </small>
+                {issue.referenceIds?.length && (
+                  <p className="small-note">
+                    References: {issue.referenceIds.join(', ')}
+                  </p>
+                )}
+                {issue.coordinates && (
+                  <button
+                    className="text-button"
+                    onClick={() =>
+                      mapRef.current?.flyTo({
+                        center: issue.coordinates,
+                        zoom: 18,
+                      })
+                    }
+                  >
+                    <MapPin size={15} /> Locate feature
+                  </button>
+                )}
+              </div>
             ))}
             {validation.warnings.map((w) => (
               <p className="small-note" key={w}>
                 {w}
               </p>
             ))}
+          </div>
+          <div className="button-row">
+            <Button
+              variant="outline"
+              disabled={validation.pending}
+              onClick={validation.retry}
+            >
+              <RefreshCw /> Retry validation
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const url = URL.createObjectURL(
+                  new Blob(
+                    [
+                      JSON.stringify(
+                        {
+                          baselineVersion,
+                          publishedVersion,
+                          revision: validation.revision,
+                          failed: validation.failed,
+                          issues: validation.issues,
+                          warnings: validation.warnings,
+                        },
+                        null,
+                        2,
+                      ),
+                    ],
+                    { type: 'application/json' },
+                  ),
+                );
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'turnright-validation.json';
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+              }}
+            >
+              Download diagnostics
+            </Button>
           </div>
           <p className="notice">
             {validation.data.coverage.disconnected.length} places still lack a
@@ -259,6 +341,7 @@ export function EditorReview({
               validation.pending ||
               workspace.unfinished !== null ||
               validation.errors.length > 0 ||
+              baselineVersion !== publishedVersion ||
               summary.trim().length < 5
             }
             onClick={() =>
@@ -288,23 +371,45 @@ export function EditorReview({
                 </a>
               )}
               {release.status === 'preview' && (
-                <Button
-                  disabled={busy}
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        'Publish this reviewed preview to the public TurnRight site?',
+                <>
+                  <p className="small-note">
+                    {baselineVersion !== publishedVersion ||
+                    release.created_at <
+                      (workspace.edits
+                        .map((e) => e.updated_at || '')
+                        .sort()
+                        .at(-1) || '')
+                      ? 'Stale preview: reconcile the baseline and build a new preview from the current drafts.'
+                      : 'The server checks this snapshot again before publication.'}
+                  </p>
+                  <Button
+                    disabled={
+                      busy ||
+                      validation.pending ||
+                      validation.errors.length > 0 ||
+                      baselineVersion !== publishedVersion ||
+                      release.created_at <
+                        (workspace.edits
+                          .map((e) => e.updated_at || '')
+                          .sort()
+                          .at(-1) || '')
+                    }
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          'Publish this reviewed preview to the public TurnRight site?',
+                        )
                       )
-                    )
-                      void action(
-                        'publish-release',
-                        { id: release.id },
-                        'Publication requested. Refresh to verify the result.',
-                      );
-                  }}
-                >
-                  Publish this preview
-                </Button>
+                        void action(
+                          'publish-release',
+                          { id: release.id },
+                          'Publication requested. Refresh to verify the result.',
+                        );
+                    }}
+                  >
+                    Publish this preview
+                  </Button>
+                </>
               )}
               {release.status === 'published' && (
                 <Button

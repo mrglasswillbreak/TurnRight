@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { applyEdits } from './editor-model';
+import type { EditorValidation as Validation } from './editor-validation';
+import type { ValidationIssue } from './validation';
 import type { CampusData, MapEdit } from './types';
 import { RevisionWorker } from './revision-worker';
-import type { DuplicateCandidate } from './duplicates';
-
-type Validation = ReturnType<typeof applyEdits> & {
-  duplicates: DuplicateCandidate[];
-};
 export function retainCampusSources(
   previous: CampusData,
   next: CampusData,
@@ -25,7 +21,14 @@ export function retainCampusSources(
   }
   return next;
 }
-export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
+const noIssues: ValidationIssue[] = [];
+export function useEditorValidation(
+  base: CampusData,
+  edits: MapEdit[],
+  fallback = base,
+  sourceIssues = noIssues,
+) {
+  const [attempt, setAttempt] = useState(0);
   const worker = useRef<RevisionWorker<
     CampusData,
     MapEdit[],
@@ -40,7 +43,16 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
   }>({
     base,
     edits: null,
-    result: { data: base, errors: [], warnings: [], duplicates: [] },
+    result: {
+      data: fallback,
+      errors: [],
+      warnings: [],
+      duplicates: [],
+      issues: [],
+      revision: 0,
+      failed: false,
+      usable: true,
+    },
   });
   useEffect(() => {
     const client = new RevisionWorker<CampusData, MapEdit[], Validation>(
@@ -53,16 +65,27 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
       client.close();
       worker.current = null;
     };
-  }, []);
+  }, [attempt]);
   const check = useCallback(
     (snapshot: MapEdit[]) => {
+      if (sourceIssues.length)
+        return Promise.resolve({
+          data: base,
+          errors: sourceIssues.map((i) => i.message),
+          warnings: [],
+          duplicates: [],
+          issues: sourceIssues,
+          revision: attempt,
+          failed: false,
+          usable: false,
+        } satisfies Validation);
       if (!worker.current)
         return Promise.reject(
           new Error('Validation is starting. Please try again.'),
         );
       return worker.current.request(base, snapshot);
     },
-    [base],
+    [base, sourceIssues, attempt],
   );
   useEffect(() => {
     let cancelled = false;
@@ -78,7 +101,9 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
             edits,
             result: {
               ...result,
-              data: retainCampusSources(previous.result.data, result.data),
+              data: result.usable
+                ? retainCampusSources(previous.result.data, result.data)
+                : previous.result.data,
             },
           }));
       })
@@ -88,27 +113,41 @@ export function useEditorValidation(base: CampusData, edits: MapEdit[]) {
           latest.current.base === base &&
           latest.current.edits === edits
         )
-          setState({
+          setState((previous) => ({
             base,
             edits,
             result: {
-              data: base,
+              data: previous.result.data,
               errors: [(error as Error).message],
               warnings: [],
               duplicates: [],
+              issues: [
+                {
+                  code: 'worker-crash',
+                  phase: 'worker',
+                  message: (error as Error).message,
+                },
+              ],
+              revision: attempt,
+              failed: true,
+              usable: false,
             },
-          });
+          }));
       });
     return () => {
       cancelled = true;
     };
-  }, [base, edits, check]);
+  }, [base, edits, check, attempt]);
   return useMemo(
     () => ({
       ...state.result,
-      data: state.base === base ? state.result.data : base,
+      data: state.result.data,
       pending: state.base !== base || state.edits !== edits,
       check,
+      retry: () => {
+        setState((previous) => ({ ...previous, edits: null }));
+        setAttempt((n) => n + 1);
+      },
     }),
     [state, base, edits, check],
   );

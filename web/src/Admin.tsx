@@ -29,7 +29,8 @@ import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
 import { api, supabase } from './supabase';
-import { assembleSources, type SourceRecord } from './editor-model';
+import { type SourceRecord } from './editor-model';
+import { assembleEditorSources } from './editor-validation';
 import { useEditorValidation } from './useEditorValidation';
 import { DuplicateReview } from './DuplicateReview';
 import { buildingPlace } from './map-display';
@@ -329,8 +330,17 @@ function Editor({
   };
   const progress = drawingProgress(workspace.unfinished);
   const calculate = useRoutes();
-  const base = useMemo(() => assembleSources(sources, data), [sources, data]);
-  const validation = useEditorValidation(base, workspace.edits);
+  const assembly = useMemo(
+    () => assembleEditorSources(sources, data),
+    [sources, data],
+  );
+  const base = assembly.data;
+  const validation = useEditorValidation(
+    base,
+    workspace.edits,
+    data,
+    assembly.issues,
+  );
   const autoReviewed = useRef(new WeakSet<CampusData>());
   const mergeBatch = useCallback(
     async (batch: MapEdit[], success: string) => {
@@ -417,7 +427,7 @@ function Editor({
     workspace.unfinished,
     mergeBatch,
   ]);
-  const visible = preview ? base : validation.data;
+  const visible = preview && validation.usable ? base : validation.data;
   const invalid = useMemo(
     () =>
       new Set(
@@ -1502,6 +1512,8 @@ function Editor({
                 state={state}
                 workspace={workspace}
                 validation={validation}
+                baselineVersion={base.version}
+                publishedVersion={data.version}
                 busy={busy}
                 action={action}
                 mapRef={mapRef}

@@ -1,6 +1,5 @@
 /// <reference lib="webworker" />
-import { applyEdits } from './editor-model';
-import { findDuplicateCandidates } from './duplicates';
+import { validateWorkspace } from './editor-validation';
 import type { CampusData, MapEdit } from './types';
 import type { RevisionRequest } from './revision-worker';
 let base: CampusData | undefined;
@@ -18,14 +17,11 @@ self.onmessage = (
   try {
     if (!base || message.revision !== revision)
       throw new Error('Validation needs the current campus map.');
-    const result = applyEdits(base, message.payload);
+    const result = validateWorkspace(base, message.payload, revision);
     self.postMessage({
       id,
       revision,
-      result: {
-        ...result,
-        duplicates: findDuplicateCandidates(result.data, message.payload),
-      },
+      result,
     });
   } catch (error) {
     self.postMessage({
