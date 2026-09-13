@@ -32,6 +32,7 @@ import { api, supabase } from './supabase';
 import { applyEdits, assembleSources, type SourceRecord } from './editor-model';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
+import { drawingProgress } from './drawing-state';
 import { SurveyPanel } from './SurveyPanel';
 import { readSurveyContext, writeSurveyContext } from './survey-storage';
 import {
@@ -309,6 +310,14 @@ function Editor({
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const routeRequest = useRef(0);
+  const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(null);
+  const restoreDrawingPanels = () => {
+    if (!drawingPanels.current) return;
+    setExplorer(drawingPanels.current.explorer);
+    setShowRoutes(drawingPanels.current.routes);
+    drawingPanels.current = null;
+  };
+  const progress = drawingProgress(workspace.unfinished);
   const calculate = useRoutes();
   const base = useMemo(() => assembleSources(sources, data), [sources, data]);
   const validation = useMemo(
@@ -369,6 +378,7 @@ function Editor({
     setSelected(current);
     selectedRef.current = current;
     setTool(null);
+    restoreDrawingPanels();
     setRoutes([]);
     controller.current?.select(current);
   };
@@ -377,10 +387,15 @@ function Editor({
     props: MapEdit['properties'] = {},
     seed?: Position[],
   ) => {
-    if (workspace.unfinished) {
+    if (tool || workspace.unfinished) {
       setMessage('Finish or cancel the current drawing first.');
       return;
     }
+    if (!controller.current) return;
+    drawingPanels.current = { explorer, routes: showRoutes };
+    setExplorer(false);
+    setShowRoutes(false);
+    setHint('');
     setSelected(null);
     selectedRef.current = null;
     setTool(kind);
@@ -689,6 +704,7 @@ function Editor({
     if (tool) {
       controller.current?.cancel();
       setTool(null);
+      restoreDrawingPanels();
     }
     if (redo) workspace.redo();
     else workspace.undo();
@@ -703,6 +719,7 @@ function Editor({
   const cancel = () => {
     controller.current?.cancel();
     setTool(null);
+    restoreDrawingPanels();
     setSelected(null);
     setHint('');
     setMessage('Drawing cancelled. Select a feature or choose a tool.');
@@ -880,6 +897,9 @@ function Editor({
   const resume = () => {
     const drawing = workspace.unfinished;
     if (!drawing) return;
+    drawingPanels.current = { explorer, routes: showRoutes };
+    setExplorer(false);
+    setShowRoutes(false);
     const points =
       drawing.geometry.type === 'LineString'
         ? drawing.geometry.coordinates
@@ -931,6 +951,7 @@ function Editor({
             <button
               key={id}
               className={tab === id ? 'active' : ''}
+              disabled={!!tool || !!workspace.unfinished}
               onClick={() => setTab(id)}
             >
               {label}
@@ -987,7 +1008,7 @@ function Editor({
           >
             <RefreshCw size={17} />
           </button>
-          <button className="editor-publish" onClick={() => setTab('releases')}>
+          <button className="editor-publish" disabled={!!tool || !!workspace.unfinished} onClick={() => setTab('releases')}>
             Review changes <ArrowUpRight size={15} />
           </button>
           <button
@@ -1009,6 +1030,8 @@ function Editor({
           buildingOpacity={
             survey ||
             tool === 'entrance' ||
+            tool === 'path' ||
+            tool === 'barrier' ||
             tool === 'building' ||
             selected?.kind === 'building'
               ? 0.2
@@ -1106,7 +1129,7 @@ function Editor({
               aria-label={name}
               aria-pressed={tool === kind}
               title={`${name}${shortcut ? ` (${shortcut})` : ''}`}
-              disabled={preview || !ready}
+              disabled={preview || !ready || (!!kind && (!!tool || !!workspace.unfinished))}
               onClick={() => (kind ? begin(kind) : cancel())}
             >
               <Icon size={20} />
@@ -1227,6 +1250,7 @@ function Editor({
             <button
               className="editor-card editor-icon"
               aria-label="Open explorer"
+              disabled={!!tool}
               onClick={() => setExplorer(true)}
             >
               <PanelLeftOpen size={20} />
@@ -1539,8 +1563,11 @@ function Editor({
               : hint || message}
             {tool && (
               <span className="editor-finish-controls">
+                <span aria-live="polite" className="drawing-progress">{progress.message}</span>
                 <button
                   className="editor-primary"
+                  disabled={!progress.canFinish}
+                  title={progress.canFinish ? 'Finish drawing' : progress.message}
                   onClick={() => controller.current?.finish()}
                 >
                   <Check size={15} /> Finish

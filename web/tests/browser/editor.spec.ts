@@ -962,6 +962,47 @@ async function focusCampus(page: Page) {
     .toBe(false);
 }
 
+for (const touch of [false, true])
+  test(`drawing session protects the first point and restores panels with ${touch ? 'touch' : 'mouse'}`, async ({ browser }) => {
+    const context = await browser.newContext({
+      baseURL: 'http://127.0.0.1:5183',
+      viewport: touch ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
+      hasTouch: touch, isMobile: touch,
+    });
+    const page = await context.newPage();
+    try {
+      const server = await setup(page);
+      await focusCampus(page);
+      await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+      await expect(page.locator('.editor-explorer')).toHaveClass(/collapsed/);
+      await expect(page.getByText('Click or tap the map to place the first point.')).toBeVisible();
+      const finish = page.getByRole('button', { name: 'Finish', exact: true });
+      await expect(finish).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Draw building', exact: true })).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Compare base', exact: true })).toBeDisabled();
+      const point = await position(page, [3.20015, 6.4601]);
+      if (touch) await page.touchscreen.tap(point.x, point.y);
+      else await page.mouse.click(point.x, point.y);
+      await expect(page.locator('.drawing-progress')).toContainText('1 point placed');
+      await expect(finish).toBeDisabled();
+      await expect.poll(() => page.evaluate(() => window.editorTestMap.queryRenderedFeatures().filter(f => /td-/.test(f.layer.id) && f.geometry.type === 'Point').length)).toBeGreaterThan(0);
+      await page.getByRole('button', { name: '3D', exact: true }).click();
+      await expect.poll(() => page.evaluate(() => window.editorTestMap.getPitch())).toBeGreaterThan(45);
+      await expect(page.locator('.drawing-progress')).toContainText('1 point placed');
+      const second = await position(page, [3.2004, 6.4601]);
+      if (touch) await page.touchscreen.tap(second.x, second.y);
+      else await page.mouse.click(second.x, second.y);
+      await expect(finish).toBeEnabled();
+      await finish.click();
+      await expect(page.locator('.editor-explorer')).not.toHaveClass(/collapsed/);
+      await expect.poll(() => server.edits().filter(e => e.kind === 'path').length).toBe(1);
+      await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+      await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+      await expect(page.locator('.editor-explorer')).not.toHaveClass(/collapsed/);
+      expect(server.edits().filter(e => e.kind === 'path')).toHaveLength(1);
+    } finally { await context.close(); }
+  });
+
 for (const threeD of [false, true])
   test(`map two entrances and their approaches in ${threeD ? '3D' : '2D'}, save and reload`, async ({
     page,

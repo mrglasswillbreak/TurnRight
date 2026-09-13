@@ -1061,3 +1061,14 @@
     display: none !important;
   }
 }
+
+/* Drawing controls retain a clear tap target at narrow widths. */
+.editor-guidance > .editor-finish-controls { flex-wrap: wrap; }
+.drawing-progress { flex-basis: 100%; color: var(--ed-text); }
+.editor-finish-controls button { min-height: 40px; }
+@media (max-width: 767px) {
+  .editor-navigation { gap: 7px; }
+  .editor-brand strong { font-size: 13px; }
+  .editor-brand strong span { font-size: 9px; }
+  .editor-header .editor-primary { padding: 9px; }
+}

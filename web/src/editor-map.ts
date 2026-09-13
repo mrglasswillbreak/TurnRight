@@ -19,6 +19,8 @@ import type { CampusData, MapEdit, Position } from './types';
 import type { UnfinishedDrawing } from './editor-workspace';
 import { snapTarget, type SnapTarget } from './editor-features';
 import { distance } from './geo';
+import { drawingProgress } from './drawing-state';
+import { visualEdges } from './map-display';
 
 type Interaction =
   | 'select'
@@ -62,6 +64,8 @@ export class EditorMap {
   private source: CampusData;
   private hint = '';
   private disposed = false;
+  private previousSources = new Map<string, string>();
+  private lastDraft: UnfinishedDrawing | null = null;
   constructor(
     readonly map: MapInstance,
     data: CampusData,
@@ -342,6 +346,7 @@ export class EditorMap {
       'editor-draft-fill',
       'places-dot',
       'places-label',
+      'places-label-detail',
       'buildings-3d',
       'buildings',
       'roads',
@@ -376,6 +381,9 @@ export class EditorMap {
     }
   };
   private setSource(id: string, data: FeatureCollection) {
+    const signature = JSON.stringify(data);
+    if (this.previousSources.get(id) === signature) return;
+    this.previousSources.set(id, signature);
     (this.map.getSource(id) as GeoJSONSource)?.setData(data);
   }
   select(edit: MapEdit | null) {
@@ -405,6 +413,7 @@ export class EditorMap {
     seed?: Position[],
     id: string = crypto.randomUUID(),
   ) {
+    if (this.kind) return;
     this.setting = true;
     this.draw.clear();
     this.selected = null;
@@ -438,6 +447,13 @@ export class EditorMap {
       }
     this.setting = false;
     this.targets(kind === 'path');
+    this.lastDraft = {
+      id, kind, properties,
+      geometry: kind === 'building' ? { type: 'Polygon', coordinates: [[]] }
+        : kind === 'path' || kind === 'barrier' ? { type: 'LineString', coordinates: [] }
+          : { type: 'Point', coordinates: [] },
+    };
+    this.callbacks.draft(this.lastDraft);
     this.captureDraft();
   }
   private captureDraft() {
@@ -455,19 +471,26 @@ export class EditorMap {
       geometry.coordinates = geometry.coordinates.slice(0, -1);
     if (geometry.type === 'Polygon')
       geometry.coordinates = [geometry.coordinates[0].slice(0, -2)];
-    this.callbacks.draft({
+    this.lastDraft = {
       id: this.creationId,
       kind: this.kind,
       geometry,
       properties: this.properties,
-    });
+    };
+    this.callbacks.draft(this.lastDraft);
   }
   finish() {
+    this.captureDraft();
+    if (!drawingProgress(this.lastDraft).canFinish) {
+      this.callbacks.hint(drawingProgress(this.lastDraft).message);
+      return;
+    }
     const event = { key: 'Enter', heldKeys: [], preventDefault: () => {} };
     if (this.kind === 'building') this.polygon.onKeyUp(event);
     else if (this.kind) this.line.onKeyUp(event);
   }
   cancel() {
+    this.lastDraft = null;
     clearTimeout(this.draftTimer);
     this.select(null);
     this.callbacks.draft(null);
@@ -511,7 +534,7 @@ export class EditorMap {
     this.setSource(
       'editor-network',
       collection(
-        data.graph.edges
+        visualEdges(data.graph.edges)
           .filter((e) => nodes.has(e.from) && nodes.has(e.to))
           .map((e) => ({
             type: 'Feature',

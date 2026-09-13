@@ -162,6 +162,7 @@ export class EditorWorkspace {
     this.changed();
   }
   draft(drawing: UnfinishedDrawing | null) {
+    if (JSON.stringify(drawing) === JSON.stringify(this.unfinished)) return;
     this.unfinished = drawing;
     this.changed();
   }
