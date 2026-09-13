@@ -364,7 +364,7 @@ export function MapView({
       map.addLayer({ ...label, id: 'places-label-detail', minzoom: 16.8, filter: ['>', ['get', 'priority'], 1] });
       map.addLayer({ ...label, id: 'places-label-selected', minzoom: 13, filter: ['==', ['get', 'id'], ''], layout: { ...label.layout, 'text-size': 14, 'text-allow-overlap': true } }, 'places-label');
       map.addLayer({ ...label, id: 'route-end-labels', source: 'route-labels', minzoom: 13, filter: ['has', 'name'],
-        layout: { ...label.layout, 'text-size': 13, 'text-offset': [0, -1], 'text-anchor': 'bottom', 'text-allow-overlap': true },
+        layout: { ...label.layout, 'symbol-sort-key': 0, 'text-size': 13, 'text-offset': [0, -1], 'text-anchor': 'bottom', 'text-allow-overlap': true },
         paint: { ...label.paint, 'text-color': '#085adb', 'text-halo-color': '#ffffff', 'text-halo-width': 2 },
       }, 'places-label-selected');
       if (!editor) {
