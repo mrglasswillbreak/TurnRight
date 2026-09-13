@@ -137,6 +137,8 @@ export function featureEdit(
           aliases: p.aliases.join(', '),
           department: p.department,
           faculty: p.faculty,
+          buildingId: p.buildingId,
+          sourceRefs: p.sourceRefs,
         },
       };
   }

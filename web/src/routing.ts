@@ -1,5 +1,6 @@
 import { bearing, distance } from './geo';
-import { geometryBlocker } from './spatial';
+import { cachedGeometryBlocker } from './spatial';
+import { resolvePlaceId } from './map-display';
 import type {
   CampusData,
   GraphEdge,
@@ -187,7 +188,7 @@ function endpointNodes(
   endpoint: RouteEndpoint,
 ): EndpointNode[] {
   if (typeof endpoint === 'string') return [{ id: endpoint, distance: 0 }];
-  const place = data.places.find((p) => p.id === endpoint.placeId);
+  const place = data.places.find((p) => p.id === resolvePlaceId(data, endpoint.placeId));
   if (!place) return [];
   const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
   if (entrances.length)
@@ -220,10 +221,11 @@ export function findRoutes(
   const blocked = new Set(
     data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
   );
+  const geometryBlocked = cachedGeometryBlocker(data.map);
   for (const edge of data.graph.edges) {
     const a = nodeMap.get(edge.from),
       b = nodeMap.get(edge.to);
-    if (!a || !b || edge.geometryBlocked || geometryBlocker(a, b, data.map))
+    if (!a || !b || edge.geometryBlocked || geometryBlocked(a, b))
       blocked.add(edge.id);
   }
   const usableGraph = {
