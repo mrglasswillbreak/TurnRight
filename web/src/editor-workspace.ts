@@ -53,6 +53,7 @@ export class EditorWorkspace {
   private flight: Promise<boolean> | null = null;
   private persistence: Promise<void> = Promise.resolve();
   private recoveryFailed = false;
+  private recoverySignature = '';
   constructor(
     server: MapEdit[],
     private send: (batch: SaveBatch) => Promise<MapEdit[]>,
@@ -106,13 +107,18 @@ export class EditorWorkspace {
     return structuredClone({ edits: this.edits, unfinished: this.unfinished });
   }
   private persistNow() {
-    const recovery: WorkspaceRecovery = structuredClone({
-      ...this.snapshot(),
+    const snapshot: WorkspaceRecovery = {
+      edits: this.edits,
+      unfinished: this.unfinished,
       saved: this.saved,
       pending: this.pending,
       past: this.past,
       future: this.future,
-    });
+    };
+    const signature = JSON.stringify(snapshot);
+    if (signature === this.recoverySignature && !this.recoveryFailed) return this.persistence;
+    this.recoverySignature = signature;
+    const recovery = structuredClone(snapshot);
     this.persistence = this.persistence
       .catch(() => {})
       .then(async () => {
@@ -120,6 +126,7 @@ export class EditorWorkspace {
         this.recoveryFailed = false;
       })
       .catch(() => {
+        if (this.recoverySignature === signature) this.recoverySignature = '';
         this.recoveryFailed = true;
         if (this.status !== 'Conflict') this.status = 'Recovery unavailable';
         if (!this.error) this.error = recoveryMessage;
