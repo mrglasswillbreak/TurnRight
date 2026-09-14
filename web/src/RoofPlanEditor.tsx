@@ -45,6 +45,15 @@ export function RoofPlanEditor({
   const svg = useRef<SVGSVGElement>(null),
     dragging = useRef<string | null>(null),
     lastValid = useRef<RoofSurface | null>(null);
+  const editButton = useRef<HTMLButtonElement>(null),
+    selectTool = useRef<HTMLButtonElement>(null),
+    hadDraft = useRef(!!draft);
+  const hasDraft = !!draft;
+  useEffect(() => {
+    if (hadDraft.current !== hasDraft)
+      (hasDraft ? selectTool.current : editButton.current)?.focus();
+    hadDraft.current = hasDraft;
+  }, [hasDraft]);
   const existing = edit.properties.appearance?.roofs?.[partId];
   const roof = useMemo(
     () =>
@@ -201,7 +210,7 @@ export function RoofPlanEditor({
       </p>
       {!draft ? (
         <>
-          <button className="editor-primary" onClick={start}>
+          <button ref={editButton} className="editor-primary" onClick={start}>
             {existing ? 'Edit custom roof' : 'Create custom roof'}
           </button>
           {existing && (
@@ -225,6 +234,7 @@ export function RoofPlanEditor({
             {(['select', 'point', 'ridge', 'valley'] as const).map((t) => (
               <button
                 key={t}
+                ref={t === 'select' ? selectTool : undefined}
                 aria-pressed={tool === t}
                 onClick={() => {
                   setTool(t);

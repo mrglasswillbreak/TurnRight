@@ -2,6 +2,7 @@ import type { Map as MapInstance } from 'maplibre-gl';
 declare global {
   interface Window {
     editorTestMap: MapInstance;
+    previewBuilds: string[][];
     surveyGps?: (fix: GeolocationPosition) => void;
     surveyGpsWatchCount: number;
     motionTest: {
@@ -2476,7 +2477,23 @@ test('building appearance: integrated view, surface inheritance, live preview, r
 test('building previews survive revisiting unedited buildings without rebuilding cached models', async ({
   page,
 }) => {
-  await setup(page);
+  await page.addInitScript(() => {
+    window.previewBuilds = [];
+    const send = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (
+      message,
+      ...rest: [Transferable[]?]
+    ) {
+      if (message?.features)
+        window.previewBuilds.push(
+          message.features.map(
+            (f: { properties: { id: string } }) => f.properties.id,
+          ),
+        );
+      return send.call(this, message, rest[0] || []);
+    };
+  });
+  const state = await setup(page);
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
@@ -2488,11 +2505,39 @@ test('building previews survive revisiting unedited buildings without rebuilding
   await expect.poll(rendered).toContain('library');
   await page.getByRole('button', { name: 'Close properties' }).click();
   await expect.poll(rendered).not.toContain('library');
+  await clickMap(page, [3.20068, 6.46022]);
+  await expect.poll(rendered).toContain('unknown-building');
+  await page.getByRole('button', { name: 'Close properties' }).click();
+  await expect.poll(rendered).not.toContain('unknown-building');
   await clickMap(page, [3.20012, 6.46022]);
   await expect(
     page.getByRole('heading', { name: 'Library', exact: true }),
   ).toBeVisible();
   await expect.poll(rendered).toContain('library');
+  expect(await page.evaluate(() => window.previewBuilds)).toEqual([
+    ['library'],
+    ['unknown-building'],
+  ]);
+  await page.getByLabel('Wall colour', { exact: true }).fill('#123456');
+  await page.getByLabel('Wall colour', { exact: true }).blur();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.wallColour,
+    )
+    .toBe('#123456');
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  await page.getByLabel('Name', { exact: true }).fill('Renamed library');
+  await page.getByLabel('Name', { exact: true }).blur();
+  await expect
+    .poll(() => state.edits().find((e) => e.id === 'library')?.properties.name)
+    .toBe('Renamed library');
+  expect(await page.evaluate(() => window.previewBuilds)).toEqual([
+    ['library'],
+    ['unknown-building'],
+    ['library'],
+  ]);
 });
 
 test('building preview survives worker timeout, crash and obsolete replies', async ({
@@ -2545,9 +2590,11 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
     await page.evaluate(() =>
       window.dispatchEvent(new Event('restore-preview-worker')),
     );
-    await page
-      .getByRole('button', { name: 'Retry 3D preview', exact: true })
-      .click();
+    if (failure === 'crash') await colour.fill('#335577');
+    else
+      await page
+        .getByRole('button', { name: 'Retry 3D preview', exact: true })
+        .click();
     await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
     await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
   }
@@ -2810,6 +2857,9 @@ test.describe('building roof touch editing', () => {
             ?.roofs?.['library:wing:0']?.lines.length,
       )
       .toBe(1);
+    await expect(
+      page.getByRole('button', { name: 'Edit custom roof', exact: true }),
+    ).toBeFocused();
     await page.screenshot({ path: 'test-results/building-phone-roof.png' });
   });
 });
