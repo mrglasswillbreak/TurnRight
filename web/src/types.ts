@@ -1,4 +1,5 @@
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
+import type { BuildingAppearance, VisualCatalogue } from './visual-types.js';
 
 export type Position = [number, number];
 export type Category =
@@ -99,6 +100,7 @@ export interface CampusData {
   /** Retained public IDs after a reviewed place merge. */
   placeIdAliases?: Record<string, string>;
   buildingIdAliases?: Record<string, string>;
+  visuals?: VisualCatalogue;
   entrances?: Entrance[];
   graph: RoutingGraph;
   closures: Closure[];
@@ -150,6 +152,7 @@ export interface CampusPackage {
   dataUrl: string;
   bytes: number;
   assets: PackageAsset[];
+  visuals?: { bytes: number; assetUrls: string[] };
 }
 export type ManeuverKind =
   | 'depart'
@@ -210,6 +213,7 @@ export interface MapEdit {
   kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure';
   geometry: Geometry;
   properties: Record<string, unknown> & {
+    appearance?: BuildingAppearance;
     vertexIds?: string[];
     connections?: PathConnection[];
     connection?: ConnectionTarget;
