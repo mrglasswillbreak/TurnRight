@@ -39,21 +39,23 @@ export function MapRenderingSettings({
   return (
     <fieldset className="rendering-settings" aria-describedby={`${id}-help`}>
       <legend>3D rendering</legend>
-      {[
+      {(
         [
-          false,
-          'Enhanced',
-          'Architectural detail with automatic performance adjustments.',
-        ],
-        [true, 'Simple', 'Basic building blocks.'],
-      ].map(([value, label, description]) => (
+          [
+            false,
+            'Enhanced',
+            'Architectural detail with automatic performance adjustments.',
+          ],
+          [true, 'Simple', 'Basic building blocks.'],
+        ] as const
+      ).map(([value, label, description]) => (
         <label key={String(value)}>
           <input
             type="radio"
             name={`${id}-rendering`}
-            aria-label={String(label)}
+            aria-label={label}
             checked={simple === value}
-            onChange={() => onSimple(value as boolean)}
+            onChange={() => onSimple(value)}
           />
           <span>
             <strong>{label}</strong>

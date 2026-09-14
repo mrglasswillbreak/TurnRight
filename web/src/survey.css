@@ -314,10 +314,10 @@
   .survey-active .editor-view-controls {
     top: 68px;
   }
-  .survey-active .editor-view-controls .editor-view-toggle {
+  .survey-active .editor-view-controls .map-view-control {
     display: flex;
   }
-  .survey-active .editor-view-controls > button,
+  .survey-active .editor-view-controls > button:not(.map-view-control),
   .survey-active .editor-view-controls > label {
     display: none;
   }

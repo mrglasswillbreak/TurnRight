@@ -424,26 +424,6 @@
   z-index: 2;
   max-width: calc(100% - 680px);
 }
-.editor-view-toggle {
-  display: flex;
-  gap: 3px;
-}
-.editor-view-toggle > button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 0;
-  padding: 8px 10px;
-  background: none;
-  color: var(--ed-muted);
-  border-radius: 8px;
-  font-size: 11px;
-}
-.editor-view-toggle > button.active {
-  background: var(--ed-soft);
-  color: var(--ed-accent);
-  font-weight: 650;
-}
 .editor-view-controls > label {
   font-size: 9px;
   color: var(--ed-muted);
@@ -983,9 +963,6 @@
   .editor-view-controls .editor-compare {
     font-size: 9px !important;
   }
-  .editor-view-toggle > button {
-    padding: 7px 8px;
-  }
   .editor-inspector,
   .editor-review-panel {
     position: absolute;
@@ -1278,4 +1255,25 @@
   .editor-error-stack {
     bottom: 80px;
   }
+}
+
+.settings-open > .editor-inspector,
+.settings-open > .editor-welcome {
+  visibility: hidden;
+  pointer-events: none;
+}
+.editor-settings input[type='range'] {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--ed-accent);
+}
+.editor-settings .field-label > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.editor-settings .field-label output {
+  color: var(--ed-muted);
+  font-weight: 400;
 }

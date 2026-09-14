@@ -51,7 +51,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
-import { MapViewControl, useSimple3D } from './MapViewControl';
+import { MapViewControl } from './MapViewControl';
+import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -1094,9 +1095,15 @@ export default function App() {
         </button>
       </div>
       <div className="map-controls">
-        <MapViewControl threeD={threeD} simple={simple3D} onSimple={setSimple3D} onView={(value) => {
-          if (!setThreeD(value)) setToast('Map view changed for this session. Storage could not save your preference.');
-        }} />
+        <MapViewControl
+          threeD={threeD}
+          onView={(value) => {
+            if (!setThreeD(value))
+              setToast(
+                'Map view changed for this session. Storage could not save your preference.',
+              );
+          }}
+        />
         <div className="control-group">
           <button
             aria-label="Zoom in"
@@ -1296,6 +1303,7 @@ export default function App() {
                     : `Always uses ${appearance} mode. Choose Device to follow your device settings.`}
                 </p>
               </fieldset>
+              <MapRenderingSettings simple={simple3D} onSimple={setSimple3D} />
               <div className="settings-row">
                 <span>Voice directions</span>
                 <button

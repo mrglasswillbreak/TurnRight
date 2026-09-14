@@ -27,7 +27,9 @@ import {
 import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
-import { MapViewControl, useSimple3D } from './MapViewControl';
+import { MapViewControl } from './MapViewControl';
+import { useSimple3D } from './MapRenderingSettings';
+import { EditorSettings } from './EditorSettings';
 import { api, supabase } from './supabase';
 import { AdminRequestError, boundedSession } from './admin-client';
 import {
@@ -444,6 +446,7 @@ function Editor({
     }
   });
   const [simple3D, setSimple3D] = useSimple3D();
+  const settingsTrigger = useRef<HTMLButtonElement>(null);
   const [opacity, setOpacity] = useState(0.8),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
@@ -1521,13 +1524,23 @@ function Editor({
             ['duplicates', 'Duplicates'],
             ['reports', 'Reports'],
             ['releases', 'Releases'],
+            ['settings', 'Settings'],
           ].map(([id, label]) => (
             <button
               key={id}
+              ref={id === 'settings' ? settingsTrigger : undefined}
               className={tab === id ? 'active' : ''}
-              disabled={!!tool || !!workspace.unfinished}
+              disabled={
+                id !== 'settings' &&
+                !(id === 'map' && tab === 'settings') &&
+                (!!tool || !!workspace.unfinished)
+              }
               onClick={() => {
                 workspace.endHistoryGroup();
+                if (id === 'settings') {
+                  setTab(id);
+                  return;
+                }
                 setReviewOverlay([]);
                 setTab(id);
                 if (id !== 'map') setExplorer(false);
@@ -1601,7 +1614,10 @@ function Editor({
           </button>
         </div>
       </header>
-      <section className="editor-map-workspace" aria-label="Mapping workspace">
+      <section
+        className={`editor-map-workspace ${tab === 'settings' ? 'settings-open' : ''}`}
+        aria-label="Mapping workspace"
+      >
         <MapView
           data={rendered}
           dark={dark}
@@ -1868,42 +1884,7 @@ function Editor({
           )}
         </div>
         <div className="editor-view-controls editor-card">
-          <MapViewControl
-            threeD={threeD}
-            simple={simple3D}
-            onView={toggleView}
-            onSimple={setSimple3D}
-          >
-            {threeD && (
-              <>
-                <label className="viewport-setting" title="Map tilt">
-                  Tilt
-                  <input
-                    aria-label="Map tilt"
-                    type="range"
-                    min={15}
-                    max={60}
-                    defaultValue={50}
-                    onChange={(e) =>
-                      mapRef.current?.setPitch(Number(e.target.value))
-                    }
-                  />
-                </label>
-                <label className="viewport-setting" title="Building opacity">
-                  Buildings
-                  <input
-                    aria-label="Building opacity"
-                    type="range"
-                    min={0.1}
-                    max={1}
-                    step={0.05}
-                    value={opacity}
-                    onChange={(e) => setOpacity(Number(e.target.value))}
-                  />
-                </label>
-              </>
-            )}
-          </MapViewControl>
+          <MapViewControl threeD={threeD} onView={toggleView} />
           <button
             className="editor-icon"
             aria-label="Zoom in"
@@ -1949,7 +1930,21 @@ function Editor({
             {preview ? 'Back to draft' : 'Compare base'}
           </button>
         </div>
-        {tab !== 'map' ? (
+        {tab === 'settings' && (
+          <EditorSettings
+            map={mapRef.current}
+            threeD={threeD}
+            simple={simple3D}
+            onSimple={setSimple3D}
+            opacity={opacity}
+            onOpacity={setOpacity}
+            onClose={() => {
+              setTab('map');
+              settingsTrigger.current?.focus();
+            }}
+          />
+        )}
+        {tab !== 'map' && tab !== 'settings' ? (
           <aside className="editor-review-panel editor-card">
             <div className="editor-panel-heading">
               <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
