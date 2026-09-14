@@ -29,7 +29,8 @@ try {
     await db(`releases?id=eq.${id}`, "PATCH", { status: "building", error: null });
     if (!release.snapshot.features.length)
       throw new Error("No approved source baseline. Run bootstrap first.");
-    const data = validateReleaseSnapshot(release.snapshot, await publishedCampus());
+    const published = await publishedCampus();
+    const data = validateReleaseSnapshot(release.snapshot, published);
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
     execFileSync(
@@ -59,11 +60,14 @@ try {
       },
       stdio: "inherit",
     });
-    const previous = await db(
-      "releases?status=eq.published&order=published_at.desc&limit=1&select=deployment_url",
+    // Preserve assets from the public origin just verified above. Historical
+    // deployment URLs can expire or return deployment-protection HTML.
+    await preservePublished(
+      path.join(web, "public"),
+      process.env.PUBLISHED_MAP_URL!,
+      false,
+      published.version,
     );
-    if (previous[0]?.deployment_url)
-      await preservePublished(path.join(web, "public"), previous[0].deployment_url);
     const manifest = JSON.parse(
       await fs.readFile(path.join(web, "public/packages/latest.json"), "utf8"),
     );

@@ -17,17 +17,23 @@ export function assetTarget(publicDir, url) {
     throw new Error("Asset escaped public directory");
   return target;
 }
-export async function preservePublished(publicDir, origin, activate = false) {
+export async function preservePublished(publicDir, origin, activate = false, expectedVersion) {
   const base = new URL(origin);
   if (base.protocol !== "https:" || base.username || base.password)
     throw new Error("Published map URL must be HTTPS");
   const response = await fetch(new URL("/packages/latest.json", base), {
+    cache: "no-store",
     signal: AbortSignal.timeout(20000),
   });
   if (!response.ok)
     throw new Error("Published map is unavailable. Build stopped to preserve the working release.");
-  const manifest = await response.json();
+  const manifest = await response.json().catch(() => {
+    throw new Error(
+      "Published map did not return a JSON manifest. Check PUBLISHED_MAP_URL; a deployment sign-in page cannot supply the published assets.",
+    );
+  });
   if (
+    !manifest ||
     manifest.schemaVersion !== 1 ||
     !/^lasu-[a-f0-9]+$/.test(manifest.version) ||
     !Array.isArray(manifest.assets) ||
@@ -35,6 +41,8 @@ export async function preservePublished(publicDir, origin, activate = false) {
     manifest.bytes > 25 * 1024 * 1024
   )
     throw new Error("Unsupported published map manifest");
+  if (expectedVersion && manifest.version !== expectedVersion)
+    throw new Error("The public campus changed during this build. Create a fresh reviewed preview.");
   for (const asset of manifest.assets) {
     const target = assetTarget(publicDir, asset.url);
     const valid = (bytes) =>
