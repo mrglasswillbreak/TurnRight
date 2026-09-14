@@ -23,7 +23,6 @@ import {
   Flag,
   GraduationCap,
   Heart,
-  Layers,
   LocateFixed,
   MapPin,
   Monitor,

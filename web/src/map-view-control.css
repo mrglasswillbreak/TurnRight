@@ -1,9 +1,76 @@
-.map-view-control { position: relative; display: flex; align-items: stretch; border: 1px solid var(--border, #c4c8bd); border-radius: 10px; background: var(--card, #fff); color: var(--foreground, #263f36); }
-.map-controls .map-view-control > button, .map-view-control > button { width: 44px; min-height: 44px; height: auto; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
-.map-view-control > button[aria-pressed=true] { background: #1764ed; color: white; }
-.map-rendering-options > summary { padding: 11px 8px; min-width: 28px; cursor: pointer; list-style: none; text-align: center; }
-.map-rendering-options fieldset { position: absolute; right: 0; bottom: calc(100% + 8px); width: 245px; padding: 12px; border: 1px solid var(--border, #c4c8bd); border-radius: 10px; background: var(--card, #fff); color: var(--foreground, #263f36); box-shadow: 0 4px 20px #0003; }
-.map-rendering-options label { display: flex; gap: 8px; align-items: center; min-height: 44px; font-size: 13px; }
-.map-rendering-options input { width: auto !important; }
-.map-view-control :focus-visible { outline: 2px solid #1764ed; outline-offset: 2px; }
-.map-detail-status { position: absolute; right: 18px; top: 75px; max-width: 230px; background: var(--card, #fff); color: var(--foreground, #263f36); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
+.map-view-control {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border, #c4c8bd);
+  border-radius: 10px;
+  background: var(--card, #fff);
+  color: var(--foreground, #263f36);
+}
+.map-controls .map-view-control > button,
+.map-view-control > button {
+  width: 44px;
+  min-height: 44px;
+  height: auto;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.map-view-control > button[aria-pressed='true'] {
+  background: #1764ed;
+  color: white;
+}
+.map-rendering-options > summary {
+  padding: 11px 8px;
+  min-width: 28px;
+  cursor: pointer;
+  list-style: none;
+  text-align: center;
+}
+.map-rendering-options fieldset {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: 245px;
+  padding: 12px;
+  border: 1px solid var(--border, #c4c8bd);
+  border-radius: 10px;
+  background: var(--card, #fff);
+  color: var(--foreground, #263f36);
+  box-shadow: 0 4px 20px #0003;
+}
+.map-rendering-options label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+}
+.map-rendering-options input {
+  width: auto !important;
+}
+.map-view-control :focus-visible {
+  outline: 2px solid #1764ed;
+  outline-offset: 2px;
+}
+.map-detail-status {
+  position: absolute;
+  right: 18px;
+  top: 75px;
+  max-width: 230px;
+  background: var(--card, #fff);
+  color: var(--foreground, #263f36);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+fieldset.map-view-control {
+  margin: 0;
+  min-width: 0;
+}
