@@ -1,4 +1,5 @@
 import { placeHasConnection } from './routing';
+import { routeSteps } from './route-steps';
 import { MotionStatus } from './MotionAssistance';
 import {
   ArrowLeft,
@@ -85,6 +86,11 @@ export function RoutePanel({
   const next = route?.maneuvers[nav.nextIndex] || route?.maneuvers.at(-1);
   return (
     <div className="route-panel">
+      {route && (
+        <p className="notice" aria-label="Recorded steps information">
+          {routeSteps(data, route).message}
+        </p>
+      )}
       {!navigating ? (
         <>
           <button className="text-button" onClick={onBack}>

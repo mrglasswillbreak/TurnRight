@@ -490,7 +490,12 @@ export function applyEdits(
                   : e.walkingAccess || access,
                 accessReviewId:
                   access === 'campus' ? e.accessReviewId : undefined,
-                steps: props.steps === undefined ? e.steps : !!props.steps,
+                steps:
+                  props.steps === null
+                    ? undefined
+                    : props.steps === undefined
+                      ? e.steps
+                      : !!props.steps,
               }
             : e,
         );
@@ -677,9 +682,16 @@ export function applyEdits(
                   'private'
                 : access,
             steps:
-              props.steps === undefined
-                ? inherited.some((e) => e.steps)
-                : !!props.steps,
+              props.steps === null
+                ? undefined
+                : props.steps === undefined
+                  ? inherited.some((e) => e.steps === true)
+                    ? true
+                    : inherited.length &&
+                        inherited.every((e) => e.steps === false)
+                      ? false
+                      : undefined
+                  : !!props.steps,
             sourceId: edit.id,
           });
         }
