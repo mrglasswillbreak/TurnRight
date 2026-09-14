@@ -1127,3 +1127,155 @@
 .duplicate-actions button {
   font-size: 11px !important;
 }
+
+.editor-error-stack {
+  position: absolute;
+  left: 70px;
+  bottom: 78px;
+  width: min(650px, calc(100% - 90px));
+  max-height: 40%;
+  overflow: auto;
+  z-index: 10;
+  display: grid;
+  gap: 8px;
+}
+.editor-error-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+}
+.editor-error-row > span {
+  flex: 1 1 260px;
+  overflow-wrap: anywhere;
+}
+.editor-conflicts,
+.editor-repair-preview {
+  position: absolute;
+  z-index: 9;
+  padding: 18px;
+  overflow: auto;
+  max-height: calc(100% - 110px);
+  font-size: 13px;
+}
+.editor-conflicts {
+  top: 14px;
+  right: 14px;
+  width: min(560px, calc(100% - 84px));
+}
+.editor-repair-preview {
+  bottom: 82px;
+  left: 70px;
+  width: min(440px, calc(100% - 90px));
+}
+.editor-conflicts h2,
+.editor-repair-preview h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+.editor-conflicts pre,
+.source-comparison pre {
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.editor-conflicts fieldset {
+  min-width: 0;
+  border: 1px solid var(--ed-line);
+  margin: 12px 0;
+  padding: 10px;
+}
+.editor-conflicts legend {
+  overflow-wrap: anywhere;
+}
+.conflict-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.source-comparison {
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.source-comparison table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.source-comparison th,
+.source-comparison td {
+  padding: 8px 5px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--ed-line);
+  overflow-wrap: anywhere;
+}
+.release-impact {
+  border: 1px solid var(--ed-line);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 16px 0;
+}
+.release-impact details {
+  max-height: 220px;
+  overflow: auto;
+}
+.editor-backup-menu {
+  position: relative;
+}
+.editor-backup-menu summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+}
+.editor-backup-menu > div {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  padding: 12px;
+  min-width: 240px;
+  display: grid;
+  gap: 8px;
+  z-index: 12;
+}
+.editor-offline {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--ed-soft);
+  font-size: 12px;
+  z-index: 5;
+}
+.editor-offline button {
+  border: 0;
+  text-decoration: underline;
+  background: transparent;
+  color: inherit;
+}
+@media (max-width: 767px) {
+  .editor-backup-menu summary {
+    font-size: 11px;
+    padding: 4px;
+  }
+  .editor-conflicts {
+    max-height: 66%;
+    font-size: 12px;
+  }
+  .conflict-values {
+    grid-template-columns: 1fr;
+  }
+  .editor-repair-preview {
+    max-height: 45%;
+  }
+  .editor-error-stack {
+    bottom: 80px;
+  }
+}

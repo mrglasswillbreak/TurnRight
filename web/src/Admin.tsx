@@ -29,6 +29,17 @@ import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
 import { api, supabase } from './supabase';
+import { AdminRequestError, boundedSession } from './admin-client';
+import {
+  loadPreparedWorkspace,
+  offlineOwner,
+  rememberOfflineOwner,
+} from './editor-loading';
+import { downloadJson } from './download-json';
+import { EditorConflictReview } from './EditorConflictReview';
+import type { ValidationIssue } from './validation';
+import { canonical } from './editor-conflicts';
+import { sourceGeometry } from './source-comparison';
 import { type SourceRecord } from './editor-model';
 import { assembleEditorSources } from './editor-validation';
 import { useEditorValidation } from './useEditorValidation';
@@ -68,12 +79,15 @@ import './editor.css';
 interface EditorState extends ReviewState {
   edits: MapEdit[];
 }
+
 interface OfflineEditor {
   state: EditorState;
   sources: SourceRecord[];
   data: CampusData;
   prepared: boolean;
+  syncedAt?: string;
 }
+
 export default function Admin({
   data,
   dark = false,
@@ -91,29 +105,33 @@ export default function Admin({
   const [workspace, setWorkspace] = useState<EditorWorkspace | null>(null);
   const [error, setError] = useState('');
   const generation = useRef(0);
+  const initialCampus = useRef(data);
+  const [loadEpoch, setLoadEpoch] = useState(0);
+  const [loadAuthError, setLoadAuthError] = useState(false);
+  const [offlineContext, setOfflineContext] = useState(false);
+  const [syncedAt, setSyncedAt] = useState<string>();
   useEffect(() => {
     if (!supabase) return;
-    if (!navigator.onLine)
-      setOwner(localStorage.getItem('turnright:offline-owner'));
+    if (!navigator.onLine) setOwner(offlineOwner());
     else
-      void supabase.auth
-        .getSession()
+      void boundedSession('state', supabase.auth.getSession())
         .then(({ data }) =>
           setOwner(
             data.session?.user.id ||
-              (!navigator.onLine
-                ? localStorage.getItem('turnright:offline-owner')
-                : null),
+              (!navigator.onLine ? offlineOwner() : null),
           ),
-        );
+        )
+        .catch((error) => {
+          setError((error as Error).message);
+          setOwner(offlineOwner());
+        });
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_OUT')
-          localStorage.removeItem('turnright:offline-owner');
+        if (event === 'SIGNED_OUT') rememberOfflineOwner(null);
         setOwner(
           session?.user.id ||
             (!navigator.onLine && event !== 'SIGNED_OUT'
-              ? localStorage.getItem('turnright:offline-owner')
+              ? offlineOwner()
               : null),
         );
       },
@@ -127,20 +145,39 @@ export default function Admin({
     if (!owner) return;
     const key = `editor-workspace:${owner}`;
     const load = async () => {
-      if (!navigator.onLine) {
-        const cached = await readSurveyContext<OfflineEditor>(owner);
-        if (!cached?.prepared)
-          throw new Error(
-            'Prepare for offline survey while online before opening the editor offline.',
+      const loaded = await loadPreparedWorkspace<OfflineEditor>(
+        async () => {
+          const [state, source] = await Promise.all([
+            api<EditorState>('state'),
+            api<{ features: SourceRecord[] }>('sources'),
+          ]);
+          rememberOfflineOwner(owner);
+          const syncedAt = new Date().toISOString();
+          const cached = await readSurveyContext<OfflineEditor>(owner).catch(
+            () => undefined,
           );
-        return [cached.state, { features: cached.sources }] as const;
+          const context = {
+            state,
+            sources: source.features,
+            data: initialCampus.current,
+            prepared: !!cached?.prepared,
+            syncedAt,
+          };
+          if (cached?.prepared)
+            await writeSurveyContext(owner, context).catch(() => {});
+          return context;
+        },
+        () => readSurveyContext<OfflineEditor>(owner),
+        !navigator.onLine,
+      );
+      if (request === generation.current) {
+        setOfflineContext(loaded.offline);
+        setSyncedAt(loaded.context.syncedAt);
       }
-      const result = await Promise.all([
-        api<EditorState>('state'),
-        api<{ features: SourceRecord[] }>('sources'),
-      ]);
-      localStorage.setItem('turnright:offline-owner', owner);
-      return result;
+      return [
+        loaded.context.state,
+        { features: loaded.context.sources },
+      ] as const;
     };
     void Promise.all([
       load(),
@@ -161,9 +198,14 @@ export default function Admin({
         setError('');
       })
       .catch((e) => {
-        if (request === generation.current) setError(e.message);
+        if (request === generation.current) {
+          setError(e.message);
+          setLoadAuthError(
+            e instanceof AdminRequestError && e.reason === 'auth',
+          );
+        }
       });
-  }, [owner]);
+  }, [owner, loadEpoch]);
   const refresh = async () => {
     const [result, source] = await Promise.all([
       api<EditorState>('state'),
@@ -171,6 +213,22 @@ export default function Admin({
     ]);
     setState(result);
     setSources(source.features);
+    setOfflineContext(false);
+    const syncedAt = new Date().toISOString();
+    setSyncedAt(syncedAt);
+    if (owner) {
+      const cached = await readSurveyContext<OfflineEditor>(owner).catch(
+        () => undefined,
+      );
+      if (cached?.prepared)
+        await writeSurveyContext(owner, {
+          state: result,
+          sources: source.features,
+          data,
+          prepared: true,
+          syncedAt,
+        } satisfies OfflineEditor).catch(() => {});
+    }
     return result.edits;
   };
   if (!workspace || !state)
@@ -206,6 +264,26 @@ export default function Admin({
             {error}
           </p>
         )}
+        {owner && error && (
+          <button
+            className="editor-primary"
+            onClick={async () => {
+              if (loadAuthError) {
+                try {
+                  const result = await supabase?.auth.signInWithOAuth({
+                    provider: 'github',
+                    options: { redirectTo: location.origin + '/admin' },
+                  });
+                  if (result?.error) throw result.error;
+                } catch (error) {
+                  setError((error as Error).message);
+                }
+              } else setLoadEpoch((n) => n + 1);
+            }}
+          >
+            {loadAuthError ? 'Sign in again' : 'Retry opening workspace'}
+          </button>
+        )}
         {owner && (
           <button
             className="editor-secondary"
@@ -226,6 +304,8 @@ export default function Admin({
       workspace={workspace}
       refresh={refresh}
       owner={owner!}
+      offlineContext={offlineContext}
+      syncedAt={syncedAt}
       updateReady={updateReady}
       installUpdate={installUpdate}
       prepareOffline={async () => {
@@ -252,8 +332,9 @@ export default function Admin({
           sources: source.features,
           data,
           prepared: true,
+          syncedAt: new Date().toISOString(),
         } satisfies OfflineEditor);
-        localStorage.setItem('turnright:offline-owner', owner!);
+        rememberOfflineOwner(owner!);
       }}
     />
   );
@@ -265,6 +346,8 @@ function Editor({
   state,
   sources,
   workspace: store,
+  offlineContext,
+  syncedAt,
   refresh,
   owner,
   prepareOffline,
@@ -276,6 +359,8 @@ function Editor({
   state: EditorState;
   sources: SourceRecord[];
   workspace: EditorWorkspace;
+  offlineContext: boolean;
+  syncedAt?: string;
   refresh: () => Promise<MapEdit[]>;
   owner: string;
   prepareOffline: () => Promise<void>;
@@ -283,6 +368,59 @@ function Editor({
   installUpdate?: () => Promise<void>;
 }) {
   const workspace = useEditorWorkspace(store);
+  const [networkOnline, setNetworkOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const changed = () => setNetworkOnline(navigator.onLine);
+    window.addEventListener('online', changed);
+    window.addEventListener('offline', changed);
+    return () => {
+      window.removeEventListener('online', changed);
+      window.removeEventListener('offline', changed);
+    };
+  }, []);
+  const [taskError, setTaskError] = useState<{
+    message: string;
+    label: string;
+    retry: () => void;
+    auth: boolean;
+  } | null>(null);
+  const failTask = (error: unknown, label: string, retry: () => void) =>
+    setTaskError({
+      message:
+        error instanceof Error
+          ? error.message
+          : 'This action could not finish.',
+      label,
+      retry,
+      auth: error instanceof AdminRequestError && error.reason === 'auth',
+    });
+  const signIn = async () => {
+    if (!(await workspace.preserveRecovery())) {
+      setError(
+        'Browser recovery is unavailable. Download local recovery and keep this tab open until storage can save your work.',
+      );
+      return;
+    }
+    try {
+      const result = await supabase?.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo: location.origin + '/admin' },
+      });
+      if (result?.error) throw result.error;
+    } catch (error) {
+      failTask(error, 'Retry sign in', signIn);
+    }
+  };
+  const [conflictServer, setConflictServer] = useState<MapEdit[] | null>(null);
+  const [reviewOverlay, setReviewOverlay] = useState<Feature[]>([]);
+  const reviewConflicts = async () => {
+    try {
+      setConflictServer((await api<EditorState>('state')).edits);
+      setTaskError(null);
+    } catch (e) {
+      failTask(e, 'Retry conflict review', reviewConflicts);
+    }
+  };
   const [survey, setSurvey] = useState(false),
     [surveyRecording, setSurveyRecording] = useState(false);
   const surveying = useRef(false);
@@ -329,19 +467,45 @@ function Editor({
     drawingPanels.current = null;
   };
   const progress = drawingProgress(workspace.unfinished);
+  const [repairFocus, setRepairFocus] = useState<ValidationIssue | null>(null);
+  const [repairPreview, setRepairPreview] = useState<{
+    batch: MapEdit[];
+    stamp: string;
+    base: CampusData;
+    title: string;
+  } | null>(null);
+  const [repairErrors, setRepairErrors] = useState<string[]>([]);
   const calculate = useRoutes();
   const assembly = useMemo(
     () => assembleEditorSources(sources, data),
     [sources, data],
   );
   const base = assembly.data;
+  useEffect(() => {
+    workspace.setSourceBaseline((edit) =>
+      featureEdit(base, edit.kind, edit.id, []),
+    );
+    return () => workspace.setSourceBaseline();
+  }, [workspace, base]);
+  const currentBase = useRef(base);
+  currentBase.current = base;
   const validation = useEditorValidation(
     base,
     workspace.edits,
     data,
     assembly.issues,
   );
-  const autoReviewed = useRef(new WeakSet<CampusData>());
+  const exactBatch = useMemo(
+    () =>
+      validation.pending || tab !== 'duplicates'
+        ? []
+        : exactDuplicateEdits(
+            validation.data,
+            workspace.edits,
+            validation.duplicates,
+          ),
+    [validation, workspace.edits, tab],
+  );
   const mergeBatch = useCallback(
     async (batch: MapEdit[], success: string) => {
       if (!batch.length || tool || workspace.unfinished || validation.pending)
@@ -396,60 +560,25 @@ function Editor({
       setError((error as Error).message);
     }
   };
-  useEffect(() => {
-    if (
-      tab !== 'duplicates' ||
-      validation.pending ||
-      busy ||
-      tool ||
-      workspace.unfinished ||
-      autoReviewed.current.has(base)
-    )
-      return;
-    autoReviewed.current.add(base);
-    const batch = exactDuplicateEdits(
-      validation.data,
-      workspace.edits,
-      validation.duplicates,
-    );
-    if (batch.length)
-      void mergeBatch(
-        batch,
-        `${batch.filter((e) => e.deleted).length} exact duplicate records consolidated. Undo is available.`,
-      );
-  }, [
-    tab,
-    validation,
-    base,
-    busy,
-    tool,
-    workspace.edits,
-    workspace.unfinished,
-    mergeBatch,
-  ]);
   const visible = preview && validation.usable ? base : validation.data;
   const invalid = useMemo(
     () =>
       new Set(
-        workspace.edits
-          .filter((e) =>
-            validation.errors.some(
-              (issue) =>
-                issue.startsWith(`${e.id}:`) ||
-                issue.startsWith(`${e.properties.name}:`),
-            ),
-          )
-          .map((e) => e.id),
+        validation.issues
+          .filter((i) => i.severity !== 'warning' && i.featureId)
+          .map((i) => i.featureId!),
       ),
-    [validation, workspace.edits],
+    [validation.issues],
   );
   const select = (edit: MapEdit, focus = false) => {
+    workspace.endHistoryGroup();
     if (workspace.unfinished) {
       setMessage(
         'Finish or cancel the current drawing before selecting another feature.',
       );
       return;
     }
+    setRepairFocus(null);
     setSelected(edit);
     selectedRef.current = edit;
     setTool(null);
@@ -485,11 +614,174 @@ function Editor({
     setRoutes([]);
     controller.current?.select(current);
   };
+  const stageRepair = (
+    batch: MapEdit[],
+    title = 'Review proposed geometry',
+  ) => {
+    workspace.endHistoryGroup();
+    if (tool || workspace.unfinished) {
+      setMessage('Finish or cancel the drawing before reviewing a repair.');
+      return;
+    }
+    setRepairErrors([]);
+    setRepairPreview({
+      batch: structuredClone(batch),
+      stamp: canonical(workspace.edits),
+      base,
+      title,
+    });
+    const before = batch
+      .map((e) => featureEdit(validation.data, e.kind, e.id, workspace.edits))
+      .filter((e): e is MapEdit => !!e);
+    setReviewOverlay([
+      ...before.map((e) => ({
+        type: 'Feature' as const,
+        geometry: e.geometry,
+        properties: { color: '#d45555' },
+      })),
+      ...batch.map((e) => ({
+        type: 'Feature' as const,
+        geometry: e.geometry,
+        properties: { color: '#26a07c' },
+      })),
+    ]);
+    const coordinates: Position[] = [];
+    const collect = (value: unknown) => {
+      if (!Array.isArray(value)) return;
+      if (typeof value[0] === 'number' && typeof value[1] === 'number')
+        coordinates.push([value[0], value[1]]);
+      else value.forEach(collect);
+    };
+    [...before, ...batch].forEach((e) => {
+      if ('coordinates' in e.geometry) collect(e.geometry.coordinates);
+    });
+    if (coordinates.length)
+      mapRef.current?.fitBounds(
+        [
+          [
+            Math.min(...coordinates.map((p) => p[0])),
+            Math.min(...coordinates.map((p) => p[1])),
+          ],
+          [
+            Math.max(...coordinates.map((p) => p[0])),
+            Math.max(...coordinates.map((p) => p[1])),
+          ],
+        ],
+        {
+          maxZoom: 20,
+          duration: 300,
+          padding: {
+            top: 80,
+            left: 75,
+            right: innerWidth < 700 ? 25 : 340,
+            bottom:
+              innerWidth < 700
+                ? Math.round(
+                    (mapRef.current?.getContainer().clientHeight ||
+                      innerHeight) * 0.64,
+                  )
+                : 220,
+          },
+        },
+      );
+    controller.current?.select(selectedRef.current);
+  };
+  const dismissRepair = () => {
+    setRepairPreview(null);
+    setReviewOverlay([]);
+    setRepairErrors([]);
+    controller.current?.select(selectedRef.current);
+  };
+  const applyRepair = async () => {
+    if (!repairPreview) return;
+    if (workspace.unfinished || tool) {
+      setRepairErrors([
+        'Finish or cancel the drawing before applying a repair.',
+      ]);
+      return;
+    }
+    if (
+      repairPreview.stamp !== canonical(workspace.edits) ||
+      repairPreview.base !== currentBase.current
+    ) {
+      setRepairErrors([
+        'The map changed. Cancel and review this repair again.',
+      ]);
+      return;
+    }
+    const original = workspace.edits;
+    const batch = repairPreview.batch;
+    setBusy(true);
+    try {
+      const check = await validation.check([
+        ...original.filter(
+          (e) => !batch.some((b) => editKey(e) === editKey(b)),
+        ),
+        ...batch,
+      ]);
+      if (
+        workspace.edits !== original ||
+        workspace.unfinished ||
+        repairPreview.base !== currentBase.current
+      )
+        throw new Error('The map changed. Review this repair again.');
+      const added = check.errors.filter(
+        (error) => !validation.errors.includes(error),
+      );
+      if (!check.usable || added.length) {
+        setRepairErrors(added.length ? added : check.errors);
+        return;
+      }
+      commit(batch);
+      dismissRepair();
+      setRepairFocus(null);
+      setMessage('Reviewed repair applied. Undo restores the previous draft.');
+    } catch (e) {
+      setRepairErrors([(e as Error).message]);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const openIssue = (issue: ValidationIssue) => {
+    if (tool || workspace.unfinished) {
+      setMessage('Finish or cancel the drawing before opening a repair.');
+      return;
+    }
+    const edit =
+      issue.featureId && issue.featureKind
+        ? featureEdit(
+            validation.data,
+            issue.featureKind,
+            issue.featureId,
+            workspace.edits,
+          )
+        : undefined;
+    if (edit) {
+      select(edit, true);
+      setRepairFocus(issue);
+      setExplorer(false);
+    } else if (issue.coordinates)
+      mapRef.current?.flyTo({ center: issue.coordinates, zoom: 18 });
+    setMessage(
+      issue.repair === 'choose-place'
+        ? 'Choose the place served by this entrance, then review the change.'
+        : issue.repair === 'connect-path'
+          ? 'Use the connection controls to choose a highlighted path or draw an approach.'
+          : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
+    );
+  };
   const begin = (
     kind: MapEdit['kind'],
     props: MapEdit['properties'] = {},
     seed?: Position[],
   ) => {
+    workspace.endHistoryGroup();
+    if (repairPreview) {
+      setMessage(
+        'Apply or cancel the repair review before starting a drawing.',
+      );
+      return;
+    }
     if (tool || workspace.unfinished) {
       setMessage('Finish or cancel the current drawing first.');
       return;
@@ -569,10 +861,13 @@ function Editor({
     if (
       edit.kind === 'path' &&
       edit.geometry.type === 'LineString' &&
-      edit.properties.entranceId
+      typeof edit.properties.entranceId === 'string'
     ) {
-      const entrance = workspace.edits.find(
-        (e) => e.kind === 'entrance' && e.id === edit.properties.entranceId,
+      const entrance = featureEdit(
+        validation.data,
+        'entrance',
+        edit.properties.entranceId,
+        workspace.edits,
       );
       if (
         entrance?.geometry.type === 'Point' &&
@@ -606,10 +901,12 @@ function Editor({
       validation.data,
       workspace.edits,
     );
-    commit(
-      batch,
-      batch.find((e) => e.id === current.id && e.kind === current.kind)!,
-    );
+    if (repairFocus) stageRepair(batch);
+    else
+      commit(
+        batch,
+        batch.find((e) => e.id === current.id && e.kind === current.kind)!,
+      );
   };
   const remove = () => {
     const current = selectedRef.current;
@@ -718,8 +1015,7 @@ function Editor({
       delete edit.properties.connectStart;
       delete edit.properties.connectEnd;
     }
-    commit([edit]);
-    setMessage('Connection updated. Test a route to check the result.');
+    stageRepair([edit], 'Review proposed connection');
   };
   const disconnect = (vertexId?: string) => {
     const current = selectedRef.current;
@@ -791,20 +1087,14 @@ function Editor({
       [review?.before, '#d45555'],
       [review?.after, '#26a07c'],
     ] as const) {
-      const record = side as {
-        payload?: { geometry?: Geometry; coordinates?: Position };
-      } | null;
-      const p = record?.payload;
-      const geometry =
-        p?.geometry ||
-        (p?.coordinates
-          ? { type: 'Point' as const, coordinates: p.coordinates }
-          : undefined);
+      const geometry = sourceGeometry(side);
       if (geometry)
         features.push({ type: 'Feature', properties: { color }, geometry });
     }
-    controller.current?.review(tab === 'changes' ? features : []);
-  }, [review, ready, tab]);
+    controller.current?.review(
+      reviewOverlay.length ? reviewOverlay : tab === 'changes' ? features : [],
+    );
+  }, [review, ready, tab, reviewOverlay]);
   const undo = (redo = false) => {
     if (tool) {
       controller.current?.cancel();
@@ -814,8 +1104,13 @@ function Editor({
     if (redo) workspace.redo();
     else workspace.undo();
     const previous = selectedRef.current;
-    const next =
+    const stored =
       previous && workspace.edits.find((e) => editKey(e) === editKey(previous));
+    const next =
+      previous &&
+      (!stored || (stored.deleted && stored.properties.revertToSource))
+        ? featureEdit(base, previous.kind, previous.id, [])
+        : stored;
     setSelected(next && !next.deleted ? next : null);
     selectedRef.current = next && !next.deleted ? next : null;
     controller.current?.select(selectedRef.current);
@@ -860,10 +1155,21 @@ function Editor({
     window.addEventListener('keydown', keydown, true);
     return () => window.removeEventListener('keydown', keydown, true);
   }, []);
+  const uncertainAction = useRef(false);
   const action = async (name: string, payload: unknown, success: string) => {
     setBusy(true);
-    setError('');
+    setTaskError(null);
+    workspace.endHistoryGroup();
+    let submitted = false;
     try {
+      if (uncertainAction.current) {
+        workspace.reconcile(await refresh(), true);
+        uncertainAction.current = false;
+        setMessage(
+          'Status checked. Review the result before requesting the action again.',
+        );
+        return false;
+      }
       if (!(await workspace.flush()))
         throw new Error(workspace.error || 'Save or repair the draft first.');
       if (name === 'prepare-release') {
@@ -874,12 +1180,27 @@ function Editor({
               'Finish the current drawing before preparing a release.',
           );
       }
+      submitted = true;
       await api(name, payload);
       workspace.reconcile(await refresh(), true);
       setMessage(success);
       return true;
     } catch (e) {
-      setError((e as Error).message);
+      if (submitted) uncertainAction.current = true;
+      failTask(e, 'Check action status', async () => {
+        try {
+          workspace.reconcile(await refresh(), true);
+          uncertainAction.current = false;
+          setTaskError(null);
+          setMessage(
+            'Status refreshed. Review the result before requesting the action again.',
+          );
+        } catch (next) {
+          failTask(next, 'Check action status', () => {
+            void refreshWorkspace();
+          });
+        }
+      });
       return false;
     } finally {
       setBusy(false);
@@ -888,35 +1209,81 @@ function Editor({
   const exportBackup = async () => {
     try {
       const server = await api('export');
-      const url = URL.createObjectURL(
-        new Blob(
-          [
-            JSON.stringify(
-              {
-                server,
-                local: workspace.edits,
-                unfinished: workspace.unfinished,
-              },
-              null,
-              2,
-            ),
-          ],
-          { type: 'application/json' },
-        ),
+      downloadJson(
+        `turnright-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        {
+          ...workspace.localBackup(base.version),
+          server,
+          local: workspace.edits,
+          unfinished: workspace.unfinished,
+        },
       );
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `turnright-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      setTaskError(null);
     } catch (e) {
-      setError((e as Error).message);
+      failTask(e, 'Retry export', exportBackup);
     }
   };
-  const issues = useMemo(
-    () => [...validation.errors, ...validation.warnings],
-    [validation],
-  );
+  const localRecovery = () => {
+    try {
+      downloadJson(
+        'turnright-local-recovery.json',
+        workspace.localBackup(base.version),
+      );
+    } catch (e) {
+      failTask(e, 'Retry local recovery download', localRecovery);
+    }
+  };
+  const refreshWorkspace = async () => {
+    try {
+      if (!(await workspace.flush())) return;
+      workspace.reconcile(await refresh(), true);
+      setTaskError(null);
+    } catch (e) {
+      failTask(e, 'Retry refresh', refreshWorkspace);
+    }
+  };
+  const previewTestRoute = async () => {
+    const request = ++routeRequest.current;
+    setBusy(true);
+    try {
+      const found = await calculate(
+        validation.data,
+        { placeId: testOrigin },
+        { placeId: testDest },
+      );
+      if (request === routeRequest.current) {
+        setRoutes(found);
+        setTaskError(null);
+        const points = found[0].coordinates;
+        mapRef.current?.fitBounds(
+          [
+            [
+              Math.min(...points.map((p) => p[0])),
+              Math.min(...points.map((p) => p[1])),
+            ],
+            [
+              Math.max(...points.map((p) => p[0])),
+              Math.max(...points.map((p) => p[1])),
+            ],
+          ],
+          {
+            maxZoom: 19,
+            padding: {
+              left: innerWidth > 1000 ? 365 : 70,
+              right: innerWidth > 1000 ? 330 : 40,
+              top: 100,
+              bottom: 165,
+            },
+          },
+        );
+      }
+    } catch (e) {
+      if (request === routeRequest.current)
+        failTask(e, 'Retry route', previewTestRoute);
+    } finally {
+      setBusy(false);
+    }
+  };
   const tasks = useMemo(() => {
     const result: {
       id: string;
@@ -955,10 +1322,10 @@ function Editor({
         });
     for (const edit of workspace.edits.filter((e) => !e.deleted))
       if (
-        issues.some(
+        validation.issues.some(
           (i) =>
-            i.startsWith(`${edit.id}:`) ||
-            i.startsWith(`${edit.properties.name}:`),
+            i.featureId === edit.id &&
+            (!i.featureKind || i.featureKind === edit.kind),
         )
       )
         result.unshift({
@@ -971,13 +1338,13 @@ function Editor({
     for (const task of result) {
       const key = `${task.kind}:${task.id}`,
         previous = grouped.get(key);
-      const reasons = issues
+      const reasons = validation.issues
         .filter(
           (issue) =>
-            issue.startsWith(`${task.id}:`) ||
-            issue.startsWith(`${task.name}:`),
+            issue.featureId === task.id &&
+            (!issue.featureKind || issue.featureKind === task.kind),
         )
-        .map((issue) => issue.slice(issue.indexOf(':') + 1).trim());
+        .map((issue) => issue.message);
       const combined = [
         ...new Set([
           ...(previous ? previous.reason.split(' · ') : []),
@@ -988,7 +1355,7 @@ function Editor({
       grouped.set(key, { ...task, reason: combined.join(' · ') });
     }
     return [...grouped.values()];
-  }, [validation, workspace.edits, invalid, issues]);
+  }, [validation, workspace.edits, invalid]);
   const visibleTasks = tasks.filter(
     (t) =>
       `${t.name} ${t.reason}`.toLowerCase().includes(search.toLowerCase()) &&
@@ -1042,6 +1409,14 @@ function Editor({
   };
   return (
     <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
+      {(offlineContext || !networkOnline) && (
+        <output className="editor-offline">
+          Working offline · Last synchronized:{' '}
+          {syncedAt ? new Date(syncedAt).toLocaleString() : 'Unknown'}
+          <button onClick={refreshWorkspace}>Reconnect and synchronize</button>
+          <button onClick={localRecovery}>Download local recovery</button>
+        </output>
+      )}
       {updateReady && (
         <output className="editor-update">
           App update ready.{' '}
@@ -1080,6 +1455,8 @@ function Editor({
               className={tab === id ? 'active' : ''}
               disabled={!!tool || !!workspace.unfinished}
               onClick={() => {
+                workspace.endHistoryGroup();
+                setReviewOverlay([]);
                 setTab(id);
                 if (id !== 'map') setExplorer(false);
               }}
@@ -1114,27 +1491,24 @@ function Editor({
             <span />
             {workspace.status}
           </output>
-          <button
-            className="editor-icon"
-            aria-label="Export backup"
-            title="Export backup"
-            onClick={exportBackup}
-          >
-            <Download size={17} />
-          </button>
+          <details className="editor-backup-menu">
+            <summary aria-label="Backup options">
+              <Download size={17} /> Backup
+            </summary>
+            <div className="editor-card">
+              <button className="editor-secondary" onClick={localRecovery}>
+                Download local recovery
+              </button>
+              <button className="editor-secondary" onClick={exportBackup}>
+                Export backup
+              </button>
+            </div>
+          </details>
           <button
             className="editor-icon"
             aria-label="Refresh workspace"
             title="Refresh workspace"
-            onClick={async () => {
-              if (await workspace.flush()) {
-                try {
-                  workspace.reconcile(await refresh(), true);
-                } catch (e) {
-                  setError((e as Error).message);
-                }
-              }
-            }}
+            onClick={refreshWorkspace}
           >
             <RefreshCw size={17} />
           </button>
@@ -1272,7 +1646,8 @@ function Editor({
               disabled={
                 preview ||
                 !ready ||
-                (!!kind && (!!tool || !!workspace.unfinished))
+                (!!kind &&
+                  (!!tool || !!workspace.unfinished || !!repairPreview))
               }
               onClick={() => (kind ? begin(kind) : cancel())}
             >
@@ -1511,6 +1886,13 @@ function Editor({
                 inspect={(kind, id) => selectId(kind, id, true)}
                 undo={() => undo()}
                 canUndo={!!workspace.past.length}
+                exactBatch={exactBatch}
+                applyExact={(batch) =>
+                  mergeBatch(
+                    batch,
+                    'Reviewed duplicate cleanup applied. Undo restores the batch.',
+                  )
+                }
               />
             ) : (
               <EditorReview
@@ -1520,6 +1902,9 @@ function Editor({
                 validation={validation}
                 baselineVersion={base.version}
                 publishedVersion={data.version}
+                published={data}
+                onIssue={openIssue}
+                onSignIn={signIn}
                 busy={busy}
                 action={action}
                 mapRef={mapRef}
@@ -1533,22 +1918,38 @@ function Editor({
         ) : selected && !preview ? (
           <EditorInspector
             onGeometry={(geometry) => {
-              if (selected) commit([{ ...selected, geometry }]);
+              if (selected)
+                stageRepair(
+                  [{ ...selected, geometry }],
+                  'Review corrected building geometry',
+                );
             }}
             key={editKey(selected)}
             edit={selected}
             data={validation.data}
-            issues={issues.filter(
-              (i) =>
-                i.startsWith(`${selected.id}:`) ||
-                i.startsWith(`${selected.properties.name}:`),
-            )}
-            onProperty={(key, value) => {
+            issues={validation.issues
+              .filter(
+                (i) =>
+                  i.featureId === selected.id &&
+                  (!i.featureKind || i.featureKind === selected.kind),
+              )
+              .map((i) => i.message)}
+            focusField={repairFocus?.field}
+            onEndField={workspace.endHistoryGroup}
+            onProperty={(key, value, continuous) => {
               const edit = {
                 ...selected,
                 properties: { ...selected.properties, [key]: value },
               };
-              workspace.commit([edit]);
+              if (repairFocus) {
+                stageRepair([edit], 'Review feature repair');
+                return;
+              }
+              workspace.commit(
+                [edit],
+                workspace.unfinished,
+                continuous ? `${editKey(edit)}:${key}` : undefined,
+              );
               setSelected(edit);
               selectedRef.current = edit;
             }}
@@ -1641,46 +2042,7 @@ function Editor({
             <button
               className="editor-primary"
               disabled={!testOrigin || !testDest || busy || validation.pending}
-              onClick={async () => {
-                const request = ++routeRequest.current;
-                setBusy(true);
-                try {
-                  const found = await calculate(
-                    validation.data,
-                    { placeId: testOrigin },
-                    { placeId: testDest },
-                  );
-                  if (request === routeRequest.current) {
-                    setRoutes(found);
-                    const points = found[0].coordinates;
-                    mapRef.current?.fitBounds(
-                      [
-                        [
-                          Math.min(...points.map((p) => p[0])),
-                          Math.min(...points.map((p) => p[1])),
-                        ],
-                        [
-                          Math.max(...points.map((p) => p[0])),
-                          Math.max(...points.map((p) => p[1])),
-                        ],
-                      ],
-                      {
-                        maxZoom: 19,
-                        padding: {
-                          left: innerWidth > 1000 ? 365 : 70,
-                          right: innerWidth > 1000 ? 330 : 40,
-                          top: 100,
-                          bottom: 165,
-                        },
-                      },
-                    );
-                  }
-                } catch (e) {
-                  setError((e as Error).message);
-                } finally {
-                  setBusy(false);
-                }
-              }}
+              onClick={previewTestRoute}
             >
               <RouteIcon size={16} /> Preview route
             </button>
@@ -1758,49 +2120,143 @@ function Editor({
             </button>
           </div>
         )}
-        {(error || workspace.error) && (
-          <div className="editor-error editor-card" role="alert">
-            <span>{error || workspace.error}</span>
-            {workspace.status === 'Conflict' ? (
-              <>
-                <button
-                  className="editor-secondary"
-                  onClick={async () => {
-                    workspace.reconcile(await refresh(), true);
-                    void workspace.flush();
-                  }}
-                >
-                  Keep my changes
-                </button>
-                <button
-                  className="editor-secondary"
-                  onClick={async () => {
-                    workspace.reconcile(await refresh(), false);
-                    setSelected(null);
-                    controller.current?.select(null);
-                  }}
-                >
-                  Use server draft
-                </button>
-              </>
-            ) : (
+        {repairPreview && (
+          <aside
+            className="editor-repair-preview editor-card"
+            aria-label="Review proposed repair"
+          >
+            <h2>{repairPreview.title}</h2>
+            <p>Red: current geometry · Green: proposed geometry</p>
+            {repairPreview.batch.map((e) => (
+              <p key={editKey(e)}>
+                {e.kind} · {String(e.properties.name || e.id)}
+                {e.kind === 'entrance' && e.properties.placeId
+                  ? ` · Serves ${validation.data.places.find((p) => p.id === e.properties.placeId)?.name || e.properties.placeId}`
+                  : ''}
+              </p>
+            ))}
+            {repairErrors.map((message) => (
+              <p className="form-error" role="alert" key={message}>
+                {message}
+              </p>
+            ))}
+            <div className="button-row">
               <button
-                className="editor-secondary"
-                onClick={() => {
-                  setError('');
-                  void workspace.flush();
-                }}
+                className="editor-primary"
+                disabled={
+                  busy || validation.pending || !!tool || !!workspace.unfinished
+                }
+                onClick={applyRepair}
               >
-                Retry
+                Apply reviewed repair
               </button>
+              <button className="editor-secondary" onClick={dismissRepair}>
+                Cancel repair
+              </button>
+            </div>
+          </aside>
+        )}
+        {conflictServer && (
+          <EditorConflictReview
+            workspace={workspace}
+            server={conflictServer}
+            onSignIn={signIn}
+            close={() => {
+              setConflictServer(null);
+              setReviewOverlay([]);
+            }}
+            resolved={() => {
+              setConflictServer(null);
+              setReviewOverlay([]);
+              setSelected(null);
+              selectedRef.current = null;
+              controller.current?.select(null);
+            }}
+            compare={(local, remote) => {
+              setReviewOverlay([
+                ...[local].filter(Boolean).map((e) => ({
+                  type: 'Feature' as const,
+                  geometry: e!.geometry,
+                  properties: { color: '#c26ce3' },
+                })),
+                ...[remote].filter(Boolean).map((e) => ({
+                  type: 'Feature' as const,
+                  geometry: e!.geometry,
+                  properties: { color: '#26a07c' },
+                })),
+              ]);
+              if (local || remote) select(local || remote!, true);
+            }}
+          />
+        )}
+        {(error || taskError || workspace.error) && (
+          <div className="editor-error-stack">
+            {error && (
+              <div className="editor-card editor-error-row" role="alert">
+                <span>{error}</span>
+                <button className="editor-text" onClick={() => setError('')}>
+                  Dismiss message
+                </button>
+              </div>
             )}
-            <button
-              className="editor-icon"
-              aria-label="Dismiss message"
-              onClick={() => setError('')}
-            >
-              <X size={16} />
-            </button>
+            {taskError && (
+              <div className="editor-card editor-error-row" role="alert">
+                <span>{taskError.message}</span>
+                <button
+                  className="editor-secondary"
+                  onClick={() => {
+                    if (taskError.auth) signIn();
+                    else taskError.retry();
+                  }}
+                >
+                  {taskError.auth ? 'Sign in again' : taskError.label}
+                </button>
+                <button
+                  className="editor-text"
+                  onClick={() => setTaskError(null)}
+                >
+                  Dismiss action error
+                </button>
+              </div>
+            )}
+            {workspace.error && (
+              <div className="editor-card editor-error-row" role="alert">
+                <span>{workspace.error}</span>
+                {workspace.status === 'Conflict' ? (
+                  <button
+                    className="editor-secondary"
+                    onClick={reviewConflicts}
+                  >
+                    Review conflicts
+                  </button>
+                ) : (
+                  <button
+                    className="editor-secondary"
+                    onClick={async () => {
+                      if ([401, 403].includes(workspace.errorStatus))
+                        await signIn();
+                      else {
+                        if (
+                          workspace.status === 'Recovery unavailable' &&
+                          !(await workspace.preserveRecovery())
+                        )
+                          return;
+                        await workspace.flush();
+                      }
+                    }}
+                  >
+                    {[401, 403].includes(workspace.errorStatus)
+                      ? 'Sign in again'
+                      : workspace.status === 'Recovery unavailable'
+                        ? 'Retry local recovery'
+                        : 'Retry save'}
+                  </button>
+                )}
+                <button className="editor-text" onClick={localRecovery}>
+                  Download local recovery
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>
