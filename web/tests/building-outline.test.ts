@@ -19,6 +19,16 @@ it('highlights four wall edges instead of six triangle edges without changing th
   });
   expect(outline).toHaveLength(24);
   expect(wall).toEqual(original);
+  expect(
+    buildingOutline(
+      {
+        ...wall,
+        positions: new Float32Array(wall.positions),
+        indices: new Uint16Array(wall.indices),
+      },
+      { buildingId: 'b', wallId: 'wall' },
+    ),
+  ).toEqual(outline);
   expect(buildingOutline(wall, { buildingId: 'b', wallId: 'other' })).toEqual(
     [],
   );

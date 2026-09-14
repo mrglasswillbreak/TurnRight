@@ -2,7 +2,10 @@ import type { BuildingSelection, ModelMesh } from './visual-types';
 
 /** Highlight surface boundaries, without triangulation diagonals or window grids. */
 export function buildingOutline(
-  mesh: ModelMesh,
+  mesh: Pick<ModelMesh, 'surfaces'> & {
+    positions: ArrayLike<number>;
+    indices: ArrayLike<number>;
+  },
   selection: BuildingSelection,
 ): number[] {
   const output: number[] = [];
@@ -25,8 +28,16 @@ export function buildingOutline(
       for (let edge = 0; edge < 3; edge++) {
         const a = mesh.indices[t * 3 + edge] * 3;
         const b = mesh.indices[t * 3 + ((edge + 1) % 3)] * 3;
-        const start = mesh.positions.slice(a, a + 3),
-          end = mesh.positions.slice(b, b + 3);
+        const start = [
+            mesh.positions[a],
+            mesh.positions[a + 1],
+            mesh.positions[a + 2],
+          ],
+          end = [
+            mesh.positions[b],
+            mesh.positions[b + 1],
+            mesh.positions[b + 2],
+          ];
         const key = [start.join(','), end.join(',')].sort().join('|');
         const existing = edges.get(key);
         if (existing) existing.count++;

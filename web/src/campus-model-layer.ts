@@ -176,7 +176,6 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         detail: part.detail,
         materialKey: part.colour,
         surfaces: part.surfaces,
-        modelMesh: part,
       };
       group.add(mesh);
     }
@@ -333,10 +332,16 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         continue;
       const positions: number[] = [];
       for (const mesh of group.children)
-        if (mesh instanceof Mesh && mesh.userData.modelMesh)
-          positions.push(
-            ...buildingOutline(mesh.userData.modelMesh, selection),
-          );
+        if (mesh instanceof Mesh && mesh.geometry.index)
+          for (const coordinate of buildingOutline(
+            {
+              positions: mesh.geometry.getAttribute('position').array,
+              indices: mesh.geometry.index.array,
+              surfaces: mesh.userData.surfaces,
+            },
+            selection,
+          ))
+            positions.push(coordinate);
       if (positions.length) {
         const geometry = new BufferGeometry();
         geometry.setAttribute(

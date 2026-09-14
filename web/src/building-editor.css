@@ -1,7 +1,7 @@
 .building-appearance {
   display: grid;
   gap: 12px;
-  border-top: 1px solid #d7ddcd;
+  border-top: 1px solid var(--ed-line, #d7ddcd);
   padding-top: 12px;
 }
 .building-modes,
@@ -17,9 +17,9 @@
   min-height: 40px;
   padding: 6px 8px;
   border-radius: 7px;
-  border: 1px solid #c0cbb8;
-  background: #f8faf4;
-  color: #263b2c;
+  border: 1px solid var(--ed-line, #c0cbb8);
+  background: var(--ed-soft, #f8faf4);
+  color: var(--ed-text, #263b2c);
 }
 .building-modes button[aria-pressed='true'],
 .roof-tools button[aria-pressed='true'] {
@@ -40,7 +40,7 @@
 }
 .surface-field output {
   font-size: 11px;
-  color: #526452;
+  color: var(--ed-muted, #526452);
 }
 .surface-field .inherit-value {
   justify-self: start;
@@ -49,7 +49,7 @@
   background: transparent;
   text-decoration: underline;
   font-size: 11px;
-  color: #315b43;
+  color: var(--ed-accent, #315b43);
 }
 .roof-plan {
   display: grid;

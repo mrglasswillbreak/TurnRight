@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MapEdit, Position } from './types';
 import type {
   BuildingTopology,
@@ -46,20 +46,26 @@ export function RoofPlanEditor({
     dragging = useRef<string | null>(null),
     lastValid = useRef<RoofSurface | null>(null);
   const existing = edit.properties.appearance?.roofs?.[partId];
-  const roof = draft?.roof ||
-    existing || {
-      eaves: Math.max(0.1, height - Math.min(1.8, height * 0.18)),
-      points: [],
-      lines: [],
-    };
-  let error = '',
-    generated: RoofSurface | null = null;
-  try {
-    generated = customRoofSurface(polygon, roof, height);
-    lastValid.current = generated;
-  } catch (e) {
-    error = (e as Error).message;
-  }
+  const roof = useMemo(
+    () =>
+      draft?.roof ||
+      existing || {
+        eaves: Math.max(0.1, height - Math.min(1.8, height * 0.18)),
+        points: [],
+        lines: [],
+      },
+    [draft?.roof, existing, height],
+  );
+  const result = useMemo(() => {
+    try {
+      return { generated: customRoofSurface(polygon, roof, height), error: '' };
+    } catch (e) {
+      return { generated: null, error: (e as Error).message };
+    }
+  }, [polygon, roof, height]);
+  const generated = result.generated;
+  let error = result.error;
+  if (generated) lastValid.current = generated;
   if (draft && draft.geometryRevision !== JSON.stringify(edit.geometry))
     error =
       'The wing outline changed. Cancel this roof draft and reopen it against the current outline.';

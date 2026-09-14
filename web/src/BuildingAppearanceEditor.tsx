@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { MapEdit, CampusData } from './types';
 import type {
   BuildingSelection,
@@ -42,21 +42,34 @@ export function BuildingAppearanceEditor({
   onRoofDraft: (draft: RoofDraft | null) => void;
   onApplyRoof: (edit: MapEdit) => void;
 }) {
-  const feature = {
-    type: 'Feature' as const,
-    geometry: edit.geometry,
-    properties: { ...edit.properties, id: edit.id },
-  };
-  const topology = buildingTopology(feature),
-    appearance = edit.properties.appearance || {};
-  const visual = resolveBuildingVisual(
-    feature,
-    data.visuals?.buildings.find((b) => b.id === edit.id),
+  const feature = useMemo(
+    () => ({
+      type: 'Feature' as const,
+      geometry: edit.geometry,
+      properties: { ...edit.properties, id: edit.id },
+    }),
+    [edit.geometry, edit.properties, edit.id],
   );
-  const partId = selection?.partId,
-    wallId = selection?.wallId;
-  const part = topology.parts.find((p) => p.id === partId),
-    index = topology.parts.findIndex((p) => p.id === partId);
+  const topology = useMemo(() => buildingTopology(feature), [feature]),
+    appearance = edit.properties.appearance || {};
+  const visual = useMemo(
+    () =>
+      resolveBuildingVisual(
+        feature,
+        data.visuals?.buildings.find((b) => b.id === edit.id),
+      ),
+    [feature, data.visuals, edit.id],
+  );
+  const part = topology.parts.find((p) => p.id === selection?.partId),
+    index = topology.parts.findIndex((p) => p === part);
+  // Undo or a reviewed outline change may remove the selected surface. Resolve
+  // a safe inspector immediately, before the selection-repair effect runs.
+  const partId = part?.id,
+    wallId = part?.rings.some((r) =>
+      r.wallIds.includes(selection?.wallId || ''),
+    )
+      ? selection?.wallId
+      : undefined;
   const own = wallId
     ? appearance.walls?.[wallId] || {}
     : partId
@@ -77,8 +90,7 @@ export function BuildingAppearanceEditor({
     ),
   );
   const invalidSelection =
-    (!!partId && !part) ||
-    (!!wallId && !part?.rings.some((r) => r.wallIds.includes(wallId)));
+    (!!selection?.partId && !part) || (!!selection?.wallId && !wallId);
   useEffect(() => {
     if (invalidSelection)
       onSelection({ buildingId: edit.id, partId: part?.id });
@@ -411,6 +423,12 @@ export function BuildingAppearanceEditor({
             </label>
             {reset('windows')}
           </div>
+          {!resolved.windows && (
+            <p className="small-note">
+              Windows are hidden on this surface. Show windows to preview their
+              colour, trim and spacing.
+            </p>
+          )}
           {numeric(
             'Window spacing (m)',
             'windowSpacing',
@@ -420,6 +438,12 @@ export function BuildingAppearanceEditor({
           )}
           {!wallId && (
             <>
+              {partId && appearance.roofs?.[partId] && (
+                <p className="notice">
+                  This wing uses a custom roof. Standard form and pitch take
+                  effect after choosing Use standard roof in Roof mode.
+                </p>
+              )}
               <div className="surface-field">
                 <label className="field-label">
                   Standard roof form
