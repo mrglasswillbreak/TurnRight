@@ -1,0 +1,47 @@
+.rendering-settings {
+  margin: 0;
+  padding: 0 0 16px;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid var(--ed-line, var(--border));
+  color: var(--ed-text, var(--foreground));
+}
+.rendering-settings legend {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.rendering-settings label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.rendering-settings input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: #1764ed;
+}
+.rendering-settings label > span {
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+}
+.rendering-settings small,
+.rendering-settings p {
+  color: var(--ed-muted, var(--muted));
+  font-size: 12px;
+  line-height: 1.5;
+}
+.rendering-settings p {
+  margin: 8px 0 0;
+}
+.rendering-settings input:focus-visible {
+  outline: 2px solid #1764ed;
+  outline-offset: 3px;
+}
