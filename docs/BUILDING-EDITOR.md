@@ -1,6 +1,10 @@
 # Building appearance and custom roofs
 
-The public map and editor share one 2D / 3D control. Enhanced rendering is the default in 3D; the attached rendering menu retains the existing Simple preference. Selecting a building opens Appearance. Outline exposes the geometry handles, and Roof opens a wing roof plan. Connection drawing and survey work suppress models so that map targets remain usable.
+The public map and editor share one compact view button: it shows 3D while viewing 2D, and 2D while viewing 3D. Tapping it changes the view. Enhanced rendering is the default; choose Enhanced or Simple in the public Settings screen or the editor's Settings section. Existing saved Simple preferences are retained. There is no attached options menu.
+
+Editor Settings also contains tilt and building opacity. Tilt follows the actual camera angle and is available in 3D. Opening or closing Settings keeps the map and inspector mounted, preserving selection, unfinished drawings and roof plans. View preferences do not create map edits or undo entries.
+
+Selecting a building opens Appearance. Outline exposes the geometry handles, and Roof opens a wing roof plan. Connection drawing and survey work suppress models so that map targets remain usable.
 
 ## Editing
 
@@ -27,6 +31,8 @@ Automated coverage includes stable surfaces, inheritance, concurrent field chang
 Validation on 14 September 2026: all 266 unit tests pass. Chromium and WebKit exercise touch roof drawing, invalid-height feedback, opacity and preview recovery. Production-service-worker acceptance verifies that an acknowledged wall edit and an unfinished roof survive cold offline reopening, and that applying the roof offline survives another reload. Preparing a workspace verifies real requests and package integrity even when the browser's connectivity hint reports offline.
 
 Chromium also verifies worker timeout, crash, delivery failure and obsolete-reply handling. Client and server type checks, lint and the production build pass. The lazy renderer is 119.5 KB gzip against its 300 KB budget. Existing broad-chunk and lint warnings remain; no new check failures were introduced.
+
+The single-button Settings follow-up passes nine Chromium scenarios and two production-offline scenarios. Coverage includes keyboard switching, shared rendering preferences, unavailable preference storage, live tilt and opacity, retained roof point/tool selection, drawing recovery and phone layout. The touch Settings flow also passes in WebKit. Browser screenshots were reviewed at desktop and phone widths.
 
 A local build of the current published campus assessed 380 buildings and generated 55 models across 22 sectors. Every generated model matched the editor's shared generator, including geometry and materials. These checks used the published data as input without publishing a campus draft.
 

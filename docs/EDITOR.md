@@ -16,9 +16,11 @@ Use the inspector to change access, direction, steps, building heights, labels, 
 
 | Control | Action |
 | --- | --- |
-| 2D / 3D | Change view without losing your drawing or selection; the preference is remembered. |
-| Tilt / rotation / north arrow | Orient the 3D view. Mouse rotation also works. |
-| Buildings slider | Adjust building transparency; entrance and outline tools automatically expose ground footprints. |
+| 2D / 3D button | Shows the view you can switch to. Tap to change view without losing your drawing or selection; the preference is remembered. |
+| Settings → 3D rendering | Choose Enhanced (the default) or Simple. The choice is shared with the public map's Settings. |
+| Settings → Tilt | Adjust the 3D camera angle; the slider follows the current tilt. |
+| Rotation / north arrow | Orient the map. Mouse rotation also works. |
+| Settings → Building opacity | Adjust building transparency; entrance and outline tools automatically expose ground footprints. |
 | Compare base | Temporarily show approved source geometry without draft corrections. Finish an active drawing first. |
 | E / P / B / M | Add entrance / draw path / draw building / add place. |
 | Enter / Escape | Finish / cancel a drawing. |
@@ -27,6 +29,8 @@ Use the inspector to change access, direction, steps, building heights, labels, 
 Public and editor views share the same height rules. Recorded heights take precedence, documented floor counts use 3 m per floor, and unknown heights use muted illustrative 6 m blocks. The illustrative heights are never stored as measurements or exported into campus packages. The public map defaults to 3D and remembers a visitor's 2D/3D choice. Building details explain height provenance. This editor models outdoor ground-level geometry, not building interiors or terrain.
 
 Starting a drawing immediately collapses the explorer and route panel. Finish or cancel before selecting another feature, changing tools, or entering another review section. The prompt shows the first-point instruction and vertex count; Finish requires two distinct path points or three distinct building points. View changes and autosaves retain the drawing, including an empty session before the first point. Finish/Cancel restore the prior panel layout. Paths and barriers temporarily reduce building opacity to expose ground geometry.
+
+Settings remains available during unfinished drawings and roof work. Opening and closing it preserves the map, inspector selection and editing state. Tilt and opacity changes affect this workspace's view; they do not create saved map edits.
 
 ## Duplicate review
 
