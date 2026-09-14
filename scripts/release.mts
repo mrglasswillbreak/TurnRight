@@ -89,6 +89,8 @@ try {
         meta: { turnrightRelease: id, turnrightVersion: manifest.version },
         projectSettings: {
           rootDirectory: "web",
+          // The reviewed reference catalogue is uploaded under data/.
+          sourceFilesOutsideRootDirectory: true,
           framework: "vite",
           buildCommand: "npm run build",
           outputDirectory: "dist",
