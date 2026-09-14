@@ -351,6 +351,7 @@ export function BuildingAppearanceEditor({
                 : null
             }
             onDraft={onRoofDraft}
+            focusedSurface={selection?.roofTriangle}
             onSurface={(index) =>
               onSelection({
                 buildingId: edit.id,

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MapEdit, Position } from './types';
 import type {
   BuildingTopology,
@@ -21,6 +21,7 @@ export function RoofPlanEditor({
   onDraft,
   onApply,
   onSurface,
+  focusedSurface,
 }: {
   edit: MapEdit;
   partId: string;
@@ -32,6 +33,7 @@ export function RoofPlanEditor({
   onDraft: (value: RoofDraft | null) => void;
   onApply: (edit: MapEdit) => void;
   onSurface: (index: number | undefined) => void;
+  focusedSurface?: number;
 }) {
   const [tool, setTool] = useState<'select' | 'point' | 'ridge' | 'valley'>(
     'select',
@@ -39,6 +41,7 @@ export function RoofPlanEditor({
   const [selected, setSelected] = useState(''),
     [from, setFrom] = useState(''),
     [surface, setSurface] = useState<number | null>(null);
+  useEffect(() => setSurface(focusedSurface ?? null), [focusedSurface]);
   const svg = useRef<SVGSVGElement>(null),
     dragging = useRef<string | null>(null),
     lastValid = useRef<RoofSurface | null>(null);
@@ -109,6 +112,7 @@ export function RoofPlanEditor({
   const pick = (id: string, current = roof) => {
     setSelected(id);
     setSurface(null);
+    onSurface(undefined);
     if (tool === 'ridge' || tool === 'valley') {
       if (from && from !== id && current.points.some((p) => p.id === from)) {
         update({

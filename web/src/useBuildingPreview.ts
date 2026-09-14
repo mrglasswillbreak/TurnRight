@@ -55,7 +55,10 @@ export function useBuildingPreview(
       setPending(false);
       return;
     }
-    if (catalogueRevision.current !== data.visuals?.revision) { signatures.current.clear(); catalogueRevision.current = data.visuals?.revision; }
+    if (catalogueRevision.current !== data.visuals?.revision) {
+      signatures.current.clear();
+      catalogueRevision.current = data.visuals?.revision;
+    }
     let cancelled = false;
     const instance = worker.current,
       revision = ++sequence.current;
@@ -67,6 +70,7 @@ export function useBuildingPreview(
     const wanted = new Set(desired.map((f) => String(f.properties?.id)));
     setModels((previous) => previous.filter((m) => wanted.has(m.model.id)));
     if (!features.length) {
+      setError('');
       setPending(false);
       return;
     }

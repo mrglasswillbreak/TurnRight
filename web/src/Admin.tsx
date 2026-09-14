@@ -313,10 +313,6 @@ export default function Admin({
       updateReady={updateReady}
       installUpdate={installUpdate}
       prepareOffline={async () => {
-        if (!navigator.onLine)
-          throw new Error(
-            'Connect to verify this owner and prepare the offline map.',
-          );
         const [verified, source] = await Promise.all([
           api<EditorState>('state'),
           api<{ features: SourceRecord[] }>('sources'),
@@ -1633,7 +1629,19 @@ function Editor({
           onSelect={() => {}}
           buildingSelection={buildingSelection}
           onBuildingSelect={(feature, hit) => {
-            if (workspace.roofDraft) return;
+            if (workspace.roofDraft) {
+              if (
+                hit?.buildingId === workspace.roofDraft.buildingId &&
+                hit.partId === workspace.roofDraft.partId &&
+                hit.role === 'roof'
+              )
+                setBuildingSelection(hit);
+              return;
+            }
+            if (selected?.id === hit?.buildingId && buildingMode === 'roof') {
+              setBuildingSelection(hit);
+              return;
+            }
             selectId('building', String(feature.properties?.id));
             if (hit) setBuildingSelection(hit);
           }}
