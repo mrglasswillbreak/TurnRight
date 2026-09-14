@@ -44,6 +44,7 @@ beforeAll(async () => {
     '003_editor_batches.sql',
     '004_private_surveys.sql',
     '005_baseline_reconciliation.sql',
+    '006_reconciliation_safe_updates.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -66,16 +67,25 @@ afterAll(async () => {
 });
 
 describe('published baseline reconciliation', () => {
+  const sources = async () =>
+    (
+      await database.query<{ sources: unknown[] }>(
+        "select coalesce(jsonb_agg(to_jsonb(s) order by s.id),'[]'::jsonb) as sources from source_features s",
+      )
+    ).rows[0].sources;
   it('preserves all drafts and audit history and refuses a stale review', async () => {
+    await save(randomUUID(), [item(randomUUID(), 'Retained entrance')]);
+    await database.query(
+      "insert into source_features(id,source,entity,payload,hash) values('meta:campus','test','meta',$1::jsonb,'old-hash')",
+      [JSON.stringify({ version: 'old-baseline' })],
+    );
     const beforeEdits = await database.query(
       'select * from map_edits order by id',
     );
     const beforeHistory = await database.query(
       'select * from edit_history order by id',
     );
-    const beforeSources = await database.query(
-      'select * from source_features order by id',
-    );
+    const beforeSources = await sources();
     const records = [
       {
         id: 'meta:campus',
@@ -88,7 +98,7 @@ describe('published baseline reconciliation', () => {
     const args = [
       owner,
       'published-test',
-      JSON.stringify(beforeSources.rows),
+      JSON.stringify(beforeSources),
       JSON.stringify(records),
     ];
     await database.query(
@@ -107,13 +117,49 @@ describe('published baseline reconciliation', () => {
           'select before_sources from baseline_reconciliations',
         )
       ).rows,
-    ).toHaveLength(1);
+    ).toEqual([{ before_sources: beforeSources }]);
+    expect(
+      (await database.query('select payload from source_features')).rows,
+    ).toEqual([{ payload: { version: 'published-test' } }]);
     await expect(
       database.query(
         'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
         args,
       ),
     ).rejects.toThrow('changed');
+  });
+  it('rolls back the archive and source replacement when replacement records are invalid', async () => {
+    const before = await sources();
+    const archives = (
+      await database.query('select * from baseline_reconciliations')
+    ).rows;
+    const edits = (await database.query('select * from map_edits order by id'))
+      .rows;
+    const record = {
+      id: 'meta:campus',
+      source: 'test',
+      entity: 'meta',
+      hash: 'duplicate',
+      payload: { version: 'replacement' },
+    };
+    await expect(
+      database.query(
+        'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
+        [
+          owner,
+          'replacement',
+          JSON.stringify(before),
+          JSON.stringify([record, record]),
+        ],
+      ),
+    ).rejects.toThrow('duplicate key');
+    expect(await sources()).toEqual(before);
+    expect(
+      (await database.query('select * from baseline_reconciliations')).rows,
+    ).toEqual(archives);
+    expect(
+      (await database.query('select * from map_edits order by id')).rows,
+    ).toEqual(edits);
   });
 });
 describe('private survey transactions', () => {
