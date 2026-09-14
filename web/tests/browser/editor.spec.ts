@@ -887,8 +887,16 @@ function browserCampus(): CampusData {
   ];
   return data;
 }
-async function setup(page: Page, realCampus = false, enhanced = false) {
-  let edits: MapEdit[] = [];
+async function setup(
+  page: Page,
+  realCampus = false,
+  enhanced = false,
+  options: {
+    initialEdits?: MapEdit[];
+    mutateCampus?: (data: CampusData) => void;
+  } = {},
+) {
+  let edits: MapEdit[] = structuredClone(options.initialEdits || []);
   let revision = 0;
   const receipts = new Map<string, MapEdit[]>();
   const campus: CampusData = realCampus
@@ -930,6 +938,7 @@ async function setup(page: Page, realCampus = false, enhanced = false) {
         }),
       );
   }
+  options.mutateCampus?.(campus);
   const bytes = JSON.stringify(campus);
   const user = {
     id: 'owner',
@@ -1035,7 +1044,13 @@ async function setup(page: Page, realCampus = false, enhanced = false) {
     page.getByRole('button', { name: 'Draw path', exact: true }),
   ).toBeEnabled();
   await attachMap(page);
-  return { edits: () => edits, campus };
+  return {
+    edits: () => edits,
+    setEdits: (value: MapEdit[]) => {
+      edits = value;
+    },
+    campus,
+  };
 }
 // Read the actual MapLibre instance from the mounted React ref. No map, renderer,
 // geometry controller, or pointer event is mocked or replaced by this test.
@@ -1074,6 +1089,500 @@ async function clickMap(page: Page, coordinates: Position) {
   const p = await position(page, coordinates);
   await page.mouse.click(p.x, p.y);
 }
+
+test('editor reliability: field typing is one undo step across an autosave', async ({
+  page,
+}) => {
+  await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  const name = page
+    .getByRole('complementary', { name: 'Feature properties' })
+    .getByLabel('Name', { exact: true });
+  const original = await name.inputValue();
+  await name.press('End');
+  await name.pressSequentially(' West');
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await name.pressSequentially(' entrance');
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(name).toHaveValue(original);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(name).toHaveValue(original + ' West entrance');
+});
+
+test('editor reliability: export retries export and local recovery downloads offline', async ({
+  page,
+}) => {
+  await setup(page);
+  await focusCampus(page);
+  let exports = 0,
+    saves = 0;
+  await page.route('**/api/admin', (route) => {
+    const { action } = route.request().postDataJSON();
+    if (action === 'export') {
+      exports++;
+      return route.fulfill({
+        status: 503,
+        json: { error: 'Export temporarily unavailable' },
+      });
+    }
+    if (action === 'save-edits') saves++;
+    return route.fallback();
+  });
+  await page.getByLabel('Backup options').click();
+  await page
+    .getByRole('button', { name: 'Export backup', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Retry export', exact: true }),
+  ).toBeVisible();
+  const initial = exports;
+  await page.getByRole('button', { name: 'Retry export', exact: true }).click();
+  await expect.poll(() => exports).toBeGreaterThan(initial);
+  expect(saves).toBe(0);
+  await page.getByRole('button', { name: 'Dismiss action error' }).click();
+  await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+  await page.context().setOffline(true);
+  const download = page.waitForEvent('download');
+  await page
+    .locator('.editor-backup-menu')
+    .getByRole('button', { name: 'Download local recovery' })
+    .click();
+  const path = await (await download).path();
+  const backup = JSON.parse(readFileSync(path!, 'utf8'));
+  expect(backup).toMatchObject({
+    schemaVersion: 1,
+    baselineVersion: expect.any(String),
+    workspace: {
+      unfinished: { kind: 'path' },
+      past: expect.any(Array),
+      future: expect.any(Array),
+    },
+  });
+  expect(saves).toBe(0);
+});
+
+test('editor reliability: opening duplicates is read-only until the reviewed batch is applied', async ({
+  page,
+}) => {
+  const server = await setup(page, false, false, {
+    mutateCampus: (campus) => {
+      const gate = campus.places.find((p) => p.id === 'gate')!;
+      campus.places.push({ ...gate, id: 'gate-copy' });
+    },
+  });
+  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Review exact duplicate cleanup' }),
+  ).toBeVisible();
+  expect(server.edits()).toEqual([]);
+  await page
+    .getByRole('button', { name: 'Review exact duplicate cleanup' })
+    .click();
+  await expect(
+    page.getByRole('region', { name: 'Proposed duplicate cleanup' }),
+  ).toContainText('gate-copy');
+  expect(server.edits()).toEqual([]);
+  await page
+    .getByRole('button', { name: 'Apply reviewed duplicate cleanup' })
+    .click();
+  await expect
+    .poll(
+      () =>
+        server.edits().filter((e) => e.deleted && e.properties.mergedInto)
+          .length,
+    )
+    .toBe(1);
+  await page.getByRole('button', { name: 'Undo last edit' }).click();
+  await expect
+    .poll(
+      () =>
+        server
+          .edits()
+          .filter(
+            (e) =>
+              e.deleted &&
+              e.properties.mergedInto &&
+              !e.properties.revertToSource,
+          ).length,
+    )
+    .toBe(0);
+});
+
+for (const firstCorrection of [false, true])
+  test(`editor reliability: conflict choices retain unrelated server properties${firstCorrection ? ' on first correction' : ''}`, async ({
+    page,
+  }) => {
+    const f = browserCampus().map.features.find(
+      (f) => f.properties?.id === 'library',
+    )!;
+    const initial: MapEdit = {
+      id: 'library',
+      kind: 'building',
+      geometry: f.geometry,
+      properties: { ...f.properties, faculty: 'Original' },
+      updated_at: '2026-09-11T10:00:00Z',
+    };
+    const server = await setup(page, false, false, {
+      initialEdits: firstCorrection ? [] : [initial],
+      mutateCampus: (campus) => {
+        campus.map.features.find(
+          (f) => f.properties?.id === 'library',
+        )!.properties!.faculty = 'Original';
+      },
+    });
+    await focusCampus(page);
+    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await clickMap(page, [3.20012, 6.46022]);
+    server.setEdits([
+      {
+        ...initial,
+        properties: {
+          ...initial.properties,
+          name: 'Remote library',
+          faculty: 'Remote faculty',
+        },
+        updated_at: '2026-09-11T11:00:00Z',
+      },
+    ]);
+    await page
+      .getByRole('complementary', { name: 'Feature properties' })
+      .getByLabel('Name', { exact: true })
+      .fill('Local library');
+    await page
+      .getByRole('button', { name: 'Review conflicts', exact: true })
+      .click();
+    const review = page.getByRole('complementary', {
+      name: 'Review draft conflicts',
+    });
+    await expect(
+      review.getByRole('button', { name: 'Apply reviewed choices' }),
+    ).toBeDisabled();
+    await review.getByLabel('Keep my value').check();
+    await review
+      .getByRole('button', { name: 'Apply reviewed choices' })
+      .click();
+    await expect
+      .poll(() => server.edits()[0].properties)
+      .toMatchObject({ name: 'Local library', faculty: 'Remote faculty' });
+  });
+
+test('editor reliability: shared destinations resolve aliases and missing links offer search', async ({
+  page,
+  context,
+  browserName,
+}) => {
+  const server = await setup(page, false, false, {
+    mutateCampus: (campus) => {
+      campus.placeIdAliases = { 'old-library': campus.places[0].id };
+    },
+  });
+  await page.goto('/?place=old-library');
+  await expect(
+    page.getByRole('heading', {
+      name: server.campus.places[0].name,
+      exact: true,
+    }),
+  ).toBeVisible();
+  let link: string;
+  if (browserName === 'webkit') {
+    await page.evaluate(() =>
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: undefined,
+      }),
+    );
+    await page.getByRole('button', { name: 'Copy link' }).click();
+    link = await page
+      .getByLabel('Destination link', { exact: true })
+      .inputValue();
+  } else {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Copy link' }).click();
+    link = await page.evaluate(() => navigator.clipboard.readText());
+  }
+  expect(new URL(link).searchParams.get('place')).toBe(
+    server.campus.places[0].id,
+  );
+  await page.getByRole('button', { name: 'Directions', exact: true }).click();
+  await page.getByLabel('Starting place').selectOption('gate');
+  await expect(page.getByLabel('Recorded steps information')).toContainText(
+    'unknown',
+  );
+  await page.goto('/?place=missing-destination');
+  await expect(
+    page.getByRole('button', { name: 'Search campus places' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Search campus places' }).click();
+  await expect(page.getByLabel('Search campus')).toBeFocused();
+});
+
+test('editor reliability: retry route replaces a failed worker and calculates the walk', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const OriginalWorker = window.Worker;
+    let fail = true;
+    window.Worker = class extends OriginalWorker {
+      private breakRequest: boolean;
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super(url, options);
+        this.breakRequest = String(url).includes('routing.worker');
+      }
+      postMessage(message: unknown, transfer?: Transferable[]) {
+        if (
+          this.breakRequest &&
+          fail &&
+          (message as { type?: string }).type === 'request'
+        ) {
+          fail = false;
+          queueMicrotask(() =>
+            this.dispatchEvent(
+              new ErrorEvent('error', { message: 'Simulated worker failure' }),
+            ),
+          );
+          return;
+        }
+        super.postMessage(message, transfer || []);
+      }
+    };
+  });
+  const server = await setup(page);
+  await page.getByRole('button', { name: 'Test route', exact: true }).click();
+  await page.getByLabel('Test route From').selectOption('gate');
+  await page
+    .getByLabel('Test route To')
+    .selectOption(server.campus.places[0].id);
+  await page
+    .getByRole('button', { name: 'Preview route', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Retry route', exact: true }).click();
+  await expect(page.locator('.editor-route-test')).toContainText(
+    'Shortest walk',
+  );
+});
+
+test('editor reliability: expired authentication offers sign-in and retains the pending save', async ({
+  page,
+}) => {
+  await setup(page);
+  await focusCampus(page);
+  await page.route('**/api/admin', (route) => {
+    if (route.request().postDataJSON().action === 'save-edits')
+      return route.fulfill({ status: 401, json: { error: 'Expired' } });
+    return route.fallback();
+  });
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page
+    .getByRole('complementary', { name: 'Feature properties' })
+    .getByLabel('Name', { exact: true })
+    .fill('Retained local name');
+  await expect(
+    page.getByRole('button', { name: 'Sign in again', exact: true }),
+  ).toBeVisible();
+  const download = page.waitForEvent('download');
+  await page
+    .locator('.editor-error-stack')
+    .getByRole('button', { name: 'Download local recovery' })
+    .click();
+  const backup = JSON.parse(
+    readFileSync((await (await download).path())!, 'utf8'),
+  );
+  expect(backup.workspace.pending.edits[0].edit.properties.name).toBe(
+    'Retained local name',
+  );
+});
+
+test('editor reliability: source comparisons and release status refresh without saving', async ({
+  page,
+}, testInfo) => {
+  const server = await setup(page, true);
+  let polls = 0,
+    saves = 0;
+  const before = server.campus.map.features.find(
+    (f) => f.properties?.id === 'arcgis:University_Property:120',
+  )!;
+  const after = structuredClone(before);
+  after.properties!.name = 'Reviewed Senate name';
+  await page.route('**/api/admin', (route) => {
+    const { action } = route.request().postDataJSON();
+    if (action === 'save-edits') saves++;
+    if (action === 'review-status') {
+      polls++;
+      return route.fulfill({
+        json: {
+          jobs: [
+            {
+              id: 'job-test',
+              kind: 'source',
+              status: 'complete',
+              message: 'Source check complete',
+              created_at: '2026-09-14T00:00:00Z',
+            },
+          ],
+          releases: [],
+          changes: [
+            {
+              id: 'change-test',
+              source_id: 'source-test',
+              kind: 'modify',
+              summary: 'Senate name update',
+              before: { payload: before },
+              after: { payload: after },
+              status: 'pending',
+            },
+          ],
+        },
+      });
+    }
+    return route.fallback();
+  });
+  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await expect(
+    page.getByText('Source check complete', { exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'modify Senate name update' }).click();
+  await expect(page.locator('.source-comparison table')).toContainText(
+    'Reviewed Senate name',
+  );
+  expect(polls).toBeGreaterThan(0);
+  expect(saves).toBe(0);
+  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  const impact = page.getByRole('region', { name: 'Release impact' });
+  await expect(impact).toContainText('Clinic–Law');
+  await expect(impact.locator('tbody')).toContainText('Connected');
+  await impact.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: testInfo.outputPath('desktop-release-impact.png'),
+  });
+  expect(saves).toBe(0);
+});
+
+test('editor reliability: uncertain jobs check status before resubmission and read errors recover authentication', async ({
+  page,
+}) => {
+  await setup(page);
+  let submissions = 0,
+    reads = 0,
+    expired = false;
+  await page.route('**/api/admin', (route) => {
+    const { action } = route.request().postDataJSON();
+    if (action === 'check-sources') {
+      submissions++;
+      return route.abort('failed');
+    }
+    if (action === 'state') reads++;
+    if (action === 'review-status' && expired)
+      return route.fulfill({ status: 401, json: { error: 'Expired' } });
+    return route.fallback();
+  });
+  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Check action status', exact: true }),
+  ).toBeVisible();
+  expect(submissions).toBe(1);
+  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await expect.poll(() => reads).toBeGreaterThan(0);
+  await expect(
+    page.getByRole('button', { name: 'Check action status', exact: true }),
+  ).not.toBeVisible();
+  expect(submissions).toBe(1);
+  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await expect.poll(() => submissions).toBe(2);
+  expired = true;
+  await expect(
+    page.getByRole('button', { name: 'Sign in again', exact: true }),
+  ).toBeVisible();
+});
+
+test('prepared offline survey editor opens its cache after backend failure while the browser is online', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !testInfo.config.configFile?.includes('pwa.config'),
+    'Requires the production service worker configuration.',
+  );
+  await setup(page);
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+    .click();
+  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+  await page.route('**/api/admin', (route) => route.abort('failed'));
+  expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+  await page.reload();
+  await attachMap(page);
+  await expect(page.locator('.editor-offline')).toContainText(
+    'Working offline',
+  );
+  await expect(page.locator('.editor-offline')).not.toContainText('Unknown');
+  await expect(
+    page.getByRole('button', { name: 'Draw path', exact: true }),
+  ).toBeEnabled();
+});
+
+test.describe('phone editor reliability', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test('phone editor reliability: guided entrance repair is previewed before saving', async ({
+    page,
+  }, testInfo) => {
+    const point = browserCampus().graph.nodes.find(
+      (n) => n.id === 'b',
+    )!.coordinates;
+    const initial: MapEdit = {
+      id: 'door-repair',
+      kind: 'entrance',
+      geometry: { type: 'Point', coordinates: point },
+      properties: {
+        name: 'Repair door',
+        placeId: '',
+        connection: { type: 'node', nodeId: 'b', coordinates: point },
+      },
+      updated_at: '2026-09-11T10:00:00Z',
+    };
+    const server = await setup(page, false, false, { initialEdits: [initial] });
+    await page.getByRole('button', { name: 'Releases', exact: true }).tap();
+    await page
+      .getByRole('button', { name: 'Choose entrance’s place' })
+      .first()
+      .tap();
+    await expect(
+      page.getByLabel('Entrance place', { exact: true }),
+    ).toBeFocused();
+    await page
+      .getByLabel('Entrance place', { exact: true })
+      .selectOption(server.campus.places[0].id);
+    await expect(
+      page.getByRole('complementary', { name: 'Review proposed repair' }),
+    ).toBeVisible();
+    expect(server.edits()[0].properties.placeId).toBe('');
+    await expect(
+      page.getByRole('button', { name: 'Draw path', exact: true }),
+    ).toBeDisabled();
+    await page.screenshot({
+      path: testInfo.outputPath('phone-repair-preview.png'),
+    });
+    await page.getByRole('button', { name: 'Cancel repair' }).tap();
+    expect(server.edits()[0].properties.placeId).toBe('');
+    await page
+      .getByLabel('Entrance place', { exact: true })
+      .selectOption(server.campus.places[0].id);
+    await page.getByRole('button', { name: 'Apply reviewed repair' }).tap();
+    await expect
+      .poll(() => server.edits()[0].properties.placeId)
+      .toBe(server.campus.places[0].id);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  });
+});
 
 async function focusModels(page: Page, phone = false) {
   await page.evaluate(
@@ -1191,6 +1700,10 @@ test('review separate building wings, edit their geometry, save and undo without
   );
   await clickMap(page, [3.1997, 6.47128]);
   await page.getByRole('button', { name: 'Review corrected wings' }).click();
+  await expect(
+    page.getByRole('complementary', { name: 'Review proposed repair' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Apply reviewed repair' }).click();
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
   const building = () =>
     server
@@ -1199,7 +1712,7 @@ test('review separate building wings, edit their geometry, save and undo without
         (e) =>
           e.id === 'arcgis:University_Property:120' && e.kind === 'building',
       );
-  expect(building()?.geometry.type).toBe('MultiPolygon');
+  await expect.poll(() => building()?.geometry.type).toBe('MultiPolygon');
   const before = structuredClone(building()!.geometry);
   const from = await position(page, [3.1996805, 6.4707775]),
     to = await position(page, [3.19967, 6.47078]);

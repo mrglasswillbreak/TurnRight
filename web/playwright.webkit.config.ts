@@ -5,7 +5,7 @@ export default defineConfig({
   // Windows WebKit's software renderer needs longer for cold map initialization.
   timeout: 120000,
   expect: { timeout: 30000 },
-  grep: /phone survey|motion assistance|drawing session.*touch|public phone/,
+  grep: /phone survey|motion assistance|drawing session.*touch|public phone|editor reliability/,
   use: {
     ...base.use,
     browserName: 'webkit',
