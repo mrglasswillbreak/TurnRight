@@ -32,3 +32,18 @@ Buildings with supported source heights receive an optional illustrative facade 
 ## Applying and publishing
 
 Open **Sources → Building appearances** to inspect proposed values and source links. Existing explicit appearance fields, wing/wall overrides and custom roofs take precedence. Apply the reviewed batch as one undoable operation, let autosave finish, then prepare and inspect the normal release preview. The editor and release use the same generated geometry from the applied properties. Physical Android/iPhone acceptance remains outstanding.
+
+## Verification
+
+The published 380-building input yields 53 proposals: 11 photo references and 42 illustrative facades. The reviewed candidate generates 56 models (49 detailed, 7 simplified) in 22 sectors, using 803,620 bytes of the 12 MB model budget. Direct generation comparison found no geometry or material differences between the editor and release for all 56 models. The candidate retains the original graph, entrances and footprint geometries. See [all-building coverage](BUILDING-APPEARANCE-COVERAGE.md).
+
+275 unit tests passed, including proposal immutability, geometry association, preservation of custom surfaces/private evidence, explicit unknown heights, one-step undo/redo, and unchanged routing. Client/server type checks and production build/budget checks passed. Browser acceptance passed on desktop and phone Chromium and phone WebKit. A full-campus browser fixture with accepted wing repairs applied 57 appearances and regenerated the enhanced models without preview errors. That fixture's count differs from the current published campus because its geometry repairs have already been accepted.
+
+Reproduce the candidate from a saved public snapshot in `web`:
+
+```powershell
+node --import tsx scripts/prepare-building-appearances.ts path/to/campus.json ../data/candidates/reference-appearances
+node --import tsx scripts/build-campus-visuals.ts ../data/candidates/reference-appearances/campus.json ../data/candidates/reference-appearances/visuals --reviewed
+```
+
+Preparing a candidate does not write to the editor or publish campus data. The live editor recomputes proposals against the current owner draft and checks for changes again before applying them.
