@@ -2,6 +2,8 @@
 
 The application retains MapLibre, local campus data and Terra Draw. Architectural models use a lazy Three.js custom layer sharing MapLibre's WebGL context. Application deployment and campus-data publication remain separate operations.
 
+**Deployment update:** the application and migration 005 were deployed on 14 September. The published campus package and saved drafts were preserved. See [production verification](PRODUCTION.md); the building catalogue and footprint corrections still await the separate campus-data review.
+
 ## Release-validation repair
 
 The owner export captured on 14 September contained 1,172 approved source rows, 20 correction records (10 active), and 65 history entries. The complete export remains in the local backup; the committed compressed regression fixture retains source geometry and correction properties without database actors or private recovery history.
@@ -58,7 +60,7 @@ npm run build
 
 Review evidence and generated diffs before committing a new catalogue. Packaging copies only catalogue-listed sector files and verifies their hashes. Stale sector files are never included merely because they exist in the directory. Geometry/appearance edits use fallback rendering until the catalogue has been rebuilt against those edits.
 
-Apply migration 005 and configure `PUBLISHED_MAP_URL` on the API before baseline reconciliation. Deploy the application while preserving the current published campus package. In Releases, review and reconcile that public baseline, replay and resolve all drafts, accept the relevant geometry corrections, then build a separate campus-data preview. Review Law/Library access, directed routes, closures and model compatibility before publishing. Retain the preceding immutable deployment/package for rollback. This implementation has not changed the live database or published a new campus package.
+Apply migration 005 and configure `PUBLISHED_MAP_URL` on the API before baseline reconciliation (completed for the current production application). Deploy the application while preserving the current published campus package. In Releases, review and reconcile that public baseline, replay and resolve all drafts, accept the relevant geometry corrections, then build a separate campus-data preview. Review Law/Library access, directed routes, closures and model compatibility before publishing. Retain the preceding immutable deployment/package for rollback. The deployment added database support without applying reconciliation or publishing a new campus package.
 
 ## Verification limits
 

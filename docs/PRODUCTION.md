@@ -1,5 +1,43 @@
 # Production deployments
 
+## Miniature styling and release-validation repair — 14 September 2026
+
+The owner requested deployment of the completed implementation. Application
+revision `3e7e747910478f078ddc49958749cf9b0164cee0` was fast-forwarded to
+`main` and Vercel reported **Ready / Production** with the public domain assigned.
+
+- Public application: [turnright.vercel.app](https://turnright.vercel.app/).
+- [Production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/Cn5F2f8D6MxmFg4ngEXxHnVrncSL).
+- Immutable URL: [turnright-55oag4lgl](https://turnright-55oag4lgl-muhammed-abdulhadi-s-projects.vercel.app/).
+- At 00:57 UTC, all 22 published assets retained their exact lengths and SHA-256
+  hashes. Package `lasu-4e4c8008b38b` remains 3,159,499 bytes. The preceding
+  `lasu-44f8af5654f1` manifest remains available.
+- The served entry, editor and lazy renderer are `index-BabM2uMe.js`,
+  `Admin-DMOiYZfw.js` and `campus-model-layer-DfibhRi2.js`. Public `/`, `/admin`
+  and `/sw.js` returned 200; the service worker precaches the new application
+  and retains its no-cache/no-store policy. Unauthenticated admin access
+  returned 401.
+- Migration `005_baseline_reconciliation.sql` was applied transactionally.
+  Its archive has RLS; anonymous and authenticated clients cannot execute the
+  reconciliation function, while the existing server role can. Before/after
+  fingerprints matched for all 1,172 source records, 20 correction records and
+  65 history entries. No reconciliation was applied.
+- The existing installed browser offered **Install update** and reopened the
+  authenticated editor with its saved workspace. Releases identified the
+  missing source endpoints, retained the usable 2,452-segment map, exposed
+  Locate/Retry/Download diagnostics and blocked the old preview.
+- The live server prepared a baseline review successfully. It retains all
+  20 corrections and the Law driveway/Library gate access reviews; four draft
+  issues remain after replay. The review was left unapplied.
+
+This application deployment enables the rendering and editor workflows and
+updates campus styling. The 58 authored models await the separate reviewed
+campus-data release; the published package has not gained a visual catalogue.
+The nine proposed wing corrections and remaining entrance issues still need
+review. See [implementation and evidence coverage](MINIATURE-CAMPUS.md).
+The preceding ready deployment, `7mougdEggCDfykCRKR9BiPyhqpbD`
+(`turnright-avbq3e2xh`), remains available for rollback.
+
 ## Map, editor and 3D update — 13 September 2026
 
 The owner requested deployment of the implemented map/editor improvements.
