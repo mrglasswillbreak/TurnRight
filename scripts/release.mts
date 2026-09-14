@@ -3,9 +3,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { db, allRows } from "./cloud.mjs";
-import { publishedCampus, snapshotHash, validateReleaseSnapshot } from '../web/server/release-validation';
+import {
+  publishedCampus,
+  snapshotHash,
+  validateReleaseSnapshot,
+} from "../web/server/release-validation";
 import { preservePublished } from "../web/scripts/published-assets.mjs";
-import { vercelApi, uploadSource, waitForDeployment } from "./vercel-api.mjs";
+import { vercelApi, uploadSource, waitForDeployment, publishDeployment } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
 const id = process.env.RELEASE_ID,
@@ -85,16 +89,28 @@ try {
     if (operation === "rollback" && release.status !== "published")
       throw new Error("Rollback requires a previously published release");
     if (!release.deployment_id) throw new Error("Deployment is missing");
-    if(operation==='publish') {
-      validateReleaseSnapshot(release.snapshot,await publishedCampus());
-      const [features,edits]=await Promise.all([allRows('source_features'),allRows('map_edits')]);
-      if(snapshotHash(release.snapshot.features,release.snapshot.edits)!==snapshotHash(features,edits)) throw new Error('Preview is stale. Create a fresh reviewed preview.');
+    await db(`releases?id=eq.${id}`, "PATCH", { error: null });
+    if (operation === "publish") {
+      validateReleaseSnapshot(release.snapshot, await publishedCampus());
+      const [features, edits] = await Promise.all([
+        allRows("source_features"),
+        allRows("map_edits"),
+      ]);
+      if (
+        snapshotHash(release.snapshot.features, release.snapshot.edits) !==
+        snapshotHash(features, edits)
+      )
+        throw new Error("Preview is stale. Create a fresh reviewed preview.");
     }
-    await vercelApi(
-      `/v10/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID!)}/promote/${encodeURIComponent(release.deployment_id)}`,
-      { method: "POST" },
-    );
-    const deployment = await waitForDeployment(release.deployment_id, true);
+    const deployment = await publishDeployment(release.deployment_id, {
+      releaseId: id,
+      operation,
+      onCreated: (deploymentId: string) =>
+        db(`releases?id=eq.${id}`, "PATCH", {
+          deployment_id: deploymentId,
+          error: null,
+        }),
+    });
     await db(`releases?id=eq.${id}`, "PATCH", {
       status: "published",
       deployment_url: `https://${deployment.url}`,

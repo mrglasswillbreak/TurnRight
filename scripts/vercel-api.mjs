@@ -80,7 +80,7 @@ export async function uploadSource(root) {
   }
   return result;
 }
-export async function waitForDeployment(id, promoting = false) {
+export async function waitForDeployment(id, promoting = false, projectId) {
   const deadline = Date.now() + 9 * 60000;
   while (Date.now() < deadline) {
     const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(id)}`);
@@ -90,12 +90,91 @@ export async function waitForDeployment(id, promoting = false) {
       deployment.readyState === "READY" &&
       (!promoting ||
         (deployment.target === "production" && deployment.aliasAssigned && !deployment.aliasError))
-    )
-      return deployment;
+    ) {
+      if (!projectId) return deployment;
+      const project = await vercelApi(`/v9/projects/${encodeURIComponent(projectId)}`);
+      if (project.targets?.production?.id === id) return deployment;
+    }
     if (deployment.aliasError) throw new Error("Production domain assignment failed");
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
   throw new Error(
     "Vercel deployment verification timed out. Inspect the dashboard before retrying.",
   );
+}
+
+// Preview builds need a new production build from their frozen source. The
+// promote endpoint only accepts production deployments (and requires a body).
+// See vercel/vercel packages/cli/src/commands/promote/request-promote.ts.
+export async function publishDeployment(id, { releaseId, operation, onCreated }) {
+  const projectId = encodeURIComponent(process.env.VERCEL_PROJECT_ID);
+  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(id)}`);
+  if (deployment.target !== "production") {
+    if (operation === "rollback")
+      throw new Error("Rollback requires a previously published production deployment");
+    const project = await vercelApi(`/v9/projects/${projectId}`);
+    // Recover a successful create whose acknowledgement or database receipt was
+    // lost. Do not create another deployment if the status check is incomplete.
+    const candidates = [];
+    let until;
+    for (let page = 0; ; page++) {
+      const query = new URLSearchParams({
+        projectId: project.id,
+        target: "production",
+        limit: "100",
+      });
+      if (deployment.createdAt) query.set("since", String(deployment.createdAt));
+      if (until) query.set("until", String(until));
+      const result = await vercelApi(`/v6/deployments?${query}`);
+      candidates.push(
+        ...result.deployments.filter(
+          (candidate) =>
+            candidate.meta?.turnrightPromotion === releaseId &&
+            candidate.meta?.turnrightPreview === id,
+        ),
+      );
+      if (!result.pagination?.next) break;
+      if (page >= 19 || result.pagination.next === until)
+        throw new Error(
+          "Publication status could not be fully checked. Inspect Vercel before retrying.",
+        );
+      until = result.pagination.next;
+    }
+    if (candidates.length > 1)
+      throw new Error(
+        "Multiple production builds exist for this release. Inspect Vercel before retrying.",
+      );
+    let created = candidates[0];
+    if (!created) {
+      created = await vercelApi("/v13/deployments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deploymentId: id,
+          name: project.name,
+          project: project.id,
+          target: "production",
+          meta: { action: "promote", turnrightPromotion: releaseId, turnrightPreview: id },
+        }),
+      });
+    }
+    id = created.id || created.uid;
+    if (!id)
+      throw new Error("Production build returned no deployment ID. Check Vercel before retrying.");
+    // Persist before waiting, so retries inspect this production build.
+    await onCreated(id);
+    return waitForDeployment(id, true, process.env.VERCEL_PROJECT_ID);
+  }
+
+  await waitForDeployment(id);
+  const project = await vercelApi(`/v9/projects/${projectId}`);
+  if (project.targets?.production?.id === id)
+    return waitForDeployment(id, true, process.env.VERCEL_PROJECT_ID);
+  await vercelApi(
+    operation === "rollback"
+      ? `/v1/projects/${projectId}/rollback/${encodeURIComponent(id)}`
+      : `/v10/projects/${projectId}/promote/${encodeURIComponent(id)}`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" },
+  );
+  return waitForDeployment(id, true, process.env.VERCEL_PROJECT_ID);
 }
