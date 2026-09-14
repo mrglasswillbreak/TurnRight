@@ -379,6 +379,19 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       )
         void load(sector);
   }
+  function movementEnded() {
+    if (disposed) return;
+    lastFrame = 0;
+    slowFrames = 0;
+    if (reduced && !fallback) {
+      reduced = false;
+      options.onStatus('ready');
+    }
+    // The last zoom event can leave the scene at a temporary detail level.
+    // Restore the current zoom's detail and explicitly draw the settled view.
+    refresh();
+    map.triggerRepaint();
+  }
   const layer: CustomLayerInterface = {
     id: 'campus-models',
     type: 'custom',
@@ -426,8 +439,11 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         // disable architecture. Editor work and background pauses also cause
         // long frame intervals; they are not evidence of a renderer failure.
       } else {
-        lastFrame = 0;
-        slowFrames = 0;
+        if (reduced && !fallback) movementEnded();
+        else {
+          lastFrame = 0;
+          slowFrames = 0;
+        }
       }
     },
     onRemove() {
@@ -435,7 +451,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     },
   };
   map.addLayer(layer, 'barriers');
-  map.on('moveend', refresh);
+  map.on('moveend', movementEnded);
   map.on('zoom', refresh);
   return {
     update(next: ModelOptions) {
@@ -478,7 +494,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     dispose() {
       if (disposed) return;
       disposed = true;
-      map.off('moveend', refresh);
+      map.off('moveend', movementEnded);
       map.off('zoom', refresh);
       for (const c of inflight.values()) c.abort();
       for (const group of loaded.values()) release(group);
