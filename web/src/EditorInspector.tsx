@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -7,6 +7,7 @@ import type { Geometry } from 'geojson';
 
 export function EditorInspector({
   edit,
+  buildingEditor,
   data,
   issues,
   onProperty,
@@ -21,6 +22,7 @@ export function EditorInspector({
   onClose,
 }: {
   edit: MapEdit;
+  buildingEditor?: ReactNode;
   data: CampusData;
   issues: string[];
   onProperty: (key: string, value: unknown, continuous?: boolean) => void;
@@ -142,107 +144,7 @@ export function EditorInspector({
                 </button>
               </div>
             )}
-            <details className="building-evidence">
-              <summary>Building appearance</summary>
-              {(['wallColour', 'roofColour'] as const).map((key) => (
-                <label className="field-label" key={key}>
-                  {key === 'wallColour' ? 'Wall colour' : 'Roof colour'}
-                  <input
-                    type="color"
-                    value={
-                      p.appearance?.[key] ||
-                      (key === 'wallColour' ? '#eedcc0' : '#b97760')
-                    }
-                    onChange={(e) =>
-                      onProperty(
-                        'appearance',
-                        {
-                          ...p.appearance,
-                          [key]: e.target.value,
-                        },
-                        true,
-                      )
-                    }
-                  />
-                </label>
-              ))}
-              <label className="field-label">
-                Roof form
-                <select
-                  value={p.appearance?.roofForm || ''}
-                  onChange={(e) =>
-                    onProperty('appearance', {
-                      ...p.appearance,
-                      roofForm: e.target.value || undefined,
-                    })
-                  }
-                >
-                  <option value="">Unknown / simplified</option>
-                  <option value="flat">Flat / parapet</option>
-                  <option value="hip">Hipped</option>
-                  <option value="gable">Gabled</option>
-                </select>
-              </label>
-              <label className="field-label">
-                Evidence confidence
-                <select
-                  value={p.appearance?.confidence || 'inferred'}
-                  onChange={(e) =>
-                    onProperty('appearance', {
-                      ...p.appearance,
-                      confidence: e.target.value,
-                    })
-                  }
-                >
-                  <option value="inferred">Inferred</option>
-                  <option value="observed">Observed in a reference</option>
-                  <option value="documented">Documented dimensions</option>
-                </select>
-              </label>
-              <label className="field-label">
-                Appearance source / date
-                <input
-                  maxLength={2000}
-                  value={p.appearance?.provenance || ''}
-                  onChange={(e) =>
-                    onProperty(
-                      'appearance',
-                      {
-                        ...p.appearance,
-                        provenance: e.target.value,
-                      },
-                      true,
-                    )
-                  }
-                />
-              </label>
-              <label className="field-label">
-                Model association
-                <select
-                  value={p.appearance?.modelId || ''}
-                  onChange={(e) =>
-                    onProperty('appearance', {
-                      ...p.appearance,
-                      modelId: e.target.value || undefined,
-                    })
-                  }
-                >
-                  <option value="">Automatic by building identity</option>
-                  {data.visuals?.buildings
-                    .filter((b) => b.id === edit.id && b.sectorId)
-                    .map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <p className="small-note">
-                Appearance changes are saved with this draft. Changed shapes,
-                heights or materials use fallback rendering until the model is
-                rebuilt.
-              </p>
-            </details>
+            {buildingEditor}
             <BuildingVisualDetails
               data={data}
               feature={{

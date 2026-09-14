@@ -1,14 +1,13 @@
+import type { BuildingSelection } from './visual-types';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowUp,
-  Box,
   Building2,
   Check,
   ChevronLeft,
   DoorOpen,
   Download,
-  Layers,
   LockKeyhole,
   MapPin,
   MousePointer2,
@@ -62,6 +61,9 @@ import {
   type WorkspaceRecovery,
 } from './editor-workspace';
 import { useEditorWorkspace } from './useEditorWorkspace';
+import { withPublishedVisuals } from './editor-visuals';
+import { BuildingAppearanceEditor } from './BuildingAppearanceEditor';
+import { remapBuildingSurfaces } from './building-surfaces';
 import { EditorInspector } from './EditorInspector';
 import { EditorReview, type ReviewState } from './EditorReview';
 import {
@@ -432,6 +434,11 @@ function Editor({
     [explorer, setExplorer] = useState(true);
   const [selected, setSelected] = useState<MapEdit | null>(null),
     [tool, setTool] = useState<MapEdit['kind'] | null>(null);
+  const [buildingMode, setBuildingMode] = useState<
+    'appearance' | 'outline' | 'roof'
+  >('appearance');
+  const [buildingSelection, setBuildingSelection] =
+    useState<BuildingSelection>();
   const [threeD, setThreeD] = useState(() => {
     try {
       return localStorage.getItem('turnright:editor-view') === '3d';
@@ -482,7 +489,16 @@ function Editor({
     () => assembleEditorSources(sources, data),
     [sources, data],
   );
-  const base = assembly.data;
+  const base = useMemo(
+    () => withPublishedVisuals(assembly.data, data),
+    [assembly.data, data],
+  );
+  const selectedBuildingKey = selected?.id;
+  useEffect(() => {
+    const edit = selectedRef.current;
+    if (edit?.kind === 'building' && edit.id === selectedBuildingKey)
+      controller.current?.select(edit, buildingMode === 'outline');
+  }, [buildingMode, selectedBuildingKey]);
   useEffect(() => {
     workspace.setSourceBaseline((edit) =>
       featureEdit(base, edit.kind, edit.id, []),
@@ -563,6 +579,42 @@ function Editor({
     }
   };
   const visible = preview && validation.usable ? base : validation.data;
+  const rendered = useMemo(() => {
+    if (preview || selected?.kind !== 'building' || selected.deleted)
+      return visible;
+    const properties = {
+      ...selected.properties,
+      id: selected.id,
+      kind: 'building',
+    };
+    const roof = workspace.roofDraft;
+    if (roof?.buildingId === selected.id)
+      properties.appearance = {
+        ...properties.appearance,
+        roofs: { ...properties.appearance?.roofs, [roof.partId]: roof.roof },
+      };
+    const feature = {
+      type: 'Feature' as const,
+      geometry: selected.geometry,
+      properties,
+    };
+    return {
+      ...visible,
+      map: {
+        ...visible.map,
+        features: [
+          ...visible.map.features.filter(
+            (f) =>
+              !(
+                f.properties?.kind === 'building' &&
+                f.properties.id === selected.id
+              ),
+          ),
+          feature,
+        ],
+      },
+    };
+  }, [visible, selected, preview, workspace.roofDraft]);
   const invalid = useMemo(
     () =>
       new Set(
@@ -574,6 +626,12 @@ function Editor({
   );
   const select = (edit: MapEdit, focus = false) => {
     workspace.endHistoryGroup();
+    if (workspace.roofDraft && workspace.roofDraft.buildingId !== edit.id) {
+      setMessage(
+        'Apply or cancel the roof plan before selecting another feature.',
+      );
+      return;
+    }
     if (workspace.unfinished) {
       setMessage(
         'Finish or cancel the current drawing before selecting another feature.',
@@ -586,7 +644,11 @@ function Editor({
     setTool(null);
     setPreview(false);
     setTab('map');
-    controller.current?.select(edit);
+    setBuildingMode(workspace.roofDraft ? 'roof' : 'appearance');
+    setBuildingSelection(
+      edit.kind === 'building' ? { buildingId: edit.id } : undefined,
+    );
+    controller.current?.select(edit, edit.kind !== 'building');
     if (focus) {
       let point: Position | undefined;
       if (edit.geometry.type === 'Point')
@@ -621,7 +683,7 @@ function Editor({
     title = 'Review proposed geometry',
   ) => {
     workspace.endHistoryGroup();
-    if (tool || workspace.unfinished) {
+    if (tool || workspace.unfinished || workspace.roofDraft) {
       setMessage('Finish or cancel the drawing before reviewing a repair.');
       return;
     }
@@ -745,7 +807,7 @@ function Editor({
     }
   };
   const openIssue = (issue: ValidationIssue) => {
-    if (tool || workspace.unfinished) {
+    if (tool || workspace.unfinished || workspace.roofDraft) {
       setMessage('Finish or cancel the drawing before opening a repair.');
       return;
     }
@@ -784,7 +846,7 @@ function Editor({
       );
       return;
     }
-    if (tool || workspace.unfinished) {
+    if (tool || workspace.unfinished || workspace.roofDraft) {
       setMessage('Finish or cancel the current drawing first.');
       return;
     }
@@ -1103,6 +1165,10 @@ function Editor({
       setTool(null);
       restoreDrawingPanels();
     }
+    if (workspace.roofDraft) {
+      setMessage('Apply or cancel the roof plan before undoing other edits.');
+      return;
+    }
     if (redo) workspace.redo();
     else workspace.undo();
     const previous = selectedRef.current;
@@ -1164,6 +1230,13 @@ function Editor({
     workspace.endHistoryGroup();
     let submitted = false;
     try {
+      if (
+        workspace.roofDraft &&
+        ['prepare-release', 'publish-release'].includes(name)
+      )
+        throw new Error(
+          'Apply or cancel the unfinished roof before preparing or publishing a release.',
+        );
       if (uncertainAction.current) {
         workspace.reconcile(await refresh(), true);
         uncertainAction.current = false;
@@ -1176,10 +1249,10 @@ function Editor({
         throw new Error(workspace.error || 'Save or repair the draft first.');
       if (name === 'prepare-release') {
         const check = await validation.check(workspace.saved);
-        if (workspace.unfinished || check.errors.length)
+        if (workspace.unfinished || workspace.roofDraft || check.errors.length)
           throw new Error(
             check.errors[0] ||
-              'Finish the current drawing before preparing a release.',
+              'Apply or cancel unfinished drawing and roof work before preparing a release.',
           );
       }
       submitted = true;
@@ -1533,13 +1606,16 @@ function Editor({
       </header>
       <section className="editor-map-workspace" aria-label="Mapping workspace">
         <MapView
-          data={visible}
+          data={rendered}
           dark={dark}
           threeD={threeD}
           simple={simple3D}
           editor
           editing={
-            !!tool || !!workspace.unfinished || selected?.kind === 'building'
+            !!tool ||
+            !!workspace.unfinished ||
+            survey ||
+            (selected?.kind === 'building' && buildingMode === 'outline')
           }
           buildingOpacity={
             survey ||
@@ -1547,16 +1623,19 @@ function Editor({
             tool === 'path' ||
             tool === 'barrier' ||
             tool === 'building' ||
-            selected?.kind === 'building'
+            (selected?.kind === 'building' && buildingMode === 'outline')
               ? 0.2
               : opacity
           }
           routes={routes}
           panelBesideMap
           onSelect={() => {}}
-          onBuildingSelect={(feature) =>
-            selectId('building', String(feature.properties?.id))
-          }
+          buildingSelection={buildingSelection}
+          onBuildingSelect={(feature, hit) => {
+            if (workspace.roofDraft) return;
+            selectId('building', String(feature.properties?.id));
+            if (hit) setBuildingSelection(hit);
+          }}
           onReady={mapReady}
         />
         {survey && ready > 0 && mapRef.current && (
@@ -1780,7 +1859,12 @@ function Editor({
           )}
         </div>
         <div className="editor-view-controls editor-card">
-          <MapViewControl threeD={threeD} simple={simple3D} onView={toggleView} onSimple={setSimple3D} />
+          <MapViewControl
+            threeD={threeD}
+            simple={simple3D}
+            onView={toggleView}
+            onSimple={setSimple3D}
+          />
           <button
             className="editor-icon"
             aria-label="Zoom in"
@@ -1906,7 +1990,7 @@ function Editor({
             onGeometry={(geometry) => {
               if (selected)
                 stageRepair(
-                  [{ ...selected, geometry }],
+                  [remapBuildingSurfaces(selected, geometry)],
                   'Review corrected building geometry',
                 );
             }}
@@ -1922,7 +2006,55 @@ function Editor({
               .map((i) => i.message)}
             focusField={repairFocus?.field}
             onEndField={workspace.endHistoryGroup}
+            buildingEditor={
+              selected.kind === 'building' && (
+                <BuildingAppearanceEditor
+                  edit={selected}
+                  data={base}
+                  mode={buildingMode}
+                  selection={buildingSelection}
+                  onMode={(mode) => {
+                    workspace.endHistoryGroup();
+                    setBuildingMode(mode);
+                    if (mode === 'roof')
+                      setBuildingSelection((s) => ({
+                        buildingId: selected.id,
+                        partId: s?.partId,
+                      }));
+                  }}
+                  onSelection={(value) => {
+                    workspace.endHistoryGroup();
+                    setBuildingSelection(value);
+                  }}
+                  onEdit={(edit, field) => {
+                    workspace.commit(
+                      [edit],
+                      workspace.unfinished,
+                      field ? `${editKey(edit)}:${field}` : undefined,
+                    );
+                    setSelected(edit);
+                    selectedRef.current = edit;
+                  }}
+                  roofDraft={workspace.roofDraft}
+                  onRoofDraft={(value) => workspace.draftRoof(value)}
+                  onApplyRoof={(edit) => {
+                    workspace.applyRoof(edit);
+                    setSelected(edit);
+                    selectedRef.current = edit;
+                    setMessage(
+                      'Roof applied. Undo restores the previous roof.',
+                    );
+                  }}
+                />
+              )
+            }
             onProperty={(key, value, continuous) => {
+              if (workspace.roofDraft) {
+                setMessage(
+                  'Apply or cancel the roof plan before changing other building properties.',
+                );
+                return;
+              }
               const edit = {
                 ...selected,
                 properties: { ...selected.properties, [key]: value },
@@ -2092,6 +2224,30 @@ function Editor({
             )}
           </output>
         </div>
+        {workspace.roofDraft &&
+          (selected?.id !== workspace.roofDraft.buildingId ||
+            buildingMode !== 'roof') && (
+            <div className="editor-recovery editor-card">
+              <strong>Unfinished roof recovered</strong>
+              <button
+                className="editor-primary"
+                onClick={() => {
+                  const draft = workspace.roofDraft!;
+                  selectId('building', draft.buildingId, true);
+                  setBuildingMode('roof');
+                  setBuildingSelection({
+                    buildingId: draft.buildingId,
+                    partId: draft.partId,
+                  });
+                }}
+              >
+                Resume roof
+              </button>
+              <button onClick={() => workspace.draftRoof(null)}>
+                Discard roof
+              </button>
+            </div>
+          )}
         {workspace.unfinished && !tool && (
           <div className="editor-recovery editor-card">
             <strong>Unfinished drawing recovered</strong>
