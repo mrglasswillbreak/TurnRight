@@ -8,7 +8,6 @@ import {
   type DuplicateCandidate,
 } from './duplicates.js';
 import {
-  firstPosition,
   structuralIssues,
   type ValidationIssue,
   type ValidationPhase,
@@ -75,24 +74,10 @@ export function validateWorkspace(
     });
     issues = structuralIssues(result.data, 'topology');
     if (issues.length) return blocked();
+    issues = [...result.issues];
     for (const message of result.errors) {
-      const edit = edits.find(
-        (e) =>
-          message.includes(e.id) ||
-          (typeof e.properties.name === 'string' &&
-            e.properties.name.length > 3 &&
-            message.startsWith(e.properties.name)),
-      );
-      issues.push({
-        code: 'edit-validation',
-        phase: 'edits',
-        message,
-        featureId: edit?.id,
-        coordinates:
-          edit && 'coordinates' in edit.geometry
-            ? firstPosition(edit.geometry.coordinates)
-            : undefined,
-      });
+      if (!issues.some((i) => i.message === message))
+        issues.push({ code: 'edit-validation', phase: 'edits', message });
     }
     phase = 'duplicates';
     return {

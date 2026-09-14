@@ -1,3 +1,4 @@
+import { firstPosition, type ValidationIssue } from './validation.js';
 import { distance, projectSegment } from './geo.js';
 import { finitePosition } from './validation.js';
 import type {
@@ -90,7 +91,24 @@ export function applyConnections(
   nodes: Map<string, GraphNode>,
   edits: MapEdit[],
   errors: string[],
+  issues: ValidationIssue[] = [],
 ) {
+  const addError = (edit: MapEdit, message: string) => {
+    errors.push(message);
+    issues.push({
+      code: 'path-connection',
+      phase: 'topology',
+      message,
+      featureId: edit.id,
+      featureKind: edit.kind,
+      field: 'connections',
+      repair: 'connect-path',
+      coordinates:
+        'coordinates' in edit.geometry
+          ? firstPosition(edit.geometry.coordinates)
+          : undefined,
+    });
+  };
   const aliases = new Map<string, string>();
   const canonical = (id: string): string =>
     aliases.has(id) ? canonical(aliases.get(id)!) : id;
@@ -118,7 +136,8 @@ export function applyConnections(
             },
           });
         else if (id)
-          errors.push(
+          addError(
+            edit,
             `${edit.id}: the chosen connection must be within 5 m of an existing path node.`,
           );
       }
@@ -167,7 +186,8 @@ export function applyConnections(
     if (!progressed) break;
   }
   for (const { edit } of pending)
-    errors.push(
+    addError(
+      edit,
       `${edit.id}: connection target changed or is not within 5 m. Reconnect the highlighted endpoint.`,
     );
   for (const feature of data.map.features) {
@@ -186,16 +206,29 @@ export function applyConnections(
   return canonical;
 }
 
-export function remapClosures(data: CampusData, errors: string[]) {
+export function remapClosures(
+  data: CampusData,
+  errors: string[],
+  issues: ValidationIssue[] = [],
+) {
   for (const closure of data.closures) {
     const expanded = closure.edgeIds.flatMap((id) => {
       const descendants = data.graph.edges.filter((edge) =>
         edgeMatches(edge, id),
       );
-      if (!descendants.length && !closure.reopenedAt)
-        errors.push(
-          `${closure.reason}: a closed segment was removed. Review this closure.`,
-        );
+      if (!descendants.length && !closure.reopenedAt) {
+        const message = `${closure.reason}: a closed segment was removed. Review this closure.`;
+        errors.push(message);
+        issues.push({
+          code: 'closure-segment',
+          phase: 'topology',
+          message,
+          featureId: closure.id,
+          featureKind: 'closure',
+          field: 'edgeIds',
+          repair: 'review-segment',
+        });
+      }
       return descendants.map((e) => e.id);
     });
     closure.edgeIds = [...new Set(expanded)];

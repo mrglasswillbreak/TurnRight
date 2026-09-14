@@ -8,7 +8,12 @@ import {
 import { distance, projectSegment } from './geo.js';
 import { cachedGeometryBlocker } from './spatial.js';
 import { resolvePlaceId } from './map-display.js';
-import { structuralIssues, type ValidationPhase } from './validation.js';
+import {
+  structuralIssues,
+  firstPosition,
+  type ValidationPhase,
+  type ValidationIssue,
+} from './validation.js';
 import type {
   CampusData,
   GraphNode,
@@ -278,7 +283,12 @@ export function applyEdits(
   base: CampusData,
   edits: MapEdit[],
   phase?: (phase: ValidationPhase) => void,
-): { data: CampusData; errors: string[]; warnings: string[] } {
+): {
+  data: CampusData;
+  errors: string[];
+  warnings: string[];
+  issues: ValidationIssue[];
+} {
   phase?.('sources');
   const structural = structuralIssues(base);
   if (structural.length)
@@ -286,11 +296,36 @@ export function applyEdits(
       data: base,
       errors: structural.map((issue) => issue.message),
       warnings: [],
+      issues: structural,
     };
   phase?.('edits');
   const data = structuredClone(base),
     errors: string[] = [],
     warnings: string[] = [];
+  const issues: ValidationIssue[] = [];
+  const issue = (
+    message: string,
+    featureId: string,
+    featureKind: MapEdit['kind'],
+    extra: Partial<ValidationIssue> = {},
+  ) => {
+    const edit = edits.find(
+      (e) => e.id === featureId && e.kind === featureKind,
+    );
+    issues.push({
+      code: 'edit-validation',
+      phase: 'edits',
+      featureId,
+      featureKind,
+      message,
+      coordinates:
+        edit && 'coordinates' in edit.geometry
+          ? firstPosition(edit.geometry.coordinates)
+          : undefined,
+      ...extra,
+    });
+    (extra.severity === 'warning' ? warnings : errors).push(message);
+  };
   const validMerges = edits.filter(
     (e) =>
       e.deleted &&
@@ -325,6 +360,7 @@ export function applyEdits(
       nodes,
       edits.filter((e) => !validateEdit(e).length),
       errors,
+      issues,
     );
     connectedPaths = true;
     phase?.('edits');
@@ -344,7 +380,9 @@ export function applyEdits(
     if (edit.deleted && edit.properties?.revertToSource === true) continue;
     const invalid = validateEdit(edit);
     if (invalid.length) {
-      errors.push(...invalid.map((e) => `${edit.id}: ${e}`));
+      invalid.forEach((message) =>
+        issue(`${edit.id}: ${message}`, edit.id, edit.kind),
+      );
       continue;
     }
     const props = edit.properties;
@@ -544,8 +582,11 @@ export function applyEdits(
         else gaps.push([start, end]);
       }
       if (lostRestriction)
-        errors.push(
+        issue(
           `${props.name}: retain the vertices on either side of a restricted gate gap.`,
+          edit.id,
+          'path',
+          { field: 'geometry', repair: 'review-segment' },
         );
       for (let i = 1; i < sequence.length; i++) {
         if (lostRestriction || gaps.some(([a, b]) => i > a && i <= b)) continue;
@@ -553,7 +594,12 @@ export function applyEdits(
           b = sequence[i],
           length = distance(a.coordinates, b.coordinates);
         if (length < 0.2) {
-          errors.push(`${props.name}: duplicate adjacent path vertices.`);
+          issue(
+            `${props.name}: duplicate adjacent path vertices.`,
+            edit.id,
+            'path',
+            { field: 'geometry', repair: 'review-segment' },
+          );
           continue;
         }
         const positions = new Map(sequence.map((n, index) => [n.id, index]));
@@ -709,10 +755,22 @@ export function applyEdits(
       };
       data.entrances.push(entrance);
       if (!data.places.some((p) => p.id === placeId))
-        errors.push(`${edit.id}: choose the place served by this entrance.`);
+        issue(
+          `${edit.id}: choose the place served by this entrance.`,
+          edit.id,
+          'entrance',
+          { code: 'entrance-place', field: 'placeId', repair: 'choose-place' },
+        );
       if (!valid)
-        errors.push(
+        issue(
           `${edit.id}: entrance needs a connected path at its position (legacy connections must be within 5 m).`,
+          edit.id,
+          'entrance',
+          {
+            code: 'entrance-path',
+            field: 'connection',
+            repair: 'connect-path',
+          },
         );
     } else if (edit.kind === 'barrier' || edit.kind === 'closure') {
       const edgeIds = Array.isArray(props.edgeIds)
@@ -722,7 +780,12 @@ export function applyEdits(
         (id) => !data.graph.edges.some((e) => edgeMatches(e, id)),
       );
       if (!edit.deleted && (!edgeIds.length || missing.length))
-        errors.push(`${props.name}: select existing path segments to block.`);
+        issue(
+          `${props.name}: select existing path segments to block.`,
+          edit.id,
+          edit.kind,
+          { field: 'edgeIds', repair: 'review-segment' },
+        );
       const bothDirections = new Set(
         data.graph.edges
           .filter((e) => edgeIds.some((id) => edgeMatches(e, id)))
@@ -762,7 +825,11 @@ export function applyEdits(
                 f.properties?.kind === 'building' && f.properties.id === to,
             );
       if (to === from || !exists)
-        errors.push(`${from}: duplicate merge has a missing or cyclic target.`);
+        issue(
+          `${from}: duplicate merge has a missing or cyclic target.`,
+          from,
+          kind,
+        );
       else aliases[from] = to;
     }
   }
@@ -787,7 +854,7 @@ export function applyEdits(
         feature.properties.placeId = resolvePlaceId(data, String(linked));
     }
   connectPaths();
-  remapClosures(data, errors);
+  remapClosures(data, errors, issues);
   const connected = new Set(data.graph.edges.flatMap((e) => [e.from, e.to]));
   data.graph.nodes = [...nodes.values()].filter((n) => connected.has(n.id));
   for (const place of data.places) {
@@ -806,16 +873,30 @@ export function applyEdits(
     if (a && b) {
       edge.geometryBlocked = blockedGeometry(a.coordinates, b.coordinates);
       if (edge.geometryBlocked)
-        warnings.push(
+        issue(
           `${edge.sourceId}: segment excluded because it crosses a mapped ${edge.geometryBlocked.split(':')[0]}.`,
+          edge.sourceId,
+          'path',
+          {
+            code: 'blocked-segment',
+            phase: 'geometry',
+            severity: 'warning',
+            field: 'geometry',
+            repair: 'review-segment',
+            coordinates: a.coordinates,
+            referenceIds: [edge.id, edge.geometryBlocked],
+          },
         );
     }
-    if (ids.has(edge.id)) errors.push(`Duplicate edge ${edge.id}`);
+    if (ids.has(edge.id))
+      issue(`Duplicate edge ${edge.id}`, edge.sourceId, 'path');
     ids.add(edge.id);
     if (!nodes.has(edge.from) || !nodes.has(edge.to))
-      errors.push(`Path ${edge.id} has a missing endpoint.`);
+      issue(`Path ${edge.id} has a missing endpoint.`, edge.sourceId, 'path', {
+        referenceIds: [edge.from, edge.to],
+      });
     if (!(edge.distance > 0) || !Number.isFinite(edge.distance))
-      errors.push(`Path ${edge.id} has an invalid length.`);
+      issue(`Path ${edge.id} has an invalid length.`, edge.sourceId, 'path');
   }
   const adjacency = new Map<string, string[]>();
   const blocked = new Set(
@@ -829,11 +910,26 @@ export function applyEdits(
   }
   for (const entrance of data.entrances) {
     if (!data.places.some((p) => p.id === entrance.placeId))
-      errors.push(`${entrance.id}: its place was removed.`);
+      issue(`${entrance.id}: its place was removed.`, entrance.id, 'entrance', {
+        code: 'entrance-place',
+        field: 'placeId',
+        repair: 'choose-place',
+        coordinates: entrance.coordinates,
+      });
     if (entrance.graphNode) entrance.graphNode = canonical(entrance.graphNode);
     if (entrance.graphNode && !connected.has(entrance.graphNode)) {
       delete entrance.graphNode;
-      errors.push(`${entrance.id}: its connecting path was removed.`);
+      issue(
+        `${entrance.id}: its connecting path was removed.`,
+        entrance.id,
+        'entrance',
+        {
+          code: 'entrance-path',
+          field: 'connection',
+          repair: 'connect-path',
+          coordinates: entrance.coordinates,
+        },
+      );
     }
   }
   for (const place of data.places) {
@@ -888,5 +984,13 @@ export function applyEdits(
     data,
     errors: [...new Set(errors)],
     warnings: [...new Set(warnings)],
+    issues: [
+      ...new Map(
+        issues.map((i) => [
+          `${i.featureKind}:${i.featureId}:${i.code}:${i.message}`,
+          i,
+        ]),
+      ).values(),
+    ],
   };
 }

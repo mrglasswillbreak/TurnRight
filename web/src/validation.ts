@@ -1,4 +1,4 @@
-import type { CampusData, Position } from './types.js';
+import type { CampusData, Position, MapEdit } from './types.js';
 import type { Geometry } from 'geojson';
 
 export type ValidationPhase =
@@ -15,6 +15,10 @@ export interface ValidationIssue {
   featureId?: string;
   referenceIds?: string[];
   coordinates?: Position;
+  featureKind?: MapEdit['kind'];
+  field?: string;
+  repair?: 'choose-place' | 'connect-path' | 'review-segment';
+  severity?: 'error' | 'warning';
 }
 export function finitePosition(value: unknown): value is Position {
   return (
