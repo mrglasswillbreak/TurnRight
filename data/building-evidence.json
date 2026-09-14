@@ -221,6 +221,28 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "date": "2022-03-17 11:58:29"
+    },
+    {
+      "id": "commons-theatre",
+      "url": "https://commons.wikimedia.org/wiki/File:Department_of_Theater_Art_and_Music,_Lagos_State_University.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12"
+    },
+    {
+      "id": "lasu-makanjuola",
+      "url": "https://lasu.edu.ng/prefasugamesseminar/",
+      "author": "Lagos State University / DICT",
+      "license": "Reference only; photograph not redistributed",
+      "date": "2024-03-26"
+    },
+    {
+      "id": "pwdc-makanjuola",
+      "url": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "author": "PWDC - Patrickwaheed Design Consultancy",
+      "license": "Copyright PWDC; reference only, photograph not redistributed",
+      "date": "2018"
     }
   ],
   "buildings": {
@@ -239,10 +261,24 @@
         "August 2026 photograph corroborates older Senate photographs."
       ],
       "inferred": [
-        "3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured."
+        "3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Surveyed floor-to-floor heights and separate lower wing footprints."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#647f87",
+        "trimColour": "#d6c6a8",
+        "wallColour": "#ecdfbf",
+        "roofColour": "#945f55",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Seven visible floor levels and horizontal glazing bands; cream walls with red-brown vertical accents; flat parapet silhouette. August 2026 photograph corroborates older Senate photographs. 3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg"
+      },
+      "footprintRevisions": [
+        "93903e79970623fd-387"
       ]
     },
     "arcgis:University_Property:3": {
@@ -260,10 +296,24 @@
         "Mapped stepped footprint retained; interior photograph confirms central covered atrium, whose exact roof footprint is not surveyed."
       ],
       "inferred": [
-        "3 m per visible floor; atrium roof detail omitted without an overhead plan."
+        "3 m per visible floor; atrium roof detail omitted without an overhead plan.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Georeferenced atrium roof plan and measured floor heights."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#73949c",
+        "trimColour": "#c7c4ba",
+        "wallColour": "#e4d2b0",
+        "roofColour": "#9e7168",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. August 2026 exterior shows four floor levels, cream walls, tall glazing bays and flat parapets. Mapped stepped footprint retained; interior photograph confirms central covered atrium, whose exact roof footprint is not surveyed. 3 m per visible floor; atrium roof detail omitted without an overhead plan. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg"
+      },
+      "footprintRevisions": [
+        "3f8b7f0b4825c889-952"
       ]
     },
     "arcgis:University_Property:76": {
@@ -279,10 +329,24 @@
         "Named Taslim Olawale Elias Law Library facade: three floor levels, red-brown pilasters, cream infill and parapet."
       ],
       "inferred": [
-        "3 m per observed floor; hidden elevations simplified."
+        "3 m per observed floor; hidden elevations simplified.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Dated overhead roof confirmation and measured height."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#536665",
+        "trimColour": "#925f55",
+        "wallColour": "#ddc69c",
+        "roofColour": "#925f55",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Named Taslim Olawale Elias Law Library facade: three floor levels, red-brown pilasters, cream infill and parapet. 3 m per observed floor; hidden elevations simplified. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg"
+      },
+      "footprintRevisions": [
+        "66f12aefb6b33d75-188"
       ]
     },
     "arcgis:University_Property:78": {
@@ -299,10 +363,24 @@
         "Two storeys, red pitched roof sections and cream walls; separate from the medical Clinic."
       ],
       "inferred": [
-        "Wing ridge layout cannot be recovered from the oblique photograph."
+        "Wing ridge layout cannot be recovered from the oblique photograph.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Roof plan for separate wing heights and ridge positions."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#667777",
+        "trimColour": "#b86351",
+        "wallColour": "#e7dbc8",
+        "roofColour": "#b86351",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Two storeys, red pitched roof sections and cream walls; separate from the medical Clinic. Wing ridge layout cannot be recovered from the oblique photograph. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:LASU_L%C3%A1%C3%A9_Clinic.jpg https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg"
+      },
+      "footprintRevisions": [
+        "6cfb935fa2665c17-466"
       ]
     },
     "arcgis:University_Property:22": {
@@ -318,10 +396,24 @@
         "Four floor levels, flat parapet and cream walls with repeated window bays."
       ],
       "inferred": [
-        "3 m per visible floor; simplified regular window spacing."
+        "3 m per visible floor; simplified regular window spacing.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Measured height and rear elevation."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#566d70",
+        "trimColour": "#aa897c",
+        "wallColour": "#ddd5c1",
+        "roofColour": "#9c9181",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Four floor levels, flat parapet and cream walls with repeated window bays. 3 m per visible floor; simplified regular window spacing. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg"
+      },
+      "footprintRevisions": [
+        "6d3c1379961bee07-274"
       ]
     },
     "arcgis:University_Property:54": {
@@ -337,10 +429,24 @@
         "Faculty entrance complex has cream walls, red-brown vertical accents and pitched roofs."
       ],
       "inferred": [
-        "Two principal visible levels; concealed wing layout unresolved."
+        "Two principal visible levels; concealed wing layout unresolved.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Overhead roof plan resolving individual ridges."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#65716b",
+        "trimColour": "#92695d",
+        "wallColour": "#dfcfae",
+        "roofColour": "#92695d",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Faculty entrance complex has cream walls, red-brown vertical accents and pitched roofs. Two principal visible levels; concealed wing layout unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg"
+      },
+      "footprintRevisions": [
+        "ebe56181880c7cdd-672"
       ]
     },
     "arcgis:University_Property:75": {
@@ -355,10 +461,24 @@
         "Two-level MBA facade with warm yellow infill and red-brown vertical framing; parapet edge visible."
       ],
       "inferred": [
-        "Hidden roof equipment omitted; regularized windows."
+        "Hidden roof equipment omitted; regularized windows.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Current overhead view and measured height."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#637878",
+        "trimColour": "#8e685a",
+        "wallColour": "#e3c587",
+        "roofColour": "#8e685a",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Two-level MBA facade with warm yellow infill and red-brown vertical framing; parapet edge visible. Hidden roof equipment omitted; regularized windows. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg"
+      },
+      "footprintRevisions": [
+        "143f28092ec06b19-232"
       ]
     },
     "arcgis:University_Property:103": {
@@ -374,10 +494,24 @@
         "Three visible storeys with red roofs and cream/red-brown walls."
       ],
       "inferred": [
-        "Roof ridge positions on individual wings are unresolved."
+        "Roof ridge positions on individual wings are unresolved.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Georeferenced roof plan."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#677b78",
+        "trimColour": "#985d52",
+        "wallColour": "#e6d6b7",
+        "roofColour": "#bf715d",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Three visible storeys with red roofs and cream/red-brown walls. Roof ridge positions on individual wings are unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg"
+      },
+      "footprintRevisions": [
+        "29d83096972a46a8-621"
       ]
     },
     "arcgis:University_Property:32": {
@@ -392,10 +526,25 @@
         "Student arcade has warm yellow wings and a red-brown central entrance block."
       ],
       "inferred": [
-        "Internal floor count is taken from source description; central glazing and separate roof levels remain unresolved."
+        "Internal floor count is taken from source description; central glazing and separate roof levels remain unresolved.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown.",
+        "The photographed front wings are mostly solid panels. Repeating windows remain disabled; central glazing needs a reviewed wall assignment."
       ],
       "needed": [
         "Roof plan and separate block heights."
+      ],
+      "appearance": {
+        "windows": false,
+        "windowSpacing": 4,
+        "windowColour": "#7398a2",
+        "trimColour": "#965f55",
+        "wallColour": "#e4c78d",
+        "roofColour": "#965f55",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Student arcade has warm yellow wings and a red-brown central entrance block. Internal floor count is taken from source description; central glazing and separate roof levels remain unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. The photographed front wings are mostly solid panels. Repeating windows remain disabled; central glazing needs a reviewed wall assignment. https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg"
+      },
+      "footprintRevisions": [
+        "66e773367649c96e-799"
       ]
     },
     "arcgis:University_Property:55": {
@@ -410,10 +559,119 @@
         "Radio building has cream/yellow walls and a flat parapet entrance face."
       ],
       "inferred": [
-        "Source two-floor estimate is retained; single visible entrance elevation cannot confirm concealed levels."
+        "Source two-floor estimate is retained; single visible entrance elevation cannot confirm concealed levels.",
+        "Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown."
       ],
       "needed": [
         "Confirm source floor count and roof plan. Antenna dimensions not documented."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#687c77",
+        "trimColour": "#854f46",
+        "wallColour": "#dec28f",
+        "roofColour": "#9b7b64",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Radio building has cream/yellow walls and a flat parapet entrance face. Source two-floor estimate is retained; single visible entrance elevation cannot confirm concealed levels. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg"
+      },
+      "footprintRevisions": [
+        "f02507881aa12ddc-188"
+      ]
+    },
+    "arcgis:University_Property:28": {
+      "level": "detailed",
+      "roofForm": "flat",
+      "wallColour": "#9babb4",
+      "roofColour": "#939ea5",
+      "sources": [
+        "lasu-makanjuola",
+        "pwdc-makanjuola"
+      ],
+      "observed": [
+        "Named Ojo lecture theatre: grey facade, narrow dark window openings, flat parapet and blue entrance accents. PWDC identifies this as its 2018 500-seat project."
+      ],
+      "inferred": [
+        "Retain the source-derived 6 m height. Four bands of facade openings do not prove four occupied floors. Regular narrow bays approximate the facade; entrance portals and horizontal scale are not invented."
+      ],
+      "needed": [
+        "Measured hall height, opening dimensions and a roof plan."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 2,
+        "windowColour": "#354f5e",
+        "trimColour": "#aab7bd",
+        "wallColour": "#9babb4",
+        "roofColour": "#939ea5",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. Named Ojo lecture theatre: grey facade, narrow dark window openings, flat parapet and blue entrance accents. PWDC identifies this as its 2018 500-seat project. Retain the source-derived 6 m height. Four bands of facade openings do not prove four occupied floors. Regular narrow bays approximate the facade; entrance portals and horizontal scale are not invented. https://lasu.edu.ng/prefasugamesseminar/ https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre"
+      },
+      "footprintRevisions": [
+        "2c8ccbcabec94b02-188"
+      ]
+    },
+    "arcgis:University_Property:43": {
+      "level": "simplified",
+      "roofForm": "flat",
+      "wallColour": "#d9c59f",
+      "roofColour": "#996e61",
+      "sources": [
+        "commons-10"
+      ],
+      "observed": [
+        "The named Postgraduate School entrance has cream walls and dusty red-brown framing, a tall solid side wall and a triangular parapet feature."
+      ],
+      "inferred": [
+        "Retain source height rather than treating the entrance tower as another storey. Flat cap is a placeholder for the unresolved roof; repeated windows disabled to avoid glazing the photographed solid wall."
+      ],
+      "needed": [
+        "Roof plan and evidence matching the entrance facade to individual mapped walls."
+      ],
+      "appearance": {
+        "windows": false,
+        "windowColour": "#5f6968",
+        "trimColour": "#996e61",
+        "wallColour": "#d9c59f",
+        "roofColour": "#996e61",
+        "windowSpacing": 4,
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. The named Postgraduate School entrance has cream walls and dusty red-brown framing, a tall solid side wall and a triangular parapet feature. Retain source height rather than treating the entrance tower as another storey. Flat cap is a placeholder for the unresolved roof; repeated windows disabled to avoid glazing the photographed solid wall. https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg"
+      },
+      "footprintRevisions": [
+        "88069b75c3c2e835-427"
+      ]
+    },
+    "arcgis:University_Property:44": {
+      "level": "detailed",
+      "floors": 2,
+      "roofForm": "flat",
+      "wallColour": "#e0bd7c",
+      "roofColour": "#947167",
+      "sources": [
+        "commons-theatre"
+      ],
+      "observed": [
+        "The named Department of Theatre Arts and Music facade shows two window levels, ochre walls, dark openings and red-brown parapet/framing."
+      ],
+      "inferred": [
+        "Use 3 m per visible floor, not a surveyed height. Window rows are regularized. Roof surface is hidden behind the parapet; a flat cap is illustrative."
+      ],
+      "needed": [
+        "Measured height, rear elevation and roof plan."
+      ],
+      "appearance": {
+        "windows": true,
+        "windowSpacing": 4,
+        "windowColour": "#515e5d",
+        "trimColour": "#947167",
+        "wallColour": "#e0bd7c",
+        "roofColour": "#947167",
+        "confidence": "inferred",
+        "provenance": "References reviewed 2026-09-14. The named Department of Theatre Arts and Music facade shows two window levels, ochre walls, dark openings and red-brown parapet/framing. Use 3 m per visible floor, not a surveyed height. Window rows are regularized. Roof surface is hidden behind the parapet; a flat cap is illustrative. https://commons.wikimedia.org/wiki/File:Department_of_Theater_Art_and_Music,_Lagos_State_University.jpg"
+      },
+      "footprintRevisions": [
+        "3fd12a64ed6b5628-188"
       ]
     }
   },
