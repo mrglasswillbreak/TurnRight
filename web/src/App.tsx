@@ -1,4 +1,5 @@
 import { placeHasConnection } from './routing';
+import { destinationLink, sharedDestination } from './destination-sharing';
 import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
 import {
   lazy,
@@ -37,6 +38,8 @@ import {
   Settings,
   Info,
   Utensils,
+  Share2,
+  Copy,
 } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { registerSW } from 'virtual:pwa-register';
@@ -110,6 +113,10 @@ export default function App() {
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
+  const [shareFallback, setShareFallback] = useState('');
+  const [sharedLinkMissing, setSharedLinkMissing] = useState(false);
+  const sharedLinkOpened = useRef('');
+  const searchInput = useRef<HTMLInputElement>(null);
   const panelContent = useRef<HTMLDivElement>(null);
   const [saved, setSaved] = useState<string[]>([]),
     [recent, setRecent] = useState<string[]>([]),
@@ -394,6 +401,8 @@ export default function App() {
       return;
     }
     routeRequest.current++;
+    setShareFallback('');
+    setSharedLinkMissing(false);
     setSelected(place);
     setPanelExpanded(true);
     setBusy(false);
@@ -406,6 +415,50 @@ export default function App() {
     );
     setRecent(next);
     void setPreference('recent', next);
+  };
+  const openDestinationLink = useEffectEvent(() => {
+    if (!data || location.pathname.startsWith('/admin')) return;
+    const stamp = `${location.search}:${data.version}`;
+    if (sharedLinkOpened.current === stamp) return;
+    const shared = sharedDestination(data, location.href);
+    if (navigating && shared.requested) {
+      setToast('Finish this walk before opening a shared destination.');
+      return;
+    }
+    sharedLinkOpened.current = stamp;
+    if (!shared.requested) return;
+    if (shared.place) selectPlace(shared.place);
+    else {
+      setSharedLinkMissing(true);
+      setPanelExpanded(true);
+    }
+  });
+  useEffect(() => {
+    openDestinationLink();
+    const changed = () => openDestinationLink();
+    window.addEventListener('popstate', changed);
+    return () => window.removeEventListener('popstate', changed);
+  }, [data, navigating]);
+  const shareDestination = async (copy = false) => {
+    if (!selected) return;
+    const url = destinationLink(selected.id, location.origin);
+    try {
+      if (!copy && navigator.share)
+        await navigator.share({
+          title: selected.name,
+          text: `Find ${selected.name} on TurnRight`,
+          url,
+        });
+      else {
+        await navigator.clipboard.writeText(url);
+        setToast('Destination link copied.');
+      }
+      setShareFallback('');
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return;
+      setShareFallback(url);
+      setToast('Select and copy the destination link below.');
+    }
   };
   useWebMcp(data, selectPlace, navigating);
   const toggleSaved = () => {
@@ -708,26 +761,51 @@ export default function App() {
           </div>
         </header>
         {!navigating && (
-          <div className="search-box">
-            <Search size={20} />
-            <input
-              aria-label="Search campus"
-              placeholder="Where do you want to go?"
-              value={query}
-              onFocus={() => setPanelExpanded(true)}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setSelected(null);
-                setRouteView(false);
-                setRoutes([]);
-              }}
-            />
-            {query && (
-              <button aria-label="Clear search" onClick={() => setQuery('')}>
-                <X size={17} />
-              </button>
+          <>
+            {sharedLinkMissing && (
+              <output className="notice">
+                This destination is unavailable in your downloaded map. Search
+                for its current name, or check for a map update.
+                <button
+                  className="text-button"
+                  onClick={() => {
+                    setSharedLinkMissing(false);
+                    setSelected(null);
+                    setQuery('');
+                    setCategory('all');
+                    setSavedOnly(false);
+                    searchInput.current?.focus();
+                    const url = new URL(location.href);
+                    url.searchParams.delete('place');
+                    history.replaceState(null, '', url);
+                  }}
+                >
+                  Search campus places
+                </button>
+              </output>
             )}
-          </div>
+            <div className="search-box">
+              <Search size={20} />
+              <input
+                aria-label="Search campus"
+                ref={searchInput}
+                placeholder="Where do you want to go?"
+                value={query}
+                onFocus={() => setPanelExpanded(true)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelected(null);
+                  setRouteView(false);
+                  setRoutes([]);
+                }}
+              />
+              {query && (
+                <button aria-label="Clear search" onClick={() => setQuery('')}>
+                  <X size={17} />
+                </button>
+              )}
+            </div>
+          </>
         )}
         {!navigating && (
           <button
@@ -929,6 +1007,20 @@ export default function App() {
                 <Navigation size={18} /> Directions
               </Button>
               <div className="button-row place-actions">
+                {typeof navigator.share === 'function' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => void shareDestination()}
+                  >
+                    <Share2 /> Share
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => void shareDestination(true)}
+                >
+                  <Copy /> Copy link
+                </Button>
                 <Button variant="outline" onClick={toggleSaved}>
                   <Heart
                     fill={saved.includes(selected.id) ? 'currentColor' : 'none'}
@@ -945,6 +1037,17 @@ export default function App() {
                   <Flag /> Report
                 </Button>
               </div>
+              {shareFallback && (
+                <label className="field-label">
+                  Destination link
+                  <input
+                    aria-label="Destination link"
+                    readOnly
+                    value={shareFallback}
+                    onFocus={(event) => event.target.select()}
+                  />
+                </label>
+              )}
               <div className="detail-facts">
                 <div>
                   <MapPin />

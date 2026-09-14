@@ -1306,6 +1306,7 @@ svg {
 }
 .place-actions {
   margin-bottom: 25px;
+  flex-wrap: wrap;
 }
 .place-actions button {
   flex: 1;
