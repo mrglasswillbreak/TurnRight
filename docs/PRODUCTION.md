@@ -1,5 +1,31 @@
 # Production deployments
 
+## Editor baseline repair — 14 September 2026
+
+The owner reported the missing endpoints on path
+`osm:way:1534765716:2297333149:2297333129:1`. The live editor has now
+reconciled its approved sources with published package `lasu-4e4c8008b38b`,
+retaining the reviewed Law driveway and International Library gate access.
+
+- The first reconciliation rolled back because Supabase requires a WHERE
+  clause on DELETE. Migration `006_reconciliation_safe_updates.sql` limits
+  replacement to the source IDs in the validated review. It was applied
+  transactionally; the database's safe-update protection remains enabled.
+- All 11 database tests passed on Node 22, including nonempty baseline
+  replacement, complete source archival, draft/history preservation, stale
+  review rejection and rollback on invalid replacement records. The successful
+  live retry additionally verified compatibility with Supabase's DELETE guard.
+- The approved baseline now contains 4,372 source rows and has zero missing
+  graph endpoints. Its reconciliation archive retains all 1,172 prior source
+  rows. All 23 pre-repair correction records and 77 history entries were
+  verified intact; one additional edit and history entry arrived during repair.
+- Releases displays matching editor/public versions and the replayed draft
+  map (220 places, 2,486 directed path segments). The missing-source-node
+  warning is gone. Four separate validation messages remain for two entrance
+  drafts requiring place or path connections.
+- Public package `lasu-4e4c8008b38b` remains 3,159,499 bytes. This repair did
+  not publish editor drafts, footprint corrections or the visual catalogue.
+
 ## Miniature styling and release-validation repair — 14 September 2026
 
 The owner requested deployment of the completed implementation. Application
@@ -21,14 +47,15 @@ revision `3e7e747910478f078ddc49958749cf9b0164cee0` was fast-forwarded to
   Its archive has RLS; anonymous and authenticated clients cannot execute the
   reconciliation function, while the existing server role can. Before/after
   fingerprints matched for all 1,172 source records, 20 correction records and
-  65 history entries. No reconciliation was applied.
+  65 history entries. No reconciliation was applied during that deployment;
+  the subsequent repair is recorded above.
 - The existing installed browser offered **Install update** and reopened the
   authenticated editor with its saved workspace. Releases identified the
   missing source endpoints, retained the usable 2,452-segment map, exposed
   Locate/Retry/Download diagnostics and blocked the old preview.
 - The live server prepared a baseline review successfully. It retains all
   20 corrections and the Law driveway/Library gate access reviews; four draft
-  issues remain after replay. The review was left unapplied.
+  issues remain after replay. The review was left unapplied at deployment time.
 
 This application deployment enables the rendering and editor workflows and
 updates campus styling. The 58 authored models await the separate reviewed

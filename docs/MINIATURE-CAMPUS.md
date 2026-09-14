@@ -2,7 +2,7 @@
 
 The application retains MapLibre, local campus data and Terra Draw. Architectural models use a lazy Three.js custom layer sharing MapLibre's WebGL context. Application deployment and campus-data publication remain separate operations.
 
-**Deployment update:** the application and migration 005 were deployed on 14 September. The published campus package and saved drafts were preserved. See [production verification](PRODUCTION.md); the building catalogue and footprint corrections still await the separate campus-data review.
+**Deployment update:** the application and migrations 005/006 were deployed on 14 September. The editor baseline is now reconciled with public package `lasu-4e4c8008b38b`; all source graph endpoints are valid, and saved drafts and history were preserved. Four validation messages remain for two entrance drafts. See [production verification](PRODUCTION.md); the building catalogue and footprint corrections still await the separate campus-data review.
 
 ## Release-validation repair
 
@@ -12,7 +12,7 @@ The actual exception came from `applyConnections` recomputing all edge lengths a
 
 Preflight validates endpoint existence, finite coordinates and geometry structure before spatial work. Diagnostics identify phase, revision, feature and references. Releases supplies Locate feature, Retry validation and Download diagnostics, distinguishes worker failures from mapping warnings, and keeps the last usable map on screen. Preview preparation and publication repeat checks on the server and release runner.
 
-The captured editor baseline is `lasu-03bc96e56965` (299 directed edges); the verified public package is `lasu-4e4c8008b38b` (2,452). Do not publish the old baseline over that package. Migration `005_baseline_reconciliation.sql` adds a transaction that archives before/after source snapshots and preserves corrections and history. The Releases baseline review verifies the current public download, shows counts, access reviews and replay issues, then accepts only the reviewed source revision. Draft edits after preview creation invalidate publication.
+The captured editor baseline was `lasu-03bc96e56965` (299 directed edges); the verified public package is `lasu-4e4c8008b38b` (2,452). The live editor now uses that public baseline. Migration `005_baseline_reconciliation.sql` adds a transaction that archives before/after source snapshots and preserves corrections and history. Migration `006_reconciliation_safe_updates.sql` scopes replacement to reviewed source IDs for compatibility with Supabase's DELETE guard. The Releases baseline review verifies the current public download, shows counts, access reviews and replay issues, then accepts only the reviewed source revision. Draft edits after preview creation invalidate publication.
 
 ## Building coverage and evidence
 
@@ -60,7 +60,7 @@ npm run build
 
 Review evidence and generated diffs before committing a new catalogue. Packaging copies only catalogue-listed sector files and verifies their hashes. Stale sector files are never included merely because they exist in the directory. Geometry/appearance edits use fallback rendering until the catalogue has been rebuilt against those edits.
 
-Apply migration 005 and configure `PUBLISHED_MAP_URL` on the API before baseline reconciliation (completed for the current production application). Deploy the application while preserving the current published campus package. In Releases, review and reconcile that public baseline, replay and resolve all drafts, accept the relevant geometry corrections, then build a separate campus-data preview. Review Law/Library access, directed routes, closures and model compatibility before publishing. Retain the preceding immutable deployment/package for rollback. The deployment added database support without applying reconciliation or publishing a new campus package.
+Apply migrations 005 and 006 and configure `PUBLISHED_MAP_URL` on the API before baseline reconciliation. These steps and the reviewed baseline reconciliation are complete in production. Deploy the application while preserving the current published campus package. In Releases, resolve the remaining draft issues, accept the relevant geometry corrections, then build a separate campus-data preview. Review Law/Library access, directed routes, closures and model compatibility before publishing. Retain the preceding immutable deployment/package for rollback. No new campus package has been published by the application deployment or baseline repair.
 
 ## Verification limits
 
