@@ -1,3 +1,4 @@
+import { withPublishedVisuals } from '../src/editor-visuals.js';
 import { createHash } from 'node:crypto';
 import { assembleSources, type SourceRecord } from '../src/editor-model.js';
 import { validateWorkspace } from '../src/editor-validation.js';
@@ -114,7 +115,10 @@ export function validateReleaseSnapshot(
 ) {
   if (!snapshot?.features?.length || !Array.isArray(snapshot.edits))
     throw new HttpError(400, 'The release has no complete source snapshot.');
-  const base = assembleSources(snapshot.features, published);
+  const base = withPublishedVisuals(
+    assembleSources(snapshot.features, published),
+    published,
+  );
   if (base.version !== published.version)
     throw new HttpError(
       409,

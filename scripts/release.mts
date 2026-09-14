@@ -32,11 +32,29 @@ try {
     const data = validateReleaseSnapshot(release.snapshot, await publishedCampus());
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
+    execFileSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "scripts/build-campus-visuals.ts",
+        "../data/release-input.json",
+        "../data/release-visuals",
+        "--reviewed",
+      ],
+      {
+        cwd: web,
+        env: process.env,
+        stdio: "inherit",
+        timeout: 120000,
+      },
+    );
     execFileSync(process.execPath, [path.join(root, "scripts/package.mjs")], {
       cwd: root,
       env: {
         ...process.env,
         CAMPUS_INPUT: "data/release-input.json",
+        VISUALS_INPUT: "data/release-visuals",
         RELEASE_SUMMARY: release.summary,
       },
       stdio: "inherit",

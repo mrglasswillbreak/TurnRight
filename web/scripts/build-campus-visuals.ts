@@ -8,7 +8,9 @@ import type {
   VisualCatalogue,
   SectorModels,
 } from '../src/visual-types';
-import { buildingRevision } from '../src/building-visuals';
+import { resolveBuildingVisual, styleFor } from '../src/building-surfaces';
+import { validateBuildingStyle } from '../src/building-style-validation';
+import { buildingRevision, validBuildingModel } from '../src/building-visuals';
 import { buildingDisplay, buildingPlace } from '../src/map-display';
 import { appearanceColours } from '../src/map-palette';
 import { findDuplicateCandidates } from '../src/duplicates';
@@ -17,6 +19,7 @@ import { repairArcGisParts } from '../src/arcgis-rings';
 
 const input = process.argv[2] || '../data/seed/campus.json';
 const output = process.argv[3] || '../data/visuals';
+const reviewed = process.argv.includes('--reviewed');
 const data = JSON.parse(await fs.readFile(input, 'utf8')) as CampusData;
 const evidence = JSON.parse(
   await fs.readFile('../data/building-evidence.json', 'utf8'),
@@ -42,9 +45,10 @@ const catalogue: VisualCatalogue = {
 };
 for (const sourceFeature of buildings) {
   const repair = repairArcGisParts(sourceFeature);
-  const feature = repair
-    ? { ...sourceFeature, geometry: repair }
-    : sourceFeature;
+  const feature =
+    repair && !reviewed
+      ? { ...sourceFeature, geometry: repair }
+      : sourceFeature;
   const p = feature.properties!,
     id = String(p.id),
     record = evidence.buildings[id];
@@ -147,6 +151,40 @@ for (const sourceFeature of buildings) {
       'Observed floors apply to the main photographed block only. Separate auxiliary parts retain a muted illustrative 6 m height pending their own evidence.',
     );
   }
+  const defaults = {
+    ...styleFor(
+      {},
+      {
+        ...visual,
+        wallColour: record?.wallColour || colours.wall,
+        roofColour: record?.roofColour || colours.roof,
+        roofForm: record?.roofForm || 'flat',
+      },
+    ),
+  };
+  const previous = data.visuals?.buildings.find((b) => b.id === id);
+  Object.assign(
+    visual,
+    resolveBuildingVisual(feature, {
+      ...visual,
+      defaults: previous?.defaults || defaults,
+    }),
+  );
+  visual.geometryRevision = buildingRevision(feature);
+  if (repair && reviewed) {
+    visual.level = 'extrusion';
+    if (p.appearance && Object.keys(p.appearance).length)
+      throw new Error(
+        `${visual.name}: review the separate-wing geometry correction before releasing appearance changes.`,
+      );
+  }
+  const errors = validateBuildingStyle({
+    id,
+    kind: 'building',
+    geometry: feature.geometry,
+    properties: p,
+  });
+  if (errors.length) throw new Error(`${visual.name}: ${errors.join(' ')}`);
   if (repair)
     visual.needed.push(
       'Accept the separate-wing geometry correction in the editor before this model can replace its extrusion.',
@@ -168,6 +206,10 @@ for (const sourceFeature of buildings) {
     }),
   );
   if (modelConflict) {
+    if (reviewed && p.appearance && Object.keys(p.appearance).length)
+      throw new Error(
+        `${visual.name}: review overlapping building identities before releasing appearance changes.`,
+      );
     visual.level = 'extrusion';
     visual.needed.push(
       'Resolve the competing model identity before authoring architectural detail. Existing source extrusion retained.',
@@ -196,7 +238,12 @@ for (const sourceFeature of buildings) {
     visual.sectorId = sectorId;
     if (!sectors.has(sectorId))
       sectors.set(sectorId, { schemaVersion: 1, id: sectorId, models: [] });
-    sectors.get(sectorId)!.models.push(createBuildingModel(feature, visual));
+    const model = createBuildingModel(feature, visual);
+    if (!validBuildingModel(model))
+      throw new Error(
+        `${visual.name}: generated model failed integrity or mesh budget validation.`,
+      );
+    sectors.get(sectorId)!.models.push(model);
   }
   catalogue.buildings.push(visual);
 }

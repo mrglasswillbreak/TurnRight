@@ -34,7 +34,10 @@ assets.push({
   bytes: glyph.length,
   contentType: "application/x-protobuf",
 });
-const visuals = await packageVisuals(path.join(root, "data/visuals"), asset);
+const visuals = await packageVisuals(
+  path.resolve(root, process.env.VISUALS_INPUT || "data/visuals"),
+  asset,
+);
 if (visuals) data.visuals = visuals.catalogue;
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
