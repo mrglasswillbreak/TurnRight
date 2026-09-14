@@ -44,6 +44,17 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         res.status(200).json({ edits, changes, reports, jobs, releases });
         break;
       }
+      case 'review-status': {
+        const [jobs, releases, changes] = await Promise.all([
+          db('jobs?order=created_at.desc&limit=20'),
+          db(
+            'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
+          ),
+          db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
+        ]);
+        res.status(200).json({ jobs, releases, changes });
+        break;
+      }
       case 'sources':
         res.status(200).json({ features: await allRows('source_features') });
         break;
@@ -57,27 +68,25 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         const expectedHash = snapshotHash(features);
         const validation = validateWorkspace(published, edits);
         if (action === 'review-baseline') {
-          res
-            .status(200)
-            .json({
-              version: published.version,
-              expectedHash,
-              before: {
-                places: features.filter((f) => f.entity === 'place').length,
-                edges: features.filter((f) => f.entity === 'edge').length,
-              },
-              after: {
-                places: published.places.length,
-                edges: published.graph.edges.length,
-              },
-              drafts: edits.length,
-              issues: validation.issues,
-              accessReviews:
-                published.accessPolicy?.connectionReviews?.map((r) => ({
-                  id: r.id,
-                  name: r.name,
-                })) || [],
-            });
+          res.status(200).json({
+            version: published.version,
+            expectedHash,
+            before: {
+              places: features.filter((f) => f.entity === 'place').length,
+              edges: features.filter((f) => f.entity === 'edge').length,
+            },
+            after: {
+              places: published.places.length,
+              edges: published.graph.edges.length,
+            },
+            drafts: edits.length,
+            issues: validation.issues,
+            accessReviews:
+              published.accessPolicy?.connectionReviews?.map((r) => ({
+                id: r.id,
+                name: r.name,
+              })) || [],
+          });
         } else {
           if (
             payload.version !== published.version ||
