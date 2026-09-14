@@ -1,5 +1,7 @@
 import {
   AmbientLight,
+  LineSegments,
+  LineBasicMaterial,
   BufferGeometry,
   Camera,
   Color,
@@ -22,7 +24,12 @@ import {
   type PointLike,
 } from 'maplibre-gl';
 import type { CampusData, Position } from './types';
-import type { BuildingModel, SectorModels, VisualSector } from './visual-types';
+import type {
+  BuildingModel,
+  SectorModels,
+  VisualSector,
+  BuildingSelection,
+} from './visual-types';
 import {
   compatibleVisual,
   detailAtZoom,
@@ -37,6 +44,12 @@ export interface ModelOptions {
   enabled: boolean;
   dark: boolean;
   selectedId: string;
+  selection?: BuildingSelection;
+  opacity?: number;
+  overrides?: {
+    model: BuildingModel;
+    visual: import('./visual-types').BuildingVisual;
+  }[];
   onReady: (ids: string[]) => void;
   onReduced: () => void;
 }
@@ -55,6 +68,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     sun = new DirectionalLight('#ffffff', 1.8);
   sun.position.set(-80, -120, 220);
   scene.add(ambient, sun);
+  const drafts = new Map<string, Group>();
   const loaded = new Map<string, Group>(),
     inflight = new Map<string, AbortController>(),
     failures = new Map<string, number>();
@@ -79,7 +93,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     .scale(new Vector3(scale, -scale, scale));
   let readyKey = '';
   const publish = () => {
-    const ids = [...loaded.values()]
+    const ids = [
+      ...loaded.values(),
+      ...[...drafts.values()].map((g) => ({
+        visible: g.visible,
+        children: [g],
+      })),
+    ]
       .filter((g) => g.visible)
       .flatMap((g) =>
         g.children
@@ -96,6 +116,10 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   function release(group: Group) {
     scene.remove(group);
     group.traverse((object) => {
+      if (object instanceof LineSegments) {
+        object.geometry.dispose();
+        (object.material as LineBasicMaterial).dispose();
+      }
       if (object instanceof Mesh) {
         object.geometry.dispose();
         const entry = materials.get(object.userData.materialKey);
@@ -149,6 +173,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         buildingId: model.id,
         detail: part.detail,
         materialKey: part.colour,
+        surfaces: part.surfaces,
       };
       group.add(mesh);
     }
@@ -240,12 +265,30 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         options.data.map.features.map((f) => [String(f.properties?.id), f]),
       );
     }
+    const draftIds = new Set(options.overrides?.map((o) => o.model.id) || []);
+    for (const [id, group] of drafts)
+      if (!draftIds.has(id)) {
+        release(group);
+        drafts.delete(id);
+      }
+    for (const override of options.overrides || []) {
+      let group = drafts.get(override.model.id);
+      if (group?.userData.draftModel !== override.model) {
+        if (group) release(group);
+        group = building(override.model);
+        group.userData.draftModel = override.model;
+        drafts.set(override.model.id, group);
+        scene.add(group);
+      }
+      group.visible = options.enabled && !fallback;
+    }
     for (const sector of loaded.values())
       for (const child of sector.children) {
         const id = String(child.userData.buildingId),
           feature = features.get(id),
           visual = visuals.get(id);
         child.visible =
+          !draftIds.has(id) &&
           !!feature &&
           compatibleVisual(feature, visual) &&
           child.userData.revision === visual?.geometryRevision;
@@ -256,10 +299,91 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     ambient.intensity = options.dark ? 1.15 : 1.6;
     sun.intensity = options.dark ? 0.9 : 1.8;
     ambient.color.set(options.dark ? '#becbd8' : '#fff1d5');
-    for (const [colour, entry] of materials)
+    for (const [colour, entry] of materials) {
       entry.value.color
         .copy(new Color(colour))
         .multiplyScalar(options.dark ? 0.8 : 1);
+      entry.value.opacity = options.opacity ?? 1;
+      entry.value.transparent = entry.value.opacity < 1;
+      entry.value.depthWrite = entry.value.opacity >= 0.7;
+    }
+    for (const group of [
+      ...[...loaded.values()].flatMap((s) => s.children as Group[]),
+      ...drafts.values(),
+    ]) {
+      const selection = options.selection;
+      const key = JSON.stringify([selection, group.userData.revision]);
+      for (const mesh of group.children)
+        if (mesh instanceof Mesh)
+          mesh.visible = !(
+            mesh.userData.detail &&
+            mode !== 'detailed' &&
+            group.userData.buildingId !== options.selectedId
+          );
+      if (group.userData.selectionKey === key) continue;
+      group.userData.selectionKey = key;
+      for (const child of group.children.slice())
+        if (child instanceof LineSegments) {
+          group.remove(child);
+          child.geometry.dispose();
+          (child.material as LineBasicMaterial).dispose();
+        }
+      if (!selection || selection.buildingId !== group.userData.buildingId)
+        continue;
+      const positions: number[] = [];
+      for (const mesh of group.children)
+        if (mesh instanceof Mesh) {
+          const surfaces = mesh.userData.surfaces || [],
+            attr = mesh.geometry.getAttribute('position'),
+            indices = mesh.geometry.index;
+          if (!indices) continue;
+          for (const surface of surfaces) {
+            if (
+              (selection.partId && surface.partId !== selection.partId) ||
+              (selection.wallId && surface.wallId !== selection.wallId) ||
+              (selection.role === 'roof' && surface.role !== 'roof')
+            )
+              continue;
+            for (
+              let i = surface.start * 3;
+              i < (surface.start + surface.count) * 3;
+              i += 3
+            )
+              if (
+                selection.roofTriangle === undefined ||
+                surface.role !== 'roof' ||
+                i / 3 - surface.start === selection.roofTriangle
+              )
+                for (let edge = 0; edge < 3; edge++)
+                  for (const at of [i + edge, i + ((edge + 1) % 3)]) {
+                    const v = indices.getX(at);
+                    positions.push(
+                      attr.getX(v),
+                      attr.getY(v),
+                      attr.getZ(v) + 0.025,
+                    );
+                  }
+          }
+        }
+      if (positions.length) {
+        const geometry = new BufferGeometry();
+        geometry.setAttribute(
+          'position',
+          new Float32BufferAttribute(positions, 3),
+        );
+        const line = new LineSegments(
+          geometry,
+          new LineBasicMaterial({
+            color: '#1764ed',
+            depthTest: false,
+            transparent: true,
+            opacity: 0.75,
+          }),
+        );
+        line.renderOrder = 5;
+        group.add(line);
+      }
+    }
     for (const sector of loaded.values())
       for (const child of sector.children)
         for (const object of child.children)
@@ -337,7 +461,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       refresh();
       map.triggerRepaint();
     },
-    pick(point: PointLike): string | undefined {
+    pick(point: PointLike): BuildingSelection | undefined {
       if (!options.enabled || !readyKey) return;
       const p = Array.isArray(point) ? { x: point[0], y: point[1] } : point;
       const x = (p.x / map.getCanvas().clientWidth) * 2 - 1,
@@ -350,9 +474,24 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       const objects = [...loaded.values()].flatMap((s) =>
         s.children.filter((c) => c.visible),
       );
-      return raycaster
+      objects.push(...[...drafts.values()].filter((g) => g.visible));
+      const hit = raycaster
         .intersectObjects(objects, true)
-        .find((hit) => hit.object.visible)?.object.userData.buildingId;
+        .find((hit) => hit.object instanceof Mesh && hit.object.visible);
+      if (!hit) return;
+      const surface = hit.object.userData.surfaces?.find(
+        (s: { start: number; count: number }) =>
+          hit.faceIndex! >= s.start && hit.faceIndex! < s.start + s.count,
+      );
+      return {
+        buildingId: hit.object.userData.buildingId,
+        partId: surface?.partId,
+        wallId: surface?.wallId,
+        role: surface?.role,
+        face: hit.faceIndex ?? undefined,
+        roofTriangle:
+          surface?.role === 'roof' ? hit.faceIndex! - surface.start : undefined,
+      };
     },
     dispose() {
       if (disposed) return;
@@ -362,6 +501,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       for (const c of inflight.values()) c.abort();
       for (const group of loaded.values()) release(group);
       loaded.clear();
+      for (const group of drafts.values()) release(group);
+      drafts.clear();
       if (map.getLayer(layer.id)) map.removeLayer(layer.id);
       options.onReady([]);
     },

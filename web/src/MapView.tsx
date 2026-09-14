@@ -1,3 +1,5 @@
+import { useBuildingPreview } from './useBuildingPreview';
+import type { BuildingSelection } from './visual-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MotionMap } from './MotionAssistance';
 import * as maplibregl from 'maplibre-gl';
@@ -32,11 +34,12 @@ export interface MapViewProps {
   editor?: boolean;
   buildingOpacity?: number;
   editing?: boolean;
+  buildingSelection?: BuildingSelection;
   follow?: boolean;
   motionActive?: boolean;
   panelBesideMap?: boolean;
   onSelect: (place: Place) => void;
-  onBuildingSelect?: (feature: Feature) => void;
+  onBuildingSelect?: (feature: Feature, selection?: BuildingSelection) => void;
   onManualPan?: () => void;
   onReady?: (map: MapInstance) => void | (() => void);
 }
@@ -52,6 +55,7 @@ export function MapView({
   editor = false,
   buildingOpacity = 0.92,
   editing = false,
+  buildingSelection,
   follow = false,
   motionActive = false,
   panelBesideMap = false,
@@ -108,6 +112,7 @@ export function MapView({
     selectedLat = selected?.coordinates[1];
   const selectedBuildingId = useMemo(
     () =>
+      buildingSelection?.buildingId ||
       String(
         data.map.features.find(
           (f) =>
@@ -115,7 +120,7 @@ export function MapView({
             buildingPlace(data, f)?.id === selectedId,
         )?.properties?.id || '',
       ),
-    [data, selectedId],
+    [data, selectedId, buildingSelection?.buildingId],
   );
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
@@ -530,7 +535,8 @@ export function MapView({
       );
       if (editor) {
         map.on('click', (event) => {
-          const id = models.current?.pick(event.point);
+          const hit = models.current?.pick(event.point);
+          const id = hit?.buildingId;
           const feature =
             id &&
             latestData.current.map.features.find(
@@ -538,12 +544,12 @@ export function MapView({
             );
           if (feature && callbacks.current.onBuildingSelect) {
             markModelSelection(event.originalEvent);
-            callbacks.current.onBuildingSelect(feature);
+            callbacks.current.onBuildingSelect(feature, hit);
           }
         });
       } else {
         map.on('click', (event) => {
-          const modelId = models.current?.pick(event.point);
+          const modelId = models.current?.pick(event.point)?.buildingId;
           const model =
             modelId &&
             latestData.current.map.features.find(
@@ -731,10 +737,8 @@ export function MapView({
         buildingOpacity,
       );
       map.setPaintProperty('buildings-3d', 'fill-extrusion-color', [
-        'case',
-        ['==', ['get', 'id'], selectedBuildingId],
-        dark ? '#5799e5' : '#6ca2da',
-        ['get', 'displayWall'],
+        'get',
+        'displayWall',
       ]);
       map.setLight({
         color: dark ? '#becfe0' : '#ffffff',
@@ -776,7 +780,12 @@ export function MapView({
       map.off('load', apply);
     };
   }, [editor, buildingOpacity, dark, selectedId, selectedBuildingId, modelIds]);
-  const modelOptions = useRef({
+  const buildingPreview = useBuildingPreview(
+    data,
+    selectedBuildingId,
+    editor && threeD && !simple,
+  );
+  const modelOptions = useRef<Parameters<typeof createCampusModels>[1]>({
     data,
     enabled: false,
     dark,
@@ -786,13 +795,17 @@ export function MapView({
   });
   modelOptions.current = {
     data,
-    enabled: threeD && !simple && !editing && buildingOpacity >= 0.7,
+    enabled: threeD && !simple && !editing,
+    selection: buildingSelection,
+    opacity: buildingOpacity,
+    overrides: buildingPreview.models,
     dark,
     selectedId: selectedBuildingId,
     onReady: setModelIds,
     onReduced: () => setReduced(true),
   };
-  const visualRevision = data.visuals?.revision;
+  const visualRevision =
+    data.visuals?.revision || (editor ? 'editor-preview' : undefined);
   useEffect(() => {
     if (!motionMap || !visualRevision || !threeD || simple) return;
     let cancelled = false;
@@ -820,6 +833,8 @@ export function MapView({
     editing,
     buildingOpacity,
     selectedBuildingId,
+    buildingSelection,
+    buildingPreview.models,
   ]);
   useEffect(() => {
     const map = mapRef.current;
@@ -971,7 +986,21 @@ export function MapView({
         ref={container}
         aria-label="Interactive map of LASU Ojo campus"
       />
-      {threeD && !simple && reduced && <small className="map-detail-status" role="status">Detail reduced for smoother movement</small>}
+      {threeD && !simple && reduced && (
+        <output className="map-detail-status">
+          Detail reduced for smoother movement
+        </output>
+      )}
+      {editor && threeD && !simple && buildingPreview.error && (
+        <div className="building-preview-error" role="alert">
+          <strong>3D preview is outdated</strong>
+          <p>{buildingPreview.error}</p>
+          <button onClick={buildingPreview.retry}>Retry 3D preview</button>
+        </div>
+      )}
+      {editor && buildingPreview.pending && (
+        <output className="map-detail-status">Updating 3D preview…</output>
+      )}
       {mapError && (
         <div className="map-error" role="alert">
           {mapError}

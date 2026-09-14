@@ -61,6 +61,7 @@ export class EditorMap {
   private creationId = '';
   private setting = false;
   private compare = false;
+  private outline = true;
   private interaction: Interaction = 'select';
   private draftTimer: ReturnType<typeof setTimeout> | undefined;
   private source: CampusData;
@@ -405,7 +406,8 @@ export class EditorMap {
     this.previousSources.set(id, signature);
     (this.map.getSource(id) as GeoJSONSource)?.setData(data);
   }
-  select(edit: MapEdit | null) {
+  select(edit: MapEdit | null, outline = this.outline) {
+    this.outline = outline;
     this.setting = true;
     this.kind = null;
     this.selected = edit;
@@ -435,10 +437,23 @@ export class EditorMap {
             }) as GeoJSONStoreFeatures,
         ),
       );
-      this.draw.setMode(this.compare ? 'render' : 'select');
-      if (!this.compare && result[0]?.valid)
+      this.draw.setMode(
+        this.compare || (edit?.kind === 'building' && !this.outline)
+          ? 'render'
+          : 'select',
+      );
+      if (
+        !this.compare &&
+        (edit.kind !== 'building' || this.outline) &&
+        result[0]?.valid
+      )
         this.draw.selectFeature(this.selectedParts[0] || edit.id);
-    } else this.draw.setMode(this.compare ? 'render' : 'select');
+    } else
+      this.draw.setMode(
+        this.compare || (edit?.kind === 'building' && !this.outline)
+          ? 'render'
+          : 'select',
+      );
     this.setting = false;
     this.targets(false);
   }
@@ -578,7 +593,9 @@ export class EditorMap {
               : this.kind === 'path' || this.kind === 'barrier'
                 ? 'linestring'
                 : 'point'
-            : 'select',
+            : this.selected?.kind === 'building' && !this.outline
+              ? 'render'
+              : 'select',
       );
     }
     const nodes = new Map(data.graph.nodes.map((n) => [n.id, n.coordinates]));
