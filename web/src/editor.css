@@ -910,6 +910,7 @@
   }
   .editor-brand {
     min-width: 0;
+    flex-shrink: 0;
   }
   .editor-brand strong {
     font-size: 15px;
