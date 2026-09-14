@@ -21,6 +21,7 @@ import { downloadJson } from './download-json';
 import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
 import { BaselineReview } from './BaselineReview';
+import { BuildingReferenceReview } from './BuildingReferenceReview';
 
 export interface ReviewState {
   changes: MapChange[];
@@ -52,6 +53,8 @@ export function EditorReview({
   setPreview,
   review,
   setReview,
+  onApplyAppearances,
+  onLocateBuilding,
 }: {
   tab: string;
   state: ReviewState;
@@ -69,6 +72,8 @@ export function EditorReview({
   setPreview: (value: boolean) => void;
   review: MapChange | null;
   setReview: (change: MapChange) => void;
+  onApplyAppearances: (batch: import('./types').MapEdit[]) => Promise<void>;
+  onLocateBuilding: (id: string) => void;
 }) {
   const [summary, setSummary] = useState('');
   const [liveState, setLiveState] = useState(state);
@@ -132,6 +137,20 @@ export function EditorReview({
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
+          <BuildingReferenceReview
+            data={validation.data}
+            duplicates={validation.duplicates}
+            edits={workspace.edits}
+            disabled={
+              busy ||
+              !!validation.pending ||
+              !!workspace.unfinished ||
+              !!workspace.roofDraft ||
+              workspace.status === 'Conflict'
+            }
+            onApply={onApplyAppearances}
+            onLocate={onLocateBuilding}
+          />
           <p className="small-note">
             Daily checks propose changes. Your campus corrections always take
             precedence.

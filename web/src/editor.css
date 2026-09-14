@@ -1278,3 +1278,56 @@
   color: var(--ed-muted);
   font-weight: 400;
 }
+/* Reference research stays inside Sources; the map remains mounted. */
+.building-reference-review > summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.building-reference-list {
+  margin-top: 16px;
+}
+.building-reference-item {
+  border-top: 1px solid var(--border, #ddd);
+  padding: 12px 0;
+}
+.building-reference-item > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.building-reference-item > summary span {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.reference-include {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.reference-values {
+  width: 100%;
+  table-layout: fixed;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+.reference-values th,
+.reference-values td {
+  padding: 8px 3px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid #ddd;
+}
+.reference-colour {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.reference-colour i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid #0003;
+}

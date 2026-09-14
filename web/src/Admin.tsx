@@ -1991,6 +1991,59 @@ function Editor({
                 setPreview={setPreview}
                 review={review}
                 setReview={setReview}
+                onLocateBuilding={(id) => selectId('building', id, true)}
+                onApplyAppearances={async (batch) => {
+                  if (
+                    tool ||
+                    workspace.unfinished ||
+                    workspace.roofDraft ||
+                    workspace.status === 'Conflict'
+                  )
+                    return;
+                  const original = workspace.edits;
+                  const originalBase = currentBase.current;
+                  setBusy(true);
+                  try {
+                    const checked = await validation.check([
+                      ...original.filter(
+                        (e) => !batch.some((b) => editKey(b) === editKey(e)),
+                      ),
+                      ...batch,
+                    ]);
+                    if (
+                      workspace.edits !== original ||
+                      currentBase.current !== originalBase
+                    )
+                      throw new Error(
+                        'The draft changed. Review the appearance batch again.',
+                      );
+                    const errors = checked.errors.filter(
+                      (e) => !validation.errors.includes(e),
+                    );
+                    if (!checked.usable || errors.length)
+                      throw new Error(
+                        errors.join(' ') ||
+                          'The proposed appearances could not be validated.',
+                      );
+                    workspace.commit(batch);
+                    const current = batch.find(
+                      (e) =>
+                        e.kind === selectedRef.current?.kind &&
+                        e.id === selectedRef.current?.id,
+                    );
+                    if (current) {
+                      setSelected(current);
+                      selectedRef.current = current;
+                    }
+                    setMessage(
+                      `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
+                    );
+                  } catch (error) {
+                    setError((error as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               />
             )}
           </aside>
