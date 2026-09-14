@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -10,6 +10,8 @@ export function EditorInspector({
   data,
   issues,
   onProperty,
+  onEndField,
+  focusField,
   onGeometry,
   onEntrance,
   onApproach,
@@ -21,7 +23,9 @@ export function EditorInspector({
   edit: MapEdit;
   data: CampusData;
   issues: string[];
-  onProperty: (key: string, value: unknown) => void;
+  onProperty: (key: string, value: unknown, continuous?: boolean) => void;
+  onEndField: () => void;
+  focusField?: string;
   onGeometry: (geometry: Geometry) => void;
   onEntrance: () => void;
   onApproach: () => void;
@@ -31,6 +35,13 @@ export function EditorInspector({
   onClose: () => void;
 }) {
   const [search, setSearch] = useState('');
+  const panel = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (focusField)
+      panel.current
+        ?.querySelector<HTMLElement>(`[data-editor-field="${focusField}"]`)
+        ?.focus();
+  }, [focusField, edit.id]);
   const p = edit.properties;
   const repair =
     edit.kind === 'building'
@@ -44,14 +55,20 @@ export function EditorInspector({
     <label className="field-label">
       {label}
       <input
-        value={String(p[key] || '')}
+        data-editor-field={key}
+        value={String(p[key] ?? '')}
         placeholder={placeholder}
-        onChange={(e) => onProperty(key, e.target.value)}
+        onChange={(e) => onProperty(key, e.target.value, true)}
       />
     </label>
   );
   return (
     <aside
+      ref={panel}
+      onBlurCapture={onEndField}
+      onKeyDownCapture={(event) => {
+        if (event.key === 'Enter') onEndField();
+      }}
       className="editor-inspector editor-card"
       aria-label="Feature properties"
     >
@@ -137,10 +154,14 @@ export function EditorInspector({
                       (key === 'wallColour' ? '#eedcc0' : '#b97760')
                     }
                     onChange={(e) =>
-                      onProperty('appearance', {
-                        ...p.appearance,
-                        [key]: e.target.value,
-                      })
+                      onProperty(
+                        'appearance',
+                        {
+                          ...p.appearance,
+                          [key]: e.target.value,
+                        },
+                        true,
+                      )
                     }
                   />
                 </label>
@@ -184,10 +205,14 @@ export function EditorInspector({
                   maxLength={2000}
                   value={p.appearance?.provenance || ''}
                   onChange={(e) =>
-                    onProperty('appearance', {
-                      ...p.appearance,
-                      provenance: e.target.value,
-                    })
+                    onProperty(
+                      'appearance',
+                      {
+                        ...p.appearance,
+                        provenance: e.target.value,
+                      },
+                      true,
+                    )
                   }
                 />
               </label>
@@ -244,7 +269,15 @@ export function EditorInspector({
                   min={1}
                   max={50}
                   value={Number(p.floors) || ''}
-                  onChange={(e) => onProperty('floors', Number(e.target.value))}
+                  onChange={(e) =>
+                    onProperty(
+                      'floors',
+                      e.target.value === ''
+                        ? undefined
+                        : Number(e.target.value),
+                      true,
+                    )
+                  }
                 />
                 <small>
                   Approximate height: {(Number(p.floors) || 0) * 3} m · 3 m per
@@ -260,10 +293,16 @@ export function EditorInspector({
                     min={0}
                     max={150}
                     step="0.1"
-                    value={Number(p.height) || ''}
+                    value={p.height === undefined ? '' : Number(p.height)}
                     placeholder="Unknown"
                     onChange={(e) =>
-                      onProperty('height', Number(e.target.value))
+                      onProperty(
+                        'height',
+                        e.target.value === ''
+                          ? undefined
+                          : Number(e.target.value),
+                        true,
+                      )
                     }
                   />
                 </label>
@@ -303,6 +342,7 @@ export function EditorInspector({
               />
               <select
                 aria-label="Entrance place"
+                data-editor-field="placeId"
                 value={String(p.placeId || '')}
                 onChange={(e) => onProperty('placeId', e.target.value)}
               >
@@ -367,13 +407,29 @@ export function EditorInspector({
                 <option value="reverse">Against the drawn line</option>
               </select>
             </label>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={!!p.steps}
-                onChange={(e) => onProperty('steps', e.target.checked)}
-              />{' '}
-              Includes steps
+            <label className="field-label">
+              Recorded steps information
+              <select
+                value={
+                  p.steps === true
+                    ? 'yes'
+                    : p.steps === false
+                      ? 'no'
+                      : 'unknown'
+                }
+                onChange={(e) =>
+                  onProperty(
+                    'steps',
+                    e.target.value === 'unknown'
+                      ? null
+                      : e.target.value === 'yes',
+                  )
+                }
+              >
+                <option value="unknown">Unknown</option>
+                <option value="yes">Includes steps</option>
+                <option value="no">Recorded without steps</option>
+              </select>
             </label>
             <div className="editor-field-title">Path connections</div>
             <div className="editor-two-buttons">
@@ -433,7 +489,7 @@ export function EditorInspector({
                 type="datetime-local"
                 value={String(p.expectedReopening || '').slice(0, 16)}
                 onChange={(e) =>
-                  onProperty('expectedReopening', e.target.value)
+                  onProperty('expectedReopening', e.target.value, true)
                 }
               />
             </label>
