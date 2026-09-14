@@ -72,11 +72,11 @@ export function customRoofSurface(
       p.length !== 2 ||
       !p.every(Number.isFinite) ||
       !Number.isFinite(height) ||
-      height < roof.eaves ||
+      height <= 0 ||
       height > totalHeight
     )
       throw new Error(
-        'Roof control points must have valid coordinates and elevations between eaves and total height.',
+        'Roof control points must have valid coordinates and elevations above ground and within total height.',
       );
     if (!contains(p))
       throw new Error(

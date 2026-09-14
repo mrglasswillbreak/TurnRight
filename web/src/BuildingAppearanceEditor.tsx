@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { MapEdit, CampusData } from './types';
 import type {
   BuildingSelection,
@@ -9,6 +10,8 @@ import {
   polygonsOf,
   resolveBuildingVisual,
   styleFor,
+  topologyFits,
+  resetBuildingAssignments,
   standardRoofSupported,
   generatedRoofPitch,
 } from './building-surfaces';
@@ -61,6 +64,25 @@ export function BuildingAppearanceEditor({
       : appearance;
   const resolved = styleFor(appearance, visual, partId, wallId);
   const locked = !!roofDraft;
+  const brokenTopology =
+    !!edit.properties.buildingTopology &&
+    !topologyFits(edit.geometry, edit.properties.buildingTopology);
+  const partIds = new Set(topology.parts.map((p) => p.id)),
+    wallIds = new Set(
+      topology.parts.flatMap((p) => p.rings.flatMap((r) => r.wallIds)),
+    );
+  const orphans = ['parts', 'walls', 'roofs'].some((key) =>
+    Object.keys(appearance[key as 'parts'] || {}).some(
+      (id) => !(key === 'walls' ? wallIds : partIds).has(id),
+    ),
+  );
+  const invalidSelection =
+    (!!partId && !part) ||
+    (!!wallId && !part?.rings.some((r) => r.wallIds.includes(wallId)));
+  useEffect(() => {
+    if (invalidSelection)
+      onSelection({ buildingId: edit.id, partId: part?.id });
+  }, [invalidSelection, onSelection, edit.id, part?.id]);
   const change = (
     field: keyof SurfaceStyle,
     value: unknown,
@@ -226,6 +248,24 @@ export function BuildingAppearanceEditor({
           </select>
         </label>
       )}
+      {(brokenTopology || orphans) && (
+        <div className="notice" role="alert">
+          <p>
+            {brokenTopology
+              ? 'Surface identities no longer match the outline. Review a reset before continuing.'
+              : 'Some appearance settings refer to removed surfaces.'}
+          </p>
+          <button
+            onClick={() =>
+              onEdit(resetBuildingAssignments(edit, !brokenTopology))
+            }
+          >
+            {brokenTopology
+              ? 'Reset surface identities and assignments'
+              : 'Reset unassigned surfaces'}
+          </button>
+        </div>
+      )}
       {(topology.issues || []).map((issue) => (
         <div className="notice" role="alert" key={issue.id}>
           <p>{issue.message}</p>
@@ -235,6 +275,10 @@ export function BuildingAppearanceEditor({
               onClick={() => {
                 const next = structuredClone(appearance);
                 if (issue.wallId) (next.walls ||= {})[issue.wallId] = candidate;
+                else {
+                  (next.parts ||= {})[issue.partId] = candidate;
+                  delete next.roofs?.[issue.partId];
+                }
                 onEdit({
                   ...edit,
                   properties: {
@@ -257,6 +301,10 @@ export function BuildingAppearanceEditor({
             onClick={() => {
               const next = structuredClone(appearance);
               if (issue.wallId) delete next.walls?.[issue.wallId];
+              else {
+                delete next.parts?.[issue.partId];
+                delete next.roofs?.[issue.partId];
+              }
               onEdit({
                 ...edit,
                 properties: {

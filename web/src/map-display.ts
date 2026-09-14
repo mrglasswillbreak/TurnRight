@@ -12,6 +12,18 @@ export type BuildingDisplay = {
 export function buildingDisplay(
   properties: Record<string, unknown> = {},
 ): BuildingDisplay {
+  const statedFloors = Number(properties.floors);
+  if (
+    properties.heightMode === 'floors' &&
+    Number.isInteger(statedFloors) &&
+    statedFloors > 0 &&
+    statedFloors <= 50
+  )
+    return {
+      metres: statedFloors * 3,
+      kind: 'floor-derived',
+      description: `Approximately ${statedFloors * 3} m · ${statedFloors} documented floors`,
+    };
   const height = Number(properties.height);
   if (Number.isFinite(height) && height > 0) {
     const estimated =

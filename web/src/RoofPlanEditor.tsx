@@ -185,8 +185,9 @@ export function RoofPlanEditor({
   return (
     <section className="roof-plan" aria-label="Wing roof plan">
       <p className="small-note">
-        Elevations are metres above ground; total wing height is {height} m.
-        Boundary points follow outline vertices. Courtyards remain open.
+        Elevations are metres above ground; total wing height is {height} m
+        {illustrative ? ' (illustrative; actual height unknown)' : ''}. Boundary
+        points follow outline vertices. Courtyards remain open.
       </p>
       {!draft ? (
         <>
@@ -393,6 +394,7 @@ export function RoofPlanEditor({
       <label className="field-label">
         Roof surface
         <select
+          aria-label="Roof surface"
           value={surface ?? ''}
           onChange={(e) => {
             const index =
@@ -444,7 +446,7 @@ export function RoofPlanEditor({
                 <input
                   type="number"
                   disabled={!!active.vertexId}
-                  min={roof.eaves}
+                  min={0.1}
                   max={height}
                   step={0.1}
                   value={active.elevation}

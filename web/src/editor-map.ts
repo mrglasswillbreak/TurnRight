@@ -113,7 +113,14 @@ export class EditorMap {
           flags: { point: flags, linestring: flags, polygon: flags },
           pointerDistance: 8,
         }),
-        new TerraDrawRenderMode({ modeName: 'render', styles: {} }),
+        new TerraDrawRenderMode({
+          modeName: 'render',
+          styles: {
+            polygonFillOpacity: 0,
+            polygonOutlineColor: '#1764ed',
+            polygonOutlineWidth: 2,
+          },
+        }),
       ],
     });
     for (const id of [
@@ -433,7 +440,12 @@ export class EditorMap {
               type: 'Feature',
               id: this.selectedParts[index] || edit.id,
               geometry,
-              properties: { mode: modeFor(geometry) },
+              properties: {
+                mode:
+                  edit.kind === 'building' && !this.outline
+                    ? 'render'
+                    : modeFor(geometry),
+              },
             }) as GeoJSONStoreFeatures,
         ),
       );

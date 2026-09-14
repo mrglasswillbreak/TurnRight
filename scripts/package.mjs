@@ -38,6 +38,8 @@ const visuals = await packageVisuals(
   path.resolve(root, process.env.VISUALS_INPUT || "data/visuals"),
   asset,
 );
+if (process.env.VISUALS_INPUT && !visuals)
+  throw new Error("The rebuilt visual catalogue is missing; release packaging stopped.");
 if (visuals) data.visuals = visuals.catalogue;
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;

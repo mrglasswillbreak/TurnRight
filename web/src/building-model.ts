@@ -157,8 +157,7 @@ export function createBuildingModel(
           : (override?.height ?? part?.height ?? visual.height);
     if (!Number.isFinite(height) || height <= 0 || height > 150)
       throw new Error('Wing height must be above zero and at most 150 metres.');
-    const wallMesh = mesh(style.wallColour!),
-      roofMesh = mesh(style.roofColour!, false, 'roof');
+    const roofMesh = mesh(style.roofColour!, false, 'roof');
     const custom = appearance.roofs?.[partId];
     const rings = polygon.map((r, index) => {
       const points = r.slice(0, -1).map(local);
@@ -305,16 +304,35 @@ export function createBuildingModel(
         [...r0, height],
         [...r1, height],
       ]);
-      face(style.roofForm === 'gable' ? wallMesh : roofMesh, [
-        [...outer[3], eaves],
-        [...outer[0], eaves],
-        [...r0, height],
-      ]);
-      face(style.roofForm === 'gable' ? wallMesh : roofMesh, [
-        [...outer[1], eaves],
-        [...outer[2], eaves],
-        [...r1, height],
-      ]);
+      const end = (a: number[], b: number[], ridge: number[]) => {
+        const original = polygon[0].slice(0, -1).map(local);
+        const index = original.findIndex((p, i) => {
+          const q = original[(i + 1) % original.length];
+          return (
+            (Math.hypot(p[0] - a[0], p[1] - a[1]) < 0.001 &&
+              Math.hypot(q[0] - b[0], q[1] - b[1]) < 0.001) ||
+            (Math.hypot(p[0] - b[0], p[1] - b[1]) < 0.001 &&
+              Math.hypot(q[0] - a[0], q[1] - a[1]) < 0.001)
+          );
+        });
+        scope = {
+          partId,
+          wallId: topology.parts[partIndex].rings[0].wallIds[index],
+        };
+        const colour = styleFor(
+          appearance,
+          surfaceVisual,
+          partId,
+          scope.wallId,
+        ).wallColour!;
+        face(style.roofForm === 'gable' ? mesh(colour) : roofMesh, [
+          [...a, eaves],
+          [...b, eaves],
+          [...ridge, height],
+        ]);
+      };
+      end(outer[3], outer[0], r0);
+      end(outer[1], outer[2], r1);
     } else {
       const vectors = rings.map((r) => r.map((p) => new Vector2(p[0], p[1])));
       const triangles = ShapeUtils.triangulateShape(

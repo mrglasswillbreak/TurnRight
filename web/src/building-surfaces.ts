@@ -18,11 +18,63 @@ export const polygonsOf = (geometry: Geometry): number[][][][] =>
 const same = (a: number[], b: number[]) =>
   Math.abs(a[0] - b[0]) < 1e-9 && Math.abs(a[1] - b[1]) < 1e-9;
 const fresh = () => crypto.randomUUID();
+export function topologyFits(
+  geometry: Geometry,
+  topology?: BuildingTopology,
+): boolean {
+  const polygons = polygonsOf(geometry);
+  if (
+    topology?.issues !== undefined &&
+    (!Array.isArray(topology.issues) ||
+      topology.issues.some(
+        (i) =>
+          !i ||
+          typeof i.id !== 'string' ||
+          typeof i.partId !== 'string' ||
+          typeof i.message !== 'string' ||
+          !Array.isArray(i.candidates) ||
+          i.candidates.some(
+            (c) => !c || typeof c !== 'object' || Array.isArray(c),
+          ),
+      ))
+  )
+    return false;
+  if (
+    !topology ||
+    !Array.isArray(topology.parts) ||
+    topology.parts.length !== polygons.length ||
+    topology.parts.some(
+      (p, i) =>
+        !p ||
+        !Array.isArray(p.rings) ||
+        p.rings.length !== polygons[i].length ||
+        p.rings.some(
+          (r, j) =>
+            !r ||
+            !Array.isArray(r.vertexIds) ||
+            !Array.isArray(r.wallIds) ||
+            r.vertexIds.length !== polygons[i][j].length - 1 ||
+            r.wallIds.length !== r.vertexIds.length,
+        ),
+    )
+  )
+    return false;
+  const ids = topology.parts.flatMap((p) => [
+    p.id,
+    ...p.rings.flatMap((r) => [r.id, ...r.vertexIds, ...r.wallIds]),
+  ]);
+  return (
+    ids.every(
+      (id) => typeof id === 'string' && id.length > 0 && id.length <= 240,
+    ) && new Set(ids).size === ids.length
+  );
+}
 export function buildingTopology(feature: Feature): BuildingTopology {
   const stored = feature.properties?.buildingTopology as
     | BuildingTopology
     | undefined;
-  if (stored) return structuredClone(stored);
+  if (stored && topologyFits(feature.geometry, stored))
+    return structuredClone(stored);
   const id = String(feature.properties?.id || feature.id || 'building');
   return {
     parts: polygonsOf(feature.geometry).map((polygon, p) => ({
@@ -219,6 +271,18 @@ export function remapBuildingSurfaces(
         unmatched.forEach((i, k) => {
           matched[i] = remaining[k];
         });
+      if (
+        unmatched.length === points.length &&
+        !translation &&
+        (appearance.parts?.[part.id] || appearance.roofs?.[part.id])
+      )
+        issues.push({
+          id: fresh(),
+          partId: part.id,
+          message:
+            'The new outline cannot be matched to the former wing. Reassign its style or reset it; its former roof remains available through Undo.',
+          candidates: [appearance.parts?.[part.id] || {}],
+        });
       const vertexIds = matched.map((i) =>
         i >= 0 ? ring.vertexIds[i] : fresh(),
       );
@@ -374,4 +438,35 @@ export function generatedRoofPitch(polygon: number[][][], height: number) {
     (Math.atan2(Math.min(height * 0.18, 1.8), roofWidth(polygon) / 2) * 180) /
     Math.PI
   );
+}
+
+export function resetBuildingAssignments(
+  edit: MapEdit,
+  orphanOnly = false,
+): MapEdit {
+  const topology = buildingTopology({
+      type: 'Feature',
+      geometry: edit.geometry,
+      properties: { ...edit.properties, id: edit.id },
+    }),
+    appearance = structuredClone(edit.properties.appearance || {});
+  const parts = new Set(topology.parts.map((p) => p.id)),
+    walls = new Set(
+      topology.parts.flatMap((p) => p.rings.flatMap((r) => r.wallIds)),
+    );
+  for (const key of ['parts', 'walls', 'roofs'] as const) {
+    if (!orphanOnly) delete appearance[key];
+    else if (appearance[key])
+      Object.assign(appearance, {
+        [key]: Object.fromEntries(
+          Object.entries(appearance[key]).filter(([id]) =>
+            (key === 'walls' ? walls : parts).has(id),
+          ),
+        ),
+      });
+  }
+  return {
+    ...edit,
+    properties: { ...edit.properties, appearance, buildingTopology: topology },
+  };
 }

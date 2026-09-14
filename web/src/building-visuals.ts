@@ -84,6 +84,7 @@ export function validBuildingModel(model: BuildingModel): boolean {
     model.meshes.length <= 100 &&
     model.meshes.every(
       (part) =>
+        !!part &&
         /^#[a-f0-9]{6}$/i.test(part.colour) &&
         Array.isArray(part.positions) &&
         Array.isArray(part.indices) &&

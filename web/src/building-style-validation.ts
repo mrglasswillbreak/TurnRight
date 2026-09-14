@@ -1,6 +1,7 @@
 import type { MapEdit } from './types.js';
 import {
   buildingTopology,
+  topologyFits,
   polygonsOf,
   standardRoofSupported,
   roofWidth,
@@ -14,6 +15,10 @@ export function validateBuildingStyle(edit: MapEdit): string[] {
     appearance = edit.properties.appearance;
   const polygon = polygonsOf(edit.geometry);
   const stored = edit.properties.buildingTopology;
+  if (stored && !topologyFits(edit.geometry, stored))
+    return [
+      'Building surface identities no longer match the outline. Review surface assignments.',
+    ];
   if (
     stored &&
     (!Array.isArray(stored.parts) ||
