@@ -23,21 +23,29 @@ export function useBuildingPreview(
     );
   const desired = useMemo(
     () =>
-      data.map.features.filter(
-        (f) =>
-          f.properties?.kind === 'building' &&
-          (f.properties.id === selectedId ||
-            f.properties.appearance ||
-            f.properties.buildingTopology),
-      ),
-    [data.map, selectedId],
+      enabled
+        ? data.map.features.filter(
+            (f) =>
+              f.properties?.kind === 'building' &&
+              (f.properties.id === selectedId ||
+                f.properties.appearance ||
+                f.properties.buildingTopology),
+          )
+        : [],
+    [data.map, selectedId, enabled],
   );
   // Autosave receipts, inspector selection and equivalent data objects must not
   // cancel an in-flight build or resend an unchanged campus to the worker.
-  const requestKey = JSON.stringify([
-    data.visuals?.revision,
-    desired.map((f) => [String(f.properties?.id), buildingRevision(f)]),
-  ]);
+  const requestKey = useMemo(
+    () =>
+      JSON.stringify([
+        data.visuals?.revision,
+        desired
+          .map((f) => [String(f.properties?.id), buildingRevision(f)])
+          .sort(([a], [b]) => a.localeCompare(b)),
+      ]),
+    [data.visuals?.revision, desired],
+  );
   const input = useRef({ desired, visuals: data.visuals });
   input.current = { desired, visuals: data.visuals };
   useEffect(
