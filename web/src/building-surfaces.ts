@@ -346,3 +346,32 @@ export function remapBuildingSurfaces(
     },
   };
 }
+
+export function standardRoofSupported(polygon: number[][][]) {
+  if (polygon.length !== 1 || polygon[0].length !== 5) return false;
+  const signs = polygon[0].slice(0, -1).map((a, i, ring) => {
+    const b = ring[(i + 1) % 4],
+      c = ring[(i + 2) % 4];
+    return Math.sign(
+      (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]),
+    );
+  });
+  return signs.every((sign) => sign !== 0 && sign === signs[0]);
+}
+export function roofWidth(polygon: number[][][]) {
+  const ring = polygon[0].slice(0, -1),
+    sy = (Math.PI / 180) * 6371008.8,
+    sx = sy * Math.cos((ring[0][1] * Math.PI) / 180);
+  return Math.min(
+    ...ring.map((p, i) => {
+      const q = ring[(i + 1) % ring.length];
+      return Math.hypot((p[0] - q[0]) * sx, (p[1] - q[1]) * sy);
+    }),
+  );
+}
+export function generatedRoofPitch(polygon: number[][][], height: number) {
+  return (
+    (Math.atan2(Math.min(height * 0.18, 1.8), roofWidth(polygon) / 2) * 180) /
+    Math.PI
+  );
+}

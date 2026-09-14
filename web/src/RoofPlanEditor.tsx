@@ -16,6 +16,7 @@ export function RoofPlanEditor({
   polygon,
   topology,
   height,
+  illustrative,
   draft,
   onDraft,
   onApply,
@@ -26,6 +27,7 @@ export function RoofPlanEditor({
   polygon: number[][][];
   topology: BuildingTopology['parts'][number];
   height: number;
+  illustrative?: boolean;
   draft: RoofDraft | null;
   onDraft: (value: RoofDraft | null) => void;
   onApply: (edit: MapEdit) => void;

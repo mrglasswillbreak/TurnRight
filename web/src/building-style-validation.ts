@@ -1,5 +1,10 @@
 import type { MapEdit } from './types.js';
-import { buildingTopology, polygonsOf } from './building-surfaces.js';
+import {
+  buildingTopology,
+  polygonsOf,
+  standardRoofSupported,
+  roofWidth,
+} from './building-surfaces.js';
 import { customRoofSurface } from './custom-roof.js';
 import { buildingDisplay } from './map-display.js';
 
@@ -140,6 +145,37 @@ export function validateBuildingStyle(edit: MapEdit): string[] {
       (typeof style.provenance !== 'string' || style.provenance.length > 2000)
     )
       errors.push('Surface evidence notes must be at most 2000 characters.');
+  }
+  for (const [index, part] of topology.parts.entries()) {
+    const style = { ...appearance, ...appearance.parts?.[part.id] },
+      pitch = style.roofPitch;
+    if (
+      pitch !== undefined &&
+      style.roofForm &&
+      style.roofForm !== 'flat' &&
+      !appearance.roofs?.[part.id]
+    ) {
+      if (!standardRoofSupported(polygon[index]))
+        errors.push(
+          'Standard roof pitch needs a convex four-sided wing without courtyards. Use a custom roof plan.',
+        );
+      else {
+        const own = appearance.parts?.[part.id],
+          height =
+            own?.heightMode === 'floors'
+              ? Number(own.floors) * 3
+              : own?.heightMode === 'unknown'
+                ? 6
+                : own?.height || buildingDisplay(edit.properties).metres;
+        if (
+          (roofWidth(polygon[index]) / 2) * Math.tan((pitch * Math.PI) / 180) >=
+          height
+        )
+          errors.push(
+            'Roof pitch exceeds the total wing height. Reduce pitch or review the height.',
+          );
+      }
+    }
   }
   for (const [partId, roof] of Object.entries(appearance.roofs || {})) {
     const i = topology.parts.findIndex((p) => p.id === partId);

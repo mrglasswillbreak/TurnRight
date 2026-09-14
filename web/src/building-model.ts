@@ -1,4 +1,8 @@
-import { buildingTopology, styleFor } from './building-surfaces.js';
+import {
+  buildingTopology,
+  styleFor,
+  standardRoofSupported,
+} from './building-surfaces.js';
 import { customRoofSurface } from './custom-roof.js';
 import { ShapeUtils, Vector2 } from 'three';
 import type { Feature, Polygon, MultiPolygon } from 'geojson';
@@ -88,7 +92,19 @@ export function createBuildingModel(
   let scope: { partId: string; wallId?: string } = { partId: '' };
   const topology = buildingTopology(feature);
   const appearance = feature.properties?.appearance || {};
-  const surfaceVisual = {...visual,partDefaults: visual.partDefaults || Object.fromEntries(topology.parts.map((part,i) => [part.id,visual.partHeights?.[i]?.kind === 'illustrative' ? {wallColour:'#d4d5c3',roofColour:'#a6b19f',windows:false} : {}]))};
+  const surfaceVisual = {
+    ...visual,
+    partDefaults:
+      visual.partDefaults ||
+      Object.fromEntries(
+        topology.parts.map((part, i) => [
+          part.id,
+          visual.partHeights?.[i]?.kind === 'illustrative'
+            ? { wallColour: '#d4d5c3', roofColour: '#a6b19f', windows: false }
+            : {},
+        ]),
+      ),
+  };
   const mesh = (
     colour: string,
     detail = false,
@@ -152,10 +168,7 @@ export function createBuildingModel(
     const outer = rings[0];
     // Roof rise is an explicitly inferred share of total height, never added above it.
     const pitched =
-      !custom &&
-      style.roofForm !== 'flat' &&
-      outer.length === 4 &&
-      rings.length === 1;
+      !custom && style.roofForm !== 'flat' && standardRoofSupported(polygon);
     const width = Math.min(
       ...outer.map((a, i) =>
         Math.hypot(
