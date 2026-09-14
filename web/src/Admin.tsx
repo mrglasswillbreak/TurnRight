@@ -28,6 +28,7 @@ import {
 import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
+import { MapViewControl, useSimple3D } from './MapViewControl';
 import { api, supabase } from './supabase';
 import { AdminRequestError, boundedSession } from './admin-client';
 import {
@@ -438,6 +439,7 @@ function Editor({
       return false;
     }
   });
+  const [simple3D, setSimple3D] = useSimple3D();
   const [opacity, setOpacity] = useState(0.8),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
@@ -1534,6 +1536,7 @@ function Editor({
           data={visible}
           dark={dark}
           threeD={threeD}
+          simple={simple3D}
           editor
           editing={
             !!tool || !!workspace.unfinished || selected?.kind === 'building'
@@ -1777,24 +1780,7 @@ function Editor({
           )}
         </div>
         <div className="editor-view-controls editor-card">
-          <div className="editor-view-toggle">
-            <button
-              aria-pressed={!threeD}
-              className={!threeD ? 'active' : ''}
-              onClick={() => toggleView(false)}
-            >
-              <Layers size={16} />
-              2D
-            </button>
-            <button
-              aria-pressed={threeD}
-              className={threeD ? 'active' : ''}
-              onClick={() => toggleView(true)}
-            >
-              <Box size={16} />
-              3D
-            </button>
-          </div>
+          <MapViewControl threeD={threeD} simple={simple3D} onView={toggleView} onSimple={setSimple3D} />
           <button
             className="editor-icon"
             aria-label="Zoom in"

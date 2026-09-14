@@ -52,6 +52,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
+import { MapViewControl, useSimple3D } from './MapViewControl';
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -107,6 +108,7 @@ export default function App() {
     [query, setQuery] = useState(''),
     [category, setCategory] = useState('all');
   const [threeD, setThreeD] = useMapViewPreference();
+  const [simple3D, setSimple3D] = useSimple3D();
   const [unlinkedBuilding, setUnlinkedBuilding] = useState<Feature | null>(
     null,
   );
@@ -673,6 +675,7 @@ export default function App() {
         fix={gps.fix}
         dark={dark}
         threeD={threeD}
+        simple={simple3D}
         buildingOpacity={navigating ? 0.65 : 0.92}
         follow={follow}
         motionActive={navigating && !nav.arrived}
@@ -1092,19 +1095,9 @@ export default function App() {
         </button>
       </div>
       <div className="map-controls">
-        <button
-          className={threeD ? 'active' : ''}
-          onClick={() => {
-            if (!setThreeD(!threeD))
-              setToast(
-                'Map view changed for this session. Storage could not save your preference.',
-              );
-          }}
-          aria-label={threeD ? 'Switch to 2D' : 'Switch to 3D'}
-        >
-          <Layers />
-          <span>{threeD ? '2D' : '3D'}</span>
-        </button>
+        <MapViewControl threeD={threeD} simple={simple3D} onSimple={setSimple3D} onView={(value) => {
+          if (!setThreeD(value)) setToast('Map view changed for this session. Storage could not save your preference.');
+        }} />
         <div className="control-group">
           <button
             aria-label="Zoom in"

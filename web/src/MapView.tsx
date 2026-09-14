@@ -28,6 +28,7 @@ export interface MapViewProps {
   fix?: GpsFix | null;
   dark?: boolean;
   threeD?: boolean;
+  simple?: boolean;
   editor?: boolean;
   buildingOpacity?: number;
   editing?: boolean;
@@ -47,6 +48,7 @@ export function MapView({
   fix,
   dark = false,
   threeD = false,
+  simple = false,
   editor = false,
   buildingOpacity = 0.92,
   editing = false,
@@ -71,13 +73,6 @@ export function MapView({
   const models = useRef<ReturnType<typeof createCampusModels> | null>(null);
   const [modelIds, setModelIds] = useState<string[]>([]),
     [reduced, setReduced] = useState(false);
-  const [simple, setSimple] = useState(() => {
-    try {
-      return localStorage.getItem('turnright:simple-3d') === 'true';
-    } catch {
-      return false;
-    }
-  });
   const campusGeometry = useMemo(
     () => displayGeometry(data.map, data.visuals),
     [data.map, data.visuals],
@@ -976,31 +971,7 @@ export function MapView({
         ref={container}
         aria-label="Interactive map of LASU Ojo campus"
       />
-      {threeD && data.visuals && (
-        <div className={`map-quality ${editor ? 'in-editor' : ''}`}>
-          <button
-            aria-pressed={simple}
-            onClick={() => {
-              const next = !simple;
-              setSimple(next);
-              try {
-                localStorage.setItem('turnright:simple-3d', String(next));
-              } catch {
-                /* Preference is optional. */
-              }
-            }}
-          >
-            {simple ? 'Simple 3D' : 'Enhanced 3D'}
-          </button>
-          <small>
-            {simple
-              ? 'Tap for architectural detail'
-              : reduced
-                ? 'Detail reduced for smoother movement'
-                : 'Auto detail · local models'}
-          </small>
-        </div>
-      )}
+      {threeD && !simple && reduced && <small className="map-detail-status" role="status">Detail reduced for smoother movement</small>}
       {mapError && (
         <div className="map-error" role="alert">
           {mapError}
