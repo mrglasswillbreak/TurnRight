@@ -90,6 +90,7 @@ export async function getActivePackage(): Promise<{
   );
   const visualsComplete =
     visualUrls.size > 0 &&
+    visualManifestMatches(record.data, record.manifest) &&
     [...visualUrls].every((url) => {
       const index = record.manifest.assets.findIndex(
         (a: PackageAsset) => a.url === url,
@@ -98,9 +99,30 @@ export async function getActivePackage(): Promise<{
     });
   return {
     ...record,
-    complete: present.every(Boolean) && (!visualUrls.size || visualsComplete),
+    complete:
+      present.every(Boolean) &&
+      (!visualUrls.size || visualsComplete) &&
+      visualManifestMatches(record.data, record.manifest),
     visualsComplete,
   };
+}
+function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
+  const sectors = data.visuals?.sectors || [],
+    urls = manifest.visuals?.assetUrls || [];
+  return (
+    sectors.length === urls.length &&
+    new Set(urls).size === urls.length &&
+    sectors.every(
+      (sector) =>
+        urls.includes(sector.url) &&
+        manifest.assets.some(
+          (a) =>
+            a.url === sector.url &&
+            a.bytes === sector.bytes &&
+            a.sha256 === sector.sha256,
+        ),
+    )
+  );
 }
 async function verifiedAsset(response: Response, asset: PackageAsset) {
   const bytes = await response.arrayBuffer();
@@ -220,6 +242,10 @@ export async function installPackage(
   }
   if (!data || data.version !== manifest.version)
     throw new Error('Incomplete campus package');
+  if (!visualManifestMatches(data, manifest))
+    throw new Error(
+      'The model catalogue does not match the verified download manifest.',
+    );
   const db = await database();
   // The sole active pointer is committed after every file has been verified.
   const tx = db.transaction(['packages', 'meta'], 'readwrite');
@@ -239,6 +265,7 @@ export async function activatePending() {
     cache = await caches.open(ASSET_CACHE);
   if (
     !record ||
+    !visualManifestMatches(record.data, record.manifest) ||
     (
       await Promise.all(
         record.manifest.assets.map(async (a: PackageAsset) => {

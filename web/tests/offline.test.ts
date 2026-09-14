@@ -59,8 +59,20 @@ describe('offline package transactions', () => {
       bytes: bytes.byteLength,
       sha256: await hashBytes(bytes.buffer),
     };
+    p.bytes = new TextEncoder().encode(
+      JSON.stringify({
+        version,
+        schemaVersion: 1,
+        visuals: { sectors: [asset] },
+      }),
+    );
+    p.manifest.assets[0] = {
+      ...p.manifest.assets[0],
+      bytes: p.bytes.byteLength,
+      sha256: await hashBytes(p.bytes.buffer),
+    };
     p.manifest.assets.push(asset);
-    p.manifest.bytes += asset.bytes;
+    p.manifest.bytes = p.bytes.byteLength + asset.bytes;
     p.manifest.visuals = { bytes: asset.bytes, assetUrls: [asset.url] };
     return { ...p, visual: asset, visualBytes: bytes };
   }
@@ -115,6 +127,29 @@ describe('offline package transactions', () => {
     await expect(installPackage(p.manifest, () => {})).rejects.toThrow(
       'Incomplete visual',
     );
+  });
+  it('rejects a catalogue whose model hashes disagree with verified assets', async () => {
+    const p = await enhanced('catalogue-mismatch');
+    const data = JSON.parse(new TextDecoder().decode(p.bytes));
+    data.visuals.sectors[0].sha256 = '0'.repeat(64);
+    p.bytes = new TextEncoder().encode(JSON.stringify(data));
+    p.manifest.assets[0] = {
+      ...p.manifest.assets[0],
+      bytes: p.bytes.byteLength,
+      sha256: await hashBytes(p.bytes.buffer),
+    };
+    p.manifest.bytes = p.bytes.byteLength + p.visual.bytes;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async (url: string) =>
+          new Response(url === p.visual.url ? p.visualBytes : p.bytes),
+      ),
+    );
+    await expect(installPackage(p.manifest, () => {})).rejects.toThrow(
+      'catalogue does not match',
+    );
+    expect(await getActivePackage()).toBeNull();
   });
   it('bounds initial data loading and reports a retryable timeout', async () => {
     const p = await pkg('slow');

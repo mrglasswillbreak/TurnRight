@@ -95,7 +95,7 @@ export function OfflinePanel({
             The basic map works while these download.
           </p>
         )}
-        {manifest.visuals && downloaded && swReady && (
+        {!!manifest.visuals?.assetUrls.length && downloaded && swReady && (
           <p className="ready-label">
             Enhanced 3D ready offline · all model files verified
           </p>
