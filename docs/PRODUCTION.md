@@ -1,5 +1,38 @@
 # Production deployments
 
+## Editor publication repair — 14 September 2026
+
+The owner reported that editor previews could not be published. The authenticated
+editor showed a saved, valid draft and an enabled Publish button. The latest
+`test new` preview built successfully, but its
+[publication workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34806595392)
+failed at 04:35 UTC with `Vercel 422: Resource cannot be processed.`
+
+The release script sent a Preview deployment directly to Vercel's production
+promotion endpoint without the required JSON body. Vercel's
+[promotion implementation](https://github.com/vercel/vercel/blob/main/packages/cli/src/commands/promote/request-promote.ts)
+rebuilds Preview deployments with production settings; direct promotion applies
+to production deployments. The workflow fallback also replaced the specific
+error with a generic message.
+
+- `902bee9` rebuilds the exact reviewed deployment for production, records the new
+  deployment ID before waiting, checks for a previous build after a lost receipt,
+  verifies the current production assignment, and uses the rollback endpoint
+  when restoring a release.
+- `4beb61d` preserves the specific release error in the editor.
+- All 238 tests passed, including 12 new publication/recovery/error tests. The
+  production build and lint of the changed files passed.
+- Vercel reported a successful **Production** deployment for
+  `4beb61deba2f106d30f3b2d9520c833cf32e6694` at 04:44:50 UTC:
+  [deployment details](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/Atop9BNMgwzGLBT7atAJdMZrNYar),
+  [immutable application](https://turnright-mlbjivljt-muhammed-abdulhadi-s-projects.vercel.app/).
+- The public application and editor returned 200; all 22 assets for
+  `lasu-4e4c8008b38b` matched their declared sizes and checksums.
+
+This deploy repairs the publishing code. The owner's campus preview remains
+unpublished; a real publication through the corrected workflow still requires
+the owner's next Publish action. No database migration was needed.
+
 ## Editor reliability and review update — 14 September 2026
 
 The owner requested focused commits and production deployment. Fifteen
