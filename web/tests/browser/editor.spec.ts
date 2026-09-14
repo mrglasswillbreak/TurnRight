@@ -700,7 +700,7 @@ test('prepared public map reopens in 3D offline with its saved view preference',
       )?.properties?.displayHeight;
     }),
   ).toBe(6);
-  await page.getByRole('button', { name: '2D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await page.reload();
   await attachMap(page);
   await expect
@@ -1756,8 +1756,8 @@ for (const phone of [false, true])
     await page.screenshot({
       path: `test-results/miniature-${phone ? 'phone' : 'desktop'}-dark.png`,
     });
-    await page.getByLabel('3D rendering options').click();
-    await page.getByRole('radio', { name: 'Simple · building blocks' }).check();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page.getByRole('radio', { name: 'Simple', exact: true }).check();
     await expect
       .poll(() =>
         page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
@@ -1765,14 +1765,15 @@ for (const phone of [false, true])
       .toBe(false);
     await page.reload();
     await attachMap(page);
-    await page.getByLabel('3D rendering options').click();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await expect(
-      page.getByRole('radio', { name: 'Simple · building blocks' }),
+      page.getByRole('radio', { name: 'Simple', exact: true }),
     ).toBeChecked();
+    await page.getByRole('radio', { name: 'Enhanced', exact: true }).check();
     await page
-      .getByRole('radio', { name: 'Enhanced · automatic detail' })
-      .check();
-    await page.getByLabel('3D rendering options').click();
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Close', exact: true })
+      .click();
     await focusModels(page, phone);
     await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14 }));
     await expect
@@ -1782,7 +1783,9 @@ for (const phone of [false, true])
         ),
       )
       .not.toContain('arcgis:University_Property:120');
-    await page.getByRole('button', { name: '2D', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Switch to 2D', exact: true })
+      .click();
     await expect
       .poll(() =>
         page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
@@ -1795,7 +1798,7 @@ test('miniature models fall back for unavailable sectors and keep drawing unobst
 }) => {
   test.setTimeout(120000);
   const { campus } = await setup(page, true, true);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await focusModels(page);
   const roof = await position(page, [3.19978, 6.47109]);
   await page.mouse.click(roof.x, roof.y - 12);
@@ -1834,7 +1837,9 @@ test('miniature models fall back for unavailable sectors and keep drawing unobst
       pitch: 50,
     }),
   );
-  await expect(page.getByLabel('3D rendering options')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Switch to 2D', exact: true }),
+  ).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -1908,7 +1913,9 @@ for (const touch of [false, true])
           ),
         )
         .toBeGreaterThan(0);
-      await page.getByRole('button', { name: '3D', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Switch to 3D', exact: true })
+        .click();
       await expect
         .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
         .toBeGreaterThan(45);
@@ -1977,7 +1984,7 @@ test('public map defaults to 3D, frames campus and opens building details', asyn
   });
   expect(heights).toContainEqual(['unknown-building', 6, 'illustrative']);
   expect(heights).toContainEqual(['library', 15, 'recorded']);
-  await page.getByRole('button', { name: '2D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await page.reload();
   await attachMap(page);
   await expect
@@ -2052,7 +2059,9 @@ test('public phone starts at 40 degrees and frames campus in both preferences', 
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
       .toBe(40);
-    await page.getByRole('button', { name: '2D', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Switch to 2D', exact: true })
+      .click();
     await page.reload();
     await attachMap(page);
     await expect
@@ -2142,7 +2151,9 @@ for (const threeD of [false, true])
     const server = await setup(page);
     await focusCampus(page);
     if (threeD) {
-      await page.getByRole('button', { name: '3D', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Switch to 3D', exact: true })
+        .click();
       await expect
         .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
         .toBeGreaterThan(45);
@@ -2267,7 +2278,7 @@ test('edits a path vertex in 3D with undo and redo across autosave', async ({
   const server = await setup(page);
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
@@ -2309,7 +2320,7 @@ test('renders the full campus in both appearances and keeps camera on draft upda
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await setup(page, true);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
@@ -2337,7 +2348,7 @@ test('recovers unfinished geometry and preserves it when switching 2D/3D', async
   await focusCampus(page);
   await clickMap(page, [3.2005, 6.4601]);
   await clickMap(page, [3.2006, 6.4601]);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect(page.locator('.editor-save-state')).toHaveText('Saved locally');
   await page.reload();
   await attachMap(page);
@@ -2355,7 +2366,7 @@ test('supports dark appearance and small-screen review', async ({ page }) => {
   await page.screenshot({ path: 'test-results/editor-dark.png' });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(
-    page.getByRole('button', { name: '3D', exact: true }),
+    page.getByRole('button', { name: 'Switch to 3D', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Sources', exact: true }).click();
   await expect(
@@ -2378,10 +2389,8 @@ test('building appearance: integrated view, surface inheritance, live preview, r
     page.getByRole('button', { name: 'Appearance', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
   expect(state.edits()).toHaveLength(0);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
-  await expect(
-    page.getByRole('group', { name: 'Map view', exact: true }),
-  ).toHaveCount(1);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await expect(page.locator('button.map-view-control')).toHaveCount(1);
   await expect(
     page.getByRole('button', { name: 'Enhanced 3D', exact: true }),
   ).toHaveCount(0);
@@ -2436,9 +2445,9 @@ test('building appearance: integrated view, surface inheritance, live preview, r
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
   await page.getByLabel('Point elevation (m)').fill('14');
-  await page.getByRole('button', { name: '2D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Apply roof' })).toBeEnabled();
   await page.reload();
   await attachMap(page);
@@ -2472,7 +2481,7 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   const rendered = () =>
     page.evaluate(() =>
       JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
@@ -2565,7 +2574,9 @@ test.describe('building roof touch editing', () => {
     const collapse = page.getByRole('button', { name: 'Collapse explorer' });
     if (await collapse.isVisible()) await collapse.click();
     await clickMap(page, [3.20012, 6.46022]);
-    await page.getByRole('button', { name: '3D', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Switch to 3D', exact: true })
+      .click();
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -2573,9 +2584,11 @@ test.describe('building roof touch editing', () => {
         ),
       )
       .toContain('library');
-    await page.getByLabel('3D rendering options').click();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByLabel('Building opacity', { exact: true }).fill('0.25');
-    await page.getByLabel('3D rendering options').click();
+    await page
+      .getByRole('button', { name: 'Close settings', exact: true })
+      .click();
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -2684,7 +2697,7 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
-  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
   await page
     .getByLabel('Wall', { exact: true })
@@ -2748,4 +2761,231 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     saved.edits.find((e: MapEdit) => e.id === 'library').properties.appearance
       .roofs['library:wing:0'].points[0].elevation,
   ).toBe(14);
+});
+
+test('view settings: single button, keyboard switching and shared preferences', async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  const toggle = page.locator('button.map-view-control');
+  await expect(toggle).toHaveCount(1);
+  await expect(toggle).toHaveAccessibleName('Switch to 2D');
+  await expect(toggle).toHaveText('2D');
+  await expect(page.locator('.map-rendering-options')).toHaveCount(0);
+  await toggle.press('Enter');
+  await expect(toggle).toHaveAccessibleName('Switch to 3D');
+  await expect(toggle).toHaveText('3D');
+  await toggle.press('Space');
+  await expect(toggle).toHaveAccessibleName('Switch to 2D');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByRole('radio', { name: 'Enhanced', exact: true }),
+  ).toBeChecked();
+  await page.getByRole('radio', { name: 'Simple', exact: true }).check();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Close', exact: true })
+    .click();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByRole('radio', { name: 'Simple', exact: true }),
+  ).toBeChecked();
+  await page.goto('/admin');
+  await attachMap(page);
+  await expect(toggle).toHaveAccessibleName('Switch to 3D');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByRole('radio', { name: 'Simple', exact: true }),
+  ).toBeChecked();
+  await expect(page.getByLabel('Map tilt', { exact: true })).toBeDisabled();
+  await page.getByRole('radio', { name: 'Enhanced', exact: true }).check();
+  await page
+    .getByRole('button', { name: 'Close settings', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Settings', exact: true }),
+  ).toBeFocused();
+  await page.goto('/');
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByRole('radio', { name: 'Enhanced', exact: true }),
+  ).toBeChecked();
+  await page.evaluate(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('Storage blocked', 'SecurityError');
+    };
+  });
+  await page.getByRole('radio', { name: 'Simple', exact: true }).check();
+  await expect(
+    page.getByRole('radio', { name: 'Simple', exact: true }),
+  ).toBeChecked();
+  await page.screenshot({ path: 'test-results/view-settings-public.png' });
+});
+
+test('view settings: preserves the map, roof selection and unfinished drawing', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const state = await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page.getByRole('button', { name: 'Create custom roof' }).click();
+  await page
+    .getByRole('button', { name: 'Add point with coordinates' })
+    .click();
+  await page.getByLabel('Point elevation (m)').fill('14');
+  await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
+  const selectedPoint = await page.getByLabel('Control point').inputValue();
+  const camera = await page.evaluate(() => ({
+    center: window.editorTestMap.getCenter().toArray(),
+    bearing: window.editorTestMap.getBearing(),
+    pitch: window.editorTestMap.getPitch(),
+    zoom: window.editorTestMap.getZoom(),
+  }));
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(page.getByLabel('Point elevation (m)')).toBeHidden();
+  await expect(page.getByLabel('Map tilt', { exact: true })).toHaveValue(
+    String(camera.pitch),
+  );
+  await page.getByRole('radio', { name: 'Simple', exact: true }).check();
+  await page.getByRole('radio', { name: 'Enhanced', exact: true }).check();
+  await page.getByLabel('Building opacity', { exact: true }).fill('0.35');
+  await page
+    .getByRole('button', { name: 'Close settings', exact: true })
+    .click();
+  await expect(page.getByLabel('Control point')).toHaveValue(selectedPoint);
+  await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
+  await expect(
+    page.getByRole('button', { name: 'Draw ridge', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  expect(
+    await page.evaluate(() => ({
+      center: window.editorTestMap.getCenter().toArray(),
+      bearing: window.editorTestMap.getBearing(),
+      pitch: window.editorTestMap.getPitch(),
+      zoom: window.editorTestMap.getZoom(),
+    })),
+  ).toEqual(camera);
+  expect(
+    await page.evaluate(
+      () =>
+        window.editorTestMap.getCanvas() ===
+        document.querySelector('.maplibregl-canvas'),
+    ),
+  ).toBe(true);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByLabel('Building opacity', { exact: true }),
+  ).toHaveValue('0.35');
+  await page.getByLabel('Map tilt', { exact: true }).fill('36');
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBe(36);
+  await page.evaluate(() => window.editorTestMap.setPitch(43));
+  await expect(page.getByLabel('Map tilt', { exact: true })).toHaveValue('43');
+  await page.screenshot({ path: 'test-results/view-settings-editor.png' });
+  await page
+    .getByRole('button', { name: 'Close settings', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Cancel roof', exact: true }).click();
+  await page.getByRole('button', { name: 'Close properties' }).click();
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
+  await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+  await clickMap(page, [3.2005, 6.4601]);
+  await clickMap(page, [3.2006, 6.4601]);
+  await expect(page.locator('.drawing-progress')).toContainText(
+    '2 points placed',
+  );
+  const progress = await page.locator('.drawing-progress').innerText();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(page.getByLabel('Map tilt', { exact: true })).toBeDisabled();
+  await page
+    .getByRole('button', { name: 'Close settings', exact: true })
+    .click();
+  await expect(page.locator('.drawing-progress')).toHaveText(progress);
+  await expect(
+    page.getByRole('button', { name: 'Finish', exact: true }),
+  ).toBeEnabled();
+  expect(state.edits()).toHaveLength(0);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Resume drawing' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Finish', exact: true }),
+  ).toBeEnabled();
+});
+
+test.describe('view settings touch', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test('view settings phone: single tap toggle and accessible editor settings', async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    await setup(page);
+    const toggle = page.locator('button.map-view-control');
+    await expect(toggle).toHaveCount(1);
+    await toggle.tap();
+    await expect(toggle).toHaveAccessibleName('Switch to 2D');
+    await page.getByRole('button', { name: 'Settings', exact: true }).tap();
+    await expect(
+      page.getByRole('complementary', { name: 'Editor settings' }),
+    ).toBeVisible();
+    const header = await page.evaluate(() => ({
+      brandRight: document
+        .querySelector('.editor-brand strong')!
+        .getBoundingClientRect().right,
+      navigationLeft: document
+        .querySelector('.editor-navigation')!
+        .getBoundingClientRect().left,
+    }));
+    expect(header.brandRight).toBeLessThanOrEqual(header.navigationLeft);
+    await page.getByRole('radio', { name: 'Simple', exact: true }).tap();
+    await expect(
+      page.getByRole('radio', { name: 'Simple', exact: true }),
+    ).toBeChecked();
+    await page.getByLabel('Building opacity', { exact: true }).fill('0.4');
+    await page.screenshot({
+      path: 'test-results/view-settings-editor-phone.png',
+    });
+    await page
+      .getByRole('button', { name: 'Close settings', exact: true })
+      .tap();
+    await toggle.tap();
+    await expect(toggle).toHaveAccessibleName('Switch to 3D');
+    await page.goto('/');
+    await attachMap(page);
+    await expect(toggle).toHaveAccessibleName('Switch to 2D');
+    await toggle.tap();
+    await expect(toggle).toHaveAccessibleName('Switch to 3D');
+    await page.getByRole('button', { name: 'Settings', exact: true }).tap();
+    await expect(
+      page.getByRole('radio', { name: 'Simple', exact: true }),
+    ).toBeChecked();
+    await page.getByRole('radio', { name: 'Enhanced', exact: true }).tap();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Close', exact: true })
+      .tap();
+    await page.screenshot({
+      path: 'test-results/view-toggle-public-phone.png',
+    });
+    await expect(page.locator('.map-rendering-options')).toHaveCount(0);
+  });
 });
