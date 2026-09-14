@@ -51,7 +51,15 @@ for (const sourceFeature of buildings) {
       : sourceFeature;
   const p = feature.properties!,
     id = String(p.id),
-    record = evidence.buildings[id];
+    candidate = evidence.buildings[id],
+    record =
+      candidate &&
+      (!candidate.footprintRevisions ||
+        candidate.footprintRevisions.includes(
+          buildingRevision({ ...sourceFeature, properties: {} }),
+        ))
+        ? candidate
+        : undefined;
   const display = buildingDisplay(p),
     colours = appearanceColours(p);
   const polygons =

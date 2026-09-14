@@ -2012,7 +2012,9 @@ function Editor({
                     ]);
                     if (
                       workspace.edits !== original ||
-                      currentBase.current !== originalBase
+                      currentBase.current !== originalBase ||
+                      workspace.unfinished ||
+                      workspace.roofDraft
                     )
                       throw new Error(
                         'The draft changed. Review the appearance batch again.',
