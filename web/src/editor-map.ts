@@ -21,6 +21,7 @@ import { snapTarget, type SnapTarget } from './editor-features';
 import { distance } from './geo';
 import { drawingProgress } from './drawing-state';
 import { visualEdges } from './map-display';
+import { hasModelSelection } from './model-selection';
 
 type Interaction =
   | 'select'
@@ -54,6 +55,7 @@ export class EditorMap {
   private line: TerraDrawLineStringMode;
   private polygon: TerraDrawPolygonMode;
   private selected: MapEdit | null = null;
+  private selectedParts: string[] = [];
   private kind: MapEdit['kind'] | null = null;
   private properties: MapEdit['properties'] = {};
   private creationId = '';
@@ -218,7 +220,8 @@ export class EditorMap {
       const feature = this.draw.getSnapshotFeature(id);
       if (!feature) return;
       if (context.action !== 'draw') {
-        if (this.selected) this.callbacks.geometry(feature.geometry);
+        if (this.selected)
+          this.callbacks.geometry(this.partGeometry() || feature.geometry);
         return;
       }
       if (!this.kind) return;
@@ -272,6 +275,17 @@ export class EditorMap {
     this.draw.on('change', (_ids, type) => {
       if (this.setting || this.compare) return;
       if (!this.kind) {
+        if (type === 'delete' && this.selectedParts.length) {
+          const geometry = this.partGeometry();
+          if (geometry?.type === 'MultiPolygon' && geometry.coordinates.length)
+            this.callbacks.geometry(geometry);
+          else {
+            this.selected = null;
+            this.selectedParts = [];
+            this.callbacks.remove();
+          }
+          return;
+        }
         if (
           type === 'delete' &&
           this.selected &&
@@ -333,7 +347,8 @@ export class EditorMap {
     }
   }
   private click = (event: MapMouseEvent) => {
-    if (this.compare || this.kind) return;
+    if (this.compare || this.kind || hasModelSelection(event.originalEvent))
+      return;
     if (this.interaction !== 'select') {
       const target = this.snap([event.lngLat.lng, event.lngLat.lat]);
       if (target) this.callbacks.connect(target, this.interaction);
@@ -396,20 +411,46 @@ export class EditorMap {
     this.selected = edit;
     this.interaction = 'select';
     this.draw.clear();
+    this.selectedParts = [];
     if (edit && !edit.deleted) {
-      const result = this.draw.addFeatures([
-        {
-          type: 'Feature',
-          id: edit.id,
-          geometry: edit.geometry,
-          properties: { mode: modeFor(edit.geometry) },
-        } as GeoJSONStoreFeatures,
-      ]);
+      const geometries =
+        edit.geometry.type === 'MultiPolygon'
+          ? edit.geometry.coordinates.map((coordinates) => ({
+              type: 'Polygon' as const,
+              coordinates,
+            }))
+          : [edit.geometry];
+      if (edit.geometry.type === 'MultiPolygon')
+        this.selectedParts = geometries.map(
+          (_, index) => `${edit.id}:part:${index}`,
+        );
+      const result = this.draw.addFeatures(
+        geometries.map(
+          (geometry, index) =>
+            ({
+              type: 'Feature',
+              id: this.selectedParts[index] || edit.id,
+              geometry,
+              properties: { mode: modeFor(geometry) },
+            }) as GeoJSONStoreFeatures,
+        ),
+      );
       this.draw.setMode(this.compare ? 'render' : 'select');
-      if (!this.compare && result[0]?.valid) this.draw.selectFeature(edit.id);
+      if (!this.compare && result[0]?.valid)
+        this.draw.selectFeature(this.selectedParts[0] || edit.id);
     } else this.draw.setMode(this.compare ? 'render' : 'select');
     this.setting = false;
     this.targets(false);
+  }
+  private partGeometry(): Geometry | undefined {
+    if (!this.selectedParts.length) return;
+    const polygons = this.selectedParts
+      .map((id) => this.draw.getSnapshotFeature(id)?.geometry)
+      .filter((g) => g?.type === 'Polygon');
+    return {
+      type: 'MultiPolygon',
+      coordinates: polygons.map((g) => g.coordinates),
+    };
   }
   begin(
     kind: MapEdit['kind'],
@@ -421,6 +462,7 @@ export class EditorMap {
     this.setting = true;
     this.draw.clear();
     this.selected = null;
+    this.selectedParts = [];
     this.kind = kind;
     this.creationId = id;
     this.properties = properties;

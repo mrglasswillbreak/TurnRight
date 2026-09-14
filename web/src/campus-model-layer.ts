@@ -1,0 +1,369 @@
+import {
+  AmbientLight,
+  BufferGeometry,
+  Camera,
+  Color,
+  DirectionalLight,
+  DoubleSide,
+  Float32BufferAttribute,
+  Group,
+  Matrix4,
+  Mesh,
+  MeshLambertMaterial,
+  Raycaster,
+  Scene,
+  Vector3,
+  WebGLRenderer,
+} from 'three';
+import {
+  MercatorCoordinate,
+  type CustomLayerInterface,
+  type Map as CampusMap,
+  type PointLike,
+} from 'maplibre-gl';
+import type { CampusData, Position } from './types';
+import type { BuildingModel, SectorModels, VisualSector } from './visual-types';
+import {
+  compatibleVisual,
+  detailAtZoom,
+  visibleSectors,
+  visualLookup,
+  validBuildingModel,
+} from './building-visuals';
+import { hashBytes, ASSET_CACHE } from './offline';
+
+export interface ModelOptions {
+  data: CampusData;
+  enabled: boolean;
+  dark: boolean;
+  selectedId: string;
+  onReady: (ids: string[]) => void;
+  onReduced: () => void;
+}
+/** A single shared WebGL context. Sector meshes are decoded only while in view. */
+export function createCampusModels(map: CampusMap, initial: ModelOptions) {
+  let options = initial,
+    disposed = false,
+    reduced = false,
+    fallback = false,
+    lastFrame = 0,
+    slowFrames = 0;
+  const scene = new Scene(),
+    camera = new Camera(),
+    raycaster = new Raycaster();
+  const ambient = new AmbientLight('#fff1d5', 1.6),
+    sun = new DirectionalLight('#ffffff', 1.8);
+  sun.position.set(-80, -120, 220);
+  scene.add(ambient, sun);
+  const loaded = new Map<string, Group>(),
+    inflight = new Map<string, AbortController>(),
+    failures = new Map<string, number>();
+  const materials = new Map<
+    string,
+    { value: MeshLambertMaterial; users: number }
+  >();
+  let renderer: WebGLRenderer | undefined;
+  let indexedData = initial.data,
+    visuals = visualLookup(initial.data.visuals),
+    features = new Map(
+      initial.data.map.features.map((f) => [String(f.properties?.id), f]),
+    );
+  const anchor: Position = [
+    (initial.data.bounds[0][0] + initial.data.bounds[1][0]) / 2,
+    (initial.data.bounds[0][1] + initial.data.bounds[1][1]) / 2,
+  ];
+  const origin = MercatorCoordinate.fromLngLat(anchor),
+    scale = origin.meterInMercatorCoordinateUnits();
+  const world = new Matrix4()
+    .makeTranslation(origin.x, origin.y, origin.z)
+    .scale(new Vector3(scale, -scale, scale));
+  let readyKey = '';
+  const publish = () => {
+    const ids = [...loaded.values()]
+      .filter((g) => g.visible)
+      .flatMap((g) =>
+        g.children
+          .filter((b) => b.visible)
+          .map((b) => String(b.userData.buildingId)),
+      )
+      .sort();
+    const key = ids.join('|');
+    if (key !== readyKey) {
+      readyKey = key;
+      options.onReady(ids);
+    }
+  };
+  function release(group: Group) {
+    scene.remove(group);
+    group.traverse((object) => {
+      if (object instanceof Mesh) {
+        object.geometry.dispose();
+        const entry = materials.get(object.userData.materialKey);
+        if (entry && --entry.users === 0) {
+          entry.value.dispose();
+          materials.delete(object.userData.materialKey);
+        }
+      }
+    });
+  }
+  function material(colour: string) {
+    let entry = materials.get(colour);
+    if (!entry) {
+      entry = {
+        value: new MeshLambertMaterial({
+          color: colour,
+          side: DoubleSide,
+          flatShading: true,
+        }),
+        users: 0,
+      };
+      materials.set(colour, entry);
+    }
+    entry.users++;
+    return entry.value;
+  }
+  function building(model: BuildingModel) {
+    if (!validBuildingModel(model))
+      throw new Error('Invalid campus model geometry.');
+    const group = new Group(),
+      at = MercatorCoordinate.fromLngLat(model.origin);
+    group.userData.buildingId = model.id;
+    group.userData.revision = model.geometryRevision;
+    group.position.set(
+      (at.x - origin.x) / scale,
+      -(at.y - origin.y) / scale,
+      0,
+    );
+    group.scale.setScalar(at.meterInMercatorCoordinateUnits() / scale);
+    for (const part of model.meshes) {
+      const geometry = new BufferGeometry();
+      geometry.setAttribute(
+        'position',
+        new Float32BufferAttribute(part.positions, 3),
+      );
+      geometry.setIndex(part.indices);
+      geometry.computeVertexNormals();
+      geometry.computeBoundingSphere();
+      const mesh = new Mesh(geometry, material(part.colour));
+      mesh.userData = {
+        buildingId: model.id,
+        detail: part.detail,
+        materialKey: part.colour,
+      };
+      group.add(mesh);
+    }
+    return group;
+  }
+  async function load(sector: VisualSector) {
+    const controller = new AbortController();
+    inflight.set(sector.id, controller);
+    let group: Group | undefined;
+    try {
+      if (
+        !/^\/packages\/visual-[a-f0-9]+\/[a-z0-9-]+\.json$/.test(sector.url) ||
+        sector.bytes > 12 * 1024 * 1024
+      )
+        throw new Error('Invalid visual sector.');
+      const cache = await caches.open(ASSET_CACHE).catch(() => null);
+      const response =
+        (await cache?.match(sector.url)) ||
+        (await fetch(sector.url, {
+          signal: AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(15000),
+          ]),
+        }));
+      if (!response.ok) throw new Error('Model unavailable');
+      const bytes = await response.arrayBuffer();
+      if (
+        bytes.byteLength !== sector.bytes ||
+        (await hashBytes(bytes)) !== sector.sha256
+      )
+        throw new Error('Model integrity check failed');
+      const payload = JSON.parse(
+        new TextDecoder().decode(bytes),
+      ) as SectorModels;
+      if (
+        payload.schemaVersion !== 1 ||
+        payload.id !== sector.id ||
+        !Array.isArray(payload.models) ||
+        payload.models.length > 400
+      )
+        throw new Error('Invalid sector');
+      if (disposed || controller.signal.aborted) return;
+      group = new Group();
+      for (const model of payload.models) {
+        if (!sector.buildingIds.includes(model.id))
+          throw new Error('Unexpected building identity');
+        group.add(building(model));
+      }
+      loaded.set(sector.id, group);
+      scene.add(group);
+      failures.delete(sector.id);
+    } catch {
+      if (group) release(group);
+      if (!controller.signal.aborted) failures.set(sector.id, Date.now());
+    } finally {
+      inflight.delete(sector.id);
+      if (!disposed) {
+        refresh();
+        map.triggerRepaint();
+      }
+    }
+  }
+  function refresh() {
+    if (disposed) return;
+    const mode =
+      options.enabled && !fallback
+        ? detailAtZoom(map.getZoom(), reduced)
+        : 'extrusion';
+    const bounds = map.getBounds();
+    const catalogue = options.data.visuals;
+    const visible =
+      mode === 'extrusion'
+        ? []
+        : visibleSectors(catalogue?.sectors || [], [
+            [bounds.getWest(), bounds.getSouth()],
+            [bounds.getEast(), bounds.getNorth()],
+          ]);
+    const wanted = new Set(visible.map((s) => s.id));
+    for (const [id, request] of inflight) if (!wanted.has(id)) request.abort();
+    for (const [id, group] of loaded)
+      if (!wanted.has(id)) {
+        release(group);
+        loaded.delete(id);
+      }
+    if (indexedData !== options.data) {
+      indexedData = options.data;
+      visuals = visualLookup(catalogue);
+      features = new Map(
+        options.data.map.features.map((f) => [String(f.properties?.id), f]),
+      );
+    }
+    for (const sector of loaded.values())
+      for (const child of sector.children) {
+        const id = String(child.userData.buildingId),
+          feature = features.get(id),
+          visual = visuals.get(id);
+        child.visible =
+          !!feature &&
+          compatibleVisual(feature, visual) &&
+          child.userData.revision === visual?.geometryRevision;
+        for (const mesh of child.children) {
+          mesh.visible = !(mesh.userData.detail && mode !== 'detailed');
+        }
+      }
+    ambient.intensity = options.dark ? 1.15 : 1.6;
+    sun.intensity = options.dark ? 0.9 : 1.8;
+    ambient.color.set(options.dark ? '#becbd8' : '#fff1d5');
+    for (const [colour, entry] of materials)
+      entry.value.color
+        .copy(new Color(colour))
+        .multiplyScalar(options.dark ? 0.8 : 1);
+    for (const sector of loaded.values())
+      for (const child of sector.children)
+        for (const object of child.children)
+          if (object instanceof Mesh) {
+            // A shared material cannot carry per-building selection; selection stays in the map's marker and outline layers.
+            object.renderOrder = object.userData.detail ? 1 : 0;
+          }
+    publish();
+    for (const sector of visible)
+      if (
+        inflight.size < 3 &&
+        !loaded.has(sector.id) &&
+        !inflight.has(sector.id) &&
+        Date.now() - (failures.get(sector.id) || 0) > 30000
+      )
+        void load(sector);
+  }
+  const layer: CustomLayerInterface = {
+    id: 'campus-models',
+    type: 'custom',
+    renderingMode: '3d',
+    onAdd(_map, gl) {
+      renderer = new WebGLRenderer({
+        canvas: map.getCanvas(),
+        context: gl as WebGL2RenderingContext,
+      });
+      renderer.autoClear = false;
+      refresh();
+    },
+    render(_gl, args) {
+      if (!renderer || disposed || fallback) return;
+      camera.projectionMatrix
+        .fromArray(args.defaultProjectionData.mainMatrix)
+        .multiply(world);
+      renderer.resetState();
+      try {
+        renderer.render(scene, camera);
+      } catch {
+        fallback = true;
+        options.onReduced();
+        refresh();
+        map.triggerRepaint();
+      }
+      renderer.resetState();
+      if (map.isMoving()) {
+        const now = performance.now(),
+          interval = now - lastFrame,
+          hadFrame = lastFrame > 0;
+        lastFrame = now;
+        if (hadFrame && interval > 38) slowFrames++;
+        else slowFrames = Math.max(0, slowFrames - 1);
+        if (slowFrames >= 12 && !reduced) {
+          reduced = true;
+          options.onReduced();
+          refresh();
+        }
+        if (slowFrames >= 24 && !fallback) {
+          fallback = true;
+          options.onReduced();
+          refresh();
+          map.triggerRepaint();
+        }
+      } else lastFrame = 0;
+    },
+    onRemove() {
+      renderer?.dispose();
+    },
+  };
+  map.addLayer(layer, 'barriers');
+  map.on('moveend', refresh);
+  map.on('zoom', refresh);
+  return {
+    update(next: ModelOptions) {
+      options = next;
+      refresh();
+      map.triggerRepaint();
+    },
+    pick(point: PointLike): string | undefined {
+      if (!options.enabled || !readyKey) return;
+      const p = Array.isArray(point) ? { x: point[0], y: point[1] } : point;
+      const x = (p.x / map.getCanvas().clientWidth) * 2 - 1,
+        y = 1 - (p.y / map.getCanvas().clientHeight) * 2;
+      const inverse = camera.projectionMatrix.clone().invert();
+      const near = new Vector3(x, y, -1).applyMatrix4(inverse),
+        far = new Vector3(x, y, 1).applyMatrix4(inverse);
+      raycaster.ray.set(near, far.sub(near).normalize());
+      scene.updateMatrixWorld(true);
+      const objects = [...loaded.values()].flatMap((s) =>
+        s.children.filter((c) => c.visible),
+      );
+      return raycaster
+        .intersectObjects(objects, true)
+        .find((hit) => hit.object.visible)?.object.userData.buildingId;
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      map.off('moveend', refresh);
+      map.off('zoom', refresh);
+      for (const c of inflight.values()) c.abort();
+      for (const group of loaded.values()) release(group);
+      loaded.clear();
+      if (map.getLayer(layer.id)) map.removeLayer(layer.id);
+      options.onReady([]);
+    },
+  };
+}

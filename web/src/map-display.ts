@@ -1,6 +1,8 @@
 import type { Feature, FeatureCollection } from 'geojson';
 import { appearanceColours } from './map-palette.js';
 import type { CampusData, GraphEdge, Place } from './types.js';
+import type { VisualCatalogue } from './visual-types.js';
+import { compatibleVisual, visualLookup } from './building-visuals.js';
 
 export type BuildingDisplay = {
   metres: number;
@@ -36,23 +38,48 @@ export function buildingDisplay(
   };
 }
 /** Display properties are never written back to campus or correction records. */
-export function displayGeometry(map: FeatureCollection): FeatureCollection {
+export function displayGeometry(
+  map: FeatureCollection,
+  catalogue?: VisualCatalogue,
+): FeatureCollection {
+  const lookup = visualLookup(catalogue);
   return {
     ...map,
-    features: map.features.map((feature) => {
-      if (feature.properties?.kind !== 'building') return feature;
+    features: map.features.flatMap((feature): Feature[] => {
+      if (feature.properties?.kind !== 'building') return [feature];
       const height = buildingDisplay(feature.properties);
       const colours = appearanceColours(feature.properties || {});
-      return {
+      const candidate = lookup.get(String(feature.properties?.id));
+      const visual = compatibleVisual(feature, candidate)
+        ? candidate
+        : undefined;
+      const displayed = {
         ...feature,
         properties: {
           ...feature.properties,
-          displayHeight: height.metres,
-          heightKind: height.kind,
-          displayWall: colours.wall,
-          displayRoof: colours.roof,
+          displayHeight: visual?.height ?? height.metres,
+          heightKind: visual?.heightKind ?? height.kind,
+          displayWall: visual?.wallColour ?? colours.wall,
+          displayRoof: visual?.roofColour ?? colours.roof,
         },
       };
+      if (visual?.partHeights && feature.geometry.type === 'MultiPolygon')
+        return feature.geometry.coordinates.map((coordinates, index) => {
+          const part = visual.partHeights![index];
+          return {
+            ...displayed,
+            geometry: { type: 'Polygon', coordinates },
+            properties: {
+              ...displayed.properties,
+              displayHeight: part?.height ?? displayed.properties.displayHeight,
+              heightKind: part?.kind ?? displayed.properties.heightKind,
+              ...(part?.kind === 'illustrative'
+                ? { displayWall: '#d4d5c3', displayRoof: '#a6b19f' }
+                : {}),
+            },
+          };
+        });
+      return [displayed];
     }),
   };
 }

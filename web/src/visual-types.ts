@@ -18,6 +18,11 @@ export interface BuildingVisual {
   height: number;
   heightKind: 'recorded' | 'floor-derived' | 'observed-floors' | 'illustrative';
   floors?: number;
+  partHeights?: {
+    height: number;
+    kind: BuildingVisual['heightKind'];
+    floors?: number;
+  }[];
   roofForm: RoofForm;
   wallColour: string;
   roofColour: string;

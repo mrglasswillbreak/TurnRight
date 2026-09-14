@@ -9,10 +9,13 @@ import type {
 } from 'maplibre-gl';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import './models.css';
+import { markModelSelection } from './model-selection';
 import type { CampusData, GpsFix, Place, Route } from './types';
 import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
 import { campusPalette } from './map-palette';
+import type { createCampusModels } from './campus-model-layer';
 import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
@@ -27,6 +30,7 @@ export interface MapViewProps {
   threeD?: boolean;
   editor?: boolean;
   buildingOpacity?: number;
+  editing?: boolean;
   follow?: boolean;
   motionActive?: boolean;
   panelBesideMap?: boolean;
@@ -45,6 +49,7 @@ export function MapView({
   threeD = false,
   editor = false,
   buildingOpacity = 0.92,
+  editing = false,
   follow = false,
   motionActive = false,
   panelBesideMap = false,
@@ -64,7 +69,20 @@ export function MapView({
   });
   callbacks.current = { onSelect, onBuildingSelect, onManualPan, onReady };
   const ready = useRef(false);
-  const campusGeometry = useMemo(() => displayGeometry(data.map), [data.map]);
+  const models = useRef<ReturnType<typeof createCampusModels> | null>(null);
+  const [modelIds, setModelIds] = useState<string[]>([]),
+    [reduced, setReduced] = useState(false);
+  const [simple, setSimple] = useState(() => {
+    try {
+      return localStorage.getItem('turnright:simple-3d') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const campusGeometry = useMemo(
+    () => displayGeometry(data.map, data.visuals),
+    [data.map, data.visuals],
+  );
   const placesGeometry = useMemo(
     () => placeFeatures(data.places),
     [data.places],
@@ -146,6 +164,7 @@ export function MapView({
               : 45
           : 0,
         maxPitch: 60,
+        canvasContextAttributes: { antialias: true },
       });
       setMapError('');
     } catch {
@@ -514,8 +533,33 @@ export function MapView({
         },
         'places-label-selected',
       );
-      if (!editor) {
+      if (editor) {
         map.on('click', (event) => {
+          const id = models.current?.pick(event.point);
+          const feature =
+            id &&
+            latestData.current.map.features.find(
+              (f) => f.properties?.id === id,
+            );
+          if (feature && callbacks.current.onBuildingSelect) {
+            markModelSelection(event.originalEvent);
+            callbacks.current.onBuildingSelect(feature);
+          }
+        });
+      } else {
+        map.on('click', (event) => {
+          const modelId = models.current?.pick(event.point);
+          const model =
+            modelId &&
+            latestData.current.map.features.find(
+              (f) => f.properties?.id === modelId,
+            );
+          if (model) {
+            const linked = buildingPlace(latestData.current, model);
+            if (linked) callbacks.current.onSelect(linked);
+            else callbacks.current.onBuildingSelect?.(model);
+            return;
+          }
           const hits = map.queryRenderedFeatures(event.point, {
             layers: [
               'places-dot',
@@ -582,6 +626,8 @@ export function MapView({
       setMotionMap(null);
       // Drawing adapters must release their layers while the map still owns its sources.
       disposeExtension?.();
+      models.current?.dispose();
+      models.current = null;
       map.remove();
       mapRef.current = null;
       ready.current = false;
@@ -668,7 +714,12 @@ export function MapView({
     if (!map) return;
     const apply = () => {
       if (!map.getLayer('buildings-3d')) return;
-      map.setFilter('buildings-3d', ['==', ['get', 'kind'], 'building']);
+      for (const layer of ['buildings-3d', 'building-roofs'])
+        map.setFilter(layer, [
+          'all',
+          ['==', ['get', 'kind'], 'building'],
+          ['!', ['in', ['get', 'id'], ['literal', modelIds]]],
+        ]);
       map.setPaintProperty('buildings-3d', 'fill-extrusion-height', [
         'get',
         'displayHeight',
@@ -728,7 +779,51 @@ export function MapView({
     return () => {
       map.off('load', apply);
     };
-  }, [editor, buildingOpacity, dark, selectedId, selectedBuildingId]);
+  }, [editor, buildingOpacity, dark, selectedId, selectedBuildingId, modelIds]);
+  const modelOptions = useRef({
+    data,
+    enabled: false,
+    dark,
+    selectedId: selectedBuildingId,
+    onReady: setModelIds,
+    onReduced: () => setReduced(true),
+  });
+  modelOptions.current = {
+    data,
+    enabled: threeD && !simple && !editing && buildingOpacity >= 0.7,
+    dark,
+    selectedId: selectedBuildingId,
+    onReady: setModelIds,
+    onReduced: () => setReduced(true),
+  };
+  useEffect(() => {
+    if (!motionMap || !data.visuals || !threeD || simple) return;
+    let cancelled = false;
+    void import('./campus-model-layer')
+      .then(({ createCampusModels }) => {
+        if (cancelled || mapRef.current !== motionMap) return;
+        models.current = createCampusModels(motionMap, modelOptions.current);
+      })
+      .catch(() => {
+        if (!cancelled) setReduced(true);
+      });
+    return () => {
+      cancelled = true;
+      models.current?.dispose();
+      models.current = null;
+    };
+  }, [motionMap, data.visuals?.revision, threeD, simple]);
+  useEffect(() => {
+    models.current?.update(modelOptions.current);
+  }, [
+    data,
+    dark,
+    threeD,
+    simple,
+    editing,
+    buildingOpacity,
+    selectedBuildingId,
+  ]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -879,6 +974,31 @@ export function MapView({
         ref={container}
         aria-label="Interactive map of LASU Ojo campus"
       />
+      {threeD && data.visuals && (
+        <div className={`map-quality ${editor ? 'in-editor' : ''}`}>
+          <button
+            aria-pressed={simple}
+            onClick={() => {
+              const next = !simple;
+              setSimple(next);
+              try {
+                localStorage.setItem('turnright:simple-3d', String(next));
+              } catch {
+                /* Preference is optional. */
+              }
+            }}
+          >
+            {simple ? 'Simple 3D' : 'Enhanced 3D'}
+          </button>
+          <small>
+            {simple
+              ? 'Tap for architectural detail'
+              : reduced
+                ? 'Detail reduced for smoother movement'
+                : 'Auto detail · local models'}
+          </small>
+        </div>
+      )}
       {mapError && (
         <div className="map-error" role="alert">
           {mapError}
