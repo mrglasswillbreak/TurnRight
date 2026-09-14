@@ -180,19 +180,20 @@ export default function Admin({
       return [
         loaded.context.state,
         { features: loaded.context.sources },
+        loaded.offline,
       ] as const;
     };
     void Promise.all([
       load(),
       getPreference<WorkspaceRecovery | null>(key, null),
     ])
-      .then(([[result, source], recovery]) => {
+      .then(([[result, source, offline], recovery]) => {
         if (request !== generation.current) return;
         setSources(source.features);
         setState(result);
         setWorkspace(
           new EditorWorkspace(
-            result.edits,
+            offline && recovery ? recovery.saved : result.edits,
             (batch) => api<MapEdit[]>('save-edits', batch),
             (snapshot) => setPreference(key, snapshot),
             recovery,
@@ -1864,7 +1865,37 @@ function Editor({
             simple={simple3D}
             onView={toggleView}
             onSimple={setSimple3D}
-          />
+          >
+            {threeD && (
+              <>
+                <label className="viewport-setting" title="Map tilt">
+                  Tilt
+                  <input
+                    aria-label="Map tilt"
+                    type="range"
+                    min={15}
+                    max={60}
+                    defaultValue={50}
+                    onChange={(e) =>
+                      mapRef.current?.setPitch(Number(e.target.value))
+                    }
+                  />
+                </label>
+                <label className="viewport-setting" title="Building opacity">
+                  Buildings
+                  <input
+                    aria-label="Building opacity"
+                    type="range"
+                    min={0.1}
+                    max={1}
+                    step={0.05}
+                    value={opacity}
+                    onChange={(e) => setOpacity(Number(e.target.value))}
+                  />
+                </label>
+              </>
+            )}
+          </MapViewControl>
           <button
             className="editor-icon"
             aria-label="Zoom in"
@@ -1900,31 +1931,6 @@ function Editor({
               >
                 <ChevronLeft size={18} />
               </button>
-              <label title="Map tilt">
-                Tilt
-                <input
-                  aria-label="Map tilt"
-                  type="range"
-                  min={15}
-                  max={60}
-                  defaultValue={50}
-                  onChange={(e) =>
-                    mapRef.current?.setPitch(Number(e.target.value))
-                  }
-                />
-              </label>
-              <label title="Building opacity">
-                Buildings
-                <input
-                  aria-label="Building opacity"
-                  type="range"
-                  min={0.1}
-                  max={1}
-                  step={0.05}
-                  value={opacity}
-                  onChange={(e) => setOpacity(Number(e.target.value))}
-                />
-              </label>
             </>
           )}
           <button

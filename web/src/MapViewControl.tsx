@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import './map-view-control.css';
 
 export function useSimple3D() {
@@ -33,11 +33,13 @@ export function MapViewControl({
   simple,
   onView,
   onSimple,
+  children,
 }: {
   threeD: boolean;
   simple: boolean;
   onView: (value: boolean) => void;
   onSimple: (value: boolean) => void;
+  children?: ReactNode;
 }) {
   return (
     <fieldset
@@ -78,6 +80,7 @@ export function MapViewControl({
             />
             Simple · building blocks
           </label>
+          {children}
         </fieldset>
       </details>
     </fieldset>
