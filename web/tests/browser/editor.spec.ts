@@ -808,6 +808,9 @@ import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { campusFixture } from '../fixture';
 import type { CampusData, MapEdit, Position } from '../../src/types';
+import { createBuildingModel } from '../../src/building-model';
+import { buildingRevision } from '../../src/building-visuals';
+import type { BuildingVisual } from '../../src/visual-types';
 
 function browserCampus(): CampusData {
   const data = campusFixture();
@@ -1794,6 +1797,195 @@ for (const phone of [false, true])
       .toBe(false);
     expect(errors).toEqual([]);
   });
+for (const editor of [false, true])
+  test(`enhanced zoom restores visible facade detail on the ${editor ? 'editor' : 'public map'}`, async ({
+    page,
+  }) => {
+    test.setTimeout(150000);
+    const sectorUrl = '/packages/visual-abcdef/zoom-test.json';
+    let sectorBody = '';
+    await page
+      .context()
+      .route(`**${sectorUrl}`, (route) =>
+        route.fulfill({ body: sectorBody, contentType: 'application/json' }),
+      );
+    await setup(page, false, false, {
+      mutateCampus(data) {
+        const feature = data.map.features.find(
+          (f) => f.properties?.id === 'library',
+        )!;
+        const visual: BuildingVisual = {
+          id: 'library',
+          name: 'Library',
+          geometryRevision: buildingRevision(feature),
+          level: 'detailed',
+          height: 15,
+          heightKind: 'recorded',
+          roofForm: 'hip',
+          wallColour: '#ddccbb',
+          roofColour: '#aa5533',
+          confidence: 'inferred',
+          sources: [],
+          observed: [],
+          inferred: [],
+          needed: [],
+          sectorId: 'zoom-test',
+        };
+        sectorBody = JSON.stringify({
+          schemaVersion: 1,
+          id: 'zoom-test',
+          models: [
+            createBuildingModel(
+              feature as import('geojson').Feature<import('geojson').Polygon>,
+              visual,
+            ),
+          ],
+        });
+        const bytes = Buffer.byteLength(sectorBody);
+        data.visuals = {
+          schemaVersion: 1,
+          revision: 'zoom-test',
+          buildings: [visual],
+          references: [],
+          bytes,
+          sectors: [
+            {
+              id: 'zoom-test',
+              url: sectorUrl,
+              bytes,
+              sha256: createHash('sha256').update(sectorBody).digest('hex'),
+              bounds: [
+                [3.2001, 6.4602],
+                [3.2004, 6.4604],
+              ],
+              buildingIds: ['library'],
+            },
+          ],
+        };
+      },
+    });
+    if (!editor) {
+      await page.goto('/');
+      await attachMap(page);
+    } else
+      await page
+        .getByRole('button', { name: 'Switch to 3D', exact: true })
+        .click();
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({
+        center: [3.20025, 6.4603],
+        zoom: 18,
+        pitch: 50,
+        bearing: 0,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+      }),
+    );
+    const rendered = () =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      );
+    await expect.poll(rendered).toContain('library');
+    // Count actual Three.js draw calls, not merely the presence of a model ID.
+    // Keep real camera gestures and WebGL; only simulate slow frame timing.
+    await page.evaluate(() => {
+      const map = window.editorTestMap;
+      const layer = (
+        map.getLayer('campus-models') as unknown as {
+          implementation: import('maplibre-gl').CustomLayerInterface;
+        }
+      ).implementation;
+      const render = layer.render;
+      const stats = {
+        calls: 0,
+        indices: 0,
+        moving: false,
+        slow: false,
+        reducedSeen: false,
+      };
+      (window as unknown as { zoomDetail: typeof stats }).zoomDetail = stats;
+      let clock = performance.now();
+      layer.render = function (gl, args) {
+        const draw = gl.drawElements,
+          now = performance.now;
+        stats.calls = 0;
+        stats.indices = 0;
+        stats.moving = map.isMoving();
+        gl.drawElements = function (mode, count, type, offset) {
+          stats.calls++;
+          stats.indices += count;
+          return draw.call(this, mode, count, type, offset);
+        };
+        if (stats.slow && map.isMoving()) {
+          clock += 70;
+          performance.now = () => clock;
+        }
+        try {
+          render.call(this, gl, args);
+        } finally {
+          gl.drawElements = draw;
+          performance.now = now;
+        }
+        if (
+          document
+            .querySelector('.map-detail-status')
+            ?.textContent?.includes('Detail reduced')
+        )
+          stats.reducedSeen = true;
+      };
+      map.triggerRepaint();
+    });
+    const drawing = () =>
+      page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              zoomDetail: {
+                calls: number;
+                indices: number;
+                moving: boolean;
+                reducedSeen: boolean;
+              };
+            }
+          ).zoomDetail,
+      );
+    await expect.poll(async () => (await drawing()).calls).toBeGreaterThan(2);
+    const full = await drawing();
+    await page.evaluate(() => {
+      (window as unknown as { zoomDetail: { slow: boolean } }).zoomDetail.slow =
+        true;
+      window.editorTestMap.easeTo({ zoom: 18.5, duration: 5000 });
+    });
+    await expect.poll(async () => (await drawing()).reducedSeen).toBe(true);
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+      .toBe(false);
+    await expect(
+      page.getByText('Detail reduced for smoother movement'),
+    ).toHaveCount(0);
+    await expect.poll(async () => (await drawing()).indices).toBe(full.indices);
+    await page.evaluate(() => {
+      (window as unknown as { zoomDetail: { slow: boolean } }).zoomDetail.slow =
+        false;
+    });
+    // Cross both LOD boundaries repeatedly without touching the view toggle.
+    for (let cycle = 0; cycle < 3; cycle++) {
+      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14.9 }));
+      await expect.poll(rendered).not.toContain('library');
+      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 16 }));
+      await expect.poll(rendered).toContain('library');
+      await expect
+        .poll(async () => (await drawing()).indices)
+        .toBeLessThan(full.indices);
+      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 18 }));
+      await expect
+        .poll(async () => (await drawing()).indices)
+        .toBe(full.indices);
+    }
+    await page.screenshot({
+      path: `test-results/zoom-detail-${editor ? 'editor' : 'public'}-${page.viewportSize()?.width}.png`,
+    });
+  });
+
 test('miniature models fall back for unavailable sectors and keep drawing unobstructed', async ({
   page,
 }) => {
