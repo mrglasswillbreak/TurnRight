@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { buildingDisplay } from './map-display';
 import type { DuplicateCandidate } from './duplicates';
-import type { CampusData } from './types';
+import type { CampusData, MapEdit } from './types';
+import { canonical } from './editor-conflicts';
 
 export function DuplicateReview({
   data,
@@ -11,6 +12,8 @@ export function DuplicateReview({
   inspect,
   undo,
   canUndo,
+  exactBatch,
+  applyExact,
 }: {
   data: CampusData;
   candidates: DuplicateCandidate[];
@@ -19,8 +22,12 @@ export function DuplicateReview({
   inspect: (kind: DuplicateCandidate['kind'], id: string) => void;
   undo: () => void;
   canUndo: boolean;
+  exactBatch: MapEdit[];
+  applyExact: (batch: MapEdit[]) => Promise<void>;
 }) {
   const [search, setSearch] = useState('');
+  const [proposal, setProposal] = useState<MapEdit[] | null>(null);
+  const stale = !!proposal && canonical(proposal) !== canonical(exactBatch);
   const filtered = candidates.filter((c) =>
     `${c.names.join(' ')} ${c.ids.join(' ')} ${c.reason}`
       .toLowerCase()
@@ -30,10 +37,66 @@ export function DuplicateReview({
     <div className="duplicate-review">
       <h2>Duplicate review</h2>
       <p className="small-note">
-        Exact matches with equivalent attributes and connections are
-        consolidated when this queue opens. Review the remaining pairs
-        individually. A repeated name can belong to separate buildings.
+        Review exact matches as a batch or compare pairs individually. A
+        repeated name can belong to separate buildings.
       </p>
+      {!!exactBatch.length && (
+        <button
+          className="editor-secondary"
+          disabled={pending}
+          onClick={() => setProposal(structuredClone(exactBatch))}
+        >
+          Review exact duplicate cleanup
+        </button>
+      )}
+      {proposal && (
+        <section
+          className="change-card"
+          aria-label="Proposed duplicate cleanup"
+        >
+          <h3>Proposed duplicate cleanup</h3>
+          {proposal
+            .filter((e) => e.deleted && e.properties.mergedInto)
+            .map((e) => (
+              <p key={`${e.kind}:${e.id}`}>
+                Remove {String(e.properties.name || e.id)} ({e.id}) → keep{' '}
+                {e.properties.mergedInto}
+              </p>
+            ))}
+          {proposal
+            .filter((e) => e.kind === 'entrance')
+            .map((e) => (
+              <p key={e.id}>
+                Redirect entrance {String(e.properties.name || e.id)} to{' '}
+                {String(e.properties.placeId || e.properties.buildingId)}
+              </p>
+            ))}
+          <p>
+            {proposal.length} correction records in one undoable batch. Saved
+            place references follow the survivors.
+          </p>
+          {stale && (
+            <p className="notice">
+              The draft changed. Review the updated batch.
+            </p>
+          )}
+          <div className="button-row">
+            <button
+              className="editor-primary"
+              disabled={pending || stale}
+              onClick={async () => {
+                await applyExact(proposal);
+                setProposal(null);
+              }}
+            >
+              Apply reviewed duplicate cleanup
+            </button>
+            <button className="editor-text" onClick={() => setProposal(null)}>
+              Cancel cleanup
+            </button>
+          </div>
+        </section>
+      )}
       <button
         className="editor-text"
         disabled={!canUndo || pending}
