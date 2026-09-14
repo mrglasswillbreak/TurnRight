@@ -1,3 +1,4 @@
+import type { RoofDraft } from './visual-types';
 import type { Geometry } from 'geojson';
 import type { MapEdit } from './types';
 import { validateEdit } from './editor-model';
@@ -23,6 +24,7 @@ export interface UnfinishedDrawing {
 export interface WorkspaceSnapshot {
   edits: MapEdit[];
   unfinished: UnfinishedDrawing | null;
+  roofDraft?: RoofDraft | null;
 }
 export interface SaveBatch {
   operationId: string;
@@ -49,6 +51,7 @@ const recoveryMessage =
 export class EditorWorkspace {
   edits: MapEdit[];
   unfinished: UnfinishedDrawing | null = null;
+  roofDraft: RoofDraft | null = null;
   saved: MapEdit[];
   pending: SaveBatch | null = null;
   past: WorkspaceSnapshot[] = [];
@@ -83,6 +86,7 @@ export class EditorWorkspace {
       this.past = recovery.past || [];
       this.future = recovery.future || [];
       this.unfinished = recovery.unfinished;
+      this.roofDraft = recovery.roofDraft || null;
       this.pending = recovery.pending;
       const previous = new Map(recovery.saved.map((e) => [editKey(e), e]));
       const remote = new Map(server.map((e) => [editKey(e), e]));
@@ -105,7 +109,10 @@ export class EditorWorkspace {
       this.edits = [...remote.values()];
       if (this.status === 'Conflict' && !this.conflictBase)
         this.conflictBase = structuredClone(recovery.saved);
-      if (this.status !== 'Conflict' && (this.dirty || this.unfinished))
+      if (
+        this.status !== 'Conflict' &&
+        (this.dirty || this.unfinished || this.roofDraft)
+      )
         this.status = 'Saved locally';
       if (this.status === 'Conflict')
         this.error =
@@ -124,12 +131,17 @@ export class EditorWorkspace {
     this.listeners.forEach((fn) => fn());
   }
   private snapshot(): WorkspaceSnapshot {
-    return structuredClone({ edits: this.edits, unfinished: this.unfinished });
+    return structuredClone({
+      edits: this.edits,
+      unfinished: this.unfinished,
+      roofDraft: this.roofDraft,
+    });
   }
   recoveryCopy(): WorkspaceRecovery {
     return structuredClone({
       edits: this.edits,
       unfinished: this.unfinished,
+      roofDraft: this.roofDraft,
       saved: this.saved,
       pending: this.pending,
       past: this.past,
@@ -158,6 +170,7 @@ export class EditorWorkspace {
     const snapshot: WorkspaceRecovery = {
       edits: this.edits,
       unfinished: this.unfinished,
+      roofDraft: this.roofDraft,
       saved: this.saved,
       pending: this.pending,
       past: this.past,
@@ -241,9 +254,22 @@ export class EditorWorkspace {
     this.unfinished = drawing;
     this.changed();
   }
+  draftRoof(roof: RoofDraft | null) {
+    this.endHistoryGroup();
+    this.roofDraft = structuredClone(roof);
+    this.changed();
+  }
+  applyRoof(edit: MapEdit) {
+    this.roofDraft = null;
+    this.commit([edit]);
+    this.changed();
+  }
   private changed() {
     if (this.status !== 'Conflict' && this.status !== 'Recovery unavailable') {
-      this.status = this.dirty || this.unfinished ? 'Saved locally' : 'Saved';
+      this.status =
+        this.dirty || this.unfinished || this.roofDraft
+          ? 'Saved locally'
+          : 'Saved';
       this.error = '';
     }
     void this.persistNow();
@@ -265,6 +291,7 @@ export class EditorWorkspace {
         });
     this.edits = [...next.values()];
     this.unfinished = snapshot.unfinished;
+    this.roofDraft = snapshot.roofDraft || null;
     this.changed();
   }
   undo() {
@@ -396,7 +423,7 @@ export class EditorWorkspace {
       }
       this.status = this.recoveryFailed
         ? 'Recovery unavailable'
-        : this.unfinished
+        : this.unfinished || this.roofDraft
           ? 'Saved locally'
           : 'Saved';
       this.error = this.recoveryFailed ? recoveryMessage : '';
