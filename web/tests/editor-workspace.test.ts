@@ -183,10 +183,13 @@ describe('editor autosave and recovery', () => {
     expect(workspace.status).toBe('Conflict');
     expect(await workspace.flush()).toBe(false);
     expect(send).toHaveBeenCalledOnce();
-    workspace.reconcile(
-      [{ ...edit('Remote'), updated_at: '2026-09-11T13:00:00Z' }],
-      true,
-    );
+    const server = [{ ...edit('Remote'), updated_at: '2026-09-11T13:00:00Z' }];
+    expect(workspace.reconcile(server, true)).toBe(false);
+    const review = workspace.reviewConflicts(server);
+    expect(review.unresolved).toHaveLength(1);
+    expect(
+      workspace.reconcile(server, true, { [review.conflicts[0].key]: 'local' }),
+    ).toBe(true);
     expect(workspace.edits[0].properties.name).toBe('Library');
     expect(workspace.saved[0].properties.name).toBe('Remote');
   });

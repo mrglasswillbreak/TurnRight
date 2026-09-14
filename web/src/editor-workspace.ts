@@ -1,6 +1,11 @@
 import type { Geometry } from 'geojson';
 import type { MapEdit } from './types';
 import { validateEdit } from './editor-model';
+import {
+  canonical,
+  mergeWorkspace,
+  type ConflictChoices,
+} from './editor-conflicts';
 
 export const editKey = (edit: Pick<MapEdit, 'id' | 'kind'>) =>
   `${edit.kind}:${edit.id}`;
@@ -28,6 +33,8 @@ export interface WorkspaceRecovery extends WorkspaceSnapshot {
   pending: SaveBatch | null;
   past: WorkspaceSnapshot[];
   future: WorkspaceSnapshot[];
+  conflictBase?: MapEdit[];
+  featureBases?: MapEdit[];
 }
 export type SaveStatus =
   | 'Saved'
@@ -48,12 +55,20 @@ export class EditorWorkspace {
   future: WorkspaceSnapshot[] = [];
   status: SaveStatus = 'Saved';
   error = '';
+  errorStatus = 0;
   revision = 0;
   private listeners = new Set<() => void>();
   private flight: Promise<boolean> | null = null;
   private persistence: Promise<void> = Promise.resolve();
   private recoveryFailed = false;
   private recoverySignature = '';
+  private historyGroup: string | undefined;
+  private conflictBase?: MapEdit[];
+  private featureBases: MapEdit[] = [];
+  private sourceBaseline?: (edit: MapEdit) => MapEdit | undefined;
+  setSourceBaseline(lookup?: (edit: MapEdit) => MapEdit | undefined) {
+    this.sourceBaseline = lookup;
+  }
   constructor(
     server: MapEdit[],
     private send: (batch: SaveBatch) => Promise<MapEdit[]>,
@@ -63,6 +78,8 @@ export class EditorWorkspace {
     this.saved = structuredClone(server);
     this.edits = structuredClone(server);
     if (recovery) {
+      this.conflictBase = recovery.conflictBase;
+      this.featureBases = structuredClone(recovery.featureBases || []);
       this.past = recovery.past || [];
       this.future = recovery.future || [];
       this.unfinished = recovery.unfinished;
@@ -77,14 +94,17 @@ export class EditorWorkspace {
           // A saved-but-unacknowledged request is retried with its original operation ID.
           if (
             editContent(next) !== editContent(before) &&
-            editContent(next) !== editContent(local) &&
-            !this.pending
-          )
-            this.status = 'Conflict';
+            editContent(next) !== editContent(local)
+          ) {
+            this.conflictBase ||= structuredClone(recovery.saved);
+            if (!this.pending) this.status = 'Conflict';
+          }
           remote.set(key, local);
         }
       }
       this.edits = [...remote.values()];
+      if (this.status === 'Conflict' && !this.conflictBase)
+        this.conflictBase = structuredClone(recovery.saved);
       if (this.status !== 'Conflict' && (this.dirty || this.unfinished))
         this.status = 'Saved locally';
       if (this.status === 'Conflict')
@@ -106,6 +126,34 @@ export class EditorWorkspace {
   private snapshot(): WorkspaceSnapshot {
     return structuredClone({ edits: this.edits, unfinished: this.unfinished });
   }
+  recoveryCopy(): WorkspaceRecovery {
+    return structuredClone({
+      edits: this.edits,
+      unfinished: this.unfinished,
+      saved: this.saved,
+      pending: this.pending,
+      past: this.past,
+      future: this.future,
+      conflictBase: this.conflictBase,
+      featureBases: this.featureBases,
+    });
+  }
+  localBackup(baselineVersion: string) {
+    return {
+      format: 'turnright-editor-recovery',
+      schemaVersion: 1,
+      exportedAt: new Date().toISOString(),
+      baselineVersion,
+      workspace: this.recoveryCopy(),
+    };
+  }
+  endHistoryGroup = () => {
+    this.historyGroup = undefined;
+  };
+  async preserveRecovery() {
+    await this.persistNow();
+    return !this.recoveryFailed;
+  }
   private persistNow() {
     const snapshot: WorkspaceRecovery = {
       edits: this.edits,
@@ -114,6 +162,8 @@ export class EditorWorkspace {
       pending: this.pending,
       past: this.past,
       future: this.future,
+      conflictBase: this.conflictBase,
+      featureBases: this.featureBases,
     };
     const signature = JSON.stringify(snapshot);
     if (signature === this.recoverySignature && !this.recoveryFailed)
@@ -154,7 +204,9 @@ export class EditorWorkspace {
   commit(
     edits: MapEdit[],
     unfinished: UnfinishedDrawing | null = this.unfinished,
+    historyGroup?: string,
   ) {
+    const sameGroup = !!historyGroup && historyGroup === this.historyGroup;
     const next = new Map(this.edits.map((e) => [editKey(e), e]));
     edits.forEach((e) => next.set(editKey(e), structuredClone(e)));
     if (
@@ -162,7 +214,21 @@ export class EditorWorkspace {
       JSON.stringify(unfinished) === JSON.stringify(this.unfinished)
     )
       return;
-    this.past.push(this.snapshot());
+    this.historyGroup = historyGroup;
+    for (const edit of edits) {
+      const key = editKey(edit);
+      if (
+        this.saved.some((e) => editKey(e) === key) ||
+        this.edits.some((e) => editKey(e) === key)
+      )
+        continue;
+      const original = this.sourceBaseline?.(edit);
+      if (original) {
+        this.featureBases = this.featureBases.filter((e) => editKey(e) !== key);
+        this.featureBases.push(structuredClone(original));
+      }
+    }
+    if (!sameGroup) this.past.push(this.snapshot());
     if (this.past.length > 100) this.past.shift();
     this.future = [];
     this.edits = [...next.values()];
@@ -170,6 +236,7 @@ export class EditorWorkspace {
     this.changed();
   }
   draft(drawing: UnfinishedDrawing | null) {
+    this.endHistoryGroup();
     if (JSON.stringify(drawing) === JSON.stringify(this.unfinished)) return;
     this.unfinished = drawing;
     this.changed();
@@ -201,6 +268,7 @@ export class EditorWorkspace {
     this.changed();
   }
   undo() {
+    this.endHistoryGroup();
     const previous = this.past.pop();
     if (previous) {
       this.future.push(this.snapshot());
@@ -208,31 +276,75 @@ export class EditorWorkspace {
     }
   }
   redo() {
+    this.endHistoryGroup();
     const next = this.future.pop();
     if (next) {
       this.past.push(this.snapshot());
       this.restore(next);
     }
   }
-  reconcile(server: MapEdit[], keepLocal: boolean) {
+  reviewConflicts(server: MapEdit[], choices: ConflictChoices = {}) {
+    const baseline = this.conflictBase || this.saved;
+    const known = new Set(baseline.map(editKey));
+    const local = new Set(this.edits.map(editKey));
+    const remote = new Set(server.map(editKey));
+    return mergeWorkspace(
+      [
+        ...baseline,
+        ...this.featureBases.filter(
+          (e) =>
+            !known.has(editKey(e)) &&
+            local.has(editKey(e)) &&
+            remote.has(editKey(e)),
+        ),
+      ],
+      this.edits,
+      server,
+      choices,
+    );
+  }
+  reconcile(
+    server: MapEdit[],
+    keepLocal: boolean,
+    choices: ConflictChoices = {},
+  ) {
     if (this.flight)
       throw new Error(
         'A save is still running. Refresh again when it finishes.',
       );
-    const changes = this.changes();
+    this.endHistoryGroup();
+    const review = this.reviewConflicts(server, choices);
+    const remoteChanged =
+      canonical(server) !== canonical(this.saved) || !!this.conflictBase;
+    if (keepLocal && review.unresolved.length) {
+      this.conflictBase ||= structuredClone(this.saved);
+      this.status = 'Conflict';
+      this.error =
+        'Review conflicting fields before saving. Your local work is preserved.';
+      void this.persistNow();
+      this.notify();
+      return false;
+    }
     this.saved = structuredClone(server);
-    const merged = new Map(server.map((e) => [editKey(e), e]));
-    if (keepLocal) changes.forEach((e) => merged.set(editKey(e), e));
-    this.edits = [...merged.values()];
+    this.edits = structuredClone(keepLocal ? review.edits : server);
+    this.conflictBase = undefined;
     this.pending = null;
     this.status = 'Saved locally';
     this.error = '';
+    this.errorStatus = 0;
+    // Pre-merge snapshots can contain stale remote fields. Start a new history
+    // after resolution instead of letting Undo overwrite the reviewed result.
+    if (remoteChanged) {
+      this.past = [];
+      this.future = [];
+    }
     if (!keepLocal) {
       this.past = [];
       this.future = [];
       this.unfinished = null;
     }
     this.changed();
+    return true;
   }
   flush(): Promise<boolean> {
     if (this.flight) return this.flight;
@@ -266,6 +378,7 @@ export class EditorWorkspace {
         }
         this.status = 'Saving';
         this.error = '';
+        this.errorStatus = 0;
         this.notify();
         const batch = this.pending;
         const result = await this.send(batch);
@@ -290,6 +403,7 @@ export class EditorWorkspace {
       this.notify();
       return true;
     } catch (error) {
+      this.errorStatus = (error as { status?: number }).status || 0;
       this.status =
         (error as { status?: number }).status === 409
           ? 'Conflict'
