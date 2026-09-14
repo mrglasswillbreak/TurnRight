@@ -1161,6 +1161,9 @@ function Editor({
           dark={dark}
           threeD={threeD}
           editor
+          editing={
+            !!tool || !!workspace.unfinished || selected?.kind === 'building'
+          }
           buildingOpacity={
             survey ||
             tool === 'entrance' ||
@@ -1174,6 +1177,9 @@ function Editor({
           routes={routes}
           panelBesideMap
           onSelect={() => {}}
+          onBuildingSelect={(feature) =>
+            selectId('building', String(feature.properties?.id))
+          }
           onReady={mapReady}
         />
         {survey && ready > 0 && mapRef.current && (
@@ -1526,6 +1532,9 @@ function Editor({
           </aside>
         ) : selected && !preview ? (
           <EditorInspector
+            onGeometry={(geometry) => {
+              if (selected) commit([{ ...selected, geometry }]);
+            }}
             key={editKey(selected)}
             edit={selected}
             data={validation.data}

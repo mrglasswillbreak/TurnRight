@@ -205,6 +205,42 @@ export function validateEdit(edit: MapEdit): string[] {
       Number(edit.properties.height) > 150)
   )
     errors.push('Building height must be between 0 and 150 metres.');
+  const appearance = edit.properties.appearance;
+  if (appearance !== undefined) {
+    if (
+      !appearance ||
+      typeof appearance !== 'object' ||
+      Array.isArray(appearance)
+    )
+      errors.push('Building appearance must be an object.');
+    else {
+      for (const colour of [appearance.wallColour, appearance.roofColour])
+        if (colour !== undefined && !/^#[0-9a-f]{6}$/i.test(colour))
+          errors.push('Appearance colours must be six-digit hex colours.');
+      if (
+        appearance.roofForm !== undefined &&
+        !['flat', 'hip', 'gable'].includes(appearance.roofForm)
+      )
+        errors.push('Choose a supported roof form.');
+      if (
+        appearance.confidence !== undefined &&
+        !['documented', 'observed', 'inferred'].includes(appearance.confidence)
+      )
+        errors.push('Choose appearance evidence confidence.');
+      if (
+        appearance.provenance !== undefined &&
+        (typeof appearance.provenance !== 'string' ||
+          appearance.provenance.length > 2000)
+      )
+        errors.push('Appearance provenance must be at most 2000 characters.');
+      if (
+        appearance.modelId !== undefined &&
+        (typeof appearance.modelId !== 'string' ||
+          appearance.modelId.length > 200)
+      )
+        errors.push('Model identity is too long.');
+    }
+  }
   return [...new Set(errors)];
 }
 export function assembleSources(
@@ -640,6 +676,7 @@ export function applyEdits(
             floors: props.floors,
             heightMode: props.heightMode,
             heightSource: props.heightSource,
+            appearance: props.appearance || original?.properties?.appearance,
             heightEstimated:
               props.heightMode === 'floors' || !!props.heightEstimated,
             source: 'campus-review',

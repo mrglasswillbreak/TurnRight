@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
+import { BuildingVisualDetails } from './BuildingVisualDetails';
+import { repairArcGisParts } from './arcgis-rings';
+import type { Geometry } from 'geojson';
 
 export function EditorInspector({
   edit,
   data,
   issues,
   onProperty,
+  onGeometry,
   onEntrance,
   onApproach,
   onPick,
@@ -18,6 +22,7 @@ export function EditorInspector({
   data: CampusData;
   issues: string[];
   onProperty: (key: string, value: unknown) => void;
+  onGeometry: (geometry: Geometry) => void;
   onEntrance: () => void;
   onApproach: () => void;
   onPick: (mode: 'start' | 'end' | 'join' | 'entrance-link' | 'block') => void;
@@ -27,6 +32,14 @@ export function EditorInspector({
 }) {
   const [search, setSearch] = useState('');
   const p = edit.properties;
+  const repair =
+    edit.kind === 'building'
+      ? repairArcGisParts({
+          type: 'Feature',
+          properties: p,
+          geometry: edit.geometry,
+        })
+      : undefined;
   const field = (label: string, key: string, placeholder = '') => (
     <label className="field-label">
       {label}
@@ -95,6 +108,124 @@ export function EditorInspector({
         )}
         {edit.kind === 'building' && (
           <>
+            {repair && (
+              <div className="notice">
+                <strong>Separate wings need a geometry correction</strong>
+                <p>
+                  This imported outline treats {repair.coordinates.length}{' '}
+                  separate parts as courtyard holes. Regrouping keeps every
+                  coordinate, this building ID and its entrances. Review the
+                  result on the map; Undo restores it.
+                </p>
+                <button
+                  className="editor-primary"
+                  onClick={() => onGeometry(repair)}
+                >
+                  Review corrected wings
+                </button>
+              </div>
+            )}
+            <details className="building-evidence">
+              <summary>Building appearance</summary>
+              {(['wallColour', 'roofColour'] as const).map((key) => (
+                <label className="field-label" key={key}>
+                  {key === 'wallColour' ? 'Wall colour' : 'Roof colour'}
+                  <input
+                    type="color"
+                    value={
+                      p.appearance?.[key] ||
+                      (key === 'wallColour' ? '#eedcc0' : '#b97760')
+                    }
+                    onChange={(e) =>
+                      onProperty('appearance', {
+                        ...p.appearance,
+                        [key]: e.target.value,
+                      })
+                    }
+                  />
+                </label>
+              ))}
+              <label className="field-label">
+                Roof form
+                <select
+                  value={p.appearance?.roofForm || ''}
+                  onChange={(e) =>
+                    onProperty('appearance', {
+                      ...p.appearance,
+                      roofForm: e.target.value || undefined,
+                    })
+                  }
+                >
+                  <option value="">Unknown / simplified</option>
+                  <option value="flat">Flat / parapet</option>
+                  <option value="hip">Hipped</option>
+                  <option value="gable">Gabled</option>
+                </select>
+              </label>
+              <label className="field-label">
+                Evidence confidence
+                <select
+                  value={p.appearance?.confidence || 'inferred'}
+                  onChange={(e) =>
+                    onProperty('appearance', {
+                      ...p.appearance,
+                      confidence: e.target.value,
+                    })
+                  }
+                >
+                  <option value="inferred">Inferred</option>
+                  <option value="observed">Observed in a reference</option>
+                  <option value="documented">Documented dimensions</option>
+                </select>
+              </label>
+              <label className="field-label">
+                Appearance source / date
+                <input
+                  maxLength={2000}
+                  value={p.appearance?.provenance || ''}
+                  onChange={(e) =>
+                    onProperty('appearance', {
+                      ...p.appearance,
+                      provenance: e.target.value,
+                    })
+                  }
+                />
+              </label>
+              <label className="field-label">
+                Model association
+                <select
+                  value={p.appearance?.modelId || ''}
+                  onChange={(e) =>
+                    onProperty('appearance', {
+                      ...p.appearance,
+                      modelId: e.target.value || undefined,
+                    })
+                  }
+                >
+                  <option value="">Automatic by building identity</option>
+                  {data.visuals?.buildings
+                    .filter((b) => b.id === edit.id && b.sectorId)
+                    .map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <p className="small-note">
+                Appearance changes are saved with this draft. Changed shapes,
+                heights or materials use fallback rendering until the model is
+                rebuilt.
+              </p>
+            </details>
+            <BuildingVisualDetails
+              data={data}
+              feature={{
+                type: 'Feature',
+                properties: { ...p, id: edit.id },
+                geometry: edit.geometry,
+              }}
+            />
             <label className="field-label">
               Height information
               <select

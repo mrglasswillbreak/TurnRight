@@ -50,12 +50,8 @@ import {
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
 import type { Feature } from 'geojson';
-import {
-  buildingDisplay,
-  buildingPlace,
-  resolvePlaceId,
-  resolvePlaceIds,
-} from './map-display';
+import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
+import { BuildingVisualDetails } from './BuildingVisualDetails';
 import { useMapViewPreference } from './useMapViewPreference';
 import {
   activatePending,
@@ -917,9 +913,7 @@ export default function App() {
                 );
                 return (
                   building && (
-                    <p className="building-height-note">
-                      {buildingDisplay(building.properties || {}).description}
-                    </p>
+                    <BuildingVisualDetails data={data} feature={building} />
                   )
                 );
               })()}
@@ -1101,9 +1095,7 @@ export default function App() {
           </DialogHeader>
           {dialog === 'building' && unlinkedBuilding && (
             <div className="settings-content">
-              <p>
-                {buildingDisplay(unlinkedBuilding.properties || {}).description}
-              </p>
+              <BuildingVisualDetails data={data} feature={unlinkedBuilding} />
               <p>
                 Source:{' '}
                 {String(unlinkedBuilding.properties?.source || 'Campus map')}.
