@@ -1,3 +1,4 @@
+import { remapBuildingSurfaces } from './building-surfaces';
 import type { Geometry } from 'geojson';
 import { distance, projectSegment } from './geo';
 import { pathWalkingAccess } from './editor-model';
@@ -236,7 +237,10 @@ export function geometryEdits(
   data: CampusData,
   edits: MapEdit[],
 ): MapEdit[] {
-  const next = structuredClone({ ...current, geometry });
+  const next =
+    current.kind === 'building'
+      ? remapBuildingSurfaces(current, geometry)
+      : structuredClone({ ...current, geometry });
   const batch: MapEdit[] = [next];
   if (current.kind === 'entrance' && geometry.type === 'Point') {
     const nodeId = data.entrances?.find((e) => e.id === current.id)?.graphNode;

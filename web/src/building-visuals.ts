@@ -12,6 +12,20 @@ import type { Position } from './types.js';
 export function buildingRevision(feature: Feature): string {
   const p = feature.properties || {};
   const appearance = p.appearance || {};
+  const extension = Object.fromEntries(
+    Object.entries(appearance).filter(([key]) =>
+      [
+        'windowColour',
+        'trimColour',
+        'windowSpacing',
+        'windows',
+        'roofPitch',
+        'parts',
+        'walls',
+        'roofs',
+      ].includes(key),
+    ),
+  );
   const input = JSON.stringify([
     feature.geometry,
     p.height,
@@ -22,6 +36,9 @@ export function buildingRevision(feature: Feature): string {
     appearance.roofColour,
     appearance.roofForm,
     appearance.modelId,
+    ...(Object.keys(extension).length || p.buildingTopology
+      ? [extension, p.buildingTopology]
+      : []),
   ]);
   let a = 2166136261,
     b = 2246822519;
@@ -77,6 +94,29 @@ export function validBuildingModel(model: BuildingModel): boolean {
         part.indices.length % 3 === 0 &&
         part.indices.length <= 600000 &&
         part.positions.every((n) => Number.isFinite(n) && Math.abs(n) < 2000) &&
+        (part.surfaces === undefined ||
+          (Array.isArray(part.surfaces) &&
+            part.surfaces.length <= part.indices.length / 3 &&
+            part.surfaces.every(
+              (s, i) =>
+                s &&
+                typeof s.partId === 'string' &&
+                s.partId.length > 0 &&
+                s.partId.length <= 240 &&
+                (s.wallId === undefined ||
+                  (typeof s.wallId === 'string' &&
+                    s.wallId.length > 0 &&
+                    s.wallId.length <= 240)) &&
+                ['wall', 'roof', 'window', 'trim'].includes(s.role) &&
+                Number.isInteger(s.start) &&
+                Number.isInteger(s.count) &&
+                s.start >= 0 &&
+                s.count > 0 &&
+                s.start + s.count <= part.indices.length / 3 &&
+                (!i ||
+                  s.start >=
+                    part.surfaces![i - 1].start + part.surfaces![i - 1].count),
+            ))) &&
         part.indices.every(
           (n) => Number.isInteger(n) && n >= 0 && n < part.positions.length / 3,
         ),

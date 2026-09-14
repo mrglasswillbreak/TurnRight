@@ -1,13 +1,63 @@
 import type { Position, PackageAsset } from './types.js';
 import type { MultiPolygon } from 'geojson';
 export type RoofForm = 'flat' | 'hip' | 'gable';
-export interface BuildingAppearance {
+export interface SurfaceStyle {
   wallColour?: string;
   roofColour?: string;
+  windowColour?: string;
+  trimColour?: string;
+  windows?: boolean;
+  windowSpacing?: number;
+  roofPitch?: number;
   roofForm?: RoofForm;
-  modelId?: string;
+  height?: number;
+  floors?: number;
+  heightMode?: 'metres' | 'floors' | 'unknown';
   confidence?: 'documented' | 'observed' | 'inferred';
   provenance?: string;
+}
+export interface RoofPoint {
+  id: string;
+  coordinates: Position;
+  elevation: number;
+  vertexId?: string;
+}
+export interface CustomRoof {
+  eaves: number;
+  points: RoofPoint[];
+  lines: { id: string; from: string; to: string; kind: 'ridge' | 'valley' }[];
+}
+export interface BuildingAppearance extends SurfaceStyle {
+  modelId?: string;
+  parts?: Record<string, SurfaceStyle>;
+  walls?: Record<string, SurfaceStyle>;
+  roofs?: Record<string, CustomRoof>;
+}
+export interface BuildingTopology {
+  parts: {
+    id: string;
+    rings: { id: string; vertexIds: string[]; wallIds: string[] }[];
+  }[];
+  issues?: {
+    id: string;
+    partId: string;
+    wallId?: string;
+    message: string;
+    candidates: SurfaceStyle[];
+  }[];
+}
+export interface BuildingSelection {
+  buildingId: string;
+  partId?: string;
+  wallId?: string;
+  role?: 'wall' | 'roof' | 'window' | 'trim';
+  face?: number;
+}
+export interface RoofDraft {
+  buildingId: string;
+  partId: string;
+  geometryRevision: string;
+  roof: CustomRoof;
 }
 export interface BuildingVisual {
   id: string;
@@ -18,6 +68,7 @@ export interface BuildingVisual {
   height: number;
   heightKind: 'recorded' | 'floor-derived' | 'observed-floors' | 'illustrative';
   floors?: number;
+  defaults?: SurfaceStyle;
   partHeights?: {
     height: number;
     kind: BuildingVisual['heightKind'];
@@ -73,6 +124,13 @@ export interface ModelMesh {
   indices: number[];
   colour: string;
   detail?: boolean;
+  surfaces?: {
+    start: number;
+    count: number;
+    partId: string;
+    wallId?: string;
+    role: NonNullable<BuildingSelection['role']>;
+  }[];
 }
 export interface BuildingModel {
   id: string;

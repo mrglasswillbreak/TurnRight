@@ -1,5 +1,9 @@
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
-import type { BuildingAppearance, VisualCatalogue } from './visual-types.js';
+import type {
+  BuildingAppearance,
+  BuildingTopology,
+  VisualCatalogue,
+} from './visual-types.js';
 
 export type Position = [number, number];
 export type Category =
@@ -214,6 +218,7 @@ export interface MapEdit {
   geometry: Geometry;
   properties: Record<string, unknown> & {
     appearance?: BuildingAppearance;
+    buildingTopology?: BuildingTopology;
     vertexIds?: string[];
     connections?: PathConnection[];
     connection?: ConnectionTarget;

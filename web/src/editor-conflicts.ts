@@ -3,6 +3,7 @@ import type { MapEdit } from './types';
 const keyOf = (edit: MapEdit) => `${edit.kind}:${edit.id}`;
 const topologyFields = new Set([
   'vertexIds',
+  'buildingTopology',
   'connections',
   'connection',
   'connectTo',
@@ -112,10 +113,20 @@ export function mergeWorkspace(
         } as MapEdit);
       continue;
     }
+    const surfaceGeometryChanged =
+      feature.kind === 'building' &&
+      (!equal(b.geometry, l.geometry) ||
+        !equal(b.geometry, r.geometry) ||
+        !equal(b.properties.buildingTopology, l.properties.buildingTopology) ||
+        !equal(b.properties.buildingTopology, r.properties.buildingTopology));
     const geometryGroup = (e: MapEdit) => ({
       geometry: e.geometry,
       properties: Object.fromEntries(
-        Object.entries(e.properties).filter(([k]) => topologyFields.has(k)),
+        Object.entries(e.properties).filter(
+          ([k]) =>
+            topologyFields.has(k) ||
+            (surfaceGeometryChanged && k === 'appearance'),
+        ),
       ),
     });
     const topology = choose(
@@ -132,13 +143,59 @@ export function mergeWorkspace(
       ...Object.keys(l.properties),
       ...Object.keys(r.properties),
     ])) {
-      if (topologyFields.has(field)) continue;
-      const value = choose(
-        field,
-        b.properties[field],
-        l.properties[field],
-        r.properties[field],
-      );
+      if (
+        topologyFields.has(field) ||
+        (surfaceGeometryChanged && field === 'appearance')
+      )
+        continue;
+      const mergeObject = (
+        path: string,
+        base: unknown,
+        local: unknown,
+        remote: unknown,
+      ): unknown => {
+        if (
+          [base, local, remote].every(
+            (v) =>
+              v === undefined ||
+              (v !== null && typeof v === 'object' && !Array.isArray(v)),
+          )
+        ) {
+          const bv = (base || {}) as Record<string, unknown>,
+            lv = (local || {}) as Record<string, unknown>,
+            rv = (remote || {}) as Record<string, unknown>;
+          return Object.fromEntries(
+            [
+              ...new Set([
+                ...Object.keys(bv),
+                ...Object.keys(lv),
+                ...Object.keys(rv),
+              ]),
+            ].flatMap((k) => {
+              const value = mergeObject(`${path}.${k}`, bv[k], lv[k], rv[k]);
+              return value === undefined ? [] : [[k, value]];
+            }),
+          );
+        }
+        return choose(path, base, local, remote);
+      };
+      const topologyChanged =
+        !equal(geometryGroup(b), geometryGroup(l)) ||
+        !equal(geometryGroup(b), geometryGroup(r));
+      const value =
+        field === 'appearance' && !topologyChanged
+          ? mergeObject(
+              field,
+              b.properties[field],
+              l.properties[field],
+              r.properties[field],
+            )
+          : choose(
+              field,
+              b.properties[field],
+              l.properties[field],
+              r.properties[field],
+            );
       if (value !== undefined) properties[field] = structuredClone(value);
     }
     edits.push({
