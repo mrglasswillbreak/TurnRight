@@ -30,7 +30,7 @@ Starting a drawing immediately collapses the explorer and route panel. Finish or
 
 ## Duplicate review
 
-Open **Duplicates** to review repeated names, nearby matching places and overlapping footprints. On opening the queue, exact matches with equivalent attributes, connections and associations are consolidated in a single undoable batch. Approximate or conflicting matches remain for individual review. Inspect either record on the map, select its survivor, or keep the pair separate. The survivor retains its geometry and direct path connection; useful names/provenance are combined and entrance associations are redirected. Saved/recent public place references resolve through published ID aliases.
+Open **Duplicates** to review repeated names, nearby matching places and overlapping footprints. Opening the queue makes no changes. **Review exact duplicate cleanup** shows the proposed survivors, removed records and entrance redirects; **Apply reviewed duplicate cleanup** commits the proposal as one undoable batch. Changed proposals require another review. Approximate or conflicting matches remain for individual review. Inspect either record on the map, select its survivor, or keep the pair separate. The survivor retains its geometry and direct path connection; useful names/provenance are combined and entrance associations are redirected. Saved/recent public place references resolve through published ID aliases.
 
 Decisions autosave through the existing batch API. Keep-separate decisions do not freeze source geometry; both kinds of decision survive source refreshes. Use **Undo last edit** or the standard undo/redo controls to reverse a decision. Nothing is removed from directed routing merely because its visual overlay overlaps another segment. Review access and closures before publishing any merged records.
 
@@ -42,11 +42,29 @@ The desktop layout provides the full workspace. Smaller screens support review, 
 
 Completed edits autosave after 750 ms of inactivity. Related changes, such as an entrance and its approach or a moved junction, save in one database transaction. Incomplete topology can be saved privately but must be repaired before publication.
 
+Typing in a text field is one undo step, including when autosave runs during the field session. Leaving the field, pressing Enter, selecting another feature or running another edit ends the group. Recovery snapshots continue to retain the latest input.
+
 The status distinguishes **Saving**, **Saved**, and **Saved locally**. Interrupted requests retry with the same operation ID. The browser keeps an owner-scoped IndexedDB recovery copy, including unfinished drawings and undo history. Reopening the editor offers **Resume drawing**. A failed storage write is reported rather than represented as a successful recovery save.
 
-If another session changes a draft, local work is preserved. Review the conflict, then choose **Keep my changes** to save against the latest revision, or **Use server draft**. **Export backup** includes both the server records and local work. Reconnecting resumes queued saves when authentication remains valid.
+If another session changes a draft, local work is preserved. **Review conflicts** compares original, local and server values. Independent property changes are combined; conflicting fields require an explicit choice. Geometry and its connection references are reviewed together. **Apply reviewed choices** checks the server again before saving; a newer revision requires another review. History preceding a changed remote snapshot is cleared after reconciliation so Undo cannot overwrite the reviewed remote changes.
+
+**Backup → Download local recovery** works without the server. It includes the baseline version, edits, unfinished drawing, undo/redo history, original conflict base and pending operation receipts. The same download is available in Releases and beside save errors, including on phones. **Backup → Export backup** adds the server records and audit history. These are private JSON backups; importing/restoring one still requires a separate reviewed recovery procedure.
+
+Action errors have their own controls, such as **Retry export**, **Retry route** or **Sign in again**, separate from draft-save errors. Network requests have bounded waits. Reads and transactional save batches can retry safely with the same operation ID; publication and job submissions are not automatically repeated after an uncertain response. **Check action status** refreshes state first.
+
+An already-prepared owner workspace can open from its cache after a network failure even when the browser reports an online connection. The editor identifies offline work and the cached synchronization date. Authorization rejection does not open a cache as a fallback. Preparation is still required before the first offline session.
 
 **Sources**, **Reports**, and **Releases** retain their separate review workflows. Building a release first flushes pending saves and validates the saved draft. The release worker independently validates the immutable snapshot before packaging it. Publishing and rollback retain the existing release controls.
+
+## Repair and release review
+
+Validation issues identify their feature and offer **Choose entrance’s place**, **Connect to path**, or **Review blocked segment** where applicable. The control selects the feature and opens its relevant properties. Connection changes, guided geometry repairs and building-wing corrections show a red current / green proposed comparison before **Apply reviewed repair**. Cancel retains the current draft. Finish or cancel an active drawing before entering repair review.
+
+Source review shows changed property rows and before/after map geometry. Raw source records remain available under Details. Source and release jobs refresh while the review panel is visible; polling does not save edits or refresh geometry beneath an active drawing.
+
+Release impact compares the working map with the public package loaded by the app. It lists additions, changes, removals, entrance changes and destinations losing their mapped approach or directed reachability from Clinic. It also compares Clinic–Senate, Clinic–Law and Clinic–International Library routes using stable place IDs and published aliases. Unknown/missing endpoints are reported explicitly. These are software checks, not field verification.
+
+Path properties distinguish unknown steps information, recorded steps, and recorded absence of steps. Public route details report those records without claiming verified step-free access. Public place details provide **Copy link**, native **Share** where available, and a selectable-link fallback. Shared destinations resolve published aliases; unavailable destinations offer campus search.
 
 ## Upgrade and verification
 

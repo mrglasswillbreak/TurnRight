@@ -54,7 +54,8 @@ Real browser captures from 9 September 2026. Mobile views use a responsive viewp
 | Map display | 3D by default with a remembered 2D/3D toggle, full-campus framing and selectable building surfaces. Recorded heights take precedence over floor-derived estimates; muted 6 m blocks illustrate unknown heights without changing source data. |
 | Offline maps | Verified resumable downloads, content-hash reuse, atomic activation, version/coverage information, storage checks, and explicit updates. |
 | Student reports | Place or pin reports with a category and description; private server submission, spam controls, and device-local offline drafts. |
-| Owner editor | Map-centered 2D/3D workspace, protected mouse/touch drawing sessions, snapped junctions, entrance routing, duplicate review, worker validation, undo/redo, automatic draft saving and offline recovery. [Editor guide](docs/EDITOR.md). |
+| Owner editor | Map-centered 2D/3D workspace, protected mouse/touch drawing, guided repair previews, reviewed duplicate cleanup, release impact, grouped undo, field-level conflict review and offline recovery downloads. [Editor guide](docs/EDITOR.md) · [Reliability update](docs/EDITOR-RELIABILITY.md). |
+| Destination sharing | Copy or natively share a stable place link, including published alias resolution and search fallback for missing places. Routes show recorded steps information and retain unknowns. |
 | Walking surveys | Owner-only phone recording, entrance markers, touch geometry review, partial path replacement, recoverable offline sessions and private survey sync. **Awaiting physical field verification.** [Survey guide](docs/SURVEY.md). |
 | Data maintenance | Daily/on-demand source imports, change review separate from corrections, immutable releases, preview/publish/rollback, and backup export. |
 
