@@ -1,3 +1,4 @@
+import { validateBuildingStyle } from './building-style-validation.js';
 import {
   applyConnections,
   resolveConnection,
@@ -246,7 +247,7 @@ export function validateEdit(edit: MapEdit): string[] {
         errors.push('Model identity is too long.');
     }
   }
-  return [...new Set(errors)];
+  return [...new Set([...errors, ...validateBuildingStyle(edit)])];
 }
 export function assembleSources(
   records: SourceRecord[],
@@ -735,6 +736,8 @@ export function applyEdits(
             heightMode: props.heightMode,
             heightSource: props.heightSource,
             appearance: props.appearance || original?.properties?.appearance,
+            buildingTopology:
+              props.buildingTopology || original?.properties?.buildingTopology,
             heightEstimated:
               props.heightMode === 'floors' || !!props.heightEstimated,
             source: 'campus-review',
