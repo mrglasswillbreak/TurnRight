@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
-  grep: /prepared offline survey|prepared public map/,
+  grep: /prepared offline survey|prepared public map|prepared building editor/,
   timeout: 90000,
   use: { ...base.use, baseURL: 'http://127.0.0.1:5184' },
   webServer: {

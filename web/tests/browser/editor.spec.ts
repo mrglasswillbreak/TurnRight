@@ -700,7 +700,7 @@ test('prepared public map reopens in 3D offline with its saved view preference',
       )?.properties?.displayHeight;
     }),
   ).toBe(6);
-  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.getByRole('button', { name: '2D', exact: true }).click();
   await page.reload();
   await attachMap(page);
   await expect
@@ -1756,9 +1756,8 @@ for (const phone of [false, true])
     await page.screenshot({
       path: `test-results/miniature-${phone ? 'phone' : 'desktop'}-dark.png`,
     });
-    await page
-      .getByRole('button', { name: 'Enhanced 3D', exact: true })
-      .click();
+    await page.getByLabel('3D rendering options').click();
+    await page.getByRole('radio', { name: 'Simple · building blocks' }).check();
     await expect
       .poll(() =>
         page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
@@ -1766,10 +1765,14 @@ for (const phone of [false, true])
       .toBe(false);
     await page.reload();
     await attachMap(page);
+    await page.getByLabel('3D rendering options').click();
     await expect(
-      page.getByRole('button', { name: 'Simple 3D', exact: true }),
-    ).toBeVisible();
-    await page.getByRole('button', { name: 'Simple 3D', exact: true }).click();
+      page.getByRole('radio', { name: 'Simple · building blocks' }),
+    ).toBeChecked();
+    await page
+      .getByRole('radio', { name: 'Enhanced · automatic detail' })
+      .check();
+    await page.getByLabel('3D rendering options').click();
     await focusModels(page, phone);
     await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14 }));
     await expect
@@ -1779,7 +1782,7 @@ for (const phone of [false, true])
         ),
       )
       .not.toContain('arcgis:University_Property:120');
-    await page.getByRole('button', { name: 'Switch to 2D' }).click();
+    await page.getByRole('button', { name: '2D', exact: true }).click();
     await expect
       .poll(() =>
         page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
@@ -1831,9 +1834,7 @@ test('miniature models fall back for unavailable sectors and keep drawing unobst
       pitch: 50,
     }),
   );
-  await expect(
-    page.getByRole('button', { name: 'Enhanced 3D', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel('3D rendering options')).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -1976,7 +1977,7 @@ test('public map defaults to 3D, frames campus and opens building details', asyn
   });
   expect(heights).toContainEqual(['unknown-building', 6, 'illustrative']);
   expect(heights).toContainEqual(['library', 15, 'recorded']);
-  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.getByRole('button', { name: '2D', exact: true }).click();
   await page.reload();
   await attachMap(page);
   await expect
@@ -2051,9 +2052,7 @@ test('public phone starts at 40 degrees and frames campus in both preferences', 
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
       .toBe(40);
-    await page
-      .getByRole('button', { name: 'Switch to 2D', exact: true })
-      .click();
+    await page.getByRole('button', { name: '2D', exact: true }).click();
     await page.reload();
     await attachMap(page);
     await expect
@@ -2363,4 +2362,390 @@ test('supports dark appearance and small-screen review', async ({ page }) => {
     page.getByRole('heading', { name: 'Source review' }),
   ).toBeVisible();
   await page.screenshot({ path: 'test-results/editor-mobile.png' });
+});
+
+test('building appearance: integrated view, surface inheritance, live preview, roof recovery and undo', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const state = await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await expect(
+    page.getByRole('button', { name: 'Appearance', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  expect(state.edits()).toHaveLength(0);
+  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await expect(
+    page.getByRole('group', { name: 'Map view', exact: true }),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole('button', { name: 'Enhanced 3D', exact: true }),
+  ).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .toContain('library');
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByLabel('Wall', { exact: true })
+    .selectOption({ label: 'Outside wall 1' });
+  const camera = await page.evaluate(() => ({
+    center: window.editorTestMap.getCenter().toArray(),
+    bearing: window.editorTestMap.getBearing(),
+    pitch: window.editorTestMap.getPitch(),
+    zoom: window.editorTestMap.getZoom(),
+  }));
+  const colour = page.getByLabel('Wall colour', { exact: true });
+  await colour.fill('#cc5533');
+  await colour.fill('#bb4422');
+  await colour.blur();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.walls?.['library:wall:0:0:0']?.wallColour,
+    )
+    .toBe('#bb4422');
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  expect(
+    await page.evaluate(() => ({
+      center: window.editorTestMap.getCenter().toArray(),
+      bearing: window.editorTestMap.getBearing(),
+      pitch: window.editorTestMap.getPitch(),
+      zoom: window.editorTestMap.getZoom(),
+    })),
+  ).toEqual(camera);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(colour).not.toHaveValue('#bb4422');
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(colour).toHaveValue('#bb4422');
+  await page
+    .getByRole('button', { name: 'Use inherited value for wallColour' })
+    .click();
+  await expect(colour).not.toHaveValue('#bb4422');
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page.getByRole('button', { name: 'Create custom roof' }).click();
+  await page
+    .getByRole('button', { name: 'Add point with coordinates' })
+    .click();
+  await page.getByLabel('Point elevation (m)').fill('14');
+  await page.getByRole('button', { name: '2D', exact: true }).click();
+  await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
+  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Apply roof' })).toBeEnabled();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
+  await expect(page.getByLabel('Control point')).toContainText('14 m');
+  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.roofs?.['library:wing:0']?.points[0]?.elevation,
+    )
+    .toBe(14);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Create custom roof' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Edit custom roof' }),
+  ).toBeVisible();
+  await page.screenshot({ path: 'test-results/building-roof-editor.png' });
+  expect(errors).toEqual([]);
+});
+
+test('building preview survives worker timeout, crash and obsolete replies', async ({
+  page,
+}) => {
+  test.setTimeout(100000);
+  await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: '3D', exact: true }).click();
+  const rendered = () =>
+    page.evaluate(() =>
+      JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+    );
+  await expect.poll(rendered).toContain('library');
+  const colour = page.getByLabel('Wall colour', { exact: true });
+  for (const [failure, value, message] of [
+    ['timeout', '#223344', '3D preview timed out.'],
+    ['crash', '#334455', '3D preview stopped.'],
+  ] as const) {
+    await page.evaluate((failure) => {
+      const send = Worker.prototype.postMessage;
+      window.addEventListener(
+        'restore-preview-worker',
+        () => {
+          Worker.prototype.postMessage = send;
+        },
+        { once: true },
+      );
+      Worker.prototype.postMessage = function (
+        message,
+        ...rest: [Transferable[]?]
+      ) {
+        if (message?.features) {
+          if (failure === 'crash')
+            this.dispatchEvent(
+              new ErrorEvent('error', { message: 'Injected worker crash' }),
+            );
+          return; // Simulate a worker that cannot reply.
+        }
+        return send.call(this, message, rest[0] || []);
+      };
+    }, failure);
+    await colour.fill(value);
+    await expect(page.getByText(message, { exact: false })).toBeVisible({
+      timeout: 25000,
+    });
+    await expect.poll(rendered).toContain('library');
+    await page.evaluate(() =>
+      window.dispatchEvent(new Event('restore-preview-worker')),
+    );
+    await page
+      .getByRole('button', { name: 'Retry 3D preview', exact: true })
+      .click();
+    await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
+    await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  }
+  await page.evaluate(() => {
+    const send = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (
+      message,
+      ...rest: [Transferable[]?]
+    ) {
+      if (message?.features) {
+        Worker.prototype.postMessage = send;
+        // A late error for the previous edit must not replace a valid new result.
+        setTimeout(
+          () =>
+            this.dispatchEvent(
+              new MessageEvent('message', {
+                data: {
+                  revision: message.revision - 1,
+                  results: [
+                    { id: 'library', error: 'Obsolete preview failure' },
+                  ],
+                },
+              }),
+            ),
+          700,
+        );
+      }
+      return send.call(this, message, rest[0] || []);
+    };
+  });
+  await colour.fill('#445566');
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
+  await expect.poll(rendered).toContain('library');
+});
+
+test.describe('building roof touch editing', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test('building appearance phone: ridge drawing, invalid elevations, opacity and worker recovery', async ({
+    page,
+  }) => {
+    test.setTimeout(150000);
+    const state = await setup(page);
+    await focusCampus(page);
+    const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+    if (await collapse.isVisible()) await collapse.click();
+    await clickMap(page, [3.20012, 6.46022]);
+    await page.getByRole('button', { name: '3D', exact: true }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      )
+      .toContain('library');
+    await page.getByLabel('3D rendering options').click();
+    await page.getByLabel('Building opacity', { exact: true }).fill('0.25');
+    await page.getByLabel('3D rendering options').click();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      )
+      .toContain('library');
+    await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+    await page.getByRole('button', { name: 'Roof', exact: true }).click();
+    await page.getByRole('button', { name: 'Create custom roof' }).click();
+    await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
+    const plan = page.getByLabel('Roof plan drawing', { exact: true });
+    for (const [x, y] of [
+      [140, 150],
+      [140, 240],
+    ]) {
+      await plan.scrollIntoViewIfNeeded();
+      const box = (await plan.boundingBox())!;
+      await page.touchscreen.tap(
+        box.x + (x / 300) * box.width,
+        box.y + (y / 300) * box.height,
+      );
+    }
+    await expect(
+      page.getByRole('button', { name: 'Remove ridge 1' }),
+    ).toBeVisible();
+    await page.getByLabel('Point elevation (m)').fill('50');
+    await expect(
+      page.getByRole('button', { name: 'Apply roof', exact: true }),
+    ).toBeDisabled();
+    await expect(page.getByText('3D preview is outdated')).toBeVisible();
+    await page.getByLabel('Point elevation (m)').fill('15');
+    await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
+    await page.evaluate(() => {
+      const send = Worker.prototype.postMessage;
+      Worker.prototype.postMessage = function (
+        message,
+        ...rest: [Transferable[]?]
+      ) {
+        if (message?.features) {
+          Worker.prototype.postMessage = send;
+          throw new DOMException(
+            'Injected worker delivery failure',
+            'DataCloneError',
+          );
+        }
+        return send.call(this, message, rest[0] || []);
+      };
+    });
+    await page.getByLabel('Point elevation (m)').fill('14.5');
+    await expect(
+      page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      )
+      .toContain('library');
+    await page
+      .getByRole('button', { name: 'Retry 3D preview', exact: true })
+      .click();
+    await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
+    await page
+      .getByLabel('Roof surface', { exact: true })
+      .selectOption({ index: 1 });
+    await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+    await expect
+      .poll(
+        () =>
+          state.edits().find((e) => e.id === 'library')?.properties.appearance
+            ?.roofs?.['library:wing:0']?.lines.length,
+      )
+      .toBe(1);
+    await page.screenshot({ path: 'test-results/building-phone-roof.png' });
+  });
+});
+
+test('prepared building editor reopens saved appearance and unfinished roofs offline', async ({
+  page,
+  context,
+}, testInfo) => {
+  test.skip(
+    !testInfo.config.configFile?.includes('pwa.config'),
+    'Requires production service worker.',
+  );
+  test.setTimeout(120000);
+  await setup(page);
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  // The browser's network hint can be false despite a reachable backend.
+  // Preparation verifies requests and assets instead of trusting that hint.
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      value: false,
+    }),
+  );
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+    .click();
+  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+  await page.evaluate(() => Reflect.deleteProperty(navigator, 'onLine'));
+  await page.getByRole('button', { name: 'Close survey', exact: true }).click();
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByLabel('Wall', { exact: true })
+    .selectOption({ label: 'Outside wall 1' });
+  await page.getByLabel('Wall colour', { exact: true }).fill('#884422');
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page.getByRole('button', { name: 'Create custom roof' }).click();
+  await page
+    .getByRole('button', { name: 'Add point with coordinates' })
+    .click();
+  await page.getByLabel('Point elevation (m)').fill('14');
+  await context.setOffline(true);
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
+  await expect(page.getByLabel('Control point')).toContainText('14 m');
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .toContain('library');
+  const downloadPromise = page.waitForEvent('download');
+  await page
+    .locator('.editor-offline')
+    .getByRole('button', { name: 'Download local recovery' })
+    .click();
+  const download = await downloadPromise;
+  const recovery = JSON.parse(
+    readFileSync((await download.path())!, 'utf8'),
+  ).workspace;
+  expect(recovery.roofDraft.roof.points[0].elevation).toBe(14);
+  expect(
+    recovery.edits.find((e: MapEdit) => e.id === 'library').properties
+      .appearance.walls['library:wall:0:0:0'].wallColour,
+  ).toBe('#884422');
+  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await focusCampus(page);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .toContain('library');
+  const secondPromise = page.waitForEvent('download');
+  await page
+    .locator('.editor-offline')
+    .getByRole('button', { name: 'Download local recovery' })
+    .click();
+  const second = await secondPromise;
+  const saved = JSON.parse(
+    readFileSync((await second.path())!, 'utf8'),
+  ).workspace;
+  expect(saved.roofDraft).toBeNull();
+  expect(
+    saved.edits.find((e: MapEdit) => e.id === 'library').properties.appearance
+      .roofs['library:wing:0'].points[0].elevation,
+  ).toBe(14);
 });

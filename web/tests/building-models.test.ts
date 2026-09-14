@@ -129,7 +129,9 @@ describe('campus architecture', () => {
         z = positions.filter((_, i) => i % 3 === 2);
       expect(Math.min(...z)).toBe(0);
       expect(Math.max(...z)).toBe(6);
-      const walls = model.meshes[0].positions,
+      const walls = model.meshes.find((mesh) =>
+          mesh.surfaces?.some((surface) => surface.role === 'wall'),
+        )!.positions,
         x = walls.filter((_, i) => i % 3 === 0),
         y = walls.filter((_, i) => i % 3 === 1),
         assessment = footprintAssessment(footprint);
@@ -152,7 +154,9 @@ describe('campus architecture', () => {
       [3.20015, 6.460025],
       [3.20005, 6.460025],
     ]);
-    const roof = createBuildingModel(f, visual).meshes[1];
+    const roof = createBuildingModel(f, visual).meshes.find((mesh) =>
+      mesh.surfaces?.some((surface) => surface.role === 'roof'),
+    )!;
     let area = 0;
     for (let i = 0; i < roof.indices.length; i += 3) {
       const [a, b, c] = roof.indices
