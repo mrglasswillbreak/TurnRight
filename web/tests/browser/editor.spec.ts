@@ -2701,6 +2701,11 @@ test('building references campus batch: all eligible facades regenerate without 
   expect(state.edits()).toHaveLength(0);
   await apply.click();
   await expect.poll(() => state.edits().length, { timeout: 45000 }).toBe(count);
+  expect(
+    state.edits().find((e) => e.id === 'arcgis:University_Property:120')
+      ?.properties.appearance?.parts?.['arcgis:University_Property:120:wing:1']
+      ?.windows,
+  ).toBe(false);
   await page.getByRole('button', { name: 'Workspace', exact: true }).click();
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
     timeout: 45000,

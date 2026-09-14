@@ -9,6 +9,7 @@ import {
   resolveBuildingVisual,
   styleFor,
   polygonsOf,
+  buildingTopology,
 } from './building-surfaces';
 import { repairArcGisParts } from './arcgis-rings';
 import { validateBuildingStyle } from './building-style-validation';
@@ -132,6 +133,14 @@ export function buildingReferenceProposals(
         'Height is unknown. Retain the muted illustrative block until floors or height are documented.',
       );
     if (
+      !hasHeight(feature) &&
+      canUseObservedFloors &&
+      polygonsOf(feature.geometry).length > 1
+    )
+      return block(
+        'Assign the photographed floor count to its specific wing before applying this reference.',
+      );
+    if (
       validateBuildingStyle({
         id,
         kind: 'building',
@@ -155,6 +164,28 @@ export function buildingReferenceProposals(
           provenance: `Illustrative facade treatment, 2026-09-14. ${buildingDisplay(p).description} Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.`,
         };
     const appearance = { ...treatment, ...p.appearance };
+    // A photographed main block does not establish its auxiliary wings. Keep
+    // their resolved treatment when installing new building-wide defaults.
+    for (const [i, part] of buildingTopology(feature).parts.entries()) {
+      if (visual.partHeights?.[i]?.kind !== 'illustrative') continue;
+      const inherited = styleFor(p.appearance, visual, part.id);
+      const retained = Object.fromEntries(
+        (Object.keys(treatment) as (keyof SurfaceStyle)[])
+          .filter(
+            (key) =>
+              !['provenance', 'confidence'].includes(key) &&
+              inherited[key] !== undefined,
+          )
+          .map((key) => [key, inherited[key]]),
+      );
+      appearance.parts = {
+        ...appearance.parts,
+        [part.id]: { ...retained, ...appearance.parts?.[part.id] },
+      };
+      proposal.notes.push(
+        'The unmeasured auxiliary wing retains its existing colours and window visibility. The photographed main block does not establish that wing’s appearance.',
+      );
+    }
     const properties: MapEdit['properties'] = { ...p, appearance };
     // A newly matched floor observation is stored in the existing building
     // properties, where both editor and immutable release resolve the height.

@@ -12,6 +12,7 @@ import { buildingRevision, validBuildingModel } from '../src/building-visuals';
 import { EditorWorkspace } from '../src/editor-workspace';
 import { applyEdits } from '../src/editor-model';
 import { campusFixture } from './fixture';
+import type { VisualCatalogue } from '../src/visual-types';
 
 const feature = (id = 'building', height = 6): Feature<Polygon> => ({
   type: 'Feature',
@@ -41,6 +42,50 @@ const campus = (features = [feature()]): CampusData => ({
   map: { type: 'FeatureCollection', features },
 });
 describe('reviewed building reference appearances', () => {
+  it('retains an unmeasured auxiliary wing when applying building-wide defaults', () => {
+    const data = campus();
+    const original = data.map.features[0];
+    original.properties!.height = 0;
+    original.properties!.heightEstimated = false;
+    original.geometry = {
+      type: 'MultiPolygon',
+      coordinates: [
+        feature().geometry.coordinates,
+        feature().geometry.coordinates.map((ring) =>
+          ring.map(([x, y]) => [x + 0.001, y]),
+        ),
+      ],
+    };
+    const v = resolveBuildingVisual(original);
+    v.height = 21;
+    v.heightKind = 'observed-floors';
+    v.floors = 7;
+    v.partHeights = [
+      { height: 21, kind: 'observed-floors', floors: 7 },
+      { height: 6, kind: 'illustrative' },
+    ];
+    data.visuals = {
+      schemaVersion: 1,
+      revision: 'test',
+      bytes: 0,
+      sectors: [],
+      buildings: [v],
+      references: [],
+    } as VisualCatalogue;
+    const p = buildingReferenceProposals(data, [])[0];
+    const auxiliary = buildingTopology(original).parts[1].id;
+    expect(p.edit?.properties.appearance).toMatchObject({
+      windows: true,
+      parts: {
+        [auxiliary]: {
+          windows: false,
+          wallColour: '#d4d5c3',
+          roofColour: '#a6b19f',
+        },
+      },
+    });
+    expect(p.edit?.properties.height).toBe(0);
+  });
   it('proposes illustrative facades without mutating or changing unknown heights', () => {
     const data = campus([feature(), feature('unknown', 0)]),
       before = structuredClone(data);
