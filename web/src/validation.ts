@@ -1,4 +1,5 @@
 import type { CampusData, Position } from './types.js';
+import type { Geometry } from 'geojson';
 
 export type ValidationPhase =
   | 'sources'
@@ -23,6 +24,7 @@ export function finitePosition(value: unknown): value is Position {
     typeof value[1] === 'number' &&
     Number.isFinite(value[0]) &&
     Number.isFinite(value[1]) &&
+    value.every((n) => typeof n === 'number' && Number.isFinite(n)) &&
     Math.abs(value[0]) <= 180 &&
     Math.abs(value[1]) <= 90
   );
@@ -36,11 +38,39 @@ export function firstPosition(value: unknown): Position | undefined {
     }
   }
 }
-function validCoordinates(value: unknown): boolean {
-  return (
-    finitePosition(value) ||
-    (Array.isArray(value) && value.length > 0 && value.every(validCoordinates))
-  );
+function validGeometry(geometry: Geometry): boolean {
+  const line = (value: unknown, min = 2): value is number[][] =>
+    Array.isArray(value) && value.length >= min && value.every(finitePosition);
+  const ring = (value: unknown) =>
+    line(value, 4) &&
+    value[0][0] === value.at(-1)![0] &&
+    value[0][1] === value.at(-1)![1];
+  const polygon = (value: unknown) =>
+    Array.isArray(value) && value.length > 0 && value.every(ring);
+  switch (geometry.type) {
+    case 'Point':
+      return finitePosition(geometry.coordinates);
+    case 'MultiPoint':
+      return line(geometry.coordinates, 1);
+    case 'LineString':
+      return line(geometry.coordinates);
+    case 'MultiLineString':
+      return (
+        Array.isArray(geometry.coordinates) &&
+        geometry.coordinates.length > 0 &&
+        geometry.coordinates.every((c) => line(c))
+      );
+    case 'Polygon':
+      return polygon(geometry.coordinates);
+    case 'MultiPolygon':
+      return (
+        Array.isArray(geometry.coordinates) &&
+        geometry.coordinates.length > 0 &&
+        geometry.coordinates.every(polygon)
+      );
+    default:
+      return false;
+  }
 }
 /** Reject malformed source data before any topology or spatial code dereferences it. */
 export function structuralIssues(
@@ -139,11 +169,7 @@ export function structuralIssues(
   }
   for (const feature of [data.boundary, ...data.map.features]) {
     const geometry = feature?.geometry;
-    if (
-      !geometry ||
-      !('coordinates' in geometry) ||
-      !validCoordinates(geometry.coordinates)
-    )
+    if (!geometry || !('coordinates' in geometry) || !validGeometry(geometry))
       add(
         'invalid-geometry',
         String(feature?.properties?.id || 'campus boundary'),

@@ -8,6 +8,7 @@ import type { MapEdit } from '../src/types';
 import { applyEdits } from '../src/editor-model';
 import { featureEdit } from '../src/editor-features';
 import type { CampusData } from '../src/types';
+import { campusFixture } from './fixture';
 const edit = (name = 'Library'): MapEdit => ({
   id: 'library',
   kind: 'place',
@@ -38,6 +39,7 @@ describe('editor autosave and recovery', () => {
   });
   it('undoes a saved first correction without deleting the approved source place', async () => {
     const base = {
+      ...campusFixture(),
       map: { type: 'FeatureCollection', features: [] },
       places: [
         {

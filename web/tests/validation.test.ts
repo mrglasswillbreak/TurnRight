@@ -19,6 +19,22 @@ const captured = (): { base: CampusData; edits: MapEdit[] } =>
     ).toString(),
   );
 describe('release structural validation', () => {
+  it.each([
+    { type: 'Polygon', coordinates: [3.2, 6.46] },
+    { type: 'LineString', coordinates: [[3.2, 6.46]] },
+    { type: 'Point', coordinates: [3.2, 6.46, NaN] },
+  ])(
+    'identifies malformed geometry before spatial processing: %j',
+    (geometry) => {
+      const base = campusFixture();
+      Object.assign(base.boundary, { geometry });
+      const result = validateWorkspace(base, [], 13);
+      expect(result.failed).toBe(false);
+      expect(result.usable).toBe(false);
+      expect(result.issues[0].code).toBe('invalid-geometry');
+      expect(result.revision).toBe(13);
+    },
+  );
   it('keeps assembly failures actionable and rejects stale connection targets', () => {
     const base = campusFixture();
     expect(
