@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from './supabase';
+import { AdminRequestError } from './admin-client';
 import type { ValidationIssue } from './validation';
 interface Review {
   version: string;
@@ -13,12 +14,15 @@ interface Review {
 export function BaselineReview({
   busy,
   action,
+  onSignIn,
 }: {
   busy: boolean;
   action: (name: string, payload: unknown, success: string) => Promise<boolean>;
+  onSignIn: () => Promise<void>;
 }) {
   const [review, setReview] = useState<Review | null>(null),
     [error, setError] = useState(''),
+    [authError, setAuthError] = useState(false),
     [loading, setLoading] = useState(false);
   return (
     <div className="change-card">
@@ -32,20 +36,27 @@ export function BaselineReview({
         className="editor-secondary"
         disabled={busy || loading}
         onClick={async () => {
+          if (authError) {
+            await onSignIn();
+            return;
+          }
           setLoading(true);
           try {
             setReview(await api<Review>('review-baseline'));
             setError('');
           } catch (e) {
             setError((e as Error).message);
+            setAuthError(e instanceof AdminRequestError && e.reason === 'auth');
           } finally {
             setLoading(false);
           }
         }}
       >
-        {loading
-          ? 'Checking public package…'
-          : 'Review baseline reconciliation'}
+        {authError
+          ? 'Sign in again'
+          : loading
+            ? 'Checking public package…'
+            : 'Review baseline reconciliation'}
       </button>
       {error && <p className="form-error">{error}</p>}
       {review && (

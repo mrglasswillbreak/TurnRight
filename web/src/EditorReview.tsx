@@ -1,4 +1,4 @@
-import { useState, type RefObject } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import {
   Check,
   Flag,
@@ -11,10 +11,17 @@ import {
 } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
-import type { MapChange, Release, StudentReport } from './types';
+import type { CampusData, MapChange, Release, StudentReport } from './types';
+import { api } from './supabase';
+import { AdminRequestError } from './admin-client';
+import { useReleaseImpact } from './useReleaseImpact';
+import { sourceComparison, sourceGeometry } from './source-comparison';
+import { firstPosition, type ValidationIssue } from './validation';
+import { downloadJson } from './download-json';
 import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
 import { BaselineReview } from './BaselineReview';
+
 export interface ReviewState {
   changes: MapChange[];
   reports: StudentReport[];
@@ -27,6 +34,7 @@ export interface ReviewState {
   }[];
   releases: Release[];
 }
+
 export function EditorReview({
   tab,
   state,
@@ -34,6 +42,9 @@ export function EditorReview({
   validation,
   baselineVersion,
   publishedVersion,
+  published,
+  onIssue,
+  onSignIn,
   busy,
   action,
   mapRef,
@@ -48,6 +59,9 @@ export function EditorReview({
   validation: EditorValidation & { pending?: boolean; retry: () => void };
   baselineVersion: string;
   publishedVersion: string;
+  published: CampusData;
+  onIssue: (issue: ValidationIssue) => void;
+  onSignIn: () => Promise<void>;
   busy: boolean;
   action: (name: string, payload: unknown, success: string) => Promise<boolean>;
   mapRef: RefObject<MapInstance | null>;
@@ -57,8 +71,64 @@ export function EditorReview({
   setReview: (change: MapChange) => void;
 }) {
   const [summary, setSummary] = useState('');
+  const [liveState, setLiveState] = useState(state);
+  const [statusError, setStatusError] = useState<Error | null>(null);
+  const [statusAttempt, setStatusAttempt] = useState(0);
+  const impact = useReleaseImpact(
+    published,
+    validation.data,
+    tab === 'releases' && !validation.pending,
+  );
+  useEffect(() => {
+    setLiveState(state);
+    if (!['changes', 'releases'].includes(tab)) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      if (!document.hidden) {
+        try {
+          const latest =
+            await api<Pick<ReviewState, 'jobs' | 'releases' | 'changes'>>(
+              'review-status',
+            );
+          if (!cancelled) {
+            setLiveState((current) => ({ ...current, ...latest }));
+            setStatusError(null);
+          }
+        } catch (e) {
+          if (!cancelled) setStatusError(e as Error);
+          if (e instanceof AdminRequestError && e.reason === 'auth') return;
+        }
+      }
+      if (!cancelled) timer = setTimeout(poll, 5000);
+    };
+    timer = setTimeout(poll, statusAttempt ? 0 : 5000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [state, tab, statusAttempt]);
   return (
     <>
+      {statusError && (
+        <p className="form-error" role="alert">
+          Status refresh: {statusError.message}{' '}
+          <button
+            className="editor-text"
+            onClick={() =>
+              statusError instanceof AdminRequestError &&
+              statusError.reason === 'auth'
+                ? void onSignIn()
+                : setStatusAttempt((n) => n + 1)
+            }
+          >
+            {statusError instanceof AdminRequestError &&
+            statusError.reason === 'auth'
+              ? 'Sign in again'
+              : 'Retry status refresh'}
+          </button>
+        </p>
+      )}
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
@@ -79,26 +149,38 @@ export function EditorReview({
           >
             <RefreshCw /> Check now
           </Button>
-          {state.jobs.slice(0, 3).map((job) => (
+          {liveState.jobs.slice(0, 3).map((job) => (
             <div className={`job-status ${job.status}`} key={job.id}>
               <strong>{job.status}</strong>
               <p>{job.message || 'Import in progress'}</p>
               <small>{new Date(job.created_at).toLocaleString()}</small>
             </div>
           ))}
-          {state.changes.length === 0 && (
+          {liveState.changes.length === 0 && (
             <div className="empty-state">
               <GitCompareArrows />
               <h3>No pending changes</h3>
               <p>New source differences will appear here.</p>
             </div>
           )}
-          {state.changes.map((change) => (
+          {liveState.changes.map((change) => (
             <div
               className={`change-card ${review?.id === change.id ? 'selected' : ''}`}
               key={change.id}
             >
-              <button onClick={() => setReview(change)}>
+              <button
+                onClick={() => {
+                  setReview(change);
+                  const geometry =
+                    sourceGeometry(change.after) ||
+                    sourceGeometry(change.before);
+                  const point =
+                    geometry && 'coordinates' in geometry
+                      ? firstPosition(geometry.coordinates)
+                      : undefined;
+                  if (point) mapRef.current?.flyTo({ center: point, zoom: 18 });
+                }}
+              >
                 <span className="change-kind">{change.kind}</span>
                 <strong>{change.summary}</strong>
               </button>
@@ -132,18 +214,61 @@ export function EditorReview({
                   <Check /> Accept
                 </Button>
               </div>
-              {review?.id === change.id && (
-                <details>
-                  <summary>Before / after values</summary>
-                  <pre>
-                    {JSON.stringify(
-                      { before: change.before, after: change.after },
-                      null,
-                      2,
-                    )}
-                  </pre>
-                </details>
-              )}
+              {review?.id === change.id &&
+                (() => {
+                  const comparison = sourceComparison(
+                    change.before,
+                    change.after,
+                  );
+                  const text = (value: unknown) =>
+                    value === undefined
+                      ? 'Not recorded'
+                      : typeof value === 'string'
+                        ? value
+                        : JSON.stringify(value);
+                  return (
+                    <div className="source-comparison">
+                      <p>Red: approved source · Green: proposed source</p>
+                      {comparison.geometryChanged && (
+                        <p className="notice">
+                          Geometry changed. Compare the highlighted outlines on
+                          the map.
+                        </p>
+                      )}
+                      {!!comparison.fields.length && (
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Property</th>
+                              <th>Before</th>
+                              <th>After</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {comparison.fields.map((f) => (
+                              <tr key={f.key}>
+                                <th>{f.key}</th>
+                                <td>{text(f.before)}</td>
+                                <td>{text(f.after)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                      {!comparison.fields.length && <p>No property changes.</p>}
+                      <details>
+                        <summary>Raw source records</summary>
+                        <pre>
+                          {JSON.stringify(
+                            { before: change.before, after: change.after },
+                            null,
+                            2,
+                          )}
+                        </pre>
+                      </details>
+                    </div>
+                  );
+                })()}
             </div>
           ))}
         </>
@@ -209,7 +334,19 @@ export function EditorReview({
       {tab === 'releases' && (
         <>
           <h2>Review, then publish</h2>
-          <BaselineReview busy={busy} action={action} />
+          <p>Draft: {workspace.status}</p>
+          <button
+            className="editor-secondary"
+            onClick={() =>
+              downloadJson(
+                'turnright-local-recovery.json',
+                workspace.localBackup(baselineVersion),
+              )
+            }
+          >
+            Download local recovery
+          </button>
+          <BaselineReview busy={busy} action={action} onSignIn={onSignIn} />
           <p className="small-note">
             Editor baseline: {baselineVersion}
             <br />
@@ -243,7 +380,12 @@ export function EditorReview({
               {validation.data.graph.edges.length} path segments
             </p>
             {validation.issues.map((issue, index) => (
-              <div className="form-error" key={`${issue.code}:${index}`}>
+              <div
+                className={
+                  issue.severity === 'warning' ? 'small-note' : 'form-error'
+                }
+                key={`${issue.code}:${index}`}
+              >
                 <p>{issue.message}</p>
                 <small>
                   {issue.phase} · revision {validation.revision}
@@ -254,26 +396,35 @@ export function EditorReview({
                     References: {issue.referenceIds.join(', ')}
                   </p>
                 )}
+                {issue.repair && (
+                  <button
+                    className="editor-secondary"
+                    onClick={() => onIssue(issue)}
+                  >
+                    {issue.repair === 'choose-place'
+                      ? 'Choose entrance’s place'
+                      : issue.repair === 'connect-path'
+                        ? 'Connect to path'
+                        : 'Review blocked segment'}
+                  </button>
+                )}
                 {issue.coordinates && (
                   <button
                     className="text-button"
-                    onClick={() =>
-                      mapRef.current?.flyTo({
-                        center: issue.coordinates,
-                        zoom: 18,
-                      })
-                    }
+                    onClick={() => onIssue(issue)}
                   >
                     <MapPin size={15} /> Locate feature
                   </button>
                 )}
               </div>
             ))}
-            {validation.warnings.map((w) => (
-              <p className="small-note" key={w}>
-                {w}
-              </p>
-            ))}
+            {validation.warnings
+              .filter((w) => !validation.issues.some((i) => i.message === w))
+              .map((w) => (
+                <p className="small-note" key={w}>
+                  {w}
+                </p>
+              ))}
           </div>
           <div className="button-row">
             <Button
@@ -328,6 +479,89 @@ export function EditorReview({
             <Layers />
             {preview ? 'Show working map' : 'Compare approved base'}
           </Button>
+          <section className="release-impact" aria-label="Release impact">
+            <h3>Release impact</h3>
+            {impact.pending && <p>Comparing this draft with the public map…</p>}
+            {impact.error && (
+              <p className="form-error" role="alert">
+                {impact.error}{' '}
+                <button className="editor-text" onClick={impact.retry}>
+                  Retry impact review
+                </button>
+              </p>
+            )}
+            {impact.result && (
+              <>
+                <p>
+                  {
+                    impact.result.changes.filter((c) => c.change === 'added')
+                      .length
+                  }{' '}
+                  added ·{' '}
+                  {
+                    impact.result.changes.filter((c) => c.change === 'changed')
+                      .length
+                  }{' '}
+                  changed ·{' '}
+                  {
+                    impact.result.changes.filter((c) => c.change === 'deleted')
+                      .length
+                  }{' '}
+                  deleted
+                </p>
+                <details>
+                  <summary>
+                    Changed features and entrances (
+                    {impact.result.changes.length})
+                  </summary>
+                  {impact.result.changes.map((c) => (
+                    <p key={`${c.kind}:${c.id}`}>
+                      {c.change} · {c.kind} · {c.name}
+                    </p>
+                  ))}
+                </details>
+                <p>
+                  {impact.result.newlyDisconnected.length} newly disconnected
+                  destinations (lost approach or reachability from Clinic).
+                </p>
+                {impact.result.newlyDisconnected.map((p) => (
+                  <p className="notice" key={p.id}>
+                    {p.name}
+                  </p>
+                ))}
+                <div className="source-comparison">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Walk</th>
+                        <th>Public map</th>
+                        <th>This draft</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {impact.result.walks.map((walk) => (
+                        <tr key={walk.name}>
+                          <th>{walk.name}</th>
+                          <td>
+                            {walk.before.status}
+                            {walk.before.distance !== undefined
+                              ? ` · ${walk.before.distance} m`
+                              : ''}
+                          </td>
+                          <td>
+                            {walk.after.status}
+                            {walk.after.distance !== undefined
+                              ? ` · ${walk.after.distance} m`
+                              : ''}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </section>
           <label className="field-label">
             What changed?
             <textarea
@@ -344,7 +578,10 @@ export function EditorReview({
               workspace.unfinished !== null ||
               validation.errors.length > 0 ||
               baselineVersion !== publishedVersion ||
-              summary.trim().length < 5
+              summary.trim().length < 5 ||
+              impact.pending ||
+              !!impact.error ||
+              !impact.result
             }
             onClick={() =>
               action(
@@ -356,7 +593,7 @@ export function EditorReview({
           >
             <Upload /> Build review preview
           </Button>
-          {state.releases.map((release) => (
+          {liveState.releases.map((release) => (
             <div className="change-card" key={release.id}>
               <span className="change-kind">{release.status}</span>
               <h3>{release.summary}</h3>
