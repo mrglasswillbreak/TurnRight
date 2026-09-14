@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
+import { packageVisuals } from "./visual-package.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -33,6 +34,8 @@ assets.push({
   bytes: glyph.length,
   contentType: "application/x-protobuf",
 });
+const visuals = await packageVisuals(path.join(root, "data/visuals"), asset);
+if (visuals) data.visuals = visuals.catalogue;
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
@@ -51,6 +54,7 @@ const manifest = {
   dataUrl,
   bytes: assets.reduce((sum, a) => sum + a.bytes, 0),
   assets,
+  ...(visuals ? { visuals: visuals.manifest } : {}),
 };
 const manifestJson = JSON.stringify(manifest, null, 2);
 await fs.writeFile(path.join(publicDir, "packages", version, "manifest.json"), manifestJson);

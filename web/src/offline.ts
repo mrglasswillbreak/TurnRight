@@ -1,5 +1,10 @@
 import { openDB } from 'idb';
-import type { CampusData, CampusPackage, ReportDraft } from './types';
+import type {
+  CampusData,
+  CampusPackage,
+  PackageAsset,
+  ReportDraft,
+} from './types';
 export const ASSET_CACHE = 'turnright-assets-v1';
 let connection: ReturnType<typeof openDB> | undefined;
 const database = () =>
@@ -66,18 +71,43 @@ export async function getActivePackage(): Promise<{
   manifest: CampusPackage;
   data: CampusData;
   complete: boolean;
+  visualsComplete: boolean;
 } | null> {
   const db = await database();
   const version = await db.get('meta', 'active');
   const record = version && (await db.get('packages', version));
   if (!record) return null;
   const cache = await caches.open(ASSET_CACHE);
+  const visualUrls = new Set<string>(record.manifest.visuals?.assetUrls || []);
   const present = await Promise.all(
-    record.manifest.assets.map(
-      async (a: { url: string }) => !!(await cache.match(a.url)),
-    ),
+    record.manifest.assets.map(async (a: PackageAsset) => {
+      const response = await cache.match(a.url);
+      return (
+        !!response &&
+        (!visualUrls.has(a.url) || (await verifiedAsset(response, a)))
+      );
+    }),
   );
-  return { ...record, complete: present.every(Boolean) };
+  const visualsComplete =
+    visualUrls.size > 0 &&
+    [...visualUrls].every((url) => {
+      const index = record.manifest.assets.findIndex(
+        (a: PackageAsset) => a.url === url,
+      );
+      return index >= 0 && present[index];
+    });
+  return {
+    ...record,
+    complete: present.every(Boolean) && (!visualUrls.size || visualsComplete),
+    visualsComplete,
+  };
+}
+async function verifiedAsset(response: Response, asset: PackageAsset) {
+  const bytes = await response.arrayBuffer();
+  return (
+    bytes.byteLength === asset.bytes &&
+    (await hashBytes(bytes)) === asset.sha256
+  );
 }
 export async function loadCampus(): Promise<{
   data: CampusData;
@@ -125,6 +155,17 @@ export async function installPackage(
 ) {
   if (manifest.schemaVersion !== 1)
     throw new Error('Update the app before downloading this map.');
+  if (
+    manifest.visuals &&
+    (manifest.visuals.bytes > 12 * 1024 * 1024 ||
+      manifest.visuals.assetUrls.some(
+        (url) => !manifest.assets.some((a) => a.url === url),
+      ) ||
+      manifest.assets
+        .filter((a) => manifest.visuals!.assetUrls.includes(a.url))
+        .reduce((sum, a) => sum + a.bytes, 0) !== manifest.visuals.bytes)
+  )
+    throw new Error('Incomplete visual download manifest.');
   const estimate = await navigator.storage?.estimate();
   if (
     estimate?.quota &&
@@ -147,7 +188,11 @@ export async function installPackage(
       throw new Error('Invalid package asset path');
     let response = await cache.match(asset.url);
     let bytes = response && (await response.clone().arrayBuffer());
-    if (!bytes || (await hashBytes(bytes)) !== asset.sha256) {
+    if (
+      !bytes ||
+      bytes.byteLength !== asset.bytes ||
+      (await hashBytes(bytes)) !== asset.sha256
+    ) {
       const timeout = AbortSignal.timeout(30000);
       response = await fetch(asset.url, {
         signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
@@ -196,9 +241,10 @@ export async function activatePending() {
     !record ||
     (
       await Promise.all(
-        record.manifest.assets.map(
-          async (a: { url: string }) => !!(await cache.match(a.url)),
-        ),
+        record.manifest.assets.map(async (a: PackageAsset) => {
+          const response = await cache.match(a.url);
+          return !!response && (await verifiedAsset(response, a));
+        }),
       )
     ).some((present) => !present)
   )

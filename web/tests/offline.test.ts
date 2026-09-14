@@ -51,6 +51,71 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe('offline package transactions', () => {
+  async function enhanced(version: string) {
+    const p = await pkg(version),
+      bytes = new TextEncoder().encode('{"schemaVersion":1,"models":[]}');
+    const asset = {
+      url: `/packages/${version}/sector.json`,
+      bytes: bytes.byteLength,
+      sha256: await hashBytes(bytes.buffer),
+    };
+    p.manifest.assets.push(asset);
+    p.manifest.bytes += asset.bytes;
+    p.manifest.visuals = { bytes: asset.bytes, assetUrls: [asset.url] };
+    return { ...p, visual: asset, visualBytes: bytes };
+  }
+  it('keeps the basic active map through interrupted model downloads and resumes verified files', async () => {
+    const old = await pkg('basic'),
+      next = await enhanced('enhanced');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(old.bytes)),
+    );
+    await installPackage(old.manifest, () => {});
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url === next.visual.url
+          ? new Response('unavailable', { status: 503 })
+          : new Response(next.bytes),
+      ),
+    );
+    await expect(installPackage(next.manifest, () => {})).rejects.toThrow(
+      'interrupted',
+    );
+    expect((await loadCampus()).data.version).toBe('basic');
+    const resume = vi.fn(async () => new Response(next.visualBytes));
+    vi.stubGlobal('fetch', resume);
+    await installPackage(next.manifest, () => {});
+    expect(resume).toHaveBeenCalledTimes(1);
+    expect((await getActivePackage())?.visualsComplete).toBe(true);
+    saved.set(next.visual.url, new Response('corrupt'));
+    const active = await getActivePackage();
+    expect(active?.visualsComplete).toBe(false);
+    expect(active?.complete).toBe(false);
+    expect(active?.data.version).toBe('enhanced');
+  });
+  it('refuses a staged activation after a visual file is corrupted', async () => {
+    const p = await enhanced('pending-visual');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async (url: string) =>
+          new Response(url === p.visual.url ? p.visualBytes : p.bytes),
+      ),
+    );
+    await installPackage(p.manifest, () => {}, undefined, false);
+    saved.set(p.visual.url, new Response('broken'));
+    expect(await activatePending()).toBe(false);
+    expect(await getActivePackage()).toBeNull();
+  });
+  it('rejects manifest claims for visual files absent from the package', async () => {
+    const p = await enhanced('missing-visual');
+    p.manifest.assets.pop();
+    await expect(installPackage(p.manifest, () => {})).rejects.toThrow(
+      'Incomplete visual',
+    );
+  });
   it('bounds initial data loading and reports a retryable timeout', async () => {
     const p = await pkg('slow');
     vi.stubGlobal(

@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Check, Download, HardDrive, RefreshCw, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { deletePackages, installPackage } from "./offline";
-import type { CampusData, CampusPackage } from "./types";
+import { useState } from 'react';
+import { Check, Download, HardDrive, RefreshCw, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { deletePackages, installPackage } from './offline';
+import type { CampusData, CampusPackage } from './types';
 export function OfflinePanel({
   manifest,
   latest,
@@ -18,20 +18,29 @@ export function OfflinePanel({
   downloaded: boolean;
   navigating: boolean;
   swReady: boolean;
-  onInstall: (data: CampusData, manifest: CampusPackage, pending: boolean) => void;
+  onInstall: (
+    data: CampusData,
+    manifest: CampusPackage,
+    pending: boolean,
+  ) => void;
   onDelete: () => void;
   onCheck: () => void;
 }) {
   const [progress, setProgress] = useState<number | null>(null),
-    [error, setError] = useState(""),
+    [error, setError] = useState(''),
     [confirmDelete, setConfirmDelete] = useState(false);
   const target = latest || manifest,
     update = target.version !== manifest.version;
   const install = async () => {
-    setError("");
+    setError('');
     setProgress(0);
     try {
-      const data = await installPackage(target, setProgress, undefined, !navigating);
+      const data = await installPackage(
+        target,
+        setProgress,
+        undefined,
+        !navigating,
+      );
       onInstall(data, target, navigating);
     } catch (e) {
       setError((e as Error).message);
@@ -49,8 +58,8 @@ export function OfflinePanel({
       </div>
       <h2>Your campus. Anywhere.</h2>
       <p>
-        Download LASU Ojo once. Search, walking routes, and voice directions stay with you when the
-        connection doesn’t.
+        Download LASU Ojo once. Search, walking routes, and voice directions
+        stay with you when the connection doesn’t.
       </p>
       <div className="download-card">
         <div className="download-title">
@@ -59,40 +68,65 @@ export function OfflinePanel({
           </span>
           <div>
             <strong>LASU · Ojo campus</strong>
-            <span>{(target.bytes / 1048576).toFixed(2)} MB · Map & voice directions</span>
+            <span>
+              {(target.bytes / 1048576).toFixed(2)} MB · Map & voice directions
+              {target.visuals ? ' + enhanced 3D' : ''}
+            </span>
           </div>
         </div>
         <div className="download-meta">
-          <span>Updated {new Date(manifest.createdAt).toLocaleDateString()}</span>
-          <span className={downloaded && swReady ? "ready-label" : ""}>
+          <span>
+            Updated {new Date(manifest.createdAt).toLocaleDateString()}
+          </span>
+          <span className={downloaded && swReady ? 'ready-label' : ''}>
             {downloaded && swReady
-              ? "Ready offline"
+              ? 'Ready offline'
               : downloaded
-                ? "Map downloaded"
-                : "Not downloaded"}
+                ? 'Map downloaded'
+                : 'Not downloaded'}
           </span>
         </div>
-        <p className="small-note">Version {manifest.version} · LASU Ojo campus only</p>
-        {update && <div className="notice">A new map is available. {target.summary}</div>}
+        <p className="small-note">
+          Version {manifest.version} · LASU Ojo campus only
+        </p>
+        {target.visuals && (
+          <p className="small-note">
+            Building models: {(target.visuals.bytes / 1048576).toFixed(2)} MB.
+            The basic map works while these download.
+          </p>
+        )}
+        {manifest.visuals && downloaded && swReady && (
+          <p className="ready-label">
+            Enhanced 3D ready offline · all model files verified
+          </p>
+        )}
+        {update && (
+          <div className="notice">A new map is available. {target.summary}</div>
+        )}
         {progress !== null ? (
           <div className="download-progress">
             <progress value={progress} max={100} />
             <span>Downloading and verifying… {progress}%</span>
           </div>
         ) : (
-          <Button className="primary-action" onClick={install} disabled={!navigator.onLine}>
+          <Button
+            className="primary-action"
+            onClick={install}
+            disabled={!navigator.onLine}
+          >
             <Download size={17} />
             {update
-              ? "Download update"
+              ? 'Download update'
               : downloaded
-                ? "Verify / repair download"
-                : "Download campus map"}
+                ? 'Verify / repair download'
+                : 'Download campus map'}
           </Button>
         )}
       </div>
       {!swReady && (
         <div className="notice">
-          Keep this page open while the app finishes saving for offline reopening.
+          Keep this page open while the app finishes saving for offline
+          reopening.
         </div>
       )}
       {navigating && (
@@ -136,7 +170,7 @@ export function OfflinePanel({
                   setConfirmDelete(false);
                 } catch {
                   setError(
-                    "The browser could not remove this download. Retry or clear this site’s storage in browser settings.",
+                    'The browser could not remove this download. Retry or clear this site’s storage in browser settings.',
                   );
                 }
               }}
@@ -152,8 +186,8 @@ export function OfflinePanel({
         </p>
       )}
       <p className="small-note">
-        Your phone supplies location. Keep the app open during navigation. Offline maps only include
-        closures known at the last download.
+        Your phone supplies location. Keep the app open during navigation.
+        Offline maps only include closures known at the last download.
       </p>
     </div>
   );
@@ -162,9 +196,20 @@ function MapGrid() {
   return (
     <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
       <rect width="42" height="42" rx="9" fill="#e4eedb" />
-      <path d="M0 14h42M0 29h42M13 0v42M30 0v42" stroke="white" strokeWidth="5" />
+      <path
+        d="M0 14h42M0 29h42M13 0v42M30 0v42"
+        stroke="white"
+        strokeWidth="5"
+      />
       <path d="M13 37V17q0-3 3-3h15" stroke="#1764ed" strokeWidth="3" />
-      <circle cx="30" cy="14" r="4" fill="#1764ed" stroke="white" strokeWidth="2" />
+      <circle
+        cx="30"
+        cy="14"
+        r="4"
+        fill="#1764ed"
+        stroke="white"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
