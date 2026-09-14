@@ -1,0 +1,474 @@
+{
+  "assessedAt": "2026-09-14",
+  "references": [
+    {
+      "id": "arcgis",
+      "url": "https://www.arcgis.com/home/item.html?id=ffd68667b1464eeb999c0050897a82a0",
+      "author": "MangroveandpartnersLimited / LASU",
+      "license": "Existing project redistribution approval",
+      "date": "2026-09-09"
+    },
+    {
+      "id": "osm",
+      "url": "https://www.openstreetmap.org/copyright",
+      "author": "OpenStreetMap contributors",
+      "license": "ODbL 1.0",
+      "date": "2026-09-09"
+    },
+    {
+      "id": "commons-7",
+      "url": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-15"
+    },
+    {
+      "id": "commons-8",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-15"
+    },
+    {
+      "id": "commons-9",
+      "url": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:29:24"
+    },
+    {
+      "id": "commons-10",
+      "url": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:40:13"
+    },
+    {
+      "id": "commons-11",
+      "url": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:42:29"
+    },
+    {
+      "id": "commons-17",
+      "url": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-12-22"
+    },
+    {
+      "id": "commons-18",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+      "author": "Shedyflowz",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-11 14:36:28"
+    },
+    {
+      "id": "commons-22",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg",
+      "author": "Justjin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-11 16:42:25"
+    },
+    {
+      "id": "commons-25",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-11 12:37:35"
+    },
+    {
+      "id": "commons-29",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_L%C3%A1%C3%A9_Clinic.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-17 18:36:13"
+    },
+    {
+      "id": "commons-31",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-17 18:36:15"
+    },
+    {
+      "id": "commons-34",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2026-08-27"
+    },
+    {
+      "id": "commons-35",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2026-08-27"
+    },
+    {
+      "id": "commons-36",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2026-08-27"
+    },
+    {
+      "id": "commons-5",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Entrance.jpg",
+      "author": "User: Kaizenify",
+      "license": "Public domain",
+      "date": "2016-03-28 03:02:43"
+    },
+    {
+      "id": "commons-6",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_gate.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-15"
+    },
+    {
+      "id": "commons-12",
+      "url": "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:50:32"
+    },
+    {
+      "id": "commons-13",
+      "url": "https://commons.wikimedia.org/wiki/File:Bola_Ahmed_Tinubu_Science_Complex,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:55:52"
+    },
+    {
+      "id": "commons-14",
+      "url": "https://commons.wikimedia.org/wiki/File:Enitan_Bababunmi_Science_Laboratory,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-11-12 11:49:17"
+    },
+    {
+      "id": "commons-16",
+      "url": "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,Lasu.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2021-12-22"
+    },
+    {
+      "id": "commons-19",
+      "url": "https://commons.wikimedia.org/wiki/File:Lasu_center_for_planning.jpg",
+      "author": "Justjin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-11 15:08:06"
+    },
+    {
+      "id": "commons-23",
+      "url": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_center_for_response_and_prevention_of_Gender_and_sexual_based_violence.jpg",
+      "author": "Justjin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-11 16:35:33"
+    },
+    {
+      "id": "commons-26",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_Main_Library_3.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-02-21 14:45:52"
+    },
+    {
+      "id": "commons-28",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-17 18:35:05"
+    },
+    {
+      "id": "commons-30",
+      "url": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building,_Ojo.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-17 18:35:32"
+    },
+    {
+      "id": "commons-32",
+      "url": "https://commons.wikimedia.org/wiki/File:Hussam_Okoya-Thomas_Sports_Hall,_LASU_Sports_Centre.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "date": "2022-03-17 11:58:29"
+    }
+  ],
+  "buildings": {
+    "arcgis:University_Property:120": {
+      "level": "detailed",
+      "floors": 7,
+      "roofForm": "flat",
+      "wallColour": "#ecdfbf",
+      "roofColour": "#945f55",
+      "sources": [
+        "commons-25",
+        "commons-34"
+      ],
+      "observed": [
+        "Seven visible floor levels and horizontal glazing bands; cream walls with red-brown vertical accents; flat parapet silhouette.",
+        "August 2026 photograph corroborates older Senate photographs."
+      ],
+      "inferred": [
+        "3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured."
+      ],
+      "needed": [
+        "Surveyed floor-to-floor heights and separate lower wing footprints."
+      ]
+    },
+    "arcgis:University_Property:3": {
+      "level": "detailed",
+      "floors": 4,
+      "roofForm": "flat",
+      "wallColour": "#e4d2b0",
+      "roofColour": "#9e7168",
+      "sources": [
+        "commons-35",
+        "commons-36"
+      ],
+      "observed": [
+        "August 2026 exterior shows four floor levels, cream walls, tall glazing bays and flat parapets.",
+        "Mapped stepped footprint retained; interior photograph confirms central covered atrium, whose exact roof footprint is not surveyed."
+      ],
+      "inferred": [
+        "3 m per visible floor; atrium roof detail omitted without an overhead plan."
+      ],
+      "needed": [
+        "Georeferenced atrium roof plan and measured floor heights."
+      ]
+    },
+    "arcgis:University_Property:76": {
+      "level": "detailed",
+      "floors": 3,
+      "roofForm": "flat",
+      "wallColour": "#ddc69c",
+      "roofColour": "#925f55",
+      "sources": [
+        "commons-11"
+      ],
+      "observed": [
+        "Named Taslim Olawale Elias Law Library facade: three floor levels, red-brown pilasters, cream infill and parapet."
+      ],
+      "inferred": [
+        "3 m per observed floor; hidden elevations simplified."
+      ],
+      "needed": [
+        "Dated overhead roof confirmation and measured height."
+      ]
+    },
+    "arcgis:University_Property:78": {
+      "level": "simplified",
+      "floors": 2,
+      "roofForm": "hip",
+      "wallColour": "#e7dbc8",
+      "roofColour": "#b86351",
+      "sources": [
+        "commons-29",
+        "commons-31"
+      ],
+      "observed": [
+        "Two storeys, red pitched roof sections and cream walls; separate from the medical Clinic."
+      ],
+      "inferred": [
+        "Wing ridge layout cannot be recovered from the oblique photograph."
+      ],
+      "needed": [
+        "Roof plan for separate wing heights and ridge positions."
+      ]
+    },
+    "arcgis:University_Property:22": {
+      "level": "detailed",
+      "floors": 4,
+      "roofForm": "flat",
+      "wallColour": "#ddd5c1",
+      "roofColour": "#9c9181",
+      "sources": [
+        "commons-8"
+      ],
+      "observed": [
+        "Four floor levels, flat parapet and cream walls with repeated window bays."
+      ],
+      "inferred": [
+        "3 m per visible floor; simplified regular window spacing."
+      ],
+      "needed": [
+        "Measured height and rear elevation."
+      ]
+    },
+    "arcgis:University_Property:54": {
+      "level": "simplified",
+      "floors": 2,
+      "roofForm": "hip",
+      "wallColour": "#dfcfae",
+      "roofColour": "#92695d",
+      "sources": [
+        "commons-9"
+      ],
+      "observed": [
+        "Faculty entrance complex has cream walls, red-brown vertical accents and pitched roofs."
+      ],
+      "inferred": [
+        "Two principal visible levels; concealed wing layout unresolved."
+      ],
+      "needed": [
+        "Overhead roof plan resolving individual ridges."
+      ]
+    },
+    "arcgis:University_Property:75": {
+      "level": "detailed",
+      "roofForm": "flat",
+      "wallColour": "#e3c587",
+      "roofColour": "#8e685a",
+      "sources": [
+        "commons-17"
+      ],
+      "observed": [
+        "Two-level MBA facade with warm yellow infill and red-brown vertical framing; parapet edge visible."
+      ],
+      "inferred": [
+        "Hidden roof equipment omitted; regularized windows."
+      ],
+      "needed": [
+        "Current overhead view and measured height."
+      ]
+    },
+    "arcgis:University_Property:103": {
+      "level": "simplified",
+      "floors": 3,
+      "roofForm": "hip",
+      "wallColour": "#e6d6b7",
+      "roofColour": "#bf715d",
+      "sources": [
+        "commons-7"
+      ],
+      "observed": [
+        "Three visible storeys with red roofs and cream/red-brown walls."
+      ],
+      "inferred": [
+        "Roof ridge positions on individual wings are unresolved."
+      ],
+      "needed": [
+        "Georeferenced roof plan."
+      ]
+    },
+    "arcgis:University_Property:32": {
+      "level": "simplified",
+      "roofForm": "flat",
+      "wallColour": "#e4c78d",
+      "roofColour": "#965f55",
+      "sources": [
+        "commons-18"
+      ],
+      "observed": [
+        "Student arcade has warm yellow wings and a red-brown central entrance block."
+      ],
+      "inferred": [
+        "Internal floor count is taken from source description; central glazing and separate roof levels remain unresolved."
+      ],
+      "needed": [
+        "Roof plan and separate block heights."
+      ]
+    },
+    "arcgis:University_Property:55": {
+      "level": "simplified",
+      "roofForm": "flat",
+      "wallColour": "#dec28f",
+      "roofColour": "#9b7b64",
+      "sources": [
+        "commons-22"
+      ],
+      "observed": [
+        "Radio building has cream/yellow walls and a flat parapet entrance face."
+      ],
+      "inferred": [
+        "Source two-floor estimate is retained; single visible entrance elevation cannot confirm concealed levels."
+      ],
+      "needed": [
+        "Confirm source floor count and roof plan. Antenna dimensions not documented."
+      ]
+    }
+  },
+  "unresolvedReferences": [
+    {
+      "reference": "commons-5",
+      "target": "Main gate",
+      "reason": "Entrance photos show beam and piers, but no surveyed structural footprint or height is available. A road gate point alone is insufficient to model its dimensions."
+    },
+    {
+      "reference": "commons-12",
+      "target": "Abisogun Leigh Science Block",
+      "reason": "Three floor facade is visible; source place point is outside every mapped footprint. Match the correct footprint before adding its observed floors."
+    },
+    {
+      "reference": "commons-14",
+      "target": "Enitan Bababunmi Science Laboratory",
+      "reason": "Two floor facade visible; source building names do not reliably resolve this identity."
+    },
+    {
+      "reference": "commons-13",
+      "target": "Bola Ahmed Tinubu Science Complex",
+      "reason": "Two floor facade visible; needs a confirmed match to the New Science Block footprint."
+    },
+    {
+      "reference": "commons-19",
+      "target": "Centre for Planning Studies",
+      "reason": "Two floor facade visible; source C.P.S association needs confirmation."
+    },
+    {
+      "reference": "commons-26",
+      "target": "Old main library",
+      "reason": "Two floor facade visible; distinguish this older library from the International Library and School Library."
+    },
+    {
+      "reference": "commons-28",
+      "target": "Printing Press",
+      "reason": "A single floor pitched roof is visible; no unambiguous named footprint."
+    },
+    {
+      "reference": "commons-32",
+      "target": "Hussam Okoya-Thomas Sports Hall",
+      "reason": "Pitched roof visible; measured hall height and exact footprint association required."
+    }
+  ],
+  "priorityUnresolved": [
+    {
+      "id": "arcgis:University_Property:6",
+      "name": "Faculty of Law",
+      "reason": "Footprint present. Law Library and Law Clinic images are different buildings; obtain main Faculty roof/floor evidence."
+    },
+    {
+      "id": "arcgis:University_Property:11",
+      "name": "LASU Clinic",
+      "reason": "A documented bungalow floor count supports a simplified 3 m model. Law Clinic photographs cannot establish medical Clinic appearance."
+    }
+  ]
+}
