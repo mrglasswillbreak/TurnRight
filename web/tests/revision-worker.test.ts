@@ -70,3 +70,18 @@ it('retains unaffected map sources after a metadata edit', () => {
   expect(next.graph).toBe(before.graph);
   expect(next.places).not.toBe(before.places);
 });
+it('terminates a hanging worker and clears the pending request', async () => {
+  vi.useFakeTimers();
+  try {
+    const worker = port(),
+      client = new RevisionWorker(worker, 100);
+    const failed = expect(client.request({}, {})).rejects.toThrow('timed out');
+    await vi.advanceTimersByTimeAsync(101);
+    await failed;
+    expect(client.closed).toBe(true);
+    expect(worker.terminate).toHaveBeenCalledOnce();
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    vi.useRealTimers();
+  }
+});

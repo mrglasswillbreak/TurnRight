@@ -16,19 +16,27 @@ export class RevisionWorker<Data, Payload, Result> {
       revision: number;
       resolve: (value: Result) => void;
       reject: (error: Error) => void;
+      timer: ReturnType<typeof setTimeout>;
     }
   >();
-  constructor(private worker: WorkerPort) {
+  constructor(
+    private worker: WorkerPort,
+    private timeoutMs = 30_000,
+  ) {
     worker.onmessage = (event) => {
       const { id, revision, result, error } = event.data;
       const request = this.pending.get(id);
       if (!request || request.revision !== revision) return;
+      clearTimeout(request.timer);
       this.pending.delete(id);
       if (error) request.reject(new Error(error));
       else request.resolve(result);
     };
     worker.onerror = () =>
-      this.close('Map processing stopped unexpectedly. Reload to retry.');
+      this.close('Map processing stopped unexpectedly. Retry this action.');
+  }
+  get closed() {
+    return this.stopped;
   }
   request(data: Data, payload: Payload): Promise<Result> {
     if (this.stopped)
@@ -40,10 +48,12 @@ export class RevisionWorker<Data, Payload, Result> {
       try {
         if (data !== this.data) {
           this.revision++;
-          for (const request of this.pending.values())
+          for (const request of this.pending.values()) {
+            clearTimeout(request.timer);
             request.reject(
               new Error('The map changed. Try again with the latest map.'),
             );
+          }
           this.pending.clear();
           this.worker.postMessage({
             type: 'init',
@@ -52,7 +62,17 @@ export class RevisionWorker<Data, Payload, Result> {
           });
           this.data = data;
         }
-        this.pending.set(id, { revision: this.revision, resolve, reject });
+        const timer = setTimeout(
+          () =>
+            this.close('Map processing timed out. Retry with the current map.'),
+          this.timeoutMs,
+        );
+        this.pending.set(id, {
+          revision: this.revision,
+          resolve,
+          reject,
+          timer,
+        });
         this.worker.postMessage({
           type: 'request',
           id,
@@ -60,6 +80,7 @@ export class RevisionWorker<Data, Payload, Result> {
           payload,
         });
       } catch (error) {
+        clearTimeout(this.pending.get(id)?.timer);
         this.pending.delete(id);
         reject(
           error instanceof Error
@@ -72,7 +93,10 @@ export class RevisionWorker<Data, Payload, Result> {
   close(message = 'Map request cancelled') {
     this.stopped = true;
     this.worker.terminate();
-    this.pending.forEach((request) => request.reject(new Error(message)));
+    this.pending.forEach((request) => {
+      clearTimeout(request.timer);
+      request.reject(new Error(message));
+    });
     this.pending.clear();
   }
 }
