@@ -97,7 +97,13 @@ export function createBuildingModel(
     for (let i = 1; i < points.length - 1; i++)
       m.indices.push(start, start + i, start + i + 1);
   };
-  for (const polygon of polygons) {
+  const unknownWalls = mesh('#d4d5c3'),
+    unknownRoofs = mesh('#a6b19f');
+  for (const [partIndex, polygon] of polygons.entries()) {
+    const part = visual.partHeights?.[partIndex],
+      height = part?.height ?? visual.height;
+    const wallMesh = part?.kind === 'illustrative' ? unknownWalls : walls,
+      roofMesh = part?.kind === 'illustrative' ? unknownRoofs : roofs;
     const rings = polygon.map((r, index) => {
       const points = r.slice(0, -1).map(local);
       if (signedArea(points) > 0 !== (index === 0)) points.reverse();
@@ -107,23 +113,24 @@ export function createBuildingModel(
     // Roof rise is an explicitly inferred share of total height, never added above it.
     const pitched =
       visual.roofForm !== 'flat' && outer.length === 4 && rings.length === 1;
-    const rise = pitched ? Math.min(visual.height * 0.18, 1.8) : 0;
-    const eaves = visual.height - rise;
+    const rise = pitched ? Math.min(height * 0.18, 1.8) : 0;
+    const eaves = height - rise;
     for (const ring of rings)
       for (let i = 0; i < ring.length; i++) {
         const a = ring[i],
           b = ring[(i + 1) % ring.length];
         const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
         if (length < 0.01) continue;
-        face(walls, [
+        face(wallMesh, [
           [...a, 0],
           [...b, 0],
           [...b, eaves],
           [...a, eaves],
         ]);
-        if (visual.level !== 'detailed') continue;
+        if (visual.level !== 'detailed' || part?.kind === 'illustrative')
+          continue;
         const floors =
-          visual.floors || Math.max(1, Math.round(visual.height / 3));
+          part?.floors || visual.floors || Math.max(1, Math.round(height / 3));
         const bays = Math.max(1, Math.floor(length / 4));
         const dx = (b[0] - a[0]) / length,
           dy = (b[1] - a[1]) / length;
@@ -181,27 +188,27 @@ export function createBuildingModel(
           r1[k] = a[k] * 0.2 + b[k] * 0.8;
         }
       }
-      face(roofs, [
+      face(roofMesh, [
         [...outer[0], eaves],
         [...outer[1], eaves],
-        [...r1, visual.height],
-        [...r0, visual.height],
+        [...r1, height],
+        [...r0, height],
       ]);
-      face(roofs, [
+      face(roofMesh, [
         [...outer[2], eaves],
         [...outer[3], eaves],
-        [...r0, visual.height],
-        [...r1, visual.height],
+        [...r0, height],
+        [...r1, height],
       ]);
-      face(visual.roofForm === 'gable' ? walls : roofs, [
+      face(visual.roofForm === 'gable' ? wallMesh : roofMesh, [
         [...outer[3], eaves],
         [...outer[0], eaves],
-        [...r0, visual.height],
+        [...r0, height],
       ]);
-      face(visual.roofForm === 'gable' ? walls : roofs, [
+      face(visual.roofForm === 'gable' ? wallMesh : roofMesh, [
         [...outer[1], eaves],
         [...outer[2], eaves],
-        [...r1, visual.height],
+        [...r1, height],
       ]);
     } else {
       const vectors = rings.map((r) => r.map((p) => new Vector2(p[0], p[1])));
@@ -212,8 +219,8 @@ export function createBuildingModel(
       const points = rings.flat();
       for (const tri of triangles)
         face(
-          roofs,
-          tri.map((i) => [...points[i], visual.height]),
+          roofMesh,
+          tri.map((i) => [...points[i], height]),
         );
     }
   }
@@ -221,6 +228,8 @@ export function createBuildingModel(
     id: visual.id,
     geometryRevision: visual.geometryRevision,
     origin,
-    meshes: [walls, roofs, windows, trim].filter((m) => m.indices.length),
+    meshes: [walls, roofs, windows, trim, unknownWalls, unknownRoofs].filter(
+      (m) => m.indices.length,
+    ),
   };
 }

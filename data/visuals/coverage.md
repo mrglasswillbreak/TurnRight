@@ -1,6 +1,6 @@
 # Campus building evidence assessment
 
-Assessed 379 buildings from lasu-4e4c8008b38b. {"detailed":5,"simplified":53,"extrusion":321}. Model assets: 238,990 bytes in 24 sectors.
+Assessed 379 buildings from lasu-4e4c8008b38b. {"detailed":5,"simplified":53,"extrusion":321}. Model assets: 222,832 bytes in 24 sectors.
 
 Every footprint is retained at source scale and orientation; metre heights derived from floor counts remain approximate. Overlaps remain review candidates, never automatic routing merges. Reference photographs are not bundled.
 

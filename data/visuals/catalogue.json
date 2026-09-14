@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "revision": "a35924e53030c116",
-  "bytes": 238990,
+  "revision": "f1193461f04cae02",
+  "bytes": 222832,
   "buildings": [
     {
       "id": "arcgis:University_Property:0",
@@ -4304,6 +4304,7 @@
       "inferred": [
         "Floor-derived total height uses 3 m per floor; no surveyed metre height.",
         "Wing ridge layout cannot be recovered from the oblique photograph.",
+        "Observed floors apply to the main photographed block only. Separate auxiliary parts retain a muted illustrative 6 m height pending their own evidence.",
         "Compound pitched roof remains a flat cap until the ridge layout can be supported."
       ],
       "needed": [
@@ -4420,6 +4421,17 @@
         },
         "reason": "Separate ArcGIS exterior rings were imported as holes. Regroup the original coordinates as separate wings; preserve the ID and entrance associations."
       },
+      "partHeights": [
+        {
+          "height": 6,
+          "kind": "observed-floors",
+          "floors": 2
+        },
+        {
+          "height": 6,
+          "kind": "illustrative"
+        }
+      ],
       "sectorId": "sector-3-2"
     },
     {
@@ -6411,7 +6423,8 @@
       "inferred": [
         "Floor-derived total height uses 3 m per floor; no surveyed metre height.",
         "3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured.",
-        "Window spacing, trim thickness and hidden elevations are simplified illustrative treatments."
+        "Window spacing, trim thickness and hidden elevations are simplified illustrative treatments.",
+        "Observed floors apply to the main photographed block only. Separate auxiliary parts retain a muted illustrative 6 m height pending their own evidence."
       ],
       "needed": [
         "Surveyed floor-to-floor heights and separate lower wing footprints.",
@@ -6509,6 +6522,17 @@
         },
         "reason": "Separate ArcGIS exterior rings were imported as holes. Regroup the original coordinates as separate wings; preserve the ID and entrance associations."
       },
+      "partHeights": [
+        {
+          "height": 21,
+          "kind": "observed-floors",
+          "floors": 7
+        },
+        {
+          "height": 6,
+          "kind": "illustrative"
+        }
+      ],
       "sectorId": "sector-2-4"
     },
     {
@@ -18324,9 +18348,9 @@
     },
     {
       "id": "sector-2-4",
-      "url": "/packages/visual-f0e2297e052d/sector-2-4-f0e2297e052d.json",
-      "sha256": "f0e2297e052d49f3723c78bcb6487ad2c266326d0226ea96799979bccb3a13c2",
-      "bytes": 56119,
+      "url": "/packages/visual-dced48586e9c/sector-2-4-dced48586e9c.json",
+      "sha256": "dced48586e9c0333a6d3cdfaef6407757db109453804a39f741e32380dba0617",
+      "bytes": 39862,
       "buildingIds": [
         "arcgis:University_Property:120"
       ],
@@ -18446,9 +18470,9 @@
     },
     {
       "id": "sector-3-2",
-      "url": "/packages/visual-a2d308fbd9c2/sector-3-2-a2d308fbd9c2.json",
-      "sha256": "a2d308fbd9c276f5a3dacb338f5ece4c3cbc1da4eab9aaedd6f34857d5400c9c",
-      "bytes": 5322,
+      "url": "/packages/visual-472cc2dd80d0/sector-3-2-472cc2dd80d0.json",
+      "sha256": "472cc2dd80d0a1a23955a491b6673228377dace46f97a0f7c67e4f585952ce3f",
+      "bytes": 5421,
       "buildingIds": [
         "arcgis:University_Property:28",
         "arcgis:University_Property:33",

@@ -133,6 +133,20 @@ for (const sourceFeature of buildings) {
         }
       : {}),
   };
+  if (
+    polygons.length > 1 &&
+    observedFloors &&
+    display.kind === 'illustrative'
+  ) {
+    visual.partHeights = polygons.map((_, index) =>
+      index === 0
+        ? { height, kind: 'observed-floors', floors: observedFloors }
+        : { height: 6, kind: 'illustrative' },
+    );
+    visual.inferred.push(
+      'Observed floors apply to the main photographed block only. Separate auxiliary parts retain a muted illustrative 6 m height pending their own evidence.',
+    );
+  }
   if (repair)
     visual.needed.push(
       'Accept the separate-wing geometry correction in the editor before this model can replace its extrusion.',

@@ -19,6 +19,7 @@ import {
   visibleSectors,
 } from '../src/building-visuals';
 import { repairArcGisParts } from '../src/arcgis-rings';
+import { displayGeometry } from '../src/map-display';
 
 const footprint: Feature<Polygon> = {
   type: 'Feature',
@@ -54,6 +55,53 @@ const visual: BuildingVisual = {
   needed: [],
 };
 describe('campus architecture', () => {
+  it('does not apply the main block height to an undocumented auxiliary part', () => {
+    const geometry = {
+      type: 'MultiPolygon' as const,
+      coordinates: [
+        footprint.geometry.coordinates,
+        footprint.geometry.coordinates.map((r) =>
+          r.map(([x, y]) => [x + 0.001, y]),
+        ),
+      ],
+    };
+    const f = { ...footprint, geometry },
+      record = {
+        ...visual,
+        geometryRevision: buildingRevision(f),
+        height: 21,
+        floors: 7,
+        partHeights: [
+          { height: 21, kind: 'observed-floors' as const, floors: 7 },
+          { height: 6, kind: 'illustrative' as const },
+        ],
+      };
+    const model = createBuildingModel(f, record);
+    expect(validBuildingModel(model)).toBe(true);
+    const unknown = model.meshes.find((m) => m.colour === '#d4d5c3')!;
+    expect(Math.max(...unknown.positions.filter((_, i) => i % 3 === 2))).toBe(
+      6,
+    );
+    const c = {
+      schemaVersion: 1 as const,
+      revision: 'test',
+      bytes: 0,
+      buildings: [record],
+      sectors: [],
+      references: [],
+    };
+    expect(
+      displayGeometry(
+        {
+          type: 'FeatureCollection',
+          features: [
+            { ...f, properties: { ...f.properties, kind: 'building' } },
+          ],
+        },
+        c,
+      ).features.map((f) => f.properties?.displayHeight),
+    ).toEqual([21, 6]);
+  });
   it('proposes separate wings without moving vertices or converting real courtyards', () => {
     const f = structuredClone(footprint);
     f.properties!.source = 'arcgis';
