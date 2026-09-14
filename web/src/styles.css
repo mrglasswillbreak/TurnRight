@@ -1242,7 +1242,7 @@ svg {
   .map-caption {
     bottom: calc(var(--mobile-panel-height) + var(--mobile-panel-bottom) + 8px);
     left: 90px;
-    right: auto;
+    right: 74px;
     font-size: 9px;
   }
 }

@@ -18,7 +18,7 @@
     left: 16px;
     right: auto;
     bottom: calc(
-      var(--mobile-panel-height) + var(--mobile-panel-bottom) + 16px
+      var(--mobile-panel-height) + var(--mobile-panel-bottom) + 50px
     );
     align-items: flex-start;
   }
