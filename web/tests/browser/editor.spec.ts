@@ -2473,6 +2473,28 @@ test('building appearance: integrated view, surface inheritance, live preview, r
   expect(errors).toEqual([]);
 });
 
+test('building previews survive revisiting unedited buildings without rebuilding cached models', async ({
+  page,
+}) => {
+  await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  const rendered = () =>
+    page.evaluate(() =>
+      JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+    );
+  await expect.poll(rendered).toContain('library');
+  await page.getByRole('button', { name: 'Close properties' }).click();
+  await expect.poll(rendered).not.toContain('library');
+  await clickMap(page, [3.20012, 6.46022]);
+  await expect(
+    page.getByRole('heading', { name: 'Library', exact: true }),
+  ).toBeVisible();
+  await expect.poll(rendered).toContain('library');
+});
+
 test('building preview survives worker timeout, crash and obsolete replies', async ({
   page,
 }) => {

@@ -2086,7 +2086,9 @@ function Editor({
             onDisconnect={disconnect}
             onDelete={remove}
             onClose={() => {
+              workspace.endHistoryGroup();
               setSelected(null);
+              setBuildingSelection(undefined);
               selectedRef.current = null;
               controller.current?.select(null);
             }}
