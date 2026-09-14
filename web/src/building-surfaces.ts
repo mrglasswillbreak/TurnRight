@@ -54,6 +54,7 @@ export function styleFor(
     roofForm: visual?.roofForm || 'flat',
     confidence: 'inferred',
     ...visual?.defaults,
+    ...(partId ? visual?.partDefaults?.[partId] : {}),
     ...base,
     ...(partId ? parts?.[partId] : {}),
     ...(wallId ? walls?.[wallId] : {}),
@@ -67,8 +68,16 @@ export function resolveBuildingVisual(
     a: BuildingAppearance = p.appearance || {};
   const display = buildingDisplay(p),
     colours = appearanceColours(p);
-  const defaults = styleFor({}, previous);
-  const style = styleFor(a, previous);
+  const reference =
+    previous ||
+    ({
+      wallColour: colours.wall,
+      roofColour: colours.roof,
+      level: 'simplified',
+      roofForm: 'flat',
+    } as BuildingVisual);
+  const defaults = styleFor({}, reference);
+  const style = styleFor(a, reference);
   const heightChanged =
     p.heightMode !== undefined || Number(p.height) > 0 || Number(p.floors) > 0;
   return {
@@ -77,6 +86,21 @@ export function resolveBuildingVisual(
     name: String(p.name || 'Building'),
     geometryRevision: '',
     defaults,
+    partDefaults: heightChanged
+      ? undefined
+      : Object.fromEntries(
+          buildingTopology(feature).parts.map((part, i) => [
+            part.id,
+            previous?.partDefaults?.[part.id] ||
+              (previous?.partHeights?.[i]?.kind === 'illustrative'
+                ? {
+                    wallColour: '#d4d5c3',
+                    roofColour: '#a6b19f',
+                    windows: false,
+                  }
+                : {}),
+          ]),
+        ),
     level: Object.keys(a).length
       ? style.windows
         ? 'detailed'
@@ -179,9 +203,18 @@ export function remapBuildingSurfaces(
         .filter((i) => i >= 0);
       const remaining = oldPoints.map((_, i) => i).filter((i) => !used.has(i));
       // Ordinary vertex moves and whole-part translations retain vertex identity.
+      const delta = points.length
+        ? [points[0][0] - oldPoints[0][0], points[0][1] - oldPoints[0][1]]
+        : [0, 0];
+      const translation =
+        points.length === oldPoints.length &&
+        points.every((q, i) =>
+          same(q, [oldPoints[i][0] + delta[0], oldPoints[i][1] + delta[1]]),
+        );
       if (
         points.length === oldPoints.length &&
-        (unmatched.length === 1 || unmatched.length === points.length)
+        (unmatched.length === 1 ||
+          (unmatched.length === points.length && translation))
       )
         unmatched.forEach((i, k) => {
           matched[i] = remaining[k];

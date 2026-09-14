@@ -52,6 +52,7 @@ export interface BuildingSelection {
   wallId?: string;
   role?: 'wall' | 'roof' | 'window' | 'trim';
   face?: number;
+  roofTriangle?: number;
 }
 export interface RoofDraft {
   buildingId: string;
@@ -69,6 +70,7 @@ export interface BuildingVisual {
   heightKind: 'recorded' | 'floor-derived' | 'observed-floors' | 'illustrative';
   floors?: number;
   defaults?: SurfaceStyle;
+  partDefaults?: Record<string, SurfaceStyle>;
   partHeights?: {
     height: number;
     kind: BuildingVisual['heightKind'];

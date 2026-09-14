@@ -101,8 +101,22 @@ export function customRoofSurface(
   }
   const ids = new Map<string, number>();
   for (const p of roof.points) {
-    if (!p.id || ids.has(p.id))
+    if (
+      !p ||
+      typeof p.id !== 'string' ||
+      !p.id ||
+      p.id.length > 240 ||
+      ids.has(p.id)
+    )
       throw new Error('Roof control point identities must be unique.');
+    if (
+      !Array.isArray(p.coordinates) ||
+      p.coordinates.length !== 2 ||
+      !p.coordinates.every(Number.isFinite)
+    )
+      throw new Error(
+        'Roof points need finite longitude and latitude coordinates.',
+      );
     ids.set(p.id, add(local(p.coordinates), p.elevation));
   }
   const lines = new Set<string>();
@@ -193,7 +207,7 @@ export function customRoofSurface(
   const triangles: number[][] = [],
     slopes: number[] = [];
   for (let i = 0; i < del.triangles.length; i += 3) {
-    const ids = [...del.triangles.slice(i, i + 3)],
+    const ids = Array.from(del.triangles.slice(i, i + 3)),
       [a, b, c] = ids.map((id) => points[id]);
     const center = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3];
     if (

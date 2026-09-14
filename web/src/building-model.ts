@@ -88,6 +88,7 @@ export function createBuildingModel(
   let scope: { partId: string; wallId?: string } = { partId: '' };
   const topology = buildingTopology(feature);
   const appearance = feature.properties?.appearance || {};
+  const surfaceVisual = {...visual,partDefaults: visual.partDefaults || Object.fromEntries(topology.parts.map((part,i) => [part.id,visual.partHeights?.[i]?.kind === 'illustrative' ? {wallColour:'#d4d5c3',roofColour:'#a6b19f',windows:false} : {}]))};
   const mesh = (
     colour: string,
     detail = false,
@@ -126,13 +127,11 @@ export function createBuildingModel(
         role: roles.get(m)!,
       });
   };
-  const unknownWalls = mesh('#d4d5c3'),
-    unknownRoofs = mesh('#a6b19f', false, 'roof');
   for (const [partIndex, polygon] of polygons.entries()) {
     const part = visual.partHeights?.[partIndex];
     const partId = topology.parts[partIndex].id;
     scope = { partId };
-    const style = styleFor(appearance, visual, partId);
+    const style = styleFor(appearance, surfaceVisual, partId);
     const override = appearance.parts?.[partId];
     const height =
       override?.heightMode === 'floors'
@@ -142,13 +141,8 @@ export function createBuildingModel(
           : (override?.height ?? part?.height ?? visual.height);
     if (!Number.isFinite(height) || height <= 0 || height > 150)
       throw new Error('Wing height must be above zero and at most 150 metres.');
-    const muted =
-      part?.kind === 'illustrative' &&
-      !override &&
-      !appearance.wallColour &&
-      !appearance.roofColour;
-    const wallMesh = muted ? unknownWalls : mesh(style.wallColour!),
-      roofMesh = muted ? unknownRoofs : mesh(style.roofColour!, false, 'roof');
+    const wallMesh = mesh(style.wallColour!),
+      roofMesh = mesh(style.roofColour!, false, 'roof');
     const custom = appearance.roofs?.[partId];
     const rings = polygon.map((r, index) => {
       const points = r.slice(0, -1).map(local);
@@ -198,11 +192,8 @@ export function createBuildingModel(
         const wallId =
           topology.parts[partIndex].rings[ringIndex].wallIds[wallIndex];
         scope = { partId, wallId };
-        const facade = styleFor(appearance, visual, partId, wallId);
-        const wallMesh =
-          muted && !appearance.walls?.[wallId]
-            ? unknownWalls
-            : mesh(facade.wallColour!);
+        const facade = styleFor(appearance, surfaceVisual, partId, wallId);
+        const wallMesh = mesh(facade.wallColour!);
         const windows = mesh(facade.windowColour!, true, 'window'),
           trim = mesh(facade.trimColour!, true, 'trim');
         const a = ring[i],
@@ -215,7 +206,7 @@ export function createBuildingModel(
           [...b, eaves],
           [...a, eaves],
         ]);
-        if (!facade.windows || (muted && !appearance.walls?.[wallId])) continue;
+        if (!facade.windows) continue;
         const floors =
           override?.floors ||
           part?.floors ||

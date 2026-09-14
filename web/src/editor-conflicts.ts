@@ -1,4 +1,5 @@
-import type { MapEdit } from './types';
+import { buildingTopology } from './building-surfaces.js';
+import type { MapEdit } from './types.js';
 
 const keyOf = (edit: MapEdit) => `${edit.kind}:${edit.id}`;
 const topologyFields = new Set([
@@ -113,12 +114,18 @@ export function mergeWorkspace(
         } as MapEdit);
       continue;
     }
+    const identities = (e: MapEdit) =>
+      buildingTopology({
+        type: 'Feature',
+        geometry: e.geometry,
+        properties: { ...e.properties, id: e.id },
+      });
     const surfaceGeometryChanged =
       feature.kind === 'building' &&
       (!equal(b.geometry, l.geometry) ||
         !equal(b.geometry, r.geometry) ||
-        !equal(b.properties.buildingTopology, l.properties.buildingTopology) ||
-        !equal(b.properties.buildingTopology, r.properties.buildingTopology));
+        !equal(identities(b), identities(l)) ||
+        !equal(identities(b), identities(r)));
     const geometryGroup = (e: MapEdit) => ({
       geometry: e.geometry,
       properties: Object.fromEntries(
@@ -130,7 +137,9 @@ export function mergeWorkspace(
       ),
     });
     const topology = choose(
-      'Geometry and connections',
+      feature.kind === 'building'
+        ? 'Geometry and surface assignments'
+        : 'Geometry and connections',
       geometryGroup(b),
       geometryGroup(l),
       geometryGroup(r),
@@ -179,11 +188,8 @@ export function mergeWorkspace(
         }
         return choose(path, base, local, remote);
       };
-      const topologyChanged =
-        !equal(geometryGroup(b), geometryGroup(l)) ||
-        !equal(geometryGroup(b), geometryGroup(r));
       const value =
-        field === 'appearance' && !topologyChanged
+        field === 'appearance'
           ? mergeObject(
               field,
               b.properties[field],
