@@ -74,3 +74,32 @@
   color: inherit;
   text-decoration: underline;
 }
+.map-rendering-error {
+  position: absolute;
+  left: 50%;
+  top: 76px;
+  transform: translateX(-50%);
+  z-index: 7;
+  width: min(290px, calc(100% - 100px));
+  padding: 12px;
+  border: 1px solid #ceac65;
+  border-radius: 8px;
+  background: #fff7dd;
+  color: #584821;
+  font-size: 12px;
+  box-shadow: 0 3px 15px #0002;
+}
+.map-rendering-error p {
+  margin: 6px 0;
+}
+.map-rendering-error button {
+  min-height: 44px;
+}
+.editor-map-workspace > .map-detail-status {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 3;
+  text-align: center;
+  max-width: min(260px, calc(100% - 110px));
+}

@@ -2585,6 +2585,130 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
   await expect.poll(rendered).toContain('library');
 });
 
+test('enhanced editing keeps models through slow frames, outline work and renderer retry', async ({
+  page,
+}) => {
+  test.setTimeout(100000);
+  await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  const rendered = () =>
+    page.evaluate(() =>
+      JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+    );
+  await expect.poll(rendered).toContain('library');
+  const camera = await page.evaluate(() => [
+    window.editorTestMap.getCenter().toArray(),
+    window.editorTestMap.getZoom(),
+    window.editorTestMap.getPitch(),
+    window.editorTestMap.getBearing(),
+  ]);
+  // Exercise the actual renderer with 32 consecutive 70 ms frame intervals.
+  // Only the timing/movement observation is controlled, not WebGL or meshes.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.editorTestMap;
+        const layer = (
+          map.getLayer('campus-models') as unknown as {
+            implementation: import('maplibre-gl').CustomLayerInterface;
+          }
+        ).implementation;
+        const render = layer.render;
+        let frame = 0,
+          clock = performance.now();
+        layer.render = function (gl, args) {
+          const now = performance.now,
+            moving = map.isMoving;
+          clock += 70;
+          performance.now = () => clock;
+          map.isMoving = () => true;
+          try {
+            render.call(this, gl, args);
+          } finally {
+            performance.now = now;
+            map.isMoving = moving;
+          }
+          if (++frame < 32) map.triggerRepaint();
+          else {
+            layer.render = render;
+            resolve();
+          }
+        };
+        map.triggerRepaint();
+      }),
+  );
+  await expect(
+    page.getByText('Detail reduced for smoother movement'),
+  ).toBeVisible();
+  await expect.poll(rendered).toContain('library');
+  await page.getByRole('button', { name: 'Outline', exact: true }).click();
+  await expect.poll(rendered).not.toContain('library');
+  await expect(
+    page.getByText('Enhanced models paused for map editing'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await expect.poll(rendered).toContain('library');
+  await page.getByLabel('Wall colour', { exact: true }).fill('#996633');
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.editorTestMap;
+        const layer = (
+          map.getLayer('campus-models') as unknown as {
+            implementation: import('maplibre-gl').CustomLayerInterface;
+          }
+        ).implementation;
+        const render = layer.render;
+        layer.render = function (gl, args) {
+          layer.render = render;
+          const draw = gl.drawElements;
+          gl.drawElements = () => {
+            throw new Error('Injected enhanced render failure');
+          };
+          try {
+            render.call(this, gl, args);
+          } finally {
+            gl.drawElements = draw;
+            resolve();
+          }
+        };
+        map.triggerRepaint();
+      }),
+  );
+  await expect(
+    page.getByText('Enhanced 3D is unavailable', { exact: true }),
+  ).toBeVisible();
+  await expect.poll(rendered).not.toContain('library');
+  await page
+    .getByRole('button', { name: 'Retry enhanced 3D', exact: true })
+    .click();
+  await expect.poll(rendered).toContain('library');
+  await expect(
+    page.getByText('Enhanced 3D is unavailable', { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText('Detail reduced for smoother movement'),
+  ).toHaveCount(0);
+  await expect(page.getByLabel('Wall colour', { exact: true })).toHaveValue(
+    '#996633',
+  );
+  expect(
+    await page.evaluate(() => [
+      window.editorTestMap.getCenter().toArray(),
+      window.editorTestMap.getZoom(),
+      window.editorTestMap.getPitch(),
+      window.editorTestMap.getBearing(),
+    ]),
+  ).toEqual(camera);
+  await page.screenshot({
+    path: 'test-results/building-renderer-recovery.png',
+  });
+});
+
 test.describe('building roof touch editing', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
   test('building appearance phone: ridge drawing, invalid elevations, opacity and worker recovery', async ({

@@ -4,7 +4,6 @@ import {
   LineBasicMaterial,
   BufferGeometry,
   Camera,
-  Color,
   DirectionalLight,
   DoubleSide,
   Float32BufferAttribute,
@@ -38,6 +37,9 @@ import {
   validBuildingModel,
 } from './building-visuals';
 import { hashBytes, ASSET_CACHE } from './offline';
+import { buildingOutline } from './building-outline';
+
+export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
 export interface ModelOptions {
   data: CampusData;
@@ -51,7 +53,7 @@ export interface ModelOptions {
     visual: import('./visual-types').BuildingVisual;
   }[];
   onReady: (ids: string[]) => void;
-  onReduced: () => void;
+  onStatus: (status: ModelStatus) => void;
 }
 /** A single shared WebGL context. Sector meshes are decoded only while in view. */
 export function createCampusModels(map: CampusMap, initial: ModelOptions) {
@@ -174,6 +176,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         detail: part.detail,
         materialKey: part.colour,
         surfaces: part.surfaces,
+        modelMesh: part,
       };
       group.add(mesh);
     }
@@ -238,10 +241,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   }
   function refresh() {
     if (disposed) return;
-    const mode =
-      options.enabled && !fallback
-        ? detailAtZoom(map.getZoom(), reduced)
-        : 'extrusion';
+    const mode = detailAtZoom(map.getZoom(), reduced);
+    const active = options.enabled && !fallback;
     const bounds = map.getBounds();
     const catalogue = options.data.visuals;
     const visible =
@@ -282,7 +283,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       }
       group.visible = options.enabled && !fallback;
     }
-    for (const sector of loaded.values())
+    for (const sector of loaded.values()) {
+      sector.visible = active && mode !== 'extrusion';
       for (const child of sector.children) {
         const id = String(child.userData.buildingId),
           feature = features.get(id),
@@ -296,13 +298,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           mesh.visible = !(mesh.userData.detail && mode !== 'detailed');
         }
       }
+    }
     ambient.intensity = options.dark ? 1.15 : 1.6;
     sun.intensity = options.dark ? 0.9 : 1.8;
     ambient.color.set(options.dark ? '#becbd8' : '#fff1d5');
     for (const [colour, entry] of materials) {
-      entry.value.color
-        .copy(new Color(colour))
-        .multiplyScalar(options.dark ? 0.8 : 1);
+      entry.value.color.set(colour).multiplyScalar(options.dark ? 0.8 : 1);
       entry.value.opacity = options.opacity ?? 1;
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
@@ -332,39 +333,10 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         continue;
       const positions: number[] = [];
       for (const mesh of group.children)
-        if (mesh instanceof Mesh) {
-          const surfaces = mesh.userData.surfaces || [],
-            attr = mesh.geometry.getAttribute('position'),
-            indices = mesh.geometry.index;
-          if (!indices) continue;
-          for (const surface of surfaces) {
-            if (
-              (selection.partId && surface.partId !== selection.partId) ||
-              (selection.wallId && surface.wallId !== selection.wallId) ||
-              (selection.role === 'roof' && surface.role !== 'roof')
-            )
-              continue;
-            for (
-              let i = surface.start * 3;
-              i < (surface.start + surface.count) * 3;
-              i += 3
-            )
-              if (
-                selection.roofTriangle === undefined ||
-                surface.role !== 'roof' ||
-                i / 3 - surface.start === selection.roofTriangle
-              )
-                for (let edge = 0; edge < 3; edge++)
-                  for (const at of [i + edge, i + ((edge + 1) % 3)]) {
-                    const v = indices.getX(at);
-                    positions.push(
-                      attr.getX(v),
-                      attr.getY(v),
-                      attr.getZ(v) + 0.025,
-                    );
-                  }
-          }
-        }
+        if (mesh instanceof Mesh && mesh.userData.modelMesh)
+          positions.push(
+            ...buildingOutline(mesh.userData.modelMesh, selection),
+          );
       if (positions.length) {
         const geometry = new BufferGeometry();
         geometry.setAttribute(
@@ -394,6 +366,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     publish();
     for (const sector of visible)
       if (
+        active &&
         inflight.size < 3 &&
         !loaded.has(sector.id) &&
         !inflight.has(sector.id) &&
@@ -414,7 +387,11 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       refresh();
     },
     render(_gl, args) {
-      if (!renderer || disposed || fallback) return;
+      if (!renderer || disposed || fallback || !options.enabled) {
+        lastFrame = 0;
+        slowFrames = 0;
+        return;
+      }
       camera.projectionMatrix
         .fromArray(args.defaultProjectionData.mainMatrix)
         .multiply(world);
@@ -423,7 +400,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         renderer.render(scene, camera);
       } catch {
         fallback = true;
-        options.onReduced();
+        options.onStatus('unavailable');
         refresh();
         map.triggerRepaint();
       }
@@ -433,20 +410,20 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           interval = now - lastFrame,
           hadFrame = lastFrame > 0;
         lastFrame = now;
-        if (hadFrame && interval > 38) slowFrames++;
+        if (hadFrame && interval > 38 && interval < 250) slowFrames++;
         else slowFrames = Math.max(0, slowFrames - 1);
         if (slowFrames >= 12 && !reduced) {
           reduced = true;
-          options.onReduced();
+          options.onStatus('reduced');
           refresh();
         }
-        if (slowFrames >= 24 && !fallback) {
-          fallback = true;
-          options.onReduced();
-          refresh();
-          map.triggerRepaint();
-        }
-      } else lastFrame = 0;
+        // Slow movement may reduce decorative detail, but never silently
+        // disable architecture. Editor work and background pauses also cause
+        // long frame intervals; they are not evidence of a renderer failure.
+      } else {
+        lastFrame = 0;
+        slowFrames = 0;
+      }
     },
     onRemove() {
       renderer?.dispose();
@@ -462,7 +439,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       map.triggerRepaint();
     },
     pick(point: PointLike): BuildingSelection | undefined {
-      if (!options.enabled || !readyKey) return;
+      if (!options.enabled || fallback || !readyKey) return;
       const p = Array.isArray(point) ? { x: point[0], y: point[1] } : point;
       const x = (p.x / map.getCanvas().clientWidth) * 2 - 1,
         y = 1 - (p.y / map.getCanvas().clientHeight) * 2;
@@ -471,9 +448,9 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         far = new Vector3(x, y, 1).applyMatrix4(inverse);
       raycaster.ray.set(near, far.sub(near).normalize());
       scene.updateMatrixWorld(true);
-      const objects = [...loaded.values()].flatMap((s) =>
-        s.children.filter((c) => c.visible),
-      );
+      const objects = [...loaded.values()]
+        .filter((s) => s.visible)
+        .flatMap((s) => s.children.filter((c) => c.visible));
       objects.push(...[...drafts.values()].filter((g) => g.visible));
       const hit = raycaster
         .intersectObjects(objects, true)

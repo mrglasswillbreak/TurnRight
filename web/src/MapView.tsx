@@ -17,7 +17,7 @@ import type { CampusData, GpsFix, Place, Route } from './types';
 import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
 import { campusPalette } from './map-palette';
-import type { createCampusModels } from './campus-model-layer';
+import type { createCampusModels, ModelStatus } from './campus-model-layer';
 import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
@@ -76,7 +76,8 @@ export function MapView({
   const ready = useRef(false);
   const models = useRef<ReturnType<typeof createCampusModels> | null>(null);
   const [modelIds, setModelIds] = useState<string[]>([]),
-    [reduced, setReduced] = useState(false);
+    [modelStatus, setModelStatus] = useState<ModelStatus>('ready'),
+    [modelAttempt, setModelAttempt] = useState(0);
   const campusGeometry = useMemo(
     () => displayGeometry(data.map, data.visuals),
     [data.map, data.visuals],
@@ -791,7 +792,7 @@ export function MapView({
     dark,
     selectedId: selectedBuildingId,
     onReady: setModelIds,
-    onReduced: () => setReduced(true),
+    onStatus: setModelStatus,
   });
   modelOptions.current = {
     data,
@@ -802,27 +803,28 @@ export function MapView({
     dark,
     selectedId: selectedBuildingId,
     onReady: setModelIds,
-    onReduced: () => setReduced(true),
+    onStatus: setModelStatus,
   };
   const visualRevision =
     data.visuals?.revision || (editor ? 'editor-preview' : undefined);
   useEffect(() => {
     if (!motionMap || !visualRevision || !threeD || simple) return;
     let cancelled = false;
+    setModelStatus('ready');
     void import('./campus-model-layer')
       .then(({ createCampusModels }) => {
         if (cancelled || mapRef.current !== motionMap) return;
         models.current = createCampusModels(motionMap, modelOptions.current);
       })
       .catch(() => {
-        if (!cancelled) setReduced(true);
+        if (!cancelled) setModelStatus('unavailable');
       });
     return () => {
       cancelled = true;
       models.current?.dispose();
       models.current = null;
     };
-  }, [motionMap, visualRevision, threeD, simple]);
+  }, [motionMap, visualRevision, threeD, simple, modelAttempt]);
   useEffect(() => {
     models.current?.update(modelOptions.current);
   }, [
@@ -986,10 +988,25 @@ export function MapView({
         ref={container}
         aria-label="Interactive map of LASU Ojo campus"
       />
-      {threeD && !simple && reduced && (
-        <output className="map-detail-status">
-          Detail reduced for smoother movement
-        </output>
+      {threeD &&
+        !simple &&
+        (editing || buildingPreview.pending || modelStatus === 'reduced') && (
+          <output className="map-detail-status" aria-live="polite">
+            {editing
+              ? 'Enhanced models paused for map editing'
+              : buildingPreview.pending
+                ? 'Updating 3D preview…'
+                : 'Detail reduced for smoother movement'}
+          </output>
+        )}
+      {threeD && !simple && !editing && modelStatus === 'unavailable' && (
+        <div className="map-rendering-error" role="alert">
+          <strong>Enhanced 3D is unavailable</strong>
+          <p>Simple buildings are shown. Your edits are preserved.</p>
+          <button onClick={() => setModelAttempt((n) => n + 1)}>
+            Retry enhanced 3D
+          </button>
+        </div>
       )}
       {editor && threeD && !simple && buildingPreview.error && (
         <div className="building-preview-error" role="alert">
@@ -997,9 +1014,6 @@ export function MapView({
           <p>{buildingPreview.error}</p>
           <button onClick={buildingPreview.retry}>Retry 3D preview</button>
         </div>
-      )}
-      {editor && buildingPreview.pending && (
-        <output className="map-detail-status">Updating 3D preview…</output>
       )}
       {mapError && (
         <div className="map-error" role="alert">
