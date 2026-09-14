@@ -1,5 +1,38 @@
 # Production deployments
 
+## Editor reliability and review update — 14 September 2026
+
+The owner requested focused commits and production deployment. Fifteen
+implementation, test and documentation commits were fast-forwarded to `main`.
+Vercel reported a successful **Production** deployment for application revision
+`641b2e9fc83a80c961513ce9076b7ce4a8f42575`.
+
+- Public application: [turnright.vercel.app](https://turnright.vercel.app/).
+- [Production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/DzmNhygdBpkGuscH93EUsy7xjf4e).
+- Immutable URL: [turnright-9u431nae9](https://turnright-9u431nae9-muhammed-abdulhadi-s-projects.vercel.app/).
+- At 04:23 UTC, `/`, `/admin` and `/sw.js` returned 200. The service worker
+  retains `no-cache, no-store, must-revalidate`; unauthenticated `review-status`
+  returned 401 with `no-store`.
+- The served application entry is `index-DVdRW6ir.js`; the editor is
+  `Admin-BzKmpZNX.js`. The live editor bundle contains local recovery export,
+  operation-specific retries, conflict review, repair/duplicate previews,
+  release impact and status polling.
+- A fresh Chromium session opened the Faculty of Law through its stable place
+  link, copied that same ID, calculated Clinic–Law and displayed recorded steps
+  information. A phone-sized unknown destination offered focused search, and
+  `/admin` opened the configured GitHub sign-in screen. No page errors occurred.
+- All 22 published assets retained their exact byte counts and SHA-256 hashes.
+  Package `lasu-4e4c8008b38b` remains 3,159,499 bytes. No map drafts were
+  published and no database migration was needed.
+
+The final local suite passed 226 tests, the production build and lint with no
+errors. Chromium and production PWA acceptance are recorded in
+[the reliability verification notes](EDITOR-RELIABILITY.md). Physical
+Android/iPhone and authenticated owner acceptance remain pending; Windows
+WebKit verification was incomplete because of WebGL context loss. The preceding
+production deployment `Cn5F2f8D6MxmFg4ngEXxHnVrncSL`
+(`turnright-55oag4lgl`) remains the recorded rollback target.
+
 ## Editor baseline repair — 14 September 2026
 
 The owner reported the missing endpoints on path
