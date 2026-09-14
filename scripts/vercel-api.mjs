@@ -35,6 +35,9 @@ export async function uploadSource(root) {
     "web/scripts",
   ];
   const singles = [
+    // Public, credited appearance references imported by the editor. Keep the
+    // rest of data/ excluded: it includes raw imports and draft snapshots.
+    "data/building-evidence.json",
     "web/package.json",
     "web/package-lock.json",
     "web/index.html",
