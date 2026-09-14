@@ -2568,6 +2568,159 @@ test('supports dark appearance and small-screen review', async ({ page }) => {
   await page.screenshot({ path: 'test-results/editor-mobile.png' });
 });
 
+for (const phone of [false, true]) {
+  test(`building references ${phone ? 'phone' : 'desktop'}: review, apply, undo and reload without moving the map`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(120000);
+    if (phone) await page.setViewportSize({ width: 390, height: 844 });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const state = await setup(page);
+    await focusCampus(page);
+    await page
+      .getByRole('button', { name: 'Switch to 3D', exact: true })
+      .click();
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({ zoom: 18, pitch: 48 }),
+    );
+    const camera = await page.evaluate(() => [
+      window.editorTestMap.getCenter().toArray(),
+      window.editorTestMap.getZoom(),
+      window.editorTestMap.getPitch(),
+    ]);
+    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await page
+      .locator('summary')
+      .filter({ hasText: /^Building appearances$/ })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Apply 1 reviewed appearances' }),
+    ).toBeEnabled();
+    await page
+      .locator('.building-reference-item')
+      .filter({ hasText: 'Library' })
+      .locator('summary')
+      .click();
+    await expect(page.locator('.reference-values')).toContainText(
+      'Window spacing',
+    );
+    expect(state.edits()).toHaveLength(0);
+    await page.screenshot({
+      path: testInfo.outputPath('reference-review.png'),
+    });
+    await page
+      .getByRole('button', { name: 'Apply 1 reviewed appearances' })
+      .click();
+    await expect
+      .poll(
+        () =>
+          state.edits().find((e) => e.id === 'library')?.properties.appearance
+            ?.windows,
+      )
+      .toBe(true);
+    await expect(
+      page.getByRole('button', { name: 'Apply 0 reviewed appearances' }),
+    ).toBeDisabled();
+    expect(
+      await page.evaluate(() => [
+        window.editorTestMap.getCenter().toArray(),
+        window.editorTestMap.getZoom(),
+        window.editorTestMap.getPitch(),
+      ]),
+    ).toEqual(camera);
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect
+      .poll(() =>
+        state
+          .edits()
+          .some(
+            (e) =>
+              e.id === 'library' &&
+              !e.deleted &&
+              e.properties.appearance?.windows,
+          ),
+      )
+      .toBe(false);
+    await expect(
+      page.getByRole('button', { name: 'Apply 1 reviewed appearances' }),
+    ).toBeEnabled();
+    await page.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect
+      .poll(() =>
+        state
+          .edits()
+          .some(
+            (e) =>
+              e.id === 'library' &&
+              !e.deleted &&
+              e.properties.appearance?.windows,
+          ),
+      )
+      .toBe(true);
+    await page.reload();
+    await attachMap(page);
+    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await page
+      .locator('summary')
+      .filter({ hasText: /^Building appearances$/ })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Apply 0 reviewed appearances' }),
+    ).toBeDisabled();
+    expect(errors).toEqual([]);
+  });
+}
+
+test('building references campus batch: all eligible facades regenerate without preview errors', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(150000);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const state = await setup(page, true, true);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.201, 6.4667],
+      zoom: 17.6,
+      pitch: 48,
+    }),
+  );
+  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await page
+    .locator('summary')
+    .filter({ hasText: /^Building appearances$/ })
+    .click();
+  const apply = page.getByRole('button', {
+    name: /^Apply \d+ reviewed appearances$/,
+  });
+  await expect(apply).toBeEnabled();
+  const count = Number((await apply.innerText()).match(/\d+/)![0]);
+  expect(count).toBeGreaterThanOrEqual(50);
+  expect(state.edits()).toHaveLength(0);
+  await apply.click();
+  await expect.poll(() => state.edits().length, { timeout: 45000 }).toBe(count);
+  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
+    timeout: 45000,
+  });
+  await expect(
+    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+  ).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .toContain('arcgis:University_Property:28');
+  await page.screenshot({
+    path: testInfo.outputPath('campus-appearances.png'),
+  });
+  expect(errors).toEqual([]);
+});
+
 test('building appearance: integrated view, surface inheritance, live preview, roof recovery and undo', async ({
   page,
 }) => {
