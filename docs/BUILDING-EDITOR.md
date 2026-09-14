@@ -24,7 +24,7 @@ The browser worker and release builder import the same mesh and appearance code.
 
 ## Preview reliability
 
-Slow map movement reduces decorative detail while retaining enhanced architecture and the selected building's details. It no longer permanently switches off models. Outline, connection and survey work temporarily hide enhanced models; returning to appearance editing restores them and reuses visible sector meshes. This intentional pause has a status message.
+Slow map movement temporarily reduces decorative detail while retaining enhanced architecture and the selected building's details. Ending or interrupting a zoom/pan clears this temporary reduction and redraws the detail appropriate to the current zoom. Zooming back in restores windows and trim automatically, without using the view toggle. Outline, connection and survey work temporarily hide enhanced models; returning to appearance editing restores them and reuses visible sector meshes. This intentional pause has a status message.
 
 A rendering failure shows simple buildings and an explicit **Retry enhanced 3D** action. Retrying replaces only the model layer, preserving the mounted map, camera, selection and roof draft. Worker failures separately retain the last valid preview and offer **Retry 3D preview**; another changed edit can also start a fresh worker. Reduced-detail and updating messages occupy a single status location.
 
@@ -33,6 +33,8 @@ The preview cache keeps each model and its content signature together, including
 Selection outlines follow wall and roof boundaries without drawing blue triangulation diagonals or window grids over the appearance. Closing properties clears the surface highlight. An outline change that removes the selected wing or wall immediately falls back to an available inspector target. Appearance colours and inherited-value links follow the editor theme; controls explain when hidden windows or a custom roof prevent standard settings from changing the preview.
 
 Starting a roof focuses its drawing controls. Applying or cancelling returns focus to the roof editing button, keeping keyboard and phone users in the roof workflow when draft controls are removed.
+
+Zoom regression coverage counts actual WebGL facade draw calls rather than only checking loaded model IDs. Chromium and WebKit both verify automatic restoration after a slow animated zoom and three zoom-out/zoom-in cycles across the extrusion, simplified and detailed thresholds, in both the public map and editor. Genuine renderer failures retain their separate retry action. These checks cover the detail state that the earlier model-presence tests missed.
 
 The release workflow rebuilds the visual catalogue and sector assets from its immutable snapshot before packaging. It verifies generated meshes and asset integrity and retains the 12 MB sector budget and 300 KB gzip lazy-renderer budget. Application deployment does not publish campus drafts; the owner still reviews and publishes a release separately.
 
