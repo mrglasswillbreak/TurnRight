@@ -15,6 +15,7 @@ export function retainCampusSources(
     'places',
     'closures',
     'entrances',
+    'visuals',
   ] as const) {
     if (JSON.stringify(previous[key]) === JSON.stringify(next[key]))
       Object.assign(next, { [key]: previous[key] });

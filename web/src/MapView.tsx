@@ -58,7 +58,6 @@ export function MapView({
   onManualPan,
   onReady,
 }: MapViewProps) {
-  const palette = campusPalette[dark ? 'dark' : 'light'];
   const container = useRef<HTMLDivElement>(null),
     mapRef = useRef<MapInstance | null>(null);
   const callbacks = useRef({
@@ -144,6 +143,7 @@ export function MapView({
   useEffect(() => {
     if (!container.current) return;
     const dark = camera.current.dark;
+    const palette = campusPalette[dark ? 'dark' : 'light'];
     let map: MapInstance;
     let disposeExtension: void | (() => void);
     try {
@@ -269,7 +269,7 @@ export function MapView({
             ['Green Area', 'Vegetation', 'Forest'],
             dark ? '#3b5645' : '#c0d0ac',
             ['Water Body', 'Water'],
-            '#a7cbd8',
+            palette.water,
             dark ? '#34473e' : '#eee4cf',
           ],
           'fill-opacity': 0.65,
@@ -638,6 +638,7 @@ export function MapView({
     if (!map) return;
     const apply = () => {
       // Repaint in place: device changes must not reset a walk, camera or editor.
+      const palette = campusPalette[dark ? 'dark' : 'light'];
       const paint: [
         string,
         Parameters<MapInstance['setPaintProperty']>[1],
@@ -654,7 +655,7 @@ export function MapView({
             ['Green Area', 'Vegetation', 'Forest'],
             dark ? '#3b5645' : '#c0d0ac',
             ['Water Body', 'Water'],
-            '#a7cbd8',
+            palette.water,
             dark ? '#34473e' : '#eee4cf',
           ],
         ],
@@ -796,8 +797,9 @@ export function MapView({
     onReady: setModelIds,
     onReduced: () => setReduced(true),
   };
+  const visualRevision = data.visuals?.revision;
   useEffect(() => {
-    if (!motionMap || !data.visuals || !threeD || simple) return;
+    if (!motionMap || !visualRevision || !threeD || simple) return;
     let cancelled = false;
     void import('./campus-model-layer')
       .then(({ createCampusModels }) => {
@@ -812,7 +814,7 @@ export function MapView({
       models.current?.dispose();
       models.current = null;
     };
-  }, [motionMap, data.visuals?.revision, threeD, simple]);
+  }, [motionMap, visualRevision, threeD, simple]);
   useEffect(() => {
     models.current?.update(modelOptions.current);
   }, [

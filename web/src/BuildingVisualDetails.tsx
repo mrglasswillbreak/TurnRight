@@ -1,7 +1,7 @@
 import type { Feature } from 'geojson';
 import type { CampusData } from './types';
 import { buildingDisplay } from './map-display';
-import { compatibleVisual } from './building-visuals';
+import { buildingRevision, compatibleVisual } from './building-visuals';
 export function BuildingVisualDetails({
   data,
   feature,
@@ -13,6 +13,13 @@ export function BuildingVisualDetails({
     (b) => b.id === feature.properties?.id,
   );
   const current = compatibleVisual(feature, record);
+  const correctionPending =
+    record?.geometryReview?.baselineRevision === buildingRevision(feature);
+  const needed = (record?.needed || []).filter(
+    (item) =>
+      !current ||
+      !item.startsWith('Accept the separate-wing geometry correction'),
+  );
   const description =
     current && record && record.heightKind !== 'illustrative'
       ? record.heightKind === 'recorded'
@@ -26,8 +33,8 @@ export function BuildingVisualDetails({
         <details className="building-evidence">
           <summary>
             {current
-              ? `${record.level === 'extrusion' ? 'Illustrative' : record.level === 'detailed' ? 'Detailed' : 'Simplified'} 3D · model evidence`
-              : record.geometryReview
+              ? `${record.level === 'extrusion' ? (record.heightKind === 'illustrative' ? 'Illustrative' : 'Source extrusion') : record.level === 'detailed' ? 'Detailed' : 'Simplified'} 3D · model evidence`
+              : correctionPending
                 ? 'Model pending footprint correction'
                 : 'Model needs rebuilding after geometry changes'}
           </summary>
@@ -37,14 +44,14 @@ export function BuildingVisualDetails({
           <p>
             <strong>Inferred:</strong> {record.inferred.join(' ')}
           </p>
-          {record.needed.length > 0 && (
+          {needed.length > 0 && (
             <p>
-              <strong>Still needed:</strong> {record.needed.join(' ')}
+              <strong>Still needed:</strong> {needed.join(' ')}
             </p>
           )}
           {record.sources
             .map((id) => data.visuals?.references.find((r) => r.id === id))
-            .filter((r) => r && /^https:\/\//.test(r.url))
+            .filter((r) => r && r.url.startsWith('https://'))
             .map((r) => (
               <a href={r!.url} key={r!.id} target="_blank" rel="noreferrer">
                 {r!.author} · {r!.date.slice(0, 10)} · {r!.license}
