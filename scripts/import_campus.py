@@ -175,7 +175,10 @@ def build(access_policy=None):
             # Retain separate source layers; OSM supplements ArcGIS rather than overwriting it.
             centroid = [sum(p[i] for p in coords[:-1]) / (len(coords) - 1) for i in (0, 1)]
             if not inside(centroid, ring): continue
-            overlap = any(f['properties']['kind'] == 'building' and inside(centroid, f['geometry']['coordinates'][0]) for f in features)
+            overlap = any(f['properties']['kind'] == 'building' and any(
+                inside(centroid, polygon[0]) and not any(inside(centroid, hole) for hole in polygon[1:])
+                for polygon in ([f['geometry']['coordinates']] if f['geometry']['type'] == 'Polygon' else f['geometry']['coordinates'])
+            ) for f in features)
             if not overlap:
                 try: height = float(tags.get('height', '0').replace(' m', '')); estimated = False
                 except ValueError: height = 0; estimated = False
