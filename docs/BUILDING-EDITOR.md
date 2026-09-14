@@ -22,6 +22,18 @@ Appearance conflicts merge at individual fields and named surfaces. Geometry ide
 
 The browser worker and release builder import the same mesh and appearance code. Draft generation is debounced, ignores obsolete replies and retains unchanged catalogue models. Compatible published visual references can augment an approved source baseline without substituting geometry or routing data.
 
+## Preview reliability
+
+Slow map movement reduces decorative detail while retaining enhanced architecture and the selected building's details. It no longer permanently switches off models. Outline, connection and survey work temporarily hide enhanced models; returning to appearance editing restores them and reuses visible sector meshes. This intentional pause has a status message.
+
+A rendering failure shows simple buildings and an explicit **Retry enhanced 3D** action. Retrying replaces only the model layer, preserving the mounted map, camera, selection and roof draft. Worker failures separately retain the last valid preview and offer **Retry 3D preview**; another changed edit can also start a fresh worker. Reduced-detail and updating messages occupy a single status location.
+
+The preview cache keeps each model and its content signature together, including up to eight recently inspected buildings beyond those actively needed. Revisiting an unchanged building restores its model. Save acknowledgements, name changes and surface selection do not restart geometry generation. Worker requests include visual references only for the buildings being rebuilt. Roof triangulation is reused when only the tool, selected point or selected surface changes.
+
+Selection outlines follow wall and roof boundaries without drawing blue triangulation diagonals or window grids over the appearance. Closing properties clears the surface highlight. An outline change that removes the selected wing or wall immediately falls back to an available inspector target. Appearance colours and inherited-value links follow the editor theme; controls explain when hidden windows or a custom roof prevent standard settings from changing the preview.
+
+Starting a roof focuses its drawing controls. Applying or cancelling returns focus to the roof editing button, keeping keyboard and phone users in the roof workflow when draft controls are removed.
+
 The release workflow rebuilds the visual catalogue and sector assets from its immutable snapshot before packaging. It verifies generated meshes and asset integrity and retains the 12 MB sector budget and 300 KB gzip lazy-renderer budget. Application deployment does not publish campus drafts; the owner still reviews and publishes a release separately.
 
 ## Acceptance
@@ -37,3 +49,5 @@ The single-button Settings follow-up passes nine Chromium scenarios and two prod
 A local build of the current published campus assessed 380 buildings and generated 55 models across 22 sectors. Every generated model matched the editor's shared generator, including geometry and materials. These checks used the published data as input without publishing a campus draft.
 
 Real Android and iPhone checks remain required before campus release acceptance: cold offline reopening, appearance controls, touch wall selection, ridge/valley drawing, attached point movement, Apply/Cancel, undo/redo and selection at low building opacity. Browser emulation does not replace those hardware checks.
+
+Building reliability follow-up, 14 September 2026: 270 unit tests pass, including removed-surface inspector recovery and boundary-only selection outlines. Chromium exercises 32 controlled slow frames without losing enhanced models, temporary outline suppression, an injected WebGL drawing failure and explicit renderer retry with an unchanged camera. Preview tests verify two unedited building visits plus a cached revisit require only two builds; a colour edit adds one build, while its save receipt and a subsequent name change add none. Worker tests cover timeout, crash, automatic recovery on another edit, explicit retry and obsolete replies. WebKit touch checks pass for roof editing, post-Apply focus and Settings. Production service-worker tests pass for model integrity repair and cold offline recovery of wall edits and unfinished roofs. Client/server type checks, lint and build/budget checks pass; the lazy renderer is 119.7 KB gzip against 300 KB. Existing toolchain warnings remain. This application update does not publish a campus draft.
