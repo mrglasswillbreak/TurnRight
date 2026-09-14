@@ -707,6 +707,48 @@ test('prepared public map reopens in 3D offline with its saved view preference',
     .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
     .toBe(0);
 });
+test('prepared public map verifies enhanced architecture, repairs corruption and reopens it offline', async ({
+  page,
+  context,
+}, testInfo) => {
+  test.skip(
+    !testInfo.config.configFile?.includes('pwa.config'),
+    'Requires production service worker.',
+  );
+  test.setTimeout(120000);
+  const { campus } = await setup(page, true, true);
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.goto('/');
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Offline', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Download campus map', exact: true })
+    .click();
+  await expect(
+    page.getByText('Enhanced 3D ready offline · all model files verified'),
+  ).toBeVisible();
+  await page.evaluate(async (url) => {
+    const cache = await caches.open('turnright-assets-v1');
+    await cache.put(url, new Response('corrupted model file'));
+  }, campus.visuals!.sectors[0].url);
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Offline', exact: true }).click();
+  await expect(
+    page.getByText('Enhanced 3D ready offline · all model files verified'),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'Download campus map', exact: true })
+    .click();
+  await expect(
+    page.getByText('Enhanced 3D ready offline · all model files verified'),
+  ).toBeVisible();
+  await context.setOffline(true);
+  await page.goto('/');
+  await attachMap(page);
+  await focusModels(page);
+  await page.screenshot({ path: 'test-results/miniature-offline.png' });
+});
 
 test('phone survey pauses when hidden and requires explicit resume after reload', async ({
   page,
@@ -762,6 +804,7 @@ interface RefFiber {
 import { test, expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { gunzipSync } from 'node:zlib';
 import { campusFixture } from '../fixture';
 import type { CampusData, MapEdit, Position } from '../../src/types';
 
@@ -844,7 +887,7 @@ function browserCampus(): CampusData {
   ];
   return data;
 }
-async function setup(page: Page, realCampus = false) {
+async function setup(page: Page, realCampus = false, enhanced = false) {
   let edits: MapEdit[] = [];
   let revision = 0;
   const receipts = new Map<string, MapEdit[]>();
@@ -859,6 +902,34 @@ async function setup(page: Page, realCampus = false) {
         ),
       )
     : browserCampus();
+  if (enhanced) {
+    campus.visuals = JSON.parse(
+      readFileSync(
+        new URL('../../../data/visuals/catalogue.json', import.meta.url),
+        'utf8',
+      ),
+    );
+    // This fixture represents acceptance of the reviewed ring corrections.
+    for (const visual of campus.visuals!.buildings)
+      if (visual.geometryReview) {
+        const feature = campus.map.features.find(
+          (f) => f.properties?.id === visual.id,
+        );
+        if (feature) feature.geometry = visual.geometryReview.geometry;
+      }
+    for (const sector of campus.visuals!.sectors)
+      await page.context().route(`**${sector.url}`, (route) =>
+        route.fulfill({
+          body: readFileSync(
+            new URL(
+              `../../../data/visuals/${sector.url.split('/').at(-1)}`,
+              import.meta.url,
+            ),
+          ),
+          contentType: 'application/json',
+        }),
+      );
+  }
   const bytes = JSON.stringify(campus);
   const user = {
     id: 'owner',
@@ -888,28 +959,39 @@ async function setup(page: Page, realCampus = false) {
   await page.route('https://editor-test.supabase.co/**', (route) =>
     route.fulfill({ json: { user } }),
   );
-  await page.route('**/packages/latest.json', (route) =>
+  await page.context().route('**/packages/latest.json', (route) =>
     route.fulfill({
       json: {
         schemaVersion: 1,
-        version: 'fixture',
+        version: campus.version,
         createdAt: campus.createdAt,
         summary: 'Test campus',
         dataUrl: '/packages/fixture/campus.json',
-        bytes: Buffer.byteLength(bytes),
+        bytes: Buffer.byteLength(bytes) + (campus.visuals?.bytes || 0),
+        ...(campus.visuals
+          ? {
+              visuals: {
+                bytes: campus.visuals.bytes,
+                assetUrls: campus.visuals.sectors.map((s) => s.url),
+              },
+            }
+          : {}),
         assets: [
           {
             url: '/packages/fixture/campus.json',
             sha256: createHash('sha256').update(bytes).digest('hex'),
             bytes: Buffer.byteLength(bytes),
           },
+          ...(campus.visuals?.sectors || []),
         ],
       },
     }),
   );
-  await page.route('**/packages/fixture/campus.json', (route) =>
-    route.fulfill({ body: bytes, contentType: 'application/json' }),
-  );
+  await page
+    .context()
+    .route('**/packages/fixture/campus.json', (route) =>
+      route.fulfill({ body: bytes, contentType: 'application/json' }),
+    );
   await page.route('**/api/admin', async (route) => {
     const { action, payload } = route.request().postDataJSON();
     if (action === 'state')
@@ -992,6 +1074,261 @@ async function clickMap(page: Page, coordinates: Position) {
   const p = await position(page, coordinates);
   await page.mouse.click(p.x, p.y);
 }
+
+async function focusModels(page: Page, phone = false) {
+  await page.evaluate(
+    (phone) =>
+      window.editorTestMap.jumpTo({
+        center: [3.19978, 6.47109],
+        zoom: 18,
+        pitch: 50,
+        bearing: -18,
+        padding: {
+          top: 0,
+          right: 0,
+          bottom: phone ? 350 : 0,
+          left: phone ? 0 : 450,
+        },
+      }),
+    phone,
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .toContain('arcgis:University_Property:120');
+}
+test('release diagnostics preserve the usable campus and identify the captured missing endpoints', async ({
+  page,
+}) => {
+  await setup(page, true);
+  const captured = JSON.parse(
+    gunzipSync(
+      readFileSync(
+        new URL('../fixtures/editor-2026-09-14.json.gz', import.meta.url),
+      ),
+    ).toString(),
+  ) as { base: CampusData; edits: MapEdit[] };
+  const { map, places, graph, ...meta } = captured.base;
+  const record = (entity: string, payload: unknown, id: string) => ({
+    entity,
+    payload,
+    id,
+    source: 'fixture',
+    hash: 'fixture',
+  });
+  const features = [
+    record('meta', meta, 'meta:campus'),
+    ...map.features.map((f, i) => record('feature', f, `feature:${i}`)),
+    ...places.map((p) => record('place', p, p.id)),
+    ...graph.nodes.map((n) => record('node', n, n.id)),
+    ...graph.edges.map((e) => record('edge', e, e.id)),
+  ];
+  await page.route('**/api/admin', (route) => {
+    const { action } = route.request().postDataJSON();
+    return route.fulfill({
+      json:
+        action === 'sources'
+          ? { features }
+          : action === 'state'
+            ? {
+                edits: captured.edits,
+                reports: [],
+                changes: [],
+                jobs: [],
+                releases: [],
+              }
+            : [],
+    });
+  });
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  await expect(
+    page.getByText('Validation needs attention', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/Showing the last usable map/)).toBeVisible();
+  await expect(
+    page.getByText(/osm:way:1534765716:2297333149:2297333129:1/).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Build review preview' }),
+  ).toBeDisabled();
+  await page.getByRole('button', { name: 'Retry validation' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Locate feature' }),
+  ).toBeVisible();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download diagnostics' }).click();
+  expect((await download).suggestedFilename()).toBe(
+    'turnright-validation.json',
+  );
+  await page.getByRole('button', { name: 'Locate feature' }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getZoom()))
+    .toBeCloseTo(18, 1);
+  expect(errors).toEqual([]);
+});
+test('review separate building wings, edit their geometry, save and undo without changing identity', async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  const server = await setup(page, true);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.19978, 6.47109],
+      zoom: 18,
+      pitch: 0,
+      padding: { top: 0, right: 300, bottom: 0, left: 0 },
+    }),
+  );
+  await clickMap(page, [3.1997, 6.47128]);
+  await page.getByRole('button', { name: 'Review corrected wings' }).click();
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  const building = () =>
+    server
+      .edits()
+      .find(
+        (e) =>
+          e.id === 'arcgis:University_Property:120' && e.kind === 'building',
+      );
+  expect(building()?.geometry.type).toBe('MultiPolygon');
+  const before = structuredClone(building()!.geometry);
+  const from = await position(page, [3.1996805, 6.4707775]),
+    to = await position(page, [3.19967, 6.47078]);
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 6 });
+  await page.mouse.up();
+  await expect
+    .poll(() => JSON.stringify(building()?.geometry))
+    .not.toBe(JSON.stringify(before));
+  expect(building()!.geometry.type).toBe('MultiPolygon');
+  await page.keyboard.press('Control+z');
+  await expect.poll(() => building()?.geometry).toEqual(before);
+  await page.keyboard.press('Control+z');
+  await expect.poll(() => building()?.properties.revertToSource).toBe(true);
+  expect(errors).toEqual([]);
+});
+for (const phone of [false, true])
+  test(`miniature models: ${phone ? 'phone' : 'desktop'} LOD, picking, appearance and simple preference`, async ({
+    page,
+  }) => {
+    test.setTimeout(120000);
+    if (phone) await page.setViewportSize({ width: 390, height: 844 });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await setup(page, true, true);
+    await page.goto('/');
+    await attachMap(page);
+    await focusModels(page, phone);
+    const p = await position(page, [3.19978, 6.47109]);
+    await page.mouse.click(p.x, p.y - 12);
+    await expect(
+      page.getByRole('heading', { name: 'LASU Senate Building', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText(/Approximately 21 m/)).toBeVisible();
+    await page.screenshot({
+      path: `test-results/miniature-${phone ? 'phone' : 'desktop'}-light.png`,
+    });
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.screenshot({
+      path: `test-results/miniature-${phone ? 'phone' : 'desktop'}-dark.png`,
+    });
+    await page
+      .getByRole('button', { name: 'Enhanced 3D', exact: true })
+      .click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
+      )
+      .toBe(false);
+    await page.reload();
+    await attachMap(page);
+    await expect(
+      page.getByRole('button', { name: 'Simple 3D', exact: true }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Simple 3D', exact: true }).click();
+    await focusModels(page, phone);
+    await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14 }));
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      )
+      .not.toContain('arcgis:University_Property:120');
+    await page.getByRole('button', { name: 'Switch to 2D' }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => !!window.editorTestMap.getLayer('campus-models')),
+      )
+      .toBe(false);
+    expect(errors).toEqual([]);
+  });
+test('miniature models fall back for unavailable sectors and keep drawing unobstructed', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const { campus } = await setup(page, true, true);
+  await page.getByRole('button', { name: '3D', exact: true }).click();
+  await focusModels(page);
+  const roof = await position(page, [3.19978, 6.47109]);
+  await page.mouse.click(roof.x, roof.y - 12);
+  await expect(
+    page.getByRole('complementary', { name: 'Feature properties' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('textbox', { name: 'Name', exact: true }),
+  ).toHaveValue('LASU Senate Building');
+  await page.getByRole('button', { name: 'Close properties' }).click();
+  await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .not.toContain('arcgis:University_Property:120');
+  await expect(
+    page.getByRole('button', { name: 'Finish', exact: true }),
+  ).toBeDisabled();
+  await clickMap(page, [3.19945, 6.47115]);
+  await expect(page.locator('.drawing-progress')).toContainText('1');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await focusModels(page);
+  for (const sector of campus.visuals!.sectors)
+    await page.route(`**${sector.url}`, (route) =>
+      route.fulfill({ status: 503, body: 'Unavailable' }),
+    );
+  await page.reload();
+  await attachMap(page);
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.19978, 6.47109],
+      zoom: 18,
+      pitch: 50,
+    }),
+  );
+  await expect(
+    page.getByRole('button', { name: 'Enhanced 3D', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+      ),
+    )
+    .not.toContain('arcgis:University_Property:120');
+});
 async function focusCampus(page: Page) {
   await page.evaluate(() =>
     window.editorTestMap.jumpTo({
@@ -1180,7 +1517,7 @@ test('public initial camera includes the northern campus', async ({ page }) => {
         window.editorTestMap.getPaintProperty('background', 'background-color'),
       ),
     )
-    .toBe('#172126');
+    .toBe('#182727');
   await page.screenshot({ path: 'test-results/public-campus-3d-dark.png' });
 });
 

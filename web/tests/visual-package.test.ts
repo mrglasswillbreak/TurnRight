@@ -2,10 +2,11 @@ import { expect, it } from 'vitest';
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 // @ts-expect-error Packaging is an executable ESM pipeline.
 import { packageVisuals } from '../../scripts/visual-package.mjs';
 it('packages only verified catalogue sectors and remains optional for old packages', async () => {
-  const root = path.resolve('../data/visuals'),
+  const root = fileURLToPath(new URL('../../data/visuals', import.meta.url)),
     urls: string[] = [];
   const result = await packageVisuals(root, async (url: string) => {
     urls.push(url);
@@ -41,7 +42,7 @@ it('packages only verified catalogue sectors and remains optional for old packag
       path.dirname(temp) !== path.resolve(tmpdir()) ||
       !path.basename(temp).startsWith('turnright-visual-test-')
     )
-      throw new Error('Unexpected test directory');
-    await rm(temp, { recursive: true });
+      console.error('Skipped cleanup of an unexpected test directory');
+    else await rm(temp, { recursive: true });
   }
 });
