@@ -15,6 +15,9 @@ def inside(p, ring):
 def blocker(a,b,features):
     for f in features:
         g,props=f['geometry'],f['properties']
+        if props.get('kind')=='building' and g['type']=='MultiPolygon':
+            result=blocker(a,b,[{**f,'geometry':{'type':'Polygon','coordinates':rings}} for rings in g['coordinates']])
+            if result: return result
         if props.get('kind')=='building' and g['type']=='Polygon':
             rings=g['coordinates'];outer=rings[0]
             if max(a[0],b[0])<min(p[0] for p in outer) or min(a[0],b[0])>max(p[0] for p in outer) or max(a[1],b[1])<min(p[1] for p in outer) or min(a[1],b[1])>max(p[1] for p in outer): continue

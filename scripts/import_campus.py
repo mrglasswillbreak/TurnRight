@@ -56,7 +56,18 @@ def project(p, sr):
 def arc_geometry(geometry, default_sr=None):
     sr = geometry.get('spatialReference', {}).get('latestWkid', geometry.get('spatialReference', {}).get('wkid', default_sr))
     if 'rings' in geometry:
-        return {'type': 'Polygon', 'coordinates': [[project(p, sr) for p in ring] for ring in geometry['rings']]}
+        rings = [[project(p, sr) for p in ring] for ring in geometry['rings']]
+        # Esri rings can contain multiple exterior parts. GeoJSON's later rings
+        # are holes, so independent wings must be emitted as a MultiPolygon.
+        area = lambda ring: abs(sum(a[0]*b[1]-b[0]*a[1] for a, b in zip(ring, ring[1:])))
+        polygons = []
+        for ring in sorted(rings, key=area, reverse=True):
+            parents = [p for p in polygons if all(inside(point, p[0]) for point in ring[:-1])]
+            if parents: min(parents, key=lambda p: area(p[0])).append(ring)
+            else: polygons.append([ring])
+        polygons.sort(key=lambda polygon: rings.index(polygon[0]))
+        if len(polygons) == 1: return {'type': 'Polygon', 'coordinates': polygons[0]}
+        return {'type': 'MultiPolygon', 'coordinates': polygons}
     return {'type': 'Point', 'coordinates': project([geometry['x'], geometry['y']], sr)}
 
 def feature(identifier, geometry, **properties):
@@ -109,7 +120,12 @@ def build(access_policy=None):
             if floors and kind == 'building': props.update(height=floors * 3, heightEstimated=True)
             if kind != 'place': features.append(feature(identifier, geom, **props))
             if kind != 'land' and name:
-                coords = geom['coordinates'] if geom['type'] == 'Point' else [sum(p[i] for p in geom['coordinates'][0][:-1]) / len(geom['coordinates'][0][:-1]) for i in (0, 1)]
+                if geom['type'] == 'Point': coords = geom['coordinates']
+                else:
+                    # Keep the place on its first mapped part; a multi-wing mean
+                    # could land between buildings and change arrival semantics.
+                    first_ring = geom['coordinates'][0] if geom['type'] == 'Polygon' else geom['coordinates'][0][0]
+                    coords = [sum(p[i] for p in first_ring[:-1]) / len(first_ring[:-1]) for i in (0, 1)]
                 if not inside(coords, ring): continue
                 aliases = [str(attrs.get(k, '')).strip() for k in ('Abbreviati', 'Name_of_De', 'Name_of_Fa') if str(attrs.get(k, '')).strip()]
                 # Never fuzzy-merge distinct nearby buildings solely on proximity.
