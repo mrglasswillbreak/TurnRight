@@ -58,6 +58,7 @@ describe('reviewed roof batches', () => {
       roofForm: 'hip' as const,
       wallColour: '#e7dbc8',
       roofColour: '#b86351',
+      defaults: undefined,
     };
     f.geometry = repairArcGisParts(f)!;
     f.properties!.source = 'campus-review';

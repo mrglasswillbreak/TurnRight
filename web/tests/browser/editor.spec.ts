@@ -3631,3 +3631,184 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
     ).toEqual({});
   });
 }
+
+for (const phone of [false, true]) {
+  test(`roof batch ${phone ? 'phone' : 'desktop'}: review, save, undo and reload`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(120000);
+    if (phone) await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const state = await setup(page);
+    await focusCampus(page);
+    await page
+      .getByRole('button', { name: 'Switch to 3D', exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+      .toBe(false);
+    const camera = await page.evaluate(() => [
+      window.editorTestMap.getCenter().toArray(),
+      window.editorTestMap.getZoom(),
+      window.editorTestMap.getPitch(),
+    ]);
+    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await page
+      .locator('summary')
+      .filter({ hasText: /^Building roofs$/ })
+      .click();
+    const apply = page.getByRole('button', {
+      name: 'Apply 1 reviewed roofs',
+      exact: true,
+    });
+    await expect(apply).toBeEnabled();
+    await page
+      .locator('.building-roof-item')
+      .filter({ hasText: 'Library' })
+      .locator('summary')
+      .click();
+    await expect(
+      page.getByRole('img', {
+        name: 'Proposed roof ridges within the unchanged wing outline',
+      }),
+    ).toBeVisible();
+    expect(state.edits()).toHaveLength(0);
+    expect(await contrastFailures(page)).toEqual([]);
+    await page.screenshot({
+      path: testInfo.outputPath('roof-batch-review.png'),
+    });
+    await apply.click();
+    const savedRoof = () =>
+      state.edits().find((e) => e.id === 'library' && !e.deleted)?.properties
+        .appearance?.roofs?.['library:wing:0'];
+    await expect.poll(() => savedRoof()?.points.length).toBeGreaterThan(0);
+    const saved = structuredClone(savedRoof());
+    expect(saved?.provenance).toContain('illustrative');
+    expect(
+      await page.evaluate(() => [
+        window.editorTestMap.getCenter().toArray(),
+        window.editorTestMap.getZoom(),
+        window.editorTestMap.getPitch(),
+      ]),
+    ).toEqual(camera);
+    await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+    await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+    ).toHaveCount(0);
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      )
+      .toContain('library');
+    await page.screenshot({
+      path: testInfo.outputPath('pitched-roof-model.png'),
+    });
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect.poll(savedRoof).toBeUndefined();
+    await page.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect.poll(savedRoof).toEqual(saved);
+    await page.reload();
+    await attachMap(page);
+    await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+    expect(savedRoof()).toEqual(saved);
+    expect(errors).toEqual([]);
+  });
+}
+test('roof proposal draft survives settings, view changes and recovery before apply', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const state = await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Preview approximate hip roof' })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Apply roof', exact: true }),
+  ).toBeEnabled();
+  expect(state.edits()).toHaveLength(0);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Apply roof', exact: true }),
+  ).toBeEnabled();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
+  await expect(page.getByText(/Approximate hip roof derived/)).toBeVisible();
+  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.roofs?.['library:wing:0']?.points.length,
+    )
+    .toBeGreaterThan(0);
+});
+test('roof campus batch: complex roof plans generate without fallback or camera jumps', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(150000);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const state = await setup(page, true, true);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.1980018, 6.4742127],
+      zoom: 18.2,
+      pitch: 55,
+      bearing: 15,
+    }),
+  );
+  const camera = await page.evaluate(() => [
+    window.editorTestMap.getCenter().toArray(),
+    window.editorTestMap.getZoom(),
+    window.editorTestMap.getPitch(),
+  ]);
+  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await page
+    .locator('summary')
+    .filter({ hasText: /^Building roofs$/ })
+    .click();
+  const apply = page.getByRole('button', {
+    name: /^Apply \d+ reviewed roofs$/,
+  });
+  await expect(apply).toBeEnabled();
+  const count = Number((await apply.innerText()).match(/\d+/)![0]);
+  expect(count).toBeGreaterThanOrEqual(35);
+  expect(state.edits()).toHaveLength(0);
+  await apply.click();
+  await expect.poll(() => state.edits().length, { timeout: 45000 }).toBe(count);
+  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
+    timeout: 45000,
+  });
+  await expect(
+    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+  ).toHaveCount(0);
+  expect(
+    await page.evaluate(() => [
+      window.editorTestMap.getCenter().toArray(),
+      window.editorTestMap.getZoom(),
+      window.editorTestMap.getPitch(),
+    ]),
+  ).toEqual(camera);
+  await page.screenshot({
+    path: testInfo.outputPath('campus-pitched-roofs.png'),
+  });
+  expect(errors).toEqual([]);
+});
