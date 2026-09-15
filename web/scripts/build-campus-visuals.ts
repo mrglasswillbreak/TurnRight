@@ -8,7 +8,12 @@ import type {
   VisualCatalogue,
   SectorModels,
 } from '../src/visual-types';
-import { resolveBuildingVisual, styleFor } from '../src/building-surfaces';
+import {
+  buildingTopology,
+  resolveBuildingVisual,
+  standardRoofSupported,
+  styleFor,
+} from '../src/building-surfaces';
 import { validateBuildingStyle } from '../src/building-style-validation';
 import { buildingRevision, validBuildingModel } from '../src/building-visuals';
 import { buildingDisplay, buildingPlace } from '../src/map-display';
@@ -223,19 +228,29 @@ for (const sourceFeature of buildings) {
       'Resolve the competing model identity before authoring architectural detail. Existing source extrusion retained.',
     );
   }
-  if (
-    roof !== 'flat' &&
-    (polygons.length !== 1 ||
-      polygons[0].length !== 1 ||
-      polygons[0][0].length !== 5)
-  ) {
-    if (!modelConflict) visual.level = 'simplified';
+  const topology = buildingTopology(feature);
+  const unsupportedRoof = polygons.some((polygon, i) => {
+    const partId = topology.parts[i].id;
+    return (
+      !p.appearance?.roofs?.[partId] &&
+      styleFor(p.appearance, visual, partId).roofForm !== 'flat' &&
+      !standardRoofSupported(polygon)
+    );
+  });
+  if (unsupportedRoof) {
     visual.inferred.push(
       'Compound pitched roof remains a flat cap until the ridge layout can be supported.',
     );
     visual.needed.push(
       'Roof plan or overhead evidence for individual wing ridges.',
     );
+  }
+  for (const [i, part] of topology.parts.entries()) {
+    const custom = p.appearance?.roofs?.[part.id];
+    if (custom)
+      visual.inferred.push(
+        `Wing ${i + 1} custom roof: ${custom.provenance || 'Owner-authored control points and elevations; roof dimensions are not independently verified.'}`,
+      );
   }
   if (visual.level !== 'extrusion') {
     const center: Position = [
