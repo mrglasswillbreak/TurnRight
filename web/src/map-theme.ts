@@ -116,9 +116,24 @@ export function mapTheme(dark: boolean) {
       ],
       'circle-stroke-color': p.halo,
     },
-    'places-label': label,
-    'places-label-detail': label,
-    'places-label-selected': label,
+    'places-label': {
+      ...label,
+      'text-color': dark
+        ? ['coalesce', ['get', 'nightColor'], p.label]
+        : p.label,
+    },
+    'places-label-detail': {
+      ...label,
+      'text-color': dark
+        ? ['coalesce', ['get', 'nightColor'], p.label]
+        : p.label,
+    },
+    'places-label-selected': {
+      ...label,
+      'text-color': dark
+        ? ['coalesce', ['get', 'nightColor'], p.label]
+        : p.label,
+    },
     'street-labels': {
       ...label,
       'text-color': p.streetLabel,
@@ -143,7 +158,36 @@ export function applyMapTheme(map: MapInstance, dark: boolean) {
   for (const [layer, paint] of Object.entries(mapTheme(dark)))
     if (map.getLayer(layer))
       for (const [property, value] of Object.entries(paint))
-        map.setPaintProperty(layer, property as Parameters<MapInstance['setPaintProperty']>[1], value);
+        map.setPaintProperty(
+          layer,
+          property as Parameters<MapInstance['setPaintProperty']>[1],
+          value,
+        );
+  const badges = dark && map.hasImage('place-other');
+  if (map.getLayer('places-dot'))
+    map.setLayoutProperty(
+      'places-dot',
+      'visibility',
+      badges ? 'none' : 'visible',
+    );
+  for (const layer of [
+    'places-label',
+    'places-label-detail',
+    'places-label-selected',
+  ]) {
+    if (!map.getLayer(layer)) continue;
+    map.setLayoutProperty(layer, 'icon-image', badges ? ['get', 'badge'] : '');
+    map.setLayoutProperty(layer, 'icon-size', 0.72);
+    map.setLayoutProperty(layer, 'icon-padding', 4);
+    map.setLayoutProperty(
+      layer,
+      'text-variable-anchor',
+      badges ? ['left', 'right', 'top', 'bottom'] : undefined,
+    );
+    map.setLayoutProperty(layer, 'text-radial-offset', badges ? 1.2 : 0);
+    map.setLayoutProperty(layer, 'text-offset', badges ? [0, 0] : [0, 1]);
+    map.setLayoutProperty(layer, 'text-padding', badges ? 6 : 12);
+  }
   map.setLight({
     color: dark ? '#c3d4e8' : '#ffffff',
     intensity: dark ? 0.3 : 0.45,

@@ -18,6 +18,7 @@ import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
 import { campusPalette } from './map-palette';
 import { applyMapTheme } from './map-theme';
+import { installPlaceBadges } from './place-badges';
 import type { createCampusModels, ModelStatus } from './campus-model-layer';
 import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
@@ -138,7 +139,9 @@ export function MapView({
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': campusPalette[theme ? 'dark' : 'light'].ground },
+        paint: {
+          'background-color': campusPalette[theme ? 'dark' : 'light'].ground,
+        },
       },
     ],
   });
@@ -467,6 +470,33 @@ export function MapView({
           'text-halo-width': 1.6,
         },
       });
+      installPlaceBadges(map);
+      map.addLayer(
+        {
+          id: 'street-labels',
+          type: 'symbol',
+          source: 'campus',
+          minzoom: 16,
+          filter: [
+            'all',
+            ['==', ['get', 'kind'], 'path'],
+            ['!=', ['get', 'streetLabel'], ''],
+          ],
+          layout: {
+            'symbol-placement': 'line',
+            'symbol-spacing': 300,
+            'text-field': ['get', 'streetLabel'],
+            'text-font': ['Open Sans Semibold'],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 16, 10, 19, 12],
+            'text-letter-spacing': 0.08,
+            'text-transform': 'uppercase',
+            'text-max-angle': 30,
+            'text-padding': 8,
+            'text-pitch-alignment': 'map',
+          },
+        },
+        'places-label',
+      );
       map.addLayer({
         id: 'gps-accuracy',
         type: 'fill',
@@ -537,6 +567,16 @@ export function MapView({
       );
       if (editor) {
         map.on('click', (event) => {
+          if (
+            map.queryRenderedFeatures(event.point, {
+              layers: [
+                'places-label',
+                'places-label-detail',
+                'places-label-selected',
+              ],
+            }).length
+          )
+            return;
           const hit = models.current?.pick(event.point);
           const id = hit?.buildingId;
           const feature =
@@ -551,6 +591,21 @@ export function MapView({
         });
       } else {
         map.on('click', (event) => {
+          const placeHit = map.queryRenderedFeatures(event.point, {
+            layers: [
+              'places-dot',
+              'places-label',
+              'places-label-detail',
+              'places-label-selected',
+            ],
+          })[0];
+          const place = latestData.current.places.find(
+            (p) => p.id === placeHit?.properties?.id,
+          );
+          if (place) {
+            callbacks.current.onSelect(place);
+            return;
+          }
           const modelId = models.current?.pick(event.point)?.buildingId;
           const model =
             modelId &&
@@ -572,14 +627,6 @@ export function MapView({
               'buildings',
             ],
           });
-          const placeHit = hits.find((f) => f.layer.id.startsWith('places'));
-          const place = latestData.current.places.find(
-            (p) => p.id === placeHit?.properties?.id,
-          );
-          if (place) {
-            callbacks.current.onSelect(place);
-            return;
-          }
           const hit = hits.find((f) => f.layer.id.startsWith('buildings'));
           const building =
             hit &&
@@ -598,6 +645,7 @@ export function MapView({
           'places-dot',
           'places-label',
           'places-label-detail',
+          'places-label-selected',
           'buildings-3d',
           'buildings',
         ]) {

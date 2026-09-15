@@ -1,17 +1,17 @@
 import type { FeatureCollection } from 'geojson';
-import type { CampusData, Place } from './types';
+import type { CampusData, Category, Place } from './types';
 import { visualEdges } from './map-display';
 
-const colors: Record<string, string> = {
-  academic: '#6863cf',
-  library: '#406fc3',
-  worship: '#ad789e',
-  food: '#db8741',
-  services: '#337f91',
-  residence: '#8896a5',
-  sports: '#639466',
-  gate: '#d58b4d',
-  other: '#778795',
+export const placeColours: Record<Category, { light: string; dark: string }> = {
+  academic: { light: '#6863cf', dark: '#c7b5ed' },
+  library: { light: '#406fc3', dark: '#aacdf5' },
+  worship: { light: '#ad789e', dark: '#e1acd3' },
+  food: { light: '#db8741', dark: '#ffbd83' },
+  services: { light: '#337f91', dark: '#91d2df' },
+  residence: { light: '#8896a5', dark: '#c6aceb' },
+  sports: { light: '#639466', dark: '#8cd59b' },
+  gate: { light: '#d58b4d', dark: '#efcf87' },
+  other: { light: '#778795', dark: '#c1cfdf' },
 };
 export function placeFeatures(places: Place[]): FeatureCollection {
   return {
@@ -24,7 +24,9 @@ export function placeFeatures(places: Place[]): FeatureCollection {
         id: p.id,
         name: p.name.replace(/[^\x20-\x7E]/g, ' '),
         category: p.category,
-        color: colors[p.category],
+        color: (placeColours[p.category] || placeColours.other).light,
+        nightColor: (placeColours[p.category] || placeColours.other).dark,
+        badge: `place-${Object.hasOwn(placeColours, p.category) ? p.category : 'other'}`,
         priority: /library|senate|health|clinic|faculty|gate/i.test(p.name)
           ? 1
           : 2,
