@@ -33,8 +33,10 @@ button.map-view-control {
   right: 18px;
   top: 75px;
   max-width: 230px;
-  background: var(--card, #fff);
-  color: var(--foreground, #263f36);
+  background: var(--ed-bg, var(--background));
+  color: var(--ed-text, var(--foreground));
+  border: 1px solid var(--ed-line, var(--border));
+  box-shadow: 0 2px 10px #0002;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;
