@@ -17,6 +17,7 @@ import type { CampusData, GpsFix, Place, Route } from './types';
 import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
 import { campusPalette } from './map-palette';
+import { applyMapTheme } from './map-theme';
 import type { createCampusModels, ModelStatus } from './campus-model-layer';
 import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
@@ -137,7 +138,7 @@ export function MapView({
       {
         id: 'background',
         type: 'background',
-        paint: { 'background-color': theme ? '#182727' : '#eee9dc' },
+        paint: { 'background-color': campusPalette[theme ? 'dark' : 'light'].ground },
       },
     ],
   });
@@ -612,6 +613,7 @@ export function MapView({
       ready.current = true;
       setMotionMap(map);
       disposeExtension = callbacks.current.onReady?.(map);
+      applyMapTheme(map, camera.current.dark);
     });
     map.on('dragstart', () => callbacks.current.onManualPan?.());
     // Suspend following as soon as a gesture begins, before sensor camera
@@ -640,47 +642,7 @@ export function MapView({
     if (!map) return;
     const apply = () => {
       // Repaint in place: device changes must not reset a walk, camera or editor.
-      const palette = campusPalette[dark ? 'dark' : 'light'];
-      const paint: [
-        string,
-        Parameters<MapInstance['setPaintProperty']>[1],
-        Parameters<MapInstance['setPaintProperty']>[2],
-      ][] = [
-        ['background', 'background-color', dark ? '#182727' : '#eee9dc'],
-        ['campus-fill', 'fill-color', dark ? '#243632' : '#faf5e8'],
-        [
-          'land',
-          'fill-color',
-          [
-            'match',
-            ['get', 'name'],
-            ['Green Area', 'Vegetation', 'Forest'],
-            dark ? '#3b5645' : '#c0d0ac',
-            ['Water Body', 'Water'],
-            palette.water,
-            dark ? '#34473e' : '#eee4cf',
-          ],
-        ],
-        ['roads-case', 'line-color', dark ? '#57665b' : '#cec1a6'],
-        [
-          'roads',
-          'line-color',
-          [
-            'case',
-            ['==', ['get', 'highway'], 'footway'],
-            palette.path,
-            palette.road,
-          ],
-        ],
-        ['buildings', 'fill-color', ['get', 'displayRoof']],
-        ['buildings', 'fill-outline-color', dark ? '#697985' : '#c2cbd0'],
-        ['building-outlines', 'line-color', dark ? '#9aabb3' : '#8094a1'],
-        ['buildings-3d', 'fill-extrusion-color', dark ? '#52616c' : '#d5dce5'],
-        ['places-label', 'text-color', dark ? '#d7e3ee' : '#53616b'],
-        ['places-label', 'text-halo-color', dark ? '#213039' : '#ffffff'],
-      ];
-      for (const [layer, property, value] of paint)
-        if (map.getLayer(layer)) map.setPaintProperty(layer, property, value);
+      applyMapTheme(map, dark);
     };
     if (ready.current) apply();
     else map.once('load', apply);
@@ -737,14 +699,6 @@ export function MapView({
         'fill-extrusion-opacity',
         buildingOpacity,
       );
-      map.setPaintProperty('buildings-3d', 'fill-extrusion-color', [
-        'get',
-        'displayWall',
-      ]);
-      map.setLight({
-        color: dark ? '#becfe0' : '#ffffff',
-        intensity: dark ? 0.35 : 0.45,
-      });
       map.setFilter('places-label-selected', ['==', ['get', 'id'], selectedId]);
       map.setFilter('places-label', [
         'all',
@@ -761,12 +715,6 @@ export function MapView({
         'places-label-detail',
         'places-label-selected',
       ]) {
-        map.setPaintProperty(layer, 'text-color', dark ? '#d7e3ee' : '#53616b');
-        map.setPaintProperty(
-          layer,
-          'text-halo-color',
-          dark ? '#213039' : '#ffffff',
-        );
         map.setLayoutProperty(layer, 'symbol-sort-key', [
           'case',
           ['==', ['get', 'id'], selectedId],
@@ -774,6 +722,7 @@ export function MapView({
           ['get', 'priority'],
         ]);
       }
+      applyMapTheme(map, dark);
     };
     if (ready.current) apply();
     else map.once('load', apply);

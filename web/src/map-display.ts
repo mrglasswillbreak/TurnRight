@@ -1,5 +1,6 @@
 import type { Feature, FeatureCollection } from 'geojson';
-import { appearanceColours } from './map-palette.js';
+import { appearanceColours, nightMaterial } from './map-palette.js';
+import { landClass, pathDisplay } from './map-classification.js';
 import type { CampusData, GraphEdge, Place } from './types.js';
 import type { VisualCatalogue } from './visual-types.js';
 import { compatibleVisual, visualLookup } from './building-visuals.js';
@@ -58,6 +59,26 @@ export function displayGeometry(
   return {
     ...map,
     features: map.features.flatMap((feature): Feature[] => {
+      if (feature.properties?.kind === 'land')
+        return [
+          {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              landClass: landClass(feature.properties),
+            },
+          },
+        ];
+      if (feature.properties?.kind === 'path')
+        return [
+          {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              ...pathDisplay(feature.properties),
+            },
+          },
+        ];
       if (feature.properties?.kind !== 'building') return [feature];
       const height = buildingDisplay(feature.properties);
       const colours = appearanceColours(feature.properties || {});
@@ -73,6 +94,14 @@ export function displayGeometry(
           heightKind: visual?.heightKind ?? height.kind,
           displayWall: visual?.wallColour ?? colours.wall,
           displayRoof: visual?.roofColour ?? colours.roof,
+          displayWallDark: nightMaterial(
+            visual?.wallColour ?? colours.wall,
+            'wall',
+          ),
+          displayRoofDark: nightMaterial(
+            visual?.roofColour ?? colours.roof,
+            'roof',
+          ),
         },
       };
       if (visual?.partHeights && feature.geometry.type === 'MultiPolygon')
@@ -86,7 +115,12 @@ export function displayGeometry(
               displayHeight: part?.height ?? displayed.properties.displayHeight,
               heightKind: part?.kind ?? displayed.properties.heightKind,
               ...(part?.kind === 'illustrative'
-                ? { displayWall: '#d4d5c3', displayRoof: '#a6b19f' }
+                ? {
+                    displayWall: '#d4d5c3',
+                    displayRoof: '#a6b19f',
+                    displayWallDark: nightMaterial('#d4d5c3', 'wall'),
+                    displayRoofDark: nightMaterial('#a6b19f', 'roof'),
+                  }
                 : {}),
             },
           };
