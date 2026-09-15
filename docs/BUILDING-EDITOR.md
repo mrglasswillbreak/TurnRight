@@ -2,7 +2,7 @@
 
 The public map and editor share one compact view button: it shows 3D while viewing 2D, and 2D while viewing 3D. Tapping it changes the view. Enhanced rendering is the default; choose Enhanced or Simple in the public Settings screen or the editor's Settings section. Existing saved Simple preferences are retained. There is no attached options menu.
 
-Editor Settings also contains tilt and building opacity. Tilt follows the actual camera angle and is available in 3D. Opening or closing Settings keeps the map and inspector mounted, preserving selection, unfinished drawings and roof plans. View preferences do not create map edits or undo entries.
+Editor Settings also contains Appearance (Device, Light or Dark), tilt and building opacity. Appearance uses the same saved preference as the public map; Device follows system changes. Enhanced buildings retain their original wall, window, roof and trim colours in either theme, with neutral dark-mode shading. Tilt follows the actual camera angle and is available in 3D. Opening or closing Settings and changing theme keeps the map and inspector mounted, preserving selection, unfinished drawings and roof plans. View preferences do not create map edits or undo entries.
 
 Selecting a building opens Appearance. Outline exposes the geometry handles, and Roof opens a wing roof plan. Connection drawing and survey work suppress models so that map targets remain usable.
 
@@ -37,6 +37,8 @@ Starting a roof focuses its drawing controls. Applying or cancelling returns foc
 Zoom regression coverage counts actual WebGL facade draw calls rather than only checking loaded model IDs. Chromium and WebKit both verify automatic restoration after a slow animated zoom and three zoom-out/zoom-in cycles across the extrusion, simplified and detailed thresholds, in both the public map and editor. Genuine renderer failures retain their separate retry action. These checks cover the detail state that the earlier model-presence tests missed.
 
 The release workflow rebuilds the visual catalogue and sector assets from its immutable snapshot before packaging. It verifies generated meshes and asset integrity and retains the 12 MB sector budget and 300 KB gzip lazy-renderer budget. Application deployment does not publish campus drafts; the owner still reviews and publishes a release separately.
+
+Unfinished roof preview validation uses the resolved visual height for each wing, matching the inspector and mesher. A missing source height no longer forces a valid reference-height draft through the generic 6 m fallback. Explicit wing height/floor/unknown settings still take precedence. Applying a roof retains the existing behavior of adopting its reference height into the saved wing properties; save and release validation continue to require those saved values.
 
 ## Acceptance
 

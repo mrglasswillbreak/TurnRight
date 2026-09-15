@@ -1,4 +1,5 @@
 import type { Map as MapInstance } from 'maplibre-gl';
+import { Color } from 'three';
 declare global {
   interface Window {
     editorTestMap: MapInstance;
@@ -1805,8 +1806,10 @@ for (const editor of [false, true])
     page,
   }, testInfo) => {
     test.setTimeout(150000);
+    await page.emulateMedia({ colorScheme: 'dark' });
     const sectorUrl = '/packages/visual-abcdef/zoom-test.json';
     let sectorBody = '';
+    let expectedColours: number[][] = [];
     await page
       .context()
       .route(`**${sectorUrl}`, (route) =>
@@ -1834,15 +1837,19 @@ for (const editor of [false, true])
           needed: [],
           sectorId: 'zoom-test',
         };
+        const model = createBuildingModel(
+          feature as import('geojson').Feature<import('geojson').Polygon>,
+          visual,
+        );
+        expectedColours = model.meshes.map((mesh) =>
+          new Color(mesh.colour).toArray(),
+        );
+        // Exercise old packages without surface metadata as well as current meshes.
+        if (!editor) for (const mesh of model.meshes) delete mesh.surfaces;
         sectorBody = JSON.stringify({
           schemaVersion: 1,
           id: 'zoom-test',
-          models: [
-            createBuildingModel(
-              feature as import('geojson').Feature<import('geojson').Polygon>,
-              visual,
-            ),
-          ],
+          models: [model],
         });
         const bytes = Buffer.byteLength(sectorBody);
         data.visuals = {
@@ -1905,6 +1912,8 @@ for (const editor of [false, true])
         slow: false,
         reducedSeen: false,
         frameMs: [] as number[],
+        collectColours: true,
+        colours: [] as number[][],
       };
       (window as unknown as { zoomDetail: typeof stats }).zoomDetail = stats;
       let clock = performance.now();
@@ -1915,9 +1924,19 @@ for (const editor of [false, true])
         stats.calls = 0;
         stats.indices = 0;
         stats.moving = map.isMoving();
+        const collectColours = stats.collectColours;
+        if (collectColours) stats.colours = [];
         gl.drawElements = function (mode, count, type, offset) {
           stats.calls++;
           stats.indices += count;
+          if (collectColours) {
+            const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+            const diffuse = gl.getUniformLocation(program, 'diffuse');
+            if (diffuse)
+              stats.colours.push(
+                Array.from(gl.getUniform(program, diffuse) as Float32Array),
+              );
+          }
           return draw.call(this, mode, count, type, offset);
         };
         if (stats.slow && map.isMoving()) {
@@ -1929,7 +1948,9 @@ for (const editor of [false, true])
         } finally {
           gl.drawElements = draw;
           performance.now = now;
-          if (!stats.slow) stats.frameMs.push(now.call(performance) - started);
+          if (!stats.slow && !collectColours)
+            stats.frameMs.push(now.call(performance) - started);
+          stats.collectColours = false;
         }
         if (
           document
@@ -1951,12 +1972,60 @@ for (const editor of [false, true])
                 moving: boolean;
                 reducedSeen: boolean;
                 frameMs: number[];
+                colours: number[][];
               };
             }
           ).zoomDetail,
       );
     await expect.poll(async () => (await drawing()).calls).toBeGreaterThan(2);
     const full = await drawing();
+    const checkColours = async () => {
+      const { colours } = await drawing();
+      // Transparent DoubleSide materials draw front and back faces separately.
+      expect(colours.length).toBeGreaterThanOrEqual(expectedColours.length);
+      for (const colour of expectedColours)
+        expect(colours).toContainEqual(
+          colour.map((channel) => expect.closeTo(channel, 5)),
+        );
+      for (const colour of colours)
+        expect(expectedColours).toContainEqual(
+          colour.map((channel) => expect.closeTo(channel, 5)),
+        );
+    };
+    // Read the actual shader's diffuse values: walls, roofs, windows and trim
+    // must retain their source RGB, rather than merely retaining saved swatches.
+    await checkColours();
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expect(page.locator('html')).toHaveClass(
+        colorScheme === 'dark' ? /dark/ : /^(?!.*dark)/,
+      );
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            window.editorTestMap.getPaintProperty(
+              'background',
+              'background-color',
+            ),
+          ),
+        )
+        .toBe(colorScheme === 'dark' ? '#293e52' : '#eee9dc');
+      await page.evaluate(() => {
+        const stats = (
+          window as unknown as {
+            zoomDetail: { collectColours: boolean; colours: number[][] };
+          }
+        ).zoomDetail;
+        stats.colours = [];
+        stats.collectColours = true;
+        window.editorTestMap.triggerRepaint();
+      });
+      await expect
+        .poll(async () => (await drawing()).colours.length)
+        .toBeGreaterThanOrEqual(expectedColours.length);
+      await checkColours();
+      expect((await drawing()).indices).toBe(full.indices);
+    }
     await page.evaluate(() => {
       (window as unknown as { zoomDetail: { slow: boolean } }).zoomDetail.slow =
         true;
@@ -2758,6 +2827,12 @@ test('building appearance: integrated view, surface inheritance, live preview, r
   await expect(
     page.getByRole('button', { name: 'Appearance', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByText('Updating 3D preview…', { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+  ).toHaveCount(0);
   expect(state.edits()).toHaveLength(0);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect(page.locator('button.map-view-control')).toHaveCount(1);
@@ -3423,6 +3498,22 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   }));
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByLabel('Point elevation (m)')).toBeHidden();
+  for (const appearance of ['Light', 'Dark'] as const) {
+    const option = page.getByRole('radio', { name: appearance, exact: true });
+    await option.focus();
+    await option.press('Space');
+    await expect(option).toBeChecked();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          window.editorTestMap.getPaintProperty(
+            'background',
+            'background-color',
+          ),
+        ),
+      )
+      .toBe(appearance === 'Dark' ? '#293e52' : '#eee9dc');
+  }
   await expect(page.getByLabel('Map tilt', { exact: true })).toHaveValue(
     String(camera.pitch),
   );
@@ -3480,6 +3571,16 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   );
   const progress = await page.locator('.drawing-progress').innerText();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByRole('radio', { name: 'Device', exact: true }).check();
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.editorTestMap.getPaintProperty('background', 'background-color'),
+      ),
+    )
+    .toBe('#eee9dc');
+  await page.getByRole('radio', { name: 'Dark', exact: true }).check();
   await expect(page.getByLabel('Map tilt', { exact: true })).toBeDisabled();
   await page
     .getByRole('button', { name: 'Close settings', exact: true })
@@ -3493,6 +3594,14 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Resume drawing' }).click();
+  await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.editorTestMap.getPaintProperty('background', 'background-color'),
+      ),
+    )
+    .toBe('#293e52');
   await expect(
     page.getByRole('button', { name: 'Finish', exact: true }),
   ).toBeEnabled();
@@ -3522,6 +3631,16 @@ test.describe('view settings touch', () => {
         .getBoundingClientRect().left,
     }));
     expect(header.brandRight).toBeLessThanOrEqual(header.navigationLeft);
+    // Tap the visible label: the semantic radio is visually hidden.
+    const appearance = page
+      .locator('.appearance-options label')
+      .filter({ hasText: 'Dark' });
+    await appearance.tap();
+    await expect(
+      page.getByRole('radio', { name: 'Dark', exact: true }),
+    ).toBeChecked();
+    const target = await appearance.boundingBox();
+    expect(target!.height).toBeGreaterThanOrEqual(44);
     await page.getByRole('radio', { name: 'Simple', exact: true }).tap();
     await expect(
       page.getByRole('radio', { name: 'Simple', exact: true }),
@@ -3541,6 +3660,9 @@ test.describe('view settings touch', () => {
     await toggle.tap();
     await expect(toggle).toHaveAccessibleName('Switch to 3D');
     await page.getByRole('button', { name: 'Settings', exact: true }).tap();
+    await expect(
+      page.getByRole('radio', { name: 'Dark', exact: true }),
+    ).toBeChecked();
     await expect(
       page.getByRole('radio', { name: 'Simple', exact: true }),
     ).toBeChecked();
@@ -4065,3 +4187,80 @@ for (const editor of [false, true])
       expect(errors).toEqual([]);
     });
   }
+
+test('documentation capture: editor appearance, roof and settings', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !process.env.TURNRIGHT_DOCS_SCREENSHOTS,
+    'Opt-in README captures with local API fixtures.',
+  );
+  test.setTimeout(240000);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  const state = await setup(page, true, true);
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await focusModels(page);
+  await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 17.3 }));
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
+    .toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('editor-workspace.png') });
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await focusModels(page);
+  const roof = await position(page, [3.19978, 6.47109]);
+  await page.mouse.click(roof.x, roof.y - 80);
+  await expect(
+    page.getByRole('textbox', { name: 'Name', exact: true }),
+  ).toHaveValue('LASU Senate Building');
+  await expect(
+    page.getByRole('button', { name: 'Appearance', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
+    .toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('editor-building.png') });
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page.getByRole('button', { name: 'Create custom roof' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Apply roof', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Updating 3D preview…', { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+  ).toHaveCount(0);
+  // Show the complete roof plan without changing the application's panel layout.
+  await page.locator('.editor-inspector-body').evaluate((element) => {
+    element.scrollTop = 300;
+  });
+  await page.screenshot({ path: testInfo.outputPath('editor-roof.png') });
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByRole('radio', { name: 'Dark', exact: true }).check();
+  await page.screenshot({ path: testInfo.outputPath('editor-settings.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(
+    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+  ).toHaveCount(0);
+  await page.screenshot({
+    path: testInfo.outputPath('editor-settings-phone.png'),
+  });
+  expect(state.edits()).toHaveLength(0);
+  await page.goto('/');
+  await attachMap(page);
+  await focusModels(page, true);
+  const place = await position(page, [3.19978, 6.47109]);
+  await page.mouse.click(place.x, place.y - 12);
+  await expect(
+    page.getByRole('heading', { name: 'LASU Senate Building', exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath('public-place-phone.png'),
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await focusModels(page);
+  await page.screenshot({
+    path: testInfo.outputPath('public-campus-dark.png'),
+  });
+});
