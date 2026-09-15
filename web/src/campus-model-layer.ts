@@ -184,7 +184,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       geometry.setIndex(part.indices);
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
-      const role = meshMaterialRole(part.surfaces);
+      const role = meshMaterialRole(part.surfaces, part);
       const mesh = new Mesh(geometry, material(part.colour, role));
       mesh.userData = {
         buildingId: model.id,

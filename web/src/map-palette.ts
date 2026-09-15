@@ -53,9 +53,18 @@ export const campusPalette = {
 export type MaterialRole = 'wall' | 'roof' | 'window' | 'trim' | 'legacy';
 export function meshMaterialRole(
   surfaces?: readonly { role: Exclude<MaterialRole, 'legacy'> }[],
+  legacy?: { detail?: boolean; positions: readonly number[] },
 ): MaterialRole {
   const first = surfaces?.[0]?.role;
-  return first && surfaces?.every((s) => s.role === first) ? first : 'legacy';
+  if (first) return surfaces?.every((s) => s.role === first) ? first : 'legacy';
+  // Old packages separate solid roofs from walls but have no surface IDs.
+  // A solid mesh wholly above ground is a roof; ambiguous/detail meshes retain colour grading.
+  if (legacy && !legacy.detail && legacy.positions.length) {
+    for (let i = 2; i < legacy.positions.length; i += 3)
+      if (legacy.positions[i] <= 0.01) return 'wall';
+    return 'roof';
+  }
+  return 'legacy';
 }
 const nightBases: Record<MaterialRole, [number, number, number]> = {
   wall: [58, 79, 101],

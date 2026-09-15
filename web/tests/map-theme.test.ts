@@ -12,6 +12,18 @@ describe('map presentation without campus edits', () => {
     );
     expect(meshMaterialRole()).toBe('legacy');
     expect(meshMaterialRole([])).toBe('legacy');
+    expect(
+      meshMaterialRole(undefined, { positions: [0, 0, 6, 1, 0, 7, 1, 1, 6] }),
+    ).toBe('roof');
+    expect(
+      meshMaterialRole(undefined, { positions: [0, 0, 0, 1, 0, 7, 1, 1, 6] }),
+    ).toBe('wall');
+    expect(
+      meshMaterialRole(undefined, {
+        detail: true,
+        positions: [0, 0, 6, 1, 0, 7, 1, 1, 6],
+      }),
+    ).toBe('legacy');
   });
   it('recognizes water and wetlands despite source spelling and whitespace', () => {
     for (const name of ['Waterbody', 'Water Body', ' water ', ' WATER  BODY '])
