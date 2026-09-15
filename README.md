@@ -2,75 +2,76 @@
 
 **Find your way around LASU Ojo — online or offline.**
 
-TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo. Explore places, compare mapped walking routes, and follow spoken directions using your device's GPS and a downloaded campus map. Search, routing, location processing, and navigation audio run on the device.
+TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, with a private owner editor for maintaining paths, entrances, building appearances and reviewed releases. Search, routing, GPS processing and navigation audio run on the device.
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight desktop campus explorer in Light mode](docs/assets/screenshots/desktop-explore.jpg)
+![TurnRight dark campus map with enhanced building models in their original colours](docs/assets/screenshots/public-campus-dark.jpg)
 
-> **Project status:** Public personal-project release. The map is derived from published sources and reviewed access corrections; campus routes have **not been field-verified**. Some destinations have only a nearby mapped approach, and confirmed entrance connections are still missing. TurnRight is an independent, non-commercial project, not an official LASU service.
+> **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
 ## Contents
 
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Quick start](#quick-start)
-- [Using TurnRight](#using-turnright)
-- [Offline operation and updates](#offline-operation-and-updates)
-- [Technology and architecture](#technology-and-architecture)
+- [Using the public map](#using-the-public-map)
+- [Appearance and 3D](#appearance-and-3d)
+- [Owner editor](#owner-editor)
+- [Building appearance and roofs](#building-appearance-and-roofs)
+- [Review and publication](#review-and-publication)
+- [Walking surveys](#walking-surveys)
+- [Offline operation and recovery](#offline-operation-and-recovery)
 - [Map data and coverage](#map-data-and-coverage)
-- [Administration and publication](#administration-and-publication)
-- [Record paths by walking](#record-paths-by-walking)
+- [Architecture](#architecture)
 - [Configuration and hosting](#configuration-and-hosting)
 - [Development and verification](#development-and-verification)
 - [Repository structure](#repository-structure)
 - [Troubleshooting](#troubleshooting)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
-- [Attribution and licensing](#attribution-and-licensing)
+- [Contributing and licensing](#contributing-and-licensing)
 
 ## Screenshots
 
-**Desktop route preview in Dark mode:** a manually selected Clinic-to-Senate walk with two alternatives.
+**Owner workspace:** explore the campus, select features and review mapping work while keeping the map visible.
 
-![Dark campus map with a blue walking route and route alternatives](docs/assets/screenshots/desktop-route-dark.jpg)
+![Dark owner editor with campus geometry, enhanced buildings and the feature explorer](docs/assets/screenshots/editor-workspace.jpg)
 
-| Mobile place details | Device appearance settings |
+**Building inspector:** edit building, wing and wall appearances alongside the enhanced preview.
+
+![Building appearance inspector with original wall and roof colour swatches and a selected enhanced model](docs/assets/screenshots/editor-building.jpg)
+
+**Roof-plan editing:** review a wing outline, roof controls and elevations before applying a custom roof.
+
+![Owner editor showing a custom roof draft, plan and elevation controls](docs/assets/screenshots/editor-roof.jpg)
+
+| Public destination details | Editor Settings |
 | --- | --- |
-| <img src="docs/assets/screenshots/mobile-place.jpg" width="300" alt="Mobile Senate Building details showing directions and the unverified entrance notice"> | <img src="docs/assets/screenshots/appearance.jpg" width="300" alt="Settings with Device appearance selected and the device currently using dark mode"> |
+| <img src="docs/assets/screenshots/public-place-phone.jpg" width="300" alt="Phone viewport showing LASU Senate Building details and enhanced architecture"> | <img src="docs/assets/screenshots/editor-settings-phone.jpg" width="300" alt="Phone editor Settings with Device, Light and Dark appearance, Enhanced and Simple rendering, tilt and building opacity"> |
 
-Real browser captures from 9 September 2026. Mobile views use a responsive viewport; they do not represent completed physical-device or campus tests. [Capture details](docs/assets/screenshots/README.md).
+Captured from the running application on **15 September 2026** using real MapLibre/Three.js rendering, checked-in campus geometry and local test fixtures for owner authentication and API responses. The roof draft is a demonstration; these captures contain no private owner reports or production draft changes. Phone images use browser emulation and do not establish physical-device acceptance. [Capture sources and reproduction](docs/assets/screenshots/README.md).
 
 ## Features
 
-| Area | Implemented behavior |
+| Area | Current behavior |
 | --- | --- |
-| Campus exploration | Local search, categories, source-supported aliases, saved places, recent selections, readable labels, and place provenance. |
-| Walking directions | A* routing in a dedicated worker; shortest permitted walk and up to two sufficiently different alternatives when available. |
-| Navigation | Foreground GPS tracking, next maneuver, remaining distance, ETA, instruction list, recentering, map following, north-up orientation, sustained-deviation rerouting, and arrival detection. |
-| Compass and motion | Optional phone-direction cone and advisory movement status for navigation and walking surveys; Travel-up, North-up and Phone-up navigation with GPS-only fallback. **Awaiting device verification.** [Sensor guide](docs/MOTION.md). |
-| Spoken guidance | 19 packaged English maneuver/distance clips, mute, repeat, and optional device-local speech for place names. |
-| Appearance | Device light/dark preference by default, live system changes, persistent Light/Dark overrides, and an accessible three-option selector. |
-| Map display | 3D by default with a remembered 2D/3D toggle, full-campus framing and selectable building surfaces. Recorded heights take precedence over floor-derived estimates; muted 6 m blocks illustrate unknown heights without changing source data. |
-| Offline maps | Verified resumable downloads, content-hash reuse, atomic activation, version/coverage information, storage checks, and explicit updates. |
-| Student reports | Place or pin reports with a category and description; private server submission, spam controls, and device-local offline drafts. |
-| Owner editor | Map-centered 2D/3D workspace, protected mouse/touch drawing, guided repair previews, reviewed duplicate cleanup, release impact, grouped undo, field-level conflict review and offline recovery downloads. [Editor guide](docs/EDITOR.md) · [Reliability update](docs/EDITOR-RELIABILITY.md). |
-| Destination sharing | Copy or natively share a stable place link, including published alias resolution and search fallback for missing places. Routes show recorded steps information and retain unknowns. |
-| Walking surveys | Owner-only phone recording, entrance markers, touch geometry review, partial path replacement, recoverable offline sessions and private survey sync. **Awaiting physical field verification.** [Survey guide](docs/SURVEY.md). |
-| Data maintenance | Daily/on-demand source imports, change review separate from corrections, immutable releases, preview/publish/rollback, and backup export. |
+| Exploration | Local place search, categories, aliases, saved places, recent selections, provenance, category badges and recorded street names. |
+| Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
+| Navigation | Foreground GPS, spoken maneuvers, remaining distance and ETA, manual origins, recentering, route following, sustained-deviation rerouting and arrival detection. |
+| Destination sharing | Copy a stable place link or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
+| Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
+| Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
+| Owner editing | Autosave, grouped undo/redo, explicit connections, recoverable drawings and roof plans, guided repairs, duplicate review and field-level conflict resolution. |
+| Building editing | Inherited building/wing/wall styles, stable surface identities, facade controls, roof presets, custom ridge/valley plans and immediate worker previews. |
+| Offline | Verified, resumable package downloads, explicit updates, integrity repair, prepared owner workspaces and immediate local recovery exports. |
+| Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
+| Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
 
-Driving, cycling, indoor positioning, satellite imagery, background navigation, public user accounts, and reviews are outside this release.
+Driving, cycling, indoor positioning, satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
 
 ## Quick start
 
-### Requirements
-
-- **Node.js 22.13 or later within the 22.x line**, matching the project's supported engine.
-- npm and Git.
-- A browser with WebGL for the map. Use HTTPS or localhost for service workers and device location.
-- Python 3.12+ if you will run source imports or Python tests.
-
-### Start development
+Use **Node.js 22.13+ within the 22.x line**, npm, Git and a WebGL-capable browser. Python 3.12+ is needed for importer scripts and their tests.
 
 ```sh
 git clone https://github.com/mrglasswillbreak/TurnRight.git
@@ -79,204 +80,202 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite, normally [localhost:5173](http://localhost:5173). The included campus package works immediately for public exploration and route previews. **No API keys are required for that local experience.**
+Open the URL printed by Vite, normally [localhost:5173](http://localhost:5173). The bundled seed supports public exploration and route previews without API keys. The production campus can have newer owner-published corrections and models than this development seed.
 
-### Test the production PWA locally
-
-From `web/`:
+To test the production PWA locally:
 
 ```sh
 npm run build
 npm run preview
 ```
 
-Open [127.0.0.1:4173](http://127.0.0.1:4173), select **Offline → Download campus map**, and wait for **Ready offline**. Use this production build to test service-worker caching and offline reopening; the development server does not provide the production offline lifecycle.
+Open [127.0.0.1:4173](http://127.0.0.1:4173), choose **Offline → Download campus map** and wait for readiness. Development mode does not provide the production service-worker lifecycle. Vite does not serve Vercel `/api` functions; connected administration and report submission require the configured hosted application. Browser tests supply isolated API fixtures.
 
-Vite's local servers do not serve the Vercel `/api` functions. Use a configured Vercel preview for connected administration and report submission. For physical-phone GPS/PWA checks, use the HTTPS deployment; an ordinary LAN HTTP address is not equivalent to localhost's secure-context exception.
+## Using the public map
 
-## Using TurnRight
+1. Search for a building, faculty or service, or narrow the map with a category.
+2. Open its details to check provenance, walking coverage and any building evidence. Save, share or report the place.
+3. Choose **Directions**, then a current-location or manual origin. Compare the available alternatives and connection notices.
+4. Choose **Start walking**, allow location/audio and keep the application visible. Use mute, repeat, the instruction list and **Follow me** as needed.
 
-1. **Explore:** search for a building, faculty, service, or other campus place; use categories to narrow the results.
-2. **Check the place:** review its source and walking coverage. Save it locally or report a missing path, entrance, or incorrect detail.
-3. **Preview a route:** select Directions, then choose your current location or a manual starting place. Compare the available walking alternatives and entrance notices.
-4. **Start walking:** grant location access and allow audio through the Start walking action. Keep the app visible. Use mute/repeat, recenter, or the instruction list as needed.
+Poor or stale GPS pauses maneuver progression. Rerouting requires sustained deviation to reduce false turns from jitter. Guidance ends at the mapped endpoint, which may be a nearby approach rather than an entrance.
 
-Poor or stale location fixes pause maneuver progression. Rerouting requires sustained deviation to reduce false wrong turns from GPS jitter. Navigation ends at the mapped endpoint; an approach endpoint is not a surveyed building entrance.
+Optional compass and motion assistance provides Travel-up, North-up and Phone-up orientation with GPS fallback. The purple cone is phone direction; the blue arrow is travel direction. Permissions are optional and can be retried from Settings. Motion hints are advisory: there is no step counting, dead reckoning or background navigation. Raw sensor readings remain in memory. [Sensor behavior and device checks](docs/MOTION.md).
 
-### Compass and motion assistance
+## Appearance and 3D
 
-The first **Start walking** or **Record new path** tap requests optional compass and motion permission where the browser requires it. Orientation and motion permissions are independent. Declining does not prevent GPS navigation or surveying, and remembered denials are retried only through **Enable/Retry sensors**. **Turn off sensors** remembers your choice on this device. Controls are in public **Settings**, the active walk, and **Survey → Compass & motion controls**.
-
-**Travel-up** remains the default and uses GPS direction of travel. **North-up** fixes north at the top. **Phone-up** uses approximate phone direction, falls back to usable GPS travel direction, then holds the map bearing with an explanation. Touching or dragging the map suspends following; **Follow me** restores the selected mode. The purple cone indicates phone direction; the blue arrow indicates GPS travel direction. Neither creates a location when GPS is unavailable.
-
-Survey recording starts north-up in 2D. Sensor readings stop on pause, finish, sign-out, exit and backgrounding; a backgrounded survey requires explicit **Resume**. Entrance placement and review never move the camera in response to sensors. Navigation can reacquire sensors when its active session returns to the foreground.
-
-Motion hints (**Likely still**, **Motion detected**, **Uncertain**) are advisory. GPS remains authoritative for position, route progress and survey geometry. Only assistance/orientation preferences are saved; sensor readings stay in memory and never enter surveys, backups or network payloads. No step counting or dead reckoning is performed. Physical Android/iPhone and installed-app checks remain pending: see [sensor behavior and field record](docs/MOTION.md).
-
-The compass/motion update was deployed to [production](https://turnright.vercel.app/) on **12 September 2026**, following automated and authenticated preview verification (release commit `37c8cbe`). Existing installations can use **Settings → Install update** after the new version is detected. The campus package remains `lasu-4e4c8008b38b`, schema 1; this application rollout did not publish campus data.
-
-### Appearance
-
-Open **Settings → Appearance**:
+**Settings → Appearance** is available in both the public map and owner editor:
 
 | Option | Behavior |
 | --- | --- |
-| **Device** — default | Follows the browser's `prefers-color-scheme` setting and reacts when the device changes between Light and Dark. |
-| **Light** | Keeps the interface and map light until you choose another option. |
-| **Dark** | Keeps the interface and map dark until you choose another option. |
+| **Device** — default | Follows the device's light/dark preference and reacts to system changes. |
+| **Light** | Keeps the interface and map light. |
+| **Dark** | Uses dark panels, blue-grey terrain and streets, green vegetation and blue water. |
 
-The choice survives reopening and works offline. Existing explicit light/dark choices are retained during migration. Choosing Device resumes automatic detection. The application applies appearance before React renders, updates browser theme colors, and recolors the map without recreating it or resetting the current view. Preference changes also synchronize between open tabs on the same origin. If storage is unavailable, the current session still works and a failed save is reported.
+Explicit choices persist across reopening and synchronize between tabs on the same origin. Storage failure retains the choice for the current session and shows a message. Changing the theme keeps the mounted map, camera, selection, drawing and roof draft.
 
-### Install on a phone
+The map has **one view button**: **3D** switches into 3D; **2D** returns to 2D. There is no attached chevron. **Settings → 3D rendering** offers Enhanced and Simple; Enhanced is the default and an existing saved Simple choice is respected. Editor Settings also provides live **Tilt** in 3D and **Building opacity**.
 
-- **Android Chrome:** open the HTTPS app and use the browser's Install app option when available.
-- **iPhone Safari:** open the HTTPS app, choose Share, then Add to Home Screen.
+Enhanced architecture retains its **original wall, window, roof and trim colours in both themes**, including older model packages and draft previews. Dark lighting adds neutral shading. Illustrative 2D footprints and Simple blocks use the slate palette. Material colour is separate from source evidence: a modeled detail is not necessarily a measured or photographed reconstruction.
 
-Installation and map download are separate steps. Install the app, complete its offline download, and verify Ready offline before relying on it without a connection. Physical-device installation and live GPS acceptance checks remain listed in [ACCEPTANCE.md](docs/ACCEPTANCE.md).
+Enhanced detail reduces at wider zooms and returns automatically on zooming in. Basic extrusions remain available where models are absent or unusable. Height evidence distinguishes measured/recorded heights, floor-based estimates and illustrative unknowns. [Rendering and dark styling](docs/DARK-MAP-STYLING.md).
 
-## Offline operation and updates
+## Owner editor
 
-An initial online visit and completed download are required. TurnRight stores two complementary parts:
+The [private editor](https://turnright.vercel.app/admin) requires the single allowlisted GitHub owner. Backend authorization and database policies protect drafts, reports, source proposals and releases.
 
-| Stored content | Mechanism | Measured size, 9 September 2026 |
-| --- | --- | --- |
-| Application shell, styles, icons, interface fonts, map/routing workers | Workbox service-worker precache | Approximately **2.46 MiB**, uncompressed build assets |
-| Campus geometry, search fields, routing graph, closures, map glyphs, audio manifest and recordings | CacheStorage assets with IndexedDB package records | **3.01 MiB** — 3,159,499 bytes across 22 assets |
+- **Workspace:** select buildings, places, entrances or paths; edit properties, draw geometry, inspect mapping needs and test routes.
+- **Sources:** compare imported records and their geometry, review reference-based appearance suggestions and inspect proposed roofs.
+- **Settings:** change theme, 3D rendering, tilt and opacity without leaving unfinished work.
+- **Reports and Releases:** review submitted issues and the release pipeline separately from live editing.
 
-The checked-in campus package is `lasu-4e4c8008b38b`. Transfer size and browser storage usage differ with compression and browser overhead. No external tile service or satellite imagery is needed.
+Autosave preserves draft edits. A continuous field interaction is one undo step; blur, Enter, selection changes or another command finish the group. Undo restores related geometry, surface identities and styles together. Drawing gestures are protected against accidental tool changes, and unfinished work can be resumed after reopening.
 
-- **Download safely:** required files are size/hash verified before the active package changes. Interrupted or corrupt updates retain the working version; valid existing files can be reused.
-- **Choose updates:** opening or reconnecting checks release metadata. A known newer map is displayed for review and download; it is not silently installed.
-- **Keep a walk stable:** a downloaded update waits until active navigation ends. Application updates that require reloading are also delayed during a walk.
-- **Know the limits:** offline devices only know closures contained in their downloaded package. Check its date and any newer-release notice before a walk.
-- **Recover storage:** the app requests persistent storage where supported, detects missing/evicted assets, and offers retry or deletion controls. Browser storage permission is not a guarantee against eviction.
-- **Keep reports as drafts:** reports saved offline remain local until you explicitly submit them online. Reconnecting does not submit them automatically.
+Errors offer the failed operation's recovery, such as **Retry save**, **Retry export**, **Retry route**, **Retry 3D preview** or renewed sign-in. Save failures and other task errors remain separate. Reads have bounded timeouts; a prepared owner workspace can be offered after network failure even when the browser claims to be online.
 
-## Technology and architecture
+Conflict review compares base, local and server values. Independent field/surface changes merge; conflicting values need an explicit choice. Geometry changes and dependent connections or surface assignments are reviewed together.
 
-| Layer | Technology | Responsibility |
-| --- | --- | --- |
-| Interface | React 19, TypeScript, Vite 8, Tailwind CSS 4, shadcn/Base UI | Responsive application, accessible controls and dialogs |
-| Map | MapLibre GL JS 6, locally packaged GeoJSON vector layers | Campus geometry, labels, routes and optional extrusions |
-| Routing | Dedicated Web Worker, A* and bounded alternative generation | Local graph search without blocking the interface |
-| Offline storage | Workbox, `vite-plugin-pwa`, IndexedDB, CacheStorage | App shell, verified packages, local preferences and drafts |
-| Navigation audio | Web Audio and optional local Web Speech voices | Packaged instructions without an online speech service |
-| Visual editor | Terra Draw with the MapLibre adapter | Geometry drawing, vertex editing and explicit connections |
-| Hosting/API | Vercel Hobby | Public application, immutable packages and small server endpoints |
-| Administration | Supabase Auth, PostgreSQL/PostGIS, row-level security | Owner identity, approved sources, private corrections, reports and releases |
-| Data jobs | GitHub Actions, Python and Node.js scripts | Imports, comparison, validation, package builds and deployment |
+Guided repairs select the affected feature and open the relevant control. Proposed geometry is previewed before **Apply reviewed repair**. Opening **Duplicates** makes no edit: review survivors, removals and redirected entrances before applying one undoable batch. [Editor guide](docs/EDITOR.md) · [Reliability and conflict handling](docs/EDITOR-RELIABILITY.md).
 
-```mermaid
-flowchart LR
-    Sources[OSM and permitted ArcGIS data] --> Imports[Import and compare]
-    Imports --> Review[Owner review and corrections]
-    Review --> Release[Validate, preview and publish]
-    Release --> CDN[Vercel app and immutable packages]
-    CDN --> Device[Browser and offline storage]
-    Device --> Local[Local search, routing, GPS and audio]
-    Device -->|Explicit online report| API[Validated private API]
-    API --> Admin[Supabase private records]
-    Admin --> Review
-```
+## Building appearance and roofs
 
-Published navigation does not depend on Supabase being available. Navigation GPS processing stays on the device. Owner surveys keep recoverable recordings locally and upload evidence privately when saved; public campus packages contain reviewed geometry and coarse provenance, never raw survey tracks or sample timestamps. Report submissions send the selected pin/place and entered description. Appearance is persisted in IndexedDB with a small localStorage mirror so the first paint can use the saved setting. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for thresholds, schema boundaries, storage transactions and authorization details.
+Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
+
+1. Set wall, roof, window and trim colours; window visibility/spacing; height or floors; supported roof form/pitch; and evidence notes.
+2. Building defaults flow to wings and then walls. **Use inherited value** clears an individual override. Swatches show the resolved saved colours.
+3. Use **Outline** for footprint editing. Stable part/ring/vertex/wall identities preserve styles through movement and reordering. Split walls inherit style; ambiguous joins or changed source geometry require reassignment or reset.
+4. Use **Roof** for the selected wing. Draw ridge/valley constraints, move control points, enter elevations and inspect calculated surface slopes.
+5. Review the result and choose **Apply roof** to commit one undoable change, or **Cancel roof** to restore the previous roof.
+
+Roof plans store editable control points, constraints and boundary attachments, rather than generated triangles. Attached points follow footprint vertices; moving a wing moves its roof. The shared constrained triangulator preserves concave footprints and courtyards. Invalid constraints, incompatible elevations, degenerate surfaces and heights above the declared total block applying or publishing the affected roof.
+
+Standard flat/hip/gable controls work on supported shapes. Window spacing accepts 0.5–20 m, with a 4 m default; supported standard pitch accepts 1–60° within the footprint and height limits. Custom roofs use point elevations. Unknown heights and approximate roof proposals remain explicitly illustrative.
+
+Preview workers rebuild affected buildings after a short debounce, reject stale replies and retain the last valid preview on failure with **Retry 3D preview**. Selection does not hide enhanced models. Outline drawing, connection work and surveying suppress obstructing detail where needed. Settings and view changes preserve unfinished roof work.
+
+Reference and roof batches require review; photographic support and inferred details are distinguished. They do not add unsupported paths, furniture or surveyed-height claims. [Building editor](docs/BUILDING-EDITOR.md) · [Roof plans](docs/BUILDING-ROOFS.md) · [Reference research](docs/BUILDING-REFERENCE-RESEARCH.md).
+
+## Review and publication
+
+**Saving a draft and deploying application code do not publish campus changes.**
+
+1. Import source candidates with **Check now** or the scheduled source job. Incomplete imports retain the last successful source set.
+2. Compare property rows and before/after geometry; raw records remain under Details. Review baseline reconciliation when approved sources differ from a published baseline.
+3. Resolve blocking validation issues and inspect release impact: added/changed/deleted features, entrance and connectivity changes, and Clinic–Senate, Clinic–Law and Clinic–Library route results.
+4. **Build review preview** flushes pending saves and creates an immutable release snapshot. The release worker independently validates it and regenerates the visual catalogue/sectors with the same building and roof rules as the editor.
+5. Review the hosted preview, then use the owner's **Publish** action. Publication is recorded only after deployment/promotion succeeds. Keep the previous release for rollback.
+
+Job status refreshes while its review panel is open. Publication and job submissions are checked before repetition; a failed action is not treated as published. Closures remain active until explicitly reopened and republished; an expected reopening date is only a review flag.
+
+| Workflow | Purpose |
+| --- | --- |
+| `source-update.yml` | Daily/on-demand source import and comparison |
+| `release.yml` | Reviewed preview, publication and rollback |
+| `preview.yml` | Manual seed-based preview deployment |
+| `bootstrap.yml` | Initial accepted source baseline without overwriting an existing baseline |
+
+For local source candidates, run `python scripts/import_campus.py --download --output data/candidates` from the repository root. `node scripts/package.mjs` builds the seed package for development. Neither replaces the reviewed production release workflow.
+
+## Walking surveys
+
+On an owner phone session, choose **Survey** and prepare it online before a field visit. The workflow is **record → mark entrances → finish → adjust/connect → save survey → apply to map draft**.
+
+Recording uses foreground GPS in north-up 2D. Pause/resume is explicit; backgrounding or reopening requires Resume. Stale fixes, implausible jumps and poor accuracy are excluded. Gaps remain separate sections. Entrance placement pauses for a deliberate building/place association.
+
+Review supports trimming, splitting, vertex movement and explicit endpoint connections. Correcting an existing path retains geometry outside the selected section and preserves boundary junctions and metadata. A visual crossing alone does not create a routing connection.
+
+Local recordings are owner-scoped and recoverable. Private sync preserves conflicting versions for review; raw sample tracks and timestamps are excluded from public packages. Field verification on physical Android and iPhone remains outstanding. [Survey guide and field record](docs/SURVEY.md).
+
+## Offline operation and recovery
+
+An initial online visit and a completed download are required. Installation and download are separate: use the browser's install/Add to Home Screen action, then download the campus package.
+
+| Content | Storage / behavior |
+| --- | --- |
+| App shell, UI, fonts, map/model/routing workers | Service-worker precache |
+| Campus geometry, routing, glyphs, audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
+| Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
+
+Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. **Settings → Install update** activates a waiting application update with editing/navigation safeguards.
+
+**Download local recovery** immediately exports the owner workspace without waiting for the server, including pending edits, unfinished geometry/roof work, undo history, save receipts and baseline information. Full server backup export is a separate online operation. Prepare an owner workspace online before relying on offline reopening.
+
+Storage can be evicted or unavailable. Keep recovery exports for important work; do not clear site storage while unsynchronized work is pending. Offline reports remain drafts until explicitly submitted. Offline closures are only as current as the downloaded package.
 
 ## Map data and coverage
 
-The map combines **OpenStreetMap** with the **LASU ArcGIS campus layers**. Original source IDs and access tags are retained alongside administrator corrections. A source modification date is not a field-survey date. An [Overture comparison](docs/OVERTURE-COMPARISON.md) did not identify useful additional campus walking geometry in the audited release.
+TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. No external tile service or satellite imagery is required.
 
-Current checked-in coverage for `lasu-4e4c8008b38b`:
+The repository seed is **`lasu-4e4c8008b38b`**. A verified production snapshot on 15 September 2026 was **`lasu-2f6ca683a0fb`**, with **45 assets / 4,798,173 bytes**, including the owner's roof release. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
-| Metric | Count / status |
+Seed coverage is a reproducible baseline, not a claim about later owner releases:
+
+| Seed metric | Value |
 | --- | --- |
-| Source place records, including duplicates awaiting review | 219 |
+| Source place records, including duplicates | 219 |
 | Places with a mapped approach | 206 |
-| Approaches on the largest connected path component | 201 |
-| Places without a mapped approach | 13 |
-| Confirmed connected entrances | **0** |
+| Approaches on the largest path component | 201 |
+| Places without an approach | 13 |
+| Confirmed connected entrances | 0 |
 | Walking graph components | 5 |
-| Directed segments excluded for building/barrier conflicts | 166 |
-| Existing internal roads enabled by the owner's student-access confirmation | 63 |
-| Individually confirmed private gates enabled for student walking | 1 |
-| Campus field verification | **Pending** |
+| Campus field verification | Pending |
 
-A **mapped approach** ends on an existing source path near a place. It does not draw an assumed final connection through a fence, building, or unmapped area. A destination can have an approach yet remain disconnected from the chosen origin.
+A mapped approach uses existing paths near the destination, without inventing the final connection. Reviewed student-access corrections permit specified internal roads, the Faculty of Law driveway and International Library gate; other restrictions, barriers, parking aisles and closures remain in force. Visual appearance changes do not modify routing.
 
-The student-access correction applies to 62 reviewed ordinary internal roads, the individually confirmed Faculty of Law driveway, and the International Library gate. Other private driveways and gates, parking aisles, explicit no-walking restrictions, barriers, and closures remain excluded; it does not grant unrestricted public campus access. See [CAMPUS-ACCESS.md](docs/CAMPUS-ACCESS.md), the [connection review](docs/CONNECTION-REVIEW.md), and the [machine-readable coverage report](data/coverage-report.json).
+The roof assessment covered 380 footprints and proposed 46 wing roofs across 44 buildings; most are illustrative, with photographic support for three building forms. This is a dated assessment, not a guarantee that every building has an accurate model. [Coverage and access](docs/CAMPUS-ACCESS.md) · [Machine-readable seed coverage](data/coverage-report.json) · [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md).
 
-Law and the International Library now connect to the main network through existing OSM paths. Priority survey work includes their final building entrances, the five approaches still on smaller disconnected sections, conflicting source geometry, and duplicate place records. These are software-checked approaches; campus walks remain unverified. Map publication is separate from a code push; see the [review and rollout record](docs/CONNECTION-REVIEW.md).
+## Architecture
 
-## Administration and publication
-
-The [owner editor](https://turnright.vercel.app/admin) requires the single allowlisted GitHub account. Both database policies and backend endpoints enforce access. Anonymous visitors cannot read drafts, reports, or administrative records, and submitted reports cannot change routes.
-
-The workflow is **review → validate → preview → publish**:
-
-1. Import source candidates daily or through **Check now**. Failed/incomplete imports retain the last successful dataset; candidates do not overwrite approved data.
-2. Review additions, removals, geometry changes, and conflicts. Administrator corrections remain separate from imported source records.
-3. Select a building, place its entrances, draw their approaches and connect to highlighted path segments in 2D or 3D. Drafts save automatically; route tests choose the shortest permitted entrance. Review unresolved items in **Needs mapping**. See the [editor guide](docs/EDITOR.md) for connections, recovery and controls.
-4. Validate an approved revision and create an immutable package/deployment preview.
-5. Review the preview and publish it. Success is recorded only after deployment and production promotion succeed. Retain the preceding release for rollback and export approved data/correction history for recovery.
-
-Closures remain active until explicitly reopened and republished. An expected reopening date creates an overdue-review flag; it never reopens a route automatically.
-
-| Workflow | Trigger / purpose |
+| Layer | Technology / responsibility |
 | --- | --- |
-| `source-update.yml` | Daily at 02:17 UTC or on demand; imports and queues source changes |
-| `release.yml` | Reviewed release preview, publication and rollback |
-| `preview.yml` | Manual seed-based preview deployment |
-| `bootstrap.yml` | One-time accepted source baseline; refuses to overwrite an existing baseline |
+| UI | React 19, TypeScript, Vite 8, Tailwind CSS 4, shadcn/Base UI |
+| Map and geometry | MapLibre GL JS 6; packaged GeoJSON, Terra Draw and explicit graph connections |
+| Architecture rendering | Three.js in the shared WebGL context; sector loading, material caching, detail levels and fallback |
+| Building generation | Shared worker/release mesh rules; Delaunator with Constrainautor for custom roofs |
+| Routing | Dedicated worker, A* and bounded alternatives |
+| Offline | Workbox, `vite-plugin-pwa`, IndexedDB and CacheStorage |
+| Audio and sensors | Packaged Web Audio clips, optional local speech, foreground GPS and optional motion/orientation |
+| Administration | Supabase Auth/PostgreSQL/PostGIS, RLS and single-owner API authorization |
+| Hosting/jobs | Vercel application/API; GitHub Actions with Python and Node scripts |
 
-For a local source refresh, run from the repository root:
-
-```sh
-python scripts/import_campus.py --download --output data/candidates
+```mermaid
+flowchart LR
+    Sources[Recorded map sources] --> Import[Import and compare]
+    Import --> Editor[Owner review and draft edits]
+    Editor --> Snapshot[Validate immutable snapshot]
+    Snapshot --> Preview[Build map and models / preview]
+    Preview --> Publish[Owner publishes release]
+    Publish --> App[Public app and verified offline package]
+    App --> Device[Local search / routing / GPS / audio]
+    Reports[Private reports and surveys] --> Editor
 ```
 
-This writes candidates; it does not publish them. `node scripts/package.mjs` builds the checked-in seed package for development. Production map changes use the reviewed release workflow. See the architecture and deployment guides before changing the data pipeline.
-
-## Record paths by walking
-
-Open the [owner editor](https://turnright.vercel.app/admin) on Android Chrome or iPhone Safari, including an installed web app, and choose **Survey**. The workflow is **record → mark entrances → finish → adjust and connect → save map draft**. The feature is labelled **Awaiting field verification** until physical walks pass on both platforms.
-
-1. Choose **Prepare for offline survey** while signed in and online. Wait for the readiness confirmation before starting an offline visit.
-2. Choose **Record new path**, grant location access, and walk with TurnRight visible. Recording starts in north-up 2D; panning suspends following and **Follow me** restores it. **Pause/Resume** controls recording explicitly.
-3. Choose **Mark entrance here** to pause and review a recent usable fix. Position the footprint under the crosshair, select its building/place, and confirm the entrance name and walking access. Resume for the next section.
-4. Choose **Finish** to compare the original trace with proposed geometry. Trim, split, remove sections, move/insert/delete vertices, and undo/redo on the phone. Use **Place here** and highlighted targets to connect endpoints deliberately; a crossing alone does not create a junction.
-5. **Save survey** preserves private evidence and queues an upload if offline. **Apply to map draft** creates editable path/entrance corrections after review and connection checks. Close Survey to test routes. Neither action publishes campus data.
-
-**Correct existing path** replaces a selected section between two boundary vertices. Geometry outside the section, fixed junctions, access/direction metadata and closure coverage are retained. Changed targets require another review. **Saved surveys** opens local recovery and private versions for later phone or desktop editing; conflicting versions remain available for explicit resolution.
-
-Reported accuracy is good through 8 metres and usable through 15 metres; this is a device estimate, not surveyed precision. Stale fixes, implausible jumps and poor accuracy are excluded. Signal gaps become separate sections and are never silently bridged. Locking the screen, switching apps or reopening pauses recording until **Resume**. Wake lock is requested where available, but background recording is outside this release.
-
-Recovery uses owner-scoped IndexedDB with incremental sample writes. Storage failures pause recording; signing out locks cached surveys. Sync requires the same owner to authenticate online. The editor's **Install update** notice requires paused recording and saved recovery/draft work before reloading. See [SURVEY.md](docs/SURVEY.md) for controls, acceptance thresholds, architecture, conflicts and the physical-device test record.
+Published navigation does not require the admin database to be available. Model appearance and optional recovery fields use existing JSON properties; source geometry and routing remain separate from display classifications. [Architecture details](docs/ARCHITECTURE.md).
 
 ## Configuration and hosting
 
-Public local exploration needs no credentials. For connected administration and reports, start with [web/.env.example](web/.env.example) and follow [DEPLOYMENT.md](docs/DEPLOYMENT.md), including the Supabase migrations, GitHub OAuth callback, administrator allowlist, workflow secrets and redirect URLs.
+Public seed exploration requires no credentials. Connected administration/reports need [web/.env.example](web/.env.example), Supabase GitHub OAuth, the owner allowlist, database migrations and workflow configuration.
 
-Apply migrations in order through [004_private_surveys.sql](supabase/migrations/004_private_surveys.sql) before deploying the survey API/editor. Migration 004 adds owner-readable private survey metadata, immutable recording revisions and bounded chunks; mutations are restricted to the authenticated admin API's service role. Normal editor-state responses do not fetch recordings. Campus package schema version remains 1.
+Apply the migrations in order through **[006_reconciliation_safe_updates.sql](supabase/migrations/006_reconciliation_safe_updates.sql)**. They include private surveys and safe baseline reconciliation. Follow the deployment guide's base setup and the reconciliation notes in the production record.
 
-| Variables | Scope / purpose |
+| Variables | Scope |
 | --- | --- |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Browser-visible Supabase URL/public key for authentication; security depends on RLS and endpoint checks |
-| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_USER_ID` | Server-only database access and administrator identity |
-| `GITHUB_REPOSITORY`, `GITHUB_WORKFLOW_TOKEN` | Server-side workflow dispatch configuration |
-| `REPORT_RATE_SALT` | Server-only salt for report rate-limit buckets |
-| `SOURCE_REDISTRIBUTION_APPROVED` | Build-time rights gate; set only when source redistribution is authorized |
-| `PUBLISHED_MAP_URL` | Build-time stable HTTPS origin used to preserve the currently published map during ordinary app builds |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Browser-visible authentication URL and public key |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_USER_ID` | Server-only database access and owner identity |
+| `GITHUB_REPOSITORY`, `GITHUB_WORKFLOW_TOKEN` | Server-side workflow dispatch |
+| `REPORT_RATE_SALT` | Server-only report rate-limit buckets |
+| `SOURCE_REDISTRIBUTION_APPROVED` | Build-time source-rights gate |
+| `PUBLISHED_MAP_URL` | Stable HTTPS origin whose approved package ordinary app builds preserve |
 
-Never put privileged keys in a `VITE_` variable or commit real environment files. The setup guide lists the additional GitHub Actions deployment secrets separately. Keep credentials in the hosting providers' secret stores.
+Do not put privileged keys in `VITE_` variables or commit real environment files. Additional GitHub Actions deployment secrets are listed in [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-Current Vercel settings use **`web` as the root directory**, **Node 22**, `npm run build`, and `dist` output, with repository files outside the root available to the build. Git changes on `main` drive application deployments. Documentation-only changes may be skipped by Vercel's monorepo detection. The project's configuration and publication history are recorded in [CONFIGURATION.md](docs/CONFIGURATION.md) and [PRODUCTION.md](docs/PRODUCTION.md).
+Vercel uses **`web` as the project root**, **Node 22**, **`npm run build`** and **`dist`** output, with repository files outside the root available. Main-branch code changes deploy the application. `PUBLISHED_MAP_URL` fetches and verifies the currently published package so a UI deployment cannot silently revert it to the seed; failure stops the build. Owner-reviewed releases use their immutable snapshot instead.
 
-`PUBLISHED_MAP_URL` is configured for code deployments so a new UI build does not revert approved map data to the seed. It fetches and verifies published assets and fails safely if they cannot be obtained. Updating seed files alone is not a replacement for an editor-reviewed production map release.
-
-This project uses free plans without paid overages. Vercel Hobby is limited to personal, non-commercial use; quota exhaustion can interrupt service. Supabase Free may pause inactive projects. Published/downloaded navigation remains independent of the administrative database. Check the current [Vercel Hobby terms](https://vercel.com/docs/plans/hobby) and [Supabase Free plan](https://supabase.com/pricing) before changing the project's use or hosting configuration.
+The project is configured on Vercel Hobby and Supabase Free. Hosting quotas or paused backend services can interrupt connected operations; already downloaded navigation remains local. See [configuration](docs/CONFIGURATION.md) and [production history](docs/PRODUCTION.md).
 
 ## Development and verification
 
-Run frontend checks from `web/`:
+Run from `web/`:
 
 ```sh
 npm test
@@ -288,97 +287,86 @@ npm run test:survey-webkit
 npm run test:survey-pwa
 ```
 
-Run importer/access-policy tests from the repository root:
+`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
+
+Focused checks for these UI changes:
+
+```sh
+npx playwright test --grep "enhanced zoom restores|view settings"
+npx playwright test --config playwright.webkit.config.ts --grep "enhanced zoom restores|view settings phone"
+```
+
+Importer/access tests run from the repository root:
 
 ```sh
 python -m unittest discover -s scripts/tests -v
 ```
 
-| Command, from `web/` | Purpose |
-| --- | --- |
-| `npm run dev` | Vite development server |
-| `npm test` | Vitest regression suite |
-| `npm run test:browser` | Real MapLibre/Terra Draw editor, survey and motion-assistance scenarios in Chromium |
-| `npm run test:survey-webkit` | Phone survey and public motion-assistance scenarios in WebKit with touch/mobile support |
-| `npm run test:survey-pwa` | Isolated production build: offline preparation/startup, recording recovery and reconnecting private sync |
-| `npm run lint` | TypeScript frontend/API checks and Oxlint |
-| `npm run build` | Preserve/package data, type-check, compile server imports, build application and service worker |
-| `npm run preview` | Serve the production build locally |
-| `npm run package` | Regenerate the campus package from the checked-in seed |
-| `npm run format -- <path>` | Format selected files with Oxfmt; keep formatting changes focused |
+Coverage includes source normalization, appearance persistence/storage failures, grouped undo, save receipts, concurrent field/surface edits, geometry identity, constrained roofs, editor/release parity, drawing/roof recovery, worker failure/stale replies, package integrity and offline reopening. Browser tests use real map/rendering libraries with isolated authentication, API and hardware fixtures. Enhanced zoom cases inspect actual shader material colours and draw calls, including legacy meshes and repeated theme/zoom changes.
 
-**Verification recorded on 12 September 2026, using Node 22:** 135 Vitest tests and seven Python tests pass. Twelve Chromium browser scenarios, five WebKit phone scenarios and the production-PWA offline/recovery scenario pass. Production build and API compilation pass. Lint has no errors, with seven existing explicit-any warnings. Coverage includes entrance routing, directed paths and closures, stable editor junctions, noisy/stale GPS, recording interruptions, partial replacement, undo/redo, owner-scoped recovery, storage failures, atomic private uploads, retries/conflicts, cross-device archive recovery and exclusion of raw survey evidence from public packages. Motion tests cover angle/tilt normalization, independent permissions, sparse readings, lifecycle cleanup, rate limits, GPS invariance, camera control and preference-only persistence. Browser tests use real MapLibre/Terra Draw with GPS, sensor, authentication and API fixtures only in tests.
-
-Migration 004 is applied. Authenticated preview checks verified offline preparation and private save/reopen, and live database checks verified incomplete-upload rejection, idempotent retries, duplicate-chunk prevention and retained concurrent versions inside a rolled-back transaction. These are software checks: physical Android/iPhone walks, accuracy near buildings, battery use and device interruption/offline behavior remain pending in the [survey field record](docs/SURVEY.md#physical-field-record--pending).
-
-Appearance checks include device changes, explicit overrides, migration, reopening, cross-tab synchronization, delayed storage hydration, storage failures, and startup-script behavior. Browser checks cover persisted Light mode, returning to Device/Dark, an open route reacting to a change in another tab, and the 390 × 844 settings layout. Automated system-change events do not replace physical OS/device checks.
-
-Earlier offline browser checks exercised cold reopening with the origin server stopped, search, worker routing, alternatives, and recorded audio. Physical Android/iPhone installation, airplane-mode navigation, live GPS, modest-phone performance, representative campus walks, and deliberate wrong turns remain acceptance work. [ACCEPTANCE.md](docs/ACCEPTANCE.md) separates completed evidence from outstanding checks.
+On 15 September 2026, **303 unit tests** passed. Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
 ## Repository structure
 
 ```text
 TurnRight/
 ├── web/
-│   ├── src/                 # UI, map, routing, GPS, audio, editor and storage
-│   │   ├── appearance.ts    # Device preference, overrides and persistence
-│   │   ├── useAppearance.ts # React integration for the appearance store
+│   ├── src/                 # Public UI, editor, map, buildings, routing and storage
+│   │   ├── AppearanceSettings.tsx # Shared public/editor theme control
+│   │   ├── campus-model-layer.ts # Enhanced rendering and model lifecycle
 │   │   └── sw.ts            # Application service worker
 │   ├── api/                 # Vercel admin and report endpoints
 │   ├── server/              # Server-only validation and authorization
-│   ├── tests/               # Regression tests
-│   ├── public/              # Packaged map/assets served with the app
-│   └── .env.example         # Configuration template without credentials
-├── data/                    # Seed, access corrections, attribution and coverage
+│   ├── tests/               # Unit, browser and offline regression coverage
+│   ├── public/              # Development seed and packaged static assets
+│   └── .env.example         # Configuration names without credentials
+├── data/                    # Sources, visuals, reference/roof assessments and attribution
 ├── scripts/                 # Import, compare, validate, package and release jobs
-├── supabase/migrations/     # Database schema, policies and API grants
+├── supabase/migrations/     # Database schema, policies and reconciliation
 ├── .github/workflows/       # Source and release automation
-└── docs/                    # Setup, architecture, acceptance and screenshots
+└── docs/                    # Workflow guides, acceptance records and screenshots
 ```
 
 ## Troubleshooting
 
-| Symptom | What to check |
+| Symptom | What to do |
 | --- | --- |
-| “A walking connection for this place has not been mapped” | The destination lacks a supported connection, or its component is disconnected from the origin. Report the actual missing path/entrance and review an explicit editor connection. Do not remove restrictions globally or draw an assumed shortcut. |
-| App does not follow the device's appearance | Select **Settings → Appearance → Device**. An explicit Light/Dark choice intentionally overrides the device. Install a waiting app update if the three-option selector is missing. |
-| Map will not reopen offline | Use a production PWA build, complete the download, and confirm Ready offline. Check eviction/storage errors and use the repair/download controls. |
-| Location is unavailable or inaccurate | Use HTTPS, grant the site's location permission, keep the app visible, and move outdoors. A manual origin still supports route previews. |
-| No spoken place name | Names need an available local English voice. Packaged maneuver clips work independently; check mute and device volume, then use Test spoken directions. |
-| Local `/admin` or report submission fails | Vite does not host the Vercel API. Use a configured hosted preview and check environment variables, session and administrator allowlist. |
-| Import/build/publish fails | Inspect the editor's job/release error and the GitHub/Vercel logs. Resolve the failed source, credentials, validation, or quota issue; do not mark a failed deployment published. |
-| Git push succeeds but the approved map is unchanged | App deployments preserve the published package. Review, validate and publish map changes through the release workflow. |
-| Survey is missing from the editor | Install a waiting update from public map **Settings → Install update**, then reopen `/admin`. Subsequent updates also appear inside the editor. |
-| A survey paused or contains gaps | Keep the app visible, check GPS accuracy, and choose **Resume** after backgrounding or reopening. Rewalk the missing section or draw and review an explicit connection. |
-| Survey upload is queued or conflicted | Reconnect as the same owner. Use **Saved surveys** to review retained versions; do not clear browser storage while recovery work is pending. |
+| Models look like basic blocks | Check **Settings → 3D rendering → Enhanced**, then zoom closer. Inspect the model status or retry failed assets. Some footprints have no enhanced model. |
+| Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
+| Editor stays in the wrong theme | Use **Editor Settings → Appearance → Light/Dark**, or **Device** to resume automatic changes. |
+| A roof preview is outdated | Use **Retry 3D preview** and inspect geometry/elevation errors. The last valid model and unfinished roof are retained. |
+| Draft changes are absent from the public map | Autosave stores a private draft. Review, validate, build a preview and publish through Releases; a code push alone does not publish it. |
+| Publish/preview is unavailable | Resolve blocking validation or reconciliation issues, pending saves and conflicts. Inspect job errors and the release state; do not repeat an uncertain submission blindly. |
+| Save/export/routing failed | Use the operation-specific retry. Renew an expired session if requested. **Download local recovery** remains independent of server export. |
+| No walking connection to a destination | Review the actual missing path/entrance or disconnected component. Do not create assumed shortcuts or remove access restrictions globally. |
+| Offline reopening fails | Use a production PWA, finish preparation/download, verify readiness and use integrity repair. Preserve unsynced recovery before changing storage. |
+| Location or compass is unavailable | Use HTTPS, allow the relevant permissions and keep the app visible. Manual origins and GPS-only operation remain available. |
+| Survey has gaps or paused | Review accuracy and interruptions, then Resume explicitly. Rewalk missing sections; gaps are not automatically connected. |
+| Local admin/report API fails | Vite does not host Vercel functions. Use a configured hosted environment and verify OAuth, variables and owner authorization. |
 
 ## Documentation
 
-| Guide | Contents |
+| Guide | Topics |
 | --- | --- |
-| [Architecture](docs/ARCHITECTURE.md) | Device flow, storage, routing thresholds, data model and security boundaries |
-| [Deployment](docs/DEPLOYMENT.md) | Reproducible Vercel, Supabase, GitHub OAuth and workflow setup |
-| [Acceptance](docs/ACCEPTANCE.md) | Automated/browser evidence, physical-device checklist and field-survey log |
-| [Editor](docs/EDITOR.md) | 2D/3D mapping, entrances, connections, draft recovery and review |
-| [Walking surveys](docs/SURVEY.md) | Phone recording/review, private sync, migration 004 and pending physical-device checks |
-| [Compass and motion](docs/MOTION.md) | Sensor permissions, heading/motion quality, orientation controls, privacy and pending device checks |
-| [Configuration record](docs/CONFIGURATION.md) | Configured services and operational setup record |
-| [Production record](docs/PRODUCTION.md) | Publication history, deployment and package verification |
-| [Campus access](docs/CAMPUS-ACCESS.md) | Reviewed student walking correction and remaining path gaps |
-| [Overture comparison](docs/OVERTURE-COMPARISON.md) | Additional-data audit and access findings |
-| [Source attribution](data/ATTRIBUTION.md) | Map, font and audio provenance and redistribution status |
-| [Coverage report](data/coverage-report.json) | Machine-readable baseline coverage metrics |
+| [Editor](docs/EDITOR.md) / [Reliability](docs/EDITOR-RELIABILITY.md) | Drawing, connections, recovery, conflict and operation-specific errors |
+| [Building editor](docs/BUILDING-EDITOR.md) | Wing/wall inheritance, identity, controls and preview lifecycle |
+| [Roof plans](docs/BUILDING-ROOFS.md) / [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md) | Constraints, validation, approximate proposals and evidence |
+| [Building references](docs/BUILDING-REFERENCE-RESEARCH.md) / [Appearance coverage](docs/BUILDING-APPEARANCE-COVERAGE.md) | Reference sources, uncertainty and facade assessments |
+| [Dark map](docs/DARK-MAP-STYLING.md) / [UI readability](docs/DARK-MODE-READABILITY.md) | Palette, original enhanced materials, labels, controls and contrast |
+| [Surveys](docs/SURVEY.md) / [Motion](docs/MOTION.md) | Recording, private evidence, permissions and field checks |
+| [Architecture](docs/ARCHITECTURE.md) / [Miniature campus](docs/MINIATURE-CAMPUS.md) | Data boundaries, routing, storage and model packages |
+| [Deployment](docs/DEPLOYMENT.md) / [Configuration](docs/CONFIGURATION.md) / [Production](docs/PRODUCTION.md) | Service setup and operational history |
+| [Acceptance](docs/ACCEPTANCE.md) | Automated evidence and outstanding physical checks |
+| [Campus access](docs/CAMPUS-ACCESS.md) / [Connection review](docs/CONNECTION-REVIEW.md) | Approved walking corrections and remaining gaps |
+| [Attribution](data/ATTRIBUTION.md) / [Overture audit](docs/OVERTURE-COMPARISON.md) | Provenance, permissions and source comparisons |
 
-## Contributing
+## Contributing and licensing
 
-Use [GitHub issues](https://github.com/mrglasswillbreak/TurnRight/issues) for reproducible software defects and feature proposals. Include the app/package version, browser/device, steps, and expected versus actual behavior. Use the in-app report flow for a specific campus place or path so it reaches the private review queue.
+Use GitHub issues for reproducible software defects or feature proposals; include browser/device, app/package version, steps and expected behavior. Use in-app reports for campus places and paths. Keep changes focused, run relevant checks and include screenshots for UI changes. Map contributions need identity, provenance, redistribution permission and evidence for connections/access. Mark unsurveyed details explicitly. Never commit credentials, private reports or raw owner recordings.
 
-Keep pull requests focused, run checks appropriate to the change, and include screenshots for interface changes. Map contributions need stable feature IDs where available, provenance, redistribution permission, and evidence for paths/access/entrances. Preserve existing corrections and explicitly mark unsurveyed geometry. Do not submit credentials or private report contents to the public repository.
+- **OpenStreetMap:** © OpenStreetMap contributors, ODbL 1.0. The package includes OSM-derived data. [Attribution and license](https://www.openstreetmap.org/copyright).
+- **LASU ArcGIS:** MangroveandpartnersLimited. The owner recorded offline redistribution permission on 8 September 2026; the public item supplied no explicit redistribution license. That confirmation is recorded in [ATTRIBUTION.md](data/ATTRIBUTION.md), not a general grant for unrelated uses.
+- **Fonts/audio:** Inter uses the SIL Open Font License; Open Sans map glyphs use Apache 2.0. Packaged navigation recordings were generated locally; provenance and regeneration details are in the attribution record.
+- **Reference images:** Linked evidence and supplied visual inspiration do not establish redistribution rights or surveyed building accuracy. The README contains application screenshots, not copied reference photography.
 
-## Attribution and licensing
-
-- **OpenStreetMap:** © OpenStreetMap contributors, ODbL 1.0. The downloadable campus JSON contains the OSM-derived database. [OSM attribution and license](https://www.openstreetmap.org/copyright).
-- **LASU ArcGIS layers:** MangroveandpartnersLimited. The TurnRight owner confirmed offline redistribution permission on 8 September 2026; the public ArcGIS item itself supplied no explicit redistribution license. The confirmation is recorded in [ATTRIBUTION.md](data/ATTRIBUTION.md) and is not a general license grant for unrelated uses.
-- **Fonts:** Inter under the SIL Open Font License; Open Sans map glyphs under Apache 2.0. Navigation recordings were generated locally; source and regeneration details are recorded in the attribution file.
-
-No standalone source-code license has been selected in this repository. Do not assume an MIT or Apache license for TurnRight's own code; third-party components and datasets retain their respective terms. No Google Maps content, satellite imagery, or externally hosted rendered map tiles are bundled.
+No standalone license has been selected for TurnRight's own source code. Do not assume an MIT or Apache license; dependencies and datasets retain their respective terms. No Google Maps content, satellite imagery or remotely hosted rendered map tiles are bundled.
