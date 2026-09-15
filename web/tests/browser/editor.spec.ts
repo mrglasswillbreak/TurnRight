@@ -807,6 +807,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { campusFixture } from '../fixture';
+import { contrastFailures } from './contrast';
 import type { CampusData, MapEdit, Position } from '../../src/types';
 import { createBuildingModel } from '../../src/building-model';
 import { buildingRevision } from '../../src/building-visuals';
@@ -3535,3 +3536,98 @@ test.describe('view settings touch', () => {
     await expect(page.locator('.map-rendering-options')).toHaveCount(0);
   });
 });
+
+for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
+  test(`readable interface ${variant}: tips, public dialogs and editor panels`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(120000);
+    if (variant.includes('phone'))
+      await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({
+      colorScheme: variant.startsWith('dark') ? 'dark' : 'light',
+      reducedMotion: 'reduce',
+    });
+    await setup(page);
+    await expect(page.locator('html')).toHaveAttribute(
+      'style',
+      new RegExp(
+        `color-scheme: ${variant.startsWith('dark') ? 'dark' : 'light'}`,
+      ),
+    );
+    const failures: Record<string, string[]> = {};
+    const audit = async (name: string) => {
+      failures[name] = await contrastFailures(page);
+    };
+    await audit('editor workspace');
+    await page
+      .getByRole('button', { name: 'Switch to 3D', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+    await expect(page.locator('.map-detail-status')).toHaveText(
+      'Enhanced models paused for map editing',
+    );
+    await audit('editing tips');
+    await page.screenshot({ path: testInfo.outputPath('editing-tips.png') });
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    for (const section of [
+      'Settings',
+      'Sources',
+      'Duplicates',
+      'Reports',
+      'Releases',
+    ]) {
+      await page.getByRole('button', { name: section, exact: true }).click();
+      await audit(`editor ${section}`);
+    }
+    await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+    await focusCampus(page);
+    if (
+      await page.getByRole('button', { name: 'Collapse explorer' }).isVisible()
+    )
+      await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await clickMap(page, [3.20012, 6.46022]);
+    await expect(
+      page.getByRole('button', { name: 'Appearance', exact: true }),
+    ).toBeVisible();
+    await audit('building inspector');
+    await page.getByRole('button', { name: 'Roof', exact: true }).click();
+    await audit('roof inspector');
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await expect(page.locator('.survey-sheet')).toBeVisible();
+    await audit('survey');
+    await page.goto('/');
+    await attachMap(page);
+    await audit('public places');
+    await page.getByRole('textbox', { name: 'Search campus' }).fill('Library');
+    await page
+      .getByRole('button', { name: /Library/ })
+      .first()
+      .click();
+    await page.getByRole('heading', { name: 'Library', exact: true }).waitFor();
+    await audit('place details');
+    await page.getByRole('button', { name: 'Copy link', exact: true }).click();
+    await expect(page.locator('.toast')).toBeVisible();
+    await audit('toast');
+    await page.getByRole('button', { name: 'Dismiss', exact: true }).click();
+    await page.getByRole('button', { name: 'Directions', exact: true }).click();
+    await page.getByLabel('Starting place').selectOption('gate');
+    await expect(
+      page.getByRole('button', { name: 'Start walking', exact: true }),
+    ).toBeVisible();
+    await audit('route details');
+    for (const section of ['Settings', 'Offline']) {
+      await page.getByRole('button', { name: section, exact: true }).click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await audit(`public ${section}`);
+      await page.screenshot({ path: testInfo.outputPath(`${section}.png`) });
+      await page.getByRole('button', { name: 'Close', exact: true }).click();
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+    }
+    expect(
+      Object.fromEntries(
+        Object.entries(failures).filter(([, list]) => list.length),
+      ),
+    ).toEqual({});
+  });
+}

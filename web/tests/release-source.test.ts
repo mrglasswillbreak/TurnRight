@@ -75,7 +75,7 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
       path.dirname(root) !== path.resolve(tmpdir()) ||
       !path.basename(root).startsWith('turnright-upload-test-')
     )
-      throw new Error('Unexpected test cleanup directory');
-    await rm(root, { recursive: true });
+      console.error('Skipped cleanup of an unexpected test directory');
+    else await rm(root, { recursive: true });
   }
 });
