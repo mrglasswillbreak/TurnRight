@@ -38,6 +38,11 @@ import {
 } from './building-visuals';
 import { hashBytes, ASSET_CACHE } from './offline';
 import { buildingOutline } from './building-outline';
+import {
+  meshMaterialRole,
+  nightMaterial,
+  type MaterialRole,
+} from './map-palette';
 
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
@@ -76,7 +81,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     failures = new Map<string, number>();
   const materials = new Map<
     string,
-    { value: MeshLambertMaterial; users: number }
+    {
+      value: MeshLambertMaterial;
+      users: number;
+      colour: string;
+      role: MaterialRole;
+      themeKey?: string;
+    }
   >();
   let renderer: WebGLRenderer | undefined;
   let indexedData = initial.data,
@@ -132,8 +143,9 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       }
     });
   }
-  function material(colour: string) {
-    let entry = materials.get(colour);
+  function material(colour: string, role: MaterialRole) {
+    const key = `${colour}:${role}`;
+    let entry = materials.get(key);
     if (!entry) {
       entry = {
         value: new MeshLambertMaterial({
@@ -142,8 +154,10 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           flatShading: true,
         }),
         users: 0,
+        colour,
+        role,
       };
-      materials.set(colour, entry);
+      materials.set(key, entry);
     }
     entry.users++;
     return entry.value;
@@ -170,11 +184,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       geometry.setIndex(part.indices);
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
-      const mesh = new Mesh(geometry, material(part.colour));
+      const role = meshMaterialRole(part.surfaces);
+      const mesh = new Mesh(geometry, material(part.colour, role));
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
-        materialKey: part.colour,
+        materialKey: `${part.colour}:${role}`,
         surfaces: part.surfaces,
       };
       group.add(mesh);
@@ -298,11 +313,17 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         }
       }
     }
-    ambient.intensity = options.dark ? 1.15 : 1.6;
-    sun.intensity = options.dark ? 0.9 : 1.8;
-    ambient.color.set(options.dark ? '#becbd8' : '#fff1d5');
-    for (const [colour, entry] of materials) {
-      entry.value.color.set(colour).multiplyScalar(options.dark ? 0.8 : 1);
+    ambient.intensity = options.dark ? 1.25 : 1.6;
+    sun.intensity = options.dark ? 0.85 : 1.8;
+    ambient.color.set(options.dark ? '#c3d4e8' : '#fff1d5');
+    sun.color.set(options.dark ? '#d4e4ff' : '#ffffff');
+    const themeKey = `${options.dark}:${options.opacity ?? 1}`;
+    for (const entry of materials.values()) {
+      if (entry.themeKey === themeKey) continue;
+      entry.themeKey = themeKey;
+      entry.value.color.set(
+        options.dark ? nightMaterial(entry.colour, entry.role) : entry.colour,
+      );
       entry.value.opacity = options.opacity ?? 1;
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
@@ -313,6 +334,11 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     ]) {
       const selection = options.selection;
       const key = JSON.stringify([selection, group.userData.revision]);
+      for (const child of group.children)
+        if (child instanceof LineSegments)
+          (child.material as LineBasicMaterial).color.set(
+            options.dark ? '#89c6ff' : '#1764ed',
+          );
       for (const mesh of group.children)
         if (mesh instanceof Mesh)
           mesh.visible = !(
@@ -351,7 +377,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         const line = new LineSegments(
           geometry,
           new LineBasicMaterial({
-            color: '#1764ed',
+            color: options.dark ? '#89c6ff' : '#1764ed',
             depthTest: false,
             transparent: true,
             opacity: 0.75,

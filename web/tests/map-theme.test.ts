@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { landClass, pathDisplay } from '../src/map-classification';
 import { displayGeometry } from '../src/map-display';
-import { nightMaterial } from '../src/map-palette';
+import { meshMaterialRole, nightMaterial } from '../src/map-palette';
 import { campusFixture } from './fixture';
 
 describe('map presentation without campus edits', () => {
+  it('uses known surface roles and preserves compatibility with old or mixed meshes', () => {
+    expect(meshMaterialRole([{ role: 'roof' }, { role: 'roof' }])).toBe('roof');
+    expect(meshMaterialRole([{ role: 'wall' }, { role: 'roof' }])).toBe(
+      'legacy',
+    );
+    expect(meshMaterialRole()).toBe('legacy');
+    expect(meshMaterialRole([])).toBe('legacy');
+  });
   it('recognizes water and wetlands despite source spelling and whitespace', () => {
     for (const name of ['Waterbody', 'Water Body', ' water ', ' WATER  BODY '])
       expect(landClass({ name })).toBe('water');

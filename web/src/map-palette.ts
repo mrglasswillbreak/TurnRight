@@ -51,6 +51,12 @@ export const campusPalette = {
 };
 
 export type MaterialRole = 'wall' | 'roof' | 'window' | 'trim' | 'legacy';
+export function meshMaterialRole(
+  surfaces?: readonly { role: Exclude<MaterialRole, 'legacy'> }[],
+): MaterialRole {
+  const first = surfaces?.[0]?.role;
+  return first && surfaces?.every((s) => s.role === first) ? first : 'legacy';
+}
 const nightBases: Record<MaterialRole, [number, number, number]> = {
   wall: [58, 79, 101],
   roof: [72, 96, 121],
