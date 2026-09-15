@@ -54,6 +54,11 @@ export function customRoofSurface(
     throw new Error(
       'A custom roof supports up to 128 control points and 256 lines.',
     );
+  if (
+    roof.provenance !== undefined &&
+    (typeof roof.provenance !== 'string' || roof.provenance.length > 2000)
+  )
+    throw new Error('Roof evidence notes must be at most 2000 characters.');
   const origin = polygon[0][0],
     sx = 111195 * Math.cos((origin[1] * Math.PI) / 180),
     sy = 111195;

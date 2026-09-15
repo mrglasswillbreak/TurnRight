@@ -23,6 +23,7 @@ export interface RoofPoint {
   vertexId?: string;
 }
 export interface CustomRoof {
+  provenance?: string;
   eaves: number;
   points: RoofPoint[];
   lines: { id: string; from: string; to: string; kind: 'ridge' | 'valley' }[];

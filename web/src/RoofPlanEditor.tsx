@@ -9,6 +9,7 @@ import type {
 import { customRoofSurface, type RoofSurface } from './custom-roof';
 import { buildingDisplay } from './map-display';
 import { buildingTopology } from './building-surfaces';
+import { proposeHipRoof } from './roof-proposal';
 
 export function RoofPlanEditor({
   edit,
@@ -38,6 +39,7 @@ export function RoofPlanEditor({
   const [tool, setTool] = useState<'select' | 'point' | 'ridge' | 'valley'>(
     'select',
   );
+  const [proposalError, setProposalError] = useState('');
   const [selected, setSelected] = useState(''),
     [from, setFrom] = useState(''),
     [surface, setSurface] = useState<number | null>(null);
@@ -213,6 +215,26 @@ export function RoofPlanEditor({
           <button ref={editButton} className="editor-primary" onClick={start}>
             {existing ? 'Edit custom roof' : 'Create custom roof'}
           </button>
+          {!existing && (
+            <button
+              className="editor-secondary"
+              onClick={() => {
+                try {
+                  update(proposeHipRoof(polygon, height));
+                  setProposalError('');
+                } catch (e) {
+                  setProposalError((e as Error).message);
+                }
+              }}
+            >
+              Preview approximate hip roof
+            </button>
+          )}
+          {proposalError && (
+            <p className="form-error" role="alert">
+              {proposalError}
+            </p>
+          )}
           {existing && (
             <button
               onClick={() => {
@@ -280,6 +302,7 @@ export function RoofPlanEditor({
           </label>
         </>
       )}
+      {roof.provenance && <p className="small-note">{roof.provenance}</p>}
       <svg
         ref={svg}
         viewBox="0 0 300 300"
