@@ -6,6 +6,7 @@ import {
   buildingTopology,
   polygonsOf,
   resolveBuildingVisual,
+  styleFor,
 } from './building-surfaces';
 import { featureEdit } from './editor-features';
 import { buildingDisplay } from './map-display';
@@ -137,6 +138,31 @@ export function buildingRoofProposals(
             roof = proposeHipRoof(polygon, height);
           roof.provenance = `${photoForm ? 'Pitched roof form is visible in the matched photograph; the individual ridge layout is approximate. ' : 'Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. '}${roof.provenance}${proposal.sources.length ? ' References: ' + proposal.sources.map((r) => r.url).join(' ') : ''}`;
           (appearance.roofs ||= {})[part.id] = roof;
+          // A newly separated auxiliary wing may have inherited a whole-building
+          // visual. Retain that visible palette when release assigns wing defaults.
+          if (
+            i > 0 &&
+            matched &&
+            record.floors &&
+            buildingDisplay(current.properties).kind === 'illustrative' &&
+            !visual.partHeights?.[i] &&
+            !own?.heightMode &&
+            !own?.height
+          ) {
+            const resolved = styleFor(appearance, visual, part.id);
+            (appearance.parts ||= {})[part.id] = {
+              wallColour: resolved.wallColour,
+              roofColour: resolved.roofColour,
+              windowColour: resolved.windowColour,
+              trimColour: resolved.trimColour,
+              windows: resolved.windows,
+              windowSpacing: resolved.windowSpacing,
+              ...own,
+              heightMode: 'unknown',
+            };
+            roof.provenance +=
+              ' Auxiliary wing: actual height and roof form are unknown; the existing 6 m height is illustrative.';
+          }
           // Validation and release use stored height, including formerly catalogue-only observations.
           if (
             !own?.heightMode &&

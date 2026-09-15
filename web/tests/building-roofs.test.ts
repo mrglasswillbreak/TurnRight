@@ -11,6 +11,7 @@ import {
 import { createBuildingModel } from '../src/building-model';
 import { validBuildingModel } from '../src/building-visuals';
 import { EditorWorkspace } from '../src/editor-workspace';
+import { repairArcGisParts } from '../src/arcgis-rings';
 
 const feature = (id = 'b', height = 6): Feature<Polygon> => ({
   type: 'Feature',
@@ -41,6 +42,49 @@ const campus = (...features: Feature[]): CampusData => ({
   map: { type: 'FeatureCollection', features },
 });
 describe('reviewed roof batches', () => {
+  it('retains the visible palette and marks newly separated auxiliary height as unknown', () => {
+    const seed = JSON.parse(
+      readFileSync('../data/seed/campus.json', 'utf8'),
+    ) as CampusData;
+    const f = structuredClone(
+      seed.map.features.find(
+        (f) => f.properties?.id === 'arcgis:University_Property:78',
+      )!,
+    );
+    const visual = {
+      ...resolveBuildingVisual(f),
+      height: 6,
+      heightKind: 'observed-floors' as const,
+      roofForm: 'hip' as const,
+      wallColour: '#e7dbc8',
+      roofColour: '#b86351',
+    };
+    f.geometry = repairArcGisParts(f)!;
+    f.properties!.source = 'campus-review';
+    const data = campus(f);
+    data.visuals = {
+      schemaVersion: 1,
+      revision: 'before-repair',
+      bytes: 0,
+      buildings: [visual],
+      sectors: [],
+      references: [],
+    };
+    const proposal = buildingRoofProposals(data, [])[0];
+    expect(proposal.roofs).toHaveLength(2);
+    expect(
+      proposal.edit!.properties.appearance!.parts![
+        buildingTopology(f).parts[1].id
+      ],
+    ).toMatchObject({
+      heightMode: 'unknown',
+      wallColour: '#e7dbc8',
+      roofColour: '#b86351',
+    });
+    expect(proposal.roofs[1].roof.provenance).toContain(
+      'actual height and roof form are unknown',
+    );
+  });
   it('preserves geometry, routing, surfaces and source evidence while adding editable roofs', () => {
     const f = feature();
     f.properties!.appearance = {

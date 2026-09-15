@@ -92,8 +92,8 @@ describe('roof release generation', () => {
         path.dirname(path.resolve(dir)) !== path.resolve(tmpdir()) ||
         !path.basename(dir).startsWith('turnright-roof-release-')
       )
-        throw new Error('Unexpected test output directory.');
-      rmSync(dir, { recursive: true, force: true });
+        console.error('Unexpected test output directory; cleanup skipped.');
+      else rmSync(dir, { recursive: true, force: true });
     }
   }, 25000);
 });

@@ -1,3 +1,4 @@
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- Inline SVG needs an image role and contains the editable ridge diagram. */
 import { useMemo, useState } from 'react';
 import type { CampusData, MapEdit } from './types';
 import type { DuplicateCandidate } from './duplicates';
