@@ -15,17 +15,20 @@ self.onmessage = ({
   const results = data.features.map((feature) => {
     const id = String(feature.properties?.id);
     try {
-      const errors = validateBuildingStyle({
-        id,
-        kind: 'building',
-        geometry: feature.geometry,
-        properties: feature.properties || {},
-      });
-      if (errors.length) throw new Error(errors.join(' '));
       const visual = resolveBuildingVisual(
         feature,
         data.visuals.find((v) => v.id === id),
       );
+      const errors = validateBuildingStyle(
+        {
+          id,
+          kind: 'building',
+          geometry: feature.geometry,
+          properties: feature.properties || {},
+        },
+        visual,
+      );
+      if (errors.length) throw new Error(errors.join(' '));
       visual.geometryRevision = buildingRevision(feature);
       const model = createBuildingModel(feature, visual);
       if (!validBuildingModel(model))

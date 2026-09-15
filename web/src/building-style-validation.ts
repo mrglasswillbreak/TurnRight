@@ -1,4 +1,5 @@
 import type { MapEdit } from './types.js';
+import type { BuildingVisual } from './visual-types.js';
 import {
   buildingTopology,
   topologyFits,
@@ -9,11 +10,20 @@ import {
 import { customRoofSurface } from './custom-roof.js';
 import { buildingDisplay } from './map-display.js';
 
-export function validateBuildingStyle(edit: MapEdit): string[] {
+export function validateBuildingStyle(
+  edit: MapEdit,
+  previewVisual?: Pick<BuildingVisual, 'height' | 'partHeights'>,
+): string[] {
   if (edit.kind !== 'building') return [];
   const errors: string[] = [],
     appearance = edit.properties.appearance;
   const polygon = polygonsOf(edit.geometry);
+  // Unfinished previews may use a resolved catalogue height. Applying a roof
+  // persists that height; save/release validation still requires saved evidence.
+  const inheritedHeight = (index: number) =>
+    previewVisual?.partHeights?.[index]?.height ??
+    previewVisual?.height ??
+    buildingDisplay(edit.properties).metres;
   const stored = edit.properties.buildingTopology;
   if (stored && !topologyFits(edit.geometry, stored))
     return [
@@ -171,7 +181,7 @@ export function validateBuildingStyle(edit: MapEdit): string[] {
               ? Number(own.floors) * 3
               : own?.heightMode === 'unknown'
                 ? 6
-                : own?.height || buildingDisplay(edit.properties).metres;
+                : (own?.height ?? inheritedHeight(index));
         if (
           (roofWidth(polygon[index]) / 2) * Math.tan((pitch * Math.PI) / 180) >=
           height
@@ -191,7 +201,7 @@ export function validateBuildingStyle(edit: MapEdit): string[] {
         ? Number(part.floors) * 3
         : part?.heightMode === 'unknown'
           ? 6
-          : part?.height || buildingDisplay(edit.properties).metres;
+          : (part?.height ?? inheritedHeight(i));
     const vertices = topology.parts[i].rings.flatMap((r) => r.vertexIds);
     if (roof?.points?.some((p) => p.vertexId && !vertices.includes(p.vertexId)))
       errors.push(

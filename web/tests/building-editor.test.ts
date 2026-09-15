@@ -33,6 +33,41 @@ const edit = (): MapEdit => {
     geometry: f.geometry,
   };
 };
+it('previews roofs against resolved visual heights while keeping saved-height validation strict', () => {
+  const e = edit();
+  const partId = e.properties.buildingTopology!.parts[0].id;
+  const reference = resolveBuildingVisual(feature());
+  e.properties.height = 0;
+  e.properties.appearance = {
+    roofs: { [partId]: { eaves: 10.5, points: [], lines: [] } },
+  };
+  const before = structuredClone(e);
+  const f = {
+    type: 'Feature' as const,
+    geometry: e.geometry as Polygon,
+    properties: { ...e.properties, id: e.id },
+  };
+  const visual = resolveBuildingVisual(f, reference);
+  visual.geometryRevision = buildingRevision(f);
+  expect(validateBuildingStyle(e)).toContain(
+    'Roof eaves must be above ground and within the building height.',
+  );
+  expect(validateBuildingStyle(e, visual)).toEqual([]);
+  expect(validBuildingModel(createBuildingModel(f, visual))).toBe(true);
+  expect(e).toEqual(before);
+  expect(
+    validateBuildingStyle(e, {
+      height: 12,
+      partHeights: [{ height: 9, kind: 'recorded' }],
+    }),
+  ).not.toEqual([]);
+  e.properties.appearance.parts = { [partId]: { heightMode: 'unknown' } };
+  expect(validateBuildingStyle(e, visual)).not.toEqual([]);
+  e.properties.appearance.parts[partId] = { heightMode: 'floors', floors: 3 };
+  expect(validateBuildingStyle(e, visual)).not.toEqual([]);
+  e.properties.appearance.parts[partId] = { heightMode: 'metres', height: 12 };
+  expect(validateBuildingStyle(e)).toEqual([]);
+});
 describe('stable building surfaces', () => {
   it('assigns deterministic identities without changing the source', () => {
     const f = feature(),
