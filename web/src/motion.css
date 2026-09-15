@@ -22,7 +22,7 @@
 }
 .motion-verification {
   display: inline-block;
-  color: #a46b20;
+  color: var(--warning-text);
   margin-top: 8px;
 }
 .motion-assistance summary {

@@ -1,7 +1,7 @@
 .editor-shell {
   --ed-bg: #fff;
   --ed-text: #24342f;
-  --ed-muted: #7c8882;
+  --ed-muted: #607168;
   --ed-line: #e4e9e5;
   --ed-soft: #f4f7f4;
   --ed-accent: #24785a;
@@ -556,7 +556,7 @@
   border-top: 1px solid var(--ed-line);
   background: transparent;
   width: 100%;
-  color: #bf6260;
+  color: var(--error-text);
   padding: 16px 0 0;
   margin-top: 20px;
   font-size: 11px !important;
@@ -564,8 +564,8 @@
 .editor-issues {
   padding: 11px;
   border-radius: 8px;
-  background: #fbf2df;
-  color: #96702d;
+  background: var(--warning-background);
+  color: var(--warning-text);
   font-size: 11px;
   margin-top: 15px;
 }
@@ -742,8 +742,9 @@
   max-width: 95%;
   width: max-content;
   font-size: 12px;
-  color: #ac514e;
-  border-color: #d9aaa5;
+  color: var(--error-text);
+  background: var(--error-background);
+  border-color: var(--error-text);
 }
 .editor-error > span {
   max-width: 430px;
