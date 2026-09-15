@@ -42,3 +42,75 @@ button.map-view-control {
   font-size: 12px;
   pointer-events: none;
 }
+
+/* Touch targets remain usable even when the surrounding toolbar is compact. */
+.map-controls button,
+.editor-view-controls > button {
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+.editor-view-controls {
+  max-width: calc(100% - 32px);
+}
+.dark .map-controls button,
+.dark .editor-view-controls {
+  background: #344e68;
+  color: #eef5ff;
+  border: 1px solid #7890aa;
+  box-shadow:
+    0 4px 18px #12283c40,
+    inset 0 1px 0 #d9eaff16;
+  border-radius: 18px;
+}
+.dark .map-controls .control-group {
+  background: #344e68;
+  border: 1px solid #7890aa;
+  border-radius: 22px;
+}
+.dark .map-controls .control-group button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.dark .map-controls .control-group button:first-child {
+  border-bottom: 1px solid #7890aa;
+}
+.dark .editor-view-controls > button {
+  color: #eef5ff;
+  border-radius: 13px;
+}
+.dark .map-controls button.active,
+.dark .editor-view-controls > button.active {
+  color: #ffffff;
+  background: #335f89;
+}
+.dark .map-controls button:hover,
+.dark .editor-view-controls > button:hover {
+  background: #496780;
+}
+.map-controls button:focus-visible,
+.editor-view-controls > button:focus-visible {
+  outline: 3px solid #89c6ff;
+  outline-offset: 3px;
+}
+@supports (backdrop-filter: blur(10px)) {
+  .dark .map-controls > button,
+  .dark .map-controls .control-group,
+  .dark .editor-view-controls {
+    background: #344e68eb;
+    backdrop-filter: blur(10px);
+  }
+  .dark .map-controls > button.active {
+    background: #335f89ed;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .dark .map-controls > button,
+  .dark .map-controls .control-group,
+  .dark .editor-view-controls {
+    background: #344e68;
+    backdrop-filter: none;
+  }
+}

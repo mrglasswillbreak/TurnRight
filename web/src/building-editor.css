@@ -30,6 +30,12 @@
   display: grid;
   gap: 3px;
 }
+.building-night-note {
+  display: none;
+}
+.dark .building-night-note {
+  display: block;
+}
 .surface-field .field-label {
   margin: 0;
 }

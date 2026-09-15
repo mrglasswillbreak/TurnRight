@@ -387,6 +387,10 @@ export function BuildingAppearanceEditor({
                 : 'Building defaults apply to all wings and walls unless overridden.'}{' '}
             Select surfaces on the 3D model or use the lists above.
           </p>
+          <p className="small-note building-night-note">
+            These swatches show saved colours. Dark mode applies blue-grey
+            lighting to the map preview.
+          </p>
           {(['wallColour', 'roofColour', 'windowColour', 'trimColour'] as const)
             .filter((key) => !wallId || key !== 'roofColour')
             .map((key) => (
