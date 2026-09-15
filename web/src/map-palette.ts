@@ -60,7 +60,7 @@ export function meshMaterialRole(
   const first = surfaces?.[0]?.role;
   if (first) return surfaces?.every((s) => s.role === first) ? first : 'legacy';
   // Old packages separate solid roofs from walls but have no surface IDs.
-  // A solid mesh wholly above ground is a roof; ambiguous/detail meshes retain colour grading.
+  // A solid mesh wholly above ground is a roof; ambiguous/detail meshes remain legacy.
   if (legacy && !legacy.detail && legacy.positions.length) {
     for (let i = 2; i < legacy.positions.length; i += 3)
       if (legacy.positions[i] <= 0.01) return 'wall';
@@ -75,7 +75,7 @@ const nightBases: Record<MaterialRole, [number, number, number]> = {
   trim: [82, 106, 130],
   legacy: [62, 83, 106],
 };
-/** Render-time grading only. Original swatches and published model colours remain unchanged. */
+/** Slate grading for illustrative map blocks; enhanced meshes retain their original colours. */
 export function nightMaterial(colour: string, role: MaterialRole = 'legacy') {
   const rgb = /^#[\da-f]{6}$/i.test(colour)
     ? [1, 3, 5].map((i) => parseInt(colour.slice(i, i + 2), 16))

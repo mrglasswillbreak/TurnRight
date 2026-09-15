@@ -388,8 +388,8 @@ export function BuildingAppearanceEditor({
             Select surfaces on the 3D model or use the lists above.
           </p>
           <p className="small-note building-night-note">
-            These swatches show saved colours. Dark mode applies blue-grey
-            lighting to the map preview.
+            Enhanced 3D keeps these saved colours in dark mode. Lighting adds
+            shading to the model.
           </p>
           {(['wallColour', 'roofColour', 'windowColour', 'trimColour'] as const)
             .filter((key) => !wallId || key !== 'roofColour')

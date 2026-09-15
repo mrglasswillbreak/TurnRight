@@ -38,11 +38,7 @@ import {
 } from './building-visuals';
 import { hashBytes, ASSET_CACHE } from './offline';
 import { buildingOutline } from './building-outline';
-import {
-  meshMaterialRole,
-  nightMaterial,
-  type MaterialRole,
-} from './map-palette';
+import { meshMaterialRole, type MaterialRole } from './map-palette';
 
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
@@ -315,15 +311,15 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     }
     ambient.intensity = options.dark ? 1.25 : 1.6;
     sun.intensity = options.dark ? 0.85 : 1.8;
-    ambient.color.set(options.dark ? '#c3d4e8' : '#fff1d5');
-    sun.color.set(options.dark ? '#d4e4ff' : '#ffffff');
+    // Detailed architecture retains its authored colours, including legacy
+    // packages and draft surfaces. Only illustrative map blocks use slate grading.
+    ambient.color.set(options.dark ? '#ffffff' : '#fff1d5');
+    sun.color.set('#ffffff');
     const themeKey = `${options.dark}:${options.opacity ?? 1}`;
     for (const entry of materials.values()) {
       if (entry.themeKey === themeKey) continue;
       entry.themeKey = themeKey;
-      entry.value.color.set(
-        options.dark ? nightMaterial(entry.colour, entry.role) : entry.colour,
-      );
+      entry.value.color.set(entry.colour);
       entry.value.opacity = options.opacity ?? 1;
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
