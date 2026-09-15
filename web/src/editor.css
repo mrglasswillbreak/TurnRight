@@ -1264,6 +1264,9 @@
   visibility: hidden;
   pointer-events: none;
 }
+.editor-settings .appearance-settings {
+  margin: 0 0 16px;
+}
 .editor-settings input[type='range'] {
   width: 100%;
   min-height: 44px;

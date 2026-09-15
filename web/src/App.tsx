@@ -25,13 +25,10 @@ import {
   Heart,
   LocateFixed,
   MapPin,
-  Monitor,
-  Moon,
   Navigation,
   Plus,
   Search,
   Shield,
-  Sun,
   WifiOff,
   X,
   Settings,
@@ -53,6 +50,7 @@ import {
 import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
 import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
+import { AppearanceSettings } from './AppearanceSettings';
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -648,6 +646,8 @@ export default function App() {
         <Admin
           data={data}
           dark={dark}
+          appearance={appearance}
+          onAppearance={setAppearance}
           updateReady={updateReady}
           installUpdate={installAppUpdate}
         />
@@ -1261,47 +1261,11 @@ export default function App() {
           )}{' '}
           {dialog === 'settings' && (
             <div className="settings-content">
-              <fieldset
-                className="appearance-settings"
-                aria-describedby="appearance-help"
-              >
-                <legend>Appearance</legend>
-                <div className="appearance-options">
-                  {(
-                    [
-                      ['system', 'Device', Monitor],
-                      ['light', 'Light', Sun],
-                      ['dark', 'Dark', Moon],
-                    ] as const
-                  ).map(([value, label, Icon]) => (
-                    <label key={value}>
-                      <input
-                        type="radio"
-                        name="appearance"
-                        value={value}
-                        checked={appearance === value}
-                        onChange={() => {
-                          void setAppearance(value).then((saved) => {
-                            if (!saved)
-                              setToast(
-                                'Appearance changed for this visit. Your browser could not save the choice.',
-                              );
-                          });
-                        }}
-                      />
-                      <span>
-                        <Icon size={19} aria-hidden="true" />
-                        {label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                <p id="appearance-help">
-                  {appearance === 'system'
-                    ? `Follows your device automatically. Currently using ${dark ? 'dark' : 'light'} mode.`
-                    : `Always uses ${appearance} mode. Choose Device to follow your device settings.`}
-                </p>
-              </fieldset>
+              <AppearanceSettings
+                preference={appearance}
+                dark={dark}
+                onChange={setAppearance}
+              />
               <MapRenderingSettings simple={simple3D} onSimple={setSimple3D} />
               <div className="settings-row">
                 <span>Voice directions</span>

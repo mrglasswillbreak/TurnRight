@@ -1527,7 +1527,9 @@ progress::-webkit-progress-value {
   outline: 3px solid #6c9fff;
   outline-offset: 3px;
 }
-.appearance-settings p {
+.appearance-settings p,
+.appearance-settings output {
+  display: block;
   margin: 11px 0 0;
   color: var(--muted);
   font-size: 12px;

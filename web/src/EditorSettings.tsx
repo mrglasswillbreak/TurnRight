@@ -2,8 +2,13 @@ import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { MapRenderingSettings } from './MapRenderingSettings';
+import { AppearanceSettings } from './AppearanceSettings';
+import type { Appearance } from './appearance';
 
 export function EditorSettings({
+  appearance,
+  dark,
+  onAppearance,
   map,
   threeD,
   simple,
@@ -12,6 +17,9 @@ export function EditorSettings({
   onOpacity,
   onClose,
 }: {
+  appearance: Appearance;
+  dark: boolean;
+  onAppearance: (value: Appearance) => Promise<boolean>;
   map: MapInstance | null;
   threeD: boolean;
   simple: boolean;
@@ -45,6 +53,11 @@ export function EditorSettings({
           <X size={18} />
         </button>
       </div>
+      <AppearanceSettings
+        preference={appearance}
+        dark={dark}
+        onChange={onAppearance}
+      />
       <MapRenderingSettings simple={simple} onSimple={onSimple} />
       <label className="field-label">
         <span>

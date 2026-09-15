@@ -30,6 +30,7 @@ import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
 import { useSimple3D } from './MapRenderingSettings';
 import { EditorSettings } from './EditorSettings';
+import type { Appearance } from './appearance';
 import { api, supabase } from './supabase';
 import { AdminRequestError, boundedSession } from './admin-client';
 import {
@@ -96,11 +97,15 @@ interface OfflineEditor {
 export default function Admin({
   data,
   dark = false,
+  appearance,
+  onAppearance,
   updateReady = false,
   installUpdate,
 }: {
   data: CampusData;
   dark?: boolean;
+  appearance: Appearance;
+  onAppearance: (value: Appearance) => Promise<boolean>;
   updateReady?: boolean;
   installUpdate?: () => Promise<void>;
 }) {
@@ -305,6 +310,8 @@ export default function Admin({
     <Editor
       data={data}
       dark={dark}
+      appearance={appearance}
+      onAppearance={onAppearance}
       state={state}
       sources={sources}
       workspace={workspace}
@@ -345,6 +352,8 @@ export default function Admin({
 function Editor({
   data,
   dark,
+  appearance,
+  onAppearance,
   state,
   sources,
   workspace: store,
@@ -358,6 +367,8 @@ function Editor({
 }: {
   data: CampusData;
   dark: boolean;
+  appearance: Appearance;
+  onAppearance: (value: Appearance) => Promise<boolean>;
   state: EditorState;
   sources: SourceRecord[];
   workspace: EditorWorkspace;
@@ -1932,6 +1943,9 @@ function Editor({
         </div>
         {tab === 'settings' && (
           <EditorSettings
+            appearance={appearance}
+            dark={dark}
+            onAppearance={onAppearance}
             map={mapRef.current}
             threeD={threeD}
             simple={simple3D}
