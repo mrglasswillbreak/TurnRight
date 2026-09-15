@@ -10,16 +10,30 @@ describe('map presentation without campus edits', () => {
   it('avoids repainting an unchanged theme but themes newly mounted or replaced layers', () => {
     const layers = new Map<string, object>([['background', {}]]);
     const paint = vi.fn();
-    const map = { getLayer: (id: string) => layers.get(id), hasImage: () => false, setPaintProperty: paint, setLayoutProperty: vi.fn(), setLight: vi.fn() } as unknown as MapInstance;
+    const map = {
+      getLayer: (id: string) => layers.get(id),
+      hasImage: () => false,
+      setPaintProperty: paint,
+      setLayoutProperty: vi.fn(),
+      setLight: vi.fn(),
+    } as unknown as MapInstance;
     applyMapTheme(map, false);
     paint.mockClear();
     applyMapTheme(map, false);
     expect(paint).not.toHaveBeenCalled();
     layers.set('editor-entrance-label', {});
     applyMapTheme(map, false);
-    expect(paint).toHaveBeenCalledWith('editor-entrance-label', 'text-color', '#53616b');
+    expect(paint).toHaveBeenCalledWith(
+      'editor-entrance-label',
+      'text-color',
+      '#53616b',
+    );
     applyMapTheme(map, true);
-    expect(paint).toHaveBeenCalledWith('background', 'background-color', '#293e52');
+    expect(paint).toHaveBeenCalledWith(
+      'background',
+      'background-color',
+      '#293e52',
+    );
     paint.mockClear();
     layers.set('background', {});
     applyMapTheme(map, true);

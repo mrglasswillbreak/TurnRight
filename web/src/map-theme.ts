@@ -95,7 +95,7 @@ export function mapTheme(dark: boolean) {
     },
     buildings: {
       'fill-color': ['get', dark ? 'displayRoofDark' : 'displayRoof'],
-      'fill-outline-color': p.outline,
+      'fill-outline-color': p.footprintBorder,
     },
     'buildings-3d': {
       'fill-extrusion-color': ['get', dark ? 'displayWallDark' : 'displayWall'],

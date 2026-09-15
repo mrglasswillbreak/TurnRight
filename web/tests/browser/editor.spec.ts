@@ -672,6 +672,7 @@ test('prepared public map reopens in 3D offline with its saved view preference',
     !testInfo.config.configFile?.includes('pwa.config'),
     'Requires the production service worker configuration.',
   );
+  await page.emulateMedia({ colorScheme: 'dark' });
   await setup(page);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   await page.goto('/');
@@ -717,6 +718,7 @@ test('prepared public map verifies enhanced architecture, repairs corruption and
     'Requires production service worker.',
   );
   test.setTimeout(120000);
+  await page.emulateMedia({ colorScheme: 'dark' });
   const { campus } = await setup(page, true, true);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   await page.goto('/');
@@ -1801,7 +1803,7 @@ for (const phone of [false, true])
 for (const editor of [false, true])
   test(`enhanced zoom restores visible facade detail on the ${editor ? 'editor' : 'public map'}`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     test.setTimeout(150000);
     const sectorUrl = '/packages/visual-abcdef/zoom-test.json';
     let sectorBody = '';
@@ -1902,12 +1904,14 @@ for (const editor of [false, true])
         moving: false,
         slow: false,
         reducedSeen: false,
+        frameMs: [] as number[],
       };
       (window as unknown as { zoomDetail: typeof stats }).zoomDetail = stats;
       let clock = performance.now();
       layer.render = function (gl, args) {
         const draw = gl.drawElements,
           now = performance.now;
+        const started = now.call(performance);
         stats.calls = 0;
         stats.indices = 0;
         stats.moving = map.isMoving();
@@ -1925,6 +1929,7 @@ for (const editor of [false, true])
         } finally {
           gl.drawElements = draw;
           performance.now = now;
+          if (!stats.slow) stats.frameMs.push(now.call(performance) - started);
         }
         if (
           document
@@ -1945,6 +1950,7 @@ for (const editor of [false, true])
                 indices: number;
                 moving: boolean;
                 reducedSeen: boolean;
+                frameMs: number[];
               };
             }
           ).zoomDetail,
@@ -1982,6 +1988,18 @@ for (const editor of [false, true])
         .poll(async () => (await drawing()).indices)
         .toBe(full.indices);
     }
+    const measured = await drawing();
+    const durations = measured.frameMs.slice().sort((a, b) => a - b);
+    await testInfo.attach('renderer-performance', {
+      body: JSON.stringify({
+        calls: full.calls,
+        indices: full.indices,
+        samples: durations.length,
+        medianMs: durations[Math.floor(durations.length / 2)],
+        p95Ms: durations[Math.floor(durations.length * 0.95)],
+      }),
+      contentType: 'application/json',
+    });
     await page.screenshot({
       path: `test-results/zoom-detail-${editor ? 'editor' : 'public'}-${page.viewportSize()?.width}.png`,
     });
@@ -2232,7 +2250,7 @@ test('public initial camera includes the northern campus', async ({ page }) => {
         window.editorTestMap.getPaintProperty('background', 'background-color'),
       ),
     )
-    .toBe('#182727');
+    .toBe('#293e52');
   await page.screenshot({ path: 'test-results/public-campus-3d-dark.png' });
 });
 
@@ -3224,6 +3242,7 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     'Requires production service worker.',
   );
   test.setTimeout(120000);
+  await page.emulateMedia({ colorScheme: 'dark' });
   await setup(page);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   // The browser's network hint can be false despite a reachable backend.
@@ -3723,6 +3742,7 @@ test('roof proposal draft survives settings, view changes and recovery before ap
   page,
 }) => {
   test.setTimeout(120000);
+  await page.emulateMedia({ colorScheme: 'dark' });
   const state = await setup(page);
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
@@ -3736,6 +3756,8 @@ test('roof proposal draft survives settings, view changes and recovery before ap
     page.getByRole('button', { name: 'Apply roof', exact: true }),
   ).toBeEnabled();
   expect(state.edits()).toHaveLength(0);
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'Workspace', exact: true }).click();
@@ -3759,6 +3781,7 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   page,
 }, testInfo) => {
   test.setTimeout(150000);
+  await page.emulateMedia({ colorScheme: 'dark' });
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const state = await setup(page, true, true);
@@ -3812,3 +3835,233 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   });
   expect(errors).toEqual([]);
 });
+
+test('slate map badges select places and street labels omit generic names', async ({
+  page,
+}, testInfo) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  const state = await setup(page, false, false, {
+    mutateCampus(data) {
+      data.map.features[0].properties!.name = 'LAW road';
+      data.map.features.push({
+        ...structuredClone(data.map.features[0]),
+        properties: {
+          ...data.map.features[0].properties,
+          id: 'unnamed-path',
+          name: 'Campus path',
+        },
+      });
+    },
+  });
+  await page.goto('/');
+  await attachMap(page);
+  await focusCampus(page);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.editorTestMap
+          .queryRenderedFeatures({ layers: ['street-labels'] })
+          .map((f) => f.properties?.streetLabel),
+      ),
+    )
+    .toContain('LAW road');
+  expect(
+    await page.evaluate(() =>
+      window.editorTestMap
+        .queryRenderedFeatures({ layers: ['street-labels'] })
+        .some((f) => f.properties?.streetLabel === 'Campus path'),
+    ),
+  ).toBe(false);
+  const point = state.campus.places[0].coordinates;
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (point) =>
+          window.editorTestMap
+            .queryRenderedFeatures(window.editorTestMap.project(point), {
+              layers: ['places-label'],
+            })
+            .map((f) => f.properties?.id),
+        point,
+      ),
+    )
+    .toContain(state.campus.places[0].id);
+  await clickMap(page, point);
+  await expect(
+    page.getByRole('button', { name: 'Directions', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.editorTestMap.getFilter('places-label-selected'),
+      ),
+    )
+    .toEqual(['==', ['get', 'id'], state.campus.places[0].id]);
+  await page.screenshot({
+    path: testInfo.outputPath('selected-badge-and-street.png'),
+  });
+  expect(state.edits()).toHaveLength(0);
+});
+
+for (const editor of [false, true])
+  for (const phone of [false, true]) {
+    test(`slate map ${editor ? 'editor' : 'public'} ${phone ? 'phone' : 'desktop'}: scales, renderers and theme continuity`, async ({
+      page,
+    }, testInfo) => {
+      test.setTimeout(210000);
+      if (phone) await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ colorScheme: 'dark' });
+      const errors: string[] = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      page.on('console', (m) => {
+        if (
+          m.type() === 'error' &&
+          /Campus map:|layers\.|Cannot|Error/.test(m.text())
+        )
+          errors.push(m.text());
+      });
+      const state = await setup(page, true, true);
+      if (!editor) {
+        await page.goto('/');
+        await attachMap(page);
+      } else {
+        await page.getByRole('button', { name: 'Collapse explorer' }).click();
+        await page
+          .getByRole('button', { name: 'Switch to 3D', exact: true })
+          .click();
+      }
+      const toggle = page.locator('.map-view-control');
+      await expect(toggle).toHaveCount(1);
+      await expect(page.locator('.map-rendering-options')).toHaveCount(0);
+      await page.evaluate(() => {
+        (window as unknown as { slateCanvas: HTMLCanvasElement }).slateCanvas =
+          window.editorTestMap.getCanvas();
+      });
+      const paint = (layer: string, property: string) =>
+        page.evaluate(
+          ({ layer, property }) =>
+            window.editorTestMap.getPaintProperty(
+              layer,
+              property as Parameters<MapInstance['getPaintProperty']>[1],
+            ),
+          { layer, property },
+        );
+      await expect
+        .poll(() => paint('background', 'background-color'))
+        .toBe('#293e52');
+      expect(
+        await page.evaluate(() =>
+          window.editorTestMap.hasImage('place-library'),
+        ),
+      ).toBe(true);
+      const sources = await page.evaluate(() =>
+        (
+          window.editorTestMap.getSource(
+            'campus',
+          ) as import('maplibre-gl').GeoJSONSource
+        ).getData(),
+      );
+      expect(
+        (sources as import('geojson').FeatureCollection).features.some(
+          (f) => f.properties?.landClass === 'water',
+        ),
+      ).toBe(true);
+      for (const mode of ['enhanced', 'simple', '2d']) {
+        if (mode === 'simple') {
+          await page
+            .getByRole('button', { name: 'Settings', exact: true })
+            .click();
+          await page
+            .getByRole('radio', { name: 'Simple', exact: true })
+            .check();
+          await page
+            .getByRole('button', {
+              name: editor ? 'Close settings' : 'Close',
+              exact: true,
+            })
+            .click();
+        }
+        if (mode === '2d') await toggle.press('Enter');
+        for (const [name, zoom, latitude] of [
+          ['campus', 15.2, 6.466],
+          ['neighbourhood', 17, 6.471],
+          ['building', 19, 6.47109],
+        ] as const) {
+          await expect
+            .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+            .toBe(false);
+          await page.evaluate(
+            ({ zoom, latitude, phone, mode }) =>
+              window.editorTestMap.jumpTo({
+                center: [3.19978, latitude],
+                zoom,
+                bearing: -12,
+                pitch: mode === '2d' ? 0 : 50,
+                padding: { top: 0, left: 0, right: 0, bottom: phone ? 270 : 0 },
+              }),
+            { zoom, latitude, phone, mode },
+          );
+          await expect
+            .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
+            .toBe(true);
+          if (mode === 'enhanced' && zoom === 19) {
+            await expect
+              .poll(() =>
+                page.evaluate(() =>
+                  JSON.stringify(
+                    window.editorTestMap.getFilter('buildings-3d'),
+                  ),
+                ),
+              )
+              .toContain('arcgis');
+          }
+          await page.screenshot({
+            path: testInfo.outputPath(`${mode}-${name}.png`),
+          });
+        }
+      }
+      const camera = await page.evaluate(() => [
+        window.editorTestMap.getCenter().toArray(),
+        window.editorTestMap.getZoom(),
+        window.editorTestMap.getPitch(),
+        window.editorTestMap.getBearing(),
+      ]);
+      await page.emulateMedia({ colorScheme: 'light' });
+      await expect
+        .poll(() => paint('background', 'background-color'))
+        .toBe('#eee9dc');
+      await page.emulateMedia({ colorScheme: 'dark' });
+      await expect
+        .poll(() => paint('background', 'background-color'))
+        .toBe('#293e52');
+      expect(
+        await page.evaluate(() => [
+          window.editorTestMap.getCenter().toArray(),
+          window.editorTestMap.getZoom(),
+          window.editorTestMap.getPitch(),
+          window.editorTestMap.getBearing(),
+        ]),
+      ).toEqual(camera);
+      expect(
+        await page.evaluate(
+          () =>
+            window.editorTestMap.getCanvas() ===
+            (window as unknown as { slateCanvas: HTMLCanvasElement })
+              .slateCanvas,
+        ),
+      ).toBe(true);
+      for (const button of await page
+        .locator(
+          editor
+            ? '.editor-view-controls > button:visible'
+            : '.map-controls button:visible',
+        )
+        .all()) {
+        const box = await button.boundingBox();
+        expect(box!.width).toBeGreaterThanOrEqual(44);
+        expect(box!.height).toBeGreaterThanOrEqual(44);
+      }
+      expect(state.edits()).toHaveLength(0);
+      expect(errors).toEqual([]);
+    });
+  }
