@@ -78,6 +78,7 @@ describe('roof release generation', () => {
       expect(visual.level).toBe('detailed');
       expect(visual.inferred.join(' ')).toContain(roof.provenance);
       expect(visual.inferred.join(' ')).not.toContain('remains a flat cap');
+      expect(visual.inferred.join(' ')).not.toContain('flat roof is');
       const sector = JSON.parse(
         readFileSync(
           path.join(output, catalogue.sectors[0].url.split('/').at(-1)!),

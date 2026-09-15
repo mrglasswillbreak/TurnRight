@@ -112,7 +112,9 @@ for (const sourceFeature of buildings) {
       ...(record?.inferred ||
         (supported
           ? [
-              'Roof form and material not documented; flat roof is a simplified cap.',
+              Object.keys(p.appearance?.roofs || {}).length
+                ? 'Roof form and material are not documented. Custom roof notes describe the approximate geometry; wings without a roof plan retain a simplified cap.'
+                : 'Roof form and material not documented; flat roof is a simplified cap.',
               'Colours are the campus palette, not observed materials.',
             ]
           : [])),
