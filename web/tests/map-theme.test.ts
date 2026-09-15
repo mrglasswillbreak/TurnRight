@@ -1,10 +1,30 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { Map as MapInstance } from 'maplibre-gl';
+import { applyMapTheme } from '../src/map-theme';
 import { landClass, pathDisplay } from '../src/map-classification';
 import { displayGeometry } from '../src/map-display';
 import { meshMaterialRole, nightMaterial } from '../src/map-palette';
 import { campusFixture } from './fixture';
 
 describe('map presentation without campus edits', () => {
+  it('avoids repainting an unchanged theme but themes newly mounted or replaced layers', () => {
+    const layers = new Map<string, object>([['background', {}]]);
+    const paint = vi.fn();
+    const map = { getLayer: (id: string) => layers.get(id), hasImage: () => false, setPaintProperty: paint, setLayoutProperty: vi.fn(), setLight: vi.fn() } as unknown as MapInstance;
+    applyMapTheme(map, false);
+    paint.mockClear();
+    applyMapTheme(map, false);
+    expect(paint).not.toHaveBeenCalled();
+    layers.set('editor-entrance-label', {});
+    applyMapTheme(map, false);
+    expect(paint).toHaveBeenCalledWith('editor-entrance-label', 'text-color', '#53616b');
+    applyMapTheme(map, true);
+    expect(paint).toHaveBeenCalledWith('background', 'background-color', '#293e52');
+    paint.mockClear();
+    layers.set('background', {});
+    applyMapTheme(map, true);
+    expect(paint).toHaveBeenCalledTimes(1);
+  });
   it('uses known surface roles and preserves compatibility with old or mixed meshes', () => {
     expect(meshMaterialRole([{ role: 'roof' }, { role: 'roof' }])).toBe('roof');
     expect(meshMaterialRole([{ role: 'wall' }, { role: 'roof' }])).toBe(

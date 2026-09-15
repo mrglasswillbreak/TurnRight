@@ -68,7 +68,7 @@ export function meshMaterialRole(
 }
 const nightBases: Record<MaterialRole, [number, number, number]> = {
   wall: [58, 79, 101],
-  roof: [72, 96, 121],
+  roof: [92, 116, 141],
   window: [32, 48, 68],
   trim: [82, 106, 130],
   legacy: [62, 83, 106],

@@ -154,17 +154,34 @@ export function mapTheme(dark: boolean) {
   } as const;
 }
 
+const applied = new WeakMap<
+  MapInstance,
+  { dark: boolean; badges: boolean; layers: Map<string, unknown> }
+>();
 export function applyMapTheme(map: MapInstance, dark: boolean) {
+  const badges = dark && map.hasImage('place-other');
+  const previous = applied.get(map);
+  const changed = !previous || previous.dark !== dark;
+  const state = changed
+    ? { dark, badges, layers: new Map<string, unknown>() }
+    : previous;
+  const updated = new Set<string>();
   for (const [layer, paint] of Object.entries(mapTheme(dark)))
-    if (map.getLayer(layer))
+    if (
+      map.getLayer(layer) &&
+      state.layers.get(layer) !== map.getLayer(layer)
+    ) {
+      state.layers.set(layer, map.getLayer(layer));
+      updated.add(layer);
       for (const [property, value] of Object.entries(paint))
         map.setPaintProperty(
           layer,
           property as Parameters<MapInstance['setPaintProperty']>[1],
           value,
         );
-  const badges = dark && map.hasImage('place-other');
-  if (map.getLayer('places-dot'))
+    }
+  const badgeChanged = changed || state.badges !== badges;
+  if (map.getLayer('places-dot') && (badgeChanged || updated.has('places-dot')))
     map.setLayoutProperty(
       'places-dot',
       'visibility',
@@ -175,7 +192,8 @@ export function applyMapTheme(map: MapInstance, dark: boolean) {
     'places-label-detail',
     'places-label-selected',
   ]) {
-    if (!map.getLayer(layer)) continue;
+    if (!map.getLayer(layer) || (!badgeChanged && !updated.has(layer)))
+      continue;
     map.setLayoutProperty(layer, 'icon-image', badges ? ['get', 'badge'] : '');
     map.setLayoutProperty(layer, 'icon-size', 0.72);
     map.setLayoutProperty(layer, 'icon-padding', 4);
@@ -188,8 +206,11 @@ export function applyMapTheme(map: MapInstance, dark: boolean) {
     map.setLayoutProperty(layer, 'text-offset', badges ? [0, 0] : [0, 1]);
     map.setLayoutProperty(layer, 'text-padding', badges ? 6 : 12);
   }
-  map.setLight({
-    color: dark ? '#c3d4e8' : '#ffffff',
-    intensity: dark ? 0.3 : 0.45,
-  });
+  if (changed)
+    map.setLight({
+      color: dark ? '#c3d4e8' : '#ffffff',
+      intensity: dark ? 0.3 : 0.45,
+    });
+  state.badges = badges;
+  applied.set(map, state);
 }

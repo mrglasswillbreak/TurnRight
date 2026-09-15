@@ -1151,8 +1151,7 @@ export default function App() {
       </div>
       {threeD && (
         <div className="map-caption">
-          3D heights: floor-derived estimates · muted blocks have unknown
-          heights
+          3D heights include estimates. Some heights are unknown.
         </div>
       )}
       {gps.error && !routeView && (

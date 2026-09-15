@@ -537,6 +537,7 @@ export function MapView({
             ...label.layout,
             'text-size': 14,
             'text-allow-overlap': true,
+            'icon-allow-overlap': true,
           },
         },
         'places-label',

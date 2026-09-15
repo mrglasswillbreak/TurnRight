@@ -114,3 +114,12 @@ button.map-view-control {
     backdrop-filter: none;
   }
 }
+@media (max-width: 767px) {
+  .dark .panel-brand {
+    top: 6px;
+    left: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: #24394f;
+  }
+}
