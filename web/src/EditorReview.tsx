@@ -22,6 +22,7 @@ import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
 import { BaselineReview } from './BaselineReview';
 import { BuildingReferenceReview } from './BuildingReferenceReview';
+import { BuildingRoofReview } from './BuildingRoofReview';
 
 export interface ReviewState {
   changes: MapChange[];
@@ -137,6 +138,20 @@ export function EditorReview({
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
+          <BuildingRoofReview
+            data={validation.data}
+            duplicates={validation.duplicates}
+            edits={workspace.edits}
+            disabled={
+              busy ||
+              !!validation.pending ||
+              !!workspace.unfinished ||
+              !!workspace.roofDraft ||
+              workspace.status === 'Conflict'
+            }
+            onApply={onApplyAppearances}
+            onLocate={onLocateBuilding}
+          />
           <BuildingReferenceReview
             data={validation.data}
             duplicates={validation.duplicates}

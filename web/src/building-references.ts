@@ -16,6 +16,7 @@ import { validateBuildingStyle } from './building-style-validation';
 import { featureEdit } from './editor-features';
 
 interface EvidenceRecord {
+  roofForm?: 'flat' | 'hip' | 'gable';
   floors?: number;
   appearance?: SurfaceStyle;
   footprintRevisions?: string[];

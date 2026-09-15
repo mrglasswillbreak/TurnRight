@@ -63,6 +63,28 @@
   border-radius: 8px;
   background: #f9faf6;
 }
+.roof-proposal-plan {
+  width: 100%;
+  max-height: 200px;
+  background: var(--ed-soft);
+  border: 1px solid var(--ed-line);
+  border-radius: 8px;
+}
+.building-roof-review .small-note,
+.roof-plan .small-note {
+  overflow-wrap: anywhere;
+}
+.roof-proposal-plan path {
+  fill: var(--ed-bg);
+  stroke: var(--ed-text);
+  stroke-width: 1;
+}
+.roof-proposal-plan line,
+.roof-proposal-plan circle {
+  stroke: var(--ed-accent);
+  fill: var(--ed-accent);
+  stroke-width: 2;
+}
 .roof-line-list {
   margin: 0;
   padding: 0;
