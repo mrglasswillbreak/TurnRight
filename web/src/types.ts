@@ -27,6 +27,8 @@ export interface Place {
   source: string;
   sourceId: string;
   graphNode?: string;
+  /** Path-local node retained when an automatic crossing merges this approach. */
+  crossingGraphNode?: string;
   buildingId?: string;
   sourceRefs?: string[];
   approachDistance?: number;
@@ -56,6 +58,8 @@ export interface GraphEdge {
   sourceId: string;
   /** Original edge IDs retained when an explicit junction splits a segment. */
   parentEdgeIds?: string[];
+  /** Original path endpoints, so automatic junctions can be undone on later edits. */
+  crossingEndpoints?: { from: GraphNode; to: GraphNode };
 }
 export type ConnectionTarget =
   | { type: 'node'; nodeId: string; coordinates: Position }
@@ -79,6 +83,7 @@ export interface Entrance {
   walkingAccess: WalkingAccess;
   source: string;
   graphNode?: string;
+  crossingGraphNode?: string;
 }
 export type RouteEndpoint = string | { placeId: string };
 export type RouteOrigin = Position | RouteEndpoint;
