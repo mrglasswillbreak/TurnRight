@@ -10,9 +10,11 @@ Open `/admin` and choose **Survey**. **Record new path** requests GPS after crea
 
 **Finish** opens review. Grey lines are the original recording, orange sections need review, and green sections have been reviewed. Purple points identify fixed anchors. The original samples are never edited by geometry adjustments. Select a section or tap a point, move the map under the crosshair, and use **Place here**. Controls support insertion, deletion, trimming, splitting, removing a section, undo and redo. **More map space** collapses the sheet. The existing 2D/3D controls remain available.
 
-Enable **Connect to highlighted target** to connect to a mapped path segment, junction or another reviewed survey vertex. Both the 12-pixel and 5-metre limits apply. Crossings alone do not create junctions. Signal gaps are never bridged automatically: rewalk a missing section or explicitly draw and review a connecting section. Confirm each section before applying. Entrances moved away from their original path anchor need an explicit connection.
+Enable **Connect to highlighted target** to connect to a mapped path segment, junction or another reviewed survey vertex. Both the 12-pixel and 5-metre limits apply to manual connections. Reviewed paths also connect automatically where they cross or touch another path at the same level. Signal gaps are never bridged automatically: rewalk a missing section or explicitly draw and review a connecting section. Confirm each section before applying. Entrances moved away from their original path anchor need an explicit connection.
 
 **Save survey** preserves evidence on the phone and queues a private upload when offline. **Apply to map draft** creates editable map corrections through the existing atomic batch API. Connections must be usable and topology must validate. Applying the same survey again uses the same correction identities, including deletions from a previously applied survey. Close the survey panel to use the editor's route tester. Publication remains a separate reviewed release.
+
+The connectivity check uses the assembled walking network, including automatic crossings, restrictions and active closures. After applying, select a path in the editor to turn off **Connect crossings automatically** or change its **Crossing level**. These settings control which crossings become navigation junctions; review the route before publishing.
 
 ## Compass and motion assistance
 

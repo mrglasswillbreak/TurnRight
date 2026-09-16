@@ -7,10 +7,18 @@ The private `/admin` workspace edits the existing campus map in 2D or a tilted 3
 1. Search for a building or choose an item in **Needs mapping**. Select the building on the map, then choose **Add entrance**.
 2. Click its ground footprint edge. Check the place association and give the entrance a useful name, such as “Library west entrance.” Several entrances can serve the same place.
 3. Choose **Draw connecting path**. The first point starts at the entrance. Click to trace the actual approach and finish on a highlighted existing path or junction. Press **Enter** or **Finish**.
-4. The editor creates a junction even in the middle of an existing path. Crossing a line without explicitly placing a connecting vertex does not join the routes. **Join here** connects an intentional crossing later.
+4. Paths that cross or touch at the same mapped level connect automatically, including crossings in the middle of a segment. **Join here** can also create an explicit connection.
 5. Open **Test route**, choose starting and destination places, and preview the walk. Routing chooses the shortest permitted route through the available entrances and names the selected destination entrance.
 
 Use the inspector to change access, direction, steps, building heights, labels, or connections. Drag vertices to adjust geometry; drag a midpoint to insert a vertex. Moving an established junction updates connected paths together. Mark a closure by selecting the actual graph segment; its reverse direction is also blocked. An expected reopening date never reopens a path automatically.
+
+## Control automatic connections
+
+Select a path and open **Path connections**. **Connect crossings automatically** is on by default. Turn it off to remove that path's automatic junctions, including junctions from a previously published release. Explicit connections remain; use **Connect start**, **Connect end**, or **Join here** to choose the junctions you want. **Disconnect** also turns automatic crossings off for that path so the removed join is not recreated.
+
+For a bridge or tunnel, set **Crossing level** to **Bridge / above ground** or **Tunnel / below ground**. **Use mapped level** retains imported bridge, tunnel and layer information; unknown levels are treated as ground. Paths at different levels do not automatically join. For mixed sections, use separate paths with the appropriate settings.
+
+Automatic connections cover actual intersections, touching endpoints and overlapping path sections. Nearby lines with a gap are not snapped together. Missing gate spans, mapped building/barrier conflicts, walking restrictions, one-way directions and active closures remain in force. Automatic junctions retain their original path identities so later edits can undo them. The editor route tester and release builder use the same connection logic. Publish a reviewed campus release to update public navigation; a code push alone does not change the public map package.
 
 ## Views and controls
 

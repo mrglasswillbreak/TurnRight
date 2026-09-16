@@ -1093,6 +1093,84 @@ async function position(page: Page, coordinates: Position) {
     return { x: rect.left + p.x, y: rect.top + p.y };
   }, coordinates);
 }
+
+test('path crossing controls persist automatic connection and bridge choices', async ({
+  page,
+}) => {
+  const server = await setup(page, false, false, {
+    initialEdits: [
+      {
+        id: 'crossing-test',
+        kind: 'path',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [3.2005, 6.4598],
+            [3.2005, 6.46015],
+          ],
+        },
+        properties: {
+          name: 'Crossing test',
+          vertexIds: ['crossing-test:start', 'crossing-test:end'],
+        },
+      },
+    ],
+  });
+  const selectPath = async () => {
+    await focusCampus(page);
+    const point = await position(page, [3.2005, 6.4601]);
+    await page.mouse.click(point.x, point.y);
+    await expect(
+      page.getByRole('checkbox', { name: 'Connect crossings automatically' }),
+    ).toBeVisible();
+  };
+  await selectPath();
+  const automatic = page.getByRole('checkbox', {
+    name: 'Connect crossings automatically',
+  });
+  await expect(automatic).toBeChecked();
+  await automatic.uncheck();
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'crossing-test')?.properties
+          .autoConnectCrossings,
+    )
+    .toBe(false);
+  await page
+    .getByRole('combobox', { name: 'Crossing level', exact: true })
+    .selectOption('bridge');
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'crossing-test')?.properties
+          .crossingLevel,
+    )
+    .toBe('bridge');
+  await page.reload();
+  await attachMap(page);
+  await selectPath();
+  await expect(automatic).not.toBeChecked();
+  await expect(
+    page.getByRole('combobox', { name: 'Crossing level', exact: true }),
+  ).toHaveValue('bridge');
+  await page.screenshot({ path: 'test-results/path-crossing-controls.png' });
+  await automatic.check();
+  await page
+    .getByRole('combobox', { name: 'Crossing level', exact: true })
+    .selectOption('ground');
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'crossing-test')?.properties
+          .crossingLevel,
+    )
+    .toBe('ground');
+  expect(
+    server.edits().find((e) => e.id === 'crossing-test')?.properties
+      .autoConnectCrossings,
+  ).toBe(true);
+});
 async function clickMap(page: Page, coordinates: Position) {
   const p = await position(page, coordinates);
   await page.mouse.click(p.x, p.y);

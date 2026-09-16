@@ -334,6 +334,30 @@ export function EditorInspector({
               </select>
             </label>
             <div className="editor-field-title">Path connections</div>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={p.autoConnectCrossings !== false}
+                onChange={(e) =>
+                  onProperty('autoConnectCrossings', e.target.checked)
+                }
+              />
+              Connect crossings automatically
+            </label>
+            <label className="field-label">
+              Crossing level
+              <select
+                value={String(p.crossingLevel || 'source')}
+                onChange={(e) => onProperty('crossingLevel', e.target.value)}
+              >
+                <option value="source">
+                  Use mapped level (ground if unknown)
+                </option>
+                <option value="ground">Ground</option>
+                <option value="bridge">Bridge / above ground</option>
+                <option value="tunnel">Tunnel / below ground</option>
+              </select>
+            </label>
             <div className="editor-two-buttons">
               <button
                 className="editor-secondary"
@@ -371,8 +395,9 @@ export function EditorInspector({
               </div>
             ))}
             <p className="small-note">
-              Click a highlighted target to join it. Lines that only cross
-              remain separate.
+              Crossings at the same level connect automatically. Turn this off
+              to choose connections with Connect start, Connect end or Join
+              here. Existing manual connections are retained.
             </p>
           </>
         )}
