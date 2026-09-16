@@ -1475,6 +1475,7 @@ export function SurveyPanel({
                           const corrections = surveyCorrections(
                             session,
                             current,
+                            edits,
                           );
                           const applied = await apply(
                             corrections,

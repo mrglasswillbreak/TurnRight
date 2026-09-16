@@ -138,6 +138,7 @@ export function surveyRecoveryCopy(
       );
     }
   };
+
   for (const state of snapshots) {
     for (const l of state.review)
       for (const v of l.vertices) {
@@ -149,6 +150,65 @@ export function surveyRecoveryCopy(
   connection(s.pendingMarker?.connection);
   return copy;
 }
+/** Check assembled connectivity, including automatic junctions and active closures. */
+export function disconnectedSurveyPaths(
+  before: CampusData,
+  after: CampusData,
+  edits: MapEdit[],
+) {
+  const closed = new Set(
+    after.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
+  );
+  const allowed = after.graph.edges.filter(
+    (e) =>
+      e.accessible &&
+      !['private', 'no'].includes(e.walkingAccess || 'yes') &&
+      !e.geometryBlocked &&
+      !closed.has(e.id),
+  );
+  const newIds = new Set(
+    edits.filter((e) => e.kind === 'path').map((e) => e.id),
+  );
+  const originalSources = new Set(
+    before.graph.edges
+      .filter((e) => !newIds.has(e.sourceId))
+      .map((e) => e.sourceId),
+  );
+  const originalNodes = new Set(before.graph.nodes.map((n) => n.id));
+  const adjacency = new Map<string, string[]>();
+  const reachable = new Set<string>();
+  for (const edge of allowed) {
+    adjacency.set(edge.from, [...(adjacency.get(edge.from) || []), edge.to]);
+    adjacency.set(edge.to, [...(adjacency.get(edge.to) || []), edge.from]);
+    if (originalSources.has(edge.sourceId)) {
+      reachable.add(edge.from);
+      reachable.add(edge.to);
+    } else {
+      // Replacement surveys may retain the entire existing component.
+      for (const end of [edge.from, edge.to])
+        if (originalNodes.has(end)) reachable.add(end);
+    }
+  }
+  const queue = [...reachable];
+  while (queue.length) {
+    for (const next of adjacency.get(queue.pop()!) || []) {
+      if (reachable.has(next)) continue;
+      reachable.add(next);
+      queue.push(next);
+    }
+  }
+  return edits.filter(
+    (edit) =>
+      edit.kind === 'path' &&
+      !edit.deleted &&
+      !allowed.some(
+        (edge) =>
+          edge.sourceId === edit.id &&
+          (reachable.has(edge.from) || reachable.has(edge.to)),
+      ),
+  );
+}
+
 export function newSurvey(
   owner: string,
   sourceRevision: string,
@@ -437,6 +497,7 @@ export function replacementTarget(
 export function surveyCorrections(
   session: SurveySession,
   currentTarget?: MapEdit,
+  previousEdits: MapEdit[] = [],
 ): MapEdit[] {
   if (session.pendingMarker)
     throw new Error('Confirm or cancel the entrance position before applying.');
@@ -445,6 +506,16 @@ export function surveyCorrections(
     session.review.some((l) => !l.reviewed || l.vertices.length < 2)
   )
     throw new Error('Review every section before applying.');
+  const connectionSettings = (id: string) => {
+    const previous = previousEdits.find(
+      (e) => e.kind === 'path' && e.id === id && !e.deleted,
+    )?.properties;
+    return Object.fromEntries(
+      ['autoConnectCrossings', 'crossingLevel']
+        .filter((key) => previous?.[key] !== undefined)
+        .map((key) => [key, previous![key]]),
+    );
+  };
   let paths: MapEdit[] = session.review.map((l) => ({
     id: `survey:${session.id}:${l.id}`,
     kind: 'path',
@@ -456,6 +527,7 @@ export function surveyCorrections(
       name: session.name,
       access: 'yes',
       footDirection: 'both',
+      ...connectionSettings(`survey:${session.id}:${l.id}`),
       vertexIds: l.vertices.map((v) => v.id),
       connections: l.vertices
         .filter((v) => v.connection)
@@ -546,13 +618,6 @@ export function surveyCorrections(
       },
     ];
   }
-  if (
-    !session.replacement &&
-    session.review.some((l) => !l.vertices.some((v) => v.connection))
-  )
-    throw new Error(
-      'Connect every section to the mapped network before applying. Keep disconnected recordings as saved surveys.',
-    );
   const entrances: MapEdit[] = session.markers.map((m) => {
     if (!m.placeId) throw new Error('Choose a place for every entrance.');
     const vertex = session.review

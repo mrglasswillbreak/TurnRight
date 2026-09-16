@@ -194,6 +194,14 @@ describe('survey recordings', () => {
     const a = surveyCorrections(r.session),
       b = surveyCorrections(r.session);
     expect(a).toEqual(b);
+    a[0].properties.autoConnectCrossings = false;
+    a[0].properties.crossingLevel = 'bridge';
+    expect(
+      surveyCorrections(r.session, undefined, a)[0].properties,
+    ).toMatchObject({
+      autoConnectCrossings: false,
+      crossingLevel: 'bridge',
+    });
     const published = applyEdits(campusFixture(), a).data;
     expect(published.coverage.fieldVerified).toBe(false);
     expect(published.schemaVersion).toBe(1);
@@ -203,7 +211,8 @@ describe('survey recordings', () => {
     expect(() => surveyCorrections(r.session)).toThrow(/Review/);
     line.reviewed = true;
     delete line.vertices[0].connection;
-    expect(() => surveyCorrections(r.session)).toThrow(/Connect/);
+    // Connectivity is checked on the assembled graph, including automatic crossings.
+    expect(() => surveyCorrections(r.session)).not.toThrow();
   });
   it('pins replacement junctions and detects stale targets and restricted gaps', () => {
     const data = campusFixture();
