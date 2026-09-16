@@ -16,9 +16,11 @@ export function canonicalNode(
   return result;
 }
 
-function crossingLevel(properties: Record<string, any> = {}) {
+function crossingLevel(properties: Record<string, unknown> = {}) {
   const tags = {
-    ...properties.sourceTags,
+    ...(properties.sourceTags && typeof properties.sourceTags === 'object'
+      ? (properties.sourceTags as Record<string, unknown>)
+      : {}),
     ...Object.fromEntries(
       Object.entries(properties).filter(([, value]) => value !== undefined),
     ),
@@ -164,7 +166,13 @@ export function connectCrossingPaths(
   const prefer = (a: string, b: string) => {
     // Keep source node metadata (e.g. a reviewed gate) on the surviving junction.
     const rank = (id: string) =>
-      nodes.get(id)?.sourceTags ? 0 : id.startsWith('crossing:') ? 2 : 1;
+      nodes.get(id)?.sourceTags
+        ? 0
+        : id.startsWith('crossing-path:')
+          ? 3
+          : id.startsWith('crossing:')
+            ? 2
+            : 1;
     return rank(a) - rank(b) || a.localeCompare(b);
   };
   const merge = (a: string, b: string) => {
@@ -204,7 +212,9 @@ export function connectCrossingPaths(
           )
           .map((j) => canonical(j.id));
         const candidates = [...new Set([...endpoints, ...nearby])].sort(prefer);
-        let id = candidates[0];
+        let id = candidates.find(
+          (candidate) => !candidate.startsWith('crossing-path:'),
+        );
         if (!id) {
           id = `crossing:${segment.level}:${point.map((n) => n.toFixed(10)).join(':')}`;
           nodes.set(id, { id, coordinates: point });
