@@ -57,6 +57,7 @@ import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
 import { drawingProgress } from './drawing-state';
 import { SurveyPanel } from './SurveyPanel';
+import { disconnectedSurveyPaths } from './survey-model';
 import { readSurveyContext, writeSurveyContext } from './survey-storage';
 import {
   EditorWorkspace,
@@ -1100,6 +1101,8 @@ function Editor({
       delete edit.properties.connection;
       delete edit.properties.connectTo;
     } else {
+      // Otherwise the topology pass would immediately recreate the removed join.
+      edit.properties.autoConnectCrossings = false;
       edit.properties.connections = edit.properties.connections?.filter(
         (c) => c.vertexId !== vertexId,
       );
@@ -1705,38 +1708,13 @@ function Editor({
                 (e) => !validation.errors.includes(e),
               );
               if (addedErrors.length) throw new Error(addedErrors.join(' '));
-              const reachable = new Set(
-                validation.data.graph.nodes.map((n) => n.id),
-              );
-              let expanded = true;
-              while (expanded) {
-                expanded = false;
-                for (const e of checked.data.graph.edges) {
-                  if (!e.accessible || e.geometryBlocked) continue;
-                  if (reachable.has(e.from) && !reachable.has(e.to)) {
-                    reachable.add(e.to);
-                    expanded = true;
-                  }
-                  if (reachable.has(e.to) && !reachable.has(e.from)) {
-                    reachable.add(e.from);
-                    expanded = true;
-                  }
-                }
-              }
-              for (const edit of edits.filter(
-                (e) => e.kind === 'path' && !e.deleted,
-              )) {
-                if (
-                  !checked.data.graph.edges.some(
-                    (e) =>
-                      e.sourceId === edit.id &&
-                      (reachable.has(e.from) || reachable.has(e.to)),
-                  )
-                )
-                  throw new Error(
-                    'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
-                  );
-              }
+              if (
+                disconnectedSurveyPaths(validation.data, checked.data, edits)
+                  .length
+              )
+                throw new Error(
+                  'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                );
               workspace.commit(next, null);
               if (navigator.onLine && !(await workspace.flush()))
                 throw new Error(

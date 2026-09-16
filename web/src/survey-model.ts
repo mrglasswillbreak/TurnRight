@@ -174,7 +174,20 @@ export function disconnectedSurveyPaths(
       .filter((e) => !newIds.has(e.sourceId))
       .map((e) => e.sourceId),
   );
-  const originalNodes = new Set(before.graph.nodes.map((n) => n.id));
+  const previouslyClosed = new Set(
+    before.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
+  );
+  const originalNodes = new Set(
+    before.graph.edges
+      .filter(
+        (edge) =>
+          newIds.has(edge.sourceId) &&
+          edge.accessible &&
+          !edge.geometryBlocked &&
+          !previouslyClosed.has(edge.id),
+      )
+      .flatMap((edge) => [edge.from, edge.to]),
+  );
   const adjacency = new Map<string, string[]>();
   const reachable = new Set<string>();
   for (const edge of allowed) {

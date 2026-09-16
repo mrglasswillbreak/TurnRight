@@ -55,5 +55,22 @@ describe('survey network connectivity', () => {
       },
     ];
     expect(disconnectedSurveyPaths(base, data, [v])).toHaveLength(1);
+    const closedBase = structuredClone(base);
+    closedBase.closures = [
+      {
+        id: 'main-closed',
+        reason: 'closed',
+        edgeIds: closedBase.graph.edges.map((e) => e.id),
+      },
+    ];
+    const touching = path('survey', [
+      [3.2, 6.46],
+      [3.2, 6.4605],
+    ]);
+    expect(
+      disconnectedSurveyPaths(closedBase, assemble([touching], closedBase), [
+        touching,
+      ]),
+    ).toHaveLength(1);
   });
 });
