@@ -1,6 +1,7 @@
 import { firstPosition, type ValidationIssue } from './validation.js';
 import { distance, projectSegment } from './geo.js';
 import { finitePosition } from './validation.js';
+import { canonicalNode } from './path-crossings.js';
 import type {
   CampusData,
   ConnectionTarget,
@@ -77,6 +78,15 @@ export function resolveConnection(
       from: start,
       to: end,
       parentEdgeIds: [...new Set([e.id, ...(e.parentEdgeIds || [])])],
+      ...(e.crossingEndpoints
+        ? {
+            crossingEndpoints: {
+              from:
+                start === e.from ? e.crossingEndpoints.from : nodes.get(start)!,
+              to: end === e.to ? e.crossingEndpoints.to : nodes.get(end)!,
+            },
+          }
+        : {}),
       distance: distance(
         nodes.get(start)!.coordinates,
         nodes.get(end)!.coordinates,
@@ -92,6 +102,7 @@ export function applyConnections(
   edits: MapEdit[],
   errors: string[],
   issues: ValidationIssue[] = [],
+  aliases = new Map<string, string>(),
 ) {
   const addError = (edit: MapEdit, message: string) => {
     errors.push(message);
@@ -109,16 +120,15 @@ export function applyConnections(
           : undefined,
     });
   };
-  const aliases = new Map<string, string>();
-  const canonical = (id: string): string =>
-    aliases.has(id) ? canonical(aliases.get(id)!) : id;
+  const canonical = (id: string): string => canonicalNode(aliases, id);
   const pending = edits
     .filter((e) => e.kind === 'path' && !e.deleted)
     .flatMap((edit) => {
       const feature = data.map.features.find(
         (f) => f.properties?.id === edit.id && f.properties?.kind === 'path',
       );
-      const ids: string[] = feature?.properties?.vertexIds || [];
+      const ids: string[] =
+        edit.properties.vertexIds || feature?.properties?.vertexIds || [];
       const connections = [...(edit.properties.connections || [])];
       for (const [index, key] of [
         [0, 'connectStart'],
@@ -150,7 +160,7 @@ export function applyConnections(
   while (pending.length) {
     let progressed = false;
     for (let i = pending.length - 1; i >= 0; i--) {
-      const { vertexId, target } = pending[i];
+      const { edit, vertexId, target } = pending[i];
       const from = nodes.get(canonical(vertexId));
       const resolved = resolveConnection(data, nodes, target);
       const to = resolved && nodes.get(canonical(resolved.id));
@@ -179,6 +189,24 @@ export function applyConnections(
             distance: distance(start!.coordinates, end!.coordinates),
           };
         });
+      }
+      // A deliberate join remains joined after automatic crossings are disabled.
+      const targets = new Set([edit.id]);
+      if (target.type === 'segment') targets.add(target.sourceId);
+      else
+        for (const edge of data.graph.edges)
+          if (
+            [
+              edge.crossingEndpoints?.from.id || edge.from,
+              edge.crossingEndpoints?.to.id || edge.to,
+            ].includes(target.nodeId)
+          )
+            targets.add(edge.sourceId);
+      for (const edge of data.graph.edges) {
+        if (!targets.has(edge.sourceId) || !edge.crossingEndpoints) continue;
+        for (const end of ['from', 'to'] as const)
+          if (canonical(edge[end]) === to.id)
+            edge.crossingEndpoints[end] = structuredClone(to);
       }
       pending.splice(i, 1);
       progressed = true;

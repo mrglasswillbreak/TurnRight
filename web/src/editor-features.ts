@@ -2,6 +2,7 @@ import { remapBuildingSurfaces } from './building-surfaces';
 import type { Geometry } from 'geojson';
 import { distance, projectSegment } from './geo';
 import { pathWalkingAccess } from './editor-model';
+import { pathNodes } from './path-crossings';
 import { BoundsIndex, boundsOf, nearbyBounds } from './spatial-index';
 import type {
   CampusData,
@@ -179,12 +180,7 @@ export function featureEdit(
   };
   if (kind === 'path' && f.geometry.type === 'LineString') {
     edit.properties.access = pathWalkingAccess(data, id);
-    const used = new Set(
-      data.graph.edges
-        .filter((e) => e.sourceId === id)
-        .flatMap((e) => [e.from, e.to]),
-    );
-    const nodes = data.graph.nodes.filter((n) => used.has(n.id));
+    const nodes = pathNodes(data, id);
     const drawn = f.geometry.coordinates as Position[];
     const points: Position[] = [];
     for (let i = 1; i < drawn.length; i++) {

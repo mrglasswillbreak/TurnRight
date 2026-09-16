@@ -78,6 +78,8 @@ describe('explicit mapping connections', () => {
   it('splits both directions, keeps closures, and reaches the actual entrance', () => {
     const data = network(),
       path = approach('approach', 3.20025);
+    // This test isolates the explicit connection; the approach also touches the detour.
+    path.properties.autoConnectCrossings = false;
     data.closures = [
       { id: 'closed', reason: 'Repairs', edgeIds: ['ab', 'ba'] },
     ];

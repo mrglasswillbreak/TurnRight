@@ -8,6 +8,10 @@ import {
 } from './editor-topology.js';
 import { distance, projectSegment } from './geo.js';
 import { cachedGeometryBlocker } from './spatial.js';
+import {
+  connectCrossingPaths,
+  restoreCrossingPaths,
+} from './path-crossings.js';
 import { resolvePlaceId } from './map-display.js';
 import {
   structuralIssues,
@@ -105,6 +109,24 @@ export function validateEdit(edit: MapEdit): string[] {
     );
   };
   const props = edit.properties;
+  if (
+    props.autoConnectCrossings !== undefined &&
+    typeof props.autoConnectCrossings !== 'boolean'
+  )
+    errors.push('Choose whether path crossings connect automatically.');
+  if (
+    props.crossingLevel !== undefined &&
+    !['source', 'ground', 'bridge', 'tunnel'].includes(
+      String(props.crossingLevel),
+    )
+  )
+    errors.push('Choose a supported crossing level.');
+  if (
+    props.layer !== undefined &&
+    (!Number.isInteger(Number(props.layer)) ||
+      Math.abs(Number(props.layer)) > 10)
+  )
+    errors.push('Path level must be an integer between -10 and 10.');
   if (
     props.mergedInto !== undefined &&
     (!['place', 'building'].includes(edit.kind) ||
@@ -349,6 +371,7 @@ export function applyEdits(
   data.buildingIdAliases = buildingAliases;
   const buildingId = (id: string) =>
     resolvePlaceId({ placeIdAliases: buildingAliases }, id);
+  restoreCrossingPaths(data);
   const nodes = new Map(data.graph.nodes.map((n) => [n.id, n]));
   data.entrances = [...(data.entrances || [])];
   let connectedPaths = false;
@@ -356,13 +379,17 @@ export function applyEdits(
   const connectPaths = () => {
     if (connectedPaths) return;
     phase?.('topology');
-    canonical = applyConnections(
+    const aliases = new Map<string, string>();
+    connectCrossingPaths(data, nodes, aliases);
+    applyConnections(
       data,
       nodes,
       edits.filter((e) => !validateEdit(e).length),
       errors,
       issues,
+      aliases,
     );
+    canonical = connectCrossingPaths(data, nodes, aliases);
     connectedPaths = true;
     phase?.('edits');
   };
@@ -455,6 +482,14 @@ export function applyEdits(
           ? { surveyProvenance: 'Reviewed walking survey' }
           : {}),
         walkingAccess: access,
+        autoConnectCrossings:
+          props.autoConnectCrossings ??
+          originalFeature?.properties?.autoConnectCrossings,
+        crossingLevel:
+          props.crossingLevel ?? originalFeature?.properties?.crossingLevel,
+        layer: props.layer ?? originalFeature?.properties?.layer,
+        bridge: props.bridge ?? originalFeature?.properties?.bridge,
+        tunnel: props.tunnel ?? originalFeature?.properties?.tunnel,
         accessReviewId:
           access === 'campus'
             ? originalFeature?.properties?.accessReviewId
@@ -518,7 +553,7 @@ export function applyEdits(
       if (edit.deleted || edit.geometry.type !== 'LineString') continue;
       const drawn = edit.geometry.coordinates as Position[];
       // Preserve only this path's established junctions that still lie on the edited geometry.
-      // Geometrically crossing a different path never creates a new connection.
+      // Other crossing paths are joined in the shared topology pass below.
       const points: Position[] = [];
       for (let i = 0; i < drawn.length - 1; i++) {
         points.push(drawn[i]);
@@ -560,15 +595,6 @@ export function applyEdits(
         sequence.push(node);
       });
       if (sequence.length !== points.length) continue;
-      if (
-        !props.connections?.length &&
-        !props.connectStart &&
-        !props.connectEnd &&
-        !sequence.some((n) => originalNodeIds.has(n.id))
-      )
-        warnings.push(
-          `${props.name}: isolated path; explicitly connect an endpoint before routing to the existing network.`,
-        );
       const gaps: [number, number][] = [];
       let lostRestriction = false;
       for (let i = 1; i < orderedOriginal.length; i++) {
@@ -873,6 +899,7 @@ export function applyEdits(
   const connected = new Set(data.graph.edges.flatMap((e) => [e.from, e.to]));
   data.graph.nodes = [...nodes.values()].filter((n) => connected.has(n.id));
   for (const place of data.places) {
+    if (place.graphNode) place.graphNode = canonical(place.graphNode);
     if (place.graphNode && !connected.has(place.graphNode)) {
       delete place.graphNode;
       place.arrivalKind = 'unmapped';

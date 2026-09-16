@@ -5,6 +5,7 @@ import {
   validateEdit,
 } from '../src/editor-model';
 import { campusFixture } from './fixture';
+import { findRoutes } from '../src/routing';
 import type { MapEdit } from '../src/types';
 const placeEdit: MapEdit = {
   id: 'library',
@@ -166,7 +167,7 @@ describe('editor topology and overrides', () => {
     expect(result.data.places[0].name).toBe('Verified library name');
     expect(base.places[0].name).toBe('Upstream rename');
   });
-  it('does not silently join visually crossing paths', () => {
+  it('joins crossing paths for navigation without a manual connection', () => {
     const edit: MapEdit = {
       id: 'newpath',
       kind: 'path',
@@ -181,12 +182,10 @@ describe('editor topology and overrides', () => {
     };
     const result = applyEdits(campusFixture(), [edit]);
     expect(result.errors).toEqual([]);
-    expect(result.warnings.join()).toContain('isolated');
+    expect(result.warnings.join()).not.toContain('isolated');
     expect(
-      result.data.graph.edges
-        .filter((e) => e.sourceId === 'newpath')
-        .every((e) => e.from.startsWith('newpath:')),
-    ).toBe(true);
+      findRoutes(result.data, 'a', 'newpath:vertex:1')[0].edgeIds.length,
+    ).toBeGreaterThan(1);
   });
   it('rejects false endpoint and entrance connections', () => {
     const path: MapEdit = {
