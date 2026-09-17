@@ -6,13 +6,14 @@ TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, wi
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight dark campus map with enhanced building models in their original colours](docs/assets/screenshots/public-campus-dark.jpg)
+![TurnRight desktop map with a full-height, adjustable destination panel and pinned navigation controls](docs/assets/screenshots/public-desktop-full-2026-09-17.png)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
 ## Contents
 
 - [Screenshots](#screenshots)
+- [Recent changes](#recent-changes)
 - [Features](#features)
 - [Quick start](#quick-start)
 - [Using the public map](#using-the-public-map)
@@ -33,35 +34,68 @@ TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, wi
 
 ## Screenshots
 
-**Owner workspace:** explore the campus, select features and review mapping work while keeping the map visible.
+The public interface below was captured on **17 September 2026** from application revision **`d37606f`** in the **Codex in-app browser**. The local production preview uses the checked-in campus seed, including its labelled illustrative building heights; the live campus package can differ.
+
+| Compact mobile map | Adjustable destination card |
+| --- | --- |
+| <img src="docs/assets/screenshots/public-mobile-map-2026-09-17.png" width="300" alt="Mobile campus map with a bottom search bar, view and compass buttons on the left, and zoom and location buttons on the right"> | <img src="docs/assets/screenshots/public-mobile-place-2026-09-17.png" width="300" alt="Mobile Senate Building details in a shortened card with the navigation buttons still visible above its scrolling content"> |
+
+| Resizable Settings dialog | Public app-update notice |
+| --- | --- |
+| <img src="docs/assets/screenshots/public-mobile-settings-2026-09-17.png" width="300" alt="Shortened mobile Settings dialog showing appearance and rendering choices while leaving the map visible"> | <img src="docs/assets/screenshots/public-mobile-update-2026-09-17.png" width="300" alt="Public campus map showing App update ready and an Install update button above the compact search dock"> |
+
+**Desktop after resizing:** the same panel shown at full height above can be shortened. Search, navigation and map controls remain accessible while its details scroll.
+
+![Desktop destination panel shortened to expose more of the campus map](docs/assets/screenshots/public-desktop-resized-2026-09-17.png)
+
+<details>
+<summary>Editor and enhanced-building gallery — 15 September 2026</summary>
+
+These earlier captures use isolated owner/API fixtures and enhanced model assets. They remain useful examples of the building and roof tools; they predate the latest mobile camera and public-panel changes.
+
+**Owner workspace**
 
 ![Dark owner editor with campus geometry, enhanced buildings and the feature explorer](docs/assets/screenshots/editor-workspace.jpg)
 
-**Building inspector:** edit building, wing and wall appearances alongside the enhanced preview.
+**Building appearance and roof editing**
 
-![Building appearance inspector with original wall and roof colour swatches and a selected enhanced model](docs/assets/screenshots/editor-building.jpg)
+![Building inspector with wall and roof colour controls](docs/assets/screenshots/editor-building.jpg)
 
-**Roof-plan editing:** review a wing outline, roof controls and elevations before applying a custom roof.
+![Owner editor showing an unfinished demonstration roof plan](docs/assets/screenshots/editor-roof.jpg)
 
-![Owner editor showing a custom roof draft, plan and elevation controls](docs/assets/screenshots/editor-roof.jpg)
-
-| Public destination details | Editor Settings |
+| Enhanced public buildings | Editor Settings |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-place-phone.jpg" width="300" alt="Phone viewport showing LASU Senate Building details and enhanced architecture"> | <img src="docs/assets/screenshots/editor-settings-phone.jpg" width="300" alt="Phone editor Settings with Device, Light and Dark appearance, Enhanced and Simple rendering, tilt and building opacity"> |
+| <img src="docs/assets/screenshots/public-place-phone.jpg" width="300" alt="Earlier public destination view with enhanced building models"> | <img src="docs/assets/screenshots/editor-settings-phone.jpg" width="300" alt="Editor Settings with appearance, rendering, tilt and opacity controls"> |
 
-Captured from the running application on **15 September 2026** using real MapLibre/Three.js rendering, checked-in campus geometry and local test fixtures for owner authentication and API responses. The roof draft is a demonstration; these captures contain no private owner reports or production draft changes. Phone images use browser emulation and do not establish physical-device acceptance. [Capture sources and reproduction](docs/assets/screenshots/README.md).
+</details>
+
+No screenshot contains production owner drafts or private reports. The update notice uses a local service-worker update demonstration. Phone images use responsive browser viewports, not physical-device field tests. [Capture sources, dimensions and reproduction](docs/assets/screenshots/README.md).
+
+## Recent changes
+
+The 17 September interface and editor updates include:
+
+- **More map space:** a compact bottom search bar, mobile controls arranged on both sides, and adjustable cards/dialogs. Desktop panels open at full height, then keep the size you choose while you use search. Explore, Saved, Offline, Settings and Editor stay visible as panel content scrolls; desktop map controls stay pinned too.
+- **Visible app updates:** an update-ready notice on the public map, with an explicit install action that is disabled during navigation. Campus-package updates remain a separate Offline Maps operation.
+- **Gentler editor selection:** selecting an object animates it into the exposed map. Long paths on phones zoom out by at most 0.75 levels and keep the tapped stretch, or the stretch nearest the current view, visible. Closing properties restores the earlier view.
+- **Connected paths with exceptions:** drawn and surveyed paths can join actual same-level crossings automatically. Per-path crossing controls, bridge/tunnel levels and explicit joins let the owner decide where connections belong.
+- **Drafts relative to publication:** pending changes and highlights compare with the latest published map, while published corrections remain stored for later source reconciliation.
+
+These are application/editor changes. Public routing changes only after the owner reviews and publishes the corresponding campus map release.
 
 ## Features
 
 | Area | Current behavior |
 | --- | --- |
-| Exploration | Local place search, categories, aliases, saved places, recent selections, provenance, category badges and recorded street names. |
+| Exploration | Bottom search dock, local place search, categories, aliases, saved/recent places, provenance and recorded street names. |
+| Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
+| App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
 | Navigation | Foreground GPS, spoken maneuvers, remaining distance and ETA, manual origins, recentering, route following, sustained-deviation rerouting and arrival detection. |
 | Destination sharing | Copy a stable place link or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
-| Owner editing | Autosave, grouped undo/redo, explicit connections, recoverable drawings and roof plans, guided repairs, duplicate review and field-level conflict resolution. |
+| Owner editing | Autosave, grouped undo/redo, controlled automatic crossings and explicit joins, selection framing, publication-relative drafts, recoverable drawings/roof plans, guided repairs and conflicts. |
 | Building editing | Inherited building/wing/wall styles, stable surface identities, facade controls, roof presets, custom ridge/valley plans and immediate worker previews. |
 | Offline | Verified, resumable package downloads, explicit updates, integrity repair, prepared owner workspaces and immediate local recovery exports. |
 | Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
@@ -93,14 +127,16 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173), choose **Offline → Download camp
 
 ## Using the public map
 
-The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline and Settings. On desktop, the expanded panel fills the available height, with navigation and map controls pinned above its scrolling content. On mobile, view and compass controls sit on the left of the map, with zoom and location controls on the right. Drag the handle at the top of a mobile card or dialog to change its height. Your chosen mobile heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
+The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline and Settings. On desktop, panels and dialogs open at full height and can then be shortened with their top handle. Navigation and map controls stay pinned above the panel’s scrolling content. On mobile, view and compass controls sit on the left of the map, with zoom and location controls on the right. Drag the handle at the top of a card or dialog to change its height. Your chosen mobile heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
+
+When a new app version is ready, a notice appears over the public map with an **Install update** button. Updates are checked while the app is visible and when you return online. Installation waits until you finish navigation. You can also install from Settings.
 
 1. Search for a building, faculty or service, or narrow the map with a category.
 2. Open its details to check provenance, walking coverage and any building evidence. Save, share or report the place.
 3. Choose **Directions**, then a current-location or manual origin. Compare the available alternatives and connection notices.
 4. Choose **Start walking**, allow location/audio and keep the application visible. Use mute, repeat, the instruction list and **Follow me** as needed.
 
-Poor or stale GPS pauses maneuver progression. Rerouting requires sustained deviation to reduce false turns from jitter. Guidance ends at the mapped endpoint, which may be a nearby approach rather than an entrance.
+Poor or stale GPS pauses maneuver progression. Changing paths can trigger rerouting after sustained deviation with a sufficiently accurate fix; a nearby parallel path may remain inside the GPS tolerance and does not guarantee an immediate switch. The current rule needs eight seconds off-route, accuracy of 35 m or better, and at least 15 seconds between recalculations. Guidance ends at the mapped endpoint, which may be a nearby approach rather than an entrance. [Routing thresholds and limitations](docs/EDITOR.md).
 
 Optional compass and motion assistance provides Travel-up, North-up and Phone-up orientation with GPS fallback. The purple cone is phone direction; the blue arrow is travel direction. Permissions are optional and can be retried from Settings. Motion hints are advisory: there is no step counting, dead reckoning or background navigation. Raw sensor readings remain in memory. [Sensor behavior and device checks](docs/MOTION.md).
 
@@ -130,6 +166,10 @@ The [private editor](https://turnright.vercel.app/admin) requires the single all
 - **Sources:** compare imported records and their geometry, review reference-based appearance suggestions and inspect proposed roofs.
 - **Settings:** change theme, 3D rendering, tilt and opacity without leaving unfinished work.
 - **Reports and Releases:** review submitted issues and the release pipeline separately from live editing.
+
+**Drafts** and map highlights show changes since the latest publication. Published corrections remain stored; editing them again creates a new pending change. Selecting an object animates it into view, and closing properties returns to the previous view. Mobile selection of a long path limits zoom-out to 0.75 levels; short paths and buildings still fit their complete geometry.
+
+Drawn paths and surveys applied to the map draft participate in the editor’s routing checks when their walking access and connections are valid. Same-level intersections connect automatically unless disabled for a path. Use **Path connections → Connect crossings automatically**, **Crossing level**, or explicit endpoint/join controls to handle exceptions. Gaps, different levels, barriers, restrictions and closures are not bypassed. A reviewed campus publication makes accepted changes available to public navigation. [Connection controls](docs/EDITOR.md#control-automatic-connections).
 
 Autosave preserves draft edits. A continuous field interaction is one undo step; blur, Enter, selection changes or another command finish the group. Undo restores related geometry, surface identities and styles together. Drawing gestures are protected against accidental tool changes, and unfinished work can be resumed after reopening.
 
@@ -198,7 +238,7 @@ An initial online visit and a completed download are required. Installation and 
 | Campus geometry, routing, glyphs, audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
 | Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
 
-Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. **Settings → Install update** activates a waiting application update with editing/navigation safeguards.
+Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. The public **App update ready** notice and **Settings → Install update** activate a waiting application update with editing/navigation safeguards. App-update checks run once a minute while visible and online, and on returning to the app or reconnecting. Installing remains an explicit action; it is disabled during an active walk.
 
 **Download local recovery** immediately exports the owner workspace without waiting for the server, including pending edits, unfinished geometry/roof work, undo history, save receipts and baseline information. Full server backup export is a separate online operation. Prepare an owner workspace online before relying on offline reopening.
 
@@ -291,12 +331,13 @@ npm run test:survey-pwa
 
 `lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
-Focused checks for these UI changes:
+Focused camera and panel regressions:
 
 ```sh
-npx playwright test --grep "enhanced zoom restores|view settings"
-npx playwright test --config playwright.webkit.config.ts --grep "enhanced zoom restores|view settings phone"
+npx vitest run tests/editor-camera.test.ts tests/public-panel.test.ts
 ```
+
+For the current UI acceptance checks, use the in-app browser with a production preview: open and resize desktop panels, scroll their pinned controls, check mobile card heights, select a long editor path in 2D/3D, and install a locally staged service-worker update. A development server alone does not exercise PWA updates.
 
 Importer/access tests run from the repository root:
 
@@ -306,7 +347,20 @@ python -m unittest discover -s scripts/tests -v
 
 Coverage includes source normalization, appearance persistence/storage failures, grouped undo, save receipts, concurrent field/surface edits, geometry identity, constrained roofs, editor/release parity, drawing/roof recovery, worker failure/stale replies, package integrity and offline reopening. Browser tests use real map/rendering libraries with isolated authentication, API and hardware fixtures. Enhanced zoom cases inspect actual shader material colours and draw calls, including legacy meshes and repeated theme/zoom changes.
 
-On 15 September 2026, **303 unit tests** passed. Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
+Latest local checks on **17 September 2026**:
+
+| Check | Result |
+| --- | --- |
+| Camera/panel regression tests | 14 / 14 passed |
+| Full unit suite | 347 / 347 passed |
+| Client and server TypeScript | Passed |
+| Lint | Passed with seven existing warnings |
+| Production app/service-worker build and renderer budget | Passed |
+| In-app browser | Desktop opening, drag/keyboard resizing, pinned controls, mobile long-path framing, update notice and update installation checked |
+
+The full suite was rerun successfully on the supported Node 22.23.2 runtime after the local tooling recovered. Browser checks include an isolated camera/navigation-state fixture; they do not establish a successful physical GPS walk.
+
+Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
 ## Repository structure
 
@@ -337,6 +391,9 @@ TurnRight/
 | Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
 | Editor stays in the wrong theme | Use **Editor Settings → Appearance → Light/Dark**, or **Device** to resume automatic changes. |
 | A roof preview is outdated | Use **Retry 3D preview** and inspect geometry/elevation errors. The last valid model and unfinished roof are retained. |
+| A long selected path extends off-screen on a phone | This preserves local map detail by limiting zoom-out. Pan along the highlighted path or use the zoom-out control to see more. |
+| Paths connect where they should stay separate | Turn off automatic crossings for that path or set the correct bridge/tunnel level. Use explicit joins for the connections you do want, then review and publish. |
+| An app update is available | Finish navigation, then choose **Install update** from the map notice or Settings. Use Offline Maps separately for campus-data updates. |
 | Draft changes are absent from the public map | Autosave stores a private draft. Review, validate, build a preview and publish through Releases; a code push alone does not publish it. |
 | Publish/preview is unavailable | Resolve blocking validation or reconciliation issues, pending saves and conflicts. Inspect job errors and the release state; do not repeat an uncertain submission blindly. |
 | Save/export/routing failed | Use the operation-specific retry. Renew an expired session if requested. **Download local recovery** remains independent of server export. |
