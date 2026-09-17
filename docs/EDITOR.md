@@ -6,6 +6,10 @@ The private `/admin` workspace edits the existing campus map in 2D or a tilted 3
 
 On phones, editor cards and survey sheets use at most 42% of the screen height. Public pop-up dialogs use at most 52% and sit near the bottom. Scroll inside a card for the remaining controls; headings and close buttons stay accessible.
 
+Selecting an object on the map or in the feature list animates the map to fit its full geometry in the space around the editor cards. Long paths can zoom out; multipart buildings include all wings. Closing properties returns to the view from before the selection. Editing fields or dragging vertices does not repeatedly refocus the camera.
+
+During public navigation, a fresh GPS fix with accuracy of 35 m or better can trigger rerouting after eight seconds continuously more than `max(22 m, accuracy × 1.4)` from the route. Reroutes have a 15-second cooldown. The new route uses the current GPS position and the same destination, with closures and access restrictions still applied. Close parallel paths may remain inside the tolerance. GPS starts currently use the nearest usable graph node within 45 m, so a long segment without a nearby node can still prevent recalculation; this is not continuous path matching.
+
 ## Map an entrance and its approach
 
 1. Search for a building or choose an item in **Needs mapping**. Select the building on the map, then choose **Add entrance**.

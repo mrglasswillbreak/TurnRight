@@ -75,4 +75,66 @@ describe("GPS navigation", () => {
     state = advanceNavigation(route, fix(4000, [3.201, 6.46]), state, 4000);
     expect(state.arrived).toBe(true);
   });
+  it('can resume on another mapped path after a sustained departure', () => {
+    const data = campusFixture();
+    const alternatePath = data.graph.nodes.find(
+      (node) => node.id === 'd',
+    )!.coordinates;
+    let state = advanceNavigation(
+      route,
+      fix(1000, alternatePath),
+      initialNavigation,
+      1000,
+    );
+    state = advanceNavigation(route, fix(9000, alternatePath), state, 9000);
+    expect(state.reroute).toBe(true);
+    const updated = findRoutes(data, alternatePath, { placeId: 'library' })[0];
+    expect(updated.nodeIds).toEqual(['d', 'c']);
+    const resumed = advanceNavigation(
+      updated,
+      fix(10000, alternatePath),
+      initialNavigation,
+      10000,
+    );
+    expect(resumed.reroute).toBe(false);
+    expect(resumed.offRouteSince).toBeNull();
+    expect(resumed.progress).toBe(0);
+  });
+  it('does not switch for nearby GPS drift, or count weak fixes as sustained departure', () => {
+    let state = advanceNavigation(
+      route,
+      fix(1000, [3.2004, 6.4601]),
+      initialNavigation,
+      1000,
+    );
+    state = advanceNavigation(
+      route,
+      fix(10000, [3.2004, 6.4601]),
+      state,
+      10000,
+    );
+    expect(state.reroute).toBe(false);
+    state = advanceNavigation(
+      route,
+      fix(11000, [3.2004, 6.4605]),
+      state,
+      11000,
+    );
+    state = advanceNavigation(
+      route,
+      fix(20000, [3.2004, 6.4605], 80),
+      state,
+      20000,
+    );
+    expect(state.reroute).toBe(false);
+    expect(state.offRouteSince).toBeNull();
+    state = advanceNavigation(
+      route,
+      fix(21000, [3.2004, 6.4605]),
+      state,
+      21000,
+    );
+    expect(state.reroute).toBe(false);
+    expect(state.offRouteSince).toBe(21000);
+  });
 });
