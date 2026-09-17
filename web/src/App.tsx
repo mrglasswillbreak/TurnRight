@@ -726,6 +726,7 @@ export default function App() {
     <main
       className={`app-shell ${navigating ? 'is-navigating' : ''}`}
       data-panel-expanded={panelExpanded}
+      data-mobile-controls={mobileMapControls}
       style={panelSheet.style}
       data-panel-view={
         navigating
@@ -842,58 +843,66 @@ export default function App() {
           className="panel-content"
           ref={panelContent}
         >
-          <nav className="app-rail" aria-label="Main navigation">
-            <a href="/" className="brandmark" aria-label="TurnRight home">
-              <ArrowUpRight />
-            </a>
-            <button
-              className={`rail-item ${!savedOnly ? 'active' : ''}`}
-              disabled={navigating}
-              onClick={() => {
-                setSavedOnly(false);
-                setPanelExpanded(true);
-                setSelected(null);
-                setRouteView(false);
-                setRoutes([]);
-              }}
-            >
-              <Compass />
-              <span>Explore</span>
-            </button>
-            <button
-              className={`rail-item ${savedOnly ? 'active' : ''}`}
-              disabled={navigating}
-              onClick={() => {
-                setSavedOnly(true);
-                setPanelExpanded(true);
-                setSelected(null);
-                setRouteView(false);
-                setRoutes([]);
-                setCategory('all');
-                setQuery('');
-              }}
-            >
-              <Heart />
-              <span>Saved</span>
-            </button>
-            <button className="rail-item" onClick={() => setDialog('offline')}>
-              <Download />
-              <span>Offline</span>
-              {latest && latest.version !== manifest.version && (
-                <i className="update-dot" />
-              )}
-            </button>
-            <div className="rail-spacer" />
-            <button className="rail-item" onClick={() => setDialog('settings')}>
-              <Settings />
-              <span>Settings</span>
-            </button>
-            <a href="/admin" className="rail-item">
-              <Shield />
-              <span>Editor</span>
-            </a>
-          </nav>
-          {!mobileMapControls && mapControls}
+          <div className="panel-toolbar">
+            <nav className="app-rail" aria-label="Main navigation">
+              <a href="/" className="brandmark" aria-label="TurnRight home">
+                <ArrowUpRight />
+              </a>
+              <button
+                className={`rail-item ${!savedOnly ? 'active' : ''}`}
+                disabled={navigating}
+                onClick={() => {
+                  setSavedOnly(false);
+                  setPanelExpanded(true);
+                  setSelected(null);
+                  setRouteView(false);
+                  setRoutes([]);
+                }}
+              >
+                <Compass />
+                <span>Explore</span>
+              </button>
+              <button
+                className={`rail-item ${savedOnly ? 'active' : ''}`}
+                disabled={navigating}
+                onClick={() => {
+                  setSavedOnly(true);
+                  setPanelExpanded(true);
+                  setSelected(null);
+                  setRouteView(false);
+                  setRoutes([]);
+                  setCategory('all');
+                  setQuery('');
+                }}
+              >
+                <Heart />
+                <span>Saved</span>
+              </button>
+              <button
+                className="rail-item"
+                onClick={() => setDialog('offline')}
+              >
+                <Download />
+                <span>Offline</span>
+                {latest && latest.version !== manifest.version && (
+                  <i className="update-dot" />
+                )}
+              </button>
+              <div className="rail-spacer" />
+              <button
+                className="rail-item"
+                onClick={() => setDialog('settings')}
+              >
+                <Settings />
+                <span>Settings</span>
+              </button>
+              <a href="/admin" className="rail-item">
+                <Shield />
+                <span>Editor</span>
+              </a>
+            </nav>
+            {!mobileMapControls && mapControls}
+          </div>
           {sharedLinkMissing && (
             <output className="notice dock-notice">
               This destination is unavailable in your downloaded map. Search for

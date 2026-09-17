@@ -107,11 +107,15 @@
   flex: 0 0 auto;
   overflow: visible;
 }
-.app-shell .app-rail {
+.app-shell .panel-toolbar {
   position: sticky;
-  inset: auto;
   top: 0;
   z-index: 2;
+  background: var(--background);
+}
+.app-shell .app-rail {
+  position: static;
+  inset: auto;
   width: 100%;
   height: auto;
   display: flex;
