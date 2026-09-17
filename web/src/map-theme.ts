@@ -53,6 +53,11 @@ export function mapTheme(dark: boolean) {
   };
   return {
     background: { 'background-color': p.ground },
+    'world-ocean': { 'background-color': p.water },
+    'world-land': { 'fill-color': p.land },
+    'world-borders': { 'line-color': p.boundary },
+    'world-country-labels': label,
+    'world-campus-label': { ...label, 'text-color': p.route },
     'campus-fill': { 'fill-color': p.campus },
     land: {
       'fill-color': [
