@@ -678,6 +678,7 @@ test('prepared public map reopens in 3D offline with its saved view preference',
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: 'Offline', exact: true }).click();
   await page
     .getByRole('button', { name: 'Download campus map', exact: true })
@@ -688,6 +689,7 @@ test('prepared public map reopens in 3D offline with its saved view preference',
   await context.setOffline(true);
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
     .toBe(45);
@@ -724,6 +726,7 @@ test('prepared public map verifies enhanced architecture, repairs corruption and
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: 'Offline', exact: true }).click();
   await page
     .getByRole('button', { name: 'Download campus map', exact: true })
@@ -1922,6 +1925,9 @@ for (const phone of [false, true])
       .toBe(false);
     await page.reload();
     await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await expect(
       page.getByRole('radio', { name: 'Simple', exact: true }),
@@ -2395,6 +2401,7 @@ test('public map defaults to 3D, frames campus and opens building details', asyn
   await setup(page);
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
     .toBe(45);
@@ -2486,6 +2493,9 @@ test('public phone starts at 40 degrees and frames campus in both preferences', 
     const { campus } = await setup(page, true);
     await page.goto('/');
     await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
       .toBe(40);
@@ -3553,6 +3563,63 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   ).toBe(14);
 });
 
+test('public cards: compact start, drag sizing, remembered heights and keyboard limits', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  const panel = page.locator('.explore-panel');
+  const handle = page.getByRole('slider', { name: 'Resize search panel' });
+  await expect(handle).toHaveAttribute('aria-valuenow', '96');
+  await expect(
+    page.getByRole('button', { name: 'Settings', exact: true }),
+  ).toBeHidden();
+  expect((await panel.boundingBox())!.y).toBeGreaterThan(700);
+  const grip = (await handle.boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(
+    grip.x + grip.width / 2,
+    grip.y + grip.height / 2 - 300,
+    { steps: 12 },
+  );
+  await page.mouse.up();
+  await expect(handle).toHaveAttribute('aria-valuenow', '396');
+  await expect(
+    page.getByRole('button', { name: 'Settings', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Collapse card' }).click();
+  await page.reload();
+  await attachMap(page);
+  await expect(handle).toHaveAttribute('aria-valuenow', '96');
+  await page.getByRole('button', { name: 'Expand card' }).click();
+  await expect(handle).toHaveAttribute('aria-valuenow', '396');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const dialogHandle = page.getByRole('slider', { name: 'Resize dialog' });
+  await dialogHandle.press('Home');
+  await expect(dialogHandle).toHaveAttribute('aria-valuenow', '220');
+  await expect(
+    page.getByRole('button', { name: 'Close', exact: true }),
+  ).toBeVisible();
+  await dialogHandle.press('ArrowUp');
+  await expect(dialogHandle).toHaveAttribute('aria-valuenow', '252');
+  await dialogHandle.press('End');
+  await expect(dialogHandle).toHaveAttribute('aria-valuenow', '743');
+  const dialog = (await page.getByRole('dialog').boundingBox())!;
+  expect(dialog.y).toBeGreaterThan(80);
+  expect(dialog.y + dialog.height).toBeLessThanOrEqual(844);
+  await dialogHandle.press('Home');
+  await dialogHandle.press('ArrowUp');
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card' }).click();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(dialogHandle).toHaveAttribute('aria-valuenow', '252');
+});
+
 test('view settings: single button, keyboard switching and shared preferences', async ({
   page,
 }) => {
@@ -3560,6 +3627,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await setup(page);
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   const toggle = page.locator('button.map-view-control');
   await expect(toggle).toHaveCount(1);
   await expect(toggle).toHaveAccessibleName('Switch to 2D');
@@ -3581,6 +3649,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
     .click();
   await page.reload();
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(
     page.getByRole('radio', { name: 'Simple', exact: true }),
@@ -3602,6 +3671,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   ).toBeFocused();
   await page.goto('/');
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(
     page.getByRole('radio', { name: 'Enhanced', exact: true }),
@@ -3810,6 +3880,9 @@ test.describe('view settings touch', () => {
     await expect(toggle).toHaveAccessibleName('Switch to 3D');
     await page.goto('/');
     await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
     await expect(toggle).toHaveAccessibleName('Switch to 2D');
     await toggle.tap();
     await expect(toggle).toHaveAccessibleName('Switch to 3D');
@@ -3822,8 +3895,8 @@ test.describe('view settings touch', () => {
     ).toBeChecked();
     await page.getByRole('radio', { name: 'Enhanced', exact: true }).tap();
     const dialogCard = await page.getByRole('dialog').boundingBox();
-    expect(dialogCard!.height).toBeLessThanOrEqual(844 * 0.53);
-    expect(dialogCard!.y).toBeGreaterThan(844 * 0.45);
+    expect(dialogCard!.height).toBeLessThanOrEqual(844 * 0.57);
+    expect(dialogCard!.y).toBeGreaterThan(844 * 0.4);
     await page.screenshot({ path: 'test-results/compact-mobile-dialog.png' });
     await page
       .getByRole('dialog')
@@ -3897,6 +3970,9 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
     await audit('survey');
     await page.goto('/');
     await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
     await audit('public places');
     await page.getByRole('textbox', { name: 'Search campus' }).fill('Library');
     await page
