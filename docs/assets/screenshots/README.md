@@ -1,5 +1,16 @@
 # Application screenshots
 
+## Offline globe — 17 September 2026
+
+Actual, unmodified PNG captures from the local production PWA in the **Codex in-app browser**, using the new globe interface, the checked-in **`lasu-4e4c8008b38b`** campus package and bundled Natural Earth v5.1.2 world geometry. The preview server was stopped before reloading and capturing both views: geometry and country labels came from the saved app/package. No device GPS or private editor data was used.
+
+| Image | View | Captured dimensions |
+| --- | --- | --- |
+| [public-globe-mobile-dark-2026-09-17.png](public-globe-mobile-dark-2026-09-17.png) | Dark globe with compact search dock and the existing side controls | 390 × 844 |
+| [public-globe-desktop-light-2026-09-17.png](public-globe-desktop-light-2026-09-17.png) | Light globe beside the full-height public panel and Back to campus action | 1248 × 900 |
+
+To reproduce: build and serve the production app, install its waiting app update if necessary, finish the campus download, stop the local server and reload. Zoom out, then adjust the wheel/pinch zoom until the entire planet fits. Capture mobile in Dark mode and desktop in Light mode, without changing the world data. These are responsive-browser checks, not physical-device airplane-mode or GPS tests.
+
 ## Current public interface — 17 September 2026
 
 Captured from the local production preview in the **Codex in-app browser**, using application revision **`d37606f`** with the mobile selection, public update-notice and desktop-resizing changes. The images document this application build and its bundled seed; publishing application code does not publish new campus map data.

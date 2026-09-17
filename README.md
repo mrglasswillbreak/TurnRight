@@ -34,7 +34,7 @@ TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, wi
 
 ## Screenshots
 
-The public interface below was captured on **17 September 2026** from application revision **`d37606f`** in the **Codex in-app browser**. The local production preview uses the checked-in campus seed, including its labelled illustrative building heights; the live campus package can differ.
+The public interface below was captured on **17 September 2026** in the **Codex in-app browser**. The original panel gallery uses application revision **`d37606f`**; the globe captures show the new offline world overview. The local production preview uses the checked-in campus seed, including its labelled illustrative building heights; the live campus package can differ.
 
 | Compact mobile map | Adjustable destination card |
 | --- | --- |
@@ -43,6 +43,12 @@ The public interface below was captured on **17 September 2026** from applicatio
 | Resizable Settings dialog | Public app-update notice |
 | --- | --- |
 | <img src="docs/assets/screenshots/public-mobile-settings-2026-09-17.png" width="300" alt="Shortened mobile Settings dialog showing appearance and rendering choices while leaving the map visible"> | <img src="docs/assets/screenshots/public-mobile-update-2026-09-17.png" width="300" alt="Public campus map showing App update ready and an Install update button above the compact search dock"> |
+
+**Offline world overview:** zoom out to explore the planet, then use **Back to campus** or the LASU marker to return. These two captures were taken after stopping the local preview server and reloading the saved app.
+
+<img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-17.png" width="300" alt="Offline globe on mobile in Dark mode, with country names, a LASU marker, side controls and the compact search dock">
+
+![Offline desktop globe in Light mode with the full-height public panel and Back to campus button](docs/assets/screenshots/public-globe-desktop-light-2026-09-17.png)
 
 **Desktop after resizing:** the same panel shown at full height above can be shortened. Search, navigation and map controls remain accessible while its details scroll.
 
@@ -75,6 +81,7 @@ No screenshot contains production owner drafts or private reports. The update no
 
 The 17 September interface and editor updates include:
 
+- **Offline globe:** the public map now zooms out to a full planet with land, oceans, country borders and names. A 255 KB world overview is saved with the app, works in both themes and returns smoothly to campus. The editor remains campus-focused.
 - **More map space:** a compact bottom search bar, mobile controls arranged on both sides, and adjustable cards/dialogs. Desktop panels open at full height, then keep the size you choose while you use search. Explore, Saved, Offline, Settings and Editor stay visible as panel content scrolls; desktop map controls stay pinned too.
 - **Visible app updates:** an update-ready notice on the public map, with an explicit install action that is disabled during navigation. Campus-package updates remain a separate Offline Maps operation.
 - **Gentler editor selection:** selecting an object animates it into the exposed map. Long paths on phones zoom out by at most 0.75 levels and keep the tapped stretch, or the stretch nearest the current view, visible. Closing properties restores the earlier view.
@@ -89,6 +96,7 @@ These are application/editor changes. Public routing changes only after the owne
 | --- | --- |
 | Exploration | Bottom search dock, local place search, categories, aliases, saved/recent places, provenance and recorded street names. |
 | Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
+| World overview | Automatic globe when zooming out; bundled Natural Earth countries, offline labels and a return-to-campus action. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
 | Navigation | Foreground GPS, spoken maneuvers, remaining distance and ETA, manual origins, recentering, route following, sustained-deviation rerouting and arrival detection. |
@@ -128,6 +136,8 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173), choose **Offline → Download camp
 ## Using the public map
 
 The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline and Settings. On desktop, panels and dialogs open at full height and can then be shortened with their top handle. Navigation and map controls stay pinned above the panel’s scrolling content. On mobile, view and compass controls sit on the left of the map, with zoom and location controls on the right. Drag the handle at the top of a card or dialog to change its height. Your chosen mobile heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
+
+Zoom out with the minus button or a pinch/scroll gesture to reveal the globe. Drag to explore and use **Back to campus**, the **LASU Ojo** marker or a campus search result to return. The globe works with either 2D/3D preference; detailed buildings return at campus zoom. **Follow me** restores walking zoom after globe exploration without ending an active route. World geography is an overview only: place search, streets and walking directions remain limited to the downloaded campus.
 
 When a new app version is ready, a notice appears over the public map with an **Install update** button. Updates are checked while the app is visible and when you return online. Installation waits until you finish navigation. You can also install from Settings.
 
@@ -234,9 +244,11 @@ An initial online visit and a completed download are required. Installation and 
 
 | Content | Storage / behavior |
 | --- | --- |
-| App shell, UI, fonts, map/model/routing workers | Service-worker precache |
+| App shell, UI, fonts, map/model/routing workers and world overview | Service-worker precache; world data is included automatically |
 | Campus geometry, routing, glyphs, audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
 | Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
+
+The world overview adds **260,913 bytes (about 255 KB)** before compression. It uses the country-label font already included in the campus download. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
 
 Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. The public **App update ready** notice and **Settings → Install update** activate a waiting application update with editing/navigation safeguards. App-update checks run once a minute while visible and online, and on returning to the app or reconnecting. Installing remains an explicit action; it is disabled during an active walk.
 
@@ -246,7 +258,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 ## Map data and coverage
 
-TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. No external tile service or satellite imagery is required.
+TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The generalized world overview uses public-domain Natural Earth v5.1.2 at 1:110m scale. It does not add worldwide roads or routing coverage. No external tile service or satellite imagery is required.
 
 The repository seed is **`lasu-4e4c8008b38b`**. A verified production snapshot on 15 September 2026 was **`lasu-2f6ca683a0fb`**, with **45 assets / 4,798,173 bytes**, including the owner's roof release. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
@@ -329,15 +341,15 @@ npm run test:survey-webkit
 npm run test:survey-pwa
 ```
 
-`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
+`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**, and **500 KB total for bundled world assets**. The build also verifies that world assets are included in the service-worker precache. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
 Focused camera and panel regressions:
 
 ```sh
-npx vitest run tests/editor-camera.test.ts tests/public-panel.test.ts
+npx vitest run tests/editor-camera.test.ts tests/public-panel.test.ts tests/world-map.test.ts tests/globe-models.test.ts
 ```
 
-For the current UI acceptance checks, use the in-app browser with a production preview: open and resize desktop panels, scroll their pinned controls, check mobile card heights, select a long editor path in 2D/3D, and install a locally staged service-worker update. A development server alone does not exercise PWA updates.
+For the current UI acceptance checks, use the in-app browser with a production preview: open and resize desktop panels, scroll their pinned controls, check mobile card heights, select a long editor path in 2D/3D, and install a locally staged service-worker update. For the globe, also check both themes, 2D/3D, world rotation, polar/date-line views, return-to-campus framing and resuming location following. Download first, stop the preview server, then reload and inspect country labels offline. A development server alone does not exercise PWA updates.
 
 Importer/access tests run from the repository root:
 
@@ -351,14 +363,14 @@ Latest local checks on **17 September 2026**:
 
 | Check | Result |
 | --- | --- |
-| Camera/panel regression tests | 14 / 14 passed |
-| Full unit suite | 347 / 347 passed |
+| Camera/panel/globe regression tests | 21 / 21 passed |
+| Full unit suite | 354 / 354 passed |
 | Client and server TypeScript | Passed |
 | Lint | Passed with seven existing warnings |
-| Production app/service-worker build and renderer budget | Passed |
-| In-app browser | Desktop opening, drag/keyboard resizing, pinned controls, mobile long-path framing, update notice and update installation checked |
+| Production app/service-worker build, renderer and world budgets | Passed; world assets 254.8 KB and precached |
+| In-app browser | Mobile/desktop globe, light/dark themes, both building modes, projection transitions, date line/poles, campus return, simulated GPS recovery, editor framing, adjustable panels and offline reload checked |
 
-The full suite was rerun successfully on the supported Node 22.23.2 runtime after the local tooling recovered. Browser checks include an isolated camera/navigation-state fixture; they do not establish a successful physical GPS walk.
+The full suite was rerun successfully on the supported Node 22.23.2 runtime after the local tooling recovered. Browser checks used the in-app browser, including an isolated camera/navigation-state fixture. The downloaded production preview reloaded and displayed globe geometry and labels with its server stopped. These checks do not establish a successful physical GPS walk or physical-device airplane-mode test.
 
 Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
