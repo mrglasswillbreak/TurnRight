@@ -325,6 +325,40 @@
 .app-shell .dock-notice {
   margin: 12px 16px;
 }
+.app-shell .public-update {
+  position: absolute;
+  z-index: 12;
+  top: max(80px, calc(env(safe-area-inset-top) + 68px));
+  right: 24px;
+  width: min(380px, calc(100% - 48px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--background);
+  box-shadow: 0 3px 18px #142b3b26;
+}
+.app-shell .public-update output {
+  flex: 1;
+  min-width: 0;
+}
+.app-shell .public-update strong,
+.app-shell .public-update span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.app-shell .public-update span {
+  color: var(--muted);
+}
+.app-shell .public-update button {
+  flex-shrink: 0;
+}
+.app-shell[data-update-ready='true'] .gps-status {
+  top: 164px;
+}
 .resizable-dialog .dialog-scroll-content {
   min-height: 0;
 }
@@ -372,6 +406,12 @@
   right: 10px;
 }
 @media (max-width: 767px), (max-width: 1000px) and (max-height: 500px) {
+  .app-shell .public-update {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    padding: 10px 12px;
+  }
   .app-shell .explore-panel {
     left: 12px;
     right: 12px;

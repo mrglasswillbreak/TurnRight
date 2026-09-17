@@ -51,6 +51,7 @@ import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SheetHandle, useSheetSize } from './ResizableSheet';
+import { AppUpdateNotice } from './AppUpdateNotice';
 import { publicMapPadding } from './public-map-layout';
 import './public-dock.css';
 import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
@@ -119,12 +120,14 @@ export default function App() {
   const mobileMapControls = useIsMobile(
     '(max-width: 767px), (max-width: 1000px) and (max-height: 500px)',
   );
+  const [updateReady, setUpdateReady] = useState(false);
+  const [installingUpdate, setInstallingUpdate] = useState(false);
   // Leave space for both rows of map controls above the expanded mobile card.
   const panelSheet = useSheetSize(
     'search',
     96,
     true,
-    mobileMapControls ? 208 : 32,
+    mobileMapControls ? (updateReady ? 288 : 208) : 32,
     !mobileMapControls,
   );
   const dialogSheet = useSheetSize(
@@ -165,8 +168,7 @@ export default function App() {
   }, [dialog]);
   const [downloaded, setDownloaded] = useState(false),
     [online, setOnline] = useState(navigator.onLine),
-    [swReady, setSwReady] = useState(!!navigator.serviceWorker?.controller),
-    [updateReady, setUpdateReady] = useState(false);
+    [swReady, setSwReady] = useState(!!navigator.serviceWorker?.controller);
   const [routeView, setRouteView] = useState(false),
     [routes, setRoutes] = useState<Route[]>([]),
     [chosen, setChosen] = useState(0),
@@ -186,11 +188,25 @@ export default function App() {
     navigatingRef = useRef(false);
   const requestedReload = useRef(false);
   const installAppUpdate = async () => {
-    await flushSurveyRecovery();
-    requestedReload.current = true;
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (registration?.waiting) await updateSW.current?.(true);
-    else location.reload();
+    if (navigatingRef.current || installingUpdate) return;
+    setInstallingUpdate(true);
+    try {
+      await flushSurveyRecovery();
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (navigatingRef.current) return;
+      requestedReload.current = true;
+      if (registration?.waiting) await updateSW.current?.(true);
+      else location.reload();
+    } catch (error) {
+      requestedReload.current = false;
+      setToast(
+        error instanceof Error
+          ? error.message
+          : 'Could not install the update. Try again.',
+      );
+    } finally {
+      setInstallingUpdate(false);
+    }
   };
   navigatingRef.current = navigating;
   const gps = useGps(),
@@ -234,10 +250,22 @@ export default function App() {
     getPreference('muted', false).then(setMuted);
     refreshDrafts();
     if ('serviceWorker' in navigator) {
+      let registration: ServiceWorkerRegistration | undefined;
+      const checkAppUpdate = () => {
+        if (navigator.onLine && !document.hidden)
+          void registration?.update().catch(() => {});
+      };
       updateSW.current = registerSW({
         immediate: true,
+        onRegisteredSW(_url, nextRegistration) {
+          registration = nextRegistration;
+        },
         onNeedReload() {
-          if (requestedReload.current && !surveyRecordingActive())
+          if (
+            requestedReload.current &&
+            !navigatingRef.current &&
+            !surveyRecordingActive()
+          )
             location.reload();
           else setUpdateReady(true);
         },
@@ -250,11 +278,20 @@ export default function App() {
       });
       const control = () => setSwReady(!!navigator.serviceWorker.controller);
       navigator.serviceWorker.addEventListener('controllerchange', control);
-      return () =>
+      const updateInterval = window.setInterval(checkAppUpdate, 60_000);
+      window.addEventListener('online', checkAppUpdate);
+      window.addEventListener('focus', checkAppUpdate);
+      document.addEventListener('visibilitychange', checkAppUpdate);
+      return () => {
+        clearInterval(updateInterval);
+        window.removeEventListener('online', checkAppUpdate);
+        window.removeEventListener('focus', checkAppUpdate);
+        document.removeEventListener('visibilitychange', checkAppUpdate);
         navigator.serviceWorker.removeEventListener(
           'controllerchange',
           control,
         );
+      };
     }
   }, []);
   useEffect(() => {
@@ -740,6 +777,7 @@ export default function App() {
       className={`app-shell ${navigating ? 'is-navigating' : ''}`}
       data-panel-expanded={panelExpanded}
       data-mobile-controls={mobileMapControls}
+      data-update-ready={updateReady}
       style={panelSheet.style}
       data-panel-view={
         navigating
@@ -783,6 +821,13 @@ export default function App() {
       />
 
       {mobileMapControls && mapControls}
+      {updateReady && (
+        <AppUpdateNotice
+          navigating={navigating}
+          installing={installingUpdate}
+          onInstall={installAppUpdate}
+        />
+      )}
       <div className="public-brand" aria-label="TurnRight · LASU Ojo">
         <span className="brandmark">
           <ArrowUpRight />
@@ -1347,14 +1392,16 @@ export default function App() {
                   <span>App update</span>
                   <Button
                     variant="outline"
-                    disabled={!updateReady || navigating}
+                    disabled={!updateReady || navigating || installingUpdate}
                     onClick={installAppUpdate}
                   >
-                    {updateReady
-                      ? navigating
-                        ? 'After navigation'
-                        : 'Install update'
-                      : 'Up to date'}
+                    {installingUpdate
+                      ? 'Installing…'
+                      : updateReady
+                        ? navigating
+                          ? 'After navigation'
+                          : 'Install update'
+                        : 'Up to date'}
                   </Button>
                 </div>
                 <MotionStatus modes fix={gps.fix} following={follow} />
