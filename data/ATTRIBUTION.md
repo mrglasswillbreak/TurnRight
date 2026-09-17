@@ -1,5 +1,7 @@
 # Source attribution
 
+- World overview: Natural Earth v5.1.2, 1:110m Admin 0 countries, public domain. https://www.naturalearthdata.com/about/terms-of-use/ . The bundled overview retains the source's generalized geometry, boundaries and English names; it is not a street map or routing database. Source: https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_admin_0_countries.geojson . Original SHA-256: `6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f`. Regenerate the compact asset with `node scripts/world-map.mjs`; ordinary builds require no world-data download.
+
 - Map geometry and roads: © OpenStreetMap contributors, ODbL 1.0. https://www.openstreetmap.org/copyright
 - LASU campus layers: MangroveandpartnersLimited, LASU Webmap – Main, ArcGIS item `ffd68667b1464eeb999c0050897a82a0`. Item metadata was modified June 2023; that is not a survey date. The public item supplied no explicit redistribution license. On 8 September 2026, the TurnRight project owner confirmed that permission covers offline redistribution. This records the owner's confirmation; the underlying agreement was not independently inspected. Retain the permission correspondence with the project records. ArcGIS Online terms: https://doc.arcgis.com/en/arcgis-online/reference/terms-of-use.htm
 - The raw source layers remain individually identified by source IDs; corrections retain provenance. The downloadable JSON contains the OSM-derived database. No Google Maps content, satellite imagery, or OSM rendered tiles are bundled.
