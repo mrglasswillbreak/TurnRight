@@ -559,6 +559,13 @@ export function applyEdits(
         points.push(drawn[i]);
         points.push(
           ...originalNodes
+            // Replaying a saved edit against its published result must not add
+            // the old position of a vertex already represented by the edit.
+            .filter(
+              (node) =>
+                !props.vertexIds?.includes(node.id) &&
+                !drawn.some((point) => distance(point, node.coordinates) < 0.2),
+            )
             .map((node) => ({
               node,
               projection: projectSegment(
