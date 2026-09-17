@@ -2,10 +2,14 @@ export function sheetLimits(
   viewportHeight: number,
   minimum: number,
   topClearance = 32,
+  fullHeight = false,
 ) {
   const max = Math.max(
     80,
-    Math.min(viewportHeight - topClearance, viewportHeight * 0.88),
+    Math.min(
+      viewportHeight - topClearance,
+      viewportHeight * (fullHeight ? 1 : 0.88),
+    ),
   );
   return { min: Math.min(minimum, max), max };
 }

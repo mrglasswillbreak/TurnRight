@@ -7,6 +7,17 @@ import {
 import { publicMapPadding } from '../src/public-map-layout';
 
 describe('resizable public cards', () => {
+  it('allows a desktop card to open at full height and then shrink', () => {
+    const desktop = sheetLimits(900, 96, 32, true);
+    expect(desktop).toEqual({ min: 96, max: 868 });
+    expect(
+      resizeSheetKey('ArrowDown', desktop.max, desktop.min, desktop.max),
+    ).toBe(836);
+    expect(resizeSheetKey('Home', desktop.max, desktop.min, desktop.max)).toBe(
+      96,
+    );
+    expect(resizeSheetKey('End', 400, desktop.min, desktop.max)).toBe(868);
+  });
   it('keeps the map exposed and lets a dialog fit above a short keyboard viewport', () => {
     const phone = sheetLimits(844, 96);
     expect(phone.min).toBe(96);

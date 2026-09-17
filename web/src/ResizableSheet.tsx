@@ -24,20 +24,30 @@ export function useSheetSize(
   minimum = 96,
   startCompact = true,
   topClearance = 32,
+  openFullHeight = false,
 ) {
   const [view, setView] = useState(viewport);
   const remembered = useRef(0.56);
   const [requested, setRequested] = useState(() => {
     try {
       const value = Number(localStorage.getItem(`turnright:sheet:${key}`));
-      if (value > 0 && value <= 0.88) remembered.current = value;
+      if (value > 0 && value <= 1) remembered.current = value;
     } catch {
       /* Resizing also works without storage. */
     }
-    return startCompact ? minimum : view.height * remembered.current;
+    return startCompact
+      ? minimum
+      : openFullHeight
+        ? sheetLimits(view.height, minimum, topClearance, true).max
+        : view.height * remembered.current;
   });
   const drag = useRef<{ id: number; y: number; height: number } | null>(null);
-  const { min, max } = sheetLimits(view.height, minimum, topClearance);
+  const { min, max } = sheetLimits(
+    view.height,
+    minimum,
+    topClearance,
+    openFullHeight,
+  );
   const height = clampSheetHeight(requested, min, max);
   const expanded = height > min + 8;
   const current = useRef(height);
@@ -57,7 +67,10 @@ export function useSheetSize(
     const next = clampSheetHeight(value, min, max);
     setRequested(next);
     if (!startCompact || next > min + 8) {
-      remembered.current = Math.min(0.88, next / view.height);
+      remembered.current = Math.min(
+        openFullHeight ? 1 : 0.88,
+        next / view.height,
+      );
       try {
         localStorage.setItem(
           `turnright:sheet:${key}`,
@@ -122,11 +135,15 @@ export function useSheetSize(
     setExpanded: (open: boolean) =>
       setRequested(
         open
-          ? clampSheetHeight(
-              Math.max(min + 9, view.height * remembered.current),
-              min,
-              max,
-            )
+          ? startCompact && expanded
+            ? height
+            : clampSheetHeight(
+                openFullHeight
+                  ? max
+                  : Math.max(min + 9, view.height * remembered.current),
+                min,
+                max,
+              )
           : min,
       ),
     style: {

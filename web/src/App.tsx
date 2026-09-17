@@ -125,8 +125,15 @@ export default function App() {
     96,
     true,
     mobileMapControls ? 208 : 32,
+    !mobileMapControls,
   );
-  const dialogSheet = useSheetSize('dialogs', 220, false);
+  const dialogSheet = useSheetSize(
+    'dialogs',
+    220,
+    false,
+    32,
+    !mobileMapControls,
+  );
   const panelExpanded = panelSheet.expanded;
   const setPanelExpanded = panelSheet.setExpanded;
   const [shareFallback, setShareFallback] = useState('');
@@ -150,6 +157,12 @@ export default function App() {
       'offline' | 'settings' | 'report' | 'building' | null
     >(null),
     [reportPin, setReportPin] = useState<Position | undefined>();
+  const openDialogAtFullHeight = useEffectEvent(() => {
+    if (!mobileMapControls) dialogSheet.setExpanded(true);
+  });
+  useEffect(() => {
+    if (dialog) openDialogAtFullHeight();
+  }, [dialog]);
   const [downloaded, setDownloaded] = useState(false),
     [online, setOnline] = useState(navigator.onLine),
     [swReady, setSwReady] = useState(!!navigator.serviceWorker?.controller),
