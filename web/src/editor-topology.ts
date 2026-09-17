@@ -163,9 +163,17 @@ export function applyConnections(
       const { edit, vertexId, target } = pending[i];
       const from = nodes.get(canonical(vertexId));
       const resolved = resolveConnection(data, nodes, target);
-      const to = resolved && nodes.get(canonical(resolved.id));
+      let to = resolved && nodes.get(canonical(resolved.id));
       if (!from || !to || distance(from.coordinates, to.coordinates) > 5)
         continue;
+      // Keep the explicitly selected node as the durable junction identity.
+      // An automatic merge may have chosen a different endpoint first; losing
+      // this target would make the same saved connection fail after publishing.
+      if (target.type === 'node' && to.id !== target.nodeId) {
+        aliases.delete(target.nodeId);
+        aliases.set(to.id, target.nodeId);
+        to = nodes.get(target.nodeId)!;
+      }
       if (from.id !== to.id) {
         aliases.set(from.id, to.id);
         // Keep aliases during assembly so references to new path vertices remain valid.

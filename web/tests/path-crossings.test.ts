@@ -369,6 +369,41 @@ describe('automatic path crossings', () => {
       ),
     ).toEqual(assemble(edits, base));
   });
+  it('retains a manual node target when an automatic merge prefers the new path', () => {
+    const base = assemble([
+      path('z-main', [
+        [3.2, 6.46],
+        [3.201, 6.46],
+      ]),
+    ]);
+    const branch = path(
+      'a-branch',
+      [
+        [3.201, 6.46],
+        [3.201, 6.461],
+      ],
+      {
+        connections: [
+          {
+            vertexId: 'a-branch:0',
+            target: {
+              type: 'node',
+              nodeId: 'z-main:1',
+              coordinates: [3.201, 6.46],
+            },
+          },
+        ],
+      },
+    );
+    const published = assemble([branch], base);
+    expect(published.graph.nodes.some((n) => n.id === 'z-main:1')).toBe(true);
+    const replayed = assemble([branch], published);
+    expect(findRoutes(replayed, 'z-main:0', 'a-branch:1')).toHaveLength(1);
+    branch.properties.autoConnectCrossings = false;
+    expect(
+      findRoutes(assemble([branch], replayed), 'z-main:0', 'a-branch:1'),
+    ).toHaveLength(1);
+  });
   it('normalizes the full campus without losing destinations or restrictions', () => {
     const seed: CampusData = JSON.parse(
       readFileSync(
