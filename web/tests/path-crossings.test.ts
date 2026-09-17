@@ -310,6 +310,55 @@ describe('automatic path crossings', () => {
     edit.properties.autoConnectCrossings = false;
     expect(route(assemble([edit], base)).length).toBeGreaterThan(0);
   });
+  it('removes a tiny automatic segment collapsed by an explicit endpoint join', () => {
+    const h = path(
+      'horizontal',
+      [
+        [3.2, 6.46],
+        [3.200501, 6.46],
+      ],
+      {
+        connectEnd: 'vertical:0',
+      },
+    );
+    const v = path('vertical', [
+      [3.2005, 6.46],
+      [3.2005, 6.4605],
+    ]);
+    const data = assemble([h, v]);
+    expect(route(data)).toHaveLength(1);
+    expect(data.graph.edges).toHaveLength(4);
+  });
+  it('can replay a snapped edit against its published baseline', () => {
+    const h = path(
+      'horizontal',
+      [
+        [3.2, 6.46],
+        [3.2005, 6.46],
+        [3.201, 6.46],
+      ],
+      {
+        connections: [
+          {
+            vertexId: 'horizontal:1',
+            target: {
+              type: 'node',
+              nodeId: 'vertical:0',
+              coordinates: [3.2005008, 6.46],
+            },
+          },
+        ],
+      },
+    );
+    const v = path('vertical', [
+      [3.2005008, 6.46],
+      [3.2005008, 6.4605],
+    ]);
+    const published = assemble([h, v]);
+    const replayed = assemble([h, v], published);
+    expect(route(replayed)).toEqual(route(published));
+    expect(replayed.graph.edges).toHaveLength(published.graph.edges.length);
+  });
   it('uses the same connections in editor previews and release validation', () => {
     const base = empty(),
       edits = [horizontal(), vertical()];

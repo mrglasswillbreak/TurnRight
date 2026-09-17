@@ -86,7 +86,7 @@ Set `ADMIN_USER_ID` to that same UUID in Vercel Preview and Production. Run **De
 
 ## 5. Review → validate → preview → publish
 
-Use the editor on desktop. Select places, paths or building outlines, or draw new features. Drag vertices/midpoints, use undo/redo, set walking access, and explicitly connect path endpoints and entrances. Existing junctions on unchanged path geometry are preserved. Merely crossing two lines does not connect them. Save each draft.
+Use the editor on desktop. Select places, paths or building outlines, or draw new features. Drag vertices/midpoints, use undo/redo, set walking access, and explicitly connect path endpoints and entrances. Crossing paths on the same level connect automatically while retaining access restrictions and mapped obstacles. Turn off **Connect crossings automatically** for a path that should stay separate, or choose its **Crossing level** for a bridge or tunnel. Deliberate manual joins remain connected. Save each draft.
 
 The Changes tab compares imported source records before/after and retains your corrections separately. **Check sources** starts the same bounded importer as the daily 02:17 UTC Actions schedule. Review source removals and conflicts carefully. Incomplete downloads and unusually large removal sets fail without deleting the accepted baseline. Source modification dates are not survey dates.
 
