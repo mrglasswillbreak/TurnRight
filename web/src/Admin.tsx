@@ -56,6 +56,7 @@ import {
 } from './duplicates';
 import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
+import { editorCamera, focusEditorSelection } from './editor-camera';
 import { drawingProgress } from './drawing-state';
 import { SurveyPanel } from './SurveyPanel';
 import { disconnectedSurveyPaths } from './survey-model';
@@ -484,6 +485,25 @@ function Editor({
     controller = useRef<EditorMap | null>(null);
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
+  const [focusRequest, setFocusRequest] = useState<MapEdit | null>(null);
+  const selectionOverview = useRef<ReturnType<typeof editorCamera> | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!focusRequest || !ready) return;
+    const frame = requestAnimationFrame(() => {
+      if (
+        mapRef.current &&
+        selectedRef.current &&
+        editKey(selectedRef.current) === editKey(focusRequest)
+      )
+        focusEditorSelection(mapRef.current, focusRequest.geometry);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [focusRequest, ready]);
+  useEffect(() => {
+    if (!selected) selectionOverview.current = null;
+  }, [selected]);
   const routeRequest = useRef(0);
   const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(
     null,
@@ -643,7 +663,7 @@ function Editor({
       ),
     [validation.issues],
   );
-  const select = (edit: MapEdit, focus = false) => {
+  const select = (edit: MapEdit, refocus = false) => {
     workspace.endHistoryGroup();
     if (workspace.roofDraft && workspace.roofDraft.buildingId !== edit.id) {
       setMessage(
@@ -657,6 +677,15 @@ function Editor({
       );
       return;
     }
+    if (
+      mapRef.current &&
+      (refocus ||
+        !selectedRef.current ||
+        editKey(selectedRef.current) !== editKey(edit))
+    ) {
+      selectionOverview.current ??= editorCamera(mapRef.current);
+      setFocusRequest(edit);
+    }
     setRepairFocus(null);
     setSelected(edit);
     selectedRef.current = edit;
@@ -668,25 +697,10 @@ function Editor({
       edit.kind === 'building' ? { buildingId: edit.id } : undefined,
     );
     controller.current?.select(edit, edit.kind !== 'building');
-    if (focus) {
-      let point: Position | undefined;
-      if (edit.geometry.type === 'Point')
-        point = edit.geometry.coordinates as Position;
-      else if (edit.geometry.type === 'LineString')
-        point = edit.geometry.coordinates[0] as Position;
-      else if (edit.geometry.type === 'Polygon')
-        point = edit.geometry.coordinates[0][0] as Position;
-      if (point)
-        mapRef.current?.easeTo({
-          center: point,
-          zoom: Math.max(mapRef.current.getZoom(), 18),
-          duration: 450,
-        });
-    }
   };
-  const selectId = (kind: MapEdit['kind'], id: string, focus = false) => {
+  const selectId = (kind: MapEdit['kind'], id: string, refocus = false) => {
     const edit = featureEdit(validation.data, kind, id, workspace.edits);
-    if (edit) select(edit, focus);
+    if (edit) select(edit, refocus);
   };
   const commit = (batch: MapEdit[], current = batch[0]) => {
     workspace.commit(batch, null);
@@ -2154,6 +2168,14 @@ function Editor({
             onDelete={remove}
             onClose={() => {
               workspace.endHistoryGroup();
+              setFocusRequest(null);
+              if (selectionOverview.current)
+                mapRef.current?.easeTo({
+                  ...selectionOverview.current,
+                  pitch: mapRef.current.getPitch(),
+                  duration: 450,
+                });
+              selectionOverview.current = null;
               setSelected(null);
               setBuildingSelection(undefined);
               selectedRef.current = null;
