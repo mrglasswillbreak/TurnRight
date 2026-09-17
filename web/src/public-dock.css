@@ -1,4 +1,10 @@
 /* The public map has one floating panel. Its top edge sets the visible height. */
+.app-shell .map-canvas {
+  background: var(--background);
+}
+.app-shell .map-canvas[data-world-view='true'] .maplibregl-marker {
+  display: none;
+}
 .app-shell .explore-panel {
   top: auto;
   bottom: calc(
@@ -239,6 +245,38 @@
   width: 32px;
   height: 32px;
   border-radius: 11px;
+}
+.app-shell button.public-brand {
+  pointer-events: auto;
+  cursor: pointer;
+  text-align: left;
+  color: var(--foreground);
+}
+.app-shell button.public-brand:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
+.app-shell .world-map-error {
+  position: absolute;
+  z-index: 11;
+  right: 24px;
+  bottom: 64px;
+  max-width: min(300px, calc(100% - 48px));
+  display: grid;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--background);
+  font-size: 12px;
+}
+.app-shell .world-map-error button {
+  min-height: 40px;
+  color: var(--link);
+}
+.app-shell[data-mobile-controls='true'] .world-map-error {
+  right: 12px;
+  bottom: calc(var(--sheet-height) + var(--sheet-bottom-offset, 0px) + 128px);
 }
 .app-shell .public-brand .brandmark svg {
   width: 23px;

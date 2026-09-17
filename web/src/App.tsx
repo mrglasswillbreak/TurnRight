@@ -53,6 +53,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { SheetHandle, useSheetSize } from './ResizableSheet';
 import { AppUpdateNotice } from './AppUpdateNotice';
 import { publicMapPadding } from './public-map-layout';
+import { CAMPUS_MIN_ZOOM, returnToCampus } from './world-map';
 import './public-dock.css';
 import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
 import { AppearanceSettings } from './AppearanceSettings';
@@ -117,6 +118,7 @@ export default function App() {
   );
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
+  const [worldView, setWorldView] = useState(false);
   const mobileMapControls = useIsMobile(
     '(max-width: 767px), (max-width: 1000px) and (max-height: 500px)',
   );
@@ -715,6 +717,7 @@ export default function App() {
         />
       </Suspense>
     );
+  const BrandTag = worldView ? 'button' : 'div';
   const mapControls = (
     <div className="map-controls">
       <MapViewControl
@@ -809,10 +812,12 @@ export default function App() {
           setDialog('building');
         }}
         onManualPan={() => setFollow(false)}
+        onWorldViewChange={setWorldView}
         onReady={(instance) => {
           map.current = instance;
           instance.on('contextmenu', (e) => {
-            if (navigatingRef.current) return;
+            if (navigatingRef.current || instance.getZoom() < CAMPUS_MIN_ZOOM)
+              return;
             setReportPin([e.lngLat.lng, e.lngLat.lat]);
             setSelected(null);
             setDialog('report');
@@ -828,15 +833,26 @@ export default function App() {
           onInstall={installAppUpdate}
         />
       )}
-      <div className="public-brand" aria-label="TurnRight · LASU Ojo">
+      <BrandTag
+        className="public-brand"
+        aria-label={worldView ? 'Back to campus' : 'TurnRight · LASU Ojo'}
+        onClick={
+          worldView
+            ? () => {
+                setFollow(false);
+                if (map.current) returnToCampus(map.current, data.bounds);
+              }
+            : undefined
+        }
+      >
         <span className="brandmark">
           <ArrowUpRight />
         </span>
         <span>
-          <strong>TurnRight</strong>
+          <strong>{worldView ? 'Back to campus' : 'TurnRight'}</strong>
           <small>LASU · OJO</small>
         </span>
-      </div>
+      </BrandTag>
       <section
         className="explore-panel"
         aria-label={navigating ? 'Walking navigation' : 'Campus places'}

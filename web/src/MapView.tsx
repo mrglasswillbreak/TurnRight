@@ -3,6 +3,13 @@ import type { BuildingSelection } from './visual-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MotionMap } from './MotionAssistance';
 import { publicMapPadding } from './public-map-layout';
+import {
+  CAMPUS_MIN_ZOOM,
+  WORLD_PROJECTION,
+  installWorldLayers,
+  loadWorld,
+  returnToCampus,
+} from './world-map';
 import * as maplibregl from 'maplibre-gl';
 import type {
   Map as MapInstance,
@@ -44,6 +51,7 @@ export interface MapViewProps {
   onSelect: (place: Place) => void;
   onBuildingSelect?: (feature: Feature, selection?: BuildingSelection) => void;
   onManualPan?: () => void;
+  onWorldViewChange?: (world: boolean) => void;
   onReady?: (map: MapInstance) => void | (() => void);
 }
 export function MapView({
@@ -65,6 +73,7 @@ export function MapView({
   onSelect,
   onBuildingSelect,
   onManualPan,
+  onWorldViewChange,
   onReady,
 }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null),
@@ -73,9 +82,16 @@ export function MapView({
     onSelect,
     onBuildingSelect,
     onManualPan,
+    onWorldViewChange,
     onReady,
   });
-  callbacks.current = { onSelect, onBuildingSelect, onManualPan, onReady };
+  callbacks.current = {
+    onSelect,
+    onBuildingSelect,
+    onManualPan,
+    onWorldViewChange,
+    onReady,
+  };
   const ready = useRef(false);
   const models = useRef<ReturnType<typeof createCampusModels> | null>(null);
   const [modelIds, setModelIds] = useState<string[]>([]),
@@ -110,6 +126,9 @@ export function MapView({
   const camera = useRef({ selected, routes, activeRoute, dark, threeD });
   camera.current = { selected, routes, activeRoute, dark, threeD };
   const [mapError, setMapError] = useState('');
+  const [worldError, setWorldError] = useState(false),
+    [worldAttempt, setWorldAttempt] = useState(0),
+    [worldView, setWorldView] = useState(false);
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
   const selectedId = selected?.id || '';
   const selectedLng = selected?.coordinates[0],
@@ -155,11 +174,14 @@ export function MapView({
     try {
       map = new maplibregl.Map({
         container: container.current,
-        style: style(dark),
+        style: {
+          ...style(dark),
+          projection: editor ? { type: 'mercator' } : WORLD_PROJECTION,
+        },
         center: [3.201, 6.465],
         zoom: 16,
         maxZoom: 20,
-        minZoom: 12,
+        minZoom: CAMPUS_MIN_ZOOM,
         attributionControl: false,
         trackResize: false,
         pitch: camera.current.threeD
@@ -180,6 +202,34 @@ export function MapView({
       return;
     }
     mapRef.current = map;
+    setWorldView(false);
+    callbacks.current.onWorldViewChange?.(false);
+    let wasWorld = false;
+    let worldPitchPending = false;
+    let pitchFrame = 0;
+    const updateWorldView = () => {
+      const world = !editor && map.getZoom() < CAMPUS_MIN_ZOOM;
+      if (world === wasWorld) return;
+      wasWorld = world;
+      worldPitchPending = true;
+      setWorldView(world);
+      callbacks.current.onWorldViewChange?.(world);
+    };
+    const syncWorldPitch = () => {
+      if (!worldPitchPending || map.isMoving()) return;
+      cancelAnimationFrame(pitchFrame);
+      // Starting an ease inside moveend can interrupt MapLibre's unfinished
+      // camera cleanup, including the zoom used when resuming GPS following.
+      pitchFrame = requestAnimationFrame(() => {
+        if (mapRef.current !== map || map.isMoving()) return;
+        worldPitchPending = false;
+        const pitch =
+          wasWorld || !camera.current.threeD ? 0 : innerWidth < 768 ? 40 : 45;
+        if (map.getPitch() !== pitch) map.jumpTo({ pitch });
+      });
+    };
+    map.on('zoom', updateWorldView);
+    map.on('moveend', syncWorldPitch);
     const mapPadding = () => {
       return panelBesideMap
         ? { top: 60, right: 40, bottom: 60, left: 40 }
@@ -629,6 +679,18 @@ export function MapView({
         });
       } else {
         map.on('click', (event) => {
+          if (map.getZoom() < CAMPUS_MIN_ZOOM) {
+            if (
+              map.getLayer('world-campus-dot') &&
+              map.queryRenderedFeatures(event.point, {
+                layers: ['world-campus-dot', 'world-campus-label'],
+              }).length
+            ) {
+              callbacks.current.onManualPan?.();
+              returnToCampus(map, latestData.current.bounds);
+            }
+            return;
+          }
           const placeHit = map.queryRenderedFeatures(event.point, {
             layers: [
               'places-dot',
@@ -695,6 +757,16 @@ export function MapView({
           });
         }
       }
+      if (!editor) {
+        for (const layer of map.getStyle().layers) {
+          if (layer.id !== 'background')
+            map.setLayerZoomRange(
+              layer.id,
+              Math.max(CAMPUS_MIN_ZOOM, layer.minzoom || 0),
+              layer.maxzoom || 24,
+            );
+        }
+      }
       frame();
       ready.current = true;
       setMotionMap(map);
@@ -715,6 +787,9 @@ export function MapView({
       window.visualViewport?.removeEventListener('resize', viewportResize);
       window.visualViewport?.removeEventListener('scroll', viewportResize);
       map.off('moveend', syncPadding);
+      map.off('zoom', updateWorldView);
+      map.off('moveend', syncWorldPitch);
+      cancelAnimationFrame(pitchFrame);
       panelResize.disconnect();
       ready.current = false;
       setMotionMap(null);
@@ -727,6 +802,21 @@ export function MapView({
       ready.current = false;
     };
   }, [panelBesideMap, editor]);
+  useEffect(() => {
+    if (!motionMap || editor) return;
+    const controller = new AbortController();
+    setWorldError(false);
+    void loadWorld(controller.signal)
+      .then((world) => {
+        if (controller.signal.aborted || mapRef.current !== motionMap) return;
+        installWorldLayers(motionMap, world, latestData.current.bounds);
+        applyMapTheme(motionMap, camera.current.dark);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setWorldError(true);
+      });
+    return () => controller.abort();
+  }, [motionMap, editor, worldAttempt]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -755,7 +845,14 @@ export function MapView({
         'visibility',
         threeD ? 'visible' : 'none',
       );
-      const pitch = threeD ? (editor ? 50 : innerWidth < 768 ? 40 : 45) : 0;
+      const pitch =
+        threeD && (editor || map.getZoom() >= CAMPUS_MIN_ZOOM)
+          ? editor
+            ? 50
+            : innerWidth < 768
+              ? 40
+              : 45
+          : 0;
       if (map.getPitch() !== pitch) map.easeTo({ pitch, duration: 500 });
     };
     if (ready.current) apply();
@@ -1024,8 +1121,21 @@ export function MapView({
       <div
         className="map-canvas"
         ref={container}
-        aria-label="Interactive map of LASU Ojo campus"
+        data-world-view={worldView}
+        aria-label={
+          worldView
+            ? 'Interactive world map'
+            : 'Interactive map of LASU Ojo campus'
+        }
       />
+      {!editor && worldError && (
+        <output className="world-map-error">
+          <span>World map unavailable. The campus map is still usable.</span>
+          <button onClick={() => setWorldAttempt((n) => n + 1)}>
+            Retry world map
+          </button>
+        </output>
+      )}
       {threeD &&
         !simple &&
         (editing || buildingPreview.pending || modelStatus === 'reduced') && (

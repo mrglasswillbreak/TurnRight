@@ -186,6 +186,11 @@ export function OfflinePanel({
         </p>
       )}
       <p className="small-note">
+        The world overview is saved with the app. Zoom out to explore land,
+        oceans and countries offline; detailed places and walking routes cover
+        LASU Ojo only.
+      </p>
+      <p className="small-note">
         Your phone supplies location. Keep the app open during navigation.
         Offline maps only include closures known at the last download.
       </p>
