@@ -904,8 +904,11 @@
   }
 }
 @media (max-width: 767px) {
+  .editor-shell {
+    --editor-mobile-card-height: min(42dvh, 360px);
+  }
   .editor-header {
-    height: 60px;
+    height: 52px;
     gap: 12px;
     padding: 0 12px;
   }
@@ -946,8 +949,24 @@
     width: calc(100% - 77px);
     max-width: 320px;
   }
-  .editor-explorer:has(+ .editor-view-controls) .editor-feature-list {
-    max-height: 29vh;
+  .editor-explorer > .editor-card {
+    display: flex;
+    flex-direction: column;
+    max-height: min(38dvh, 320px);
+    overflow: hidden;
+  }
+  .editor-explorer .editor-feature-list {
+    min-height: 0;
+    max-height: none;
+    flex: 1;
+    overscroll-behavior: contain;
+  }
+  .editor-explorer-top,
+  .editor-search,
+  .editor-filters,
+  .editor-result-count,
+  .editor-explorer-bottom {
+    flex-shrink: 0;
   }
   .editor-explorer.collapsed {
     top: 12px;
@@ -973,10 +992,30 @@
     top: auto;
     bottom: 80px;
     width: auto;
-    max-height: 55vh;
+    max-height: var(--editor-mobile-card-height);
+    overscroll-behavior: contain;
+  }
+  .editor-inspector {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .editor-inspector > .editor-panel-heading {
+    flex-shrink: 0;
+  }
+  .editor-review-panel {
+    padding: 0 14px 14px;
+  }
+  .editor-review-panel > .editor-panel-heading {
+    position: sticky;
+    top: 0;
+    background: var(--ed-bg);
+    z-index: 3;
   }
   .editor-inspector-body {
-    max-height: calc(55vh - 85px);
+    min-height: 0;
+    max-height: none;
+    overscroll-behavior: contain;
   }
   .editor-welcome {
     display: none;
@@ -991,7 +1030,8 @@
   .editor-inspector-body {
     padding: 0 15px 14px;
   }
-  .editor-explorer:has(~ .editor-inspector) {
+  .editor-explorer:has(~ .editor-inspector),
+  .editor-explorer:has(~ .editor-review-panel) {
     display: none;
   }
   .editor-bottom {
@@ -1021,6 +1061,9 @@
     right: 10px;
     width: auto;
     bottom: 95px;
+    max-height: var(--editor-mobile-card-height);
+    overflow: auto;
+    overscroll-behavior: contain;
   }
   .editor-error {
     bottom: 28px;
@@ -1245,14 +1288,16 @@
     padding: 4px;
   }
   .editor-conflicts {
-    max-height: 66%;
+    top: auto;
+    bottom: 80px;
+    max-height: var(--editor-mobile-card-height);
     font-size: 12px;
   }
   .conflict-values {
     grid-template-columns: 1fr;
   }
   .editor-repair-preview {
-    max-height: 45%;
+    max-height: var(--editor-mobile-card-height);
   }
   .editor-error-stack {
     bottom: 80px;

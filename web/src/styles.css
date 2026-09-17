@@ -1843,8 +1843,38 @@ progress::-webkit-progress-value {
   margin-bottom: 15px;
 }
 @media (max-width: 767px) {
+  [data-slot='dialog-overlay'] {
+    backdrop-filter: none;
+  }
   .app-dialog {
-    padding: 20px !important;
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    translate: -50% 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 52dvh;
+    overflow: hidden;
+    padding: 16px !important;
+    gap: 12px;
+  }
+  .app-dialog > [data-slot='dialog-header'] {
+    flex-shrink: 0;
+    padding-right: 28px;
+  }
+  .app-dialog
+    > :not([data-slot='dialog-header']):not([data-slot='dialog-close']) {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .app-dialog .settings-content {
+    gap: 12px;
+    padding-top: 0;
+  }
+  .app-dialog .offline-art {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
   }
   .app-dialog [data-slot='dialog-title'] {
     font-size: 20px;

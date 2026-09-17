@@ -232,7 +232,7 @@
     bottom: 8px;
     width: auto;
     max-width: none;
-    max-height: 52%;
+    max-height: 42%;
     padding: 12px 14px;
     padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
