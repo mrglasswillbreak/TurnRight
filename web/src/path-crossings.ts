@@ -243,6 +243,8 @@ export function connectCrossingPaths(
     const segment = edgeSegments.get(edge.id);
     const from = canonical(edge.from),
       to = canonical(edge.to);
+    // A later explicit join can collapse a tiny automatic split into one node.
+    if (from === to) continue;
     const cuts = segment
       ? [...new Set([...segment.cuts].map(canonical))].sort(
           (a, b) =>
