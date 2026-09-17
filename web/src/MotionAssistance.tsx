@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Marker, type Map as MapInstance } from 'maplibre-gl';
 import type { GpsFix } from './types';
 import { motionService } from './motion-service';
+import { followZoom } from './world-map';
 import {
   angleDelta,
   cameraDirection,
@@ -179,6 +180,7 @@ export function MotionMap({
     following: false,
     timestamp: -1,
     hadPosition: false,
+    recoveringZoom: false,
     lastBearingUpdate: -Infinity,
   });
   useEffect(() => {
@@ -186,6 +188,7 @@ export function MotionMap({
       following: false,
       timestamp: -1,
       hadPosition: false,
+      recoveringZoom: false,
       lastBearingUpdate: -Infinity,
     };
     const element = (kind: 'phone' | 'travel') => {
@@ -235,7 +238,8 @@ export function MotionMap({
     if (survey) return; // Survey recording owns GPS following; review never follows sensors.
     const previous = camera.current;
     const beganFollowing = follow && !previous.following;
-    previous.following = follow;
+    previous.following = follow && valid && !!fix;
+    if (!follow) previous.recoveringZoom = false;
     if (!follow || !valid || !fix) return;
     const direction = cameraDirection(state.preferences.mode, phone, fix);
     const recenter = beganFollowing || fix.timestamp !== previous.timestamp;
@@ -247,9 +251,18 @@ export function MotionMap({
       recenter ||
       (bearingChanged && now - previous.lastBearingUpdate >= 100)
     ) {
+      const zoom = followZoom(
+        map.getZoom(),
+        previous.hadPosition,
+        beganFollowing,
+        previous.recoveringZoom,
+      );
+      // New fixes can arrive before the return flight finishes. Continue its
+      // target zoom until reached, rather than freezing at an intermediate zoom.
+      previous.recoveringZoom = zoom !== undefined;
       map.easeTo({
         ...(recenter ? { center: fix.coordinates } : {}),
-        ...(!previous.hadPosition ? { zoom: 18 } : {}),
+        ...(zoom !== undefined ? { zoom } : {}),
         ...(direction.bearing !== null ? { bearing: direction.bearing } : {}),
         duration: 250,
       });

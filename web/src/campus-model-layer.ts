@@ -38,6 +38,7 @@ import {
 } from './building-visuals';
 import { hashBytes, ASSET_CACHE } from './offline';
 import { buildingOutline } from './building-outline';
+import { CAMPUS_MIN_ZOOM } from './world-map';
 import { meshMaterialRole, type MaterialRole } from './map-palette';
 
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
@@ -252,7 +253,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   function refresh() {
     if (disposed) return;
     const mode = detailAtZoom(map.getZoom(), reduced);
-    const active = options.enabled && !fallback;
+    const active =
+      options.enabled && !fallback && map.getZoom() >= CAMPUS_MIN_ZOOM;
     const bounds = map.getBounds();
     const catalogue = options.data.visuals;
     const visible =
@@ -291,7 +293,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         drafts.set(override.model.id, group);
         scene.add(group);
       }
-      group.visible = options.enabled && !fallback;
+      group.visible = active;
     }
     for (const sector of loaded.values()) {
       sector.visible = active && mode !== 'extrusion';
@@ -427,7 +429,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       refresh();
     },
     render(_gl, args) {
-      if (!renderer || disposed || fallback || !options.enabled) {
+      if (
+        !renderer ||
+        disposed ||
+        fallback ||
+        !options.enabled ||
+        map.getZoom() < CAMPUS_MIN_ZOOM
+      ) {
         lastFrame = 0;
         slowFrames = 0;
         return;
@@ -482,7 +490,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       map.triggerRepaint();
     },
     pick(point: PointLike): BuildingSelection | undefined {
-      if (!options.enabled || fallback || !readyKey) return;
+      if (
+        !options.enabled ||
+        fallback ||
+        !readyKey ||
+        map.getZoom() < CAMPUS_MIN_ZOOM
+      )
+        return;
       const p = Array.isArray(point) ? { x: point[0], y: point[1] } : point;
       const x = (p.x / map.getCanvas().clientWidth) * 2 - 1,
         y = 1 - (p.y / map.getCanvas().clientHeight) * 2;
