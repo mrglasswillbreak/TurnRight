@@ -1,6 +1,7 @@
 import type { Geometry } from 'geojson';
 import type { Map as MapInstance, PaddingOptions } from 'maplibre-gl';
 import type { Position } from './types';
+import { projectSegment } from './geo';
 
 export function selectionBounds(
   geometry: Geometry,
@@ -68,7 +69,11 @@ export function selectionPadding(
   return padding;
 }
 
-export function focusEditorSelection(map: MapInstance, geometry: Geometry) {
+export function focusEditorSelection(
+  map: MapInstance,
+  geometry: Geometry,
+  anchor?: Position,
+) {
   const bounds = selectionBounds(geometry);
   if (!bounds) return;
   const padding = selectionPadding(map.getContainer());
@@ -78,14 +83,45 @@ export function focusEditorSelection(map: MapInstance, geometry: Geometry) {
     bearing: map.getBearing(),
   });
   if (!camera) return;
+  let center: Position = [
+    (bounds[0][0] + bounds[1][0]) / 2,
+    (bounds[0][1] + bounds[1][1]) / 2,
+  ];
+  let zoom = camera.zoom ?? map.getZoom();
+  const mobilePath =
+    window.matchMedia('(max-width: 767px)').matches &&
+    (geometry.type === 'LineString' || geometry.type === 'MultiLineString');
+  // A long path should not pull a phone out of the area being inspected.
+  // Keep the tapped stretch (or the stretch nearest the current view) in sight.
+  if (mobilePath && zoom < map.getZoom() - 0.75) {
+    zoom = map.getZoom() - 0.75;
+    const reference: Position = anchor ?? [
+      map.getCenter().lng,
+      map.getCenter().lat,
+    ];
+    const lines =
+      geometry.type === 'LineString'
+        ? [geometry.coordinates]
+        : geometry.coordinates;
+    let nearest = Infinity;
+    for (const line of lines) {
+      for (let i = 1; i < line.length; i++) {
+        const a: Position = [line[i - 1][0], line[i - 1][1]];
+        const b: Position = [line[i][0], line[i][1]];
+        if (![...a, ...b].every(Number.isFinite)) continue;
+        const projected = projectSegment(reference, a, b);
+        if (projected.distance < nearest) {
+          nearest = projected.distance;
+          center = projected.point;
+        }
+      }
+    }
+  }
   // fitBounds calculates its padded center on a flat map. An explicit screen
   // offset also keeps the geometry above the phone inspector when tilted.
   map.easeTo({
-    center: [
-      (bounds[0][0] + bounds[1][0]) / 2,
-      (bounds[0][1] + bounds[1][1]) / 2,
-    ],
-    zoom: camera.zoom,
+    center,
+    zoom,
     bearing: map.getBearing(),
     pitch: map.getPitch(),
     offset: [

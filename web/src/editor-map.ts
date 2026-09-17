@@ -31,7 +31,7 @@ type Interaction =
   | 'entrance-link'
   | 'block';
 interface Callbacks {
-  select: (kind: MapEdit['kind'], id: string) => void;
+  select: (kind: MapEdit['kind'], id: string, anchor?: Position) => void;
   create: (edit: MapEdit) => void;
   geometry: (geometry: Geometry) => void;
   remove: () => void;
@@ -398,7 +398,10 @@ export class EditorMap {
         this.selected.kind === kind
       )
         return;
-      this.callbacks.select(kind, String(f.properties.id));
+      this.callbacks.select(kind, String(f.properties.id), [
+        event.lngLat.lng,
+        event.lngLat.lat,
+      ]);
       break;
     }
   };

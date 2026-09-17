@@ -485,7 +485,10 @@ function Editor({
     controller = useRef<EditorMap | null>(null);
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
-  const [focusRequest, setFocusRequest] = useState<MapEdit | null>(null);
+  const [focusRequest, setFocusRequest] = useState<{
+    edit: MapEdit;
+    anchor?: Position;
+  } | null>(null);
   const selectionOverview = useRef<ReturnType<typeof editorCamera> | null>(
     null,
   );
@@ -495,9 +498,13 @@ function Editor({
       if (
         mapRef.current &&
         selectedRef.current &&
-        editKey(selectedRef.current) === editKey(focusRequest)
+        editKey(selectedRef.current) === editKey(focusRequest.edit)
       )
-        focusEditorSelection(mapRef.current, focusRequest.geometry);
+        focusEditorSelection(
+          mapRef.current,
+          focusRequest.edit.geometry,
+          focusRequest.anchor,
+        );
     });
     return () => cancelAnimationFrame(frame);
   }, [focusRequest, ready]);
@@ -663,7 +670,7 @@ function Editor({
       ),
     [validation.issues],
   );
-  const select = (edit: MapEdit, refocus = false) => {
+  const select = (edit: MapEdit, refocus = false, anchor?: Position) => {
     workspace.endHistoryGroup();
     if (workspace.roofDraft && workspace.roofDraft.buildingId !== edit.id) {
       setMessage(
@@ -684,7 +691,7 @@ function Editor({
         editKey(selectedRef.current) !== editKey(edit))
     ) {
       selectionOverview.current ??= editorCamera(mapRef.current);
-      setFocusRequest(edit);
+      setFocusRequest({ edit, anchor });
     }
     setRepairFocus(null);
     setSelected(edit);
@@ -698,9 +705,14 @@ function Editor({
     );
     controller.current?.select(edit, edit.kind !== 'building');
   };
-  const selectId = (kind: MapEdit['kind'], id: string, refocus = false) => {
+  const selectId = (
+    kind: MapEdit['kind'],
+    id: string,
+    refocus = false,
+    anchor?: Position,
+  ) => {
     const edit = featureEdit(validation.data, kind, id, workspace.edits);
-    if (edit) select(edit, refocus);
+    if (edit) select(edit, refocus, anchor);
   };
   const commit = (batch: MapEdit[], current = batch[0]) => {
     workspace.commit(batch, null);
@@ -1155,7 +1167,8 @@ function Editor({
     mapRef.current = map;
     map.setMaxPitch(60);
     const instance = new EditorMap(map, live.current.validation.data, {
-      select: (kind, id) => live.current.selectId(kind, id),
+      select: (kind, id, anchor) =>
+        live.current.selectId(kind, id, false, anchor),
       create: (edit) => live.current.create(edit),
       geometry: (geometry) => live.current.updateGeometry(geometry),
       remove: () => live.current.remove(),
