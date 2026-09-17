@@ -6,7 +6,7 @@ TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, wi
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight desktop map with a full-height, adjustable destination panel and pinned navigation controls](docs/assets/screenshots/public-desktop-full-2026-09-17.png)
+![TurnRight desktop map with a full-height, adjustable destination panel and pinned navigation controls](docs/assets/screenshots/public-desktop-full-2026-09-17.jpg)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
@@ -38,21 +38,29 @@ The public interface below was captured on **17 September 2026** in the **Codex 
 
 | Compact mobile map | Adjustable destination card |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-mobile-map-2026-09-17.png" width="300" alt="Mobile campus map with a bottom search bar, view and compass buttons on the left, and zoom and location buttons on the right"> | <img src="docs/assets/screenshots/public-mobile-place-2026-09-17.png" width="300" alt="Mobile Senate Building details in a shortened card with the navigation buttons still visible above its scrolling content"> |
+| <img src="docs/assets/screenshots/public-mobile-map-2026-09-17.jpg" width="300" alt="Mobile campus map with a bottom search bar, view and compass buttons on the left, and zoom and location buttons on the right"> | <img src="docs/assets/screenshots/public-mobile-place-2026-09-17.jpg" width="300" alt="Mobile Senate Building details in a shortened card with the navigation buttons still visible above its scrolling content"> |
 
 | Resizable Settings dialog | Public app-update notice |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-mobile-settings-2026-09-17.png" width="300" alt="Shortened mobile Settings dialog showing appearance and rendering choices while leaving the map visible"> | <img src="docs/assets/screenshots/public-mobile-update-2026-09-17.png" width="300" alt="Public campus map showing App update ready and an Install update button above the compact search dock"> |
+| <img src="docs/assets/screenshots/public-mobile-settings-2026-09-17.jpg" width="300" alt="Shortened mobile Settings dialog showing appearance and rendering choices while leaving the map visible"> | <img src="docs/assets/screenshots/public-mobile-update-2026-09-17.jpg" width="300" alt="Public campus map showing App update ready and an Install update button above the compact search dock"> |
 
 **Offline world overview:** zoom out to explore the planet, then use **Back to campus** or the LASU marker to return. These two captures were taken after stopping the local preview server and reloading the saved app.
 
-<img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-17.png" width="300" alt="Offline globe on mobile in Dark mode, with country names, a LASU marker, side controls and the compact search dock">
+<img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-17.jpg" width="300" alt="Offline globe on mobile in Dark mode, with country names, a LASU marker, side controls and the compact search dock">
 
-![Offline desktop globe in Light mode with the full-height public panel and Back to campus button](docs/assets/screenshots/public-globe-desktop-light-2026-09-17.png)
+![Offline desktop globe in Light mode with the full-height public panel and Back to campus button](docs/assets/screenshots/public-globe-desktop-light-2026-09-17.jpg)
 
 **Desktop after resizing:** the same panel shown at full height above can be shortened. Search, navigation and map controls remain accessible while its details scroll.
 
-![Desktop destination panel shortened to expose more of the campus map](docs/assets/screenshots/public-desktop-resized-2026-09-17.png)
+![Desktop destination panel shortened to expose more of the campus map](docs/assets/screenshots/public-desktop-resized-2026-09-17.jpg)
+
+**Current owner editor:** the desktop workspace and compact mobile inspectors, captured from revision **`b69cde0`** with the campus seed and isolated owner/API responses.
+
+![Current desktop editor with campus geometry, feature explorer, drawing tools and review controls](docs/assets/screenshots/editor-workspace-desktop-2026-09-17.jpg)
+
+| Mobile building inspector | Mobile editor Settings |
+| --- | --- |
+| <img src="docs/assets/screenshots/editor-building-mobile-2026-09-17.jpg" width="300" alt="Dark mobile editor with the Faculty of Law selected and a compact building appearance inspector leaving the map visible"> | <img src="docs/assets/screenshots/editor-settings-mobile-2026-09-17.jpg" width="300" alt="Light mobile editor with compact Settings showing appearance and 3D rendering options over the selected campus building"> |
 
 <details>
 <summary>Editor and enhanced-building gallery — 15 September 2026</summary>

@@ -1,13 +1,25 @@
 # Application screenshots
 
-## Offline globe — 17 September 2026
+## Current owner editor — 17 September 2026
 
-Actual, unmodified PNG captures from the local production PWA in the **Codex in-app browser**, using the new globe interface, the checked-in **`lasu-4e4c8008b38b`** campus package and bundled Natural Earth v5.1.2 world geometry. The preview server was stopped before reloading and capturing both views: geometry and country labels came from the saved app/package. No device GPS or private editor data was used.
+Unmodified JPEG captures from application revision **`b69cde0`**, using the real editor in the **Codex in-app browser**. The local preview loaded the checked-in **`lasu-4e4c8008b38b`** campus seed. A temporary development fixture supplied a local sample owner, empty drafts/reports/releases and no source updates. Save/publish requests were disabled in that fixture; no production session or private workspace was opened.
 
 | Image | View | Captured dimensions |
 | --- | --- | --- |
-| [public-globe-mobile-dark-2026-09-17.png](public-globe-mobile-dark-2026-09-17.png) | Dark globe with compact search dock and the existing side controls | 390 × 844 |
-| [public-globe-desktop-light-2026-09-17.png](public-globe-desktop-light-2026-09-17.png) | Light globe beside the full-height public panel and Back to campus action | 1248 × 900 |
+| [editor-workspace-desktop-2026-09-17.jpg](editor-workspace-desktop-2026-09-17.jpg) | Dark desktop workspace, explorer, drawing tools and campus in 3D | 1248 × 900 |
+| [editor-building-mobile-2026-09-17.jpg](editor-building-mobile-2026-09-17.jpg) | Faculty of Law selected with the compact appearance inspector | 390 × 844 |
+| [editor-settings-mobile-2026-09-17.jpg](editor-settings-mobile-2026-09-17.jpg) | Compact mobile Settings in Light mode | 390 × 844 |
+
+To reproduce, use isolated owner/API responses like the existing editor browser-test fixture, serve the current editor and campus seed locally, and open it in the in-app browser. Capture the desktop workspace in 3D. Switch to a 390 × 844 viewport, search for Faculty Of Law, select its building record, and capture the inspector. Open Settings and select Light for the final image. Unknown heights remain labelled illustrative; no feature edits are needed. Remove the temporary fixture and reset the viewport afterward.
+
+## Offline globe — 17 September 2026
+
+Actual, unmodified JPEG captures from the local production PWA in the **Codex in-app browser**, using the new globe interface, the checked-in **`lasu-4e4c8008b38b`** campus package and bundled Natural Earth v5.1.2 world geometry. The preview server was stopped before reloading and capturing both views: geometry and country labels came from the saved app/package. No device GPS or private editor data was used.
+
+| Image | View | Captured dimensions |
+| --- | --- | --- |
+| [public-globe-mobile-dark-2026-09-17.jpg](public-globe-mobile-dark-2026-09-17.jpg) | Dark globe with compact search dock and the existing side controls | 390 × 844 |
+| [public-globe-desktop-light-2026-09-17.jpg](public-globe-desktop-light-2026-09-17.jpg) | Light globe beside the full-height public panel and Back to campus action | 1248 × 900 |
 
 To reproduce: build and serve the production app, install its waiting app update if necessary, finish the campus download, stop the local server and reload. Zoom out, then adjust the wheel/pinch zoom until the entire planet fits. Capture mobile in Dark mode and desktop in Light mode, without changing the world data. These are responsive-browser checks, not physical-device airplane-mode or GPS tests.
 
@@ -19,14 +31,14 @@ The map uses the checked-in **`lasu-4e4c8008b38b`** campus seed. The app renders
 
 | Image | View | Captured dimensions |
 | --- | --- | --- |
-| [public-desktop-full-2026-09-17.png](public-desktop-full-2026-09-17.png) | Full-height desktop destination panel; search, navigation and map controls above its scrolling details | 1248 × 900 |
-| [public-desktop-resized-2026-09-17.png](public-desktop-resized-2026-09-17.png) | The same panel shortened to 548 px using its top handle | 1248 × 900 |
-| [public-mobile-map-2026-09-17.png](public-mobile-map-2026-09-17.png) | Compact bottom search dock; view/compass on the left and zoom/location on the right | 390 × 844 |
-| [public-mobile-place-2026-09-17.png](public-mobile-place-2026-09-17.png) | Destination card resized to 432 px with pinned navigation | 390 × 844 |
-| [public-mobile-settings-2026-09-17.png](public-mobile-settings-2026-09-17.png) | Settings dialog shortened to 440 px | 390 × 844 |
-| [public-mobile-update-2026-09-17.png](public-mobile-update-2026-09-17.png) | The public update-ready notice with an explicit install button | 390 × 844 |
+| [public-desktop-full-2026-09-17.jpg](public-desktop-full-2026-09-17.jpg) | Full-height desktop destination panel; search, navigation and map controls above its scrolling details | 1248 × 900 |
+| [public-desktop-resized-2026-09-17.jpg](public-desktop-resized-2026-09-17.jpg) | The same panel shortened to 548 px using its top handle | 1248 × 900 |
+| [public-mobile-map-2026-09-17.jpg](public-mobile-map-2026-09-17.jpg) | Compact bottom search dock; view/compass on the left and zoom/location on the right | 390 × 844 |
+| [public-mobile-place-2026-09-17.jpg](public-mobile-place-2026-09-17.jpg) | Destination card resized to 432 px with pinned navigation | 390 × 844 |
+| [public-mobile-settings-2026-09-17.jpg](public-mobile-settings-2026-09-17.jpg) | Settings dialog shortened to 440 px | 390 × 844 |
+| [public-mobile-update-2026-09-17.jpg](public-mobile-update-2026-09-17.jpg) | The public update-ready notice with an explicit install button | 390 × 844 |
 
-These are unmodified PNG browser captures: no interface elements were composited, removed or recoloured. The update screenshot uses a real waiting service worker triggered by a comment-only revision to the local built `dist/sw.js`. The original built file was restored after capture; no application source or live deployment was changed for the demonstration.
+These are unmodified JPEG browser captures: no interface elements were composited, removed or recoloured. The update screenshot uses a real waiting service worker triggered by a comment-only revision to the local built `dist/sw.js`. The original built file was restored after capture; no application source or live deployment was changed for the demonstration.
 
 ### Reproduce the current gallery
 
