@@ -108,8 +108,10 @@
   overflow: visible;
 }
 .app-shell .app-rail {
-  position: static;
+  position: sticky;
   inset: auto;
+  top: 0;
+  z-index: 2;
   width: 100%;
   height: auto;
   display: flex;
@@ -118,7 +120,7 @@
   padding: 0 12px 12px;
   gap: 4px;
   border: 0;
-  background: transparent;
+  background: var(--background);
 }
 .app-shell .app-rail .brandmark,
 .app-shell .app-rail .rail-spacer {
