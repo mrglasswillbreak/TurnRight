@@ -42,6 +42,7 @@ import { downloadJson } from './download-json';
 import { EditorConflictReview } from './EditorConflictReview';
 import type { ValidationIssue } from './validation';
 import { canonical } from './editor-conflicts';
+import { unpublishedEdits } from './editor-publication';
 import { sourceGeometry } from './source-comparison';
 import { type SourceRecord } from './editor-model';
 import { assembleEditorSources } from './editor-validation';
@@ -382,6 +383,12 @@ function Editor({
   installUpdate?: () => Promise<void>;
 }) {
   const workspace = useEditorWorkspace(store);
+  const [publishedWorkspace, setPublishedWorkspace] = useState(state.published);
+  useEffect(() => setPublishedWorkspace(state.published), [state.published]);
+  const drafts = useMemo(
+    () => unpublishedEdits(workspace.edits, publishedWorkspace),
+    [workspace.edits, publishedWorkspace],
+  );
   const [networkOnline, setNetworkOnline] = useState(navigator.onLine);
   useEffect(() => {
     const changed = () => setNetworkOnline(navigator.onLine);
@@ -1153,12 +1160,12 @@ function Editor({
   useEffect(() => {
     controller.current?.update(
       validation.data,
-      workspace.edits,
-      base,
+      drafts,
+      data,
       invalid,
       preview || survey,
     );
-  }, [validation, workspace.edits, base, invalid, preview, ready, survey]);
+  }, [validation, drafts, data, invalid, preview, ready, survey]);
   useEffect(() => {
     const features: Feature[] = [];
     for (const [side, color] of [
@@ -1423,6 +1430,18 @@ function Editor({
           name: String(edit.properties.name),
           reason: invalid.has(edit.id) ? 'Needs repair' : 'Review connection',
         });
+    for (const edit of drafts)
+      if (
+        !result.some((task) => task.id === edit.id && task.kind === edit.kind)
+      )
+        result.push({
+          id: edit.id,
+          kind: edit.kind,
+          name: String(edit.properties.name || edit.id),
+          reason: edit.deleted
+            ? 'Removed in this draft'
+            : 'Unpublished correction',
+        });
     const grouped = new Map<string, (typeof result)[number]>();
     for (const task of result) {
       const key = `${task.kind}:${task.id}`,
@@ -1444,7 +1463,7 @@ function Editor({
       grouped.set(key, { ...task, reason: combined.join(' · ') });
     }
     return [...grouped.values()];
-  }, [validation, workspace.edits, invalid]);
+  }, [validation, workspace.edits, drafts, invalid]);
   const visibleTasks = tasks.filter(
     (t) =>
       `${t.name} ${t.reason}`.toLowerCase().includes(search.toLowerCase()) &&
@@ -1452,12 +1471,7 @@ function Editor({
         (filter === 'needs' &&
           (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||
         (filter === 'drafts' &&
-          workspace.edits.some(
-            (e) =>
-              e.id === t.id &&
-              e.kind === t.kind &&
-              !(e.deleted && e.properties.revertToSource),
-          ))),
+          drafts.some((e) => e.id === t.id && e.kind === t.kind))),
   );
   const toolButtons = [
     { kind: null, name: 'Select', icon: MousePointer2, shortcut: '' },
@@ -1842,7 +1856,11 @@ function Editor({
                   </button>
                 ))}
                 {!visibleTasks.length && (
-                  <p className="editor-empty">No matching features.</p>
+                  <p className="editor-empty">
+                    {filter === 'drafts' && !search
+                      ? 'No unpublished changes. Published work stays on the map.'
+                      : 'No matching features.'}
+                  </p>
                 )}
                 {visibleTasks.length > 100 && (
                   <p className="small-note">Search to narrow these results.</p>
@@ -1969,6 +1987,8 @@ function Editor({
               <EditorReview
                 tab={tab}
                 state={state}
+                onPublishedWorkspace={setPublishedWorkspace}
+                draftCount={drafts.length}
                 workspace={workspace}
                 validation={validation}
                 baselineVersion={base.version}

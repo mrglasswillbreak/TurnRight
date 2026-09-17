@@ -23,8 +23,10 @@ import type { EditorValidation } from './editor-validation';
 import { BaselineReview } from './BaselineReview';
 import { BuildingReferenceReview } from './BuildingReferenceReview';
 import { BuildingRoofReview } from './BuildingRoofReview';
+import type { PublishedWorkspace } from './editor-publication';
 
 export interface ReviewState {
+  published?: PublishedWorkspace | null;
   changes: MapChange[];
   reports: StudentReport[];
   jobs: {
@@ -56,6 +58,8 @@ export function EditorReview({
   setReview,
   onApplyAppearances,
   onLocateBuilding,
+  onPublishedWorkspace,
+  draftCount,
 }: {
   tab: string;
   state: ReviewState;
@@ -75,6 +79,8 @@ export function EditorReview({
   setReview: (change: MapChange) => void;
   onApplyAppearances: (batch: import('./types').MapEdit[]) => Promise<void>;
   onLocateBuilding: (id: string) => void;
+  onPublishedWorkspace: (published: PublishedWorkspace | null) => void;
+  draftCount: number;
 }) {
   const [summary, setSummary] = useState('');
   const [liveState, setLiveState] = useState(state);
@@ -94,11 +100,13 @@ export function EditorReview({
       if (!document.hidden) {
         try {
           const latest =
-            await api<Pick<ReviewState, 'jobs' | 'releases' | 'changes'>>(
-              'review-status',
-            );
+            await api<
+              Pick<ReviewState, 'jobs' | 'releases' | 'changes' | 'published'>
+            >('review-status');
           if (!cancelled) {
             setLiveState((current) => ({ ...current, ...latest }));
+            if (latest.published !== undefined)
+              onPublishedWorkspace(latest.published);
             setStatusError(null);
           }
         } catch (e) {
@@ -113,7 +121,7 @@ export function EditorReview({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [state, tab, statusAttempt]);
+  }, [state, tab, statusAttempt, onPublishedWorkspace]);
   return (
     <>
       {statusError && (
@@ -368,7 +376,9 @@ export function EditorReview({
       {tab === 'releases' && (
         <>
           <h2>Review, then publish</h2>
-          <p>Draft: {workspace.status}</p>
+          <p>
+            {draftCount} unpublished corrections · {workspace.status}
+          </p>
           <button
             className="editor-secondary"
             onClick={() =>

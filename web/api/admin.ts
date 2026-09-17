@@ -20,6 +20,7 @@ import {
   validateReleaseSnapshot,
 } from '../server/release-validation.js';
 import { validateWorkspace } from '../src/editor-validation.js';
+import { publishedWorkspace } from '../server/published-workspace.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {
@@ -32,27 +33,32 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         res.status(200).json(await surveyAction(user.id, action, payload));
         break;
       case 'state': {
-        const [edits, changes, reports, jobs, releases] = await Promise.all([
-          allRows('map_edits'),
-          db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
-          db('reports?status=eq.pending&order=created_at.desc&limit=200'),
-          db('jobs?order=created_at.desc&limit=20'),
-          db(
-            'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
-          ),
-        ]);
-        res.status(200).json({ edits, changes, reports, jobs, releases });
+        const [edits, changes, reports, jobs, releases, published] =
+          await Promise.all([
+            allRows('map_edits'),
+            db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
+            db('reports?status=eq.pending&order=created_at.desc&limit=200'),
+            db('jobs?order=created_at.desc&limit=20'),
+            db(
+              'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
+            ),
+            publishedWorkspace(),
+          ]);
+        res
+          .status(200)
+          .json({ edits, changes, reports, jobs, releases, published });
         break;
       }
       case 'review-status': {
-        const [jobs, releases, changes] = await Promise.all([
+        const [jobs, releases, changes, published] = await Promise.all([
           db('jobs?order=created_at.desc&limit=20'),
           db(
             'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
           ),
           db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
+          publishedWorkspace(),
         ]);
-        res.status(200).json({ jobs, releases, changes });
+        res.status(200).json({ jobs, releases, changes, published });
         break;
       }
       case 'sources':
