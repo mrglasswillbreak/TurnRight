@@ -2,6 +2,10 @@
 
 The private `/admin` workspace edits the existing campus map in 2D or a tilted 3D view. Drafts stay visible while you work. Campus navigation changes only after a release is reviewed and published.
 
+**Drafts** and the colored map highlights show corrections made since the latest publication. Published corrections stay saved to protect your work during source updates, but stop appearing as pending drafts. Editing a published feature makes it a draft again; restoring an older release compares your current corrections with that restored version.
+
+On phones, editor cards and survey sheets use at most 42% of the screen height. Public pop-up dialogs use at most 52% and sit near the bottom. Scroll inside a card for the remaining controls; headings and close buttons stay accessible.
+
 ## Map an entrance and its approach
 
 1. Search for a building or choose an item in **Needs mapping**. Select the building on the map, then choose **Add entrance**.

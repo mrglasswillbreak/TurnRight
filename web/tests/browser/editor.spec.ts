@@ -901,6 +901,7 @@ async function setup(
   enhanced = false,
   options: {
     initialEdits?: MapEdit[];
+    publishedEdits?: MapEdit[];
     mutateCampus?: (data: CampusData) => void;
   } = {},
 ) {
@@ -947,6 +948,12 @@ async function setup(
       );
   }
   options.mutateCampus?.(campus);
+  let published = options.publishedEdits
+    ? {
+        version: campus.version,
+        edits: structuredClone(options.publishedEdits),
+      }
+    : null;
   const bytes = JSON.stringify(campus);
   const user = {
     id: 'owner',
@@ -1013,7 +1020,18 @@ async function setup(
     const { action, payload } = route.request().postDataJSON();
     if (action === 'state')
       return route.fulfill({
-        json: { edits, reports: [], changes: [], jobs: [], releases: [] },
+        json: {
+          edits,
+          reports: [],
+          changes: [],
+          jobs: [],
+          releases: [],
+          published,
+        },
+      });
+    if (action === 'review-status')
+      return route.fulfill({
+        json: { changes: [], jobs: [], releases: [], published },
       });
     if (action === 'sources') return route.fulfill({ json: { features: [] } });
     if (action === 'survey-list') return route.fulfill({ json: [] });
@@ -1057,6 +1075,9 @@ async function setup(
     setEdits: (value: MapEdit[]) => {
       edits = value;
     },
+    publish: () => {
+      published = { version: campus.version, edits: structuredClone(edits) };
+    },
     campus,
   };
 }
@@ -1093,6 +1114,56 @@ async function position(page: Page, coordinates: Position) {
     return { x: rect.left + p.x, y: rect.top + p.y };
   }, coordinates);
 }
+
+test('published corrections leave Drafts and map highlights without losing saved edits', async ({
+  page,
+}) => {
+  const correction: MapEdit = {
+    id: 'library',
+    kind: 'place',
+    geometry: { type: 'Point', coordinates: [3.2001, 6.4601] },
+    properties: { name: 'Published library' },
+  };
+  const server = await setup(page, false, false, {
+    initialEdits: [correction],
+    publishedEdits: [correction],
+  });
+  const draftIds = () =>
+    page.evaluate(() => {
+      const source = window.editorTestMap.getSource('editor-drafts');
+      const data = source?.serialize().data as
+        | { features?: { properties: { id: string } }[] }
+        | undefined;
+      return data?.features?.map((f) => f.properties.id) || [];
+    });
+  await page.getByRole('button', { name: 'Drafts', exact: true }).click();
+  await expect(
+    page.getByText('No unpublished changes. Published work stays on the map.'),
+  ).toBeVisible();
+  await expect.poll(draftIds).toEqual([]);
+  expect(server.edits()).toHaveLength(1);
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('Published library');
+  await page
+    .locator('.editor-feature-list button')
+    .filter({ hasText: 'Published library' })
+    .click();
+  await page.getByLabel('Name', { exact: true }).fill('Next library');
+  await page.getByLabel('Name', { exact: true }).press('Tab');
+  await expect
+    .poll(() => server.edits()[0].properties.name)
+    .toBe('Next library');
+  await expect.poll(draftIds).toEqual(['library']);
+  server.publish();
+  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  await expect(
+    page.getByText('0 unpublished corrections · Saved'),
+  ).toBeVisible();
+  await expect.poll(draftIds).toEqual([]);
+  expect(server.edits()[0].properties.name).toBe('Next library');
+});
 
 test('path crossing controls persist automatic connection and bridge choices', async ({
   page,
@@ -3700,6 +3771,11 @@ test.describe('view settings touch', () => {
     await expect(
       page.getByRole('complementary', { name: 'Editor settings' }),
     ).toBeVisible();
+    const settingsCard = await page
+      .getByRole('complementary', { name: 'Editor settings' })
+      .boundingBox();
+    expect(settingsCard!.height).toBeLessThanOrEqual(844 * 0.43);
+    expect(settingsCard!.y).toBeGreaterThan(844 * 0.4);
     const header = await page.evaluate(() => ({
       brandRight: document
         .querySelector('.editor-brand strong')!
@@ -3745,6 +3821,10 @@ test.describe('view settings touch', () => {
       page.getByRole('radio', { name: 'Simple', exact: true }),
     ).toBeChecked();
     await page.getByRole('radio', { name: 'Enhanced', exact: true }).tap();
+    const dialogCard = await page.getByRole('dialog').boundingBox();
+    expect(dialogCard!.height).toBeLessThanOrEqual(844 * 0.53);
+    expect(dialogCard!.y).toBeGreaterThan(844 * 0.45);
+    await page.screenshot({ path: 'test-results/compact-mobile-dialog.png' });
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Close', exact: true })
