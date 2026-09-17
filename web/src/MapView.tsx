@@ -2,6 +2,7 @@ import { useBuildingPreview } from './useBuildingPreview';
 import type { BuildingSelection } from './visual-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MotionMap } from './MotionAssistance';
+import { publicMapPadding } from './public-map-layout';
 import * as maplibregl from 'maplibre-gl';
 import type {
   Map as MapInstance,
@@ -180,18 +181,47 @@ export function MapView({
     }
     mapRef.current = map;
     const mapPadding = () => {
-      const mobile = innerWidth < 768;
       return panelBesideMap
         ? { top: 60, right: 40, bottom: 60, left: 40 }
-        : {
-            top: mobile ? 125 : 85,
-            right: 70,
-            bottom: mobile ? innerHeight * 0.49 : 65,
-            left: mobile ? 25 : 485,
-          };
+        : publicMapPadding(map.getContainer());
     };
+    const panel =
+      !panelBesideMap &&
+      map.getContainer().closest('.app-shell')?.querySelector('.explore-panel');
+    let paddingPending = false;
+    const syncPadding = () => {
+      // setPadding stops camera animations. Let a selection flight finish first.
+      if (
+        !paddingPending ||
+        panelBesideMap ||
+        mapRef.current !== map ||
+        map.isMoving()
+      )
+        return;
+      paddingPending = false;
+      const next = mapPadding(),
+        current = map.getPadding();
+      if (
+        Object.entries(next).some(
+          ([side, value]) =>
+            Math.abs(value - (current[side as keyof typeof current] ?? 0)) >
+            0.5,
+        )
+      )
+        map.setPadding(next);
+    };
+    const requestPadding = () => {
+      paddingPending = true;
+      syncPadding();
+    };
+    const panelResize = new ResizeObserver(requestPadding);
+    map.on('moveend', syncPadding);
+    if (panel) {
+      map.setPadding(mapPadding());
+      panelResize.observe(panel);
+    }
     const frame = () => {
-      const padding = mapPadding();
+      const padding = panelBesideMap ? mapPadding() : 20;
       const current = camera.current,
         route = current.routes[current.activeRoute];
       if (route?.coordinates.length) {
@@ -210,7 +240,11 @@ export function MapView({
           { padding, maxZoom: 18, duration: 0 },
         );
       } else if (current.selected)
-        map.jumpTo({ center: current.selected.coordinates, zoom: 17, padding });
+        map.jumpTo({
+          center: current.selected.coordinates,
+          zoom: 17,
+          padding: mapPadding(),
+        });
       else
         map.fitBounds(latestData.current.bounds, {
           padding,
@@ -228,6 +262,9 @@ export function MapView({
       });
     };
     window.addEventListener('resize', resize);
+    const viewportResize = () => requestAnimationFrame(requestPadding);
+    window.visualViewport?.addEventListener('resize', viewportResize);
+    window.visualViewport?.addEventListener('scroll', viewportResize);
     map.on('error', (event) => console.error('Campus map:', event.error));
     map.on('webglcontextlost', () =>
       setMapError(
@@ -675,6 +712,10 @@ export function MapView({
       });
     return () => {
       window.removeEventListener('resize', resize);
+      window.visualViewport?.removeEventListener('resize', viewportResize);
+      window.visualViewport?.removeEventListener('scroll', viewportResize);
+      map.off('moveend', syncPadding);
+      panelResize.disconnect();
       ready.current = false;
       setMotionMap(null);
       // Drawing adapters must release their layers while the map still owns its sources.
@@ -867,10 +908,9 @@ export function MapView({
     map.flyTo({
       center: [selectedLng, selectedLat],
       zoom: Math.max(map.getZoom(), 17),
-      padding: {
-        left: panelBesideMap ? 40 : window.innerWidth > 767 ? 360 : 0,
-        bottom: panelBesideMap ? 40 : window.innerWidth < 768 ? 180 : 0,
-      },
+      padding: panelBesideMap
+        ? { top: 40, right: 40, bottom: 40, left: 40 }
+        : publicMapPadding(map.getContainer()),
       duration: 750,
     });
     return () => {

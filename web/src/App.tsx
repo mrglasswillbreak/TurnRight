@@ -49,6 +49,9 @@ import {
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
+import { SheetHandle, useSheetSize } from './ResizableSheet';
+import { publicMapPadding } from './public-map-layout';
+import './public-dock.css';
 import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import type { Feature } from 'geojson';
@@ -112,7 +115,10 @@ export default function App() {
   );
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
-  const [panelExpanded, setPanelExpanded] = useState(false);
+  const panelSheet = useSheetSize('search');
+  const dialogSheet = useSheetSize('dialogs', 220, false);
+  const panelExpanded = panelSheet.expanded;
+  const setPanelExpanded = panelSheet.setExpanded;
   const [shareFallback, setShareFallback] = useState('');
   const [sharedLinkMissing, setSharedLinkMissing] = useState(false);
   const sharedLinkOpened = useRef('');
@@ -513,6 +519,7 @@ export default function App() {
       setRoutes(result);
       setChosen(0);
       const points = result[0].coordinates;
+      map.current?.setPadding(publicMapPadding(map.current.getContainer()));
       if (points.length > 1)
         map.current?.fitBounds(
           [
@@ -526,12 +533,7 @@ export default function App() {
             ],
           ],
           {
-            padding: {
-              top: 80,
-              right: 75,
-              bottom: innerWidth < 768 ? innerHeight * 0.42 : 70,
-              left: innerWidth < 768 ? 30 : 485,
-            },
+            padding: 20,
             maxZoom: 18,
           },
         );
@@ -656,7 +658,8 @@ export default function App() {
   return (
     <main
       className={`app-shell ${navigating ? 'is-navigating' : ''}`}
-      data-panel-expanded={panelExpanded || navigating}
+      data-panel-expanded={panelExpanded}
+      style={panelSheet.style}
       data-panel-view={
         navigating
           ? 'navigation'
@@ -697,102 +700,42 @@ export default function App() {
           });
         }}
       />
-      <nav className="app-rail" aria-label="Main navigation">
-        <a href="/" className="brandmark" aria-label="TurnRight home">
+
+      <div className="public-brand" aria-label="TurnRight · LASU Ojo">
+        <span className="brandmark">
           <ArrowUpRight />
-        </a>
-        <button
-          className={`rail-item ${!savedOnly ? 'active' : ''}`}
-          disabled={navigating}
-          onClick={() => {
-            setSavedOnly(false);
-            setPanelExpanded(true);
-            setSelected(null);
-            setRouteView(false);
-            setRoutes([]);
-          }}
-        >
-          <Compass />
-          <span>Explore</span>
-        </button>
-        <button
-          className={`rail-item ${savedOnly ? 'active' : ''}`}
-          disabled={navigating}
-          onClick={() => {
-            setSavedOnly(true);
-            setPanelExpanded(true);
-            setSelected(null);
-            setRouteView(false);
-            setRoutes([]);
-            setCategory('all');
-            setQuery('');
-          }}
-        >
-          <Heart />
-          <span>Saved</span>
-        </button>
-        <button className="rail-item" onClick={() => setDialog('offline')}>
-          <Download />
-          <span>Offline</span>
-          {latest && latest.version !== manifest.version && (
-            <i className="update-dot" />
-          )}
-        </button>
-        <div className="rail-spacer" />
-        <button className="rail-item" onClick={() => setDialog('settings')}>
-          <Settings />
-          <span>Settings</span>
-        </button>
-        <a href="/admin" className="rail-item">
-          <Shield />
-          <span>Editor</span>
-        </a>
-      </nav>
+        </span>
+        <span>
+          <strong>TurnRight</strong>
+          <small>LASU · OJO</small>
+        </span>
+      </div>
       <section
         className="explore-panel"
         aria-label={navigating ? 'Walking navigation' : 'Campus places'}
       >
-        <header className="panel-brand">
-          <div>
-            <strong>
-              TurnRight<span>.</span>
-            </strong>
-            <p>LASU · OJO CAMPUS</p>
-          </div>
-          <div className="campus-badge">
-            <GraduationCap size={20} />
-          </div>
-        </header>
-        {!navigating && (
-          <>
-            {sharedLinkMissing && (
-              <output className="notice">
-                This destination is unavailable in your downloaded map. Search
-                for its current name, or check for a map update.
-                <button
-                  className="text-button"
-                  onClick={() => {
-                    setSharedLinkMissing(false);
-                    setSelected(null);
-                    setQuery('');
-                    setCategory('all');
-                    setSavedOnly(false);
-                    searchInput.current?.focus();
-                    const url = new URL(location.href);
-                    url.searchParams.delete('place');
-                    history.replaceState(null, '', url);
-                  }}
-                >
-                  Search campus places
-                </button>
-              </output>
-            )}
+        <SheetHandle sheet={panelSheet} label="Resize search panel" />
+        <div className="dock-search-row">
+          {navigating ? (
+            <div className="navigation-summary" aria-live="polite">
+              <Navigation size={21} />
+              <span>
+                <strong>
+                  {nav.arrived
+                    ? 'You have arrived'
+                    : currentRoute?.maneuvers[nav.nextIndex]?.instruction ||
+                      'Follow your walking route'}
+                </strong>
+                <small>{selected?.name}</small>
+              </span>
+            </div>
+          ) : (
             <div className="search-box">
-              <Search size={20} />
+              <Search size={21} />
               <input
                 aria-label="Search campus"
                 ref={searchInput}
-                placeholder="Where do you want to go?"
+                placeholder="Search LASU campus"
                 value={query}
                 onFocus={() => setPanelExpanded(true)}
                 onChange={(e) => {
@@ -808,37 +751,157 @@ export default function App() {
                 </button>
               )}
             </div>
-          </>
-        )}
-        {!navigating && (
+          )}
           <button
-            className="mobile-panel-toggle"
+            className="dock-toggle"
             aria-expanded={panelExpanded}
             aria-controls="campus-panel-content"
             aria-label={panelExpanded ? 'Collapse card' : 'Expand card'}
-            onClick={() => setPanelExpanded((expanded) => !expanded)}
+            onClick={() => {
+              if (panelExpanded) searchInput.current?.blur();
+              setPanelExpanded(!panelExpanded);
+            }}
           >
-            <span>
-              {selected
-                ? `${routeView ? 'Route to ' : ''}${selected.name}`
-                : savedOnly
-                  ? 'Saved places'
-                  : query
-                    ? 'Search results'
-                    : 'Browse places'}
-            </span>
             {panelExpanded ? (
-              <ChevronDown size={20} />
+              <ChevronDown size={22} />
             ) : (
-              <ChevronUp size={20} />
+              <ChevronUp size={22} />
             )}
           </button>
-        )}
+        </div>
         <div
           id="campus-panel-content"
           className="panel-content"
           ref={panelContent}
         >
+          <nav className="app-rail" aria-label="Main navigation">
+            <a href="/" className="brandmark" aria-label="TurnRight home">
+              <ArrowUpRight />
+            </a>
+            <button
+              className={`rail-item ${!savedOnly ? 'active' : ''}`}
+              disabled={navigating}
+              onClick={() => {
+                setSavedOnly(false);
+                setPanelExpanded(true);
+                setSelected(null);
+                setRouteView(false);
+                setRoutes([]);
+              }}
+            >
+              <Compass />
+              <span>Explore</span>
+            </button>
+            <button
+              className={`rail-item ${savedOnly ? 'active' : ''}`}
+              disabled={navigating}
+              onClick={() => {
+                setSavedOnly(true);
+                setPanelExpanded(true);
+                setSelected(null);
+                setRouteView(false);
+                setRoutes([]);
+                setCategory('all');
+                setQuery('');
+              }}
+            >
+              <Heart />
+              <span>Saved</span>
+            </button>
+            <button className="rail-item" onClick={() => setDialog('offline')}>
+              <Download />
+              <span>Offline</span>
+              {latest && latest.version !== manifest.version && (
+                <i className="update-dot" />
+              )}
+            </button>
+            <div className="rail-spacer" />
+            <button className="rail-item" onClick={() => setDialog('settings')}>
+              <Settings />
+              <span>Settings</span>
+            </button>
+            <a href="/admin" className="rail-item">
+              <Shield />
+              <span>Editor</span>
+            </a>
+          </nav>
+          <div className="map-controls">
+            <MapViewControl
+              threeD={threeD}
+              onView={(value) => {
+                if (!setThreeD(value))
+                  setToast(
+                    'Map view changed for this session. Storage could not save your preference.',
+                  );
+              }}
+            />
+            <div className="control-group">
+              <button
+                aria-label="Zoom in"
+                onClick={() => {
+                  setFollow(false);
+                  map.current?.zoomIn();
+                }}
+              >
+                <Plus />
+              </button>
+              <button
+                aria-label="Zoom out"
+                onClick={() => {
+                  setFollow(false);
+                  map.current?.zoomOut();
+                }}
+              >
+                <span className="minus">−</span>
+              </button>
+            </div>
+            <button
+              aria-label="North up"
+              onClick={() => {
+                motionService().setMode('north');
+                setFollow(false);
+                map.current?.resetNorth();
+              }}
+            >
+              <Compass />
+            </button>
+            <button
+              aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
+              className={follow ? 'active' : ''}
+              onClick={() => {
+                gps.start();
+                setFollow(true);
+                if (!gps.fix)
+                  setToast(
+                    'Waiting for your location. Allow location access if prompted.',
+                  );
+              }}
+            >
+              <LocateFixed />
+            </button>
+          </div>
+          {sharedLinkMissing && (
+            <output className="notice dock-notice">
+              This destination is unavailable in your downloaded map. Search for
+              its current name, or check Offline for an update.
+              <button
+                className="text-button"
+                onClick={() => {
+                  setSharedLinkMissing(false);
+                  setSelected(null);
+                  setQuery('');
+                  setCategory('all');
+                  setSavedOnly(false);
+                  searchInput.current?.focus();
+                  const url = new URL(location.href);
+                  url.searchParams.delete('place');
+                  history.replaceState(null, '', url);
+                }}
+              >
+                Search campus places
+              </button>
+            </output>
+          )}
           {routeView && selected ? (
             <RoutePanel
               data={data}
@@ -1084,76 +1147,30 @@ export default function App() {
               </div>
             </div>
           )}
+          <div className="map-topbar">
+            <button
+              className="location-pill"
+              onClick={() => setDialog('offline')}
+            >
+              {!online ? (
+                <WifiOff size={14} />
+              ) : (
+                <span className="status-dot" />
+              )}
+              <span>{!online ? 'Offline' : 'Lagos State University'}</span>
+              <span className="pill-divider" />
+              <span>
+                {downloaded && swReady ? 'Map downloaded' : 'Ojo, Lagos'}
+              </span>
+            </button>
+          </div>
+          {threeD && (
+            <div className="map-caption">
+              3D heights include estimates. Some heights are unknown.
+            </div>
+          )}
         </div>
       </section>
-      <div className="map-topbar">
-        <button className="location-pill" onClick={() => setDialog('offline')}>
-          {!online ? <WifiOff size={14} /> : <span className="status-dot" />}
-          <span>{!online ? 'Offline' : 'Lagos State University'}</span>
-          <span className="pill-divider" />
-          <span>{downloaded && swReady ? 'Map downloaded' : 'Ojo, Lagos'}</span>
-        </button>
-      </div>
-      <div className="map-controls">
-        <MapViewControl
-          threeD={threeD}
-          onView={(value) => {
-            if (!setThreeD(value))
-              setToast(
-                'Map view changed for this session. Storage could not save your preference.',
-              );
-          }}
-        />
-        <div className="control-group">
-          <button
-            aria-label="Zoom in"
-            onClick={() => {
-              setFollow(false);
-              map.current?.zoomIn();
-            }}
-          >
-            <Plus />
-          </button>
-          <button
-            aria-label="Zoom out"
-            onClick={() => {
-              setFollow(false);
-              map.current?.zoomOut();
-            }}
-          >
-            <span className="minus">−</span>
-          </button>
-        </div>
-        <button
-          aria-label="North up"
-          onClick={() => {
-            motionService().setMode('north');
-            setFollow(false);
-            map.current?.resetNorth();
-          }}
-        >
-          <Compass />
-        </button>
-        <button
-          aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
-          className={follow ? 'active' : ''}
-          onClick={() => {
-            gps.start();
-            setFollow(true);
-            if (!gps.fix)
-              setToast(
-                'Waiting for your location. Allow location access if prompted.',
-              );
-          }}
-        >
-          <LocateFixed />
-        </button>
-      </div>
-      {threeD && (
-        <div className="map-caption">
-          3D heights include estimates. Some heights are unknown.
-        </div>
-      )}
       {gps.error && !routeView && (
         <output className="gps-status">{gps.error}</output>
       )}
@@ -1171,7 +1188,11 @@ export default function App() {
           if (!open) setDialog(null);
         }}
       >
-        <DialogContent className="app-dialog">
+        <DialogContent
+          className="app-dialog resizable-dialog"
+          style={dialogSheet.style}
+        >
+          <SheetHandle sheet={dialogSheet} label="Resize dialog" />
           <DialogHeader>
             <DialogTitle>
               {dialog === 'building'
@@ -1194,206 +1215,211 @@ export default function App() {
                     : 'Make TurnRight work for you.'}
             </DialogDescription>
           </DialogHeader>
-          {dialog === 'building' && unlinkedBuilding && (
-            <div className="settings-content">
-              <BuildingVisualDetails data={data} feature={unlinkedBuilding} />
-              <p>
-                Source:{' '}
-                {String(unlinkedBuilding.properties?.source || 'Campus map')}.
-                This footprint is not yet linked to a named destination.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const g = unlinkedBuilding.geometry;
-                  const point =
-                    g.type === 'Polygon'
-                      ? g.coordinates[0][0]
-                      : g.type === 'MultiPolygon'
-                        ? g.coordinates[0][0][0]
-                        : undefined;
-                  if (point) setReportPin(point as Position);
-                  setDialog('report');
-                }}
-              >
-                <Flag /> Report building details
-              </Button>
-            </div>
-          )}
-          {dialog === 'offline' && (
-            <OfflinePanel
-              manifest={manifest}
-              latest={latest}
-              downloaded={downloaded}
-              navigating={navigating}
-              swReady={swReady}
-              onCheck={() => void checkUpdates(true)}
-              onDelete={() => setDownloaded(false)}
-              onInstall={(nextData, nextManifest, pending) => {
-                setDownloaded(true);
-                if (!pending) {
-                  setData(nextData);
-                  setManifest(nextManifest);
-                  setRoutes([]);
-                  setRouteView(false);
-                  setSelected(null);
-                }
-                setToast(
-                  pending
-                    ? 'Download complete. It will activate after your walk.'
-                    : 'Campus map downloaded and verified.',
-                );
-              }}
-            />
-          )}{' '}
-          {dialog === 'report' && (
-            <ReportForm
-              onDraftSaved={refreshDrafts}
-              place={selected}
-              coordinates={reportPin}
-              onDone={() => {
-                setDialog(null);
-                setToast(
-                  'Report submitted. Thank you for helping improve the map.',
-                );
-              }}
-            />
-          )}{' '}
-          {dialog === 'settings' && (
-            <div className="settings-content">
-              <AppearanceSettings
-                preference={appearance}
-                dark={dark}
-                onChange={setAppearance}
-              />
-              <MapRenderingSettings simple={simple3D} onSimple={setSimple3D} />
-              <div className="settings-row">
-                <span>Voice directions</span>
-                <button
-                  role="switch"
-                  aria-checked={!muted}
-                  aria-label="Voice directions"
-                  className={`toggle ${!muted ? 'on' : ''}`}
-                  onClick={() => {
-                    setMuted(!muted);
-                    void setPreference('muted', !muted);
-                  }}
-                >
-                  <i />
-                </button>
-              </div>
-              <div className="settings-row">
-                <span>App update</span>
+          <div className="dialog-scroll-content">
+            {dialog === 'building' && unlinkedBuilding && (
+              <div className="settings-content">
+                <BuildingVisualDetails data={data} feature={unlinkedBuilding} />
+                <p>
+                  Source:{' '}
+                  {String(unlinkedBuilding.properties?.source || 'Campus map')}.
+                  This footprint is not yet linked to a named destination.
+                </p>
                 <Button
                   variant="outline"
-                  disabled={!updateReady || navigating}
-                  onClick={installAppUpdate}
+                  onClick={() => {
+                    const g = unlinkedBuilding.geometry;
+                    const point =
+                      g.type === 'Polygon'
+                        ? g.coordinates[0][0]
+                        : g.type === 'MultiPolygon'
+                          ? g.coordinates[0][0][0]
+                          : undefined;
+                    if (point) setReportPin(point as Position);
+                    setDialog('report');
+                  }}
                 >
-                  {updateReady
-                    ? navigating
-                      ? 'After navigation'
-                      : 'Install update'
-                    : 'Up to date'}
+                  <Flag /> Report building details
                 </Button>
               </div>
-              <MotionStatus modes fix={gps.fix} following={follow} />
-              <Button
-                variant="outline"
-                disabled={muted}
-                onClick={async () => {
-                  try {
-                    await voice.current.unlock();
-                    await voice.current.load(manifest.version);
-                    await voice.current.play('depart');
-                    setToast('Offline voice test played.');
-                  } catch {
-                    setToast(
-                      'Audio is unavailable. Check device volume and download the campus map.',
-                    );
+            )}
+            {dialog === 'offline' && (
+              <OfflinePanel
+                manifest={manifest}
+                latest={latest}
+                downloaded={downloaded}
+                navigating={navigating}
+                swReady={swReady}
+                onCheck={() => void checkUpdates(true)}
+                onDelete={() => setDownloaded(false)}
+                onInstall={(nextData, nextManifest, pending) => {
+                  setDownloaded(true);
+                  if (!pending) {
+                    setData(nextData);
+                    setManifest(nextManifest);
+                    setRoutes([]);
+                    setRouteView(false);
+                    setSelected(null);
                   }
+                  setToast(
+                    pending
+                      ? 'Download complete. It will activate after your walk.'
+                      : 'Campus map downloaded and verified.',
+                  );
                 }}
-              >
-                Test spoken directions
-              </Button>
-              <p className="small-note">
-                Install: in Android Chrome, choose Install app from the menu. On
-                iPhone, use Safari → Share → Add to Home Screen. Keep the app
-                visible during navigation.
-              </p>
-              <h3 className="subheading">Map coverage</h3>
-              {data.accessPolicy && (
-                <p className="small-note">
-                  Student walking access on the main internal roads was
-                  confirmed by the project owner on{' '}
-                  {data.accessPolicy.confirmedAt}. Restricted areas, no-walking
-                  paths, and closures remain excluded.
-                </p>
-              )}
-              <p>
-                {data.coverage.placeCount} places ·{' '}
-                {data.coverage.approachCount} mapped approaches ·{' '}
-                {data.coverage.routableCount} connected entrances.
-              </p>
-              <p className="notice">
-                This source-derived campus map has not been field-verified.
-                Missing entrances and paths are shown in place details.
-              </p>
-              {reportDrafts.length > 0 && (
-                <>
-                  <h3 className="subheading">Saved report drafts</h3>
-                  {reportDrafts.map((draft) => (
-                    <Button
-                      key={draft.key}
-                      variant="outline"
-                      onClick={() => {
-                        setSelected(
-                          data.places.find(
-                            (p) =>
-                              p.id ===
-                              resolvePlaceId(data, draft.placeId || ''),
-                          ) || null,
-                        );
-                        setReportPin(draft.coordinates);
-                        setDialog('report');
-                      }}
-                    >
-                      {draft.name} · Resume draft
-                    </Button>
-                  ))}
-                </>
-              )}
-              <h3 className="subheading">Your privacy</h3>
-              <p>
-                Location and navigation history stay on your phone. Student
-                reports only send the pin and description you submit. TurnRight
-                is an independent personal project, not an official LASU
-                service.
-              </p>
-              <h3 className="subheading">Sources & attribution</h3>
-              {data.sources.map((source) => (
-                <p key={source.id}>
-                  <a
-                    className="source-link"
-                    href={source.url}
-                    target="_blank"
-                    rel="noreferrer"
+              />
+            )}{' '}
+            {dialog === 'report' && (
+              <ReportForm
+                onDraftSaved={refreshDrafts}
+                place={selected}
+                coordinates={reportPin}
+                onDone={() => {
+                  setDialog(null);
+                  setToast(
+                    'Report submitted. Thank you for helping improve the map.',
+                  );
+                }}
+              />
+            )}{' '}
+            {dialog === 'settings' && (
+              <div className="settings-content">
+                <AppearanceSettings
+                  preference={appearance}
+                  dark={dark}
+                  onChange={setAppearance}
+                />
+                <MapRenderingSettings
+                  simple={simple3D}
+                  onSimple={setSimple3D}
+                />
+                <div className="settings-row">
+                  <span>Voice directions</span>
+                  <button
+                    role="switch"
+                    aria-checked={!muted}
+                    aria-label="Voice directions"
+                    className={`toggle ${!muted ? 'on' : ''}`}
+                    onClick={() => {
+                      setMuted(!muted);
+                      void setPreference('muted', !muted);
+                    }}
                   >
-                    {source.attribution}
-                  </a>
-                  <br />
-                  <span className="small-note">{source.license}</span>
+                    <i />
+                  </button>
+                </div>
+                <div className="settings-row">
+                  <span>App update</span>
+                  <Button
+                    variant="outline"
+                    disabled={!updateReady || navigating}
+                    onClick={installAppUpdate}
+                  >
+                    {updateReady
+                      ? navigating
+                        ? 'After navigation'
+                        : 'Install update'
+                      : 'Up to date'}
+                  </Button>
+                </div>
+                <MotionStatus modes fix={gps.fix} following={follow} />
+                <Button
+                  variant="outline"
+                  disabled={muted}
+                  onClick={async () => {
+                    try {
+                      await voice.current.unlock();
+                      await voice.current.load(manifest.version);
+                      await voice.current.play('depart');
+                      setToast('Offline voice test played.');
+                    } catch {
+                      setToast(
+                        'Audio is unavailable. Check device volume and download the campus map.',
+                      );
+                    }
+                  }}
+                >
+                  Test spoken directions
+                </Button>
+                <p className="small-note">
+                  Install: in Android Chrome, choose Install app from the menu.
+                  On iPhone, use Safari → Share → Add to Home Screen. Keep the
+                  app visible during navigation.
                 </p>
-              ))}
-              <a className="text-button" href={manifest.dataUrl} download>
-                Download source-derived campus database
-              </a>
-              <p className="small-note">
-                English voice directions · Walking only · Updated{' '}
-                {new Date(manifest.createdAt).toLocaleDateString()} ·{' '}
-                {manifest.version}
-              </p>
-            </div>
-          )}
+                <h3 className="subheading">Map coverage</h3>
+                {data.accessPolicy && (
+                  <p className="small-note">
+                    Student walking access on the main internal roads was
+                    confirmed by the project owner on{' '}
+                    {data.accessPolicy.confirmedAt}. Restricted areas,
+                    no-walking paths, and closures remain excluded.
+                  </p>
+                )}
+                <p>
+                  {data.coverage.placeCount} places ·{' '}
+                  {data.coverage.approachCount} mapped approaches ·{' '}
+                  {data.coverage.routableCount} connected entrances.
+                </p>
+                <p className="notice">
+                  This source-derived campus map has not been field-verified.
+                  Missing entrances and paths are shown in place details.
+                </p>
+                {reportDrafts.length > 0 && (
+                  <>
+                    <h3 className="subheading">Saved report drafts</h3>
+                    {reportDrafts.map((draft) => (
+                      <Button
+                        key={draft.key}
+                        variant="outline"
+                        onClick={() => {
+                          setSelected(
+                            data.places.find(
+                              (p) =>
+                                p.id ===
+                                resolvePlaceId(data, draft.placeId || ''),
+                            ) || null,
+                          );
+                          setReportPin(draft.coordinates);
+                          setDialog('report');
+                        }}
+                      >
+                        {draft.name} · Resume draft
+                      </Button>
+                    ))}
+                  </>
+                )}
+                <h3 className="subheading">Your privacy</h3>
+                <p>
+                  Location and navigation history stay on your phone. Student
+                  reports only send the pin and description you submit.
+                  TurnRight is an independent personal project, not an official
+                  LASU service.
+                </p>
+                <h3 className="subheading">Sources & attribution</h3>
+                {data.sources.map((source) => (
+                  <p key={source.id}>
+                    <a
+                      className="source-link"
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {source.attribution}
+                    </a>
+                    <br />
+                    <span className="small-note">{source.license}</span>
+                  </p>
+                ))}
+                <a className="text-button" href={manifest.dataUrl} download>
+                  Download source-derived campus database
+                </a>
+                <p className="small-note">
+                  English voice directions · Walking only · Updated{' '}
+                  {new Date(manifest.createdAt).toLocaleDateString()} ·{' '}
+                  {manifest.version}
+                </p>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </main>
