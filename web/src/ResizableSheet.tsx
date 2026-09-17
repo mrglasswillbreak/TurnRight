@@ -19,7 +19,12 @@ function viewport() {
   };
 }
 
-export function useSheetSize(key: string, minimum = 96, startCompact = true) {
+export function useSheetSize(
+  key: string,
+  minimum = 96,
+  startCompact = true,
+  topClearance = 32,
+) {
   const [view, setView] = useState(viewport);
   const remembered = useRef(0.56);
   const [requested, setRequested] = useState(() => {
@@ -32,7 +37,7 @@ export function useSheetSize(key: string, minimum = 96, startCompact = true) {
     return startCompact ? minimum : view.height * remembered.current;
   });
   const drag = useRef<{ id: number; y: number; height: number } | null>(null);
-  const { min, max } = sheetLimits(view.height, minimum);
+  const { min, max } = sheetLimits(view.height, minimum, topClearance);
   const height = clampSheetHeight(requested, min, max);
   const expanded = height > min + 8;
   const current = useRef(height);

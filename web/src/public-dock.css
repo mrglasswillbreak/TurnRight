@@ -339,16 +339,57 @@
     top: max(12px, env(safe-area-inset-top));
   }
   .app-shell .maplibregl-ctrl-bottom-left {
-    left: 12px;
+    left: 50%;
     right: auto;
+    transform: translateX(-50%);
     bottom: calc(var(--sheet-height) + var(--sheet-bottom-offset, 0px) + 22px);
   }
   .app-shell .maplibregl-ctrl-attrib {
     font-size: 8px;
   }
   .app-shell .map-controls {
-    gap: 6px;
-    padding-inline: 14px;
+    position: absolute;
+    z-index: 8;
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(
+      var(--sheet-height) + var(--sheet-bottom-offset, 0px) +
+        max(12px, env(safe-area-inset-bottom)) + 12px
+    );
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 48px 48px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border: 0;
+    pointer-events: none;
+  }
+  .app-shell .map-controls > * {
+    pointer-events: auto;
+    box-shadow: 0 3px 16px #142b3b26;
+    backdrop-filter: blur(16px);
+    background: color-mix(in srgb, var(--background) 92%, transparent);
+  }
+  .app-shell .map-controls button {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+  }
+  .app-shell .map-controls > button:has(span:not(.minus)) {
+    height: 48px;
+    width: 70px;
+  }
+  .app-shell .map-controls > :nth-child(even) {
+    justify-self: end;
+  }
+  .app-shell .map-controls .control-group {
+    height: 48px;
+    border-radius: 24px;
+  }
+  .app-shell .map-controls .control-group button {
+    background: transparent;
   }
   .app-dialog.resizable-dialog {
     transition-property: opacity, transform, translate, background-color, color;

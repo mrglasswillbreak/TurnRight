@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/dialog';
 import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { SheetHandle, useSheetSize } from './ResizableSheet';
 import { publicMapPadding } from './public-map-layout';
 import './public-dock.css';
@@ -115,7 +116,16 @@ export default function App() {
   );
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
-  const panelSheet = useSheetSize('search');
+  const mobileMapControls = useIsMobile(
+    '(max-width: 767px), (max-width: 1000px) and (max-height: 500px)',
+  );
+  // Leave space for both rows of map controls above the expanded mobile card.
+  const panelSheet = useSheetSize(
+    'search',
+    96,
+    true,
+    mobileMapControls ? 208 : 32,
+  );
   const dialogSheet = useSheetSize('dialogs', 220, false);
   const panelExpanded = panelSheet.expanded;
   const setPanelExpanded = panelSheet.setExpanded;
@@ -655,6 +665,63 @@ export default function App() {
         />
       </Suspense>
     );
+  const mapControls = (
+    <div className="map-controls">
+      <MapViewControl
+        threeD={threeD}
+        onView={(value) => {
+          if (!setThreeD(value))
+            setToast(
+              'Map view changed for this session. Storage could not save your preference.',
+            );
+        }}
+      />
+      <div className="control-group">
+        <button
+          aria-label="Zoom in"
+          onClick={() => {
+            setFollow(false);
+            map.current?.zoomIn();
+          }}
+        >
+          <Plus />
+        </button>
+        <button
+          aria-label="Zoom out"
+          onClick={() => {
+            setFollow(false);
+            map.current?.zoomOut();
+          }}
+        >
+          <span className="minus">−</span>
+        </button>
+      </div>
+      <button
+        aria-label="North up"
+        onClick={() => {
+          motionService().setMode('north');
+          setFollow(false);
+          map.current?.resetNorth();
+        }}
+      >
+        <Compass />
+      </button>
+      <button
+        aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
+        className={follow ? 'active' : ''}
+        onClick={() => {
+          gps.start();
+          setFollow(true);
+          if (!gps.fix)
+            setToast(
+              'Waiting for your location. Allow location access if prompted.',
+            );
+        }}
+      >
+        <LocateFixed />
+      </button>
+    </div>
+  );
   return (
     <main
       className={`app-shell ${navigating ? 'is-navigating' : ''}`}
@@ -701,6 +768,7 @@ export default function App() {
         }}
       />
 
+      {mobileMapControls && mapControls}
       <div className="public-brand" aria-label="TurnRight · LASU Ojo">
         <span className="brandmark">
           <ArrowUpRight />
@@ -825,61 +893,7 @@ export default function App() {
               <span>Editor</span>
             </a>
           </nav>
-          <div className="map-controls">
-            <MapViewControl
-              threeD={threeD}
-              onView={(value) => {
-                if (!setThreeD(value))
-                  setToast(
-                    'Map view changed for this session. Storage could not save your preference.',
-                  );
-              }}
-            />
-            <div className="control-group">
-              <button
-                aria-label="Zoom in"
-                onClick={() => {
-                  setFollow(false);
-                  map.current?.zoomIn();
-                }}
-              >
-                <Plus />
-              </button>
-              <button
-                aria-label="Zoom out"
-                onClick={() => {
-                  setFollow(false);
-                  map.current?.zoomOut();
-                }}
-              >
-                <span className="minus">−</span>
-              </button>
-            </div>
-            <button
-              aria-label="North up"
-              onClick={() => {
-                motionService().setMode('north');
-                setFollow(false);
-                map.current?.resetNorth();
-              }}
-            >
-              <Compass />
-            </button>
-            <button
-              aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
-              className={follow ? 'active' : ''}
-              onClick={() => {
-                gps.start();
-                setFollow(true);
-                if (!gps.fix)
-                  setToast(
-                    'Waiting for your location. Allow location access if prompted.',
-                  );
-              }}
-            >
-              <LocateFixed />
-            </button>
-          </div>
+          {!mobileMapControls && mapControls}
           {sharedLinkMissing && (
             <output className="notice dock-notice">
               This destination is unavailable in your downloaded map. Search for

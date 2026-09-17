@@ -93,7 +93,7 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173), choose **Offline → Download camp
 
 ## Using the public map
 
-The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline, Settings and the map controls. Drag the handle at the top of the card to change its height; mobile dialogs have the same handle. Your chosen expanded heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
+The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline and Settings. On mobile, view and compass controls sit on the left of the map, with zoom and location controls on the right; desktop map controls stay inside the panel. Drag the handle at the top of the card to change its height; mobile dialogs have the same handle. Your chosen expanded heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
 
 1. Search for a building, faculty or service, or narrow the map with a category.
 2. Open its details to check provenance, walking coverage and any building evidence. Save, share or report the place.
