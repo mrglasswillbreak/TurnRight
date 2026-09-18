@@ -15,3 +15,19 @@ The accepted baseline is `lasu-03bc96e56965` (153 nodes / 299 edges).
 Edge `osm:way:1534765716:2297333149:2297333129:1` references missing sampled nodes
 ending in `:10` and `:9`. The unpublished path join triggers the global distance
 calculation that exposes that unrelated source defect.
+
+## Public mobile search keyboard
+
+Open `/tests/fixtures/keyboard-check.html` with the Vite development server
+and a phone viewport. Focusing Search campus displays a 340 px simulated
+keyboard and sends visual viewport resize/scroll events while the layout
+viewport stays full size. The fixture is excluded from production builds.
+
+Verified at 390 × 844 and 360 × 660: results remain above the keyboard,
+scroll with the main navigation pinned, survive viewport panning, and open
+on the first tap. Selecting a place dismisses the keyboard and restores the
+normal card height. Collapse/reopen preserves that height. Also check the
+public page at 390 × 450 for browsers that resize the layout viewport, and
+at desktop size for the unchanged full-height adjustable card.
+
+The desktop simulation does not replace a real iOS/Android keyboard check.
