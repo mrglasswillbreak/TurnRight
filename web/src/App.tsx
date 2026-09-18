@@ -53,6 +53,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { SheetHandle, useSheetSize } from './ResizableSheet';
 import { AppUpdateNotice } from './AppUpdateNotice';
 import { publicMapPadding } from './public-map-layout';
+import { ResultTap } from './result-tap';
 import { CAMPUS_MIN_ZOOM, returnToCampus } from './world-map';
 import './public-dock.css';
 import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
@@ -150,6 +151,7 @@ export default function App() {
   const sharedLinkOpened = useRef('');
   const searchInput = useRef<HTMLInputElement>(null);
   const panelContent = useRef<HTMLDivElement>(null);
+  const resultTap = useRef(new ResultTap());
   const [saved, setSaved] = useState<string[]>([]),
     [recent, setRecent] = useState<string[]>([]),
     [savedOnly, setSavedOnly] = useState(false);
@@ -1097,15 +1099,26 @@ export default function App() {
                     className="place-row"
                     key={place.id}
                     onPointerDown={(event) => {
-                      // Keep the keyboard from moving the result before the tap
-                      // completes. Selection dismisses it in selectPlace.
-                      if (
-                        mobileSearch &&
-                        document.activeElement === searchInput.current
-                      )
+                      if (resultTap.current.begin(event, mobileSearch)) {
                         event.preventDefault();
+                        event.currentTarget.setPointerCapture(event.pointerId);
+                      }
                     }}
-                    onClick={() => selectPlace(place)}
+                    onPointerMove={(event) => resultTap.current.move(event)}
+                    onPointerUp={(event) => {
+                      if (resultTap.current.end(event)) {
+                        event.preventDefault();
+                        selectPlace(place);
+                      }
+                    }}
+                    onPointerCancel={() => resultTap.current.cancel()}
+                    onLostPointerCapture={() => resultTap.current.cancel()}
+                    onContextMenu={() => resultTap.current.cancel()}
+                    onClick={(event) => {
+                      if (resultTap.current.allowClick(event.detail))
+                        selectPlace(place);
+                      else event.preventDefault();
+                    }}
                   >
                     <span className={`place-icon ${place.category}`}>
                       {place.category === 'library' ? (
