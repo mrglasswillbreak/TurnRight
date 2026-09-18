@@ -1,0 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+kokoro==0.9.4
+misaki[en]==0.9.4
+torch==2.6.0+cpu
+numpy==2.2.6
+soundfile==0.13.1
+lameenc==1.8.4
+espeakng-loader==0.2.4
+transformers==4.48.3
+huggingface-hub==0.28.1
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

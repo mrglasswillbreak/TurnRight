@@ -12,6 +12,7 @@ data/runtime-audit.json
 test-results/
 playwright-report/
 __pycache__/
+.venv-voice/
 *.pyc
 web/lint-results.json
 web/lint-check.txt

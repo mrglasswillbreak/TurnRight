@@ -1,0 +1,1645 @@
+{
+  "schemaVersion": 1,
+  "sourceVersion": "lasu-06da0dddfcf6",
+  "sourceUrl": "https://turnright.vercel.app/packages/lasu-06da0dddfcf6/campus.json",
+  "sourceSha256": "23ba61ba0bfb276e7807af486de9d0d254a5ce04a8e23a991d385a8452099786",
+  "voice": "bf_emma",
+  "language": "en-GB",
+  "model": "hexgrad/Kokoro-82M",
+  "revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+  "files": {
+    "kokoro-v1_0.pth": "496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4",
+    "voices/bf_emma.pt": "d0a423deabf4a52b4f49318c51742c54e21bb89bbbe9a12141e7758ddb5da701"
+  },
+  "destinations": {
+    "a.j": "destination:b3d220d98aba24ff",
+    "aceiise": "destination:8c22ce4735976078",
+    "asuu lasu cooperative golden pharmacy": "destination:ee6a253c2c74d31a",
+    "abisogun leigh science block": "destination:764030c5caf90b39",
+    "access": "destination:a0561fd649cdb6ba",
+    "access bank": "destination:9d086dbb9431d2c1",
+    "admin block 1": "destination:0e7b7bffdbb30f0d",
+    "admin block 2": "destination:1b26175ec9d7195d",
+    "alumni block": "destination:08f9b48396029b18",
+    "art auditorium": "destination:a2bafa1c1acce9d4",
+    "art building": "destination:44b330dfd6c9a327",
+    "art classroom": "destination:863cd3997339dbb1",
+    "automedis limited": "destination:b88e86b31b6f6217",
+    "buba marwa hall": "destination:5f308ac11929847f",
+    "benson hall": "destination:eca2c6bf3f726f54",
+    "bio-chem relaxation centre": "destination:67b7d2cc0c10e95f",
+    "bookshop": "destination:0299706ac912e1d4",
+    "botanical garden": "destination:6c0ab3ed289bcb2c",
+    "building underconstruction": "destination:bd924e628c79d63d",
+    "business area (science)": "destination:ff30a113c3709cff",
+    "c.p.s": "destination:8e55f4c9b24ebd40",
+    "cesd": "destination:5dd9c66e5fd8bf3b",
+    "chl": "destination:fe34785479fd2e3f",
+    "campus place": "destination:ad13e3e083ed9226",
+    "chapel": "destination:7b2c852b2a2d5eea",
+    "chapel extension": "destination:364123402d140b14",
+    "computer science lab": "destination:9bcd4d58740ceb57",
+    "cooperative multi-purpose": "destination:1ae96204e67786d4",
+    "department of theartre arts and music": "destination:0a389047e1cf47f0",
+    "eco libraryt business centres": "destination:5edd631e8b09f7f5",
+    "education annex./cesd": "destination:ea297e1dbf1767a0",
+    "eco library and business centres": "destination:c2d751bcd67da80a",
+    "english language hall": "destination:cfd4d8e58abb11f9",
+    "f.a. classroom": "destination:81a9087e2382da1a",
+    "fa lang lab": "destination:7b2f1c3113a18e6e",
+    "fms": "destination:b6dfa7c04ce31df4",
+    "fms 2 in 1": "destination:cd65a7ccecb4e0d4",
+    "fms extension": "destination:71d9686a6fa72eaf",
+    "fms kitchen": "destination:93d631c289584ae1",
+    "fms marketing studio": "destination:5cb12b8bdca6bce8",
+    "fss": "destination:26d44010e3a666aa",
+    "fss hut": "destination:a29ff77536b548b6",
+    "fss kitchen": "destination:ebef0c8473891b28",
+    "fac. of edu. extension": "destination:feb413bed2a69133",
+    "fac. of edu. kitchen": "destination:f5c0ebcab0c2c77b",
+    "fac. of edu. new building": "destination:65319c5632662c6f",
+    "fac. of education 3 in 1": "destination:aa4caf5f37a2e28f",
+    "fac. of law": "destination:5ac6ef3e5d5932e7",
+    "fac. office (law) 1": "destination:43fdafad0ed0ce66",
+    "faculty of education 3 in 1": "destination:8f71bde781662f1f",
+    "faculty of education extension": "destination:1a80720d3ed24951",
+    "faculty of education kitchen": "destination:34dd132a0506107d",
+    "faculty of education new building": "destination:6a8e952bbc5583b4",
+    "faculty of law": "destination:7f083ed61998a74b",
+    "faculty of art language lab": "destination:86b0f5a89924dccb",
+    "faculty of social science": "destination:f6be8dc7027dd068",
+    "fish farm": "destination:ca05fbfb3553e70d",
+    "i.r.m.p": "destination:6389e75ca02828be",
+    "ict": "destination:175a680792c1fbf7",
+    "information block": "destination:ade71b54a2620c60",
+    "iya wariz": "destination:6249fdb804adb23c",
+    "lacvis": "destination:b1fda4644e891e13",
+    "lasu (sieu)": "destination:3db606a57b9dfc78",
+    "lasu clinic": "destination:9e633d900251d437",
+    "lasu ap": "destination:82177e06a5508c63",
+    "lasu cbt": "destination:490759e9dc3636b9",
+    "lasu coop. annex": "destination:5d7351edc1f96a63",
+    "lasu distance learning": "destination:49f26a25888bd726",
+    "lasu ent centre": "destination:e9660c279d6d1017",
+    "lasu int. sch. building 1": "destination:615e09264c9c13d3",
+    "lasu int. sch. building 2": "destination:13317512a278c1e6",
+    "lasu international library": "destination:464ed400eefa01db",
+    "lasu main auditorium": "destination:d4879b98d52d5f26",
+    "lasu public toilet": "destination:0f12360c2eedf4ac",
+    "lasu radio": "destination:b9ecbea664c63b44",
+    "lasu senate building": "destination:99abbeae702bb4dd",
+    "lasu water works": "destination:9b4827fde4955d7c",
+    "lag. lab": "destination:5abb422d5eb5cefe",
+    "lagos home block 1": "destination:dfc42f497b651f49",
+    "lagos home block 2": "destination:da87a2f5621354a5",
+    "lagos home block 3": "destination:0740ab98da80e5a7",
+    "lagos state university": "destination:6abf845b51792a87",
+    "language lab": "destination:b340bcceb324b0b7",
+    "law clinic": "destination:3ea78f00a914c4cb",
+    "law library": "destination:61e02d4123eea118",
+    "law office1 2": "destination:95cb73814f8a6be0",
+    "law toilet": "destination:680f295e0d60d1c8",
+    "m.b.a": "destination:87a10316be7635c1",
+    "m.b.a.": "destination:f5d8acec9cd70b91",
+    "makanjuola lecture theatre": "destination:5826fe5fd84b121a",
+    "mass comm": "destination:30b222496a976f14",
+    "mass communication": "destination:fae6f77eddf5231c",
+    "mass communication lecture hall": "destination:2e9777bef2c8e838",
+    "moot court": "destination:a861050eced57726",
+    "mosque": "destination:253221cbda027cc9",
+    "new building": "destination:e799dda9221483c4",
+    "naval base kitchen": "destination:5adbc4dc59d39a57",
+    "naval base/kitchen": "destination:bc60ecaf7e0a29a9",
+    "new fms annex": "destination:9f66c14a83d82708",
+    "new science block": "destination:1201f1a415a82661",
+    "new staff quarters block 1": "destination:0526b23eeb8049f2",
+    "new staff quarters block 2": "destination:afd90c79e42f09dc",
+    "new staff quarters block 3": "destination:ebf32ace85a665ef",
+    "new zenith bank": "destination:f7752a4abb0fd5e3",
+    "old female hostel": "destination:2791270925281c89",
+    "old zenith bank": "destination:d4916a626bbb3239",
+    "ongoing construction": "destination:59dca0ea22f4c419",
+    "ongoing construction beside edu.": "destination:3a534163f78870ef",
+    "ongoing fms extension": "destination:6d1cab9ab33c0f38",
+    "ongoing student village 1": "destination:1ad1e006df5b9cc1",
+    "ongoing student village 2": "destination:31f74aa3f25cfb70",
+    "pg school": "destination:3ca0e0a8e56d646c",
+    "pgd hall": "destination:905fb42928304ca9",
+    "psy lab": "destination:274bd9b746c73529",
+    "pharmarcy medical laboratory unit": "destination:d2054a44c7ea4935",
+    "physics lab 1": "destination:fb9a1005b264e8c7",
+    "physics lab 2": "destination:a1e0ddbc41e9a04f",
+    "post office": "destination:4b3baa4f4e5850ea",
+    "professorial office": "destination:0d9218b1ea18dab4",
+    "proposed gbajabiamila hall": "destination:69fccd02d2178562",
+    "proposed mvaa": "destination:01638cc965c583c6",
+    "proposed tech hub": "destination:2c6ed63128107e75",
+    "public toilet": "destination:36d01eef3ebeb0aa",
+    "radiation monitoring and protection service": "destination:4a9b03cddfb69d70",
+    "religion dept.": "destination:15dc338cef43dd6c",
+    "s.l.edu. hall": "destination:e8f7c2a958c309ba",
+    "s.q. block 1": "destination:e27298c0b558aba9",
+    "s.q. block 2": "destination:11b2075307960e2e",
+    "s.q. block 3": "destination:3eb2b76d07a31119",
+    "s.q. block 4": "destination:1a409fbc8fcdd3bf",
+    "school of transport and logistics": "destination:1ef4318fa8f92671",
+    "sdg-phc facility": "destination:3b3153f4ad2fd4fa",
+    "ssanu office": "destination:ee84e0db0618c89b",
+    "sch. car park": "destination:2d23eaf0459a84e1",
+    "sch. library": "destination:324f19511a3e2ec4",
+    "school car park": "destination:a23a2f307900fd19",
+    "school library": "destination:36c0f90fbf84e49c",
+    "school of transport": "destination:ec279f58c44fda03",
+    "school of transportc": "destination:eb1db6e5e12e7a6b",
+    "science annex": "destination:aae4fbbbb1ebcfe1",
+    "science lab 2": "destination:c75c2fc31573691e",
+    "science lab. 1": "destination:1e511ae26548be1e",
+    "science lab. extension": "destination:d6a1625627ac10c1",
+    "science library": "destination:dded1dfa72acb28e",
+    "senate chambers": "destination:614a0294c4328338",
+    "site for materials production": "destination:4f26475883f3c831",
+    "sport center": "destination:b12b4061ecf44daf",
+    "sports center": "destination:c632ffeac00554ff",
+    "staff club": "destination:450e74a718adfec9",
+    "staff qtrs 1a&b": "destination:ef80ad2a6e3d4eed",
+    "staff qtrs 2a&b": "destination:66ea25cf3da93949",
+    "staff qtrs 4a&b": "destination:c6518ddb4683efbc",
+    "staff qtrs 5a&b": "destination:1f04b9b68a587c16",
+    "staff qtrs 6a&b": "destination:dbaa6846ed33db10",
+    "staff qtrs 7a&b": "destination:79f736fb2caec0a5",
+    "staff quarter block 1": "destination:3a6a5b4f30a77236",
+    "staff quarter block 2": "destination:e4f45eea547169c0",
+    "staff quarter block 3": "destination:e1fe3578ad927e43",
+    "staff quarter block 4": "destination:642187ae9022554a",
+    "staff quarters duplex 1a&b": "destination:a92cc3ce77b2cb56",
+    "staff quarters duplex 2a&b": "destination:c329cb13becbfd84",
+    "staff quarters duplex 3a&b": "destination:a25e900cbd94aac2",
+    "staff quarters duplex 4a&b": "destination:9df03a50c9f77058",
+    "staff quarters duplex 5a and b": "destination:db47b1f2f16e631f",
+    "staff quarters duplex 5a&b": "destination:68d78da804d65f8d",
+    "staff quarters duplex 6a&b": "destination:6801325484361b7e",
+    "staff quarters duplex 7a&b": "destination:b2ffa3c313a804c1",
+    "staff school": "destination:fc20655dc775f24e",
+    "sterling": "destination:401cb0a3c9577a6a",
+    "sterling bank": "destination:0ca78457318551c5",
+    "store": "destination:824d80d71985f082",
+    "stu. affairs (career & councelling)": "destination:9b0824f6f2d13d03",
+    "student affairs": "destination:570e7d67e1f2841b",
+    "student affairs (career & councelling)": "destination:8a9a3ddd8000273c",
+    "student arcade": "destination:da61580d039fcccc",
+    "student center (law)": "destination:67c6cdf031e0675d",
+    "student union office": "destination:6d26696404caea5a",
+    "uba": "destination:a878bdd615682066",
+    "uba bank": "destination:58fef12758df6ea9",
+    "union": "destination:ef3ff703d7565ab5",
+    "union bank": "destination:daf79e5161fa9c17",
+    "wema bank": "destination:338c2b2d416602f4",
+    "wema": "destination:47cc76f3af40dd2e",
+    "works department": "destination:121efd61c5f12315",
+    "works dept.": "destination:c0c4c8084133bbc6",
+    "zenith": "destination:0d517047196cd116",
+    "zenith i.c.t": "destination:9b1a9b8e3f24a8d4",
+    "zoological garden": "destination:9db10771d95c8bcb"
+  },
+  "roads": {
+    "law road": "1c7a61c3b09a"
+  },
+  "phrases": {
+    "depart": {
+      "transcript": "Start walking along the highlighted route.",
+      "spoken": "Start walking along the highlighted route."
+    },
+    "continue": {
+      "transcript": "Continue along the highlighted route.",
+      "spoken": "Continue along the highlighted route."
+    },
+    "destination-ahead": {
+      "transcript": "Your destination is ahead. Keep following the highlighted route.",
+      "spoken": "Your destination is ahead. Keep following the highlighted route."
+    },
+    "arrive-entrance": {
+      "transcript": "You have reached the mapped entrance. Your walking route is complete.",
+      "spoken": "You have reached the mapped entrance. Your walking route is complete."
+    },
+    "arrive-approach": {
+      "transcript": "You have reached the end of the mapped route. Your destination is nearby, but its entrance connection has not been verified.",
+      "spoken": "You have reached the end of the mapped route. Your destination is nearby, but its entrance connection has not been verified."
+    },
+    "weak": {
+      "transcript": "Your location signal is weak. Directions are paused until it improves.",
+      "spoken": "Your location signal is weak. Directions are paused until it improves."
+    },
+    "stale": {
+      "transcript": "Your location has stopped updating. Directions will resume when your location is available.",
+      "spoken": "Your location has stopped updating. Directions will resume when your location is available."
+    },
+    "recovered": {
+      "transcript": "Your location is available again. Follow the highlighted route.",
+      "spoken": "Your location is available again. Follow the highlighted route."
+    },
+    "rerouting": {
+      "transcript": "You are away from the route. Finding a new walking route.",
+      "spoken": "You are away from the route. Finding a new walking route."
+    },
+    "rerouted": {
+      "transcript": "Your walking route has been updated.",
+      "spoken": "Your walking route has been updated."
+    },
+    "route-unavailable": {
+      "transcript": "A new walking route could not be found. Check the map before continuing.",
+      "spoken": "A new walking route could not be found. Check the map before continuing."
+    },
+    "off-route": {
+      "transcript": "You are away from the highlighted route. Checking your location.",
+      "spoken": "You are away from the highlighted route. Checking your location."
+    },
+    "ready": {
+      "transcript": "Natural voice directions are on. In about thirty metres, turn left. Then turn right.",
+      "spoken": "Natural voice directions are on. In about thirty metres, turn left. Then turn right."
+    },
+    "turn:left:now": {
+      "transcript": "Now, turn left.",
+      "spoken": "Now, turn left."
+    },
+    "turn:left:now:1c7a61c3b09a": {
+      "transcript": "Now, turn left onto LAW road.",
+      "spoken": "Now, turn left onto Law road."
+    },
+    "turn:left:10": {
+      "transcript": "In about ten metres, turn left.",
+      "spoken": "In about ten metres, turn left."
+    },
+    "turn:left:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, turn left onto LAW road.",
+      "spoken": "In about ten metres, turn left onto Law road."
+    },
+    "turn:left:20": {
+      "transcript": "In about twenty metres, turn left.",
+      "spoken": "In about twenty metres, turn left."
+    },
+    "turn:left:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, turn left onto LAW road.",
+      "spoken": "In about twenty metres, turn left onto Law road."
+    },
+    "turn:left:30": {
+      "transcript": "In about thirty metres, turn left.",
+      "spoken": "In about thirty metres, turn left."
+    },
+    "turn:left:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, turn left onto LAW road.",
+      "spoken": "In about thirty metres, turn left onto Law road."
+    },
+    "turn:left:40": {
+      "transcript": "In about forty metres, turn left.",
+      "spoken": "In about forty metres, turn left."
+    },
+    "turn:left:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, turn left onto LAW road.",
+      "spoken": "In about forty metres, turn left onto Law road."
+    },
+    "turn:left:50": {
+      "transcript": "In about fifty metres, turn left.",
+      "spoken": "In about fifty metres, turn left."
+    },
+    "turn:left:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, turn left onto LAW road.",
+      "spoken": "In about fifty metres, turn left onto Law road."
+    },
+    "turn:left:60": {
+      "transcript": "In about sixty metres, turn left.",
+      "spoken": "In about sixty metres, turn left."
+    },
+    "turn:left:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, turn left onto LAW road.",
+      "spoken": "In about sixty metres, turn left onto Law road."
+    },
+    "turn:left:100": {
+      "transcript": "In about one hundred metres, turn left.",
+      "spoken": "In about one hundred metres, turn left."
+    },
+    "turn:left:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, turn left onto LAW road.",
+      "spoken": "In about one hundred metres, turn left onto Law road."
+    },
+    "turn:left:200": {
+      "transcript": "In about two hundred metres, turn left.",
+      "spoken": "In about two hundred metres, turn left."
+    },
+    "turn:left:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, turn left onto LAW road.",
+      "spoken": "In about two hundred metres, turn left onto Law road."
+    },
+    "chain:left:left:soon": {
+      "transcript": "Ahead, turn left, then turn left.",
+      "spoken": "Ahead, turn left, then turn left."
+    },
+    "chain:left:left:now": {
+      "transcript": "Now, turn left, then turn left.",
+      "spoken": "Now, turn left, then turn left."
+    },
+    "chain:left:right:soon": {
+      "transcript": "Ahead, turn left, then turn right.",
+      "spoken": "Ahead, turn left, then turn right."
+    },
+    "chain:left:right:now": {
+      "transcript": "Now, turn left, then turn right.",
+      "spoken": "Now, turn left, then turn right."
+    },
+    "chain:left:slight-left:soon": {
+      "transcript": "Ahead, turn left, then bear left.",
+      "spoken": "Ahead, turn left, then bear left."
+    },
+    "chain:left:slight-left:now": {
+      "transcript": "Now, turn left, then bear left.",
+      "spoken": "Now, turn left, then bear left."
+    },
+    "chain:left:slight-right:soon": {
+      "transcript": "Ahead, turn left, then bear right.",
+      "spoken": "Ahead, turn left, then bear right."
+    },
+    "chain:left:slight-right:now": {
+      "transcript": "Now, turn left, then bear right.",
+      "spoken": "Now, turn left, then bear right."
+    },
+    "chain:left:uturn:soon": {
+      "transcript": "Ahead, turn left, then turn around when it is safe.",
+      "spoken": "Ahead, turn left, then turn around when it is safe."
+    },
+    "chain:left:uturn:now": {
+      "transcript": "Now, turn left, then turn around when it is safe.",
+      "spoken": "Now, turn left, then turn around when it is safe."
+    },
+    "turn:right:now": {
+      "transcript": "Now, turn right.",
+      "spoken": "Now, turn right."
+    },
+    "turn:right:now:1c7a61c3b09a": {
+      "transcript": "Now, turn right onto LAW road.",
+      "spoken": "Now, turn right onto Law road."
+    },
+    "turn:right:10": {
+      "transcript": "In about ten metres, turn right.",
+      "spoken": "In about ten metres, turn right."
+    },
+    "turn:right:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, turn right onto LAW road.",
+      "spoken": "In about ten metres, turn right onto Law road."
+    },
+    "turn:right:20": {
+      "transcript": "In about twenty metres, turn right.",
+      "spoken": "In about twenty metres, turn right."
+    },
+    "turn:right:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, turn right onto LAW road.",
+      "spoken": "In about twenty metres, turn right onto Law road."
+    },
+    "turn:right:30": {
+      "transcript": "In about thirty metres, turn right.",
+      "spoken": "In about thirty metres, turn right."
+    },
+    "turn:right:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, turn right onto LAW road.",
+      "spoken": "In about thirty metres, turn right onto Law road."
+    },
+    "turn:right:40": {
+      "transcript": "In about forty metres, turn right.",
+      "spoken": "In about forty metres, turn right."
+    },
+    "turn:right:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, turn right onto LAW road.",
+      "spoken": "In about forty metres, turn right onto Law road."
+    },
+    "turn:right:50": {
+      "transcript": "In about fifty metres, turn right.",
+      "spoken": "In about fifty metres, turn right."
+    },
+    "turn:right:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, turn right onto LAW road.",
+      "spoken": "In about fifty metres, turn right onto Law road."
+    },
+    "turn:right:60": {
+      "transcript": "In about sixty metres, turn right.",
+      "spoken": "In about sixty metres, turn right."
+    },
+    "turn:right:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, turn right onto LAW road.",
+      "spoken": "In about sixty metres, turn right onto Law road."
+    },
+    "turn:right:100": {
+      "transcript": "In about one hundred metres, turn right.",
+      "spoken": "In about one hundred metres, turn right."
+    },
+    "turn:right:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, turn right onto LAW road.",
+      "spoken": "In about one hundred metres, turn right onto Law road."
+    },
+    "turn:right:200": {
+      "transcript": "In about two hundred metres, turn right.",
+      "spoken": "In about two hundred metres, turn right."
+    },
+    "turn:right:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, turn right onto LAW road.",
+      "spoken": "In about two hundred metres, turn right onto Law road."
+    },
+    "chain:right:left:soon": {
+      "transcript": "Ahead, turn right, then turn left.",
+      "spoken": "Ahead, turn right, then turn left."
+    },
+    "chain:right:left:now": {
+      "transcript": "Now, turn right, then turn left.",
+      "spoken": "Now, turn right, then turn left."
+    },
+    "chain:right:right:soon": {
+      "transcript": "Ahead, turn right, then turn right.",
+      "spoken": "Ahead, turn right, then turn right."
+    },
+    "chain:right:right:now": {
+      "transcript": "Now, turn right, then turn right.",
+      "spoken": "Now, turn right, then turn right."
+    },
+    "chain:right:slight-left:soon": {
+      "transcript": "Ahead, turn right, then bear left.",
+      "spoken": "Ahead, turn right, then bear left."
+    },
+    "chain:right:slight-left:now": {
+      "transcript": "Now, turn right, then bear left.",
+      "spoken": "Now, turn right, then bear left."
+    },
+    "chain:right:slight-right:soon": {
+      "transcript": "Ahead, turn right, then bear right.",
+      "spoken": "Ahead, turn right, then bear right."
+    },
+    "chain:right:slight-right:now": {
+      "transcript": "Now, turn right, then bear right.",
+      "spoken": "Now, turn right, then bear right."
+    },
+    "chain:right:uturn:soon": {
+      "transcript": "Ahead, turn right, then turn around when it is safe.",
+      "spoken": "Ahead, turn right, then turn around when it is safe."
+    },
+    "chain:right:uturn:now": {
+      "transcript": "Now, turn right, then turn around when it is safe.",
+      "spoken": "Now, turn right, then turn around when it is safe."
+    },
+    "turn:slight-left:now": {
+      "transcript": "Now, bear left.",
+      "spoken": "Now, bear left."
+    },
+    "turn:slight-left:now:1c7a61c3b09a": {
+      "transcript": "Now, bear left onto LAW road.",
+      "spoken": "Now, bear left onto Law road."
+    },
+    "turn:slight-left:10": {
+      "transcript": "In about ten metres, bear left.",
+      "spoken": "In about ten metres, bear left."
+    },
+    "turn:slight-left:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, bear left onto LAW road.",
+      "spoken": "In about ten metres, bear left onto Law road."
+    },
+    "turn:slight-left:20": {
+      "transcript": "In about twenty metres, bear left.",
+      "spoken": "In about twenty metres, bear left."
+    },
+    "turn:slight-left:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, bear left onto LAW road.",
+      "spoken": "In about twenty metres, bear left onto Law road."
+    },
+    "turn:slight-left:30": {
+      "transcript": "In about thirty metres, bear left.",
+      "spoken": "In about thirty metres, bear left."
+    },
+    "turn:slight-left:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, bear left onto LAW road.",
+      "spoken": "In about thirty metres, bear left onto Law road."
+    },
+    "turn:slight-left:40": {
+      "transcript": "In about forty metres, bear left.",
+      "spoken": "In about forty metres, bear left."
+    },
+    "turn:slight-left:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, bear left onto LAW road.",
+      "spoken": "In about forty metres, bear left onto Law road."
+    },
+    "turn:slight-left:50": {
+      "transcript": "In about fifty metres, bear left.",
+      "spoken": "In about fifty metres, bear left."
+    },
+    "turn:slight-left:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, bear left onto LAW road.",
+      "spoken": "In about fifty metres, bear left onto Law road."
+    },
+    "turn:slight-left:60": {
+      "transcript": "In about sixty metres, bear left.",
+      "spoken": "In about sixty metres, bear left."
+    },
+    "turn:slight-left:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, bear left onto LAW road.",
+      "spoken": "In about sixty metres, bear left onto Law road."
+    },
+    "turn:slight-left:100": {
+      "transcript": "In about one hundred metres, bear left.",
+      "spoken": "In about one hundred metres, bear left."
+    },
+    "turn:slight-left:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, bear left onto LAW road.",
+      "spoken": "In about one hundred metres, bear left onto Law road."
+    },
+    "turn:slight-left:200": {
+      "transcript": "In about two hundred metres, bear left.",
+      "spoken": "In about two hundred metres, bear left."
+    },
+    "turn:slight-left:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, bear left onto LAW road.",
+      "spoken": "In about two hundred metres, bear left onto Law road."
+    },
+    "chain:slight-left:left:soon": {
+      "transcript": "Ahead, bear left, then turn left.",
+      "spoken": "Ahead, bear left, then turn left."
+    },
+    "chain:slight-left:left:now": {
+      "transcript": "Now, bear left, then turn left.",
+      "spoken": "Now, bear left, then turn left."
+    },
+    "chain:slight-left:right:soon": {
+      "transcript": "Ahead, bear left, then turn right.",
+      "spoken": "Ahead, bear left, then turn right."
+    },
+    "chain:slight-left:right:now": {
+      "transcript": "Now, bear left, then turn right.",
+      "spoken": "Now, bear left, then turn right."
+    },
+    "chain:slight-left:slight-left:soon": {
+      "transcript": "Ahead, bear left, then bear left.",
+      "spoken": "Ahead, bear left, then bear left."
+    },
+    "chain:slight-left:slight-left:now": {
+      "transcript": "Now, bear left, then bear left.",
+      "spoken": "Now, bear left, then bear left."
+    },
+    "chain:slight-left:slight-right:soon": {
+      "transcript": "Ahead, bear left, then bear right.",
+      "spoken": "Ahead, bear left, then bear right."
+    },
+    "chain:slight-left:slight-right:now": {
+      "transcript": "Now, bear left, then bear right.",
+      "spoken": "Now, bear left, then bear right."
+    },
+    "chain:slight-left:uturn:soon": {
+      "transcript": "Ahead, bear left, then turn around when it is safe.",
+      "spoken": "Ahead, bear left, then turn around when it is safe."
+    },
+    "chain:slight-left:uturn:now": {
+      "transcript": "Now, bear left, then turn around when it is safe.",
+      "spoken": "Now, bear left, then turn around when it is safe."
+    },
+    "turn:slight-right:now": {
+      "transcript": "Now, bear right.",
+      "spoken": "Now, bear right."
+    },
+    "turn:slight-right:now:1c7a61c3b09a": {
+      "transcript": "Now, bear right onto LAW road.",
+      "spoken": "Now, bear right onto Law road."
+    },
+    "turn:slight-right:10": {
+      "transcript": "In about ten metres, bear right.",
+      "spoken": "In about ten metres, bear right."
+    },
+    "turn:slight-right:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, bear right onto LAW road.",
+      "spoken": "In about ten metres, bear right onto Law road."
+    },
+    "turn:slight-right:20": {
+      "transcript": "In about twenty metres, bear right.",
+      "spoken": "In about twenty metres, bear right."
+    },
+    "turn:slight-right:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, bear right onto LAW road.",
+      "spoken": "In about twenty metres, bear right onto Law road."
+    },
+    "turn:slight-right:30": {
+      "transcript": "In about thirty metres, bear right.",
+      "spoken": "In about thirty metres, bear right."
+    },
+    "turn:slight-right:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, bear right onto LAW road.",
+      "spoken": "In about thirty metres, bear right onto Law road."
+    },
+    "turn:slight-right:40": {
+      "transcript": "In about forty metres, bear right.",
+      "spoken": "In about forty metres, bear right."
+    },
+    "turn:slight-right:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, bear right onto LAW road.",
+      "spoken": "In about forty metres, bear right onto Law road."
+    },
+    "turn:slight-right:50": {
+      "transcript": "In about fifty metres, bear right.",
+      "spoken": "In about fifty metres, bear right."
+    },
+    "turn:slight-right:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, bear right onto LAW road.",
+      "spoken": "In about fifty metres, bear right onto Law road."
+    },
+    "turn:slight-right:60": {
+      "transcript": "In about sixty metres, bear right.",
+      "spoken": "In about sixty metres, bear right."
+    },
+    "turn:slight-right:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, bear right onto LAW road.",
+      "spoken": "In about sixty metres, bear right onto Law road."
+    },
+    "turn:slight-right:100": {
+      "transcript": "In about one hundred metres, bear right.",
+      "spoken": "In about one hundred metres, bear right."
+    },
+    "turn:slight-right:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, bear right onto LAW road.",
+      "spoken": "In about one hundred metres, bear right onto Law road."
+    },
+    "turn:slight-right:200": {
+      "transcript": "In about two hundred metres, bear right.",
+      "spoken": "In about two hundred metres, bear right."
+    },
+    "turn:slight-right:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, bear right onto LAW road.",
+      "spoken": "In about two hundred metres, bear right onto Law road."
+    },
+    "chain:slight-right:left:soon": {
+      "transcript": "Ahead, bear right, then turn left.",
+      "spoken": "Ahead, bear right, then turn left."
+    },
+    "chain:slight-right:left:now": {
+      "transcript": "Now, bear right, then turn left.",
+      "spoken": "Now, bear right, then turn left."
+    },
+    "chain:slight-right:right:soon": {
+      "transcript": "Ahead, bear right, then turn right.",
+      "spoken": "Ahead, bear right, then turn right."
+    },
+    "chain:slight-right:right:now": {
+      "transcript": "Now, bear right, then turn right.",
+      "spoken": "Now, bear right, then turn right."
+    },
+    "chain:slight-right:slight-left:soon": {
+      "transcript": "Ahead, bear right, then bear left.",
+      "spoken": "Ahead, bear right, then bear left."
+    },
+    "chain:slight-right:slight-left:now": {
+      "transcript": "Now, bear right, then bear left.",
+      "spoken": "Now, bear right, then bear left."
+    },
+    "chain:slight-right:slight-right:soon": {
+      "transcript": "Ahead, bear right, then bear right.",
+      "spoken": "Ahead, bear right, then bear right."
+    },
+    "chain:slight-right:slight-right:now": {
+      "transcript": "Now, bear right, then bear right.",
+      "spoken": "Now, bear right, then bear right."
+    },
+    "chain:slight-right:uturn:soon": {
+      "transcript": "Ahead, bear right, then turn around when it is safe.",
+      "spoken": "Ahead, bear right, then turn around when it is safe."
+    },
+    "chain:slight-right:uturn:now": {
+      "transcript": "Now, bear right, then turn around when it is safe.",
+      "spoken": "Now, bear right, then turn around when it is safe."
+    },
+    "turn:uturn:now": {
+      "transcript": "Now, turn around when it is safe.",
+      "spoken": "Now, turn around when it is safe."
+    },
+    "turn:uturn:now:1c7a61c3b09a": {
+      "transcript": "Now, turn around when it is safe onto LAW road.",
+      "spoken": "Now, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:10": {
+      "transcript": "In about ten metres, turn around when it is safe.",
+      "spoken": "In about ten metres, turn around when it is safe."
+    },
+    "turn:uturn:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about ten metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:20": {
+      "transcript": "In about twenty metres, turn around when it is safe.",
+      "spoken": "In about twenty metres, turn around when it is safe."
+    },
+    "turn:uturn:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about twenty metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:30": {
+      "transcript": "In about thirty metres, turn around when it is safe.",
+      "spoken": "In about thirty metres, turn around when it is safe."
+    },
+    "turn:uturn:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about thirty metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:40": {
+      "transcript": "In about forty metres, turn around when it is safe.",
+      "spoken": "In about forty metres, turn around when it is safe."
+    },
+    "turn:uturn:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about forty metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:50": {
+      "transcript": "In about fifty metres, turn around when it is safe.",
+      "spoken": "In about fifty metres, turn around when it is safe."
+    },
+    "turn:uturn:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about fifty metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:60": {
+      "transcript": "In about sixty metres, turn around when it is safe.",
+      "spoken": "In about sixty metres, turn around when it is safe."
+    },
+    "turn:uturn:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about sixty metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:100": {
+      "transcript": "In about one hundred metres, turn around when it is safe.",
+      "spoken": "In about one hundred metres, turn around when it is safe."
+    },
+    "turn:uturn:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about one hundred metres, turn around when it is safe onto Law road."
+    },
+    "turn:uturn:200": {
+      "transcript": "In about two hundred metres, turn around when it is safe.",
+      "spoken": "In about two hundred metres, turn around when it is safe."
+    },
+    "turn:uturn:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, turn around when it is safe onto LAW road.",
+      "spoken": "In about two hundred metres, turn around when it is safe onto Law road."
+    },
+    "chain:uturn:left:soon": {
+      "transcript": "Ahead, turn around when it is safe, then turn left.",
+      "spoken": "Ahead, turn around when it is safe, then turn left."
+    },
+    "chain:uturn:left:now": {
+      "transcript": "Now, turn around when it is safe, then turn left.",
+      "spoken": "Now, turn around when it is safe, then turn left."
+    },
+    "chain:uturn:right:soon": {
+      "transcript": "Ahead, turn around when it is safe, then turn right.",
+      "spoken": "Ahead, turn around when it is safe, then turn right."
+    },
+    "chain:uturn:right:now": {
+      "transcript": "Now, turn around when it is safe, then turn right.",
+      "spoken": "Now, turn around when it is safe, then turn right."
+    },
+    "chain:uturn:slight-left:soon": {
+      "transcript": "Ahead, turn around when it is safe, then bear left.",
+      "spoken": "Ahead, turn around when it is safe, then bear left."
+    },
+    "chain:uturn:slight-left:now": {
+      "transcript": "Now, turn around when it is safe, then bear left.",
+      "spoken": "Now, turn around when it is safe, then bear left."
+    },
+    "chain:uturn:slight-right:soon": {
+      "transcript": "Ahead, turn around when it is safe, then bear right.",
+      "spoken": "Ahead, turn around when it is safe, then bear right."
+    },
+    "chain:uturn:slight-right:now": {
+      "transcript": "Now, turn around when it is safe, then bear right.",
+      "spoken": "Now, turn around when it is safe, then bear right."
+    },
+    "chain:uturn:uturn:soon": {
+      "transcript": "Ahead, turn around when it is safe, then turn around when it is safe.",
+      "spoken": "Ahead, turn around when it is safe, then turn around when it is safe."
+    },
+    "chain:uturn:uturn:now": {
+      "transcript": "Now, turn around when it is safe, then turn around when it is safe.",
+      "spoken": "Now, turn around when it is safe, then turn around when it is safe."
+    },
+    "turn:straight:now": {
+      "transcript": "Now, continue straight.",
+      "spoken": "Now, continue straight."
+    },
+    "turn:straight:now:1c7a61c3b09a": {
+      "transcript": "Now, continue straight onto LAW road.",
+      "spoken": "Now, continue straight onto Law road."
+    },
+    "turn:straight:10": {
+      "transcript": "In about ten metres, continue straight.",
+      "spoken": "In about ten metres, continue straight."
+    },
+    "turn:straight:10:1c7a61c3b09a": {
+      "transcript": "In about ten metres, continue straight onto LAW road.",
+      "spoken": "In about ten metres, continue straight onto Law road."
+    },
+    "turn:straight:20": {
+      "transcript": "In about twenty metres, continue straight.",
+      "spoken": "In about twenty metres, continue straight."
+    },
+    "turn:straight:20:1c7a61c3b09a": {
+      "transcript": "In about twenty metres, continue straight onto LAW road.",
+      "spoken": "In about twenty metres, continue straight onto Law road."
+    },
+    "turn:straight:30": {
+      "transcript": "In about thirty metres, continue straight.",
+      "spoken": "In about thirty metres, continue straight."
+    },
+    "turn:straight:30:1c7a61c3b09a": {
+      "transcript": "In about thirty metres, continue straight onto LAW road.",
+      "spoken": "In about thirty metres, continue straight onto Law road."
+    },
+    "turn:straight:40": {
+      "transcript": "In about forty metres, continue straight.",
+      "spoken": "In about forty metres, continue straight."
+    },
+    "turn:straight:40:1c7a61c3b09a": {
+      "transcript": "In about forty metres, continue straight onto LAW road.",
+      "spoken": "In about forty metres, continue straight onto Law road."
+    },
+    "turn:straight:50": {
+      "transcript": "In about fifty metres, continue straight.",
+      "spoken": "In about fifty metres, continue straight."
+    },
+    "turn:straight:50:1c7a61c3b09a": {
+      "transcript": "In about fifty metres, continue straight onto LAW road.",
+      "spoken": "In about fifty metres, continue straight onto Law road."
+    },
+    "turn:straight:60": {
+      "transcript": "In about sixty metres, continue straight.",
+      "spoken": "In about sixty metres, continue straight."
+    },
+    "turn:straight:60:1c7a61c3b09a": {
+      "transcript": "In about sixty metres, continue straight onto LAW road.",
+      "spoken": "In about sixty metres, continue straight onto Law road."
+    },
+    "turn:straight:100": {
+      "transcript": "In about one hundred metres, continue straight.",
+      "spoken": "In about one hundred metres, continue straight."
+    },
+    "turn:straight:100:1c7a61c3b09a": {
+      "transcript": "In about one hundred metres, continue straight onto LAW road.",
+      "spoken": "In about one hundred metres, continue straight onto Law road."
+    },
+    "turn:straight:200": {
+      "transcript": "In about two hundred metres, continue straight.",
+      "spoken": "In about two hundred metres, continue straight."
+    },
+    "turn:straight:200:1c7a61c3b09a": {
+      "transcript": "In about two hundred metres, continue straight onto LAW road.",
+      "spoken": "In about two hundred metres, continue straight onto Law road."
+    },
+    "destination:b3d220d98aba24ff": {
+      "transcript": "Your destination is A.J.",
+      "spoken": "Your destination is A.J."
+    },
+    "destination:8c22ce4735976078": {
+      "transcript": "Your destination is ACEIISE.",
+      "spoken": "Your destination is A C E I I S E."
+    },
+    "destination:ee6a253c2c74d31a": {
+      "transcript": "Your destination is ASUU LASU Cooperative Golden Pharmacy.",
+      "spoken": "Your destination is A S U U Lagos State University Cooperative Golden Pharmacy."
+    },
+    "destination:764030c5caf90b39": {
+      "transcript": "Your destination is Abisogun Leigh Science Block.",
+      "spoken": "Your destination is Abisogun Leigh Science Block."
+    },
+    "destination:a0561fd649cdb6ba": {
+      "transcript": "Your destination is Access.",
+      "spoken": "Your destination is Access."
+    },
+    "destination:9d086dbb9431d2c1": {
+      "transcript": "Your destination is Access Bank.",
+      "spoken": "Your destination is Access Bank."
+    },
+    "destination:0e7b7bffdbb30f0d": {
+      "transcript": "Your destination is Admin Block 1.",
+      "spoken": "Your destination is Admin Block 1."
+    },
+    "destination:1b26175ec9d7195d": {
+      "transcript": "Your destination is Admin Block 2.",
+      "spoken": "Your destination is Admin Block 2."
+    },
+    "destination:08f9b48396029b18": {
+      "transcript": "Your destination is Alumni Block.",
+      "spoken": "Your destination is Alumni Block."
+    },
+    "destination:a2bafa1c1acce9d4": {
+      "transcript": "Your destination is Art Auditorium.",
+      "spoken": "Your destination is Art Auditorium."
+    },
+    "destination:44b330dfd6c9a327": {
+      "transcript": "Your destination is Art Building.",
+      "spoken": "Your destination is Art Building."
+    },
+    "destination:863cd3997339dbb1": {
+      "transcript": "Your destination is Art Classroom.",
+      "spoken": "Your destination is Art Classroom."
+    },
+    "destination:b88e86b31b6f6217": {
+      "transcript": "Your destination is Automedis Limited.",
+      "spoken": "Your destination is Automedis Limited."
+    },
+    "destination:5f308ac11929847f": {
+      "transcript": "Your destination is BUBA MARWA HALL.",
+      "spoken": "Your destination is BUBA MARWA HALL."
+    },
+    "destination:eca2c6bf3f726f54": {
+      "transcript": "Your destination is Benson Hall.",
+      "spoken": "Your destination is Benson Hall."
+    },
+    "destination:67b7d2cc0c10e95f": {
+      "transcript": "Your destination is Bio-Chem Relaxation Centre.",
+      "spoken": "Your destination is Bio-Chem Relaxation Centre."
+    },
+    "destination:0299706ac912e1d4": {
+      "transcript": "Your destination is Bookshop.",
+      "spoken": "Your destination is Bookshop."
+    },
+    "destination:6c0ab3ed289bcb2c": {
+      "transcript": "Your destination is Botanical Garden.",
+      "spoken": "Your destination is Botanical Garden."
+    },
+    "destination:bd924e628c79d63d": {
+      "transcript": "Your destination is Building Underconstruction.",
+      "spoken": "Your destination is Building Underconstruction."
+    },
+    "destination:ff30a113c3709cff": {
+      "transcript": "Your destination is Business Area (Science).",
+      "spoken": "Your destination is Business Area (Science)."
+    },
+    "destination:8e55f4c9b24ebd40": {
+      "transcript": "Your destination is C.P.S.",
+      "spoken": "Your destination is C.P.S."
+    },
+    "destination:5dd9c66e5fd8bf3b": {
+      "transcript": "Your destination is CESD.",
+      "spoken": "Your destination is C E S D."
+    },
+    "destination:fe34785479fd2e3f": {
+      "transcript": "Your destination is CHL.",
+      "spoken": "Your destination is CHL."
+    },
+    "destination:ad13e3e083ed9226": {
+      "transcript": "Your destination is Campus place.",
+      "spoken": "Your destination is Campus place."
+    },
+    "destination:7b2c852b2a2d5eea": {
+      "transcript": "Your destination is Chapel.",
+      "spoken": "Your destination is Chapel."
+    },
+    "destination:364123402d140b14": {
+      "transcript": "Your destination is Chapel Extension.",
+      "spoken": "Your destination is Chapel Extension."
+    },
+    "destination:9bcd4d58740ceb57": {
+      "transcript": "Your destination is Computer Science Lab.",
+      "spoken": "Your destination is Computer Science Lab."
+    },
+    "destination:1ae96204e67786d4": {
+      "transcript": "Your destination is Cooperative Multi-Purpose.",
+      "spoken": "Your destination is Cooperative Multi-Purpose."
+    },
+    "destination:0a389047e1cf47f0": {
+      "transcript": "Your destination is Department of Theartre Arts and Music.",
+      "spoken": "Your destination is Department of Theartre Arts and Music."
+    },
+    "destination:5edd631e8b09f7f5": {
+      "transcript": "Your destination is ECO LIBRARYT Business Centres.",
+      "spoken": "Your destination is ECO LIBRARYT Business Centres."
+    },
+    "destination:ea297e1dbf1767a0": {
+      "transcript": "Your destination is EDUCATION ANNEX./CESD.",
+      "spoken": "Your destination is EDUCATION ANNEX./C E S D."
+    },
+    "destination:c2d751bcd67da80a": {
+      "transcript": "Your destination is Eco Library and Business Centres.",
+      "spoken": "Your destination is Eco Library and Business Centres."
+    },
+    "destination:cfd4d8e58abb11f9": {
+      "transcript": "Your destination is English Language Hall.",
+      "spoken": "Your destination is English Language Hall."
+    },
+    "destination:81a9087e2382da1a": {
+      "transcript": "Your destination is F.A. Classroom.",
+      "spoken": "Your destination is F.A. Classroom."
+    },
+    "destination:7b2f1c3113a18e6e": {
+      "transcript": "Your destination is FA Lang LAB.",
+      "spoken": "Your destination is FA Lang LAB."
+    },
+    "destination:b6dfa7c04ce31df4": {
+      "transcript": "Your destination is FMS.",
+      "spoken": "Your destination is F M S."
+    },
+    "destination:cd65a7ccecb4e0d4": {
+      "transcript": "Your destination is FMS 2 IN 1.",
+      "spoken": "Your destination is F M S 2 IN 1."
+    },
+    "destination:71d9686a6fa72eaf": {
+      "transcript": "Your destination is FMS Extension.",
+      "spoken": "Your destination is F M S Extension."
+    },
+    "destination:93d631c289584ae1": {
+      "transcript": "Your destination is FMS Kitchen.",
+      "spoken": "Your destination is F M S Kitchen."
+    },
+    "destination:5cb12b8bdca6bce8": {
+      "transcript": "Your destination is FMS Marketing Studio.",
+      "spoken": "Your destination is F M S Marketing Studio."
+    },
+    "destination:26d44010e3a666aa": {
+      "transcript": "Your destination is FSS.",
+      "spoken": "Your destination is F S S."
+    },
+    "destination:a29ff77536b548b6": {
+      "transcript": "Your destination is FSS Hut.",
+      "spoken": "Your destination is F S S Hut."
+    },
+    "destination:ebef0c8473891b28": {
+      "transcript": "Your destination is FSS Kitchen.",
+      "spoken": "Your destination is F S S Kitchen."
+    },
+    "destination:feb413bed2a69133": {
+      "transcript": "Your destination is Fac. Of Edu. Extension.",
+      "spoken": "Your destination is Faculty. Of Education. Extension."
+    },
+    "destination:f5c0ebcab0c2c77b": {
+      "transcript": "Your destination is Fac. Of Edu. Kitchen.",
+      "spoken": "Your destination is Faculty. Of Education. Kitchen."
+    },
+    "destination:65319c5632662c6f": {
+      "transcript": "Your destination is Fac. Of Edu. New Building.",
+      "spoken": "Your destination is Faculty. Of Education. New Building."
+    },
+    "destination:aa4caf5f37a2e28f": {
+      "transcript": "Your destination is Fac. Of Education 3 In 1.",
+      "spoken": "Your destination is Faculty. Of Education 3 In 1."
+    },
+    "destination:5ac6ef3e5d5932e7": {
+      "transcript": "Your destination is Fac. Of Law.",
+      "spoken": "Your destination is Faculty. Of Law."
+    },
+    "destination:43fdafad0ed0ce66": {
+      "transcript": "Your destination is Fac. Office (Law) 1.",
+      "spoken": "Your destination is Faculty. Office (Law) 1."
+    },
+    "destination:8f71bde781662f1f": {
+      "transcript": "Your destination is Faculty Of Education 3 In 1.",
+      "spoken": "Your destination is Faculty Of Education 3 In 1."
+    },
+    "destination:1a80720d3ed24951": {
+      "transcript": "Your destination is Faculty Of Education Extension.",
+      "spoken": "Your destination is Faculty Of Education Extension."
+    },
+    "destination:34dd132a0506107d": {
+      "transcript": "Your destination is Faculty Of Education Kitchen.",
+      "spoken": "Your destination is Faculty Of Education Kitchen."
+    },
+    "destination:6a8e952bbc5583b4": {
+      "transcript": "Your destination is Faculty Of Education New Building.",
+      "spoken": "Your destination is Faculty Of Education New Building."
+    },
+    "destination:7f083ed61998a74b": {
+      "transcript": "Your destination is Faculty Of Law.",
+      "spoken": "Your destination is Faculty Of Law."
+    },
+    "destination:86b0f5a89924dccb": {
+      "transcript": "Your destination is Faculty of Art Language Lab.",
+      "spoken": "Your destination is Faculty of Art Language Lab."
+    },
+    "destination:f6be8dc7027dd068": {
+      "transcript": "Your destination is Faculty of Social Science.",
+      "spoken": "Your destination is Faculty of Social Science."
+    },
+    "destination:ca05fbfb3553e70d": {
+      "transcript": "Your destination is Fish Farm.",
+      "spoken": "Your destination is Fish Farm."
+    },
+    "destination:6389e75ca02828be": {
+      "transcript": "Your destination is I.R.M.P.",
+      "spoken": "Your destination is I.R.M.P."
+    },
+    "destination:175a680792c1fbf7": {
+      "transcript": "Your destination is ICT.",
+      "spoken": "Your destination is I C T."
+    },
+    "destination:ade71b54a2620c60": {
+      "transcript": "Your destination is Information Block.",
+      "spoken": "Your destination is Information Block."
+    },
+    "destination:6249fdb804adb23c": {
+      "transcript": "Your destination is Iya Wariz.",
+      "spoken": "Your destination is Iya Wariz."
+    },
+    "destination:b1fda4644e891e13": {
+      "transcript": "Your destination is LACVIS.",
+      "spoken": "Your destination is LACVIS."
+    },
+    "destination:3db606a57b9dfc78": {
+      "transcript": "Your destination is LASU  (SIEU).",
+      "spoken": "Your destination is Lagos State University  (SIEU)."
+    },
+    "destination:9e633d900251d437": {
+      "transcript": "Your destination is LASU Clinic.",
+      "spoken": "Your destination is Lagos State University Clinic."
+    },
+    "destination:82177e06a5508c63": {
+      "transcript": "Your destination is LASU AP.",
+      "spoken": "Your destination is Lagos State University AP."
+    },
+    "destination:490759e9dc3636b9": {
+      "transcript": "Your destination is LASU CBT.",
+      "spoken": "Your destination is Lagos State University C B T."
+    },
+    "destination:5d7351edc1f96a63": {
+      "transcript": "Your destination is LASU Coop. Annex.",
+      "spoken": "Your destination is Lagos State University Coop. Annex."
+    },
+    "destination:49f26a25888bd726": {
+      "transcript": "Your destination is LASU Distance Learning.",
+      "spoken": "Your destination is Lagos State University Distance Learning."
+    },
+    "destination:e9660c279d6d1017": {
+      "transcript": "Your destination is LASU Ent Centre.",
+      "spoken": "Your destination is Lagos State University Ent Centre."
+    },
+    "destination:615e09264c9c13d3": {
+      "transcript": "Your destination is LASU Int. Sch. Building 1.",
+      "spoken": "Your destination is Lagos State University Int. School. Building 1."
+    },
+    "destination:13317512a278c1e6": {
+      "transcript": "Your destination is LASU Int. Sch. Building 2.",
+      "spoken": "Your destination is Lagos State University Int. School. Building 2."
+    },
+    "destination:464ed400eefa01db": {
+      "transcript": "Your destination is LASU International Library.",
+      "spoken": "Your destination is Lagos State University International Library."
+    },
+    "destination:d4879b98d52d5f26": {
+      "transcript": "Your destination is LASU Main Auditorium.",
+      "spoken": "Your destination is Lagos State University Main Auditorium."
+    },
+    "destination:0f12360c2eedf4ac": {
+      "transcript": "Your destination is LASU Public Toilet.",
+      "spoken": "Your destination is Lagos State University Public Toilet."
+    },
+    "destination:b9ecbea664c63b44": {
+      "transcript": "Your destination is LASU Radio.",
+      "spoken": "Your destination is Lagos State University Radio."
+    },
+    "destination:99abbeae702bb4dd": {
+      "transcript": "Your destination is LASU Senate Building.",
+      "spoken": "Your destination is Lagos State University Senate Building."
+    },
+    "destination:9b4827fde4955d7c": {
+      "transcript": "Your destination is LASU Water Works.",
+      "spoken": "Your destination is Lagos State University Water Works."
+    },
+    "destination:5abb422d5eb5cefe": {
+      "transcript": "Your destination is Lag. Lab.",
+      "spoken": "Your destination is Lag. Lab."
+    },
+    "destination:dfc42f497b651f49": {
+      "transcript": "Your destination is Lagos Home  Block 1.",
+      "spoken": "Your destination is Lagos Home  Block 1."
+    },
+    "destination:da87a2f5621354a5": {
+      "transcript": "Your destination is Lagos Home  Block 2.",
+      "spoken": "Your destination is Lagos Home  Block 2."
+    },
+    "destination:0740ab98da80e5a7": {
+      "transcript": "Your destination is Lagos Home  Block 3.",
+      "spoken": "Your destination is Lagos Home  Block 3."
+    },
+    "destination:6abf845b51792a87": {
+      "transcript": "Your destination is Lagos State University.",
+      "spoken": "Your destination is Lagos State University."
+    },
+    "destination:b340bcceb324b0b7": {
+      "transcript": "Your destination is Language Lab.",
+      "spoken": "Your destination is Language Lab."
+    },
+    "destination:3ea78f00a914c4cb": {
+      "transcript": "Your destination is Law Clinic.",
+      "spoken": "Your destination is Law Clinic."
+    },
+    "destination:61e02d4123eea118": {
+      "transcript": "Your destination is Law Library.",
+      "spoken": "Your destination is Law Library."
+    },
+    "destination:95cb73814f8a6be0": {
+      "transcript": "Your destination is Law Office1 2.",
+      "spoken": "Your destination is Law Office1 2."
+    },
+    "destination:680f295e0d60d1c8": {
+      "transcript": "Your destination is Law Toilet.",
+      "spoken": "Your destination is Law Toilet."
+    },
+    "destination:87a10316be7635c1": {
+      "transcript": "Your destination is M.B.A.",
+      "spoken": "Your destination is M.B.A."
+    },
+    "destination:f5d8acec9cd70b91": {
+      "transcript": "Your destination is M.B.A..",
+      "spoken": "Your destination is M.B.A.."
+    },
+    "destination:5826fe5fd84b121a": {
+      "transcript": "Your destination is Makanjuola Lecture Theatre.",
+      "spoken": "Your destination is Makanjuola Lecture Theatre."
+    },
+    "destination:30b222496a976f14": {
+      "transcript": "Your destination is Mass Comm.",
+      "spoken": "Your destination is Mass Comm."
+    },
+    "destination:fae6f77eddf5231c": {
+      "transcript": "Your destination is Mass Communication.",
+      "spoken": "Your destination is Mass Communication."
+    },
+    "destination:2e9777bef2c8e838": {
+      "transcript": "Your destination is Mass Communication Lecture Hall.",
+      "spoken": "Your destination is Mass Communication Lecture Hall."
+    },
+    "destination:a861050eced57726": {
+      "transcript": "Your destination is Moot Court.",
+      "spoken": "Your destination is Moot Court."
+    },
+    "destination:253221cbda027cc9": {
+      "transcript": "Your destination is Mosque.",
+      "spoken": "Your destination is Mosque."
+    },
+    "destination:e799dda9221483c4": {
+      "transcript": "Your destination is NEW BUILDING.",
+      "spoken": "Your destination is NEW BUILDING."
+    },
+    "destination:5adbc4dc59d39a57": {
+      "transcript": "Your destination is Naval Base Kitchen.",
+      "spoken": "Your destination is Naval Base Kitchen."
+    },
+    "destination:bc60ecaf7e0a29a9": {
+      "transcript": "Your destination is Naval Base/Kitchen.",
+      "spoken": "Your destination is Naval Base/Kitchen."
+    },
+    "destination:9f66c14a83d82708": {
+      "transcript": "Your destination is New FMS Annex.",
+      "spoken": "Your destination is New F M S Annex."
+    },
+    "destination:1201f1a415a82661": {
+      "transcript": "Your destination is New Science Block.",
+      "spoken": "Your destination is New Science Block."
+    },
+    "destination:0526b23eeb8049f2": {
+      "transcript": "Your destination is New Staff Quarters Block 1.",
+      "spoken": "Your destination is New Staff Quarters Block 1."
+    },
+    "destination:afd90c79e42f09dc": {
+      "transcript": "Your destination is New Staff Quarters Block 2.",
+      "spoken": "Your destination is New Staff Quarters Block 2."
+    },
+    "destination:ebf32ace85a665ef": {
+      "transcript": "Your destination is New Staff Quarters Block 3.",
+      "spoken": "Your destination is New Staff Quarters Block 3."
+    },
+    "destination:f7752a4abb0fd5e3": {
+      "transcript": "Your destination is New Zenith Bank.",
+      "spoken": "Your destination is New Zenith Bank."
+    },
+    "destination:2791270925281c89": {
+      "transcript": "Your destination is Old Female Hostel.",
+      "spoken": "Your destination is Old Female Hostel."
+    },
+    "destination:d4916a626bbb3239": {
+      "transcript": "Your destination is Old Zenith Bank.",
+      "spoken": "Your destination is Old Zenith Bank."
+    },
+    "destination:59dca0ea22f4c419": {
+      "transcript": "Your destination is Ongoing Construction.",
+      "spoken": "Your destination is Ongoing Construction."
+    },
+    "destination:3a534163f78870ef": {
+      "transcript": "Your destination is Ongoing Construction Beside Edu..",
+      "spoken": "Your destination is Ongoing Construction Beside Education.."
+    },
+    "destination:6d1cab9ab33c0f38": {
+      "transcript": "Your destination is Ongoing FMS Extension.",
+      "spoken": "Your destination is Ongoing F M S Extension."
+    },
+    "destination:1ad1e006df5b9cc1": {
+      "transcript": "Your destination is Ongoing Student Village 1.",
+      "spoken": "Your destination is Ongoing Student Village 1."
+    },
+    "destination:31f74aa3f25cfb70": {
+      "transcript": "Your destination is Ongoing Student Village 2.",
+      "spoken": "Your destination is Ongoing Student Village 2."
+    },
+    "destination:3ca0e0a8e56d646c": {
+      "transcript": "Your destination is PG School.",
+      "spoken": "Your destination is PG School."
+    },
+    "destination:905fb42928304ca9": {
+      "transcript": "Your destination is PGD Hall.",
+      "spoken": "Your destination is P G D Hall."
+    },
+    "destination:274bd9b746c73529": {
+      "transcript": "Your destination is PSY Lab.",
+      "spoken": "Your destination is P S Y Lab."
+    },
+    "destination:d2054a44c7ea4935": {
+      "transcript": "Your destination is Pharmarcy Medical Laboratory Unit.",
+      "spoken": "Your destination is Pharmarcy Medical Laboratory Unit."
+    },
+    "destination:fb9a1005b264e8c7": {
+      "transcript": "Your destination is Physics Lab 1.",
+      "spoken": "Your destination is Physics Lab 1."
+    },
+    "destination:a1e0ddbc41e9a04f": {
+      "transcript": "Your destination is Physics Lab 2.",
+      "spoken": "Your destination is Physics Lab 2."
+    },
+    "destination:4b3baa4f4e5850ea": {
+      "transcript": "Your destination is Post Office.",
+      "spoken": "Your destination is Post Office."
+    },
+    "destination:0d9218b1ea18dab4": {
+      "transcript": "Your destination is Professorial Office.",
+      "spoken": "Your destination is Professorial Office."
+    },
+    "destination:69fccd02d2178562": {
+      "transcript": "Your destination is Proposed Gbajabiamila Hall.",
+      "spoken": "Your destination is Proposed Gbajabiamila Hall."
+    },
+    "destination:01638cc965c583c6": {
+      "transcript": "Your destination is Proposed MVAA.",
+      "spoken": "Your destination is Proposed MVAA."
+    },
+    "destination:2c6ed63128107e75": {
+      "transcript": "Your destination is Proposed TECH Hub.",
+      "spoken": "Your destination is Proposed TECH Hub."
+    },
+    "destination:36d01eef3ebeb0aa": {
+      "transcript": "Your destination is Public Toilet.",
+      "spoken": "Your destination is Public Toilet."
+    },
+    "destination:4a9b03cddfb69d70": {
+      "transcript": "Your destination is Radiation Monitoring and Protection Service.",
+      "spoken": "Your destination is Radiation Monitoring and Protection Service."
+    },
+    "destination:15dc338cef43dd6c": {
+      "transcript": "Your destination is Religion Dept..",
+      "spoken": "Your destination is Religion Department.."
+    },
+    "destination:e8f7c2a958c309ba": {
+      "transcript": "Your destination is S.L.Edu. Hall.",
+      "spoken": "Your destination is S.L.Education. Hall."
+    },
+    "destination:e27298c0b558aba9": {
+      "transcript": "Your destination is S.Q. Block 1.",
+      "spoken": "Your destination is S.Q. Block 1."
+    },
+    "destination:11b2075307960e2e": {
+      "transcript": "Your destination is S.Q. Block 2.",
+      "spoken": "Your destination is S.Q. Block 2."
+    },
+    "destination:3eb2b76d07a31119": {
+      "transcript": "Your destination is S.Q. Block 3.",
+      "spoken": "Your destination is S.Q. Block 3."
+    },
+    "destination:1a409fbc8fcdd3bf": {
+      "transcript": "Your destination is S.Q. Block 4.",
+      "spoken": "Your destination is S.Q. Block 4."
+    },
+    "destination:1ef4318fa8f92671": {
+      "transcript": "Your destination is SCHOOL OF TRANSPORT AND LOGISTICS.",
+      "spoken": "Your destination is SCHOOL OF TRANSPORT AND LOGISTICS."
+    },
+    "destination:3b3153f4ad2fd4fa": {
+      "transcript": "Your destination is SDG-PHC FACILITY.",
+      "spoken": "Your destination is SDG-PHC FACILITY."
+    },
+    "destination:ee84e0db0618c89b": {
+      "transcript": "Your destination is SSANU Office.",
+      "spoken": "Your destination is S S A N U Office."
+    },
+    "destination:2d23eaf0459a84e1": {
+      "transcript": "Your destination is Sch. Car Park.",
+      "spoken": "Your destination is School. Car Park."
+    },
+    "destination:324f19511a3e2ec4": {
+      "transcript": "Your destination is Sch. Library.",
+      "spoken": "Your destination is School. Library."
+    },
+    "destination:a23a2f307900fd19": {
+      "transcript": "Your destination is School Car Park.",
+      "spoken": "Your destination is School Car Park."
+    },
+    "destination:36c0f90fbf84e49c": {
+      "transcript": "Your destination is School Library.",
+      "spoken": "Your destination is School Library."
+    },
+    "destination:ec279f58c44fda03": {
+      "transcript": "Your destination is School Of Transport.",
+      "spoken": "Your destination is School Of Transport."
+    },
+    "destination:eb1db6e5e12e7a6b": {
+      "transcript": "Your destination is School Of TransportC.",
+      "spoken": "Your destination is School Of TransportC."
+    },
+    "destination:aae4fbbbb1ebcfe1": {
+      "transcript": "Your destination is Science Annex.",
+      "spoken": "Your destination is Science Annex."
+    },
+    "destination:c75c2fc31573691e": {
+      "transcript": "Your destination is Science Lab 2.",
+      "spoken": "Your destination is Science Lab 2."
+    },
+    "destination:1e511ae26548be1e": {
+      "transcript": "Your destination is Science Lab. 1.",
+      "spoken": "Your destination is Science Lab. 1."
+    },
+    "destination:d6a1625627ac10c1": {
+      "transcript": "Your destination is Science Lab. Extension.",
+      "spoken": "Your destination is Science Lab. Extension."
+    },
+    "destination:dded1dfa72acb28e": {
+      "transcript": "Your destination is Science Library.",
+      "spoken": "Your destination is Science Library."
+    },
+    "destination:614a0294c4328338": {
+      "transcript": "Your destination is Senate Chambers.",
+      "spoken": "Your destination is Senate Chambers."
+    },
+    "destination:4f26475883f3c831": {
+      "transcript": "Your destination is Site For Materials Production.",
+      "spoken": "Your destination is Site For Materials Production."
+    },
+    "destination:b12b4061ecf44daf": {
+      "transcript": "Your destination is Sport Center.",
+      "spoken": "Your destination is Sport Center."
+    },
+    "destination:c632ffeac00554ff": {
+      "transcript": "Your destination is Sports Center.",
+      "spoken": "Your destination is Sports Center."
+    },
+    "destination:450e74a718adfec9": {
+      "transcript": "Your destination is Staff Club.",
+      "spoken": "Your destination is Staff Club."
+    },
+    "destination:ef80ad2a6e3d4eed": {
+      "transcript": "Your destination is Staff Qtrs 1A&B.",
+      "spoken": "Your destination is Staff Quarters 1A&B."
+    },
+    "destination:66ea25cf3da93949": {
+      "transcript": "Your destination is Staff Qtrs 2A&B.",
+      "spoken": "Your destination is Staff Quarters 2A&B."
+    },
+    "destination:c6518ddb4683efbc": {
+      "transcript": "Your destination is Staff Qtrs 4A&B.",
+      "spoken": "Your destination is Staff Quarters 4A&B."
+    },
+    "destination:1f04b9b68a587c16": {
+      "transcript": "Your destination is Staff Qtrs 5A&B.",
+      "spoken": "Your destination is Staff Quarters 5A&B."
+    },
+    "destination:dbaa6846ed33db10": {
+      "transcript": "Your destination is Staff Qtrs 6A&B.",
+      "spoken": "Your destination is Staff Quarters 6A&B."
+    },
+    "destination:79f736fb2caec0a5": {
+      "transcript": "Your destination is Staff Qtrs 7A&B.",
+      "spoken": "Your destination is Staff Quarters 7A&B."
+    },
+    "destination:3a6a5b4f30a77236": {
+      "transcript": "Your destination is Staff Quarter Block 1.",
+      "spoken": "Your destination is Staff Quarter Block 1."
+    },
+    "destination:e4f45eea547169c0": {
+      "transcript": "Your destination is Staff Quarter Block 2.",
+      "spoken": "Your destination is Staff Quarter Block 2."
+    },
+    "destination:e1fe3578ad927e43": {
+      "transcript": "Your destination is Staff Quarter Block 3.",
+      "spoken": "Your destination is Staff Quarter Block 3."
+    },
+    "destination:642187ae9022554a": {
+      "transcript": "Your destination is Staff Quarter Block 4.",
+      "spoken": "Your destination is Staff Quarter Block 4."
+    },
+    "destination:a92cc3ce77b2cb56": {
+      "transcript": "Your destination is Staff Quarters Duplex 1A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 1A&B."
+    },
+    "destination:c329cb13becbfd84": {
+      "transcript": "Your destination is Staff Quarters Duplex 2A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 2A&B."
+    },
+    "destination:a25e900cbd94aac2": {
+      "transcript": "Your destination is Staff Quarters Duplex 3A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 3A&B."
+    },
+    "destination:9df03a50c9f77058": {
+      "transcript": "Your destination is Staff Quarters Duplex 4A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 4A&B."
+    },
+    "destination:db47b1f2f16e631f": {
+      "transcript": "Your destination is Staff Quarters Duplex 5A and B.",
+      "spoken": "Your destination is Staff Quarters Duplex 5A and B."
+    },
+    "destination:68d78da804d65f8d": {
+      "transcript": "Your destination is Staff Quarters Duplex 5A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 5A&B."
+    },
+    "destination:6801325484361b7e": {
+      "transcript": "Your destination is Staff Quarters Duplex 6A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 6A&B."
+    },
+    "destination:b2ffa3c313a804c1": {
+      "transcript": "Your destination is Staff Quarters Duplex 7A&B.",
+      "spoken": "Your destination is Staff Quarters Duplex 7A&B."
+    },
+    "destination:fc20655dc775f24e": {
+      "transcript": "Your destination is Staff School.",
+      "spoken": "Your destination is Staff School."
+    },
+    "destination:401cb0a3c9577a6a": {
+      "transcript": "Your destination is Sterling.",
+      "spoken": "Your destination is Sterling."
+    },
+    "destination:0ca78457318551c5": {
+      "transcript": "Your destination is Sterling Bank.",
+      "spoken": "Your destination is Sterling Bank."
+    },
+    "destination:824d80d71985f082": {
+      "transcript": "Your destination is Store.",
+      "spoken": "Your destination is Store."
+    },
+    "destination:9b0824f6f2d13d03": {
+      "transcript": "Your destination is Stu. Affairs (Career & Councelling).",
+      "spoken": "Your destination is Stu. Affairs (Career & Councelling)."
+    },
+    "destination:570e7d67e1f2841b": {
+      "transcript": "Your destination is Student Affairs.",
+      "spoken": "Your destination is Student Affairs."
+    },
+    "destination:8a9a3ddd8000273c": {
+      "transcript": "Your destination is Student Affairs (Career & Councelling).",
+      "spoken": "Your destination is Student Affairs (Career & Councelling)."
+    },
+    "destination:da61580d039fcccc": {
+      "transcript": "Your destination is Student Arcade.",
+      "spoken": "Your destination is Student Arcade."
+    },
+    "destination:67c6cdf031e0675d": {
+      "transcript": "Your destination is Student Center (Law).",
+      "spoken": "Your destination is Student Center (Law)."
+    },
+    "destination:6d26696404caea5a": {
+      "transcript": "Your destination is Student Union Office.",
+      "spoken": "Your destination is Student Union Office."
+    },
+    "destination:a878bdd615682066": {
+      "transcript": "Your destination is UBA.",
+      "spoken": "Your destination is U B A."
+    },
+    "destination:58fef12758df6ea9": {
+      "transcript": "Your destination is UBA Bank.",
+      "spoken": "Your destination is U B A Bank."
+    },
+    "destination:ef3ff703d7565ab5": {
+      "transcript": "Your destination is Union.",
+      "spoken": "Your destination is Union."
+    },
+    "destination:daf79e5161fa9c17": {
+      "transcript": "Your destination is Union Bank.",
+      "spoken": "Your destination is Union Bank."
+    },
+    "destination:338c2b2d416602f4": {
+      "transcript": "Your destination is WEMA Bank.",
+      "spoken": "Your destination is WEMA Bank."
+    },
+    "destination:47cc76f3af40dd2e": {
+      "transcript": "Your destination is Wema.",
+      "spoken": "Your destination is Wema."
+    },
+    "destination:121efd61c5f12315": {
+      "transcript": "Your destination is Works Department.",
+      "spoken": "Your destination is Works Department."
+    },
+    "destination:c0c4c8084133bbc6": {
+      "transcript": "Your destination is Works Dept..",
+      "spoken": "Your destination is Works Department.."
+    },
+    "destination:0d517047196cd116": {
+      "transcript": "Your destination is Zenith.",
+      "spoken": "Your destination is Zenith."
+    },
+    "destination:9b1a9b8e3f24a8d4": {
+      "transcript": "Your destination is Zenith I.C.T.",
+      "spoken": "Your destination is Zenith I.C.T."
+    },
+    "destination:9db10771d95c8bcb": {
+      "transcript": "Your destination is Zoological Garden.",
+      "spoken": "Your destination is Zoological Garden."
+    }
+  }
+}
