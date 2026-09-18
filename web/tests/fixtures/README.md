@@ -31,3 +31,10 @@ public page at 390 × 450 for browsers that resize the layout viewport, and
 at desktop size for the unchanged full-height adjustable card.
 
 The desktop simulation does not replace a real iOS/Android keyboard check.
+
+The keyboard fixture also treats result presses as touch input with real
+pointer capture and drops the later compatibility click while the keyboard is
+open. A completed tap must open the place details and blue map pin using the
+release event. Dragging across a result must leave Search results open. The
+result-tap unit tests cover cancelled gestures, long presses, multiple
+fingers, duplicate clicks, mouse use and keyboard/screen-reader activation.

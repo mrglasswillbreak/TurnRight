@@ -62,5 +62,30 @@ document.addEventListener('focusout', () => {
     update();
   });
 });
+// Exercise a touch release without relying on a later compatibility click.
+// Keep real pointer IDs so pointer capture is exercised in the in-app browser.
+document.addEventListener(
+  'pointerdown',
+  (event) => {
+    if (keyboardOpen && (event.target as Element).closest('.place-row'))
+      Object.defineProperty(event, 'pointerType', { value: 'touch' });
+  },
+  true,
+);
+document.addEventListener(
+  'click',
+  (event) => {
+    if (
+      keyboardOpen &&
+      event.detail > 0 &&
+      (event.target as Element).closest('.place-row')
+    ) {
+      (document.activeElement as HTMLElement)?.blur();
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  },
+  true,
+);
 await import('../../src/main');
 export {};
