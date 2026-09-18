@@ -87,7 +87,9 @@ No screenshot contains production owner drafts or private reports. The update no
 
 ## Recent changes
 
-The 17 September interface and editor updates include:
+The 17–18 September updates include:
+
+- **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).
 
 - **Offline globe:** the public map now zooms out to a full planet with land, oceans, country borders and names. A 255 KB world overview is saved with the app, works in both themes and returns smoothly to campus. The editor remains campus-focused.
 - **More map space:** a compact bottom search bar, mobile controls arranged on both sides, and adjustable cards/dialogs. Desktop panels open at full height, then keep the size you choose while you use search. Explore, Saved, Offline, Settings and Editor stay visible as panel content scrolls; desktop map controls stay pinned too.
@@ -107,7 +109,7 @@ These are application/editor changes. Public routing changes only after the owne
 | World overview | Automatic globe when zooming out; bundled Natural Earth countries, offline labels and a return-to-campus action. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
-| Navigation | Foreground GPS, spoken maneuvers, remaining distance and ETA, manual origins, recentering, route following, sustained-deviation rerouting and arrival detection. |
+| Navigation | Foreground GPS, natural offline British English voice, balanced turn timing, close-turn combinations, mapped names, remaining distance/ETA, route following, sustained-deviation rerouting and three-fix arrival confirmation. |
 | Destination sharing | Copy a stable place link or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
@@ -153,6 +155,8 @@ When a new app version is ready, a notice appears over the public map with an **
 2. Open its details to check provenance, walking coverage and any building evidence. Save, share or report the place.
 3. Choose **Directions**, then a current-location or manual origin. Compare the available alternatives and connection notices.
 4. Choose **Start walking**, allow location/audio and keep the application visible. Use mute, repeat, the instruction list and **Follow me** as needed.
+
+Voice directions use complete prerecorded sentences. Advance warnings adapt to recent walking speed (30–60 m); immediate turns need good location accuracy. Consecutive turns within 25 m are combined. Repeat describes the current state, including GPS loss or arrival. Muting, stopping and backgrounding cancel speech. New or renamed places without a recording keep their visible names and receive generic speech. **Settings → Preview voice directions** plays a sample outside navigation.
 
 Poor or stale GPS pauses maneuver progression. Changing paths can trigger rerouting after sustained deviation with a sufficiently accurate fix; a nearby parallel path may remain inside the GPS tolerance and does not guarantee an immediate switch. The current rule needs eight seconds off-route, accuracy of 35 m or better, and at least 15 seconds between recalculations. Guidance ends at the mapped endpoint, which may be a nearby approach rather than an entrance. [Routing thresholds and limitations](docs/EDITOR.md).
 
@@ -252,9 +256,11 @@ An initial online visit and a completed download are required. Installation and 
 
 | Content | Storage / behavior |
 | --- | --- |
-| App shell, UI, fonts, map/model/routing workers and world overview | Service-worker precache; world data is included automatically |
-| Campus geometry, routing, glyphs, audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
+| App shell, UI, fonts, map/model/routing workers, world overview and natural voice | Service-worker precache; world data and natural audio are included automatically |
+| Campus geometry, routing, glyphs, legacy fallback audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
 | Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
+
+The natural voice pack is saved automatically with the **app**, independently of the campus download, with an 8 MiB total budget. Ordinary deployments reuse its checked-in recordings; no speech model runs on a phone. Existing campus-packaged recordings remain available as a fallback. Finish saving the app **and** downloading the campus map before disconnecting.
 
 The world overview adds **260,913 bytes (about 255 KB)** before compression. It uses the country-label font already included in the campus download. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
 
@@ -349,7 +355,7 @@ npm run test:survey-webkit
 npm run test:survey-pwa
 ```
 
-`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**, and **500 KB total for bundled world assets**. The build also verifies that world assets are included in the service-worker precache. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
+`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**, and **500 KB total for bundled world assets**, and **8 MiB for natural voice**. The build verifies world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
 Focused camera and panel regressions:
 
@@ -367,18 +373,19 @@ python -m unittest discover -s scripts/tests -v
 
 Coverage includes source normalization, appearance persistence/storage failures, grouped undo, save receipts, concurrent field/surface edits, geometry identity, constrained roofs, editor/release parity, drawing/roof recovery, worker failure/stale replies, package integrity and offline reopening. Browser tests use real map/rendering libraries with isolated authentication, API and hardware fixtures. Enhanced zoom cases inspect actual shader material colours and draw calls, including legacy meshes and repeated theme/zoom changes.
 
-Latest local checks on **17 September 2026**:
+Latest local checks on **18 September 2026** (globe/editor browser checks below were completed on 17 September):
 
 | Check | Result |
 | --- | --- |
 | Camera/panel/globe regression tests | 21 / 21 passed |
-| Full unit suite | 354 / 354 passed |
+| Full unit suite | 378 / 378 passed across the full regression and final voice-asset runs |
 | Client and server TypeScript | Passed |
 | Lint | Passed with seven existing warnings |
-| Production app/service-worker build, renderer and world budgets | Passed; world assets 254.8 KB and precached |
+| Production app/service-worker build, renderer, world and voice budgets | Passed; world assets 254.8 KB and natural voice 5.84 MiB, both precached |
+| Voice recordings | All 359 MP3s decoded; hash/transcript/name coverage passed; no missing published names |
 | In-app browser | Mobile/desktop globe, light/dark themes, both building modes, projection transitions, date line/poles, campus return, simulated GPS recovery, editor framing, adjustable panels and offline reload checked |
 
-The full suite was rerun successfully on the supported Node 22.23.2 runtime after the local tooling recovered. Browser checks used the in-app browser, including an isolated camera/navigation-state fixture. The downloaded production preview reloaded and displayed globe geometry and labels with its server stopped. These checks do not establish a successful physical GPS walk or physical-device airplane-mode test.
+The checks ran on the supported Node 22.23.2 runtime. Natural-voice browser checks cover desktop/mobile Settings playback, close turns, GPS recovery, rerouting, Repeat, mute, preview and simulated visibility changes. A fixed production preview also reloaded and played the natural voice with its server stopped. Physical-device listening and outdoor timing remain unverified; see [voice acceptance notes](docs/VOICE.md#verification-and-remaining-device-checks). Browser checks used the in-app browser, including an isolated camera/navigation-state fixture. The downloaded production preview reloaded and displayed globe geometry and labels with its server stopped. These checks do not establish a successful physical GPS walk or physical-device airplane-mode test.
 
 Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
@@ -437,6 +444,7 @@ TurnRight/
 | [Deployment](docs/DEPLOYMENT.md) / [Configuration](docs/CONFIGURATION.md) / [Production](docs/PRODUCTION.md) | Service setup and operational history |
 | [Acceptance](docs/ACCEPTANCE.md) | Automated evidence and outstanding physical checks |
 | [Campus access](docs/CAMPUS-ACCESS.md) / [Connection review](docs/CONNECTION-REVIEW.md) | Approved walking corrections and remaining gaps |
+| [Offline voice](docs/VOICE.md) | Timing, recording provenance, regeneration, name coverage and device checks |
 | [Attribution](data/ATTRIBUTION.md) / [Overture audit](docs/OVERTURE-COMPARISON.md) | Provenance, permissions and source comparisons |
 
 ## Contributing and licensing
@@ -445,7 +453,7 @@ Use GitHub issues for reproducible software defects or feature proposals; includ
 
 - **OpenStreetMap:** © OpenStreetMap contributors, ODbL 1.0. The package includes OSM-derived data. [Attribution and license](https://www.openstreetmap.org/copyright).
 - **LASU ArcGIS:** MangroveandpartnersLimited. The owner recorded offline redistribution permission on 8 September 2026; the public item supplied no explicit redistribution license. That confirmation is recorded in [ATTRIBUTION.md](data/ATTRIBUTION.md), not a general grant for unrelated uses.
-- **Fonts/audio:** Inter uses the SIL Open Font License; Open Sans map glyphs use Apache 2.0. Packaged navigation recordings were generated locally; provenance and regeneration details are in the attribution record.
+- **Fonts/audio:** Inter uses the SIL Open Font License; Open Sans map glyphs use Apache 2.0. Natural navigation recordings use locally generated Kokoro v1.0 `bf_emma` (Apache 2.0 model); original Windows recordings remain a fallback. Provenance and regeneration details are in the attribution record.
 - **Reference images:** Linked evidence and supplied visual inspiration do not establish redistribution rights or surveyed building accuracy. The README contains application screenshots, not copied reference photography.
 
 No standalone license has been selected for TurnRight's own source code. Do not assume an MIT or Apache license; dependencies and datasets retain their respective terms. No Google Maps content, satellite imagery or remotely hosted rendered map tiles are bundled.
