@@ -13,7 +13,11 @@ export default defineConfig({
       injectRegister: false,
       registerType: 'prompt',
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'world/*.geojson'],
+        globPatterns: [
+          '**/*.{js,css,html,svg,png,woff2}',
+          'world/*.geojson',
+          'voice/**/*.{json,mp3}',
+        ],
         globIgnores: ['packages/**', 'glyphs/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },

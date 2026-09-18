@@ -72,6 +72,7 @@ import { OfflinePanel } from './OfflinePanel';
 import { ReportForm } from './ReportForm';
 import { RoutePanel } from './RoutePanel';
 import { OfflineVoice } from './audio';
+import { useVoiceGuidance } from './useVoiceGuidance';
 import { advanceNavigation, initialNavigation } from './navigation';
 import { useGps } from './useGps';
 import { MotionStatus, useMotionSession } from './MotionAssistance';
@@ -184,8 +185,13 @@ export default function App() {
   const map = useRef<MapInstance | null>(null),
     voice = useRef(new OfflineVoice()),
     routeRequest = useRef(0),
-    rerouteAt = useRef(0),
-    announced = useRef(new Set<string>());
+    rerouteAt = useRef(0);
+  const [rerouting, setRerouting] = useState(false);
+  const [previewingVoice, setPreviewingVoice] = useState(false);
+  const [voicePreviewFeedback, setVoicePreviewFeedback] = useState('');
+  const [voiceMode, setVoiceMode] = useState<
+    'natural' | 'basic' | 'unavailable'
+  >('natural');
   const updateSW = useRef<((reload?: boolean) => Promise<void>) | null>(null),
     navigatingRef = useRef(false);
   const requestedReload = useRef(false);
@@ -214,6 +220,23 @@ export default function App() {
   const gps = useGps(),
     calculate = useRoutes();
   const currentRoute = routes[chosen];
+  const repeatDirections = useVoiceGuidance(
+    voice.current,
+    navigating && currentRoute
+      ? {
+          route: currentRoute,
+          nav,
+          fix: gps.fix,
+          destination: selected?.name || '',
+          arrivalKind: currentRoute.arrivalKind || selected?.arrivalKind,
+          rerouting,
+          routeFailed: !!routeError && nav.offRouteSince !== null,
+          now: clock,
+        }
+      : null,
+    muted,
+    setToast,
+  );
   useMotionSession(navigating && !nav.arrived);
   useEffect(() => {
     panelContent.current?.scrollTo(0, 0);
@@ -332,7 +355,11 @@ export default function App() {
     }
   }, [data, saved, recent]);
   useEffect(() => {
-    if (packageVersion) voice.current.load(packageVersion).catch(() => {});
+    if (packageVersion)
+      void voice.current
+        .load(packageVersion)
+        .then(setVoiceMode)
+        .catch(() => setVoiceMode('unavailable'));
   }, [packageVersion]);
   useEffect(() => {
     if (!toast) return;
@@ -372,53 +399,10 @@ export default function App() {
         advanceNavigation(currentRoute, gps.fix!, previous, clock),
       );
   }, [gps.fix, clock, navigating, currentRoute]);
-  const announceManeuver = useEffectEvent(() => {
-    if (!navigating || !currentRoute) return;
-    if (nav.quality !== 'good') {
-      const key = `weak:${nav.quality}`;
-      if (!announced.current.has(key)) {
-        announced.current.add(key);
-        void voice.current
-          .play('weak')
-          .catch(() =>
-            setToast('Audio unavailable; follow the on-screen directions.'),
-          );
-      }
-      return;
-    }
-    if (nav.arrived) {
-      if (!announced.current.has('arrive')) {
-        announced.current.add('arrive');
-        void voice.current
-          .playWithName(
-            selected?.name || '',
-            'arrive',
-            ...((currentRoute.arrivalKind || selected?.arrivalKind) !==
-            'entrance'
-              ? ['approach']
-              : []),
-          )
-          .catch(() => {});
-        gps.stop();
-      }
-      return;
-    }
-    const next = currentRoute.maneuvers[nav.nextIndex];
-    if (!next) return;
-    const remaining = next.at - nav.progress;
-    if (remaining <= 55 && remaining >= -5) {
-      const key = `${currentRoute.id}:${nav.nextIndex}:${remaining < 12 ? 'now' : 'soon'}`;
-      if (!announced.current.has(key)) {
-        announced.current.add(key);
-        void voice.current
-          .maneuver(next.kind, remaining)
-          .catch(() =>
-            setToast('Audio unavailable; follow the on-screen directions.'),
-          );
-      }
-    }
-  });
-  useEffect(() => announceManeuver(), [nav, navigating, currentRoute]);
+  const stopGps = gps.stop;
+  useEffect(() => {
+    if (navigating && nav.arrived) stopGps();
+  }, [navigating, nav.arrived, stopGps]);
   useEffect(() => {
     if (
       !nav.reroute ||
@@ -431,17 +415,24 @@ export default function App() {
       return;
     rerouteAt.current = Date.now();
     const request = ++routeRequest.current;
-    void voice.current.play('reroute').catch(() => {});
+    setRerouting(true);
+    setRouteError('');
     calculate(data, gps.fix.coordinates, { placeId: selected.id })
       .then((next) => {
         if (request !== routeRequest.current || !navigatingRef.current) return;
         setRoutes(next);
         setChosen(0);
         setNav(initialNavigation);
-        announced.current.clear();
+        setRerouting(false);
+        setRouteError('');
         setToast('Walking route updated.');
       })
-      .catch((e) => setToast(e.message));
+      .catch((e) => {
+        if (request !== routeRequest.current || !navigatingRef.current) return;
+        setRerouting(false);
+        setRouteError(e.message);
+        setToast(e.message);
+      });
   }, [nav.reroute, gps.fix, navigating, data, selected, calculate]);
   const places = useMemo(
     () =>
@@ -651,9 +642,8 @@ export default function App() {
       setNav(initialNavigation);
       setNavigating(true);
       setFollow(true);
-      announced.current.clear();
+      setRerouting(false);
       setRouteError('');
-      await voice.current.play('depart');
     } catch (e) {
       setRouteError((e as Error).message);
     } finally {
@@ -677,6 +667,7 @@ export default function App() {
     startRequested.current = false;
     routeRequest.current++;
     setNavigating(false);
+    setRerouting(false);
     setFollow(false);
     gps.stop();
     voice.current.stop();
@@ -1036,13 +1027,7 @@ export default function App() {
                 setMuted(!muted);
                 void setPreference('muted', !muted);
               }}
-              onRepeat={() => {
-                const m = currentRoute?.maneuvers[nav.nextIndex];
-                if (m)
-                  void voice.current
-                    .maneuver(m.kind, m.at - nav.progress)
-                    .catch(() => setToast('Audio could not play.'));
-              }}
+              onRepeat={repeatDirections}
             />
           ) : !selected ? (
             <>
@@ -1421,24 +1406,44 @@ export default function App() {
                   </Button>
                 </div>
                 <MotionStatus modes fix={gps.fix} following={follow} />
+                <p className="small-note">
+                  {voiceMode === 'natural'
+                    ? 'Natural offline voice · British English. Saved with the app.'
+                    : voiceMode === 'basic'
+                      ? 'Using basic offline voice. Reload online to retry the natural voice.'
+                      : 'Voice unavailable. Save the app and download the campus map before going offline.'}
+                </p>
                 <Button
                   variant="outline"
-                  disabled={muted}
+                  disabled={muted || navigating || previewingVoice}
                   onClick={async () => {
+                    setPreviewingVoice(true);
+                    setVoicePreviewFeedback('');
                     try {
                       await voice.current.unlock();
-                      await voice.current.load(manifest.version);
-                      await voice.current.play('depart');
-                      setToast('Offline voice test played.');
-                    } catch {
-                      setToast(
-                        'Audio is unavailable. Check device volume and download the campus map.',
+                      setVoiceMode(await voice.current.load(manifest.version));
+                      await voice.current.preview();
+                      setVoicePreviewFeedback('Voice preview played.');
+                    } catch (error) {
+                      setVoicePreviewFeedback(
+                        error instanceof Error
+                          ? error.message
+                          : 'Audio is unavailable. Check device volume and download the campus map.',
                       );
+                    } finally {
+                      setPreviewingVoice(false);
                     }
                   }}
                 >
-                  Test spoken directions
+                  {previewingVoice
+                    ? 'Playing preview…'
+                    : 'Preview voice directions'}
                 </Button>
+                {voicePreviewFeedback && (
+                  <output className="small-note" aria-live="polite">
+                    {voicePreviewFeedback}
+                  </output>
+                )}
                 <p className="small-note">
                   Install: in Android Chrome, choose Install app from the menu.
                   On iPhone, use Safari → Share → Add to Home Screen. Keep the

@@ -206,6 +206,11 @@ export function RoutePanel({
         </>
       ) : (
         <>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
           <div className={`turn-banner ${nav.arrived ? 'arrived' : ''}`}>
             <TurnIcon
               kind={nav.arrived ? 'arrive' : next?.kind || 'straight'}
@@ -272,7 +277,7 @@ export function RoutePanel({
               {muted ? <VolumeX /> : <Volume2 />}
               {muted ? 'Unmute' : 'Mute'}
             </Button>
-            <Button variant="outline" onClick={onRepeat}>
+            <Button variant="outline" onClick={onRepeat} disabled={muted}>
               <RotateCcw /> Repeat
             </Button>
           </div>
