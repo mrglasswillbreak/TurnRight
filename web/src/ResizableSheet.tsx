@@ -5,18 +5,15 @@ import {
   type CSSProperties,
   type HTMLAttributes,
 } from 'react';
-import { clampSheetHeight, resizeSheetKey, sheetLimits } from './sheet-size';
+import {
+  clampSheetHeight,
+  resizeSheetKey,
+  sheetLimits,
+  sheetViewport,
+} from './sheet-size';
 
 function viewport() {
-  const view = window.visualViewport;
-  return {
-    height: view?.height ?? window.innerHeight,
-    bottom: Math.max(
-      0,
-      window.innerHeight -
-        (view ? view.height + view.offsetTop : window.innerHeight),
-    ),
-  };
+  return sheetViewport(window.innerHeight, window.visualViewport);
 }
 
 export function useSheetSize(
@@ -25,9 +22,15 @@ export function useSheetSize(
   startCompact = true,
   topClearance = 32,
   openFullHeight = false,
+  focusContent = false,
 ) {
   const [view, setView] = useState(viewport);
   const remembered = useRef(0.56);
+  // A search session uses the visible viewport without replacing the saved size.
+  const [focusedHeight, setFocusedHeight] = useState<number | null>(null);
+  useEffect(() => {
+    if (!focusContent) setFocusedHeight(null);
+  }, [focusContent]);
   const [requested, setRequested] = useState(() => {
     try {
       const value = Number(localStorage.getItem(`turnright:sheet:${key}`));
@@ -47,8 +50,13 @@ export function useSheetSize(
     minimum,
     topClearance,
     openFullHeight,
+    focusContent,
   );
-  const height = clampSheetHeight(requested, min, max);
+  const height = clampSheetHeight(
+    focusContent ? (focusedHeight ?? max) : requested,
+    min,
+    max,
+  );
   const expanded = height > min + 8;
   const current = useRef(height);
   current.current = height;
@@ -65,6 +73,10 @@ export function useSheetSize(
   }, []);
   const save = (value: number) => {
     const next = clampSheetHeight(value, min, max);
+    if (focusContent) {
+      setFocusedHeight(next);
+      return;
+    }
     setRequested(next);
     if (!startCompact || next > min + 8) {
       remembered.current = Math.min(
@@ -110,7 +122,8 @@ export function useSheetSize(
         min,
         max,
       );
-      setRequested(current.current);
+      if (focusContent) setFocusedHeight(current.current);
+      else setRequested(current.current);
     },
     onPointerUp: (event) => {
       if (drag.current?.id !== event.pointerId) return;
@@ -119,7 +132,10 @@ export function useSheetSize(
       event.currentTarget.releasePointerCapture(event.pointerId);
     },
     onPointerCancel: () => {
-      if (drag.current) setRequested(drag.current.height);
+      if (drag.current) {
+        if (focusContent) setFocusedHeight(drag.current.height);
+        else setRequested(drag.current.height);
+      }
       drag.current = null;
     },
     onLostPointerCapture: () => {
@@ -136,7 +152,9 @@ export function useSheetSize(
       setRequested(
         open
           ? startCompact && expanded
-            ? height
+            ? focusContent
+              ? requested
+              : height
             : clampSheetHeight(
                 openFullHeight
                   ? max

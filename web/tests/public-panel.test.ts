@@ -3,6 +3,7 @@ import {
   clampSheetHeight,
   resizeSheetKey,
   sheetLimits,
+  sheetViewport,
 } from '../src/sheet-size';
 import { publicMapPadding } from '../src/public-map-layout';
 
@@ -27,6 +28,39 @@ describe('resizable public cards', () => {
     expect(clampSheetHeight(600, keyboard.min, keyboard.max)).toBe(208);
     expect(clampSheetHeight(-20, phone.min, phone.max)).toBe(96);
     expect(clampSheetHeight(NaN, phone.min, phone.max)).toBe(96);
+  });
+
+  it('gives focused search room for results instead of reserving map controls', () => {
+    for (const height of [320, 450, 540]) {
+      const search = sheetLimits(height, 96, 208, false, true);
+      expect(search.max).toBe(height - 32);
+      expect(search.max - 196).toBeGreaterThanOrEqual(92);
+      expect(sheetLimits(height, 96, 288, false, true)).toEqual(search);
+      expect(
+        resizeSheetKey('ArrowDown', search.max, search.min, search.max),
+      ).toBe(search.max - 32);
+    }
+    expect(sheetLimits(844, 96, 208).max).toBe(636);
+  });
+
+  it('anchors sheets to the visible viewport with either keyboard resize behavior', () => {
+    expect(sheetViewport(844, { height: 450, offsetTop: 0 })).toEqual({
+      height: 450,
+      bottom: 394,
+    });
+    expect(sheetViewport(844, { height: 450, offsetTop: 70 })).toEqual({
+      height: 450,
+      bottom: 324,
+    });
+    expect(sheetViewport(450, { height: 450, offsetTop: 0 })).toEqual({
+      height: 450,
+      bottom: 0,
+    });
+    expect(sheetViewport(844, { height: 844, offsetTop: 0 })).toEqual({
+      height: 844,
+      bottom: 0,
+    });
+    expect(sheetViewport(450)).toEqual({ height: 450, bottom: 0 });
   });
 
   it('supports keyboard resizing without trapping unrelated keys', () => {

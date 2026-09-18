@@ -125,6 +125,8 @@ export default function App() {
   );
   const [updateReady, setUpdateReady] = useState(false);
   const [installingUpdate, setInstallingUpdate] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const mobileSearch = mobileMapControls && searching;
   // Leave space for both rows of map controls above the expanded mobile card.
   const panelSheet = useSheetSize(
     'search',
@@ -132,6 +134,7 @@ export default function App() {
     true,
     mobileMapControls ? (updateReady ? 288 : 208) : 32,
     !mobileMapControls,
+    mobileSearch,
   );
   const dialogSheet = useSheetSize(
     'dialogs',
@@ -459,6 +462,8 @@ export default function App() {
       setToast('Finish this walk before choosing a new destination.');
       return;
     }
+    setSearching(false);
+    searchInput.current?.blur();
     routeRequest.current++;
     setShareFallback('');
     setSharedLinkMissing(false);
@@ -771,6 +776,7 @@ export default function App() {
       className={`app-shell ${navigating ? 'is-navigating' : ''}`}
       data-panel-expanded={panelExpanded}
       data-mobile-controls={mobileMapControls}
+      data-searching={mobileSearch}
       data-update-ready={updateReady}
       style={panelSheet.style}
       data-panel-view={
@@ -844,9 +850,15 @@ export default function App() {
           <small>LASU · OJO</small>
         </span>
       </BrandTag>
+      {/* Focus tracking only; this region has no pointer or keyboard actions. */}
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <section
         className="explore-panel"
         aria-label={navigating ? 'Walking navigation' : 'Campus places'}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setSearching(false);
+        }}
       >
         <SheetHandle sheet={panelSheet} label="Resize search panel" />
         <div className="dock-search-row">
@@ -871,7 +883,15 @@ export default function App() {
                 ref={searchInput}
                 placeholder="Search LASU campus"
                 value={query}
-                onFocus={() => setPanelExpanded(true)}
+                onFocus={() => {
+                  setSearching(true);
+                  setPanelExpanded(true);
+                  panelContent.current?.scrollTo(0, 0);
+                }}
+                enterKeyHint="search"
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') event.currentTarget.blur();
+                }}
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setSelected(null);
@@ -880,7 +900,14 @@ export default function App() {
                 }}
               />
               {query && (
-                <button aria-label="Clear search" onClick={() => setQuery('')}>
+                <button
+                  aria-label="Clear search"
+                  onPointerDown={(event) => {
+                    if (document.activeElement === searchInput.current)
+                      event.preventDefault();
+                  }}
+                  onClick={() => setQuery('')}
+                >
                   <X size={17} />
                 </button>
               )}
@@ -892,6 +919,7 @@ export default function App() {
             aria-controls="campus-panel-content"
             aria-label={panelExpanded ? 'Collapse card' : 'Expand card'}
             onClick={() => {
+              setSearching(false);
               if (panelExpanded) searchInput.current?.blur();
               setPanelExpanded(!panelExpanded);
             }}
@@ -917,6 +945,7 @@ export default function App() {
                 className={`rail-item ${!savedOnly ? 'active' : ''}`}
                 disabled={navigating}
                 onClick={() => {
+                  setSearching(false);
                   setSavedOnly(false);
                   setPanelExpanded(true);
                   setSelected(null);
@@ -931,6 +960,7 @@ export default function App() {
                 className={`rail-item ${savedOnly ? 'active' : ''}`}
                 disabled={navigating}
                 onClick={() => {
+                  setSearching(false);
                   setSavedOnly(true);
                   setPanelExpanded(true);
                   setSelected(null);
@@ -1066,6 +1096,15 @@ export default function App() {
                   <button
                     className="place-row"
                     key={place.id}
+                    onPointerDown={(event) => {
+                      // Keep the keyboard from moving the result before the tap
+                      // completes. Selection dismisses it in selectPlace.
+                      if (
+                        mobileSearch &&
+                        document.activeElement === searchInput.current
+                      )
+                        event.preventDefault();
+                    }}
                     onClick={() => selectPlace(place)}
                   >
                     <span className={`place-icon ${place.category}`}>

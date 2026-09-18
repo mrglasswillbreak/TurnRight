@@ -3,12 +3,13 @@ export function sheetLimits(
   minimum: number,
   topClearance = 32,
   fullHeight = false,
+  focusContent = false,
 ) {
   const max = Math.max(
     80,
     Math.min(
-      viewportHeight - topClearance,
-      viewportHeight * (fullHeight ? 1 : 0.88),
+      viewportHeight - (focusContent ? 32 : topClearance),
+      viewportHeight * (fullHeight || focusContent ? 1 : 0.88),
     ),
   );
   return { min: Math.min(minimum, max), max };
@@ -29,4 +30,17 @@ export function resizeSheetKey(
   if (key === 'ArrowUp') return clampSheetHeight(height + 32, min, max);
   if (key === 'ArrowDown') return clampSheetHeight(height - 32, min, max);
   return null;
+}
+
+export function sheetViewport(
+  layoutHeight: number,
+  visual?: { height: number; offsetTop: number } | null,
+) {
+  return {
+    height: visual?.height ?? layoutHeight,
+    bottom: Math.max(
+      0,
+      layoutHeight - (visual ? visual.height + visual.offsetTop : layoutHeight),
+    ),
+  };
 }

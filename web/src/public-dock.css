@@ -516,6 +516,23 @@
     background: transparent;
   }
 }
+/* Typing gets the available screen above the keyboard. Main navigation stays
+   pinned, while map controls and browse filters return when search ends. */
+.app-shell[data-searching='true'] > .map-controls,
+.app-shell[data-searching='true'] > .public-brand,
+.app-shell[data-searching='true'] > .public-update,
+.app-shell[data-searching='true'] .category-strip {
+  display: none;
+}
+.app-shell[data-searching='true'] .section-heading {
+  padding-block: 6px;
+}
+.app-shell[data-searching='true'] .section-heading h1 {
+  font-size: 17px;
+}
+.app-shell[data-searching='true'] .panel-content {
+  scroll-padding-top: 76px;
+}
 @media (prefers-reduced-transparency: reduce) {
   .app-shell .explore-panel,
   .app-shell .public-brand {
