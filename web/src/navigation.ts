@@ -39,7 +39,7 @@ export function advanceNavigation(
     : Math.min(route.distance, Math.max(0, match.progress));
   const nextIndex = Math.max(
     1,
-    route.maneuvers.findIndex((m, index) => index > 0 && m.at > progress + 5),
+    route.maneuvers.findIndex((m, index) => index > 0 && m.at >= progress - 5),
   );
   const atEnd =
     !offRoute &&
@@ -48,7 +48,7 @@ export function advanceNavigation(
   const arrivalFixes = atEnd ? state.arrivalFixes + 1 : 0;
   return {
     progress,
-    nextIndex: route.distance - progress <= 8 ? route.maneuvers.length - 1 : nextIndex,
+    nextIndex,
     offRouteSince,
     reroute: offRouteSince !== null && now - offRouteSince >= 8000,
     arrived: arrivalFixes >= 3,
