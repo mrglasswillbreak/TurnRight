@@ -407,6 +407,152 @@
 .app-shell[data-mobile-controls='false'] .panel-content {
   scroll-padding-top: 132px;
 }
+.app-shell[data-mobile-controls='false'] .explore-panel {
+  left: 24px;
+  width: min(430px, calc(100% - 48px));
+  top: 22px;
+  bottom: 30px;
+  height: auto;
+  border-radius: 20px;
+  background: var(--background);
+  backdrop-filter: none;
+}
+.app-shell[data-mobile-controls='false'] .sheet-resize-handle,
+.app-shell[data-mobile-controls='false'] .dock-toggle {
+  display: none;
+}
+.app-shell[data-mobile-controls='false'] .dock-search-row {
+  padding: 20px 20px 14px 106px;
+  flex: 0 0 auto;
+}
+.app-shell[data-mobile-controls='false'] .search-box {
+  border-radius: 12px;
+  height: 49px;
+  min-height: 49px;
+}
+.app-shell[data-mobile-controls='false'] .panel-content {
+  position: relative;
+  scroll-padding-top: 12px;
+}
+.app-shell[data-mobile-controls='false'] .panel-toolbar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 86px;
+  z-index: 3;
+  border-right: 1px solid var(--border);
+}
+.app-shell[data-mobile-controls='false'] .app-rail {
+  width: 86px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 13px;
+  padding: 25px 9px 20px;
+  background: var(--background);
+}
+.app-shell[data-mobile-controls='false'] .app-rail .brandmark,
+.app-shell[data-mobile-controls='false'] .app-rail .rail-spacer {
+  display: grid;
+}
+.app-shell[data-mobile-controls='false'] .app-rail .rail-spacer {
+  display: block;
+}
+.app-shell[data-mobile-controls='false'] .app-rail .rail-item {
+  width: 66px;
+  min-height: 67px;
+  flex: none;
+  border-radius: 12px;
+  font-size: 12px;
+  gap: 7px;
+}
+.app-shell[data-mobile-controls='false'] .app-rail .rail-item svg {
+  width: 23px;
+  height: 23px;
+}
+.app-shell[data-mobile-controls='false'] .category-strip,
+.app-shell[data-mobile-controls='false'] .section-heading,
+.app-shell[data-mobile-controls='false'] .section-description,
+.app-shell[data-mobile-controls='false'] .place-list,
+.app-shell[data-mobile-controls='false'] .place-detail,
+.app-shell[data-mobile-controls='false'] .route-panel,
+.app-shell[data-mobile-controls='false'] .panel-footer,
+.app-shell[data-mobile-controls='false'] .map-topbar,
+.app-shell[data-mobile-controls='false'] .map-caption {
+  margin-left: 86px;
+}
+.app-shell[data-mobile-controls='false'] .map-topbar {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  margin-left: 0;
+  padding: 0;
+}
+.app-shell[data-mobile-controls='false'] .location-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 1px solid #ffffff50;
+  border-radius: 30px;
+  background: var(--background);
+  box-shadow: 0 2px 12px #1c3c5010;
+  font-size: 11px;
+}
+.app-shell[data-mobile-controls='false'] .map-caption {
+  position: absolute;
+  right: 25px;
+  bottom: 34px;
+  margin-left: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--background);
+  font-size: 11px;
+}
+.app-shell[data-mobile-controls='false'] .map-controls {
+  position: absolute;
+  z-index: 8;
+  right: 25px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+}
+.app-shell[data-mobile-controls='false'] .map-controls button {
+  width: 43px;
+  height: 43px;
+  border-radius: 11px;
+  background: var(--background);
+  box-shadow: 0 2px 12px #1b384b13;
+}
+.app-shell[data-mobile-controls='false'] .map-controls > button:has(span:not(.minus)) {
+  width: 43px;
+  height: 49px;
+  flex-direction: column;
+  gap: 2px;
+}
+.app-shell[data-mobile-controls='false'] .map-controls .control-group {
+  display: block;
+  border-radius: 11px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #1b384b13;
+}
+.app-shell[data-mobile-controls='false'] .map-controls .control-group button {
+  border-radius: 0;
+  box-shadow: none;
+}
+.app-shell[data-mobile-controls='false'] .map-controls .control-group button:first-child {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+.app-shell[data-mobile-controls='false'] .maplibregl-ctrl-bottom-left {
+  left: calc(min(430px, calc(100% - 48px)) + 44px);
+  right: auto;
+  bottom: 8px;
+  transform: none;
+}
 .app-dialog.resizable-dialog {
   transition-property: opacity, transform, translate, background-color, color;
   top: auto;

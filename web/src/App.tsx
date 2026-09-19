@@ -824,7 +824,7 @@ export default function App() {
         }}
       />
 
-      {mobileMapControls && mapControls}
+      {mapControls}
       {updateReady && (
         <AppUpdateNotice
           navigating={navigating}
@@ -998,7 +998,6 @@ export default function App() {
                 <span>Editor</span>
               </a>
             </nav>
-            {!mobileMapControls && mapControls}
           </div>
           {sharedLinkMissing && (
             <output className="notice dock-notice">
