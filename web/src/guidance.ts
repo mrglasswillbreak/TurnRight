@@ -46,7 +46,11 @@ export class GuidanceController {
     // same ID, so a new route object also starts a fresh announcement session.
     const changed = this.route !== route || this.routeId !== route.id;
     if (changed) {
-      this.updatedRoute = !!this.routeId;
+      this.updatedRoute = !!this.routeId && this.route?.mode === route.mode;
+      if (this.route?.mode !== route.mode) {
+        this.speeds = [];
+        this.speedTimestamp = -1;
+      }
       this.routeId = route.id;
       this.route = route;
       // GPS episodes span route replacements; do not announce the same
@@ -113,14 +117,18 @@ export class GuidanceController {
         make(
           'arrived',
           [
-            input.arrivalKind === 'entrance'
-              ? 'arrive-entrance'
-              : 'arrive-approach',
+            route.mode === 'driving'
+              ? 'arrive-parking'
+              : input.arrivalKind === 'entrance'
+                ? 'arrive-entrance'
+                : 'arrive-approach',
           ],
           2,
-          input.arrivalKind === 'entrance'
+          route.mode === 'driving'
             ? ['arrive']
-            : ['arrive', 'approach'],
+            : input.arrivalKind === 'entrance'
+              ? ['arrive']
+              : ['arrive', 'approach'],
           { destination: input.destination },
         ),
       );
@@ -186,7 +194,7 @@ export class GuidanceController {
         fix!.speed !== null &&
         Number.isFinite(fix!.speed) &&
         fix!.speed >= 0.3 &&
-        fix!.speed <= 3
+        fix!.speed <= (route.mode === 'driving' ? 36 : 3)
       )
         this.speeds = [...this.speeds.slice(-4), fix!.speed];
       else this.speeds = [];
@@ -194,9 +202,17 @@ export class GuidanceController {
     const ordered = [...this.speeds].sort((a, b) => a - b);
     const speed = ordered.length
       ? ordered[Math.floor(ordered.length / 2)]
-      : 1.25;
-    const advance = clamp(speed * 30, 30, 60),
-      immediate = clamp(speed * 6, 8, 12);
+      : route.mode === 'driving'
+        ? route.distance / Math.max(1, route.seconds)
+        : 1.25;
+    const advance =
+        route.mode === 'driving'
+          ? clamp(speed * 20, 50, 200)
+          : clamp(speed * 30, 30, 60),
+      immediate =
+        route.mode === 'driving'
+          ? clamp(speed * 4, 12, 35)
+          : clamp(speed * 6, 8, 12);
     const index = nav.nextIndex,
       next = route.maneuvers[index];
     const remaining = next ? next.at - nav.progress : Infinity;
@@ -214,10 +230,20 @@ export class GuidanceController {
       !this.announced.has(`${route.id}:depart`)
     )
       return decision(
-        make('depart', ['depart'], 0, ['depart'], {
-          destination: input.destination,
-          expiresAtProgress: Math.min(10, next?.at || 10),
-        }),
+        make(
+          'depart',
+          [route.mode === 'driving' ? 'depart-driving' : 'depart'],
+          0,
+          route.mode === 'driving' ? ['straight'] : ['depart'],
+          {
+            destination: input.destination,
+            expiresAtProgress: Math.min(10, next?.at || 10),
+          },
+        ),
+      );
+    if (next?.roundaboutExit !== undefined && remaining <= advance)
+      return decision(
+        make(`${index}:roundabout`, ['roundabout'], 1, ['straight']),
       );
     if (!next || next.kind === 'arrive') {
       // Arrival is a confirmed state, never a turn that can be spoken early.

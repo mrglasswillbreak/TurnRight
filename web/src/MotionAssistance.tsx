@@ -166,12 +166,14 @@ export function MotionMap({
   follow = false,
   active = false,
   survey = false,
+  driving = false,
 }: {
   map: MapInstance;
   fix?: GpsFix | null;
   follow?: boolean;
   active?: boolean;
   survey?: boolean;
+  driving?: boolean;
 }) {
   const state = useMotion();
   const expiry = useGpsExpiry(fix, survey ? 10000 : 12000);
@@ -251,12 +253,16 @@ export function MotionMap({
       recenter ||
       (bearingChanged && now - previous.lastBearingUpdate >= 100)
     ) {
-      const zoom = followZoom(
-        map.getZoom(),
-        previous.hadPosition,
-        beganFollowing,
-        previous.recoveringZoom,
-      );
+      const zoom = driving
+        ? beganFollowing
+          ? 16.5
+          : undefined
+        : followZoom(
+            map.getZoom(),
+            previous.hadPosition,
+            beganFollowing,
+            previous.recoveringZoom,
+          );
       // New fixes can arrive before the return flight finishes. Continue its
       // target zoom until reached, rather than freezing at an intermediate zoom.
       previous.recoveringZoom = zoom !== undefined;
@@ -270,6 +276,6 @@ export function MotionMap({
       previous.hadPosition = true;
       previous.lastBearingUpdate = now;
     }
-  }, [map, fix, follow, active, survey, state, expiry]);
+  }, [map, fix, follow, active, survey, driving, state, expiry]);
   return null;
 }
