@@ -114,6 +114,10 @@ export function preserveReviewedMetadata(previous, candidate) {
   const old = previous.find((r) => r.entity === "meta")?.payload;
   const meta = candidate.find((r) => r.entity === "meta");
   if (!old || !meta) return candidate;
+  // This identifies the public baseline whose owner corrections were reviewed,
+  // not the import's candidate hash. Keep it until an explicit reconciliation.
+  // Published release versions are assigned from the immutable release snapshot.
+  meta.payload.version = old.version;
   for (const key of ["visuals", "entrances", "closures", "placeIdAliases", "buildingIdAliases"])
     if (old[key] !== undefined) meta.payload[key] = structuredClone(old[key]);
   if (old.driving) {
