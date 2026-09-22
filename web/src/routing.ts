@@ -162,6 +162,7 @@ export function makeRoute(
     nodeIds,
     edgeIds: edges.map((e) => e.id),
     coordinates,
+    mode: 'walking',
     distance: total,
     seconds: total / 1.25,
     maneuvers,
@@ -221,7 +222,9 @@ export function findRoutes(
 ): Route[] {
   const nodeMap = new Map(data.graph.nodes.map((n) => [n.id, n.coordinates]));
   const blocked = new Set(
-    data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
+    data.closures
+      .filter((c) => !c.reopenedAt && (!c.modes || c.modes.includes('walking')))
+      .flatMap((c) => c.edgeIds),
   );
   const geometryBlocked = cachedGeometryBlocker(data.map);
   for (const edge of data.graph.edges) {

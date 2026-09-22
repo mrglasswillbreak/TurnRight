@@ -1,7 +1,18 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { CampusData, RouteOrigin, RouteEndpoint, Route } from './types';
+import type {
+  CampusData,
+  RouteOrigin,
+  RouteEndpoint,
+  Route,
+  TravelMode,
+} from './types';
 import { RevisionWorker } from './revision-worker';
-export type RouteRequest = { origin: RouteOrigin; destination: RouteEndpoint };
+export type RouteRequest = {
+  origin: RouteOrigin;
+  destination: RouteEndpoint;
+  mode?: TravelMode;
+  parkingId?: string;
+};
 function routeWorker() {
   return new RevisionWorker<CampusData, RouteRequest, Route[]>(
     new Worker(new URL('./routing.worker.ts', import.meta.url), {
@@ -24,13 +35,24 @@ export function useRoutes() {
     };
   }, []);
   return useCallback(
-    (data: CampusData, origin: RouteOrigin, destination: RouteEndpoint) => {
+    (
+      data: CampusData,
+      origin: RouteOrigin,
+      destination: RouteEndpoint,
+      mode: TravelMode = 'walking',
+      parkingId?: string,
+    ) => {
       if (!worker.current)
         return Promise.reject(
           new Error('Routing is starting. Please try again.'),
         );
       if (worker.current.closed) worker.current = routeWorker();
-      return worker.current.request(data, { origin, destination });
+      return worker.current.request(data, {
+        origin,
+        destination,
+        mode,
+        parkingId,
+      });
     },
     [],
   );

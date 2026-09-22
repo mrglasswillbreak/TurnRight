@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { findDrivingJourneys } from './driving';
 import { findRoutes } from './routing';
 import type { CampusData } from './types';
 import type { RouteRequest } from './useRoutes';
@@ -21,7 +22,15 @@ self.onmessage = (
     self.postMessage({
       id,
       revision,
-      result: findRoutes(data, payload.origin, payload.destination),
+      result:
+        payload.mode === 'driving'
+          ? findDrivingJourneys(
+              data,
+              payload.origin,
+              payload.destination,
+              payload.parkingId,
+            )
+          : findRoutes(data, payload.origin, payload.destination),
     });
   } catch (error) {
     self.postMessage({
