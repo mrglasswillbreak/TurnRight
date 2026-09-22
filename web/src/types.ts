@@ -63,7 +63,39 @@ export interface SourceEvidence {
   accuracyMetres?: number;
 }
 export type FieldEvidence = Record<string, SourceEvidence[]>;
+export interface ArrivalGuide {
+  description?: string;
+  restrictions?: string;
+  steps?: number;
+  ramp?: 'yes' | 'no' | 'unknown';
+  surface?: string;
+  doorwayWidthCm?: number;
+  observedAt?: string;
+  evidence?: FieldEvidence;
+  /** Moving an entrance invalidates the location-specific guide review. */
+  needsReview?: boolean;
+  photoIds?: string[];
+}
+export interface CampusPhoto extends PackageAsset {
+  id: string;
+  buildingId: string;
+  entranceId?: string;
+  caption: string;
+  alt: string;
+  author: string;
+  sourceUrl: string;
+  license: 'CC BY 4.0' | 'CC BY-SA 4.0' | 'CC0 1.0' | 'Public domain';
+  licenseUrl: string;
+  attribution: string;
+  modifications: string;
+  capturedAt?: string;
+  checkedAt: string;
+  historical?: boolean;
+  width: number;
+  height: number;
+}
 export interface PlaceDetails {
+  arrival?: ArrivalGuide;
   subtype?: string;
   address?: string;
   phone?: string;
@@ -134,6 +166,7 @@ export interface PathConnection {
   target: ConnectionTarget;
 }
 export interface Entrance {
+  arrival?: ArrivalGuide;
   id: string;
   placeId: string;
   buildingId?: string;
@@ -144,7 +177,7 @@ export interface Entrance {
   graphNode?: string;
   crossingGraphNode?: string;
 }
-export type RouteEndpoint = string | { placeId: string };
+export type RouteEndpoint = string | { placeId: string; entranceId?: string };
 export type RouteOrigin = Position | RouteEndpoint;
 export interface RoutingGraph {
   nodes: GraphNode[];
@@ -178,6 +211,7 @@ export interface CampusData {
   placeIdAliases?: Record<string, string>;
   buildingIdAliases?: Record<string, string>;
   visuals?: VisualCatalogue;
+  photos?: CampusPhoto[];
   entrances?: Entrance[];
   graph: RoutingGraph;
   driving?: {
@@ -238,6 +272,7 @@ export interface CampusPackage {
   bytes: number;
   assets: PackageAsset[];
   visuals?: { bytes: number; assetUrls: string[] };
+  photos?: { bytes: number; assetUrls: string[] };
 }
 export type ManeuverKind =
   | 'depart'

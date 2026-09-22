@@ -5,6 +5,20 @@ export function withPublishedVisuals(
   base: CampusData,
   published: CampusData,
 ): CampusData {
+  base = {
+    ...base,
+    photos: base.photos ?? published.photos,
+    places: base.places.map((p) => ({
+      ...p,
+      arrival:
+        p.arrival ?? published.places.find((v) => v.id === p.id)?.arrival,
+    })),
+    entrances: base.entrances?.map((e) => ({
+      ...e,
+      arrival:
+        e.arrival ?? published.entrances?.find((v) => v.id === e.id)?.arrival,
+    })),
+  };
   if (base.visuals || !published.visuals) return base;
   const source = new Map(
     published.map.features

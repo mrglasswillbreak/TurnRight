@@ -135,6 +135,7 @@ export function featureEdit(
         geometry: { type: 'Point', coordinates: e.coordinates },
         properties: {
           name: e.name,
+          arrival: e.arrival,
           placeId: e.placeId,
           buildingId: e.buildingId,
           access: e.walkingAccess,
@@ -152,6 +153,7 @@ export function featureEdit(
         geometry: { type: 'Point', coordinates: p.coordinates },
         properties: {
           name: p.name,
+          arrival: p.arrival,
           ...Object.fromEntries(detailFields.map((key) => [key, p[key]])),
           evidence: p.evidence,
           category: p.category,
@@ -254,6 +256,11 @@ export function geometryEdits(
       : structuredClone({ ...current, geometry });
   const batch: MapEdit[] = [next];
   if (current.kind === 'entrance' && geometry.type === 'Point') {
+    if (JSON.stringify(current.geometry) !== JSON.stringify(geometry))
+      next.properties.arrival = {
+        ...(current.properties.arrival as object),
+        needsReview: true,
+      };
     const nodeId = data.entrances?.find((e) => e.id === current.id)?.graphNode;
     const sourceId =
       nodeId &&
@@ -335,6 +342,10 @@ export function geometryEdits(
         const edit = featureEdit(data, 'entrance', entrance.id, edits);
         if (edit) {
           edit.geometry = { type: 'Point', coordinates: move.point };
+          edit.properties.arrival = {
+            ...(edit.properties.arrival as object),
+            needsReview: true,
+          };
           edit.properties.connection = {
             type: 'node',
             nodeId: move.id,

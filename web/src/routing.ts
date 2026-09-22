@@ -1,6 +1,7 @@
 import { bearing, distance } from './geo';
 import { cachedGeometryBlocker } from './spatial';
 import { resolvePlaceId } from './map-display';
+import { entranceConnected, placeEntrances } from './arrival';
 import type {
   CampusData,
   GraphEdge,
@@ -170,11 +171,9 @@ export function makeRoute(
   };
 }
 export function placeHasConnection(data: CampusData, place: Place): boolean {
-  const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
+  const entrances = placeEntrances(data, place.id);
   return entrances.length
-    ? entrances.some(
-        (e) => e.graphNode && ['yes', 'campus'].includes(e.walkingAccess),
-      )
+    ? entrances.some((e) => entranceConnected(data, e))
     : !!place.graphNode;
 }
 interface EndpointNode {
@@ -193,10 +192,14 @@ function endpointNodes(
     (p) => p.id === resolvePlaceId(data, endpoint.placeId),
   );
   if (!place) return [];
-  const entrances = data.entrances?.filter((e) => e.placeId === place.id) || [];
-  if (entrances.length)
+  const entrances = placeEntrances(data, place.id);
+  if (entrances.length || endpoint.entranceId)
     return entrances
-      .filter((e) => e.graphNode && ['yes', 'campus'].includes(e.walkingAccess))
+      .filter(
+        (e) =>
+          (!endpoint.entranceId || e.id === endpoint.entranceId) &&
+          entranceConnected(data, e),
+      )
       .sort((a, b) => a.id.localeCompare(b.id))
       .map((e) => ({
         id: e.graphNode!,
@@ -254,7 +257,9 @@ export function findRoutes(
     );
   if (!ends.length)
     throw new RoutingError(
-      'This destination has no available mapped walking connection yet.',
+      typeof destination !== 'string' && destination.entranceId
+        ? 'The selected entrance is unavailable or has no permitted mapped connection. Choose another entrance.'
+        : 'This destination has no available mapped walking connection yet.',
     );
   const candidates: Route[] = [];
   for (const start of starts)

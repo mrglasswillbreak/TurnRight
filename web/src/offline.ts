@@ -83,10 +83,7 @@ export async function getActivePackage(): Promise<{
   const present = await Promise.all(
     record.manifest.assets.map(async (a: PackageAsset) => {
       const response = await cache.match(a.url);
-      return (
-        !!response &&
-        (!visualUrls.has(a.url) || (await verifiedAsset(response, a)))
-      );
+      return !!response && (await verifiedAsset(response, a));
     }),
   );
   const visualsComplete =
@@ -111,6 +108,7 @@ function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
   const sectors = data.visuals?.sectors || [],
     urls = manifest.visuals?.assetUrls || [];
   return (
+    photoManifestMatches(data, manifest) &&
     sectors.length === urls.length &&
     new Set(urls).size === urls.length &&
     sectors.every(
@@ -123,6 +121,28 @@ function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
             a.sha256 === sector.sha256,
         ),
     )
+  );
+}
+export function photoManifestMatches(
+  data: CampusData,
+  manifest: CampusPackage,
+) {
+  const photos = data.photos || [],
+    urls = [...new Set(photos.map((p) => p.url))];
+  const declared = manifest.photos?.assetUrls || [];
+  return (
+    urls.length === declared.length &&
+    new Set(declared).size === declared.length &&
+    urls.every((url) => declared.includes(url)) &&
+    photos.every((p) =>
+      manifest.assets.some(
+        (a) => a.url === p.url && a.bytes === p.bytes && a.sha256 === p.sha256,
+      ),
+    ) &&
+    (manifest.photos?.bytes || 0) ===
+      manifest.assets
+        .filter((a) => urls.includes(a.url))
+        .reduce((n, a) => n + a.bytes, 0)
   );
 }
 async function verifiedAsset(response: Response, asset: PackageAsset) {
@@ -195,6 +215,20 @@ export async function installPackage(
         .reduce((sum, a) => sum + a.bytes, 0) !== manifest.visuals.bytes)
   )
     throw new Error('Incomplete visual download manifest.');
+  if (
+    new Set(manifest.assets.map((a) => a.url)).size !==
+      manifest.assets.length ||
+    manifest.assets.some(
+      (a) =>
+        !Number.isSafeInteger(a.bytes) ||
+        a.bytes <= 0 ||
+        !/^[a-f0-9]{64}$/.test(a.sha256),
+    ) ||
+    manifest.bytes !== manifest.assets.reduce((n, a) => n + a.bytes, 0)
+  )
+    throw new Error(
+      'Invalid download manifest. Your previous map is unchanged.',
+    );
   const estimate = await navigator.storage?.estimate();
   if (
     estimate?.quota &&

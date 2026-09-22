@@ -1,5 +1,6 @@
 import { validDrivingData, validVehicleRules } from './driving-validation.js';
 import { detailErrors } from './place-details.js';
+import { arrivalIssues } from './arrival.js';
 import type { CampusData, Position, MapEdit } from './types.js';
 import type { Geometry } from 'geojson';
 
@@ -212,5 +213,7 @@ export function structuralIssues(
         place?.id || 'unknown place',
         'Place or entrance has missing or invalid coordinates.',
       );
+  for (const message of arrivalIssues(data))
+    add('arrival-media', 'campus', message);
   return issues;
 }

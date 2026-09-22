@@ -5,6 +5,12 @@ import {
   validDrivingReview,
 } from './driving-validation.js';
 import { detailErrors, editedPlaceDetails } from './place-details.js';
+import {
+  guideErrors,
+  validPhoto,
+  publicPhoto,
+  canonicalBuildingId,
+} from './arrival.js';
 import { applyDrivingEdits, drivingIssues } from './driving-data.js';
 import { validateBuildingStyle } from './building-style-validation.js';
 import {
@@ -35,6 +41,8 @@ import type {
   Position,
   WalkingAccess,
   ConnectionTarget,
+  ArrivalGuide,
+  CampusPhoto,
 } from './types.js';
 import type { Geometry } from 'geojson';
 export interface SourceRecord {
@@ -77,6 +85,16 @@ export function validateEdit(edit: MapEdit): string[] {
     return ['Draw a point, path, or building outline.'];
   if (!edit.properties || typeof edit.properties !== 'object')
     return ['Feature properties are required.'];
+  errors.push(...guideErrors(edit.properties.arrival));
+  if (
+    edit.properties.photos !== undefined &&
+    (!['building', 'entrance'].includes(edit.kind) ||
+      !Array.isArray(edit.properties.photos) ||
+      !edit.properties.photos.every(validPhoto))
+  )
+    errors.push(
+      'Review photograph identity, license, credits and optimized asset before saving.',
+    );
   if (edit.kind === 'place') {
     errors.push(...detailErrors(edit.properties));
     for (const field of [
@@ -461,6 +479,28 @@ export function applyEdits(
     const props = edit.properties;
     // A keep-separate decision must not freeze source geometry or metadata.
     if (props.duplicateReviewOnly && !edit.deleted) continue;
+    if (
+      props.photos !== undefined &&
+      ['building', 'entrance'].includes(edit.kind)
+    ) {
+      const belongs = (p: CampusPhoto) =>
+        edit.kind === 'entrance'
+          ? p.entranceId === edit.id
+          : !p.entranceId &&
+            canonicalBuildingId(data, p.buildingId) === buildingId(edit.id);
+      const photos = props.photos as CampusPhoto[];
+      if (photos.some((p) => !belongs(p)))
+        issue(
+          `${edit.id}: photograph belongs to a different building or entrance.`,
+          edit.id,
+          edit.kind,
+        );
+      else
+        data.photos = [
+          ...(data.photos || []).filter((p) => !belongs(p)),
+          ...photos.map(publicPhoto),
+        ];
+    }
     if (['entrance', 'barrier', 'closure'].includes(edit.kind)) connectPaths();
     if (edit.kind === 'place') {
       const previous = data.places.find((p) => p.id === edit.id);
@@ -475,6 +515,10 @@ export function applyEdits(
         data.places.push({
           ...previous,
           ...editedPlaceDetails(props, previous),
+          arrival:
+            props.arrival !== undefined
+              ? structuredClone(props.arrival as ArrivalGuide)
+              : previous?.arrival,
           id: edit.id,
           name: String(props.name),
           category: (props.category ||
@@ -835,6 +879,7 @@ export function applyEdits(
           },
         });
     } else if (edit.kind === 'entrance' && edit.geometry.type === 'Point') {
+      const previousEntrance = data.entrances.find((e) => e.id === edit.id);
       data.entrances = data.entrances.filter((e) => e.id !== edit.id);
       if (edit.deleted) continue;
       const coordinates = edit.geometry.coordinates as Position;
@@ -848,6 +893,10 @@ export function applyEdits(
       const valid =
         node && distance(node.coordinates, coordinates) <= (target ? 0.2 : 5);
       const entrance = {
+        arrival:
+          props.arrival !== undefined
+            ? structuredClone(props.arrival as ArrivalGuide)
+            : previousEntrance?.arrival,
         id: edit.id,
         name: String(props.name),
         placeId,
@@ -859,6 +908,17 @@ export function applyEdits(
         source: 'campus-review',
         graphNode: valid ? node.id : undefined,
       };
+      if (
+        previousEntrance &&
+        distance(previousEntrance.coordinates, coordinates) > 0.1 &&
+        JSON.stringify(props.arrival) ===
+          JSON.stringify(previousEntrance.arrival)
+      )
+        entrance.arrival = { ...entrance.arrival, needsReview: true };
+      if (entrance.arrival?.needsReview)
+        warnings.push(
+          `${entrance.name}: entrance moved; review its arrival instructions and photographs.`,
+        );
       data.entrances.push(entrance);
       if (!data.places.some((p) => p.id === placeId))
         issue(
