@@ -2,6 +2,10 @@
 
 TurnRight uses one built-in British female voice: **Kokoro v1.0, `bf_emma`**. Complete recorded sentences play locally; there is no speech API, runtime AI model, browser speech synthesis or invented landmark guidance. Search and routing remain campus-only.
 
+## Driving additions
+
+The pack also includes driving departure, parking arrival, and roundabout guidance. Driving uses 50–200 m advance cues and 12–35 m immediate cues according to recent speed. Missing speed uses the route estimate. Parking arrival prompts the explicit walking handoff. The current pack contains 362 phrase entries and remains within the 8 MiB budget.
+
 ## What is spoken
 
 - Advance warnings arrive about 30 seconds ahead using the median of recent valid walking speeds, clamped to 30–60 metres. Missing or implausible speed uses 1.25 m/s.

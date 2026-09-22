@@ -1640,6 +1640,18 @@
     "destination:9db10771d95c8bcb": {
       "transcript": "Your destination is Zoological Garden.",
       "spoken": "Your destination is Zoological Garden."
+    },
+    "depart-driving": {
+      "transcript": "Start driving along the highlighted route.",
+      "spoken": "Start driving along the highlighted route."
+    },
+    "arrive-parking": {
+      "transcript": "You have reached the mapped parking or drop-off point. Park, then select start walking to continue.",
+      "spoken": "You have reached the mapped parking or drop-off point. Park, then select start walking to continue."
+    },
+    "roundabout": {
+      "transcript": "Enter the roundabout and follow the highlighted route to your exit.",
+      "spoken": "Enter the roundabout and follow the highlighted route to your exit."
     }
   }
 }
