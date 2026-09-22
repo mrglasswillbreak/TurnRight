@@ -7,7 +7,7 @@ python scripts/import_campus.py --output data/candidates  (review candidate)
 import argparse
 import re
 from spatial import blocker
-from campus_access import walking_access, node_blocks_walking, connection_review, access_review_id
+from campus_access import vehicle_rules, node_blocks_vehicle, walking_access, node_blocks_walking, connection_review, access_review_id
 import collections
 import datetime as dt
 import hashlib
@@ -16,6 +16,7 @@ import math
 import pathlib
 import urllib.request
 import xml.etree.ElementTree as ET
+from place_enrichment import enrich_osm, classify, update_coverage, snapshot_manifest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RAW = ROOT / 'data/raw'
@@ -74,6 +75,9 @@ def feature(identifier, geometry, **properties):
     return {'type': 'Feature', 'id': identifier, 'geometry': geometry, 'properties': {'id': identifier, **properties}}
 
 def category(name, tags=None):
+    if tags:
+        mapped, _ = classify(tags)
+        if mapped != 'other': return mapped
     text = (name + ' ' + json.dumps(tags or {})).lower()
     for key, terms in [('library', ['library']), ('worship', ['mosque', 'church', 'chapel', 'worship']), ('food', ['restaurant', 'cafeteria', 'canteen', 'food', 'cafe']), ('gate', ['gate', 'entrance']), ('sports', ['sport', 'stadium', 'football', 'basketball']), ('residence', ['hostel', 'quarters', 'residence']), ('academic', ['faculty', 'department', 'lecture', 'science', 'school', 'laborator', 'classroom', 'education', 'college', 'theatre']), ('services', ['bank', 'atm', 'health', 'clinic', 'admin', 'senate', 'bookshop', 'security', 'centre', 'center'])]:
         if any(re.search(r'\b' + re.escape(word), text) for word in terms):
@@ -129,7 +133,6 @@ def build(access_policy=None):
                 if not inside(coords, ring): continue
                 aliases = [str(attrs.get(k, '')).strip() for k in ('Abbreviati', 'Name_of_De', 'Name_of_Fa') if str(attrs.get(k, '')).strip()]
                 # Never fuzzy-merge distinct nearby buildings solely on proximity.
-                if any(p['name'].lower() == name.lower() and distance(p['coordinates'], coords) < 30 for p in places): continue
                 places.append({'id': identifier, 'name': name, 'category': category(name), 'coordinates': coords, 'aliases': aliases, 'department': str(attrs.get('Name_of_De') or '').strip(), 'faculty': str(attrs.get('Name_of_Fa') or '').strip(), 'source': 'arcgis', 'sourceId': identifier, 'arrivalKind': 'unmapped', 'height': props['height'], 'heightEstimated': props['heightEstimated']})
     tree = ET.parse(RAW / 'osm.xml').getroot()
     osm_nodes = {}
@@ -146,29 +149,31 @@ def build(access_policy=None):
         identifier = 'osm:way:' + way.attrib['id']
         if tags.get('highway'):
             access = walking_access(identifier, tags, access_policy)
-            access_props = {'walkingAccess': access, 'sourceTags': tags}
+            rules = vehicle_rules(tags)
+            access_props = {'walkingAccess': access, 'sourceTags': tags, 'vehicle': rules}
             if access == 'campus':
                 access_props['accessReviewId'] = access_review_id(identifier, tags, access_policy)
                 campus_ways.append(identifier)
             features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='path', name=tags.get('name', ''), highway=tags['highway'], footDirection={'yes':'forward','-1':'reverse'}.get(tags.get('oneway:foot'),'both'), source='osm', **access_props))
-            if access not in {'yes', 'campus'}: continue
             for i, (a, b) in enumerate(zip(refs, refs[1:])):
                 # Restrict routes to campus. Do not create junctions at visual crossings.
                 if not inside(osm_nodes[a]['coordinates'], ring) or not inside(osm_nodes[b]['coordinates'], ring): continue
-                if any(node_blocks_walking(osm_nodes[r]['tags'], 'osm:node:' + r, access_policy) for r in (a, b)): continue
+                walkable = access in {'yes', 'campus'} and not any(node_blocks_walking(osm_nodes[r]['tags'], 'osm:node:' + r, access_policy) for r in (a, b))
+                vehicle_blocked = any(node_blocks_vehicle(osm_nodes[r]['tags']) for r in (a, b))
                 gate_reviews = []
                 for r in (a, b):
                     node_key = 'osm:node:' + r
-                    node = {'id': node_key, 'coordinates': osm_nodes[r]['coordinates']}
+                    node = {'id': node_key, 'coordinates': osm_nodes[r]['coordinates'], 'sourceTags': osm_nodes[r]['tags']}
                     review = connection_review(node_key, osm_nodes[r]['tags'], access_policy)
                     if review and osm_nodes[r]['tags'].get('barrier') == 'gate':
                         node.update(sourceTags=osm_nodes[r]['tags'], accessReviewId=review['id'])
                         gate_reviews.append(review['id'])
                     graph_nodes[node_key] = node
                 review_ids = ([access_props['accessReviewId']] if access == 'campus' else []) + gate_reviews
-                directions = [(a, b)] if tags.get('oneway:foot') == 'yes' else ([(b, a)] if tags.get('oneway:foot') == '-1' else [(a, b), (b, a)])
+                walking_directions = [(a, b)] if tags.get('oneway:foot') == 'yes' else ([(b, a)] if tags.get('oneway:foot') == '-1' else [(a, b), (b, a)])
+                directions = [(a, b), (b, a)]
                 for start, end in directions:
-                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'accessible': True, 'walkingAccess': 'campus' if gate_reviews else access, **({'accessReviewId': review_ids[0]} if review_ids else {}), **({'accessReviewIds': list(dict.fromkeys(review_ids))} if gate_reviews else {}), 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
+                    edges.append({'id': f'{identifier}:{start}:{end}', 'from': 'osm:node:' + start, 'to': 'osm:node:' + end, 'distance': round(distance(osm_nodes[start]['coordinates'], osm_nodes[end]['coordinates']), 2), 'name': tags.get('name', 'Campus path' if tags['highway'] in ('path', 'footway', 'steps') else 'Campus road'), 'vehicle': rules.copy(), 'vehicleAllowed': not vehicle_blocked and (rules['direction'] == 'both' or (rules['direction'] == 'forward') == (start == a)), 'accessible': walkable and (start, end) in walking_directions, 'walkingAccess': 'campus' if gate_reviews else access, **({'accessReviewId': review_ids[0]} if review_ids else {}), **({'accessReviewIds': list(dict.fromkeys(review_ids))} if gate_reviews else {}), 'steps': tags['highway'] == 'steps', 'sourceId': identifier})
         elif tags.get('barrier'):
             features.append(feature(identifier, {'type': 'LineString', 'coordinates': coords}, kind='barrier', name=tags.get('barrier'), source='osm'))
         elif tags.get('building') and coords[0] == coords[-1]:
@@ -195,6 +200,13 @@ def build(access_policy=None):
             places.append({'id': key, 'name': tags['name'], 'category': category(tags['name'], tags), 'coordinates': coords, 'aliases': [], 'source': 'osm', 'sourceId': key, 'arrivalKind': 'unmapped'})
     # Add points along the existing polylines so a long straight road can be
     # selected near its midpoint. This changes sampling, not walkable geometry.
+    enriched = {'boundary': boundary, 'places': places, 'map': {'features': features}, 'graph': {'edges': edges}}
+    checked = dt.datetime.fromtimestamp((RAW / 'osm.xml').stat().st_mtime, dt.timezone.utc).isoformat()
+    enrichment_issues = enrich_osm(enriched, tree, checked)
+    places, features = enriched['places'], enriched['map']['features']
+    for node in graph_nodes.values():
+        if node.get('sourceTags', {}).get('barrier') in {'gate', 'lift_gate', 'swing_gate'}:
+            features.append(feature(node['id'], {'type': 'Point', 'coordinates': node['coordinates']}, kind='barrier', name=node['sourceTags'].get('name', 'Vehicle gate'), source='osm', sourceTags=node['sourceTags']))
     dense_edges = []
     for edge in edges:
         a, b = edge['from'], edge['to']
@@ -213,7 +225,7 @@ def build(access_policy=None):
     for edge in edges:
         conflict=blocker(graph_nodes[edge['from']]['coordinates'],graph_nodes[edge['to']]['coordinates'],features)
         if conflict: edge['geometryBlocked']=conflict
-    allowed_edges=[edge for edge in edges if not edge.get('geometryBlocked')]
+    allowed_edges=[edge for edge in edges if edge['accessible'] and not edge.get('geometryBlocked')]
     usable_ids={key for edge in allowed_edges for key in (edge['from'],edge['to'])}
     groups = components({key:value for key,value in graph_nodes.items() if key in usable_ids}, allowed_edges)
     largest = groups[0] if groups else set()
@@ -228,8 +240,33 @@ def build(access_policy=None):
             if meters <= 15 and osm_nodes.get(osm_id, {}).get('tags', {}).get('entrance') not in (None, 'no'):
                 place['arrivalKind'] = 'entrance'
     now = dt.datetime.now(dt.timezone.utc).isoformat()
-    result = {'schemaVersion': 1, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'ArcGIS item is publicly viewable but provides no redistribution license. Confirm permission with the owner before public deployment.', 'retrievedAt': now}]}
+    restrictions = []
+    for relation in tree.findall('relation'):
+        tags = {t.attrib['k']: t.attrib['v'] for t in relation.findall('tag')}
+        if tags.get('type') != 'restriction' or 'motorcar' in tags.get('except', '').split(';'): continue
+        members = relation.findall('member')
+        starts = ['osm:way:' + m.attrib['ref'] for m in members if m.attrib.get('role') == 'from']
+        ends = ['osm:way:' + m.attrib['ref'] for m in members if m.attrib.get('role') == 'to']
+        via = [m for m in members if m.attrib.get('role') == 'via']
+        restriction = tags.get('restriction:motorcar', tags.get('restriction:motor_vehicle', tags.get('restriction', '')))
+        if len(starts) == len(ends) == len(via) == 1 and via[0].attrib['type'] == 'node' and restriction.startswith(('no_', 'only_')) and not any(':conditional' in k for k in tags):
+            node_id = 'osm:node:' + via[0].attrib['ref']
+            if node_id in graph_nodes and any(e['sourceId'] == starts[0] for e in edges) and any(e['sourceId'] == ends[0] for e in edges):
+                restrictions.append({'id': 'osm:relation:' + relation.attrib['id'], 'fromSourceId': starts[0], 'toSourceId': ends[0], 'viaNodeId': node_id, 'kind': 'only' if restriction.startswith('only_') else 'no', 'uTurn': restriction == 'no_u_turn'})
+        else:
+            # Unsupported via-way/conditional restrictions fail closed until owner review.
+            for edge in edges:
+                if edge['sourceId'] in starts: edge['vehicle']['conditional'] = True
+            for f in features:
+                if f['properties'].get('id') in starts: f['properties']['vehicle']['conditional'] = True
+    result = {'schemaVersion': 2, 'driving': {'version': 1, 'parking': [], 'restrictions': restrictions}, 'version': '', 'createdAt': now, 'boundary': boundary, 'bounds': bounds, 'map': {'type': 'FeatureCollection', 'features': features}, 'places': sorted(places, key=lambda p: p['name']), 'graph': {'nodes': list(graph_nodes.values()), 'edges': edges}, 'closures': [], 'coverage': {'fieldVerified': False, 'placeCount': len(places), 'routableCount': sum(p['arrivalKind'] == 'entrance' for p in places), 'approachCount': sum(p['arrivalKind'] == 'mapped-approach' for p in places), 'disconnected': [p['id'] for p in places if not p.get('graphNode')], 'components': len(groups), 'notes': ['Source-derived map; campus walks have not been field-verified.', 'Mapped approach routes stop on an existing path near a building, not at an assumed entrance.', 'Missing paths and entrances require review in the editor.', '3D heights derived from floor counts are approximate (3 m per floor).']}, 'sources': [{'id': 'osm', 'name': 'OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright', 'attribution': '© OpenStreetMap contributors', 'license': 'ODbL 1.0; OSM-derived database available in the downloadable campus package.', 'retrievedAt': now}, {'id': 'arcgis', 'name': 'LASU Webmap – Main / MangroveandpartnersLimited', 'url': f'https://www.arcgis.com/home/item.html?id={APP_ID}', 'attribution': 'LASU campus layers: MangroveandpartnersLimited, via ArcGIS Online', 'license': 'ArcGIS item is publicly viewable but provides no redistribution license. Confirm permission with the owner before public deployment.', 'retrievedAt': now}]}
     result['coverage']['notes'].append(f"{sum(bool(e.get('geometryBlocked')) for e in edges)} directed segments excluded due to building or barrier conflicts.")
+    result['sources'][1]['license'] = 'Owner-confirmed offline redistribution permission, 2026-09-08; see data/ATTRIBUTION.md.'
+    result['sourceSnapshots'] = snapshot_manifest(RAW, [
+        ('osm.xml', 'https://www.openstreetmap.org/api/0.6/map?bbox=3.190,6.455,3.215,6.489', 'ODbL-1.0'),
+        ('arcgis.json', f'https://www.arcgis.com/sharing/rest/content/items/{APP_ID}/data?f=json', 'Owner-confirmed permission 2026-09-08'),
+    ])
+    update_coverage(result)
     if campus_ways:
         result['accessPolicy'] = {key: access_policy[key] for key in ('id', 'audience', 'confirmedAt', 'summary')}
         result['accessPolicy']['connectionReviews'] = access_policy.get('connectionReviews', [])
@@ -238,10 +275,13 @@ def build(access_policy=None):
     digest_input = {k: v for k, v in result.items() if k not in ('version', 'createdAt', 'sources')}
     result['version'] = 'lasu-' + hashlib.sha256(json.dumps(digest_input, sort_keys=True).encode()).hexdigest()[:12]
     if not graph_nodes or not edges or len(places) < 50: raise ValueError('Incomplete import: expected campus places and a nonempty path graph')
+    result['_sourceIssues'] = enrichment_issues
     return result
 
 def write_data(data, output):
     output.mkdir(parents=True, exist_ok=True)
+    issues = data.pop('_sourceIssues', [])
+    (output / 'source-issues.json').write_text(json.dumps(issues, ensure_ascii=False, indent=2), encoding='utf-8')
     encoded = json.dumps(data, ensure_ascii=False, separators=(',', ':')).encode()
     (output / 'campus.json').write_bytes(encoded)
     (output / 'coverage.json').write_text(json.dumps(data['coverage'], indent=2), encoding='utf-8')

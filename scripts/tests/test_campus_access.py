@@ -115,11 +115,11 @@ class CampusAccessTests(unittest.TestCase):
             with patch.object(import_campus, 'RAW', raw):
                 result = import_campus.build(POLICY)
         edges = result['graph']['edges']
-        self.assertEqual({e['sourceId'] for e in edges}, {'osm:way:101', 'osm:way:102'})
+        self.assertEqual({e['sourceId'] for e in edges if e['accessible']}, {'osm:way:101', 'osm:way:102'})
         self.assertEqual({e['sourceId'] for e in edges if e['from'] == 'osm:node:2'}, {'osm:way:101', 'osm:way:102'})
-        self.assertFalse(any('osm:node:5' in [e['from'], e['to']] for e in edges))
-        self.assertTrue(all(e['walkingAccess'] == 'campus' for e in edges))
-        self.assertTrue(all(e['accessReviewId'] == POLICY['id'] for e in edges))
+        self.assertFalse(any('osm:node:5' in [e['from'], e['to']] for e in edges if e['accessible']))
+        self.assertTrue(all(e['walkingAccess'] == 'campus' for e in edges if e['accessible']))
+        self.assertTrue(all(e['accessReviewId'] == POLICY['id'] for e in edges if e['accessible']))
         source = next(f for f in result['map']['features'] if f['properties']['id'] == 'osm:way:101')
         self.assertEqual(source['properties']['sourceTags']['access'], 'private')
         self.assertEqual(result['coverage']['campusAccessWayCount'], 2)
@@ -138,7 +138,7 @@ class CampusAccessTests(unittest.TestCase):
             (raw / 'osm.xml').write_text(osm, encoding='utf-8')
             with patch.object(import_campus, 'RAW', raw):
                 reviewed = import_campus.build(CONNECTION_POLICY)
-        reviewed_edges = reviewed['graph']['edges']
+        reviewed_edges = [e for e in reviewed['graph']['edges'] if e['accessible']]
         self.assertEqual({e['sourceId'] for e in reviewed_edges}, {'osm:way:101', 'osm:way:102', 'osm:way:104'})
         self.assertTrue(any(e['to'] == 'osm:node:5' for e in reviewed_edges))
         self.assertTrue(any(e['from'] == 'osm:node:5' for e in reviewed_edges))

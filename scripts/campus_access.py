@@ -78,3 +78,32 @@ def node_blocks_walking(tags, node_id=None, policy=None):
             and tags.get('foot') not in FOOT_ALLOWED
         )
     )
+
+
+VEHICLE_HIGHWAYS = {'residential', 'service', 'living_street', 'unclassified', 'tertiary', 'secondary', 'primary', 'tertiary_link', 'secondary_link', 'primary_link'}
+
+def vehicle_rules(tags):
+    access = tags.get('motorcar', tags.get('motor_vehicle', tags.get('vehicle', tags.get('access', 'yes'))))
+    conditional = any(':conditional' in key for key in tags)
+    if tags.get('highway') not in VEHICLE_HIGHWAYS or tags.get('construction') is not None or tags.get('locked') == 'yes':
+        access = 'no'
+    elif access in {'yes', 'permissive', 'designated', 'public'}:
+        access = 'yes'
+    elif access != 'no':
+        access = 'private' if access in {'private', 'destination', 'customers', 'delivery', 'permit'} else 'unknown'
+    direction = tags.get('oneway:motorcar', tags.get('oneway:motor_vehicle', tags.get('oneway', 'yes' if tags.get('junction') == 'roundabout' else 'no')))
+    rules = {'access': access, 'direction': {'yes': 'forward', '1': 'forward', 'true': 'forward', '-1': 'reverse', 'no': 'both', '0': 'both', 'false': 'both'}.get(direction, 'both'), 'conditional': conditional or direction not in {'yes','1','true','-1','no','0','false'}, 'roundabout': tags.get('junction') == 'roundabout', 'parkingAisle': tags.get('service') == 'parking_aisle'}
+    try:
+        value = tags.get('maxspeed', '')
+        speed = float(value.removesuffix(' mph')) * (1.609344 if value.endswith(' mph') else 1)
+        if 0 < speed <= 130: rules['speedKph'] = speed
+    except ValueError:
+        pass
+    return rules
+
+def node_blocks_vehicle(tags):
+    if tags.get('locked') == 'yes' or any(':conditional' in k for k in tags): return True
+    access = tags.get('motorcar', tags.get('motor_vehicle', tags.get('vehicle', tags.get('access'))))
+    if access and access not in {'yes', 'permissive', 'designated', 'public'}: return True
+    if tags.get('barrier') in {'bollard','block','wall','fence','hedge','retaining_wall','cycle_barrier','stile','turnstile'}: return True
+    return bool(tags.get('barrier') and access not in {'yes', 'permissive', 'designated', 'public'})
