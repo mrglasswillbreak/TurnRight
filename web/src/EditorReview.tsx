@@ -30,6 +30,7 @@ import type { PublishedWorkspace } from './editor-publication';
 export interface ReviewState {
   published?: PublishedWorkspace | null;
   changes: MapChange[];
+  hasMoreChanges?: boolean;
   reports: StudentReport[];
   jobs: {
     id: string;
@@ -88,28 +89,39 @@ export function EditorReview({
   const [liveState, setLiveState] = useState(state);
   const [statusError, setStatusError] = useState<Error | null>(null);
   const [statusAttempt, setStatusAttempt] = useState(0);
+  const [sourceQuery, setSourceQuery] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
+  const [sourceOffset, setSourceOffset] = useState(0);
+  const [sourceLoading, setSourceLoading] = useState(false);
   const impact = useReleaseImpact(
     published,
     validation.data,
     tab === 'releases' && !validation.pending,
   );
   useEffect(() => {
-    setLiveState(state);
-    if (!['changes', 'releases'].includes(tab)) return;
+    if (!['changes', 'releases'].includes(tab)) {
+      setLiveState(state);
+      return;
+    }
+    setLiveState({ ...state, changes: [], hasMoreChanges: false });
+    setSourceLoading(true);
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
       if (!document.hidden) {
         try {
-          const latest =
-            await api<
-              Pick<ReviewState, 'jobs' | 'releases' | 'changes' | 'published'>
-            >('review-status');
+          const latest = await api<
+            Pick<
+              ReviewState,
+              'jobs' | 'releases' | 'changes' | 'hasMoreChanges' | 'published'
+            >
+          >('review-status', { sourceQuery: sourceFilter, sourceOffset });
           if (!cancelled) {
             setLiveState((current) => ({ ...current, ...latest }));
             if (latest.published !== undefined)
               onPublishedWorkspace(latest.published);
             setStatusError(null);
+            setSourceLoading(false);
           }
         } catch (e) {
           if (!cancelled) setStatusError(e as Error);
@@ -118,12 +130,19 @@ export function EditorReview({
       }
       if (!cancelled) timer = setTimeout(poll, 5000);
     };
-    timer = setTimeout(poll, statusAttempt ? 0 : 5000);
+    timer = setTimeout(poll, 0);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [state, tab, statusAttempt, onPublishedWorkspace]);
+  }, [
+    state,
+    tab,
+    statusAttempt,
+    onPublishedWorkspace,
+    sourceFilter,
+    sourceOffset,
+  ]);
   return (
     <>
       {statusError && (
@@ -203,11 +222,61 @@ export function EditorReview({
               <small>{new Date(job.created_at).toLocaleString()}</small>
             </div>
           ))}
-          {liveState.changes.length === 0 && (
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSourceFilter(sourceQuery.trim());
+              setSourceOffset(0);
+              setStatusAttempt((n) => n + 1);
+            }}
+          >
+            <label>
+              Filter by source ID prefix
+              <input
+                value={sourceQuery}
+                maxLength={160}
+                placeholder="e.g. feature:overture: or place:"
+                onChange={(event) => setSourceQuery(event.target.value)}
+              />
+            </label>
+            <Button type="submit" variant="outline" disabled={busy}>
+              Filter changes
+            </Button>
+          </form>
+          <div className="button-row">
+            <Button
+              variant="outline"
+              disabled={busy || sourceLoading || sourceOffset === 0}
+              onClick={() => setSourceOffset((n) => Math.max(0, n - 300))}
+            >
+              Previous changes
+            </Button>
+            <Button
+              variant="outline"
+              disabled={
+                busy ||
+                sourceLoading ||
+                !liveState.hasMoreChanges ||
+                sourceOffset >= 30000
+              }
+              onClick={() => setSourceOffset((n) => n + 300)}
+            >
+              Next changes
+            </Button>
+          </div>
+          <p className="small-note" aria-live="polite">
+            {sourceLoading
+              ? 'Loading source changes…'
+              : `Page ${sourceOffset / 300 + 1} · ${liveState.changes.length} pending changes${liveState.hasMoreChanges ? ' · more pages available' : ''}`}
+          </p>
+          {!sourceLoading && liveState.changes.length === 0 && (
             <div className="empty-state">
               <GitCompareArrows />
-              <h3>No pending changes</h3>
-              <p>New source differences will appear here.</p>
+              <h3>No pending changes on this page</h3>
+              <p>
+                Clear the filter or return to the previous page to see other
+                proposals.
+              </p>
             </div>
           )}
           {liveState.changes.map((change) => (

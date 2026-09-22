@@ -23,6 +23,10 @@ import {
 } from '../server/release-validation.js';
 import { validateWorkspace } from '../src/editor-validation.js';
 import { publishedWorkspace } from '../server/published-workspace.js';
+import {
+  sourceReviewQuery,
+  SOURCE_REVIEW_PAGE_SIZE,
+} from '../server/source-review-query.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {
@@ -38,7 +42,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         const [edits, changes, reports, jobs, releases, published] =
           await Promise.all([
             allRows('map_edits'),
-            db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
+            db<unknown[]>(sourceReviewQuery()),
             db('reports?status=eq.pending&order=created_at.desc&limit=200'),
             db('jobs?order=created_at.desc&limit=20'),
             db(
@@ -48,19 +52,41 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           ]);
         res
           .status(200)
-          .json({ edits, changes, reports, jobs, releases, published });
+          .json({
+            edits,
+            changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
+            hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
+            reports,
+            jobs,
+            releases,
+            published,
+          });
         break;
       }
       case 'review-status': {
+        let changesQuery: string;
+        try {
+          changesQuery = sourceReviewQuery(payload);
+        } catch (error) {
+          throw new HttpError(400, (error as Error).message);
+        }
         const [jobs, releases, changes, published] = await Promise.all([
           db('jobs?order=created_at.desc&limit=20'),
           db(
             'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
           ),
-          db('map_changes?status=eq.pending&order=created_at.desc&limit=300'),
+          db<unknown[]>(changesQuery),
           publishedWorkspace(),
         ]);
-        res.status(200).json({ jobs, releases, changes, published });
+        res
+          .status(200)
+          .json({
+            jobs,
+            releases,
+            changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
+            hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
+            published,
+          });
         break;
       }
       case 'sources':
