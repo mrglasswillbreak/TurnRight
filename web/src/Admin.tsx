@@ -451,6 +451,15 @@ function Editor({
     [search, setSearch] = useState(''),
     [filter, setFilter] = useState('needs'),
     [explorer, setExplorer] = useState(true);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
+    try {
+      return (
+        localStorage.getItem('turnright:editor-welcome-dismissed') === 'true'
+      );
+    } catch {
+      return false;
+    }
+  });
   const [selected, setSelected] = useState<MapEdit | null>(null),
     [tool, setTool] = useState<MapEdit['kind'] | null>(null);
   const [buildingMode, setBuildingMode] = useState<
@@ -2197,8 +2206,29 @@ function Editor({
           />
         ) : (
           !tool &&
-          !preview && (
+          !preview &&
+          !welcomeDismissed && (
             <aside className="editor-welcome editor-card">
+              <button
+                type="button"
+                className="editor-icon editor-welcome-dismiss"
+                aria-label="Dismiss welcome card"
+                title="Dismiss welcome card"
+                onClick={() => {
+                  setWelcomeDismissed(true);
+                  try {
+                    localStorage.setItem(
+                      'turnright:editor-welcome-dismissed',
+                      'true',
+                    );
+                  } catch {
+                    // Dismiss for this visit when browser storage is unavailable.
+                  }
+                  mapRef.current?.getCanvas().focus();
+                }}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
               <span className="editor-welcome-icon">
                 <DoorOpen size={23} />
               </span>

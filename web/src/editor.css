@@ -577,6 +577,13 @@
 .editor-welcome {
   padding: 23px;
 }
+.editor-welcome-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+}
 .editor-welcome-icon {
   display: flex;
   align-items: center;
