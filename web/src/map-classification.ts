@@ -44,7 +44,7 @@ export function pathDisplay(properties: Record<string, unknown>) {
       'sand',
       'grass',
     ].includes(surface),
-    streetLabel: /^(campus path|path|road|unnamed|unnamed road)$/i.test(name)
+    streetLabel: /^(campus path|campus road|path|road|unnamed|unnamed road)$/i.test(name)
       ? ''
       : name,
   };

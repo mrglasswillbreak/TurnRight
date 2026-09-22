@@ -5,6 +5,41 @@ import type {
   VisualCatalogue,
 } from './visual-types.js';
 
+export type TravelMode = 'walking' | 'driving';
+export type VehicleAccess = 'yes' | 'reviewed' | 'private' | 'no' | 'unknown';
+export interface DrivingReview {
+  id: string;
+  audience: string;
+  confirmedAt: string;
+  summary: string;
+}
+export interface VehicleRules {
+  access: VehicleAccess;
+  direction: 'both' | 'forward' | 'reverse';
+  speedKph?: number;
+  review?: DrivingReview;
+  conditional?: boolean;
+  roundabout?: boolean;
+  parkingAisle?: boolean;
+}
+export interface TurnRestriction {
+  id: string;
+  fromSourceId: string;
+  toSourceId: string;
+  viaNodeId: string;
+  kind: 'no' | 'only';
+  uTurn?: boolean;
+}
+export interface ParkingConnection {
+  id: string;
+  name: string;
+  kind: 'parking' | 'drop-off';
+  vehicleNodeId: string;
+  walkingNodeId: string;
+  access: VehicleAccess;
+  review?: DrivingReview;
+  restrictions?: string;
+}
 export type Position = [number, number];
 export type Category =
   | 'academic'
@@ -16,7 +51,28 @@ export type Category =
   | 'sports'
   | 'gate'
   | 'other';
-export interface Place {
+export interface SourceEvidence {
+  sourceId: string;
+  recordId: string;
+  checkedAt: string;
+  url?: string;
+  license?: string;
+  release?: string;
+  upstreamRecordId?: string;
+  observedAt?: string;
+  accuracyMetres?: number;
+}
+export type FieldEvidence = Record<string, SourceEvidence[]>;
+export interface PlaceDetails {
+  subtype?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
+  openingHours?: string;
+  businessStatus?: 'operating' | 'temporarily-closed' | 'closed' | 'unknown';
+  evidence?: FieldEvidence;
+}
+export interface Place extends PlaceDetails {
   id: string;
   name: string;
   category: Category;
@@ -37,6 +93,7 @@ export interface Place {
   heightEstimated?: boolean;
 }
 export interface GraphNode {
+  vehicleReview?: DrivingReview;
   id: string;
   coordinates: Position;
   sourceTags?: Record<string, string>;
@@ -50,6 +107,8 @@ export interface GraphEdge {
   distance: number;
   name: string;
   accessible: boolean;
+  vehicle?: VehicleRules;
+  vehicleAllowed?: boolean;
   walkingAccess?: WalkingAccess;
   accessReviewId?: string;
   accessReviewIds?: string[];
@@ -92,6 +151,7 @@ export interface RoutingGraph {
   edges: GraphEdge[];
 }
 export interface Closure {
+  modes?: TravelMode[];
   id: string;
   edgeIds: string[];
   reason: string;
@@ -99,7 +159,15 @@ export interface Closure {
   reopenedAt?: string;
 }
 export interface CampusData {
-  schemaVersion: 1;
+  sourceSnapshots?: {
+    file: string;
+    url: string;
+    license: string;
+    sha256: string;
+    bytes: number;
+    retrievedAt: string;
+  }[];
+  schemaVersion: 1 | 2;
   version: string;
   createdAt: string;
   boundary: Feature;
@@ -112,6 +180,11 @@ export interface CampusData {
   visuals?: VisualCatalogue;
   entrances?: Entrance[];
   graph: RoutingGraph;
+  driving?: {
+    version: 1;
+    parking: ParkingConnection[];
+    restrictions: TurnRestriction[];
+  };
   closures: Closure[];
   accessPolicy?: {
     id: string;
@@ -145,6 +218,9 @@ export interface CampusData {
     url: string;
     attribution: string;
     license: string;
+    licenseText?: string;
+    notice?: string;
+    release?: string;
     retrievedAt: string;
   }[];
 }
@@ -154,7 +230,7 @@ export interface PackageAsset {
   bytes: number;
 }
 export interface CampusPackage {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   version: string;
   createdAt: string;
   summary: string;
@@ -173,6 +249,7 @@ export type ManeuverKind =
   | 'straight'
   | 'arrive';
 export interface Maneuver {
+  roundaboutExit?: number;
   kind: ManeuverKind;
   instruction: string;
   at: number;
@@ -180,6 +257,12 @@ export interface Maneuver {
   street: string;
 }
 export interface Route {
+  mode?: TravelMode;
+  legs?: Route[];
+  parkingId?: string;
+  parkingName?: string;
+  estimatedSpeed?: boolean;
+  segmentSeconds?: number[];
   id: string;
   nodeIds: string[];
   edgeIds: string[];

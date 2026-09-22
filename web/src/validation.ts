@@ -1,3 +1,5 @@
+import { validDrivingData, validVehicleRules } from './driving-validation.js';
+import { detailErrors } from './place-details.js';
 import type { CampusData, Position, MapEdit } from './types.js';
 import type { Geometry } from 'geojson';
 
@@ -106,6 +108,19 @@ export function structuralIssues(
           'The campus source is incomplete. Restore a complete approved snapshot.',
       },
     ];
+  if (
+    ![1, 2].includes(data.schemaVersion) ||
+    (data.driving !== undefined &&
+      (data.schemaVersion !== 2 || !validDrivingData(data.driving)))
+  )
+    add(
+      'invalid-driving',
+      'campus',
+      'Unsupported or malformed driving package. Update the app or restore a valid package.',
+    );
+  for (const edge of data.graph.edges)
+    if (edge?.vehicle !== undefined && !validVehicleRules(edge.vehicle))
+      add('invalid-driving', edge.sourceId, 'Invalid vehicle rules.');
   const nodes = new Map<string, CampusData['graph']['nodes'][number]>();
   for (const node of data.graph.nodes) {
     if (
@@ -180,6 +195,16 @@ export function structuralIssues(
         'Feature geometry has missing or invalid coordinates.',
       );
   }
+  for (const place of data.places)
+    for (const message of detailErrors({ ...place }))
+      issues.push({
+        code: 'place-evidence',
+        phase: 'sources',
+        message,
+        featureId: place.id,
+        featureKind: 'place',
+        coordinates: place.coordinates,
+      });
   for (const place of [...data.places, ...(data.entrances || [])])
     if (!place || !finitePosition(place.coordinates))
       add(
