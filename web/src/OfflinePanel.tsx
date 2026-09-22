@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check, Download, HardDrive, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deletePackages, installPackage } from './offline';
+import { PHOTO_WARNING_BYTES } from './arrival';
 import type { CampusData, CampusPackage } from './types';
 export function OfflinePanel({
   manifest,
@@ -58,8 +59,9 @@ export function OfflinePanel({
       </div>
       <h2>Your campus. Anywhere.</h2>
       <p>
-        Download LASU Ojo once. Search, walking routes, and voice directions
-        stay with you when the connection doesn’t.
+        Download LASU Ojo once. Search, campus routes, arrival guides,
+        photographs and voice directions stay with you when the connection
+        doesn’t.
       </p>
       <div className="download-card">
         <div className="download-title">
@@ -71,6 +73,9 @@ export function OfflinePanel({
             <span>
               {(target.bytes / 1048576).toFixed(2)} MB · Map & voice directions
               {target.visuals ? ' + enhanced 3D' : ''}
+              {target.photos?.assetUrls.length
+                ? ' + all approved photographs'
+                : ''}
             </span>
           </div>
         </div>
@@ -102,6 +107,20 @@ export function OfflinePanel({
         )}
         {update && (
           <div className="notice">A new map is available. {target.summary}</div>
+        )}
+        {!!target.photos?.assetUrls.length && (
+          <p className="small-note">
+            All {target.photos.assetUrls.length} photograph assets are included
+            and verified: {(target.photos.bytes / 1048576).toFixed(2)} MB.
+            Credits and recorded arrival information work offline.
+          </p>
+        )}
+        {(target.photos?.bytes || 0) > PHOTO_WARNING_BYTES && (
+          <p className="notice">
+            This release includes more than 20 MiB of photographs. Consider
+            Wi-Fi and available storage. Every approved photograph will be
+            downloaded.
+          </p>
         )}
         {progress !== null ? (
           <div className="download-progress">

@@ -25,6 +25,7 @@ import type { CampusData, GpsFix, Place, Route } from './types';
 import type { Feature, FeatureCollection } from 'geojson';
 import { displayGeometry, buildingPlace } from './map-display';
 import { campusPalette } from './map-palette';
+import { entranceConnected, placeEntrances } from './arrival';
 import { applyMapTheme } from './map-theme';
 import { installPlaceBadges } from './place-badges';
 import type { createCampusModels, ModelStatus } from './campus-model-layer';
@@ -1062,6 +1063,25 @@ export function MapView({
       marker.remove();
     };
   }, [selectedId, selectedLng, selectedLat, panelBesideMap]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !selectedId || editor) return;
+    const markers = placeEntrances(data, selectedId).map((entrance) => {
+      const connected = entranceConnected(data, entrance);
+      const element = document.createElement('button');
+      element.type = 'button';
+      element.className = `entrance-marker ${connected ? 'connected' : 'unconfirmed'}`;
+      element.textContent = connected ? '↪' : '?';
+      const label = `${entrance.name}: ${connected ? 'connected entrance' : 'unconfirmed or restricted connection'}`;
+      element.setAttribute('aria-label', label);
+      element.title = label;
+      return new maplibregl.Marker({ element })
+        .setLngLat(entrance.coordinates)
+        .setPopup(new maplibregl.Popup({ offset: 18 }).setText(label))
+        .addTo(map);
+    });
+    return () => markers.forEach((marker) => marker.remove());
+  }, [data, selectedId, editor]);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;

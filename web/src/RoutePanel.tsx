@@ -2,6 +2,7 @@ import { remainingSeconds, vehiclePermitted } from './driving';
 import { placeHasConnection } from './routing';
 import { routeSteps } from './route-steps';
 import { MotionStatus } from './MotionAssistance';
+import { ArrivalSection, EntranceSelector } from './ArrivalGuide';
 import {
   ArrowLeft,
   ArrowUp,
@@ -49,6 +50,8 @@ export function RoutePanel({
   data,
   mode = 'walking',
   parkingId = '',
+  entranceId = '',
+  onEntrance,
   onMode,
   onParking,
   activeRoute,
@@ -75,6 +78,8 @@ export function RoutePanel({
   data: CampusData;
   mode?: TravelMode;
   parkingId?: string;
+  entranceId?: string;
+  onEntrance?: (id: string) => void;
   onMode?: (mode: TravelMode) => void;
   onParking?: (id: string) => void;
   activeRoute?: Route;
@@ -154,6 +159,14 @@ export function RoutePanel({
               <strong>{destination.name}</strong>
             </div>
           </div>
+          {onEntrance && (
+            <EntranceSelector
+              data={data}
+              place={destination}
+              value={entranceId}
+              onChange={onEntrance}
+            />
+          )}
           {origin === 'gps' && (
             <button className="text-button" onClick={() => onOrigin('gps')}>
               Use current location
@@ -425,6 +438,14 @@ export function RoutePanel({
             ))}
           </ol>
         </>
+      )}
+      {(!navigating || route?.mode !== 'driving') && (
+        <ArrivalSection
+          data={data}
+          place={destination}
+          entranceId={entranceId || destinationRoute?.destinationEntranceId}
+          compact
+        />
       )}
     </div>
   );

@@ -64,6 +64,8 @@ import { AppearanceSettings } from './AppearanceSettings';
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
+import { ArrivalSection, PhotoGallery } from './ArrivalGuide';
+import { buildingPhotos, placeBuildingId } from './arrival';
 import { useMapViewPreference } from './useMapViewPreference';
 import {
   activatePending,
@@ -123,6 +125,7 @@ export default function App() {
   );
   const [selected, setSelected] = useState<Place | null>(null),
     [follow, setFollow] = useState(false);
+  const [entranceId, setEntranceId] = useState('');
   const [worldView, setWorldView] = useState(false);
   const mobileMapControls = useIsMobile(
     '(max-width: 767px), (max-width: 1000px) and (max-height: 500px)',
@@ -445,7 +448,10 @@ export default function App() {
     calculate(
       data,
       gps.fix.coordinates,
-      { placeId: selected.id },
+      {
+        placeId: selected.id,
+        entranceId: entranceId || journey?.destinationEntranceId,
+      },
       currentRoute?.mode || 'walking',
       journey?.parkingId,
     )
@@ -474,6 +480,8 @@ export default function App() {
     calculate,
     currentRoute?.mode,
     journey?.parkingId,
+    journey?.destinationEntranceId,
+    entranceId,
   ]);
   const places = useMemo(
     () =>
@@ -510,6 +518,7 @@ export default function App() {
     setShareFallback('');
     setSharedLinkMissing(false);
     setSelected(place);
+    setEntranceId('');
     setParkingId('');
     setActiveLeg(0);
     setPanelExpanded(true);
@@ -535,8 +544,10 @@ export default function App() {
     }
     sharedLinkOpened.current = stamp;
     if (!shared.requested) return;
-    if (shared.place) selectPlace(shared.place);
-    else {
+    if (shared.place) {
+      selectPlace(shared.place);
+      setEntranceId(shared.entranceId || '');
+    } else {
       setSharedLinkMissing(true);
       setPanelExpanded(true);
     }
@@ -549,7 +560,11 @@ export default function App() {
   }, [data, navigating]);
   const shareDestination = async (copy = false) => {
     if (!selected) return;
-    const url = destinationLink(selected.id, location.origin);
+    const url = destinationLink(
+      selected.id,
+      location.origin,
+      entranceId || undefined,
+    );
     try {
       if (!copy && navigator.share)
         await navigator.share({
@@ -581,6 +596,7 @@ export default function App() {
     from = origin,
     mode = travelMode,
     parking = parkingId,
+    entrance = entranceId,
   ) => {
     startRequested.current = false;
     if (!data || !selected) return;
@@ -624,7 +640,7 @@ export default function App() {
       const result = await calculate(
         data,
         source,
-        { placeId: selected.id },
+        { placeId: selected.id, entranceId: entrance || undefined },
         mode,
         parking || undefined,
       );
@@ -697,6 +713,7 @@ export default function App() {
         gps.fix.coordinates,
         {
           placeId: selected.id,
+          entranceId: entranceId || journey?.destinationEntranceId,
         },
         travelMode,
         journey?.parkingId || parkingId || undefined,
@@ -1089,6 +1106,11 @@ export default function App() {
               destination={selected}
               mode={travelMode}
               parkingId={parkingId}
+              entranceId={entranceId}
+              onEntrance={(id) => {
+                setEntranceId(id);
+                void previewRoute(origin, travelMode, parkingId, id);
+              }}
               onMode={(mode) => {
                 setTravelMode(mode);
                 setActiveLeg(0);
@@ -1294,6 +1316,16 @@ export default function App() {
               </span>
               <h1>{selected.name}</h1>
               <PlaceInformation place={selected} sources={data.sources} />
+              <PhotoGallery
+                key={selected.id}
+                photos={buildingPhotos(data, placeBuildingId(data, selected))}
+              />
+              <ArrivalSection
+                data={data}
+                place={selected}
+                entranceId={entranceId}
+                onEntrance={setEntranceId}
+              />
               {(() => {
                 const building = data.map.features.find(
                   (f) =>
@@ -1465,6 +1497,12 @@ export default function App() {
             {dialog === 'building' && unlinkedBuilding && (
               <div className="settings-content">
                 <BuildingVisualDetails data={data} feature={unlinkedBuilding} />
+                <PhotoGallery
+                  photos={buildingPhotos(
+                    data,
+                    String(unlinkedBuilding.properties?.id || ''),
+                  )}
+                />
                 <p>
                   Source:{' '}
                   {String(unlinkedBuilding.properties?.source || 'Campus map')}.

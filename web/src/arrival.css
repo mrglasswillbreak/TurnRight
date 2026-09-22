@@ -1,0 +1,99 @@
+.photo-gallery {
+  margin-block: 1rem;
+}
+.photo-gallery h3 {
+  font-size: 1rem;
+  margin-block: 0.5rem;
+}
+.photo-gallery figure {
+  margin: 0;
+}
+.photo-gallery img {
+  width: 100%;
+  height: auto;
+  max-height: 24rem;
+  object-fit: contain;
+  border-radius: 0.8rem;
+  background: #e7ecec;
+}
+.photo-gallery figcaption {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.photo-gallery figcaption p {
+  margin-block: 0.5rem;
+}
+.photo-gallery a {
+  color: var(--primary, #1764ed);
+  text-decoration: underline;
+}
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.gallery-controls button {
+  min-height: 44px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #92a5b8;
+  border-radius: 0.6rem;
+}
+.arrival-section {
+  margin-block: 1rem;
+  border-block: 1px solid #8192a544;
+  padding-block: 0.75rem;
+}
+.arrival-section summary {
+  cursor: pointer;
+  font-weight: 650;
+  min-height: 32px;
+}
+.entrance-guide {
+  padding-block: 0.5rem;
+}
+.entrance-guide h4 {
+  margin-block: 0.5rem;
+}
+.arrival-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+.arrival-facts dd {
+  margin: 0;
+}
+.arrival-facts dt {
+  font-weight: 600;
+}
+.entrance-selector {
+  display: grid;
+  gap: 0.4rem;
+  margin-block: 0.8rem;
+}
+.entrance-selector select {
+  width: 100%;
+  min-height: 44px;
+}
+.entrance-marker {
+  width: 32px;
+  height: 32px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #12734b;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 2px 7px #0006;
+}
+.entrance-marker.unconfirmed {
+  background: #745b18;
+  border-style: dashed;
+}
+.photo-gallery button:focus-visible,
+.photo-gallery a:focus-visible,
+.entrance-marker:focus-visible,
+.arrival-section summary:focus-visible {
+  outline: 3px solid #1764ed;
+  outline-offset: 3px;
+}
