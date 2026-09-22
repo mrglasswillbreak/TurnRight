@@ -1,0 +1,3221 @@
+{
+  "reviewedAt": "2026-09-22T18:13:11.294964+00:00",
+  "status": "published",
+  "baselineVersion": "lasu-78d1db1049f5",
+  "initialCandidateVersion": "lasu-8bee25f4510d",
+  "refreshedCandidateVersion": "lasu-d61609ea62d3",
+  "sourceRefreshRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/35760654352",
+  "previewRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/35765453789",
+  "baseLedger": {
+    "file": "coverage.json",
+    "sha256": "1207ac5f9424acb5c0761e00c4f0f9dca3b56e3ba8977e99eba8db7455194e0f",
+    "rule": "For each original ledger row, use accepted for an ID listed in acceptedLedgerIds; otherwise retain the original status. Reasons below refine held records without changing their original classification."
+  },
+  "effectiveDecisions": {
+    "awaiting-evidence": 1871,
+    "rejected": 14949,
+    "accepted": 88
+  },
+  "acceptedLedgerIds": [
+    "feature:osm:node:13774055448",
+    "feature:osm:node:13991461886",
+    "feature:osm:node:2297333298",
+    "feature:osm:node:5482703069",
+    "feature:osm:node:5531038583",
+    "feature:osm:node:5646140224",
+    "feature:osm:node:9753202915",
+    "feature:overture:027826f9-8a87-4c6b-8972-ce5ac4035373",
+    "feature:overture:0282535b-9dca-4bf0-be23-eba9a807a3c7",
+    "feature:overture:02f7e6ec-2dd4-436c-836f-56a82be14334",
+    "feature:overture:042cb4a3-ad15-4174-b024-831d4689fe59",
+    "feature:overture:11b6bdf1-0e42-4fb3-98ae-75d4ba5fb868",
+    "feature:overture:164076a3-cbfe-4d83-b163-e72b95550c40",
+    "feature:overture:22c4eb31-f91f-437b-8b4d-300b8df38d01",
+    "feature:overture:24301410-ada0-4ecd-8d5a-72f692ac3645",
+    "feature:overture:25581b54-e942-46f6-80a9-fb10ddee909e",
+    "feature:overture:266ff1df-7173-460d-8d25-7684844d11d4",
+    "feature:overture:29191298-f1ea-4c3b-857e-71ba0b7f6e7c",
+    "feature:overture:32d985d5-9677-4cef-9aa9-fa5922889e8c",
+    "feature:overture:3d4f08eb-2059-417c-8fdf-cae3edd262d0",
+    "feature:overture:43bda9de-e8d3-477a-aa25-dd9b3e567eb2",
+    "feature:overture:5b52237e-255f-4e09-accb-24ca3639a38c",
+    "feature:overture:61adbf1a-fed0-4210-9f23-34c19028d73c",
+    "feature:overture:7111b71d-67a9-4938-ad82-1fac20f479ea",
+    "feature:overture:8c969f03-c803-4ea3-8057-0a60b876588a",
+    "feature:overture:8e6b4b19-6d2e-4fe2-bcf8-40d41381dca4",
+    "feature:overture:912de537-7af6-4c55-b5cf-01a5d14e6f67",
+    "feature:overture:95bcc484-e024-4e91-974a-53ba3ca27f50",
+    "feature:overture:9c896bc2-9f1a-4976-9f1b-2096ef62f82a",
+    "feature:overture:9e4a3481-04fa-48f1-a354-2bafffdd84c0",
+    "feature:overture:a236db54-9e5e-4a20-a158-e576825c42df",
+    "feature:overture:a6171083-185c-4c90-b6fd-d9f1c974e4b7",
+    "feature:overture:a9555bb2-f22f-444d-8b9d-eaf523c79011",
+    "feature:overture:aaff1b44-c652-4309-85c9-6ed0cc4e170f",
+    "feature:overture:b19975d2-b375-49fa-baf0-d6952e35e9f6",
+    "feature:overture:b5359799-f566-4927-b82d-5af8550cc965",
+    "feature:overture:c29f7b3f-bd50-4c5e-8614-5a78e6bcb6d6",
+    "feature:overture:c3cb8116-d1c8-4007-a8d4-bb9867e34b13",
+    "feature:overture:c3f3d900-29a3-47ad-8841-2bc108197545",
+    "feature:overture:cd277db4-4e0a-4996-bf9c-7f014dc500cb",
+    "feature:overture:dfe01a6a-bfc5-4165-822a-a7f238cfc074",
+    "feature:overture:e3d9b037-2d64-46a1-bd66-87afe4b3b290",
+    "feature:overture:e4aaeca7-5a10-4534-8bad-9e0d6c37215a",
+    "feature:overture:ee091a23-bc89-4b62-9e0a-5432dc0b8a17",
+    "feature:overture:facf2916-974c-42c7-a8c1-0144457a375b",
+    "feature:overture:fbf19dde-fbf9-4504-8972-12769f2fe848",
+    "feature:overture:fc30a964-ec3d-43f1-8d74-5df05c124c7f",
+    "overture:027826f9-8a87-4c6b-8972-ce5ac4035373",
+    "overture:0282535b-9dca-4bf0-be23-eba9a807a3c7",
+    "overture:02f7e6ec-2dd4-436c-836f-56a82be14334",
+    "overture:042cb4a3-ad15-4174-b024-831d4689fe59",
+    "overture:11b6bdf1-0e42-4fb3-98ae-75d4ba5fb868",
+    "overture:164076a3-cbfe-4d83-b163-e72b95550c40",
+    "overture:22c4eb31-f91f-437b-8b4d-300b8df38d01",
+    "overture:24301410-ada0-4ecd-8d5a-72f692ac3645",
+    "overture:25581b54-e942-46f6-80a9-fb10ddee909e",
+    "overture:266ff1df-7173-460d-8d25-7684844d11d4",
+    "overture:29191298-f1ea-4c3b-857e-71ba0b7f6e7c",
+    "overture:32d985d5-9677-4cef-9aa9-fa5922889e8c",
+    "overture:3d4f08eb-2059-417c-8fdf-cae3edd262d0",
+    "overture:43bda9de-e8d3-477a-aa25-dd9b3e567eb2",
+    "overture:5b52237e-255f-4e09-accb-24ca3639a38c",
+    "overture:61adbf1a-fed0-4210-9f23-34c19028d73c",
+    "overture:7111b71d-67a9-4938-ad82-1fac20f479ea",
+    "overture:8c969f03-c803-4ea3-8057-0a60b876588a",
+    "overture:8e6b4b19-6d2e-4fe2-bcf8-40d41381dca4",
+    "overture:912de537-7af6-4c55-b5cf-01a5d14e6f67",
+    "overture:95bcc484-e024-4e91-974a-53ba3ca27f50",
+    "overture:9c896bc2-9f1a-4976-9f1b-2096ef62f82a",
+    "overture:9e4a3481-04fa-48f1-a354-2bafffdd84c0",
+    "overture:a236db54-9e5e-4a20-a158-e576825c42df",
+    "overture:a6171083-185c-4c90-b6fd-d9f1c974e4b7",
+    "overture:a9555bb2-f22f-444d-8b9d-eaf523c79011",
+    "overture:aaff1b44-c652-4309-85c9-6ed0cc4e170f",
+    "overture:b19975d2-b375-49fa-baf0-d6952e35e9f6",
+    "overture:b5359799-f566-4927-b82d-5af8550cc965",
+    "overture:c29f7b3f-bd50-4c5e-8614-5a78e6bcb6d6",
+    "overture:c3cb8116-d1c8-4007-a8d4-bb9867e34b13",
+    "overture:c3f3d900-29a3-47ad-8841-2bc108197545",
+    "overture:cd277db4-4e0a-4996-bf9c-7f014dc500cb",
+    "overture:dfe01a6a-bfc5-4165-822a-a7f238cfc074",
+    "overture:e3d9b037-2d64-46a1-bd66-87afe4b3b290",
+    "overture:e4aaeca7-5a10-4534-8bad-9e0d6c37215a",
+    "overture:ee091a23-bc89-4b62-9e0a-5432dc0b8a17",
+    "overture:facf2916-974c-42c7-a8c1-0144457a375b",
+    "overture:fbf19dde-fbf9-4504-8972-12769f2fe848",
+    "overture:fc30a964-ec3d-43f1-8d74-5df05c124c7f",
+    "place:osm:way:591396726"
+  ],
+  "sourceReviewMethod": "Exact immutable source payload hashes checked before acceptance using the existing review_map_change transaction and its source revision guards. The university category used the authenticated field-review UI. Preview and publication use the normal owner release workflow.",
+  "footprintReviewPolicy": {
+    "minimumReportedSourceConfidence": 0.8,
+    "minimumAreaSquareMetres": 20,
+    "minimumMappedPathClearanceMetres": 3,
+    "checks": [
+      "Inside the existing campus polygon",
+      "Valid geometry",
+      "No overlap with retained published footprints",
+      "Shape and campus context reviewed together with existing footprints and paths"
+    ],
+    "limitations": [
+      "Source confidence is not field verification or a calibrated probability.",
+      "New footprints remain unnamed; no heights, tenants, entrances, walking connections or vehicle permissions are inferred."
+    ]
+  },
+  "footprintReviews": [
+    {
+      "id": "feature:overture:419acb3b-2475-48e1-a589-fc8a84120b40",
+      "confidence": 0.6738,
+      "areaSquareMetres": 24.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:779866e4-0f01-4677-b17d-a75847080e55",
+      "confidence": 0.737,
+      "areaSquareMetres": 18.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:611d0735-7974-4efb-953b-91309649d8cc",
+      "confidence": 0.71,
+      "areaSquareMetres": 16.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:a64bb2a1-bd67-4606-b0fb-0e5eda7de59e",
+      "confidence": 0.7317,
+      "areaSquareMetres": 13.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:09448df5-36ba-4d6f-a372-ec6e78110dda",
+      "confidence": 0.6541,
+      "areaSquareMetres": 14.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:7d275b68-b71e-48f7-ae48-c47bd97c8dd7",
+      "confidence": 0.7586,
+      "areaSquareMetres": 10.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c0df18f9-319c-4f2e-b857-885e357f5ee7",
+      "confidence": 0.667,
+      "areaSquareMetres": 64.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a5ed0b38-5bd7-4236-ab7f-d1fd577698ed",
+      "confidence": null,
+      "areaSquareMetres": 168.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3a1549c6-2407-4ab2-b03b-218d61e39414",
+      "confidence": null,
+      "areaSquareMetres": 219.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:6e1bf6d5-3883-4a45-b345-36be70d21088",
+      "confidence": 0.7366,
+      "areaSquareMetres": 24.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:92ada034-001e-4817-aac2-f648041cc4c2",
+      "confidence": 0.7323,
+      "areaSquareMetres": 14.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:0bfb0555-bf79-4713-9c83-9530cb0ed1b5",
+      "confidence": 0.7228,
+      "areaSquareMetres": 125.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:ad2ceee7-0fbd-44e6-b471-f3c40c6e7075",
+      "confidence": 0.7324,
+      "areaSquareMetres": 25.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3dbaeadd-d1d3-4d91-89c7-14f6c4e7d5de",
+      "confidence": 0.6745,
+      "areaSquareMetres": 29.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:cd277db4-4e0a-4996-bf9c-7f014dc500cb",
+      "confidence": 0.9215,
+      "areaSquareMetres": 167.8,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:400a2cb9-dfd9-4155-b452-f0fc57a8ea34",
+      "confidence": 0.7336,
+      "areaSquareMetres": 12.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:b4356ce1-bf0e-4671-a43d-06ed0c88e3b3",
+      "confidence": 0.7339,
+      "areaSquareMetres": 18.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:b5359799-f566-4927-b82d-5af8550cc965",
+      "confidence": 0.8918,
+      "areaSquareMetres": 52,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:45dcb89b-10b4-4626-8a06-45964bad208c",
+      "confidence": null,
+      "areaSquareMetres": 103.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7c5890f4-2719-4221-a606-99d933ea583f",
+      "confidence": 0.759,
+      "areaSquareMetres": 32.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:88960a8a-68a5-4603-b77c-46823751f50e",
+      "confidence": null,
+      "areaSquareMetres": 182.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:44e2caa1-c6a5-4754-8f1f-c3ce62ebfd92",
+      "confidence": null,
+      "areaSquareMetres": 43.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:912de537-7af6-4c55-b5cf-01a5d14e6f67",
+      "confidence": 0.8263,
+      "areaSquareMetres": 59.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:083a893b-19a7-4257-a4eb-cb006efef70e",
+      "confidence": 0.7725,
+      "areaSquareMetres": 15.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:43da0ee5-58f0-4264-8575-bc08353cfa6e",
+      "confidence": null,
+      "areaSquareMetres": 98.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:39a2e7e9-1a62-4897-8a88-ff592b00b136",
+      "confidence": null,
+      "areaSquareMetres": 347.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d7eb744a-073f-4ef9-a147-688ac5af9856",
+      "confidence": null,
+      "areaSquareMetres": 392.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a529f8bc-7992-4dd8-bd2a-480590cafbdd",
+      "confidence": null,
+      "areaSquareMetres": 24.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:f2c927c0-aa3a-4a1e-993d-1ea1d2138434",
+      "confidence": 0.74,
+      "areaSquareMetres": 31.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:cc9f2474-8ce4-4b94-9cfe-7932020a35d5",
+      "confidence": 0.7476,
+      "areaSquareMetres": 16,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:1de405b3-4dd9-4f44-b288-0fde46915286",
+      "confidence": null,
+      "areaSquareMetres": 33,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:164076a3-cbfe-4d83-b163-e72b95550c40",
+      "confidence": 0.841,
+      "areaSquareMetres": 21.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:7111b71d-67a9-4938-ad82-1fac20f479ea",
+      "confidence": 0.8077,
+      "areaSquareMetres": 23.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:a236db54-9e5e-4a20-a158-e576825c42df",
+      "confidence": 0.8432,
+      "areaSquareMetres": 78.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:04615aa2-f016-4ec8-b120-9e03cad97017",
+      "confidence": 0.7305,
+      "areaSquareMetres": 12.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:04e8f9c6-3719-4cd2-8230-09118b71abc7",
+      "confidence": null,
+      "areaSquareMetres": 317.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:5c3b94d2-33d7-4bf4-91f4-9db76070ca56",
+      "confidence": 0.6515,
+      "areaSquareMetres": 16.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:68969d21-ad94-4ed5-bba5-6fe52a9a72fb",
+      "confidence": 0.662,
+      "areaSquareMetres": 36.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:814a1b53-0acb-4f1f-ac96-0b90871f629f",
+      "confidence": null,
+      "areaSquareMetres": 30,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b19975d2-b375-49fa-baf0-d6952e35e9f6",
+      "confidence": 0.8343,
+      "areaSquareMetres": 20.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:0c35917e-fd06-4faa-bc2a-e657889775aa",
+      "confidence": null,
+      "areaSquareMetres": 70.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0282535b-9dca-4bf0-be23-eba9a807a3c7",
+      "confidence": 0.8412,
+      "areaSquareMetres": 25.7,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:55ba980e-0d09-40cf-a425-9b5b3eb40690",
+      "confidence": 0.663,
+      "areaSquareMetres": 21,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:cacdfa07-91b7-40dd-a186-652be6f8e818",
+      "confidence": 0.7352,
+      "areaSquareMetres": 46.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:2c6ea138-512b-4a28-8119-58bf735c43bb",
+      "confidence": null,
+      "areaSquareMetres": 56.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2f54df8e-eea5-429e-a943-fd2154383a00",
+      "confidence": null,
+      "areaSquareMetres": 63.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:38ea9271-75d8-4e4d-a50d-62bf798f0e55",
+      "confidence": 0.6512,
+      "areaSquareMetres": 15.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:b1b6093c-55dc-4d6e-8d75-907742645f0d",
+      "confidence": 0.7997,
+      "areaSquareMetres": 53.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d51d0de5-9f44-4ac7-b2db-3ac47289fb7a",
+      "confidence": null,
+      "areaSquareMetres": 93.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7a4aaff1-87ac-428a-811b-dd736ed98027",
+      "confidence": 0.7003,
+      "areaSquareMetres": 51.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b62fb5ab-b86d-4768-9fd0-0f055d7600dc",
+      "confidence": null,
+      "areaSquareMetres": 127.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:191626da-f0b6-448c-a2ed-a521e71b11bb",
+      "confidence": 0.7331,
+      "areaSquareMetres": 111.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fe7a7d99-6465-4c55-aa6c-6ac170003042",
+      "confidence": 0.7382,
+      "areaSquareMetres": 23,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:dd8e0095-eabd-4c63-8243-b09e9a88e13f",
+      "confidence": 0.7261,
+      "areaSquareMetres": 26.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:570cd5f1-e94c-492b-b7a5-e79c9be3914f",
+      "confidence": null,
+      "areaSquareMetres": 85.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:be71c962-4837-43c9-b368-be3f9696b19d",
+      "confidence": 0.7652,
+      "areaSquareMetres": 26.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:e3c8f5c3-1803-4a29-afac-b295b2609d8f",
+      "confidence": 0.7868,
+      "areaSquareMetres": 50.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:43bda9de-e8d3-477a-aa25-dd9b3e567eb2",
+      "confidence": 0.8717,
+      "areaSquareMetres": 183.5,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:9cce0a24-4787-440e-ac31-08116405671c",
+      "confidence": 0.6762,
+      "areaSquareMetres": 10.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:55774f66-5732-445b-9980-f8aaaf8e190d",
+      "confidence": 0.694,
+      "areaSquareMetres": 157,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:84e4dd4e-bf0e-46b5-ab8d-e4483bc5ccf5",
+      "confidence": null,
+      "areaSquareMetres": 32.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:61adbf1a-fed0-4210-9f23-34c19028d73c",
+      "confidence": 0.8141,
+      "areaSquareMetres": 45.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:8c969f03-c803-4ea3-8057-0a60b876588a",
+      "confidence": 0.8024,
+      "areaSquareMetres": 23.1,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:07eda6ef-45bf-4910-9a5f-013237a7a655",
+      "confidence": null,
+      "areaSquareMetres": 192.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:2b4a0833-cc5e-4fce-8394-b95fd2525bf8",
+      "confidence": null,
+      "areaSquareMetres": 383.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fa7c3005-2aaa-4222-a1b7-6b3cef447ef7",
+      "confidence": 0.7185,
+      "areaSquareMetres": 27.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:f531836a-9cfe-42b2-868f-01735906657a",
+      "confidence": 0.7682,
+      "areaSquareMetres": 37.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d62ad8eb-6674-47c0-b48c-ab0714c79c31",
+      "confidence": 0.6535,
+      "areaSquareMetres": 31.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1a8db5d8-d039-4175-b7a3-a7320115f1e4",
+      "confidence": 0.6762,
+      "areaSquareMetres": 35.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:5e6bb1f5-bd53-404a-9b1d-f8042351cacd",
+      "confidence": 0.7259,
+      "areaSquareMetres": 67.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d086609e-025d-49a9-9301-3c289d3a9b3a",
+      "confidence": 0.6897,
+      "areaSquareMetres": 22.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:f0de6721-d92c-46f8-870a-943657d15550",
+      "confidence": null,
+      "areaSquareMetres": 16.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:d37a6549-76fd-469c-bf64-359d7a71bb73",
+      "confidence": null,
+      "areaSquareMetres": 215.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:24301410-ada0-4ecd-8d5a-72f692ac3645",
+      "confidence": 0.832,
+      "areaSquareMetres": 23.5,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:f9cbcd43-d7c3-4468-b602-cbe1d786665f",
+      "confidence": null,
+      "areaSquareMetres": 142.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:500fda6f-baec-44ea-88e5-9a67ede4f43f",
+      "confidence": 0.8873,
+      "areaSquareMetres": 147.2,
+      "status": "awaiting-evidence",
+      "reason": "Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:4332b271-3f24-4a95-90d3-06bbfd35baab",
+      "confidence": null,
+      "areaSquareMetres": 63,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:abf0f546-7c52-477f-982c-411c55d7d06d",
+      "confidence": null,
+      "areaSquareMetres": 175,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1ac12570-be32-4af0-9638-2f0041da1366",
+      "confidence": null,
+      "areaSquareMetres": 80,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a2410572-832a-4130-9fa2-3f0a6201d9d4",
+      "confidence": 0.7662,
+      "areaSquareMetres": 82.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7ba76a5e-ac0d-4665-a180-5f77a571ed84",
+      "confidence": 0.7912,
+      "areaSquareMetres": 45.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:e9e304d4-23fb-4c60-9b62-b3ba5dc027e0",
+      "confidence": 0.7913,
+      "areaSquareMetres": 20.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:f91ce5c7-ba4b-4796-9246-7b5cf1455bb2",
+      "confidence": 0.7187,
+      "areaSquareMetres": 19.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:79048b0f-7f21-4918-9824-880292d11338",
+      "confidence": null,
+      "areaSquareMetres": 159.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:09662936-6692-4105-a52c-ffad81feaeb5",
+      "confidence": null,
+      "areaSquareMetres": 70,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:aff50cba-97ce-4716-9997-0ae6648fc2a2",
+      "confidence": null,
+      "areaSquareMetres": 195.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:bfa6780a-a9d4-4034-95bf-a0b70d35eea2",
+      "confidence": null,
+      "areaSquareMetres": 72.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:78652370-af1d-468f-9820-75360966cd10",
+      "confidence": null,
+      "areaSquareMetres": 320.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:255e36df-729f-44e9-a6ff-fa4baf858fb4",
+      "confidence": null,
+      "areaSquareMetres": 83.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3f0b952e-b8f6-4bfe-841f-3993e28b6f8e",
+      "confidence": null,
+      "areaSquareMetres": 322.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:8332d0e2-07b4-48f5-bf7d-e31112881673",
+      "confidence": 0.6809,
+      "areaSquareMetres": 11.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:e381f06c-e9ed-4dbe-bb3a-ff1e9ecea5a2",
+      "confidence": 0.7101,
+      "areaSquareMetres": 14.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:bb79f432-d4b6-45f2-8ca2-8ed4ca1609ad",
+      "confidence": 0.6848,
+      "areaSquareMetres": 11.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:e4aaeca7-5a10-4534-8bad-9e0d6c37215a",
+      "confidence": 0.8413,
+      "areaSquareMetres": 49.9,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:cede2ccb-63cc-4d5e-81ee-e493dd0be9e0",
+      "confidence": null,
+      "areaSquareMetres": 164.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b7316a63-2c09-4c89-bd98-cbf330ba4545",
+      "confidence": null,
+      "areaSquareMetres": 112.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:5274ec98-3c14-4e30-8274-83081a86d1db",
+      "confidence": null,
+      "areaSquareMetres": 327.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fe6e46d6-c2da-4c88-84db-fc968c15bb53",
+      "confidence": null,
+      "areaSquareMetres": 325.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:686d9aa6-636b-4103-bd9d-17aa0eafb28f",
+      "confidence": 0.6967,
+      "areaSquareMetres": 13,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:221cb062-1382-480d-9ae7-f0a35cc4a742",
+      "confidence": 0.7098,
+      "areaSquareMetres": 11.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:9d674d01-dddb-43cd-8c0c-7b6b4b6e018d",
+      "confidence": 0.6664,
+      "areaSquareMetres": 28,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:74f5b28a-579c-4431-b1c2-bbb552fe8b71",
+      "confidence": 0.6718,
+      "areaSquareMetres": 30.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d5bf9dcd-56a2-4f1b-bc9f-03b152564d79",
+      "confidence": 0.721,
+      "areaSquareMetres": 11.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:236490ae-4cde-4d5a-8c9e-2b9ed1fff2d1",
+      "confidence": null,
+      "areaSquareMetres": 671.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fbba5f5c-3f2f-4f5d-9156-5a1cee2980da",
+      "confidence": null,
+      "areaSquareMetres": 70.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:085bd226-4b31-4442-a3b6-b75a4e82f6ec",
+      "confidence": null,
+      "areaSquareMetres": 245.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:f8fec2ec-8a85-44c2-b7fc-bffc115cccbb",
+      "confidence": 0.7968,
+      "areaSquareMetres": 20.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:c91a85f5-ffc8-49f1-915e-867256042eae",
+      "confidence": null,
+      "areaSquareMetres": 275.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b279cd99-f8cb-4ae3-a9ea-db3a5d0bae58",
+      "confidence": null,
+      "areaSquareMetres": 288.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:65dad88e-96c8-4275-96e4-7c7ab53ce57a",
+      "confidence": 0.6956,
+      "areaSquareMetres": 28.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:df18dd1c-7a68-4652-a9e9-cef5f5ec27b6",
+      "confidence": null,
+      "areaSquareMetres": 212.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:e8286d91-897c-40f5-92a8-2244f2e4ff64",
+      "confidence": 0.6651,
+      "areaSquareMetres": 20,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:bbdd0bc9-8a23-4867-b7c4-f9c9b8385df5",
+      "confidence": 0.6931,
+      "areaSquareMetres": 14.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:f057a254-f9da-4fc9-a134-c7c2c8623366",
+      "confidence": 0.7281,
+      "areaSquareMetres": 14.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:e3d9b037-2d64-46a1-bd66-87afe4b3b290",
+      "confidence": 0.8096,
+      "areaSquareMetres": 29.8,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:02082089-54cf-46da-997e-fc919ced47d6",
+      "confidence": 0.7334,
+      "areaSquareMetres": 33.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0e9ff0c1-4d92-4da0-92df-3d94376de2e5",
+      "confidence": 0.6623,
+      "areaSquareMetres": 11.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:29191298-f1ea-4c3b-857e-71ba0b7f6e7c",
+      "confidence": 0.8574,
+      "areaSquareMetres": 58.4,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:2475c5f3-ebc1-45d2-ac0b-1ff3a454aff3",
+      "confidence": 0.7691,
+      "areaSquareMetres": 31.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:77e16559-985f-4e57-b198-41d72b82ad7d",
+      "confidence": null,
+      "areaSquareMetres": 64,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a51afc57-3684-406f-b070-2fd1b294d904",
+      "confidence": null,
+      "areaSquareMetres": 47.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2241f141-4d84-4fc4-9b4a-9dc157a6d353",
+      "confidence": null,
+      "areaSquareMetres": 227.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:30faaeba-c318-40cc-bc86-e375c7ffc671",
+      "confidence": null,
+      "areaSquareMetres": 45.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0d7b4132-0f18-4c8b-8d74-561885a5dbcc",
+      "confidence": null,
+      "areaSquareMetres": 440.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1daf4b57-c28b-4d84-b565-444f5972cd8b",
+      "confidence": null,
+      "areaSquareMetres": 115.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2810d48f-cbe8-4f0a-b3a3-172a8f866962",
+      "confidence": null,
+      "areaSquareMetres": 173,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:8e6b4b19-6d2e-4fe2-bcf8-40d41381dca4",
+      "confidence": 0.8201,
+      "areaSquareMetres": 38.4,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:43139263-3d9c-4770-b9c4-3082a16e8570",
+      "confidence": null,
+      "areaSquareMetres": 125.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:dc48f105-97a7-46a0-8649-d9bca9f2f541",
+      "confidence": 0.7052,
+      "areaSquareMetres": 36.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1e19f130-420c-4874-a2b7-effe7dc37381",
+      "confidence": 0.7191,
+      "areaSquareMetres": 38.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2936127f-1afd-4f0a-8db6-d6bfe13bf540",
+      "confidence": null,
+      "areaSquareMetres": 324.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:e9be8cd7-a757-45e3-8ba7-538fb54e6a6e",
+      "confidence": null,
+      "areaSquareMetres": 161.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d3e68f57-5dea-455f-8300-50597572cc22",
+      "confidence": 0.7591,
+      "areaSquareMetres": 262.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:9846fd5a-0c18-4eb0-9157-97caf9330c57",
+      "confidence": 0.716,
+      "areaSquareMetres": 239.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:be96a7f8-9bd9-4f13-b610-2048e92b0bac",
+      "confidence": 0.7107,
+      "areaSquareMetres": 54.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:33b3a012-a664-45b5-b538-575768c8d8ad",
+      "confidence": 0.6951,
+      "areaSquareMetres": 15.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:b45dcca8-1f76-416b-bee2-0a331fdf4f07",
+      "confidence": 0.7357,
+      "areaSquareMetres": 18,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:9ec232ea-28b4-48f9-b53e-9e9f801e21b2",
+      "confidence": 0.7265,
+      "areaSquareMetres": 14.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c307567e-f698-4a7b-b387-a265eabc8618",
+      "confidence": 0.6578,
+      "areaSquareMetres": 19.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:6e2dd5bd-649f-4076-bdff-7425b13cc9fb",
+      "confidence": 0.7512,
+      "areaSquareMetres": 275.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:af0306be-5de1-401a-9e8d-6def90b3a0bf",
+      "confidence": 0.7024,
+      "areaSquareMetres": 148.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2b4b63d0-5c87-4ccf-9fb4-837ea9768523",
+      "confidence": 0.6544,
+      "areaSquareMetres": 121.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fe5d5563-6a5c-41a2-a990-54b18caa87a7",
+      "confidence": 0.7324,
+      "areaSquareMetres": 57.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a6171083-185c-4c90-b6fd-d9f1c974e4b7",
+      "confidence": 0.8206,
+      "areaSquareMetres": 29.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:436eb44e-d473-4766-9c7e-baf615086bd6",
+      "confidence": null,
+      "areaSquareMetres": 230.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a3559c99-ba15-4f17-832c-a3fbd8293782",
+      "confidence": null,
+      "areaSquareMetres": 195.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:ef2f31fc-7e5f-4651-962f-f5750c027d48",
+      "confidence": null,
+      "areaSquareMetres": 214.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d826364e-06fd-4637-b457-93d27ef845d2",
+      "confidence": null,
+      "areaSquareMetres": 151.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a7a0d1d3-8e48-4097-9637-dc5d4c979609",
+      "confidence": null,
+      "areaSquareMetres": 641.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:86409ef1-2ee7-4f83-b70a-78b9dc7561e7",
+      "confidence": null,
+      "areaSquareMetres": 213.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7537cd16-328a-4dda-ab62-1d31b0a6b2c7",
+      "confidence": null,
+      "areaSquareMetres": 121.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2b97b0eb-1a8d-4ae4-939a-a235da6c2f4e",
+      "confidence": 0.7408,
+      "areaSquareMetres": 83.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b3a11373-ada2-40b1-abf6-6118dfa17ca0",
+      "confidence": 0.7187,
+      "areaSquareMetres": 56.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:67cda5ab-0b44-4cf6-8b0f-8f46bcaf8ab1",
+      "confidence": 0.7055,
+      "areaSquareMetres": 58.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1ba3b4e8-31c3-434c-8fd7-0b5f4d386238",
+      "confidence": 0.7551,
+      "areaSquareMetres": 11.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:e93dba72-72a4-4805-aa28-e97a11954e08",
+      "confidence": null,
+      "areaSquareMetres": 251.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:15f37b51-cd53-42f4-ac85-7b74d3c4db54",
+      "confidence": 0.6628,
+      "areaSquareMetres": 10.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c74d7a65-2002-422b-8770-974fd5994291",
+      "confidence": null,
+      "areaSquareMetres": 142.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:5dae0a2e-25f9-43b0-9841-0e5ff02fe98d",
+      "confidence": null,
+      "areaSquareMetres": 18.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:54771a26-e086-4f46-ac55-93eb02f8af8a",
+      "confidence": null,
+      "areaSquareMetres": 100.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0b5f2659-5005-4ede-b7c9-a575d8704719",
+      "confidence": null,
+      "areaSquareMetres": 818.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:48477fe4-ae68-4b3c-b846-897ba8841217",
+      "confidence": 0.7545,
+      "areaSquareMetres": 14.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c38dd063-b824-4035-9481-3029def27b99",
+      "confidence": null,
+      "areaSquareMetres": 22.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:213d500b-d855-4c4b-9484-d3a718e8bdbd",
+      "confidence": null,
+      "areaSquareMetres": 344.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d1108392-2363-4ca5-8531-f22d0f220e29",
+      "confidence": 0.7123,
+      "areaSquareMetres": 108.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0f08aa10-22f8-4f1c-9d06-0f05119e9a91",
+      "confidence": null,
+      "areaSquareMetres": 144.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1f6e3638-3759-4b40-a36f-c6b1ac2811a5",
+      "confidence": 0.6844,
+      "areaSquareMetres": 62.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:4d72a56a-3227-4f3d-a973-a6203f9c513e",
+      "confidence": 0.6963,
+      "areaSquareMetres": 33.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3dd905f8-2ed5-4697-b08a-a8e8777af8a9",
+      "confidence": 0.6922,
+      "areaSquareMetres": 84.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:bd558650-7c5d-487b-86b2-218744adb6ff",
+      "confidence": 0.7351,
+      "areaSquareMetres": 60.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:0a9ea8b8-121d-4244-aa90-06b232d30161",
+      "confidence": 0.7483,
+      "areaSquareMetres": 46,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:32d985d5-9677-4cef-9aa9-fa5922889e8c",
+      "confidence": 0.8164,
+      "areaSquareMetres": 62.6,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:dfe01a6a-bfc5-4165-822a-a7f238cfc074",
+      "confidence": 0.831,
+      "areaSquareMetres": 51.7,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:3ce7c3c1-a524-4657-b376-495b47aee966",
+      "confidence": 0.774,
+      "areaSquareMetres": 67.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3d4f08eb-2059-417c-8fdf-cae3edd262d0",
+      "confidence": 0.8355,
+      "areaSquareMetres": 52.7,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:95bcc484-e024-4e91-974a-53ba3ca27f50",
+      "confidence": 0.8691,
+      "areaSquareMetres": 60,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:7b4f73df-de18-46ce-8c6a-fd9c7461cb33",
+      "confidence": 0.7746,
+      "areaSquareMetres": 284.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:22c4eb31-f91f-437b-8b4d-300b8df38d01",
+      "confidence": 0.8439,
+      "areaSquareMetres": 44.4,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:86a9dd4d-c985-45e2-851b-165f3583ee10",
+      "confidence": null,
+      "areaSquareMetres": 96.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:88d3bb11-fe3f-49e4-923e-b6e493e56b0e",
+      "confidence": null,
+      "areaSquareMetres": 405.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:b05abcc8-62e6-4c27-9fb9-b78d922016e5",
+      "confidence": null,
+      "areaSquareMetres": 256.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:5b52237e-255f-4e09-accb-24ca3639a38c",
+      "confidence": 0.8139,
+      "areaSquareMetres": 26.1,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:aaff1b44-c652-4309-85c9-6ed0cc4e170f",
+      "confidence": 0.8838,
+      "areaSquareMetres": 55.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:c9c27083-47fb-4156-a54d-205db6ab2701",
+      "confidence": null,
+      "areaSquareMetres": 92.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7bb66f98-bb5c-4f96-b563-01b03ee50812",
+      "confidence": null,
+      "areaSquareMetres": 181.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d054f2e3-d192-47fd-8e20-678f0d516055",
+      "confidence": 0.7938,
+      "areaSquareMetres": 21.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2929659e-bd63-43a3-ab1a-46bf133706e2",
+      "confidence": null,
+      "areaSquareMetres": 102,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d4fb19b6-9da0-48fc-9784-48347e805110",
+      "confidence": 0.697,
+      "areaSquareMetres": 14.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:339c704b-2d8c-48b1-bb21-760f7511325a",
+      "confidence": null,
+      "areaSquareMetres": 136.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:4ecda8de-b20f-46de-9e4b-9d157d16ea73",
+      "confidence": null,
+      "areaSquareMetres": 54.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:bcb0047c-53a1-4d36-9598-168906386c3f",
+      "confidence": null,
+      "areaSquareMetres": 35,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:9b15ba34-f58b-4e9a-8c02-90c6770456c4",
+      "confidence": null,
+      "areaSquareMetres": 41.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:26632830-181b-4532-93d4-aa617c5d89da",
+      "confidence": 0.6945,
+      "areaSquareMetres": 29.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2483b714-4fe5-4d18-8218-5ef998b0e94b",
+      "confidence": 0.6745,
+      "areaSquareMetres": 20,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:6e6d4bd1-e7bf-4648-967c-a30e7d47dc1d",
+      "confidence": null,
+      "areaSquareMetres": 131.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:dcc7f915-4667-4c8b-aad1-984d54348f7d",
+      "confidence": null,
+      "areaSquareMetres": 281.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:24f73288-c31c-4705-a381-71de05363b47",
+      "confidence": 0.6703,
+      "areaSquareMetres": 10.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:d951e0ba-e11e-4fff-a854-084b457e5be8",
+      "confidence": 0.6653,
+      "areaSquareMetres": 26.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fcffd0c6-ee9e-43c7-b77b-52865ab3864e",
+      "confidence": 0.7593,
+      "areaSquareMetres": 40.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:c443ff06-2761-4180-8466-98bd699e6a74",
+      "confidence": 0.6857,
+      "areaSquareMetres": 110.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:2e612730-b6d6-45aa-b43f-336d39fe9be8",
+      "confidence": 0.7266,
+      "areaSquareMetres": 240.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7957e450-15d2-42d3-a7c5-93fe2d517815",
+      "confidence": 0.7876,
+      "areaSquareMetres": 94.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:027826f9-8a87-4c6b-8972-ce5ac4035373",
+      "confidence": 0.832,
+      "areaSquareMetres": 162.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:c7d595e3-43ed-4045-983b-76e6ccd554b9",
+      "confidence": null,
+      "areaSquareMetres": 152.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:654cae49-a3f3-49dc-8df6-00691de9fb7c",
+      "confidence": null,
+      "areaSquareMetres": 80,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:3ae6b760-8edd-40f9-9dee-d40769f76c13",
+      "confidence": null,
+      "areaSquareMetres": 97.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d8cf76d9-5aee-4d75-8c59-a127c8395e3d",
+      "confidence": 0.7766,
+      "areaSquareMetres": 28.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:266ff1df-7173-460d-8d25-7684844d11d4",
+      "confidence": 0.8287,
+      "areaSquareMetres": 39.9,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:ee091a23-bc89-4b62-9e0a-5432dc0b8a17",
+      "confidence": 0.8386,
+      "areaSquareMetres": 42.7,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:838a6123-6b6f-4c1f-9ac9-29d2b1f75fba",
+      "confidence": null,
+      "areaSquareMetres": 223.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:ae3c24df-cf09-49bf-a922-51dfeeb23f9d",
+      "confidence": 0.7146,
+      "areaSquareMetres": 25.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:042cb4a3-ad15-4174-b024-831d4689fe59",
+      "confidence": 0.8468,
+      "areaSquareMetres": 55.3,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:0d838f2a-12bd-4b84-b6ca-5e93a053493b",
+      "confidence": 0.6843,
+      "areaSquareMetres": 45.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:b0145257-12c0-4199-b494-c03ed0fa1bb0",
+      "confidence": 0.6845,
+      "areaSquareMetres": 75.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:dd00e6a7-f86b-4681-989d-bbcd6ff2c36a",
+      "confidence": 0.7644,
+      "areaSquareMetres": 22.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:7980ca0b-481f-4228-b9a3-00baa1080122",
+      "confidence": 0.6837,
+      "areaSquareMetres": 12.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:693d7182-416a-4ec4-a5bd-9980f547f594",
+      "confidence": 0.7829,
+      "areaSquareMetres": 16.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:2c7cb667-7c12-431e-a943-c8f973cdbf2f",
+      "confidence": 0.7481,
+      "areaSquareMetres": 13.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:5424329e-1b0c-4be3-9dba-073440183a32",
+      "confidence": null,
+      "areaSquareMetres": 37.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:cd15c8f0-e80a-419b-98df-876c3222a554",
+      "confidence": 0.7613,
+      "areaSquareMetres": 24.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fbf19dde-fbf9-4504-8972-12769f2fe848",
+      "confidence": 0.8136,
+      "areaSquareMetres": 27.6,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:5dd7128b-dba3-47c1-921c-8184bdada782",
+      "confidence": null,
+      "areaSquareMetres": 314.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:facf2916-974c-42c7-a8c1-0144457a375b",
+      "confidence": 0.8211,
+      "areaSquareMetres": 23.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:2e97b31d-3b06-410e-838a-807418209e27",
+      "confidence": 0.7099,
+      "areaSquareMetres": 41,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:a6767ad3-c342-472f-94d5-144a133005a6",
+      "confidence": 0.7417,
+      "areaSquareMetres": 23.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:cfedd430-ce93-4af3-880b-c554bbb7ad7a",
+      "confidence": 0.7847,
+      "areaSquareMetres": 76.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1c8b44de-fc9d-4709-b617-ee7435c14e23",
+      "confidence": 0.7788,
+      "areaSquareMetres": 19.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:11b6bdf1-0e42-4fb3-98ae-75d4ba5fb868",
+      "confidence": 0.8153,
+      "areaSquareMetres": 66.8,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:29daa3f4-4d05-4246-814d-a8b780749473",
+      "confidence": 0.7544,
+      "areaSquareMetres": 23.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:bf53e88c-68e2-4c24-b6fb-bb61c6fb79d6",
+      "confidence": 0.7408,
+      "areaSquareMetres": 16.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c7e7643b-09b3-4e2e-955e-8ddb592be646",
+      "confidence": 0.6862,
+      "areaSquareMetres": 11.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:fbaed7aa-66f3-479f-809d-22de30adff91",
+      "confidence": null,
+      "areaSquareMetres": 144.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:c136a7ec-ac5e-4536-8e1b-e75b6d7e761d",
+      "confidence": null,
+      "areaSquareMetres": 53.8,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:1c1862a9-49da-4923-b0d8-4e36f7516602",
+      "confidence": 0.799,
+      "areaSquareMetres": 15.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:416570e8-39ff-49e0-af64-3307fffc7e07",
+      "confidence": 0.8408,
+      "areaSquareMetres": 27.2,
+      "status": "awaiting-evidence",
+      "reason": "Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:3d522eaa-f28b-48d7-a7b8-2f8594c790b2",
+      "confidence": null,
+      "areaSquareMetres": 160.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:4419f3c5-febf-41da-923b-742f1c52e3bf",
+      "confidence": null,
+      "areaSquareMetres": 116.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:aa8b2f7b-a479-4862-9de8-1198daa15feb",
+      "confidence": 0.7016,
+      "areaSquareMetres": 85.9,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:d55f76f0-1797-4ab6-aba2-6df980226c15",
+      "confidence": 0.6832,
+      "areaSquareMetres": 15.5,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:c3cb8116-d1c8-4007-a8d4-bb9867e34b13",
+      "confidence": 0.861,
+      "areaSquareMetres": 197.1,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:a2b2b9b7-817b-4586-aeea-c7713ad9689c",
+      "confidence": 0.691,
+      "areaSquareMetres": 26,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:f023e35f-f261-4d72-a6f8-c3c3192f69cb",
+      "confidence": 0.7463,
+      "areaSquareMetres": 12.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:a9555bb2-f22f-444d-8b9d-eaf523c79011",
+      "confidence": 0.8111,
+      "areaSquareMetres": 88.4,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:b269ea50-5bd5-4ec7-8965-588bdce73974",
+      "confidence": 0.7995,
+      "areaSquareMetres": 46.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:fc30a964-ec3d-43f1-8d74-5df05c124c7f",
+      "confidence": 0.857,
+      "areaSquareMetres": 41.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:9e4a3481-04fa-48f1-a354-2bafffdd84c0",
+      "confidence": 0.815,
+      "areaSquareMetres": 20.5,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:c91f4de5-7195-4317-8a79-3813ef5f7f86",
+      "confidence": null,
+      "areaSquareMetres": 19.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:d453e9d6-48f6-4602-84a0-5a2261e67af7",
+      "confidence": null,
+      "areaSquareMetres": 286.7,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path"
+    },
+    {
+      "id": "feature:overture:02f7e6ec-2dd4-436c-836f-56a82be14334",
+      "confidence": 0.853,
+      "areaSquareMetres": 39.7,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:c3f3d900-29a3-47ad-8841-2bc108197545",
+      "confidence": 0.8426,
+      "areaSquareMetres": 27.6,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:0f5b362a-8183-402d-81a1-96265f1de0c2",
+      "confidence": null,
+      "areaSquareMetres": 279,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:611e24ae-40c0-449c-b398-4815fc235adc",
+      "confidence": 0.6931,
+      "areaSquareMetres": 19.2,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:25581b54-e942-46f6-80a9-fb10ddee909e",
+      "confidence": 0.8565,
+      "areaSquareMetres": 49.1,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:fb522f5e-beb4-4016-91ca-09ec3ea95ceb",
+      "confidence": 0.6553,
+      "areaSquareMetres": 13.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Within 3 metres of a mapped path; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:3445df6f-efcd-45af-b971-6da6cd251ab9",
+      "confidence": null,
+      "areaSquareMetres": 18.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:63163c2a-19c6-420c-8d59-f00a0fe717db",
+      "confidence": 0.7313,
+      "areaSquareMetres": 16.3,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:9c896bc2-9f1a-4976-9f1b-2096ef62f82a",
+      "confidence": 0.849,
+      "areaSquareMetres": 69.6,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:3a99c4a3-875f-4ed2-8393-7c1ab74af6c2",
+      "confidence": null,
+      "areaSquareMetres": 164.6,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:c29f7b3f-bd50-4c5e-8614-5a78e6bcb6d6",
+      "confidence": 0.8102,
+      "areaSquareMetres": 31.2,
+      "status": "accepted",
+      "reason": "Source confidence at least 0.8, valid campus footprint, no retained building overlap, at least 3m from mapped paths; geometry reviewed in campus context."
+    },
+    {
+      "id": "feature:overture:9738f496-7525-44ca-a4c9-027d820df870",
+      "confidence": null,
+      "areaSquareMetres": 141.4,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    },
+    {
+      "id": "feature:overture:69e00122-6f90-4553-bbf3-ae7d65f20783",
+      "confidence": 0.7843,
+      "areaSquareMetres": 10.1,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable; Small footprint requires corroboration (<20 square metres)"
+    },
+    {
+      "id": "feature:overture:98707dea-a5f6-49a4-a123-3a1b55a6f8be",
+      "confidence": null,
+      "areaSquareMetres": 200,
+      "status": "awaiting-evidence",
+      "reason": "Reported source confidence below 0.8 or unavailable"
+    }
+  ],
+  "placeReviews": [
+    {
+      "id": "place:arcgis:Infrastructure:81",
+      "name": "ACEIISE",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:108",
+          "name": "ACEIISE",
+          "distanceMetres": 16.7
+        },
+        {
+          "id": "arcgis:Infrastructure:125",
+          "name": "Professorial Office",
+          "distanceMetres": 48.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:28",
+      "name": "ASUU LASU Cooperative Golden Pharmacy",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:27",
+          "name": "ASUU LASU Cooperative Golden Pharmacy",
+          "distanceMetres": 13.6
+        },
+        {
+          "id": "arcgis:Infrastructure:29",
+          "name": "FA Lang LAB",
+          "distanceMetres": 24.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:41",
+      "name": "Admin Block 1",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:37",
+          "name": "Admin Block 1",
+          "distanceMetres": 22
+        },
+        {
+          "id": "arcgis:University_Property:15",
+          "name": "Senate Chambers",
+          "distanceMetres": 46.4
+        }
+      ]
+    },
+    {
+      "id": "place:osm:relation:8332298",
+      "name": "Admin Block 1",
+      "status": "awaiting-evidence",
+      "reason": "Administration block numbers conflict with the existing campus records at these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:16",
+          "name": "Admin Block 2",
+          "distanceMetres": 16.3
+        },
+        {
+          "id": "arcgis:Infrastructure:43",
+          "name": "Sch. Library",
+          "distanceMetres": 33.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:42",
+      "name": "Admin Block 2",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:16",
+          "name": "Admin Block 2",
+          "distanceMetres": 24.7
+        },
+        {
+          "id": "arcgis:Infrastructure:43",
+          "name": "Sch. Library",
+          "distanceMetres": 27.7
+        }
+      ]
+    },
+    {
+      "id": "place:osm:relation:8332297",
+      "name": "Admin Block 2",
+      "status": "awaiting-evidence",
+      "reason": "Administration block numbers conflict with the existing campus records at these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:37",
+          "name": "Admin Block 1",
+          "distanceMetres": 13
+        },
+        {
+          "id": "arcgis:University_Property:80",
+          "name": "PGD Hall",
+          "distanceMetres": 44.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:20",
+      "name": "Alumni Block",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:119",
+          "name": "Alumni Block",
+          "distanceMetres": 16.4
+        },
+        {
+          "id": "arcgis:Infrastructure:19",
+          "name": "Student Arcade",
+          "distanceMetres": 77.7
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:33",
+      "name": "Art Auditorium",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:46",
+          "name": "Art Auditorium",
+          "distanceMetres": 26.7
+        },
+        {
+          "id": "arcgis:Infrastructure:34",
+          "name": "Sch. Car Park",
+          "distanceMetres": 36.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:40",
+      "name": "Art Classroom",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:9",
+          "name": "Art Classroom",
+          "distanceMetres": 9.7
+        },
+        {
+          "id": "arcgis:University_Property:66",
+          "name": "Mass Communication Lecture Hall",
+          "distanceMetres": 35.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:62",
+      "name": "Benson Hall",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:59",
+          "name": "Benson Hall",
+          "distanceMetres": 11.9
+        },
+        {
+          "id": "arcgis:University_Property:42",
+          "name": "S.L.Edu. Hall",
+          "distanceMetres": 44.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:44",
+      "name": "Bookshop",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:14",
+          "name": "Bookshop",
+          "distanceMetres": 23.5
+        },
+        {
+          "id": "arcgis:Infrastructure:43",
+          "name": "Sch. Library",
+          "distanceMetres": 27.5
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:53",
+      "name": "Botanical Garden",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:62",
+          "name": "Botanical Garden",
+          "distanceMetres": 23
+        },
+        {
+          "id": "arcgis:Infrastructure:54",
+          "name": "Abisogun Leigh Science Block",
+          "distanceMetres": 26.4
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:65",
+      "name": "Business Area (Science)",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:68",
+          "name": "Business Area (Science)",
+          "distanceMetres": 25.9
+        },
+        {
+          "id": "arcgis:University_Property:20",
+          "name": "Public Toilet",
+          "distanceMetres": 64.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:37",
+      "name": "C.P.S",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:47",
+          "name": "C.P.S",
+          "distanceMetres": 19.8
+        },
+        {
+          "id": "arcgis:Infrastructure:36",
+          "name": "Lag. Lab",
+          "distanceMetres": 44.4
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:35",
+      "name": "F.A. Classroom",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:45",
+          "name": "F.A. Classroom",
+          "distanceMetres": 10.2
+        },
+        {
+          "id": "arcgis:University_Property:11",
+          "name": "LASU  Clinic",
+          "distanceMetres": 28.3
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:86",
+      "name": "FMS 2 IN 1",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:96",
+          "name": "FMS 2 IN 1",
+          "distanceMetres": 22.3
+        },
+        {
+          "id": "arcgis:University_Property:95",
+          "name": "FMS Marketing Studio",
+          "distanceMetres": 33.3
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:88",
+      "name": "FMS Kitchen",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:94",
+          "name": "FMS Kitchen",
+          "distanceMetres": 15.2
+        },
+        {
+          "id": "arcgis:University_Property:95",
+          "name": "FMS Marketing Studio",
+          "distanceMetres": 18.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:87",
+      "name": "FMS Marketing Studio",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:95",
+          "name": "FMS Marketing Studio",
+          "distanceMetres": 7.6
+        },
+        {
+          "id": "arcgis:University_Property:94",
+          "name": "FMS Kitchen",
+          "distanceMetres": 30.5
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:92",
+      "name": "FSS Kitchen",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:105",
+          "name": "FSS Kitchen",
+          "distanceMetres": 16.4
+        },
+        {
+          "id": "arcgis:University_Property:104",
+          "name": "Automedis Limited",
+          "distanceMetres": 31.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:4",
+      "name": "Fac. Office (Law) 1",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:7",
+          "name": "Fac. Office (Law) 1",
+          "distanceMetres": 28.5
+        },
+        {
+          "id": "arcgis:Infrastructure:5",
+          "name": "Fac. Of Law",
+          "distanceMetres": 32.7
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:12",
+      "name": "ICT",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:31",
+          "name": "ICT",
+          "distanceMetres": 21.8
+        },
+        {
+          "id": "arcgis:University_Property:43",
+          "name": "PG School",
+          "distanceMetres": 44.9
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:16",
+      "name": "Information Block",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:34",
+          "name": "Information Block",
+          "distanceMetres": 9.6
+        },
+        {
+          "id": "arcgis:University_Property:33",
+          "name": "SDG-PHC FACILITY",
+          "distanceMetres": 40.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:48",
+      "name": "Iya Wariz",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:128",
+          "name": "Iya Wariz",
+          "distanceMetres": 13
+        },
+        {
+          "id": "arcgis:University_Property:49",
+          "name": "Science Library",
+          "distanceMetres": 14.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:111",
+      "name": "LASU  (SIEU)",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:4",
+          "name": "LASU  (SIEU)",
+          "distanceMetres": 11.8
+        },
+        {
+          "id": "arcgis:Infrastructure:110",
+          "name": "Fish Farm",
+          "distanceMetres": 70
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:49",
+      "name": "LASU Coop. Annex",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:50",
+          "name": "LASU Coop. Annex",
+          "distanceMetres": 8.7
+        },
+        {
+          "id": "arcgis:University_Property:128",
+          "name": "Iya Wariz",
+          "distanceMetres": 19.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:90",
+      "name": "LASU Distance Learning",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:40",
+          "name": "LASU Distance Learning",
+          "distanceMetres": 20
+        },
+        {
+          "id": "arcgis:University_Property:95",
+          "name": "FMS Marketing Studio",
+          "distanceMetres": 57.3
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:95",
+      "name": "LASU Ent Centre",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:102",
+          "name": "LASU Ent Centre",
+          "distanceMetres": 17.5
+        },
+        {
+          "id": "arcgis:Infrastructure:96",
+          "name": "Fac. Of Edu. New Building",
+          "distanceMetres": 69.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:77",
+      "name": "LASU Int. Sch. Building 2",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:124",
+          "name": "LASU Int. Sch. Building 2",
+          "distanceMetres": 16.9
+        },
+        {
+          "id": "arcgis:University_Property:125",
+          "name": "LASU Int. Sch. Building 1",
+          "distanceMetres": 53.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:104",
+      "name": "LASU Main Auditorium",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:2",
+          "name": "LASU Main Auditorium",
+          "distanceMetres": 18.9
+        },
+        {
+          "id": "osm:way:1273141548",
+          "name": "BUBA MARWA HALL",
+          "distanceMetres": 28.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:97",
+      "name": "LASU Public Toilet",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:99",
+          "name": "LASU Public Toilet",
+          "distanceMetres": 9.3
+        },
+        {
+          "id": "arcgis:Infrastructure:98",
+          "name": "Fac. Of Edu. Kitchen",
+          "distanceMetres": 40.4
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:106",
+      "name": "LASU Radio",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:55",
+          "name": "LASU Radio",
+          "distanceMetres": 14.8
+        },
+        {
+          "id": "arcgis:University_Property:22",
+          "name": "Mass Communication",
+          "distanceMetres": 43.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:2",
+      "name": "Law Clinic",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:78",
+          "name": "Law Clinic",
+          "distanceMetres": 16.3
+        },
+        {
+          "id": "arcgis:Infrastructure:3",
+          "name": "Law Toilet",
+          "distanceMetres": 28.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:6",
+      "name": "Law Library",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:76",
+          "name": "Law Library",
+          "distanceMetres": 19.5
+        },
+        {
+          "id": "arcgis:Infrastructure:9",
+          "name": "Student Union Office",
+          "distanceMetres": 21.9
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:7",
+      "name": "Law Office1 2",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:77",
+          "name": "Law Office1 2",
+          "distanceMetres": 13.4
+        },
+        {
+          "id": "arcgis:University_Property:65",
+          "name": "Moot Court",
+          "distanceMetres": 23
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:14",
+      "name": "Makanjuola Lecture Theatre",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:28",
+          "name": "Makanjuola Lecture Theatre",
+          "distanceMetres": 23.9
+        },
+        {
+          "id": "arcgis:Infrastructure:15",
+          "name": "CESD",
+          "distanceMetres": 49.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:10",
+      "name": "Moot Court",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:65",
+          "name": "Moot Court",
+          "distanceMetres": 11.4
+        },
+        {
+          "id": "arcgis:University_Property:77",
+          "name": "Law Office1 2",
+          "distanceMetres": 39.5
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:57",
+      "name": "Mosque",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:29",
+          "name": "Mosque",
+          "distanceMetres": 29.6
+        },
+        {
+          "id": "arcgis:Infrastructure:56",
+          "name": "Building Underconstruction",
+          "distanceMetres": 50
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:132",
+      "name": "Old Zenith Bank",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:48",
+          "name": "Old Zenith Bank",
+          "distanceMetres": 19
+        },
+        {
+          "id": "arcgis:Infrastructure:31",
+          "name": "Post Office",
+          "distanceMetres": 37.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:102",
+      "name": "Ongoing Construction Beside Edu.",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:97",
+          "name": "Ongoing Construction Beside Edu.",
+          "distanceMetres": 17.4
+        },
+        {
+          "id": "arcgis:University_Property:98",
+          "name": "Zenith I.C.T",
+          "distanceMetres": 44.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:11",
+      "name": "PG School",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:43",
+          "name": "PG School",
+          "distanceMetres": 29.3
+        },
+        {
+          "id": "arcgis:University_Property:5",
+          "name": "Student Center (Law)",
+          "distanceMetres": 49.9
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:83",
+      "name": "PSY Lab",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:106",
+          "name": "PSY Lab",
+          "distanceMetres": 13.4
+        },
+        {
+          "id": "arcgis:University_Property:107",
+          "name": "FMS Extension",
+          "distanceMetres": 49.3
+        }
+      ]
+    },
+    {
+      "id": "place:osm:way:591396672",
+      "name": "Physics Laboratory",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:63",
+          "name": "Physics Lab 1",
+          "distanceMetres": 6.4
+        },
+        {
+          "id": "arcgis:Infrastructure:39",
+          "name": "Science Annex",
+          "distanceMetres": 26.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:105",
+      "name": "Public Toilet",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:93",
+          "name": "Public Toilet",
+          "distanceMetres": 14.1
+        },
+        {
+          "id": "osm:way:1273141548",
+          "name": "BUBA MARWA HALL",
+          "distanceMetres": 41.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:32",
+      "name": "Religion Dept.",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:12",
+          "name": "Religion Dept.",
+          "distanceMetres": 6.7
+        },
+        {
+          "id": "arcgis:University_Property:26",
+          "name": "Language Lab",
+          "distanceMetres": 45.3
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:63",
+      "name": "S.L.Edu. Hall",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:42",
+          "name": "S.L.Edu. Hall",
+          "distanceMetres": 9.9
+        },
+        {
+          "id": "arcgis:University_Property:59",
+          "name": "Benson Hall",
+          "distanceMetres": 30.1
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:18",
+      "name": "SDG-PHC FACILITY",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:33",
+          "name": "SDG-PHC FACILITY",
+          "distanceMetres": 24
+        },
+        {
+          "id": "arcgis:University_Property:34",
+          "name": "Information Block",
+          "distanceMetres": 53.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:61",
+      "name": "Science Lab 2",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:67",
+          "name": "Science Lab 2",
+          "distanceMetres": 27.8
+        },
+        {
+          "id": "arcgis:University_Property:19",
+          "name": "Science Lab. 1",
+          "distanceMetres": 31.2
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:60",
+      "name": "Science Lab. 1",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:19",
+          "name": "Science Lab. 1",
+          "distanceMetres": 23.9
+        },
+        {
+          "id": "arcgis:University_Property:42",
+          "name": "S.L.Edu. Hall",
+          "distanceMetres": 56.5
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:47",
+      "name": "Science Library",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:49",
+          "name": "Science Library",
+          "distanceMetres": 19.4
+        },
+        {
+          "id": "arcgis:University_Property:18",
+          "name": "Computer Science Lab",
+          "distanceMetres": 32.8
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:8",
+      "name": "Student Center (Law)",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:5",
+          "name": "Student Center (Law)",
+          "distanceMetres": 10.7
+        },
+        {
+          "id": "arcgis:University_Property:77",
+          "name": "Law Office1 2",
+          "distanceMetres": 36.6
+        }
+      ]
+    },
+    {
+      "id": "place:arcgis:Infrastructure:101",
+      "name": "Zenith I.C.T",
+      "status": "awaiting-evidence",
+      "reason": "Potential duplicate of an existing mapped place; retain the published ID and seek evidence before linking or merging.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:98",
+          "name": "Zenith I.C.T",
+          "distanceMetres": 24.3
+        },
+        {
+          "id": "arcgis:University_Property:1",
+          "name": "Automedis Limited",
+          "distanceMetres": 57.5
+        }
+      ]
+    },
+    {
+      "id": "place:overture:1fa7edcc-9e89-4d63-8cd0-aca2605c5f3d",
+      "name": "Senior Staff Club",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:88",
+          "name": "Staff Club",
+          "distanceMetres": 10.8
+        },
+        {
+          "id": "arcgis:Infrastructure:115",
+          "name": "Staff Club",
+          "distanceMetres": 40.9
+        }
+      ]
+    },
+    {
+      "id": "place:overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e",
+      "name": "Chapel Of Light",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:Infrastructure:50",
+          "name": "Chapel",
+          "distanceMetres": 18.7
+        },
+        {
+          "id": "arcgis:University_Property:51",
+          "name": "Chapel",
+          "distanceMetres": 24.9
+        }
+      ]
+    },
+    {
+      "id": "place:overture:4a44de47-0fb4-4229-9ba7-08fe0334536b",
+      "name": "Leus Travels and Tours",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:30",
+          "name": "New Science Block",
+          "distanceMetres": 35.8
+        },
+        {
+          "id": "arcgis:Infrastructure:56",
+          "name": "Building Underconstruction",
+          "distanceMetres": 37.5
+        }
+      ]
+    },
+    {
+      "id": "place:overture:7ad07290-62d8-41bf-b72e-d95b3c810c06",
+      "name": "Lagos State University",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:30",
+          "name": "New Science Block",
+          "distanceMetres": 6.7
+        },
+        {
+          "id": "arcgis:Infrastructure:56",
+          "name": "Building Underconstruction",
+          "distanceMetres": 50
+        }
+      ]
+    },
+    {
+      "id": "place:overture:9148b370-d614-43b0-8624-99201fff2d3e",
+      "name": "Golden touch makeover",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:30",
+          "name": "New Science Block",
+          "distanceMetres": 13.9
+        },
+        {
+          "id": "arcgis:Infrastructure:56",
+          "name": "Building Underconstruction",
+          "distanceMetres": 32.3
+        }
+      ]
+    },
+    {
+      "id": "place:overture:6104489c-e212-4a3b-a851-d37caeedb25c",
+      "name": "Lasu-Aceitse",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:30",
+          "name": "New Science Block",
+          "distanceMetres": 27.7
+        },
+        {
+          "id": "arcgis:Infrastructure:56",
+          "name": "Building Underconstruction",
+          "distanceMetres": 29.8
+        }
+      ]
+    },
+    {
+      "id": "place:overture:c169b9c6-c0b2-4027-9cac-bf1d9f47796c",
+      "name": "Temma's Closet",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:Infrastructure:0",
+          "name": "A.J",
+          "distanceMetres": 18.2
+        },
+        {
+          "id": "arcgis:Infrastructure:13",
+          "name": "Naval Base/Kitchen",
+          "distanceMetres": 41.9
+        }
+      ]
+    },
+    {
+      "id": "place:overture:d2d5fbdf-f0e1-401e-a066-fa1221b145a8",
+      "name": "Lasu Faculty of Management",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:Infrastructure:84",
+          "name": "FSS",
+          "distanceMetres": 46.3
+        },
+        {
+          "id": "arcgis:University_Property:39",
+          "name": "FMS",
+          "distanceMetres": 57
+        }
+      ]
+    },
+    {
+      "id": "place:overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2",
+      "name": "Lagos State University Open and Distance Learning and Research Institute",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:University_Property:40",
+          "name": "LASU Distance Learning",
+          "distanceMetres": 24.2
+        },
+        {
+          "id": "arcgis:University_Property:94",
+          "name": "FMS Kitchen",
+          "distanceMetres": 50.9
+        }
+      ]
+    },
+    {
+      "id": "place:overture:ae7ab1f6-7652-4c83-842e-249659180447",
+      "name": "Sun & Dry laundry",
+      "status": "awaiting-evidence",
+      "reason": "Business location needs corroboration or conflicts with existing campus records; a campus address alone does not verify these coordinates.",
+      "nearbyPublished": [
+        {
+          "id": "arcgis:Infrastructure:38",
+          "name": "Art Building",
+          "distanceMetres": 16.8
+        },
+        {
+          "id": "arcgis:Infrastructure:36",
+          "name": "Lag. Lab",
+          "distanceMetres": 38.5
+        }
+      ]
+    }
+  ],
+  "otherAcceptedChanges": [
+    {
+      "id": "feature:osm:node:2297333298",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:5646140224",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:9753202915",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:5482703069",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:5531038583",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:13774055448",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "feature:osm:node:13991461886",
+      "status": "accepted",
+      "reason": "Recorded OSM gate point and original access tags; no vehicle approval granted."
+    },
+    {
+      "id": "place:osm:way:591396726",
+      "status": "accepted",
+      "fields": [
+        "category"
+      ],
+      "reason": "Existing university place classified as academic; identity and coordinates retained."
+    },
+    {
+      "id": "meta:campus",
+      "status": "accepted",
+      "reason": "Source attribution, snapshot evidence and schema compatibility metadata. Existing walking reviews, owner models, aliases, entrances and closures retained. The reconciled baseline version is preserved separately from the candidate hash."
+    }
+  ],
+  "remainingCoverageGaps": [
+    "No supported new campus street names or food-category places in these snapshots.",
+    "Other topology changes, removals, overlapping footprints and boundary cases remain pending.",
+    "No approved driving road segments or confirmed parking/drop-off connections in this release."
+  ],
+  "expectedCoverage": {
+    "places": 220,
+    "buildings": 420,
+    "roadFeatures": 94,
+    "namedRoadFeatures": 1,
+    "foodCategoryPlaces": 0,
+    "newFeatures": 47,
+    "newlyDisconnectedDestinations": 0
+  },
+  "release": {
+    "version": "lasu-3fe75a6ac04b",
+    "schemaVersion": 2,
+    "productionUrl": "https://turnright.vercel.app/",
+    "manifestUrl": "https://turnright.vercel.app/packages/latest.json",
+    "previewUrl": "https://turnright-ba34yi7pd-muhammed-abdulhadi-s-projects.vercel.app/",
+    "publishRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/35766442710",
+    "publishedRunCompletedAt": "2026-09-22T18:21:56Z",
+    "applicationCommit": "2d236a5423fa4c30c8d9b64fe1fac9e40a546e4c"
+  },
+  "actualCoverage": {
+    "places": 220,
+    "buildings": 420,
+    "roadFeatures": 94,
+    "foodCategoryPlaces": 0,
+    "disconnectedDestinations": 15,
+    "directedGraphEdges": 2524,
+    "graphNodes": 1233,
+    "namedRoadFeatures": 1,
+    "newFeatures": 47,
+    "newlyDisconnectedDestinations": 0,
+    "permittedDrivingSegments": 0,
+    "parkingConnections": 0
+  },
+  "publicationVerification": {
+    "verifiedAt": "2026-09-22T18:26:31.411Z",
+    "assetCount": 45,
+    "assetBytes": 5528853,
+    "visualAssetCount": 23,
+    "visualBytes": 1032908,
+    "campusSha256": "df13e3d8defd1a028ecc56bc3df1227d25e24cb627c28c785ddaa9155c9442e5",
+    "allAssetSizesAndHashesMatch": true,
+    "allExistingPlaceIdsRetained": true,
+    "noFeaturesRemoved": true,
+    "walkingGraphAndPermissionsPreserved": true,
+    "walkingGraphNormalization": "All edges now explicitly disallow vehicles; six lineage records are normalized. Existing walking edge geometry, endpoints, distances and permissions are unchanged.",
+    "accessReviewPrivacy": "Walking approval records are preserved; reviewer identities are omitted from the public package.",
+    "existingFeaturesChanged": 3,
+    "existingFeatureChanges": "Three saved owner corrections affect appearance/topology; one includes a geometry edit.",
+    "privateFieldsExcluded": true,
+    "sourceSnapshotCount": 6,
+    "desktopAndMobilePreviewChecked": true,
+    "productionOfflineInstallAndReloadVerified": true,
+    "productionConsoleErrors": 0,
+    "coverageNoteScope": "The imported excluded-segment note describes the full source candidate. Published graph and destination counts above were recomputed and verified separately."
+  },
+  "publishedSourceSnapshots": [
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=3.190,6.455,3.215,6.489",
+      "file": "osm.xml",
+      "bytes": 13168846,
+      "sha256": "64b891757eff3cc051e89cd88f287306dc54f125a820e584d33196d750991a66",
+      "license": "ODbL-1.0",
+      "retrievedAt": "2026-09-22T17:26:49.081652+00:00"
+    },
+    {
+      "url": "https://www.arcgis.com/sharing/rest/content/items/ffd68667b1464eeb999c0050897a82a0/data?f=json",
+      "file": "arcgis.json",
+      "bytes": 192796,
+      "sha256": "148054b1a489f2b65534f7e2bccde6396582f34a74ba68b9d34c302857d552dd",
+      "license": "Owner-confirmed permission 2026-09-08",
+      "retrievedAt": "2026-09-22T17:26:45.574965+00:00"
+    },
+    {
+      "url": "https://stac.overturemaps.org/2026-08-19.0/catalog.json",
+      "file": "place.geojson",
+      "bytes": 542868,
+      "sha256": "1606d1307e912b77fc3a3dde2c8669c3270778e728112c6b65fd7ef9b805acc0",
+      "license": "Per-record licensing; see sources",
+      "retrievedAt": "2026-09-22T17:26:50.535752+00:00"
+    },
+    {
+      "url": "https://stac.overturemaps.org/2026-08-19.0/catalog.json",
+      "file": "building.geojson",
+      "bytes": 7889048,
+      "sha256": "77893649f87ecb0f34a828e5ec3ce29bc457be6949f8bb3cd666fa02e64b5063",
+      "license": "Per-record licensing; see sources",
+      "retrievedAt": "2026-09-22T17:26:52.330750+00:00"
+    },
+    {
+      "url": "https://stac.overturemaps.org/2026-08-19.0/catalog.json",
+      "file": "segment.geojson",
+      "bytes": 860425,
+      "sha256": "5d8b4802b4d81b0169d5fbe81bb5ec7f9c0178062ad85524e8e59b4f1504ac65",
+      "license": "Per-record licensing; see sources",
+      "retrievedAt": "2026-09-22T17:26:54.785747+00:00"
+    },
+    {
+      "url": "https://stac.overturemaps.org/2026-08-19.0/catalog.json",
+      "file": "connector.geojson",
+      "bytes": 391208,
+      "sha256": "320e36c91a54c8310bba4cadefa5f66041ffd5fa2c6353895957b17620f0150c",
+      "license": "Per-record licensing; see sources",
+      "retrievedAt": "2026-09-22T17:26:55.845745+00:00"
+    }
+  ]
+}

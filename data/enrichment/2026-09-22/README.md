@@ -1,6 +1,7 @@
 # Initial LASU enrichment candidate — 22 September 2026
 
-**Review material only. Nothing in this folder is a published campus release.**
+**The complete candidate remains review material. A reviewed subset was published
+as `lasu-3fe75a6ac04b`; see the publication record below.**
 
 Baseline: production `lasu-78d1db1049f5`, downloaded and verified against its
 package manifest. Candidate: `lasu-8bee25f4510d`. Overture release:
@@ -21,7 +22,7 @@ The only recorded street name remains **LAW road**. Generic “Campus path” la
 are excluded from named-street counts. New footprint counts include source
 proposals and do not mean that 251 additional buildings have been verified.
 
-All 16,908 review items are classified in `coverage.json`: **0 accepted**,
+Initially, all 16,908 review items were classified in `coverage.json`: **0 accepted**,
 **14,949 rejected** (outside the campus), and **1,959 awaiting evidence or owner
 review**. These are ledger items, not unique physical-feature counts: source
 records and proposed changes can describe the same feature.
@@ -74,3 +75,46 @@ require the normal authenticated workflow. Apply migration
 
 This inventory accounts for the selected source snapshots. It does not claim a
 complete campus survey or parity with Google Maps listings.
+
+## Reviewed publication — 22 September 2026
+
+Published [TurnRight](https://turnright.vercel.app/) package
+`lasu-3fe75a6ac04b` through the existing owner preview/publication workflow.
+[publication-review.json](publication-review.json) records the decisions, source
+snapshot receipts, coverage and verification. Apply its explicit accepted-ID
+overrides to the immutable original ledger: **88 accepted**, **14,949 rejected**,
+and **1,871 awaiting evidence**. These still count ledger items rather than
+unique physical features.
+
+The release adds 40 unnamed Overture building footprints and seven recorded OSM
+gates, corrects the existing university place's category, and includes the three
+saved owner corrections. Accepted footprints have source confidence of at least
+0.8, area of at least 20 m², valid geometry inside campus, no overlap with retained
+buildings, and at least 3 m separation from mapped paths. Each was reviewed in
+map context; this does not constitute field verification. No new names, heights,
+tenants, entrances, routing connections or driving permissions were inferred.
+
+| Coverage | Before publication | Published subset |
+| --- | ---: | ---: |
+| Places | 220 | 220 |
+| Building footprints | 380 | 420 |
+| Road features | 94 | 94 |
+| Named road features | 1 | 1 |
+| Food-category places | 0 | 0 |
+| Places without a confirmed graph approach | 15 | 15 |
+| Directed walking graph edges | 2,524 | 2,524 |
+
+All 61 proposed new places remain held for duplicate, identity or location
+evidence, alongside the remaining 222 non-overlapping footprint proposals and
+other unresolved changes. Existing place IDs, walking permissions and path
+geometry are preserved. There are still no approved vehicle segments or confirmed
+parking connections, so driving correctly reports unavailable coverage.
+
+The fresh source workflow completed before review. Accepted feature payloads
+matched the inspected candidate by canonical hash despite snapshot serialization
+differences. Migration 007 was applied and verified; university category approval
+used its partial-field review workflow. All 45 public package assets, including
+23 model sectors, passed size and SHA-256 checks. Desktop/mobile preview checks
+passed, and production installed the new package and retained its verified
+offline state after reload. The imported excluded-segment narrative describes
+the full candidate; the published counts in this table were checked separately.
