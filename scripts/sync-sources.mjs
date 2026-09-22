@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { allRows, compareSources, db, flatten } from "./cloud.mjs";
+import { allRows, compareSources, db, flatten, preserveReviewedMetadata } from "./cloud.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let jobId = process.env.JOB_ID;
 try {
@@ -12,7 +12,10 @@ try {
   const bootstrap = process.argv.includes("--bootstrap");
   const data = JSON.parse(
     await fs.readFile(
-      path.join(root, bootstrap ? "data/seed/campus.json" : "data/candidates/campus.json"),
+      path.join(
+        root,
+        bootstrap ? "data/seed/campus.json" : "data/candidates/enrichment/campus.json",
+      ),
       "utf8",
     ),
   );
@@ -25,7 +28,7 @@ try {
   } else {
     if (!previous.length)
       throw new Error("Run the documented one-time bootstrap before source checks.");
-    const changes = compareSources(previous, candidate);
+    const changes = compareSources(previous, preserveReviewedMetadata(previous, candidate));
     // Suppress identical rejected decisions, but replace obsolete pending proposals.
     const known = await allRows("map_changes"),
       knownIds = new Set(known.map((c) => c.id)),

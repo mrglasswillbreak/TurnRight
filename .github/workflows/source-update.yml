@@ -15,7 +15,7 @@ concurrency:
 jobs:
   import:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -28,10 +28,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install bounded data import tools
+        run: python -m pip install -r scripts/requirements-data.txt
+      - name: Read accepted sources and owner corrections
+        working-directory: web
+        env:
+          PUBLISHED_MAP_URL: https://turnright.vercel.app
+        run: |
+          npm ci
+          node node_modules/tsx/dist/cli.mjs scripts/enrichment-context.ts
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/enrichment/overture-*
+          key: overture-campus-v1-${{ github.run_id }}
+          restore-keys: overture-campus-v1-
       - name: Verify campus access rules
         run: python -m unittest discover -s scripts/tests
       - name: Download bounded source snapshots
-        run: python scripts/import_campus.py --download --output data/candidates
+        run: python scripts/enrich_campus.py
+      - name: Retain coverage and unresolved candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: campus-enrichment-review
+          path: data/candidates/enrichment/
+          retention-days: 30
       - name: Queue semantic changes for review
         run: node scripts/sync-sources.mjs
       - name: Record upstream failure

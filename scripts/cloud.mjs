@@ -33,7 +33,7 @@ export function canonical(value) {
     return Object.fromEntries(
       Object.keys(value)
         .sort()
-        .filter((k) => !["createdAt", "retrievedAt"].includes(k))
+        .filter((k) => !["createdAt", "retrievedAt", "checkedAt"].includes(k))
         .map((k) => [k, canonical(value[k])]),
     );
   return value;
@@ -81,4 +81,56 @@ export function compareSources(previous, candidate) {
     });
   }
   return changes;
+}
+
+// Owner-controlled metadata may live in the reconciled baseline as well as edits.
+// A source refresh must not erase parking, closures, retained identities or models.
+export function preserveReviewedMetadata(previous, candidate) {
+  const ids = new Set(candidate.map((r) => r.id));
+  const ownerFeatures = new Set(
+    previous
+      .filter(
+        (r) =>
+          r.entity === "feature" &&
+          (r.source === "campus-review" || r.payload.properties?.source === "campus-review"),
+      )
+      .map((r) => r.payload.properties.id),
+  );
+  const ownerEdges = previous.filter(
+    (r) => r.entity === "edge" && ownerFeatures.has(r.payload.sourceId),
+  );
+  const ownerNodes = new Set(ownerEdges.flatMap((r) => [r.payload.from, r.payload.to]));
+  for (const record of previous) {
+    if (
+      !ids.has(record.id) &&
+      (record.source === "campus-review" ||
+        record.payload.source === "campus-review" ||
+        (record.entity === "feature" && ownerFeatures.has(record.payload.properties.id)) ||
+        (record.entity === "edge" && ownerFeatures.has(record.payload.sourceId)) ||
+        (record.entity === "node" && ownerNodes.has(record.payload.id)))
+    )
+      candidate.push(structuredClone(record));
+  }
+  const old = previous.find((r) => r.entity === "meta")?.payload;
+  const meta = candidate.find((r) => r.entity === "meta");
+  if (!old || !meta) return candidate;
+  for (const key of ["visuals", "entrances", "closures", "placeIdAliases", "buildingIdAliases"])
+    if (old[key] !== undefined) meta.payload[key] = structuredClone(old[key]);
+  if (old.driving) {
+    meta.payload.schemaVersion = 2;
+    meta.payload.driving = {
+      ...meta.payload.driving,
+      parking: structuredClone(old.driving.parking || []),
+      restrictions: [
+        ...(meta.payload.driving?.restrictions || []),
+        ...(old.driving.restrictions || []).filter(
+          (r) =>
+            !r.id.startsWith("osm:") &&
+            !(meta.payload.driving?.restrictions || []).some((n) => n.id === r.id),
+        ),
+      ],
+    };
+  }
+  meta.hash = hash(meta.payload);
+  return candidate;
 }
