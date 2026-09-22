@@ -2,7 +2,7 @@
 
 **Find your way around LASU Ojo — online or offline.**
 
-TurnRight is a campus walking-navigation PWA for Lagos State University, Ojo, with a private owner editor for maintaining paths, entrances, building appearances and reviewed releases. Search, routing, GPS processing and navigation audio run on the device.
+TurnRight is a campus walking and driving navigation PWA for Lagos State University, Ojo, with a private owner editor for maintaining paths, entrances, building appearances and reviewed releases. Search, routing, GPS processing and navigation audio run on the device.
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
@@ -108,6 +108,7 @@ These are application/editor changes. Public routing changes only after the owne
 | Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
 | World overview | Automatic globe when zooming out; bundled Natural Earth countries, offline labels and a return-to-campus action. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
+| Driving directions | Offline campus drive-and-walk journeys, vehicle permissions and one-way roads, turn restrictions, estimated ETA, parking selection, voice guidance, and a confirmed parking-to-walking handoff. Private roads and parking require separate owner driving review. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
 | Navigation | Foreground GPS, natural offline British English voice, balanced turn timing, close-turn combinations, mapped names, remaining distance/ETA, route following, sustained-deviation rerouting and three-fix arrival confirmation. |
 | Destination sharing | Copy a stable place link or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
@@ -119,7 +120,7 @@ These are application/editor changes. Public routing changes only after the owne
 | Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
 | Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
 
-Driving, cycling, indoor positioning, satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
+Cycling, indoor positioning, satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
 
 ## Quick start
 
@@ -161,6 +162,14 @@ Voice directions use complete prerecorded sentences. Advance warnings adapt to r
 Poor or stale GPS pauses maneuver progression. Changing paths can trigger rerouting after sustained deviation with a sufficiently accurate fix; a nearby parallel path may remain inside the GPS tolerance and does not guarantee an immediate switch. The current rule needs eight seconds off-route, accuracy of 35 m or better, and at least 15 seconds between recalculations. Guidance ends at the mapped endpoint, which may be a nearby approach rather than an entrance. [Routing thresholds and limitations](docs/EDITOR.md).
 
 Optional compass and motion assistance provides Travel-up, North-up and Phone-up orientation with GPS fallback. The purple cone is phone direction; the blue arrow is travel direction. Permissions are optional and can be retried from Settings. Motion hints are advisory: there is no step counting, dead reckoning or background navigation. Raw sensor readings remain in memory. [Sensor behavior and device checks](docs/MOTION.md).
+
+## Driving on campus
+
+Choose **Directions → Travel mode → Driving + walking**. Select a starting place or your current location, then use the suggested parking/drop-off point or choose another mapped point. Purple shows the driving leg; blue shows the walking leg. Total journey estimates combine both legs and do not include live traffic, parking search, or occupancy.
+
+Keep the app visible. At the mapped vehicle endpoint, stop and park, then choose **Parked—start walking**. Driving reroutes retain the chosen parking point. The app never substitutes walking permission for vehicle access or draws an assumed connection across an unmapped gap.
+
+The bundled map includes source-derived vehicle rules, but private campus roads and parking connections await owner driving review. An unavailable driving journey is expected until permitted roads, gates, parking and walking links are connected and published. Existing walking-only packages continue to work; update the campus package to obtain driving data. [Driving data, owner workflow and verification](docs/DRIVING.md).
 
 ## Appearance and 3D
 
@@ -238,7 +247,7 @@ Job status refreshes while its review panel is open. Publication and job submiss
 | `preview.yml` | Manual seed-based preview deployment |
 | `bootstrap.yml` | Initial accepted source baseline without overwriting an existing baseline |
 
-For local source candidates, run `python scripts/import_campus.py --download --output data/candidates` from the repository root. `node scripts/package.mjs` builds the seed package for development. Neither replaces the reviewed production release workflow.
+For campus enrichment, install `scripts/requirements-data.txt` in an isolated Python environment and run `python scripts/enrich_campus.py` from the repository root. It produces a review candidate, source receipts, coverage ledger and transportation comparison using OSM, permitted LASU ArcGIS data and bounded Overture extracts. Streets, restaurant/business details, multilingual aliases and addresses are searchable offline. See [enrichment and review](docs/ENRICHMENT.md). `node scripts/package.mjs` builds the seed package for development. Neither replaces the reviewed production release workflow.
 
 ## Walking surveys
 
