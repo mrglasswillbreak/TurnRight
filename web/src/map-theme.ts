@@ -151,7 +151,14 @@ export function mapTheme(dark: boolean) {
     },
     'routes-case': { 'line-color': p.routeCase },
     'routes-line': {
-      'line-color': ['case', ['get', 'active'], p.route, p.routeAlternative],
+      'line-color': [
+        'case',
+        ['!', ['get', 'active']],
+        p.routeAlternative,
+        ['==', ['get', 'mode'], 'driving'],
+        '#a366de',
+        p.route,
+      ],
     },
     'editor-entrance-label': label,
     'editor-network': { 'line-color': p.selection },

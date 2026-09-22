@@ -1,3 +1,6 @@
+import type { TravelMode } from './types';
+import { placeMatches, streetResults } from './place-details';
+import { PlaceInformation } from './PlaceInformation';
 import { placeHasConnection } from './routing';
 import { destinationLink, sharedDestination } from './destination-sharing';
 import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
@@ -177,6 +180,17 @@ export default function App() {
   const [downloaded, setDownloaded] = useState(false),
     [online, setOnline] = useState(navigator.onLine),
     [swReady, setSwReady] = useState(!!navigator.serviceWorker?.controller);
+  const [travelMode, setTravelMode] = useState<TravelMode>(() => {
+    try {
+      return localStorage.getItem('turnright-travel-mode') === 'driving'
+        ? 'driving'
+        : 'walking';
+    } catch {
+      return 'walking';
+    }
+  });
+  const [parkingId, setParkingId] = useState('');
+  const [activeLeg, setActiveLeg] = useState(0);
   const [routeView, setRouteView] = useState(false),
     [routes, setRoutes] = useState<Route[]>([]),
     [chosen, setChosen] = useState(0),
@@ -224,7 +238,10 @@ export default function App() {
   navigatingRef.current = navigating;
   const gps = useGps(),
     calculate = useRoutes();
-  const currentRoute = routes[chosen];
+  const journey = routes[chosen];
+  const currentRoute = navigating
+    ? journey?.legs?.[activeLeg] || journey
+    : journey;
   const repeatDirections = useVoiceGuidance(
     voice.current,
     navigating && currentRoute
@@ -232,7 +249,10 @@ export default function App() {
           route: currentRoute,
           nav,
           fix: gps.fix,
-          destination: selected?.name || '',
+          destination:
+            currentRoute.mode === 'driving'
+              ? currentRoute.parkingName || ''
+              : selected?.name || '',
           arrivalKind: currentRoute.arrivalKind || selected?.arrivalKind,
           rerouting,
           routeFailed: !!routeError && nav.offRouteSince !== null,
@@ -422,15 +442,22 @@ export default function App() {
     const request = ++routeRequest.current;
     setRerouting(true);
     setRouteError('');
-    calculate(data, gps.fix.coordinates, { placeId: selected.id })
+    calculate(
+      data,
+      gps.fix.coordinates,
+      { placeId: selected.id },
+      currentRoute?.mode || 'walking',
+      journey?.parkingId,
+    )
       .then((next) => {
         if (request !== routeRequest.current || !navigatingRef.current) return;
         setRoutes(next);
+        setActiveLeg(0);
         setChosen(0);
         setNav(initialNavigation);
         setRerouting(false);
         setRouteError('');
-        setToast('Walking route updated.');
+        setToast('Route updated.');
       })
       .catch((e) => {
         if (request !== routeRequest.current || !navigatingRef.current) return;
@@ -438,7 +465,16 @@ export default function App() {
         setRouteError(e.message);
         setToast(e.message);
       });
-  }, [nav.reroute, gps.fix, navigating, data, selected, calculate]);
+  }, [
+    nav.reroute,
+    gps.fix,
+    navigating,
+    data,
+    selected,
+    calculate,
+    currentRoute?.mode,
+    journey?.parkingId,
+  ]);
   const places = useMemo(
     () =>
       (data?.places || [])
@@ -446,9 +482,7 @@ export default function App() {
           (p) =>
             (!savedOnly || saved.includes(p.id)) &&
             (category === 'all' || p.category === category) &&
-            `${p.name} ${p.aliases.join(' ')} ${p.department || ''} ${p.faculty || ''}`
-              .toLowerCase()
-              .includes(query.toLowerCase()),
+            placeMatches(p, query),
         )
         .sort(
           (a, b) =>
@@ -458,7 +492,13 @@ export default function App() {
         ),
     [data, query, category, saved, savedOnly, recent],
   );
+  const streets = useMemo(
+    () => (category === 'all' && !savedOnly ? streetResults(data, query) : []),
+    [data, query, category, savedOnly],
+  );
+  const [selectedStreet, setSelectedStreet] = useState<string | null>(null);
   const selectPlace = (place: Place) => {
+    setSelectedStreet(null);
     startRequested.current = false;
     if (navigating) {
       setToast('Finish this walk before choosing a new destination.');
@@ -470,6 +510,8 @@ export default function App() {
     setShareFallback('');
     setSharedLinkMissing(false);
     setSelected(place);
+    setParkingId('');
+    setActiveLeg(0);
     setPanelExpanded(true);
     setBusy(false);
     setRouteView(false);
@@ -535,7 +577,11 @@ export default function App() {
     setSaved(next);
     void setPreference('saved', next);
   };
-  const previewRoute = async (from = origin) => {
+  const previewRoute = async (
+    from = origin,
+    mode = travelMode,
+    parking = parkingId,
+  ) => {
     startRequested.current = false;
     if (!data || !selected) return;
     setRouteView(true);
@@ -545,7 +591,7 @@ export default function App() {
     setRoutes([]);
     setChosen(0);
     const request = ++routeRequest.current;
-    if (!placeHasConnection(data, selected)) {
+    if (mode === 'walking' && !placeHasConnection(data, selected)) {
       setRouteError(
         'A walking connection for this place has not been mapped. You can report a missing path or entrance.',
       );
@@ -563,7 +609,8 @@ export default function App() {
     } else {
       gps.stop();
       source = data.places.some(
-        (p) => p.id === from && placeHasConnection(data, p),
+        (p) =>
+          p.id === from && (mode === 'driving' || placeHasConnection(data, p)),
       )
         ? { placeId: from }
         : undefined;
@@ -574,7 +621,13 @@ export default function App() {
     }
     setBusy(true);
     try {
-      const result = await calculate(data, source, { placeId: selected.id });
+      const result = await calculate(
+        data,
+        source,
+        { placeId: selected.id },
+        mode,
+        parking || undefined,
+      );
       if (request !== routeRequest.current) return;
       setRoutes(result);
       setChosen(0);
@@ -639,12 +692,19 @@ export default function App() {
     if (!selected || !data) return;
     setBusy(true);
     try {
-      const live = await calculate(data, gps.fix.coordinates, {
-        placeId: selected.id,
-      });
+      const live = await calculate(
+        data,
+        gps.fix.coordinates,
+        {
+          placeId: selected.id,
+        },
+        travelMode,
+        journey?.parkingId || parkingId || undefined,
+      );
       if (request !== routeRequest.current) return;
       const matching = live.findIndex((r) => r.id === currentRoute?.id);
       setRoutes(live);
+      setActiveLeg(0);
       setChosen(Math.max(0, matching));
       setNav(initialNavigation);
       setNavigating(true);
@@ -792,10 +852,11 @@ export default function App() {
       }
     >
       <MapView
+        selectedStreet={selectedStreet}
         data={data}
         selected={selected}
-        routes={routes}
-        activeRoute={chosen}
+        routes={navigating && currentRoute ? [currentRoute] : routes}
+        activeRoute={navigating ? 0 : chosen}
         fix={gps.fix}
         dark={dark}
         threeD={threeD}
@@ -872,7 +933,7 @@ export default function App() {
                   {nav.arrived
                     ? 'You have arrived'
                     : currentRoute?.maneuvers[nav.nextIndex]?.instruction ||
-                      'Follow your walking route'}
+                      'Follow your route'}
                 </strong>
                 <small>{selected?.name}</small>
               </span>
@@ -1026,6 +1087,30 @@ export default function App() {
             <RoutePanel
               data={data}
               destination={selected}
+              mode={travelMode}
+              parkingId={parkingId}
+              onMode={(mode) => {
+                setTravelMode(mode);
+                setActiveLeg(0);
+                try {
+                  localStorage.setItem('turnright-travel-mode', mode);
+                } catch {
+                  setToast('Travel mode is saved for this session only.');
+                }
+                void previewRoute(origin, mode);
+              }}
+              onParking={(id) => {
+                setParkingId(id);
+                void previewRoute(origin, travelMode, id);
+              }}
+              activeRoute={navigating ? currentRoute : undefined}
+              onParked={() => {
+                voice.current.stop();
+                setActiveLeg(1);
+                setNav(initialNavigation);
+                gps.start();
+                setFollow(true);
+              }}
               routes={routes}
               chosen={chosen}
               origin={origin}
@@ -1086,7 +1171,9 @@ export default function App() {
                         : 'Explore campus'}
                   </h1>
                 </div>
-                <span className="count-pill">{places.length}</span>
+                <span className="count-pill">
+                  {places.length + streets.length}
+                </span>
               </div>
               <p className="section-description">
                 {savedOnly
@@ -1094,6 +1181,29 @@ export default function App() {
                   : 'Find a building. Pick a path. You’re on your way.'}
               </p>
               <div className="place-list">
+                {streets.map((street) => (
+                  <button
+                    className="place-row"
+                    key={String(street.properties?.id)}
+                    onClick={() => {
+                      setSelectedStreet(String(street.properties?.id));
+                      setSearching(false);
+                      searchInput.current?.blur();
+                      setToast(
+                        `${street.properties?.name} highlighted. Select a place or mapped entrance for directions.`,
+                      );
+                    }}
+                  >
+                    <span className="place-icon">
+                      <Navigation />
+                    </span>
+                    <span className="place-copy">
+                      <strong>{String(street.properties?.name)}</strong>
+                      <span>Street · Show on map</span>
+                    </span>
+                    <ChevronRight size={17} />
+                  </button>
+                ))}
                 {places.map((place) => (
                   <button
                     className="place-row"
@@ -1142,7 +1252,7 @@ export default function App() {
                     <ChevronRight size={17} />
                   </button>
                 ))}
-                {!places.length && (
+                {!places.length && !streets.length && (
                   <div className="empty-state">
                     {savedOnly ? <Heart /> : <Search />}
                     <h3>
@@ -1183,6 +1293,7 @@ export default function App() {
                 {selected.category.toUpperCase()} · LASU OJO
               </span>
               <h1>{selected.name}</h1>
+              <PlaceInformation place={selected} sources={data.sources} />
               {(() => {
                 const building = data.map.features.find(
                   (f) =>
@@ -1270,11 +1381,12 @@ export default function App() {
                   <Info />
                   <span>
                     Source:{' '}
-                    {selected.source === 'osm'
-                      ? 'OpenStreetMap'
-                      : selected.source === 'campus-review'
-                        ? 'Campus administrator'
-                        : 'LASU ArcGIS campus map'}
+                    {data.sources.find((s) => s.id === selected.source)?.name ||
+                      (selected.source === 'overture'
+                        ? 'Overture Maps Foundation'
+                        : selected.source === 'campus-review'
+                          ? 'Campus review'
+                          : selected.source)}
                     . Not field-verified.
                   </span>
                 </div>
@@ -1502,6 +1614,11 @@ export default function App() {
                   app visible during navigation.
                 </p>
                 <h3 className="subheading">Map coverage</h3>
+                <p className="small-note">
+                  {data.driving
+                    ? `Driving enabled: ${data.driving.parking.length} mapped parking/drop-off points. Vehicle access requires separate review; walking approval does not grant driving access.`
+                    : 'This package supports walking only. Download an updated map for driving.'}
+                </p>
                 {data.accessPolicy && (
                   <p className="small-note">
                     Student walking access on the main internal roads was
@@ -1563,6 +1680,20 @@ export default function App() {
                     </a>
                     <br />
                     <span className="small-note">{source.license}</span>
+                    {(source.licenseText || source.notice) && (
+                      <details>
+                        <summary>Offline license and notices</summary>
+                        <pre
+                          style={{
+                            whiteSpace: 'pre-wrap',
+                            overflowWrap: 'anywhere',
+                          }}
+                        >
+                          {source.licenseText}
+                          {source.notice ? `\n\n${source.notice}` : ''}
+                        </pre>
+                      </details>
+                    )}
                   </p>
                 ))}
                 <a className="text-button" href={manifest.dataUrl} download>

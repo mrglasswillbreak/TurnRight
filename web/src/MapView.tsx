@@ -33,6 +33,7 @@ const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
 const noRoutes: Route[] = [];
 export interface MapViewProps {
+  selectedStreet?: string | null;
   data: CampusData;
   selected?: Place | null;
   routes?: Route[];
@@ -56,6 +57,7 @@ export interface MapViewProps {
 }
 export function MapView({
   data,
+  selectedStreet,
   selected,
   routes = noRoutes,
   activeRoute = 0,
@@ -131,6 +133,34 @@ export function MapView({
     [worldView, setWorldView] = useState(false);
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
   const selectedId = selected?.id || '';
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      if (!map.getLayer('street-selected')) return;
+      map.setFilter('street-selected', [
+        '==',
+        ['get', 'id'],
+        selectedStreet || '',
+      ]);
+      const street = data.map.features.find(
+        (f) => f.properties?.id === selectedStreet,
+      );
+      if (street?.geometry.type === 'LineString') {
+        const bounds = new maplibregl.LngLatBounds();
+        street.geometry.coordinates.forEach((p) => bounds.extend([p[0], p[1]]));
+        map.fitBounds(bounds, {
+          padding: container.current ? publicMapPadding(container.current) : 24,
+          maxZoom: 19,
+        });
+      }
+    };
+    if (ready.current) apply();
+    else map.once('load', apply);
+    return () => {
+      map.off('load', apply);
+    };
+  }, [selectedStreet, data]);
   const selectedLng = selected?.coordinates[0],
     selectedLat = selected?.coordinates[1];
   const selectedBuildingId = useMemo(
@@ -501,7 +531,14 @@ export function MapView({
         source: 'routes',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
-          'line-color': ['case', ['get', 'active'], '#085adb', '#809ac2'],
+          'line-color': [
+            'case',
+            ['!', ['get', 'active']],
+            '#809ac2',
+            ['==', ['get', 'mode'], 'driving'],
+            '#8b36c9',
+            '#085adb',
+          ],
           'line-width': ['case', ['get', 'active'], 6.5, 3.5],
         },
       });
@@ -558,6 +595,17 @@ export function MapView({
         },
       });
       installPlaceBadges(map);
+      map.addLayer({
+        id: 'street-selected',
+        type: 'line',
+        source: 'campus',
+        filter: ['==', ['get', 'id'], ''],
+        paint: {
+          'line-color': '#f59e0b',
+          'line-width': 7,
+          'line-opacity': 0.8,
+        },
+      });
       map.addLayer(
         {
           id: 'street-labels',
@@ -1031,10 +1079,11 @@ export function MapView({
               {
                 type: 'Feature',
                 properties: {
-                  name: (selected?.name || 'Destination').replace(
-                    /[^\x20-\x7E]/g,
-                    ' ',
-                  ),
+                  name: (
+                    (route.mode === 'driving' && !route.legs
+                      ? route.parkingName
+                      : selected?.name) || 'Destination'
+                  ).replace(/[^\x20-\x7E]/g, ' '),
                 },
                 geometry: {
                   type: 'Point',
@@ -1050,17 +1099,22 @@ export function MapView({
           .sort(
             ([i], [j]) => Number(i === activeRoute) - Number(j === activeRoute),
           )
-          .map(([i, r]) => ({
-            type: 'Feature',
-            properties: { active: i === activeRoute },
-            geometry: {
-              type: 'LineString',
-              coordinates:
-                r.coordinates.length > 1
-                  ? r.coordinates
-                  : [...r.coordinates, ...r.coordinates],
-            },
-          })),
+          .flatMap(([i, journey]) =>
+            (journey.legs || [journey]).map((r) => ({
+              type: 'Feature',
+              properties: {
+                active: i === activeRoute,
+                mode: r.mode || 'walking',
+              },
+              geometry: {
+                type: 'LineString',
+                coordinates:
+                  r.coordinates.length > 1
+                    ? r.coordinates
+                    : [...r.coordinates, ...r.coordinates],
+              },
+            })),
+          ),
       });
     };
     if (ready.current) apply();
@@ -1116,6 +1170,7 @@ export function MapView({
           fix={fix}
           follow={follow}
           active={motionActive}
+          driving={routes[activeRoute]?.mode === 'driving'}
         />
       )}
       <div
