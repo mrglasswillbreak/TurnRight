@@ -3,12 +3,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { packageVisuals } from "./visual-package.mjs";
+import { publicCampus } from './public-campus.mjs';
+import { packageGlyphs } from './package-glyphs.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const input = process.env.CAMPUS_INPUT || "data/seed/campus.json";
-const data = JSON.parse(await fs.readFile(path.join(root, input), "utf8"));
-if (data.schemaVersion !== 1 || !data.graph?.edges?.length)
+const data = publicCampus(JSON.parse(await fs.readFile(path.join(root, input), "utf8")));
+if (![1, 2].includes(data.schemaVersion) || !data.graph?.edges?.length)
   throw new Error("No valid campus graph to package");
 const audioDir = path.join(root, "data/audio");
 const files = (await fs.readdir(audioDir)).filter((f) => f.endsWith(".wav")).sort();
@@ -27,13 +29,7 @@ for (const file of files) {
   await asset(url, bytes, "audio/wav");
   audio[file.replace(".wav", "")] = url;
 }
-const glyph = await fs.readFile(path.join(publicDir, "glyphs/Open Sans Semibold/0-255.pbf"));
-assets.push({
-  url: "/glyphs/Open%20Sans%20Semibold/0-255.pbf",
-  sha256: hash(glyph),
-  bytes: glyph.length,
-  contentType: "application/x-protobuf",
-});
+await packageGlyphs(data, publicDir, asset);
 const visuals = await packageVisuals(
   path.resolve(root, process.env.VISUALS_INPUT || "data/visuals"),
   asset,
@@ -51,7 +47,7 @@ await asset(
   "application/json",
 );
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: data.driving ? 2 : 1,
   version,
   createdAt: data.createdAt,
   summary:

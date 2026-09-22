@@ -1,3 +1,4 @@
+import { campusFixture } from './fixture';
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -34,7 +35,7 @@ beforeEach(async () => {
 });
 async function pkg(version: string) {
   const bytes = new TextEncoder().encode(
-    JSON.stringify({ version, schemaVersion: 1 }),
+    JSON.stringify({ ...campusFixture(), version, schemaVersion: 1 }),
   );
   const url = `/packages/${version}/campus.json`;
   const manifest: CampusPackage = {
@@ -51,6 +52,39 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe('offline package transactions', () => {
+  it('installs driving packages offline and rejects schema mismatches without replacing them', async () => {
+    const p = await pkg('driving');
+    const data = {
+      ...campusFixture(),
+      version: 'driving',
+      schemaVersion: 2,
+      driving: { version: 1, parking: [], restrictions: [] },
+    };
+    const bytes = new TextEncoder().encode(JSON.stringify(data));
+    p.manifest.schemaVersion = 2;
+    p.manifest.bytes = bytes.byteLength;
+    p.manifest.assets[0] = {
+      ...p.manifest.assets[0],
+      bytes: bytes.byteLength,
+      sha256: await hashBytes(bytes.buffer),
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(bytes)),
+    );
+    await installPackage(p.manifest, () => {});
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('offline');
+      }),
+    );
+    expect((await loadCampus()).data.driving?.version).toBe(1);
+    await expect(
+      installPackage({ ...p.manifest, schemaVersion: 1 }, () => {}),
+    ).rejects.toThrow('Incomplete campus package');
+    expect((await getActivePackage())?.manifest.schemaVersion).toBe(2);
+  });
   async function enhanced(version: string) {
     const p = await pkg(version),
       bytes = new TextEncoder().encode('{"schemaVersion":1,"models":[]}');
@@ -61,6 +95,7 @@ describe('offline package transactions', () => {
     };
     p.bytes = new TextEncoder().encode(
       JSON.stringify({
+        ...campusFixture(),
         version,
         schemaVersion: 1,
         visuals: { sectors: [asset] },

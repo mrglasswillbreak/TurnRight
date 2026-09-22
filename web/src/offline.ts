@@ -1,3 +1,4 @@
+import { structuralIssues } from './validation';
 import { openDB } from 'idb';
 import type {
   CampusData,
@@ -63,7 +64,7 @@ export async function latestPackage(): Promise<CampusPackage> {
       'Could not check for campus updates. Your downloaded map is unchanged.',
     );
   const manifest = (await response.json()) as CampusPackage;
-  if (manifest.schemaVersion !== 1 || !manifest.assets?.length)
+  if (![1, 2].includes(manifest.schemaVersion) || !manifest.assets?.length)
     throw new Error('This map version needs a newer app.');
   return manifest;
 }
@@ -163,8 +164,14 @@ export async function loadCampus(): Promise<{
     throw new Error(
       'Campus data did not pass its integrity check. Please retry.',
     );
+  const data = JSON.parse(new TextDecoder().decode(bytes)) as CampusData;
+  if (
+    data.schemaVersion !== manifest.schemaVersion ||
+    structuralIssues(data).length
+  )
+    throw new Error('This campus package is invalid or needs a newer app.');
   return {
-    data: JSON.parse(new TextDecoder().decode(bytes)),
+    data,
     manifest,
     downloaded: false,
   };
@@ -175,7 +182,7 @@ export async function installPackage(
   signal?: AbortSignal,
   activate = true,
 ) {
-  if (manifest.schemaVersion !== 1)
+  if (![1, 2].includes(manifest.schemaVersion))
     throw new Error('Update the app before downloading this map.');
   if (
     manifest.visuals &&
@@ -240,7 +247,12 @@ export async function installPackage(
     loaded += asset.bytes;
     progress(Math.round((loaded / manifest.bytes) * 100));
   }
-  if (!data || data.version !== manifest.version)
+  if (
+    !data ||
+    data.version !== manifest.version ||
+    data.schemaVersion !== manifest.schemaVersion ||
+    structuralIssues(data).length
+  )
     throw new Error('Incomplete campus package');
   if (!visualManifestMatches(data, manifest))
     throw new Error(
