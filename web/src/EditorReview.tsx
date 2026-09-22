@@ -16,6 +16,8 @@ import { api } from './supabase';
 import { AdminRequestError } from './admin-client';
 import { useReleaseImpact } from './useReleaseImpact';
 import { sourceComparison, sourceGeometry } from './source-comparison';
+import { SourceFieldReview } from './SourceFieldReview';
+import { EnrichmentReview } from './EnrichmentReview';
 import { firstPosition, type ValidationIssue } from './validation';
 import { downloadJson } from './download-json';
 import type { EditorWorkspace } from './editor-workspace';
@@ -146,6 +148,9 @@ export function EditorReview({
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
+          <EnrichmentReview
+            onLocate={(center) => mapRef.current?.flyTo({ center, zoom: 19 })}
+          />
           <BuildingRoofReview
             data={validation.data}
             duplicates={validation.duplicates}
@@ -270,6 +275,13 @@ export function EditorReview({
                         : JSON.stringify(value);
                   return (
                     <div className="source-comparison">
+                      <SourceFieldReview
+                        key={change.id + JSON.stringify(change.before)}
+                        change={change}
+                        data={validation.data}
+                        busy={busy}
+                        action={action}
+                      />
                       <p>Red: approved source · Green: proposed source</p>
                       {comparison.geometryChanged && (
                         <p className="notice">
@@ -510,6 +522,23 @@ export function EditorReview({
               Download diagnostics
             </Button>
           </div>
+          {validation.data.driving && (
+            <p className="notice">
+              Driving:{' '}
+              {
+                validation.data.graph.edges.filter(
+                  (e) =>
+                    e.vehicleAllowed &&
+                    e.vehicle &&
+                    ['yes', 'reviewed'].includes(e.vehicle.access) &&
+                    !e.vehicle.conditional,
+                ).length
+              }{' '}
+              permitted directed road segments;{' '}
+              {validation.data.driving.parking.length} parking/drop-off points.
+              Driving and walking connections are validated separately.
+            </p>
+          )}
           <p className="notice">
             {validation.data.coverage.disconnected.length} places still lack a
             mapped approach. Source-derived routes have not been field-verified.
@@ -583,23 +612,25 @@ export function EditorReview({
                       </tr>
                     </thead>
                     <tbody>
-                      {impact.result.walks.map((walk) => (
-                        <tr key={walk.name}>
-                          <th>{walk.name}</th>
-                          <td>
-                            {walk.before.status}
-                            {walk.before.distance !== undefined
-                              ? ` · ${walk.before.distance} m`
-                              : ''}
-                          </td>
-                          <td>
-                            {walk.after.status}
-                            {walk.after.distance !== undefined
-                              ? ` · ${walk.after.distance} m`
-                              : ''}
-                          </td>
-                        </tr>
-                      ))}
+                      {[...impact.result.walks, ...impact.result.drives].map(
+                        (walk) => (
+                          <tr key={walk.name}>
+                            <th>{walk.name}</th>
+                            <td>
+                              {walk.before.status}
+                              {walk.before.distance !== undefined
+                                ? ` · ${walk.before.distance} m`
+                                : ''}
+                            </td>
+                            <td>
+                              {walk.after.status}
+                              {walk.after.distance !== undefined
+                                ? ` · ${walk.after.distance} m`
+                                : ''}
+                            </td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>

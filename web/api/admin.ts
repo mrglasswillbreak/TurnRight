@@ -1,4 +1,6 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
+import { selectSourceFields } from '../src/source-field-review.js';
+import type { MapChange } from '../src/types.js';
 import {
   allRows,
   bodyOf,
@@ -164,6 +166,53 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           typeof payload.accept !== 'boolean'
         )
           throw new HttpError(400, 'Invalid review decision');
+        if (payload.fields !== undefined) {
+          if (
+            !payload.accept ||
+            !Array.isArray(payload.fields) ||
+            payload.fields.some((f: unknown) => typeof f !== 'string')
+          )
+            throw new HttpError(400, 'Invalid field selection');
+          const [change] = await db<MapChange[]>(
+            `map_changes?id=eq.${encodeURIComponent(payload.id)}&status=eq.pending`,
+          );
+          if (!change) throw new HttpError(409, 'Change is no longer pending');
+          let next;
+          try {
+            next = selectSourceFields(change, payload.fields);
+          } catch (e) {
+            throw new HttpError(400, (e as Error).message);
+          }
+          const stable = (v: unknown): unknown =>
+            Array.isArray(v)
+              ? v.map(stable)
+              : v && typeof v === 'object'
+                ? Object.fromEntries(
+                    Object.entries(v)
+                      .filter(
+                        ([key]) =>
+                          !['createdAt', 'retrievedAt', 'checkedAt'].includes(
+                            key,
+                          ),
+                      )
+                      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+                      .map(([k, value]) => [k, stable(value)]),
+                  )
+                : v;
+          next.hash = createHash('sha256')
+            .update(JSON.stringify(stable(next.payload)))
+            .digest('hex');
+          await db('rpc/review_map_fields', 'POST', {
+            change_id: payload.id,
+            expected_before: change.before,
+            expected_after: change.after,
+            reviewed_record: next,
+            selected_fields: payload.fields,
+            actor_id: user.id,
+          });
+          res.status(200).json({ ok: true });
+          break;
+        }
         await db('rpc/review_map_change', 'POST', {
           change_id: payload.id,
           accept_change: payload.accept,

@@ -45,6 +45,7 @@ beforeAll(async () => {
     '004_private_surveys.sql',
     '005_baseline_reconciliation.sql',
     '006_reconciliation_safe_updates.sql',
+    '007_source_field_reviews.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -64,6 +65,96 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+
+describe('partial source acceptance', () => {
+  it('atomically records accepted fields and keeps geometry pending, rejecting stale reviews', async () => {
+    const before = {
+      id: 'place:partial-test',
+      entity: 'place',
+      source: 'osm',
+      hash: 'old',
+      payload: { id: 'partial-test', name: 'Before', coordinates: [3.2, 6.46] },
+    };
+    const after = {
+      ...before,
+      hash: 'proposed',
+      payload: {
+        ...before.payload,
+        name: 'After',
+        coordinates: [3.201, 6.461],
+      },
+    };
+    const reviewed = {
+      ...before,
+      hash: 'reviewed',
+      payload: { ...before.payload, name: 'After' },
+    };
+    await database.query(
+      'insert into source_features(id,entity,source,payload,hash) values($1,$2,$3,$4,$5)',
+      [
+        before.id,
+        before.entity,
+        before.source,
+        JSON.stringify(before.payload),
+        before.hash,
+      ],
+    );
+    await database.query(
+      'insert into map_changes(id,source_id,kind,before,after,base_hash,status,summary) values($1,$2,$3,$4,$5,$6,$7,$8)',
+      [
+        'partial-test',
+        before.id,
+        'modify',
+        JSON.stringify(before),
+        JSON.stringify(after),
+        'old',
+        'pending',
+        'Metadata and geometry',
+      ],
+    );
+    const args = [
+      'partial-test',
+      JSON.stringify(before),
+      JSON.stringify(after),
+      JSON.stringify(reviewed),
+      JSON.stringify(['name']),
+      owner,
+    ];
+    await database.query('select review_map_fields($1,$2,$3,$4,$5,$6)', args);
+    expect(
+      (
+        await database.query<{ payload: { coordinates: number[] } }>(
+          'select payload from source_features where id=$1',
+          [before.id],
+        )
+      ).rows[0].payload.coordinates,
+    ).toEqual(before.payload.coordinates);
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from map_changes where id=$1',
+          ['partial-test'],
+        )
+      ).rows[0].status,
+    ).toBe('pending');
+    expect(
+      (
+        await database.query(
+          'select * from source_field_reviews where change_id=$1',
+          ['partial-test'],
+        )
+      ).rows,
+    ).toHaveLength(1);
+    await expect(
+      database.query('select review_map_fields($1,$2,$3,$4,$5,$6)', args),
+    ).rejects.toThrow(/Proposal changed/);
+    await database.exec('set role authenticated');
+    await expect(
+      database.query('select review_map_fields($1,$2,$3,$4,$5,$6)', args),
+    ).rejects.toThrow(/permission denied/);
+    await database.exec('reset role');
+  });
 });
 
 describe('published baseline reconciliation', () => {

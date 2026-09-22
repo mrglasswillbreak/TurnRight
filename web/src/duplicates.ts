@@ -17,7 +17,7 @@ const nameKey = (name: unknown) =>
   String(name || '')
     .normalize('NFKD')
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
+    .replace(/[^\p{L}\p{N}]/gu, '');
 function ringKey(ring: number[][]) {
   const points = ring.slice(0, -1).map((p) => p.join(','));
   return (
@@ -185,7 +185,16 @@ export function findDuplicateCandidates(
       const nearbyMatch =
         distance(place.coordinates, other.coordinates) <= 35 &&
         words(place.name).some((w) => words(other.name).includes(w));
-      if (!sameName && !nearbyMatch) continue;
+      const sharedIdentity = [...(place.sourceRefs || []), place.sourceId].some(
+        (id) => [other.sourceId, ...(other.sourceRefs || [])].includes(id),
+      );
+      const sameContact =
+        distance(place.coordinates, other.coordinates) <= 150 &&
+        ((!!place.phone &&
+          place.phone.replace(/\D/g, '') === other.phone?.replace(/\D/g, '')) ||
+          (!!place.website && place.website === other.website));
+      if (!sameName && !nearbyMatch && !sharedIdentity && !sameContact)
+        continue;
       const excluded = ['id', 'source', 'sourceId', 'sourceRefs'];
       const exact =
         exactAttributes({ ...place }, excluded) ===
@@ -201,9 +210,13 @@ export function findDuplicateCandidates(
         exact,
         reason: exact
           ? 'Identical place and connections'
-          : sameName
-            ? 'Repeated place name'
-            : 'Nearby similar names',
+          : sharedIdentity
+            ? 'Shared source identity'
+            : sameContact
+              ? 'Nearby matching contact details'
+              : sameName
+                ? 'Repeated place name'
+                : 'Nearby similar names',
         distance: distance(place.coordinates, other.coordinates),
       });
     }
