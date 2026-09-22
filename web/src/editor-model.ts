@@ -1,3 +1,11 @@
+import {
+  validVehicleRules,
+  validParking,
+  validTurnRestriction,
+  validDrivingReview,
+} from './driving-validation.js';
+import { detailErrors, editedPlaceDetails } from './place-details.js';
+import { applyDrivingEdits, drivingIssues } from './driving-data.js';
 import { validateBuildingStyle } from './building-style-validation.js';
 import {
   applyConnections,
@@ -69,6 +77,28 @@ export function validateEdit(edit: MapEdit): string[] {
     return ['Draw a point, path, or building outline.'];
   if (!edit.properties || typeof edit.properties !== 'object')
     return ['Feature properties are required.'];
+  if (edit.kind === 'place') {
+    errors.push(...detailErrors(edit.properties));
+    for (const field of [
+      'subtype',
+      'address',
+      'phone',
+      'website',
+      'openingHours',
+      'businessStatus',
+    ]) {
+      const evidence = edit.properties.evidence as
+        | import('./types.js').FieldEvidence
+        | undefined;
+      if (
+        edit.properties[field] &&
+        edit.properties[field] !== 'unknown' &&
+        !evidence?.[field]?.length &&
+        !(edit.properties.detailSource && edit.properties.detailCheckedAt)
+      )
+        errors.push(`Record the source and check date for ${field}.`);
+    }
+  }
   if (edit.kind === 'path' && edit.geometry.type !== 'LineString')
     errors.push('Walking paths must be lines.');
   if (
@@ -166,6 +196,21 @@ export function validateEdit(edit: MapEdit): string[] {
       ))
   )
     errors.push('Invalid path connection reference.');
+  if (props.vehicle !== undefined && !validVehicleRules(props.vehicle))
+    errors.push('Complete the vehicle rules and driving approval evidence.');
+  if (props.parking && !validParking(props.parking))
+    errors.push('Complete the parking details and approval evidence.');
+  if (
+    props.turnRestrictions !== undefined &&
+    (!Array.isArray(props.turnRestrictions) ||
+      !props.turnRestrictions.every(validTurnRestriction))
+  )
+    errors.push('Complete each turn restriction.');
+  if (
+    props.vehiclePassable === true &&
+    !validDrivingReview(props.vehicleReview)
+  )
+    errors.push('Complete the gate driving approval evidence.');
   if (props.connection !== undefined && !validTarget(props.connection))
     errors.push('Invalid entrance connection reference.');
   if (
@@ -429,6 +474,7 @@ export function applyEdits(
           ) > 5;
         data.places.push({
           ...previous,
+          ...editedPlaceDetails(props, previous),
           id: edit.id,
           name: String(props.name),
           category: (props.category ||
@@ -474,6 +520,7 @@ export function applyEdits(
         access !== pathWalkingAccess(data, edit.id);
       const pathProperties = {
         ...originalFeature?.properties,
+        vehicle: props.vehicle ?? originalFeature?.properties?.vehicle,
         id: edit.id,
         kind: 'path',
         name: props.name,
@@ -672,21 +719,29 @@ export function applyEdits(
               }),
             );
         }
-        for (const [from, to] of (props.footDirection ||
-          pathProperties.footDirection) === 'forward'
-          ? [[a, b]]
-          : props.footDirection === 'reverse'
-            ? [[b, a]]
-            : [
-                [a, b],
-                [b, a],
-              ]) {
+        for (const [from, to] of pathProperties.vehicle
+          ? [
+              [a, b],
+              [b, a],
+            ]
+          : (props.footDirection || pathProperties.footDirection) === 'forward'
+            ? [[a, b]]
+            : props.footDirection === 'reverse'
+              ? [[b, a]]
+              : [
+                  [a, b],
+                  [b, a],
+                ]) {
           // Replacing an unchanged-direction section retains each original directed span.
           const directionChanged =
             props.footDirection !== undefined &&
             props.footDirection !==
               (originalFeature?.properties?.footDirection || 'both');
-          if (!directionChanged && inherited.length) {
+          if (
+            !pathProperties.vehicle &&
+            !directionChanged &&
+            inherited.length
+          ) {
             const wanted = from.id === a.id ? 1 : -1;
             const permitted = inherited.some((e) => {
               const f = orderedOriginal.findIndex((n) => n.id === e.from),
@@ -709,6 +764,9 @@ export function applyEdits(
             name: String(props.name),
             accessible:
               (access === 'yes' || access === 'campus') &&
+              (pathProperties.footDirection === 'both' ||
+                (pathProperties.footDirection === 'forward') ===
+                  (from.id === a.id)) &&
               (changedAccess || inherited.every((e) => e.accessible)),
             walkingAccess:
               !changedAccess && inherited.some((e) => !e.accessible)
@@ -821,6 +879,10 @@ export function applyEdits(
           },
         );
     } else if (edit.kind === 'barrier' || edit.kind === 'closure') {
+      if (edit.kind === 'barrier' && props.vehiclePassable !== undefined) {
+        data.closures = data.closures.filter((c) => c.id !== edit.id);
+        continue;
+      }
       const edgeIds = Array.isArray(props.edgeIds)
         ? props.edgeIds.filter((id): id is string => typeof id === 'string')
         : [];
@@ -851,6 +913,12 @@ export function applyEdits(
         data.closures.push({
           id: edit.id,
           edgeIds: [...bothDirections],
+          modes:
+            props.closureMode === 'driving'
+              ? ['driving']
+              : props.closureMode === 'walking'
+                ? ['walking']
+                : undefined,
           reason: String(props.name),
           expectedReopening: props.expectedReopening
             ? String(props.expectedReopening)
@@ -913,6 +981,19 @@ export function applyEdits(
       warnings.push(`${place.name}: its old walking connection was removed.`);
     }
   }
+  applyDrivingEdits(
+    data,
+    edits.filter((e) => !validateEdit(e).length),
+  );
+  if (data.driving) {
+    for (const p of data.driving.parking) {
+      p.vehicleNodeId = canonical(p.vehicleNodeId);
+      p.walkingNodeId = canonical(p.walkingNodeId);
+    }
+    for (const r of data.driving.restrictions)
+      r.viaNodeId = canonical(r.viaNodeId);
+  }
+  for (const message of drivingIssues(data)) issue(message, '', 'path');
   const ids = new Set<string>();
   phase?.('geometry');
   const blockedGeometry = cachedGeometryBlocker(data.map);
@@ -949,7 +1030,9 @@ export function applyEdits(
   }
   const adjacency = new Map<string, string[]>();
   const blocked = new Set(
-    data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
+    data.closures
+      .filter((c) => !c.reopenedAt && (!c.modes || c.modes.includes('walking')))
+      .flatMap((c) => c.edgeIds),
   );
   for (const e of data.graph.edges.filter(
     (e) => e.accessible && !e.geometryBlocked && !blocked.has(e.id),

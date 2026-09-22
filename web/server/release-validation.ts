@@ -12,7 +12,7 @@ function stable(value: unknown, source = false): unknown {
     return Object.fromEntries(
       Object.entries(value)
         .filter(
-          ([key]) => !source || !['createdAt', 'retrievedAt'].includes(key),
+          ([key]) => !source || !['createdAt', 'retrievedAt', 'checkedAt'].includes(key),
         )
         .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
         .map(([key, v]) => [key, stable(v, source)]),
@@ -55,7 +55,7 @@ export async function publishedCampus(): Promise<CampusData> {
   const manifest = (await response.json()) as CampusPackage;
   const asset = manifest.assets?.find((a) => a.url === manifest.dataUrl);
   if (
-    manifest.schemaVersion !== 1 ||
+    ![1, 2].includes(manifest.schemaVersion) ||
     !asset ||
     !/^\/packages\/[a-zA-Z0-9-]+\/campus\.json$/.test(manifest.dataUrl) ||
     asset.bytes > 25_000_000

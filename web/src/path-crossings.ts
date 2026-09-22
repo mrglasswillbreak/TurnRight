@@ -1,3 +1,4 @@
+import { vehicleNodeBlocked } from './driving-data.js';
 import { distance, projectSegment } from './geo.js';
 import { BoundsIndex, boundsOf, nearbyBounds } from './spatial-index.js';
 import { cachedGeometryBlocker } from './spatial.js';
@@ -166,13 +167,15 @@ export function connectCrossingPaths(
   const prefer = (a: string, b: string) => {
     // Keep source node metadata (e.g. a reviewed gate) on the surviving junction.
     const rank = (id: string) =>
-      nodes.get(id)?.sourceTags
-        ? 0
-        : id.startsWith('crossing-path:')
-          ? 3
-          : id.startsWith('crossing:')
-            ? 2
-            : 1;
+      vehicleNodeBlocked(nodes.get(id)?.sourceTags)
+        ? -1
+        : nodes.get(id)?.sourceTags
+          ? 0
+          : id.startsWith('crossing-path:')
+            ? 3
+            : id.startsWith('crossing:')
+              ? 2
+              : 1;
     return rank(a) - rank(b) || a.localeCompare(b);
   };
   const merge = (a: string, b: string) => {

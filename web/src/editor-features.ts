@@ -1,4 +1,5 @@
 import { remapBuildingSurfaces } from './building-surfaces';
+import { detailFields } from './place-details';
 import type { Geometry } from 'geojson';
 import { distance, projectSegment } from './geo';
 import { pathWalkingAccess } from './editor-model';
@@ -151,7 +152,10 @@ export function featureEdit(
         geometry: { type: 'Point', coordinates: p.coordinates },
         properties: {
           name: p.name,
+          ...Object.fromEntries(detailFields.map((key) => [key, p[key]])),
+          evidence: p.evidence,
           category: p.category,
+          parking: data.driving?.parking.find((parking) => parking.id === p.id),
           aliases: p.aliases.join(', '),
           department: p.department,
           faculty: p.faculty,
@@ -178,8 +182,19 @@ export function featureEdit(
         f.properties?.name || (kind === 'path' ? 'Campus path' : 'Building'),
     },
   };
+  if (kind === 'barrier') {
+    const node = data.graph.nodes.find((n) => n.id === id);
+    if (node?.vehicleReview && edit.properties.vehiclePassable === undefined) {
+      edit.properties.vehiclePassable = true;
+      edit.properties.vehicleReview = node.vehicleReview;
+    }
+  }
   if (kind === 'path' && f.geometry.type === 'LineString') {
     edit.properties.access = pathWalkingAccess(data, id);
+    if (data.driving)
+      edit.properties.turnRestrictions = data.driving.restrictions.filter(
+        (r) => r.fromSourceId === id,
+      );
     const nodes = pathNodes(data, id);
     const drawn = f.geometry.coordinates as Position[];
     const points: Position[] = [];

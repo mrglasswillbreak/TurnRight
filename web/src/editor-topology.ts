@@ -1,3 +1,4 @@
+import { vehicleNodeBlocked } from './driving-data.js';
 import { firstPosition, type ValidationIssue } from './validation.js';
 import { distance, projectSegment } from './geo.js';
 import { finitePosition } from './validation.js';
@@ -175,6 +176,13 @@ export function applyConnections(
         to = nodes.get(target.nodeId)!;
       }
       if (from.id !== to.id) {
+        if (
+          vehicleNodeBlocked(from.sourceTags) &&
+          !vehicleNodeBlocked(to.sourceTags)
+        ) {
+          to.sourceTags = from.sourceTags;
+          to.vehicleReview = from.vehicleReview;
+        }
         aliases.set(from.id, to.id);
         // Keep aliases during assembly so references to new path vertices remain valid.
         nodes.set(from.id, { ...to, id: from.id });

@@ -1,3 +1,4 @@
+import { DrivingEditor } from './DrivingEditor';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
@@ -123,6 +124,49 @@ export function EditorInspector({
             {field('Also known as', 'aliases', 'Separate names with commas')}
             {field('Department', 'department')}
             {field('Faculty', 'faculty')}
+            <details>
+              <summary>Business details and evidence</summary>
+              {field('Type of place', 'subtype', 'restaurant, cafe, bookshop…')}
+              {field('Address', 'address')}
+              {field('Public business phone', 'phone')}
+              {field('Website', 'website', 'https://…')}
+              {field(
+                'Recorded opening hours',
+                'openingHours',
+                'Recorded schedule, not live status',
+              )}
+              <label className="field-label">
+                Recorded business status
+                <select
+                  value={String(p.businessStatus || 'unknown')}
+                  onChange={(e) => onProperty('businessStatus', e.target.value)}
+                >
+                  <option value="unknown">Unknown</option>
+                  <option value="operating">Operating business</option>
+                  <option value="temporarily-closed">Temporarily closed</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </label>
+              {field(
+                'Evidence source for changed details',
+                'detailSource',
+                'Source URL or campus observation reference',
+              )}
+              <label className="field-label">
+                Date checked
+                <input
+                  type="date"
+                  value={String(p.detailCheckedAt || '').slice(0, 10)}
+                  onChange={(e) =>
+                    onProperty('detailCheckedAt', e.target.value)
+                  }
+                />
+              </label>
+              <p className="small-note">
+                Record only supported details. Source evidence is public; keep
+                private survey notes out of these fields.
+              </p>
+            </details>
           </>
         )}
         {edit.kind === 'building' && (
@@ -282,6 +326,7 @@ export function EditorInspector({
             )}
           </>
         )}
+        <DrivingEditor edit={edit} data={data} onProperty={onProperty} />
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">
             Walking access

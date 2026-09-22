@@ -1,3 +1,4 @@
+import { findDrivingJourneys } from './driving';
 import type { CampusData, MapEdit } from './types';
 import { canonical } from './editor-conflicts';
 import { findRoutes, placeHasConnection } from './routing';
@@ -38,10 +39,24 @@ function records(data: CampusData) {
         kind,
         String(f.properties!.id),
         String(f.properties!.name || f.properties!.id),
-        { geometry: f.geometry, properties: f.properties },
+        {
+          geometry: f.geometry,
+          properties: f.properties,
+          drivingRestrictions: data.driving?.restrictions.filter(
+            (r) => r.fromSourceId === f.properties?.id,
+          ),
+        },
       );
   });
-  data.places.forEach((p) => add('place', p.id, p.name, p));
+  data.places.forEach((p) =>
+    add('place', p.id, p.name, {
+      ...p,
+      parking: data.driving?.parking.find((parking) => parking.id === p.id),
+    }),
+  );
+  data.graph.nodes
+    .filter((n) => n.vehicleReview)
+    .forEach((n) => add('barrier', n.id, 'Reviewed vehicle gate', n));
   data.entrances?.forEach((e) => add('entrance', e.id, e.name, e));
   data.closures.forEach((c) => add('closure', c.id, c.reason, c));
   return records;
@@ -52,7 +67,9 @@ function clinicReachable(data: CampusData): Set<string> {
   );
   if (!origin) return new Set();
   const blocked = new Set(
-    data.closures.filter((c) => !c.reopenedAt).flatMap((c) => c.edgeIds),
+    data.closures
+      .filter((c) => !c.reopenedAt && (!c.modes || c.modes.includes('walking')))
+      .flatMap((c) => c.edgeIds),
   );
   const adjacency = new Map<string, string[]>();
   data.graph.edges
@@ -114,6 +131,18 @@ function walk(data: CampusData, origin: string, destination: string) {
     return { status: (e as Error).message };
   }
 }
+function drive(data: CampusData, origin: string, destination: string) {
+  try {
+    const route = findDrivingJourneys(
+      data,
+      { placeId: origin },
+      { placeId: destination },
+    )[0];
+    return { status: 'Connected', distance: Math.round(route.distance) };
+  } catch (error) {
+    return { status: (error as Error).message };
+  }
+}
 export function releaseImpact(published: CampusData, draft: CampusData) {
   const before = records(published),
     after = records(draft);
@@ -152,6 +181,19 @@ export function releaseImpact(published: CampusData, draft: CampusData) {
   return {
     changes,
     newlyDisconnected,
+    drives: draft.places
+      .filter((p) => p.category === 'gate')
+      .slice(0, 3)
+      .flatMap((origin) =>
+        draft.places
+          .filter((p) => p.category !== 'gate')
+          .slice(0, 3)
+          .map((destination) => ({
+            name: `Drive + walk: ${origin.name}–${destination.name}`,
+            before: drive(published, origin.id, destination.id),
+            after: drive(draft, origin.id, destination.id),
+          })),
+      ),
     walks: releaseWalks.map((r) => ({
       name: r.name,
       before: walk(published, r.origin, r.destination),
