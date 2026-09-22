@@ -1,5 +1,46 @@
 # Production deployments
 
+## Reviewed campus enrichment — 22 September 2026
+
+Published **`lasu-3fe75a6ac04b`** at
+[turnright.vercel.app](https://turnright.vercel.app/) through the authenticated
+owner review, preview and publication workflow. The
+[publication run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35766442710)
+completed successfully at 18:21:56 UTC, following the successful
+[preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35765453789).
+
+- Added 40 source-reviewed Overture footprints and seven recorded OSM gates;
+  corrected the existing university category and included three saved owner
+  corrections. No uncertain new businesses, street names or access permissions
+  were published.
+- The package contains 420 buildings, 220 places and 94 path features. All prior
+  place IDs, walking edge geometry, endpoints, distances and access rules remain.
+  The same 15 destinations lack a confirmed approach. Reviewer identities and
+  private survey fields are absent from the public data.
+- All 45 manifest assets passed byte-size and SHA-256 verification at 18:26 UTC:
+  5,528,853 bytes, including 23 model sectors totaling 1,032,908 bytes. Campus
+  SHA-256: `df13e3d8defd1a028ecc56bc3df1227d25e24cb627c28c785ddaa9155c9442e5`.
+- Desktop and mobile preview checks covered place details, walking alternatives,
+  driving-unavailable messages and offline models. Production downloaded the
+  new package, showed **Ready offline**, and retained that state after reload
+  with no browser console errors. Driving remains unavailable until separate
+  vehicle permissions and mapped parking connections are reviewed.
+- Preview and publication CI tests passed. Local targeted suites, TypeScript,
+  lint and production asset budgets passed; lint retains seven existing
+  `no-explicit-any` warnings.
+
+Source review exposed two workflow defects fixed before publication: `60aae26`
+adds source-ID filtering and pagination beyond the first 300 proposals;
+`2d236a5` keeps the reconciled published-baseline version when accepting source
+metadata. The metadata anchor repair used the existing guarded review RPC and
+an auditable proposal; it did not bypass publication validation.
+
+See the [complete review receipt](../data/enrichment/2026-09-22/publication-review.json)
+and [coverage report](../data/enrichment/2026-09-22/README.md). All 16,908 original
+ledger items remain accounted for: 88 accepted, 14,949 rejected and 1,871 awaiting
+evidence. The imported excluded-segment narrative refers to the full candidate;
+published graph and destination counts were verified independently.
+
 ## Source field review migration — 22 September 2026
 
 Applied `supabase/migrations/007_source_field_reviews.sql` to the existing
