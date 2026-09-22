@@ -1,5 +1,20 @@
 # Production deployments
 
+## Source field review migration — 22 September 2026
+
+Applied `supabase/migrations/007_source_field_reviews.sql` to the existing
+TurnRight production database through its authenticated SQL editor. Preflight
+confirmed the source-review prerequisites and that neither new object existed.
+The migration ran in one transaction with lock and statement timeouts; the
+PostgREST schema cache was notified after creation.
+
+All seven live verification checks passed: row-level security is enabled on
+`source_field_reviews`; anonymous reads and authenticated-browser writes are
+denied; the server can write audit records; anonymous and authenticated-browser
+execution of `review_map_fields` is denied; and the server can execute it.
+This enables partial source-field approval without changing or publishing map
+records itself.
+
 ## Editor publication repair — 14 September 2026
 
 The owner reported that editor previews could not be published. The authenticated

@@ -4,6 +4,9 @@ Campus enrichment adds migration `007_source_field_reviews.sql`. Apply it before
 using “Accept selected details” in the owner editor. Daily source checks now use
 the bounded enrichment pipeline and retain a review artifact; they still cannot
 publish a map. See [enrichment setup and source licenses](ENRICHMENT.md).
+Migration 007 was applied and verified on the existing TurnRight production
+database on 22 September 2026; do not rerun it there. See the
+[production record](PRODUCTION.md).
 
 See [the configuration record](CONFIGURATION.md) for the current projects and completed steps. The public map runs locally without Supabase; editor login, submitted reports, daily source checks, and release publication need the setup below. Never put service keys in `VITE_*` variables or commit `.env` files.
 
