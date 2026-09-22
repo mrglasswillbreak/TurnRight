@@ -2,6 +2,8 @@ import { distance, projectSegment } from './geo';
 import type {
   CampusData,
   ConnectionTarget,
+  Category,
+  PlaceDetails,
   GpsFix,
   MapEdit,
   Position,
@@ -38,11 +40,15 @@ export interface SurveyVertex {
   connection?: ConnectionTarget;
 }
 export interface SurveyLine {
+  name?: string;
   id: string;
   vertices: SurveyVertex[];
   reviewed: boolean;
 }
-export interface SurveyMarker {
+export interface SurveyMarker extends PlaceDetails {
+  kind?: 'entrance' | 'place';
+  category?: Category;
+  observedAt?: string;
   id: string;
   sampleId: string;
   segmentId?: string;
@@ -515,7 +521,7 @@ export function surveyCorrections(
   if (session.pendingMarker)
     throw new Error('Confirm or cancel the entrance position before applying.');
   if (
-    !session.review.length ||
+    (!session.review.length && !session.markers.length) ||
     session.review.some((l) => !l.reviewed || l.vertices.length < 2)
   )
     throw new Error('Review every section before applying.');
@@ -537,7 +543,19 @@ export function surveyCorrections(
       coordinates: l.vertices.map((v) => v.coordinates),
     },
     properties: {
-      name: session.name,
+      name: l.name || '',
+      evidence: l.name
+        ? {
+            name: [
+              {
+                sourceId: 'campus-survey',
+                recordId: `survey-feature:${l.id}`,
+                checkedAt: session.updatedAt,
+                observedAt: session.createdAt,
+              },
+            ],
+          }
+        : undefined,
       access: 'yes',
       footDirection: 'both',
       ...connectionSettings(`survey:${session.id}:${l.id}`),
@@ -632,6 +650,53 @@ export function surveyCorrections(
     ];
   }
   const entrances: MapEdit[] = session.markers.map((m) => {
+    if (m.kind === 'place') {
+      if (!m.name.trim())
+        throw new Error('Record a name for each surveyed place.');
+      const metadata = Object.fromEntries(
+        [
+          'subtype',
+          'address',
+          'phone',
+          'website',
+          'openingHours',
+          'businessStatus',
+        ]
+          .filter((key) => m[key as keyof SurveyMarker] !== undefined)
+          .map((key) => [key, m[key as keyof SurveyMarker]]),
+      );
+      return {
+        id: `survey:${session.id}:${m.id}`,
+        kind: 'place',
+        geometry: { type: 'Point', coordinates: m.coordinates },
+        properties: {
+          name: m.name,
+          category: m.category || 'other',
+          ...metadata,
+          buildingId: m.buildingId,
+          evidence: Object.fromEntries(
+            ['name', 'coordinates', 'category', ...Object.keys(metadata)].map(
+              (key) => [
+                key,
+                [
+                  {
+                    sourceId: 'campus-survey',
+                    recordId: `survey-feature:${m.id}`,
+                    checkedAt: m.observedAt || session.createdAt,
+                    observedAt: m.observedAt || session.createdAt,
+                    accuracyMetres: m.accuracy,
+                  },
+                ],
+              ],
+            ),
+          ),
+          surveyEvidence: {
+            surveyId: session.id,
+            revisionId: session.remoteRevision,
+          },
+        },
+      };
+    }
     if (!m.placeId) throw new Error('Choose a place for every entrance.');
     const vertex = session.review
       .flatMap((l) => l.vertices)

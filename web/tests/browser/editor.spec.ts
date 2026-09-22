@@ -295,7 +295,7 @@ test('motion assistance survey denial retry, stable entrance crosshair and pause
     .toBe(0);
   await page.getByText('Compass & motion controls', { exact: true }).click();
   await page
-    .getByRole('button', { name: 'Mark entrance here', exact: true })
+    .getByRole('button', { name: 'Mark place or entrance', exact: true })
     .click();
   await expect(page.getByLabel('Entrance name', { exact: true })).toBeVisible();
   await expect
@@ -503,6 +503,49 @@ test('phone survey records, reviews, connects, applies and recovers without coor
     }),
   ).toBeVisible();
 });
+test('phone survey records a business without inventing a routing connection', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await surveyGps(page);
+  const server = await setup(page);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Record new path', exact: true })
+    .click();
+  await pushSurveyFix(page, [3.20015, 6.46]);
+  await page
+    .getByRole('button', { name: 'Mark place or entrance', exact: true })
+    .click();
+  await page.getByLabel('Observation type').selectOption('place');
+  await page.getByLabel('Place name', { exact: true }).fill('Campus Canteen');
+  await page.getByLabel('Survey place category').selectOption('food');
+  await page.getByLabel('Survey subtype').fill('canteen');
+  await page.getByLabel('Survey openingHours').fill('Mo-Fr 08:00-17:00');
+  await page
+    .getByRole('button', { name: 'Confirm place observation', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Finish', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Apply to map draft', exact: true })
+    .click();
+  await expect
+    .poll(() => server.edits().filter((e) => e.kind === 'place'))
+    .toHaveLength(1);
+  const place = server.edits().find((e) => e.kind === 'place')!;
+  expect(place.properties).toMatchObject({
+    name: 'Campus Canteen',
+    category: 'food',
+    subtype: 'canteen',
+    openingHours: 'Mo-Fr 08:00-17:00',
+  });
+  expect(place.properties.connection).toBeUndefined();
+  expect(place.properties.evidence).toBeDefined();
+  expect(
+    server.edits().some((e) => e.kind === 'path' || e.kind === 'entrance'),
+  ).toBe(false);
+});
+
 test('phone survey marks two entrances, connects both approaches and tests their route', async ({
   page,
 }) => {
@@ -523,11 +566,14 @@ test('phone survey marks two entrances, connects both approaches and tests their
       await page.clock.setFixedTime(clock);
       await pushSurveyFix(page, [x, 6.46 + step * 0.000025]);
       await expect(
-        page.getByRole('button', { name: 'Mark entrance here', exact: true }),
+        page.getByRole('button', {
+          name: 'Mark place or entrance',
+          exact: true,
+        }),
       ).toBeEnabled();
     }
     await page
-      .getByRole('button', { name: 'Mark entrance here', exact: true })
+      .getByRole('button', { name: 'Mark place or entrance', exact: true })
       .click();
     await page
       .getByLabel('Entrance name', { exact: true })
@@ -4497,4 +4543,78 @@ test('documentation capture: editor appearance, roof and settings', async ({
   await page.screenshot({
     path: testInfo.outputPath('public-campus-dark.png'),
   });
+});
+
+test('driving road approval persists separately from walking access', async ({
+  page,
+}) => {
+  const server = await setup(page, false, false, {
+    initialEdits: [
+      {
+        id: 'driving-review-road',
+        kind: 'path',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [3.2005, 6.4598],
+            [3.2005, 6.46015],
+          ],
+        },
+        properties: {
+          name: 'Driving review road',
+          access: 'campus',
+          vertexIds: ['drive:start', 'drive:end'],
+        },
+      },
+    ],
+  });
+  const select = async () => {
+    await focusCampus(page);
+    const point = await position(page, [3.2005, 6.4601]);
+    await page.mouse.click(point.x, point.y);
+    await expect(
+      page.getByRole('combobox', { name: 'Vehicle access', exact: true }),
+    ).toBeVisible();
+  };
+  await select();
+  await expect(
+    page.getByRole('combobox', { name: 'Vehicle access', exact: true }),
+  ).toHaveValue('unknown');
+  await page
+    .getByRole('combobox', { name: 'Vehicle access', exact: true })
+    .selectOption('reviewed');
+  await page.getByLabel('Permitted vehicle audience').fill('Campus visitors');
+  await page.getByLabel('Driving approval date').fill('2026-09-22');
+  await page
+    .getByLabel('Driving approval evidence and restrictions')
+    .fill('Owner inspected this road; visitors permitted.');
+  await page
+    .getByRole('combobox', { name: 'Vehicle direction', exact: true })
+    .selectOption('reverse');
+  await page.getByLabel('Recorded speed (km/h)').fill('15');
+  await expect
+    .poll(
+      () =>
+        (
+          server.edits().find((e) => e.id === 'driving-review-road')?.properties
+            .vehicle as { speedKph?: number }
+        )?.speedKph,
+    )
+    .toBe(15);
+  expect(
+    server.edits().find((e) => e.id === 'driving-review-road')?.properties
+      .access,
+  ).toBe('campus');
+  await page.reload();
+  await attachMap(page);
+  await select();
+  await expect(
+    page.getByRole('combobox', { name: 'Vehicle access', exact: true }),
+  ).toHaveValue('reviewed');
+  await expect(
+    page.getByRole('combobox', { name: 'Vehicle direction', exact: true }),
+  ).toHaveValue('reverse');
+  await expect(page.getByLabel('Permitted vehicle audience')).toHaveValue(
+    'Campus visitors',
+  );
 });
