@@ -13,7 +13,7 @@ interface MediaRow {
   original_path: string;
   derivative_path?: string;
   public_metadata?: CampusPhoto;
-  draft_metadata?: Partial<CampusPhoto>;
+  draft_metadata?: Partial<CampusPhoto> & { replacesPhotoId?: string };
   draft_revision?: number;
   original_filename?: string;
   original_mime?: string;
@@ -79,18 +79,17 @@ export async function mediaAction(
     );
     return {
       items: await Promise.all(
-        rows
-          .slice(0, 20)
-          .map(async (row) => ({
-            id: row.id,
-            status: row.status,
-            filename: row.original_filename,
-            metadata: row.public_metadata,
-            draft: row.draft_metadata,
-            revision: row.draft_revision || 0,
-            authorshipConfirmed: row.authorship_confirmed,
-            previewUrl: await preview(row).catch(() => undefined),
-          })),
+        rows.slice(0, 20).map(async (row) => ({
+          id: row.id,
+          status: row.status,
+          filename: row.original_filename,
+          metadata: row.public_metadata,
+          draft: row.draft_metadata,
+          revision: row.draft_revision || 0,
+          authorshipConfirmed: row.authorship_confirmed,
+          replacesPhotoId: row.draft_metadata?.replacesPhotoId,
+          previewUrl: await preview(row).catch(() => undefined),
+        })),
       ),
       nextOffset: rows.length > 20 ? offset + 20 : null,
     };
@@ -161,7 +160,12 @@ export async function mediaAction(
       `building_media?id=eq.${row.id}&owner=eq.${owner}&draft_revision=eq.${revision}&status=neq.approved`,
       'PATCH',
       {
-        draft_metadata: photoDetails(payload.metadata),
+        draft_metadata: {
+          ...photoDetails(payload.metadata),
+          ...(row.draft_metadata?.replacesPhotoId
+            ? { replacesPhotoId: row.draft_metadata.replacesPhotoId }
+            : {}),
+        },
         draft_revision: revision + 1,
         updated_at: new Date().toISOString(),
       },
@@ -210,7 +214,10 @@ export async function mediaAction(
       original_path: row.original_path,
       derivative_path: row.derivative_path,
       public_metadata: { ...row.public_metadata, id: `owner:${id}` },
-      draft_metadata: photoDetails(row.public_metadata),
+      draft_metadata: {
+        ...photoDetails(row.public_metadata),
+        replacesPhotoId: row.public_metadata?.id,
+      },
       original_filename: row.original_filename,
       authorship_confirmed: row.authorship_confirmed || false,
     });
@@ -280,6 +287,7 @@ export async function mediaAction(
       previewUrl: await preview(row),
       status: row.status,
       authorshipConfirmed: row.authorship_confirmed || false,
+      replacesPhotoId: row.draft_metadata?.replacesPhotoId,
     };
   }
   if (action === 'media-approve') {

@@ -190,6 +190,36 @@ describe('photo management', () => {
       'owner=eq.owner&draft_revision=eq.3&status=neq.approved',
     );
   });
+  it('retains the original photo association across private revision saves', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test');
+    const id = '11111111-1111-4111-8111-111111111111';
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            {
+              id,
+              status: 'processed',
+              draft_revision: 1,
+              draft_metadata: { replacesPhotoId: 'owner:original' },
+            },
+          ]),
+        ),
+      )
+      .mockResolvedValueOnce(new Response('[{}]'));
+    vi.stubGlobal('fetch', fetcher);
+    await mediaAction('owner', 'media-draft', {
+      id,
+      revision: 1,
+      metadata: { caption: 'Revised', replacesPhotoId: 'forged' },
+    });
+    expect(JSON.parse(fetcher.mock.calls[1][1].body).draft_metadata).toEqual({
+      caption: 'Revised',
+      replacesPhotoId: 'owner:original',
+    });
+  });
   it('requires authorship confirmation before approving an author upload', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test');

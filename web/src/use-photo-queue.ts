@@ -34,6 +34,7 @@ export interface PrivatePhoto {
   revision: number;
   previewUrl?: string;
   authorshipConfirmed?: boolean;
+  replacesPhotoId?: string;
 }
 export function usePhotoQueue(owner: string, target: string) {
   const storageKey = `turnright:photo-drafts:${owner}:${target}`;
@@ -182,7 +183,8 @@ export function usePhotoQueue(owner: string, target: string) {
                     ...photoDetails(j.metadata),
                   },
                   previewUrl: result.previewUrl,
-                  revision: result.revision,
+                  // Processing never advances draft revisions. Retain our last
+                  // acknowledged revision so another session still causes a conflict.
                   state: 'needs details',
                   error: undefined,
                 }
