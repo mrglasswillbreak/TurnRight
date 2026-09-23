@@ -189,13 +189,9 @@
     "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
   },
   "File:Lagos State University Babajide Olusola Sanwo-Olu Library Complex aug 2026 IMG 6003.png": {
-    "status": "included",
-    "buildingId": "arcgis:University_Property:3",
-    "caption": "International Library across the gardens, August 2026",
-    "alt": "Library facade seen beyond planted gardens and a paved path",
-    "historical": false,
+    "status": "rejected",
     "qualityReviewedAt": "2026-09-23",
-    "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
+    "reason": "Withdrawn after full original metadata review: DigitalSourceType is trainedAlgorithmicMedia and Credit is Made with Google AI. A licensed synthetic image is not photographic building evidence. Original metadata receipt is retained in research/source-metadata-audit.json."
   },
   "File:MEMBERS OF THE CLUB PAYING RAPT ATTENTION.jpg": {
     "status": "rejected",

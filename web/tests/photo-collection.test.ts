@@ -6,10 +6,57 @@ import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validPhoto } from '../src/arrival';
 import type { CampusPhoto } from '../src/types';
+import {
+  requirePhotographicSource,
+  syntheticPhotoEvidence,
+} from '../../scripts/photo-source.mjs';
 const root = path.resolve(import.meta.dirname, '../../data/photos');
 const hash = (bytes: Buffer | string) =>
   createHash('sha256').update(bytes).digest('hex');
 describe('reviewed campus photograph collection', () => {
+  it('excludes synthetic source images and requires a current original metadata audit', async () => {
+    const audit = JSON.parse(
+      await readFile(
+        path.join(root, 'research/source-metadata-audit.json'),
+        'utf8',
+      ),
+    );
+    const catalogue: CampusPhoto[] = JSON.parse(
+      await readFile(path.join(root, 'catalogue.json'), 'utf8'),
+    );
+    for (const receipt of audit.receipts)
+      expect(hash(receipt.body)).toBe(receipt.sha256);
+    for (const photo of catalogue) {
+      const source = audit.pages.find(
+        (p) => `commons:${p.pageid}` === photo.id,
+      );
+      expect(source).toBeDefined();
+      expect(() => requirePhotographicSource(source, source)).not.toThrow();
+    }
+    const synthetic = audit.pages.find((p) => p.pageid === 199191750);
+    expect(syntheticPhotoEvidence(synthetic.imageinfo[0])).toBe(true);
+    expect(() => requirePhotographicSource(synthetic, synthetic)).toThrow(
+      /Synthetic/,
+    );
+    expect(catalogue.some((p) => p.id === 'commons:199191750')).toBe(false);
+    expect(() => requirePhotographicSource(synthetic, undefined)).toThrow(
+      /missing or stale/,
+    );
+    const altered = { imageinfo: [{ sha1: 'changed', commonmetadata: [] }] };
+    expect(() => requirePhotographicSource(synthetic, altered)).toThrow(
+      /missing or stale/,
+    );
+    expect(
+      syntheticPhotoEvidence({
+        commonmetadata: [
+          {
+            name: 'DigitalSourceType',
+            value: 'compositeWithTrainedAlgorithmicMedia',
+          },
+        ],
+      }),
+    ).toBe(true);
+  });
   it('accounts for every selected snapshot candidate and all published buildings', async () => {
     const commons = JSON.parse(
       await readFile(

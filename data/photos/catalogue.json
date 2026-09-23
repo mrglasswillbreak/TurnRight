@@ -280,26 +280,6 @@
     "url": "/packages/photos/ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba.webp"
   },
   {
-    "id": "commons:199191750",
-    "buildingId": "arcgis:University_Property:3",
-    "caption": "International Library across the gardens, August 2026",
-    "alt": "Library facade seen beyond planted gardens and a paved path",
-    "author": "FrankvEck",
-    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_6003.png",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "attribution": "FrankvEck · Lagos State University Babajide Olusola Sanwo-Olu Library Complex aug 2026 IMG 6003.png · CC BY-SA 4.0",
-    "modifications": "Oriented, resized and converted to WebP; EXIF, location and other embedded metadata removed. No scene content added.",
-    "capturedAt": "2026-09-09",
-    "checkedAt": "2026-09-23T00:25:24.415Z",
-    "historical": false,
-    "width": 1195,
-    "height": 896,
-    "bytes": 249930,
-    "sha256": "576f58b3c06abd38201adf0acc0d1c28b4c5e5700872e1333da23c6c243c17a2",
-    "url": "/packages/photos/576f58b3c06abd38201adf0acc0d1c28b4c5e5700872e1333da23c6c243c17a2.webp"
-  },
-  {
     "id": "commons:112834607",
     "buildingId": "arcgis:University_Property:54",
     "caption": "Faculty of Education complex",

@@ -9,8 +9,8 @@
   "after": {
     "buildings": 420,
     "photographedBuildings": 13,
-    "photos": 22,
-    "bytes": 4468572
+    "photos": 21,
+    "bytes": 4218642
   },
   "buildings": [
     {
@@ -4054,7 +4054,6 @@
         }
       ],
       "photoIds": [
-        "commons:199191750",
         "commons:198256515",
         "commons:198256532"
       ],
@@ -11710,18 +11709,8 @@
       "checkedAt": "2026-09-23T00:25:24.415Z",
       "capturedAt": "2026-09-09",
       "description": "Lagos State University, Babajide Olusola Sanwo-Olu Library Complex, Aug. 2026",
-      "status": "included",
-      "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred.",
-      "buildingId": "arcgis:University_Property:3",
-      "derivativeSha256": "576f58b3c06abd38201adf0acc0d1c28b4c5e5700872e1333da23c6c243c17a2",
-      "processingInput": {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_6003.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
-        "kind": "Commons thumbnail",
-        "sha256": "fb37e18c91acb16bedf2b28e92d0ae2a17de0de06ca7887c99906a649c95d6cd",
-        "bytes": 2003232
-      },
-      "bytes": 249930,
-      "qualityReviewedAt": "2026-09-23"
+      "status": "rejected",
+      "reason": "Withdrawn after full original metadata review: DigitalSourceType is trainedAlgorithmicMedia and Credit is Made with Google AI. A licensed synthetic image is not photographic building evidence. Original metadata receipt is retained in research/source-metadata-audit.json."
     },
     {
       "id": "commons:162102648",

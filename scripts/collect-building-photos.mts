@@ -5,6 +5,7 @@ import { gzipSync } from "node:zlib";
 import { photoDerivative } from "../web/server/photo-processing";
 import { validPhoto } from "../web/src/arrival";
 import type { CampusPhoto } from "../web/src/types";
+import { requirePhotographicSource } from "./photo-source.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const raw = path.join(root, "data/raw/photo-research");
@@ -12,6 +13,7 @@ const destination = path.join(root, "data/photos");
 await fs.mkdir(path.join(destination, "research"), { recursive: true });
 const inventory = JSON.parse(await fs.readFile(path.join(raw, "inventory.json"), "utf8"));
 const decisions = JSON.parse(await fs.readFile(path.join(destination, "decisions.json"), "utf8"));
+const sourceAudit = JSON.parse(await fs.readFile(path.join(destination, "research/source-metadata-audit.json"), "utf8"));
 const references = JSON.parse(
   await fs.readFile(path.join(root, "data/raw/building-references/index.json"), "utf8"),
 );
@@ -60,6 +62,7 @@ for (const page of inventory.pages) {
     ...credit,
   };
   if (decision?.status === "included") {
+    requirePhotographicSource(page, sourceAudit.pages.find((p: { pageid: number }) => p.pageid === page.pageid));
     if (
       !info?.url ||
       !credit.author ||

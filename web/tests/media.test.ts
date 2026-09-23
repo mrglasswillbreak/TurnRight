@@ -134,5 +134,33 @@ describe('private building photograph processing', () => {
       buildingIdAliases: { former: 'building' },
     };
     expect(await packagePhotos(merged, root, async () => {})).toBeUndefined();
+    await mkdir(path.join(root, 'data/photos/research'), { recursive: true });
+    await writeFile(
+      path.join(root, 'data/photos/research/source-metadata-audit.json'),
+      JSON.stringify({
+        pages: [
+          {
+            pageid: 42,
+            imageinfo: [
+              {
+                commonmetadata: [
+                  {
+                    name: 'DigitalSourceType',
+                    value: 'trainedAlgorithmicMedia',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    const withdrawn = { ...removed, photos: [{ ...p, id: 'commons:42' }] };
+    expect(
+      await packagePhotos(withdrawn, root, async () => {
+        throw Error('Withdrawn asset must not be emitted');
+      }),
+    ).toBeUndefined();
+    expect(withdrawn.photos).toBeUndefined();
   });
 });
