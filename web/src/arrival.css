@@ -90,6 +90,10 @@
   background: #745b18;
   border-style: dashed;
 }
+.entrance-marker.mapped-approach {
+  background: #855300;
+  border-radius: 8px;
+}
 .photo-gallery button:focus-visible,
 .photo-gallery a:focus-visible,
 .entrance-marker:focus-visible,

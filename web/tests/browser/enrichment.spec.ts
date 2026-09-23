@@ -44,26 +44,24 @@ async function prepare(page: Page) {
     },
   });
   const bytes = JSON.stringify(data);
-  await page
-    .context()
-    .route('**/packages/latest.json', (route) =>
-      route.fulfill({
-        json: {
-          schemaVersion: 1,
-          version: data.version,
-          createdAt: data.createdAt,
-          dataUrl: '/packages/fixture/campus.json',
-          bytes: Buffer.byteLength(bytes),
-          assets: [
-            {
-              url: '/packages/fixture/campus.json',
-              bytes: Buffer.byteLength(bytes),
-              sha256: createHash('sha256').update(bytes).digest('hex'),
-            },
-          ],
-        },
-      }),
-    );
+  await page.context().route('**/packages/latest.json', (route) =>
+    route.fulfill({
+      json: {
+        schemaVersion: 1,
+        version: data.version,
+        createdAt: data.createdAt,
+        dataUrl: '/packages/fixture/campus.json',
+        bytes: Buffer.byteLength(bytes),
+        assets: [
+          {
+            url: '/packages/fixture/campus.json',
+            bytes: Buffer.byteLength(bytes),
+            sha256: createHash('sha256').update(bytes).digest('hex'),
+          },
+        ],
+      },
+    }),
+  );
   await page
     .context()
     .route('**/packages/fixture/campus.json', (route) =>
@@ -109,7 +107,9 @@ for (const width of [1440, 390])
 test('prepared offline enrichment retains business details on reload', async ({
   page,
   context,
+  baseURL,
 }) => {
+  test.skip(!baseURL?.includes('5184'), 'Production service worker test');
   await prepare(page);
   await page.goto('/?place=cafe');
   await expect(

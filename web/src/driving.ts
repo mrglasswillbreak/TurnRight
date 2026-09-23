@@ -245,7 +245,9 @@ export function findDrivingJourneys(
   candidates.sort((a, b) => a.seconds - b.seconds || a.id.localeCompare(b.id));
   if (!candidates.length)
     throw new RoutingError(
-      'No complete drive-and-walk journey is mapped. Roads, gates, parking and walking connections need separate owner review.',
+      typeof destination !== 'string' && destination.entranceId
+        ? 'No complete journey to the selected entrance is available. Review its connection or choose another entrance.'
+        : 'No complete drive-and-walk journey is mapped. Roads, gates, parking and walking connections need separate owner review.',
     );
   const result: Route[] = [];
   for (const candidate of candidates) {

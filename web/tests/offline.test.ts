@@ -52,6 +52,93 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe('offline package transactions', () => {
+  it('retains the active map until every photo is verified, repairs corrupt photos and supports rollback', async () => {
+    const old = await pkg('before-photos'),
+      next = await pkg('with-photos');
+    const photoBytes = new TextEncoder().encode('verified photograph bytes');
+    const digest = await hashBytes(photoBytes.buffer);
+    const photo = {
+      url: `/packages/photos/${digest}.webp`,
+      bytes: photoBytes.length,
+      sha256: digest,
+    };
+    const data = {
+      ...campusFixture(),
+      version: 'with-photos',
+      schemaVersion: 1,
+      photos: [
+        {
+          ...photo,
+          id: 'photo',
+          buildingId: 'building',
+          width: 40,
+          height: 30,
+          caption: 'Building exterior',
+          alt: 'Building with a pitched roof',
+          author: 'Photographer',
+          sourceUrl: 'https://example.org/photo',
+          license: 'CC BY-SA 4.0' as const,
+          licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+          attribution: 'Photographer',
+          modifications: 'Converted to WebP',
+          checkedAt: '2026-09-23',
+        },
+      ],
+    };
+    data.map.features.push({
+      ...data.boundary,
+      properties: { id: 'building', kind: 'building' },
+    });
+    next.bytes = new TextEncoder().encode(JSON.stringify(data));
+    next.manifest.assets[0] = {
+      ...next.manifest.assets[0],
+      bytes: next.bytes.length,
+      sha256: await hashBytes(next.bytes.buffer),
+    };
+    next.manifest.assets.push(photo);
+    next.manifest.photos = { bytes: photo.bytes, assetUrls: [photo.url] };
+    next.manifest.bytes = next.bytes.length + photo.bytes;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(old.bytes)),
+    );
+    await installPackage(old.manifest, () => {});
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url === photo.url
+          ? new Response('interrupted', { status: 503 })
+          : new Response(next.bytes),
+      ),
+    );
+    await expect(installPackage(next.manifest, () => {})).rejects.toThrow(
+      'interrupted',
+    );
+    expect((await getActivePackage())?.manifest.version).toBe('before-photos');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(photoBytes)),
+    );
+    await installPackage(next.manifest, () => {}, undefined, false);
+    saved.set(photo.url, new Response('corrupt'));
+    expect(await activatePending()).toBe(false);
+    expect((await getActivePackage())?.manifest.version).toBe('before-photos');
+    await installPackage(next.manifest, () => {});
+    expect((await getActivePackage())?.complete).toBe(true);
+    saved.set(photo.url, new Response('corrupt'));
+    expect((await getActivePackage())?.complete).toBe(false);
+    await installPackage(next.manifest, () => {});
+    expect((await getActivePackage())?.complete).toBe(true);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw Error('offline');
+      }),
+    );
+    await installPackage(old.manifest, () => {});
+    expect((await getActivePackage())?.manifest.version).toBe('before-photos');
+    expect(await cache.match(photo.url)).toBeDefined();
+  });
   it('installs driving packages offline and rejects schema mismatches without replacing them', async () => {
     const p = await pkg('driving');
     const data = {

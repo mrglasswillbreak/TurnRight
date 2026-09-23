@@ -39,6 +39,38 @@ function drivingFixture() {
   return data;
 }
 describe('offline driving journeys', () => {
+  it('keeps the chosen entrance on the walking leg, alternatives and parking reroutes', () => {
+    const data = drivingFixture();
+    data.entrances = ['c', 'd'].map((node) => ({
+      id: `door-${node}`,
+      placeId: 'library',
+      name: node,
+      graphNode: node,
+      coordinates: data.graph.nodes.find((n) => n.id === node)!.coordinates,
+      walkingAccess: 'yes',
+      source: 'review',
+    }));
+    const endpoint = { placeId: 'library', entranceId: 'door-d' };
+    const routes = findDrivingJourneys(data, 'a', endpoint, 'parking');
+    expect(
+      routes.every(
+        (r) =>
+          r.destinationEntranceId === 'door-d' &&
+          r.legs![1].destinationEntranceId === 'door-d',
+      ),
+    ).toBe(true);
+    expect(
+      findDrivingJourneys(data, 'b', endpoint, 'parking')[0]
+        .destinationEntranceId,
+    ).toBe('door-d');
+    expect(findRoutes(data, 'b', endpoint)[0].destinationEntranceId).toBe(
+      'door-d',
+    );
+    data.entrances[1].walkingAccess = 'no';
+    expect(() => findDrivingJourneys(data, 'a', endpoint, 'parking')).toThrow(
+      /entrance/,
+    );
+  });
   it('confirms an already-reached parking point without inventing a driving segment', () => {
     const route = findDrivingJourneys(drivingFixture(), 'b', 'c')[0].legs![0];
     expect(route.distance).toBe(0);

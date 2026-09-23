@@ -1080,6 +1080,25 @@ export function MapView({
         .setPopup(new maplibregl.Popup({ offset: 18 }).setText(label))
         .addTo(map);
     });
+    const place = data.places.find((p) => p.id === selectedId);
+    const approach =
+      place?.arrivalKind === 'mapped-approach' &&
+      data.graph.nodes.find((node) => node.id === place.graphNode);
+    if (approach) {
+      const element = document.createElement('button');
+      element.type = 'button';
+      element.className = 'entrance-marker mapped-approach';
+      element.textContent = '◇';
+      const label = `Mapped approach to ${place.name}; final entrance not verified`;
+      element.setAttribute('aria-label', label);
+      element.title = label;
+      markers.push(
+        new maplibregl.Marker({ element })
+          .setLngLat(approach.coordinates)
+          .setPopup(new maplibregl.Popup({ offset: 18 }).setText(label))
+          .addTo(map),
+      );
+    }
     return () => markers.forEach((marker) => marker.remove());
   }, [data, selectedId, editor]);
   useEffect(() => {

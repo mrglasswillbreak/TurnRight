@@ -87,6 +87,9 @@ describe('recorded arrivals and photographs', () => {
     ).toBe('door-c');
     d.entrances![1].walkingAccess = 'private';
     expect(() => findRoutes(d, 'a', endpoint)).toThrow(/selected entrance/);
+    d.entrances![1].walkingAccess = 'yes';
+    d.graph.edges = d.graph.edges.filter((edge) => edge.to !== 'c');
+    expect(() => findRoutes(d, 'a', endpoint)).toThrow(/selected entrance/);
     expect(() =>
       findRoutes(d, 'a', { ...endpoint, entranceId: 'missing' }),
     ).toThrow(/selected entrance/);

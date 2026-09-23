@@ -39,7 +39,13 @@ export function entranceConnected(data: CampusData, entrance: Entrance) {
   return (
     !!entrance.graphNode &&
     ['yes', 'campus'].includes(entrance.walkingAccess) &&
-    data.graph.nodes.some((n) => n.id === entrance.graphNode)
+    data.graph.nodes.some((n) => n.id === entrance.graphNode) &&
+    data.graph.edges.some(
+      (edge) =>
+        edge.to === entrance.graphNode &&
+        edge.accessible &&
+        !edge.geometryBlocked,
+    )
   );
 }
 export function buildingPhotos(

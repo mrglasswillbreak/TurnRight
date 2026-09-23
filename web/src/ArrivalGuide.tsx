@@ -193,7 +193,11 @@ export function EntranceSelector({
   return (
     <label className="field-label entrance-selector">
       Destination entrance
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
+      <select
+        aria-label="Destination entrance"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
         <option value="">Best mapped entrance</option>
         {missing && (
           <option value={value} disabled>
