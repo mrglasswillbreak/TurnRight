@@ -1,6 +1,9 @@
 import { DrivingEditor } from './DrivingEditor';
 import { ArrivalEditor } from './ArrivalEditor';
-import { PhotoManager } from './PhotoManager';
+import { lazy, Suspense } from 'react';
+const PhotoManager = lazy(() =>
+  import('./PhotoManager').then((m) => ({ default: m.PhotoManager })),
+);
 import type { PhotoChange } from './photo-workspace';
 import type { CampusPhoto } from './types';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -347,15 +350,17 @@ export function EditorInspector({
           data={data}
           onProperty={onProperty}
         />
-        <PhotoManager
-          edit={edit}
-          data={data}
-          owner={photoOwner}
-          onApply={onPhotos}
-          onUndo={onPhotoUndo}
-          saveStatus={photoSaveStatus}
-          publishedPhotos={publishedPhotos}
-        />
+        <Suspense fallback={<p>Loading photo tools…</p>}>
+          <PhotoManager
+            edit={edit}
+            data={data}
+            owner={photoOwner}
+            onApply={onPhotos}
+            onUndo={onPhotoUndo}
+            saveStatus={photoSaveStatus}
+            publishedPhotos={publishedPhotos}
+          />
+        </Suspense>
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">
             Walking access

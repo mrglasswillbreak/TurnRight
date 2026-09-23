@@ -6,6 +6,14 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   publicDir: false,
+  define: {
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(
+      'https://editor-test.supabase.co',
+    ),
+    'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(
+      'test-only-public-key',
+    ),
+  },
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   css: { postcss: { plugins: [tailwindcss()] } },
   build: {

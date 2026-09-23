@@ -1,4 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { campusPhotoIndex } from './campus-photo-index';
 import {
   Dialog,
   DialogContent,
@@ -6,13 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  buildingPhotos,
-  canonicalBuildingId,
-  placeBuildingId,
-  photoLicenses,
-  validPhoto,
-} from './arrival';
+import { canonicalBuildingId, photoLicenses, validPhoto } from './arrival';
 import { PhotoGallery } from './ArrivalGuide';
 import {
   licenseLinks,
@@ -20,59 +23,117 @@ import {
   photoDetails,
   samePhotoRights,
 } from './photo-details';
-import { usePhotoQueue, type PrivatePhoto } from './use-photo-queue';
+import {
+  usePhotoQueue,
+  usePhotoStore,
+  type PrivatePhoto,
+} from './use-photo-queue';
 import { api } from './supabase';
 import type { CampusData, CampusPhoto, MapEdit } from './types';
 import type { PhotoChange } from './photo-workspace';
 import './photo-manager.css';
 
+// Stable event handlers read the current render without invalidating unrelated cards.
+function useLiveCallback<T extends (...args: never[]) => unknown>(
+  callback: T,
+): T {
+  const latest = useRef(callback);
+  latest.current = callback;
+  return useCallback(((...args) => latest.current(...args)) as T, []);
+}
+
 function PhotoImage({
   photo,
   onUrl,
   className,
+  previewOnly = false,
 }: {
   photo: Partial<CampusPhoto>;
   onUrl?: (url: string) => void;
   className?: string;
+  previewOnly?: boolean;
 }) {
+  const store = usePhotoStore();
   const [url, setUrl] = useState(photo.url),
     [failed, setFailed] = useState(false);
-  const tried = useRef(false);
-  useEffect(() => {
-    // Switch from the local original to the processed derivative for quality review.
-    setUrl(photo.url);
-    setFailed(false);
-  }, [photo.url]);
-  const renew = async () => {
+  const tried = useRef(false),
+    generation = useRef(0),
+    onUrlRef = useRef(onUrl);
+  const placeholder = useRef<HTMLElement | null>(null);
+  const previewRequest = useRef<AbortController | null>(null);
+  onUrlRef.current = onUrl;
+  const renew = useCallback(async () => {
+    const request = generation.current;
     if (!photo.id?.startsWith('owner:')) {
       setFailed(true);
       return;
     }
     try {
-      const r = await api<{ previewUrl: string }>('media-preview', {
-        id: photo.id.slice(6),
-      });
-      setUrl(r.previewUrl);
-      onUrl?.(r.previewUrl);
+      const result = await store.previews.get(
+        photo.id.slice(6),
+        tried.current,
+        previewRequest.current?.signal,
+      );
+      if (request !== generation.current) return;
+      if (!result.previewUrl) throw Error('Preview unavailable');
+      setUrl(result.previewUrl);
+      onUrlRef.current?.(result.previewUrl);
       setFailed(false);
     } catch {
-      setFailed(true);
+      if (request === generation.current) setFailed(true);
     }
-  };
+  }, [photo.id, store]);
+  useEffect(() => {
+    const requestGeneration = generation;
+    requestGeneration.current++;
+    const controller = new AbortController();
+    previewRequest.current = controller;
+    setUrl(photo.url);
+    setFailed(false);
+    let observer: IntersectionObserver | undefined;
+    if (!photo.url && photo.id?.startsWith('owner:')) {
+      if (placeholder.current && typeof IntersectionObserver !== 'undefined') {
+        observer = new IntersectionObserver((entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            observer?.disconnect();
+            void renew();
+          }
+        });
+        observer.observe(placeholder.current);
+      } else void renew();
+    }
+    return () => {
+      observer?.disconnect();
+      controller.abort();
+      requestGeneration.current++;
+    };
+  }, [photo.id, photo.url, renew]);
+  useEffect(() => {
+    tried.current = false;
+  }, [photo.id]);
+  const Placeholder = previewOnly ? 'span' : 'button';
   return failed || (!url && !photo.url) ? (
-    <button
+    <Placeholder
+      ref={(node) => {
+        placeholder.current = node;
+      }}
       type="button"
       disabled={!photo.id?.startsWith('owner:')}
-      onClick={() => void renew()}
+      onClick={previewOnly ? undefined : () => void renew()}
     >
-      {failed ? 'Retry photograph' : 'Load private preview'}
-    </button>
+      {previewOnly
+        ? 'Photo'
+        : failed
+          ? 'Retry photograph'
+          : 'Load private preview'}
+    </Placeholder>
   ) : (
     <img
       className={className}
       src={url || photo.url}
       alt={photo.alt || photo.caption || 'Photograph preview'}
       loading="lazy"
+      decoding="async"
       onError={() => {
         if (tried.current) setFailed(true);
         else {
@@ -101,32 +162,40 @@ export function PhotoManager({
   saveStatus: string;
   publishedPhotos?: CampusPhoto[];
 }) {
-  const place = data.places.find((p) => p.id === edit.id);
+  const index = useMemo(() => campusPhotoIndex(data), [data]);
   const buildingId = canonicalBuildingId(
     data,
     edit.kind === 'building'
       ? edit.id
       : String(
           edit.properties.buildingId ||
-            (place && placeBuildingId(data, place)) ||
-            data.places.find((p) => p.id === edit.properties.placeId)
-              ?.buildingId ||
+            index.placeBuildings.get(edit.id) ||
+            index.placeBuildings.get(String(edit.properties.placeId)) ||
             '',
         ),
   );
   const entranceId = edit.kind === 'entrance' ? edit.id : undefined;
-  const gallery = buildingPhotos(data, buildingId, entranceId);
-  const buildings = data.map.features.filter(
-    (f) => f.properties?.kind === 'building',
+  const target = entranceId
+    ? `entrance:${entranceId}`
+    : `building:${buildingId}`;
+  const gallery = useMemo(
+    () => index.photos.get(target) || [],
+    [index, target],
   );
-  const name = (id?: string) =>
-    id
-      ? String(
-          buildings.find((f) => f.properties?.id === id)?.properties?.name ||
-            data.places.find((p) => placeBuildingId(data, p) === id)?.name ||
-            'Unnamed building',
-        )
-      : 'Building not selected';
+  const name = index.name;
+  const buildingOptions = useMemo(
+    () =>
+      index.options.map((b) => (
+        <option key={b.id} value={b.id}>
+          {b.label}
+        </option>
+      )),
+    [index],
+  );
+  const published = useMemo(
+    () => new Set(publishedPhotos.map((p) => JSON.stringify(p))),
+    [publishedPhotos],
+  );
   const targetName = entranceId
     ? `${name(buildingId)} · ${String(edit.properties.name || 'Entrance')}`
     : name(buildingId);
@@ -135,7 +204,7 @@ export function PhotoManager({
       'gallery',
     );
   const [selected, setSelected] = useState<string>(),
-    [busy, setBusy] = useState(false),
+    [busy, setBusy] = useState<string | false>(false),
     [message, setMessage] = useState(''),
     [error, setError] = useState('');
   const [removed, setRemoved] = useState(false),
@@ -146,14 +215,42 @@ export function PhotoManager({
     [fieldErrors, setFieldErrors] = useState<
       Partial<Record<keyof CampusPhoto, string>>
     >({});
+  const [galleryPage, setGalleryPage] = useState(0),
+    [queuePage, setQueuePage] = useState(0),
+    [libraryOffset, setLibraryOffset] = useState(0),
+    [loadingLibrary, setLoadingLibrary] = useState(false);
+  const libraryRequest = useRef<AbortController | null>(null);
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
-  const queue = usePhotoQueue(
-    owner,
-    `${entranceId ? 'entrance' : 'building'}:${entranceId || buildingId}`,
+  const store = usePhotoStore();
+  const queue = usePhotoQueue(owner, target);
+  const { patch, update, editable } = queue;
+  const queueKeys = queue.jobs.map((j) => j.key).join('|');
+  const queueOrder = useMemo(
+    () => (queueKeys ? queueKeys.split('|') : []),
+    [queueKeys],
   );
+  const [attaching, setAttaching] = useState<string[]>([]);
   const job = queue.jobs.find((j) => j.key === selected);
   const panel = useRef<HTMLDivElement>(null),
     mounted = useRef(true);
+  const galleryFocus = useRef<string | null>(null);
+  useEffect(() => {
+    if (!galleryFocus.current) return;
+    const card = [
+      ...(panel.current?.querySelectorAll<HTMLElement>('[data-photo-id]') ||
+        []),
+    ].find((el) => el.dataset.photoId === galleryFocus.current);
+    if (card) {
+      card.querySelector<HTMLButtonElement>('button')?.focus();
+      galleryFocus.current = null;
+    }
+  }, [gallery, galleryPage]);
+  useEffect(() => {
+    if (removed)
+      panel.current
+        ?.querySelector<HTMLButtonElement>('[data-photo-undo]')
+        ?.focus();
+  }, [removed]);
   useEffect(() => {
     if (tab === 'review' && !job && queue.jobs.length)
       setSelected(queue.jobs[0].key);
@@ -162,8 +259,48 @@ export function PhotoManager({
     mounted.current = true;
     return () => {
       mounted.current = false;
+      libraryRequest.current?.abort();
     };
   }, []);
+  useEffect(() => {
+    if (selected) {
+      const i = queueOrder.indexOf(selected);
+      if (i >= 0) setQueuePage(Math.floor(i / 20));
+    }
+  }, [selected, queueOrder]);
+  useEffect(() => {
+    setGalleryPage((p) =>
+      Math.min(p, Math.max(0, Math.ceil(gallery.length / 20) - 1)),
+    );
+  }, [gallery.length]);
+  useEffect(() => {
+    setQueuePage((p) =>
+      Math.min(p, Math.max(0, Math.ceil(queue.jobs.length / 20) - 1)),
+    );
+  }, [queue.jobs.length]);
+  useEffect(() => {
+    panel.current?.querySelector('.photo-workspace-body')?.scrollTo({ top: 0 });
+  }, [tab, selected]);
+  useEffect(() => {
+    if (!open || !visualViewport) return;
+    const resize = () => {
+      panel.current?.style.setProperty(
+        '--photo-viewport-height',
+        visualViewport!.height + 'px',
+      );
+      panel.current?.style.setProperty(
+        '--photo-viewport-top',
+        visualViewport!.offsetTop + 'px',
+      );
+    };
+    resize();
+    visualViewport.addEventListener('resize', resize);
+    visualViewport.addEventListener('scroll', resize);
+    return () => {
+      visualViewport?.removeEventListener('resize', resize);
+      visualViewport?.removeEventListener('scroll', resize);
+    };
+  }, [open]);
   const defaults = () => ({
     buildingId,
     entranceId,
@@ -203,7 +340,7 @@ export function PhotoManager({
       setTab('review');
       return;
     }
-    setBusy(true);
+    setBusy(photo.id);
     setError('');
     try {
       let mediaId: string | undefined,
@@ -211,9 +348,17 @@ export function PhotoManager({
         previewUrl = previewUrls[photo.id] || photo.url;
       if (photo.id.startsWith('owner:')) {
         mediaId = (
-          await api<{ id: string }>('media-revise', { id: photo.id.slice(6) })
+          await api<{ id: string }>(
+            'media-revise',
+            { id: photo.id.slice(6) },
+            { signal: store.signal },
+          )
         ).id;
-        const r = await api<PrivatePhoto>('media-process', { id: mediaId });
+        const r = await api<PrivatePhoto>(
+          'media-process',
+          { id: mediaId },
+          { signal: store.signal },
+        );
         metadata = { ...photo, ...r.metadata };
         previewUrl = r.previewUrl!;
       }
@@ -223,6 +368,7 @@ export function PhotoManager({
         ...items,
         {
           key,
+          target,
           filename: photo.caption,
           metadata,
           mediaId,
@@ -243,7 +389,7 @@ export function PhotoManager({
       setBusy(false);
     }
   };
-  const change = (key: keyof CampusPhoto, value: unknown) => {
+  const change = useLiveCallback((key: keyof CampusPhoto, value: unknown) => {
     if (!job || job.approved) return;
     const metadata = { ...job.metadata, [key]: value };
     if (key === 'buildingId') metadata.entranceId = undefined;
@@ -261,7 +407,9 @@ export function PhotoManager({
     queue.patch(job.key, {
       metadata,
       reviewed: false,
-      state: 'needs details',
+      state: ['queued', 'uploading', 'processing'].includes(job.state)
+        ? job.state
+        : 'needs details',
       rightsReviewed: samePhotoRights(metadata, job.metadata)
         ? job.rightsReviewed
         : !!job.original && samePhotoRights(metadata, job.original),
@@ -270,8 +418,8 @@ export function PhotoManager({
       error: undefined,
     });
     setFieldErrors({});
-  };
-  const markReady = () => {
+  });
+  const markReady = useLiveCallback(() => {
     if (!job) return;
     if (
       [
@@ -317,15 +465,16 @@ export function PhotoManager({
     }
     queue.patch(job.key, { state: 'ready' });
     setError('');
-    const next = queue.jobs.find(
-      (j) => j.key !== job.key && j.state === 'needs details',
-    );
+    const next = store
+      .snapshot(target)
+      .find((j) => j.key !== job.key && j.state === 'needs details');
     if (next) setSelected(next.key);
-  };
+  });
   const attach = async () => {
     const ready = queue.jobs.filter((j) => j.state === 'ready');
     if (!ready.length) return;
-    setBusy(true);
+    setBusy('attach');
+    setAttaching(ready.map((j) => j.key));
     setError('');
     const approved: CampusPhoto[] = [];
     try {
@@ -337,12 +486,16 @@ export function PhotoManager({
         const photo =
           item.approved ||
           (item.mediaId
-            ? await api<CampusPhoto>('media-approve', {
-                id: item.mediaId,
-                metadata: item.metadata,
-                reviewed: item.reviewed && item.rightsReviewed,
-                authorshipConfirmed: item.authorshipConfirmed,
-              })
+            ? await api<CampusPhoto>(
+                'media-approve',
+                {
+                  id: item.mediaId,
+                  metadata: item.metadata,
+                  reviewed: item.reviewed && item.rightsReviewed,
+                  authorshipConfirmed: item.authorshipConfirmed,
+                },
+                { signal: store.signal },
+              )
             : item.metadata);
         queue.patch(item.key, {
           approved: photo,
@@ -376,24 +529,30 @@ export function PhotoManager({
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setAttaching([]);
     }
   };
   const loadLibrary = async (offset = 0) => {
-    setBusy(true);
+    libraryRequest.current?.abort();
+    const request = new AbortController();
+    libraryRequest.current = request;
+    setLoadingLibrary(true);
+    setTab('private');
     setError('');
     try {
       const r = await api<{ items: PrivatePhoto[]; nextOffset: number | null }>(
         'media-library',
-        { offset, query },
+        { offset, query, previews: false },
+        { signal: request.signal },
       );
-      if (!mounted.current) return;
-      setLibrary((items) => (offset ? [...items, ...r.items] : r.items));
+      if (!mounted.current || request.signal.aborted) return;
+      setLibrary(r.items);
       setNextOffset(r.nextOffset);
-      setTab('private');
+      setLibraryOffset(offset);
     } catch (e) {
-      setError((e as Error).message);
+      if (!request.signal.aborted) setError((e as Error).message);
     } finally {
-      setBusy(false);
+      if (!request.signal.aborted) setLoadingLibrary(false);
     }
   };
   const recover = async (item: PrivatePhoto) => {
@@ -406,6 +565,7 @@ export function PhotoManager({
       ...items.filter((j) => j.mediaId !== item.id),
       {
         key,
+        target,
         filename: item.filename || item.metadata?.caption || 'Private photo',
         mediaId: item.id,
         revision: item.revision,
@@ -422,30 +582,296 @@ export function PhotoManager({
     setSelected(key);
     setTab('review');
   };
-  const field = (label: string, key: keyof CampusPhoto, type = 'text') => (
-    <label className="field-label" key={key}>
-      {label}
-      <input
-        aria-label={label}
-        type={type}
-        value={String(job?.metadata[key] || '')}
-        aria-invalid={!!fieldErrors[key]}
-        aria-describedby={fieldErrors[key] ? `photo-error-${key}` : undefined}
-        onChange={(e) => change(key, e.target.value || undefined)}
-      />
-      {fieldErrors[key] && (
-        <span id={`photo-error-${key}`} className="photo-error">
-          {fieldErrors[key]}
-        </span>
-      )}
-    </label>
-  );
   const move = (index: number, to: number) => {
     const next = [...gallery];
     const [p] = next.splice(index, 1);
     next.splice(to, 0, p);
-    apply(next);
+    galleryFocus.current = p.id;
+    if (apply(next)) setGalleryPage(Math.floor(to / 20));
+    else galleryFocus.current = null;
   };
+  const reviewForm = useMemo(() => {
+    const field = (label: string, key: keyof CampusPhoto, type = 'text') => (
+      <label className="field-label" key={key}>
+        {label}
+        <input
+          aria-label={label}
+          type={type}
+          value={String(job?.metadata[key] || '')}
+          aria-invalid={!!fieldErrors[key]}
+          aria-describedby={fieldErrors[key] ? `photo-error-${key}` : undefined}
+          onChange={(e) => change(key, e.target.value || undefined)}
+        />
+        {fieldErrors[key] && (
+          <span id={`photo-error-${key}`} className="photo-error">
+            {fieldErrors[key]}
+          </span>
+        )}
+      </label>
+    );
+    return (
+      job && (
+        <section className="photo-review-form" aria-label="Photo details">
+          <PhotoImage
+            key={job.key}
+            className="photo-review-image"
+            photo={{
+              ...job.metadata,
+              id: job.mediaId ? `owner:${job.mediaId}` : job.metadata.id,
+              url: job.previewUrl,
+              alt: job.metadata.alt || 'Photo awaiting review',
+            }}
+            onUrl={(url) => patch(job.key, { previewUrl: url })}
+          />
+          <div className="photo-actions">
+            <button
+              disabled={queueOrder.indexOf(job.key) === 0}
+              onClick={() =>
+                setSelected(queueOrder[queueOrder.indexOf(job.key) - 1])
+              }
+            >
+              Previous photo
+            </button>
+            <button
+              disabled={queueOrder.indexOf(job.key) === queueOrder.length - 1}
+              onClick={() =>
+                setSelected(queueOrder[queueOrder.indexOf(job.key) + 1])
+              }
+            >
+              Next photo
+            </button>
+          </div>
+          {job.approved && (
+            <p className="photo-notice">
+              Approved privately. Add this photo to the map draft to finish. To
+              revise these locked details, remove it from this queue and resume
+              it from Private uploads.
+            </p>
+          )}
+          <fieldset
+            className="photo-body-controls"
+            disabled={
+              !!job.approved || !editable || attaching.includes(job.key)
+            }
+          >
+            {field('Caption', 'caption')}
+            {field('Image description (alternative text)', 'alt')}
+            <label className="field-label">
+              Pictured building
+              <select
+                aria-label="Pictured building"
+                aria-invalid={!!fieldErrors.buildingId}
+                value={job.metadata.buildingId || ''}
+                onChange={(e) => change('buildingId', e.target.value)}
+              >
+                <option value="">Choose building</option>
+                {buildingOptions}
+              </select>
+              {fieldErrors.buildingId && (
+                <span className="photo-error">{fieldErrors.buildingId}</span>
+              )}
+            </label>
+            <label className="field-label">
+              Photograph of
+              <select
+                aria-label="Photograph of"
+                value={job.metadata.entranceId || ''}
+                onChange={(e) =>
+                  change('entranceId', e.target.value || undefined)
+                }
+              >
+                <option value="">General building view</option>
+                {(index.entrances.get(job.metadata.buildingId || '') || []).map(
+                  (e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.name}
+                    </option>
+                  ),
+                )}
+              </select>
+            </label>
+            <details open={!job.original}>
+              <summary>
+                Source & credits{' '}
+                {job.original && samePhotoRights(job.metadata, job.original)
+                  ? '· previously reviewed'
+                  : ''}
+              </summary>
+              <label className="field-label">
+                Photo source
+                <select
+                  aria-label="Photo source"
+                  value={job.metadata.sourceKind || 'external'}
+                  onChange={(e) => change('sourceKind', e.target.value)}
+                >
+                  <option value="external">Photo from another source</option>
+                  <option
+                    value="author-upload"
+                    disabled={!!job.original && !job.mediaId}
+                  >
+                    I took this photo
+                  </option>
+                </select>
+              </label>
+              {field('Photographer / public credit', 'author')}
+              {job.metadata.sourceKind === 'author-upload' ? (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={job.authorshipConfirmed}
+                    onChange={(e) =>
+                      patch(job.key, {
+                        authorshipConfirmed: e.target.checked,
+                        state: ['queued', 'uploading', 'processing'].includes(
+                          job.state,
+                        )
+                          ? job.state
+                          : 'needs details',
+                      })
+                    }
+                  />
+                  I took this photograph and choose to share it under the
+                  selected license.
+                </label>
+              ) : (
+                field('Original source page', 'sourceUrl', 'url')
+              )}
+              <label className="field-label">
+                Reuse license
+                <select
+                  aria-label="Reuse license"
+                  value={job.metadata.license || ''}
+                  aria-invalid={!!fieldErrors.license}
+                  onChange={(e) => change('license', e.target.value)}
+                >
+                  <option value="">Choose a verified license</option>
+                  {photoLicenses.map((l) => (
+                    <option key={l}>{l}</option>
+                  ))}
+                </select>
+                {fieldErrors.license && (
+                  <span className="photo-error">{fieldErrors.license}</span>
+                )}
+              </label>
+              {field(
+                'License / public-domain evidence page',
+                'licenseUrl',
+                'url',
+              )}
+              {field('Required attribution', 'attribution')}
+              <label>
+                <input
+                  type="checkbox"
+                  checked={job.rightsReviewed}
+                  onChange={(e) =>
+                    patch(job.key, {
+                      rightsReviewed: e.target.checked,
+                      state: ['queued', 'uploading', 'processing'].includes(
+                        job.state,
+                      )
+                        ? job.state
+                        : 'needs details',
+                    })
+                  }
+                />
+                I checked the author, source and permission for offline
+                redistribution.
+              </label>
+              <button
+                disabled={!shared.length}
+                onClick={() =>
+                  update((items) =>
+                    items.map((item) =>
+                      shared.includes(item.key) &&
+                      !attaching.includes(item.key) &&
+                      !item.approved &&
+                      item.key !== job.key
+                        ? {
+                            ...item,
+                            metadata: {
+                              ...item.metadata,
+                              author: job.metadata.author,
+                              license: job.metadata.license,
+                              licenseUrl: job.metadata.licenseUrl,
+                              attribution: job.metadata.attribution,
+                            },
+                            reviewed: false,
+                            rightsReviewed: false,
+                            authorshipConfirmed: false,
+                            state: [
+                              'queued',
+                              'uploading',
+                              'processing',
+                            ].includes(item.state)
+                              ? item.state
+                              : 'needs details',
+                          }
+                        : item,
+                    ),
+                  )
+                }
+              >
+                Apply these author/license details to {shared.length} selected
+                uploads
+              </button>
+            </details>
+            <details>
+              <summary>Dates & historical view</summary>
+              {field('Capture date (if known)', 'capturedAt', 'date')}
+              {field('Source checked', 'checkedAt', 'date')}
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!!job.metadata.historical}
+                  onChange={(e) => change('historical', e.target.checked)}
+                />
+                Historical view
+              </label>
+            </details>
+            <label>
+              <input
+                type="checkbox"
+                checked={job.reviewed}
+                onChange={(e) =>
+                  patch(job.key, {
+                    reviewed: e.target.checked,
+                    state: ['queued', 'uploading', 'processing'].includes(
+                      job.state,
+                    )
+                      ? job.state
+                      : 'needs details',
+                  })
+                }
+              />
+              I checked visual quality and the building / entrance identity.
+            </label>
+            <button
+              className="photo-primary"
+              disabled={
+                !editable || attaching.includes(job.key) || !job.metadata.sha256
+              }
+              onClick={markReady}
+            >
+              Mark ready
+            </button>
+          </fieldset>
+        </section>
+      )
+    );
+  }, [
+    job,
+    fieldErrors,
+    shared,
+    index,
+    buildingOptions,
+    queueOrder,
+    attaching,
+    editable,
+    patch,
+    update,
+    change,
+    markReady,
+  ]);
   if (!['building', 'entrance', 'place'].includes(edit.kind)) return null;
   return (
     <section className="photo-launcher" aria-label="Building photos">
@@ -463,7 +889,11 @@ export function PhotoManager({
             Link this place or entrance to a building before adding photos.
           </p>
         )}
-        <DialogContent className="photo-workspace" ref={panel}>
+        <DialogContent
+          className="photo-workspace"
+          overlayClassName="photo-workspace-overlay"
+          ref={panel}
+        >
           <header>
             <DialogTitle>Photos · {targetName}</DialogTitle>
             <DialogDescription>
@@ -487,7 +917,7 @@ export function PhotoManager({
             </button>
             <button
               aria-pressed={tab === 'private'}
-              disabled={busy}
+              disabled={!queue.editable}
               onClick={() => void loadLibrary()}
             >
               Private uploads
@@ -500,12 +930,20 @@ export function PhotoManager({
             </button>
           </nav>
           <div className="photo-workspace-body">
-            <fieldset className="photo-body-controls" disabled={busy}>
+            <fieldset className="photo-body-controls">
+              {!queue.editable && (
+                <output>
+                  {queue.jobs.length
+                    ? 'Photo editing is active in another tab.'
+                    : 'Preparing private photo workspace…'}
+                </output>
+              )}
               {message && (
                 <output className="photo-notice">
                   {message}{' '}
                   {removed && (
                     <button
+                      data-photo-undo
                       onClick={() => {
                         onUndo();
                         setRemoved(false);
@@ -556,7 +994,7 @@ export function PhotoManager({
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
                         multiple
-                        disabled={busy}
+                        disabled={!queue.editable || busy === 'attach'}
                         onChange={(e) => {
                           addFiles(Array.from(e.target.files || []));
                           e.target.value = '';
@@ -575,59 +1013,83 @@ export function PhotoManager({
                     </p>
                   )}
                   <div className="photo-grid">
-                    {gallery.map((p, i) => (
-                      <article className="photo-card" key={p.id}>
-                        <PhotoImage
-                          photo={{ ...p, url: previewUrls[p.id] || p.url }}
-                          onUrl={(url) =>
-                            setPreviewUrls((v) => ({ ...v, [p.id]: url }))
-                          }
-                        />
-                        <h3>{p.caption}</h3>
-                        <p>
-                          {i === 0 && <strong>Cover · </strong>}
-                          {publishedPhotos.some(
-                            (v) => JSON.stringify(v) === JSON.stringify(p),
-                          )
-                            ? 'Published'
-                            : 'In map draft'}
-                          {p.historical ? ' · Historical' : ''}
-                        </p>
-                        <div className="photo-actions">
-                          <button
-                            disabled={busy}
-                            onClick={() => void editPhoto(p)}
+                    {gallery
+                      .slice(galleryPage * 20, (galleryPage + 1) * 20)
+                      .map((p, localIndex) => {
+                        const i = galleryPage * 20 + localIndex;
+                        return (
+                          <StableCard
+                            key={p.id}
+                            value={p}
+                            detail={`${i}:${busy}:${queue.editable}`}
                           >
-                            Edit details
-                          </button>
-                          <button disabled={i === 0} onClick={() => move(i, 0)}>
-                            Make cover
-                          </button>
-                          <button
-                            aria-label={`Move ${p.caption} earlier`}
-                            disabled={i === 0}
-                            onClick={() => move(i, i - 1)}
-                          >
-                            Move earlier
-                          </button>
-                          <button
-                            aria-label={`Move ${p.caption} later`}
-                            disabled={i === gallery.length - 1}
-                            onClick={() => move(i, i + 1)}
-                          >
-                            Move later
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (apply([], [p.id])) setRemoved(true);
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </article>
-                    ))}
+                            <article
+                              className="photo-card"
+                              data-photo-id={p.id}
+                            >
+                              <PhotoImage
+                                photo={{
+                                  ...p,
+                                  url: previewUrls[p.id] || p.url,
+                                }}
+                                onUrl={(url) =>
+                                  setPreviewUrls((v) => ({ ...v, [p.id]: url }))
+                                }
+                              />
+                              <h3>{p.caption}</h3>
+                              <p>
+                                {i === 0 && <strong>Cover · </strong>}
+                                {published.has(JSON.stringify(p))
+                                  ? 'Published'
+                                  : 'In map draft'}
+                                {p.historical ? ' · Historical' : ''}
+                              </p>
+                              <div className="photo-actions">
+                                <button
+                                  disabled={!queue.editable || busy === p.id}
+                                  onClick={() => void editPhoto(p)}
+                                >
+                                  Edit details
+                                </button>
+                                <button
+                                  disabled={i === 0}
+                                  onClick={() => move(i, 0)}
+                                >
+                                  Make cover
+                                </button>
+                                <button
+                                  aria-label={`Move ${p.caption} earlier`}
+                                  disabled={i === 0}
+                                  onClick={() => move(i, i - 1)}
+                                >
+                                  Move earlier
+                                </button>
+                                <button
+                                  aria-label={`Move ${p.caption} later`}
+                                  disabled={i === gallery.length - 1}
+                                  onClick={() => move(i, i + 1)}
+                                >
+                                  Move later
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (apply([], [p.id])) setRemoved(true);
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </article>
+                          </StableCard>
+                        );
+                      })}
                   </div>
+                  <Pages
+                    page={galleryPage}
+                    count={gallery.length}
+                    onPage={setGalleryPage}
+                    label="Gallery"
+                  />
                 </>
               )}
               {tab === 'private' && (
@@ -647,7 +1109,9 @@ export function PhotoManager({
                         type="search"
                       />
                     </label>
-                    <button disabled={busy}>Search</button>
+                    <button disabled={!queue.editable || busy === 'attach'}>
+                      Search
+                    </button>
                   </form>
                   <p>
                     Private uploads are not published automatically. Choose one
@@ -656,7 +1120,7 @@ export function PhotoManager({
                   <div className="photo-grid">
                     {library.map((item) => (
                       <article className="photo-card" key={item.id}>
-                        {item.previewUrl ? (
+                        {item.metadata?.sha256 ? (
                           <PhotoImage
                             photo={{
                               ...item.metadata,
@@ -689,7 +1153,7 @@ export function PhotoManager({
                               : 'Upload unfinished'}
                         </p>
                         <button
-                          disabled={busy}
+                          disabled={!queue.editable || busy === 'attach'}
                           onClick={() => void recover(item)}
                         >
                           Resume review
@@ -697,13 +1161,25 @@ export function PhotoManager({
                       </article>
                     ))}
                   </div>
-                  {!library.length && <p>No private photos found.</p>}
+                  {loadingLibrary && <output>Loading private uploads…</output>}
+                  {!loadingLibrary && !library.length && (
+                    <p>No private photos found.</p>
+                  )}
+                  {libraryOffset > 0 && (
+                    <button
+                      onClick={() =>
+                        void loadLibrary(Math.max(0, libraryOffset - 20))
+                      }
+                    >
+                      Previous page
+                    </button>
+                  )}
                   {nextOffset !== null && (
                     <button
-                      disabled={busy}
+                      disabled={!queue.editable || busy === 'attach'}
                       onClick={() => void loadLibrary(nextOffset)}
                     >
-                      Load more
+                      Next page
                     </button>
                   )}
                 </>
@@ -718,383 +1194,124 @@ export function PhotoManager({
                   )}
                   <div className="photo-review-layout">
                     <aside aria-label="Upload queue">
-                      {queue.jobs.map((item) => (
-                        <div className="photo-queue-card" key={item.key}>
-                          <button
-                            aria-pressed={selected === item.key}
-                            onClick={() => {
-                              setSelected(item.key);
-                              setFieldErrors({});
-                            }}
+                      {queue.jobs
+                        .slice(queuePage * 20, (queuePage + 1) * 20)
+                        .map((item) => (
+                          <StableCard
+                            key={item.key}
+                            value={item}
+                            detail={`${selected === item.key}:${shared.includes(item.key)}:${attaching.includes(item.key)}:${queue.editable}`}
                           >
-                            {item.previewUrl && (
-                              <img src={item.previewUrl} alt="" />
-                            )}
-                            <span>
-                              {item.filename}
-                              <small>
-                                {item.state}
-                                {item.mediaId &&
-                                item.savedDetails ===
-                                  JSON.stringify(photoDetails(item.metadata))
-                                  ? ' · Saved privately'
-                                  : ''}
-                              </small>
-                            </span>
-                          </button>
-                          {item.error && <p role="alert">{item.error}</p>}
-                          <div className="photo-actions">
-                            {item.error && item.state !== 'failed' && (
+                            <div className="photo-queue-card">
                               <button
-                                onClick={() =>
-                                  queue.patch(item.key, { error: undefined })
-                                }
+                                aria-pressed={selected === item.key}
+                                onClick={() => {
+                                  setSelected(item.key);
+                                  setFieldErrors({});
+                                }}
                               >
-                                Retry private save / preview
-                              </button>
-                            )}
-                            {item.state === 'failed' && (
-                              <>
-                                <button onClick={() => queue.retry(item.key)}>
-                                  Retry processing
-                                </button>
-                                <label>
-                                  Reselect file
-                                  <input
-                                    aria-label={`Reselect ${item.filename}`}
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/webp"
-                                    onChange={(e) =>
-                                      queue.retry(item.key, e.target.files?.[0])
-                                    }
-                                  />
-                                </label>
-                              </>
-                            )}
-                            <button
-                              disabled={
-                                busy ||
-                                ['processing', 'uploading'].includes(item.state)
-                              }
-                              onClick={() => queue.remove(item.key)}
-                            >
-                              Remove from queue
-                            </button>
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={shared.includes(item.key)}
-                                onChange={(e) =>
-                                  setShared((s) =>
-                                    e.target.checked
-                                      ? [...s, item.key]
-                                      : s.filter((k) => k !== item.key),
-                                  )
-                                }
-                              />
-                              Use shared credits
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </aside>
-                    {job && (
-                      <section
-                        className="photo-review-form"
-                        aria-label="Photo details"
-                      >
-                        <PhotoImage
-                          key={job.key}
-                          className="photo-review-image"
-                          photo={{
-                            ...job.metadata,
-                            id: job.mediaId
-                              ? `owner:${job.mediaId}`
-                              : job.metadata.id,
-                            url: job.previewUrl,
-                            alt: job.metadata.alt || 'Photo awaiting review',
-                          }}
-                          onUrl={(url) =>
-                            queue.patch(job.key, { previewUrl: url })
-                          }
-                        />
-                        <div className="photo-actions">
-                          <button
-                            disabled={
-                              queue.jobs.findIndex((j) => j.key === job.key) ===
-                              0
-                            }
-                            onClick={() =>
-                              setSelected(
-                                queue.jobs[
-                                  queue.jobs.findIndex(
-                                    (j) => j.key === job.key,
-                                  ) - 1
-                                ].key,
-                              )
-                            }
-                          >
-                            Previous photo
-                          </button>
-                          <button
-                            disabled={
-                              queue.jobs.findIndex((j) => j.key === job.key) ===
-                              queue.jobs.length - 1
-                            }
-                            onClick={() =>
-                              setSelected(
-                                queue.jobs[
-                                  queue.jobs.findIndex(
-                                    (j) => j.key === job.key,
-                                  ) + 1
-                                ].key,
-                              )
-                            }
-                          >
-                            Next photo
-                          </button>
-                        </div>
-                        {job.approved && (
-                          <p className="photo-notice">
-                            Approved privately. Add this photo to the map draft
-                            to finish. To revise these locked details, remove it
-                            from this queue and resume it from Private uploads.
-                          </p>
-                        )}
-                        <fieldset
-                          className="photo-body-controls"
-                          disabled={!!job.approved}
-                        >
-                          {field('Caption', 'caption')}
-                          {field('Image description (alternative text)', 'alt')}
-                          <label className="field-label">
-                            Pictured building
-                            <select
-                              aria-label="Pictured building"
-                              aria-invalid={!!fieldErrors.buildingId}
-                              value={job.metadata.buildingId || ''}
-                              onChange={(e) =>
-                                change('buildingId', e.target.value)
-                              }
-                            >
-                              <option value="">Choose building</option>
-                              {buildings.map((b) => (
-                                <option
-                                  key={String(b.properties?.id)}
-                                  value={String(b.properties?.id)}
-                                >
-                                  {name(String(b.properties?.id))}
-                                  {b.properties?.name
-                                    ? ''
-                                    : b.geometry.type === 'Polygon'
-                                      ? ` · near ${b.geometry.coordinates[0][0][1].toFixed(5)}, ${b.geometry.coordinates[0][0][0].toFixed(5)}`
-                                      : ''}
-                                </option>
-                              ))}
-                            </select>
-                            {fieldErrors.buildingId && (
-                              <span className="photo-error">
-                                {fieldErrors.buildingId}
-                              </span>
-                            )}
-                          </label>
-                          <label className="field-label">
-                            Photograph of
-                            <select
-                              aria-label="Photograph of"
-                              value={job.metadata.entranceId || ''}
-                              onChange={(e) =>
-                                change(
-                                  'entranceId',
-                                  e.target.value || undefined,
-                                )
-                              }
-                            >
-                              <option value="">General building view</option>
-                              {data.entrances
-                                ?.filter(
-                                  (e) =>
-                                    canonicalBuildingId(
-                                      data,
-                                      e.buildingId ||
-                                        data.places.find(
-                                          (p) => p.id === e.placeId,
-                                        )?.buildingId ||
-                                        '',
-                                    ) === job.metadata.buildingId,
-                                )
-                                .map((e) => (
-                                  <option key={e.id} value={e.id}>
-                                    {e.name}
-                                  </option>
-                                ))}
-                            </select>
-                          </label>
-                          <details open={!job.original}>
-                            <summary>
-                              Source & credits{' '}
-                              {job.original &&
-                              samePhotoRights(job.metadata, job.original)
-                                ? '· previously reviewed'
-                                : ''}
-                            </summary>
-                            <label className="field-label">
-                              Photo source
-                              <select
-                                aria-label="Photo source"
-                                value={job.metadata.sourceKind || 'external'}
-                                onChange={(e) =>
-                                  change('sourceKind', e.target.value)
-                                }
-                              >
-                                <option value="external">
-                                  Photo from another source
-                                </option>
-                                <option
-                                  value="author-upload"
-                                  disabled={!!job.original && !job.mediaId}
-                                >
-                                  I took this photo
-                                </option>
-                              </select>
-                            </label>
-                            {field('Photographer / public credit', 'author')}
-                            {job.metadata.sourceKind === 'author-upload' ? (
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  checked={job.authorshipConfirmed}
-                                  onChange={(e) =>
-                                    queue.patch(job.key, {
-                                      authorshipConfirmed: e.target.checked,
-                                      state: 'needs details',
-                                    })
+                                <PhotoImage
+                                  previewOnly
+                                  photo={{
+                                    ...item.metadata,
+                                    id: item.mediaId
+                                      ? `owner:${item.mediaId}`
+                                      : undefined,
+                                    url: item.previewUrl,
+                                    alt: '',
+                                  }}
+                                  onUrl={(url) =>
+                                    patch(item.key, { previewUrl: url })
                                   }
                                 />
-                                I took this photograph and choose to share it
-                                under the selected license.
-                              </label>
-                            ) : (
-                              field('Original source page', 'sourceUrl', 'url')
-                            )}
-                            <label className="field-label">
-                              Reuse license
-                              <select
-                                aria-label="Reuse license"
-                                value={job.metadata.license || ''}
-                                aria-invalid={!!fieldErrors.license}
-                                onChange={(e) =>
-                                  change('license', e.target.value)
-                                }
-                              >
-                                <option value="">
-                                  Choose a verified license
-                                </option>
-                                {photoLicenses.map((l) => (
-                                  <option key={l}>{l}</option>
-                                ))}
-                              </select>
-                              {fieldErrors.license && (
-                                <span className="photo-error">
-                                  {fieldErrors.license}
+                                <span>
+                                  {item.filename}
+                                  <small>
+                                    {item.state}
+                                    {item.mediaId &&
+                                    item.savedDetails ===
+                                      JSON.stringify(
+                                        photoDetails(item.metadata),
+                                      )
+                                      ? ' · Saved privately'
+                                      : ''}
+                                  </small>
                                 </span>
-                              )}
-                            </label>
-                            {field(
-                              'License / public-domain evidence page',
-                              'licenseUrl',
-                              'url',
-                            )}
-                            {field('Required attribution', 'attribution')}
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={job.rightsReviewed}
-                                onChange={(e) =>
-                                  queue.patch(job.key, {
-                                    rightsReviewed: e.target.checked,
-                                    state: 'needs details',
-                                  })
-                                }
-                              />
-                              I checked the author, source and permission for
-                              offline redistribution.
-                            </label>
-                            <button
-                              disabled={!shared.length}
-                              onClick={() =>
-                                queue.update((items) =>
-                                  items.map((item) =>
-                                    shared.includes(item.key) &&
-                                    !item.approved &&
-                                    item.key !== job.key
-                                      ? {
-                                          ...item,
-                                          metadata: {
-                                            ...item.metadata,
-                                            author: job.metadata.author,
-                                            license: job.metadata.license,
-                                            licenseUrl: job.metadata.licenseUrl,
-                                            attribution:
-                                              job.metadata.attribution,
-                                          },
-                                          reviewed: false,
-                                          rightsReviewed: false,
-                                          authorshipConfirmed: false,
-                                          state: 'needs details',
+                              </button>
+                              {item.error && <p role="alert">{item.error}</p>}
+                              <div className="photo-actions">
+                                {item.error && item.state !== 'failed' && (
+                                  <button
+                                    onClick={() =>
+                                      queue.patch(item.key, {
+                                        error: undefined,
+                                      })
+                                    }
+                                  >
+                                    Retry private save / preview
+                                  </button>
+                                )}
+                                {item.state === 'failed' && (
+                                  <>
+                                    <button
+                                      onClick={() => queue.retry(item.key)}
+                                    >
+                                      Retry processing
+                                    </button>
+                                    <label>
+                                      Reselect file
+                                      <input
+                                        aria-label={`Reselect ${item.filename}`}
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        onChange={(e) =>
+                                          queue.retry(
+                                            item.key,
+                                            e.target.files?.[0],
+                                          )
                                         }
-                                      : item,
-                                  ),
-                                )
-                              }
-                            >
-                              Apply these author/license details to{' '}
-                              {shared.length} selected uploads
-                            </button>
-                          </details>
-                          <details>
-                            <summary>Dates & historical view</summary>
-                            {field(
-                              'Capture date (if known)',
-                              'capturedAt',
-                              'date',
-                            )}
-                            {field('Source checked', 'checkedAt', 'date')}
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={!!job.metadata.historical}
-                                onChange={(e) =>
-                                  change('historical', e.target.checked)
-                                }
-                              />
-                              Historical view
-                            </label>
-                          </details>
-                          <label>
-                            <input
-                              type="checkbox"
-                              checked={job.reviewed}
-                              onChange={(e) =>
-                                queue.patch(job.key, {
-                                  reviewed: e.target.checked,
-                                  state: 'needs details',
-                                })
-                              }
-                            />
-                            I checked visual quality and the building / entrance
-                            identity.
-                          </label>
-                          <button
-                            className="photo-primary"
-                            disabled={busy || !job.metadata.sha256}
-                            onClick={markReady}
-                          >
-                            Mark ready
-                          </button>
-                        </fieldset>
-                      </section>
-                    )}
+                                      />
+                                    </label>
+                                  </>
+                                )}
+                                <button
+                                  disabled={
+                                    !queue.editable ||
+                                    busy === 'attach' ||
+                                    ['processing', 'uploading'].includes(
+                                      item.state,
+                                    )
+                                  }
+                                  onClick={() => queue.remove(item.key)}
+                                >
+                                  Remove from queue
+                                </button>
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    checked={shared.includes(item.key)}
+                                    onChange={(e) =>
+                                      setShared((s) =>
+                                        e.target.checked
+                                          ? [...s, item.key]
+                                          : s.filter((k) => k !== item.key),
+                                      )
+                                    }
+                                  />
+                                  Use shared credits
+                                </label>
+                              </div>
+                            </div>
+                          </StableCard>
+                        ))}
+                      <Pages
+                        page={queuePage}
+                        count={queue.jobs.length}
+                        onPage={setQueuePage}
+                        label="Uploads"
+                      />
+                    </aside>
+                    {reviewForm}
                   </div>
                 </>
               )}
@@ -1108,7 +1325,11 @@ export function PhotoManager({
             </output>
             <button
               className="photo-primary"
-              disabled={busy || !queue.jobs.some((j) => j.state === 'ready')}
+              disabled={
+                !queue.editable ||
+                busy === 'attach' ||
+                !queue.jobs.some((j) => j.state === 'ready')
+              }
               onClick={() => void attach()}
             >
               Add reviewed photos to draft
@@ -1117,5 +1338,47 @@ export function PhotoManager({
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+const StableCard = memo(
+  function StableCard({
+    children,
+  }: {
+    value: unknown;
+    detail: string;
+    children: ReactNode;
+  }) {
+    return <>{children}</>;
+  },
+  (a, b) => a.value === b.value && a.detail === b.detail,
+);
+function Pages({
+  page,
+  count,
+  onPage,
+  label,
+}: {
+  page: number;
+  count: number;
+  onPage: (page: number) => void;
+  label: string;
+}) {
+  if (count <= 20) return null;
+  return (
+    <nav aria-label={label + ' pages'} className="photo-pages">
+      <button disabled={!page} onClick={() => onPage(page - 1)}>
+        Previous page
+      </button>
+      <span>
+        Page {page + 1} of {Math.ceil(count / 20)}
+      </span>
+      <button
+        disabled={(page + 1) * 20 >= count}
+        onClick={() => onPage(page + 1)}
+      >
+        Next page
+      </button>
+    </nav>
   );
 }

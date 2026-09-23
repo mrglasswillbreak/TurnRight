@@ -1167,6 +1167,15 @@ for (const width of [1440, 390])
       const { action, payload } = route.request().postDataJSON();
       if (!action.startsWith('media-')) return route.fallback();
       if (action === 'media-begin') {
+        if (records.has(payload.uploadId))
+          return route.fulfill({
+            json: {
+              id: payload.uploadId,
+              bucket: 'building-media',
+              path: `owner/${payload.uploadId}/original`,
+              token: 'test-only',
+            },
+          });
         const index = records.size;
         const sample = samples[index];
         const id = `11111111-1111-4111-8111-${String(index + 1).padStart(12, '0')}`;
@@ -1205,6 +1214,8 @@ for (const width of [1440, 390])
           },
         });
       const r = records.get(payload.id)!;
+      if (action === 'media-status')
+        return route.fulfill({ json: { ...r, previewUrl: r.metadata.url } });
       if (action === 'media-process') {
         if (!failed) {
           failed = true;
@@ -1516,9 +1527,6 @@ test('an upload keeps its original building when the inspector changes mid-uploa
       .click();
     await page.getByRole('button', { name: /Manage photos/ }).click();
     await dialog.getByRole('button', { name: /Review uploads/ }).click();
-    await dialog
-      .getByRole('button', { name: 'Retry processing', exact: true })
-      .click();
     await expect(dialog.locator('.photo-queue-card')).toContainText(
       'needs details',
     );

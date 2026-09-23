@@ -1,6 +1,14 @@
 .photo-launcher {
   margin-block: 1rem;
 }
+.photo-workspace-overlay {
+  backdrop-filter: none;
+  background: rgb(0 0 0 / 32%);
+}
+.photo-review-form,
+.photo-queue-card {
+  contain: layout style;
+}
 .photo-strip {
   display: flex;
   gap: 6px;
@@ -44,7 +52,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 12px;
-  min-height: 40px;
+  min-height: 44px;
   color: var(--foreground);
   background: var(--soft);
   cursor: pointer;
@@ -124,7 +132,7 @@
 }
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 16px;
 }
 .photo-card {
@@ -194,7 +202,7 @@
 }
 .photo-review-image {
   width: 100%;
-  height: 280px;
+  height: clamp(120px, 30dvh, 280px);
   object-fit: contain;
   background: var(--soft);
   border-radius: 10px;
@@ -205,10 +213,15 @@
 @media (max-width: 640px) {
   .photo-workspace[data-slot='dialog-content'] {
     width: 100vw;
-    height: 100dvh;
+    height: var(--photo-viewport-height, 100dvh);
+    top: var(--photo-viewport-top, 0px);
+    translate: -50% 0;
     max-width: 100vw;
     border-radius: 0;
-    padding: 16px;
+    padding: max(10px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
   .photo-review-layout {
     grid-template-columns: 1fr;
@@ -217,12 +230,77 @@
     display: flex;
     gap: 10px;
     overflow-x: auto;
+    max-height: 150px;
   }
   .photo-queue-card {
-    min-width: 200px;
-    max-width: 240px;
+    min-width: 170px;
+    max-width: 200px;
   }
   .photo-workspace footer {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+.photo-workspace-body {
+  overscroll-behavior: contain;
+  scroll-padding-block: 16px;
+}
+.photo-workspace header {
+  min-width: 0;
+}
+.photo-workspace nav {
+  flex-shrink: 0;
+}
+.photo-workspace footer {
+  flex-shrink: 0;
+}
+.photo-workspace :focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 2px;
+}
+.photo-pages {
+  grid-column: 1 / -1;
+}
+.owner-upload-status {
+  position: fixed;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  right: 8px;
+  z-index: 35;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: min(440px, calc(100vw - 16px));
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 12px;
+  box-shadow: 0 2px 12px #0002;
+}
+.owner-upload-status button {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: var(--soft);
+  color: var(--foreground);
+}
+@media (max-height: 500px) {
+  .photo-workspace[data-slot='dialog-content'] {
+    gap: 4px;
+    padding-block: 6px;
+  }
+  .photo-workspace header p {
+    display: none;
+  }
+  .photo-workspace nav,
+  .photo-workspace footer {
+    padding-block: 4px;
+  }
+  .photo-review-image {
+    height: 110px;
+  }
+  .photo-review-layout aside {
+    max-height: 90px;
   }
 }

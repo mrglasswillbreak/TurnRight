@@ -1,3 +1,4 @@
+import { PhotoSession } from './PhotoSession';
 import type { BuildingSelection } from './visual-types';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -311,45 +312,47 @@ export default function Admin({
       </main>
     );
   return (
-    <Editor
-      data={data}
-      dark={dark}
-      appearance={appearance}
-      onAppearance={onAppearance}
-      state={state}
-      sources={sources}
-      workspace={workspace}
-      refresh={refresh}
-      owner={owner!}
-      offlineContext={offlineContext}
-      syncedAt={syncedAt}
-      updateReady={updateReady}
-      installUpdate={installUpdate}
-      prepareOffline={async () => {
-        const [verified, source] = await Promise.all([
-          api<EditorState>('state'),
-          api<{ features: SourceRecord[] }>('sources'),
-        ]);
-        const manifest = await latestPackage();
-        await installPackage(manifest, () => {});
-        if (!(await getActivePackage())?.complete)
-          throw new Error(
-            'Offline map verification failed. Retry preparation.',
-          );
-        if (!navigator.serviceWorker?.controller)
-          throw new Error(
-            'The offline app is not ready. Reload once online, then retry preparation.',
-          );
-        await writeSurveyContext(owner!, {
-          state: verified,
-          sources: source.features,
-          data,
-          prepared: true,
-          syncedAt: new Date().toISOString(),
-        } satisfies OfflineEditor);
-        rememberOfflineOwner(owner!);
-      }}
-    />
+    <PhotoSession key={owner} owner={owner!}>
+      <Editor
+        data={data}
+        dark={dark}
+        appearance={appearance}
+        onAppearance={onAppearance}
+        state={state}
+        sources={sources}
+        workspace={workspace}
+        refresh={refresh}
+        owner={owner!}
+        offlineContext={offlineContext}
+        syncedAt={syncedAt}
+        updateReady={updateReady}
+        installUpdate={installUpdate}
+        prepareOffline={async () => {
+          const [verified, source] = await Promise.all([
+            api<EditorState>('state'),
+            api<{ features: SourceRecord[] }>('sources'),
+          ]);
+          const manifest = await latestPackage();
+          await installPackage(manifest, () => {});
+          if (!(await getActivePackage())?.complete)
+            throw new Error(
+              'Offline map verification failed. Retry preparation.',
+            );
+          if (!navigator.serviceWorker?.controller)
+            throw new Error(
+              'The offline app is not ready. Reload once online, then retry preparation.',
+            );
+          await writeSurveyContext(owner!, {
+            state: verified,
+            sources: source.features,
+            data,
+            prepared: true,
+            syncedAt: new Date().toISOString(),
+          } satisfies OfflineEditor);
+          rememberOfflineOwner(owner!);
+        }}
+      />
+    </PhotoSession>
   );
 }
 
@@ -635,42 +638,65 @@ function Editor({
     }
   };
   const visible = preview && validation.usable ? base : validation.data;
-  const rendered = useMemo(() => {
-    if (preview || selected?.kind !== 'building' || selected.deleted)
-      return visible;
+  const selectionForMap =
+    selected &&
+    (() => {
+      const {
+        photos: _photos,
+        arrival: _arrival,
+        ...properties
+      } = selected.properties;
+      return {
+        id: selected.id,
+        kind: selected.kind,
+        deleted: selected.deleted,
+        geometry: selected.geometry,
+        properties,
+      };
+    })();
+  const selectionSignature = JSON.stringify(selectionForMap);
+  // Photographs and guides do not affect map geometry or building models.
+  const mapSelection = useMemo(
+    () => JSON.parse(selectionSignature) as MapEdit | null,
+    [selectionSignature],
+  );
+  const renderedMap = useMemo(() => {
+    if (preview || mapSelection?.kind !== 'building' || mapSelection.deleted)
+      return visible.map;
     const properties = {
-      ...selected.properties,
-      id: selected.id,
+      ...mapSelection.properties,
+      id: mapSelection.id,
       kind: 'building',
     };
     const roof = workspace.roofDraft;
-    if (roof?.buildingId === selected.id)
+    if (roof?.buildingId === mapSelection.id)
       properties.appearance = {
         ...properties.appearance,
         roofs: { ...properties.appearance?.roofs, [roof.partId]: roof.roof },
       };
     const feature = {
       type: 'Feature' as const,
-      geometry: selected.geometry,
+      geometry: mapSelection.geometry,
       properties,
     };
     return {
-      ...visible,
-      map: {
-        ...visible.map,
-        features: [
-          ...visible.map.features.filter(
-            (f) =>
-              !(
-                f.properties?.kind === 'building' &&
-                f.properties.id === selected.id
-              ),
-          ),
-          feature,
-        ],
-      },
+      ...visible.map,
+      features: [
+        ...visible.map.features.filter(
+          (f) =>
+            !(
+              f.properties?.kind === 'building' &&
+              f.properties.id === mapSelection.id
+            ),
+        ),
+        feature,
+      ],
     };
-  }, [visible, selected, preview, workspace.roofDraft]);
+  }, [visible.map, mapSelection, preview, workspace.roofDraft]);
+  const rendered = useMemo(
+    () => ({ ...visible, map: renderedMap }),
+    [visible, renderedMap],
+  );
   const invalid = useMemo(
     () =>
       new Set(
