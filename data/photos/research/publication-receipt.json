@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-09-23T02:29:37.636Z",
+  "origin": "https://turnright.vercel.app",
+  "version": "lasu-cb5e27351c8b",
+  "previousVersion": "lasu-a81135d18314",
+  "bytes": 10160289,
+  "verifiedAssets": 67,
+  "campusSha256": "75d2aa472a68307ca74503aa4dd3e8276620f95e3c92cd9167b8baaa5396851a",
+  "photographs": 22,
+  "photographedBuildings": 13,
+  "buildings": 420,
+  "photoBytes": 4468572,
+  "routingGraphPreserved": true,
+  "reconciliationMetadataChanges": {
+    "edges": 222,
+    "fields": [
+      "crossingEndpoints",
+      "parentEdgeIds"
+    ],
+    "explanation": "Existing baseline reconciliation removes temporary crossingEndpoints and extends parentEdgeIds. Node IDs/coordinates, edge IDs/endpoints/geometries/distances/access and all other edge fields are unchanged."
+  },
+  "places": 220,
+  "entrances": 0,
+  "walkingApproaches": 205,
+  "routeChecks": [
+    {
+      "from": "arcgis:University_Property:11",
+      "to": "arcgis:University_Property:120",
+      "metres": 1099.6611108798024
+    },
+    {
+      "from": "arcgis:University_Property:11",
+      "to": "arcgis:Infrastructure:5",
+      "metres": 486.116452180406
+    },
+    {
+      "from": "arcgis:University_Property:11",
+      "to": "arcgis:University_Property:3",
+      "metres": 937.4521754001605
+    }
+  ]
+}

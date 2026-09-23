@@ -1,5 +1,53 @@
 # Production deployments
 
+## Entrance guides and photographs — 23 September 2026
+
+Published **`lasu-cb5e27351c8b`** at [TurnRight](https://turnright.vercel.app/)
+through the existing owner preview and publication workflow. The reviewed
+[preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35808577194)
+and [publication run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35809740891)
+both completed successfully, using application revision `5b43c4d`.
+
+- Added explicit destination entrances, recorded arrival/accessibility guides,
+  building galleries, private owner photo processing/review and verified offline
+  photo downloads. Migration 008 is applied; original uploads and owner records
+  remain private.
+- Reviewed all 420 published buildings against the documented photo sources.
+  Included 22 distinct CC BY-SA 4.0 photographs for 13 buildings, totaling
+  4,468,572 bytes. The other 407 buildings have no verified release photograph.
+  All 7,976 research records are classified, including duplicates, irrelevant
+  search results and 63 records awaiting identity/permission evidence.
+- All **67 production manifest assets**, totaling **10,160,289 bytes**, passed
+  byte-size and SHA-256 checks. Public photograph metadata exactly matches the
+  reviewed catalogue, and associations pass arrival validation. See the
+  [machine-readable publication receipt](../data/photos/research/publication-receipt.json).
+- Retained 220 places, 1,329 graph nodes, 2,692 directed edges and 205 mapped
+  approaches. Node IDs/coordinates and edge IDs/endpoints/geometries/distances/
+  access rules are unchanged. Reconciliation only removes temporary crossing
+  endpoint bookkeeping and extends parent-edge ancestry on 222 edges; these
+  differences are recorded in the receipt. Three Clinic walking routes retain
+  their previous distances. No confirmed doorway, vehicle approval or parking
+  connection was invented from a photograph.
+- 431 Vitest tests, 23 Python tests, TypeScript, lint and production build budgets
+  passed. Lint retains seven existing warnings. Desktop/mobile public and owner
+  browser journeys passed, including caption editing, undo/redo, saved recovery,
+  explicit entrance links, driving/parking transitions and old-package behavior.
+  Production-build PWA tests passed for photos, driving/voice and enrichment;
+  interrupted download, corruption repair and rollback tests also passed.
+- The deployed preview displayed the real galleries and required credits and
+  reached **Ready offline** with every approved photograph. Review caught and
+  fixed photo-credit contrast in dark mode before the final preview. Existing
+  immutable assets remain available for rollback.
+- The deployed owner API successfully listed private uploads and processed an
+  uploaded copy of an already reviewed Senate photograph into a signed private
+  preview. Attachment was cancelled; it remains an unreviewed private upload,
+  with no draft or published-gallery change.
+
+The first guarded baseline reconciliation attempt timed out without changing
+the baseline; a status check and retry succeeded, retaining all 104 correction
+records and the Law/Library access reviews. No security setting or review check
+was disabled. [Collection scope and outstanding evidence](../data/photos/README.md).
+
 ## Reviewed campus enrichment — 22 September 2026
 
 Published **`lasu-3fe75a6ac04b`** at
