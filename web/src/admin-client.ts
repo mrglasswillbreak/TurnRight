@@ -1,3 +1,4 @@
+import { measureOperation } from './performance';
 export class AdminRequestError extends Error {
   constructor(
     public action: string,
@@ -21,6 +22,9 @@ const readable = new Set([
   'survey-list',
   'survey-get',
   'review-status',
+  'media-library',
+  'media-preview',
+  'media-status',
 ]);
 export function isConnectionFailure(error: unknown) {
   return (
@@ -70,6 +74,7 @@ export async function adminRequest<T>(
     retries?: number;
     fetcher?: typeof fetch;
     delay?: (ms: number) => Promise<void>;
+    signal?: AbortSignal;
   } = {},
 ): Promise<T> {
   const fetcher = options.fetcher || fetch;
@@ -78,7 +83,11 @@ export async function adminRequest<T>(
       ? (options.retries ?? 1)
       : 0;
   for (let attempt = 0; ; attempt++) {
+    const started = performance.now();
+    options.signal?.throwIfAborted();
     const controller = new AbortController();
+    const abort = () => controller.abort(options.signal?.reason);
+    options.signal?.addEventListener('abort', abort, { once: true });
     const timer = setTimeout(
       () => controller.abort(),
       options.timeoutMs ?? 30_000,
@@ -126,6 +135,7 @@ export async function adminRequest<T>(
         );
       return body;
     } catch (error) {
+      if (options.signal?.aborted) throw options.signal.reason;
       const failure =
         error instanceof AdminRequestError
           ? error
@@ -139,7 +149,16 @@ export async function adminRequest<T>(
             );
       if (attempt >= retries || !isConnectionFailure(failure)) throw failure;
     } finally {
+      const phase = {
+        'media-begin': 'upload-begin',
+        'media-process': 'processing',
+        'media-preview': 'signing',
+        'media-draft': 'private-save',
+      } as const;
+      if (action in phase)
+        measureOperation(phase[action as keyof typeof phase], started);
       clearTimeout(timer);
+      options.signal?.removeEventListener('abort', abort);
     }
     await (
       options.delay ||
