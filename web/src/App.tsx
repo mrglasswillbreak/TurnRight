@@ -7,6 +7,8 @@ import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
 import {
   lazy,
   Suspense,
+  useDeferredValue,
+  useCallback,
   useEffect,
   useEffectEvent,
   useMemo,
@@ -269,15 +271,32 @@ export default function App() {
   useEffect(() => {
     panelContent.current?.scrollTo(0, 0);
   }, [selected?.id, routeView, navigating, query, category, savedOnly]);
-  const reloadData = () =>
-    loadCampus()
+  const [checkingDownload, setCheckingDownload] = useState(false);
+  const downloadGeneration = useRef(0);
+  const reloadData = () => {
+    const generation = ++downloadGeneration.current;
+    return loadCampus()
       .then((result) => {
+        if (generation !== downloadGeneration.current) return;
         setData(result.data);
         setManifest(result.manifest);
         setDownloaded(result.downloaded);
+        setCheckingDownload(!!result.verification);
         setLoadError('');
+        void result.verification?.then((complete) => {
+          if (generation === downloadGeneration.current) {
+            setDownloaded(complete);
+            setCheckingDownload(false);
+          }
+        });
       })
-      .catch((e) => setLoadError(e.message));
+      .catch((e) => {
+        if (generation === downloadGeneration.current) {
+          setLoadError(e.message);
+          setCheckingDownload(false);
+        }
+      });
+  };
   const checkUpdates = async (announce = false) => {
     try {
       const next = await latestPackage();
@@ -483,6 +502,11 @@ export default function App() {
     journey?.destinationEntranceId,
     entranceId,
   ]);
+  const deferredQuery = useDeferredValue(query);
+  const [visiblePlaceCount, setVisiblePlaceCount] = useState(50);
+  useEffect(() => {
+    setVisiblePlaceCount(50);
+  }, [deferredQuery, category, savedOnly]);
   const places = useMemo(
     () =>
       (data?.places || [])
@@ -490,7 +514,7 @@ export default function App() {
           (p) =>
             (!savedOnly || saved.includes(p.id)) &&
             (category === 'all' || p.category === category) &&
-            placeMatches(p, query),
+            placeMatches(p, deferredQuery),
         )
         .sort(
           (a, b) =>
@@ -498,41 +522,99 @@ export default function App() {
             Number(/library|senate|health|faculty/i.test(b.name)) -
               Number(/library|senate|health|faculty/i.test(a.name)),
         ),
-    [data, query, category, saved, savedOnly, recent],
+    [data, deferredQuery, category, saved, savedOnly, recent],
   );
   const streets = useMemo(
-    () => (category === 'all' && !savedOnly ? streetResults(data, query) : []),
-    [data, query, category, savedOnly],
+    () =>
+      category === 'all' && !savedOnly
+        ? streetResults(data, deferredQuery)
+        : [],
+    [data, deferredQuery, category, savedOnly],
   );
   const [selectedStreet, setSelectedStreet] = useState<string | null>(null);
-  const selectPlace = (place: Place) => {
-    setSelectedStreet(null);
-    startRequested.current = false;
-    if (navigating) {
-      setToast('Finish this walk before choosing a new destination.');
-      return;
-    }
-    setSearching(false);
-    searchInput.current?.blur();
-    routeRequest.current++;
-    setShareFallback('');
-    setSharedLinkMissing(false);
-    setSelected(place);
-    setEntranceId('');
-    setParkingId('');
-    setActiveLeg(0);
-    setPanelExpanded(true);
-    setBusy(false);
-    setRouteView(false);
-    setRoutes([]);
-    setRouteError('');
-    const next = [place.id, ...recent.filter((id) => id !== place.id)].slice(
-      0,
-      12,
-    );
-    setRecent(next);
-    void setPreference('recent', next);
-  };
+  const selectPlace = useCallback(
+    (place: Place) => {
+      setSelectedStreet(null);
+      startRequested.current = false;
+      if (navigating) {
+        setToast('Finish this walk before choosing a new destination.');
+        return;
+      }
+      setSearching(false);
+      searchInput.current?.blur();
+      routeRequest.current++;
+      setShareFallback('');
+      setSharedLinkMissing(false);
+      setSelected(place);
+      setEntranceId('');
+      setParkingId('');
+      setActiveLeg(0);
+      setPanelExpanded(true);
+      setBusy(false);
+      setRouteView(false);
+      setRoutes([]);
+      setRouteError('');
+      const next = [place.id, ...recent.filter((id) => id !== place.id)].slice(
+        0,
+        12,
+      );
+      setRecent(next);
+      void setPreference('recent', next);
+    },
+    [navigating, recent, setPanelExpanded],
+  );
+  // GPS fixes leave the destination list untouched; routing still evaluates every fix.
+  const placeRows = useMemo(
+    () =>
+      places.slice(0, visiblePlaceCount).map((place) => (
+        <button
+          className="place-row"
+          key={place.id}
+          onPointerDown={(event) => {
+            if (resultTap.current.begin(event, mobileSearch)) {
+              event.preventDefault();
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }
+          }}
+          onPointerMove={(event) => resultTap.current.move(event)}
+          onPointerUp={(event) => {
+            if (resultTap.current.end(event)) {
+              event.preventDefault();
+              selectPlace(place);
+            }
+          }}
+          onPointerCancel={() => resultTap.current.cancel()}
+          onLostPointerCapture={() => resultTap.current.cancel()}
+          onContextMenu={() => resultTap.current.cancel()}
+          onClick={(event) => {
+            if (resultTap.current.allowClick(event.detail)) selectPlace(place);
+            else event.preventDefault();
+          }}
+        >
+          <span className={`place-icon ${place.category}`}>
+            {place.category === 'library' ? (
+              <BookOpen />
+            ) : place.category === 'academic' ? (
+              <GraduationCap />
+            ) : (
+              <MapPin />
+            )}
+          </span>
+          <span className="place-copy">
+            <strong>{place.name}</strong>
+            <span>
+              {place.category === 'academic'
+                ? 'Academic building'
+                : place.category.charAt(0).toUpperCase() +
+                  place.category.slice(1)}{' '}
+              · Ojo campus
+            </span>
+          </span>
+          <ChevronRight size={17} />
+        </button>
+      )),
+    [places, visiblePlaceCount, mobileSearch, selectPlace],
+  );
   const openDestinationLink = useEffectEvent(() => {
     if (!data || location.pathname.startsWith('/admin')) return;
     const stamp = `${location.search}:${data.version}`;
@@ -1226,54 +1308,16 @@ export default function App() {
                     <ChevronRight size={17} />
                   </button>
                 ))}
-                {places.map((place) => (
+                {placeRows}
+                {places.length > visiblePlaceCount && (
                   <button
-                    className="place-row"
-                    key={place.id}
-                    onPointerDown={(event) => {
-                      if (resultTap.current.begin(event, mobileSearch)) {
-                        event.preventDefault();
-                        event.currentTarget.setPointerCapture(event.pointerId);
-                      }
-                    }}
-                    onPointerMove={(event) => resultTap.current.move(event)}
-                    onPointerUp={(event) => {
-                      if (resultTap.current.end(event)) {
-                        event.preventDefault();
-                        selectPlace(place);
-                      }
-                    }}
-                    onPointerCancel={() => resultTap.current.cancel()}
-                    onLostPointerCapture={() => resultTap.current.cancel()}
-                    onContextMenu={() => resultTap.current.cancel()}
-                    onClick={(event) => {
-                      if (resultTap.current.allowClick(event.detail))
-                        selectPlace(place);
-                      else event.preventDefault();
-                    }}
+                    className="text-button"
+                    onClick={() => setVisiblePlaceCount((n) => n + 50)}
                   >
-                    <span className={`place-icon ${place.category}`}>
-                      {place.category === 'library' ? (
-                        <BookOpen />
-                      ) : place.category === 'academic' ? (
-                        <GraduationCap />
-                      ) : (
-                        <MapPin />
-                      )}
-                    </span>
-                    <span className="place-copy">
-                      <strong>{place.name}</strong>
-                      <span>
-                        {place.category === 'academic'
-                          ? 'Academic building'
-                          : place.category.charAt(0).toUpperCase() +
-                            place.category.slice(1)}{' '}
-                        · Ojo campus
-                      </span>
-                    </span>
-                    <ChevronRight size={17} />
+                    Show more places ({places.length - visiblePlaceCount}{' '}
+                    remaining)
                   </button>
-                ))}
+                )}
                 {!places.length && !streets.length && (
                   <div className="empty-state">
                     {savedOnly ? <Heart /> : <Search />}
@@ -1290,11 +1334,13 @@ export default function App() {
               </div>
               <footer className="panel-footer">
                 <span className="status-dot" />
-                {downloaded && swReady
-                  ? 'Ready offline'
-                  : online
-                    ? 'Campus map'
-                    : 'Offline'}
+                {checkingDownload
+                  ? 'Checking downloaded files…'
+                  : downloaded && swReady
+                    ? 'Ready offline'
+                    : online
+                      ? 'Campus map'
+                      : 'Offline'}
                 <button
                   className="text-button"
                   onClick={() => setDialog('offline')}
@@ -1531,11 +1577,18 @@ export default function App() {
                 manifest={manifest}
                 latest={latest}
                 downloaded={downloaded}
+                checking={checkingDownload}
                 navigating={navigating}
                 swReady={swReady}
                 onCheck={() => void checkUpdates(true)}
-                onDelete={() => setDownloaded(false)}
+                onDelete={() => {
+                  downloadGeneration.current++;
+                  setDownloaded(false);
+                  setCheckingDownload(false);
+                }}
                 onInstall={(nextData, nextManifest, pending) => {
+                  downloadGeneration.current++;
+                  setCheckingDownload(false);
                   setDownloaded(true);
                   if (!pending) {
                     setData(nextData);

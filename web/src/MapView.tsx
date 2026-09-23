@@ -1013,7 +1013,8 @@ export function MapView({
   useEffect(() => {
     models.current?.update(modelOptions.current);
   }, [
-    data,
+    data.map,
+    data.visuals,
     dark,
     threeD,
     simple,
@@ -1195,9 +1196,12 @@ export function MapView({
         ],
       });
     };
-    if (ready.current) apply();
-    else map.once('load', apply);
+    const frame = requestAnimationFrame(() => {
+      if (ready.current) apply();
+    });
+    if (!ready.current) map.once('load', apply);
     return () => {
+      cancelAnimationFrame(frame);
       map.off('load', apply);
     };
   }, [fix, panelBesideMap]);

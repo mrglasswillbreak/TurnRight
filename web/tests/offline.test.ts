@@ -52,6 +52,46 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe('offline package transactions', () => {
+  it('shows verified campus data before slow asset auditing and shares concurrent audits', async () => {
+    const { manifest, bytes } = await pkg('core-first');
+    const extra = new TextEncoder().encode('additional asset');
+    const asset = {
+      url: '/packages/slow.dat',
+      bytes: extra.length,
+      sha256: await hashBytes(extra.buffer),
+    };
+    manifest.assets.push(asset);
+    manifest.bytes += extra.length;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async (url: string) => new Response(url === asset.url ? extra : bytes),
+      ),
+    );
+    await installPackage(manifest, () => {});
+    let finish!: () => void,
+      reads = 0;
+    const match = cache.match;
+    const pause = vi.spyOn(cache, 'match').mockImplementation(async (url) => {
+      if (url === asset.url) {
+        reads++;
+        await new Promise<void>((resolve) => {
+          finish = resolve;
+        });
+      }
+      return match(url);
+    });
+    const loaded = await loadCampus();
+    expect(loaded.data.version).toBe('core-first');
+    expect(loaded.downloaded).toBe(false);
+    const concurrent = getActivePackage();
+    await vi.waitFor(() => expect(reads).toBe(1));
+    finish();
+    expect(await loaded.verification).toBe(true);
+    expect((await concurrent)?.complete).toBe(true);
+    expect(reads).toBe(1);
+    pause.mockRestore();
+  });
   it('retains the active map until every photo is verified, repairs corrupt photos and supports rollback', async () => {
     const old = await pkg('before-photos'),
       next = await pkg('with-photos');
@@ -342,7 +382,9 @@ describe('offline package transactions', () => {
       throw new TypeError('Offline');
     });
     vi.stubGlobal('fetch', offline);
-    expect((await loadCampus()).downloaded).toBe(true);
+    const loaded = await loadCampus();
+    expect(loaded.downloaded).toBe(false);
+    expect(await loaded.verification).toBe(true);
     expect(offline).not.toHaveBeenCalled();
   });
   it('reuses verified files and detects storage eviction', async () => {

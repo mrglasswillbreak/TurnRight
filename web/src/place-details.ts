@@ -20,19 +20,28 @@ export const searchKey = (value: string) =>
     .replace(/\p{M}/gu, '')
     .toLocaleLowerCase()
     .replace(/[_-]/g, ' ');
+const placeSearch = new WeakMap<Place, string>();
+const streetSearch = new WeakMap<
+  CampusData['map'],
+  { feature: CampusData['map']['features'][number]; text: string }[]
+>();
 export function placeMatches(place: Place, query: string) {
-  const text = searchKey(
-    [
-      place.name,
-      ...place.aliases,
-      place.department,
-      place.faculty,
-      place.subtype,
-      place.address,
-    ]
-      .filter(Boolean)
-      .join(' '),
-  );
+  let text = placeSearch.get(place);
+  if (text === undefined) {
+    text = searchKey(
+      [
+        place.name,
+        ...place.aliases,
+        place.department,
+        place.faculty,
+        place.subtype,
+        place.address,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    );
+    placeSearch.set(place, text);
+  }
   return searchKey(query)
     .trim()
     .split(/\s+/)
@@ -40,18 +49,32 @@ export function placeMatches(place: Place, query: string) {
 }
 export function streetResults(data: CampusData | null, query: string) {
   if (!query.trim() || !data) return [];
-  return data.map.features.filter(
-    (f) =>
-      f.properties?.kind === 'path' &&
-      f.geometry.type === 'LineString' &&
-      pathDisplay(f.properties).streetLabel &&
-      searchKey(
-        [
-          f.properties.name,
-          ...(Array.isArray(f.properties.aliases) ? f.properties.aliases : []),
-        ].join(' '),
-      ).includes(searchKey(query).trim()),
-  );
+  let entries = streetSearch.get(data.map);
+  if (!entries) {
+    entries = data.map.features
+      .filter(
+        (f) =>
+          f.properties?.kind === 'path' &&
+          f.geometry.type === 'LineString' &&
+          pathDisplay(f.properties).streetLabel,
+      )
+      .map((feature) => ({
+        feature,
+        text: searchKey(
+          [
+            feature.properties!.name,
+            ...(Array.isArray(feature.properties!.aliases)
+              ? feature.properties!.aliases
+              : []),
+          ].join(' '),
+        ),
+      }));
+    streetSearch.set(data.map, entries);
+  }
+  const key = searchKey(query).trim();
+  return entries
+    .filter((entry) => entry.text.includes(key))
+    .map((entry) => entry.feature);
 }
 export function safeWebsite(value: unknown): string | undefined {
   if (typeof value !== 'string' || !value) return undefined;

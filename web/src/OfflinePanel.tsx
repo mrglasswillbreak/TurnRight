@@ -8,6 +8,7 @@ export function OfflinePanel({
   manifest,
   latest,
   downloaded,
+  checking = false,
   navigating,
   swReady,
   onInstall,
@@ -17,6 +18,7 @@ export function OfflinePanel({
   manifest: CampusPackage;
   latest: CampusPackage | null;
   downloaded: boolean;
+  checking?: boolean;
   navigating: boolean;
   swReady: boolean;
   onInstall: (
@@ -84,11 +86,13 @@ export function OfflinePanel({
             Updated {new Date(manifest.createdAt).toLocaleDateString()}
           </span>
           <span className={downloaded && swReady ? 'ready-label' : ''}>
-            {downloaded && swReady
-              ? 'Ready offline'
-              : downloaded
-                ? 'Map downloaded'
-                : 'Not downloaded'}
+            {checking
+              ? 'Checking downloaded files…'
+              : downloaded && swReady
+                ? 'Ready offline'
+                : downloaded
+                  ? 'Map downloaded'
+                  : 'Not downloaded'}
           </span>
         </div>
         <p className="small-note">

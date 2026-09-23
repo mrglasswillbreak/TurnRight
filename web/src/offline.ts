@@ -1,5 +1,6 @@
 import { structuralIssues } from './validation';
 import { openDB } from 'idb';
+import { boundedMap } from './asset-pool';
 import type {
   CampusData,
   CampusPackage,
@@ -7,6 +8,23 @@ import type {
   ReportDraft,
 } from './types';
 export const ASSET_CACHE = 'turnright-assets-v1';
+const audits = new Map<string, Promise<boolean[]>>();
+function auditAssets(manifest: CampusPackage): Promise<boolean[]> {
+  const key = JSON.stringify(manifest.assets);
+  const current = audits.get(key);
+  if (current) return current;
+  const result = caches
+    .open(ASSET_CACHE)
+    .then((cache) =>
+      boundedMap(manifest.assets, async (a) => {
+        const response = await cache.match(a.url);
+        return !!response && (await verifiedAsset(response, a));
+      }),
+    )
+    .finally(() => audits.delete(key));
+  audits.set(key, result);
+  return result;
+}
 let connection: ReturnType<typeof openDB> | undefined;
 const database = () =>
   (connection ??= openDB('turnright', 1, {
@@ -78,14 +96,8 @@ export async function getActivePackage(): Promise<{
   const version = await db.get('meta', 'active');
   const record = version && (await db.get('packages', version));
   if (!record) return null;
-  const cache = await caches.open(ASSET_CACHE);
   const visualUrls = new Set<string>(record.manifest.visuals?.assetUrls || []);
-  const present = await Promise.all(
-    record.manifest.assets.map(async (a: PackageAsset) => {
-      const response = await cache.match(a.url);
-      return !!response && (await verifiedAsset(response, a));
-    }),
-  );
+  const present = await auditAssets(record.manifest);
   const visualsComplete =
     visualUrls.size > 0 &&
     visualManifestMatches(record.data, record.manifest) &&
@@ -156,14 +168,36 @@ export async function loadCampus(): Promise<{
   data: CampusData;
   manifest: CampusPackage;
   downloaded: boolean;
+  verification?: Promise<boolean>;
 }> {
-  const active = await getActivePackage().catch(() => null);
-  if (active)
-    return {
-      data: active.data,
-      manifest: active.manifest,
-      downloaded: active.complete,
-    };
+  const db = await database().catch(() => null);
+  const version = db && (await db.get('meta', 'active'));
+  const active = version && (await db!.get('packages', version));
+  if (active && [1, 2, 3].includes(active.manifest.schemaVersion)) {
+    const manifest: CampusPackage = active.manifest;
+    const core = manifest.assets.find((a) => a.url === manifest.dataUrl);
+    const response =
+      core && (await (await caches.open(ASSET_CACHE)).match(core.url));
+    if (core && response && (await verifiedAsset(response.clone(), core))) {
+      const data: CampusData = await response.json();
+      if (
+        data.version === manifest.version &&
+        data.schemaVersion === manifest.schemaVersion &&
+        !structuralIssues(data).length
+      )
+        return {
+          data,
+          manifest,
+          downloaded: false,
+          verification: auditAssets(manifest)
+            .then(
+              (present) =>
+                present.every(Boolean) && visualManifestMatches(data, manifest),
+            )
+            .catch(() => false),
+        };
+    }
+  }
   const manifest = await latestPackage();
   const response = await fetch(manifest.dataUrl, {
     signal: AbortSignal.timeout(20000),
@@ -241,7 +275,7 @@ export async function installPackage(
   const cache = await caches.open(ASSET_CACHE);
   let loaded = 0;
   let data: CampusData | undefined;
-  for (const asset of manifest.assets) {
+  await boundedMap(manifest.assets, async (asset) => {
     if (signal?.aborted)
       throw new DOMException('Download cancelled', 'AbortError');
     if (
@@ -280,7 +314,7 @@ export async function installPackage(
       data = JSON.parse(new TextDecoder().decode(bytes));
     loaded += asset.bytes;
     progress(Math.round((loaded / manifest.bytes) * 100));
-  }
+  });
   if (
     !data ||
     data.version !== manifest.version ||
@@ -307,19 +341,11 @@ export async function activatePending() {
   const db = await database(),
     pending = await db.get('meta', 'pending');
   if (!pending) return false;
-  const record = await db.get('packages', pending),
-    cache = await caches.open(ASSET_CACHE);
+  const record = await db.get('packages', pending);
   if (
     !record ||
     !visualManifestMatches(record.data, record.manifest) ||
-    (
-      await Promise.all(
-        record.manifest.assets.map(async (a: PackageAsset) => {
-          const response = await cache.match(a.url);
-          return !!response && (await verifiedAsset(response, a));
-        }),
-      )
-    ).some((present) => !present)
+    (await auditAssets(record.manifest)).some((present) => !present)
   )
     return false;
   const tx = db.transaction('meta', 'readwrite');
