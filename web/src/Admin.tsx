@@ -71,6 +71,7 @@ import { withPublishedVisuals } from './editor-visuals';
 import { BuildingAppearanceEditor } from './BuildingAppearanceEditor';
 import { remapBuildingSurfaces } from './building-surfaces';
 import { EditorInspector } from './EditorInspector';
+import { photoEdits } from './photo-workspace';
 import { EditorReview, type ReviewState } from './EditorReview';
 import {
   getPreference,
@@ -2099,6 +2100,33 @@ function Editor({
           </aside>
         ) : selected && !preview ? (
           <EditorInspector
+            photoOwner={owner}
+            photoSaveStatus={workspace.status}
+            publishedPhotos={data.photos}
+            onPhotoUndo={() => undo()}
+            onPhotos={(change) => {
+              if (
+                workspace.roofDraft ||
+                workspace.unfinished ||
+                validation.pending
+              )
+                throw Error(
+                  'Finish the current edit and wait for map validation before changing photos.',
+                );
+              const batch = photoEdits(
+                validation.data,
+                workspace.edits,
+                change,
+              );
+              workspace.commit(batch, null);
+              const next = batch.find(
+                (e) => e.id === selected.id && e.kind === selected.kind,
+              );
+              if (next) {
+                setSelected(next);
+                selectedRef.current = next;
+              }
+            }}
             onGeometry={(geometry) => {
               if (selected)
                 stageRepair(

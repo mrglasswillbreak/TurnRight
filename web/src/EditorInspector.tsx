@@ -1,5 +1,8 @@
 import { DrivingEditor } from './DrivingEditor';
 import { ArrivalEditor } from './ArrivalEditor';
+import { PhotoManager } from './PhotoManager';
+import type { PhotoChange } from './photo-workspace';
+import type { CampusPhoto } from './types';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
@@ -22,6 +25,11 @@ export function EditorInspector({
   onDisconnect,
   onDelete,
   onClose,
+  photoOwner,
+  onPhotos,
+  onPhotoUndo,
+  photoSaveStatus,
+  publishedPhotos,
 }: {
   edit: MapEdit;
   buildingEditor?: ReactNode;
@@ -37,6 +45,11 @@ export function EditorInspector({
   onDisconnect: (vertexId?: string) => void;
   onDelete: () => void;
   onClose: () => void;
+  photoOwner: string;
+  onPhotos: (change: PhotoChange) => void;
+  onPhotoUndo: () => void;
+  photoSaveStatus: string;
+  publishedPhotos?: CampusPhoto[];
 }) {
   const [search, setSearch] = useState('');
   const panel = useRef<HTMLElement>(null);
@@ -333,6 +346,15 @@ export function EditorInspector({
           edit={edit}
           data={data}
           onProperty={onProperty}
+        />
+        <PhotoManager
+          edit={edit}
+          data={data}
+          owner={photoOwner}
+          onApply={onPhotos}
+          onUndo={onPhotoUndo}
+          saveStatus={photoSaveStatus}
+          publishedPhotos={publishedPhotos}
         />
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">

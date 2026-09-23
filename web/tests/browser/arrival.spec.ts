@@ -2,8 +2,9 @@ import { test, expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { campusFixture } from '../fixture';
-async function prepare(page: Page) {
+async function prepare(page: Page, schema: 1 | 3 = 1) {
   const data = campusFixture();
+  data.schemaVersion = schema;
   data.places[0].buildingId = 'building';
   data.places.push({
     ...data.places[0],
@@ -56,7 +57,8 @@ async function prepare(page: Page) {
     caption: `Library photograph ${n}`,
     alt: `Library exterior view ${n}`,
     author: 'Campus photographer',
-    sourceUrl: 'https://example.org/photos',
+    sourceKind: schema === 3 ? 'author-upload' : undefined,
+    sourceUrl: schema === 3 ? undefined : 'https://example.org/photos',
     license: 'CC BY-SA 4.0',
     licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
     attribution: 'Campus photographer · CC BY-SA 4.0',
@@ -77,7 +79,7 @@ async function prepare(page: Page) {
   await page.context().route('**/packages/latest.json', (route) =>
     route.fulfill({
       json: {
-        schemaVersion: 1,
+        schemaVersion: schema,
         version: 'fixture',
         createdAt: data.createdAt,
         summary: 'Arrival fixture',
@@ -159,37 +161,46 @@ for (const width of [1440, 390])
       page.getByRole('button', { name: 'Start walking', exact: true }),
     ).toBeVisible();
   });
-test('prepared offline arrival photographs survive reload with credits and entrance selection', async ({
-  page,
-  context,
-  baseURL,
-}) => {
-  test.skip(!baseURL?.includes('5184'), 'Production service worker test');
-  await prepare(page);
-  await page.goto('/?place=library&entrance=door-c');
-  await expect(
-    page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(page.getByText('Ready offline', { exact: true })).toBeVisible();
-  await context.setOffline(true);
-  await page.reload();
-  await expect(
-    page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByLabel('Destination entrance', { exact: true }),
-  ).toHaveValue('door-c');
-  await page.getByText('Photo credits & license', { exact: true }).click();
-  await expect(
-    page.getByText('Campus photographer · CC BY-SA 4.0', { exact: true }),
-  ).toBeVisible();
-  const loaded = await page
-    .getByRole('img', { name: 'Library exterior view 1', exact: true })
-    .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
-  expect(loaded).toBe(true);
-});
+for (const schema of [1, 3] as const)
+  test(`prepared offline arrival schema ${schema} photographs survive reload with credits and entrance selection`, async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    test.skip(!baseURL?.includes('5184'), 'Production service worker test');
+    await prepare(page, schema);
+    await page.goto('/?place=library&entrance=door-c');
+    await expect(
+      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Ready offline', { exact: true }),
+    ).toBeVisible();
+    await context.setOffline(true);
+    await page.reload();
+    await expect(
+      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByLabel('Destination entrance', { exact: true }),
+    ).toHaveValue('door-c');
+    await page.getByText('Photo credits & license', { exact: true }).click();
+    await expect(
+      page.getByText('Campus photographer · CC BY-SA 4.0', { exact: true }),
+    ).toBeVisible();
+    if (schema === 3)
+      await expect(
+        page.getByText('Photograph provided by the author', { exact: true }),
+      ).toBeVisible();
+    const loaded = await page
+      .getByRole('img', { name: 'Library exterior view 1', exact: true })
+      .evaluate(
+        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+      );
+    expect(loaded).toBe(true);
+  });

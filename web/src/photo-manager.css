@@ -1,0 +1,228 @@
+.photo-launcher {
+  margin-block: 1rem;
+}
+.photo-strip {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.photo-strip img {
+  width: 64px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.photo-workspace[data-slot='dialog-content'] {
+  width: min(1100px, calc(100vw - 40px));
+  max-width: none;
+  height: min(850px, calc(100dvh - 40px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  color: var(--foreground);
+  background: var(--background);
+}
+.photo-workspace header {
+  padding-right: 36px;
+}
+.photo-workspace nav,
+.photo-actions,
+.photo-workspace footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.photo-workspace nav {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+.photo-workspace button,
+.photo-add {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-height: 40px;
+  color: var(--foreground);
+  background: var(--soft);
+  cursor: pointer;
+}
+.photo-workspace button[aria-pressed='true'] {
+  border-color: var(--link);
+  color: var(--link);
+}
+.photo-workspace .photo-primary {
+  color: white;
+  background: #175bcc;
+}
+.photo-workspace-body {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 2px;
+}
+.photo-body-controls {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.photo-workspace footer {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  justify-content: space-between;
+}
+.photo-workspace input:not([type='checkbox']),
+.photo-workspace select {
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  min-height: 42px;
+}
+.photo-workspace label {
+  display: block;
+  margin-block: 8px;
+}
+.photo-workspace input[type='checkbox'] {
+  margin-right: 8px;
+  accent-color: var(--link);
+}
+.photo-workspace summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.photo-workspace details {
+  border-block: 1px solid var(--border);
+  margin-block: 12px;
+}
+.photo-drop {
+  padding: 20px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.photo-add {
+  display: inline-block !important;
+  color: var(--link);
+  font-weight: 600;
+}
+.photo-add input {
+  display: block;
+  margin-top: 8px;
+}
+.photo-drop p,
+.photo-card p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-block: 8px;
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.photo-card {
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 12px;
+  min-width: 0;
+}
+.photo-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  background: var(--soft);
+  border-radius: 8px;
+}
+.photo-card h3 {
+  margin-top: 10px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.photo-card .photo-actions button {
+  font-size: 12px;
+  padding: 6px 9px;
+}
+.photo-notice {
+  display: block;
+  padding: 12px;
+  background: var(--info-background);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.photo-error {
+  color: var(--error-text);
+  background: var(--error-background);
+  padding: 8px;
+  border-radius: 6px;
+  display: block;
+}
+.photo-review-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 24px;
+}
+.photo-queue-card {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.photo-queue-card > button {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+.photo-queue-card img {
+  width: 60px;
+  height: 50px;
+  object-fit: cover;
+}
+.photo-queue-card small {
+  display: block;
+  font-weight: 400;
+}
+.photo-queue-card .photo-actions {
+  font-size: 12px;
+}
+.photo-review-image {
+  width: 100%;
+  height: 280px;
+  object-fit: contain;
+  background: var(--soft);
+  border-radius: 10px;
+}
+.photo-review-form {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .photo-workspace[data-slot='dialog-content'] {
+    width: 100vw;
+    height: 100dvh;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 16px;
+  }
+  .photo-review-layout {
+    grid-template-columns: 1fr;
+  }
+  .photo-review-layout aside {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  .photo-queue-card {
+    min-width: 200px;
+    max-width: 240px;
+  }
+  .photo-workspace footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
