@@ -104,6 +104,7 @@ npm run benchmark:photos -- baseline
 npm run benchmark:core
 npm run test:performance
 npm run build
+npm run check:configured-build
 ```
 
 The photo benchmark exits nonzero if a pooled interaction target is exceeded.
@@ -116,7 +117,13 @@ The performance browser suite reads the same pinned fixture. Ignored `work`
 reports contain raw samples. Checked-in reports contain measurements only.
 
 Build checks independently budget public startup JavaScript, additional owner
-editor JavaScript and the lazy photo workspace at 425, 130 and 12 KiB gzip.
+editor JavaScript and the lazy photo workspace at 425, 185 and 12 KiB gzip.
+The configured-build check uses nonfunctional public placeholders to retain the
+Supabase authentication client during tree-shaking. Its output is a measurement
+fixture and must not be deployed; normal builds use the deployment environment.
+The initial unconfigured local check understated the editor by about 55 KiB; the
+first client deployment correctly failed its budget before activation. The
+corrected budget includes that existing production dependency.
 Static shared dependencies are counted once; the photo workspace must remain
 lazy and appear in the service-worker precache. Existing 3D, world and voice
 budgets also run. Local-only browser Performance entries named
@@ -130,8 +137,9 @@ Verification completed on 23 September 2026: **462 Vitest tests**, **23 Python
 import tests**, **36 browser/PWA journeys** (15 photo layout/workflow, seven
 public navigation/details, five owner photo, nine offline), both TypeScript
 projects, lint with seven pre-existing warnings, production build and all four
-budget checks. Public/editor/photo JavaScript measured 413,921 / 122,690 / 7,574
-gzip bytes respectively. The photo-specific fixture avoids sharing Playwright
+budget checks. Configured public/editor/photo JavaScript measured 413,919 / 177,767 / 7,574
+gzip bytes respectively using the nonfunctional placeholders. Live configuration
+adds a few bytes for the actual public URL and key. The photo-specific fixture avoids sharing Playwright
 artifact directories with the main browser suite.
 
 Deterministic checks cover index reuse, validation equivalence, delta ordering,

@@ -20,7 +20,8 @@
     "prebuild": "node scripts/prebuild.mjs",
     "test:performance": "vite build --config vite.performance.config.ts && playwright test --config playwright.performance.config.ts",
     "benchmark:photos": "node scripts/benchmark-photos.mjs",
-    "benchmark:core": "node --import tsx scripts/benchmark-core.mjs"
+    "benchmark:core": "node --import tsx scripts/benchmark-core.mjs",
+    "check:configured-build": "node scripts/check-configured-build.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

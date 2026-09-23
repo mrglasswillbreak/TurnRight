@@ -37,7 +37,8 @@ const checks = [
   [
     'Additional owner editor JS',
     sum([...editorKeys].filter((key) => !publicKeys.has(key))),
-    130 * 1024,
+    // Include the Supabase client retained by configured production builds.
+    185 * 1024,
   ],
   ['Lazy photo workspace JS', sizes.get('src/PhotoManager.tsx'), 12 * 1024],
 ];

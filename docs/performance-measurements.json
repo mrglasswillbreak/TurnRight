@@ -1571,8 +1571,8 @@
     ]
   },
   "bundleGzipBytes": {
-    "publicStartup": 413921,
-    "additionalEditor": 122690,
+    "publicStartup": 413919,
+    "additionalEditor": 177767,
     "photoWorkspace": 7574
   },
   "verification": {
@@ -1582,5 +1582,11 @@
     "publicBrowser": 7,
     "ownerPhotoBrowser": 5,
     "pwaBrowser": 9
-  }
+  },
+  "unconfiguredBundleGzipBytes": {
+    "publicStartup": 413921,
+    "additionalEditor": 122690,
+    "photoWorkspace": 7574
+  },
+  "bundleConfiguration": "Configured Supabase production client retained using nonfunctional public placeholders; never deploy this fixture build."
 }
