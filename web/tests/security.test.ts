@@ -34,6 +34,10 @@ describe('server authorization', () => {
       'media-process',
       'media-approve',
       'media-revise',
+      'media-library',
+      'media-draft',
+      'media-preview',
+      'media-upload-url',
     ]) {
       const res = response();
       await admin({ method: 'POST', headers: {}, body: { action } }, res);

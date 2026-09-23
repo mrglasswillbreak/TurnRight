@@ -3,6 +3,7 @@ import { db, HttpError, requireConfig } from './backend.js';
 import { photoDerivative, MAX_ORIGINAL_BYTES } from './photo-processing.js';
 import { publicPhoto, validPhoto } from '../src/arrival.js';
 import type { CampusPhoto, MapEdit } from '../src/types.js';
+import { photoDetails, samePhotoRights } from '../src/photo-details.js';
 
 const bucket = 'building-media';
 interface MediaRow {
@@ -12,6 +13,12 @@ interface MediaRow {
   original_path: string;
   derivative_path?: string;
   public_metadata?: CampusPhoto;
+  draft_metadata?: Partial<CampusPhoto>;
+  draft_revision?: number;
+  original_filename?: string;
+  original_mime?: string;
+  original_bytes?: number;
+  authorship_confirmed?: boolean;
 }
 async function storage(
   route: string,
@@ -47,6 +54,47 @@ export async function mediaAction(
   action: string,
   payload: Record<string, unknown>,
 ) {
+  const preview = async (row: MediaRow) => {
+    if (!row.derivative_path) return undefined;
+    const signed = await (
+      await storage(`object/sign/${bucket}/${row.derivative_path}`, 'POST', {
+        expiresIn: 3600,
+      })
+    ).json();
+    return `${process.env.SUPABASE_URL}/storage/v1${signed.signedURL}`;
+  };
+  if (action === 'media-library') {
+    const offset = Number(payload.offset || 0);
+    if (!Number.isSafeInteger(offset) || offset < 0 || offset > 100000)
+      throw new HttpError(400, 'Invalid photo page.');
+    const query = String(payload.query || '')
+      .trim()
+      .slice(0, 100)
+      .replace(/[^\p{L}\p{N} _-]/gu, '');
+    const filter = query
+      ? `&or=(original_filename.ilike.*${encodeURIComponent(query)}*,public_metadata->>caption.ilike.*${encodeURIComponent(query)}*,draft_metadata->>caption.ilike.*${encodeURIComponent(query)}*)`
+      : '';
+    const rows = await db<MediaRow[]>(
+      `building_media?owner=eq.${owner}&order=created_at.desc,id.desc&limit=21&offset=${offset}${filter}`,
+    );
+    return {
+      items: await Promise.all(
+        rows
+          .slice(0, 20)
+          .map(async (row) => ({
+            id: row.id,
+            status: row.status,
+            filename: row.original_filename,
+            metadata: row.public_metadata,
+            draft: row.draft_metadata,
+            revision: row.draft_revision || 0,
+            authorshipConfirmed: row.authorship_confirmed,
+            previewUrl: await preview(row).catch(() => undefined),
+          })),
+      ),
+      nextOffset: rows.length > 20 ? offset + 20 : null,
+    };
+  }
   if (action === 'media-list') {
     const rows = await db<MediaRow[]>(
       `building_media?owner=eq.${owner}&order=created_at.desc&limit=100`,
@@ -69,7 +117,15 @@ export async function mediaAction(
       throw new HttpError(400, 'Choose a JPEG, PNG or WebP up to 10 MiB.');
     const id = randomUUID(),
       original_path = `${owner}/${id}/original`;
-    await db('building_media', 'POST', { id, owner, original_path });
+    await db('building_media', 'POST', {
+      id,
+      owner,
+      original_path,
+      original_filename: String(payload.filename || 'Photograph').slice(0, 256),
+      original_mime: payload.mime,
+      original_bytes: payload.bytes,
+      draft_metadata: photoDetails(payload.metadata),
+    });
     const signed = await (
       await storage(`object/upload/sign/${bucket}/${original_path}`, 'POST', {
         upsert: false,
@@ -87,6 +143,62 @@ export async function mediaAction(
     `building_media?id=eq.${payload.id}&owner=eq.${owner}`,
   );
   if (!row) throw new HttpError(404, 'Photograph not found.');
+  if (action === 'media-preview') return { previewUrl: await preview(row) };
+  if (action === 'media-draft') {
+    if (row.status === 'approved')
+      throw new HttpError(
+        409,
+        'Create a revision before changing an approved photograph.',
+      );
+    const revision = Number(payload.revision);
+    if (
+      !Number.isSafeInteger(revision) ||
+      revision < 0 ||
+      JSON.stringify(payload.metadata || {}).length > 24000
+    )
+      throw new HttpError(400, 'Invalid photo draft.');
+    const updated = await db<MediaRow[]>(
+      `building_media?id=eq.${row.id}&owner=eq.${owner}&draft_revision=eq.${revision}&status=neq.approved`,
+      'PATCH',
+      {
+        draft_metadata: photoDetails(payload.metadata),
+        draft_revision: revision + 1,
+        updated_at: new Date().toISOString(),
+      },
+    );
+    if (!updated.length)
+      throw new HttpError(
+        409,
+        'This photo draft changed in another session. Recover the latest private upload before saving again.',
+      );
+    return { revision: revision + 1 };
+  }
+  if (action === 'media-upload-url') {
+    if (
+      row.status !== 'pending' ||
+      payload.bytes !== row.original_bytes ||
+      payload.mime !== row.original_mime
+    )
+      throw new HttpError(
+        409,
+        'Reselect the original file with the same size and type.',
+      );
+    const signed = await (
+      await storage(
+        `object/upload/sign/${bucket}/${row.original_path}`,
+        'POST',
+        { upsert: false },
+      )
+    ).json();
+    return {
+      id: row.id,
+      bucket,
+      path: row.original_path,
+      token: new URL(signed.url, process.env.SUPABASE_URL).searchParams.get(
+        'token',
+      ),
+    };
+  }
   if (action === 'media-revise') {
     if (row.status !== 'approved')
       throw new HttpError(400, 'Choose an approved photograph to revise.');
@@ -98,6 +210,9 @@ export async function mediaAction(
       original_path: row.original_path,
       derivative_path: row.derivative_path,
       public_metadata: { ...row.public_metadata, id: `owner:${id}` },
+      draft_metadata: photoDetails(row.public_metadata),
+      original_filename: row.original_filename,
+      authorship_confirmed: row.authorship_confirmed || false,
     });
     return { id };
   }
@@ -154,17 +269,17 @@ export async function mediaAction(
         original_sha256: image.originalSha256,
         public_metadata: metadata,
       });
+      row.status = 'processed';
       row.derivative_path = derivative_path;
       row.public_metadata = metadata as CampusPhoto;
     }
-    const signed = await (
-      await storage(`object/sign/${bucket}/${row.derivative_path}`, 'POST', {
-        expiresIn: 3600,
-      })
-    ).json();
     return {
       metadata: row.public_metadata,
-      previewUrl: `${process.env.SUPABASE_URL}/storage/v1${signed.signedURL}`,
+      draft: row.draft_metadata,
+      revision: row.draft_revision || 0,
+      previewUrl: await preview(row),
+      status: row.status,
+      authorshipConfirmed: row.authorship_confirmed || false,
     };
   }
   if (action === 'media-approve') {
@@ -182,6 +297,18 @@ export async function mediaAction(
         'Process the image and confirm its identity, quality and redistribution rights first.',
       );
     const metadata = payload.metadata as CampusPhoto;
+    if (
+      metadata?.sourceKind === 'author-upload' &&
+      payload.authorshipConfirmed !== true &&
+      !(
+        row.authorship_confirmed &&
+        samePhotoRights(metadata, row.public_metadata || {})
+      )
+    )
+      throw new HttpError(
+        400,
+        'Confirm that you took this photograph and selected its reuse license.',
+      );
     if (
       !validPhoto(metadata) ||
       ['id', 'url', 'sha256', 'bytes', 'width', 'height'].some(
@@ -202,6 +329,7 @@ export async function mediaAction(
         status: 'approved',
         public_metadata: clean,
         reviewed_at: new Date().toISOString(),
+        authorship_confirmed: metadata.sourceKind === 'author-upload',
       },
     );
     if (!updated.length)
@@ -222,7 +350,14 @@ export async function validateMediaEdits(edits: MapEdit[]) {
   )) {
     if (!validPhoto(photo))
       throw new HttpError(400, 'Invalid photograph metadata.');
-    if (!photo.id.startsWith('owner:')) continue; // Published research catalogue is checked by hash during packaging.
+    if (!photo.id.startsWith('owner:')) {
+      if (photo.sourceKind === 'author-upload')
+        throw new HttpError(
+          400,
+          'Author photographs require a private approved upload.',
+        );
+      continue;
+    } // Published research catalogue is checked by hash during packaging.
     const [row] = await db<MediaRow[]>(
       `building_media?id=eq.${encodeURIComponent(photo.id.slice(6))}&status=eq.approved`,
     );

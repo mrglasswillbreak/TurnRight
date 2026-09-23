@@ -39,6 +39,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       case 'media-process':
       case 'media-approve':
       case 'media-revise':
+      case 'media-library':
+      case 'media-draft':
+      case 'media-preview':
+      case 'media-upload-url':
         res.status(200).json(await mediaAction(user.id, action, payload));
         break;
       case 'survey-list':
