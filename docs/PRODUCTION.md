@@ -1,5 +1,40 @@
 # Production deployments
 
+## Performance and upload recovery — 23 September 2026
+
+Deployed application revision **`3d1badb`** through
+[Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/DPrK1daYpnsypjW2M3qmu5iZx57G).
+Additive private-media API support at `2ff0691` was deployed successfully before
+the dependent client. No database migration or public package schema change was
+needed. The first client build stopped safely at its editor bundle budget;
+configured-build measurements now include the Supabase authentication dependency.
+
+Photo management now uses indexed building labels, bounded rendering and previews,
+session-wide sequential uploads with pause, per-job IndexedDB recovery and tab
+ownership. Editor validation, worker replies, map updates, search and offline
+startup avoid repeated work. All approved photographs remain in offline downloads.
+The [performance report](PERFORMANCE.md) records the design, reproduction commands,
+five-run measurements and device-coverage limits. Caption typing pooled p95 was
+**17.1 ms** on desktop and **44.1 ms** in the mobile viewport at 4× CPU throttling;
+photo selection and workspace navigation also met the 100/200 ms lab targets.
+
+Checks passed: **462 Vitest tests**, **23 Python tests**, **36 browser/PWA
+journeys**, both TypeScript projects, lint (seven existing warnings), production
+build and all four budget checks. Live owner verification loaded the Senate
+building's four-photo gallery and the private library without modifying content.
+The app update activated successfully; a transient workspace request timeout
+recovered through Retry. Physical mobile devices and native screen-reader speech
+were unavailable; emulated keyboard, reflow, accessibility and layout checks are
+documented separately.
+
+Post-deployment verification at **19:20 UTC** checked all **67 published assets**
+against their lengths and SHA-256 hashes. The manifest remains unchanged at
+**`lasu-286bae3c6016`**, schema 2, **420 buildings, 220 places, 22 photos** and
+**9,977,021 bytes**. Public/editor pages and the service worker returned 200;
+the lazy photo workspace is precached. Unauthenticated `media-status` and
+`media-library` requests returned **401**. Production campus content was not
+republished by this application rollout.
+
 ## Visual photo workspace — 23 September 2026
 
 Deployed the photo workspace and schema-3 readers at application revision
