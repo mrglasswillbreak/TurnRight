@@ -786,6 +786,7 @@ test('prepared public map verifies enhanced architecture, repairs corruption and
   }, campus.visuals!.sectors[0].url);
   await page.reload();
   await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: 'Offline', exact: true }).click();
   await expect(
     page.getByText('Enhanced 3D ready offline · all model files verified'),

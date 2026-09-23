@@ -7,9 +7,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && tsc --project tsconfig.functions.json && vite build && node scripts/check-visual-budget.mjs && node scripts/check-world-budget.mjs && node scripts/check-voice-budget.mjs",
+    "build": "tsc --noEmit && tsc --project tsconfig.functions.json && vite build && node scripts/check-visual-budget.mjs && node scripts/check-world-budget.mjs && node scripts/check-voice-budget.mjs && node scripts/check-bundle-budget.mjs",
     "start": "vite preview --host 127.0.0.1",
-    "lint": "tsc --noEmit && tsc --project tsconfig.functions.json && oxlint src api server tests vite.config.ts vitest.config.ts playwright.config.ts playwright.pwa.config.ts playwright.webkit.config.ts",
+    "lint": "tsc --noEmit && tsc --project tsconfig.functions.json && oxlint src api server tests vite.config.ts vitest.config.ts playwright.config.ts playwright.pwa.config.ts playwright.webkit.config.ts playwright.performance.config.ts vite.performance.config.ts",
     "format": "oxfmt",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
@@ -17,7 +17,10 @@
     "test:survey-pwa": "playwright test --config playwright.pwa.config.ts",
     "test:survey-webkit": "playwright test --config playwright.webkit.config.ts",
     "package": "node ../scripts/package.mjs",
-    "prebuild": "node scripts/prebuild.mjs"
+    "prebuild": "node scripts/prebuild.mjs",
+    "test:performance": "vite build --config vite.performance.config.ts && playwright test --config playwright.performance.config.ts",
+    "benchmark:photos": "node scripts/benchmark-photos.mjs",
+    "benchmark:core": "node --import tsx scripts/benchmark-core.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

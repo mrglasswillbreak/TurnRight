@@ -53,6 +53,7 @@ export default defineConfig({
   worker: { format: 'es' },
   css: { postcss: { plugins: [tailwindcss()] } },
   build: {
+    manifest: true,
     target: 'es2022',
     rollupOptions: {
       output: {
