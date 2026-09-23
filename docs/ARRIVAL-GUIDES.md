@@ -29,27 +29,71 @@ accessibility facts, evidence and observation dates. Moving an entrance flags it
 guide and entrance photographs for another review. Existing draft batches,
 undo/redo, recovery and source reconciliation retain these optional fields.
 
-Building and entrance inspectors import JPEG, PNG and WebP photographs up to
-10 MiB. Originals and upload/reviewer records remain in the private
-`building-media` bucket and owner-authorized `building_media` table. The server
-rejects malformed, animated, oversized or unsupported images and creates a
-metadata-free WebP at most 1,600 pixels on its longest side and 250 KiB.
+### Manage photos
 
-Review the actual derivative, match, caption, alternative text, author, source,
-redistribution license, credits and historical/capture dates before attachment.
-Use **Recover private uploads** after an interruption; **Revise caption or match**
-creates an immutable revision for an approved owner upload. General research
-photographs also support caption/credit edits. Reorder or remove photographs in
-the draft. Explicit owner galleries, including empty galleries, override the
-research catalogue through building aliases and merges.
+Select a building or entrance and choose **Manage photos** below its thumbnail
+strip. A linked place opens its building's gallery. The desktop dialog becomes a
+full-screen workspace on mobile, with the gallery name and draft save status
+kept visible.
 
-Apply migration `008_private_building_media.sql` before deploying the media API.
-Apply `009_bounded_baseline_comparison.sql` before reconciling large published
-packages. It compares complete source records individually, retaining the owner
-guard, atomic stale-review check, source-table lock and rollback snapshots.
-It was applied to the existing production project on 23 September 2026; the table
-and private bucket were verified. It does not publish a map or grant public
-access to originals. New installations apply migrations in order.
+- **Gallery:** edit details, make a photo the cover, move it earlier/later, or
+  remove it from the draft. The first photograph is the cover. Removal offers
+  **Undo removal**, and all gallery operations support the editor's undo/redo.
+  Editing keeps the original position. Changing **Pictured building** or
+  **Photograph of** moves the photo and updates affected galleries in one batch.
+- **Add photos:** select several JPEG, PNG or WebP files, or drop them onto the
+  desktop upload area. Each file is limited to 10 MiB. Files upload and process
+  sequentially; a failed file has its own retry/reselection controls and does
+  not discard other uploads.
+- **Review uploads:** use the large preview and Previous/Next controls. Give each
+  photo a caption, useful image description and correct building/entrance match.
+  The image itself must be checked for identity and visual quality individually.
+- **I took this photo:** enter the public photographer credit, deliberately select
+  a supported reuse license and confirm authorship. No source website is needed.
+  **Photo from another source** requires its original source page, photographer,
+  license evidence and attribution. Standard Creative Commons license links are
+  filled automatically; suggested credits remain editable. Capture dates are
+  optional and never inferred. Existing approved rights remain reviewed until
+  their source, author, license or attribution changes.
+- **Use shared credits:** explicitly select uploads, then apply author/license
+  details from the current photo. This never copies a building match, capture date,
+  description, authorship declaration or individual quality/rights confirmation.
+- **Mark ready**, then **Add reviewed photos to draft**, attaches all ready items
+  in one undoable batch. Unfinished items remain private. If attachment is
+  interrupted after approval, the approved details remain locked and retryable;
+  use Private uploads to create another revision if those details need changing.
+- **Preview public gallery** uses visitors' ordering, captions and credits. It
+  does not publish. **Saved privately**, **In map draft**, and **Published** are
+  distinct states; publication still happens through Releases.
+
+### Recovery and privacy
+
+Unfinished metadata is saved locally per owner and original gallery, and uploaded
+metadata synchronizes privately when online. Switching inspectors never attaches
+an upload to the new selection. After reopening, uploaded derivatives can resume
+review; files that never finished uploading explicitly request reselection.
+
+**Private uploads** provides a searchable gallery with 20 items per page and
+**Load more**. Resume an item to recover its recorded target and details. Expired
+signed previews renew without reprocessing the original. Stale draft saves are
+rejected instead of overwriting a newer session; recover the latest private
+upload before continuing. Removing an item from the local queue does not delete
+its private upload. Approved records are immutable; edits create a new revision.
+
+Originals and upload/reviewer records remain in the private `building-media`
+bucket and owner-authorized `building_media` table. The server rejects malformed,
+animated, oversized or unsupported images and creates a metadata-free WebP at
+most 1,600 pixels on its longest side and 250 KiB. Cropping, rotation controls and
+image alteration are outside this workflow. Explicit owner galleries, including
+empty galleries, override the research catalogue through aliases and merges.
+
+New installations apply migrations in order through
+[`010_private_photo_drafts.sql`](../supabase/migrations/010_private_photo_drafts.sql).
+Migration 008 adds private media storage; 009 bounds baseline reconciliation; 010
+adds private draft metadata, filenames, target associations and revision guards.
+Migration 010 was applied to production on 23 September 2026. Owner RLS,
+approved-record immutability, a private bucket and no anonymous table reads were
+verified. It does not publish a map or grant public access to originals.
 
 ## Release and offline integrity
 
@@ -63,7 +107,13 @@ Every approved release photograph is included. Above 20 MiB, the interface warns
 about download size; there is no aggregate photo cap or silent omission.
 Interrupted or corrupt downloads cannot replace the working package. Repair
 verifies cached bytes again; prior immutable package assets remain available for
-rollback. Older packages remain readable with absent guides/galleries omitted.
+rollback. Older schema-1 and schema-2 packages remain readable with absent
+information omitted. Releases containing author-provided photos without an
+external source URL use **schema 3**. Deploy compatible application, editor,
+importer and publication readers before publishing those releases. Older clients
+request an app update and retain their working package. Public author-upload
+credits say “Photograph provided by the author”; private authorship declarations
+and account identities are never included in downloads.
 
 ## Collection and limits
 

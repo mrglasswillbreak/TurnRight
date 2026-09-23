@@ -25,9 +25,10 @@ retaining all 104 correction records. Database regression tests verify unchanged
 timestamps, reordered snapshots, duplicate/missing IDs, changed access with an
 unchanged hash, unauthorized callers, rollback, drafts and history preservation.
 
-The preview is reviewed and publication has been requested. Confirmation in the
-owner browser is pending after browser automation stalled on the native dialog.
-The production receipt below still describes the preceding 22-image release.
+Publication completed through the owner workflow. The current public manifest
+confirms **`lasu-874f9cd2158c`**, with 21 photographs and 66 required assets
+totaling **9,909,392 bytes**. The historical receipt below describes the preceding
+22-image release.
 
 ## Entrance guides and photographs — 23 September 2026
 
