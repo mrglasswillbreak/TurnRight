@@ -3,6 +3,11 @@ import type { EditorValidation as Validation } from './editor-validation';
 import type { ValidationIssue } from './validation';
 import type { CampusData, MapEdit } from './types';
 import { RevisionWorker } from './revision-worker';
+import {
+  LatestPreview,
+  type ValidationDelta,
+  type ValidationPayload,
+} from './editor-validation-cache';
 export function retainCampusSources(
   previous: CampusData,
   next: CampusData,
@@ -32,9 +37,15 @@ export function useEditorValidation(
   const [attempt, setAttempt] = useState(0);
   const worker = useRef<RevisionWorker<
     CampusData,
-    MapEdit[],
-    Validation
+    ValidationPayload,
+    ValidationDelta
   > | null>(null);
+  const previews = useRef(new LatestPreview());
+  const decoded = useRef<{
+    base: CampusData;
+    data: CampusData;
+    sequence: number;
+  }>({ base, data: base, sequence: 0 });
   const latest = useRef({ base, edits });
   latest.current = { base, edits };
   const [state, setState] = useState<{
@@ -56,19 +67,30 @@ export function useEditorValidation(
     },
   });
   useEffect(() => {
-    const client = new RevisionWorker<CampusData, MapEdit[], Validation>(
+    const client = new RevisionWorker<
+      CampusData,
+      ValidationPayload,
+      ValidationDelta
+    >(
       new Worker(new URL('./editor-validation.worker.ts', import.meta.url), {
         type: 'module',
       }),
     );
     worker.current = client;
+    previews.current = new LatestPreview();
+    decoded.current = {
+      base: latest.current.base,
+      data: latest.current.base,
+      sequence: 0,
+    };
     return () => {
       client.close();
+      previews.current.close();
       worker.current = null;
     };
   }, [attempt]);
   const check = useCallback(
-    (snapshot: MapEdit[]) => {
+    (snapshot: MapEdit[], full = true) => {
       if (sourceIssues.length)
         return Promise.resolve({
           data: base,
@@ -84,13 +106,28 @@ export function useEditorValidation(
         return Promise.reject(
           new Error('Validation is starting. Please try again.'),
         );
-      return worker.current.request(base, snapshot);
+      return worker.current
+        .request(base, { edits: snapshot, full })
+        .then((result) => {
+          const previous =
+            decoded.current.base === base
+              ? decoded.current
+              : { base, data: base, sequence: 0 };
+          if (result.sequence !== previous.sequence + 1)
+            throw Error(
+              'Validation response is out of sequence. Retry validation.',
+            );
+          const data = { ...previous.data, ...result.data } as CampusData;
+          decoded.current = { base, data, sequence: result.sequence };
+          return { ...result, data };
+        });
     },
     [base, sourceIssues, attempt],
   );
   useEffect(() => {
     let cancelled = false;
-    void check(edits)
+    void previews.current
+      .request(() => check(edits, false))
       .then((result) => {
         if (
           !cancelled &&
@@ -102,9 +139,7 @@ export function useEditorValidation(
             edits,
             result: {
               ...result,
-              data: result.usable
-                ? retainCampusSources(previous.result.data, result.data)
-                : previous.result.data,
+              data: result.usable ? result.data : previous.result.data,
             },
           }));
       })

@@ -10,10 +10,15 @@ import {
 
 export const editKey = (edit: Pick<MapEdit, 'id' | 'kind'>) =>
   `${edit.kind}:${edit.id}`;
+const contentCache = new WeakMap<MapEdit, string>();
 export function editContent(edit: MapEdit | undefined) {
   if (!edit) return '';
+  const cached = contentCache.get(edit);
+  if (cached !== undefined) return cached;
   const { updated_at: _timestamp, ...content } = edit;
-  return JSON.stringify(content);
+  const value = JSON.stringify(content);
+  contentCache.set(edit, value);
+  return value;
 }
 export interface UnfinishedDrawing {
   id: string;
@@ -64,7 +69,9 @@ export class EditorWorkspace {
   private flight: Promise<boolean> | null = null;
   private persistence: Promise<void> = Promise.resolve();
   private recoveryFailed = false;
-  private recoverySignature = '';
+  private recoverySnapshot?: WorkspaceRecovery;
+  private queuedRecovery?: WorkspaceRecovery;
+  private writingRecovery = false;
   private historyGroup: string | undefined;
   private conflictBase?: MapEdit[];
   private featureBases: MapEdit[] = [];
@@ -131,11 +138,11 @@ export class EditorWorkspace {
     this.listeners.forEach((fn) => fn());
   }
   private snapshot(): WorkspaceSnapshot {
-    return structuredClone({
+    return {
       edits: this.edits,
-      unfinished: this.unfinished,
-      roofDraft: this.roofDraft,
-    });
+      unfinished: structuredClone(this.unfinished),
+      roofDraft: structuredClone(this.roofDraft),
+    };
   }
   recoveryCopy(): WorkspaceRecovery {
     return structuredClone({
@@ -173,28 +180,48 @@ export class EditorWorkspace {
       roofDraft: this.roofDraft,
       saved: this.saved,
       pending: this.pending,
-      past: this.past,
-      future: this.future,
+      past: [...this.past],
+      future: [...this.future],
       conflictBase: this.conflictBase,
-      featureBases: this.featureBases,
+      featureBases: [...this.featureBases],
     };
-    const signature = JSON.stringify(snapshot);
-    if (signature === this.recoverySignature && !this.recoveryFailed)
-      return this.persistence;
-    this.recoverySignature = signature;
-    const recovery = structuredClone(snapshot);
-    this.persistence = this.persistence
-      .catch(() => {})
-      .then(async () => {
-        await this.persist(recovery);
-        this.recoveryFailed = false;
+    const previous = this.recoverySnapshot;
+    const sameList = (a: unknown[], b: unknown[]) =>
+      a.length === b.length && a.every((v, i) => v === b[i]);
+    if (
+      previous &&
+      !this.recoveryFailed &&
+      Object.keys(snapshot).every((key) => {
+        const a = snapshot[key as keyof WorkspaceRecovery],
+          b = previous[key as keyof WorkspaceRecovery];
+        return Array.isArray(a) && Array.isArray(b) ? sameList(a, b) : a === b;
       })
-      .catch(() => {
-        if (this.recoverySignature === signature) this.recoverySignature = '';
-        this.recoveryFailed = true;
-        if (this.status !== 'Conflict') this.status = 'Recovery unavailable';
-        if (!this.error) this.error = recoveryMessage;
-        this.notify();
+    )
+      return this.persistence;
+    this.recoverySnapshot = snapshot;
+    this.queuedRecovery = snapshot;
+    if (this.writingRecovery) return this.persistence;
+    this.writingRecovery = true;
+    this.persistence = Promise.resolve()
+      .then(async () => {
+        while (this.queuedRecovery) {
+          const next = this.queuedRecovery;
+          this.queuedRecovery = undefined;
+          try {
+            await this.persist(next);
+            this.recoveryFailed = false;
+          } catch {
+            this.recoverySnapshot = undefined;
+            this.recoveryFailed = true;
+            if (this.status !== 'Conflict')
+              this.status = 'Recovery unavailable';
+            if (!this.error) this.error = recoveryMessage;
+            this.notify();
+          }
+        }
+      })
+      .finally(() => {
+        this.writingRecovery = false;
       });
     return this.persistence;
   }
@@ -221,9 +248,12 @@ export class EditorWorkspace {
   ) {
     const sameGroup = !!historyGroup && historyGroup === this.historyGroup;
     const next = new Map(this.edits.map((e) => [editKey(e), e]));
+    const unchanged = edits.every(
+      (e) => editContent(e) === editContent(next.get(editKey(e))),
+    );
     edits.forEach((e) => next.set(editKey(e), structuredClone(e)));
     if (
-      JSON.stringify([...next.values()]) === JSON.stringify(this.edits) &&
+      unchanged &&
       JSON.stringify(unfinished) === JSON.stringify(this.unfinished)
     )
       return;
