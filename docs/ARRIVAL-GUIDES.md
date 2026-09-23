@@ -73,8 +73,25 @@ metadata synchronizes privately when online. Switching inspectors never attaches
 an upload to the new selection. After reopening, uploaded derivatives can resume
 review; files that never finished uploading explicitly request reselection.
 
+Uploads continue after closing the photo dialog or selecting another building,
+while the editor session stays available. **Pause uploads** in the persistent
+indicator finishes the current upload/processing operation, then stops before
+the next file. **Resume uploads** continues the queue. Keep the browser open until
+original files finish uploading; browser closure and operating-system suspension
+do not provide background-upload guarantees. Signing out stops further owner
+requests and clears private previews from memory.
+
+Recovery uses per-photo IndexedDB records. Existing localStorage drafts migrate
+only after their replacement is stored successfully. The indicator distinguishes
+pending local recovery from saved recovery; **Saved privately** on a photo means
+the server acknowledged its details. A storage error remains visible and app
+updates wait for recovery and original uploads. Only one tab owns an owner's
+queue at a time; another tab can take over after the current editor closes.
+Browsers without Web Locks show an explanation instead of risking duplicate
+uploads. Galleries and upload queues also use pages of 20 photographs.
+
 **Private uploads** provides a searchable gallery with 20 items per page and
-**Load more**. Resume an item to recover its recorded target and details. Expired
+**Previous page / Next page**. Resume an item to recover its recorded target and details. Expired
 signed previews renew without reprocessing the original. Stale draft saves are
 rejected instead of overwriting a newer session; recover the latest private
 upload before continuing. Removing an item from the local queue does not delete
@@ -94,6 +111,10 @@ adds private draft metadata, filenames, target associations and revision guards.
 Migration 010 was applied to production on 23 September 2026. Owner RLS,
 approved-record immutability, a private bucket and no anonymous table reads were
 verified. It does not publish a map or grant public access to originals.
+
+The responsiveness update needs no additional database migration or public
+package schema. Its additive upload reconciliation and preview endpoints use
+the existing media records. [Measurements and test coverage](PERFORMANCE.md).
 
 ## Release and offline integrity
 

@@ -95,6 +95,8 @@ The researched collection contains **21 photographs for 13 of 420 buildings**; o
 
 The photo editor now has a visual **Manage photos** workspace with multiple uploads, individual retries, guided source/author review, cover ordering, an offline-compatible public preview and private recovery. Migration 010 and schema-3 readers are deployed; new photographs still publish through owner release review.
 
+Photo uploads continue while the editor session remains open, including after closing the dialog or changing buildings. The persistent upload indicator offers **Pause uploads**, which finishes the current file first. Galleries and private uploads use 20-item pages; owner-scoped IndexedDB recovery preserves unfinished details. The installed map opens after its campus data verifies, while **Checking downloaded files…** audits the remaining assets. See [performance measurements and verification](docs/PERFORMANCE.md).
+
 The 17–18 September updates include:
 
 - **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).

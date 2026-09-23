@@ -89,6 +89,14 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 ## Upgrade and verification
 
 Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo owner guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the draft and publish through Releases; author-provided photographs without external URLs require package schema 3 and compatible readers.
+
+Photo uploads continue across inspector changes and dialog closure during the
+owner session. Use the persistent **Pause uploads / Resume uploads** control;
+pausing finishes the current file. Per-photo local recovery, separate private
+saves and a single upload-owning tab protect unfinished work. Photo-only edits
+reuse validated topology and map models; release review always runs full
+validation. See [the recovery guide](ARRIVAL-GUIDES.md#recovery-and-privacy) and
+[performance verification](PERFORMANCE.md).
 Migration 009 prevents full-campus baseline comparisons from timing out while
 retaining owner authorization, exact record checks and reconciliation history.
 See [arrival editing, private uploads and publication](ARRIVAL-GUIDES.md) for the
