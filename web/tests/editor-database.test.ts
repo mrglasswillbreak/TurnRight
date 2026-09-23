@@ -38,6 +38,9 @@ beforeAll(async () => {
   await database.exec(
     'create role anon; create role authenticated; create role service_role; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql as $$ select null::uuid $$;',
   );
+  await database.exec(
+    'create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);',
+  );
   for (const filename of [
     '001_campus.sql',
     '002_explicit_api_grants.sql',
@@ -46,6 +49,7 @@ beforeAll(async () => {
     '005_baseline_reconciliation.sql',
     '006_reconciliation_safe_updates.sql',
     '007_source_field_reviews.sql',
+    '008_private_building_media.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -65,6 +69,38 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+describe('private media migration', () => {
+  it('keeps originals private and makes reviewed metadata immutable', async () => {
+    const id = randomUUID();
+    await database.query(
+      'insert into building_media(id,owner,original_path) values($1,$2,$3)',
+      [id, owner, `${owner}/${id}/original`],
+    );
+    await database.query(
+      "update building_media set status='approved',derivative_path='approved.webp',public_metadata='{}',reviewed_at=now() where id=$1",
+      [id],
+    );
+    await expect(
+      database.query(
+        "update building_media set public_metadata='{}' where id=$1",
+        [id],
+      ),
+    ).rejects.toThrow(/immutable/);
+    const access = await database.query<{ allowed: boolean }>(
+      "select has_table_privilege('anon','building_media','SELECT') as allowed",
+    );
+    expect(access.rows[0].allowed).toBe(false);
+    const bucket = await database.query<{ public: boolean }>(
+      "select public from storage.buckets where id='building-media'",
+    );
+    expect(bucket.rows[0].public).toBe(false);
+    const policies = await database.query<{ qual: string }>(
+      "select qual from pg_policies where tablename='building_media'",
+    );
+    expect(policies.rows[0].qual).toContain('auth.uid()');
+    expect(policies.rows[0].qual).toContain('admin_users');
+  });
 });
 
 describe('partial source acceptance', () => {

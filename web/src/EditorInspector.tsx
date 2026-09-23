@@ -1,4 +1,5 @@
 import { DrivingEditor } from './DrivingEditor';
+import { ArrivalEditor } from './ArrivalEditor';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { DoorOpen, Route, Trash2, Unlink, X } from 'lucide-react';
 import type { CampusData, MapEdit } from './types';
@@ -327,6 +328,12 @@ export function EditorInspector({
           </>
         )}
         <DrivingEditor edit={edit} data={data} onProperty={onProperty} />
+        <ArrivalEditor
+          key={edit.id}
+          edit={edit}
+          data={data}
+          onProperty={onProperty}
+        />
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">
             Walking access

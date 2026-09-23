@@ -15,6 +15,7 @@ import {
 } from '../server/backend.js';
 import { validateEdit } from '../src/editor-model.js';
 import { surveyAction } from '../server/surveys.js';
+import { mediaAction, validateMediaEdits } from '../server/building-media.js';
 import {
   publishedCampus,
   publishedRecords,
@@ -33,6 +34,12 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     const user = await requireAdmin(req);
     const { action, payload = {} } = bodyOf(req, 3_000_000);
     switch (action) {
+      case 'media-begin':
+      case 'media-process':
+      case 'media-approve':
+      case 'media-revise':
+        res.status(200).json(await mediaAction(user.id, action, payload));
+        break;
       case 'survey-list':
       case 'survey-get':
       case 'survey-save':
@@ -50,17 +57,15 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             ),
             publishedWorkspace(),
           ]);
-        res
-          .status(200)
-          .json({
-            edits,
-            changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
-            hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
-            reports,
-            jobs,
-            releases,
-            published,
-          });
+        res.status(200).json({
+          edits,
+          changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
+          hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
+          reports,
+          jobs,
+          releases,
+          published,
+        });
         break;
       }
       case 'review-status': {
@@ -78,15 +83,13 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           db<unknown[]>(changesQuery),
           publishedWorkspace(),
         ]);
-        res
-          .status(200)
-          .json({
-            jobs,
-            releases,
-            changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
-            hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
-            published,
-          });
+        res.status(200).json({
+          jobs,
+          releases,
+          changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
+          hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
+          published,
+        });
         break;
       }
       case 'sources':
@@ -178,6 +181,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             expectedUpdatedAt: item.expectedUpdatedAt,
           };
         });
+        await validateMediaEdits(clean.map((item) => item.edit));
         const result = await db('rpc/save_editor_batch', 'POST', {
           operation_id: operationId,
           actor_id: user.id,
