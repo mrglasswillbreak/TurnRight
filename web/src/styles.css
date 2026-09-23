@@ -897,6 +897,32 @@ svg {
   color: #647869;
   background: #ffffff66;
 }
+.map-canvas .maplibregl-popup-content {
+  color: var(--foreground);
+  background: var(--background);
+}
+.map-canvas .maplibregl-popup-close-button {
+  color: inherit;
+}
+.map-canvas .maplibregl-popup-close-button:hover {
+  background: var(--soft);
+}
+.map-canvas .maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.map-canvas .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.map-canvas .maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--background);
+}
+.map-canvas .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.map-canvas .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.map-canvas .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--background);
+}
+.map-canvas .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--background);
+}
+.map-canvas .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--background);
+}
 .place-detail {
   padding: 22px 24px;
   overflow-y: auto;
