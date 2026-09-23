@@ -1,0 +1,2201 @@
+{
+  "File:Lasu School of transport.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:103",
+    "caption": "School of Transport exterior",
+    "alt": "Cream multi-storey School of Transport building with red roof and a central entrance",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos state university school of communication.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:22",
+    "caption": "School of Communication exterior",
+    "alt": "School of Communication facade with rows of windows and the department sign",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Faculty of Education, Lagos State University(LASU).jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:54",
+    "caption": "Faculty of Education complex",
+    "alt": "Faculty of Education entrance complex with cream walls and red-brown columns",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Post-graduate school, LASU.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:43",
+    "caption": "Postgraduate School exterior",
+    "alt": "Postgraduate School sign on a cream entrance facade with a tall red-brown side wall",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Law library, LASU.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:76",
+    "caption": "Taslim Olawale Elias Law Library",
+    "alt": "Law Library facade and forecourt beneath the Taslim Olawale Elias Library sign",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lasu master of Business Administration complex.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:75",
+    "caption": "MBA complex exterior",
+    "alt": "MBA complex courtyard approach with parked cars and cream and red-brown facade",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos State University Students’ Arcade.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:32",
+    "caption": "Students’ Arcade exterior",
+    "alt": "Students’ Arcade with yellow wings and a central red-brown entrance block",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Senate building.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:120",
+    "caption": "Senate building, oblique view",
+    "alt": "Tall cream Senate building seen obliquely beside the campus road",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Faculty of Education, Lagos State University (LASU) Ojo.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:54",
+    "caption": "Faculty of Education entrance facade",
+    "alt": "Faculty of Education sign above the central entrance and broad steps",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos state university radio.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:55",
+    "caption": "LASU Radio exterior",
+    "alt": "LASU Radio building behind a circular paved forecourt and landscaping",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:School of Communication.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:22",
+    "caption": "School of Communication facade detail",
+    "alt": "Lower floors of the School of Communication with its sign and parked vehicles",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:LASU Senate Building Right Section 1.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:120",
+    "caption": "Senate building, right section",
+    "alt": "Right side of the cream and red-brown Senate building with projecting floor bands",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:LASU Láé Clinic.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:78",
+    "caption": "Law Clinic exterior",
+    "alt": "Law Clinic facade with red pitched roofs, cream walls and a foreground walkway",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:LASU Law Clinic, Ojo.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:78",
+    "caption": "Law Clinic, wider approach view",
+    "alt": "Law Clinic entrance facade framed by a tree and paved foreground steps",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos State University Senate building aug 2026 IMG 5989b.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:120",
+    "caption": "Senate building, August 2026",
+    "alt": "Senate building across its landscaped forecourt, framed by palms",
+    "historical": false,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos State University Babajide Olusola Sanwo-Olu Library Complex aug 2026 IMG 5997b.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:3",
+    "caption": "International Library atrium, August 2026",
+    "alt": "Interior atrium of the Babajide Olusola Sanwo-Olu Library Complex beneath a green glazed roof",
+    "historical": false,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos State University Babajide Olusola Sanwo-Olu Library Complex aug 2026 IMG 5994b.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:3",
+    "caption": "International Library exterior, August 2026",
+    "alt": "Front of the Babajide Olusola Sanwo-Olu Library Complex across a landscaped forecourt",
+    "historical": false,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original-source building name and visually matching facade; stable published building association corroborated by data/building-evidence.json. Reviewed as a general building view, not a confirmed doorway connection."
+  },
+  "File:Lagos State University Senate Building.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:120",
+    "caption": "Senate building, front facade",
+    "alt": "Front elevation of the Senate building, with red diamond motifs beside rows of windows",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
+  },
+  "File:Department of Theater Art and Music, Lagos State University.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:44",
+    "caption": "Theatre Art and Music exterior",
+    "alt": "Department of Theatre Arts and Music sign above the entrance of a two-storey yellow building",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
+  },
+  "File:IMG-20220313-WA0000.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:31",
+    "caption": "ICT Centre exterior",
+    "alt": "Yellow ICT Centre seen behind its perimeter fence and a tree",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original source identifies the ICT Centre at LASU; matched to the uniquely named ICT building in the accepted campus baseline. General exterior view only; no entrance or access assertion."
+  },
+  "File:IMG-20220313-WA0007.jpg": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:75",
+    "caption": "MBA complex courtyard approach",
+    "alt": "Tree-lined driveway toward the MBA complex, with its banner beside the entrance",
+    "historical": true,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
+  },
+  "File:Lagos State University Babajide Olusola Sanwo-Olu Library Complex aug 2026 IMG 6003.png": {
+    "status": "included",
+    "buildingId": "arcgis:University_Property:3",
+    "caption": "International Library across the gardens, August 2026",
+    "alt": "Library facade seen beyond planted gardens and a paved path",
+    "historical": false,
+    "qualityReviewedAt": "2026-09-23",
+    "reason": "Original source building identity, visible facade/sign and accepted campus building name agree. Distinct viewpoint visually reviewed against existing project evidence; no doorway connection inferred."
+  },
+  "File:MEMBERS OF THE CLUB PAYING RAPT ATTENTION.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG8.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 17.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 23.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 26.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 28.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 35.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 40.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 43.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 44.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Department Of Theatre Art, Lagos state University carnival parade3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 8.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sunset images at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 19.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:MissMooooo Training WUGN LASU.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (16).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (19).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU Excos and Volunteers.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Awareness LASU 04.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LEONARDO AZPIRI (7879606506).jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Ewa Agonyi 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Amala ati obe gbegri.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Food Inspection 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ofada rice.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Eko ati obe ata 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Eko ati obe ata 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Obe efo ati eran.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Eyan 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Eyan ati obe efo.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Lagos State University, entrance, 2014-12-15-16h23m26s252.png": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lagos State University, entrance, 2014-12-15-16h24m20s36.png": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lagos State University, entrance, 2014-12-15-16h24m39s231.png": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lagos State University, entrance, 2014-12-15-16h25m02s169.png": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lagos State University Entrance.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lagos State University, Epe Campus Library.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos state university gate.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Lasu center for planning.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Centre for Planning is identifiable, but its abbreviation/name has not been conclusively linked to a published footprint."
+  },
+  "File:Lagos state university center for response and prevention of Gender and sexual based violence.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Identified centre in the source, but a stable published building match remains unconfirmed."
+  },
+  "File:LASU Eco Market 2.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Eco Market is identified, but its individual market building/occupants do not have a confirmed footprint match."
+  },
+  "File:LASU Main Library 3.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "This is the older Fatiu Ademola Akesode Library, not the International Library. Published School Library identity requires confirmation."
+  },
+  "File:LASU Library Under Construction.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Historical library construction view. Its precise building match requires corroborating evidence."
+  },
+  "File:Landscape with the sky.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos State University Farm, Nigeria.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:WikidataNG3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sky images at lasu Epe campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:The Statue of Eyo.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Wikimedia User Group Nigeria- Lagos State University Fan Club members. 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Training at Lagos State University 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 20.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (7).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (9).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mofiyinfoluwa Atere Training WUGN LASU FAN CLUB.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:MissMooooo Training WUGN LASU FAN CLUB.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Refreshment at WUGN LASU FAN CLUB TRAINING.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 18.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 55.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 57.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 65.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 67.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 73.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 81.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 82.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 84.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 90.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 94.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 96.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 100.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 108.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:GROUP PHOTOGRAPH OF MEMBER OF WIKI CLUB LASU.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Meeting with HoD Yoruba Language Departments LASU.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sapala ati Ate.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ekuru ati Ata.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ewa (Beans).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sapala ati ate.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Eko ati obe ata.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU members during scavenger hunt.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU Leader (Jesugbogo Benjamin - Jesugbog0).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Editors.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Participants (1).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 58.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 87.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikibloggers.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikibloggers2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Food Inspection 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Food Inspection 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Department Of Theatre Art, Lagos state University carnival parade4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:An induction procession of the department of Theatre Arts Lagos state University.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wind blowing a coconut tree (Cocos nucifera).jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:WIKICLUB LASU EDIT.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Lasu Epe way.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Yoruba Wikipedia Training at Lagos State University 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Laundromart Lagos State University.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Laundromat identified at Ojo but no verified link to a published building footprint."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 15.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (2).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (8).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (14).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (13).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Bibisuccess training WUGN LASU FAN CLUB JUNE 2026.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Bibisuccess Training WUGN LASU FAN CLUB on Wikiquote.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Department Of Theatre Art, Lagos state University carnival parade2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Epe road after lasu.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Yoruba wikimedians user group training of lecturers and students at Lasu 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1lib1refLASU2024 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU Fan Club Logo.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 9.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 8.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (6).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (10).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (12).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ghetto, Lagos, Nigeria, 2014-12-15-16h20m27s242.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:12 LASU (096549).jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Workshop LASU 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU farm landscape.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:WikiClub LASU Leader training editors.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Awareness LASU 05.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Followup training for LASU Fa. Club.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikkibloggers4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 20.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 21.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 22.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU second gate.png": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Prof. Olanrewaju Fagbohun.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Nurse carrying supplies.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Maternity Ward.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Maternity Statue.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Roadside of Lagos State University.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:LASU Main Printing Press Building.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Printing press building identity is known but its published footprint remains unconfirmed."
+  },
+  "File:LASU Main Printing Press Building, Ojo.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Distinct printing press viewpoint; published footprint remains unconfirmed."
+  },
+  "File:Nigeria savannah beauty.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Main Entrance, Lagos State University of Education, Oto Ijanikin.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Ojo banner LASU Eco Market.jpg": {
+    "status": "duplicate",
+    "duplicateOf": "commons:116073985",
+    "reason": "Banner crop of the same Eco Market photograph; original candidate retained in the evidence queue."
+  },
+  "File:Yoruba indigenous cuisine.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 34.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 24.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 35.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 31.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Calabash bowl plate.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Adegbile Mariam Temilade 2026.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ghetto, Lagos, Nigeria, 12-15-16h20m56s237.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Department Of Theatre Art, Lagos state University carnival parade.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sunny day at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:A corn plantation at lasu Epe campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos State University of Science and Technology Main Gate.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Yoruba wikimedians user group training of lecturers and students at Lasu.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba wikimedians user group training of lecturers and students at Lasu 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User Group Nigeria- Lagos State University Fan Club members. 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User Group Nigeria- Lagos State University Fan Club members. 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Training at Lagos State University 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1lib1refLASU2024 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Professor Omotunde Boyo Deputy Vice Chancellor Admin Lagos State University Ojo Lagos Nigeria.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (3).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ghetto, Lagos, Nigeria, 2014-12-15-16h21m36s192.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:An induction procession of the department of Theatre Arts Lagos state University2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sky images at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Wikimedia User Group Nigeria- Lagos State University Fan Club members. 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Training at Lagos State University.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1lib1refLASU2024 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (17).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 8.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 9.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:1Lib1Ref LASU 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU Community.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Facilitators of the LASU training.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU training session.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU Wikipedia training1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU FAN CLUB.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 14.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 16.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 18.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 17.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 25.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 26.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 32.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 33.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU Green Environment.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:LASU followup training.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 15.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 19.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 23.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 27.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 29.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba indigenous cuisine 30.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Ewa Agonyi.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mofiyinfoluwa Atere 2026.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Lagos State University Health Centre.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Interior reception view; campus and specific Health Centre building match need corroboration."
+  },
+  "File:1lib1refLASU2024 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1lib1refLASU2024 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 0.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikimedians User Group Training at Lagos State University, Ojo Campus 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mofiyinfoluwa Atere meets Mr Willy Buloso at WUGN LEADERS RETREAT 2026.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (11).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sun rising at lasu Epe campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:A sunny day at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:1lib1refLASU2024 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University9.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mofiyinfoluwa Atere training WUGN LASU FAN CLUB.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (20).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Department Of Theatre Art, Lagos state University carnival parade5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Photo with LASU VC.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sunset at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Landscape images at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos State University of Science and Technology (Lasutech).jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:WUGN Lagos State University Logo.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 101.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University16.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 18.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:President, WUGN LASU Fan Club.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Official LASU shield.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:WikiClub LASU commons upload training.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Awareness LASU 01.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU commons upload training (1).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in 2025 image 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in 2025 image 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote in September 2025 image 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in 2025 image 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in 2025 image 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in 2025 image 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in September 2025 image 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Participants (3).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 14.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 56.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 62.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 70.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 71.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 78.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 89.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 76.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 99.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 106.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 22.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 51.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 103.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU commons upload training.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Participants(2).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Excos & Participants (2).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 17.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 69.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 72.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 88.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 91.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 97.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 98.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 105.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 107.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 21.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 159.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia User group Nigeria Lasu fan club Wikiquote event in September 2025 image 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 110.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU meetup 1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WIKI CLUB, LAGOS STATE UNIVERSITY HOLDS AN ORIENTATION PROGRAMME CENTERED ON WIKIPEDIA- WE INTRODUCED EVERYONE TO WIKIPEDIA, HOW THEY CAN CONTRIBUTE AND EDITING.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:AWMD Meetup 1 Lagos State University 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa, LASU participants.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Participant from LASU.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Surgical Emergency.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Sky image at lasu Epe campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Windmill image at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Windmill at LASU Epe Campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Sometimes Nature is all you need. So don’t forget to enjoy some level of Nature today 😌💙 01.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University0.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 8.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DURING THE PRACTICE OF EDITING ON WIKIPEDIA.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG4.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 15.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 18.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 24.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 27.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 25.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 29.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 41.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 46.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 14.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 16.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 20.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 19.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 21.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 36.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 38.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Professor Ibiyemi Olatunji-Bello.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 16.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 53.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 66.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 63.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 93.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 95.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 102.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 101.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 104.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:G-LASU Eurocopter EC135 Helicopter National Police Air Service (35638586682).jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Wikimedia UGN visit LASU VC 10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 16.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Day Participants from Lagos State University.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:A pig farming at lasu Epe.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos State University Central library.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Historical central library construction view; sunset and partial facade do not establish a reliable footprint match."
+  },
+  "File:LASU Wikipedia training 2.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 221.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (5).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU Community Members.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU Volunteer.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 37.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiGlam Awareness for Librarians in Lagos state.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikiclub, Lagos State university.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 9.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mahveotm during the Wikipedia exclusive section for Lagos State University Staff 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Sunset at lasu Epe campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Lagos State University Of Education, Entrance gate.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Cusine Practical Test and Food Carnival Collaboration With Department of Linguistics, African Languages and Communication Arts, Lagos State University 000.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:2026 President, WUGN LASU Fan Club meets Mr Willy Buloso ,Senior Program Officer for the Sub-Saharan Africa Region.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Mofiyinfoluwa Atere meets Mr Willy Buloso.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (4).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (15).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WUGN LASU FAN CLUB JUNE 2026 (18).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Bibisuccess training WUGN LASU FAN CLUB 2026.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Group photo after training.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:The annual Yoruba indegenouse cousin.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Yoruba Wikipedia Training,.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU group photo.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU Wikipedia training 3.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU FAN CLUB M.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU FAN CLUB W.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wiki Loves Africa 2023 - WikiClub LASU Excos & Participants (1).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 15.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 79.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 153.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 152.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 151.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 155.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 154.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 156.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 157.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 158.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:DSC08305 copyFreshers and Asa Day. Linguistics and language studies, LASU 160.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 06.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:A COVID-19 Response Ambulance.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Abisogun Leigh Science Building, Faculty of Science, Lagos State University.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Abisogun Leigh Science Building has a named place, but it is not conclusively linked to a published footprint."
+  },
+  "File:Bola Ahmed Tinubu Science Complex, Faculty of Science, Lagos State University.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Bola Ahmed Tinubu Science Complex is not conclusively matched to New Science Block or another published footprint."
+  },
+  "File:Enitan Bababunmi Science Laboratory, Faculty of Science, Lagos State University.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Enitan Bababunmi Science Laboratory is not conclusively matched to a published footprint."
+  },
+  "File:Enitan Bababumi science laboratory building, Lasu.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Enitan Bababunmi Science Laboratory is not conclusively matched to a published footprint."
+  },
+  "File:Abisogun Leigh Science Building,Lasu.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Abisogun Leigh Science Building has a named place, but it is not conclusively linked to a published footprint."
+  },
+  "File:Farm Settlement of LASU Fulani and Hausa Farmers.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:An Hausa Farmer in the Lagos State University.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Hussam Okoya-Thomas Sports Hall, LASU Sports Centre.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Sports Hall identity is known, but Sports Center may cover a different footprint; do not conflate them."
+  },
+  "File:Ebubechukwu1.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Front view of the best state university in Nigeria.jpg": {
+    "status": "awaiting evidence/permission",
+    "reason": "Campus gate photograph; no reviewed association to an inventoried building footprint. Keep as a future gate/entrance evidence candidate."
+  },
+  "File:Ants marching in unique form.jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Dr. Fatai Abatun.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Epe road.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Newly elected leaders of Yorùbá wikimedians user group fans' club and the President of YWUG, Mr. Mikaeel Sodiq Adesina at Lagos State University.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Lagos State University logo.png": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Lagos State University of Education, Epe Campus.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:LAGOS STATE UNIVERSITY OF EDUCATION, LASUED.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:LAGOS STATE UNIVERSITY OF SCIENCE AND TECHNOLOGY.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 20.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 59.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 60.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 61.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 64.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 68.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 83.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 92.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Staff Wiki meetup 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG9.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikidataNG 42.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Winner of the Scavenger hunt.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LEONARDO AZPIRI (7885715676).jpg": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:LASU Bloggers.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 14.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 13.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU Epe clinic awareness.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:Workshop LASU 7.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 6.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Workshop LASU 5.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:1Lib1Ref LASU 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:WikiClub LASU members.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Simisola Ekunkan (Gen. Sec WikiClub LASU) and Jesugbogo Benjamin (President WikiClub LASU).jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU FAN CLUB B.png": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 52.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 74.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 85.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Freshers and Asa Day. Linguistics and language studies, LASU 86.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 02.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikidata training at LASU OJO 10.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 03.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 11.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia Yoruba edit-a-thon in LASU 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 01.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 05.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 04.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 09.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 08.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 07.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 12.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 15.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 14.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Wikimedia UGN visit LASU VC 17.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:LASU road.jpg": {
+    "status": "rejected",
+    "reason": "Different campus or institution; outside the published LASU Ojo coverage."
+  },
+  "File:LASEK.JPG": {
+    "status": "rejected",
+    "reason": "Unrelated search result, nature/road/landscape view or non-building subject; no verified published building match."
+  },
+  "File:Road is free.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  },
+  "File:Water transportation.jpg": {
+    "status": "rejected",
+    "reason": "Source describes an event, people, food, portrait or training activity, without an identified useful building view."
+  }
+}
