@@ -9,6 +9,8 @@ import {
   validateReleaseSnapshot,
 } from "../web/server/release-validation";
 import { preservePublished } from "../web/scripts/published-assets.mjs";
+import { prepareReleasePhotos } from './photo-release.mjs';
+import { arrivalIssues } from '../web/src/arrival';
 import { vercelApi, uploadSource, waitForDeployment, publishDeployment } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
@@ -31,6 +33,7 @@ try {
       throw new Error("No approved source baseline. Run bootstrap first.");
     const published = await publishedCampus();
     const data = validateReleaseSnapshot(release.snapshot, published);
+    await prepareReleasePhotos(data, root);
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
     execFileSync(
@@ -71,6 +74,9 @@ try {
     const manifest = JSON.parse(
       await fs.readFile(path.join(web, "public/packages/latest.json"), "utf8"),
     );
+    const packagedData = JSON.parse(await fs.readFile(path.join(web, 'public', manifest.dataUrl), 'utf8'));
+    const photoIssues = arrivalIssues(packagedData);
+    if (photoIssues.length) throw new Error(photoIssues.join('\n'));
     await fs.writeFile(
       path.join(web, "release-build.json"),
       JSON.stringify({ version: manifest.version, releaseId: id }),

@@ -44,10 +44,18 @@ export async function preservePublished(
     ![1, 2].includes(manifest.schemaVersion) ||
     !/^lasu-[a-f0-9]+$/.test(manifest.version) ||
     !Array.isArray(manifest.assets) ||
-    manifest.assets.length > 200 ||
-    manifest.bytes > 25 * 1024 * 1024
+    !Number.isSafeInteger(manifest.bytes) || manifest.bytes <= 0
   )
     throw new Error('Unsupported published map manifest');
+  const photoUrls = new Set(manifest.photos?.assetUrls || []);
+  const regular = manifest.assets.filter((a) => !photoUrls.has(a.url));
+  if (regular.length > 200 || regular.reduce((n, a) => n + a.bytes, 0) > 25 * 1024 * 1024 ||
+      new Set(manifest.assets.map((a) => a.url)).size !== manifest.assets.length ||
+      manifest.assets.some((a) => !Number.isSafeInteger(a.bytes) || a.bytes <= 0 || !/^[a-f0-9]{64}$/.test(a.sha256)) ||
+      manifest.bytes !== manifest.assets.reduce((n, a) => n + a.bytes, 0) ||
+      [...photoUrls].some((url) => !manifest.assets.some((a) => a.url === url && a.url === `/packages/photos/${a.sha256}.webp` && a.bytes <= 250 * 1024)) ||
+      (manifest.photos?.bytes || 0) !== manifest.assets.filter((a) => photoUrls.has(a.url)).reduce((n, a) => n + a.bytes, 0))
+    throw new Error('Invalid published asset manifest');
   if (expectedVersion && manifest.version !== expectedVersion)
     throw new Error(
       'The public campus changed during this build. Create a fresh reviewed preview.',

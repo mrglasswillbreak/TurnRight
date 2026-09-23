@@ -8,6 +8,7 @@ export function withPublishedVisuals(
   base = {
     ...base,
     photos: base.photos ?? published.photos,
+    photoOverrides: base.photoOverrides ?? published.photoOverrides,
     places: base.places.map((p) => ({
       ...p,
       arrival:

@@ -1,6 +1,7 @@
 data/raw/
 data/candidates/
 data/release-input.json
+data/release-photos/
 node_modules/
 .env*
 !.env.example

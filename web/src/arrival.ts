@@ -105,9 +105,15 @@ export function guideErrors(value: unknown): string[] {
       continue;
     if (
       !date(g.observedAt) ||
-      !g.evidence?.[field]?.length ||
+      !Array.isArray(g.evidence?.[field]) ||
+      !g.evidence[field].length ||
       g.evidence[field].some(
-        (e) => !text(e.sourceId) || !text(e.recordId) || !date(e.checkedAt),
+        (e) =>
+          !e ||
+          !text(e.sourceId) ||
+          !text(e.recordId) ||
+          !date(e.checkedAt) ||
+          (e.url !== undefined && !https(e.url)),
       )
     )
       errors.push(
@@ -214,7 +220,9 @@ export function arrivalIssues(data: CampusData): string[] {
   }
   for (const e of [...data.places, ...(data.entrances || [])]) {
     issues.push(...guideErrors(e.arrival).map((s) => `${e.id}: ${s}`));
-    for (const id of e.arrival?.photoIds || []) {
+    for (const id of Array.isArray(e.arrival?.photoIds)
+      ? e.arrival.photoIds
+      : []) {
       const p = data.photos?.find((photo) => photo.id === id);
       const buildingId =
         'placeId' in e

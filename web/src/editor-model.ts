@@ -10,6 +10,7 @@ import {
   validPhoto,
   publicPhoto,
   canonicalBuildingId,
+  arrivalIssues,
 } from './arrival.js';
 import { applyDrivingEdits, drivingIssues } from './driving-data.js';
 import { validateBuildingStyle } from './building-style-validation.js';
@@ -483,6 +484,10 @@ export function applyEdits(
       props.photos !== undefined &&
       ['building', 'entrance'].includes(edit.kind)
     ) {
+      if (edit.kind === 'building')
+        data.photoOverrides = [
+          ...new Set([...(data.photoOverrides || []), buildingId(edit.id)]),
+        ];
       const belongs = (p: CampusPhoto) =>
         edit.kind === 'entrance'
           ? p.entranceId === edit.id
@@ -1172,6 +1177,8 @@ export function applyEdits(
     disconnected: data.places.filter((p) => !p.graphNode).map((p) => p.id),
     fieldVerified: false,
   };
+  for (const message of arrivalIssues(data))
+    issue(message, 'campus', 'building', { code: 'arrival-media' });
   return {
     data,
     errors: [...new Set(errors)],

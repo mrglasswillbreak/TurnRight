@@ -212,6 +212,8 @@ export interface CampusData {
   buildingIdAliases?: Record<string, string>;
   visuals?: VisualCatalogue;
   photos?: CampusPhoto[];
+  /** Explicit owner galleries override subsequent research imports, including removals. */
+  photoOverrides?: string[];
   entrances?: Entrance[];
   graph: RoutingGraph;
   driving?: {

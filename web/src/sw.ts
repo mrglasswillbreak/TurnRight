@@ -12,7 +12,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
-    denylist: [/^\/api\//, /^\/auth\//],
+    denylist: [/^\/api\//, /^\/auth\//, /^\/(packages|audio|glyphs)\//],
   }),
 );
 self.addEventListener('message', (event) => {

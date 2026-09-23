@@ -118,7 +118,7 @@ export function preserveReviewedMetadata(previous, candidate) {
   // not the import's candidate hash. Keep it until an explicit reconciliation.
   // Published release versions are assigned from the immutable release snapshot.
   meta.payload.version = old.version;
-  for (const key of ["visuals", "entrances", "closures", "placeIdAliases", "buildingIdAliases"])
+  for (const key of ["visuals", "photos", "photoOverrides", "entrances", "closures", "placeIdAliases", "buildingIdAliases"])
     if (old[key] !== undefined) meta.payload[key] = structuredClone(old[key]);
   if (old.driving) {
     meta.payload.schemaVersion = 2;
@@ -136,5 +136,12 @@ export function preserveReviewedMetadata(previous, candidate) {
     };
   }
   meta.hash = hash(meta.payload);
+  for (const record of candidate) {
+    const previousRecord = previous.find((r) => r.id === record.id);
+    if (record.entity === 'place' && previousRecord?.payload.arrival) {
+      record.payload.arrival = structuredClone(previousRecord.payload.arrival);
+      record.hash = hash(record.payload);
+    }
+  }
   return candidate;
 }

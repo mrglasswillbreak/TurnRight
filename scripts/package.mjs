@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { packageVisuals } from "./visual-package.mjs";
 import { publicCampus } from './public-campus.mjs';
 import { packageGlyphs } from './package-glyphs.mjs';
+import { packagePhotos } from './photo-package.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -37,6 +38,7 @@ const visuals = await packageVisuals(
 if (process.env.VISUALS_INPUT && !visuals)
   throw new Error("The rebuilt visual catalogue is missing; release packaging stopped.");
 if (visuals) data.visuals = visuals.catalogue;
+const photos = await packagePhotos(data, root, asset);
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
@@ -56,6 +58,7 @@ const manifest = {
   bytes: assets.reduce((sum, a) => sum + a.bytes, 0),
   assets,
   ...(visuals ? { visuals: visuals.manifest } : {}),
+  ...(photos ? { photos } : {}),
 };
 const manifestJson = JSON.stringify(manifest, null, 2);
 await fs.writeFile(path.join(publicDir, "packages", version, "manifest.json"), manifestJson);
