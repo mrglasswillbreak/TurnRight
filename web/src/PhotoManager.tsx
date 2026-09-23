@@ -207,6 +207,11 @@ export function PhotoManager({
     [busy, setBusy] = useState<string | false>(false),
     [message, setMessage] = useState(''),
     [error, setError] = useState('');
+  const [reviewVisited, setReviewVisited] = useState(false);
+  useEffect(() => {
+    if (!open) setReviewVisited(false);
+    else if (tab === 'review') setReviewVisited(true);
+  }, [open, tab]);
   const [removed, setRemoved] = useState(false),
     [query, setQuery] = useState(''),
     [library, setLibrary] = useState<PrivatePhoto[]>([]),
@@ -590,6 +595,26 @@ export function PhotoManager({
     if (apply(next)) setGalleryPage(Math.floor(to / 20));
     else galleryFocus.current = null;
   };
+  const chosenBuilding = job?.metadata.buildingId;
+  const buildingError = fieldErrors.buildingId;
+  const buildingPicker = useMemo(
+    () => (
+      <label className="field-label">
+        Pictured building
+        <select
+          aria-label="Pictured building"
+          aria-invalid={!!buildingError}
+          value={chosenBuilding || ''}
+          onChange={(e) => change('buildingId', e.target.value)}
+        >
+          <option value="">Choose building</option>
+          {buildingOptions}
+        </select>
+        {buildingError && <span className="photo-error">{buildingError}</span>}
+      </label>
+    ),
+    [chosenBuilding, buildingError, buildingOptions, change],
+  );
   const reviewForm = useMemo(() => {
     const field = (label: string, key: keyof CampusPhoto, type = 'text') => (
       <label className="field-label" key={key}>
@@ -656,21 +681,7 @@ export function PhotoManager({
           >
             {field('Caption', 'caption')}
             {field('Image description (alternative text)', 'alt')}
-            <label className="field-label">
-              Pictured building
-              <select
-                aria-label="Pictured building"
-                aria-invalid={!!fieldErrors.buildingId}
-                value={job.metadata.buildingId || ''}
-                onChange={(e) => change('buildingId', e.target.value)}
-              >
-                <option value="">Choose building</option>
-                {buildingOptions}
-              </select>
-              {fieldErrors.buildingId && (
-                <span className="photo-error">{fieldErrors.buildingId}</span>
-              )}
-            </label>
+            {buildingPicker}
             <label className="field-label">
               Photograph of
               <select
@@ -863,7 +874,7 @@ export function PhotoManager({
     fieldErrors,
     shared,
     index,
-    buildingOptions,
+    buildingPicker,
     queueOrder,
     attaching,
     editable,
@@ -1184,8 +1195,8 @@ export function PhotoManager({
                   )}
                 </>
               )}
-              {tab === 'review' && (
-                <>
+              {open && (reviewVisited || tab === 'review') && (
+                <div hidden={tab !== 'review'}>
                   {!queue.jobs.length && (
                     <p>
                       No unfinished photos. Choose Gallery → Add photos to get
@@ -1313,7 +1324,7 @@ export function PhotoManager({
                     </aside>
                     {reviewForm}
                   </div>
-                </>
+                </div>
               )}
             </fieldset>
           </div>

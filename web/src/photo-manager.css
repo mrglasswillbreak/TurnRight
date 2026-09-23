@@ -7,6 +7,8 @@
 }
 .photo-review-form,
 .photo-queue-card {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 140px;
   contain: layout style;
 }
 .photo-strip {
