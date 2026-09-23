@@ -1,5 +1,34 @@
 # Production deployments
 
+## Corrected photograph collection — 23 September 2026
+
+The corrective preview **`lasu-874f9cd2158c`** passed the
+[release workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35818195877)
+at application revision `f2a506d`. It contains **21** licensed photographs for
+the same **13 of 420** buildings, totaling **4,218,642 bytes**. Its complete map,
+photos, models and voice download reached **Ready offline** in the deployed
+preview. The library retains an exterior view and an atrium photograph.
+
+Full original metadata review revealed that Commons image `199191750` declares
+`trainedAlgorithmicMedia` and "Made with Google AI". It is withdrawn from the
+research catalogue and excluded when repackaging an older baseline. Its source
+audit remains reproducible, and every included source now requires an original
+metadata check. The 7,976 research records now comprise 21 included, 167 duplicate,
+7,725 rejected and 63 awaiting evidence/permission.
+
+Migration **009** is applied and verified. Production logs located reconciliation
+timeouts first in whole-snapshot comparison and then in replacing unchanged source
+rows. The migration compares individual full records and writes only changed rows,
+retaining the owner guard, exact stale-review checks, table lock, rollback records
+and private execution grants. Reconciliation to `lasu-cb5e27351c8b` then succeeded,
+retaining all 104 correction records. Database regression tests verify unchanged
+timestamps, reordered snapshots, duplicate/missing IDs, changed access with an
+unchanged hash, unauthorized callers, rollback, drafts and history preservation.
+
+The preview is reviewed and publication has been requested. Confirmation in the
+owner browser is pending after browser automation stalled on the native dialog.
+The production receipt below still describes the preceding 22-image release.
+
 ## Entrance guides and photographs — 23 September 2026
 
 Published **`lasu-cb5e27351c8b`** at [TurnRight](https://turnright.vercel.app/)
