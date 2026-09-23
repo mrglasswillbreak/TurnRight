@@ -91,7 +91,9 @@ No screenshot contains production owner drafts or private reports. The update no
 
 The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
 
-The reviewed collection contains **21 photographs for 13 of 420 buildings**; 407 buildings still lack a verified photograph. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
+The researched collection contains **21 photographs for 13 of 420 buildings**; owner-approved uploads can add to this collection. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
+
+The photo editor now has a visual **Manage photos** workspace with multiple uploads, individual retries, guided source/author review, cover ordering, an offline-compatible public preview and private recovery. Migration 010 and schema-3 readers are deployed; new photographs still publish through owner release review.
 
 The 17–18 September updates include:
 
@@ -305,7 +307,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The generalized world overview uses public-domain Natural Earth v5.1.2 at 1:110m scale. It does not add worldwide roads or routing coverage. No external tile service or satellite imagery is required.
 
-The repository seed is **`lasu-b487503395f2`**. The public manifest checked on **23 September 2026** is **`lasu-874f9cd2158c`**, containing **420 buildings, 220 places and 21 photographs**, with **66 assets / 9,909,392 bytes**. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The repository seed is **`lasu-b487503395f2`**. The public manifest checked on **23 September 2026** is **`lasu-286bae3c6016`**, containing **420 buildings, 220 places and 22 photographs**, with **67 assets / 9,977,021 bytes**. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 

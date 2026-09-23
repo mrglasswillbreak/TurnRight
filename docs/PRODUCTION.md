@@ -1,5 +1,36 @@
 # Production deployments
 
+## Visual photo workspace — 23 September 2026
+
+Deployed the photo workspace and schema-3 readers at application revision
+`f443f23` through [Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/C5nbfboZtxcSg8MtGkKNiYg9b1xD).
+The owner editor shows thumbnail galleries, populated photo details, previously
+reviewed rights and the searchable private-upload gallery against real campus
+content. A follow-up labels legacy uploads without recorded targets as
+**Building not selected**. The verification review was removed from the local
+queue without editing or publishing campus content.
+
+Migration **010** was applied before deployment. All seven added columns were
+verified, alongside owner RLS, the enabled approved-record immutability trigger,
+a private storage bucket and no anonymous table reads. An unauthenticated live
+`media-library` request returned **401**. Original files, draft metadata, revision
+links and authorship declarations remain private.
+
+Checks passed: the complete 442-test Vitest suite plus subsequent focused photo
+regressions, 23 Python import tests using the pinned data requirements,
+TypeScript/lint (seven existing warnings), production build and all asset
+budgets. Desktop/mobile photo journeys cover retries, interrupted batch approval,
+local recovery, captions, cover ordering, undo/redo, keyboard focus restoration,
+public previews and selection changes during uploads. Production service-worker
+journeys passed offline reloads for both schema 1 and schema 3 photographs.
+
+The app build preserved the owner's existing published **`lasu-286bae3c6016`**
+release: schema 2, 420 buildings, 220 places, **22 photos**, **67 required assets**
+and **9,977,021 bytes**. This comprises the corrected 21-image research collection
+and an additional approved owner upload. No schema-3 content was published by
+this rollout. Future author-provided photos without external source URLs use
+schema 3 after the normal preview, publication and rollback review.
+
 ## Corrected photograph collection — 23 September 2026
 
 The corrective preview **`lasu-874f9cd2158c`** passed the
@@ -25,8 +56,8 @@ retaining all 104 correction records. Database regression tests verify unchanged
 timestamps, reordered snapshots, duplicate/missing IDs, changed access with an
 unchanged hash, unauthorized callers, rollback, drafts and history preservation.
 
-Publication completed through the owner workflow. The current public manifest
-confirms **`lasu-874f9cd2158c`**, with 21 photographs and 66 required assets
+Publication completed through the owner workflow. Its public manifest
+confirmed **`lasu-874f9cd2158c`**, with 21 photographs and 66 required assets
 totaling **9,909,392 bytes**. The historical receipt below describes the preceding
 22-image release.
 
