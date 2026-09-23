@@ -17,6 +17,8 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 - [Features](#features)
 - [Quick start](#quick-start)
 - [Using the public map](#using-the-public-map)
+- [Driving on campus](#driving-on-campus)
+- [Entrance guides and photographs](#entrance-guides-and-photographs)
 - [Appearance and 3D](#appearance-and-3d)
 - [Owner editor](#owner-editor)
 - [Building appearance and roofs](#building-appearance-and-roofs)
@@ -89,6 +91,8 @@ No screenshot contains production owner drafts or private reports. The update no
 
 The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
 
+The reviewed collection contains **21 photographs for 13 of 420 buildings**; 407 buildings still lack a verified photograph. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
+
 The 17–18 September updates include:
 
 - **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).
@@ -113,7 +117,9 @@ These are application/editor changes. Public routing changes only after the owne
 | Driving directions | Offline campus drive-and-walk journeys, vehicle permissions and one-way roads, turn restrictions, estimated ETA, parking selection, voice guidance, and a confirmed parking-to-walking handoff. Private roads and parking require separate owner driving review. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
 | Navigation | Foreground GPS, natural offline British English voice, balanced turn timing, close-turn combinations, mapped names, remaining distance/ETA, route following, sustained-deviation rerouting and three-fix arrival confirmation. |
-| Destination sharing | Copy a stable place link or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
+| Entrance guides | Best mapped entrance by default, optional explicit connected entrance, recorded approach/restriction/accessibility facts and a guide available during navigation and arrival. |
+| Building photographs | Shared occupant galleries, entrance-specific photos, historical labels and offline source/license credits; all approved photographs are included in verified downloads. |
+| Destination sharing | Copy a stable place link with an optional entrance ID or use native sharing; published aliases resolve old IDs and missing destinations offer a search fallback. |
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
 | Owner editing | Autosave, grouped undo/redo, controlled automatic crossings and explicit joins, selection framing, publication-relative drafts, recoverable drawings/roof plans, guided repairs and conflicts. |
@@ -155,9 +161,9 @@ Zoom out with the minus button or a pinch/scroll gesture to reveal the globe. Dr
 When a new app version is ready, a notice appears over the public map with an **Install update** button. Updates are checked while the app is visible and when you return online. Installation waits until you finish navigation. You can also install from Settings.
 
 1. Search for a building, faculty or service, or narrow the map with a category.
-2. Open its details to check provenance, walking coverage and any building evidence. Save, share or report the place.
-3. Choose **Directions**, then a current-location or manual origin. Compare the available alternatives and connection notices.
-4. Choose **Start walking**, allow location/audio and keep the application visible. Use mute, repeat, the instruction list and **Follow me** as needed.
+2. Open its details to check provenance, photographs, entrances and route coverage. Save, share or report the place.
+3. Choose **Directions**, Walking or Driving + walking, and a current-location or manual origin. Review the destination entrance, any parking choice, alternatives and connection notices.
+4. Start the available journey, allow location/audio and keep the application visible. Use mute, repeat, the instruction list and **Follow me** as needed. Driving requires a confirmed parking-to-walking handoff.
 
 Voice directions use complete prerecorded sentences. Advance warnings adapt to recent walking speed (30–60 m); immediate turns need good location accuracy. Consecutive turns within 25 m are combined. Repeat describes the current state, including GPS loss or arrival. Muting, stopping and backgrounding cancel speech. New or renamed places without a recording keep their visible names and receive generic speech. **Settings → Preview voice directions** plays a sample outside navigation.
 
@@ -173,6 +179,16 @@ Keep the app visible. At the mapped vehicle endpoint, stop and park, then choose
 
 The bundled map includes source-derived vehicle rules, but private campus roads and parking connections await owner driving review. An unavailable driving journey is expected until permitted roads, gates, parking and walking links are connected and published. Existing walking-only packages continue to work; update the campus package to obtain driving data. [Driving data, owner workflow and verification](docs/DRIVING.md).
 
+## Entrance guides and photographs
+
+Open a destination's **Building photographs** and **Entrances & arrival** sections. Galleries show distinct reviewed views, captions, historical labels, recorded capture dates and source-check dates. **Photo credits & license** contains the author, original source, reuse license and modification notices. Occupants share their building's photographs without downloading duplicate assets; a general building photograph does not identify every occupant's doorway.
+
+**Destination entrance** defaults to **Best mapped entrance**. Where permitted, connected entrances exist, choose one explicitly. That choice survives alternatives, rerouting and driving-to-walking transitions. A closed, missing or disconnected selection requires another choice. Shared links can include `entrance=<stable-id>`; existing place-only links continue to work.
+
+The map distinguishes connected entrances, unconfirmed connections and mapped approaches. **Mapped approach …; final entrance not verified** means the route ends on a mapped path near the destination. It does not confirm a doorway connection. Recorded steps, ramps, surfaces and measured doorway widths remain observations, with unknown details left unknown; no accessible-route guarantee is implied.
+
+Owners edit guides and review image identity, rights, captions, alternative text and order in the editor. Original uploads and reviewer records remain private. Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
+
 ## Appearance and 3D
 
 **Settings → Appearance** is available in both the public map and owner editor:
@@ -184,6 +200,8 @@ The bundled map includes source-derived vehicle rules, but private campus roads 
 | **Dark** | Uses dark panels, blue-grey terrain and streets, green vegetation and blue water. |
 
 Explicit choices persist across reopening and synchronize between tabs on the same origin. Storage failure retains the choice for the current session and shows a message. Changing the theme keeps the mounted map, camera, selection, drawing and roof draft.
+
+Entrance and mapped-approach popup text, background, pointer and close button follow the active theme, including while a popup is open.
 
 The map has **one view button**: **3D** switches into 3D; **2D** returns to 2D. There is no attached chevron. **Settings → 3D rendering** offers Enhanced and Simple; Enhanced is the default and an existing saved Simple choice is respected. Editor Settings also provides live **Tilt** in 3D and **Building opacity**.
 
@@ -268,7 +286,7 @@ An initial online visit and a completed download are required. Installation and 
 | Content | Storage / behavior |
 | --- | --- |
 | App shell, UI, fonts, map/model/routing workers, world overview and natural voice | Service-worker precache; world data and natural audio are included automatically |
-| Campus geometry, routing, glyphs, legacy fallback audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
+| Campus geometry, routing, arrival guides, approved photographs and credits, glyphs, legacy fallback audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
 | Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
 
 The natural voice pack is saved automatically with the **app**, independently of the campus download, with an 8 MiB total budget. Ordinary deployments reuse its checked-in recordings; no speech model runs on a phone. Existing campus-packaged recordings remain available as a fallback. Finish saving the app **and** downloading the campus map before disconnecting.
@@ -276,6 +294,8 @@ The natural voice pack is saved automatically with the **app**, independently of
 The world overview adds **260,913 bytes (about 255 KB)** before compression. It uses the country-label font already included in the campus download. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
 
 Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. The public **App update ready** notice and **Settings → Install update** activate a waiting application update with editing/navigation safeguards. App-update checks run once a minute while visible and online, and on returning to the app or reconnecting. Installing remains an explicit action; it is disabled during an active walk.
+
+The campus download includes **every approved release photograph** and its required credits. Photo totals above 20 MiB produce a size warning, not silent omissions. Every required asset must verify before activation; integrity repair and immutable older assets support recovery and rollback. Older packages remain readable with absent guides and galleries omitted.
 
 **Download local recovery** immediately exports the owner workspace without waiting for the server, including pending edits, unfinished geometry/roof work, undo history, save receipts and baseline information. Full server backup export is a separate online operation. Prepare an owner workspace online before relying on offline reopening.
 
@@ -285,7 +305,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The generalized world overview uses public-domain Natural Earth v5.1.2 at 1:110m scale. It does not add worldwide roads or routing coverage. No external tile service or satellite imagery is required.
 
-The repository seed is **`lasu-4e4c8008b38b`**. A verified production snapshot on 15 September 2026 was **`lasu-2f6ca683a0fb`**, with **45 assets / 4,798,173 bytes**, including the owner's roof release. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The repository seed is **`lasu-b487503395f2`**. The public manifest checked on **23 September 2026** is **`lasu-874f9cd2158c`**, containing **420 buildings, 220 places and 21 photographs**, with **66 assets / 9,909,392 bytes**. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -300,6 +320,8 @@ Seed coverage is a reproducible baseline, not a claim about later owner releases
 | Campus field verification | Pending |
 
 A mapped approach uses existing paths near the destination, without inventing the final connection. Reviewed student-access corrections permit specified internal roads, the Faculty of Law driveway and International Library gate; other restrictions, barriers, parking aisles and closures remain in force. Visual appearance changes do not modify routing.
+
+The photograph inventory covers all 420 published buildings and accounts for all **7,976 records** discovered in its documented snapshots: **21 included, 167 duplicate, 7,725 rejected and 63 awaiting evidence or permission**. These are source-record counts, not a claim to have found every photograph online. Uncertain building matches, unlicensed material and declared synthetic imagery are excluded. [Reproducible inventory and coverage](data/photos/README.md).
 
 The roof assessment covered 380 footprints and proposed 46 wing roofs across 44 buildings; most are illustrative, with photographic support for three building forms. This is a dated assessment, not a guarantee that every building has an accurate model. [Coverage and access](docs/CAMPUS-ACCESS.md) · [Machine-readable seed coverage](data/coverage-report.json) · [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md).
 
@@ -335,7 +357,7 @@ Published navigation does not require the admin database to be available. Model 
 
 Public seed exploration requires no credentials. Connected administration/reports need [web/.env.example](web/.env.example), Supabase GitHub OAuth, the owner allowlist, database migrations and workflow configuration.
 
-Apply the migrations in order through **[006_reconciliation_safe_updates.sql](supabase/migrations/006_reconciliation_safe_updates.sql)**. They include private surveys and safe baseline reconciliation. Follow the deployment guide's base setup and the reconciliation notes in the production record.
+Apply the migrations in order through **[009_bounded_baseline_comparison.sql](supabase/migrations/009_bounded_baseline_comparison.sql)**. Migration [007](supabase/migrations/007_source_field_reviews.sql) adds field-level source reviews; [008](supabase/migrations/008_private_building_media.sql) adds private building media storage and owner-only metadata; [009](supabase/migrations/009_bounded_baseline_comparison.sql) bounds source comparisons and writes only changed baseline rows while retaining authorization, stale-review checks and rollback records. Follow the deployment guide's base setup and the reconciliation notes in the production record.
 
 | Variables | Scope |
 | --- | --- |
@@ -384,7 +406,7 @@ python -m unittest discover -s scripts/tests -v
 
 Coverage includes source normalization, appearance persistence/storage failures, grouped undo, save receipts, concurrent field/surface edits, geometry identity, constrained roofs, editor/release parity, drawing/roof recovery, worker failure/stale replies, package integrity and offline reopening. Browser tests use real map/rendering libraries with isolated authentication, API and hardware fixtures. Enhanced zoom cases inspect actual shader material colours and draw calls, including legacy meshes and repeated theme/zoom changes.
 
-Latest local checks on **18 September 2026** (globe/editor browser checks below were completed on 17 September):
+Historical local checks on **18 September 2026** (globe/editor browser checks below were completed on 17 September). Newer entrance, photo, driving and publication checks are recorded in [Production](docs/PRODUCTION.md) and [Entrance guides](docs/ARRIVAL-GUIDES.md).
 
 | Check | Result |
 | --- | --- |
@@ -427,6 +449,7 @@ TurnRight/
 | --- | --- |
 | Models look like basic blocks | Check **Settings → 3D rendering → Enhanced**, then zoom closer. Inspect the model status or retry failed assets. Some footprints have no enhanced model. |
 | Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
+| Mapped-approach text is pale on a white popup in Dark mode | Install the available **app update** from the notice or Settings. Popup text and surfaces now follow the active theme; no campus-data update is required for this display fix. |
 | Editor stays in the wrong theme | Use **Editor Settings → Appearance → Light/Dark**, or **Device** to resume automatic changes. |
 | A roof preview is outdated | Use **Retry 3D preview** and inspect geometry/elevation errors. The last valid model and unfinished roof are retained. |
 | A long selected path extends off-screen on a phone | This preserves local map detail by limiting zoom-out. Pan along the highlighted path or use the zoom-out control to see more. |
@@ -446,6 +469,8 @@ TurnRight/
 | Guide | Topics |
 | --- | --- |
 | [Editor](docs/EDITOR.md) / [Reliability](docs/EDITOR-RELIABILITY.md) | Drawing, connections, recovery, conflict and operation-specific errors |
+| [Entrance guides](docs/ARRIVAL-GUIDES.md) / [Photograph collection](data/photos/README.md) | Entrance selection, accessibility observations, private media review, reusable image coverage and offline galleries |
+| [Driving](docs/DRIVING.md) / [Campus enrichment](docs/ENRICHMENT.md) | Independent vehicle permissions, drive-and-walk journeys, imports, source evidence and review |
 | [Building editor](docs/BUILDING-EDITOR.md) | Wing/wall inheritance, identity, controls and preview lifecycle |
 | [Roof plans](docs/BUILDING-ROOFS.md) / [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md) | Constraints, validation, approximate proposals and evidence |
 | [Building references](docs/BUILDING-REFERENCE-RESEARCH.md) / [Appearance coverage](docs/BUILDING-APPEARANCE-COVERAGE.md) | Reference sources, uncertainty and facade assessments |
@@ -466,5 +491,6 @@ Use GitHub issues for reproducible software defects or feature proposals; includ
 - **LASU ArcGIS:** MangroveandpartnersLimited. The owner recorded offline redistribution permission on 8 September 2026; the public item supplied no explicit redistribution license. That confirmation is recorded in [ATTRIBUTION.md](data/ATTRIBUTION.md), not a general grant for unrelated uses.
 - **Fonts/audio:** Inter uses the SIL Open Font License; Open Sans map glyphs use Apache 2.0. Natural navigation recordings use locally generated Kokoro v1.0 `bf_emma` (Apache 2.0 model); original Windows recordings remain a fallback. Provenance and regeneration details are in the attribution record.
 - **Reference images:** Linked evidence and supplied visual inspiration do not establish redistribution rights or surveyed building accuracy. The README contains application screenshots, not copied reference photography.
+- **Published photographs:** The current researched collection uses CC BY-SA 4.0 images with verified building matches. Each gallery retains its source, author, license and derivative notices online and offline. Original authors retain copyright; see the [collection report](data/photos/README.md).
 
 No standalone license has been selected for TurnRight's own source code. Do not assume an MIT or Apache license; dependencies and datasets retain their respective terms. No Google Maps content, satellite imagery or remotely hosted rendered map tiles are bundled.
