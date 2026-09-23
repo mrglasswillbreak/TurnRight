@@ -110,9 +110,10 @@ export function OfflinePanel({
         )}
         {!!target.photos?.assetUrls.length && (
           <p className="small-note">
-            All {target.photos.assetUrls.length} photograph assets are included
-            and verified: {(target.photos.bytes / 1048576).toFixed(2)} MB.
-            Credits and recorded arrival information work offline.
+            Includes all {target.photos.assetUrls.length} photographs:{' '}
+            {(target.photos.bytes / 1048576).toFixed(2)} MB. Every photograph is
+            checked before the map is ready offline. Credits and recorded
+            arrival information are saved with the map.
           </p>
         )}
         {(target.photos?.bytes || 0) > PHOTO_WARNING_BYTES && (
