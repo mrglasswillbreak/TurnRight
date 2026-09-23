@@ -120,11 +120,13 @@ export function PhotoManager({
     (f) => f.properties?.kind === 'building',
   );
   const name = (id?: string) =>
-    String(
-      buildings.find((f) => f.properties?.id === id)?.properties?.name ||
-        data.places.find((p) => placeBuildingId(data, p) === id)?.name ||
-        'Unnamed building',
-    );
+    id
+      ? String(
+          buildings.find((f) => f.properties?.id === id)?.properties?.name ||
+            data.places.find((p) => placeBuildingId(data, p) === id)?.name ||
+            'Unnamed building',
+        )
+      : 'Building not selected';
   const targetName = entranceId
     ? `${name(buildingId)} · ${String(edit.properties.name || 'Entrance')}`
     : name(buildingId);
