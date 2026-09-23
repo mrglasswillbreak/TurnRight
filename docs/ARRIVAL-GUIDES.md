@@ -44,6 +44,9 @@ the draft. Explicit owner galleries, including empty galleries, override the
 research catalogue through building aliases and merges.
 
 Apply migration `008_private_building_media.sql` before deploying the media API.
+Apply `009_bounded_baseline_comparison.sql` before reconciling large published
+packages. It compares complete source records individually, retaining the owner
+guard, atomic stale-review check, source-table lock and rollback snapshots.
 It was applied to the existing production project on 23 September 2026; the table
 and private bucket were verified. It does not publish a map or grant public
 access to originals. New installations apply migrations in order.

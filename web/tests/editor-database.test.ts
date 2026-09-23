@@ -50,6 +50,7 @@ beforeAll(async () => {
     '006_reconciliation_safe_updates.sql',
     '007_source_field_reviews.sql',
     '008_private_building_media.sql',
+    '009_bounded_baseline_comparison.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -287,6 +288,46 @@ describe('published baseline reconciliation', () => {
     expect(
       (await database.query('select * from map_edits order by id')).rows,
     ).toEqual(edits);
+  });
+  it('compares every source field regardless of order and rejects duplicate or missing expected IDs', async () => {
+    await database.exec(
+      "insert into source_features(id,source,entity,payload,hash) values('edge:guard','test','edge','{\"access\":\"private\"}','same-hash')",
+    );
+    const before = (await sources()) as Record<string, unknown>[];
+    const records = before.map(
+      ({ updated_at: _timestamp, ...record }) => record,
+    );
+    const call = (expected: unknown[], actor = owner) =>
+      database.query(
+        'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
+        [
+          actor,
+          'published-test',
+          JSON.stringify(expected),
+          JSON.stringify(records),
+        ],
+      );
+    await expect(call([before[0], before[0]])).rejects.toThrow('changed');
+    await expect(call(before.slice(1))).rejects.toThrow('changed');
+    await expect(
+      call(
+        before.map((record) =>
+          record.id === 'edge:guard'
+            ? { ...record, payload: { access: 'yes' } }
+            : record,
+        ),
+      ),
+    ).rejects.toThrow('changed');
+    await expect(call(before, randomUUID())).rejects.toThrow(
+      'Administrator required',
+    );
+    expect(await sources()).toEqual(before);
+    await call([...before].reverse());
+    expect(
+      ((await sources()) as Record<string, unknown>[]).map(
+        ({ updated_at: _timestamp, ...record }) => record,
+      ),
+    ).toEqual(records);
   });
 });
 describe('private survey transactions', () => {

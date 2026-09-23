@@ -89,6 +89,8 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 ## Upgrade and verification
 
 Entrance guides and building galleries additionally require migration 008.
+Migration 009 prevents full-campus baseline comparisons from timing out while
+retaining owner authorization, exact record checks and reconciliation history.
 See [arrival editing, private uploads and publication](ARRIVAL-GUIDES.md) for the
 review flow and photo package guarantees.
 
