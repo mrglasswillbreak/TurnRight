@@ -88,6 +88,10 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 
 ## Upgrade and verification
 
+Entrance guides and building galleries additionally require migration 008.
+See [arrival editing, private uploads and publication](ARRIVAL-GUIDES.md) for the
+review flow and photo package guarantees.
+
 Apply `supabase/migrations/003_editor_batches.sql` once to the existing database **before deploying this editor and API**. For a new database, apply migrations 001, 002, and 003 in order. Migration 003 adds the service-role-only batch function and operation receipts; it does not modify published map packages. Retain operation receipts so delayed retries remain idempotent.
 
 Migration 003 was applied to the TurnRight Supabase project on 11 September 2026. Live verification confirmed that receipt RLS is enabled, anonymous and authenticated roles cannot execute the function, and the service role can. The implementation passed 85 unit/database tests, seven real MapLibre/Terra Draw browser tests, seven Python tests, lint (existing warnings), and a production build on Node 22.23.2. Browser coverage includes undoing the first saved correction to a source building and retaining that building after reload.

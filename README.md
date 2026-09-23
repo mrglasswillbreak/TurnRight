@@ -87,6 +87,8 @@ No screenshot contains production owner drafts or private reports. The update no
 
 ## Recent changes
 
+The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
+
 The 17–18 September updates include:
 
 - **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).
