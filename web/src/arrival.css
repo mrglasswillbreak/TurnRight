@@ -24,7 +24,7 @@
   margin-block: 0.5rem;
 }
 .photo-gallery a {
-  color: var(--primary, #1764ed);
+  color: var(--link, #175bcc);
   text-decoration: underline;
 }
 .gallery-controls {
@@ -98,6 +98,6 @@
 .photo-gallery a:focus-visible,
 .entrance-marker:focus-visible,
 .arrival-section summary:focus-visible {
-  outline: 3px solid #1764ed;
+  outline: 3px solid var(--link, #175bcc);
   outline-offset: 3px;
 }
