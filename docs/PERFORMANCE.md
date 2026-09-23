@@ -133,6 +133,14 @@ They retain bounded samples and contain no filenames, owners or photo metadata.
 
 ## Coverage and limits
 
+The 23 September 23:11 UTC preview run exposed a race in the offline-audit
+test fixture before release packaging began. Starting a second package read did
+not guarantee its IndexedDB work had reached the shared audit before the test
+released the first audit. The test now awaits both core loads before opening
+one shared gate, checks both verification results and always releases the gate
+during cleanup. The full 462-test suite and 20 isolated repetitions passed on
+24 September. Production audit behavior and test timeouts are unchanged.
+
 Verification completed on 23 September 2026: **462 Vitest tests**, **23 Python
 import tests**, **36 browser/PWA journeys** (15 photo layout/workflow, seven
 public navigation/details, five owner photo, nine offline), both TypeScript

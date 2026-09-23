@@ -71,26 +71,39 @@ describe('offline package transactions', () => {
     await installPackage(manifest, () => {});
     let finish!: () => void,
       reads = 0;
+    const auditGate = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
     const match = cache.match;
     const pause = vi.spyOn(cache, 'match').mockImplementation(async (url) => {
       if (url === asset.url) {
         reads++;
-        await new Promise<void>((resolve) => {
-          finish = resolve;
-        });
+        await auditGate;
       }
       return match(url);
     });
-    const loaded = await loadCampus();
-    expect(loaded.data.version).toBe('core-first');
-    expect(loaded.downloaded).toBe(false);
-    const concurrent = getActivePackage();
-    await vi.waitFor(() => expect(reads).toBe(1));
-    finish();
-    expect(await loaded.verification).toBe(true);
-    expect((await concurrent)?.complete).toBe(true);
-    expect(reads).toBe(1);
-    pause.mockRestore();
+    try {
+      const loaded = await loadCampus();
+      expect(loaded.data.version).toBe('core-first');
+      expect(loaded.downloaded).toBe(false);
+      // Await the second caller's core load so it has actually joined the audit.
+      // Starting getActivePackage() alone only schedules its IndexedDB reads;
+      // releasing the gate then could finish and discard the first audit before
+      // that caller reaches it, starting another audit instead of sharing one.
+      const concurrent = await loadCampus();
+      expect(concurrent.data.version).toBe('core-first');
+      expect(concurrent.downloaded).toBe(false);
+      await vi.waitFor(() => expect(reads).toBe(1));
+      finish();
+      expect(await loaded.verification).toBe(true);
+      expect(await concurrent.verification).toBe(true);
+      expect(reads).toBe(1);
+    } finally {
+      // One shared gate also releases an unexpected extra read on failure.
+      finish();
+      pause.mockRestore();
+    }
+    expect((await getActivePackage())?.complete).toBe(true);
   });
   it('retains the active map until every photo is verified, repairs corrupt photos and supports rollback', async () => {
     const old = await pkg('before-photos'),
