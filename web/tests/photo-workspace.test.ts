@@ -265,10 +265,69 @@ describe('photo management', () => {
         new Response(JSON.stringify({ signedURL: '/signed/preview' })),
       );
     vi.stubGlobal('fetch', fetcher);
-    expect(await mediaAction('owner', 'media-preview', { id })).toEqual({
+    expect(await mediaAction('owner', 'media-preview', { id })).toMatchObject({
       previewUrl: 'https://test.supabase.co/storage/v1/signed/preview',
     });
     expect(fetcher).toHaveBeenCalledTimes(2);
     expect(String(fetcher.mock.calls[1][0])).toContain('/object/sign/');
+  });
+  it('lists metadata without waiting for storage signing', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test');
+    const fetcher = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify([
+            { id: 'one', derivative_path: 'private', status: 'processed' },
+          ]),
+        ),
+      );
+    vi.stubGlobal('fetch', fetcher);
+    const result = await mediaAction('owner', 'media-library', {
+      previews: false,
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(result)).not.toMatch(/previewUrl|private/);
+  });
+  it('reconciles stable upload IDs without overwriting drafts or another owner', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test');
+    const id = '11111111-1111-4111-8111-111111111111';
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('{}', { status: 409 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            {
+              id,
+              status: 'processed',
+              original_filename: 'front.jpg',
+              original_bytes: 100,
+              original_mime: 'image/jpeg',
+              public_metadata: { caption: 'Preserved' },
+            },
+          ]),
+        ),
+      )
+      .mockResolvedValueOnce(new Response('{}', { status: 409 }))
+      .mockResolvedValueOnce(new Response('[]'));
+    vi.stubGlobal('fetch', fetcher);
+    const payload = {
+      uploadId: id,
+      filename: 'front.jpg',
+      bytes: 100,
+      mime: 'image/jpeg',
+    };
+    expect(await mediaAction('owner', 'media-begin', payload)).toMatchObject({
+      id,
+      status: 'processed',
+      metadata: { caption: 'Preserved' },
+    });
+    await expect(mediaAction('other', 'media-begin', payload)).rejects.toThrow(
+      'different file',
+    );
+    expect(String(fetcher.mock.calls[3][0])).toContain('owner=eq.other');
   });
 });

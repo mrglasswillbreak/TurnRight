@@ -37,6 +37,7 @@ describe('server authorization', () => {
       'media-library',
       'media-draft',
       'media-preview',
+      'media-status',
       'media-upload-url',
     ]) {
       const res = response();

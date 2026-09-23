@@ -88,7 +88,12 @@ export async function mediaAction(
           revision: row.draft_revision || 0,
           authorshipConfirmed: row.authorship_confirmed,
           replacesPhotoId: row.draft_metadata?.replacesPhotoId,
-          previewUrl: await preview(row).catch(() => undefined),
+          ...(payload.previews === false
+            ? {}
+            : {
+                previewUrl: await preview(row).catch(() => undefined),
+                previewExpiresAt: Date.now() + 3_600_000,
+              }),
         })),
       ),
       nextOffset: rows.length > 20 ? offset + 20 : null,
@@ -114,17 +119,59 @@ export async function mediaAction(
       Number(payload.bytes) > MAX_ORIGINAL_BYTES
     )
       throw new HttpError(400, 'Choose a JPEG, PNG or WebP up to 10 MiB.');
-    const id = randomUUID(),
+    if (
+      payload.uploadId !== undefined &&
+      (typeof payload.uploadId !== 'string' ||
+        !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(payload.uploadId))
+    )
+      throw new HttpError(400, 'Invalid upload identifier.');
+    const id = String(payload.uploadId || randomUUID()),
       original_path = `${owner}/${id}/original`;
-    await db('building_media', 'POST', {
-      id,
-      owner,
-      original_path,
-      original_filename: String(payload.filename || 'Photograph').slice(0, 256),
-      original_mime: payload.mime,
-      original_bytes: payload.bytes,
-      draft_metadata: photoDetails(payload.metadata),
-    });
+    const rowForRetry = async () => {
+      const [existing] = await db<MediaRow[]>(
+        `building_media?id=eq.${id}&owner=eq.${owner}`,
+      );
+      if (
+        !existing ||
+        existing.original_bytes !== payload.bytes ||
+        existing.original_mime !== payload.mime ||
+        existing.original_filename !==
+          String(payload.filename || 'Photograph').slice(0, 256)
+      )
+        throw new HttpError(
+          409,
+          'This upload identifier belongs to a different file.',
+        );
+      return existing;
+    };
+    try {
+      await db('building_media', 'POST', {
+        id,
+        owner,
+        original_path,
+        original_filename: String(payload.filename || 'Photograph').slice(
+          0,
+          256,
+        ),
+        original_mime: payload.mime,
+        original_bytes: payload.bytes,
+        draft_metadata: photoDetails(payload.metadata),
+      });
+    } catch (error) {
+      if (
+        !payload.uploadId ||
+        !(error instanceof HttpError) ||
+        error.status !== 409
+      )
+        throw error;
+      const existing = await rowForRetry();
+      if (existing.status !== 'pending')
+        return {
+          id,
+          status: existing.status,
+          metadata: existing.public_metadata,
+        };
+    }
     const signed = await (
       await storage(`object/upload/sign/${bucket}/${original_path}`, 'POST', {
         upsert: false,
@@ -142,7 +189,19 @@ export async function mediaAction(
     `building_media?id=eq.${payload.id}&owner=eq.${owner}`,
   );
   if (!row) throw new HttpError(404, 'Photograph not found.');
-  if (action === 'media-preview') return { previewUrl: await preview(row) };
+  if (action === 'media-preview')
+    return {
+      previewUrl: await preview(row),
+      previewExpiresAt: Date.now() + 3_600_000,
+    };
+  if (action === 'media-status')
+    return {
+      id: row.id,
+      status: row.status,
+      metadata: row.public_metadata,
+      draft: row.draft_metadata,
+      revision: row.draft_revision || 0,
+    };
   if (action === 'media-draft') {
     if (row.status === 'approved')
       throw new HttpError(
@@ -285,6 +344,7 @@ export async function mediaAction(
       draft: row.draft_metadata,
       revision: row.draft_revision || 0,
       previewUrl: await preview(row),
+      previewExpiresAt: Date.now() + 3_600_000,
       status: row.status,
       authorshipConfirmed: row.authorship_confirmed || false,
       replacesPhotoId: row.draft_metadata?.replacesPhotoId,

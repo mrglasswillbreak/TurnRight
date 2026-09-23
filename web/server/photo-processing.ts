@@ -19,17 +19,30 @@ export async function photoDerivative(bytes: Buffer) {
       (info.pages || 1) !== 1
     )
       throw Error('Unsupported image');
+    // Decode/orient the potentially 40 MP source once. Subsequent attempts use
+    // a bounded raw raster, avoiding repeated JPEG/PNG decoding and rotation.
+    const oriented = await input
+      .rotate()
+      .resize({
+        width: 1600,
+        height: 1600,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     for (const size of [1600, 1400, 1200, 1000, 800]) {
+      const resized = await sharp(oriented.data, { raw: oriented.info })
+        .resize({
+          width: size,
+          height: size,
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .raw()
+        .toBuffer({ resolveWithObject: true });
       for (const quality of [84, 74, 64]) {
-        const result = await input
-          .clone()
-          .rotate()
-          .resize({
-            width: size,
-            height: size,
-            fit: 'inside',
-            withoutEnlargement: true,
-          })
+        const result = await sharp(resized.data, { raw: resized.info })
           .webp({ quality, effort: 5 })
           .toBuffer({ resolveWithObject: true });
         if (result.data.length <= 250 * 1024)
