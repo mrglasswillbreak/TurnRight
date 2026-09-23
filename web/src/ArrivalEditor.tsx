@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { api, supabase } from './supabase';
-import { buildingPhotos, photoLicenses, placeBuildingId } from './arrival';
+import {
+  buildingPhotos,
+  photoLicenses,
+  placeBuildingId,
+  validPhoto,
+} from './arrival';
 import type { ArrivalGuide, CampusData, CampusPhoto, MapEdit } from './types';
 
 export function ArrivalEditor({
@@ -21,6 +26,8 @@ export function ArrivalEditor({
   const [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [reviewed, setReviewed] = useState(false);
+  const [privateUploads, setPrivateUploads] =
+    useState<{ id: string; status: string; caption: string }[]>();
   if (!['place', 'entrance', 'building'].includes(edit.kind)) return null;
   const guide = (edit.properties.arrival || {}) as ArrivalGuide;
   const place = data.places.find((p) => p.id === edit.id);
@@ -116,13 +123,19 @@ export function ArrivalEditor({
     setBusy(true);
     setError('');
     try {
-      const photo = await api<CampusPhoto>('media-approve', {
-        id: upload.id,
-        metadata: upload.metadata,
-        reviewed,
-      });
+      if (!reviewed || !validPhoto(upload.metadata))
+        throw new Error(
+          'Complete the caption, alternative text, author, source, license and building match, then confirm review.',
+        );
+      const photo = upload.id.startsWith('published:')
+        ? upload.metadata
+        : await api<CampusPhoto>('media-approve', {
+            id: upload.id,
+            metadata: upload.metadata,
+            reviewed,
+          });
       onProperty('photos', [
-        ...photos.filter((p) => p.id !== upload.replaces),
+        ...photos.filter((p) => p.id !== upload.replaces && p.id !== photo.id),
         photo,
       ]);
       setUpload(undefined);
@@ -279,7 +292,7 @@ export function ArrivalEditor({
               >
                 Remove from draft
               </button>
-              {photo.id.startsWith('owner:') && (
+              {
                 <button
                   type="button"
                   disabled={busy}
@@ -287,6 +300,16 @@ export function ArrivalEditor({
                     setBusy(true);
                     setError('');
                     try {
+                      if (!photo.id.startsWith('owner:')) {
+                        setUpload({
+                          id: `published:${photo.id}`,
+                          previewUrl: photo.url,
+                          metadata: { ...photo },
+                          replaces: photo.id,
+                        });
+                        setReviewed(false);
+                        return;
+                      }
                       const result = await api<{ id: string }>('media-revise', {
                         id: photo.id.slice(6),
                       });
@@ -300,7 +323,7 @@ export function ArrivalEditor({
                 >
                   Revise caption or match
                 </button>
-              )}
+              }
             </div>
           ))}
           <label className="field-label">
@@ -312,6 +335,52 @@ export function ArrivalEditor({
               onChange={(e) => void pick(e.target.files?.[0])}
             />
           </label>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setError('');
+              try {
+                setPrivateUploads(await api('media-list', {}));
+              } catch (e) {
+                setError((e as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Recover private uploads
+          </button>
+          {privateUploads && (
+            <div>
+              <p className="small-note">
+                Your latest 100 private uploads. Resume review or attach an
+                approved photograph; nothing publishes automatically.
+              </p>
+              {!privateUploads.length && <p>No private uploads found.</p>}
+              {privateUploads.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  disabled={busy || !buildingId}
+                  onClick={async () => {
+                    setBusy(true);
+                    setError('');
+                    try {
+                      await processUpload(item.id);
+                    } catch (e) {
+                      setError((e as Error).message);
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  {item.caption} · {item.status} · {item.id.slice(0, 8)}
+                </button>
+              ))}
+            </div>
+          )}
           {!buildingId && (
             <p className="notice">
               Link this entrance to its building before adding photographs.

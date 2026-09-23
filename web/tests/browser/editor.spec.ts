@@ -1130,6 +1130,85 @@ async function setup(
     campus,
   };
 }
+for (const width of [1440, 390])
+  test(`owner photo review preserves captions through undo and reload at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const originalPhoto = JSON.parse(
+      readFileSync(
+        new URL('../../../data/photos/catalogue.json', import.meta.url),
+        'utf8',
+      ),
+    )[0];
+    const photo = { ...originalPhoto, buildingId: 'library' };
+    const feature = browserCampus().map.features.find(
+      (f) => f.properties?.id === 'library',
+    )!;
+    await page.route(`**${photo.url}`, (route) =>
+      route.fulfill({
+        body: readFileSync(
+          new URL(`../../../data/photos/${photo.sha256}.webp`, import.meta.url),
+        ),
+        contentType: 'image/webp',
+      }),
+    );
+    const server = await setup(page, false, false, {
+      initialEdits: [
+        {
+          id: 'library',
+          kind: 'building',
+          geometry: feature.geometry,
+          properties: { ...feature.properties, photos: [photo] },
+          deleted: false,
+        },
+      ],
+    });
+    await focusCampus(page);
+    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await clickMap(page, [3.20012, 6.46022]);
+    const panel = page.getByRole('complementary', {
+      name: 'Feature properties',
+    });
+    await panel.getByText('Photographs · 1', { exact: true }).click();
+    await panel
+      .getByRole('button', { name: 'Revise caption or match', exact: true })
+      .click();
+    await panel
+      .getByLabel('Caption', { exact: true })
+      .fill('Reviewed courtyard view');
+    await panel
+      .getByRole('checkbox', { name: /I checked visual quality/ })
+      .check();
+    await panel
+      .getByRole('button', { name: 'Approve photograph and attach to draft' })
+      .click();
+    await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+    await expect
+      .poll(
+        () =>
+          (server.edits()[0].properties.photos as { caption: string }[])[0]
+            .caption,
+      )
+      .toBe('Reviewed courtyard view');
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect
+      .poll(
+        () =>
+          (server.edits()[0].properties.photos as { caption: string }[])[0]
+            .caption,
+      )
+      .toBe(originalPhoto.caption);
+    await page.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+    await page.reload();
+    await expect(
+      page.getByRole('button', { name: 'Draw path', exact: true }),
+    ).toBeEnabled();
+    expect(
+      (server.edits()[0].properties.photos as { caption: string }[])[0].caption,
+    ).toBe('Reviewed courtyard view');
+  });
 // Read the actual MapLibre instance from the mounted React ref. No map, renderer,
 // geometry controller, or pointer event is mocked or replaced by this test.
 async function attachMap(page: Page) {

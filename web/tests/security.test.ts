@@ -30,6 +30,7 @@ describe('server authorization', () => {
     vi.stubGlobal('fetch', fetcher);
     for (const action of [
       'media-begin',
+      'media-list',
       'media-process',
       'media-approve',
       'media-revise',

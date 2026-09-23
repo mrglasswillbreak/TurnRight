@@ -128,5 +128,11 @@ describe('private building photograph processing', () => {
     );
     const removed = { ...data, photos: [], photoOverrides: ['building'] };
     expect(await packagePhotos(removed, root, async () => {})).toBeUndefined();
+    const merged = {
+      ...removed,
+      photoOverrides: ['former'],
+      buildingIdAliases: { former: 'building' },
+    };
+    expect(await packagePhotos(merged, root, async () => {})).toBeUndefined();
   });
 });

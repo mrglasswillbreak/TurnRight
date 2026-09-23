@@ -35,6 +35,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     const { action, payload = {} } = bodyOf(req, 3_000_000);
     switch (action) {
       case 'media-begin':
+      case 'media-list':
       case 'media-process':
       case 'media-approve':
       case 'media-revise':

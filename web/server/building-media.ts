@@ -47,6 +47,16 @@ export async function mediaAction(
   action: string,
   payload: Record<string, unknown>,
 ) {
+  if (action === 'media-list') {
+    const rows = await db<MediaRow[]>(
+      `building_media?owner=eq.${owner}&order=created_at.desc&limit=100`,
+    );
+    return rows.map(({ id, status, public_metadata }) => ({
+      id,
+      status,
+      caption: public_metadata?.caption || 'Private photograph upload',
+    }));
+  }
   if (action === 'media-begin') {
     if (
       !['image/jpeg', 'image/png', 'image/webp'].includes(
@@ -158,6 +168,14 @@ export async function mediaAction(
     };
   }
   if (action === 'media-approve') {
+    if (
+      row.status === 'approved' &&
+      payload.reviewed === true &&
+      validPhoto(payload.metadata) &&
+      JSON.stringify(publicPhoto(payload.metadata)) ===
+        JSON.stringify(publicPhoto(row.public_metadata!))
+    )
+      return row.public_metadata;
     if (row.status !== 'processed' || payload.reviewed !== true)
       throw new HttpError(
         409,

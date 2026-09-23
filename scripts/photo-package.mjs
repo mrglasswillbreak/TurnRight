@@ -9,7 +9,7 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
   const buildings = new Set(data.map.features.filter((f) => f.properties?.kind === 'building').map((f) => String(f.properties.id)));
   const resolve = (id) => { const seen = new Set(); while (data.buildingIdAliases?.[id] && !seen.has(id)) { seen.add(id); id = data.buildingIdAliases[id]; } return id; };
   // An owner's explicit gallery, including an empty one, takes precedence over the research catalogue.
-  const overridden = new Set(data.photoOverrides || []);
+  const overridden = new Set((data.photoOverrides || []).map(resolve));
   const combined = [...(data.photos || []), ...catalogue.filter((p) =>
     buildings.has(resolve(p.buildingId)) && !overridden.has(resolve(p.buildingId)) && !(data.photos || []).some((old) => old.id === p.id))];
   const photos = publicCampus(combined, 'photos');
