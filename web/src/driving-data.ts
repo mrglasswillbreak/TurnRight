@@ -69,7 +69,7 @@ export function applyDrivingEdits(data: CampusData, edits: MapEdit[]) {
     )
   )
     return;
-  data.schemaVersion = 2;
+  data.schemaVersion = data.schemaVersion === 3 ? 3 : 2;
   data.driving ||= { version: 1, parking: [], restrictions: [] };
   for (const edit of edits) {
     if (edit.kind === 'place') {

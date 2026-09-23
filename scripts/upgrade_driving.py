@@ -11,7 +11,7 @@ from import_campus import build
 
 
 def upgrade(existing, imported):
-    existing['schemaVersion'] = 2
+    existing['schemaVersion'] = 3 if existing.get('schemaVersion') == 3 else 2
     existing['driving'] = imported['driving']
     incoming_nodes = {n['id']: n for n in imported['graph']['nodes']}
     incoming_edges = {e['id']: e for e in imported['graph']['edges']}

@@ -77,7 +77,7 @@ def published_snapshot(origin, directory):
     import_campus.fetch(urljoin(origin, '/packages/latest.json'), directory / 'manifest.json')
     manifest = read(directory / 'manifest.json')
     path = manifest.get('dataUrl', '')
-    if not re.fullmatch(r'/packages/lasu-[a-f0-9]+/campus.json', path) or manifest.get('schemaVersion') not in (1, 2):
+    if not re.fullmatch(r'/packages/lasu-[a-f0-9]+/campus.json', path) or manifest.get('schemaVersion') not in (1, 2, 3):
         raise ValueError('Unsupported published manifest')
     asset = next((a for a in manifest['assets'] if a['url'] == path), None)
     if not asset:

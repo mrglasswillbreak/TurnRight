@@ -83,7 +83,8 @@ export interface CampusPhoto extends PackageAsset {
   caption: string;
   alt: string;
   author: string;
-  sourceUrl: string;
+  sourceKind?: 'external' | 'author-upload';
+  sourceUrl?: string;
   license: 'CC BY 4.0' | 'CC BY-SA 4.0' | 'CC0 1.0' | 'Public domain';
   licenseUrl: string;
   attribution: string;
@@ -200,7 +201,7 @@ export interface CampusData {
     bytes: number;
     retrievedAt: string;
   }[];
-  schemaVersion: 1 | 2;
+  schemaVersion: 1 | 2 | 3;
   version: string;
   createdAt: string;
   boundary: Feature;
@@ -266,7 +267,7 @@ export interface PackageAsset {
   bytes: number;
 }
 export interface CampusPackage {
-  schemaVersion: 1 | 2;
+  schemaVersion: 1 | 2 | 3;
   version: string;
   createdAt: string;
   summary: string;

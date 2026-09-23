@@ -145,7 +145,11 @@ export function validPhoto(value: unknown): value is CampusPhoto {
     [p.caption, p.alt, p.author, p.attribution, p.modifications].every((s) =>
       text(s),
     ) &&
-    https(p.sourceUrl) &&
+    (p.sourceKind === undefined ||
+      ['external', 'author-upload'].includes(p.sourceKind)) &&
+    (p.sourceKind === 'author-upload' && !p.sourceUrl
+      ? true
+      : https(p.sourceUrl)) &&
     https(p.licenseUrl) &&
     photoLicenses.includes(p.license) &&
     date(p.checkedAt) &&
@@ -173,6 +177,7 @@ export function publicPhoto(p: CampusPhoto): CampusPhoto {
     'alt',
     'author',
     'sourceUrl',
+    'sourceKind',
     'license',
     'licenseUrl',
     'attribution',

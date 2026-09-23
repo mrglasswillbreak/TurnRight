@@ -64,7 +64,7 @@ export async function latestPackage(): Promise<CampusPackage> {
       'Could not check for campus updates. Your downloaded map is unchanged.',
     );
   const manifest = (await response.json()) as CampusPackage;
-  if (![1, 2].includes(manifest.schemaVersion) || !manifest.assets?.length)
+  if (![1, 2, 3].includes(manifest.schemaVersion) || !manifest.assets?.length)
     throw new Error('This map version needs a newer app.');
   return manifest;
 }
@@ -202,7 +202,7 @@ export async function installPackage(
   signal?: AbortSignal,
   activate = true,
 ) {
-  if (![1, 2].includes(manifest.schemaVersion))
+  if (![1, 2, 3].includes(manifest.schemaVersion))
     throw new Error('Update the app before downloading this map.');
   if (
     manifest.visuals &&

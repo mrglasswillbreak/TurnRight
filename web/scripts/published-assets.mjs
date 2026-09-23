@@ -41,7 +41,7 @@ export async function preservePublished(
   });
   if (
     !manifest ||
-    ![1, 2].includes(manifest.schemaVersion) ||
+    ![1, 2, 3].includes(manifest.schemaVersion) ||
     !/^lasu-[a-f0-9]+$/.test(manifest.version) ||
     !Array.isArray(manifest.assets) ||
     !Number.isSafeInteger(manifest.bytes) || manifest.bytes <= 0

@@ -61,9 +61,13 @@ export function PhotoGallery({
             <summary>Photo credits & license</summary>
             <p>{photo.attribution}</p>
             <p>
-              <a href={photo.sourceUrl} target="_blank" rel="noreferrer">
-                Original source
-              </a>{' '}
+              {photo.sourceUrl ? (
+                <a href={photo.sourceUrl} target="_blank" rel="noreferrer">
+                  Original source
+                </a>
+              ) : (
+                <span>Photograph provided by the author</span>
+              )}{' '}
               ·{' '}
               <a href={photo.licenseUrl} target="_blank" rel="noreferrer">
                 {photo.license}

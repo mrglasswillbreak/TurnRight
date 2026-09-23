@@ -63,7 +63,7 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
       !photo.license ||
       !photo.author ||
       !photo.attribution ||
-      !photo.sourceUrl ||
+      (!photo.sourceUrl && photo.sourceKind !== 'author-upload') ||
       !photo.licenseUrl ||
       !buildings.has(resolve(photo.buildingId))
     )

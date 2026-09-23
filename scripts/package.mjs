@@ -11,7 +11,7 @@ const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const input = process.env.CAMPUS_INPUT || "data/seed/campus.json";
 const data = publicCampus(JSON.parse(await fs.readFile(path.join(root, input), "utf8")));
-if (![1, 2].includes(data.schemaVersion) || !data.graph?.edges?.length)
+if (![1, 2, 3].includes(data.schemaVersion) || !data.graph?.edges?.length)
   throw new Error("No valid campus graph to package");
 const audioDir = path.join(root, "data/audio");
 const files = (await fs.readdir(audioDir)).filter((f) => f.endsWith(".wav")).sort();
@@ -39,6 +39,7 @@ if (process.env.VISUALS_INPUT && !visuals)
   throw new Error("The rebuilt visual catalogue is missing; release packaging stopped.");
 if (visuals) data.visuals = visuals.catalogue;
 const photos = await packagePhotos(data, root, asset);
+data.schemaVersion = data.photos?.some(p => p.sourceKind === 'author-upload' && !p.sourceUrl) ? 3 : data.driving ? 2 : 1;
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
@@ -49,7 +50,7 @@ await asset(
   "application/json",
 );
 const manifest = {
-  schemaVersion: data.driving ? 2 : 1,
+  schemaVersion: data.schemaVersion,
   version,
   createdAt: data.createdAt,
   summary:

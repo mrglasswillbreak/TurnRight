@@ -110,9 +110,9 @@ export function structuralIssues(
       },
     ];
   if (
-    ![1, 2].includes(data.schemaVersion) ||
+    ![1, 2, 3].includes(data.schemaVersion) ||
     (data.driving !== undefined &&
-      (data.schemaVersion !== 2 || !validDrivingData(data.driving)))
+      (data.schemaVersion < 2 || !validDrivingData(data.driving)))
   )
     add(
       'invalid-driving',

@@ -65,7 +65,7 @@ describe('offline package transactions', () => {
     const data = {
       ...campusFixture(),
       version: 'with-photos',
-      schemaVersion: 1,
+      schemaVersion: 3,
       photos: [
         {
           ...photo,
@@ -76,7 +76,7 @@ describe('offline package transactions', () => {
           caption: 'Building exterior',
           alt: 'Building with a pitched roof',
           author: 'Photographer',
-          sourceUrl: 'https://example.org/photo',
+          sourceKind: 'author-upload' as const,
           license: 'CC BY-SA 4.0' as const,
           licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
           attribution: 'Photographer',
@@ -95,6 +95,7 @@ describe('offline package transactions', () => {
       bytes: next.bytes.length,
       sha256: await hashBytes(next.bytes.buffer),
     };
+    next.manifest.schemaVersion = 3;
     next.manifest.assets.push(photo);
     next.manifest.photos = { bytes: photo.bytes, assetUrls: [photo.url] };
     next.manifest.bytes = next.bytes.length + photo.bytes;

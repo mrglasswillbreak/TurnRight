@@ -120,8 +120,9 @@ export function preserveReviewedMetadata(previous, candidate) {
   meta.payload.version = old.version;
   for (const key of ["visuals", "photos", "photoOverrides", "entrances", "closures", "placeIdAliases", "buildingIdAliases"])
     if (old[key] !== undefined) meta.payload[key] = structuredClone(old[key]);
+  if (old.schemaVersion === 3) meta.payload.schemaVersion = 3;
   if (old.driving) {
-    meta.payload.schemaVersion = 2;
+    meta.payload.schemaVersion = old.schemaVersion === 3 ? 3 : 2;
     meta.payload.driving = {
       ...meta.payload.driving,
       parking: structuredClone(old.driving.parking || []),

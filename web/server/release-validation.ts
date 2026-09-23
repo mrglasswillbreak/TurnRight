@@ -55,7 +55,7 @@ export async function publishedCampus(): Promise<CampusData> {
   const manifest = (await response.json()) as CampusPackage;
   const asset = manifest.assets?.find((a) => a.url === manifest.dataUrl);
   if (
-    ![1, 2].includes(manifest.schemaVersion) ||
+    ![1, 2, 3].includes(manifest.schemaVersion) ||
     !asset ||
     !/^\/packages\/[a-zA-Z0-9-]+\/campus\.json$/.test(manifest.dataUrl) ||
     asset.bytes > 25_000_000
