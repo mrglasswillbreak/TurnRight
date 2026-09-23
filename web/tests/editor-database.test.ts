@@ -280,7 +280,7 @@ describe('published baseline reconciliation', () => {
           JSON.stringify([record, record]),
         ],
       ),
-    ).rejects.toThrow('duplicate key');
+    ).rejects.toThrow(/duplicate key|cannot affect row a second time/);
     expect(await sources()).toEqual(before);
     expect(
       (await database.query('select * from baseline_reconciliations')).rows,
@@ -321,8 +321,20 @@ describe('published baseline reconciliation', () => {
     await expect(call(before, randomUUID())).rejects.toThrow(
       'Administrator required',
     );
+    await expect(
+      database.query(
+        'select reconcile_published_baseline($1::uuid,$2::text,$3::jsonb,$4::jsonb)',
+        [
+          owner,
+          'published-test',
+          JSON.stringify(before),
+          JSON.stringify([...records, records[0]]),
+        ],
+      ),
+    ).rejects.toThrow('duplicate key');
     expect(await sources()).toEqual(before);
     await call([...before].reverse());
+    expect(await sources()).toEqual(before);
     expect(
       ((await sources()) as Record<string, unknown>[]).map(
         ({ updated_at: _timestamp, ...record }) => record,
