@@ -1281,6 +1281,10 @@ function Editor({
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       if (surveying.current) return;
+      // Modal workspaces own Escape, history and tool shortcuts while open.
+      // The window capture listener must not cancel the selected map feature.
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]'))
+        return;
       if (
         (event.target as HTMLElement)?.closest(
           'input, textarea, select, [contenteditable=true]',
@@ -2175,6 +2179,8 @@ function Editor({
             buildingEditor={
               selected.kind === 'building' && (
                 <BuildingAppearanceEditor
+                  workspace={workspace}
+                  onHistory={undo}
                   edit={selected}
                   data={validation.data}
                   mode={buildingMode}

@@ -1,3 +1,6 @@
+/* The roof SVG supports spatial gestures; point lists and numeric fields provide equivalent keyboard controls. */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
+import { ModelField } from './ModelField';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MapEdit, Position } from './types';
 import type {
@@ -23,6 +26,8 @@ export function RoofPlanEditor({
   onApply,
   onSurface,
   focusedSurface,
+  autoSave = false,
+  workspace,
 }: {
   edit: MapEdit;
   partId: string;
@@ -35,6 +40,8 @@ export function RoofPlanEditor({
   onApply: (edit: MapEdit) => void;
   onSurface: (index: number | undefined) => void;
   focusedSurface?: number;
+  autoSave?: boolean;
+  workspace?: import('./editor-workspace').EditorWorkspace;
 }) {
   const [tool, setTool] = useState<'select' | 'point' | 'ridge' | 'valley'>(
     'select',
@@ -47,6 +54,8 @@ export function RoofPlanEditor({
   const svg = useRef<SVGSVGElement>(null),
     dragging = useRef<string | null>(null),
     lastValid = useRef<RoofSurface | null>(null);
+  const latestRoof = useRef<CustomRoof | null>(null);
+  const gestureRoof = useRef<CustomRoof | null>(null);
   const editButton = useRef<HTMLButtonElement>(null),
     selectTool = useRef<HTMLButtonElement>(null),
     hadDraft = useRef(!!draft);
@@ -97,13 +106,16 @@ export function RoofPlanEditor({
     west + (x - 20) / scale / sx,
     south + (280 - y) / scale,
   ];
-  const update = (next: CustomRoof) =>
+  const update = (next: CustomRoof, continuous = false) => {
+    latestRoof.current = next;
     onDraft({
       buildingId: edit.id,
       partId,
       geometryRevision: JSON.stringify(edit.geometry),
       roof: next,
     });
+    if (autoSave && !continuous && !dragging.current) apply(next);
+  };
   const start = () => update(structuredClone(roof));
   const location = (clientX: number, clientY: number) => {
     const matrix = svg.current?.getScreenCTM();
@@ -172,10 +184,15 @@ export function RoofPlanEditor({
         p.id === selected ? { ...p, ...value } : p,
       ),
     });
-  const apply = () => {
-    if (error || !draft) return;
+  const apply = (candidate = roof) => {
+    if (!draft && !autoSave) return;
+    try {
+      customRoofSurface(polygon, candidate, height);
+    } catch {
+      return;
+    }
     const appearance = structuredClone(edit.properties.appearance || {});
-    (appearance.roofs ||= {})[partId] = structuredClone(roof);
+    (appearance.roofs ||= {})[partId] = structuredClone(candidate);
     if (
       !appearance.parts?.[partId]?.heightMode &&
       !appearance.parts?.[partId]?.height &&
@@ -280,16 +297,18 @@ export function RoofPlanEditor({
                   ? 'Tap the plan to add a control point.'
                   : 'Tap two points to draw a roof line.'}
           </output>
-          <label className="field-label">
-            Eaves elevation (m)
-            <input
-              type="number"
+          {autoSave ? (
+            <ModelField
+              label="Eaves elevation (m)"
+              value={roof.eaves}
+              buildingId={edit.id}
+              workspace={workspace}
+              field={`roof:${partId}:eaves`}
               min={0.1}
               max={height}
               step={0.1}
-              value={roof.eaves}
-              onChange={(e) => {
-                const eaves = Number(e.target.value);
+              onCommit={(value) => {
+                const eaves = Number(value);
                 update({
                   ...roof,
                   eaves,
@@ -297,9 +316,31 @@ export function RoofPlanEditor({
                     p.vertexId ? { ...p, elevation: eaves } : p,
                   ),
                 });
+                return true;
               }}
             />
-          </label>
+          ) : (
+            <label className="field-label">
+              Eaves elevation (m)
+              <input
+                type="number"
+                min={0.1}
+                max={height}
+                step={0.1}
+                value={roof.eaves}
+                onChange={(e) => {
+                  const eaves = Number(e.target.value);
+                  update({
+                    ...roof,
+                    eaves,
+                    points: roof.points.map((p) =>
+                      p.vertexId ? { ...p, elevation: eaves } : p,
+                    ),
+                  });
+                }}
+              />
+            </label>
+          )}
         </>
       )}
       {roof.provenance && <p className="small-note">{roof.provenance}</p>}
@@ -307,8 +348,21 @@ export function RoofPlanEditor({
         ref={svg}
         viewBox="0 0 300 300"
         aria-label="Roof plan drawing"
+        role="application"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape' && dragging.current) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragging.current = null;
+            if (gestureRoof.current) update(gestureRoof.current, true);
+            latestRoof.current = null;
+            gestureRoof.current = null;
+          }
+        }}
         className="roof-canvas"
         onPointerDown={(e) => {
+          e.currentTarget.focus();
           if (
             !draft ||
             tool === 'select' ||
@@ -323,26 +377,35 @@ export function RoofPlanEditor({
           const coordinates = location(e.clientX, e.clientY);
           if (coordinates) {
             const attached = snap(coordinates);
-            update({
-              ...roof,
-              points: roof.points.map((p) =>
-                p.id === dragging.current
-                  ? {
-                      ...p,
-                      ...attached,
-                      vertexId: attached.vertexId,
-                      elevation: attached.vertexId ? roof.eaves : p.elevation,
-                    }
-                  : p,
-              ),
-            });
+            update(
+              {
+                ...roof,
+                points: roof.points.map((p) =>
+                  p.id === dragging.current
+                    ? {
+                        ...p,
+                        ...attached,
+                        vertexId: attached.vertexId,
+                        elevation: attached.vertexId ? roof.eaves : p.elevation,
+                      }
+                    : p,
+                ),
+              },
+              true,
+            );
           }
         }}
         onPointerUp={() => {
           dragging.current = null;
+          if (autoSave && latestRoof.current) apply(latestRoof.current);
+          latestRoof.current = null;
+          gestureRoof.current = null;
         }}
         onPointerCancel={() => {
           dragging.current = null;
+          if (gestureRoof.current) update(gestureRoof.current, true);
+          latestRoof.current = null;
+          gestureRoof.current = null;
         }}
       >
         <path
@@ -411,6 +474,7 @@ export function RoofPlanEditor({
                   pick(p.id);
                   if (tool === 'select') {
                     dragging.current = p.id;
+                    gestureRoof.current = structuredClone(roof);
                     svg.current?.setPointerCapture(e.pointerId);
                   }
                 }}
@@ -484,34 +548,78 @@ export function RoofPlanEditor({
           </button>
           {active && (
             <>
-              <label className="field-label">
-                Point elevation (m)
-                <input
-                  type="number"
-                  disabled={!!active.vertexId}
-                  min={0.1}
-                  max={height}
-                  step={0.1}
-                  value={active.elevation}
-                  onChange={(e) => patch({ elevation: Number(e.target.value) })}
-                />
-              </label>
-              {(['Longitude', 'Latitude'] as const).map((name, i) => (
-                <label className="field-label" key={name}>
-                  {name}
-                  <input
-                    type="number"
-                    step="0.000001"
+              {autoSave ? (
+                <>
+                  <ModelField
+                    label="Point elevation (m)"
+                    value={active.elevation}
                     disabled={!!active.vertexId}
-                    value={active.coordinates[i]}
-                    onChange={(e) => {
-                      const coordinates = [...active.coordinates] as Position;
-                      coordinates[i] = Number(e.target.value);
-                      patch({ coordinates });
+                    buildingId={edit.id}
+                    workspace={workspace}
+                    field={`roof:${partId}:${active.id}:elevation`}
+                    min={0.1}
+                    max={height}
+                    onCommit={(v) => {
+                      patch({ elevation: Number(v) });
+                      return true;
                     }}
                   />
-                </label>
-              ))}
+                  {(['Longitude', 'Latitude'] as const).map((label, i) => (
+                    <ModelField
+                      key={`${active.id}:${i}`}
+                      label={label}
+                      value={active.coordinates[i]}
+                      disabled={!!active.vertexId}
+                      buildingId={edit.id}
+                      workspace={workspace}
+                      field={`roof:${partId}:${active.id}:${i}`}
+                      step={0.000001}
+                      onCommit={(v) => {
+                        const coordinates = [...active.coordinates] as Position;
+                        coordinates[i] = Number(v);
+                        patch({ coordinates });
+                        return true;
+                      }}
+                    />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {' '}
+                  <label className="field-label">
+                    Point elevation (m)
+                    <input
+                      type="number"
+                      disabled={!!active.vertexId}
+                      min={0.1}
+                      max={height}
+                      step={0.1}
+                      value={active.elevation}
+                      onChange={(e) =>
+                        patch({ elevation: Number(e.target.value) })
+                      }
+                    />
+                  </label>
+                  {(['Longitude', 'Latitude'] as const).map((name, i) => (
+                    <label className="field-label" key={name}>
+                      {name}
+                      <input
+                        type="number"
+                        step="0.000001"
+                        disabled={!!active.vertexId}
+                        value={active.coordinates[i]}
+                        onChange={(e) => {
+                          const coordinates = [
+                            ...active.coordinates,
+                          ] as Position;
+                          coordinates[i] = Number(e.target.value);
+                          patch({ coordinates });
+                        }}
+                      />
+                    </label>
+                  ))}
+                </>
+              )}
               {active.vertexId && (
                 <button onClick={() => patch({ vertexId: undefined })}>
                   Detach from outline vertex
@@ -556,9 +664,9 @@ export function RoofPlanEditor({
             <button
               className="editor-primary"
               disabled={!!error}
-              onClick={apply}
+              onClick={() => apply()}
             >
-              Apply roof
+              {autoSave ? 'Save valid roof' : 'Apply roof'}
             </button>
             <button
               onClick={() => {
@@ -567,12 +675,13 @@ export function RoofPlanEditor({
                 setSelected('');
               }}
             >
-              Cancel roof
+              {autoSave ? 'Done editing roof' : 'Cancel roof'}
             </button>
           </div>
           <p className="small-note">
-            This unfinished plan is saved in local recovery. Apply commits it as
-            one undo step.
+            {autoSave
+              ? 'Completed valid actions save to the draft. Incomplete plans remain in local recovery.'
+              : 'This unfinished plan is saved in local recovery. Apply commits it as one undo step.'}
           </p>
         </>
       )}

@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react';
+/* SVG has no native button. Corner buttons support arrow keys and have equivalent labelled numeric fields. */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/prefer-tag-over-role */
+import { useEffect, useRef, useState } from 'react';
 import type { CampusPhoto } from './types';
 import type { FacadeDescription, FacadeTextureRecipe } from './visual-types';
 import type { EditorWorkspace } from './editor-workspace';
@@ -27,6 +29,22 @@ export function ModelPhotoPanel({
     image = useRef<HTMLDivElement>(null),
     latest = useRef<FacadeTextureRecipe | null>(null);
   const texture = recipe || facade?.texture;
+  const recoveryWall = facade?.wallId;
+  useEffect(() => {
+    const saved =
+      recoveryWall &&
+      workspace?.modelInputs[buildingId]?.[`texture:${recoveryWall}`];
+    if (saved)
+      try {
+        const restored = JSON.parse(saved) as FacadeTextureRecipe;
+        if (restored.photoId === photo?.id) setRecipe(restored);
+      } catch {
+        setError(
+          'Unfinished texture alignment could not be restored. Discard unfinished input to clear it.',
+        );
+      }
+    else setRecipe(null);
+  }, [recoveryWall, workspace?.modelInputs, buildingId, photo?.id]);
   const apply = (next: FacadeTextureRecipe | undefined) => {
     if (!facade) return false;
     const ok = onCommit({
@@ -40,8 +58,16 @@ export function ModelPhotoPanel({
       setRecipe(null);
       setError('');
       workspace?.recoverModelInput(buildingId, `texture:${facade.wallId}`);
-    } else
+    } else {
+      if (next)
+        workspace?.recoverModelInput(
+          buildingId,
+          `texture:${facade.wallId}`,
+          JSON.stringify(next),
+        );
+      setRecipe(next || null);
       setError('Check the four corners: use clockwise, non-crossing corners.');
+    }
     return ok;
   };
   if (!photo)
@@ -87,8 +113,19 @@ export function ModelPhotoPanel({
           <img src={photo.url} alt={photo.alt} loading="lazy" />
           {texture?.photoId === photo.id && (
             <svg
+              role="application"
+              aria-label="Texture alignment. Select a corner or use its numeric coordinates below."
               viewBox="0 0 1 1"
               preserveAspectRatio="none"
+              onKeyDown={(e) => {
+                if (e.key === 'Escape' && dragging.current !== null) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  dragging.current = null;
+                  latest.current = null;
+                  setRecipe(null);
+                }
+              }}
               onPointerMove={(e) => {
                 if (dragging.current === null || !image.current) return;
                 const b = image.current.getBoundingClientRect(),
@@ -133,19 +170,65 @@ export function ModelPhotoPanel({
                 strokeWidth={0.005}
               />
               {texture.corners.map((p, i) => (
-                <circle
-                  key={i}
-                  cx={p[0]}
-                  cy={p[1]}
-                  r={0.025}
-                  fill="#087cf0"
-                  stroke="white"
-                  strokeWidth={0.004}
-                  onPointerDown={(e) => {
-                    dragging.current = i;
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                  }}
-                />
+                <g key={i}>
+                  <circle
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${['Top left', 'Top right', 'Bottom right', 'Bottom left'][i]} texture corner. Arrow keys adjust alignment.`}
+                    cx={p[0]}
+                    cy={p[1]}
+                    r={0.025}
+                    fill="#087cf0"
+                    stroke="white"
+                    strokeWidth={0.004}
+                    onPointerDown={(e) => {
+                      e.currentTarget.focus();
+                      dragging.current = i;
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    }}
+                    onKeyDown={(e) => {
+                      if (
+                        ![
+                          'ArrowLeft',
+                          'ArrowRight',
+                          'ArrowUp',
+                          'ArrowDown',
+                        ].includes(e.key)
+                      )
+                        return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const axis =
+                        e.key === 'ArrowLeft' || e.key === 'ArrowRight' ? 0 : 1;
+                      const amount =
+                        (e.key === 'ArrowLeft' || e.key === 'ArrowUp'
+                          ? -1
+                          : 1) * (e.shiftKey ? 0.01 : 0.001);
+                      apply({
+                        ...texture,
+                        corners: texture.corners.map((corner, j) =>
+                          j === i
+                            ? (corner.map((n, a) =>
+                                a === axis
+                                  ? Math.max(0, Math.min(1, n + amount))
+                                  : n,
+                              ) as [number, number])
+                            : corner,
+                        ),
+                      });
+                    }}
+                  />
+                  <text
+                    x={p[0]}
+                    y={p[1] + 0.009}
+                    textAnchor="middle"
+                    fontSize=".025"
+                    fill="white"
+                    pointerEvents="none"
+                  >
+                    {['TL', 'TR', 'BR', 'BL'][i]}
+                  </text>
+                </g>
               ))}
             </svg>
           )}

@@ -54,6 +54,8 @@ export function PhotoModelPreview(props: {
   const request = useRef<() => void>(() => {}),
     action = useRef<(a: string) => void>(() => {});
   const syncSelection = useRef<() => void>(() => {});
+  const retry = useRef<() => void>(() => {});
+  const [failed, setFailed] = useState(false);
   const [message, setMessage] = useState('Building preview…');
   const signature = JSON.stringify([
     buildingRevision(props.feature),
@@ -83,6 +85,11 @@ export function PhotoModelPreview(props: {
     camera.up.set(0, 0, 1);
     const draw = () => {
       if (!disposed && renderer) {
+        scene.background = new Color(
+          document.documentElement.classList.contains('dark')
+            ? '#202b32'
+            : '#dfe6e9',
+        );
         const start = performance.now();
         renderer.render(scene, camera);
         current.current.onMetrics?.({
@@ -95,6 +102,11 @@ export function PhotoModelPreview(props: {
       }
     };
     const textures = createFacadeTextures(draw);
+    const themeObserver = new MutationObserver(draw);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
     const clearHighlights = () => {
       for (const o of highlights.children.slice()) {
         highlights.remove(o);
@@ -161,7 +173,8 @@ export function PhotoModelPreview(props: {
         }
       }
     };
-    const worker = new Worker(
+    let dead = false;
+    let worker = new Worker(
       new URL('./building-preview.worker.ts', import.meta.url),
       { type: 'module' },
     );
@@ -259,6 +272,19 @@ export function PhotoModelPreview(props: {
     }
     const send = () => {
       if (disposed) return;
+      if (dead) {
+        const message = worker.onmessage;
+        worker.terminate();
+        worker = new Worker(
+          new URL('./building-preview.worker.ts', import.meta.url),
+          { type: 'module' },
+        );
+        worker.onmessage = message;
+        worker.onerror = () =>
+          fail('3D preview stopped. Your draft is retained.');
+        dead = false;
+        running = false;
+      }
       if (running) {
         pending = true;
         return;
@@ -267,27 +293,38 @@ export function PhotoModelPreview(props: {
       pending = false;
       active = generation;
       const { feature, visual } = current.current;
-      worker.postMessage({
-        revision: active,
-        features: [feature],
-        visuals: visual ? [visual] : [],
-      });
+      setFailed(false);
+      try {
+        worker.postMessage({
+          revision: active,
+          features: [feature],
+          visuals: visual ? [visual] : [],
+        });
+      } catch {
+        fail('3D preview could not start. Your draft is retained.');
+        return;
+      }
       deadline = setTimeout(() => {
-        worker.terminate();
-        setMessage(
-          'Preview timed out. Reopen to retry; your draft is retained.',
-        );
+        fail('Preview timed out. Your draft is retained.');
       }, 15000);
+    };
+    const fail = (message: string) => {
+      if (disposed) return;
+      clearTimeout(deadline);
+      worker.terminate();
+      dead = true;
+      running = false;
+      setFailed(true);
+      setMessage(message);
     };
     request.current = () => {
       generation++;
       send();
     };
-    worker.onerror = () => {
-      clearTimeout(deadline);
-      setMessage('3D preview stopped. Reopen to retry.');
-    };
+    retry.current = () => request.current();
+    worker.onerror = () => fail('3D preview stopped. Your draft is retained.');
     worker.onmessage = ({ data: reply }) => {
+      if (reply?.revision !== active) return;
       clearTimeout(deadline);
       running = false;
       if (disposed) return;
@@ -295,7 +332,11 @@ export function PhotoModelPreview(props: {
         send();
         return;
       }
-      const result = reply.results[0];
+      const result = reply?.results?.[0];
+      if (!result || (!result.error && !result.model?.meshes)) {
+        fail('Invalid model preview response. Your draft is retained.');
+        return;
+      }
       if (result.error) {
         setMessage(result.error);
         return;
@@ -341,6 +382,7 @@ export function PhotoModelPreview(props: {
       clearTimeout(deadline);
       worker.terminate();
       observer?.disconnect();
+      themeObserver.disconnect();
       controls?.dispose();
       clear();
       textures.dispose();
@@ -349,11 +391,11 @@ export function PhotoModelPreview(props: {
       request.current = () => {};
       action.current = () => {};
       syncSelection.current = () => {};
+      retry.current = () => {};
     };
   }, []);
   useEffect(() => {
-    const timer = setTimeout(() => request.current(), 120);
-    return () => clearTimeout(timer);
+    request.current();
   }, [signature]);
   const selectionKey = JSON.stringify([
     props.selection,
@@ -365,6 +407,9 @@ export function PhotoModelPreview(props: {
     <section className="photo-model-preview">
       <div ref={host} className="photo-model-canvas" />
       <output aria-live="polite">{message}</output>
+      {failed && (
+        <button onClick={() => retry.current()}>Retry model preview</button>
+      )}
       <div className="photo-model-view-buttons">
         <button onClick={() => action.current('fit')}>
           Fit selected detail

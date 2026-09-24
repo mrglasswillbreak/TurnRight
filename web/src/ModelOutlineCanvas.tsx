@@ -1,3 +1,5 @@
+/* The interactive SVG has equivalent vertex-selection and numeric controls below it. */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
 import { useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { MapEdit } from './types';
@@ -68,6 +70,16 @@ export function ModelOutlineCanvas({
         className="model-outline-canvas"
         viewBox={`${west} ${north} ${east - west} ${south - north}`}
         aria-label="Top-down building outline"
+        role="application"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && drag.current) {
+            event.preventDefault();
+            event.stopPropagation();
+            drag.current = null;
+            setPreview(null);
+          }
+        }}
+        tabIndex={0}
         onPointerMove={(e) => {
           if (drag.current) setPreview(update(drag.current, location(e)));
         }}
@@ -107,6 +119,7 @@ export function ModelOutlineCanvas({
                       stroke="#087cf0"
                       strokeWidth={pixel * 2}
                       onPointerDown={(e) => {
+                        svg.current!.focus();
                         drag.current = [p, r, v];
                         setSelected([p, r, v]);
                         svg.current!.setPointerCapture(e.pointerId);

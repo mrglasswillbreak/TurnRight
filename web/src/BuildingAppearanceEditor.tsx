@@ -17,6 +17,8 @@ import {
 } from './building-surfaces';
 import { RoofPlanEditor } from './RoofPlanEditor';
 import './building-editor.css';
+import type { EditorWorkspace } from './editor-workspace';
+import { ModelField } from './ModelField';
 const PhotoModelWorkspace = lazy(() => import('./PhotoModelWorkspace'));
 
 export type BuildingMode = 'appearance' | 'outline' | 'roof';
@@ -31,6 +33,9 @@ export function BuildingAppearanceEditor({
   roofDraft,
   onRoofDraft,
   onApplyRoof,
+  embedded = false,
+  workspace,
+  onHistory,
 }: {
   edit: MapEdit;
   data: CampusData;
@@ -38,12 +43,18 @@ export function BuildingAppearanceEditor({
   onMode: (mode: BuildingMode) => void;
   selection?: BuildingSelection;
   onSelection: (selection: BuildingSelection) => void;
-  onEdit: (edit: MapEdit, field?: string) => void;
+  onEdit: (edit: MapEdit, field?: string) => void | boolean;
   roofDraft: RoofDraft | null;
   onRoofDraft: (draft: RoofDraft | null) => void;
   onApplyRoof: (edit: MapEdit) => void;
+  embedded?: boolean;
+  workspace?: EditorWorkspace;
+  onHistory?: (redo?: boolean) => void;
 }) {
   const [photoModelOpen, setPhotoModelOpen] = useState(false);
+  const [workspaceMode, setWorkspaceMode] = useState<'details' | BuildingMode>(
+    'details',
+  );
   const feature = useMemo(
     () => ({
       type: 'Feature' as const,
@@ -131,7 +142,7 @@ export function BuildingAppearanceEditor({
       delete target.heightMode;
     } else if (value === undefined) delete target[field];
     else Object.assign(target, { [field]: value });
-    onEdit(
+    return onEdit(
       {
         ...edit,
         properties: {
@@ -164,26 +175,43 @@ export function BuildingAppearanceEditor({
     step = 0.1,
   ) => (
     <div className="surface-field" key={key}>
-      <label className="field-label">
-        {label}
-        <input
-          type="number"
+      {embedded && value !== undefined ? (
+        <ModelField
+          label={label}
+          value={value}
+          field={`appearance:${partId || 'building'}:${wallId || ''}:${key}`}
+          buildingId={edit.id}
+          workspace={workspace}
           min={min}
           max={max}
           step={step}
-          value={value ?? ''}
-          placeholder={
-            key === 'roofPitch' ? 'Generated proportions' : undefined
-          }
-          onChange={(e) =>
-            change(
-              key,
-              e.target.value === '' ? undefined : Number(e.target.value),
-              true,
-            )
-          }
+          onCommit={(value) => {
+            change(key, Number(value));
+            return true;
+          }}
         />
-      </label>
+      ) : (
+        <label className="field-label">
+          {label}
+          <input
+            type="number"
+            min={min}
+            max={max}
+            step={step}
+            value={value ?? ''}
+            placeholder={
+              key === 'roofPitch' ? 'Generated proportions' : undefined
+            }
+            onChange={(e) =>
+              change(
+                key,
+                e.target.value === '' ? undefined : Number(e.target.value),
+                true,
+              )
+            }
+          />
+        </label>
+      )}
       {reset(key)}
     </div>
   );
@@ -213,13 +241,17 @@ export function BuildingAppearanceEditor({
       className="building-appearance"
       aria-label="Building appearance editor"
     >
-      <button
-        type="button"
-        disabled={locked}
-        onClick={() => setPhotoModelOpen(true)}
-      >
-        Photo &amp; model
-      </button>
+      {!embedded && (
+        <button
+          type="button"
+          onClick={() => {
+            setWorkspaceMode('details');
+            setPhotoModelOpen(true);
+          }}
+        >
+          Photo &amp; model
+        </button>
+      )}
       {photoModelOpen && (
         <Suspense
           fallback={
@@ -234,343 +266,413 @@ export function BuildingAppearanceEditor({
             onSelection={onSelection}
             onEdit={onEdit}
             onClose={() => setPhotoModelOpen(false)}
+            workspace={workspace}
+            onHistory={onHistory}
+            initialMode={workspaceMode}
           />
         </Suspense>
       )}
-      <fieldset className="building-modes" aria-label="Building editing mode">
-        {(['appearance', 'outline', 'roof'] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            aria-pressed={mode === m}
-            disabled={locked && m !== 'roof'}
-            onClick={() => onMode(m)}
-          >
-            {m[0].toUpperCase() + m.slice(1)}
-          </button>
-        ))}
-      </fieldset>
-      <label className="field-label">
-        Building / wing
-        <select
-          aria-label="Building or wing"
-          disabled={locked}
-          value={partId || ''}
-          onChange={(e) => choose(e.target.value || undefined)}
-        >
-          <option value="">Whole building · defaults</option>
-          {topology.parts.map((p, i) => (
-            <option key={p.id} value={p.id}>
-              Wing {i + 1}
-            </option>
-          ))}
-        </select>
-      </label>
-      {part && mode !== 'roof' && (
-        <label className="field-label">
-          Wall
-          <select
-            aria-label="Wall"
-            disabled={locked}
-            value={wallId || ''}
-            onChange={(e) => choose(part.id, e.target.value || undefined)}
-          >
-            <option value="">All walls · wing defaults</option>
-            {part.rings.flatMap((r, ri) =>
-              r.wallIds.map((id, wi) => (
-                <option key={id} value={id}>
-                  {ri ? `Courtyard ${ri}` : 'Outside'} wall {wi + 1}
-                </option>
-              )),
-            )}
-          </select>
-        </label>
-      )}
-      {(brokenTopology || orphans) && (
-        <div className="notice" role="alert">
-          <p>
-            {brokenTopology
-              ? 'Surface identities no longer match the outline. Review a reset before continuing.'
-              : 'Some appearance settings refer to removed surfaces.'}
-          </p>
-          <button
-            onClick={() =>
-              onEdit(resetBuildingAssignments(edit, !brokenTopology))
-            }
-          >
-            {brokenTopology
-              ? 'Reset surface identities and assignments'
-              : 'Reset unassigned surfaces'}
-          </button>
-        </div>
-      )}
-      {(topology.issues || []).map((issue) => (
-        <div className="notice" role="alert" key={issue.id}>
-          <p>{issue.message}</p>
-          {issue.candidates.map((candidate, i) => (
+      {!embedded && !photoModelOpen && (
+        <fieldset className="building-modes" aria-label="Building editing mode">
+          {(['appearance', 'outline', 'roof'] as const).map((m) => (
             <button
-              key={i}
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              disabled={locked && m !== 'roof'}
               onClick={() => {
-                const next = structuredClone(appearance);
-                if (issue.wallId) (next.walls ||= {})[issue.wallId] = candidate;
-                else {
-                  (next.parts ||= {})[issue.partId] = candidate;
-                  delete next.roofs?.[issue.partId];
-                }
-                onEdit({
-                  ...edit,
-                  properties: {
-                    ...edit.properties,
-                    appearance: next,
-                    buildingTopology: {
-                      ...topology,
-                      issues: topology.issues?.filter(
-                        (item) => item.id !== issue.id,
-                      ),
-                    },
-                  },
-                });
+                onMode(m);
+                setWorkspaceMode(m);
+                setPhotoModelOpen(true);
               }}
             >
-              Use former style {i + 1} ({candidate.wallColour || 'inherited'})
+              {m[0].toUpperCase() + m.slice(1)}
             </button>
           ))}
-          <button
-            onClick={() => {
-              const next = structuredClone(appearance);
-              if (issue.wallId) delete next.walls?.[issue.wallId];
-              else {
-                delete next.parts?.[issue.partId];
-                delete next.roofs?.[issue.partId];
-              }
-              onEdit({
-                ...edit,
-                properties: {
-                  ...edit.properties,
-                  appearance: next,
-                  buildingTopology: {
-                    ...topology,
-                    issues: topology.issues?.filter(
-                      (item) => item.id !== issue.id,
-                    ),
-                  },
-                },
-              });
-            }}
-          >
-            Reset surface assignments
-          </button>
-        </div>
-      ))}
-      {mode === 'outline' ? (
-        <p className="small-note">
-          Move outline vertices on the map. Surface styles follow their walls;
-          joining differently styled walls requires review.
-        </p>
-      ) : mode === 'roof' ? (
-        part ? (
-          <RoofPlanEditor
-            key={part.id}
-            edit={edit}
-            partId={part.id}
-            polygon={polygonsOf(edit.geometry)[index]}
-            topology={part}
-            height={wingHeight}
-            illustrative={
-              own.heightMode === 'unknown' ||
-              (!own.height &&
-                !own.floors &&
-                (visual.partHeights?.[index]?.kind || visual.heightKind) ===
-                  'illustrative')
-            }
-            draft={
-              roofDraft?.buildingId === edit.id && roofDraft.partId === part.id
-                ? roofDraft
-                : null
-            }
-            onDraft={onRoofDraft}
-            focusedSurface={selection?.roofTriangle}
-            onSurface={(index) =>
-              onSelection({
-                buildingId: edit.id,
-                partId: part.id,
-                role: 'roof',
-                roofTriangle: index,
-              })
-            }
-            onApply={onApplyRoof}
-          />
-        ) : (
-          <p className="notice">Choose a wing above to edit its roof plan.</p>
-        )
-      ) : (
+        </fieldset>
+      )}
+      {(!photoModelOpen || embedded) && (
         <>
-          <p className="small-note">
-            {wallId
-              ? 'This wall inherits wing settings.'
-              : partId
-                ? 'This wing inherits building defaults.'
-                : 'Building defaults apply to all wings and walls unless overridden.'}{' '}
-            Select surfaces on the 3D model or use the lists above.
-          </p>
-          <p className="small-note building-night-note">
-            Enhanced 3D keeps these saved colours in dark mode. Lighting adds
-            shading to the model.
-          </p>
-          {(['wallColour', 'roofColour', 'windowColour', 'trimColour'] as const)
-            .filter((key) => !wallId || key !== 'roofColour')
-            .map((key) => (
-              <div className="surface-field" key={key}>
-                <label className="field-label">
-                  {
-                    {
-                      wallColour: 'Wall colour',
-                      roofColour: 'Roof colour',
-                      windowColour: 'Window colour',
-                      trimColour: 'Trim colour',
-                    }[key]
-                  }
-                  <input
-                    type="color"
-                    value={resolved[key]}
-                    onChange={(e) => change(key, e.target.value, true)}
-                  />
-                </label>
-                <output>{resolved[key]}</output>
-                {reset(key)}
-              </div>
-            ))}
-          <div className="surface-field">
+          <label className="field-label">
+            Building / wing
+            <select
+              aria-label="Building or wing"
+              disabled={locked}
+              value={partId || ''}
+              onChange={(e) => choose(e.target.value || undefined)}
+            >
+              <option value="">Whole building · defaults</option>
+              {topology.parts.map((p, i) => (
+                <option key={p.id} value={p.id}>
+                  Wing {i + 1}
+                </option>
+              ))}
+            </select>
+          </label>
+          {part && mode !== 'roof' && (
             <label className="field-label">
-              Windows
+              Wall
               <select
-                value={resolved.windows ? 'show' : 'hide'}
-                onChange={(e) => change('windows', e.target.value === 'show')}
+                aria-label="Wall"
+                disabled={locked}
+                value={wallId || ''}
+                onChange={(e) => choose(part.id, e.target.value || undefined)}
               >
-                <option value="show">Show illustrative windows</option>
-                <option value="hide">Hide windows</option>
+                <option value="">All walls · wing defaults</option>
+                {part.rings.flatMap((r, ri) =>
+                  r.wallIds.map((id, wi) => (
+                    <option key={id} value={id}>
+                      {ri ? `Courtyard ${ri}` : 'Outside'} wall {wi + 1}
+                    </option>
+                  )),
+                )}
               </select>
             </label>
-            {reset('windows')}
-          </div>
-          {!resolved.windows && (
-            <p className="small-note">
-              Windows are hidden on this surface. Show windows to preview their
-              colour, trim and spacing.
-            </p>
           )}
-          {numeric(
-            'Window spacing (m)',
-            'windowSpacing',
-            resolved.windowSpacing,
-            0.5,
-            20,
-          )}
-          {!wallId && (
-            <>
-              {partId && appearance.roofs?.[partId] && (
-                <p className="notice">
-                  This wing uses a custom roof. Standard form and pitch take
-                  effect after choosing Use standard roof in Roof mode.
-                </p>
-              )}
-              <div className="surface-field">
-                <label className="field-label">
-                  Standard roof form
-                  <select
-                    value={resolved.roofForm}
-                    onChange={(e) => change('roofForm', e.target.value)}
-                  >
-                    <option value="flat">Flat</option>
-                    <option value="hip" disabled={!canPitch}>
-                      Hip · four-sided wing
-                    </option>
-                    <option value="gable" disabled={!canPitch}>
-                      Gable · four-sided wing
-                    </option>
-                  </select>
-                </label>
-                {reset('roofForm')}
-              </div>
-              {resolved.roofForm !== 'flat' &&
-                canPitch &&
-                numeric(
-                  'Standard roof pitch (degrees)',
-                  'roofPitch',
-                  pitch,
-                  1,
-                  60,
-                )}
-              <p className="small-note">
-                Custom roof plans override standard forms. Complex outlines use
-                a flat cap until a custom roof is applied.
+          {(brokenTopology || orphans) && (
+            <div className="notice" role="alert">
+              <p>
+                {brokenTopology
+                  ? 'Surface identities no longer match the outline. Review a reset before continuing.'
+                  : 'Some appearance settings refer to removed surfaces.'}
               </p>
-            </>
+              <button
+                onClick={() =>
+                  onEdit(resetBuildingAssignments(edit, !brokenTopology))
+                }
+              >
+                {brokenTopology
+                  ? 'Reset surface identities and assignments'
+                  : 'Reset unassigned surfaces'}
+              </button>
+            </div>
           )}
-          {partId && !wallId && (
+          {(topology.issues || []).map((issue) => (
+            <div className="notice" role="alert" key={issue.id}>
+              <p>{issue.message}</p>
+              {issue.candidates.map((candidate, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    const next = structuredClone(appearance);
+                    if (issue.wallId)
+                      (next.walls ||= {})[issue.wallId] = candidate;
+                    else {
+                      (next.parts ||= {})[issue.partId] = candidate;
+                      delete next.roofs?.[issue.partId];
+                    }
+                    onEdit({
+                      ...edit,
+                      properties: {
+                        ...edit.properties,
+                        appearance: next,
+                        buildingTopology: {
+                          ...topology,
+                          issues: topology.issues?.filter(
+                            (item) => item.id !== issue.id,
+                          ),
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Use former style {i + 1} (
+                  {candidate.wallColour || 'inherited'})
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  const next = structuredClone(appearance);
+                  if (issue.wallId) delete next.walls?.[issue.wallId];
+                  else {
+                    delete next.parts?.[issue.partId];
+                    delete next.roofs?.[issue.partId];
+                  }
+                  onEdit({
+                    ...edit,
+                    properties: {
+                      ...edit.properties,
+                      appearance: next,
+                      buildingTopology: {
+                        ...topology,
+                        issues: topology.issues?.filter(
+                          (item) => item.id !== issue.id,
+                        ),
+                      },
+                    },
+                  });
+                }}
+              >
+                Reset surface assignments
+              </button>
+            </div>
+          ))}
+          {mode === 'outline' ? (
+            <p className="small-note">
+              Move outline vertices on the map. Surface styles follow their
+              walls; joining differently styled walls requires review.
+            </p>
+          ) : mode === 'roof' ? (
+            part ? (
+              <RoofPlanEditor
+                autoSave={embedded}
+                workspace={workspace}
+                key={part.id}
+                edit={edit}
+                partId={part.id}
+                polygon={polygonsOf(edit.geometry)[index]}
+                topology={part}
+                height={wingHeight}
+                illustrative={
+                  own.heightMode === 'unknown' ||
+                  (!own.height &&
+                    !own.floors &&
+                    (visual.partHeights?.[index]?.kind || visual.heightKind) ===
+                      'illustrative')
+                }
+                draft={
+                  roofDraft?.buildingId === edit.id &&
+                  roofDraft.partId === part.id
+                    ? roofDraft
+                    : null
+                }
+                onDraft={onRoofDraft}
+                focusedSurface={selection?.roofTriangle}
+                onSurface={(index) =>
+                  onSelection({
+                    buildingId: edit.id,
+                    partId: part.id,
+                    role: 'roof',
+                    roofTriangle: index,
+                  })
+                }
+                onApply={onApplyRoof}
+              />
+            ) : (
+              <p className="notice">
+                Choose a wing above to edit its roof plan.
+              </p>
+            )
+          ) : (
             <>
+              <p className="small-note">
+                {wallId
+                  ? 'This wall inherits wing settings.'
+                  : partId
+                    ? 'This wing inherits building defaults.'
+                    : 'Building defaults apply to all wings and walls unless overridden.'}{' '}
+                Select surfaces on the 3D model or use the lists above.
+              </p>
+              <p className="small-note building-night-note">
+                Enhanced 3D keeps these saved colours in dark mode. Lighting
+                adds shading to the model.
+              </p>
+              {(
+                [
+                  'wallColour',
+                  'roofColour',
+                  'windowColour',
+                  'trimColour',
+                ] as const
+              )
+                .filter((key) => !wallId || key !== 'roofColour')
+                .map((key) => (
+                  <div className="surface-field" key={key}>
+                    {embedded ? (
+                      <ModelField
+                        label={
+                          {
+                            wallColour: 'Wall colour',
+                            roofColour: 'Roof colour',
+                            windowColour: 'Window colour',
+                            trimColour: 'Trim colour',
+                          }[key]
+                        }
+                        type="color"
+                        value={resolved[key]!}
+                        buildingId={edit.id}
+                        field={`appearance:${partId || 'building'}:${wallId || ''}:${key}`}
+                        workspace={workspace}
+                        onCommit={(v) => change(key, v) !== false}
+                      />
+                    ) : (
+                      <label className="field-label">
+                        {
+                          {
+                            wallColour: 'Wall colour',
+                            roofColour: 'Roof colour',
+                            windowColour: 'Window colour',
+                            trimColour: 'Trim colour',
+                          }[key]
+                        }
+                        <input
+                          type="color"
+                          value={resolved[key]}
+                          onChange={(e) => change(key, e.target.value, true)}
+                        />
+                      </label>
+                    )}
+                    <output>{resolved[key]}</output>
+                    {reset(key)}
+                  </div>
+                ))}
               <div className="surface-field">
                 <label className="field-label">
-                  Wing height information
+                  Windows
                   <select
-                    value={own.heightMode || 'inherit'}
+                    value={resolved.windows ? 'show' : 'hide'}
                     onChange={(e) =>
-                      change(
-                        'heightMode',
-                        e.target.value === 'inherit'
-                          ? undefined
-                          : e.target.value,
-                      )
+                      change('windows', e.target.value === 'show')
                     }
                   >
-                    <option value="inherit">Inherit building height</option>
-                    <option value="metres">Metres</option>
-                    <option value="floors">Floors · 3 m per floor</option>
-                    <option value="unknown">Unknown · illustrative 6 m</option>
+                    <option value="show">Show illustrative windows</option>
+                    <option value="hide">Hide windows</option>
                   </select>
                 </label>
-                {reset('heightMode')}
+                {reset('windows')}
               </div>
-              {own.heightMode === 'floors' ? (
-                numeric('Wing floors', 'floors', resolved.floors, 1, 50, 1)
-              ) : own.heightMode === 'metres' ? (
-                numeric('Wing total height (m)', 'height', wingHeight, 0.1, 150)
-              ) : (
+              {!resolved.windows && (
                 <p className="small-note">
-                  Current height: {wingHeight} m{' '}
-                  {own.heightMode === 'unknown' ||
-                  visual.heightKind === 'illustrative'
-                    ? '· illustrative, unverified'
-                    : ''}
+                  Windows are hidden on this surface. Show windows to preview
+                  their colour, trim and spacing.
                 </p>
               )}
+              {numeric(
+                'Window spacing (m)',
+                'windowSpacing',
+                resolved.windowSpacing,
+                0.5,
+                20,
+              )}
+              {!wallId && (
+                <>
+                  {partId && appearance.roofs?.[partId] && (
+                    <p className="notice">
+                      This wing uses a custom roof. Standard form and pitch take
+                      effect after choosing Use standard roof in Roof mode.
+                    </p>
+                  )}
+                  <div className="surface-field">
+                    <label className="field-label">
+                      Standard roof form
+                      <select
+                        value={resolved.roofForm}
+                        onChange={(e) => change('roofForm', e.target.value)}
+                      >
+                        <option value="flat">Flat</option>
+                        <option value="hip" disabled={!canPitch}>
+                          Hip · four-sided wing
+                        </option>
+                        <option value="gable" disabled={!canPitch}>
+                          Gable · four-sided wing
+                        </option>
+                      </select>
+                    </label>
+                    {reset('roofForm')}
+                  </div>
+                  {resolved.roofForm !== 'flat' &&
+                    canPitch &&
+                    numeric(
+                      'Standard roof pitch (degrees)',
+                      'roofPitch',
+                      pitch,
+                      1,
+                      60,
+                    )}
+                  <p className="small-note">
+                    Custom roof plans override standard forms. Complex outlines
+                    use a flat cap until a custom roof is applied.
+                  </p>
+                </>
+              )}
+              {partId && !wallId && (
+                <>
+                  <div className="surface-field">
+                    <label className="field-label">
+                      Wing height information
+                      <select
+                        value={own.heightMode || 'inherit'}
+                        onChange={(e) =>
+                          change(
+                            'heightMode',
+                            e.target.value === 'inherit'
+                              ? undefined
+                              : e.target.value,
+                          )
+                        }
+                      >
+                        <option value="inherit">Inherit building height</option>
+                        <option value="metres">Metres</option>
+                        <option value="floors">Floors · 3 m per floor</option>
+                        <option value="unknown">
+                          Unknown · illustrative 6 m
+                        </option>
+                      </select>
+                    </label>
+                    {reset('heightMode')}
+                  </div>
+                  {own.heightMode === 'floors' ? (
+                    numeric('Wing floors', 'floors', resolved.floors, 1, 50, 1)
+                  ) : own.heightMode === 'metres' ? (
+                    numeric(
+                      'Wing total height (m)',
+                      'height',
+                      wingHeight,
+                      0.1,
+                      150,
+                    )
+                  ) : (
+                    <p className="small-note">
+                      Current height: {wingHeight} m{' '}
+                      {own.heightMode === 'unknown' ||
+                      visual.heightKind === 'illustrative'
+                        ? '· illustrative, unverified'
+                        : ''}
+                    </p>
+                  )}
+                </>
+              )}
+              <div className="surface-field">
+                <label className="field-label">
+                  Evidence confidence
+                  <select
+                    value={resolved.confidence}
+                    onChange={(e) => change('confidence', e.target.value)}
+                  >
+                    <option value="inferred">Inferred</option>
+                    <option value="observed">Observed in a reference</option>
+                    <option value="documented">Documented dimensions</option>
+                  </select>
+                </label>
+                {reset('confidence')}
+              </div>
+              <div className="surface-field">
+                {embedded ? (
+                  <ModelField
+                    label="Appearance source / date"
+                    type="text"
+                    value={resolved.provenance || ''}
+                    buildingId={edit.id}
+                    field={`appearance:${partId || 'building'}:${wallId || ''}:provenance`}
+                    workspace={workspace}
+                    onCommit={(v) => change('provenance', v) !== false}
+                  />
+                ) : (
+                  <label className="field-label">
+                    Appearance source / date
+                    <textarea
+                      maxLength={2000}
+                      value={resolved.provenance || ''}
+                      onChange={(e) =>
+                        change('provenance', e.target.value, true)
+                      }
+                    />
+                  </label>
+                )}
+                {reset('provenance')}
+              </div>
             </>
           )}
-          <div className="surface-field">
-            <label className="field-label">
-              Evidence confidence
-              <select
-                value={resolved.confidence}
-                onChange={(e) => change('confidence', e.target.value)}
-              >
-                <option value="inferred">Inferred</option>
-                <option value="observed">Observed in a reference</option>
-                <option value="documented">Documented dimensions</option>
-              </select>
-            </label>
-            {reset('confidence')}
-          </div>
-          <div className="surface-field">
-            <label className="field-label">
-              Appearance source / date
-              <textarea
-                maxLength={2000}
-                value={resolved.provenance || ''}
-                onChange={(e) => change('provenance', e.target.value, true)}
-              />
-            </label>
-            {reset('provenance')}
-          </div>
         </>
       )}
     </section>

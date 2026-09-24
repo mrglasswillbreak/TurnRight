@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { EditorWorkspace } from './editor-workspace';
+const display = (value: string | number, step: number) =>
+  typeof value === 'number' && Number.isFinite(value)
+    ? String(
+        Number(
+          value.toFixed(Math.min(8, Math.max(0, Math.ceil(-Math.log10(step))))),
+        ),
+      )
+    : String(value);
 /** A field's intermediate text is not a geometry command. Never coerce blank input to zero. */
 export function ModelField({
   label,
@@ -27,13 +35,27 @@ export function ModelField({
   disabled?: boolean;
 }) {
   const recovered = workspace?.modelInputs[buildingId]?.[field];
-  const [text, setText] = useState(recovered ?? String(value)),
+  const [text, setText] = useState(recovered ?? display(value, step)),
     [error, setError] = useState('');
   const focused = useRef(false),
     dirty = useRef(recovered !== undefined);
+  const previousRecovery = useRef(recovered);
   useEffect(() => {
-    if (!dirty.current && !focused.current) setText(String(value));
-  }, [value]);
+    // A workspace-level discard must also clear an already mounted field.
+    if (
+      previousRecovery.current !== undefined &&
+      recovered === undefined &&
+      dirty.current
+    ) {
+      dirty.current = false;
+      setText(display(value, step));
+      setError('');
+    }
+    previousRecovery.current = recovered;
+  }, [recovered, value, step]);
+  useEffect(() => {
+    if (!dirty.current && !focused.current) setText(display(value, step));
+  }, [value, step]);
   const clear = () => {
     dirty.current = false;
     workspace?.recoverModelInput(buildingId, field);
@@ -92,7 +114,7 @@ export function ModelField({
           if (e.key === 'Escape') {
             e.stopPropagation();
             clear();
-            setText(String(value));
+            setText(display(value, step));
             setError('');
           }
         }}
