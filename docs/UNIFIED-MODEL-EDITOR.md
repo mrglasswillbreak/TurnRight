@@ -12,7 +12,7 @@ Desktop panels can be resized. On a phone, switch between **Wall**, **3D** and *
 
 Supported details are windows, doors, columns, balconies, canopies, parapets and trim. These are visual primitives. A decorative door does not create a mapped entrance, walking connection, accessibility observation or vehicle permission.
 
-1. Preview conversion of a generated façade before making it editable. Existing generated windows and trim are retained when adding custom details.
+1. Use **Add window**, **Add door** or another detail button to insert it immediately. Existing generated windows and trim are preserved in the same undoable action. **Preview editable layout** remains available when you want to inspect conversion first.
 2. Select a detail on the wall, from the hierarchy or in 3D. Shift-click and a marquee allow multiple selections.
 3. Drag to move or use numeric position, dimensions and projection in metres. A resize handle is available for an individual detail.
 4. Choose a 0.01, 0.1 or 1 metre grid. Arrow keys nudge by that increment; Shift multiplies it by ten. Alt temporarily bypasses snapping during a gesture. Floor guides are illustrative estimates.
@@ -30,6 +30,8 @@ Use the photograph panel to compare the selected wall and align a texture with l
 
 Appearance controls retain building defaults and wing/wall overrides. Roof and outline modes use the existing geographic geometry and roof operations. Changing a footprint, wall length, roof or height can invalidate an assignment. Affected details remain available for placement review or rematching; they must not silently stretch onto a different wall.
 
+**Appearance → Building height** edits the whole-building height, recorded floor count, approximate flag and source notes without leaving the workspace. These controls are separate from wing overrides. A missing floor count cannot be invented: enter the recorded value, or explicitly choose height in metres/unknown. Switching wall selectors keeps Appearance and Details on the same wall.
+
 The **Review** mode lists changes and unresolved assignments. Review the selected wall explicitly. Saving a draft does not approve every wall, and model review does not establish field-surveyed accuracy.
 
 ## Saving, undo and recovery
@@ -37,6 +39,10 @@ The **Review** mode lists changes and unresolved assignments. Review the selecte
 Completed commands use the editor's shared 100-action undo/redo history, optimistic save identities and conflict handling. Selection, camera movement and panel changes remain outside model history.
 
 Unfinished numeric fields and pending roof/detail work use owner-scoped local recovery. Closing the workspace preserves that work; **Discard unfinished input** removes the unfinished values. A local save is distinct from a server-confirmed map draft. Resolve storage errors or conflicts before relying on a remote save. Offline editing cannot upload changes until the connection returns.
+
+If an addition cannot save because of a placement or building validation error, it stays visible as an unfinished wall and recovers when reopened. Resolve the reported issue, then choose **Save unfinished wall**. **Check building height** opens the relevant controls. Rejected appearance values remain with their original building and wall when switching selections; they are not silently cleared or applied elsewhere.
+
+Map-draft saves share one atomic queue. An invalid change to another feature can leave the whole batch saved locally; the save error names that feature and its kind. Repair the named feature through the explorer. The server does not accept a partial batch while silently discarding its invalid changes.
 
 Private authoring metadata stores names, groups, patterns and presets in the existing draft JSON. It is excluded from public campus downloads. Compatible server validation must deploy before the new client. Older editors receive an update message when they would otherwise drop this metadata. Public package schemas 1–3 and the database schema remain unchanged.
 

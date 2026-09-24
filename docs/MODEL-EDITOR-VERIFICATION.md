@@ -13,6 +13,29 @@ The unified workspace uses the existing owner draft and publication pipeline. Th
 
 ## Automated verification
 
+### Interaction repairs · 25 September 2026
+
+Add buttons now preserve generated details and insert the requested primitive in
+one undoable command. Failed placements or building validation retain the proposed
+wall privately, with an explicit retry after repair. Whole-building height and
+floor controls are available inside Appearance. Appearance wall selection stays
+aligned with Details; rejected numeric values keep their recovery record and
+remain bound to the original field. Validation descriptions no longer change an
+input's accessible name. Shared-save errors identify the feature that blocks the
+batch rather than appearing to belong to whichever building is open.
+
+The repair checks include the complete 494-test unit suite and a final 27-test
+workspace/model run containing the new shared-save regression. Browser regressions
+exercise all seven Add tools, generated layout preservation, undo/redo, rejected
+insertions, close/reopen recovery, height repair, unknown-height reset, field
+identity, selection, patterns, worker retry and roof/outline history. The original
+five-trial performance measurements below predate these interaction repairs.
+
+All **20 distinct browser cases** passed across the focused and appearance/layout
+runs, including 320/390/768/1440-pixel light/dark views and short-screen controls.
+The production PWA building-recovery journey passed again. TypeScript, lint
+(seven existing warnings) and the authentication-configured build budgets pass.
+
 Client and server TypeScript and lint pass; lint retains seven existing `no-explicit-any` warnings. **494 Vitest tests in 63 files** and **23 Python importer tests** pass. Python tests use the pinned data dependencies from `scripts/requirements-data.txt`.
 
 The new tests cover metre conversion, placement bounds, reversed walls and courtyards, generated façade conversion, copies, patterns and detached slots, authoring validation, private metadata exclusion, routing-result reuse and input recovery. **17 distinct model/appearance browser cases passed**, including focused reruns after correcting the narrow test setup. They exercise actual React, MapLibre and Three.js rendering with isolated owner responses: numeric editing, keyboard movement, locking, copying, targeted review, pattern repair after reopening, roof/outline history, worker failure/retry and focus restoration. Layout checks include 320, 390, 768 and 1440 pixels in both themes, plus 740 × 390 and 320 × 450. The narrow setup selects buildings through the feature list to avoid clicking a drawing toolbar over a mapped coordinate. Another **five entrance/driving browser journeys** pass on desktop/mobile, including the old-package walking fallback. The production documentation capture also passes.
@@ -23,9 +46,9 @@ The authentication-configured production build passes all four budget scripts. A
 
 | Allocation | Measured | Limit |
 | --- | ---: | ---: |
-| Lazy renderer + guided editor, including shared non-startup dependencies | 166.6 KiB gzip | 300 KiB |
-| Public startup JavaScript | 418,682 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 183,443 bytes gzip | 189,440 bytes |
+| Lazy renderer + guided editor, including shared non-startup dependencies | 167.3 KiB gzip | 300 KiB |
+| Public startup JavaScript | 418,678 bytes gzip | 435,200 bytes |
+| Additional owner editor JavaScript | 183,457 bytes gzip | 189,440 bytes |
 | Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |

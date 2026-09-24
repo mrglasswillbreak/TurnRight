@@ -17,7 +17,7 @@ No image in this snapshot has an established camera bearing tied to a specific m
 Select a building and open **Photo & model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. Mobile offers **Wall**, **3D** and **Photo** views. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
 
 1. Choose a mapped wall and photograph. Confirm their correspondence and check historical labels and credits. A general building photograph does not prove every elevation.
-2. Preview conversion of generated details, then place windows, doors, columns, balconies, canopies, parapets or trim in metres. Dimensions and unseen sides remain estimates unless supported by measurements. Appearance, roof and outline controls are modes in this same workspace.
+2. Add windows, doors, columns, balconies, canopies, parapets or trim directly in metres; generated details are preserved in the same action. Conversion can also be previewed first. Dimensions and unseen sides remain estimates unless supported by measurements. Appearance (including whole-building height), roof and outline controls are modes in this same workspace.
 3. For an unobstructed wall, open **Photographic texture alignment**. Align corners clockwise from top left using draggable markers or labelled numeric coordinates. Originals remain unchanged; the release produces an attributed, immutable derivative.
 4. Compare with the opening state using **Before / after**. Completed actions autosave as undoable draft commands; closing retains unfinished input. **Mark this wall reviewed** reviews only the selected wall. Normal release review remains separate.
 

@@ -8,7 +8,7 @@ Use the searchable hierarchy, mapped-wall list, face-on canvas or selectable 3D 
 
 Move and resize on the canvas, enter dimensions, or nudge with arrow keys. The grid offers 0.01, 0.1 and 1 metre increments; Shift multiplies a nudge by ten and Alt bypasses snapping. Multi-selection supports alignment, equal gaps and mirroring. Groups, editable patterns, instance detachment, duplicate, copy-to-wall/building and independent named presets reuse the same command history. Copied layouts receive fresh identities and show a placement preview. Out-of-bounds details require explicit repair.
 
-Generated windows and trim can be previewed and converted into editable details. Custom windows, doors, columns, balconies, canopies, parapets and trim do not create entrances or routing connections. Photographs are optional for explicitly illustrative designs. Observed details require matching photographic evidence; documented dimensions need measurement provenance.
+Generated windows and trim can be previewed and converted into editable details. Add buttons insert the requested detail immediately while preserving that generated layout in one undoable action. Blocked additions remain recoverable; repair the reported issue and use **Save unfinished wall**. Whole-building height and floor-count controls are available inside Appearance. Custom windows, doors, columns, balconies, canopies, parapets and trim do not create entrances or routing connections. Photographs are optional for explicitly illustrative designs. Observed details require matching photographic evidence; documented dimensions need measurement provenance.
 
 ## Appearance and geometry
 

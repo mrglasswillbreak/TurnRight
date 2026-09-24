@@ -219,6 +219,8 @@ Guided repairs select the affected feature and open the relevant control. Propos
 
 **Photo & model** is a lazy-loaded building workspace with a measured wall canvas, selectable 3D, photograph reference and mobile view tabs. It supports windows, doors, columns, balconies, canopies, parapets and trim, with metre-based placement, repeated patterns and independent presets. Completed actions create undoable draft edits; camera movement and selection do not. Footprint or source-photo changes flag affected assignments for review. Private names, groups and presets stay out of public downloads; no database or package-schema migration is required. [Current owner workflow](docs/UNIFIED-MODEL-EDITOR.md) · [Photographic evidence and textures](docs/PHOTO-MODELS.md) · [Coverage](docs/PHOTO-MODEL-COVERAGE.md).
 
+Add buttons preserve generated windows and trim while inserting the requested detail. Blocked placements stay visible and recoverable; repair their errors and use **Save unfinished wall**. Appearance includes whole-building height/floor controls, and unfinished fields remain tied to their original wall when selections change.
+
 Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
 
 1. Set wall, roof, window and trim colours; window visibility/spacing; height or floors; supported roof form/pitch; and evidence notes.
