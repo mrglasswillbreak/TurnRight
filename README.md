@@ -130,6 +130,7 @@ To test the production PWA locally:
 
 ```sh
 npm run build
+npm run check:configured-build
 npm run preview
 ```
 
@@ -373,7 +374,7 @@ npm run test:survey-webkit
 npm run test:survey-pwa
 ```
 
-`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MiB for campus geometry and textures**, **8 MiB for globe assets**, and **8 MiB for natural voice**. The build verifies world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
+`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KiB gzip for the lazy renderer and model workspace**, **12 MiB for campus geometry and textures**, **8 MiB for globe assets**, and **8 MiB for natural voice**. Separate startup budgets cover public, owner and photo-management code. `check:configured-build` repeats these checks with dummy authentication configuration to retain the production auth dependencies; its output is a measurement fixture and must not be deployed. The build verifies lazy editor/world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
 Focused camera and panel regressions:
 

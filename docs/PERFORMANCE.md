@@ -131,7 +131,12 @@ first client deployment correctly failed its budget before activation. The
 corrected budget includes that existing production dependency.
 Static shared dependencies are counted once; the photo workspace must remain
 lazy and appear in the service-worker precache. Existing 3D, world and voice
-budgets also run. Local-only browser Performance entries named
+budgets also run. The unified-model rollout also checks that shared controls do
+not import the entire authentication entry. Building inspector tools load on
+selection, and entry-aware shared chunks keep their dependencies out of public
+startup. All building-tool dependencies must be precached. The current configured
+sizes are recorded in [model verification](MODEL-EDITOR-VERIFICATION.md).
+Local-only browser Performance entries named
 `turnright:photo:upload`, `processing`, `signing`, `private-save` and `upload-begin`
 measure each phase separately, including its network round trip where applicable.
 They retain bounded samples and contain no filenames, owners or photo metadata.

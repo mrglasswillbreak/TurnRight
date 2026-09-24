@@ -19,14 +19,14 @@ The new tests cover metre conversion, placement bounds, reversed walls and court
 
 **All nine production PWA journeys pass:** schema-1/schema-3 photo galleries and entrance choices, driving voice, survey cold start/recovery/sync, saved 3D preferences, enhanced-asset corruption/repair, backend-failure recovery, building/roof/input recovery and enriched place details. Existing immutable update/rollback, authorization and walking/driving regressions remain covered by the unit/PWA suites.
 
-The production build passes all four budgets:
+The authentication-configured production build passes all four budget scripts. An initial deployment failed because shared model controls pulled the owner authentication entry into the workspace. Entry-aware shared chunks and lazy building inspector tools correct that dependency boundary without raising budgets. Checks now reject a model workspace that imports `Admin`, require building tools to remain lazy, and verify their complete offline dependency set.
 
 | Allocation | Measured | Limit |
 | --- | ---: | ---: |
-| Lazy renderer + guided editor, including shared non-startup dependencies | 272.7 KiB gzip | 300 KiB |
-| Public startup JavaScript | 418,825 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 134,105 bytes gzip | 189,440 bytes |
-| Lazy photo manager | 7,584 bytes gzip | 12,288 bytes |
+| Lazy renderer + guided editor, including shared non-startup dependencies | 166.6 KiB gzip | 300 KiB |
+| Public startup JavaScript | 418,682 bytes gzip | 435,200 bytes |
+| Additional owner editor JavaScript | 183,443 bytes gzip | 189,440 bytes |
+| Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |
 
@@ -35,6 +35,8 @@ World/voice hashes and precache inclusion pass. The campus geometry/texture budg
 ## Production-build measurements
 
 Each group has five trials on Windows, Chromium headless and SwiftShader, at a 1440 × 1000 viewport. Both versions use the same verified campus; the dense fixture adds 100 details to one wall. The baseline is commit `9bb1ef7`. The final fixture includes real `EditorWorkspace` commands and IndexedDB recovery; the baseline uses the former staged form. No other browser suite ran concurrently with these trials.
+
+These interaction trials precede the final deployment chunk-boundary correction. That correction changes loading, not the measured command/canvas logic; configured-build budgets and production offline journeys are checked again afterward.
 
 | Fixture / CPU | Baseline input p95 | Final input p95 | Final selection/view-switch p95 |
 | --- | ---: | ---: | ---: |
@@ -67,7 +69,7 @@ npx playwright test --config playwright.docs.config.ts
 
 `--smoke` runs one published-data trial per version. `--final` keeps the recorded baseline and repeats the final groups after a change. `--capture` captures current desktop/mobile model views without replacing the performance report. All versions fetch and hash-check public assets into `web/work/model-benchmark/public`; no owner authentication or production write is performed. Run these measurements separately from browser/PWA suites on software-GPU machines.
 
-For correctness, run `npm test`, `npm run lint`, `npm run build`, relevant editor browser journeys and `npm run test:survey-pwa`. The [screenshot inventory](assets/screenshots/README.md) records all 19 README views and their sources.
+For correctness, run `npm test`, `npm run lint`, `npm run build`, `npm run check:configured-build`, relevant editor browser journeys and `npm run test:survey-pwa`. The configured build uses nonfunctional auth placeholders and must not be deployed. The [screenshot inventory](assets/screenshots/README.md) records all 19 README views and their sources.
 
 ## Coverage limits and rollout
 

@@ -4,6 +4,8 @@
 
 The lazy building workspace routes completed commands through `EditorWorkspace`; its existing 100-action history, operation IDs and optimistic saves remain authoritative. Metre controls convert at the boundary to compatible façade fractions/repetitions. Private `modelAuthoring.version = 1` stores names, groups, patterns, detached slots and independent presets in draft JSON; `applyEdits` excludes it from public map features. Unfinished strings and pending roof/detail work use owner-scoped IndexedDB recovery.
 
+Building inspector tools load when a building is selected. Shared controls and validation use entry-aware chunks so the model workspace does not import the owner authentication entry, and public startup does not pull in building controls. All lazy dependencies are precached for prepared offline use. Configured-build checks retain authentication dependencies, enforce the existing budgets and verify these boundaries.
+
 The server rejects an older editor write that could discard model-authoring metadata. Public package schemas 1–3 and the database schema do not change. Architectural-only edits reuse topology/routing validation; publication always runs full validation. Selection and evidence are separated from geometry work, and per-instance picking ranges survive material batching. Preview builds keep one active/newest pending request; drags draw lightweight canvas geometry until completion. See [owner workflow](UNIFIED-MODEL-EDITOR.md) and [verification](MODEL-EDITOR-VERIFICATION.md).
 
 
