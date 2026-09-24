@@ -13,6 +13,10 @@ const collect = (key, found = new Set()) => {
 const startup = collect('index.html'),
   renderer = collect('src/campus-model-layer.ts'),
   workspace = collect('src/PhotoModelWorkspace.tsx');
+if (workspace.has('src/Admin.tsx'))
+  throw Error(
+    'Shared model tools must not import the owner authentication entry',
+  );
 const extra = [...new Set([...renderer, ...workspace])].filter(
   (k) => !startup.has(k),
 );

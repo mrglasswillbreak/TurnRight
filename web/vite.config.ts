@@ -57,10 +57,21 @@ export default defineConfig({
     target: 'es2022',
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules/maplibre-gl')) return 'map';
-          if (/node_modules\/(react|react-dom|scheduler)\//.test(id))
-            return 'react';
+        codeSplitting: {
+          groups: [
+            { name: 'map', test: /node_modules[\\/]maplibre-gl/ },
+            {
+              name: 'react',
+              test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+            },
+            {
+              // Keep shared model controls out of the authentication entry,
+              // without pulling editor-only dependencies into public startup.
+              name: 'building-editor-core',
+              test: /[\\/]src[\\/](BuildingAppearanceEditor|RoofPlanEditor|ModelField|editor-model)\.tsx?$/,
+              entriesAware: true,
+            },
+          ],
         },
       },
     },

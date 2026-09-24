@@ -14,12 +14,24 @@ const collect = (key, found = new Set()) => {
 const publicKeys = collect('index.html');
 const editorKeys = collect('src/Admin.tsx');
 const photos = manifest['src/PhotoManager.tsx'];
+// Explicit entry-aware chunks may use a chunk key instead of the source path.
+const buildingToolsKey = manifest['src/Admin.tsx'].dynamicImports?.find(
+  (key) =>
+    key === 'src/BuildingAppearanceEditor.tsx' ||
+    manifest[key]?.name === 'building-editor-core~BuildingAppearanceEditor',
+);
 if (
   !photos?.isDynamicEntry ||
   publicKeys.has('src/PhotoManager.tsx') ||
   publicKeys.has('src/Admin.tsx')
 )
   throw Error('Owner photo management must remain lazy-loaded');
+if (
+  !buildingToolsKey ||
+  publicKeys.has(buildingToolsKey) ||
+  editorKeys.has(buildingToolsKey)
+)
+  throw Error('Building tools must load only when a building is selected');
 const sizes = new Map(
   await Promise.all(
     [...new Set([...publicKeys, ...editorKeys, 'src/PhotoManager.tsx'])].map(
@@ -49,3 +61,6 @@ for (const [label, bytes, budget] of checks) {
 const sw = await fs.readFile('dist/sw.js', 'utf8');
 if (!sw.includes(photos.file))
   throw Error('Offline preparation must cache the lazy photo workspace');
+for (const key of collect(buildingToolsKey))
+  if (!sw.includes(manifest[key].file))
+    throw Error(`Offline building tools dependency missing: ${key}`);

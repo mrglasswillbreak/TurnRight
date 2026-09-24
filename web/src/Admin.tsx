@@ -1,6 +1,14 @@
 import { PhotoSession } from './PhotoSession';
 import type { BuildingSelection } from './visual-types';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ArrowUpRight,
   ArrowUp,
@@ -69,7 +77,6 @@ import {
 } from './editor-workspace';
 import { useEditorWorkspace } from './useEditorWorkspace';
 import { withPublishedVisuals } from './editor-visuals';
-import { BuildingAppearanceEditor } from './BuildingAppearanceEditor';
 import { remapBuildingSurfaces } from './building-surfaces';
 import { EditorInspector } from './EditorInspector';
 import { photoEdits } from './photo-workspace';
@@ -86,6 +93,12 @@ import { useRoutes } from './useRoutes';
 import { placeHasConnection } from './routing';
 import type { CampusData, MapChange, MapEdit, Position, Route } from './types';
 import './editor.css';
+
+const BuildingAppearanceEditor = lazy(() =>
+  import('./BuildingAppearanceEditor').then((module) => ({
+    default: module.BuildingAppearanceEditor,
+  })),
+);
 
 interface EditorState extends ReviewState {
   edits: MapEdit[];
@@ -2178,46 +2191,50 @@ function Editor({
             onEndField={workspace.endHistoryGroup}
             buildingEditor={
               selected.kind === 'building' && (
-                <BuildingAppearanceEditor
-                  workspace={workspace}
-                  onHistory={undo}
-                  edit={selected}
-                  data={validation.data}
-                  mode={buildingMode}
-                  selection={buildingSelection}
-                  onMode={(mode) => {
-                    workspace.endHistoryGroup();
-                    setBuildingMode(mode);
-                    if (mode === 'roof')
-                      setBuildingSelection((s) => ({
-                        buildingId: selected.id,
-                        partId: s?.partId,
-                      }));
-                  }}
-                  onSelection={(value) => {
-                    workspace.endHistoryGroup();
-                    setBuildingSelection(value);
-                  }}
-                  onEdit={(edit, field) => {
-                    workspace.commit(
-                      [edit],
-                      workspace.unfinished,
-                      field ? `${editKey(edit)}:${field}` : undefined,
-                    );
-                    setSelected(edit);
-                    selectedRef.current = edit;
-                  }}
-                  roofDraft={workspace.roofDraft}
-                  onRoofDraft={(value) => workspace.draftRoof(value)}
-                  onApplyRoof={(edit) => {
-                    workspace.applyRoof(edit);
-                    setSelected(edit);
-                    selectedRef.current = edit;
-                    setMessage(
-                      'Roof applied. Undo restores the previous roof.',
-                    );
-                  }}
-                />
+                <Suspense
+                  fallback={<output>Loading building tools…</output>}
+                >
+                  <BuildingAppearanceEditor
+                    workspace={workspace}
+                    onHistory={undo}
+                    edit={selected}
+                    data={validation.data}
+                    mode={buildingMode}
+                    selection={buildingSelection}
+                    onMode={(mode) => {
+                      workspace.endHistoryGroup();
+                      setBuildingMode(mode);
+                      if (mode === 'roof')
+                        setBuildingSelection((s) => ({
+                          buildingId: selected.id,
+                          partId: s?.partId,
+                        }));
+                    }}
+                    onSelection={(value) => {
+                      workspace.endHistoryGroup();
+                      setBuildingSelection(value);
+                    }}
+                    onEdit={(edit, field) => {
+                      workspace.commit(
+                        [edit],
+                        workspace.unfinished,
+                        field ? `${editKey(edit)}:${field}` : undefined,
+                      );
+                      setSelected(edit);
+                      selectedRef.current = edit;
+                    }}
+                    roofDraft={workspace.roofDraft}
+                    onRoofDraft={(value) => workspace.draftRoof(value)}
+                    onApplyRoof={(edit) => {
+                      workspace.applyRoof(edit);
+                      setSelected(edit);
+                      selectedRef.current = edit;
+                      setMessage(
+                        'Roof applied. Undo restores the previous roof.',
+                      );
+                    }}
+                  />
+                </Suspense>
               )
             }
             onProperty={(key, value, continuous) => {
