@@ -1,5 +1,46 @@
 # Production deployments
 
+## Unified Photo & model editor — 24 September 2026
+
+Application revision **`9414109`** deployed successfully through
+[Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/3SesGo9maFZTdd3psNagb6W9w3yM).
+Additive model-authoring validation at `a195899` deployed before the dependent
+client. No database migration or public package-schema change was required.
+
+The building workspace integrates measured wall editing, selectable 3D, photographs,
+appearance, roofs, geographic outlines and targeted review. Completed commands use
+the existing 100-action history and draft saves; unfinished input recovers privately.
+Copies, groups, patterns, presets and wall rematching retain compatible public
+façade records. Private authoring metadata stays out of map downloads. See the
+[owner guide](UNIFIED-MODEL-EDITOR.md) and [verification report](MODEL-EDITOR-VERIFICATION.md).
+
+The first client deployment stopped at the existing visual bundle limit because
+shared model controls imported the owner authentication entry. Entry-aware shared
+chunks and lazy building inspector tools fixed that boundary without raising
+budgets. The configured build passes all four budget scripts; guards now check
+lazy loading, authentication separation and offline dependencies. All nine
+production PWA journeys passed again after the fix, including building appearance,
+unfinished roofs, private input recovery, corrupted-asset repair, walking/entrance
+and driving behavior. The wider verification includes 494 Vitest tests, 23 Python
+tests, client/server TypeScript, lint with seven existing warnings, model browser
+journeys and five-trial performance groups. Physical-device coverage remains
+unavailable and one dense throttled timing trial exceeds the target; the report
+records those limits.
+
+Live verification at **22:14 UTC** checked all **84 published assets** against
+their lengths and SHA-256 hashes. The manifest exactly matches the pre-rollout
+reference: **`lasu-313d8a168635`**, schema 2, **395 buildings, 220 places, 39
+photographs** and **18,880,327 bytes**. Public/editor pages and the service worker
+returned 200; the deployed unified model workspace is precached. Unauthenticated
+`media-status`, `media-library` and `save` requests returned **401**. This application
+rollout did not publish demonstration edits or replace the reviewed campus package.
+
+The README and related owner, architecture, recovery, deployment and verification
+guides have been refreshed. The [screenshot inventory](assets/screenshots/README.md)
+documents **19 current public/editor captures**, including desktop/mobile building,
+photo, roof, outline and model workflows. Historical screenshots and source/release
+receipts are explicitly dated rather than presented as current instructions.
+
 ## Performance and upload recovery — 23 September 2026
 
 Deployed application revision **`3d1badb`** through

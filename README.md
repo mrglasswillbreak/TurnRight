@@ -55,6 +55,7 @@ Current production-build captures use the verified published campus **`lasu-313d
 | Walking route · desktop Dark | Walking route · mobile Dark |
 | --- | --- |
 | ![Offline-capable Clinic to Senate walking route preview](docs/assets/screenshots/public-route-desktop-current-2026-09-24.png) | <img src="docs/assets/screenshots/public-route-mobile-current-2026-09-24.png" width="260" alt="Mobile walking route with manual origin and mapped approach notice"> |
+
 ### Owner editor
 
 | Workspace and feature explorer | Selected building with photographs at the top |

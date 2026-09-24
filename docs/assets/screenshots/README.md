@@ -36,11 +36,11 @@ From `web/`, use Node 22 and installed project dependencies:
 
 ```sh
 npx vite build --config vite.performance.config.ts
-node scripts/benchmark-model-editor.mjs --smoke
+node scripts/benchmark-model-editor.mjs --capture
 npx playwright test --config playwright.docs.config.ts
 ```
 
-The benchmark first retrieves and verifies the public manifest and all assets into `work/model-benchmark/public`. It needs the documented baseline fixture build for its comparison; see [the verification report](../../MODEL-EDITOR-VERIFICATION.md). Use `--capture` instead of `--smoke` to refresh model screenshots without replacing existing benchmark measurements. The documentation project builds a separate local production app, supplies isolated owner responses and serves only the verified snapshot assets. Its screenshots overwrite the current filenames; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes only the final two walking previews. Inspect all captures before updating the README; record a new date if capturing on a later date.
+The benchmark first retrieves and verifies the public manifest and all assets into `work/model-benchmark/public`. Its comparison mode needs the documented baseline fixture build; see [the verification report](../../MODEL-EDITOR-VERIFICATION.md). `--capture` refreshes model screenshots without replacing existing benchmark measurements. The documentation project builds a separate local production app, supplies isolated owner responses and serves only the verified snapshot assets. Its screenshots overwrite the current filenames; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes only the final two walking previews. Inspect all captures before updating the README; record a new date if capturing on a later date.
 
 NASA/Natural Earth globe attribution remains in [the source inventory](../../../data/ATTRIBUTION.md). Building photographs retain their public in-app credits and [source identity/rights inventory](../../../data/photo-models/inventory.json). Earlier screenshots below are dated archives and do not describe current controls.
 
