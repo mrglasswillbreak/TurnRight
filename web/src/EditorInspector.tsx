@@ -82,6 +82,19 @@ export function EditorInspector({
       />
     </label>
   );
+  const photoTools = (
+    <Suspense fallback={<p>Loading photo tools…</p>}>
+      <PhotoManager
+        edit={edit}
+        data={data}
+        owner={photoOwner}
+        onApply={onPhotos}
+        onUndo={onPhotoUndo}
+        saveStatus={photoSaveStatus}
+        publishedPhotos={publishedPhotos}
+      />
+    </Suspense>
+  );
   return (
     <aside
       ref={panel}
@@ -109,6 +122,7 @@ export function EditorInspector({
         {edit.deleted && (
           <p className="notice">Removed from this draft. Undo to restore it.</p>
         )}
+        {edit.kind === 'building' && photoTools}
         {field('Name', 'name', 'Give this feature a useful name')}
         {(edit.kind === 'place' || edit.kind === 'building') && (
           <button className="editor-primary" onClick={onEntrance}>
@@ -350,17 +364,7 @@ export function EditorInspector({
           data={data}
           onProperty={onProperty}
         />
-        <Suspense fallback={<p>Loading photo tools…</p>}>
-          <PhotoManager
-            edit={edit}
-            data={data}
-            owner={photoOwner}
-            onApply={onPhotos}
-            onUndo={onPhotoUndo}
-            saveStatus={photoSaveStatus}
-            publishedPhotos={publishedPhotos}
-          />
-        </Suspense>
+        {edit.kind !== 'building' && photoTools}
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">
             Walking access
