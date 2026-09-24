@@ -15,7 +15,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: [
           '**/*.{js,css,html,svg,png,woff2}',
-          'world/*.geojson',
+          'world/**/*.{geojson,json,webp}',
           'voice/**/*.{json,mp3}',
         ],
         globIgnores: ['packages/**', 'glyphs/**'],

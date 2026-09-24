@@ -1,0 +1,29 @@
+{
+  "countries": {
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_admin_0_countries.geojson",
+    "sha256": "3e458fc036ad0a66411f2c1e6cac49c5d7bfb81cb1123bc513b22511a2b7fdeb",
+    "bytes": 3083490,
+    "retrievedAt": "2026-09-24T00:28:40.032Z"
+  },
+  "lakes": {
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_lakes.geojson",
+    "sha256": "d350b75978b26fe839b797c2c529b2fb8f47fb3983c03f4964e36d5df9378a52",
+    "bytes": 876018,
+    "retrievedAt": "2026-09-24T00:28:40.749Z"
+  },
+  "cities": {
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_populated_places_simple.geojson",
+    "sha256": "8e70756b39fae9bcdc1e332bfc510c024c5edd3a13203ffd20092ee37b61d978",
+    "bytes": 850767,
+    "retrievedAt": "2026-09-24T00:28:41.210Z"
+  },
+  "imagery": {
+    "url": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography/september/world.topo.200409.3x21600x10800.jpg",
+    "sha256": "d38f6099976e9ce91d45cfc3a48a24a78ef2a8deb4c0242b75a0b884b76d45fa",
+    "bytes": 22910406,
+    "retrievedAt": "2026-09-24T00:28:48.689Z"
+  },
+  "credit": "NASA Earth Observatory, Blue Marble Next Generation, September 2004, shaded topography; Natural Earth v5.1.2 (public domain)",
+  "imagerySourceResolution": "21600 × 10800, approximately 2 km per source pixel at equator",
+  "modifications": "Reprojected, resampled and WebP compressed. Overview imagery, not current campus photography."
+}

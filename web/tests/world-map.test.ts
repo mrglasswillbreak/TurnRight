@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import type { Map as MapInstance, StyleSpecification } from 'maplibre-gl';
 import {
@@ -24,6 +25,15 @@ const data = JSON.parse(bytes.toString()) as WorldData;
 afterEach(() => vi.unstubAllGlobals());
 
 describe('offline world overview', () => {
+  it('ships complete pinned raster zooms and detailed geography within 8 MiB', () => {
+    const manifest=JSON.parse(readFileSync(new URL('../public/world/manifest.json',import.meta.url),'utf8'));
+    expect(manifest.bytes).toBeLessThan(8*1024*1024);
+    expect(manifest.assets.filter((a:{url:string})=>a.url.endsWith('.webp'))).toHaveLength(341);
+    for(const asset of manifest.assets){const content=readFileSync(new URL('../public'+asset.url,import.meta.url));expect(content.length).toBe(asset.bytes);expect(createHash('sha256').update(content).digest('hex')).toBe(asset.sha256);}
+    const detailed=JSON.parse(readFileSync(new URL('../public/world/countries-50m-v5.1.2.geojson',import.meta.url),'utf8'));
+    expect(validWorldData(detailed)).toBe(true);
+    expect(detailed.features.length).toBeGreaterThan(200);
+  });
   it('counts the desktop panel padding once when returning to campus', () => {
     const setPadding = vi.fn(),
       fitBounds = vi.fn();

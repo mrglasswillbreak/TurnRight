@@ -9,8 +9,8 @@ import { publicMapPadding } from './public-map-layout';
 
 export const CAMPUS_MIN_ZOOM = 12;
 export const WORLD_MIN_ZOOM = -2;
-export const WORLD_URL = '/world/countries-v5.1.2.geojson';
-export const WORLD_MAX_BYTES = 500 * 1024;
+export const WORLD_URL = '/world/countries-50m-v5.1.2.geojson';
+export const WORLD_MAX_BYTES = 3 * 1024 * 1024;
 export const WORLD_PROJECTION: ProjectionSpecification = {
   type: [
     'interpolate',
@@ -28,7 +28,13 @@ export interface CountryLabel {
   labelX: number;
   labelY: number;
 }
-export type WorldData = FeatureCollection<Polygon | MultiPolygon, CountryLabel>;
+export type WorldData = FeatureCollection<
+  Polygon | MultiPolygon,
+  CountryLabel
+> & {
+  lakes?: FeatureCollection;
+  cities?: FeatureCollection;
+};
 
 export function validWorldData(value: unknown): value is WorldData {
   if (!value || typeof value !== 'object') return false;
@@ -94,6 +100,31 @@ export async function loadWorld(signal: AbortSignal): Promise<WorldData> {
     throw new Error('World map is too large');
   const data: unknown = JSON.parse(new TextDecoder().decode(bytes));
   if (!validWorldData(data)) throw new Error('Invalid world map');
+  await Promise.all(
+    ['lakes', 'cities'].map(async (kind) => {
+      try {
+        const response = await fetch(`/world/${kind}-50m-v5.1.2.geojson`, {
+          signal,
+        });
+        if (!response.ok) return;
+        const bytes = await response.arrayBuffer();
+        if (bytes.byteLength > WORLD_MAX_BYTES) return;
+        const extra = JSON.parse(
+          new TextDecoder().decode(bytes),
+        ) as FeatureCollection;
+        if (
+          extra.type !== 'FeatureCollection' ||
+          !Array.isArray(extra.features) ||
+          extra.features.length > 10000
+        )
+          return;
+        if (kind === 'lakes') data.lakes = extra;
+        else data.cities = extra;
+      } catch {
+        /* The verified vector overview remains useful without optional layers. */
+      }
+    }),
+  );
   return data;
 }
 
@@ -113,6 +144,15 @@ export function installWorldLayers(
   bounds: CampusData['bounds'],
 ) {
   if (map.getSource('world')) return;
+  map.addSource('world-imagery', {
+    type: 'raster',
+    tiles: ['/world/blue-marble-200409/{z}/{x}/{y}.webp'],
+    tileSize: 512,
+    minzoom: 0,
+    maxzoom: 4,
+    attribution:
+      '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/">NASA Earth Observatory · September 2004</a> · shaded relief overview; resampled and compressed',
+  });
   map.addSource('world', {
     type: 'geojson',
     data,
@@ -176,6 +216,67 @@ export function installWorldLayers(
     },
     'campus-fill',
   );
+  map.addLayer(
+    {
+      id: 'world-imagery',
+      source: 'world-imagery',
+      type: 'raster',
+      maxzoom: 8,
+      paint: {
+        'raster-opacity': ['interpolate', ['linear'], ['zoom'], 5, 1, 8, 0],
+        'raster-fade-duration': 0,
+      },
+    },
+    'campus-fill',
+  );
+  for (const kind of ['lakes', 'cities'] as const) {
+    if (!data[kind]) continue;
+    map.addSource(`world-${kind}`, { type: 'geojson', data: data[kind]! });
+    if (kind === 'lakes')
+      map.addLayer(
+        {
+          id: 'world-lakes',
+          type: 'fill',
+          source: 'world-lakes',
+          minzoom: 5,
+          maxzoom: 12,
+          paint: { 'fill-color': '#527d96', 'fill-opacity': fade },
+        },
+        'campus-fill',
+      );
+    else
+      map.addLayer(
+        {
+          id: 'world-cities',
+          type: 'symbol',
+          source: 'world-cities',
+          minzoom: 3,
+          maxzoom: 10,
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-font': ['Open Sans Semibold'],
+            'text-size': 11,
+            'text-padding': 8,
+            'symbol-sort-key': ['get', 'labelRank'],
+          },
+          paint: {
+            'text-color': '#1d3345',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1.5,
+          },
+        },
+        'campus-fill',
+      );
+  }
+  map.setSky?.({
+    'sky-color': '#c7dff4',
+    'horizon-color': '#d8e8f2',
+    'fog-color': '#d8e8f2',
+    'sky-horizon-blend': 0.5,
+    'horizon-fog-blend': 0.5,
+    'fog-ground-blend': 0,
+    'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 8, 0],
+  });
   map.addLayer(
     {
       id: 'world-borders',
