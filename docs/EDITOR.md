@@ -4,11 +4,11 @@ The private `/admin` workspace edits the existing campus map in 2D or a tilted 3
 
 **Drafts** and the colored map highlights show corrections made since the latest publication. Published corrections stay saved to protect your work during source updates, but stop appearing as pending drafts. Editing a published feature makes it a draft again; restoring an older release compares your current corrections with that restored version.
 
-On phones, editor cards and survey sheets use at most 42% of the screen height. Public panels and pop-up dialogs have a draggable top handle. They open at full height on desktop and can be shortened to reveal more of the map. On phones, their height stays within the available space above the keyboard and map controls. Scroll inside a card for the remaining controls; headings and close buttons stay accessible.
+On phones, ordinary inspector cards and survey sheets use at most 42% of the screen height. Photo management and Photo & model open dedicated full-screen workspaces with their own scrolling and view controls. Public panels and pop-up dialogs have a draggable top handle. They open at full height on desktop and can be shortened to reveal more of the map. On phones, their height stays within the available space above the keyboard and map controls. Scroll inside a card for the remaining controls; headings and close buttons stay accessible.
 
 Selecting an object on the map or in the feature list animates the map into the space around the editor cards. On phones, long paths zoom out by at most 0.75 zoom levels, showing the stretch nearest the tap or current view instead of fitting the entire path. Short paths and buildings still fit their full geometry; multipart buildings include all wings. Desktop selection continues to fit the whole object. Closing properties returns to the view from before the selection. Editing fields or dragging vertices does not repeatedly refocus the camera.
 
-During public navigation, a fresh GPS fix with accuracy of 35 m or better can trigger rerouting after eight seconds continuously more than `max(22 m, accuracy × 1.4)` from the route. Reroutes have a 15-second cooldown. The new route uses the current GPS position and the same destination, with closures and access restrictions still applied. Close parallel paths may remain inside the tolerance. GPS starts currently use the nearest usable graph node within 45 m, so a long segment without a nearby node can still prevent recalculation; this is not continuous path matching.
+Public navigation uses mode- and leg-aware GPS matching and rerouting. Driving arrival requires an explicit parked-to-walking transition and retains the chosen parking point and entrance. Architectural model edits never grant routing permissions. See [driving](DRIVING.md) and [arrival guides](ARRIVAL-GUIDES.md).
 
 ## Map an entrance and its approach
 
@@ -47,6 +47,14 @@ Public and editor views share the same height rules. Recorded heights take prece
 Starting a drawing immediately collapses the explorer and route panel. Finish or cancel before selecting another feature, changing tools, or entering another review section. The prompt shows the first-point instruction and vertex count; Finish requires two distinct path points or three distinct building points. View changes and autosaves retain the drawing, including an empty session before the first point. Finish/Cancel restore the prior panel layout. Paths and barriers temporarily reduce building opacity to expose ground geometry.
 
 Settings remains available during unfinished drawings and roof work. Opening and closing it preserves the map, inspector selection and editing state. Tilt and opacity changes affect this workspace's view; they do not create saved map edits.
+
+## Building photos and models
+
+The photo strip and **Manage photos** controls appear directly below the building title. Photo management covers uploads, captions, rights, cover ordering and private recovery; it remains separate from architectural modelling.
+
+**Photo & model**, **Appearance**, **Roof** and **Outline** open the unified building workspace in the relevant mode. **Details** uses a measured wall canvas linked to selectable 3D and a collapsible photograph reference. It supports precise placement, duplicate/copy previews, groups, row/column patterns and independent presets. Mobile has Wall, 3D and Photo views. **Review** identifies changed details, evidence gaps and wall assignments that need attention.
+
+Completed actions autosave as individual commands in the shared 100-action history. Numeric input commits on Enter or blur; unfinished input remains private and recoverable. A drag commits on release. Closing the workspace retains unfinished work; explicit discard removes it. Saving does not approve all walls or publish the map. [Full controls and recovery guide](UNIFIED-MODEL-EDITOR.md) · [Appearance, roofs and rendering](BUILDING-EDITOR.md).
 
 ## Duplicate review
 

@@ -1,6 +1,12 @@
 # Editor reliability and review update
 
-This application update implements operation-specific recovery, private local recovery downloads, grouped field undo, three-way conflict review, prepared-workspace fallback, guided repairs, explicit duplicate cleanup, release impact review, source comparisons, destination sharing and recorded steps information.
+The editor provides operation-specific recovery, private local recovery downloads, grouped field undo, three-way conflict review, prepared-workspace fallback, guided repairs, explicit duplicate cleanup, release impact review, source comparisons, destination sharing and recorded steps information.
+
+## Building workspace integration
+
+The unified model editor uses this same history and save path. A completed numeric edit or pointer gesture is one command; a temporary roof preview is excluded from the history snapshot so Undo does not trap Redo behind an unfinished roof. Selection and cameras do not consume history. Server acknowledgements retain save-operation identities and cannot replace newer local commands.
+
+Optional private `modelInputs` recovery records retain blank/incomplete numeric text, invalid placement work and texture alignment by building and field. Pending layouts retain their pattern/group metadata too. Discarding unfinished input clears mounted fields as well as storage. Private authoring metadata is versioned, excluded from public downloads and guarded against older editors dropping it. No database or public package migration is required. See [current workflow](UNIFIED-MODEL-EDITOR.md) and [current verification](MODEL-EDITOR-VERIFICATION.md); the earlier check counts below are historical.
 
 ## Interfaces and compatibility
 

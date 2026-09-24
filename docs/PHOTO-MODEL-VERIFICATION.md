@@ -1,5 +1,7 @@
 # Photo model and globe verification · 24 September 2026
 
+This is the dated photographic-model/globe publication record. The later [unified editor verification](MODEL-EDITOR-VERIFICATION.md) supersedes its editor interaction measurements and workflow instructions; the evidence inventory and published-campus checks below retain their original scope.
+
 The release candidate starts from `lasu-8577d5c85d2c` (395 buildings, 220 places, 39 photographs). The [coverage report](PHOTO-MODEL-COVERAGE.md) accounts for all 19 photographed buildings and every source image. It contains illustrative comparisons, not registered photogrammetric reconstructions. No footprint, entrance, access approval or route is added by these appearance proposals.
 
 ## Published release

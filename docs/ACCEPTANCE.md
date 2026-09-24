@@ -1,5 +1,10 @@
 # TurnRight verification and release checklist
 
+## Current model editor verification
+
+Use [MODEL-EDITOR-VERIFICATION.md](MODEL-EDITOR-VERIFICATION.md) for the unified workspace's checks, measured performance, responsive captures and remaining hardware gaps. Its completed-command autosave replaces the old one-shot façade Apply workflow. Building review stays targeted and architectural work never grants navigation permissions. The dated records below are historical evidence, not current suite totals or proof of physical-device acceptance.
+
+
 ## Evidence from implementation
 
 Production was published on 9 September 2026 at the owner's explicit request.

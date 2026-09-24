@@ -6,7 +6,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight illustrated globe using the campus map colours, with subtle offline relief and campus controls](docs/assets/screenshots/public-globe-desktop-light-2026-09-24.jpg)
+![TurnRight campus map with the Senate Building destination and published architecture](docs/assets/screenshots/public-place-desktop-current-2026-09-24.png)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
@@ -36,44 +36,58 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 ## Screenshots
 
-Captured **24 September 2026** from production builds using the verified public campus snapshot **`lasu-8577d5c85d2c`**. The globe captures show the real public application. Photo/model captures use the real workspace in an isolated fixture; no production drafts or private account information appear. Phone views are responsive browser simulations, not physical-device tests.
+Current production-build captures use the verified published campus **`lasu-313d8a168635`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
 
-| Illustrated globe · mobile Dark mode | Photo & model · mobile |
+### Public map
+
+| Campus and destination · desktop | Adjustable destination panel · desktop |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-24.jpg" width="300" alt="Illustrated Earth with campus greens and blues, gentle atmosphere, LASU marker and navigation controls in Dark mode"> | <img src="docs/assets/screenshots/photo-model-mobile-2026-09-24.jpg" width="300" alt="Full-screen mobile Photo and model workspace with a building photograph, credits, view tabs and mapped wall selector"> |
+| ![Campus and Senate destination in Light mode](docs/assets/screenshots/public-place-desktop-current-2026-09-24.png) | ![Desktop panel shortened using its keyboard-accessible resize handle](docs/assets/screenshots/public-panel-resized-current-2026-09-24.png) |
 
-**Photo & model on desktop:** compare the published photograph with the model, choose a mapped wall and review architectural details. Dimensions and unseen elevations remain estimates.
+| Compact mobile map | Destination details | Settings | Offline download |
+| --- | --- | --- | --- |
+| <img src="docs/assets/screenshots/public-map-mobile-current-2026-09-24.png" width="240" alt="Mobile campus map with compact search dock"> | <img src="docs/assets/screenshots/public-place-mobile-current-2026-09-24.png" width="240" alt="Mobile destination details and building photograph"> | <img src="docs/assets/screenshots/public-settings-mobile-current-2026-09-24.png" width="240" alt="Mobile public appearance and navigation settings"> | <img src="docs/assets/screenshots/public-offline-mobile-current-2026-09-24.png" width="240" alt="Mobile offline package status and download controls"> |
 
-![Desktop Photo and model workspace with the photograph beside its model and architectural controls](docs/assets/screenshots/photo-model-desktop-2026-09-24.jpg)
+| Illustrated globe · desktop Light | Illustrated globe · mobile Dark |
+| --- | --- |
+| ![Offline globe with campus colours, geographic labels and gentle relief](docs/assets/screenshots/public-globe-desktop-current-2026-09-24.png) | <img src="docs/assets/screenshots/public-globe-mobile-current-2026-09-24.png" width="260" alt="Dark globe and campus return control on a phone-sized screen"> |
 
-The building inspector now places its **photo preview and Manage photos controls at the top**, directly below the building title. [All 19 building comparisons and evidence gaps](docs/PHOTO-MODEL-COVERAGE.md) · [Capture sources and reproduction](docs/assets/screenshots/README.md). Previous interface captures remain documented there.
+| Walking route · desktop Dark | Walking route · mobile Dark |
+| --- | --- |
+| ![Offline-capable Clinic to Senate walking route preview](docs/assets/screenshots/public-route-desktop-current-2026-09-24.png) | <img src="docs/assets/screenshots/public-route-mobile-current-2026-09-24.png" width="260" alt="Mobile walking route with manual origin and mapped approach notice"> |
+### Owner editor
+
+| Workspace and feature explorer | Selected building with photographs at the top |
+| --- | --- |
+| ![Owner workspace, feature explorer and 3D campus](docs/assets/screenshots/editor-workspace-current-2026-09-24.png) | ![Building inspector with gallery preview, Manage photos and architectural tools](docs/assets/screenshots/editor-building-current-2026-09-24.png) |
+
+| Mobile building inspector | Mobile editor settings | Unified model · mobile |
+| --- | --- | --- |
+| <img src="docs/assets/screenshots/editor-building-mobile-current-2026-09-24.png" width="260" alt="Selected building and compact inspector on mobile"> | <img src="docs/assets/screenshots/editor-settings-mobile-current-2026-09-24.png" width="260" alt="Mobile owner appearance, tilt and model settings"> | <img src="docs/assets/screenshots/unified-model-mobile-2026-09-24.png" width="260" alt="Full-screen mobile model workspace with measured wall canvas and precision controls"> |
+
+**Photo management:** review, arrange and edit building photographs independently from model details.
+
+![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-24.png)
+
+**Photo & model:** a measured wall canvas, searchable hierarchy, selectable 3D preview and photograph reference share the building draft.
+
+![Unified desktop model workspace with selection, architectural properties and photographic reference](docs/assets/screenshots/unified-model-desktop-2026-09-24.png)
+
+| Roof tools | Outline tools |
+| --- | --- |
+| ![Integrated roof mode and geographic roof plan](docs/assets/screenshots/editor-roof-current-2026-09-24.png) | ![Integrated footprint view with mapped vertices and geographic context](docs/assets/screenshots/editor-outline-current-2026-09-24.png) |
+
+These **19 distinct screenshots** restore broad public/editor coverage. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
 
 ## Recent changes
 
-The 24 September visual update adds a **Photo & model** workspace, framed building openings, reviewed façade details and optional photographic textures. The reviewed 19-building batch is published as **`lasu-313d8a168635`**, covering all photographed buildings in the 395-building map, using 39 photographs and preserving owner roofs and colours. Dimensions and unseen sides remain estimates; uncertain wall/photo matches require review. No photographic wall textures are approved in this initial release. [Evidence, owner workflow and comparisons](docs/PHOTO-MODELS.md).
+- **Unified building editing:** Details, Appearance, Roof, Outline and Review share one draft and history. Use metre-based placement, snapping, keyboard nudges, multi-selection, duplication, alignment, groups, patterns, presets and previewed copies between walls/buildings. Completed actions autosave; unfinished values recover privately. Saving does not approve evidence or publish content. [Owner guide](docs/UNIFIED-MODEL-EDITOR.md).
+- **Published photographic architecture:** the reviewed release contains 39 photographs covering 19 of 395 buildings. Roofs, colours and stable identities remain owner-managed. Dimensions and unseen sides remain estimates; there are no approved photographic wall textures in this release. [Evidence and coverage](docs/PHOTO-MODELS.md).
+- **Illustrated offline globe:** the campus palette leads, with faint September 2004 NASA relief, Natural Earth geography and restrained atmosphere. It fades into the campus map and includes every required overview asset offline. [Attribution](data/ATTRIBUTION.md).
+- **Visual photo management:** multiple uploads, per-file retry, author/external-source review, cover ordering, private drafts and public-gallery previews. Uploads continue while the app session remains open; Pause finishes the active file. Galleries use 20-item pages and IndexedDB recovery. [Photo workflow](docs/ARRIVAL-GUIDES.md).
+- **Responsive and recoverable editing:** revision-aware indexes, bounded workers, geometry-independent metadata updates, committed-action model regeneration, resource disposal and explicit retry. The active map opens after campus verification while remaining offline assets are audited. [Current model measurements](docs/MODEL-EDITOR-VERIFICATION.md) · [Photo and app performance](docs/PERFORMANCE.md).
 
-The offline globe uses the campus map's greens and blues, softer contrast and a gentle atmosphere for an illustrated appearance. The September 2004 **NASA Blue Marble** imagery supplies faint relief beneath Natural Earth coastlines, lakes, borders and labels, then fades into the campus map as you zoom in. The dated imagery is an overview, not current street coverage. Globe and campus visual assets retain separate 8 MiB and 12 MiB limits. The guided editor met the measured input targets; software-GPU map movement remains slow and is documented in the [verification report](docs/PHOTO-MODEL-VERIFICATION.md).
-
-The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
-
-The initial researched collection contained **21 photographs for 13 of 420 buildings**. After owner uploads and reviewed building consolidation, the 24 September published snapshot contains **39 photographs for 19 of 395 buildings**. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
-
-The photo editor now has a visual **Manage photos** workspace with multiple uploads, individual retries, guided source/author review, cover ordering, an offline-compatible public preview and private recovery. Migration 010 and schema-3 readers are deployed; new photographs still publish through owner release review.
-
-Photo uploads continue while the editor session remains open, including after closing the dialog or changing buildings. The persistent upload indicator offers **Pause uploads**, which finishes the current file first. Galleries and private uploads use 20-item pages; owner-scoped IndexedDB recovery preserves unfinished details. The installed map opens after its campus data verifies, while **Checking downloaded files…** audits the remaining assets. See [performance measurements and verification](docs/PERFORMANCE.md).
-
-The 17–18 September updates include:
-
-- **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).
-
-- **Offline globe:** the public map now zooms out to a full planet with land, oceans, country borders and names. A 5.30 MiB dated NASA/Natural Earth overview is saved with the app, works in both themes and returns smoothly to campus. The editor remains campus-focused.
-- **More map space:** a compact bottom search bar, mobile controls arranged on both sides, and adjustable cards/dialogs. Desktop panels open at full height, then keep the size you choose while you use search. Explore, Saved, Offline, Settings and Editor stay visible as panel content scrolls; desktop map controls stay pinned too.
-- **Visible app updates:** an update-ready notice on the public map, with an explicit install action that is disabled during navigation. Campus-package updates remain a separate Offline Maps operation.
-- **Gentler editor selection:** selecting an object animates it into the exposed map. Long paths on phones zoom out by at most 0.75 levels and keep the tapped stretch, or the stretch nearest the current view, visible. Closing properties restores the earlier view.
-- **Connected paths with exceptions:** drawn and surveyed paths can join actual same-level crossings automatically. Per-path crossing controls, bridge/tunnel levels and explicit joins let the owner decide where connections belong.
-- **Drafts relative to publication:** pending changes and highlights compare with the latest published map, while published corrections remain stored for later source reconciliation.
-
-These are application/editor changes. Public routing changes only after the owner reviews and publishes the corresponding campus map release.
+Application deployment leaves the published campus unchanged. New photos, models, permissions and routing changes use the owner preview, publication and rollback workflow.
 
 ## Features
 
@@ -92,7 +106,7 @@ These are application/editor changes. Public routing changes only after the owne
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
 | Owner editing | Autosave, grouped undo/redo, controlled automatic crossings and explicit joins, selection framing, publication-relative drafts, recoverable drawings/roof plans, guided repairs and conflicts. |
-| Building editing | Inherited building/wing/wall styles, stable surface identities, facade controls, roof presets, custom ridge/valley plans and immediate worker previews. |
+| Building editing | Unified measured canvas and 3D selection; inherited styles; precise details, duplication, patterns and presets; integrated roof/outline tools; targeted evidence review and recoverable autosave. |
 | Offline | Verified, resumable package downloads, explicit updates, integrity repair, prepared owner workspaces and immediate local recovery exports. |
 | Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
 | Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
@@ -201,7 +215,7 @@ Guided repairs select the affected feature and open the relevant control. Propos
 
 ## Building appearance and roofs
 
-**Photo & model** adds a lazy-loaded, side-by-side photograph/model workspace with mobile view tabs, stable wall selection, framed windows, doors, columns, balconies, canopies, parapets and reviewed perspective-aligned textures. Apply saves one undoable edit. Footprint or source-photo changes flag affected assignments for review; photo captions do not rebuild models. The initial 19-building candidate adds supported opening proportions and evidence notes, with **zero automatically approved wall textures** until camera/wall correspondence is reviewed. [Owner workflow](docs/PHOTO-MODELS.md) · [Coverage](docs/PHOTO-MODEL-COVERAGE.md) · [Checks and performance](docs/PHOTO-MODEL-VERIFICATION.md).
+**Photo & model** is a lazy-loaded building workspace with a measured wall canvas, selectable 3D, photograph reference and mobile view tabs. It supports windows, doors, columns, balconies, canopies, parapets and trim, with metre-based placement, repeated patterns and independent presets. Completed actions create undoable draft edits; camera movement and selection do not. Footprint or source-photo changes flag affected assignments for review. Private names, groups and presets stay out of public downloads; no database or package-schema migration is required. [Current owner workflow](docs/UNIFIED-MODEL-EDITOR.md) · [Photographic evidence and textures](docs/PHOTO-MODELS.md) · [Coverage](docs/PHOTO-MODEL-COVERAGE.md).
 
 Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
 
@@ -209,13 +223,13 @@ Select a building to open **Appearance**, then choose the building, a wing or a 
 2. Building defaults flow to wings and then walls. **Use inherited value** clears an individual override. Swatches show the resolved saved colours.
 3. Use **Outline** for footprint editing. Stable part/ring/vertex/wall identities preserve styles through movement and reordering. Split walls inherit style; ambiguous joins or changed source geometry require reassignment or reset.
 4. Use **Roof** for the selected wing. Draw ridge/valley constraints, move control points, enter elevations and inspect calculated surface slopes.
-5. Review the result and choose **Apply roof** to commit one undoable change, or **Cancel roof** to restore the previous roof.
+5. Completed valid roof actions save automatically as undoable commands. **Done editing roof** closes the controls. Invalid intermediate work stays local for repair; Undo restores completed actions. The separate source-proposal batch retains its explicit reviewed apply action.
 
 Roof plans store editable control points, constraints and boundary attachments, rather than generated triangles. Attached points follow footprint vertices; moving a wing moves its roof. The shared constrained triangulator preserves concave footprints and courtyards. Invalid constraints, incompatible elevations, degenerate surfaces and heights above the declared total block applying or publishing the affected roof.
 
 Standard flat/hip/gable controls work on supported shapes. Window spacing accepts 0.5–20 m, with a 4 m default; supported standard pitch accepts 1–60° within the footprint and height limits. Custom roofs use point elevations. Unknown heights and approximate roof proposals remain explicitly illustrative.
 
-Preview workers rebuild affected buildings after a short debounce, reject stale replies and retain the last valid preview on failure with **Retry 3D preview**. Selection does not hide enhanced models. Outline drawing, connection work and surveying suppress obstructing detail where needed. Settings and view changes preserve unfinished roof work.
+The unified workspace rebuilds the affected model after completed actions, with one active request and the newest pending revision. Selection and façade evidence notes do not regenerate geometry. Failed workspace previews retain the draft and offer **Retry model preview**; the underlying map has its separate **Retry 3D preview** control. Selection does not hide enhanced models. Outline drawing, connection work and surveying suppress obstructing detail where needed. Settings and view changes preserve unfinished roof work.
 
 Reference and roof batches require review; photographic support and inferred details are distinguished. They do not add unsupported paths, furniture or surveyed-height claims. [Building editor](docs/BUILDING-EDITOR.md) · [Roof plans](docs/BUILDING-ROOFS.md) · [Reference research](docs/BUILDING-REFERENCE-RESEARCH.md).
 
@@ -328,7 +342,7 @@ Published navigation does not require the admin database to be available. Model 
 
 Public seed exploration requires no credentials. Connected administration/reports need [web/.env.example](web/.env.example), Supabase GitHub OAuth, the owner allowlist, database migrations and workflow configuration.
 
-Apply the migrations in order through **[010_private_photo_drafts.sql](supabase/migrations/010_private_photo_drafts.sql)**. Migration [007](supabase/migrations/007_source_field_reviews.sql) adds field-level source reviews; [008](supabase/migrations/008_private_building_media.sql) adds private building media storage and owner-only metadata; [009](supabase/migrations/009_bounded_baseline_comparison.sql) bounds source comparisons and writes only changed baseline rows while retaining authorization, stale-review checks and rollback records. Migration [010](supabase/migrations/010_private_photo_drafts.sql) adds private photo drafts, original filenames, target associations and guarded revisions while preserving immutable approvals. Author-uploaded photographs may omit a source website; releases containing them use package schema 3. Deploy compatible readers before publishing schema-3 content; schemas 1 and 2 remain readable. Follow the deployment guide's base setup and the production record.
+The unified model editor adds no migration or public package schema. Deploy its compatible authoring-metadata validation before dependent clients. For a new installation, apply the existing migrations in order through **[010_private_photo_drafts.sql](supabase/migrations/010_private_photo_drafts.sql)**. Migration [007](supabase/migrations/007_source_field_reviews.sql) adds field-level source reviews; [008](supabase/migrations/008_private_building_media.sql) adds private building media storage and owner-only metadata; [009](supabase/migrations/009_bounded_baseline_comparison.sql) bounds source comparisons and writes only changed baseline rows while retaining authorization, stale-review checks and rollback records. Migration [010](supabase/migrations/010_private_photo_drafts.sql) adds private photo drafts, original filenames, target associations and guarded revisions while preserving immutable approvals. Author-uploaded photographs may omit a source website; releases containing them use package schema 3. Deploy compatible readers before publishing schema-3 content; schemas 1 and 2 remain readable. Follow the deployment guide's base setup and the production record.
 
 | Variables | Scope |
 | --- | --- |
@@ -359,7 +373,7 @@ npm run test:survey-webkit
 npm run test:survey-pwa
 ```
 
-`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MB per model sector**, and **500 KB total for bundled world assets**, and **8 MiB for natural voice**. The build verifies world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
+`lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KB gzip for the lazy renderer**, **12 MiB for campus geometry and textures**, **8 MiB for globe assets**, and **8 MiB for natural voice**. The build verifies world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
 Focused camera and panel regressions:
 
@@ -377,19 +391,7 @@ python -m unittest discover -s scripts/tests -v
 
 Coverage includes source normalization, appearance persistence/storage failures, grouped undo, save receipts, concurrent field/surface edits, geometry identity, constrained roofs, editor/release parity, drawing/roof recovery, worker failure/stale replies, package integrity and offline reopening. Browser tests use real map/rendering libraries with isolated authentication, API and hardware fixtures. Enhanced zoom cases inspect actual shader material colours and draw calls, including legacy meshes and repeated theme/zoom changes.
 
-Historical local checks on **18 September 2026** (globe/editor browser checks below were completed on 17 September). Newer entrance, photo, driving and publication checks are recorded in [Production](docs/PRODUCTION.md) and [Entrance guides](docs/ARRIVAL-GUIDES.md).
-
-| Check | Result |
-| --- | --- |
-| Camera/panel/globe regression tests | 21 / 21 passed |
-| Full unit suite | 378 / 378 passed across the full regression and final voice-asset runs |
-| Client and server TypeScript | Passed |
-| Lint | Passed with seven existing warnings |
-| Production app/service-worker build, renderer, world and voice budgets | Passed; world assets 254.8 KB and natural voice 5.84 MiB, both precached |
-| Voice recordings | All 359 MP3s decoded; hash/transcript/name coverage passed; no missing published names |
-| In-app browser | Mobile/desktop globe, light/dark themes, both building modes, projection transitions, date line/poles, campus return, simulated GPS recovery, editor framing, adjustable panels and offline reload checked |
-
-The checks ran on the supported Node 22.23.2 runtime. Natural-voice browser checks cover desktop/mobile Settings playback, close turns, GPS recovery, rerouting, Repeat, mute, preview and simulated visibility changes. A fixed production preview also reloaded and played the natural voice with its server stopped. Physical-device listening and outdoor timing remain unverified; see [voice acceptance notes](docs/VOICE.md#verification-and-remaining-device-checks). Browser checks used the in-app browser, including an isolated camera/navigation-state fixture. The downloaded production preview reloaded and displayed globe geometry and labels with its server stopped. These checks do not establish a successful physical GPS walk or physical-device airplane-mode test.
+Current results, five-run production benchmarks, build budgets and reproducible commands are recorded in [Model editor verification](docs/MODEL-EDITOR-VERIFICATION.md). Earlier voice, photo and globe measurements remain dated in their respective reports and in [Production](docs/PRODUCTION.md). This README no longer repeats obsolete test counts or superseded asset sizes.
 
 Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
@@ -442,7 +444,8 @@ TurnRight/
 | [Editor](docs/EDITOR.md) / [Reliability](docs/EDITOR-RELIABILITY.md) | Drawing, connections, recovery, conflict and operation-specific errors |
 | [Entrance guides](docs/ARRIVAL-GUIDES.md) / [Photograph collection](data/photos/README.md) | Entrance selection, accessibility observations, private media review, reusable image coverage and offline galleries |
 | [Driving](docs/DRIVING.md) / [Campus enrichment](docs/ENRICHMENT.md) | Independent vehicle permissions, drive-and-walk journeys, imports, source evidence and review |
-| [Building editor](docs/BUILDING-EDITOR.md) | Wing/wall inheritance, identity, controls and preview lifecycle |
+| [Unified model workflow](docs/UNIFIED-MODEL-EDITOR.md) / [Building editor](docs/BUILDING-EDITOR.md) | Precision tools, duplication, patterns, roofs/outlines, evidence, undo and recovery |
+| [Model verification](docs/MODEL-EDITOR-VERIFICATION.md) / [Performance](docs/PERFORMANCE.md) | Current production measurements, regressions, resource budgets and unavailable device coverage |
 | [Roof plans](docs/BUILDING-ROOFS.md) / [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md) | Constraints, validation, approximate proposals and evidence |
 | [Building references](docs/BUILDING-REFERENCE-RESEARCH.md) / [Appearance coverage](docs/BUILDING-APPEARANCE-COVERAGE.md) | Reference sources, uncertainty and facade assessments |
 | [Dark map](docs/DARK-MAP-STYLING.md) / [UI readability](docs/DARK-MODE-READABILITY.md) | Palette, original enhanced materials, labels, controls and contrast |

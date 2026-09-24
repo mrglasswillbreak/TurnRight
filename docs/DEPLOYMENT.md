@@ -1,5 +1,10 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Unified model editor rollout
+
+No migration or public package-schema change is required. Deploy additive model-authoring validation and the older-writer guard before dependent clients. The guard rejects edits to buildings whose newer private authoring metadata would be dropped, while unaffected older-editor changes remain supported. Private metadata stays in owner draft JSON and is excluded from public packages. Keep `PUBLISHED_MAP_URL` enabled for application builds; reviewed architectural changes publish only through the existing immutable release workflow.
+
+
 Campus enrichment adds migration `007_source_field_reviews.sql`. Apply it before
 using “Accept selected details” in the owner editor. Daily source checks now use
 the bounded enrichment pipeline and retain a review artifact; they still cannot

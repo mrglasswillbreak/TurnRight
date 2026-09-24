@@ -1,6 +1,6 @@
 # Photographic building detail and offline globe
 
-This release assesses **395 buildings and 39 published photographs covering 19 buildings** in `lasu-8577d5c85d2c`, checked on 24 September 2026. Stable IDs, owner colours, custom roofs, footprints and routing permissions are retained. Photo captions and GPS fixes do not change model revisions.
+The photographic assessment used **395 buildings and 39 photographs covering 19 buildings** in baseline `lasu-8577d5c85d2c`. The reviewed result is published as `lasu-313d8a168635`, verified on 24 September 2026. The unified editor updates tools, not that published content. Stable IDs, owner colours, custom roofs, footprints and routing permissions are retained. Photo captions and GPS fixes do not change model revisions.
 
 The 19 proposals add framed openings, photo-informed opening proportions and evidence notes. The Faculty of Management Sciences receives a three-floor estimate where its height was unknown; 9 m uses the existing 3 m/floor convention. Existing owner heights take precedence. Regular window positions and frame dimensions remain illustrative. Photographs do not establish unseen elevations, exact dimensions, usable entrances or permission to enter.
 
@@ -14,12 +14,12 @@ No image in this snapshot has an established camera bearing tied to a specific m
 
 ## Owner workflow
 
-Select a building and choose **Photo & model**. Desktop shows the photograph and model together; narrow screens have Photograph and Model tabs.
+Select a building and open **Photo & model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. Mobile offers **Wall**, **3D** and **Photo** views. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
 
-1. Select a photograph and a **Mapped wall**. The wall is outlined in blue. Rotate/zoom using view buttons, mouse or touch. Check the photo's historical label and credits.
-2. Confirm the correspondence. Left-to-right placement follows the wall's original endpoints. Add windows, doors, columns, balconies, canopies, parapets or trim; set position, dimensions, projection and repetitions. Record visible evidence and estimated dimensions. Existing wing and roof tools remain in the building inspector.
-3. For an unobstructed wall view, open **Photographic wall texture**. Choose four corners clockwise from top left using draggable markers or labelled coordinates. Exclude sky, people, vegetation and unrelated surfaces. Gallery originals remain unchanged. Unavailable textures retain a plain material.
-4. Use **Before / After** to compare with the opening state. **Apply reviewed model details** saves one undoable map edit. Closing without Apply discards uncommitted controls; applied edits use normal draft recovery and release review.
+1. Choose a mapped wall and photograph. Confirm their correspondence and check historical labels and credits. A general building photograph does not prove every elevation.
+2. Preview conversion of generated details, then place windows, doors, columns, balconies, canopies, parapets or trim in metres. Dimensions and unseen sides remain estimates unless supported by measurements. Appearance, roof and outline controls are modes in this same workspace.
+3. For an unobstructed wall, open **Photographic texture alignment**. Align corners clockwise from top left using draggable markers or labelled numeric coordinates. Originals remain unchanged; the release produces an attributed, immutable derivative.
+4. Compare with the opening state using **Before / after**. Completed actions autosave as undoable draft commands; closing retains unfinished input. **Mark this wall reviewed** reviews only the selected wall. Normal release review remains separate.
 
 Moving a footprint or moving/replacing a source photograph flags affected evidence. Removed wall assignments retain their recipes: rematch them explicitly or reset the details. Release validation blocks stale assignments. Caption and ordering changes preserve review.
 
@@ -60,6 +60,6 @@ npm run test:browser
 npm run test:survey-pwa
 ```
 
-Build the production fixture with `vite.performance.config.ts` and serve `work/performance-dist` on port 5195. `node scripts/benchmark-models.mjs --sheets` produces the 19 comparison sheets; running it without that flag records five before/after map trials and five editor trials each at normal and 4× CPU speed. It reads a verified snapshot and photographs from `work/photo-model`, never authenticating or writing to production. Baseline map trials use the previous catalogue and the 110m vector-only overview in the same application, isolating visual costs.
+Build the production fixture with `vite.performance.config.ts` and serve `work/performance-dist` on port 5195. `node scripts/benchmark-models.mjs --sheets` produces the 19 comparison sheets from `work/photo-model`; its original editor trials are a historical benchmark for the pre-unified workspace. Use `node scripts/benchmark-model-editor.mjs` for the current baseline/final editor comparison documented in [verification](MODEL-EDITOR-VERIFICATION.md). The newer harness verifies the published snapshot into `work/model-benchmark/public` and starts isolated local fixture servers; it never authenticates or writes to production. Earlier map trials use the previous catalogue and the 110m vector-only overview in the same application, isolating their visual costs.
 
 Measurements use Chromium/SwiftShader, not physical Android/iPhone hardware. The coverage report records results and unavailable coverage. Deploy compatible readers first, then inspect, accept and publish the reviewed draft through Releases. Keep the previous immutable deployment for rollback.

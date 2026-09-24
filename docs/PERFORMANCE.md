@@ -1,5 +1,10 @@
 # Responsiveness and recovery
 
+## Current building workspace
+
+The unified model editor extends this work with a measured canvas, commit-on-completion numeric fields, shared history and private input recovery. Appearance-only changes reuse routing results; wall selection and façade evidence notes do not rebuild models. Preview generation is bounded to one active and one newest pending request, with explicit resource disposal and retry. The [current model-editor report](MODEL-EDITOR-VERIFICATION.md) records five-run production comparisons at published campus scale and a 100-detail wall, including 4× CPU throttling. The photo-upload measurements below retain their original scope and dates.
+
+
 The September 2026 update targets photo management, repeated editor work and
 offline startup. It leaves public package schemas 1–3 and the database schema
 unchanged. Published campus content and routing approvals are unchanged.
