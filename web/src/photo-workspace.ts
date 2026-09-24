@@ -56,33 +56,50 @@ export function photoEdits(
                 ),
             ),
           );
-    const appearance =
-      edit.properties.appearance && structuredClone(edit.properties.appearance);
-    if (appearance?.facades)
-      for (const facade of Object.values(appearance.facades)) {
-        if (
-          facade.photoIds.some(
-            (id) =>
-              affected.has(id) &&
-              !normalized.some(
-                (p) =>
-                  p.id === id &&
-                  p.buildingId === edit.id &&
-                  p.sha256 ===
-                    data.photos?.find((old) => old.id === id)?.sha256,
-              ),
-          )
-        )
-          facade.needsReview = true;
-      }
     result.push({
       ...edit,
       properties: {
         ...edit.properties,
-        ...(appearance ? { appearance } : {}),
         photos,
       },
     });
+  }
+  // Entrance-owned photographs can also support their parent building's model.
+  // Keep the evidence invalidation in the same transaction as gallery changes.
+  for (const buildingId of new Set(
+    [...before, ...normalized].map((p) => p.buildingId),
+  )) {
+    const index = result.findIndex(
+      (e) => e.kind === 'building' && e.id === buildingId,
+    );
+    const edit =
+      index >= 0
+        ? result[index]
+        : featureEdit(data, 'building', buildingId, edits);
+    if (!edit?.properties.appearance?.facades || edit.deleted) continue;
+    const appearance = structuredClone(edit.properties.appearance);
+    let changed = false;
+    for (const facade of Object.values(appearance.facades!)) {
+      if (
+        facade.photoIds.some(
+          (id) =>
+            affected.has(id) &&
+            !normalized.some(
+              (p) =>
+                p.id === id &&
+                p.buildingId === buildingId &&
+                p.sha256 === data.photos?.find((old) => old.id === id)?.sha256,
+            ),
+        )
+      ) {
+        facade.needsReview = true;
+        changed = true;
+      }
+    }
+    if (!changed) continue;
+    const updated = { ...edit, properties: { ...edit.properties, appearance } };
+    if (index >= 0) result[index] = updated;
+    else result.push(updated);
   }
   // A moved/deleted photograph cannot remain a guide reference for its previous destination.
   for (const entity of [...data.places, ...(data.entrances || [])]) {

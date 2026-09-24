@@ -44,6 +44,35 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 describe('photo management', () => {
+  it('invalidates parent facade evidence when an entrance-owned photograph changes', () => {
+    const data = campus();
+    data.entrances = [
+      {
+        id: 'door',
+        placeId: 'library',
+        buildingId: 'one',
+        name: 'Door',
+        coordinates: [3.2, 6.46],
+        walkingAccess: 'yes',
+        source: 'owner',
+      },
+    ];
+    data.photos![1].entranceId = 'door';
+    data.map.features[0].properties!.appearance = {
+      facades: { wall: { photoIds: ['b'], needsReview: false } },
+    };
+    const edits = photoEdits(data, [], {
+      photos: [{ ...data.photos![1], sha256: 'b'.repeat(64) }],
+      removeIds: [],
+    });
+    expect(edits.find((e) => e.id === 'door')!.properties.photos).toHaveLength(
+      1,
+    );
+    expect(
+      edits.find((e) => e.id === 'one')!.properties.appearance!.facades!.wall
+        .needsReview,
+    ).toBe(true);
+  });
   it('flags model evidence after photo moves or byte changes, while caption edits preserve its review', () => {
     const data = campus();
     data.map.features[0].properties!.appearance = {
