@@ -864,6 +864,7 @@ import { campusFixture } from '../fixture';
 import { contrastFailures } from './contrast';
 import type {
   CampusData,
+  CampusPackage,
   CampusPhoto,
   MapEdit,
   Position,
@@ -959,22 +960,25 @@ async function setup(
     initialEdits?: MapEdit[];
     publishedEdits?: MapEdit[];
     mutateCampus?: (data: CampusData) => void;
+    snapshot?: { data: CampusData; manifest: CampusPackage };
   } = {},
 ) {
   let edits: MapEdit[] = structuredClone(options.initialEdits || []);
   let revision = 0;
   const receipts = new Map<string, MapEdit[]>();
-  const campus: CampusData = realCampus
-    ? JSON.parse(
-        readFileSync(
-          new URL(
-            '../../public/packages/lasu-4e4c8008b38b/campus.json',
-            import.meta.url,
+  const campus: CampusData =
+    options.snapshot?.data ||
+    (realCampus
+      ? JSON.parse(
+          readFileSync(
+            new URL(
+              '../../public/packages/lasu-4e4c8008b38b/campus.json',
+              import.meta.url,
+            ),
+            'utf8',
           ),
-          'utf8',
-        ),
-      )
-    : browserCampus();
+        )
+      : browserCampus());
   if (enhanced) {
     campus.visuals = JSON.parse(
       readFileSync(
@@ -1041,30 +1045,51 @@ async function setup(
   );
   await page.context().route('**/packages/latest.json', (route) =>
     route.fulfill({
-      json: {
-        schemaVersion: 1,
-        version: campus.version,
-        createdAt: campus.createdAt,
-        summary: 'Test campus',
-        dataUrl: '/packages/fixture/campus.json',
-        bytes: Buffer.byteLength(bytes) + (campus.visuals?.bytes || 0),
-        ...(campus.visuals
-          ? {
-              visuals: {
-                bytes: campus.visuals.bytes,
-                assetUrls: campus.visuals.sectors.map((s) => s.url),
+      json: options.snapshot
+        ? {
+            ...options.snapshot.manifest,
+            dataUrl: '/packages/fixture/campus.json',
+            assets: options.snapshot.manifest.assets.map((a) =>
+              a.url === options.snapshot!.manifest.dataUrl
+                ? {
+                    ...a,
+                    url: '/packages/fixture/campus.json',
+                    sha256: createHash('sha256').update(bytes).digest('hex'),
+                    bytes: Buffer.byteLength(bytes),
+                  }
+                : a,
+            ),
+            bytes:
+              options.snapshot.manifest.bytes -
+              options.snapshot.manifest.assets.find(
+                (a) => a.url === options.snapshot!.manifest.dataUrl,
+              )!.bytes +
+              Buffer.byteLength(bytes),
+          }
+        : {
+            schemaVersion: 1,
+            version: campus.version,
+            createdAt: campus.createdAt,
+            summary: 'Test campus',
+            dataUrl: '/packages/fixture/campus.json',
+            bytes: Buffer.byteLength(bytes) + (campus.visuals?.bytes || 0),
+            ...(campus.visuals
+              ? {
+                  visuals: {
+                    bytes: campus.visuals.bytes,
+                    assetUrls: campus.visuals.sectors.map((s) => s.url),
+                  },
+                }
+              : {}),
+            assets: [
+              {
+                url: '/packages/fixture/campus.json',
+                sha256: createHash('sha256').update(bytes).digest('hex'),
+                bytes: Buffer.byteLength(bytes),
               },
-            }
-          : {}),
-        assets: [
-          {
-            url: '/packages/fixture/campus.json',
-            sha256: createHash('sha256').update(bytes).digest('hex'),
-            bytes: Buffer.byteLength(bytes),
+              ...(campus.visuals?.sectors || []),
+            ],
           },
-          ...(campus.visuals?.sectors || []),
-        ],
-      },
     }),
   );
   await page
@@ -3610,15 +3635,7 @@ test('building appearance: integrated view, surface inheritance, live preview, r
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
   await page.getByLabel('Point elevation (m)').fill('14');
-  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
-  await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
-  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Apply roof' })).toBeEnabled();
-  await page.reload();
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
-  await expect(page.getByLabel('Control point')).toContainText('14 m');
-  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+  await page.getByLabel('Point elevation (m)').press('Enter');
   await expect
     .poll(
       () =>
@@ -3626,14 +3643,26 @@ test('building appearance: integrated view, surface inheritance, live preview, r
           ?.roofs?.['library:wing:0']?.points[0]?.elevation,
     )
     .toBe(14);
-  await page.getByRole('button', { name: 'Undo', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Create custom roof' }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Redo', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Edit custom roof' }),
-  ).toBeVisible();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.roofs?.['library:wing:0']?.points[0]?.elevation,
+    )
+    .toBe(14);
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Edit custom roof', exact: true })
+    .click();
+  await expect(dialog.getByLabel('Control point')).toContainText('14 m');
   await page.screenshot({ path: 'test-results/building-roof-editor.png' });
   expect(errors).toEqual([]);
 });
@@ -3922,7 +3951,7 @@ test('enhanced editing keeps models through slow frames, outline work and render
 
 test.describe('building roof touch editing', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
-  test('building appearance phone: ridge drawing, invalid elevations, opacity and worker recovery', async ({
+  test('building appearance phone: ridge drawing, invalid elevations and opacity', async ({
     page,
   }) => {
     test.setTimeout(150000);
@@ -3973,47 +4002,17 @@ test.describe('building roof touch editing', () => {
       page.getByRole('button', { name: 'Remove ridge 1' }),
     ).toBeVisible();
     await page.getByLabel('Point elevation (m)').fill('50');
-    await expect(
-      page.getByRole('button', { name: 'Apply roof', exact: true }),
-    ).toBeDisabled();
-    await expect(page.getByText('3D preview is outdated')).toBeVisible();
-    await page.getByLabel('Point elevation (m)').fill('15');
-    await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
-    await page.evaluate(() => {
-      const send = Worker.prototype.postMessage;
-      Worker.prototype.postMessage = function (
-        message,
-        ...rest: [Transferable[]?]
-      ) {
-        if (message?.features) {
-          Worker.prototype.postMessage = send;
-          throw new DOMException(
-            'Injected worker delivery failure',
-            'DataCloneError',
-          );
-        }
-        return send.call(this, message, rest[0] || []);
-      };
-    });
+    await page.getByLabel('Point elevation (m)').press('Enter');
+    await expect(page.getByLabel('Point elevation (m)')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
     await page.getByLabel('Point elevation (m)').fill('14.5');
-    await expect(
-      page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
-    ).toBeVisible();
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
-        ),
-      )
-      .toContain('library');
-    await page
-      .getByRole('button', { name: 'Retry 3D preview', exact: true })
-      .click();
-    await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
-    await page
-      .getByLabel('Roof surface', { exact: true })
-      .selectOption({ index: 1 });
-    await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+    await page.getByLabel('Point elevation (m)').press('Enter');
+    await expect(page.getByLabel('Point elevation (m)')).toHaveAttribute(
+      'aria-invalid',
+      'false',
+    );
     await expect
       .poll(
         () =>
@@ -4021,9 +4020,15 @@ test.describe('building roof touch editing', () => {
             ?.roofs?.['library:wing:0']?.lines.length,
       )
       .toBe(1);
+    await page
+      .getByLabel('Roof surface', { exact: true })
+      .selectOption({ index: 1 });
+    await page
+      .getByRole('button', { name: 'Done editing roof', exact: true })
+      .click();
     await expect(
       page.getByRole('button', { name: 'Edit custom roof', exact: true }),
-    ).toBeFocused();
+    ).toBeVisible();
     await page.screenshot({ path: 'test-results/building-phone-roof.png' });
   });
 });
@@ -4071,11 +4076,16 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
   await page.getByLabel('Point elevation (m)').fill('14');
+  await page.getByLabel('Point elevation (m)').press('Enter');
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.getByLabel('Eaves elevation (m)').fill('');
+  await expect(page.getByRole('dialog').locator('header output')).toContainText(
+    'Unsaved input',
+  );
   await context.setOffline(true);
   await page.reload();
   await attachMap(page);
-  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
-  await expect(page.getByLabel('Control point')).toContainText('14 m');
+  await focusCampus(page);
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -4092,12 +4102,32 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   const recovery = JSON.parse(
     readFileSync((await download.path())!, 'utf8'),
   ).workspace;
-  expect(recovery.roofDraft.roof.points[0].elevation).toBe(14);
+  expect(recovery.modelInputs.library['roof:library:wing:0:eaves']).toBe('');
+  expect(
+    recovery.edits.find((e: MapEdit) => e.id === 'library').properties
+      .appearance.roofs['library:wing:0'].points[0].elevation,
+  ).toBe(14);
   expect(
     recovery.edits.find((e: MapEdit) => e.id === 'library').properties
       .appearance.walls['library:wall:0:0:0'].wallColour,
   ).toBe('#884422');
-  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
+  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  if (await collapse.isVisible()) await collapse.click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByRole('button', { name: 'Edit custom roof', exact: true })
+    .click();
+  await expect(page.getByLabel('Eaves elevation (m)')).toHaveValue('');
+  await page.getByLabel('Eaves elevation (m)').fill('8');
+  await page.getByLabel('Eaves elevation (m)').press('Enter');
+  await page
+    .getByRole('button', { name: 'Done editing roof', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
   await page.reload();
   await attachMap(page);
   await focusCampus(page);
@@ -4118,6 +4148,9 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     readFileSync((await second.path())!, 'utf8'),
   ).workspace;
   expect(saved.roofDraft).toBeNull();
+  expect(
+    saved.modelInputs.library['roof:library:wing:0:eaves'],
+  ).toBeUndefined();
   expect(
     saved.edits.find((e: MapEdit) => e.id === 'library').properties.appearance
       .roofs['library:wing:0'].points[0].elevation,
@@ -4987,6 +5020,255 @@ for (const editor of [false, true])
     });
   }
 
+test('documentation current gallery: published campus and isolated owner workflow', async ({
+  page,
+}, info) => {
+  test.skip(
+    !info.config.configFile?.includes('docs.config'),
+    'Explicit production documentation project only.',
+  );
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL(
+        '../../work/model-benchmark/public/packages/latest.json',
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  ) as CampusPackage;
+  const data = JSON.parse(
+    readFileSync(
+      new URL(
+        `../../work/model-benchmark/public${manifest.dataUrl}`,
+        import.meta.url,
+      ),
+      'utf8',
+    ),
+  ) as CampusData;
+  for (const a of manifest.assets)
+    await page.context().route(`**${a.url}`, (r) =>
+      r.fulfill({
+        body: readFileSync(
+          new URL(`../../work/model-benchmark/public${a.url}`, import.meta.url),
+        ),
+        contentType: a.url.endsWith('.webp')
+          ? 'image/webp'
+          : a.url.endsWith('.json')
+            ? 'application/json'
+            : 'application/octet-stream',
+      }),
+    );
+  const shot = async (name: string) => {
+    await page.evaluate(() => document.fonts.ready);
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+      .toBe(false);
+    await page.screenshot({
+      path: `../docs/assets/screenshots/${name}-2026-09-24.png`,
+    });
+  };
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await setup(page, false, false, { snapshot: { data, manifest } });
+  if (!process.env.TURNRIGHT_DOCS_ROUTES_ONLY) {
+    const three = page.getByRole('button', {
+      name: 'Switch to 3D',
+      exact: true,
+    });
+    if (await three.isVisible()) await three.click();
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({
+        center: [3.1998, 6.471],
+        zoom: 17.3,
+        pitch: 45,
+      }),
+    );
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
+      .toBe(true);
+    await shot('editor-workspace-current');
+    await page.getByRole('button', { name: 'All', exact: true }).click();
+    await page.getByLabel('Search map features').fill('Senate');
+    await page
+      .locator('.editor-feature-list button')
+      .filter({
+        has: page.locator('.editor-feature-icon.building'),
+        hasText: 'Senate',
+      })
+      .first()
+      .click();
+    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await shot('editor-building-current');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await shot('editor-building-mobile-current');
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await shot('editor-settings-mobile-current');
+    await page
+      .getByRole('button', { name: 'Close settings', exact: true })
+      .click();
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.getByRole('button', { name: /Manage photos/ }).click();
+    await expect(page.getByRole('heading', { name: /Photos ·/ })).toBeVisible();
+    await shot('editor-photos-current');
+    await page.keyboard.press('Escape');
+    await page
+      .getByRole('button', { name: 'Photo & model', exact: true })
+      .click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: 'Roof', exact: true }).click();
+    await dialog
+      .getByLabel('Building or wing', { exact: true })
+      .selectOption({ label: 'Wing 1' });
+    const editRoof = dialog.getByRole('button', {
+      name: 'Edit custom roof',
+      exact: true,
+    });
+    if (await editRoof.isVisible()) await editRoof.click();
+    await shot('editor-roof-current');
+    const doneRoof = dialog.getByRole('button', {
+      name: 'Done editing roof',
+      exact: true,
+    });
+    if (await doneRoof.isVisible()) await doneRoof.click();
+    await dialog.getByRole('button', { name: 'Outline', exact: true }).click();
+    await shot('editor-outline-current');
+    await dialog
+      .getByRole('button', { name: 'Close workspace', exact: true })
+      .click();
+    await page.goto('/');
+    await attachMap(page);
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({
+        center: [3.1998, 6.471],
+        zoom: 17.6,
+        pitch: 45,
+      }),
+    );
+    await page.getByLabel('Search campus').fill('Senate');
+    await page
+      .getByRole('button', { name: /LASU Senate Building/ })
+      .first()
+      .click();
+    await shot('public-place-desktop-current');
+    const handle = page.getByRole('slider', { name: 'Resize search panel' });
+    await handle.focus();
+    await handle.press('Home');
+    await shot('public-panel-resized-current');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await handle.press('End');
+    await shot('public-place-mobile-current');
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await shot('public-settings-mobile-current');
+    await page.keyboard.press('Escape');
+    await page
+      .getByRole('button', { name: /Offline maps|Offline/, exact: false })
+      .first()
+      .click();
+    await shot('public-offline-mobile-current');
+    await page.keyboard.press('Escape');
+    const close = page.getByRole('button', {
+      name: 'Close place details',
+      exact: true,
+    });
+    if (await close.isVisible()) await close.click();
+    const clear = page.getByRole('button', {
+      name: 'Clear search',
+      exact: true,
+    });
+    if (await clear.isVisible()) await clear.click();
+    const collapse = page.getByRole('button', {
+      name: 'Collapse card',
+      exact: true,
+    });
+    if (await collapse.isVisible()) await collapse.click();
+    await shot('public-map-mobile-current');
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({
+        center: [14, 12],
+        zoom: -0.7,
+        pitch: 0,
+        bearing: 0,
+      }),
+    );
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
+      .toBe(true);
+    await shot('public-globe-mobile-current');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.evaluate(() =>
+      window.editorTestMap.jumpTo({
+        center: [14, 12],
+        zoom: 1.65,
+        pitch: 0,
+        bearing: 0,
+      }),
+    );
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
+      .toBe(true);
+    await shot('public-globe-desktop-current');
+  }
+  await page.goto('/');
+  await attachMap(page);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.getByLabel('Search campus').fill('Senate');
+  await page
+    .getByRole('button', { name: /LASU Senate Building/ })
+    .first()
+    .click();
+  await page.getByRole('button', { name: 'Directions', exact: true }).click();
+  await page
+    .getByLabel('Starting place')
+    .selectOption('arcgis:University_Property:129');
+  await expect(
+    page.getByRole('button', { name: 'Start walking', exact: true }),
+  ).toBeVisible();
+  const flat = page.getByRole('button', { name: 'Switch to 2D', exact: true });
+  if (await flat.isVisible()) await flat.click();
+  const frameRoute = async (mobile: boolean) =>
+    page.evaluate(async (mobile) => {
+      const map = window.editorTestMap;
+      const lines = (await (
+        map.getSource('routes') as import('maplibre-gl').GeoJSONSource
+      ).getData()) as import('geojson').FeatureCollection<
+        import('geojson').LineString
+      >;
+      const points = lines.features.flatMap((f) => f.geometry.coordinates);
+      map.fitBounds(
+        [
+          [
+            Math.min(...points.map((p) => p[0])),
+            Math.min(...points.map((p) => p[1])),
+          ],
+          [
+            Math.max(...points.map((p) => p[0])),
+            Math.max(...points.map((p) => p[1])),
+          ],
+        ],
+        {
+          padding: mobile
+            ? { top: 110, bottom: 430, left: 35, right: 35 }
+            : { top: 60, bottom: 60, left: 510, right: 60 },
+          pitch: 0,
+          duration: 0,
+        },
+      );
+    }, mobile);
+  await frameRoute(false);
+  await shot('public-route-desktop-current');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const routeHandle = page.getByRole('slider', { name: 'Resize search panel' });
+  await routeHandle.press('Home');
+  for (let i = 0; i < 9; i++) await routeHandle.press('ArrowUp');
+  await page
+    .getByRole('button', { name: 'Start walking', exact: true })
+    .scrollIntoViewIfNeeded();
+  await frameRoute(true);
+  await shot('public-route-mobile-current');
+});
+
 test('documentation capture: editor appearance, roof and settings', async ({
   page,
 }, testInfo) => {
@@ -5137,6 +5419,284 @@ test('driving road approval persists separately from walking access', async ({
     'Campus visitors',
   );
 });
+async function unifiedModelFixture(page: Page) {
+  const building = browserCampus().map.features.find(
+    (f) => f.properties?.id === 'library',
+  )!;
+  const server = await setup(page, false, false, {
+    initialEdits: [
+      {
+        id: 'library',
+        kind: 'building',
+        geometry: building.geometry,
+        properties: { ...building.properties },
+      },
+    ],
+  });
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page.getByLabel('Search map features').fill('Library');
+  await page
+    .locator('.editor-feature-list button')
+    .filter({
+      has: page.locator('.editor-feature-icon.building'),
+      hasText: 'Library',
+    })
+    .first()
+    .click();
+  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  if (await collapse.isVisible()) await collapse.click();
+  await page
+    .getByRole('button', { name: 'Photo & model', exact: true })
+    .click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
+  await dialog
+    .getByRole('button', { name: 'Preview editable layout', exact: true })
+    .click();
+  await dialog
+    .getByRole('button', { name: 'Use editable layout', exact: true })
+    .click();
+  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.facades?.['library:wall:0:0:0']?.elements.length,
+    )
+    .toBe(1);
+  return {
+    server,
+    dialog,
+    wall: () =>
+      server.edits().find((e) => e.id === 'library')?.properties.appearance
+        ?.facades?.['library:wall:0:0:0'],
+  };
+}
+test('unified model retries failed preview without losing draft or camera', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const Base = Worker;
+    window.Worker = class extends Base {
+      modelPreview: boolean;
+      constructor(...args: ConstructorParameters<typeof Worker>) {
+        super(...args);
+        this.modelPreview = !!document.querySelector('.photo-model-workspace');
+      }
+      postMessage(message: unknown, ...rest: [Transferable[]?]) {
+        if (
+          this.modelPreview &&
+          document.documentElement.dataset.failModelPreview === 'true'
+        ) {
+          delete document.documentElement.dataset.failModelPreview;
+          throw new DOMException(
+            'Injected preview delivery failure',
+            'DataCloneError',
+          );
+        }
+        return super.postMessage(message, rest[0] || []);
+      }
+    };
+  });
+  const { dialog, wall } = await unifiedModelFixture(page);
+  const canvas = await dialog.locator('canvas').elementHandle();
+  await page.evaluate(() => {
+    document.documentElement.dataset.failModelPreview = 'true';
+  });
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('1.9');
+  await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+  await expect(
+    dialog.getByRole('button', { name: 'Retry model preview', exact: true }),
+  ).toBeVisible();
+  await expect.poll(() => wall()?.elements[0].width).toBe(1.9);
+  await dialog
+    .getByRole('button', { name: 'Retry model preview', exact: true })
+    .click();
+  await expect(
+    dialog.getByText('Estimated dimensions · selected wall outlined'),
+  ).toBeVisible();
+  expect(await canvas!.evaluate((el) => el.isConnected)).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('button', { name: 'Photo & model', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('textbox', { name: 'Name', exact: true }),
+  ).toHaveValue('Library');
+});
+test('unified model duplication, patterns, undo and private input recovery', async ({
+  page,
+}) => {
+  const { server, dialog, wall } = await unifiedModelFixture(page);
+  await dialog.getByRole('button', { name: 'Duplicate', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  expect(new Set(wall()!.elements.map((e) => e.id)).size).toBe(2);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  await dialog.locator('.model-detail-item').last().click();
+  await dialog.getByText('Groups, patterns & presets', { exact: true }).click();
+  await dialog.getByLabel('Name', { exact: true }).fill('Window bays');
+  await dialog.getByLabel('Rows', { exact: true }).fill('2');
+  await dialog.getByLabel('Columns', { exact: true }).fill('3');
+  await dialog
+    .getByRole('button', { name: 'Create pattern', exact: true })
+    .click();
+  await expect.poll(() => wall()?.elements.length).toBe(7);
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'library')?.properties
+          .modelAuthoring?.patterns.length,
+    )
+    .toBe(1);
+  await dialog.locator('.model-detail-item').first().click();
+  const beforeWidth = wall()!.elements[0].width;
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('');
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Photo & model', exact: true })
+    .click();
+  await dialog.locator('.model-detail-item').first().click();
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue('');
+  expect(wall()!.elements[0].width).toBe(beforeWidth);
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('1.7');
+  await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+  await expect.poll(() => wall()?.elements[0].width).toBe(1.7);
+});
+test('unified model keyboard placement, locking, copy preview and targeted review', async ({
+  page,
+}) => {
+  const { dialog, wall } = await unifiedModelFixture(page);
+  const before = wall()!.elements[0].x;
+  const canvas = dialog.getByRole('application', { name: /Wall canvas/ });
+  await canvas.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => wall()?.elements[0].x || 0).toBeGreaterThan(before);
+  await dialog.getByRole('button', { name: 'Lock / unlock' }).click();
+  const locked = wall()!.elements[0].x;
+  await canvas.focus();
+  await page.keyboard.press('ArrowRight');
+  expect(wall()!.elements[0].x).toBe(locked);
+  await dialog.getByRole('button', { name: 'Lock / unlock' }).click();
+  await dialog.getByRole('button', { name: 'Copy', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Paste / copy to…', exact: true })
+    .click();
+  await dialog
+    .getByLabel('Target wall', { exact: true })
+    .selectOption('library:wall:0:0:1');
+  await expect(
+    dialog.getByLabel('Copied layout preview on target wall', { exact: true }),
+  ).toBeVisible();
+  await dialog.getByRole('button', { name: 'Confirm placement' }).click();
+  await expect(dialog.getByLabel('Mapped wall')).toHaveValue(
+    'library:wall:0:0:1',
+  );
+  await dialog.getByText('Evidence & wall review', { exact: true }).click();
+  await dialog.getByRole('button', { name: 'Mark this wall reviewed' }).click();
+  expect(wall()?.reviewedAt).toBeUndefined();
+});
+test('unified model retains an invalid pattern privately and repairs it after reopening', async ({
+  page,
+}) => {
+  const { server, dialog, wall } = await unifiedModelFixture(page);
+  await dialog.getByText('Groups, patterns & presets', { exact: true }).click();
+  await dialog.getByLabel('Horizontal step (m)', { exact: true }).fill('50');
+  await dialog
+    .getByRole('button', { name: 'Create pattern', exact: true })
+    .click();
+  await expect(dialog.locator('header output')).toContainText('Unsaved input');
+  expect(wall()?.elements.length).toBe(1);
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Photo & model', exact: true })
+    .click();
+  await dialog
+    .getByRole('button', { name: 'Pattern · Repeated details', exact: true })
+    .click();
+  await dialog.getByText('Groups, patterns & presets', { exact: true }).click();
+  await dialog.getByLabel('Horizontal step (m)', { exact: true }).fill('2');
+  await dialog
+    .getByRole('button', { name: 'Update pattern', exact: true })
+    .click();
+  await expect.poll(() => wall()?.elements.length).toBe(3);
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'library')?.properties
+          .modelAuthoring?.patterns.length,
+    )
+    .toBe(1);
+});
+
+for (const viewport of [
+  { width: 740, height: 390 },
+  { width: 320, height: 450 },
+])
+  test(`unified model controls remain reachable at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const { dialog } = await unifiedModelFixture(page);
+    const width = dialog.getByLabel('Width (m)', { exact: true });
+    await width.fill('1.8');
+    await width.press('Enter');
+    await expect(width).toHaveValue('1.8');
+    const close = dialog.getByRole('button', {
+      name: 'Close workspace',
+      exact: true,
+    });
+    await close.scrollIntoViewIfNeeded();
+    const box = await close.boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
+    await close.click();
+    await expect(
+      page.getByRole('button', { name: 'Photo & model', exact: true }),
+    ).toBeFocused();
+  });
+test('unified model roof and outline tools share draft history', async ({
+  page,
+}) => {
+  const { server, dialog } = await unifiedModelFixture(page);
+  await dialog.getByRole('button', { name: 'Roof', exact: true }).click();
+  await dialog
+    .getByLabel('Building or wing', { exact: true })
+    .selectOption({ label: 'Wing 1' });
+  await dialog
+    .getByRole('button', { name: 'Create custom roof', exact: true })
+    .click();
+  await expect
+    .poll(
+      () =>
+        Object.keys(
+          server.edits().find((e) => e.id === 'library')?.properties.appearance
+            ?.roofs || {},
+        ).length,
+    )
+    .toBe(1);
+  await dialog
+    .getByRole('button', { name: 'Done editing roof', exact: true })
+    .click();
+  await dialog.getByRole('button', { name: 'Outline', exact: true }).click();
+  await expect(dialog.getByLabel('Top-down building outline')).toBeVisible();
+  await dialog
+    .getByRole('button', { name: 'Insert midpoint after vertex' })
+    .click();
+  await expect(
+    dialog.getByLabel('Outline vertex').locator('option'),
+  ).toHaveCount(5);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    dialog.getByLabel('Outline vertex').locator('option'),
+  ).toHaveCount(4);
+});
 for (const width of [320, 390, 768, 1440])
   for (const dark of [false, true])
     test(`photo model workspace ${width}px ${dark ? 'dark' : 'light'}`, async ({
@@ -5183,50 +5743,58 @@ for (const width of [320, 390, 768, 1440])
       });
       await trigger.click();
       const dialog = page.getByRole('dialog');
-      await expect(dialog.getByRole('img')).toBeVisible();
       await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
+      await dialog
+        .getByRole('button', { name: 'Preview editable layout', exact: true })
+        .click();
+      await dialog
+        .getByRole('button', { name: 'Use editable layout', exact: true })
+        .click();
       await dialog
         .getByRole('button', { name: 'Add window', exact: true })
         .click();
       await dialog.getByLabel('Width (m)', { exact: true }).fill('1.8');
+      await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+      await expect
+        .poll(
+          () =>
+            server
+              .edits()
+              .find((e) => e.id === 'library')
+              ?.properties.appearance?.facades?.[
+                'library:wall:0:0:0'
+              ]?.elements.at(-1)?.width,
+        )
+        .toBe(1.8);
+      await dialog.getByText('Evidence & wall review', { exact: true }).click();
       await dialog
-        .getByLabel('Evidence and estimated dimensions')
-        .fill('Matched to the selected elevation; dimensions estimated.');
-      if (width < 640)
-        await dialog
-          .getByRole('button', { name: 'Model', exact: true })
-          .click();
+        .getByLabel('Evidence and measurement provenance')
+        .fill('Illustrative visible window; dimensions estimated.');
+      await dialog
+        .getByLabel('Evidence and measurement provenance')
+        .press('Enter');
+      await dialog
+        .getByRole('button', { name: 'Mark this wall reviewed', exact: true })
+        .click();
+      if (width <= 800)
+        await dialog.getByRole('button', { name: '3D', exact: true }).click();
       await expect(dialog.locator('canvas')).toBeVisible();
       await expect(
         dialog.getByText('Estimated dimensions · selected wall outlined'),
       ).toBeVisible();
       const canvas = await dialog.locator('canvas').elementHandle();
-      await dialog
-        .getByLabel('Evidence and estimated dimensions')
-        .fill('Reviewed visible window; hidden surfaces unknown.');
-      await expect
-        .poll(() => canvas!.evaluate((el) => el.isConnected))
-        .toBe(true);
       await expect
         .poll(() =>
           dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
         )
         .toBe(true);
-      await page.screenshot({ path: info.outputPath('photo-model.png') });
-      await dialog
-        .getByRole('button', { name: 'Apply reviewed model details' })
-        .click();
-      await expect(dialog.getByText(/Saved to map draft/)).toBeVisible();
       await expect
-        .poll(
-          () =>
-            server.edits().find((e) => e.id === 'library')?.properties
-              .appearance?.facades?.['library:wall:0:0:0']?.elements[0].width,
-        )
-        .toBe(1.8);
+        .poll(() => canvas!.evaluate((el) => el.isConnected))
+        .toBe(true);
+      await page.screenshot({ path: info.outputPath('photo-model.png') });
+      await expect(dialog.getByText(/Saved to map draft/)).toBeVisible();
       await dialog
-        .getByRole('button', { name: 'Close', exact: true })
-        .last()
+        .getByRole('button', { name: 'Close workspace', exact: true })
         .click();
       await expect(trigger).toBeFocused();
     });

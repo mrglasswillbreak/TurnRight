@@ -1,5 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
+import { EditorWorkspace } from '../../src/editor-workspace';
+import type { BuildingSelection } from '../../src/visual-types';
+import { openDB } from 'idb';
 import { PhotoModelPreview } from '../../src/PhotoModelPreview';
 import PhotoModelWorkspace from '../../src/PhotoModelWorkspace';
 import { photoModelProposals } from '../../src/photo-model-proposals';
@@ -88,6 +91,28 @@ function MapHarness() {
   );
 }
 function Harness() {
+  const [workspace] = useState(
+    () =>
+      new EditorWorkspace(
+        [],
+        async (batch) =>
+          batch.edits.map(({ edit }) => ({
+            ...edit,
+            updated_at: new Date().toISOString(),
+          })),
+        async (state) => {
+          const db = await openDB('model-benchmark-recovery', 1, {
+            upgrade(db) {
+              db.createObjectStore('drafts');
+            },
+          });
+          await db.put('drafts', state, 'fixture-owner');
+          db.close();
+        },
+      ),
+  );
+  useSyncExternalStore(workspace.subscribe, workspace.getRevision);
+  const [selection, setSelection] = useState<BuildingSelection>();
   const [id, setId] = useState(base.photos![0].buildingId),
     [after, setAfter] = useState(false),
     [editing, setEditing] = useState(false);
@@ -156,8 +181,18 @@ function Harness() {
             properties: feature.properties!,
           }}
           data={data}
-          onSelection={() => {}}
-          onEdit={() => {}}
+          workspace={workspace}
+          selection={selection}
+          onSelection={setSelection}
+          onHistory={(redo) => {
+            if (redo) workspace.redo();
+            else workspace.undo();
+            void workspace.flush();
+          }}
+          onEdit={(edit) => {
+            workspace.commit([edit]);
+            void workspace.flush();
+          }}
           onClose={() => setEditing(false)}
         />
       )}
