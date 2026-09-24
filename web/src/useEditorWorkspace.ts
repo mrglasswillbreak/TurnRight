@@ -18,6 +18,9 @@ export function useEditorWorkspace(workspace: EditorWorkspace) {
       void workspace.flush();
     };
     const unload = (event: BeforeUnloadEvent) => {
+      // An explicit update has already verified recovery for this revision.
+      // Any subsequent edit invalidates this exemption automatically.
+      if (workspace.canReloadForUpdate) return;
       if (
         workspace.dirty ||
         workspace.unfinished ||

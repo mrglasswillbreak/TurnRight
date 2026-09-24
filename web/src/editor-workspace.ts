@@ -72,6 +72,7 @@ export class EditorWorkspace {
   private flight: Promise<boolean> | null = null;
   private persistence: Promise<void> = Promise.resolve();
   private recoveryFailed = false;
+  private updateRecoveryRevision = -1;
   private recoverySnapshot?: WorkspaceRecovery;
   private queuedRecovery?: WorkspaceRecovery;
   private writingRecovery = false;
@@ -181,8 +182,18 @@ export class EditorWorkspace {
   async prepareUpdate() {
     // A draft may need the new editor to repair it. Server validation must not
     // block the update, but unfinished work still requires durable recovery.
+    this.updateRecoveryRevision = -1;
     await this.flush();
-    return this.preserveRecovery();
+    const revision = this.revision;
+    if (!(await this.preserveRecovery()) || this.revision !== revision)
+      return false;
+    this.updateRecoveryRevision = revision;
+    return true;
+  }
+  get canReloadForUpdate() {
+    return (
+      !this.recoveryFailed && this.updateRecoveryRevision === this.revision
+    );
   }
   private persistNow() {
     const snapshot: WorkspaceRecovery = {

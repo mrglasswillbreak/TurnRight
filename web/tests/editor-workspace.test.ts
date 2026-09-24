@@ -28,18 +28,24 @@ describe('editor autosave and recovery', () => {
       { ...edit(), properties: { name: 'Library', heightMode: 'floors' } },
     ]);
     workspace.recoverModelInput('library', 'height', '');
+    expect(workspace.canReloadForUpdate).toBe(false);
     expect(await workspace.prepareUpdate()).toBe(true);
+    expect(workspace.canReloadForUpdate).toBe(true);
     expect(send).not.toHaveBeenCalled();
     const recovered = new EditorWorkspace([], send, async () => {}, stored);
     expect(recovered.edits).toEqual(workspace.edits);
     expect(recovered.past).toEqual(workspace.past);
     expect(recovered.modelInputs.library.height).toBe('');
     expect(await recovered.flush()).toBe(false);
+    expect(recovered.canReloadForUpdate).toBe(false);
+    workspace.recoverModelInput('library', 'height', '6');
+    expect(workspace.canReloadForUpdate).toBe(false);
     const unavailable = new EditorWorkspace([], send, async () => {
       throw new Error('disk full');
     });
     unavailable.recoverModelInput('library', 'height', '');
     expect(await unavailable.prepareUpdate()).toBe(false);
+    expect(unavailable.canReloadForUpdate).toBe(false);
     expect(unavailable.status).toBe('Recovery unavailable');
   });
   it('identifies the feature blocking a shared save and retains the complete batch for repair', async () => {
