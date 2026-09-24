@@ -5580,6 +5580,12 @@ for (const width of [390, 1440])
     expect(first.elements.some((e) => e.kind === 'trim')).toBe(true);
     await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
     await expect.poll(() => wall()).toBeUndefined();
+    await expect(
+      dialog.getByText('0 selected · 0 details', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'Duplicate', exact: true }),
+    ).toBeDisabled();
     await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
     await expect.poll(() => wall()?.elements).toEqual(first.elements);
     for (const kind of [

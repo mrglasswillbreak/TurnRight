@@ -52,6 +52,7 @@ const kinds: FacadeElementKind[] = [
   'trim',
 ];
 type Stamp = { elements: FacadeElement[]; wallLength: number; name: string };
+const emptyElements: FacadeElement[] = [];
 
 type WorkspaceProps = {
   edit: MapEdit;
@@ -213,7 +214,13 @@ function ModelWorkspace({
     emptyAuthoring();
   const recorded = draft.properties.appearance?.facades?.[activeWall];
   const facade = pending?.wallId === activeWall ? pending : recorded;
-  const elements = facade?.elements || conversion?.elements || [];
+  const elements = facade?.elements || conversion?.elements || emptyElements;
+  useEffect(() => {
+    setSelected((current) => {
+      const next = current.filter((id) => elements.some((e) => e.id === id));
+      return next.length === current.length ? current : next;
+    });
+  }, [elements]);
   const active = elements.find((e) => e.id === selected[0]);
   const photos = useMemo(
     () => (data.photos || []).filter((p) => p.buildingId === edit.id),
