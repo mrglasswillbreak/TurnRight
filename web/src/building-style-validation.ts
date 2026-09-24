@@ -9,6 +9,7 @@ import {
 } from './building-surfaces.js';
 import { customRoofSurface } from './custom-roof.js';
 import { buildingDisplay } from './map-display.js';
+import { facadeErrors } from './building-facades.js';
 
 export function validateBuildingStyle(
   edit: MapEdit,
@@ -17,6 +18,13 @@ export function validateBuildingStyle(
   if (edit.kind !== 'building') return [];
   const errors: string[] = [],
     appearance = edit.properties.appearance;
+  errors.push(
+    ...facadeErrors({
+      type: 'Feature',
+      geometry: edit.geometry,
+      properties: { ...edit.properties, id: edit.id },
+    }),
+  );
   const polygon = polygonsOf(edit.geometry);
   // Unfinished previews may use a resolved catalogue height. Applying a roof
   // persists that height; save/release validation still requires saved evidence.
@@ -102,6 +110,20 @@ export function validateBuildingStyle(
       errors.push('Surface style must be an object.');
       continue;
     }
+    for (const key of [
+      'windowFrameDepth',
+      'windowWidthRatio',
+      'windowHeightRatio',
+    ] as const)
+      if (
+        style[key] !== undefined &&
+        (!Number.isFinite(style[key]) ||
+          style[key]! < 0.01 ||
+          style[key]! > (key === 'windowFrameDepth' ? 0.5 : 0.9))
+      )
+        errors.push(
+          'Window frame dimensions and proportions are outside the supported range.',
+        );
     for (const key of [
       'wallColour',
       'roofColour',

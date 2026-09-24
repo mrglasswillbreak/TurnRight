@@ -40,6 +40,9 @@ import { hashBytes, ASSET_CACHE } from './offline';
 import { buildingOutline } from './building-outline';
 import { CAMPUS_MIN_ZOOM } from './world-map';
 import { meshMaterialRole, type MaterialRole } from './map-palette';
+import { textureKey } from './building-facades';
+import { createFacadeTextures } from './facade-textures';
+import type { FacadeTextureRecipe } from './visual-types';
 
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
@@ -84,9 +87,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       colour: string;
       role: MaterialRole;
       themeKey?: string;
+      releaseTexture?: () => void;
+      recipe?: FacadeTextureRecipe;
     }
   >();
   let renderer: WebGLRenderer | undefined;
+  const textures = createFacadeTextures(() => map.triggerRepaint());
   let indexedData = initial.data,
     visuals = visualLookup(initial.data.visuals),
     features = new Map(
@@ -134,14 +140,19 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         object.geometry.dispose();
         const entry = materials.get(object.userData.materialKey);
         if (entry && --entry.users === 0) {
+          entry.releaseTexture?.();
           entry.value.dispose();
           materials.delete(object.userData.materialKey);
         }
       }
     });
   }
-  function material(colour: string, role: MaterialRole) {
-    const key = `${colour}:${role}`;
+  function material(
+    colour: string,
+    role: MaterialRole,
+    recipe?: FacadeTextureRecipe,
+  ) {
+    const key = `${colour}:${role}${recipe ? ':' + textureKey(recipe) : ''}`;
     let entry = materials.get(key);
     if (!entry) {
       entry = {
@@ -153,6 +164,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         users: 0,
         colour,
         role,
+        recipe,
       };
       materials.set(key, entry);
     }
@@ -165,7 +177,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     const group = new Group(),
       at = MercatorCoordinate.fromLngLat(model.origin);
     group.userData.buildingId = model.id;
-    group.userData.revision = model.geometryRevision;
+    group.userData.revision = `${model.geometryRevision}:${model.detailRevision || ''}`;
     group.position.set(
       (at.x - origin.x) / scale,
       -(at.y - origin.y) / scale,
@@ -179,14 +191,19 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         new Float32BufferAttribute(part.positions, 3),
       );
       geometry.setIndex(part.indices);
+      if (part.uvs)
+        geometry.setAttribute('uv', new Float32BufferAttribute(part.uvs, 2));
       geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
       const role = meshMaterialRole(part.surfaces, part);
-      const mesh = new Mesh(geometry, material(part.colour, role));
+      const mesh = new Mesh(
+        geometry,
+        material(part.colour, role, part.texture),
+      );
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
-        materialKey: `${part.colour}:${role}`,
+        materialKey: `${part.colour}:${role}${part.texture ? ':' + textureKey(part.texture) : ''}`,
         surfaces: part.surfaces,
       };
       group.add(mesh);
@@ -305,7 +322,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           !draftIds.has(id) &&
           !!feature &&
           compatibleVisual(feature, visual) &&
-          child.userData.revision === visual?.geometryRevision;
+          child.userData.revision ===
+            `${visual?.geometryRevision}:${visual?.detailRevision || ''}`;
         for (const mesh of child.children) {
           mesh.visible = !(mesh.userData.detail && mode !== 'detailed');
         }
@@ -321,7 +339,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     for (const entry of materials.values()) {
       if (entry.themeKey === themeKey) continue;
       entry.themeKey = themeKey;
-      entry.value.color.set(entry.colour);
+      entry.value.color.set(entry.value.map ? '#ffffff' : entry.colour);
       entry.value.opacity = options.opacity ?? 1;
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
@@ -392,6 +410,30 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
             // A shared material cannot carry per-building selection; selection stays in the map's marker and outline layers.
             object.renderOrder = object.userData.detail ? 1 : 0;
           }
+    const visibleMaterials = new Set<string>();
+    scene.traverseVisible((object) => {
+      if (object instanceof Mesh)
+        visibleMaterials.add(object.userData.materialKey);
+    });
+    for (const [key, entry] of materials) {
+      if (entry.recipe && visibleMaterials.has(key) && !entry.releaseTexture) {
+        entry.releaseTexture = textures.acquire(
+          entry.recipe,
+          options.data,
+          (texture) => {
+            entry.value.map = texture;
+            entry.value.color.set('#ffffff');
+            entry.value.needsUpdate = true;
+          },
+        );
+      } else if (entry.releaseTexture && !visibleMaterials.has(key)) {
+        entry.releaseTexture();
+        entry.releaseTexture = undefined;
+        entry.value.map = null;
+        entry.value.color.set(entry.colour);
+        entry.value.needsUpdate = true;
+      }
+    }
     publish();
     for (const sector of visible)
       if (
@@ -537,6 +579,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       loaded.clear();
       for (const group of drafts.values()) release(group);
       drafts.clear();
+      textures.dispose();
       if (map.getLayer(layer.id)) map.removeLayer(layer.id);
       options.onReady([]);
     },

@@ -7,6 +7,7 @@ import type {
 } from './visual-types.js';
 import { finitePosition } from './validation.js';
 import type { Position } from './types.js';
+import { detailRevision, validTextureRecipe } from './building-facades.js';
 
 /** Content identity for stale-model rejection, independent of feature or package ordering. */
 export function buildingRevision(feature: Feature): string {
@@ -49,7 +50,11 @@ export function buildingRevision(feature: Feature): string {
   return `${(a >>> 0).toString(16)}${(b >>> 0).toString(16)}-${input.length}`;
 }
 export function compatibleVisual(feature: Feature, visual?: BuildingVisual) {
-  return !!visual && visual.geometryRevision === buildingRevision(feature);
+  return (
+    !!visual &&
+    visual.geometryRevision === buildingRevision(feature) &&
+    visual.detailRevision === detailRevision(feature)
+  );
 }
 export function visualLookup(catalogue?: VisualCatalogue) {
   return new Map(catalogue?.buildings.map((b) => [b.id, b]));
@@ -86,6 +91,13 @@ export function validBuildingModel(model: BuildingModel): boolean {
       (part) =>
         !!part &&
         /^#[a-f0-9]{6}$/i.test(part.colour) &&
+        (part.texture === undefined || validTextureRecipe(part.texture)) &&
+        (part.uvs === undefined ||
+          (Array.isArray(part.positions) &&
+            Array.isArray(part.uvs) &&
+            part.uvs.length === (part.positions.length / 3) * 2 &&
+            part.uvs.every((n) => Number.isFinite(n) && n >= 0 && n <= 1))) &&
+        (part.texture === undefined || part.uvs !== undefined) &&
         Array.isArray(part.positions) &&
         Array.isArray(part.indices) &&
         part.positions.length > 0 &&

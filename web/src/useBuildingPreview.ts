@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CampusData } from './types';
 import type { BuildingModel, BuildingVisual } from './visual-types';
 import { buildingRevision } from './building-visuals';
+import { detailRevision } from './building-facades';
 
 export interface PreviewModel {
   model: BuildingModel;
@@ -41,7 +42,11 @@ export function useBuildingPreview(
       JSON.stringify([
         data.visuals?.revision,
         desired
-          .map((f) => [String(f.properties?.id), buildingRevision(f)])
+          .map((f) => [
+            String(f.properties?.id),
+            buildingRevision(f),
+            detailRevision(f) || '',
+          ])
           .sort(([a], [b]) => a.localeCompare(b)),
       ]),
     [data.visuals?.revision, desired],
@@ -93,7 +98,8 @@ export function useBuildingPreview(
       const entry = cache.current.get(String(f.properties?.id));
       return (
         entry?.catalogue !== visuals?.revision ||
-        entry?.preview.model.geometryRevision !== buildingRevision(f)
+        entry?.preview.model.geometryRevision !== buildingRevision(f) ||
+        entry?.preview.model.detailRevision !== detailRevision(f)
       );
     });
     if (!features.length) {

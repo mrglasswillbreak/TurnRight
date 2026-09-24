@@ -275,6 +275,7 @@ export interface CampusPackage {
   bytes: number;
   assets: PackageAsset[];
   visuals?: { bytes: number; assetUrls: string[] };
+  textures?: { bytes: number; assetUrls: string[] };
   photos?: { bytes: number; assetUrls: string[] };
 }
 export type ManeuverKind =

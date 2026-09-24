@@ -2,6 +2,9 @@ import type { Position, PackageAsset } from './types.js';
 import type { MultiPolygon } from 'geojson';
 export type RoofForm = 'flat' | 'hip' | 'gable';
 export interface SurfaceStyle {
+  windowFrameDepth?: number;
+  windowWidthRatio?: number;
+  windowHeightRatio?: number;
   wallColour?: string;
   roofColour?: string;
   windowColour?: string;
@@ -29,10 +32,69 @@ export interface CustomRoof {
   lines: { id: string; from: string; to: string; kind: 'ridge' | 'valley' }[];
 }
 export interface BuildingAppearance extends SurfaceStyle {
+  photoEvidence?: {
+    photoIds: string[];
+    observed: string[];
+    estimated: string[];
+    needed: string[];
+    checkedAt: string;
+  };
+  facades?: Record<string, FacadeDescription>;
   modelId?: string;
   parts?: Record<string, SurfaceStyle>;
   walls?: Record<string, SurfaceStyle>;
   roofs?: Record<string, CustomRoof>;
+}
+export type FacadeElementKind =
+  | 'window'
+  | 'door'
+  | 'column'
+  | 'balcony'
+  | 'canopy'
+  | 'parapet'
+  | 'trim';
+export interface FacadeElement {
+  id: string;
+  kind: FacadeElementKind;
+  /** Centre along the original wall, 0..1. Dimensions are metres, not survey measurements. */
+  x: number;
+  bottom: number;
+  width: number;
+  height: number;
+  depth: number;
+  count: number;
+  spacing: number;
+  colour: string;
+}
+export interface FacadeTextureRecipe {
+  photoId: string;
+  /** Clockwise top-left, top-right, bottom-right, bottom-left in normalized source pixels. */
+  corners: [number, number][];
+}
+export interface FacadeDescription {
+  partId: string;
+  wallId: string;
+  /** Original endpoints, preserving direction. A moved wall requires a new review. */
+  wallCoordinates: Position[];
+  photoIds: string[];
+  confidence: 'documented' | 'observed' | 'inferred';
+  reviewedAt?: string;
+  needsReview?: boolean;
+  notes: string;
+  elements: FacadeElement[];
+  texture?: FacadeTextureRecipe;
+}
+export interface VisualTexture extends PackageAsset {
+  id: string;
+  width: number;
+  height: number;
+  photoId: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  attribution: string;
+  sourceUrl?: string;
+  modifications: string;
 }
 export interface BuildingTopology {
   parts: {
@@ -62,6 +124,7 @@ export interface RoofDraft {
   roof: CustomRoof;
 }
 export interface BuildingVisual {
+  detailRevision?: string;
   id: string;
   placeId?: string;
   name: string;
@@ -108,6 +171,7 @@ export interface VisualSector extends PackageAsset {
   buildingIds: string[];
 }
 export interface VisualCatalogue {
+  textures?: VisualTexture[];
   schemaVersion: 1;
   revision: string;
   bytes: number;
@@ -123,6 +187,8 @@ export interface VisualCatalogue {
   }[];
 }
 export interface ModelMesh {
+  uvs?: number[];
+  texture?: FacadeTextureRecipe;
   positions: number[];
   indices: number[];
   colour: string;
@@ -136,6 +202,7 @@ export interface ModelMesh {
   }[];
 }
 export interface BuildingModel {
+  detailRevision?: string;
   id: string;
   geometryRevision: string;
   origin: Position;

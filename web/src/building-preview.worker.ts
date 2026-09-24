@@ -3,6 +3,7 @@ import { createBuildingModel } from './building-model';
 import { resolveBuildingVisual } from './building-surfaces';
 import { buildingRevision, validBuildingModel } from './building-visuals';
 import { validateBuildingStyle } from './building-style-validation';
+import { detailRevision } from './building-facades';
 import type { Feature, Polygon, MultiPolygon } from 'geojson';
 import type { BuildingVisual } from './visual-types';
 self.onmessage = ({
@@ -30,6 +31,7 @@ self.onmessage = ({
       );
       if (errors.length) throw new Error(errors.join(' '));
       visual.geometryRevision = buildingRevision(feature);
+      visual.detailRevision = detailRevision(feature);
       const model = createBuildingModel(feature, visual);
       if (!validBuildingModel(model))
         throw new Error(

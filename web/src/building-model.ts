@@ -4,6 +4,8 @@ import {
   standardRoofSupported,
 } from './building-surfaces.js';
 import { customRoofSurface } from './custom-roof.js';
+import { detailRevision, facadeMatches } from './building-facades.js';
+import { facadeMeshes } from './facade-mesh.js';
 import { ShapeUtils, Vector2 } from 'three';
 import type { Feature, Polygon, MultiPolygon } from 'geojson';
 import type {
@@ -88,6 +90,7 @@ export function createBuildingModel(
     (p[1] - origin[1]) * rad * radius,
   ];
   const allMeshes = new Map<string, ModelMesh>();
+  const detailedMeshes: ModelMesh[] = [];
   const roles = new WeakMap<ModelMesh, 'wall' | 'roof' | 'window' | 'trim'>();
   let scope: { partId: string; wallId?: string } = { partId: '' };
   const topology = buildingTopology(feature);
@@ -218,6 +221,25 @@ export function createBuildingModel(
           [...b, eaves],
           [...a, eaves],
         ]);
+        const description = appearance.facades?.[wallId];
+        if (
+          description &&
+          !description.needsReview &&
+          facadeMatches(description, feature)
+        ) {
+          detailedMeshes.push(
+            ...facadeMeshes(
+              description,
+              original[wallIndex],
+              original[(wallIndex + 1) % original.length],
+              [(b[1] - a[1]) / length, -(b[0] - a[0]) / length],
+              eaves,
+              facade.wallColour!,
+              facade.trimColour,
+            ),
+          );
+          continue;
+        }
         if (!facade.windows) continue;
         const floors =
           override?.floors ||
@@ -235,12 +257,33 @@ export function createBuildingModel(
           a[1] + dy * t - dx * 0.018,
           z,
         ];
+        const frameElements: import('./visual-types').FacadeElement[] = [];
         for (let floor = 0; floor < floors; floor++) {
           const low = ((floor + 0.3) * eaves) / floors,
-            high = ((floor + 0.78) * eaves) / floors;
+            high = Math.min(
+              eaves,
+              low + ((facade.windowHeightRatio ?? 0.48) * eaves) / floors,
+            );
           for (let bay = 0; bay < bays; bay++) {
             const center = ((bay + 0.5) * length) / bays,
-              width = Math.min(2.1, (length / bays) * 0.6);
+              width = Math.min(
+                // Keep the legacy cap until an explicit photo-informed ratio exists.
+                facade.windowWidthRatio === undefined ? 2.1 : length / bays,
+                (length / bays) * (facade.windowWidthRatio ?? 0.6),
+              );
+            if (facade.windowFrameDepth)
+              frameElements.push({
+                id: `${floor}-${bay}`,
+                kind: 'window',
+                x: center / length,
+                bottom: low,
+                width,
+                height: high - low,
+                depth: facade.windowFrameDepth,
+                count: 1,
+                spacing: 0,
+                colour: facade.windowColour!,
+              });
             face(windows, [
               point(center - width / 2, low),
               point(center + width / 2, low),
@@ -262,6 +305,27 @@ export function createBuildingModel(
           point(length, eaves),
           point(0, eaves),
         ]);
+        if (frameElements.length)
+          detailedMeshes.push(
+            ...facadeMeshes(
+              {
+                partId,
+                wallId,
+                wallCoordinates: [],
+                photoIds: [],
+                confidence: 'inferred',
+                notes:
+                  'Regularized illustrative window positions; frame proportions informed by photographic evidence.',
+                elements: frameElements,
+              },
+              a,
+              b,
+              [(b[1] - a[1]) / length, -(b[0] - a[0]) / length],
+              eaves,
+              facade.wallColour!,
+              facade.trimColour,
+            ),
+          );
       }
     scope = { partId };
     if (custom) {
@@ -350,7 +414,45 @@ export function createBuildingModel(
   return {
     id: visual.id,
     geometryRevision: visual.geometryRevision,
+    detailRevision: detailRevision(feature),
     origin,
-    meshes: [...allMeshes.values()].filter((m) => m.indices.length),
+    meshes: mergeModelMeshes([...allMeshes.values(), ...detailedMeshes]),
   };
+}
+/** Wall-specific authoring must not imply a draw call per frame or wall. */
+export function mergeModelMeshes(meshes: ModelMesh[]): ModelMesh[] {
+  const merged = new Map<string, ModelMesh>();
+  for (const source of meshes) {
+    if (!source.indices.length) continue;
+    const key = JSON.stringify([
+      source.colour,
+      source.detail,
+      source.surfaces?.[0]?.role,
+      source.texture,
+    ]);
+    let target = merged.get(key);
+    if (!target) {
+      target = {
+        positions: [],
+        indices: [],
+        colour: source.colour,
+        detail: source.detail,
+        surfaces: [],
+        ...(source.texture ? { texture: source.texture, uvs: [] } : {}),
+      };
+      merged.set(key, target);
+    }
+    const vertexOffset = target.positions.length / 3,
+      triangleOffset = target.indices.length / 3;
+    for (const position of source.positions) target.positions.push(position);
+    for (const index of source.indices)
+      target.indices.push(index + vertexOffset);
+    for (const surface of source.surfaces || [])
+      target.surfaces!.push({
+        ...surface,
+        start: surface.start + triangleOffset,
+      });
+    if (source.uvs) for (const uv of source.uvs) target.uvs!.push(uv);
+  }
+  return [...merged.values()];
 }

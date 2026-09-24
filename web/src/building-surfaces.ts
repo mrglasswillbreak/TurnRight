@@ -203,6 +203,11 @@ export function remapBuildingSurfaces(
   const appearance: BuildingAppearance = structuredClone(
     edit.properties.appearance || {},
   );
+  // Preserve evidence and recipes even when a wall is removed. The owner must
+  // explicitly rematch it; a plausible neighbouring wall is not evidence.
+  if (JSON.stringify(edit.geometry) !== JSON.stringify(geometry))
+    for (const facade of Object.values(appearance.facades || {}))
+      facade.needsReview = true;
   const issues: NonNullable<BuildingTopology['issues']> = [
     ...(old.issues || []),
   ];
@@ -454,13 +459,13 @@ export function resetBuildingAssignments(
     walls = new Set(
       topology.parts.flatMap((p) => p.rings.flatMap((r) => r.wallIds)),
     );
-  for (const key of ['parts', 'walls', 'roofs'] as const) {
+  for (const key of ['parts', 'walls', 'roofs', 'facades'] as const) {
     if (!orphanOnly) delete appearance[key];
     else if (appearance[key])
       Object.assign(appearance, {
         [key]: Object.fromEntries(
           Object.entries(appearance[key]).filter(([id]) =>
-            (key === 'walls' ? walls : parts).has(id),
+            (key === 'walls' || key === 'facades' ? walls : parts).has(id),
           ),
         ),
       });
