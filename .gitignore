@@ -9,6 +9,7 @@ node_modules/
 web/release-build.json
 data/runtime-audit.json
 .vercel/
+.vs/
 *.tsbuildinfo
 test-results/
 playwright-report/
