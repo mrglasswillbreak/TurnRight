@@ -96,7 +96,10 @@ export async function getActivePackage(): Promise<{
   const version = await db.get('meta', 'active');
   const record = version && (await db.get('packages', version));
   if (!record) return null;
-  const visualUrls = new Set<string>(record.manifest.visuals?.assetUrls || []);
+  const visualUrls = new Set<string>([
+    ...(record.manifest.visuals?.assetUrls || []),
+    ...(record.manifest.textures?.assetUrls || []),
+  ]);
   const present = await auditAssets(record.manifest);
   const visualsComplete =
     visualUrls.size > 0 &&
@@ -119,6 +122,38 @@ export async function getActivePackage(): Promise<{
 function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
   const sectors = data.visuals?.sectors || [],
     urls = manifest.visuals?.assetUrls || [];
+  const textures = data.visuals?.textures || [],
+    textureUrls = manifest.textures?.assetUrls || [];
+  if (
+    new Set(textureUrls).size !== textureUrls.length ||
+    new Set(textures.map((t) => t.url)).size !== textureUrls.length ||
+    new Set(textures.map((t) => t.id)).size !== textures.length ||
+    !textures.every(
+      (t) =>
+        textureUrls.includes(t.url) &&
+        /^\/packages\/texture-[a-f0-9]+\/[a-f0-9]+\.webp$/.test(t.url) &&
+        t.bytes <= 250 * 1024 &&
+        t.width > 0 &&
+        t.width <= 1024 &&
+        t.height > 0 &&
+        t.height <= 1024 &&
+        !!t.author &&
+        !!t.license &&
+        !!t.attribution &&
+        data.photos?.some((p) => p.id === t.photoId) &&
+        manifest.assets.some(
+          (a) =>
+            a.url === t.url && a.bytes === t.bytes && a.sha256 === t.sha256,
+        ),
+    ) ||
+    (manifest.textures?.bytes || 0) !==
+      manifest.assets
+        .filter((a) => textureUrls.includes(a.url))
+        .reduce((n, a) => n + a.bytes, 0) ||
+    (manifest.textures?.bytes || 0) + (manifest.visuals?.bytes || 0) >
+      12 * 1024 * 1024
+  )
+    return false;
   return (
     photoManifestMatches(data, manifest) &&
     sectors.length === urls.length &&

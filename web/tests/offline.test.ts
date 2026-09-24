@@ -52,6 +52,100 @@ async function pkg(version: string) {
   return { manifest, bytes };
 }
 describe('offline package transactions', () => {
+  it('verifies the optional texture group before activation and retains the working map through failure, repair and rollback', async () => {
+    const old = await pkg('texture-baseline');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(old.bytes)),
+    );
+    await installPackage(old.manifest, () => {});
+    const next = await pkg('textured');
+    const pixels = new TextEncoder().encode('verified-image');
+    const digest = await hashBytes(pixels.buffer);
+    const texture = {
+      id: 'recipe',
+      photoId: 'photo',
+      url: `/packages/texture-${digest.slice(0, 12)}/${digest}.webp`,
+      sha256: digest,
+      bytes: pixels.length,
+      width: 512,
+      height: 512,
+      author: 'Photographer',
+      license: 'CC BY 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+      attribution: 'Photographer · CC BY 4.0',
+      modifications: 'Cropped and rectified',
+    };
+    const photograph = {
+      ...texture,
+      id: 'photo',
+      buildingId: 'building',
+      caption: 'Reviewed wall',
+      alt: 'Window in the building wall',
+      sourceUrl: 'https://example.org/original',
+      checkedAt: '2026-09-24',
+      url: `/packages/photos/${digest}.webp`,
+    };
+    const data = {
+      ...campusFixture(),
+      version: 'textured',
+      schemaVersion: 1,
+      photos: [photograph],
+      visuals: { sectors: [], textures: [texture] },
+    };
+    data.map.features.push({
+      ...data.boundary,
+      properties: { id: 'building', kind: 'building' },
+    });
+    next.bytes = new TextEncoder().encode(JSON.stringify(data));
+    next.manifest.assets[0] = {
+      ...next.manifest.assets[0],
+      bytes: next.bytes.length,
+      sha256: await hashBytes(next.bytes.buffer),
+    };
+    next.manifest.assets.push(photograph, texture);
+    next.manifest.bytes = next.bytes.length + pixels.length * 2;
+    next.manifest.textures = { bytes: pixels.length, assetUrls: [texture.url] };
+    next.manifest.photos = {
+      bytes: pixels.length,
+      assetUrls: [photograph.url],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async (url: string) =>
+          new Response(
+            url === texture.url
+              ? 'corrupt'
+              : url === photograph.url
+                ? pixels
+                : next.bytes,
+          ),
+      ),
+    );
+    await expect(installPackage(next.manifest, () => {})).rejects.toThrow(
+      'verification',
+    );
+    expect((await getActivePackage())?.data.version).toBe('texture-baseline');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(pixels)),
+    );
+    await installPackage(next.manifest, () => {}, undefined, false);
+    saved.set(texture.url, new Response('corrupt'));
+    expect(await activatePending()).toBe(false);
+    await installPackage(next.manifest, () => {});
+    expect((await getActivePackage())?.visualsComplete).toBe(true);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw Error('offline');
+      }),
+    );
+    expect(await (await loadCampus()).verification).toBe(true);
+    await installPackage(old.manifest, () => {});
+    expect((await getActivePackage())?.data.version).toBe('texture-baseline');
+  });
   it('shows verified campus data before slow asset auditing and shares concurrent audits', async () => {
     const { manifest, bytes } = await pkg('core-first');
     const extra = new TextEncoder().encode('additional asset');

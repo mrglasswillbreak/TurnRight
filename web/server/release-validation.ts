@@ -5,6 +5,7 @@ import { validateWorkspace } from '../src/editor-validation.js';
 import { structuralIssues } from '../src/validation.js';
 import type { CampusData, CampusPackage, MapEdit } from '../src/types.js';
 import { HttpError } from './backend.js';
+import { facadeErrors } from '../src/building-facades.js';
 
 function stable(value: unknown, source = false): unknown {
   if (Array.isArray(value)) return value.map((v) => stable(v, source));
@@ -12,7 +13,8 @@ function stable(value: unknown, source = false): unknown {
     return Object.fromEntries(
       Object.entries(value)
         .filter(
-          ([key]) => !source || !['createdAt', 'retrievedAt', 'checkedAt'].includes(key),
+          ([key]) =>
+            !source || !['createdAt', 'retrievedAt', 'checkedAt'].includes(key),
         )
         .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
         .map(([key, v]) => [key, stable(v, source)]),
@@ -126,5 +128,10 @@ export function validateReleaseSnapshot(
     );
   const result = validateWorkspace(base, snapshot.edits);
   if (result.errors.length) throw new HttpError(400, result.errors.join('\n'));
+  const facadeIssues = result.data.map.features
+    .filter((f) => f.properties?.kind === 'building')
+    .flatMap((f) => facadeErrors(f, result.data.photos, true));
+  if (facadeIssues.length)
+    throw new HttpError(400, [...new Set(facadeIssues)].join('\n'));
   return result.data;
 }

@@ -3,9 +3,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { packageVisuals } from "./visual-package.mjs";
-import { publicCampus } from './public-campus.mjs';
-import { packageGlyphs } from './package-glyphs.mjs';
-import { packagePhotos } from './photo-package.mjs';
+import { publicCampus } from "./public-campus.mjs";
+import { packageGlyphs } from "./package-glyphs.mjs";
+import { packagePhotos } from "./photo-package.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -39,7 +39,11 @@ if (process.env.VISUALS_INPUT && !visuals)
   throw new Error("The rebuilt visual catalogue is missing; release packaging stopped.");
 if (visuals) data.visuals = visuals.catalogue;
 const photos = await packagePhotos(data, root, asset);
-data.schemaVersion = data.photos?.some(p => p.sourceKind === 'author-upload' && !p.sourceUrl) ? 3 : data.driving ? 2 : 1;
+data.schemaVersion = data.photos?.some((p) => p.sourceKind === "author-upload" && !p.sourceUrl)
+  ? 3
+  : data.driving
+    ? 2
+    : 1;
 const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
@@ -59,6 +63,7 @@ const manifest = {
   bytes: assets.reduce((sum, a) => sum + a.bytes, 0),
   assets,
   ...(visuals ? { visuals: visuals.manifest } : {}),
+  ...(visuals?.textures ? { textures: visuals.textures } : {}),
   ...(photos ? { photos } : {}),
 };
 const manifestJson = JSON.stringify(manifest, null, 2);

@@ -36,5 +36,44 @@ export async function packageVisuals(directory, writeAsset) {
     await writeAsset(sector.url, content, "application/json");
   }
   if (bytes !== catalogue.bytes) throw new Error("Visual catalogue size mismatch");
-  return { catalogue, manifest: { bytes, assetUrls: [...urls] } };
+  const textureUrls = new Set();
+  const textureIds = new Set();
+  let textureBytes = 0;
+  for (const texture of catalogue.textures || []) {
+    if (
+      !texture ||
+      typeof texture.id !== "string" ||
+      textureIds.has(texture.id) ||
+      !/^\/packages\/texture-[a-f0-9]+\/[a-f0-9]+\.webp$/.test(texture.url) ||
+      !texture.photoId ||
+      !texture.author ||
+      !texture.license ||
+      !texture.licenseUrl ||
+      !texture.attribution ||
+      !texture.modifications ||
+      texture.width !== 512 ||
+      texture.height !== 512
+    )
+      throw new Error("Invalid texture attribution or identity");
+    textureIds.add(texture.id);
+    const content = await fs.readFile(path.join(directory, path.basename(texture.url)));
+    if (
+      content.length !== texture.bytes ||
+      content.length > 250 * 1024 ||
+      createHash("sha256").update(content).digest("hex") !== texture.sha256
+    )
+      throw new Error("Texture integrity check failed");
+    if (!textureUrls.has(texture.url)) {
+      textureBytes += content.length;
+      textureUrls.add(texture.url);
+      await writeAsset(texture.url, content, "image/webp");
+    }
+  }
+  if (bytes + textureBytes > 12 * 1024 * 1024)
+    throw new Error("Campus geometry and textures exceed 12 MiB");
+  return {
+    catalogue,
+    manifest: { bytes, assetUrls: [...urls] },
+    ...(textureUrls.size ? { textures: { bytes: textureBytes, assetUrls: [...textureUrls] } } : {}),
+  };
 }

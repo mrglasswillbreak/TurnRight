@@ -11,6 +11,8 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
   const reference = JSON.stringify({ buildings: [{ id: 'public-reference' }] });
   const fixtures = {
     'data/building-evidence.json': reference,
+    'data/photo-models/inventory.json': '{"buildings":[]}',
+    'data/photo-models/private-review.json': 'private notes',
     'data/raw/private.json': 'raw import',
     'data/release-input.json': 'draft snapshot',
     '.env': 'private configuration',
@@ -57,7 +59,10 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
       files
         .filter((file) => file.file.startsWith('data/'))
         .map((file) => file.file),
-    ).toEqual(['data/building-evidence.json']);
+    ).toEqual([
+      'data/building-evidence.json',
+      'data/photo-models/inventory.json',
+    ]);
     expect(files.some((file) => file.file.includes('.env'))).toBe(false);
     expect(
       files.some(

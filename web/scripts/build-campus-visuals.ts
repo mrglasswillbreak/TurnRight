@@ -21,6 +21,8 @@ import { appearanceColours } from '../src/map-palette';
 import { findDuplicateCandidates } from '../src/duplicates';
 import { createBuildingModel, footprintAssessment } from './building-model';
 import { repairArcGisParts } from '../src/arcgis-rings';
+import { detailRevision } from '../src/building-facades';
+import { buildFacadeTextures } from './build-facade-textures';
 
 const input = process.argv[2] || '../data/seed/campus.json';
 const output = process.argv[3] || '../data/visuals';
@@ -100,8 +102,10 @@ for (const sourceFeature of buildings) {
       'Georeferenced source footprint, including its mapped wings and courtyards.',
       ...(supported ? [display.description] : []),
       ...(record?.observed || []),
+      ...(p.appearance?.photoEvidence?.observed || []),
     ],
     inferred: [
+      ...(p.appearance?.photoEvidence?.estimated || []),
       ...(level === 'extrusion'
         ? ['Illustrative 6 m height; real height unknown.']
         : display.kind === 'recorded'
@@ -128,6 +132,7 @@ for (const sourceFeature of buildings) {
         : []),
     ],
     needed: [
+      ...(p.appearance?.photoEvidence?.needed || []),
       ...(record?.needed ||
         (supported
           ? ['Dated roof and facade references matched to this footprint.']
@@ -186,6 +191,7 @@ for (const sourceFeature of buildings) {
     }),
   );
   visual.geometryRevision = buildingRevision(feature);
+  visual.detailRevision = detailRevision(feature);
   if (repair && reviewed) {
     visual.level = 'extrusion';
     if (p.appearance && Object.keys(p.appearance).length)
@@ -273,6 +279,8 @@ for (const sourceFeature of buildings) {
   catalogue.buildings.push(visual);
 }
 await fs.mkdir(output, { recursive: true });
+const textures = await buildFacadeTextures(data, output);
+if (textures.length) catalogue.textures = textures;
 for (const sector of [...sectors.values()].sort((a, b) =>
   a.id.localeCompare(b.id),
 )) {
@@ -306,8 +314,11 @@ for (const sector of [...sectors.values()].sort((a, b) =>
   });
 }
 catalogue.bytes = catalogue.sectors.reduce((s, g) => s + g.bytes, 0);
-if (catalogue.bytes > 12 * 1024 * 1024)
-  throw new Error('Campus model assets exceed 12 MB. Optimize the meshes.');
+const textureBytes = textures.reduce((sum, texture) => sum + texture.bytes, 0);
+if (catalogue.bytes + textureBytes > 12 * 1024 * 1024)
+  throw new Error(
+    'Campus geometry and textures exceed 12 MiB. Optimize the meshes or textures.',
+  );
 catalogue.revision = hash(JSON.stringify(catalogue)).slice(0, 16);
 await fs.writeFile(
   path.join(output, 'catalogue.json'),
@@ -321,7 +332,7 @@ const counts = Object.fromEntries(
 );
 await fs.writeFile(
   path.join(output, 'coverage.md'),
-  `# Campus building evidence assessment\n\nAssessed ${buildings.length} buildings from ${data.version}. ${JSON.stringify(counts)}. Model assets: ${catalogue.bytes.toLocaleString()} bytes in ${sectors.size} sectors.\n\nEvery footprint is retained at source scale and orientation; metre heights derived from floor counts remain approximate. Overlaps remain review candidates, never automatic routing merges. Reference photographs are not bundled.\n\n| Building | ID | Treatment | References still needed |\n|---|---|---|---|\n` +
+  `# Campus building evidence assessment\n\nAssessed ${buildings.length} buildings from ${data.version}. ${JSON.stringify(counts)}. Model assets: ${catalogue.bytes.toLocaleString()} bytes in ${sectors.size} sectors.\n\nEvery footprint is retained at source scale and orientation; metre heights derived from floor counts remain approximate. Overlaps remain review candidates, never automatic routing merges. Approved gallery photographs and photographic textures are bundled separately with verified credits.\n\n| Building | ID | Treatment | References still needed |\n|---|---|---|---|\n` +
     catalogue.buildings
       .map(
         (b) =>
@@ -335,6 +346,7 @@ console.log({
   ...counts,
   sectors: sectors.size,
   bytes: catalogue.bytes,
+  textureBytes,
   revision: catalogue.revision,
 });
 await fs.writeFile(
