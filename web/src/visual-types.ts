@@ -65,6 +65,31 @@ export interface FacadeElement {
   count: number;
   spacing: number;
   colour: string;
+  /** Preserve generated flat details when making a wall editable. */
+  flat?: boolean;
+}
+/** Owner-only organisation. Geometry remains in the compatible façade records. */
+export interface ModelAuthoring {
+  version: 1;
+  names: Record<string, string>;
+  groups: { id: string; name: string; wallId: string; members: string[] }[];
+  patterns: {
+    id: string;
+    name: string;
+    wallId: string;
+    members: string[];
+    seed: FacadeElement[];
+    rows: number;
+    columns: number;
+    stepX: number;
+    stepY: number;
+  }[];
+  presets: {
+    id: string;
+    name: string;
+    wallLength: number;
+    elements: FacadeElement[];
+  }[];
 }
 export interface FacadeTextureRecipe {
   photoId: string;
@@ -116,6 +141,8 @@ export interface BuildingSelection {
   role?: 'wall' | 'roof' | 'window' | 'trim';
   face?: number;
   roofTriangle?: number;
+  elementId?: string;
+  instanceIndex?: number;
 }
 export interface RoofDraft {
   buildingId: string;
@@ -201,6 +228,8 @@ export interface ModelMesh {
     partId: string;
     wallId?: string;
     role: NonNullable<BuildingSelection['role']>;
+    elementId?: string;
+    instanceIndex?: number;
   }[];
 }
 export interface BuildingModel {

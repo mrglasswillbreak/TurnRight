@@ -17,6 +17,11 @@ export function facadeMeshes(
     dx = (b[0] - a[0]) / length,
     dy = (b[1] - a[1]) / length;
   const meshes = new Map<string, ModelMesh>();
+  const roles = new WeakMap<
+    ModelMesh,
+    NonNullable<BuildingSelection['role']>
+  >();
+  let elementId: string | undefined, instanceIndex: number | undefined;
   const point = (x: number, z: number, d: number) =>
     [a[0] + dx * x + outward[0] * d, a[1] + dy * x + outward[1] * d, z].map(
       (n) => Math.round(n * 1000) / 1000,
@@ -32,17 +37,35 @@ export function facadeMeshes(
         indices: [],
         colour,
         detail: true,
-        surfaces: [
-          { start: 0, count: 0, partId: f.partId, wallId: f.wallId, role },
-        ],
+        surfaces: [],
       });
-    return meshes.get(key)!;
+    const value = meshes.get(key)!;
+    roles.set(value, role);
+    return value;
   };
   const face = (m: ModelMesh, p: number[][]) => {
     const s = m.positions.length / 3;
+    const start = m.indices.length / 3;
+    const last = m.surfaces!.at(-1);
+    const role = roles.get(m)!;
     m.positions.push(...p.flat());
     m.indices.push(s, s + 1, s + 2, s, s + 2, s + 3);
-    m.surfaces![0].count += 2;
+    if (
+      last &&
+      last.elementId === elementId &&
+      last.instanceIndex === instanceIndex
+    )
+      last.count += 2;
+    else
+      m.surfaces!.push({
+        start,
+        count: 2,
+        partId: f.partId,
+        wallId: f.wallId,
+        role,
+        elementId,
+        instanceIndex,
+      });
   };
   const box = (
     m: ModelMesh,
@@ -97,12 +120,21 @@ export function facadeMeshes(
   }
   for (const e of f.elements)
     for (let i = 0; i < e.count; i++) {
+      elementId = e.id;
+      instanceIndex = i;
       const x = (e.x + (i - (e.count - 1) / 2) * e.spacing) * length;
       const m = mesh(
         e.colour,
         e.kind === 'window' ? 'window' : e.kind === 'door' ? 'wall' : 'trim',
       );
-      if (e.kind === 'window' || e.kind === 'door') {
+      if (e.flat) {
+        face(m, [
+          point(x - e.width / 2, e.bottom, 0.018),
+          point(x + e.width / 2, e.bottom, 0.018),
+          point(x + e.width / 2, e.bottom + e.height, 0.018),
+          point(x - e.width / 2, e.bottom + e.height, 0.018),
+        ]);
+      } else if (e.kind === 'window' || e.kind === 'door') {
         box(m, x, e.bottom, e.width, e.height, 0.02);
         const frame = mesh(frameColour, 'trim'),
           t = Math.min(0.09, e.width / 8, e.height / 8),

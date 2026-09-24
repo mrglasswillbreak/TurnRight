@@ -345,6 +345,7 @@ export interface MapEdit {
   geometry: Geometry;
   properties: Record<string, unknown> & {
     appearance?: BuildingAppearance;
+    modelAuthoring?: import('./visual-types.js').ModelAuthoring;
     buildingTopology?: BuildingTopology;
     vertexIds?: string[];
     connections?: PathConnection[];

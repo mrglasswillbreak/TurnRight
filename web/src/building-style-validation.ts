@@ -10,6 +10,7 @@ import {
 import { customRoofSurface } from './custom-roof.js';
 import { buildingDisplay } from './map-display.js';
 import { facadeErrors } from './building-facades.js';
+import { authoringErrors } from './model-authoring.js';
 
 export function validateBuildingStyle(
   edit: MapEdit,
@@ -18,6 +19,7 @@ export function validateBuildingStyle(
   if (edit.kind !== 'building') return [];
   const errors: string[] = [],
     appearance = edit.properties.appearance;
+  errors.push(...authoringErrors(edit.properties.modelAuthoring));
   errors.push(
     ...facadeErrors({
       type: 'Feature',

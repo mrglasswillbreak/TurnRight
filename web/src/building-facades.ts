@@ -116,7 +116,7 @@ export function facadeErrors(
       !f ||
       id !== f.wallId ||
       !Array.isArray(f.photoIds) ||
-      !f.photoIds.length ||
+      (f.confidence === 'observed' && !f.photoIds.length) ||
       f.photoIds.length > 20 ||
       f.photoIds.some((p) => typeof p !== 'string') ||
       !['documented', 'observed', 'inferred'].includes(f.confidence) ||
@@ -126,7 +126,7 @@ export function facadeErrors(
       f.elements.length > 100
     ) {
       errors.push(
-        'Each façade needs its wall, photographic evidence, confidence, and bounded detail list.',
+        'Each façade needs its wall, confidence, and bounded detail list. Observed details need photographic evidence.',
       );
       continue;
     }
@@ -135,6 +135,8 @@ export function facadeErrors(
       (!f.reviewedAt || f.needsReview || !facadeMatches(f, feature))
     )
       errors.push('Review the changed façade assignment before publication.');
+    if (f.confidence === 'documented' && !f.notes.trim())
+      errors.push('Documented dimensions need measurement provenance.');
     if (
       photos &&
       f.photoIds.some(
@@ -160,6 +162,7 @@ export function facadeErrors(
         !e ||
         typeof e.id !== 'string' ||
         !e.id ||
+        (e.flat !== undefined && typeof e.flat !== 'boolean') ||
         ![
           'window',
           'door',

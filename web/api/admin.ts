@@ -1,6 +1,6 @@
 import { randomUUID, createHash } from 'node:crypto';
 import { selectSourceFields } from '../src/source-field-review.js';
-import type { MapChange } from '../src/types.js';
+import type { MapChange, MapEdit } from '../src/types.js';
 import {
   allRows,
   bodyOf,
@@ -188,6 +188,28 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           };
         });
         await validateMediaEdits(clean.map((item) => item.edit));
+        if (
+          payload.modelAuthoringVersion !== 1 &&
+          clean.some((item) => item.edit.kind === 'building')
+        ) {
+          const current = (await allRows('map_edits')) as MapEdit[];
+          if (
+            clean.some(
+              (item) =>
+                item.edit.properties.modelAuthoring ||
+                current.some(
+                  (old) =>
+                    old.kind === 'building' &&
+                    old.id === item.edit.id &&
+                    old.properties.modelAuthoring,
+                ),
+            )
+          )
+            throw new HttpError(
+              409,
+              'Update the app before editing this building. Its model uses newer authoring controls. Your changes are retained locally.',
+            );
+        }
         const result = await db('rpc/save_editor_batch', 'POST', {
           operation_id: operationId,
           actor_id: user.id,

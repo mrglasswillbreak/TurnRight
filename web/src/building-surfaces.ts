@@ -205,9 +205,6 @@ export function remapBuildingSurfaces(
   );
   // Preserve evidence and recipes even when a wall is removed. The owner must
   // explicitly rematch it; a plausible neighbouring wall is not evidence.
-  if (JSON.stringify(edit.geometry) !== JSON.stringify(geometry))
-    for (const facade of Object.values(appearance.facades || {}))
-      facade.needsReview = true;
   const issues: NonNullable<BuildingTopology['issues']> = [
     ...(old.issues || []),
   ];
@@ -389,6 +386,21 @@ export function remapBuildingSurfaces(
   const wallIds = new Set(
     parts.flatMap((p) => p.rings.flatMap((r) => r.wallIds)),
   );
+  for (const facade of Object.values(appearance.facades || {})) {
+    let coordinates: number[][] | undefined;
+    parts.forEach((part, p) =>
+      part.rings.forEach((ring, r) => {
+        const w = ring.wallIds.indexOf(facade.wallId);
+        if (w >= 0) coordinates = [after[p][r][w], after[p][r][w + 1]];
+      }),
+    );
+    if (
+      JSON.stringify(coordinates) !== JSON.stringify(facade.wallCoordinates)
+    ) {
+      facade.needsReview = true;
+      facade.reviewedAt = undefined;
+    }
+  }
   const partIds = new Set(parts.map((p) => p.id));
   if (appearance.walls)
     appearance.walls = Object.fromEntries(

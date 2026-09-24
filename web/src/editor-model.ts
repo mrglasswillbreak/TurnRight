@@ -1026,6 +1026,7 @@ export function applyEdits(
   }
   for (const feature of data.map.features)
     if (feature.properties?.kind === 'building') {
+      delete feature.properties.modelAuthoring;
       const linked =
         feature.properties.placeId ||
         (Object.hasOwn(data.placeIdAliases, feature.properties.id)

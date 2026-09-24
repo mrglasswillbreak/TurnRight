@@ -32,10 +32,12 @@ export interface WorkspaceSnapshot {
   roofDraft?: RoofDraft | null;
 }
 export interface SaveBatch {
+  modelAuthoringVersion?: 1;
   operationId: string;
   edits: { edit: MapEdit; expectedUpdatedAt: string | null }[];
 }
 export interface WorkspaceRecovery extends WorkspaceSnapshot {
+  modelInputs?: Record<string, Record<string, string>>;
   saved: MapEdit[];
   pending: SaveBatch | null;
   past: WorkspaceSnapshot[];
@@ -54,6 +56,7 @@ const recoveryMessage =
 
 /** One history entry per user command; the network never replaces newer local commands. */
 export class EditorWorkspace {
+  modelInputs: Record<string, Record<string, string>> = {};
   edits: MapEdit[];
   unfinished: UnfinishedDrawing | null = null;
   roofDraft: RoofDraft | null = null;
@@ -88,6 +91,7 @@ export class EditorWorkspace {
     this.saved = structuredClone(server);
     this.edits = structuredClone(server);
     if (recovery) {
+      this.modelInputs = recovery.modelInputs || {};
       this.conflictBase = recovery.conflictBase;
       this.featureBases = structuredClone(recovery.featureBases || []);
       this.past = recovery.past || [];
@@ -146,6 +150,7 @@ export class EditorWorkspace {
   }
   recoveryCopy(): WorkspaceRecovery {
     return structuredClone({
+      modelInputs: this.modelInputs,
       edits: this.edits,
       unfinished: this.unfinished,
       roofDraft: this.roofDraft,
@@ -175,6 +180,7 @@ export class EditorWorkspace {
   }
   private persistNow() {
     const snapshot: WorkspaceRecovery = {
+      modelInputs: this.modelInputs,
       edits: this.edits,
       unfinished: this.unfinished,
       roofDraft: this.roofDraft,
@@ -283,6 +289,14 @@ export class EditorWorkspace {
     if (JSON.stringify(drawing) === JSON.stringify(this.unfinished)) return;
     this.unfinished = drawing;
     this.changed();
+  }
+  recoverModelInput(buildingId: string, key: string, value?: string) {
+    const inputs = { ...this.modelInputs[buildingId] };
+    if (value === undefined) delete inputs[key];
+    else inputs[key] = value;
+    this.modelInputs = { ...this.modelInputs, [buildingId]: inputs };
+    void this.persistNow();
+    this.notify();
   }
   draftRoof(roof: RoofDraft | null) {
     this.endHistoryGroup();
@@ -425,6 +439,7 @@ export class EditorWorkspace {
           }
           const saved = new Map(this.saved.map((e) => [editKey(e), e]));
           this.pending = {
+            modelAuthoringVersion: 1,
             operationId: crypto.randomUUID(),
             edits: changes.map((edit) => ({
               edit: structuredClone(edit),
