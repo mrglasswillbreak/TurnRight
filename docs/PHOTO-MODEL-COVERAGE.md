@@ -2,6 +2,8 @@
 
 Baseline: **lasu-8577d5c85d2c**, campus SHA-256 `0075f0ff11d1df45c3b9c5be6c6d72d230a12230f6b504bc2bcd59171f2d93c3`. All 395 published building identities and all 39 photographs were accounted for. The 19 photographed buildings receive reviewed observation proposals; 376 buildings have no published photograph and retain their existing treatment. No footprint, routing connection or access approval is created.
 
+These 19 proposals were reviewed, previewed and published on 24 September as **lasu-313d8a168635**. The comparisons below retain the original baseline and candidate terminology for reproducibility. [Live package integrity and unchanged routing checks](PHOTO-MODEL-VERIFICATION.md#published-release).
+
 | Coverage | Before | Candidate |
 |---|---:|---:|
 | Buildings | 395 | 395 |

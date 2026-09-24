@@ -50,7 +50,7 @@ The building inspector now places its **photo preview and Manage photos controls
 
 ## Recent changes
 
-The 24 September visual update adds a **Photo & model** workspace, framed building openings, reviewed façade details and optional photographic textures. Its assessment covers **all 19 photographed buildings in the published 395-building map**, using 39 photographs and preserving owner roofs and colours. Dimensions and unseen sides remain estimates; uncertain wall/photo matches require review. [Evidence, owner workflow and comparisons](docs/PHOTO-MODELS.md).
+The 24 September visual update adds a **Photo & model** workspace, framed building openings, reviewed façade details and optional photographic textures. The reviewed 19-building batch is published as **`lasu-313d8a168635`**, covering all photographed buildings in the 395-building map, using 39 photographs and preserving owner roofs and colours. Dimensions and unseen sides remain estimates; uncertain wall/photo matches require review. No photographic wall textures are approved in this initial release. [Evidence, owner workflow and comparisons](docs/PHOTO-MODELS.md).
 
 The offline globe now bundles the September 2004 **NASA Blue Marble** shaded-relief overview with Natural Earth coastlines, lakes, borders and labels, plus MapLibre atmosphere. It fades into the campus map as you zoom in. The dated imagery is an overview, not current street coverage. Globe and campus visual assets retain separate 8 MiB and 12 MiB limits. The guided editor met the measured input targets; software-GPU map movement remains slow and is documented in the [verification report](docs/PHOTO-MODEL-VERIFICATION.md).
 
@@ -276,7 +276,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The repository seed is **`lasu-b487503395f2`**. The public baseline checked on **24 September 2026** is **`lasu-8577d5c85d2c`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 10,797,658 bytes**. The photographic model candidate is documented in the [coverage report](docs/PHOTO-MODEL-COVERAGE.md). The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The repository seed is **`lasu-b487503395f2`**. The reviewed public release verified on **24 September 2026** is **`lasu-313d8a168635`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 18,880,327 bytes**. It adds the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 

@@ -2,6 +2,16 @@
 
 The release candidate starts from `lasu-8577d5c85d2c` (395 buildings, 220 places, 39 photographs). The [coverage report](PHOTO-MODEL-COVERAGE.md) accounts for all 19 photographed buildings and every source image. It contains illustrative comparisons, not registered photogrammetric reconstructions. No footprint, entrance, access approval or route is added by these appearance proposals.
 
+## Published release
+
+Application commit `c6192a0` deployed successfully before the owner applied the reviewed batch. Baseline reconciliation retained all 129 correction records and the Law driveway / Library gate access reviews. Release impact showed exactly 19 changed buildings, no additions or deletions, and no newly disconnected destinations. Clinic–Senate remained 1,036 m, Clinic–Law 430 m and Clinic–Library 874 m. The 23 existing excluded-cross-building segment warnings remain unchanged.
+
+The [immutable preview build](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35948816101) passed, and its complete 39-photo download verified in the signed-in browser before publication. The [publication workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/35949342795) completed successfully at 02:58 UTC on 24 September. The live version is **`lasu-313d8a168635`**, package schema 2, **84 assets / 18,880,327 bytes**. All 84 live assets subsequently passed byte-count and SHA-256 checks; all 345 deployed globe assets passed independently.
+
+The live campus SHA-256 is `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. Comparison with the pinned baseline confirmed unchanged routing graph, places, entrances, driving metadata, closures, access rules, photographs, aliases, boundary, feature identities and every footprint. Exactly the 19 inventoried buildings changed properties. The published model revision is `7800b61507856525`, with 9,084,537 geometry bytes and zero approved wall textures. The owner workspace shows **0 unpublished corrections · Saved**.
+
+The deployed inspector was also checked: photograph thumbnails and **Manage photos** appear immediately below the building heading, before Name and appearance controls. Final visual review prompted a small follow-up to wrap long evidence URLs and use the existing theme-aware muted text colour; the production build and budgets passed again after that CSS change.
+
 ## Automated checks
 
 - Full Vitest suite: 478 tests in 62 files passed, including the added wide-glazing, close-detail and entrance-photo provenance regressions.
