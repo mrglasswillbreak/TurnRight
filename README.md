@@ -221,6 +221,8 @@ Guided repairs select the affected feature and open the relevant control. Propos
 
 Add buttons preserve generated windows and trim while inserting the requested detail. Blocked placements stay visible and recoverable; repair their errors and use **Save unfinished wall**. Appearance includes whole-building height/floor controls, and unfinished fields remain tied to their original wall when selections change.
 
+Save errors identify the feature blocking the shared draft. Conflict review preserves removed wall records; older empty records offer an undoable repair instead of crashing the workspace. Explicit app updates verify local recovery before reloading, and new edits invalidate that reload permission.
+
 Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
 
 1. Set wall, roof, window and trim colours; window visibility/spacing; height or floors; supported roof form/pitch; and evidence notes.

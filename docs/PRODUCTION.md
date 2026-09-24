@@ -1,5 +1,32 @@
 # Production deployments
 
+## Model insertion and recovered-draft repairs — 25 September 2026
+
+Application repairs through **`2051f02`** are served at
+[TurnRight](https://turnright.vercel.app/admin). Add buttons insert their requested
+detail in one undoable action while preserving generated windows and trim. Blocked
+work remains recoverable, whole-building height can be repaired within Appearance,
+and save errors name the feature blocking the shared batch. Conflict merging no
+longer resurrects deleted wall records. Existing empty records have an explicit,
+undoable repair instead of crashing the model workspace. Updates verify recovery
+and permit reload only for its unchanged revision. Undo clears removed selections.
+
+Verification includes **498 Vitest tests**, focused workspace regressions after the
+reload guard, **22 distinct model/appearance browser cases**, the production PWA
+building/roof/input recovery journey, both TypeScript projects, lint with seven
+existing warnings, and all configured build budgets. See the updated
+[verification report](MODEL-EDITOR-VERIFICATION.md). Live owner checks exercised
+Add window, Add door and Add column on the reported wall, then undid every test
+insertion. Reviewed draft repairs reached the server-confirmed Saved state.
+
+At **23:33 UTC on 24 September** (00:33 on 25 September in London), all **84 assets**
+passed byte-length and SHA-256 checks. The published manifest is unchanged:
+**`lasu-313d8a168635`**, schema 2, **395 buildings, 220 places, 39 photographs** and
+**18,880,327 bytes**. The public bundle is `index-YhkE0g8I.js`, the editor is
+`Admin-DlLq0BHh.js`, and the precached workspace is
+`PhotoModelWorkspace-BmPAn2fJ.js`. Unauthenticated media/status/save requests returned
+401. No map release, database migration or package-schema change was made.
+
 ## Unified Photo & model editor — 24 September 2026
 
 Application revision **`9414109`** deployed successfully through

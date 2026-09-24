@@ -1,4 +1,4 @@
-# Unified model editor verification · 24 September 2026
+# Unified model editor verification · updated 25 September 2026
 
 The unified workspace uses the existing owner draft and publication pipeline. This rollout changes application/editor behavior, not the published architectural content. The verified reference snapshot is **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`: **395 buildings, 220 places, 39 photographs covering 19 buildings**, and 84 package assets totaling 18,880,327 bytes.
 
@@ -24,28 +24,33 @@ remain bound to the original field. Validation descriptions no longer change an
 input's accessible name. Shared-save errors identify the feature that blocks the
 batch rather than appearing to belong to whichever building is open.
 
-App updates now allow invalid drafts to remain for repair only after durable local
-recovery is verified. A further 56 workspace/reliability/building tests pass,
-including update recovery of invalid edits, history and unfinished inputs, and
-rejection when recovery storage fails.
+App updates allow invalid drafts to remain for repair only after durable local
+recovery is verified. The browser leave guard permits the explicit update only
+for that verified revision; subsequent edits invalidate the exemption. Storage
+failure still blocks the update. Undo clears selection when its element disappears.
 
-The repair checks include the complete 494-test unit suite and a final 27-test
-workspace/model run containing the new shared-save regression. Browser regressions
-exercise all seven Add tools, generated layout preservation, undo/redo, rejected
-insertions, close/reopen recovery, height repair, unknown-height reset, field
-identity, selection, patterns, worker retry and roof/outline history. The original
-five-trial performance measurements below predate these interaction repairs.
+Conflict merging preserves nested removals and requires a whole-wall choice when
+removal conflicts with edits. Recovered empty assignments previously crashed the
+workspace; a guarded repair view now removes only an explicitly selected empty
+entry. Incomplete nonempty records retain their observations and other data.
 
-All **20 distinct browser cases** passed across the focused and appearance/layout
-runs, including 320/390/768/1440-pixel light/dark views and short-screen controls.
-The production PWA building-recovery journey passed again. TypeScript, lint
-(seven existing warnings) and the authentication-configured build budgets pass.
+The latest complete run passes **498 Vitest tests in 63 files**. Focused workspace
+tests pass after the final reload-guard change. **22 distinct model/appearance
+browser cases** pass across the repair runs, including all seven Add tools,
+generated-layout preservation, blocked additions, height repair, field identity,
+patterns, worker retry, empty-record repair/undo and roof/outline history. Layout
+coverage includes 320/390/768/1440-pixel light/dark views and short screens. The
+production PWA building/roof/private-input recovery journey passes again. Client
+and server TypeScript, lint (seven existing warnings), and the final configured
+build budgets pass. The five-trial timing study below predates these repairs.
 
-Client and server TypeScript and lint pass; lint retains seven existing `no-explicit-any` warnings. **494 Vitest tests in 63 files** and **23 Python importer tests** pass. Python tests use the pinned data dependencies from `scripts/requirements-data.txt`.
+The initial 24 September rollout also passed **23 Python importer tests**, **five
+entrance/driving browser journeys**, and the production documentation capture.
+Those suites were not repeated for these frontend/recovery fixes. Browser cases
+use actual React, MapLibre and Three.js with isolated owner responses; the narrow
+setup selects buildings through the feature list to avoid toolbar overlap.
 
-The new tests cover metre conversion, placement bounds, reversed walls and courtyards, generated façade conversion, copies, patterns and detached slots, authoring validation, private metadata exclusion, routing-result reuse and input recovery. **17 distinct model/appearance browser cases passed**, including focused reruns after correcting the narrow test setup. They exercise actual React, MapLibre and Three.js rendering with isolated owner responses: numeric editing, keyboard movement, locking, copying, targeted review, pattern repair after reopening, roof/outline history, worker failure/retry and focus restoration. Layout checks include 320, 390, 768 and 1440 pixels in both themes, plus 740 × 390 and 320 × 450. The narrow setup selects buildings through the feature list to avoid clicking a drawing toolbar over a mapped coordinate. Another **five entrance/driving browser journeys** pass on desktop/mobile, including the old-package walking fallback. The production documentation capture also passes.
-
-**All nine production PWA journeys pass:** schema-1/schema-3 photo galleries and entrance choices, driving voice, survey cold start/recovery/sync, saved 3D preferences, enhanced-asset corruption/repair, backend-failure recovery, building/roof/input recovery and enriched place details. Existing immutable update/rollback, authorization and walking/driving regressions remain covered by the unit/PWA suites.
+**All nine production PWA journeys passed for the initial rollout:** schema-1/schema-3 photo galleries and entrance choices, driving voice, survey cold start/recovery/sync, saved 3D preferences, enhanced-asset corruption/repair, backend-failure recovery, building/roof/input recovery and enriched place details. Existing immutable update/rollback, authorization and walking/driving regressions remain covered by the unit/PWA suites.
 
 The authentication-configured production build passes all four budget scripts. An initial deployment failed because shared model controls pulled the owner authentication entry into the workspace. Entry-aware shared chunks and lazy building inspector tools correct that dependency boundary without raising budgets. Checks now reject a model workspace that imports `Admin`, require building tools to remain lazy, and verify their complete offline dependency set.
 
@@ -53,7 +58,7 @@ The authentication-configured production build passes all four budget scripts. A
 | --- | ---: | ---: |
 | Lazy renderer + guided editor, including shared non-startup dependencies | 167.7 KiB gzip | 300 KiB |
 | Public startup JavaScript | 418,682 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 183,526 bytes gzip | 189,440 bytes |
+| Additional owner editor JavaScript | 183,598 bytes gzip | 189,440 bytes |
 | Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |
@@ -61,22 +66,6 @@ The authentication-configured production build passes all four budget scripts. A
 World/voice hashes and precache inclusion pass. The campus geometry/texture budget remains 12 MiB and resident building textures remain limited to 64 MiB. The published snapshot has no approved wall textures; synthetic pool/asset tests cover malformed textures, bounded residency and release.
 
 ## Production-build measurements
-
-### Follow-up repair verification — 25 September 2026
-
-The Add-tool and recovery repairs pass **498 Vitest tests in 63 files**, client/server
-TypeScript, lint (the same seven warnings), and the authentication-configured build
-with all four budgets shown above. **22 distinct model/appearance browser cases**
-passed across the focused runs, including all seven Add buttons on desktop/mobile,
-preservation of generated details, rejected-input recovery, wall selection,
-height repair, empty-record repair/undo, and preservation of incomplete nonempty
-records. The building/roof/private-input production PWA recovery journey also passed.
-
-Conflict merging now preserves nested removals and requires a whole-wall choice
-when removal conflicts with edits. Recovered empty assignments previously caused
-a blank model workspace; a guarded repair view now retains the draft and removes
-only an explicitly selected empty entry. These follow-up checks do not repeat the
-five-trial timing study below or the Python suite, which was unchanged.
 
 Each group has five trials on Windows, Chromium headless and SwiftShader, at a 1440 × 1000 viewport. Both versions use the same verified campus; the dense fixture adds 100 details to one wall. The baseline is commit `9bb1ef7`. The final fixture includes real `EditorWorkspace` commands and IndexedDB recovery; the baseline uses the former staged form. No other browser suite ran concurrently with these trials.
 
