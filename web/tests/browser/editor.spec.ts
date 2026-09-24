@@ -5423,6 +5423,7 @@ async function unifiedModelFixture(
   page: Page,
   options: {
     prepareWall?: boolean;
+    repairMode?: boolean;
     properties?: Record<string, unknown>;
   } = {},
 ) {
@@ -5455,6 +5456,7 @@ async function unifiedModelFixture(
     .getByRole('button', { name: 'Photo & model', exact: true })
     .click();
   const dialog = page.getByRole('dialog');
+  if (options.repairMode) return { server, dialog, wall: () => undefined };
   await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
   if (options.prepareWall !== false) {
     await dialog
@@ -5482,6 +5484,78 @@ async function unifiedModelFixture(
         ?.facades?.['library:wall:0:0:0'],
   };
 }
+test('unified model repairs empty recovered wall records without crashing or changing other properties', async ({
+  page,
+}) => {
+  const failures: string[] = [];
+  page.on('pageerror', (e) => failures.push(e.message));
+  const { server, dialog } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    repairMode: true,
+    properties: {
+      height: 6,
+      heightEstimated: true,
+      appearance: { windows: false, facades: { 'library:wall:0:0:0': {} } },
+    },
+  });
+  await expect(
+    dialog.getByRole('heading', { name: /Repair wall records/ }),
+  ).toBeVisible();
+  await dialog
+    .getByRole('button', { name: 'Remove empty wall record' })
+    .click();
+  await expect(
+    dialog.getByRole('button', { name: 'Add window', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => server.edits()[0].properties.appearance?.facades)
+    .toEqual({});
+  expect(server.edits()[0].properties.appearance?.windows).toBe(false);
+  expect(server.edits()[0].properties.height).toBe(6);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    dialog.getByRole('heading', { name: /Repair wall records/ }),
+  ).toBeVisible();
+  await dialog
+    .getByRole('button', { name: 'Remove empty wall record' })
+    .click();
+  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        server.edits()[0].properties.appearance?.facades?.['library:wall:0:0:0']
+          ?.elements.length,
+    )
+    .toBe(1);
+  expect(failures).toEqual([]);
+});
+test('unified model preserves incomplete nonempty records for recovery', async ({
+  page,
+}) => {
+  const failures: string[] = [];
+  page.on('pageerror', (e) => failures.push(e.message));
+  const { server, dialog } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    repairMode: true,
+    properties: {
+      appearance: {
+        facades: { 'library:wall:0:0:0': { notes: 'Keep this observation' } },
+      },
+    },
+  });
+  await expect(
+    dialog.getByText(/contents have not been discarded/),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole('button', { name: 'Remove empty wall record' }),
+  ).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Close workspace' }).click();
+  expect(
+    server.edits()[0].properties.appearance?.facades?.['library:wall:0:0:0']
+      ?.notes,
+  ).toBe('Keep this observation');
+  expect(failures).toEqual([]);
+});
 for (const width of [390, 1440])
   test(`unified model Add tools preserve generated details at ${width}px`, async ({
     page,

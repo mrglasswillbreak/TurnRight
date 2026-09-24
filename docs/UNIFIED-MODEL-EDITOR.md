@@ -44,6 +44,8 @@ If an addition cannot save because of a placement or building validation error, 
 
 Map-draft saves share one atomic queue. An invalid change to another feature can leave the whole batch saved locally; the save error names that feature and its kind. Repair the named feature through the explorer. The server does not accept a partial batch while silently discarding its invalid changes.
 
+Conflict merging preserves removed wall assignments. If a removal competes with edits to that same wall, choose the complete version to retain. Older recovered drafts can contain an empty wall record: opening Photo & model shows **Repair wall records**, with an undoable **Remove empty wall record** action. This removes only the empty entry. Incomplete records that contain observations or other data are preserved for recovery rather than silently discarded.
+
 Installing an app update attempts a server save and then verifies local recovery. A validation error can remain for repair after updating, but failed recovery storage blocks installation so unfinished inputs and history are not lost.
 
 Private authoring metadata stores names, groups, patterns and presets in the existing draft JSON. It is excluded from public campus downloads. Compatible server validation must deploy before the new client. Older editors receive an update message when they would otherwise drop this metadata. Public package schemas 1–3 and the database schema remain unchanged.

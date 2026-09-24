@@ -51,16 +51,32 @@ The authentication-configured production build passes all four budget scripts. A
 
 | Allocation | Measured | Limit |
 | --- | ---: | ---: |
-| Lazy renderer + guided editor, including shared non-startup dependencies | 167.3 KiB gzip | 300 KiB |
-| Public startup JavaScript | 418,684 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 183,493 bytes gzip | 189,440 bytes |
-| Lazy photo manager | 7,619 bytes gzip | 12,288 bytes |
+| Lazy renderer + guided editor, including shared non-startup dependencies | 167.7 KiB gzip | 300 KiB |
+| Public startup JavaScript | 418,682 bytes gzip | 435,200 bytes |
+| Additional owner editor JavaScript | 183,526 bytes gzip | 189,440 bytes |
+| Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |
 
 World/voice hashes and precache inclusion pass. The campus geometry/texture budget remains 12 MiB and resident building textures remain limited to 64 MiB. The published snapshot has no approved wall textures; synthetic pool/asset tests cover malformed textures, bounded residency and release.
 
 ## Production-build measurements
+
+### Follow-up repair verification — 25 September 2026
+
+The Add-tool and recovery repairs pass **498 Vitest tests in 63 files**, client/server
+TypeScript, lint (the same seven warnings), and the authentication-configured build
+with all four budgets shown above. **22 distinct model/appearance browser cases**
+passed across the focused runs, including all seven Add buttons on desktop/mobile,
+preservation of generated details, rejected-input recovery, wall selection,
+height repair, empty-record repair/undo, and preservation of incomplete nonempty
+records. The building/roof/private-input production PWA recovery journey also passed.
+
+Conflict merging now preserves nested removals and requires a whole-wall choice
+when removal conflicts with edits. Recovered empty assignments previously caused
+a blank model workspace; a guarded repair view now retains the draft and removes
+only an explicitly selected empty entry. These follow-up checks do not repeat the
+five-trial timing study below or the Python suite, which was unchanged.
 
 Each group has five trials on Windows, Chromium headless and SwiftShader, at a 1440 × 1000 viewport. Both versions use the same verified campus; the dense fixture adds 100 details to one wall. The baseline is commit `9bb1ef7`. The final fixture includes real `EditorWorkspace` commands and IndexedDB recovery; the baseline uses the former staged form. No other browser suite ran concurrently with these trials.
 
