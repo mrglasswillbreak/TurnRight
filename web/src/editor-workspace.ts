@@ -430,7 +430,12 @@ export class EditorWorkspace {
       while (this.pending || this.changes().length) {
         if (!this.pending) {
           const changes = this.changes();
-          const errors = changes.flatMap(validateEdit);
+          const errors = changes.flatMap((edit) =>
+            validateEdit(edit).map(
+              (message) =>
+                `${edit.properties.name || edit.id} (${edit.kind}): ${message}`,
+            ),
+          );
           if (errors.length) {
             this.status = 'Saved locally';
             this.error = errors[0];

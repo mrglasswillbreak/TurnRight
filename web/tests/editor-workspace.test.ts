@@ -18,6 +18,39 @@ const edit = (name = 'Library'): MapEdit => ({
 const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
   batch.edits.map(({ edit }) => ({ ...edit, updated_at: revision }));
 describe('editor autosave and recovery', () => {
+  it('identifies the feature blocking a shared save and retains the complete batch for repair', async () => {
+    const send = vi.fn(async (batch: SaveBatch) => ack(batch));
+    const workspace = new EditorWorkspace([], send, async () => {});
+    const invalid: MapEdit = {
+      id: 'theatre',
+      kind: 'building',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [3.2, 6.46],
+            [3.201, 6.46],
+            [3.201, 6.461],
+            [3.2, 6.46],
+          ],
+        ],
+      },
+      properties: { name: 'Lecture theatre', heightMode: 'floors' },
+    };
+    workspace.commit([edit(), invalid]);
+    expect(await workspace.flush()).toBe(false);
+    expect(workspace.error).toBe(
+      'Lecture theatre (building): Documented floor count must be between 1 and 50.',
+    );
+    expect(send).not.toHaveBeenCalled();
+    expect(workspace.edits).toHaveLength(2);
+    workspace.commit([
+      { ...invalid, properties: { ...invalid.properties, floors: 2 } },
+    ]);
+    expect(await workspace.flush()).toBe(true);
+    expect(send.mock.calls[0][0].edits).toHaveLength(2);
+    expect(workspace.error).toBe('');
+  });
   it('coalesces identical drawing snapshots and immediately preserves a committed edit', async () => {
     const persist = vi.fn(async () => {});
     const workspace = new EditorWorkspace(
