@@ -244,6 +244,7 @@ test('motion assistance public permission timing, orientation modes, fallback an
     .getByRole('button', { name: 'Stop navigation', exact: true })
     .click();
   await page.reload();
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await page.getByRole('button', { name: /Settings/ }).click();
   await expect(page.getByLabel('Map orientation', { exact: true })).toHaveValue(
     'phone',
@@ -1789,8 +1790,15 @@ test('path crossing controls persist automatic connection and bridge choices', a
   ).toBe(true);
 });
 async function clickMap(page: Page, coordinates: Position) {
+  // Feature selection can animate the camera. Project only after it settles.
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
   const p = await position(page, coordinates);
   await page.mouse.click(p.x, p.y);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
 }
 
 test('editor reliability: field typing is one undo step across an autosave', async ({
@@ -2417,6 +2425,10 @@ test('review separate building wings, edit their geometry, save and undo without
       );
   await expect.poll(() => building()?.geometry.type).toBe('MultiPolygon');
   const before = structuredClone(building()!.geometry);
+  await page.getByRole('button', { name: 'Outline', exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
   const from = await position(page, [3.1996805, 6.4707775]),
     to = await position(page, [3.19967, 6.47078]);
   await page.mouse.move(from.x, from.y);
@@ -3165,6 +3177,12 @@ for (const threeD of [false, true])
       await inspector
         .getByRole('button', { name: 'Draw connecting path' })
         .click();
+      // In 3D the ground target is behind the bottom drawing toolbar.
+      // Pan it into the clear map area, as an owner would before placing it.
+      if (threeD)
+        await page.evaluate(() =>
+          window.editorTestMap.panBy([0, 180], { duration: 0 }),
+        );
       await clickMap(page, [x, 6.46]);
       await page.getByRole('button', { name: 'Finish', exact: true }).click();
       await expect(
@@ -3388,7 +3406,7 @@ for (const phone of [false, true]) {
       page.getByRole('button', { name: 'Apply 1 reviewed appearances' }),
     ).toBeEnabled();
     await page
-      .locator('.building-reference-item')
+      .locator('.building-reference-item:visible')
       .filter({ hasText: 'Library' })
       .locator('summary')
       .click();
@@ -4867,6 +4885,10 @@ for (const editor of [false, true])
       ).toBe(true);
       for (const mode of ['enhanced', 'simple', '2d']) {
         if (mode === 'simple') {
+          if (!editor)
+            await page
+              .getByRole('button', { name: 'Expand card', exact: true })
+              .click();
           await page
             .getByRole('button', { name: 'Settings', exact: true })
             .click();
@@ -5115,3 +5137,96 @@ test('driving road approval persists separately from walking access', async ({
     'Campus visitors',
   );
 });
+for (const width of [320, 390, 768, 1440])
+  for (const dark of [false, true])
+    test(`photo model workspace ${width}px ${dark ? 'dark' : 'light'}`, async ({
+      page,
+    }, info) => {
+      await page.setViewportSize({ width, height: 850 });
+      await page.emulateMedia({ colorScheme: dark ? 'dark' : 'light' });
+      const sample = JSON.parse(
+        readFileSync(
+          new URL('../../../data/photos/catalogue.json', import.meta.url),
+          'utf8',
+        ),
+      )[0] as CampusPhoto;
+      const building = browserCampus().map.features.find(
+        (f) => f.properties?.id === 'library',
+      )!;
+      const edit: MapEdit = {
+        id: 'library',
+        kind: 'building',
+        geometry: building.geometry,
+        properties: {
+          ...building.properties,
+          photos: [{ ...sample, buildingId: 'library' }],
+        },
+      };
+      await page.route(`**${sample.url}`, (r) =>
+        r.fulfill({
+          body: readFileSync(
+            new URL(
+              `../../../data/photos/${sample.sha256}.webp`,
+              import.meta.url,
+            ),
+          ),
+          contentType: 'image/webp',
+        }),
+      );
+      const server = await setup(page, false, false, { initialEdits: [edit] });
+      await focusCampus(page);
+      await page.getByRole('button', { name: 'Collapse explorer' }).click();
+      await clickMap(page, [3.20012, 6.46022]);
+      const trigger = page.getByRole('button', {
+        name: 'Photo & model',
+        exact: true,
+      });
+      await trigger.click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog.getByRole('img')).toBeVisible();
+      await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
+      await dialog
+        .getByRole('button', { name: 'Add window', exact: true })
+        .click();
+      await dialog.getByLabel('Width (m)', { exact: true }).fill('1.8');
+      await dialog
+        .getByLabel('Evidence and estimated dimensions')
+        .fill('Matched to the selected elevation; dimensions estimated.');
+      if (width < 640)
+        await dialog
+          .getByRole('button', { name: 'Model', exact: true })
+          .click();
+      await expect(dialog.locator('canvas')).toBeVisible();
+      await expect(
+        dialog.getByText('Estimated dimensions · selected wall outlined'),
+      ).toBeVisible();
+      const canvas = await dialog.locator('canvas').elementHandle();
+      await dialog
+        .getByLabel('Evidence and estimated dimensions')
+        .fill('Reviewed visible window; hidden surfaces unknown.');
+      await expect
+        .poll(() => canvas!.evaluate((el) => el.isConnected))
+        .toBe(true);
+      await expect
+        .poll(() =>
+          dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+        )
+        .toBe(true);
+      await page.screenshot({ path: info.outputPath('photo-model.png') });
+      await dialog
+        .getByRole('button', { name: 'Apply reviewed model details' })
+        .click();
+      await expect(dialog.getByText(/Saved to map draft/)).toBeVisible();
+      await expect
+        .poll(
+          () =>
+            server.edits().find((e) => e.id === 'library')?.properties
+              .appearance?.facades?.['library:wall:0:0:0']?.elements[0].width,
+        )
+        .toBe(1.8);
+      await dialog
+        .getByRole('button', { name: 'Close', exact: true })
+        .last()
+        .click();
+      await expect(trigger).toBeFocused();
+    });

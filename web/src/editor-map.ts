@@ -64,6 +64,7 @@ export class EditorMap {
   private outline = true;
   private interaction: Interaction = 'select';
   private draftTimer: ReturnType<typeof setTimeout> | undefined;
+  private finishTimer: ReturnType<typeof setTimeout> | undefined;
   private source: CampusData;
   private hint = '';
   private disposed = false;
@@ -272,13 +273,22 @@ export class EditorMap {
           },
         );
       }
-      this.kind = null;
-      queueMicrotask(() => {
-        if (this.disposed) return;
+      // Terra finishes a point during the pointer gesture. Keep drawing active
+      // through its trailing map click so it cannot select the building beneath
+      // the new entrance before that entrance's layer has rendered.
+      clearTimeout(this.finishTimer);
+      this.finishTimer = setTimeout(() => {
+        if (
+          this.disposed ||
+          this.creationId !== edit.id ||
+          this.kind !== edit.kind
+        )
+          return;
+        this.kind = null;
         this.callbacks.draft(null);
         this.callbacks.create(edit);
         this.select(edit);
-      });
+      }, 0);
     });
     this.draw.on('change', (_ids, type) => {
       if (this.setting || this.compare) return;
@@ -674,6 +684,7 @@ export class EditorMap {
   }
   dispose() {
     this.disposed = true;
+    clearTimeout(this.finishTimer);
     clearTimeout(this.draftTimer);
     this.map.off('mousemove', this.mousemove);
     this.map.off('click', this.click);
