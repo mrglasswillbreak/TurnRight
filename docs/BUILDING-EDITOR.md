@@ -1,5 +1,7 @@
 # Building appearance and custom roofs
 
+**24 September 2026:** choose **Photo & model** in a building inspector for photo/model review, highlighted walls, framed openings, columns, balconies, canopies and texture alignment. Apply saves one undoable draft operation; moved walls and changed source photographs need renewed review. Sources includes photographic observations for 19 buildings. [Complete workflow and offline texture publishing](PHOTO-MODELS.md).
+
 The public map and editor share one compact view button: it shows 3D while viewing 2D, and 2D while viewing 3D. Tapping it changes the view. Enhanced rendering is the default; choose Enhanced or Simple in the public Settings screen or the editor's Settings section. Existing saved Simple preferences are retained. There is no attached options menu.
 
 Editor Settings also contains Appearance (Device, Light or Dark), tilt and building opacity. Appearance uses the same saved preference as the public map; Device follows system changes. Enhanced buildings retain their original wall, window, roof and trim colours in either theme, with neutral dark-mode shading. Tilt follows the actual camera angle and is available in 3D. Opening or closing Settings and changing theme keeps the map and inspector mounted, preserving selection, unfinished drawings and roof plans. View preferences do not create map edits or undo entries.

@@ -6,7 +6,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight desktop map with a full-height, adjustable destination panel and pinned navigation controls](docs/assets/screenshots/public-desktop-full-2026-09-17.jpg)
+![TurnRight natural-colour globe with campus controls and offline world imagery](docs/assets/screenshots/public-globe-desktop-light-2026-09-24.jpg)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
@@ -36,62 +36,27 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 ## Screenshots
 
-The public interface below was captured on **17 September 2026** in the **Codex in-app browser**. The original panel gallery uses application revision **`d37606f`**; the globe captures show the new offline world overview. The local production preview uses the checked-in campus seed, including its labelled illustrative building heights; the live campus package can differ.
+Captured **24 September 2026** from production builds using the verified public campus snapshot **`lasu-8577d5c85d2c`**. The globe captures show the real public application. Photo/model captures use the real workspace in an isolated fixture; no production drafts or private account information appear. Phone views are responsive browser simulations, not physical-device tests.
 
-| Compact mobile map | Adjustable destination card |
+| Realistic globe · mobile Dark mode | Photo & model · mobile |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-mobile-map-2026-09-17.jpg" width="300" alt="Mobile campus map with a bottom search bar, view and compass buttons on the left, and zoom and location buttons on the right"> | <img src="docs/assets/screenshots/public-mobile-place-2026-09-17.jpg" width="300" alt="Mobile Senate Building details in a shortened card with the navigation buttons still visible above its scrolling content"> |
+| <img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-24.jpg" width="300" alt="Natural-colour Earth with atmosphere, LASU marker and campus navigation controls in Dark mode"> | <img src="docs/assets/screenshots/photo-model-mobile-2026-09-24.jpg" width="300" alt="Full-screen mobile Photo and model workspace with a building photograph, credits, view tabs and mapped wall selector"> |
 
-| Resizable Settings dialog | Public app-update notice |
-| --- | --- |
-| <img src="docs/assets/screenshots/public-mobile-settings-2026-09-17.jpg" width="300" alt="Shortened mobile Settings dialog showing appearance and rendering choices while leaving the map visible"> | <img src="docs/assets/screenshots/public-mobile-update-2026-09-17.jpg" width="300" alt="Public campus map showing App update ready and an Install update button above the compact search dock"> |
+**Photo & model on desktop:** compare the published photograph with the model, choose a mapped wall and review architectural details. Dimensions and unseen elevations remain estimates.
 
-**Offline world overview:** zoom out to explore the planet, then use **Back to campus** or the LASU marker to return. These two captures were taken after stopping the local preview server and reloading the saved app.
+![Desktop Photo and model workspace with the photograph beside its model and architectural controls](docs/assets/screenshots/photo-model-desktop-2026-09-24.jpg)
 
-<img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-17.jpg" width="300" alt="Offline globe on mobile in Dark mode, with country names, a LASU marker, side controls and the compact search dock">
-
-![Offline desktop globe in Light mode with the full-height public panel and Back to campus button](docs/assets/screenshots/public-globe-desktop-light-2026-09-17.jpg)
-
-**Desktop after resizing:** the same panel shown at full height above can be shortened. Search, navigation and map controls remain accessible while its details scroll.
-
-![Desktop destination panel shortened to expose more of the campus map](docs/assets/screenshots/public-desktop-resized-2026-09-17.jpg)
-
-**Current owner editor:** the desktop workspace and compact mobile inspectors, captured from revision **`b69cde0`** with the campus seed and isolated owner/API responses.
-
-![Current desktop editor with campus geometry, feature explorer, drawing tools and review controls](docs/assets/screenshots/editor-workspace-desktop-2026-09-17.jpg)
-
-| Mobile building inspector | Mobile editor Settings |
-| --- | --- |
-| <img src="docs/assets/screenshots/editor-building-mobile-2026-09-17.jpg" width="300" alt="Dark mobile editor with the Faculty of Law selected and a compact building appearance inspector leaving the map visible"> | <img src="docs/assets/screenshots/editor-settings-mobile-2026-09-17.jpg" width="300" alt="Light mobile editor with compact Settings showing appearance and 3D rendering options over the selected campus building"> |
-
-<details>
-<summary>Editor and enhanced-building gallery — 15 September 2026</summary>
-
-These earlier captures use isolated owner/API fixtures and enhanced model assets. They remain useful examples of the building and roof tools; they predate the latest mobile camera and public-panel changes.
-
-**Owner workspace**
-
-![Dark owner editor with campus geometry, enhanced buildings and the feature explorer](docs/assets/screenshots/editor-workspace.jpg)
-
-**Building appearance and roof editing**
-
-![Building inspector with wall and roof colour controls](docs/assets/screenshots/editor-building.jpg)
-
-![Owner editor showing an unfinished demonstration roof plan](docs/assets/screenshots/editor-roof.jpg)
-
-| Enhanced public buildings | Editor Settings |
-| --- | --- |
-| <img src="docs/assets/screenshots/public-place-phone.jpg" width="300" alt="Earlier public destination view with enhanced building models"> | <img src="docs/assets/screenshots/editor-settings-phone.jpg" width="300" alt="Editor Settings with appearance, rendering, tilt and opacity controls"> |
-
-</details>
-
-No screenshot contains production owner drafts or private reports. The update notice uses a local service-worker update demonstration. Phone images use responsive browser viewports, not physical-device field tests. [Capture sources, dimensions and reproduction](docs/assets/screenshots/README.md).
+The building inspector now places its **photo preview and Manage photos controls at the top**, directly below the building title. [All 19 building comparisons and evidence gaps](docs/PHOTO-MODEL-COVERAGE.md) · [Capture sources and reproduction](docs/assets/screenshots/README.md). Previous interface captures remain documented there.
 
 ## Recent changes
 
+The 24 September visual update adds a **Photo & model** workspace, framed building openings, reviewed façade details and optional photographic textures. Its assessment covers **all 19 photographed buildings in the published 395-building map**, using 39 photographs and preserving owner roofs and colours. Dimensions and unseen sides remain estimates; uncertain wall/photo matches require review. [Evidence, owner workflow and comparisons](docs/PHOTO-MODELS.md).
+
+The offline globe now bundles the September 2004 **NASA Blue Marble** shaded-relief overview with Natural Earth coastlines, lakes, borders and labels, plus MapLibre atmosphere. It fades into the campus map as you zoom in. The dated imagery is an overview, not current street coverage. Globe and campus visual assets retain separate 8 MiB and 12 MiB limits. The guided editor met the measured input targets; software-GPU map movement remains slow and is documented in the [verification report](docs/PHOTO-MODEL-VERIFICATION.md).
+
 The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
 
-The researched collection contains **21 photographs for 13 of 420 buildings**; owner-approved uploads can add to this collection. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
+The initial researched collection contained **21 photographs for 13 of 420 buildings**. After owner uploads and reviewed building consolidation, the 24 September published snapshot contains **39 photographs for 19 of 395 buildings**. Every approved release photograph is included in the campus download with its credits. Entrance and mapped-approach popups now use theme-aware text, backgrounds, pointers and close controls, including in Dark mode.
 
 The photo editor now has a visual **Manage photos** workspace with multiple uploads, individual retries, guided source/author review, cover ordering, an offline-compatible public preview and private recovery. Migration 010 and schema-3 readers are deployed; new photographs still publish through owner release review.
 
@@ -101,7 +66,7 @@ The 17–18 September updates include:
 
 - **Natural offline directions:** a built-in British female voice, complete turn sentences, mapped destination/road names, speed-aware turn timing, close-turn combinations and clearer GPS/rerouting messages. Preview it in Settings. [Voice maintenance and checks](docs/VOICE.md).
 
-- **Offline globe:** the public map now zooms out to a full planet with land, oceans, country borders and names. A 255 KB world overview is saved with the app, works in both themes and returns smoothly to campus. The editor remains campus-focused.
+- **Offline globe:** the public map now zooms out to a full planet with land, oceans, country borders and names. A 5.30 MiB dated NASA/Natural Earth overview is saved with the app, works in both themes and returns smoothly to campus. The editor remains campus-focused.
 - **More map space:** a compact bottom search bar, mobile controls arranged on both sides, and adjustable cards/dialogs. Desktop panels open at full height, then keep the size you choose while you use search. Explore, Saved, Offline, Settings and Editor stay visible as panel content scrolls; desktop map controls stay pinned too.
 - **Visible app updates:** an update-ready notice on the public map, with an explicit install action that is disabled during navigation. Campus-package updates remain a separate Offline Maps operation.
 - **Gentler editor selection:** selecting an object animates it into the exposed map. Long paths on phones zoom out by at most 0.75 levels and keep the tapped stretch, or the stretch nearest the current view, visible. Closing properties restores the earlier view.
@@ -116,7 +81,7 @@ These are application/editor changes. Public routing changes only after the owne
 | --- | --- |
 | Exploration | Bottom search dock, local place search, categories, aliases, saved/recent places, provenance and recorded street names. |
 | Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
-| World overview | Automatic globe when zooming out; bundled Natural Earth countries, offline labels and a return-to-campus action. |
+| World overview | Natural-colour September 2004 NASA imagery, shaded relief, atmosphere, Natural Earth coastlines/lakes/borders, offline labels and a return-to-campus action. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Driving directions | Offline campus drive-and-walk journeys, vehicle permissions and one-way roads, turn restrictions, estimated ETA, parking selection, voice guidance, and a confirmed parking-to-walking handoff. Private roads and parking require separate owner driving review. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
@@ -132,7 +97,7 @@ These are application/editor changes. Public routing changes only after the owne
 | Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
 | Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
 
-Cycling, indoor positioning, satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
+Cycling, indoor positioning, current campus satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
 
 ## Quick start
 
@@ -191,7 +156,7 @@ Open a destination's **Building photographs** and **Entrances & arrival** sectio
 
 The map distinguishes connected entrances, unconfirmed connections and mapped approaches. **Mapped approach …; final entrance not verified** means the route ends on a mapped path near the destination. It does not confirm a doorway connection. Recorded steps, ramps, surfaces and measured doorway widths remain observations, with unknown details left unknown; no accessible-route guarantee is implied.
 
-Owners edit arrival guides separately from the **Manage photos** workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Original uploads and reviewer records remain private. Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
+The building inspector shows its gallery preview and **Manage photos** button at the top. Owners edit arrival guides separately from this photo workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Original uploads and reviewer records remain private. Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
 
 ## Appearance and 3D
 
@@ -235,6 +200,8 @@ Conflict review compares base, local and server values. Independent field/surfac
 Guided repairs select the affected feature and open the relevant control. Proposed geometry is previewed before **Apply reviewed repair**. Opening **Duplicates** makes no edit: review survivors, removals and redirected entrances before applying one undoable batch. [Editor guide](docs/EDITOR.md) · [Reliability and conflict handling](docs/EDITOR-RELIABILITY.md).
 
 ## Building appearance and roofs
+
+**Photo & model** adds a lazy-loaded, side-by-side photograph/model workspace with mobile view tabs, stable wall selection, framed windows, doors, columns, balconies, canopies, parapets and reviewed perspective-aligned textures. Apply saves one undoable edit. Footprint or source-photo changes flag affected assignments for review; photo captions do not rebuild models. The initial 19-building candidate adds supported opening proportions and evidence notes, with **zero automatically approved wall textures** until camera/wall correspondence is reviewed. [Owner workflow](docs/PHOTO-MODELS.md) · [Coverage](docs/PHOTO-MODEL-COVERAGE.md) · [Checks and performance](docs/PHOTO-MODEL-VERIFICATION.md).
 
 Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
 
@@ -295,7 +262,7 @@ An initial online visit and a completed download are required. Installation and 
 
 The natural voice pack is saved automatically with the **app**, independently of the campus download, with an 8 MiB total budget. Ordinary deployments reuse its checked-in recordings; no speech model runs on a phone. Existing campus-packaged recordings remain available as a fallback. Finish saving the app **and** downloading the campus map before disconnecting.
 
-The world overview adds **260,913 bytes (about 255 KB)** before compression. It uses the country-label font already included in the campus download. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
+The world overview adds **about 5.30 MiB**, including 341 local 512-pixel raster tiles at zooms 0–4 and Natural Earth vectors. It uses the bundled label font. World assets are hash-verified before a new service worker activates; a failed installation keeps the working app. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
 
 Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. The public **App update ready** notice and **Settings → Install update** activate a waiting application update with editing/navigation safeguards. App-update checks run once a minute while visible and online, and on returning to the app or reconnecting. Installing remains an explicit action; it is disabled during an active walk.
 
@@ -307,9 +274,9 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 ## Map data and coverage
 
-TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The generalized world overview uses public-domain Natural Earth v5.1.2 at 1:110m scale. It does not add worldwide roads or routing coverage. No external tile service or satellite imagery is required.
+TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The repository seed is **`lasu-b487503395f2`**. The public manifest checked on **23 September 2026** is **`lasu-286bae3c6016`**, containing **420 buildings, 220 places and 22 photographs**, with **67 assets / 9,977,021 bytes**. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The repository seed is **`lasu-b487503395f2`**. The public baseline checked on **24 September 2026** is **`lasu-8577d5c85d2c`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 10,797,658 bytes**. The photographic model candidate is documented in the [coverage report](docs/PHOTO-MODEL-COVERAGE.md). The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -325,7 +292,7 @@ Seed coverage is a reproducible baseline, not a claim about later owner releases
 
 A mapped approach uses existing paths near the destination, without inventing the final connection. Reviewed student-access corrections permit specified internal roads, the Faculty of Law driveway and International Library gate; other restrictions, barriers, parking aisles and closures remain in force. Visual appearance changes do not modify routing.
 
-The photograph inventory covers all 420 published buildings and accounts for all **7,976 records** discovered in its documented snapshots: **21 included, 167 duplicate, 7,725 rejected and 63 awaiting evidence or permission**. These are source-record counts, not a claim to have found every photograph online. Uncertain building matches, unlicensed material and declared synthetic imagery are excluded. [Reproducible inventory and coverage](data/photos/README.md).
+The initial photograph inventory covered all 420 buildings in that source snapshot and accounts for all **7,976 records** discovered in its documented snapshots: **21 included, 167 duplicate, 7,725 rejected and 63 awaiting evidence or permission**. These are source-record counts, not a claim to have found every photograph online. Uncertain building matches, unlicensed material and declared synthetic imagery are excluded. [Reproducible inventory and coverage](data/photos/README.md).
 
 The roof assessment covered 380 footprints and proposed 46 wing roofs across 44 buildings; most are illustrative, with photographic support for three building forms. This is a dated assessment, not a guarantee that every building has an accurate model. [Coverage and access](docs/CAMPUS-ACCESS.md) · [Machine-readable seed coverage](data/coverage-report.json) · [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md).
 
@@ -497,4 +464,4 @@ Use GitHub issues for reproducible software defects or feature proposals; includ
 - **Reference images:** Linked evidence and supplied visual inspiration do not establish redistribution rights or surveyed building accuracy. The README contains application screenshots, not copied reference photography.
 - **Published photographs:** The current researched collection uses CC BY-SA 4.0 images with verified building matches. Each gallery retains its source, author, license and derivative notices online and offline. Original authors retain copyright; see the [collection report](data/photos/README.md).
 
-No standalone license has been selected for TurnRight's own source code. Do not assume an MIT or Apache license; dependencies and datasets retain their respective terms. No Google Maps content, satellite imagery or remotely hosted rendered map tiles are bundled.
+No standalone license has been selected for TurnRight's own source code. Do not assume an MIT or Apache license; dependencies and datasets retain their respective terms. No Google Maps content or remotely hosted rendered map tiles are bundled. The offline globe includes the dated NASA composite under its recorded reuse conditions; this is not current campus satellite coverage.

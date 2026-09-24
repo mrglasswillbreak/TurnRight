@@ -1,5 +1,7 @@
 # Miniature campus implementation · 14 September 2026
 
+This historical assessment is supplemented by the [24 September photographic model and globe release](PHOTO-MODELS.md), covering the current 395-building map and all 19 photographed buildings. Its budgets, texture pipeline and coverage supersede the earlier figures below.
+
 The application retains MapLibre, local campus data and Terra Draw. Architectural models use a lazy Three.js custom layer sharing MapLibre's WebGL context. Application deployment and campus-data publication remain separate operations.
 
 **Deployment update:** the application and migrations 005/006 were deployed on 14 September. The editor baseline is now reconciled with public package `lasu-4e4c8008b38b`; all source graph endpoints are valid, and saved drafts and history were preserved. Four validation messages remain for two entrance drafts. See [production verification](PRODUCTION.md); the building catalogue and footprint corrections still await the separate campus-data review.

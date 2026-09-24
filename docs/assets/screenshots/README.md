@@ -1,5 +1,13 @@
 # Application screenshots
 
+## Photo models and realistic globe — 24 September 2026
+
+The four `2026-09-24` images are unaltered Chromium screenshots from production builds. The public globe uses the actual app with a verified local copy of published campus `lasu-8577d5c85d2c`; the guided workspace uses its real component in a production fixture. No owner session, private upload, draft, or physical GPS is used. Desktop is 1440 × 900 for the globe and 1280 × 900 for the workspace; mobile is 390 × 844. The workspace demonstrates estimated details before applying them, not a published wall assignment.
+
+Reproduce from `web`: fetch the documented evidence snapshot, build `vite.performance.config.ts`, serve its output on 5195, build the application and serve `dist` on 5196, then run `node scripts/capture-photo-model.mjs` and `node scripts/capture-visual-update.mjs`. The scripts read only public fixtures and write screenshots. They block service workers for public captures, so these particular screenshots do not claim a disconnected session; separate PWA tests verify offline reloads.
+
+The globe contains reprojected/resampled NASA Earth Observatory Blue Marble Next Generation, September 2004, and Natural Earth v5.1.2. See [attribution](../../../data/ATTRIBUTION.md). The workspace shows the published Mass Communication photograph with its in-app credit; [all photo identities and rights](../../../data/photo-models/inventory.json) and [19 annotated comparison sheets](../../PHOTO-MODEL-COVERAGE.md) retain original source credits and modification notices.
+
 ## Current owner editor — 17 September 2026
 
 Unmodified JPEG captures from application revision **`b69cde0`**, using the real editor in the **Codex in-app browser**. The local preview loaded the checked-in **`lasu-4e4c8008b38b`** campus seed. A temporary development fixture supplied a local sample owner, empty drafts/reports/releases and no source updates. Save/publish requests were disabled in that fixture; no production session or private workspace was opened.
