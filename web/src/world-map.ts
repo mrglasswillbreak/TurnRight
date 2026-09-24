@@ -164,7 +164,7 @@ export function installWorldLayers(
     minzoom: 0,
     maxzoom: 4,
     attribution:
-      '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/">NASA Earth Observatory · September 2004</a> · shaded relief overview; resampled and compressed',
+      '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/">NASA Earth Observatory · September 2004</a> · palette-styled relief overview; resampled and compressed',
   });
   map.addSource('world', {
     type: 'geojson',
@@ -236,7 +236,12 @@ export function installWorldLayers(
       type: 'raster',
       maxzoom: 8,
       paint: {
-        'raster-opacity': ['interpolate', ['linear'], ['zoom'], 5, 1, 8, 0],
+        // The campus palette leads; imagery supplies only quiet surface relief.
+        'raster-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.28, 8, 0],
+        'raster-saturation': -0.55,
+        'raster-contrast': -0.4,
+        'raster-brightness-min': 0.12,
+        'raster-brightness-max': 0.92,
         'raster-fade-duration': 0,
       },
     },
@@ -288,7 +293,17 @@ export function installWorldLayers(
     'sky-horizon-blend': 0.5,
     'horizon-fog-blend': 0.5,
     'fog-ground-blend': 0,
-    'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 8, 0],
+    'atmosphere-blend': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      0,
+      0.55,
+      5,
+      0.55,
+      8,
+      0,
+    ],
   });
   map.addLayer(
     {
@@ -309,7 +324,7 @@ export function installWorldLayers(
       type: 'FeatureCollection',
       features: [-1, 1].map((hemisphere) => ({
         type: 'Feature',
-        properties: { colour: hemisphere < 0 ? '#edf2f3' : '#070d21' },
+        properties: { hemisphere },
         geometry: {
           type: 'Polygon',
           coordinates: [
@@ -335,7 +350,12 @@ export function installWorldLayers(
       type: 'fill',
       maxzoom: 8,
       paint: {
-        'fill-color': ['get', 'colour'],
+        'fill-color': [
+          'case',
+          ['<', ['get', 'hemisphere'], 0],
+          '#f8f3e8',
+          '#8eacb7',
+        ],
         'fill-antialias': false,
         'fill-opacity': ['interpolate', ['linear'], ['zoom'], 5, 1, 8, 0],
       },

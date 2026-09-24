@@ -54,7 +54,29 @@ export function mapTheme(dark: boolean) {
   return {
     background: { 'background-color': p.ground },
     'world-ocean': { 'background-color': p.water },
-    'world-land': { 'fill-color': p.land },
+    'world-land': {
+      'fill-color': ['match', ['get', 'name'], 'Antarctica', p.campus, p.green],
+    },
+    'world-imagery': {
+      'raster-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        5,
+        dark ? 0.18 : 0.28,
+        8,
+        0,
+      ],
+    },
+    'world-polar-caps': {
+      // Flat caps mask stretched Mercator pixels and follow the graded ocean/ice.
+      'fill-color': [
+        'case',
+        ['<', ['get', 'hemisphere'], 0],
+        dark ? '#4d5e6d' : '#f8f3e8',
+        dark ? '#294379' : '#8eacb7',
+      ],
+    },
     'world-borders': { 'line-color': p.boundary },
     'world-country-labels': label,
     'world-cities': label,
