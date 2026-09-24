@@ -18,6 +18,9 @@ existing warnings, and all configured build budgets. See the updated
 [verification report](MODEL-EDITOR-VERIFICATION.md). Live owner checks exercised
 Add window, Add door and Add column on the reported wall, then undid every test
 insertion. Reviewed draft repairs reached the server-confirmed Saved state.
+After a manual refresh cleared a stale in-app browser page, a fresh owner session
+loaded the current bundle and retained the saved repairs. The final live Add/Undo
+check also cleared selection and disabled Duplicate when no detail remained.
 
 At **23:33 UTC on 24 September** (00:33 on 25 September in London), all **84 assets**
 passed byte-length and SHA-256 checks. The published manifest is unchanged:
