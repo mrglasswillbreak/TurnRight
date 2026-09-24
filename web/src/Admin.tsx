@@ -2176,7 +2176,7 @@ function Editor({
               selected.kind === 'building' && (
                 <BuildingAppearanceEditor
                   edit={selected}
-                  data={base}
+                  data={validation.data}
                   mode={buildingMode}
                   selection={buildingSelection}
                   onMode={(mode) => {

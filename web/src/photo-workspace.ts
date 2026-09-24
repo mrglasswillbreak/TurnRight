@@ -56,7 +56,33 @@ export function photoEdits(
                 ),
             ),
           );
-    result.push({ ...edit, properties: { ...edit.properties, photos } });
+    const appearance =
+      edit.properties.appearance && structuredClone(edit.properties.appearance);
+    if (appearance?.facades)
+      for (const facade of Object.values(appearance.facades)) {
+        if (
+          facade.photoIds.some(
+            (id) =>
+              affected.has(id) &&
+              !normalized.some(
+                (p) =>
+                  p.id === id &&
+                  p.buildingId === edit.id &&
+                  p.sha256 ===
+                    data.photos?.find((old) => old.id === id)?.sha256,
+              ),
+          )
+        )
+          facade.needsReview = true;
+      }
+    result.push({
+      ...edit,
+      properties: {
+        ...edit.properties,
+        ...(appearance ? { appearance } : {}),
+        photos,
+      },
+    });
   }
   // A moved/deleted photograph cannot remain a guide reference for its previous destination.
   for (const entity of [...data.places, ...(data.entrances || [])]) {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import type { MapEdit, CampusData } from './types';
 import type {
   BuildingSelection,
@@ -17,6 +17,7 @@ import {
 } from './building-surfaces';
 import { RoofPlanEditor } from './RoofPlanEditor';
 import './building-editor.css';
+const PhotoModelWorkspace = lazy(() => import('./PhotoModelWorkspace'));
 
 export type BuildingMode = 'appearance' | 'outline' | 'roof';
 export function BuildingAppearanceEditor({
@@ -42,6 +43,7 @@ export function BuildingAppearanceEditor({
   onRoofDraft: (draft: RoofDraft | null) => void;
   onApplyRoof: (edit: MapEdit) => void;
 }) {
+  const [photoModelOpen, setPhotoModelOpen] = useState(false);
   const feature = useMemo(
     () => ({
       type: 'Feature' as const,
@@ -211,6 +213,30 @@ export function BuildingAppearanceEditor({
       className="building-appearance"
       aria-label="Building appearance editor"
     >
+      <button
+        type="button"
+        disabled={locked}
+        onClick={() => setPhotoModelOpen(true)}
+      >
+        Photo &amp; model
+      </button>
+      {photoModelOpen && (
+        <Suspense
+          fallback={
+            <output aria-live="polite">Opening model workspace…</output>
+          }
+        >
+          <PhotoModelWorkspace
+            key={edit.id}
+            edit={edit}
+            data={data}
+            selection={selection}
+            onSelection={onSelection}
+            onEdit={onEdit}
+            onClose={() => setPhotoModelOpen(false)}
+          />
+        </Suspense>
+      )}
       <fieldset className="building-modes" aria-label="Building editing mode">
         {(['appearance', 'outline', 'roof'] as const).map((m) => (
           <button

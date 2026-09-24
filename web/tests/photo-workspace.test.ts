@@ -44,6 +44,20 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 describe('photo management', () => {
+  it('flags model evidence after photo moves or byte changes, while caption edits preserve its review', () => {
+    const data = campus();
+    data.map.features[0].properties!.appearance = {
+      facades: { wall: { photoIds: ['b'], needsReview: false } },
+    };
+    const draft = (change: Partial<CampusPhoto>) =>
+      photoEdits(data, [], {
+        photos: [{ ...photo('b'), ...change }],
+        removeIds: [],
+      }).find((e) => e.id === 'one')!.properties.appearance!.facades!.wall;
+    expect(draft({ caption: 'New label' }).needsReview).toBe(false);
+    expect(draft({ buildingId: 'two' }).needsReview).toBe(true);
+    expect(draft({ sha256: 'b'.repeat(64) }).needsReview).toBe(true);
+  });
   it('accepts an author-provided photo without inventing a URL, but still requires external source evidence', () => {
     const own = {
       ...photo(),

@@ -1,0 +1,165 @@
+.photo-model-overlay[data-slot='dialog-overlay'] {
+  backdrop-filter: none;
+  background: rgb(0 0 0 / 35%);
+}
+.photo-model-workspace[data-slot='dialog-content'] {
+  width: min(1120px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  gap: 16px;
+  padding: 20px;
+  background: var(--background);
+  color: var(--foreground);
+}
+.photo-model-workspace header {
+  padding-right: 36px;
+}
+.photo-model-workspace p {
+  margin: 0.4rem 0;
+}
+.photo-model-workspace label {
+  display: grid;
+  gap: 4px;
+}
+.photo-model-workspace :is(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--foreground);
+  padding: 8px;
+  font: inherit;
+}
+.photo-model-workspace :is(button, input, select, summary) {
+  min-height: 44px;
+}
+.photo-model-workspace button {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--foreground);
+}
+.photo-model-workspace button:disabled {
+  opacity: 0.5;
+}
+.photo-model-workspace :focus-visible {
+  outline: 2px solid #1764ed;
+  outline-offset: 2px;
+}
+.photo-model-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.photo-model-image {
+  position: relative;
+  width: 100%;
+  margin-top: 8px;
+}
+.photo-model-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+.photo-model-image svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  touch-action: none;
+}
+.photo-model-canvas {
+  height: 300px;
+  max-height: 38dvh;
+  min-height: 150px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.photo-model-canvas canvas {
+  display: block;
+  touch-action: none;
+}
+.photo-model-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.photo-model-controls {
+  display: grid;
+  gap: 12px;
+}
+.photo-model-controls fieldset {
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+}
+.photo-model-add,
+.photo-model-view-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.photo-model-workspace footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: sticky;
+  bottom: -20px;
+  background: var(--background);
+  padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+}
+.photo-model-workspace footer [role='alert'] {
+  width: 100%;
+  color: var(--danger, #b33132);
+}
+.photo-model-mobile-tabs {
+  display: none;
+}
+@media (max-width: 640px) {
+  .photo-model-workspace[data-slot='dialog-content'] {
+    --tw-translate-x: 0px;
+    --tw-translate-y: 0px;
+    inset: 0;
+    transform: none;
+    translate: none;
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+    padding: max(16px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+  .photo-model-mobile-tabs {
+    display: flex;
+    gap: 8px;
+  }
+  .photo-model-comparison {
+    display: block;
+  }
+  .photo-model-comparison.show-photo .photo-model-result,
+  .photo-model-comparison.show-model .photo-model-reference {
+    display: none;
+  }
+  .photo-model-workspace footer {
+    bottom: -16px;
+  }
+  .photo-model-workspace :is(input, select, textarea) {
+    font-size: 16px;
+  }
+  .photo-model-image img {
+    height: 100%;
+  }
+  .photo-model-canvas {
+    height: 30dvh;
+  }
+}

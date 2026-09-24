@@ -1,0 +1,1069 @@
+{
+  "schemaVersion": 1,
+  "baselineVersion": "lasu-8577d5c85d2c",
+  "checkedAt": "2026-09-24",
+  "buildings": [
+    {
+      "buildingId": "arcgis:University_Property:2",
+      "name": "LASU Main Auditorium",
+      "photoIds": [
+        "owner:0d3bf62a-b1ad-4784-97e0-ca5ef7d75f12",
+        "owner:f4f817e8-8ee9-4870-9838-26c6b28ea1d2"
+      ],
+      "observed": [
+        "Cream and muted red-brown wall planes; tall vertical fins; entrance canopy and side galleries."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "One linked image shows the campus gate and is excluded from model evidence. Low-resolution overlay photograph is not a texture source.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.64,
+        "windowHeightRatio": 0.6
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:3",
+      "name": "LASU International Library",
+      "photoIds": [
+        "commons:198256532",
+        "commons:198256515"
+      ],
+      "observed": [
+        "Four exterior levels; broad blue glazing; cream framing and red-brown vertical panels. Interior image shows covered atrium."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Interior view does not locate the atrium roof in map coordinates. Preserve the mapped courtyard and owner roof.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.82,
+        "windowHeightRatio": 0.66
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:22",
+      "name": "Mass Communication",
+      "photoIds": [
+        "commons:112540966",
+        "commons:116073666"
+      ],
+      "observed": [
+        "Four visible storeys; paired rectangular windows; pale wall panels and red-brown vertical strips."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Flat parapet visible. Air-conditioning units are omitted.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.56,
+        "windowHeightRatio": 0.46
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:25",
+      "name": "Faculty of Art Language Lab",
+      "photoIds": [
+        "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf"
+      ],
+      "observed": [
+        "Two levels; yellow walls; red pitched roof; rounded end and recessed entrance."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Trees obscure the end façade. Preserve owner outline and custom roof; do not infer circular footprint from perspective.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.57,
+        "windowHeightRatio": 0.45
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:28",
+      "name": "Makanjuola Lecture Theatre",
+      "photoIds": [
+        "owner:29167df2-b9dc-4031-86ab-7b27a9ec1ad4",
+        "owner:5938e73d-5f89-4688-8c55-1bd8a04afce3",
+        "owner:157703d4-eac0-43a7-aba5-49670c40241a"
+      ],
+      "observed": [
+        "Three visible levels; grey exterior screen with irregular tall narrow openings; blue entrance canopies; flat parapet."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Screen pattern is irregular: regularized model openings remain estimates. Existing owner roof retained pending review.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.3,
+        "windowHeightRatio": 0.67
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:31",
+      "name": "ICT",
+      "photoIds": [
+        "commons:116026274"
+      ],
+      "observed": [
+        "Yellow walls and brown trim; recessed low entrance section between taller end blocks."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Fence and trees obstruct the façade. No whole-wall photographic texture is safe.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.55,
+        "windowHeightRatio": 0.45
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:32",
+      "name": "Student Arcade",
+      "photoIds": [
+        "commons:115984120"
+      ],
+      "observed": [
+        "Yellow solid façade panels; red-brown central entrance block; central glazing."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Wall orientation and relief-panel motifs need owner matching. Preserve existing solid walls.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.7,
+        "windowHeightRatio": 0.65
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:33",
+      "name": "SDG-PHC FACILITY",
+      "photoIds": [
+        "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+        "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+        "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555"
+      ],
+      "observed": [
+        "Two levels; cream walls; red-brown vertical bands and canopy; white-framed blue windows."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Strong colour grading in one image is unsuitable for texture/material sampling. External ramp does not establish routing permission.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.52,
+        "windowHeightRatio": 0.5
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:39",
+      "name": "FMS",
+      "photoIds": [
+        "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+        "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9"
+      ],
+      "observed": [
+        "Three visible levels; yellow infill; repeated rectangular windows; white entrance portico."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Previously illustrative height can use three observed floors at an estimated 3 m per floor. Exact front-wall location remains unconfirmed.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.7,
+        "windowHeightRatio": 0.53
+      },
+      "observedFloors": 3,
+      "palette": {
+        "wallColour": "#d7b75b",
+        "roofColour": "#987259",
+        "windowColour": "#5c665b",
+        "trimColour": "#ede9df"
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:43",
+      "name": "PG School",
+      "photoIds": [
+        "commons:112834702"
+      ],
+      "observed": [
+        "Cream wall planes and red-brown entrance framing; tall solid tower and triangular entrance feature."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Tower silhouette cannot be assigned confidently to the footprint from this view.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.5,
+        "windowHeightRatio": 0.45
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:44",
+      "name": "Department of Theartre Arts and Music",
+      "photoIds": [
+        "commons:112838171"
+      ],
+      "observed": [
+        "Two levels; yellow walls; red-brown roof-edge trim; rectangular dark windows."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Trees obscure some openings. Wall position needs matching.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.6,
+        "windowHeightRatio": 0.42
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:54",
+      "name": "Faculty Of Education 3 In 1",
+      "photoIds": [
+        "commons:112834607",
+        "commons:115992650"
+      ],
+      "observed": [
+        "Cream/yellow infill; tall red-brown vertical columns; entrance portico and pitched roof sections."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Existing custom roof retained. Photographs do not resolve all courtyard roof ridges.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.55,
+        "windowHeightRatio": 0.56
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:55",
+      "name": "LASU Radio",
+      "photoIds": [
+        "commons:115996430"
+      ],
+      "observed": [
+        "Cream/yellow entrance elevation; flat parapet; glazed entrance doors."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Mast is separate from the building. Concealed levels and side windows remain unknown.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.55,
+        "windowHeightRatio": 0.45
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:73",
+      "name": "LASU CBT",
+      "photoIds": [
+        "owner:b4086f16-2907-435d-82ec-bed122723989",
+        "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+        "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8"
+      ],
+      "observed": [
+        "Large grey hall; stepped façade/parapet; light entrance surround; small high windows. Interior shows computer hall."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Interior photograph cannot establish exterior floor count. Retain existing roof and height pending survey; do not texture with the approach or interior.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.35,
+        "windowHeightRatio": 0.35
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:75",
+      "name": "M.B.A",
+      "photoIds": [
+        "commons:113564415",
+        "commons:116026424"
+      ],
+      "observed": [
+        "Yellow infill with red-brown vertical framing; recessed entrance approach."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Trees obscure the upper façade and roof. Courtyard structure is not a surveyed footprint.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.56,
+        "windowHeightRatio": 0.5
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:76",
+      "name": "Law Library",
+      "photoIds": [
+        "commons:112835955"
+      ],
+      "observed": [
+        "Three visible levels; cream infill, dark windows, red-brown pilasters and continuous floor bands."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Exact pilaster spacing and façade orientation require matching.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.65,
+        "windowHeightRatio": 0.45
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:78",
+      "name": "Law Clinic",
+      "photoIds": [
+        "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+        "commons:116180211",
+        "commons:116180607",
+        "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465"
+      ],
+      "observed": [
+        "Two levels; red pitched roofs; cream walls, veranda columns and balcony rails. Views show different entrance finishes."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "New-looking dark-clad view has no capture date; material chronology unresolved. Preserve owner cream finish and custom roof.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.52,
+        "windowHeightRatio": 0.5
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:103",
+      "name": "School Of TransportC",
+      "photoIds": [
+        "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+        "commons:112540904"
+      ],
+      "observed": [
+        "Four visible levels; cream infill with red-brown vertical framing; multiple red pitched roof sections."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Aerial image supports roof form, not surveyed ridge elevations. Owner roof retained.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.62,
+        "windowHeightRatio": 0.5
+      }
+    },
+    {
+      "buildingId": "arcgis:University_Property:120",
+      "name": "LASU Senate Building",
+      "photoIds": [
+        "commons:138069484",
+        "commons:198256507",
+        "commons:116073984",
+        "commons:115987634"
+      ],
+      "observed": [
+        "Seven visible levels; long blue-glazed window bands; cream horizontal bands; red diamond motifs on tall side panels."
+      ],
+      "estimated": [
+        "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+      ],
+      "needed": [
+        "Different dated views show finish changes. Exact front-wall orientation and diamond placement need review.",
+        "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+      ],
+      "settings": {
+        "windowFrameDepth": 0.08,
+        "windowWidthRatio": 0.86,
+        "windowHeightRatio": 0.63
+      }
+    }
+  ],
+  "photos": [
+    {
+      "id": "commons:112540966",
+      "buildingId": "arcgis:University_Property:22",
+      "sha256": "2e9e5a353edc69d531c7249f76d10d721c73fe3324c19383f06a3dadd8ab0b69",
+      "url": "/packages/photos/2e9e5a353edc69d531c7249f76d10d721c73fe3324c19383f06a3dadd8ab0b69.webp",
+      "caption": "School of Communication exterior",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+      "capturedAt": "2021-11-15",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:115984120",
+      "buildingId": "arcgis:University_Property:32",
+      "sha256": "dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010",
+      "url": "/packages/photos/dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010.webp",
+      "caption": "Students’ Arcade exterior",
+      "author": "Shedyflowz",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:115996430",
+      "buildingId": "arcgis:University_Property:55",
+      "sha256": "48074f9ebaf007a50457ba458c8acc205356e134607218b1e661ea79d53cc043",
+      "url": "/packages/photos/48074f9ebaf007a50457ba458c8acc205356e134607218b1e661ea79d53cc043.webp",
+      "caption": "LASU Radio exterior",
+      "author": "Justjin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:112834702",
+      "buildingId": "arcgis:University_Property:43",
+      "sha256": "4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b",
+      "url": "/packages/photos/4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b.webp",
+      "caption": "Postgraduate School exterior",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:112835955",
+      "buildingId": "arcgis:University_Property:76",
+      "sha256": "c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09",
+      "url": "/packages/photos/c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09.webp",
+      "caption": "Taslim Olawale Elias Law Library",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:113564415",
+      "buildingId": "arcgis:University_Property:75",
+      "sha256": "a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7",
+      "url": "/packages/photos/a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7.webp",
+      "caption": "MBA complex exterior",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+      "capturedAt": "2021-12-22",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116073666",
+      "buildingId": "arcgis:University_Property:22",
+      "sha256": "45441f76b70faf3f121ddda9739e780faf8fd06464963294fdc87db6696a8d7c",
+      "url": "/packages/photos/45441f76b70faf3f121ddda9739e780faf8fd06464963294fdc87db6696a8d7c.webp",
+      "caption": "School of Communication facade detail",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:School_of_Communication.jpg",
+      "capturedAt": "2022-02-21",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:112834607",
+      "buildingId": "arcgis:University_Property:54",
+      "sha256": "2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078",
+      "url": "/packages/photos/2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078.webp",
+      "caption": "Faculty of Education complex",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:112838171",
+      "buildingId": "arcgis:University_Property:44",
+      "sha256": "b54d46a6aecff2bd440ea31004ef73d1948d26860eed87085ddea593caa28bf5",
+      "url": "/packages/photos/b54d46a6aecff2bd440ea31004ef73d1948d26860eed87085ddea593caa28bf5.webp",
+      "caption": "Theatre Art and Music exterior",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Department_of_Theater_Art_and_Music,_Lagos_State_University.jpg",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:115992650",
+      "buildingId": "arcgis:University_Property:54",
+      "sha256": "edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef",
+      "url": "/packages/photos/edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef.webp",
+      "caption": "Faculty of Education entrance facade",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg",
+      "capturedAt": "2022-02-21",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116026274",
+      "buildingId": "arcgis:University_Property:31",
+      "sha256": "28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f",
+      "url": "/packages/photos/28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f.webp",
+      "caption": "ICT Centre exterior",
+      "author": "Ajokeoba",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0000.jpg",
+      "capturedAt": "2022-03-13",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116026424",
+      "buildingId": "arcgis:University_Property:75",
+      "sha256": "5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9",
+      "url": "/packages/photos/5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9.webp",
+      "caption": "MBA complex courtyard approach",
+      "author": "Ajokeoba",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0007.jpg",
+      "capturedAt": "2022-03-13",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+      "buildingId": "arcgis:University_Property:103",
+      "sha256": "58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323",
+      "url": "/packages/photos/58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323.webp",
+      "caption": "School Of Transport",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+      "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:112540904",
+      "buildingId": "arcgis:University_Property:103",
+      "sha256": "d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7",
+      "url": "/packages/photos/d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7.webp",
+      "caption": "School of Transport exterior",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+      "capturedAt": "2021-11-15",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:138069484",
+      "buildingId": "arcgis:University_Property:120",
+      "sha256": "ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba",
+      "url": "/packages/photos/ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba.webp",
+      "caption": "Senate building, front facade",
+      "author": "Aimee.shot.it",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg",
+      "capturedAt": "2023-07-07",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:198256507",
+      "buildingId": "arcgis:University_Property:120",
+      "sha256": "2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94",
+      "url": "/packages/photos/2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94.webp",
+      "caption": "Senate building, August 2026",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116073984",
+      "buildingId": "arcgis:University_Property:120",
+      "sha256": "108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7",
+      "url": "/packages/photos/108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7.webp",
+      "caption": "Senate building, right section",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:115987634",
+      "buildingId": "arcgis:University_Property:120",
+      "sha256": "9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066",
+      "url": "/packages/photos/9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066.webp",
+      "caption": "Senate building, oblique view",
+      "author": "Ebubechukwu1",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:0d3bf62a-b1ad-4784-97e0-ca5ef7d75f12",
+      "buildingId": "arcgis:University_Property:2",
+      "sha256": "43099d0531594b86c43e824ea5c73635d1ad6ede03e7c5cf4d37693f7019e1e6",
+      "url": "/packages/photos/43099d0531594b86c43e824ea5c73635d1ad6ede03e7c5cf4d37693f7019e1e6.webp",
+      "caption": "LASU Main Auditorium(BUBA MARWA HALL)",
+      "author": "LASU Admission facebook account",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:f4f817e8-8ee9-4870-9838-26c6b28ea1d2",
+      "buildingId": "arcgis:University_Property:2",
+      "sha256": "430e48c06de3d3b8e858c2c953ded9ebd50e2c29f20e811fbeb2f8f9ac3e82e5",
+      "url": "/packages/photos/430e48c06de3d3b8e858c2c953ded9ebd50e2c29f20e811fbeb2f8f9ac3e82e5.webp",
+      "caption": "LASU Main Auditorium(BUBA MARWA HALL)",
+      "author": "LASU Admission facebook account",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:219bff19-0911-4994-9e4b-1b88c02de40a",
+      "buildingId": "arcgis:University_Property:2",
+      "sha256": "46e43769089b50fd0a99df22b27fb1490c1c03341a1df742a2ab4990186ca549",
+      "url": "/packages/photos/46e43769089b50fd0a99df22b27fb1490c1c03341a1df742a2ab4990186ca549.webp",
+      "caption": "LASU Main Auditorium(BUBA MARWA HALL)",
+      "author": "LASU Admission facebook account",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+      "historical": false,
+      "classification": "rejected-building-match",
+      "textureDecision": "rejected",
+      "reason": "Shows LASU campus gate, not the Main Auditorium. Gallery correction requires owner review."
+    },
+    {
+      "id": "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf",
+      "buildingId": "arcgis:University_Property:25",
+      "sha256": "103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7",
+      "url": "/packages/photos/103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7.webp",
+      "caption": "Faculty of Art Language Lab",
+      "author": "The Intellectual",
+      "license": "Public domain",
+      "licenseUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+      "sourceUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:29167df2-b9dc-4031-86ab-7b27a9ec1ad4",
+      "buildingId": "arcgis:University_Property:28",
+      "sha256": "b4e0fa66b748c4e308d71bc1a524d251d9afe4bc0a5dcadfef7b4545ebc40f79",
+      "url": "/packages/photos/b4e0fa66b748c4e308d71bc1a524d251d9afe4bc0a5dcadfef7b4545ebc40f79.webp",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "author": "Photo © PWDC",
+      "license": "Public domain",
+      "licenseUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "sourceUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:5938e73d-5f89-4688-8c55-1bd8a04afce3",
+      "buildingId": "arcgis:University_Property:28",
+      "sha256": "0479514e110b6fbd1e2d1b17634309e5ae6413fa994a9994f16a71f62d34f22d",
+      "url": "/packages/photos/0479514e110b6fbd1e2d1b17634309e5ae6413fa994a9994f16a71f62d34f22d.webp",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "author": "Patrickwaheed Design Consultancy",
+      "license": "Public domain",
+      "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:157703d4-eac0-43a7-aba5-49670c40241a",
+      "buildingId": "arcgis:University_Property:28",
+      "sha256": "d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3",
+      "url": "/packages/photos/d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3.webp",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "author": "Patrickwaheed Design Consultancy",
+      "license": "Public domain",
+      "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:198256532",
+      "buildingId": "arcgis:University_Property:3",
+      "sha256": "a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8",
+      "url": "/packages/photos/a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8.webp",
+      "caption": "International Library exterior, August 2026",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:198256515",
+      "buildingId": "arcgis:University_Property:3",
+      "sha256": "54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b",
+      "url": "/packages/photos/54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b.webp",
+      "caption": "International Library atrium, August 2026",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "classification": "interior-evidence",
+      "textureDecision": "not-exterior-texture",
+      "reason": "Useful interior evidence; does not establish an exterior façade."
+    },
+    {
+      "id": "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+      "buildingId": "arcgis:University_Property:33",
+      "sha256": "9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4",
+      "url": "/packages/photos/9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4.webp",
+      "caption": "SDG-PHC FACILITY",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+      "buildingId": "arcgis:University_Property:33",
+      "sha256": "fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58",
+      "url": "/packages/photos/fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58.webp",
+      "caption": "SDG-PHC FACILITY",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555",
+      "buildingId": "arcgis:University_Property:33",
+      "sha256": "7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e",
+      "url": "/packages/photos/7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e.webp",
+      "caption": "SDG-PHC FACILITY",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+      "buildingId": "arcgis:University_Property:39",
+      "sha256": "feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3",
+      "url": "/packages/photos/feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3.webp",
+      "caption": "FMS",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+      "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9",
+      "buildingId": "arcgis:University_Property:39",
+      "sha256": "5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b",
+      "url": "/packages/photos/5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b.webp",
+      "caption": "FMS",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+      "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:b4086f16-2907-435d-82ec-bed122723989",
+      "buildingId": "arcgis:University_Property:73",
+      "sha256": "1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11",
+      "url": "/packages/photos/1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11.webp",
+      "caption": "LASU CBT",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+      "buildingId": "arcgis:University_Property:73",
+      "sha256": "0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06",
+      "url": "/packages/photos/0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06.webp",
+      "caption": "LASU CBT",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "historical": false,
+      "classification": "approach-only",
+      "textureDecision": "not-exterior-texture",
+      "reason": "Approach overview; exterior detail too small for a façade texture."
+    },
+    {
+      "id": "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8",
+      "buildingId": "arcgis:University_Property:73",
+      "sha256": "9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812",
+      "url": "/packages/photos/9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812.webp",
+      "caption": "LASU CBT",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "historical": false,
+      "classification": "interior-evidence",
+      "textureDecision": "not-exterior-texture",
+      "reason": "Useful interior evidence; does not establish an exterior façade."
+    },
+    {
+      "id": "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+      "buildingId": "arcgis:University_Property:78",
+      "sha256": "2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1",
+      "url": "/packages/photos/2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1.webp",
+      "caption": "Law Clinic",
+      "author": "The Nation",
+      "license": "Public domain",
+      "licenseUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+      "sourceUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116180211",
+      "buildingId": "arcgis:University_Property:78",
+      "sha256": "c690e0c8e45aaa8934ad4c3744bec1650cdfb447ff73a8ab077d0b0632c0b140",
+      "url": "/packages/photos/c690e0c8e45aaa8934ad4c3744bec1650cdfb447ff73a8ab077d0b0632c0b140.webp",
+      "caption": "Law Clinic exterior",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_L%C3%A1%C3%A9_Clinic.jpg",
+      "capturedAt": "2022-03-17",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "commons:116180607",
+      "buildingId": "arcgis:University_Property:78",
+      "sha256": "47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58",
+      "url": "/packages/photos/47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58.webp",
+      "caption": "Law Clinic, wider approach view",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+      "capturedAt": "2022-03-17",
+      "historical": true,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    },
+    {
+      "id": "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465",
+      "buildingId": "arcgis:University_Property:78",
+      "sha256": "6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d",
+      "url": "/packages/photos/6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d.webp",
+      "caption": " Law Clinic",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+      "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+      "historical": false,
+      "classification": "exterior-evidence",
+      "textureDecision": "awaiting-wall-orientation-and-unobstructed-crop",
+      "reason": "Supports visible architectural observations. Camera orientation is not georeferenced; do not silently choose a wall."
+    }
+  ],
+  "coverage": {
+    "buildings": 395,
+    "photographedBuildings": 19,
+    "photographs": 39,
+    "exteriorEvidence": 35,
+    "interiorEvidence": 2,
+    "approachOnly": 1,
+    "rejectedBuildingMatches": 1,
+    "wallTexturesApproved": 0
+  }
+}

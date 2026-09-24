@@ -24,6 +24,7 @@ import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
 import { BaselineReview } from './BaselineReview';
 import { BuildingReferenceReview } from './BuildingReferenceReview';
+import { BuildingPhotoReview } from './BuildingPhotoReview';
 import { BuildingRoofReview } from './BuildingRoofReview';
 import type { PublishedWorkspace } from './editor-publication';
 
@@ -187,6 +188,19 @@ export function EditorReview({
           <BuildingReferenceReview
             data={validation.data}
             duplicates={validation.duplicates}
+            edits={workspace.edits}
+            disabled={
+              busy ||
+              !!validation.pending ||
+              !!workspace.unfinished ||
+              !!workspace.roofDraft ||
+              workspace.status === 'Conflict'
+            }
+            onApply={onApplyAppearances}
+            onLocate={onLocateBuilding}
+          />
+          <BuildingPhotoReview
+            data={validation.data}
             edits={workspace.edits}
             disabled={
               busy ||
