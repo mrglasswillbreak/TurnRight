@@ -189,8 +189,13 @@ export default function PhotoModelWorkspace({
     !!workspace?.roofDraft ||
     Object.keys(workspace?.modelInputs[edit.id] || {}).length > 0;
   const publishErrors = useMemo(
-    () => facadeErrors(feature, data.photos, true),
-    [feature, data.photos],
+    () => [
+      ...new Set([
+        ...validateEdit(draft),
+        ...facadeErrors(feature, data.photos, true),
+      ]),
+    ],
+    [draft, feature, data.photos],
   );
   const label = (e: FacadeElement) =>
     authoring.names[e.id] ||
@@ -230,7 +235,10 @@ export default function PhotoModelWorkspace({
     if (before) return false;
     if (
       next.id === edit.id &&
-      next.properties.appearance !== draft.properties.appearance
+      (next.properties.appearance !== draft.properties.appearance ||
+        ['height', 'floors', 'heightMode'].some(
+          (key) => next.properties[key] !== draft.properties[key],
+        ))
     ) {
       const facades = next.properties.appearance?.facades;
       if (facades)
@@ -286,19 +294,24 @@ export default function PhotoModelWorkspace({
     reviewed = false,
   ) => {
     if (!metrics) return false;
+    if (before) return false;
+    const retain = () => {
+      setPending(next);
+      setPendingAuthoring(metadata);
+      setConversion(null);
+      workspace?.recoverModelInput(
+        edit.id,
+        `pending:${activeWall}`,
+        JSON.stringify({ facade: next, authoring: metadata }),
+      );
+    };
     const errors = placementErrors(
       next.elements,
       metrics.length,
       metrics.eaves,
     );
     if (errors.length) {
-      setPending(next);
-      setPendingAuthoring(metadata);
-      workspace?.recoverModelInput(
-        edit.id,
-        `pending:${activeWall}`,
-        JSON.stringify({ facade: next, authoring: metadata }),
-      );
+      retain();
       setError(
         errors
           .map(
@@ -334,6 +347,7 @@ export default function PhotoModelWorkspace({
       workspace?.recoverModelInput(edit.id, `pending:${activeWall}`);
       return true;
     }
+    retain();
     return false;
   };
   const updateElements = (next: FacadeElement[], metadata = authoring) => {
@@ -403,27 +417,27 @@ export default function PhotoModelWorkspace({
       setSelected([]);
   };
   const add = (kind: FacadeElementKind) => {
-    if (!metrics) return;
-    if (!facade) {
-      tryAction(() =>
-        setConversion(editableFacade(feature, activeWall, visual)),
-      );
-      return;
-    }
-    const value: FacadeElement = {
-      id: crypto.randomUUID(),
-      kind,
-      x: 0.5,
-      bottom: kind === 'window' ? 1 : 0,
-      width: kind === 'column' ? 0.35 : 1.5,
-      height: ['trim', 'canopy', 'parapet'].includes(kind) ? 0.2 : 2,
-      depth: ['balcony', 'canopy'].includes(kind) ? 1 : 0.08,
-      count: 1,
-      spacing: 0,
-      colour: kind === 'window' ? '#557585' : '#d8cbb1',
-    };
-    updateElements([...elements, value]);
-    setSelected([value.id]);
+    if (!metrics || before) return;
+    tryAction(() => {
+      // Insertion and preserving generated details are one undoable command.
+      // A preview remains optional; an Add action must not discard its intent.
+      const base =
+        facade || conversion || editableFacade(feature, activeWall, visual);
+      const value: FacadeElement = {
+        id: crypto.randomUUID(),
+        kind,
+        x: 0.5,
+        bottom: kind === 'window' ? 1 : 0,
+        width: kind === 'column' ? 0.35 : 1.5,
+        height: ['trim', 'canopy', 'parapet'].includes(kind) ? 0.2 : 2,
+        depth: ['balcony', 'canopy'].includes(kind) ? 1 : 0.08,
+        count: 1,
+        spacing: 0,
+        colour: kind === 'window' ? '#557585' : '#d8cbb1',
+      };
+      applyWall({ ...base, elements: [...base.elements, value] });
+      setSelected([value.id]);
+    });
   };
   const editPattern = () =>
     tryAction(() => {
@@ -839,8 +853,9 @@ export default function PhotoModelWorkspace({
                     {!facade && !conversion && (
                       <div className="model-notice">
                         <p>
-                          This wall uses generated details. Convert its existing
-                          layout before adding or moving individual elements.
+                          Adding a detail preserves this wall’s generated
+                          layout. You can also preview and convert it before
+                          editing.
                         </p>
                         <button
                           onClick={() =>
@@ -868,6 +883,20 @@ export default function PhotoModelWorkspace({
                         </button>
                         <button onClick={() => setConversion(null)}>
                           Cancel conversion
+                        </button>
+                      </div>
+                    )}
+                    {pending?.wallId === activeWall && (
+                      <div className="model-notice">
+                        <p>
+                          Unfinished wall retained locally. Resolve its
+                          placement or building errors, then save it.
+                        </p>
+                        <button onClick={() => applyWall(pending)}>
+                          Save unfinished wall
+                        </button>
+                        <button onClick={() => setMode('appearance')}>
+                          Check building height
                         </button>
                       </div>
                     )}
@@ -922,8 +951,17 @@ export default function PhotoModelWorkspace({
                         wallId: activeWall,
                       }
                     }
-                    onSelection={onSelection}
+                    onSelection={(next) => {
+                      const id =
+                        next.wallId ||
+                        (next.partId !== metrics?.partId
+                          ? walls.find((w) => w.partId === next.partId)?.wallId
+                          : undefined);
+                      if (id && id !== activeWall) choose(id);
+                      onSelection(next);
+                    }}
                     onEdit={(next) => commit(next)}
+                    onHeightEdit={(next) => commit(next, true)}
                     roofDraft={roofDraft}
                     onRoofDraft={onRoofDraft}
                     onApplyRoof={onRoofApply}

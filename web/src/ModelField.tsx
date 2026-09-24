@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { EditorWorkspace } from './editor-workspace';
 const display = (value: string | number, step: number) =>
   typeof value === 'number' && Number.isFinite(value)
@@ -8,20 +8,7 @@ const display = (value: string | number, step: number) =>
         ),
       )
     : String(value);
-/** A field's intermediate text is not a geometry command. Never coerce blank input to zero. */
-export function ModelField({
-  label,
-  value,
-  field,
-  buildingId,
-  workspace,
-  onCommit,
-  type = 'number',
-  min,
-  max,
-  step = 0.01,
-  disabled = false,
-}: {
+type ModelFieldProps = {
   label: string;
   value: string | number;
   field: string;
@@ -33,7 +20,28 @@ export function ModelField({
   max?: number;
   step?: number;
   disabled?: boolean;
-}) {
+};
+/** Bind unfinished input to its entity, even when React reuses a properties panel. */
+export function ModelField(props: ModelFieldProps) {
+  return (
+    <ModelFieldInput key={`${props.buildingId}:${props.field}`} {...props} />
+  );
+}
+/** A field's intermediate text is not a geometry command. Never coerce blank input to zero. */
+function ModelFieldInput({
+  label,
+  value,
+  field,
+  buildingId,
+  workspace,
+  onCommit,
+  type = 'number',
+  min,
+  max,
+  step = 0.01,
+  disabled = false,
+}: ModelFieldProps) {
+  const errorId = useId();
   const recovered = workspace?.modelInputs[buildingId]?.[field];
   const [text, setText] = useState(recovered ?? display(value, step)),
     [error, setError] = useState('');
@@ -79,7 +87,7 @@ export function ModelField({
       setError('');
     } else
       setError(
-        'Change retained locally. Resolve the highlighted placement before saving.',
+        'Change retained locally. Resolve the reported validation error before saving.',
       );
   };
   return (
@@ -92,7 +100,9 @@ export function ModelField({
         max={max}
         step={step}
         disabled={disabled}
+        aria-label={label}
         aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
         onFocus={() => {
           focused.current = true;
         }}
@@ -119,7 +129,11 @@ export function ModelField({
           }
         }}
       />
-      {error && <small role="alert">{error}</small>}
+      {error && (
+        <small id={errorId} role="alert">
+          {error}
+        </small>
+      )}
     </label>
   );
 }

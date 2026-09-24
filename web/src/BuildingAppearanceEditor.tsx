@@ -30,6 +30,7 @@ export function BuildingAppearanceEditor({
   selection,
   onSelection,
   onEdit,
+  onHeightEdit,
   roofDraft,
   onRoofDraft,
   onApplyRoof,
@@ -44,6 +45,7 @@ export function BuildingAppearanceEditor({
   selection?: BuildingSelection;
   onSelection: (selection: BuildingSelection) => void;
   onEdit: (edit: MapEdit, field?: string) => void | boolean;
+  onHeightEdit?: (edit: MapEdit) => void | boolean;
   roofDraft: RoofDraft | null;
   onRoofDraft: (draft: RoofDraft | null) => void;
   onApplyRoof: (edit: MapEdit) => void;
@@ -185,10 +187,7 @@ export function BuildingAppearanceEditor({
           min={min}
           max={max}
           step={step}
-          onCommit={(value) => {
-            change(key, Number(value));
-            return true;
-          }}
+          onCommit={(value) => change(key, Number(value)) !== false}
         />
       ) : (
         <label className="field-label">
@@ -217,6 +216,11 @@ export function BuildingAppearanceEditor({
   );
   const choose = (partId?: string, wallId?: string) =>
     onSelection({ buildingId: edit.id, partId, wallId });
+  const changeHeight = (field: string, value: unknown) =>
+    (onHeightEdit || onEdit)({
+      ...edit,
+      properties: { ...edit.properties, [field]: value },
+    }) !== false;
   const wingHeight =
     own.heightMode === 'floors'
       ? Number(own.floors) * 3
@@ -455,6 +459,110 @@ export function BuildingAppearanceEditor({
             )
           ) : (
             <>
+              {embedded && (
+                <fieldset className="model-building-height">
+                  <legend>
+                    Building height · all wings inherit unless overridden
+                  </legend>
+                  <label>
+                    Building height information
+                    <select
+                      value={String(edit.properties.heightMode || 'metres')}
+                      onChange={(e) =>
+                        changeHeight('heightMode', e.target.value)
+                      }
+                    >
+                      <option value="metres">
+                        Height in metres, or unknown
+                      </option>
+                      <option value="floors">Documented floor count</option>
+                    </select>
+                  </label>
+                  {edit.properties.heightMode === 'floors' ? (
+                    <ModelField
+                      label="Building floors"
+                      value={Number(edit.properties.floors) || ''}
+                      field="building:floors"
+                      buildingId={edit.id}
+                      workspace={workspace}
+                      min={1}
+                      max={50}
+                      step={1}
+                      onCommit={(v) =>
+                        Number.isInteger(Number(v)) &&
+                        changeHeight('floors', Number(v))
+                      }
+                    />
+                  ) : (
+                    <>
+                      <ModelField
+                        label="Building height (m)"
+                        value={
+                          edit.properties.height === undefined
+                            ? ''
+                            : Number(edit.properties.height)
+                        }
+                        field="building:height"
+                        buildingId={edit.id}
+                        workspace={workspace}
+                        min={0.1}
+                        max={150}
+                        onCommit={(v) => changeHeight('height', Number(v))}
+                      />
+                      <button
+                        onClick={() => {
+                          const properties: MapEdit['properties'] = {
+                            ...edit.properties,
+                            heightMode: 'metres',
+                          };
+                          delete properties.height;
+                          delete properties.floors;
+                          const accepted =
+                            (onHeightEdit || onEdit)({
+                              ...edit,
+                              properties,
+                            }) !== false;
+                          if (accepted) {
+                            workspace?.recoverModelInput(
+                              edit.id,
+                              'building:height',
+                            );
+                            workspace?.recoverModelInput(
+                              edit.id,
+                              'building:floors',
+                            );
+                          }
+                        }}
+                      >
+                        Use unknown building height
+                      </button>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={!!edit.properties.heightEstimated}
+                          onChange={(e) =>
+                            changeHeight('heightEstimated', e.target.checked)
+                          }
+                        />{' '}
+                        Height is approximate
+                      </label>
+                    </>
+                  )}
+                  <ModelField
+                    label="Building height source / notes"
+                    type="text"
+                    value={String(edit.properties.heightSource || '')}
+                    field="building:heightSource"
+                    buildingId={edit.id}
+                    workspace={workspace}
+                    onCommit={(v) => changeHeight('heightSource', v)}
+                  />
+                  <p className="small-note">
+                    Enter only recorded information. Unknown height uses an
+                    illustrative block; a floor count estimates 3 m per floor.
+                  </p>
+                </fieldset>
+              )}
               <p className="small-note">
                 {wallId
                   ? 'This wall inherits wing settings.'

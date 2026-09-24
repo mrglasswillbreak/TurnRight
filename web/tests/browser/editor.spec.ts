@@ -5419,7 +5419,13 @@ test('driving road approval persists separately from walking access', async ({
     'Campus visitors',
   );
 });
-async function unifiedModelFixture(page: Page) {
+async function unifiedModelFixture(
+  page: Page,
+  options: {
+    prepareWall?: boolean;
+    properties?: Record<string, unknown>;
+  } = {},
+) {
   const building = browserCampus().map.features.find(
     (f) => f.properties?.id === 'library',
   )!;
@@ -5429,7 +5435,7 @@ async function unifiedModelFixture(page: Page) {
         id: 'library',
         kind: 'building',
         geometry: building.geometry,
-        properties: { ...building.properties },
+        properties: { ...building.properties, ...options.properties },
       },
     ],
   });
@@ -5450,20 +5456,24 @@ async function unifiedModelFixture(page: Page) {
     .click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
-  await dialog
-    .getByRole('button', { name: 'Preview editable layout', exact: true })
-    .click();
-  await dialog
-    .getByRole('button', { name: 'Use editable layout', exact: true })
-    .click();
-  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
-  await expect
-    .poll(
-      () =>
-        server.edits().find((e) => e.id === 'library')?.properties.appearance
-          ?.facades?.['library:wall:0:0:0']?.elements.length,
-    )
-    .toBe(1);
+  if (options.prepareWall !== false) {
+    await dialog
+      .getByRole('button', { name: 'Preview editable layout', exact: true })
+      .click();
+    await dialog
+      .getByRole('button', { name: 'Use editable layout', exact: true })
+      .click();
+    await dialog
+      .getByRole('button', { name: 'Add window', exact: true })
+      .click();
+    await expect
+      .poll(
+        () =>
+          server.edits().find((e) => e.id === 'library')?.properties.appearance
+            ?.facades?.['library:wall:0:0:0']?.elements.length,
+      )
+      .toBe(1);
+  }
   return {
     server,
     dialog,
@@ -5472,6 +5482,167 @@ async function unifiedModelFixture(page: Page) {
         ?.facades?.['library:wall:0:0:0'],
   };
 }
+for (const width of [390, 1440])
+  test(`unified model Add tools preserve generated details at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const { dialog, wall } = await unifiedModelFixture(page, {
+      prepareWall: false,
+      properties: {
+        height: 6,
+        floors: 2,
+        appearance: { windows: true, roofForm: 'flat' },
+      },
+    });
+    await dialog.getByRole('button', { name: 'Add door', exact: true }).click();
+    await expect
+      .poll(() => wall()?.elements.some((e) => e.kind === 'door'))
+      .toBe(true);
+    const first = structuredClone(wall()!);
+    expect(first.elements.some((e) => e.kind === 'window' && e.count > 1)).toBe(
+      true,
+    );
+    expect(first.elements.some((e) => e.kind === 'trim')).toBe(true);
+    await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect.poll(() => wall()).toBeUndefined();
+    await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect.poll(() => wall()?.elements).toEqual(first.elements);
+    for (const kind of [
+      'window',
+      'column',
+      'balcony',
+      'canopy',
+      'parapet',
+      'trim',
+    ]) {
+      const count = wall()!.elements.length;
+      await dialog
+        .getByRole('button', { name: `Add ${kind}`, exact: true })
+        .click();
+      await expect.poll(() => wall()?.elements.length).toBe(count + 1);
+      expect(wall()!.elements.at(-1)?.kind).toBe(kind);
+    }
+    expect(wall()!.elements.slice(0, first.elements.length)).toEqual(
+      first.elements,
+    );
+    await expect(dialog.locator('footer [role="alert"]')).toHaveCount(0);
+  });
+
+test('unified model retains a blocked insertion and repairs building height without leaving the workspace', async ({
+  page,
+}) => {
+  const { server, dialog, wall } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: { heightMode: 'floors', floors: undefined },
+  });
+  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
+  await expect(dialog.locator('footer [role="alert"]')).toContainText(
+    'floor count',
+  );
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue(
+    '1.5',
+  );
+  expect(wall()).toBeUndefined();
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Photo & model', exact: true })
+    .click();
+  await expect(
+    dialog.getByRole('button', { name: 'Save unfinished wall' }),
+  ).toBeVisible();
+  await dialog.getByRole('button', { name: 'Check building height' }).click();
+  const floors = dialog.getByLabel('Building floors', { exact: true });
+  await floors.fill('3');
+  await floors.press('Enter');
+  await expect
+    .poll(
+      () => server.edits().find((e) => e.id === 'library')?.properties.floors,
+    )
+    .toBe(3);
+  await dialog.getByRole('button', { name: 'Details', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Save unfinished wall' }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  await expect(
+    dialog.getByRole('button', { name: 'Save unfinished wall' }),
+  ).toHaveCount(0);
+  expect(wall()?.elements[0].kind).toBe('window');
+  await dialog.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await dialog.getByLabel('Building height information').selectOption('metres');
+  await dialog.getByLabel('Building height (m)', { exact: true }).fill('');
+  await dialog.getByLabel('Building height (m)', { exact: true }).press('Tab');
+  await dialog
+    .getByRole('button', { name: 'Use unknown building height' })
+    .click();
+  await expect
+    .poll(
+      () => server.edits().find((e) => e.id === 'library')?.properties.height,
+    )
+    .toBeUndefined();
+  expect(
+    server.edits().find((e) => e.id === 'library')?.properties.floors,
+  ).toBeUndefined();
+  await expect(dialog.locator('header output')).not.toContainText(
+    'Unsaved input',
+  );
+});
+
+test('unified model rejected appearance input stays with its wall and selection follows appearance tools', async ({
+  page,
+}) => {
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: { heightMode: 'floors', floors: undefined },
+  });
+  await dialog.getByRole('button', { name: 'Appearance', exact: true }).click();
+  const spacing = dialog.getByLabel('Window spacing (m)', { exact: true });
+  await spacing.fill('12');
+  await spacing.press('Enter');
+  await expect(spacing).toHaveAttribute('aria-invalid', 'true');
+  await dialog
+    .getByLabel('Wall', { exact: true })
+    .selectOption('library:wall:0:0:1');
+  await expect(dialog.getByLabel('Mapped wall')).toHaveValue(
+    'library:wall:0:0:1',
+  );
+  await expect(spacing).not.toHaveValue('12');
+  await dialog
+    .getByLabel('Wall', { exact: true })
+    .selectOption('library:wall:0:0:0');
+  await expect(spacing).toHaveValue('12');
+  await dialog.getByLabel('Building floors', { exact: true }).fill('2');
+  await dialog.getByLabel('Building floors', { exact: true }).press('Enter');
+  await spacing.press('Enter');
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'library')?.properties.appearance
+          ?.walls?.['library:wall:0:0:0']?.windowSpacing,
+    )
+    .toBe(12);
+  expect(
+    server.edits().find((e) => e.id === 'library')?.properties.appearance
+      ?.walls?.['library:wall:0:0:1']?.windowSpacing,
+  ).toBeUndefined();
+  await dialog
+    .getByLabel('Wall', { exact: true })
+    .selectOption('library:wall:0:0:1');
+  await dialog.getByRole('button', { name: 'Details', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Add column', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        server
+          .edits()
+          .find((e) => e.id === 'library')
+          ?.properties.appearance?.facades?.['library:wall:0:0:1']?.elements.at(
+            -1,
+          )?.kind,
+    )
+    .toBe('column');
+});
 test('unified model retries failed preview without losing draft or camera', async ({
   page,
 }) => {
