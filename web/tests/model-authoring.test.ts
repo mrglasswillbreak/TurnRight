@@ -13,11 +13,18 @@ import {
   wallMetrics,
   authoringErrors,
   emptyAuthoring,
+  regeneratePattern,
+  reconcilePatternEdit,
+  patternSlots,
 } from '../src/model-authoring';
 import { facadeErrors } from '../src/building-facades';
 import { facadeMeshes } from '../src/facade-mesh';
 import { mergeModelMeshes } from '../src/building-model';
 import { remapBuildingSurfaces } from '../src/building-surfaces';
+import { EditorWorkspace } from '../src/editor-workspace';
+import { EditorValidationCache } from '../src/editor-validation-cache';
+import { campusFixture } from './fixture';
+import { applyEdits } from '../src/editor-model';
 import type { MapEdit } from '../src/types';
 import type { FacadeElement } from '../src/visual-types';
 const edit: MapEdit = {
@@ -189,5 +196,142 @@ describe('precise model commands', () => {
     expect(authoringErrors({ ...emptyAuthoring(), version: 2 })).not.toEqual(
       [],
     );
+  });
+  it('recovers unfinished numeric text without adding a history command or server change', async () => {
+    let recovery: ReturnType<EditorWorkspace['recoveryCopy']> | undefined;
+    const workspace = new EditorWorkspace(
+      [edit],
+      async (b) => b.edits.map((e) => e.edit),
+      async (value) => {
+        recovery = value;
+      },
+    );
+    workspace.recoverModelInput(edit.id, 'window:width', '');
+    await workspace.preserveRecovery();
+    expect(workspace.past).toHaveLength(0);
+    expect(workspace.dirty).toBe(false);
+    const restored = new EditorWorkspace(
+      [edit],
+      async () => [],
+      async () => {},
+      recovery,
+    );
+    expect(restored.modelInputs[edit.id]['window:width']).toBe('');
+    restored.recoverModelInput(edit.id, 'window:width');
+    expect(restored.modelInputs[edit.id]).toEqual({});
+  });
+  it('retains graph identity for model-only edits and excludes private authoring from public campus data', () => {
+    const base = campusFixture();
+    const local = structuredClone(edit);
+    if (local.geometry.type === 'Polygon')
+      local.geometry.coordinates = local.geometry.coordinates.map((r) =>
+        r.map((p) => [p[0] + 0.2, p[1] + 0.46]),
+      );
+    base.map.features.push(modelFeature(local));
+    const cache = new EditorValidationCache(base, 1);
+    const before = cache.validate([local]);
+    const next = {
+      ...local,
+      properties: {
+        ...local.properties,
+        modelAuthoring: {
+          ...emptyAuthoring(),
+          names: { secret: 'Owner-only name' },
+        },
+        appearance: { ...local.properties.appearance, wallColour: '#abcdef' },
+      },
+    };
+    const after = cache.validate([next]);
+    expect(after.data.graph).toBe(before.data.graph);
+    expect(
+      after.data.map.features.find((f) => f.properties?.id === 'b')?.properties
+        ?.appearance.wallColour,
+    ).toBe('#abcdef');
+    expect(JSON.stringify(applyEdits(base, [next]).data)).not.toContain(
+      'Owner-only name',
+    );
+  });
+  it('rejects malformed preset contents before they can reach the editor', () => {
+    expect(
+      authoringErrors({
+        ...emptyAuthoring(),
+        presets: [
+          { id: 'p', name: 'p', wallLength: 20, elements: [{ id: 'bad' }] },
+        ],
+      }),
+    ).not.toEqual([]);
+  });
+  it('keeps translated and resized patterns editable without restoring their original position', () => {
+    const p = {
+      id: 'p',
+      name: 'P',
+      wallId: 'wall',
+      members: [] as string[],
+      seed: [element],
+      rows: 2,
+      columns: 3,
+      stepX: 2,
+      stepY: 3,
+    };
+    const layout = regeneratePattern(p, 20);
+    const metadata = {
+      ...emptyAuthoring(),
+      patterns: [
+        {
+          ...p,
+          members: layout.elements.map((e) => e.id),
+          slots: layout.slots,
+        },
+      ],
+    };
+    const moved = moveElements(
+      layout.elements,
+      metadata.patterns[0].members,
+      1,
+      0.5,
+      20,
+    );
+    const result = reconcilePatternEdit(
+      metadata,
+      'wall',
+      layout.elements,
+      moved,
+    );
+    const regenerated = regeneratePattern(result.authoring.patterns[0], 20);
+    expect(regenerated.elements.map(({ id: _, ...e }) => e)).toEqual(
+      moved.map(({ id: _, ...e }) => e),
+    );
+    const resized = reconcilePatternEdit(
+      result.authoring,
+      'wall',
+      moved,
+      moved.map((e, i) => (i === 2 ? { ...e, width: 1.8 } : e)),
+    );
+    expect(resized.elements.every((e) => e.width === 1.8)).toBe(true);
+    expect(resized.authoring.patterns[0].seed[0].width).toBe(1.8);
+  });
+  it('never regenerates detached pattern slots even when column counts change', () => {
+    const p = {
+      id: 'p',
+      name: 'P',
+      wallId: 'wall',
+      members: ['a', 'b', 'c'],
+      seed: [element],
+      rows: 1,
+      columns: 3,
+      stepX: 2,
+      stepY: 3,
+    };
+    const slots = patternSlots(p);
+    const detached = {
+      ...p,
+      members: ['a', 'c'],
+      slots: [slots[0], slots[2]],
+      excluded: [slots[1]],
+      columns: 4,
+    };
+    const next = regeneratePattern(detached, 20);
+    expect(next.slots).toEqual(['0:0:0', '0:2:0', '0:3:0']);
+    expect(next.elements).toHaveLength(3);
   });
 });

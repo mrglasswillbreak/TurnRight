@@ -35,7 +35,11 @@ export function metadataChanges(
       ...Object.keys(old.properties),
     ]))
       if (
-        !['photos', 'arrival'].includes(key) &&
+        ![
+          'photos',
+          'arrival',
+          ...(e.kind === 'building' ? ['modelAuthoring', 'appearance'] : []),
+        ].includes(key) &&
         !same(e.properties[key], old.properties[key])
       )
         return null;
@@ -69,6 +73,30 @@ export class EditorValidationCache {
       const data = { ...this.result.data };
       for (const edit of changes) {
         const props = edit.properties;
+        if (edit.kind === 'building') {
+          const feature = data.map.features.find(
+            (f) =>
+              f.properties?.id === edit.id && f.properties.kind === 'building',
+          );
+          if (
+            feature &&
+            !same(feature.properties?.appearance, props.appearance)
+          )
+            data.map = {
+              ...data.map,
+              features: data.map.features.map((f) =>
+                f === feature
+                  ? {
+                      ...f,
+                      properties: {
+                        ...f.properties,
+                        appearance: props.appearance,
+                      },
+                    }
+                  : f,
+              ),
+            };
+        }
         if (
           props.photos !== undefined &&
           ['building', 'entrance'].includes(edit.kind)

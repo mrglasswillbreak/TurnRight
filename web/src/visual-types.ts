@@ -79,6 +79,9 @@ export interface ModelAuthoring {
     wallId: string;
     members: string[];
     seed: FacadeElement[];
+    /** Stable row:column:seed slots keep detached instances absent on regeneration. */
+    slots?: string[];
+    excluded?: string[];
     rows: number;
     columns: number;
     stepX: number;

@@ -6,7 +6,7 @@ import type {
   FacadeElement,
   ModelAuthoring,
 } from './visual-types.js';
-import { facadeWalls } from './building-facades.js';
+import { facadeWalls, facadeErrors } from './building-facades.js';
 import {
   buildingTopology,
   polygonsOf,
@@ -18,7 +18,7 @@ import {
 export const modelFeature = (edit: MapEdit): Feature => ({
   type: 'Feature',
   geometry: edit.geometry,
-  properties: { ...edit.properties, id: edit.id },
+  properties: { ...edit.properties, id: edit.id, kind: edit.kind },
 });
 export const emptyAuthoring = (): ModelAuthoring => ({
   version: 1,
@@ -161,7 +161,7 @@ export function generatedElements(
     x: 0.5,
     bottom: m.eaves - 0.16,
     width: m.length,
-    height: 0.11,
+    height: 0.16,
     depth: 0,
     count: 1,
     spacing: 0,
@@ -393,6 +393,119 @@ export function detachInstance(
     throw new Error('Detaching would exceed 100 detail records.');
   return { elements: next, detachedId: detached.id };
 }
+export function patternSlots(p: ModelAuthoring['patterns'][number]) {
+  return (
+    p.slots ||
+    p.members.map(
+      (_, i) =>
+        `${Math.floor(i / (p.columns * p.seed.length))}:${Math.floor(i / p.seed.length) % p.columns}:${i % p.seed.length}`,
+    )
+  );
+}
+export function regeneratePattern(
+  p: ModelAuthoring['patterns'][number],
+  length: number,
+) {
+  const values = patternElements(
+    p.seed,
+    p.rows,
+    p.columns,
+    p.stepX,
+    p.stepY,
+    length,
+  );
+  const slots = values.map(
+    (_, i) =>
+      `${Math.floor(i / (p.columns * p.seed.length))}:${Math.floor(i / p.seed.length) % p.columns}:${i % p.seed.length}`,
+  );
+  const excluded = new Set(p.excluded || []);
+  return {
+    elements: values.filter((_, i) => !excluded.has(slots[i])),
+    slots: slots.filter((s) => !excluded.has(s)),
+  };
+}
+/** Keep the seed and all linked instances in sync; detached slots never regenerate. */
+export function reconcilePatternEdit(
+  authoring: ModelAuthoring,
+  wallId: string,
+  before: FacadeElement[],
+  after: FacadeElement[],
+) {
+  let elements = after;
+  const keys = [
+    'x',
+    'bottom',
+    'width',
+    'height',
+    'depth',
+    'count',
+    'spacing',
+  ] as const;
+  const patterns = authoring.patterns.map((p) => {
+    if (p.wallId !== wallId) return p;
+    const slots = patternSlots(p),
+      excluded = new Set(p.excluded || []);
+    const seed = structuredClone(p.seed);
+    p.members.forEach((id, i) => {
+      if (!after.some((e) => e.id === id)) excluded.add(slots[i]);
+    });
+    for (let index = 0; index < seed.length; index++) {
+      const members = p.members.filter(
+        (_, i) => Number(slots[i].split(':')[2]) === index,
+      );
+      const changes = members.flatMap((id) => {
+        const a = before.find((e) => e.id === id),
+          b = after.find((e) => e.id === id);
+        return a && b && JSON.stringify(a) !== JSON.stringify(b)
+          ? [{ a, b }]
+          : [];
+      });
+      if (!changes.length) continue;
+      const first = changes[0];
+      const delta = Object.fromEntries(
+        keys.map((k) => [k, first.b[k] - first.a[k]]),
+      ) as Record<(typeof keys)[number], number>;
+      if (
+        changes.some(
+          ({ a, b }) =>
+            keys.some((k) => Math.abs(b[k] - a[k] - delta[k]) > 1e-7) ||
+            b.colour !== first.b.colour ||
+            b.kind !== first.b.kind,
+        )
+      )
+        throw new Error(
+          'This would distort a linked pattern. Move the pattern together or detach the affected details first.',
+        );
+      for (const k of keys) seed[index][k] += delta[k];
+      seed[index].colour = first.b.colour;
+      seed[index].kind = first.b.kind;
+      seed[index].flat = first.b.flat;
+      elements = elements.map((e) => {
+        if (!members.includes(e.id) || changes.some((c) => c.b.id === e.id))
+          return e;
+        const next = {
+          ...e,
+          colour: first.b.colour,
+          kind: first.b.kind,
+          flat: first.b.flat,
+        };
+        for (const k of keys) next[k] += delta[k];
+        return next;
+      });
+    }
+    const keep = p.members
+      .map((id, i) => ({ id, slot: slots[i] }))
+      .filter((v) => elements.some((e) => e.id === v.id));
+    return {
+      ...p,
+      seed,
+      members: keep.map((v) => v.id),
+      slots: keep.map((v) => v.slot),
+      excluded: [...excluded],
+    };
+  });
+  return { elements, authoring: { ...authoring, patterns } };
+}
 export function authoringErrors(value: unknown): string[] {
   if (value === undefined) return [];
   const a = value as ModelAuthoring;
@@ -439,6 +552,20 @@ export function authoringErrors(value: unknown): string[] {
       return ['Invalid model preset.'];
   for (const p of a.patterns)
     if (
+      (p.slots !== undefined &&
+        (!Array.isArray(p.slots) ||
+          p.slots.length !== p.members.length ||
+          p.slots.some(
+            (s) =>
+              typeof s !== 'string' || !/^\d{1,2}:\d{1,2}:\d{1,2}$/.test(s),
+          ))) ||
+      (p.excluded !== undefined &&
+        (!Array.isArray(p.excluded) ||
+          p.excluded.length > 100 ||
+          p.excluded.some(
+            (s) =>
+              typeof s !== 'string' || !/^\d{1,2}:\d{1,2}:\d{1,2}$/.test(s),
+          ))) ||
       !Array.isArray(p.seed) ||
       p.seed.length > 100 ||
       ![p.rows, p.columns].every(
@@ -447,5 +574,38 @@ export function authoringErrors(value: unknown): string[] {
       ![p.stepX, p.stepY].every((n) => Number.isFinite(n) && n >= 0)
     )
       return ['Invalid model pattern.'];
+  const identities = [...a.groups, ...a.patterns, ...a.presets].map(
+    (i) => i.id,
+  );
+  if (new Set(identities).size !== identities.length)
+    return ['Private model item identities must be unique.'];
+  for (const elements of [
+    ...a.presets.map((p) => p.elements),
+    ...a.patterns.map((p) => p.seed),
+  ]) {
+    const errors = facadeErrors({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [0, 0] },
+      properties: {
+        appearance: {
+          facades: {
+            preset: {
+              wallId: 'preset',
+              partId: 'preset',
+              wallCoordinates: [],
+              photoIds: [],
+              confidence: 'inferred',
+              notes: 'Private design preset',
+              elements,
+            },
+          },
+        },
+      },
+    });
+    if (errors.length)
+      return [
+        'Private model presets and patterns must contain valid detail records.',
+      ];
+  }
   return [];
 }
