@@ -11,7 +11,11 @@ export function buildingOutline(
   const output: number[] = [];
   for (const surface of mesh.surfaces || []) {
     if (
-      !['wall', 'roof'].includes(surface.role) ||
+      (selection.elementId
+        ? surface.elementId !== selection.elementId ||
+          (selection.instanceIndex !== undefined &&
+            surface.instanceIndex !== selection.instanceIndex)
+        : !['wall', 'roof'].includes(surface.role) || !!surface.elementId) ||
       (selection.partId && surface.partId !== selection.partId) ||
       (selection.wallId && surface.wallId !== selection.wallId) ||
       (selection.role === 'roof' && surface.role !== 'roof')

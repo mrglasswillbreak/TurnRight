@@ -16,10 +16,17 @@ import {
   Scene,
   Vector3,
   WebGLRenderer,
+  Raycaster,
+  Vector2,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Feature } from 'geojson';
-import type { BuildingModel, BuildingVisual } from './visual-types';
+import type {
+  BuildingModel,
+  BuildingVisual,
+  BuildingSelection,
+  ModelMesh,
+} from './visual-types';
 import type { CampusData } from './types';
 import { createFacadeTextures } from './facade-textures';
 import { buildingRevision } from './building-visuals';
@@ -30,6 +37,9 @@ export function PhotoModelPreview(props: {
   visual?: BuildingVisual;
   data: CampusData;
   wallId?: string;
+  selection?: BuildingSelection;
+  onSelect?: (selection: BuildingSelection) => void;
+  hidden?: string[];
   onMetrics?: (metrics: {
     drawMs: number;
     calls: number;
@@ -43,12 +53,12 @@ export function PhotoModelPreview(props: {
   current.current = props;
   const request = useRef<() => void>(() => {}),
     action = useRef<(a: string) => void>(() => {});
+  const syncSelection = useRef<() => void>(() => {});
   const [message, setMessage] = useState('Building preview…');
   const signature = JSON.stringify([
     buildingRevision(props.feature),
     detailRevision(props.feature),
     props.visual,
-    props.wallId,
   ]);
   useEffect(() => {
     const element = host.current!;
@@ -60,15 +70,16 @@ export function PhotoModelPreview(props: {
       pending = false,
       generation = 0,
       active = 0,
-      model: BuildingModel | undefined,
-      lastWall: string | undefined;
+      model: BuildingModel | undefined;
     let releases: (() => void)[] = [];
     let deadline: ReturnType<typeof setTimeout> | undefined;
     const scene = new Scene(),
       group = new Group(),
+      highlights = new Group(),
       camera = new PerspectiveCamera(40, 1, 0.1, 5000);
     scene.background = new Color('#dfe6e9');
     scene.add(group);
+    scene.add(highlights);
     camera.up.set(0, 0, 1);
     const draw = () => {
       if (!disposed && renderer) {
@@ -84,7 +95,62 @@ export function PhotoModelPreview(props: {
       }
     };
     const textures = createFacadeTextures(draw);
+    const clearHighlights = () => {
+      for (const o of highlights.children.slice()) {
+        highlights.remove(o);
+        if (o instanceof LineSegments) {
+          o.geometry.dispose();
+          (o.material as LineBasicMaterial).dispose();
+        }
+      }
+    };
+    syncSelection.current = () => {
+      clearHighlights();
+      const { selection, wallId, hidden = [] } = current.current;
+      if (!model) return;
+      for (const mesh of group.children) {
+        if (!(mesh instanceof Mesh)) continue;
+        const part = mesh.userData.part as ModelMesh;
+        if (JSON.stringify(mesh.userData.hidden) !== JSON.stringify(hidden)) {
+          const triangles: number[] = [],
+            excluded = new Set(hidden);
+          let surface = 0;
+          for (let t = 0; t < part.indices.length / 3; t++) {
+            while (
+              part.surfaces?.[surface] &&
+              t >= part.surfaces[surface].start + part.surfaces[surface].count
+            )
+              surface++;
+            const s = part.surfaces?.[surface];
+            if (!s?.elementId || !excluded.has(s.elementId)) triangles.push(t);
+          }
+          mesh.geometry.setIndex(
+            triangles.flatMap((t) => part.indices.slice(t * 3, t * 3 + 3)),
+          );
+          mesh.userData.hidden = [...hidden];
+          mesh.userData.triangles = triangles;
+        }
+        const selected = selection || { buildingId: model.id, wallId };
+        if (!selected.wallId && !selected.elementId) continue;
+        const positions = buildingOutline(part, selected);
+        if (positions.length) {
+          const geometry = new BufferGeometry();
+          geometry.setAttribute(
+            'position',
+            new Float32BufferAttribute(positions, 3),
+          );
+          highlights.add(
+            new LineSegments(
+              geometry,
+              new LineBasicMaterial({ color: '#168aff', depthTest: false }),
+            ),
+          );
+        }
+      }
+      draw();
+    };
     const clear = () => {
+      clearHighlights();
       for (const release of releases) release();
       releases = [];
       for (const o of group.children.slice()) {
@@ -113,6 +179,42 @@ export function PhotoModelPreview(props: {
       scene.add(sun);
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = false;
+      const raycaster = new Raycaster();
+      let down = [0, 0];
+      renderer.domElement.addEventListener('pointerdown', (e) => {
+        down = [e.clientX, e.clientY];
+      });
+      renderer.domElement.addEventListener('pointerup', (e) => {
+        if (!model || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5)
+          return;
+        const bounds = renderer!.domElement.getBoundingClientRect();
+        raycaster.setFromCamera(
+          new Vector2(
+            ((e.clientX - bounds.left) / bounds.width) * 2 - 1,
+            1 - ((e.clientY - bounds.top) / bounds.height) * 2,
+          ),
+          camera,
+        );
+        for (const hit of raycaster.intersectObjects(group.children, false)) {
+          const part = hit.object.userData.part as ModelMesh,
+            triangle =
+              hit.object.userData.triangles?.[hit.faceIndex!] ?? hit.faceIndex;
+          const s = part?.surfaces?.find(
+            (s) => triangle >= s.start && triangle < s.start + s.count,
+          );
+          if (s) {
+            current.current.onSelect?.({
+              buildingId: model.id,
+              partId: s.partId,
+              wallId: s.wallId,
+              role: s.role,
+              elementId: s.elementId,
+              instanceIndex: s.instanceIndex,
+            });
+            break;
+          }
+        }
+      });
       controls.addEventListener('change', draw);
       observer = new ResizeObserver(() => {
         const width = element.clientWidth,
@@ -125,6 +227,20 @@ export function PhotoModelPreview(props: {
       });
       observer.observe(element);
       action.current = (a) => {
+        if (a === 'reset' || a === 'fit') {
+          const box = new Box3().setFromObject(
+              a === 'fit' && highlights.children.length ? highlights : group,
+            ),
+            centre = box.getCenter(new Vector3()),
+            size = Math.max(2, box.getSize(new Vector3()).length());
+          controls!.target.copy(centre);
+          camera.position
+            .copy(centre)
+            .add(new Vector3(size, -size, size * 0.7));
+          controls!.update();
+          draw();
+          return;
+        }
         const offset = camera.position.clone().sub(controls!.target);
         if (a === 'left' || a === 'right')
           offset.applyAxisAngle(
@@ -186,10 +302,8 @@ export function PhotoModelPreview(props: {
       }
       const first = !model;
       model = result.model;
-      const { data, wallId } = current.current;
+      const { data } = current.current;
       clear();
-      let selectedCentre: Vector3 | undefined,
-        selectedNormal: Vector3 | undefined;
       for (const part of model!.meshes) {
         const geometry = new BufferGeometry();
         geometry.setAttribute(
@@ -204,48 +318,9 @@ export function PhotoModelPreview(props: {
           color: part.colour,
           side: DoubleSide,
         });
-        group.add(new Mesh(geometry, material));
-        const surface = part.surfaces?.find(
-          (s) => s.wallId === wallId && s.role === 'wall',
-        );
-        if (surface) {
-          const i = part.indices[surface.start * 3];
-          selectedNormal = new Vector3().fromBufferAttribute(
-            geometry.getAttribute('normal'),
-            i,
-          );
-          const vertices = new Set(
-            part.indices.slice(
-              surface.start * 3,
-              (surface.start + surface.count) * 3,
-            ),
-          );
-          selectedCentre = new Vector3();
-          for (const vertex of vertices)
-            selectedCentre.add(
-              new Vector3().fromArray(part.positions, vertex * 3),
-            );
-          selectedCentre.divideScalar(vertices.size);
-        }
-        if (wallId) {
-          const positions = buildingOutline(part, {
-            buildingId: model!.id,
-            wallId,
-          });
-          if (positions.length) {
-            const outline = new BufferGeometry();
-            outline.setAttribute(
-              'position',
-              new Float32BufferAttribute(positions, 3),
-            );
-            group.add(
-              new LineSegments(
-                outline,
-                new LineBasicMaterial({ color: '#1764ed', depthTest: false }),
-              ),
-            );
-          }
-        }
+        const rendered = new Mesh(geometry, material);
+        rendered.userData.part = part;
+        group.add(rendered);
         if (part.texture)
           releases.push(
             textures.acquire(part.texture, data, (t) => {
@@ -255,26 +330,8 @@ export function PhotoModelPreview(props: {
             }),
           );
       }
-      if (controls && (first || lastWall !== wallId)) {
-        const box = new Box3().setFromObject(group),
-          centre = box.getCenter(new Vector3()),
-          size = box.getSize(new Vector3()).length();
-        if (selectedCentre && selectedNormal) {
-          selectedCentre.z = centre.z;
-          controls.target.copy(selectedCentre);
-          camera.position
-            .copy(selectedCentre)
-            .addScaledVector(selectedNormal, size * 1.7);
-          camera.position.z += size * 0.2;
-        } else {
-          controls.target.copy(centre);
-          camera.position
-            .copy(centre)
-            .add(new Vector3(size, -size, size * 0.7));
-        }
-        controls.update();
-      }
-      lastWall = wallId;
+      if (controls && first) action.current('reset');
+      syncSelection.current();
       setMessage('Estimated dimensions · selected wall outlined');
       draw();
       if (pending) send();
@@ -291,17 +348,28 @@ export function PhotoModelPreview(props: {
       renderer?.domElement.remove();
       request.current = () => {};
       action.current = () => {};
+      syncSelection.current = () => {};
     };
   }, []);
   useEffect(() => {
     const timer = setTimeout(() => request.current(), 120);
     return () => clearTimeout(timer);
   }, [signature]);
+  const selectionKey = JSON.stringify([
+    props.selection,
+    props.wallId,
+    props.hidden,
+  ]);
+  useEffect(() => syncSelection.current(), [selectionKey]);
   return (
     <section className="photo-model-preview">
       <div ref={host} className="photo-model-canvas" />
       <output aria-live="polite">{message}</output>
       <div className="photo-model-view-buttons">
+        <button onClick={() => action.current('fit')}>
+          Fit selected detail
+        </button>
+        <button onClick={() => action.current('reset')}>Reset 3D view</button>
         {['left', 'right', 'in', 'out'].map((a) => (
           <button
             key={a}

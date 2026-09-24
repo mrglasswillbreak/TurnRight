@@ -1,0 +1,503 @@
+/* The spatial SVG is an application surface; the hierarchy and metre fields provide equivalent non-spatial controls. */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
+import type { FacadeElement } from './visual-types';
+import {
+  elementBounds,
+  moveElements,
+  placementErrors,
+  type wallMetrics,
+} from './model-authoring';
+
+type Metrics = ReturnType<typeof wallMetrics>;
+export type WallView = { x: number; y: number; width: number; height: number };
+export function ModelWallCanvas({
+  metrics: m,
+  elements,
+  selected,
+  hidden,
+  locked,
+  grid,
+  onSelect,
+  onCommit,
+  onDuplicate,
+  onDelete,
+  onCancel,
+  views,
+}: {
+  metrics: Metrics;
+  elements: FacadeElement[];
+  selected: string[];
+  hidden: string[];
+  locked: string[];
+  grid: number;
+  onSelect: (ids: string[], instance?: number) => void;
+  onCommit: (elements: FacadeElement[]) => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+  onCancel: () => void;
+  views?: Map<string, WallView>;
+}) {
+  const svg = useRef<SVGSVGElement>(null);
+  const [preview, setPreview] = useState<FacadeElement[] | null>(null),
+    [marquee, setMarquee] = useState<number[] | null>(null);
+  const [view, setView] = useState(
+      views?.get(m.wallId) || {
+        x: -1,
+        y: -m.eaves - 1,
+        width: m.length + 2,
+        height: m.eaves + 2,
+      },
+    ),
+    [pan, setPan] = useState(false);
+  const frame = useRef(0),
+    candidate = useRef<FacadeElement[] | null>(null);
+  const gesture = useRef<{
+    kind: 'move' | 'resize' | 'marquee' | 'pan';
+    start: [number, number];
+    elements: FacadeElement[];
+    ids: string[];
+    view: typeof view;
+    last: [number, number];
+    matrix: DOMMatrix;
+  } | null>(null);
+  useEffect(() => {
+    views?.set(m.wallId, view);
+  }, [views, m.wallId, view]);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  const shown = preview || elements,
+    pixel = view.width / Math.max(320, svg.current?.clientWidth || 700);
+  const invalid = useMemo(
+    () => new Set(placementErrors(shown, m.length, m.eaves).map((e) => e.id)),
+    [shown, m.length, m.eaves],
+  );
+  const point = (event: ReactPointerEvent): [number, number] => {
+    const matrix = svg.current!.getScreenCTM()!;
+    const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      matrix.inverse(),
+    );
+    return [p.x, -p.y];
+  };
+  const begin = (
+    event: ReactPointerEvent,
+    kind: 'move' | 'resize' | 'marquee' | 'pan',
+    id?: string,
+    instance?: number,
+  ) => {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    svg.current?.focus();
+    if (id && locked.includes(id)) return;
+    const ids = id
+      ? event.shiftKey
+        ? selected.includes(id)
+          ? selected.filter((v) => v !== id)
+          : [...selected, id]
+        : selected.includes(id)
+          ? selected
+          : [id]
+      : selected;
+    if (id) onSelect(ids, instance);
+    const start = point(event);
+    gesture.current = {
+      kind,
+      start,
+      last: start,
+      elements,
+      ids: ids.filter((id) => !locked.includes(id)),
+      view,
+      matrix: svg.current!.getScreenCTM()!.inverse(),
+    };
+    svg.current!.setPointerCapture(event.pointerId);
+    candidate.current = null;
+  };
+  const update = (event: ReactPointerEvent) => {
+    const g = gesture.current;
+    if (!g) return;
+    const position = new DOMPoint(event.clientX,event.clientY).matrixTransform(g.matrix);
+    const p: [number,number] = [position.x,-position.y];
+    g.last = p;
+    if (g.kind === 'pan') {
+      setView({
+        ...g.view,
+        x: g.view.x + g.start[0] - p[0],
+        y: g.view.y + p[1] - g.start[1],
+      });
+      return;
+    }
+    if (g.kind === 'marquee') {
+      setMarquee([
+        Math.min(g.start[0], p[0]),
+        Math.min(g.start[1], p[1]),
+        Math.abs(p[0] - g.start[0]),
+        Math.abs(p[1] - g.start[1]),
+      ]);
+      return;
+    }
+    let dx = p[0] - g.start[0],
+      dy = p[1] - g.start[1];
+    const targets = g.elements.filter((e) => g.ids.includes(e.id));
+    if (!targets.length) return;
+    if (!event.altKey) {
+      const anchor = targets[0];
+      dx =
+        Math.round((anchor.x * m.length + dx) / grid) * grid -
+        anchor.x * m.length;
+      dy = Math.round((anchor.bottom + dy) / grid) * grid - anchor.bottom;
+      if (g.kind === 'move') {
+        const others = g.elements
+          .filter((e) => !g.ids.includes(e.id))
+          .map((e) => elementBounds(e, m.length));
+        const xs = [
+          0,
+          m.length / 2,
+          m.length,
+          ...others.flatMap((b) => [b.left, b.right, (b.left + b.right) / 2]),
+        ];
+        const ys = [
+          0,
+          m.eaves,
+          ...Array.from(
+            { length: Math.max(1, Math.floor(m.floors)) },
+            (_, i) => (i * m.eaves) / m.floors,
+          ),
+          ...others.flatMap((b) => [b.bottom, b.top]),
+        ];
+        const bounds = targets.map((e) => elementBounds(e, m.length));
+        const anchorsX = [
+          Math.min(...bounds.map((b) => b.left)),
+          Math.max(...bounds.map((b) => b.right)),
+          anchor.x * m.length,
+        ];
+        const anchorsY = [
+          Math.min(...bounds.map((b) => b.bottom)),
+          Math.max(...bounds.map((b) => b.top)),
+        ];
+        const snap = (delta: number, anchors: number[], values: number[]) => {
+          let best = 6 * pixel,
+            shift = 0;
+          for (const a of anchors)
+            for (const v of values)
+              if (Math.abs(v - a - delta) < best) {
+                best = Math.abs(v - a - delta);
+                shift = v - a - delta;
+              }
+          return delta + shift;
+        };
+        dx = snap(dx, anchorsX, xs);
+        dy = snap(dy, anchorsY, ys);
+      }
+    }
+    candidate.current =
+      g.kind === 'move'
+        ? moveElements(g.elements, g.ids, dx, dy, m.length)
+        : g.elements.map((e) =>
+            e.id === g.ids[0]
+              ? {
+                  ...e,
+                  x: e.x + dx / 2 / m.length,
+                  width: e.width + dx,
+                  height: e.height + dy,
+                  flat: undefined,
+                }
+              : e,
+          );
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => setPreview(candidate.current));
+  };
+  const cancel = () => {
+    gesture.current = null;
+    candidate.current = null;
+    cancelAnimationFrame(frame.current);
+    setPreview(null);
+    setMarquee(null);
+    onCancel();
+  };
+  const finish = (event: ReactPointerEvent) => {
+    const g = gesture.current;
+    if (!g) return;
+    if (g.kind === 'marquee') {
+      const [x, y] = g.start,
+        [a, b] = g.last;
+      const ids = elements
+        .filter((e) => !hidden.includes(e.id))
+        .filter((e) => {
+          const q = elementBounds(e, m.length);
+          return (
+            q.right >= Math.min(x, a) &&
+            q.left <= Math.max(x, a) &&
+            q.top >= Math.min(y, b) &&
+            q.bottom <= Math.max(y, b)
+          );
+        })
+        .map((e) => e.id);
+      onSelect(event.shiftKey ? [...new Set([...selected, ...ids])] : ids);
+    } else if (candidate.current) onCommit(candidate.current);
+    gesture.current = null;
+    candidate.current = null;
+    cancelAnimationFrame(frame.current);
+    setPreview(null);
+    setMarquee(null);
+  };
+  const zoom = (factor: number) =>
+    setView((v) => ({
+      ...v,
+      x: v.x + (v.width * (1 - factor)) / 2,
+      y: v.y + (v.height * (1 - factor)) / 2,
+      width: v.width * factor,
+      height: v.height * factor,
+    }));
+  const fit = () => {
+    const bounds = elements
+      .filter((e) => selected.includes(e.id))
+      .map((e) => elementBounds(e, m.length));
+    if (!bounds.length) {
+      setView({
+        x: -1,
+        y: -m.eaves - 1,
+        width: m.length + 2,
+        height: m.eaves + 2,
+      });
+      return;
+    }
+    const left = Math.min(...bounds.map((b) => b.left)),
+      right = Math.max(...bounds.map((b) => b.right)),
+      bottom = Math.min(...bounds.map((b) => b.bottom)),
+      top = Math.max(...bounds.map((b) => b.top));
+    setView({
+      x: left - 0.5,
+      y: -top - 0.5,
+      width: right - left + 1,
+      height: top - bottom + 1,
+    });
+  };
+  const rough = 65 * pixel,
+    magnitude = 10 ** Math.floor(Math.log10(rough));
+  const tick = Math.max(
+    grid,
+    ([1, 2, 5, 10].find((n) => n * magnitude >= rough) || 10) * magnitude,
+  );
+  const xTicks = Array.from(
+    { length: Math.min(160, Math.ceil(view.width / tick) + 1) },
+    (_, i) => (Math.floor(view.x / tick) + i) * tick,
+  );
+  const yTicks = Array.from(
+    { length: Math.min(160, Math.ceil(view.height / tick) + 1) },
+    (_, i) => (Math.floor(-view.y / tick) - i) * tick,
+  );
+  return (
+    <section className="model-wall-view" aria-label="Measured wall editor">
+      <div className="model-toolbar">
+        <button aria-pressed={pan} onClick={() => setPan((v) => !v)}>
+          Pan
+        </button>
+        <button onClick={() => zoom(0.8)}>Zoom in</button>
+        <button onClick={() => zoom(1.25)}>Zoom out</button>
+        <button onClick={fit}>Fit selection</button>
+        <button
+          onClick={() =>
+            setView({
+              x: -1,
+              y: -m.eaves - 1,
+              width: m.length + 2,
+              height: m.eaves + 2,
+            })
+          }
+        >
+          Reset view
+        </button>
+      </div>
+      <p className="small-note">
+        {m.length.toFixed(2)} m wide · {m.eaves.toFixed(2)} m to eaves · A → B (
+        {m.direction}). Floor guides are estimates. Arrow keys move; Shift ×10;
+        Alt disables snapping.
+      </p>
+      <svg
+        ref={svg}
+        className="model-wall-canvas"
+        viewBox={`${view.x} ${view.y} ${view.width} ${view.height}`}
+        tabIndex={0}
+        role="application"
+        aria-label="Wall canvas: select and move architectural details"
+        onPointerDown={(e) => begin(e, pan ? 'pan' : 'marquee')}
+        onPointerMove={update}
+        onPointerUp={finish}
+        onPointerCancel={cancel}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            cancel();
+          }
+          if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            onDelete();
+          }
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+            e.preventDefault();
+            onDuplicate();
+          }
+          const arrows: Record<string, [number, number]> = {
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+            ArrowUp: [0, 1],
+            ArrowDown: [0, -1],
+          };
+          if (arrows[e.key]) {
+            e.preventDefault();
+            const [x, y] = arrows[e.key],
+              step = grid * (e.shiftKey ? 10 : 1);
+            onCommit(
+              moveElements(
+                elements,
+                selected.filter((id) => !locked.includes(id)),
+                x * step,
+                y * step,
+                m.length,
+              ),
+            );
+          }
+        }}
+      >
+        <rect
+          x={0}
+          y={-m.eaves}
+          width={m.length}
+          height={m.eaves}
+          fill={m.style.wallColour || '#ddd6c5'}
+          stroke="currentColor"
+          strokeWidth={pixel}
+        />
+        <g className="model-grid" strokeWidth={pixel * 0.5}>
+          {xTicks.map((x) => (
+            <line
+              key={`x${x}`}
+              x1={x}
+              x2={x}
+              y1={view.y}
+              y2={view.y + view.height}
+            />
+          ))}
+          {yTicks.map((y) => (
+            <line
+              key={`y${y}`}
+              x1={view.x}
+              x2={view.x + view.width}
+              y1={-y}
+              y2={-y}
+            />
+          ))}
+        </g>
+        {Array.from(
+          { length: Math.max(0, Math.floor(m.floors) - 1) },
+          (_, i) => (
+            <line
+              key={i}
+              x1={0}
+              x2={m.length}
+              y1={(-(i + 1) * m.eaves) / m.floors}
+              y2={(-(i + 1) * m.eaves) / m.floors}
+              stroke="#536577"
+              strokeDasharray={`${pixel * 4} ${pixel * 4}`}
+              strokeWidth={pixel}
+            />
+          ),
+        )}
+        {shown
+          .filter((e) => !hidden.includes(e.id))
+          .flatMap((e) =>
+            Array.from({ length: e.count }, (_, i) => {
+              const x =
+                (e.x + (i - (e.count - 1) / 2) * e.spacing) * m.length -
+                e.width / 2;
+              if (
+                x + e.width < view.x ||
+                x > view.x + view.width ||
+                -e.bottom < view.y ||
+                -e.bottom - e.height > view.y + view.height
+              )
+                return null;
+              return (
+                <rect
+                  key={`${e.id}:${i}`}
+                  data-element-id={e.id}
+                  data-instance={i}
+                  x={x}
+                  y={-e.bottom - e.height}
+                  width={Math.max(0.01, e.width)}
+                  height={Math.max(0.01, e.height)}
+                  fill={e.colour}
+                  fillOpacity={locked.includes(e.id) ? 0.45 : 0.85}
+                  stroke={
+                    invalid.has(e.id)
+                      ? '#db3535'
+                      : selected.includes(e.id)
+                        ? '#087cf0'
+                        : '#535b62'
+                  }
+                  strokeWidth={pixel * (selected.includes(e.id) ? 3 : 1)}
+                  onPointerDown={(event) =>
+                    begin(event, pan ? 'pan' : 'move', e.id, i)
+                  }
+                >
+                  <title>
+                    {e.kind} · {(x + e.width / 2).toFixed(2)} m from A ·{' '}
+                    {e.bottom.toFixed(2)} m above base
+                    {locked.includes(e.id) ? ' · locked' : ''}
+                  </title>
+                </rect>
+              );
+            }),
+          )}
+        {selected.length === 1 &&
+          shown
+            .filter(
+              (e) =>
+                e.id === selected[0] &&
+                e.count === 1 &&
+                !locked.includes(e.id) &&
+                !hidden.includes(e.id),
+            )
+            .map((e) => (
+              <circle
+                key={e.id}
+                aria-label="Resize selected detail"
+                cx={e.x * m.length + e.width / 2}
+                cy={-e.bottom - e.height}
+                r={pixel * 9}
+                fill="#087cf0"
+                stroke="white"
+                strokeWidth={pixel * 2}
+                onPointerDown={(event) => begin(event, 'resize', e.id)}
+              />
+            ))}
+        {marquee && (
+          <rect
+            x={marquee[0]}
+            y={-marquee[1] - marquee[3]}
+            width={marquee[2]}
+            height={marquee[3]}
+            fill="#087cf0"
+            fillOpacity={0.12}
+            stroke="#087cf0"
+            strokeWidth={pixel}
+          />
+        )}
+        <g fill="currentColor" fontSize={pixel * 11}>
+          {xTicks
+            .filter((x) => x >= 0 && x <= m.length)
+            .map((x) => (
+              <text key={x} x={x} y={pixel * 15}>
+                {Number(x.toFixed(2))} m
+              </text>
+            ))}
+        </g>
+      </svg>
+      <output aria-live="polite">
+        {invalid.size
+          ? `${invalid.size} detail(s) need repositioning or resizing.`
+          : `${selected.length} selected · ${shown.reduce((n, e) => n + e.count, 0)} details`}
+      </output>
+    </section>
+  );
+}
