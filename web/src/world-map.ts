@@ -104,7 +104,7 @@ export async function loadWorld(signal: AbortSignal): Promise<WorldData> {
     ['lakes', 'cities'].map(async (kind) => {
       try {
         const response = await fetch(`/world/${kind}-50m-v5.1.2.geojson`, {
-          signal,
+          signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]),
         });
         if (!response.ok) return;
         const bytes = await response.arrayBuffer();
@@ -116,6 +116,19 @@ export async function loadWorld(signal: AbortSignal): Promise<WorldData> {
           extra.type !== 'FeatureCollection' ||
           !Array.isArray(extra.features) ||
           extra.features.length > 10000
+        )
+          return;
+        if (
+          !extra.features.every(
+            (f) =>
+              f.type === 'Feature' &&
+              !!f.geometry &&
+              (kind === 'cities'
+                ? f.geometry.type === 'Point' &&
+                  typeof f.properties?.name === 'string' &&
+                  Number.isFinite(f.properties?.labelRank)
+                : ['Polygon', 'MultiPolygon'].includes(f.geometry.type)),
+          )
         )
           return;
         if (kind === 'lakes') data.lakes = extra;

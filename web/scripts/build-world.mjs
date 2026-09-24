@@ -69,7 +69,13 @@ for (const key of ['countries', 'lakes', 'cities']) {
               labelY: p.LABEL_Y,
             }
           : key === 'cities'
-            ? { name: p.name, labelRank: p.scalerank }
+            ? {
+                name: [...p.name].some((c) => c.codePointAt(0) > 255)
+                  ? p.name.normalize('NFKD').replace(/\p{M}/gu, '')
+                  : p.name,
+                sourceName: p.name,
+                labelRank: p.scalerank,
+              }
             : {},
     }));
   await write(

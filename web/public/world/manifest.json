@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "bytes": 5484546,
+  "bytes": 5497012,
   "assets": [
     {
       "url": "/world/countries-50m-v5.1.2.geojson",
@@ -14,8 +14,8 @@
     },
     {
       "url": "/world/cities-50m-v5.1.2.geojson",
-      "bytes": 65541,
-      "sha256": "7c908db7b90a5fbf3347f23cd532c91d13adeb7fb4f6e929d6b0f56525c85ea4"
+      "bytes": 78007,
+      "sha256": "659fa67bdf3183c9dff5990e8a8e966bd38b5784190b862a356e96cdd5e14963"
     },
     {
       "url": "/world/blue-marble-200409/0/0/0.webp",
