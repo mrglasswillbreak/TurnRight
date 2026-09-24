@@ -1,0 +1,17 @@
+{
+  "origin": "https://turnright.vercel.app",
+  "version": "lasu-8577d5c85d2c",
+  "retrievedAt": "2026-09-24",
+  "data": {
+    "url": "/packages/lasu-8577d5c85d2c/campus.json",
+    "sha256": "0075f0ff11d1df45c3b9c5be6c6d72d230a12230f6b504bc2bcd59171f2d93c3",
+    "bytes": 2749760,
+    "contentType": "application/json"
+  },
+  "manifest": {
+    "url": "/packages/lasu-8577d5c85d2c/manifest.json",
+    "sha256": "6fe0ffe4eb2977f4e75802f2e241751bbde8fa823ef0300e7ebb2b7306b3e188",
+    "bytes": 25720,
+    "contentType": "application/json"
+  }
+}

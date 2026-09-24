@@ -1,0 +1,5026 @@
+{
+  "baseline": "lasu-8577d5c85d2c",
+  "edits": [
+    {
+      "id": "arcgis:University_Property:2",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2016648,
+              6.4731411
+            ],
+            [
+              3.2016747,
+              6.4731866
+            ],
+            [
+              3.2017178,
+              6.4731768
+            ],
+            [
+              3.2017753,
+              6.4733107
+            ],
+            [
+              3.201981,
+              6.4732009
+            ],
+            [
+              3.2019837,
+              6.4732339
+            ],
+            [
+              3.2021032,
+              6.4732393
+            ],
+            [
+              3.2021248,
+              6.4729349
+            ],
+            [
+              3.2019999,
+              6.4729331
+            ],
+            [
+              3.2019999,
+              6.4729563
+            ],
+            [
+              3.2018274,
+              6.4728367
+            ],
+            [
+              3.2017439,
+              6.4729563
+            ],
+            [
+              3.201699,
+              6.4729278
+            ],
+            [
+              3.2016648,
+              6.472976
+            ],
+            [
+              3.2017151,
+              6.4730072
+            ],
+            [
+              3.2017134,
+              6.4730358
+            ],
+            [
+              3.2016244,
+              6.4730242
+            ],
+            [
+              3.2016172,
+              6.4730768
+            ],
+            [
+              3.2017134,
+              6.4730857
+            ],
+            [
+              3.2017178,
+              6.4731295
+            ],
+            [
+              3.2016648,
+              6.4731411
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:2",
+        "kind": "building",
+        "name": "LASU Main Auditorium",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:2:wing:0": {
+              "roofColour": "#9e7168",
+              "wallColour": "#e4d2b0"
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:2:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-17",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-17",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-17",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-5",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-7",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-6",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-18",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-7",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-18",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-8",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-18",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-9",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-7",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-10",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-10",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-11",
+                  "to": "ridge-point-12",
+                  "from": "ridge-point-19",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-12",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-19",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-13",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-19",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-14",
+                  "to": "ridge-point-13",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-15",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-16",
+                  "to": "ridge-point-15",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-17",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-18",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-19",
+                  "to": "ridge-point-10",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-20",
+                  "to": "ridge-point-13",
+                  "from": "ridge-point-16",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.093927942309815,
+                  "coordinates": [
+                    3.2016913000000002,
+                    6.47315895
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.102890224453185,
+                  "coordinates": [
+                    3.2017178,
+                    6.47315315
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 5.058426195387347,
+                  "coordinates": [
+                    3.2017286499999997,
+                    6.47299605
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.823109323093743,
+                  "coordinates": [
+                    3.20185665,
+                    6.47299605
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.496313669807574,
+                  "coordinates": [
+                    3.2018719,
+                    6.4729563
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.116717872551638,
+                  "coordinates": [
+                    3.2017134,
+                    6.47306075
+                  ]
+                },
+                {
+                  "id": "ridge-point-6",
+                  "elevation": 5.116717872551638,
+                  "coordinates": [
+                    3.2016652999999997,
+                    6.4730563000000005
+                  ]
+                },
+                {
+                  "id": "ridge-point-7",
+                  "elevation": 5.1509503735326865,
+                  "coordinates": [
+                    3.2017295,
+                    6.47298175
+                  ]
+                },
+                {
+                  "id": "ridge-point-8",
+                  "elevation": 5.940935380299936,
+                  "coordinates": [
+                    3.20185665,
+                    6.473021
+                  ]
+                },
+                {
+                  "id": "ridge-point-9",
+                  "elevation": 5.129386725591704,
+                  "coordinates": [
+                    3.20170435,
+                    6.4729661499999995
+                  ]
+                },
+                {
+                  "id": "ridge-point-10",
+                  "elevation": 5.820012637192063,
+                  "coordinates": [
+                    3.2018472,
+                    6.4731433
+                  ]
+                },
+                {
+                  "id": "ridge-point-11",
+                  "elevation": 5.659052508953722,
+                  "coordinates": [
+                    3.2018494,
+                    6.4731652
+                  ]
+                },
+                {
+                  "id": "ridge-point-12",
+                  "elevation": 5.494076677496299,
+                  "coordinates": [
+                    3.2018494,
+                    6.47318885
+                  ]
+                },
+                {
+                  "id": "ridge-point-13",
+                  "elevation": 5.404187129778227,
+                  "coordinates": [
+                    3.20205155,
+                    6.4730978
+                  ]
+                },
+                {
+                  "id": "ridge-point-14",
+                  "elevation": 5.891293256645641,
+                  "coordinates": [
+                    3.2019904500000003,
+                    6.4730786
+                  ]
+                },
+                {
+                  "id": "ridge-point-15",
+                  "elevation": 5.050039204662652,
+                  "coordinates": [
+                    3.2020421,
+                    6.473220100000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-16",
+                  "elevation": 5.011845945282272,
+                  "coordinates": [
+                    3.20206235,
+                    6.4729456
+                  ]
+                },
+                {
+                  "id": "ridge-point-17",
+                  "elevation": 5.226229440903702,
+                  "coordinates": [
+                    3.201765981962582,
+                    6.47298814534632
+                  ]
+                },
+                {
+                  "id": "ridge-point-18",
+                  "elevation": 5.134558651006347,
+                  "coordinates": [
+                    3.2017351213864016,
+                    6.473052181336622
+                  ]
+                },
+                {
+                  "id": "ridge-point-19",
+                  "elevation": 5.148178042707371,
+                  "coordinates": [
+                    3.201739226593974,
+                    6.473157381730359
+                  ]
+                },
+                {
+                  "id": "ridge-point-20",
+                  "elevation": 5.376374561828525,
+                  "coordinates": [
+                    3.2020290698233596,
+                    6.473168646908538
+                  ]
+                },
+                {
+                  "id": "ridge-point-21",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.201910027125818,
+                    6.4730839617246465
+                  ]
+                }
+              ],
+              "provenance": "Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "Illustrative facade treatment, 2026-09-14. Approximately 6 m · derived from floors Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.",
+          "roofColour": "#829b82",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#d7cde0",
+          "windowColour": "#6f9bad",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.64,
+          "windowHeightRatio": 0.6,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:0d3bf62a-b1ad-4784-97e0-ca5ef7d75f12",
+              "owner:f4f817e8-8ee9-4870-9838-26c6b28ea1d2"
+            ],
+            "observed": [
+              "Cream and muted red-brown wall planes; tall vertical fins; entrance canopy and side galleries."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "One linked image shows the campus gate and is excluded from model evidence. Low-resolution overlay photograph is not a texture source.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:2:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:2:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:2:wall:0:0:0",
+                    "arcgis:University_Property:2:wall:0:0:1",
+                    "arcgis:University_Property:2:wall:0:0:2",
+                    "arcgis:University_Property:2:wall:0:0:3",
+                    "arcgis:University_Property:2:wall:0:0:4",
+                    "arcgis:University_Property:2:wall:0:0:5",
+                    "arcgis:University_Property:2:wall:0:0:6",
+                    "arcgis:University_Property:2:wall:0:0:7",
+                    "arcgis:University_Property:2:wall:0:0:8",
+                    "arcgis:University_Property:2:wall:0:0:9",
+                    "arcgis:University_Property:2:wall:0:0:10",
+                    "arcgis:University_Property:2:wall:0:0:11",
+                    "arcgis:University_Property:2:wall:0:0:12",
+                    "arcgis:University_Property:2:wall:0:0:13",
+                    "arcgis:University_Property:2:wall:0:0:14",
+                    "arcgis:University_Property:2:wall:0:0:15",
+                    "arcgis:University_Property:2:wall:0:0:16",
+                    "arcgis:University_Property:2:wall:0:0:17",
+                    "arcgis:University_Property:2:wall:0:0:18",
+                    "arcgis:University_Property:2:wall:0:0:19"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:2:vertex:0:0:0",
+                    "arcgis:University_Property:2:vertex:0:0:1",
+                    "arcgis:University_Property:2:vertex:0:0:2",
+                    "arcgis:University_Property:2:vertex:0:0:3",
+                    "arcgis:University_Property:2:vertex:0:0:4",
+                    "arcgis:University_Property:2:vertex:0:0:5",
+                    "arcgis:University_Property:2:vertex:0:0:6",
+                    "arcgis:University_Property:2:vertex:0:0:7",
+                    "arcgis:University_Property:2:vertex:0:0:8",
+                    "arcgis:University_Property:2:vertex:0:0:9",
+                    "arcgis:University_Property:2:vertex:0:0:10",
+                    "arcgis:University_Property:2:vertex:0:0:11",
+                    "arcgis:University_Property:2:vertex:0:0:12",
+                    "arcgis:University_Property:2:vertex:0:0:13",
+                    "arcgis:University_Property:2:vertex:0:0:14",
+                    "arcgis:University_Property:2:vertex:0:0:15",
+                    "arcgis:University_Property:2:vertex:0:0:16",
+                    "arcgis:University_Property:2:vertex:0:0:17",
+                    "arcgis:University_Property:2:vertex:0:0:18",
+                    "arcgis:University_Property:2:vertex:0:0:19"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:3",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2012319,
+              6.4719816
+            ],
+            [
+              3.2011986,
+              6.4721414
+            ],
+            [
+              3.2014762,
+              6.4722012
+            ],
+            [
+              3.2014879,
+              6.4721342
+            ],
+            [
+              3.2015265,
+              6.4721414
+            ],
+            [
+              3.201496,
+              6.4722779
+            ],
+            [
+              3.2016873,
+              6.4723253
+            ],
+            [
+              3.2017178,
+              6.4721771
+            ],
+            [
+              3.2017852,
+              6.4721914
+            ],
+            [
+              3.2017753,
+              6.4722396
+            ],
+            [
+              3.2019667,
+              6.4722851
+            ],
+            [
+              3.2019936,
+              6.4721628
+            ],
+            [
+              3.2020529,
+              6.4721726
+            ],
+            [
+              3.20207,
+              6.4720673
+            ],
+            [
+              3.2021724,
+              6.471978
+            ],
+            [
+              3.2021104,
+              6.471904
+            ],
+            [
+              3.2021463,
+              6.4717415
+            ],
+            [
+              3.2021131,
+              6.471737
+            ],
+            [
+              3.2021365,
+              6.4716219
+            ],
+            [
+              3.2019209,
+              6.4715737
+            ],
+            [
+              3.2019092,
+              6.4716389
+            ],
+            [
+              3.2018418,
+              6.4716264
+            ],
+            [
+              3.2018831,
+              6.4714853
+            ],
+            [
+              3.2016792,
+              6.4714425
+            ],
+            [
+              3.2016505,
+              6.4715862
+            ],
+            [
+              3.2016145,
+              6.471579
+            ],
+            [
+              3.2016388,
+              6.4714853
+            ],
+            [
+              3.2013639,
+              6.4714282
+            ],
+            [
+              3.2013397,
+              6.4715603
+            ],
+            [
+              3.2012965,
+              6.4715532
+            ],
+            [
+              3.2012777,
+              6.4716728
+            ],
+            [
+              3.2011699,
+              6.4717469
+            ],
+            [
+              3.2012301,
+              6.4718379
+            ],
+            [
+              3.2011986,
+              6.4719745
+            ],
+            [
+              3.2012319,
+              6.4719816
+            ]
+          ],
+          [
+            [
+              3.2016388,
+              6.4719736
+            ],
+            [
+              3.2015552,
+              6.471854
+            ],
+            [
+              3.2016747,
+              6.4717683
+            ],
+            [
+              3.2017583,
+              6.4718923
+            ],
+            [
+              3.2016388,
+              6.4719736
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:3",
+        "kind": "building",
+        "name": "LASU International Library",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:3:wing:0": {
+              "height": 12,
+              "confidence": "inferred",
+              "heightMode": "metres",
+              "provenance": "Total wing height adopted from the current visual reference when applying this roof.",
+              "roofColour": "#9e7168"
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:3:wing:0": {
+              "eaves": 10.2,
+              "lines": [],
+              "points": []
+            }
+          },
+          "walls": {
+            "arcgis:University_Property:3:wall:0:0:10": {
+              "wallColour": "#afbce4"
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. August 2026 exterior shows four floor levels, cream walls, tall glazing bays and flat parapets. Mapped stepped footprint retained; interior photograph confirms central covered atrium, whose exact roof footprint is not surveyed. 3 m per visible floor; atrium roof detail omitted without an overhead plan. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+          "roofColour": "#9e7168",
+          "trimColour": "#c7c4ba",
+          "wallColour": "#e4d2b0",
+          "windowColour": "#73949c",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.82,
+          "windowHeightRatio": 0.66,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:198256532",
+              "commons:198256515"
+            ],
+            "observed": [
+              "Four exterior levels; broad blue glazing; cream framing and red-brown vertical panels. Interior image shows covered atrium."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Interior view does not locate the atrium roof in map coordinates. Preserve the mapped courtyard and owner roof.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:3:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:3:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:3:wall:0:0:0",
+                    "arcgis:University_Property:3:wall:0:0:1",
+                    "arcgis:University_Property:3:wall:0:0:2",
+                    "arcgis:University_Property:3:wall:0:0:3",
+                    "arcgis:University_Property:3:wall:0:0:4",
+                    "arcgis:University_Property:3:wall:0:0:5",
+                    "arcgis:University_Property:3:wall:0:0:6",
+                    "arcgis:University_Property:3:wall:0:0:7",
+                    "arcgis:University_Property:3:wall:0:0:8",
+                    "arcgis:University_Property:3:wall:0:0:9",
+                    "arcgis:University_Property:3:wall:0:0:10",
+                    "arcgis:University_Property:3:wall:0:0:11",
+                    "arcgis:University_Property:3:wall:0:0:12",
+                    "arcgis:University_Property:3:wall:0:0:13",
+                    "arcgis:University_Property:3:wall:0:0:14",
+                    "arcgis:University_Property:3:wall:0:0:15",
+                    "arcgis:University_Property:3:wall:0:0:16",
+                    "arcgis:University_Property:3:wall:0:0:17",
+                    "arcgis:University_Property:3:wall:0:0:18",
+                    "arcgis:University_Property:3:wall:0:0:19",
+                    "arcgis:University_Property:3:wall:0:0:20",
+                    "arcgis:University_Property:3:wall:0:0:21",
+                    "arcgis:University_Property:3:wall:0:0:22",
+                    "arcgis:University_Property:3:wall:0:0:23",
+                    "arcgis:University_Property:3:wall:0:0:24",
+                    "arcgis:University_Property:3:wall:0:0:25",
+                    "arcgis:University_Property:3:wall:0:0:26",
+                    "arcgis:University_Property:3:wall:0:0:27",
+                    "arcgis:University_Property:3:wall:0:0:28",
+                    "arcgis:University_Property:3:wall:0:0:29",
+                    "arcgis:University_Property:3:wall:0:0:30",
+                    "arcgis:University_Property:3:wall:0:0:31",
+                    "arcgis:University_Property:3:wall:0:0:32",
+                    "arcgis:University_Property:3:wall:0:0:33"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:3:vertex:0:0:0",
+                    "arcgis:University_Property:3:vertex:0:0:1",
+                    "arcgis:University_Property:3:vertex:0:0:2",
+                    "arcgis:University_Property:3:vertex:0:0:3",
+                    "arcgis:University_Property:3:vertex:0:0:4",
+                    "arcgis:University_Property:3:vertex:0:0:5",
+                    "arcgis:University_Property:3:vertex:0:0:6",
+                    "arcgis:University_Property:3:vertex:0:0:7",
+                    "arcgis:University_Property:3:vertex:0:0:8",
+                    "arcgis:University_Property:3:vertex:0:0:9",
+                    "arcgis:University_Property:3:vertex:0:0:10",
+                    "arcgis:University_Property:3:vertex:0:0:11",
+                    "arcgis:University_Property:3:vertex:0:0:12",
+                    "arcgis:University_Property:3:vertex:0:0:13",
+                    "arcgis:University_Property:3:vertex:0:0:14",
+                    "arcgis:University_Property:3:vertex:0:0:15",
+                    "arcgis:University_Property:3:vertex:0:0:16",
+                    "arcgis:University_Property:3:vertex:0:0:17",
+                    "arcgis:University_Property:3:vertex:0:0:18",
+                    "arcgis:University_Property:3:vertex:0:0:19",
+                    "arcgis:University_Property:3:vertex:0:0:20",
+                    "arcgis:University_Property:3:vertex:0:0:21",
+                    "arcgis:University_Property:3:vertex:0:0:22",
+                    "arcgis:University_Property:3:vertex:0:0:23",
+                    "arcgis:University_Property:3:vertex:0:0:24",
+                    "arcgis:University_Property:3:vertex:0:0:25",
+                    "arcgis:University_Property:3:vertex:0:0:26",
+                    "arcgis:University_Property:3:vertex:0:0:27",
+                    "arcgis:University_Property:3:vertex:0:0:28",
+                    "arcgis:University_Property:3:vertex:0:0:29",
+                    "arcgis:University_Property:3:vertex:0:0:30",
+                    "arcgis:University_Property:3:vertex:0:0:31",
+                    "arcgis:University_Property:3:vertex:0:0:32",
+                    "arcgis:University_Property:3:vertex:0:0:33"
+                  ]
+                },
+                {
+                  "id": "arcgis:University_Property:3:ring:0:1",
+                  "wallIds": [
+                    "arcgis:University_Property:3:wall:0:1:0",
+                    "arcgis:University_Property:3:wall:0:1:1",
+                    "arcgis:University_Property:3:wall:0:1:2",
+                    "arcgis:University_Property:3:wall:0:1:3"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:3:vertex:0:1:0",
+                    "arcgis:University_Property:3:vertex:0:1:1",
+                    "arcgis:University_Property:3:vertex:0:1:2",
+                    "arcgis:University_Property:3:vertex:0:1:3"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:22",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2000362,
+              6.4721458
+            ],
+            [
+              3.2000173,
+              6.4722574
+            ],
+            [
+              3.2001772,
+              6.472286
+            ],
+            [
+              3.2001979,
+              6.4721289
+            ],
+            [
+              3.2001224,
+              6.4721146
+            ],
+            [
+              3.200117,
+              6.4721342
+            ],
+            [
+              3.2000748,
+              6.4721244
+            ],
+            [
+              3.2000694,
+              6.4721405
+            ],
+            [
+              3.2000362,
+              6.4721458
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:22",
+        "kind": "building",
+        "name": "Mass Communication",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Four floor levels, flat parapet and cream walls with repeated window bays. 3 m per visible floor; simplified regular window spacing. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+          "roofColour": "#9c9181",
+          "trimColour": "#aa897c",
+          "wallColour": "#ddd5c1",
+          "windowColour": "#566d70",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.56,
+          "windowHeightRatio": 0.46,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:112540966",
+              "commons:116073666"
+            ],
+            "observed": [
+              "Four visible storeys; paired rectangular windows; pale wall panels and red-brown vertical strips."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Flat parapet visible. Air-conditioning units are omitted.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false
+      }
+    },
+    {
+      "id": "arcgis:University_Property:25",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2026476,
+              6.464133
+            ],
+            [
+              3.2028264,
+              6.4640946
+            ],
+            [
+              3.2028093,
+              6.4640116
+            ],
+            [
+              3.2027761,
+              6.4640187
+            ],
+            [
+              3.2027473,
+              6.4638732
+            ],
+            [
+              3.2027761,
+              6.4638661
+            ],
+            [
+              3.2027617,
+              6.4637804
+            ],
+            [
+              3.2025739,
+              6.4638134
+            ],
+            [
+              3.202591,
+              6.4638991
+            ],
+            [
+              3.2026072,
+              6.4638947
+            ],
+            [
+              3.2026189,
+              6.4639473
+            ],
+            [
+              3.2025811,
+              6.4639518
+            ],
+            [
+              3.202591,
+              6.4640134
+            ],
+            [
+              3.2026287,
+              6.4640062
+            ],
+            [
+              3.2026431,
+              6.4640562
+            ],
+            [
+              3.2026287,
+              6.4640589
+            ],
+            [
+              3.2026476,
+              6.464133
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:25",
+        "kind": "building",
+        "name": "Faculty of Art Language Lab",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "roofs": {
+            "arcgis:University_Property:25:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-5",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-6",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-14",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-7",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-14",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-8",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-14",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-9",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-8",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-10",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-9",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-11",
+                  "to": "ridge-point-10",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-12",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-13",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-14",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-12",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.378675598232899,
+                  "coordinates": [
+                    3.2026238,
+                    6.4639767500000005
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.210415161738236,
+                  "coordinates": [
+                    3.20260495,
+                    6.46398035
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 5.047887555006562,
+                  "coordinates": [
+                    3.20259055,
+                    6.46385405
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.9916762222760855,
+                  "coordinates": [
+                    3.2026831,
+                    6.46391025
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.9916762222760855,
+                  "coordinates": [
+                    3.2026975,
+                    6.463983
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.20267725,
+                    6.46388395
+                  ]
+                },
+                {
+                  "id": "ridge-point-6",
+                  "elevation": 5.602951114749414,
+                  "coordinates": [
+                    3.2026605999999997,
+                    6.463843300000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-7",
+                  "elevation": 5.975435626860724,
+                  "coordinates": [
+                    3.2027023999999997,
+                    6.46401245
+                  ]
+                },
+                {
+                  "id": "ridge-point-8",
+                  "elevation": 5.145847133870734,
+                  "coordinates": [
+                    3.2027545,
+                    6.4638268
+                  ]
+                },
+                {
+                  "id": "ridge-point-9",
+                  "elevation": 5.975438249160069,
+                  "coordinates": [
+                    3.2027096,
+                    6.464037449999999
+                  ]
+                },
+                {
+                  "id": "ridge-point-10",
+                  "elevation": 5.031660022729668,
+                  "coordinates": [
+                    3.20264535,
+                    6.4640946
+                  ]
+                },
+                {
+                  "id": "ridge-point-11",
+                  "elevation": 5.571107765621544,
+                  "coordinates": [
+                    3.20271185,
+                    6.4640758499999995
+                  ]
+                },
+                {
+                  "id": "ridge-point-12",
+                  "elevation": 5.179246897571379,
+                  "coordinates": [
+                    3.2028012500000003,
+                    6.46405665
+                  ]
+                },
+                {
+                  "id": "ridge-point-13",
+                  "elevation": 5.493186085855534,
+                  "coordinates": [
+                    3.202625707108596,
+                    6.463862246044866
+                  ]
+                },
+                {
+                  "id": "ridge-point-14",
+                  "elevation": 5.3574430736618055,
+                  "coordinates": [
+                    3.202648145998116,
+                    6.463985293726761
+                  ]
+                },
+                {
+                  "id": "ridge-point-15",
+                  "elevation": 5.447044099022494,
+                  "coordinates": [
+                    3.2026712324269284,
+                    6.464076075181433
+                  ]
+                }
+              ],
+              "provenance": "Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "Illustrative facade treatment, 2026-09-14. Approximately 6 m · derived from floors Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.",
+          "roofColour": "#9c8caf",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#cbd8da",
+          "windowColour": "#6f9bad",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.57,
+          "windowHeightRatio": 0.45,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf"
+            ],
+            "observed": [
+              "Two levels; yellow walls; red pitched roof; rounded end and recessed entrance."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Trees obscure the end façade. Preserve owner outline and custom roof; do not infer circular footprint from perspective.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:25:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:25:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:25:wall:0:0:0",
+                    "arcgis:University_Property:25:wall:0:0:1",
+                    "arcgis:University_Property:25:wall:0:0:2",
+                    "arcgis:University_Property:25:wall:0:0:3",
+                    "arcgis:University_Property:25:wall:0:0:4",
+                    "arcgis:University_Property:25:wall:0:0:5",
+                    "arcgis:University_Property:25:wall:0:0:6",
+                    "arcgis:University_Property:25:wall:0:0:7",
+                    "arcgis:University_Property:25:wall:0:0:8",
+                    "arcgis:University_Property:25:wall:0:0:9",
+                    "arcgis:University_Property:25:wall:0:0:10",
+                    "arcgis:University_Property:25:wall:0:0:11",
+                    "arcgis:University_Property:25:wall:0:0:12",
+                    "arcgis:University_Property:25:wall:0:0:13",
+                    "arcgis:University_Property:25:wall:0:0:14",
+                    "arcgis:University_Property:25:wall:0:0:15"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:25:vertex:0:0:0",
+                    "arcgis:University_Property:25:vertex:0:0:1",
+                    "arcgis:University_Property:25:vertex:0:0:2",
+                    "arcgis:University_Property:25:vertex:0:0:3",
+                    "arcgis:University_Property:25:vertex:0:0:4",
+                    "arcgis:University_Property:25:vertex:0:0:5",
+                    "arcgis:University_Property:25:vertex:0:0:6",
+                    "arcgis:University_Property:25:vertex:0:0:7",
+                    "arcgis:University_Property:25:vertex:0:0:8",
+                    "arcgis:University_Property:25:vertex:0:0:9",
+                    "arcgis:University_Property:25:vertex:0:0:10",
+                    "arcgis:University_Property:25:vertex:0:0:11",
+                    "arcgis:University_Property:25:vertex:0:0:12",
+                    "arcgis:University_Property:25:vertex:0:0:13",
+                    "arcgis:University_Property:25:vertex:0:0:14",
+                    "arcgis:University_Property:25:vertex:0:0:15"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:28",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2011851,
+              6.4664538
+            ],
+            [
+              3.2014942,
+              6.4664484
+            ],
+            [
+              3.2014942,
+              6.4662342
+            ],
+            [
+              3.2011824,
+              6.4662413
+            ],
+            [
+              3.2011851,
+              6.4664538
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:28",
+        "kind": "building",
+        "name": "Makanjuola Lecture Theatre",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:28:wing:0": {
+              "roofForm": "gable"
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:28:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.20124584,
+                    6.4663463
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.999809857467646,
+                  "coordinates": [
+                    3.20143211,
+                    6.46634255
+                  ]
+                }
+              ],
+              "provenance": "Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Named Ojo lecture theatre: grey facade, narrow dark window openings, flat parapet and blue entrance accents. PWDC identifies this as its 2018 500-seat project. Retain the source-derived 6 m height. Four bands of facade openings do not prove four occupied floors. Regular narrow bays approximate the facade; entrance portals and horizontal scale are not invented. https://lasu.edu.ng/prefasugamesseminar/ https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "roofColour": "#939ea5",
+          "trimColour": "#aab7bd",
+          "wallColour": "#9babb4",
+          "windowColour": "#354f5e",
+          "windowSpacing": 2,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.3,
+          "windowHeightRatio": 0.67,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:29167df2-b9dc-4031-86ab-7b27a9ec1ad4",
+              "owner:5938e73d-5f89-4688-8c55-1bd8a04afce3",
+              "owner:157703d4-eac0-43a7-aba5-49670c40241a"
+            ],
+            "observed": [
+              "Three visible levels; grey exterior screen with irregular tall narrow openings; blue entrance canopies; flat parapet."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Screen pattern is irregular: regularized model openings remain estimates. Existing owner roof retained pending review.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:28:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:28:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:28:wall:0:0:0",
+                    "arcgis:University_Property:28:wall:0:0:1",
+                    "arcgis:University_Property:28:wall:0:0:2",
+                    "arcgis:University_Property:28:wall:0:0:3"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:28:vertex:0:0:0",
+                    "arcgis:University_Property:28:vertex:0:0:1",
+                    "arcgis:University_Property:28:vertex:0:0:2",
+                    "arcgis:University_Property:28:vertex:0:0:3"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:31",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2010755,
+              6.4689236
+            ],
+            [
+              3.2013441,
+              6.4689664
+            ],
+            [
+              3.2013567,
+              6.4689093
+            ],
+            [
+              3.2013729,
+              6.4689138
+            ],
+            [
+              3.2014043,
+              6.4687397
+            ],
+            [
+              3.2013774,
+              6.4687326
+            ],
+            [
+              3.2013944,
+              6.4686353
+            ],
+            [
+              3.2011375,
+              6.4685924
+            ],
+            [
+              3.2011205,
+              6.4686897
+            ],
+            [
+              3.2011447,
+              6.4686897
+            ],
+            [
+              3.201116,
+              6.468854
+            ],
+            [
+              3.2010854,
+              6.4688495
+            ],
+            [
+              3.2010755,
+              6.4689236
+            ]
+          ],
+          [
+            [
+              3.2011609,
+              6.4688665
+            ],
+            [
+              3.2011591,
+              6.4688495
+            ],
+            [
+              3.2012417,
+              6.4688611
+            ],
+            [
+              3.2012687,
+              6.4686897
+            ],
+            [
+              3.2011923,
+              6.4686808
+            ],
+            [
+              3.201195,
+              6.4686665
+            ],
+            [
+              3.2013136,
+              6.4686853
+            ],
+            [
+              3.2012804,
+              6.4688825
+            ],
+            [
+              3.2011609,
+              6.4688665
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:31",
+        "kind": "building",
+        "name": "ICT",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "roofs": {
+            "arcgis:University_Property:31:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-2",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-4",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-5",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-6",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-6",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-7",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-7",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-8",
+                  "to": "ridge-point-10",
+                  "from": "ridge-point-9",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-9",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-10",
+                  "to": "ridge-point-12",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-11",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-12",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-13",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-14",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-14",
+                  "to": "ridge-point-16",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-15",
+                  "to": "ridge-point-13",
+                  "from": "ridge-point-17",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-16",
+                  "to": "ridge-point-12",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-17",
+                  "to": "ridge-point-19",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-18",
+                  "to": "ridge-point-17",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-19",
+                  "to": "ridge-point-16",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-20",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-21",
+                  "to": "ridge-point-18",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-22",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-23",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-10",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.758575403168965,
+                  "coordinates": [
+                    3.2013289,
+                    6.46880755
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.758575403168965,
+                  "coordinates": [
+                    3.2013455000000004,
+                    6.46870895
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 5.118387421951285,
+                  "coordinates": [
+                    3.2013805,
+                    6.4688245
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.447025619076874,
+                  "coordinates": [
+                    3.20136705,
+                    6.46882095
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.666592788365644,
+                  "coordinates": [
+                    3.2013540000000003,
+                    6.4686603
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.87879547827366,
+                  "coordinates": [
+                    3.20131855,
+                    6.4688959
+                  ]
+                },
+                {
+                  "id": "ridge-point-6",
+                  "elevation": 5.7882677372522915,
+                  "coordinates": [
+                    3.20131225,
+                    6.46892445
+                  ]
+                },
+                {
+                  "id": "ridge-point-7",
+                  "elevation": 5.951430707829326,
+                  "coordinates": [
+                    3.2011757000000003,
+                    6.46876515
+                  ]
+                },
+                {
+                  "id": "ridge-point-8",
+                  "elevation": 5.830684257876956,
+                  "coordinates": [
+                    3.201217,
+                    6.46877095
+                  ]
+                },
+                {
+                  "id": "ridge-point-9",
+                  "elevation": 5.678411892515211,
+                  "coordinates": [
+                    3.20116625,
+                    6.46862945
+                  ]
+                },
+                {
+                  "id": "ridge-point-10",
+                  "elevation": 5.666592788365644,
+                  "coordinates": [
+                    3.20122555,
+                    6.46863885
+                  ]
+                },
+                {
+                  "id": "ridge-point-11",
+                  "elevation": 5.493846808226342,
+                  "coordinates": [
+                    3.2011685,
+                    6.46868525
+                  ]
+                },
+                {
+                  "id": "ridge-point-12",
+                  "elevation": 5.413936732489208,
+                  "coordinates": [
+                    3.2011519,
+                    6.4687696
+                  ]
+                },
+                {
+                  "id": "ridge-point-13",
+                  "elevation": 5.752457333124805,
+                  "coordinates": [
+                    3.2012525,
+                    6.46891645
+                  ]
+                },
+                {
+                  "id": "ridge-point-14",
+                  "elevation": 5.455842987835268,
+                  "coordinates": [
+                    3.20116985,
+                    6.4686781
+                  ]
+                },
+                {
+                  "id": "ridge-point-15",
+                  "elevation": 5.413936732489208,
+                  "coordinates": [
+                    3.20113755,
+                    6.468851750000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-16",
+                  "elevation": 5.43344596926601,
+                  "coordinates": [
+                    3.20113845,
+                    6.4688602500000005
+                  ]
+                },
+                {
+                  "id": "ridge-point-17",
+                  "elevation": 5.752457333124805,
+                  "coordinates": [
+                    3.2011182,
+                    6.46889505
+                  ]
+                },
+                {
+                  "id": "ridge-point-18",
+                  "elevation": 5.2024883631638135,
+                  "coordinates": [
+                    3.2011411,
+                    6.4686410500000004
+                  ]
+                },
+                {
+                  "id": "ridge-point-19",
+                  "elevation": 5.286446884030643,
+                  "coordinates": [
+                    3.20109575,
+                    6.4688888
+                  ]
+                },
+                {
+                  "id": "ridge-point-20",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.2013294187660977,
+                    6.468865827975091
+                  ]
+                },
+                {
+                  "id": "ridge-point-21",
+                  "elevation": 5.498281225601035,
+                  "coordinates": [
+                    3.2011665943061556,
+                    6.468706161031999
+                  ]
+                },
+                {
+                  "id": "ridge-point-22",
+                  "elevation": 5.395562732107136,
+                  "coordinates": [
+                    3.2011235689518163,
+                    6.468872469580168
+                  ]
+                },
+                {
+                  "id": "ridge-point-23",
+                  "elevation": 5.7001100282623165,
+                  "coordinates": [
+                    3.2011630186864624,
+                    6.468658733966526
+                  ]
+                }
+              ],
+              "provenance": "Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "Illustrative facade treatment, 2026-09-14. Approximately 6 m · derived from floors Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.",
+          "roofColour": "#778f9e",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#e5c8b1",
+          "windowColour": "#6f9bad",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.55,
+          "windowHeightRatio": 0.45,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:116026274"
+            ],
+            "observed": [
+              "Yellow walls and brown trim; recessed low entrance section between taller end blocks."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Fence and trees obstruct the façade. No whole-wall photographic texture is safe.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:31:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:31:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:31:wall:0:0:0",
+                    "arcgis:University_Property:31:wall:0:0:1",
+                    "arcgis:University_Property:31:wall:0:0:2",
+                    "arcgis:University_Property:31:wall:0:0:3",
+                    "arcgis:University_Property:31:wall:0:0:4",
+                    "arcgis:University_Property:31:wall:0:0:5",
+                    "arcgis:University_Property:31:wall:0:0:6",
+                    "arcgis:University_Property:31:wall:0:0:7",
+                    "arcgis:University_Property:31:wall:0:0:8",
+                    "arcgis:University_Property:31:wall:0:0:9",
+                    "arcgis:University_Property:31:wall:0:0:10",
+                    "arcgis:University_Property:31:wall:0:0:11"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:31:vertex:0:0:0",
+                    "arcgis:University_Property:31:vertex:0:0:1",
+                    "arcgis:University_Property:31:vertex:0:0:2",
+                    "arcgis:University_Property:31:vertex:0:0:3",
+                    "arcgis:University_Property:31:vertex:0:0:4",
+                    "arcgis:University_Property:31:vertex:0:0:5",
+                    "arcgis:University_Property:31:vertex:0:0:6",
+                    "arcgis:University_Property:31:vertex:0:0:7",
+                    "arcgis:University_Property:31:vertex:0:0:8",
+                    "arcgis:University_Property:31:vertex:0:0:9",
+                    "arcgis:University_Property:31:vertex:0:0:10",
+                    "arcgis:University_Property:31:vertex:0:0:11"
+                  ]
+                },
+                {
+                  "id": "arcgis:University_Property:31:ring:0:1",
+                  "wallIds": [
+                    "arcgis:University_Property:31:wall:0:1:0",
+                    "arcgis:University_Property:31:wall:0:1:1",
+                    "arcgis:University_Property:31:wall:0:1:2",
+                    "arcgis:University_Property:31:wall:0:1:3",
+                    "arcgis:University_Property:31:wall:0:1:4",
+                    "arcgis:University_Property:31:wall:0:1:5",
+                    "arcgis:University_Property:31:wall:0:1:6",
+                    "arcgis:University_Property:31:wall:0:1:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:31:vertex:0:1:0",
+                    "arcgis:University_Property:31:vertex:0:1:1",
+                    "arcgis:University_Property:31:vertex:0:1:2",
+                    "arcgis:University_Property:31:vertex:0:1:3",
+                    "arcgis:University_Property:31:vertex:0:1:4",
+                    "arcgis:University_Property:31:vertex:0:1:5",
+                    "arcgis:University_Property:31:vertex:0:1:6",
+                    "arcgis:University_Property:31:vertex:0:1:7"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:32",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2028264,
+              6.4655549
+            ],
+            [
+              3.2028093,
+              6.4659477
+            ],
+            [
+              3.202874,
+              6.465953
+            ],
+            [
+              3.202874,
+              6.4660574
+            ],
+            [
+              3.202962,
+              6.4660574
+            ],
+            [
+              3.2029593,
+              6.4660807
+            ],
+            [
+              3.2030186,
+              6.4660833
+            ],
+            [
+              3.2030186,
+              6.4660619
+            ],
+            [
+              3.2030689,
+              6.4660646
+            ],
+            [
+              3.2030644,
+              6.4660833
+            ],
+            [
+              3.2031354,
+              6.4660807
+            ],
+            [
+              3.2031354,
+              6.4660601
+            ],
+            [
+              3.2031875,
+              6.4660673
+            ],
+            [
+              3.2031902,
+              6.4660789
+            ],
+            [
+              3.2032378,
+              6.4660807
+            ],
+            [
+              3.2032405,
+              6.4660646
+            ],
+            [
+              3.2033501,
+              6.4660762
+            ],
+            [
+              3.2033447,
+              6.4659816
+            ],
+            [
+              3.2033977,
+              6.4659816
+            ],
+            [
+              3.2034139,
+              6.4655835
+            ],
+            [
+              3.2033573,
+              6.4655817
+            ],
+            [
+              3.2033591,
+              6.4655103
+            ],
+            [
+              3.2032405,
+              6.4655049
+            ],
+            [
+              3.2032234,
+              6.4659619
+            ],
+            [
+              3.2031875,
+              6.4659602
+            ],
+            [
+              3.2032046,
+              6.4655362
+            ],
+            [
+              3.2030474,
+              6.4655362
+            ],
+            [
+              3.203033,
+              6.4659548
+            ],
+            [
+              3.2029881,
+              6.4659548
+            ],
+            [
+              3.2029997,
+              6.4655031
+            ],
+            [
+              3.2028857,
+              6.4654978
+            ],
+            [
+              3.2028901,
+              6.4655549
+            ],
+            [
+              3.2028264,
+              6.4655549
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:32",
+        "kind": "building",
+        "name": "Student Arcade",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "walls": {
+            "arcgis:University_Property:32:wall:0:0:21": {
+              "windows": true,
+              "windowSpacing": 4
+            },
+            "arcgis:University_Property:32:wall:0:0:25": {
+              "wallColour": "#965f55"
+            },
+            "arcgis:University_Property:32:wall:0:0:29": {
+              "windows": true
+            }
+          },
+          "windows": false,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Student arcade has warm yellow wings and a red-brown central entrance block. Internal floor count is taken from source description; central glazing and separate roof levels remain unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. The photographed front wings are mostly solid panels. Repeating windows remain disabled; central glazing needs a reviewed wall assignment. https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+          "roofColour": "#965f55",
+          "trimColour": "#965f55",
+          "wallColour": "#e4c78d",
+          "windowColour": "#7398a2",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.7,
+          "windowHeightRatio": 0.65,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:115984120"
+            ],
+            "observed": [
+              "Yellow solid façade panels; red-brown central entrance block; central glazing."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Wall orientation and relief-panel motifs need owner matching. Preserve existing solid walls.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:32:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:32:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:32:wall:0:0:0",
+                    "arcgis:University_Property:32:wall:0:0:1",
+                    "arcgis:University_Property:32:wall:0:0:2",
+                    "arcgis:University_Property:32:wall:0:0:3",
+                    "arcgis:University_Property:32:wall:0:0:4",
+                    "arcgis:University_Property:32:wall:0:0:5",
+                    "arcgis:University_Property:32:wall:0:0:6",
+                    "arcgis:University_Property:32:wall:0:0:7",
+                    "arcgis:University_Property:32:wall:0:0:8",
+                    "arcgis:University_Property:32:wall:0:0:9",
+                    "arcgis:University_Property:32:wall:0:0:10",
+                    "arcgis:University_Property:32:wall:0:0:11",
+                    "arcgis:University_Property:32:wall:0:0:12",
+                    "arcgis:University_Property:32:wall:0:0:13",
+                    "arcgis:University_Property:32:wall:0:0:14",
+                    "arcgis:University_Property:32:wall:0:0:15",
+                    "arcgis:University_Property:32:wall:0:0:16",
+                    "arcgis:University_Property:32:wall:0:0:17",
+                    "arcgis:University_Property:32:wall:0:0:18",
+                    "arcgis:University_Property:32:wall:0:0:19",
+                    "arcgis:University_Property:32:wall:0:0:20",
+                    "arcgis:University_Property:32:wall:0:0:21",
+                    "arcgis:University_Property:32:wall:0:0:22",
+                    "arcgis:University_Property:32:wall:0:0:23",
+                    "arcgis:University_Property:32:wall:0:0:24",
+                    "arcgis:University_Property:32:wall:0:0:25",
+                    "arcgis:University_Property:32:wall:0:0:26",
+                    "arcgis:University_Property:32:wall:0:0:27",
+                    "arcgis:University_Property:32:wall:0:0:28",
+                    "arcgis:University_Property:32:wall:0:0:29",
+                    "arcgis:University_Property:32:wall:0:0:30",
+                    "arcgis:University_Property:32:wall:0:0:31"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:32:vertex:0:0:0",
+                    "arcgis:University_Property:32:vertex:0:0:1",
+                    "arcgis:University_Property:32:vertex:0:0:2",
+                    "arcgis:University_Property:32:vertex:0:0:3",
+                    "arcgis:University_Property:32:vertex:0:0:4",
+                    "arcgis:University_Property:32:vertex:0:0:5",
+                    "arcgis:University_Property:32:vertex:0:0:6",
+                    "arcgis:University_Property:32:vertex:0:0:7",
+                    "arcgis:University_Property:32:vertex:0:0:8",
+                    "arcgis:University_Property:32:vertex:0:0:9",
+                    "arcgis:University_Property:32:vertex:0:0:10",
+                    "arcgis:University_Property:32:vertex:0:0:11",
+                    "arcgis:University_Property:32:vertex:0:0:12",
+                    "arcgis:University_Property:32:vertex:0:0:13",
+                    "arcgis:University_Property:32:vertex:0:0:14",
+                    "arcgis:University_Property:32:vertex:0:0:15",
+                    "arcgis:University_Property:32:vertex:0:0:16",
+                    "arcgis:University_Property:32:vertex:0:0:17",
+                    "arcgis:University_Property:32:vertex:0:0:18",
+                    "arcgis:University_Property:32:vertex:0:0:19",
+                    "arcgis:University_Property:32:vertex:0:0:20",
+                    "arcgis:University_Property:32:vertex:0:0:21",
+                    "arcgis:University_Property:32:vertex:0:0:22",
+                    "arcgis:University_Property:32:vertex:0:0:23",
+                    "arcgis:University_Property:32:vertex:0:0:24",
+                    "arcgis:University_Property:32:vertex:0:0:25",
+                    "arcgis:University_Property:32:vertex:0:0:26",
+                    "arcgis:University_Property:32:vertex:0:0:27",
+                    "arcgis:University_Property:32:vertex:0:0:28",
+                    "arcgis:University_Property:32:vertex:0:0:29",
+                    "arcgis:University_Property:32:vertex:0:0:30",
+                    "arcgis:University_Property:32:vertex:0:0:31"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:33",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2018966,
+              6.4661512
+            ],
+            [
+              3.2021149,
+              6.4661431
+            ],
+            [
+              3.202114,
+              6.4660673
+            ],
+            [
+              3.2021517,
+              6.4660655
+            ],
+            [
+              3.202149,
+              6.4659539
+            ],
+            [
+              3.2021032,
+              6.4659566
+            ],
+            [
+              3.2021032,
+              6.4658495
+            ],
+            [
+              3.2018921,
+              6.4658566
+            ],
+            [
+              3.2018966,
+              6.4661512
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:33",
+        "kind": "building",
+        "name": "SDG-PHC FACILITY",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:33:wing:0": {
+              "roofColour": "#b86351",
+              "trimColour": "#b86351",
+              "wallColour": "#e7dbc8"
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:33:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.4001678673961155,
+                  "coordinates": [
+                    3.2021086,
+                    6.46601195
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.1367621560631935,
+                  "coordinates": [
+                    3.2021314999999997,
+                    6.4660106
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 5.538840278689557,
+                  "coordinates": [
+                    3.2019976499999996,
+                    6.4659066
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.2019998999999997,
+                    6.4660539
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.358122600333576,
+                  "coordinates": [
+                    3.2020052999999997,
+                    6.46610925
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.495237957203614,
+                  "coordinates": [
+                    3.202071365102996,
+                    6.466041218785502
+                  ]
+                }
+              ],
+              "provenance": "Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "Illustrative facade treatment, 2026-09-14. Approximately 6 m · derived from floors Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.",
+          "roofColour": "#829b82",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#d7cde0",
+          "windowColour": "#6f9bad",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.52,
+          "windowHeightRatio": 0.5,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+              "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+              "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555"
+            ],
+            "observed": [
+              "Two levels; cream walls; red-brown vertical bands and canopy; white-framed blue windows."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Strong colour grading in one image is unsuitable for texture/material sampling. External ramp does not establish routing permission.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:33:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:33:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:33:wall:0:0:0",
+                    "arcgis:University_Property:33:wall:0:0:1",
+                    "arcgis:University_Property:33:wall:0:0:2",
+                    "arcgis:University_Property:33:wall:0:0:3",
+                    "arcgis:University_Property:33:wall:0:0:4",
+                    "arcgis:University_Property:33:wall:0:0:5",
+                    "arcgis:University_Property:33:wall:0:0:6",
+                    "arcgis:University_Property:33:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:33:vertex:0:0:0",
+                    "arcgis:University_Property:33:vertex:0:0:1",
+                    "arcgis:University_Property:33:vertex:0:0:2",
+                    "arcgis:University_Property:33:vertex:0:0:3",
+                    "arcgis:University_Property:33:vertex:0:0:4",
+                    "arcgis:University_Property:33:vertex:0:0:5",
+                    "arcgis:University_Property:33:vertex:0:0:6",
+                    "arcgis:University_Property:33:vertex:0:0:7"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "floors": 2,
+        "heightMode": "floors"
+      }
+    },
+    {
+      "id": "arcgis:University_Property:39",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.199649,
+              6.4759259
+            ],
+            [
+              3.2001045,
+              6.4760509
+            ],
+            [
+              3.2002805,
+              6.4754136
+            ],
+            [
+              3.1998242,
+              6.4752869
+            ],
+            [
+              3.199649,
+              6.4759259
+            ]
+          ],
+          [
+            [
+              3.1997928,
+              6.475859
+            ],
+            [
+              3.1999176,
+              6.4754207
+            ],
+            [
+              3.2001566,
+              6.4754904
+            ],
+            [
+              3.2000272,
+              6.4759286
+            ],
+            [
+              3.1997928,
+              6.475859
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:39",
+        "kind": "building",
+        "name": "FMS",
+        "height": 9,
+        "source": "campus-review",
+        "heightEstimated": true,
+        "appearance": {
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.7,
+          "windowHeightRatio": 0.53,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+              "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9"
+            ],
+            "observed": [
+              "Three visible levels; yellow infill; repeated rectangular windows; white entrance portico."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Previously illustrative height can use three observed floors at an estimated 3 m per floor. Exact front-wall location remains unconfirmed.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          },
+          "wallColour": "#d7b75b",
+          "roofColour": "#987259",
+          "windowColour": "#5c665b",
+          "trimColour": "#ede9df",
+          "windows": true
+        },
+        "floors": 3,
+        "heightMode": "floors"
+      }
+    },
+    {
+      "id": "arcgis:University_Property:43",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.201142,
+              6.4685067
+            ],
+            [
+              3.2014708,
+              6.4685523
+            ],
+            [
+              3.2014825,
+              6.468471
+            ],
+            [
+              3.2014466,
+              6.4684666
+            ],
+            [
+              3.2014492,
+              6.4684309
+            ],
+            [
+              3.201416,
+              6.4684309
+            ],
+            [
+              3.2014322,
+              6.4683023
+            ],
+            [
+              3.2011995,
+              6.4682738
+            ],
+            [
+              3.201178,
+              6.4684068
+            ],
+            [
+              3.2011537,
+              6.4684068
+            ],
+            [
+              3.201142,
+              6.4685067
+            ]
+          ],
+          [
+            [
+              3.2012444,
+              6.4684166
+            ],
+            [
+              3.2012543,
+              6.4683711
+            ],
+            [
+              3.2013513,
+              6.4683809
+            ],
+            [
+              3.2013495,
+              6.4684264
+            ],
+            [
+              3.2012444,
+              6.4684166
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:43",
+        "kind": "building",
+        "name": "PG School",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. The named Postgraduate School entrance has cream walls and dusty red-brown framing, a tall solid side wall and a triangular parapet feature. Retain source height rather than treating the entrance tower as another storey. Flat cap is a placeholder for the unresolved roof; repeated windows disabled to avoid glazing the photographed solid wall. https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+          "roofColour": "#996e61",
+          "trimColour": "#996e61",
+          "wallColour": "#d9c59f",
+          "windowColour": "#5f6968",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.5,
+          "windowHeightRatio": 0.45,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:112834702"
+            ],
+            "observed": [
+              "Cream wall planes and red-brown entrance framing; tall solid tower and triangular entrance feature."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Tower silhouette cannot be assigned confidently to the footprint from this view.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:43:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:43:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:43:wall:0:0:0",
+                    "arcgis:University_Property:43:wall:0:0:1",
+                    "arcgis:University_Property:43:wall:0:0:2",
+                    "arcgis:University_Property:43:wall:0:0:3",
+                    "arcgis:University_Property:43:wall:0:0:4",
+                    "arcgis:University_Property:43:wall:0:0:5",
+                    "arcgis:University_Property:43:wall:0:0:6",
+                    "arcgis:University_Property:43:wall:0:0:7",
+                    "arcgis:University_Property:43:wall:0:0:8",
+                    "arcgis:University_Property:43:wall:0:0:9"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:43:vertex:0:0:0",
+                    "arcgis:University_Property:43:vertex:0:0:1",
+                    "arcgis:University_Property:43:vertex:0:0:2",
+                    "arcgis:University_Property:43:vertex:0:0:3",
+                    "arcgis:University_Property:43:vertex:0:0:4",
+                    "arcgis:University_Property:43:vertex:0:0:5",
+                    "arcgis:University_Property:43:vertex:0:0:6",
+                    "arcgis:University_Property:43:vertex:0:0:7",
+                    "arcgis:University_Property:43:vertex:0:0:8",
+                    "arcgis:University_Property:43:vertex:0:0:9"
+                  ]
+                },
+                {
+                  "id": "arcgis:University_Property:43:ring:0:1",
+                  "wallIds": [
+                    "arcgis:University_Property:43:wall:0:1:0",
+                    "arcgis:University_Property:43:wall:0:1:1",
+                    "arcgis:University_Property:43:wall:0:1:2",
+                    "arcgis:University_Property:43:wall:0:1:3"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:43:vertex:0:1:0",
+                    "arcgis:University_Property:43:vertex:0:1:1",
+                    "arcgis:University_Property:43:vertex:0:1:2",
+                    "arcgis:University_Property:43:vertex:0:1:3"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:44",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2009534,
+              6.4646462
+            ],
+            [
+              3.2010531,
+              6.4646498
+            ],
+            [
+              3.2010657,
+              6.4642785
+            ],
+            [
+              3.2009606,
+              6.4642749
+            ],
+            [
+              3.2009534,
+              6.4646462
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:44",
+        "kind": "building",
+        "name": "Department of Theartre Arts and Music",
+        "floors": 2,
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. The named Department of Theatre Arts and Music facade shows two window levels, ochre walls, dark openings and red-brown parapet/framing. Use 3 m per visible floor, not a surveyed height. Window rows are regularized. Roof surface is hidden behind the parapet; a flat cap is illustrative. https://commons.wikimedia.org/wiki/File:Department_of_Theater_Art_and_Music,_Lagos_State_University.jpg",
+          "roofColour": "#947167",
+          "trimColour": "#947167",
+          "wallColour": "#e0bd7c",
+          "windowColour": "#515e5d",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.6,
+          "windowHeightRatio": 0.42,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:112838171"
+            ],
+            "observed": [
+              "Two levels; yellow walls; red-brown roof-edge trim; rectangular dark windows."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Trees obscure some openings. Wall position needs matching.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightMode": "floors",
+        "heightEstimated": true
+      }
+    },
+    {
+      "id": "arcgis:University_Property:54",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.1991514,
+              6.4726502
+            ],
+            [
+              3.1990804,
+              6.4729286
+            ],
+            [
+              3.1997317,
+              6.4731143
+            ],
+            [
+              3.1996724,
+              6.4733303
+            ],
+            [
+              3.1999553,
+              6.4734017
+            ],
+            [
+              3.200144,
+              6.4726975
+            ],
+            [
+              3.1998745,
+              6.4726261
+            ],
+            [
+              3.1998251,
+              6.4728385
+            ],
+            [
+              3.1991514,
+              6.4726502
+            ]
+          ],
+          [
+            [
+              3.1993463,
+              6.472976
+            ],
+            [
+              3.1993634,
+              6.4729117
+            ],
+            [
+              3.1993966,
+              6.4729242
+            ],
+            [
+              3.1994182,
+              6.4728189
+            ],
+            [
+              3.1993921,
+              6.4728144
+            ],
+            [
+              3.1994056,
+              6.4727528
+            ],
+            [
+              3.1996014,
+              6.4728046
+            ],
+            [
+              3.1995367,
+              6.4730286
+            ],
+            [
+              3.1993463,
+              6.472976
+            ]
+          ],
+          [
+            [
+              3.1991082,
+              6.4729072
+            ],
+            [
+              3.1991684,
+              6.4726859
+            ],
+            [
+              3.1993777,
+              6.472743
+            ],
+            [
+              3.1993634,
+              6.4728073
+            ],
+            [
+              3.1993229,
+              6.4727974
+            ],
+            [
+              3.1992969,
+              6.4729001
+            ],
+            [
+              3.1993346,
+              6.4729099
+            ],
+            [
+              3.1993175,
+              6.4729643
+            ],
+            [
+              3.1991082,
+              6.4729072
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:54",
+        "kind": "building",
+        "name": "Faculty Of Education 3 In 1",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "roofs": {
+            "arcgis:University_Property:54:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-2",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-27",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-27",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-27",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-5",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-7",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-6",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-8",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-7",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-28",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-8",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-28",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-9",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-28",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-10",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-11",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-10",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-12",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-12",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-13",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-14",
+                  "to": "ridge-point-15",
+                  "from": "ridge-point-29",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-15",
+                  "to": "ridge-point-16",
+                  "from": "ridge-point-29",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-16",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-29",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-17",
+                  "to": "ridge-point-16",
+                  "from": "ridge-point-17",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-18",
+                  "to": "ridge-point-15",
+                  "from": "ridge-point-18",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-19",
+                  "to": "ridge-point-17",
+                  "from": "ridge-point-13",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-20",
+                  "to": "ridge-point-19",
+                  "from": "ridge-point-30",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-21",
+                  "to": "ridge-point-20",
+                  "from": "ridge-point-30",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-22",
+                  "to": "ridge-point-21",
+                  "from": "ridge-point-30",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-23",
+                  "to": "ridge-point-20",
+                  "from": "ridge-point-31",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-24",
+                  "to": "ridge-point-22",
+                  "from": "ridge-point-31",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-25",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-31",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-26",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-32",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-27",
+                  "to": "ridge-point-23",
+                  "from": "ridge-point-32",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-28",
+                  "to": "ridge-point-22",
+                  "from": "ridge-point-32",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-29",
+                  "to": "ridge-point-18",
+                  "from": "ridge-point-24",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-30",
+                  "to": "ridge-point-10",
+                  "from": "ridge-point-25",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-31",
+                  "to": "ridge-point-24",
+                  "from": "ridge-point-25",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-32",
+                  "to": "ridge-point-23",
+                  "from": "ridge-point-12",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-33",
+                  "to": "ridge-point-19",
+                  "from": "ridge-point-26",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.033920707581626,
+                  "coordinates": [
+                    3.1993319,
+                    6.47297015
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.0245218369748725,
+                  "coordinates": [
+                    3.1993404500000002,
+                    6.47294295
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 5.0245218369748725,
+                  "coordinates": [
+                    3.1993489999999998,
+                    6.4729108
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.063882963615674,
+                  "coordinates": [
+                    3.19932875,
+                    6.47285365
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.049395934478799,
+                  "coordinates": [
+                    3.1993908,
+                    6.4728653000000005
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.256273575638403,
+                  "coordinates": [
+                    3.1993634,
+                    6.4728595
+                  ]
+                },
+                {
+                  "id": "ridge-point-6",
+                  "elevation": 5.217883016822338,
+                  "coordinates": [
+                    3.1993489999999998,
+                    6.4728586
+                  ]
+                },
+                {
+                  "id": "ridge-point-7",
+                  "elevation": 5.147166493232831,
+                  "coordinates": [
+                    3.19937775,
+                    6.47286305
+                  ]
+                },
+                {
+                  "id": "ridge-point-8",
+                  "elevation": 5.0284499382381025,
+                  "coordinates": [
+                    3.1993845,
+                    6.472780050000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-9",
+                  "elevation": 5.029159934907786,
+                  "coordinates": [
+                    3.19937775,
+                    6.47281085
+                  ]
+                },
+                {
+                  "id": "ridge-point-10",
+                  "elevation": 5.0257045410660135,
+                  "coordinates": [
+                    3.1992645499999997,
+                    6.4726966
+                  ]
+                },
+                {
+                  "id": "ridge-point-11",
+                  "elevation": 5.019470945532176,
+                  "coordinates": [
+                    3.1996013999999997,
+                    6.47279075
+                  ]
+                },
+                {
+                  "id": "ridge-point-12",
+                  "elevation": 5.0284499382381025,
+                  "coordinates": [
+                    3.19939165,
+                    6.4727479
+                  ]
+                },
+                {
+                  "id": "ridge-point-13",
+                  "elevation": 5.027520370004728,
+                  "coordinates": [
+                    3.1996342,
+                    6.47307145
+                  ]
+                },
+                {
+                  "id": "ridge-point-14",
+                  "elevation": 5.69993833508272,
+                  "coordinates": [
+                    3.19966655,
+                    6.472959449999999
+                  ]
+                },
+                {
+                  "id": "ridge-point-15",
+                  "elevation": 5.023864884274286,
+                  "coordinates": [
+                    3.19919895,
+                    6.47294645
+                  ]
+                },
+                {
+                  "id": "ridge-point-16",
+                  "elevation": 5.021493607597933,
+                  "coordinates": [
+                    3.19921335,
+                    6.4729523
+                  ]
+                },
+                {
+                  "id": "ridge-point-17",
+                  "elevation": 5.021493607597933,
+                  "coordinates": [
+                    3.199539,
+                    6.47304515
+                  ]
+                },
+                {
+                  "id": "ridge-point-18",
+                  "elevation": 4.999970000195352,
+                  "coordinates": [
+                    3.1990943,
+                    6.472917900000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-19",
+                  "elevation": 5.923058663265696,
+                  "coordinates": [
+                    3.1998902,
+                    6.4731201
+                  ]
+                },
+                {
+                  "id": "ridge-point-20",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.1997784,
+                    6.4729764
+                  ]
+                },
+                {
+                  "id": "ridge-point-21",
+                  "elevation": 5.751881323190155,
+                  "coordinates": [
+                    3.1998435,
+                    6.4732579999999995
+                  ]
+                },
+                {
+                  "id": "ridge-point-22",
+                  "elevation": 5.022397588754245,
+                  "coordinates": [
+                    3.1997132500000003,
+                    6.47282155
+                  ]
+                },
+                {
+                  "id": "ridge-point-23",
+                  "elevation": 4.928686279970314,
+                  "coordinates": [
+                    3.19948955,
+                    6.472773800000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-24",
+                  "elevation": 4.999970000195352,
+                  "coordinates": [
+                    3.1991297999999997,
+                    6.4727787
+                  ]
+                },
+                {
+                  "id": "ridge-point-25",
+                  "elevation": 5.013435814169002,
+                  "coordinates": [
+                    3.1991598999999997,
+                    6.47266805
+                  ]
+                },
+                {
+                  "id": "ridge-point-26",
+                  "elevation": 5.72965174612378,
+                  "coordinates": [
+                    3.19998455,
+                    6.472768
+                  ]
+                },
+                {
+                  "id": "ridge-point-27",
+                  "elevation": 5.055382182509956,
+                  "coordinates": [
+                    3.1993508505081523,
+                    6.472898421514528
+                  ]
+                },
+                {
+                  "id": "ridge-point-28",
+                  "elevation": 5.05587694621271,
+                  "coordinates": [
+                    3.1993761403424483,
+                    6.472823497382615
+                  ]
+                },
+                {
+                  "id": "ridge-point-29",
+                  "elevation": 4.944152675034497,
+                  "coordinates": [
+                    3.199316629986169,
+                    6.472967432635621
+                  ]
+                },
+                {
+                  "id": "ridge-point-30",
+                  "elevation": 5.521682870504456,
+                  "coordinates": [
+                    3.199812045154965,
+                    6.473100863079776
+                  ]
+                },
+                {
+                  "id": "ridge-point-31",
+                  "elevation": 5.560340580951634,
+                  "coordinates": [
+                    3.1997239903829846,
+                    6.472899740794963
+                  ]
+                },
+                {
+                  "id": "ridge-point-32",
+                  "elevation": 4.970303356748582,
+                  "coordinates": [
+                    3.199602827360865,
+                    6.472797973546152
+                  ]
+                }
+              ],
+              "provenance": "Pitched roof form is visible in the matched photograph; the individual ridge layout is approximate. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained. References: https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg"
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Faculty entrance complex has cream walls, red-brown vertical accents and pitched roofs. Two principal visible levels; concealed wing layout unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+          "roofColour": "#92695d",
+          "trimColour": "#92695d",
+          "wallColour": "#dfcfae",
+          "windowColour": "#65716b",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.55,
+          "windowHeightRatio": 0.56,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:112834607",
+              "commons:115992650"
+            ],
+            "observed": [
+              "Cream/yellow infill; tall red-brown vertical columns; entrance portico and pitched roof sections."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Existing custom roof retained. Photographs do not resolve all courtyard roof ridges.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:54:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:54:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:54:wall:0:0:0",
+                    "arcgis:University_Property:54:wall:0:0:1",
+                    "arcgis:University_Property:54:wall:0:0:2",
+                    "arcgis:University_Property:54:wall:0:0:3",
+                    "arcgis:University_Property:54:wall:0:0:4",
+                    "arcgis:University_Property:54:wall:0:0:5",
+                    "arcgis:University_Property:54:wall:0:0:6",
+                    "arcgis:University_Property:54:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:54:vertex:0:0:0",
+                    "arcgis:University_Property:54:vertex:0:0:1",
+                    "arcgis:University_Property:54:vertex:0:0:2",
+                    "arcgis:University_Property:54:vertex:0:0:3",
+                    "arcgis:University_Property:54:vertex:0:0:4",
+                    "arcgis:University_Property:54:vertex:0:0:5",
+                    "arcgis:University_Property:54:vertex:0:0:6",
+                    "arcgis:University_Property:54:vertex:0:0:7"
+                  ]
+                },
+                {
+                  "id": "arcgis:University_Property:54:ring:0:1",
+                  "wallIds": [
+                    "arcgis:University_Property:54:wall:0:1:0",
+                    "arcgis:University_Property:54:wall:0:1:1",
+                    "arcgis:University_Property:54:wall:0:1:2",
+                    "arcgis:University_Property:54:wall:0:1:3",
+                    "arcgis:University_Property:54:wall:0:1:4",
+                    "arcgis:University_Property:54:wall:0:1:5",
+                    "arcgis:University_Property:54:wall:0:1:6",
+                    "arcgis:University_Property:54:wall:0:1:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:54:vertex:0:1:0",
+                    "arcgis:University_Property:54:vertex:0:1:1",
+                    "arcgis:University_Property:54:vertex:0:1:2",
+                    "arcgis:University_Property:54:vertex:0:1:3",
+                    "arcgis:University_Property:54:vertex:0:1:4",
+                    "arcgis:University_Property:54:vertex:0:1:5",
+                    "arcgis:University_Property:54:vertex:0:1:6",
+                    "arcgis:University_Property:54:vertex:0:1:7"
+                  ]
+                },
+                {
+                  "id": "arcgis:University_Property:54:ring:0:2",
+                  "wallIds": [
+                    "arcgis:University_Property:54:wall:0:2:0",
+                    "arcgis:University_Property:54:wall:0:2:1",
+                    "arcgis:University_Property:54:wall:0:2:2",
+                    "arcgis:University_Property:54:wall:0:2:3",
+                    "arcgis:University_Property:54:wall:0:2:4",
+                    "arcgis:University_Property:54:wall:0:2:5",
+                    "arcgis:University_Property:54:wall:0:2:6",
+                    "arcgis:University_Property:54:wall:0:2:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:54:vertex:0:2:0",
+                    "arcgis:University_Property:54:vertex:0:2:1",
+                    "arcgis:University_Property:54:vertex:0:2:2",
+                    "arcgis:University_Property:54:vertex:0:2:3",
+                    "arcgis:University_Property:54:vertex:0:2:4",
+                    "arcgis:University_Property:54:vertex:0:2:5",
+                    "arcgis:University_Property:54:vertex:0:2:6",
+                    "arcgis:University_Property:54:vertex:0:2:7"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:55",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.1995628,
+              6.4724288
+            ],
+            [
+              3.1996894,
+              6.4724475
+            ],
+            [
+              3.1997128,
+              6.4723101
+            ],
+            [
+              3.1995816,
+              6.4722887
+            ],
+            [
+              3.1995628,
+              6.4724288
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:55",
+        "kind": "building",
+        "name": "LASU Radio",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Radio building has cream/yellow walls and a flat parapet entrance face. Source two-floor estimate is retained; single visible entrance elevation cannot confirm concealed levels. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg",
+          "roofColour": "#9b7b64",
+          "trimColour": "#854f46",
+          "wallColour": "#dec28f",
+          "windowColour": "#687c77",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.55,
+          "windowHeightRatio": 0.45,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:115996430"
+            ],
+            "observed": [
+              "Cream/yellow entrance elevation; flat parapet; glazed entrance doors."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Mast is separate from the building. Concealed levels and side windows remain unknown.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true
+      }
+    },
+    {
+      "id": "arcgis:University_Property:73",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.20116,
+              6.4753377
+            ],
+            [
+              3.2011483,
+              6.4753743
+            ],
+            [
+              3.2012992,
+              6.4754216
+            ],
+            [
+              3.2013082,
+              6.475369
+            ],
+            [
+              3.2013684,
+              6.4753859
+            ],
+            [
+              3.2014618,
+              6.47507
+            ],
+            [
+              3.2012004,
+              6.4749887
+            ],
+            [
+              3.2011007,
+              6.4753261
+            ],
+            [
+              3.20116,
+              6.4753377
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:73",
+        "kind": "building",
+        "name": "LASU CBT",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:73:wing:0": {
+              "wallColour": "#9babb4"
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:73:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-2",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.1919328987038735,
+                  "coordinates": [
+                    3.2012282499999998,
+                    6.47537165
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.389511706057743,
+                  "coordinates": [
+                    3.2012340999999997,
+                    6.47535335
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.2012543,
+                    6.47517885
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.227689008249131,
+                  "coordinates": [
+                    3.2011801999999996,
+                    6.4751632
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.239785206900817,
+                  "coordinates": [
+                    3.201385,
+                    6.4752195
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.736374999017498,
+                  "coordinates": [
+                    3.2012248256191294,
+                    6.475291382331217
+                  ]
+                }
+              ],
+              "provenance": "Roof form is unknown: this is an illustrative hip-roof option, not a photographed reconstruction. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained."
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "Illustrative facade treatment, 2026-09-14. Approximately 6 m · derived from floors Regular window spacing and trim are schematic; dated photographs and measured opening dimensions are still needed.",
+          "roofColour": "#829b82",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#d7cde0",
+          "windowColour": "#6f9bad",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.35,
+          "windowHeightRatio": 0.35,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:b4086f16-2907-435d-82ec-bed122723989",
+              "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+              "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8"
+            ],
+            "observed": [
+              "Large grey hall; stepped façade/parapet; light entrance surround; small high windows. Interior shows computer hall."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Interior photograph cannot establish exterior floor count. Retain existing roof and height pending survey; do not texture with the approach or interior.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:73:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:73:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:73:wall:0:0:0",
+                    "arcgis:University_Property:73:wall:0:0:1",
+                    "arcgis:University_Property:73:wall:0:0:2",
+                    "arcgis:University_Property:73:wall:0:0:3",
+                    "arcgis:University_Property:73:wall:0:0:4",
+                    "arcgis:University_Property:73:wall:0:0:5",
+                    "arcgis:University_Property:73:wall:0:0:6",
+                    "arcgis:University_Property:73:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:73:vertex:0:0:0",
+                    "arcgis:University_Property:73:vertex:0:0:1",
+                    "arcgis:University_Property:73:vertex:0:0:2",
+                    "arcgis:University_Property:73:vertex:0:0:3",
+                    "arcgis:University_Property:73:vertex:0:0:4",
+                    "arcgis:University_Property:73:vertex:0:0:5",
+                    "arcgis:University_Property:73:vertex:0:0:6",
+                    "arcgis:University_Property:73:vertex:0:0:7"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:75",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2001144,
+              6.4685853
+            ],
+            [
+              3.2001476,
+              6.4685996
+            ],
+            [
+              3.2001359,
+              6.4686335
+            ],
+            [
+              3.2004117,
+              6.4687709
+            ],
+            [
+              3.2005141,
+              6.4685496
+            ],
+            [
+              3.2001979,
+              6.4684023
+            ],
+            [
+              3.2001144,
+              6.4685853
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:75",
+        "kind": "building",
+        "name": "M.B.A",
+        "height": 6,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Two-level MBA facade with warm yellow infill and red-brown vertical framing; parapet edge visible. Hidden roof equipment omitted; regularized windows. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+          "roofColour": "#8e685a",
+          "trimColour": "#8e685a",
+          "wallColour": "#e3c587",
+          "windowColour": "#637878",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.56,
+          "windowHeightRatio": 0.5,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:113564415",
+              "commons:116026424"
+            ],
+            "observed": [
+              "Yellow infill with red-brown vertical framing; recessed entrance approach."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Trees obscure the upper façade and roof. Courtyard structure is not a surveyed footprint.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": true
+      }
+    },
+    {
+      "id": "arcgis:University_Property:76",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.2017511,
+              6.4681881
+            ],
+            [
+              3.2018993,
+              6.4682666
+            ],
+            [
+              3.2020772,
+              6.4679141
+            ],
+            [
+              3.2019272,
+              6.4678426
+            ],
+            [
+              3.2017511,
+              6.4681881
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:76",
+        "kind": "building",
+        "name": "Law Library",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Named Taslim Olawale Elias Law Library facade: three floor levels, red-brown pilasters, cream infill and parapet. 3 m per observed floor; hidden elevations simplified. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+          "roofColour": "#925f55",
+          "trimColour": "#925f55",
+          "wallColour": "#ddc69c",
+          "windowColour": "#536665",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.65,
+          "windowHeightRatio": 0.45,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:112835955"
+            ],
+            "observed": [
+              "Three visible levels; cream infill, dark windows, red-brown pilasters and continuous floor bands."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Exact pilaster spacing and façade orientation require matching.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false
+      }
+    },
+    {
+      "id": "arcgis:University_Property:78",
+      "kind": "building",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                3.2023269,
+                6.4668081
+              ],
+              [
+                3.2023296,
+                6.466751
+              ],
+              [
+                3.2021769,
+                6.4667367
+              ],
+              [
+                3.2021769,
+                6.4667938
+              ],
+              [
+                3.202149,
+                6.4667912
+              ],
+              [
+                3.202149,
+                6.4668367
+              ],
+              [
+                3.2023395,
+                6.4668536
+              ],
+              [
+                3.202344,
+                6.4668081
+              ],
+              [
+                3.2023269,
+                6.4668081
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                3.202308,
+                6.4669884
+              ],
+              [
+                3.202308,
+                6.4669313
+              ],
+              [
+                3.2023323,
+                6.4669313
+              ],
+              [
+                3.2023368,
+                6.466884
+              ],
+              [
+                3.2021418,
+                6.4668751
+              ],
+              [
+                3.2021463,
+                6.466917
+              ],
+              [
+                3.2021562,
+                6.4669197
+              ],
+              [
+                3.2021562,
+                6.466984
+              ],
+              [
+                3.202308,
+                6.4669884
+              ]
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:78",
+        "kind": "building",
+        "name": "Law Clinic",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wing:0": {
+              "windows": true,
+              "roofColour": "#b86351",
+              "trimColour": "#b86351",
+              "wallColour": "#e7dbc8",
+              "windowColour": "#667777",
+              "windowSpacing": 4
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:78:wing:0": {
+              "eaves": 4.92,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-5",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-4",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 5.254896044506046,
+                  "coordinates": [
+                    3.20216295,
+                    6.46681525
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 5.12427485908124,
+                  "coordinates": [
+                    3.2023332,
+                    6.46683085
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 6,
+                  "coordinates": [
+                    3.2022519000000003,
+                    6.46680095
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 5.465973587573007,
+                  "coordinates": [
+                    3.2022582,
+                    6.4668237
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 5.606742211914075,
+                  "coordinates": [
+                    3.20225325,
+                    6.4667724
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 5.444707366753158,
+                  "coordinates": [
+                    3.2023128369302314,
+                    6.466824724898929
+                  ]
+                }
+              ],
+              "provenance": "Pitched roof form is visible in the matched photograph; the individual ridge layout is approximate. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained. References: https://commons.wikimedia.org/wiki/File:LASU_L%C3%A1%C3%A9_Clinic.jpg https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg"
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Two storeys, red pitched roof sections and cream walls; separate from the medical Clinic. Wing ridge layout cannot be recovered from the oblique photograph. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:LASU_L%C3%A1%C3%A9_Clinic.jpg https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+          "roofColour": "#b86351",
+          "trimColour": "#b86351",
+          "wallColour": "#e7dbc8",
+          "windowColour": "#667777",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.52,
+          "windowHeightRatio": 0.5,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+              "commons:116180211",
+              "commons:116180607",
+              "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465"
+            ],
+            "observed": [
+              "Two levels; red pitched roofs; cream walls, veranda columns and balcony rails. Views show different entrance finishes."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "New-looking dark-clad view has no capture date; material chronology unresolved. Preserve owner cream finish and custom roof.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:78:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:78:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:78:wall:0:0:0",
+                    "arcgis:University_Property:78:wall:0:0:1",
+                    "arcgis:University_Property:78:wall:0:0:2",
+                    "arcgis:University_Property:78:wall:0:0:3",
+                    "arcgis:University_Property:78:wall:0:0:4",
+                    "arcgis:University_Property:78:wall:0:0:5",
+                    "arcgis:University_Property:78:wall:0:0:6",
+                    "arcgis:University_Property:78:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:78:vertex:0:0:0",
+                    "arcgis:University_Property:78:vertex:0:0:1",
+                    "arcgis:University_Property:78:vertex:0:0:2",
+                    "arcgis:University_Property:78:vertex:0:0:3",
+                    "arcgis:University_Property:78:vertex:0:0:4",
+                    "arcgis:University_Property:78:vertex:0:0:5",
+                    "arcgis:University_Property:78:vertex:0:0:6",
+                    "arcgis:University_Property:78:vertex:0:0:7"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wing:0",
+              "rings": [
+                {
+                  "id": "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:ring:0:0",
+                  "wallIds": [
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:0",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:1",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:2",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:3",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:4",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:5",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:6",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:0",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:1",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:2",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:3",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:4",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:5",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:6",
+                    "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:vertex:0:0:7"
+                  ]
+                }
+              ]
+            }
+          ],
+          "issues": []
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:103",
+      "kind": "building",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              3.1978722,
+              6.4741051
+            ],
+            [
+              3.197847,
+              6.474172
+            ],
+            [
+              3.1978551,
+              6.4741765
+            ],
+            [
+              3.1978479,
+              6.4742006
+            ],
+            [
+              3.197838,
+              6.4741979
+            ],
+            [
+              3.197821,
+              6.4742532
+            ],
+            [
+              3.1978308,
+              6.4742559
+            ],
+            [
+              3.1978219,
+              6.4742809
+            ],
+            [
+              3.1979782,
+              6.474338
+            ],
+            [
+              3.1979898,
+              6.4742997
+            ],
+            [
+              3.1980294,
+              6.4743148
+            ],
+            [
+              3.1980204,
+              6.474347
+            ],
+            [
+              3.1981767,
+              6.4744068
+            ],
+            [
+              3.1982126,
+              6.4742961
+            ],
+            [
+              3.1982198,
+              6.4742997
+            ],
+            [
+              3.1982459,
+              6.4742291
+            ],
+            [
+              3.1982099,
+              6.4742166
+            ],
+            [
+              3.1982324,
+              6.4741533
+            ],
+            [
+              3.1981057,
+              6.4741069
+            ],
+            [
+              3.198086,
+              6.4741568
+            ],
+            [
+              3.1980374,
+              6.4741443
+            ],
+            [
+              3.1980563,
+              6.4740944
+            ],
+            [
+              3.1979314,
+              6.4740497
+            ],
+            [
+              3.1979072,
+              6.4741176
+            ],
+            [
+              3.1978722,
+              6.4741051
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:103",
+        "kind": "building",
+        "name": "School Of TransportC",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:103:wing:0": {
+              "height": 9,
+              "confidence": "inferred",
+              "heightMode": "metres",
+              "provenance": "Total height retained from the existing visual reference when applying this roof."
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:103:wing:0": {
+              "eaves": 7.38,
+              "lines": [
+                {
+                  "id": "ridge-line-0",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-0",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-1",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-2",
+                  "to": "ridge-point-3",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-3",
+                  "to": "ridge-point-4",
+                  "from": "ridge-point-21",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-4",
+                  "to": "ridge-point-5",
+                  "from": "ridge-point-3",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-5",
+                  "to": "ridge-point-0",
+                  "from": "ridge-point-6",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-6",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-7",
+                  "to": "ridge-point-6",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-8",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-22",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-9",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-4",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-10",
+                  "to": "ridge-point-2",
+                  "from": "ridge-point-10",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-11",
+                  "to": "ridge-point-12",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-12",
+                  "to": "ridge-point-11",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-13",
+                  "to": "ridge-point-13",
+                  "from": "ridge-point-23",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-14",
+                  "to": "ridge-point-9",
+                  "from": "ridge-point-14",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-15",
+                  "to": "ridge-point-15",
+                  "from": "ridge-point-24",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-16",
+                  "to": "ridge-point-8",
+                  "from": "ridge-point-24",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-17",
+                  "to": "ridge-point-14",
+                  "from": "ridge-point-24",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-18",
+                  "to": "ridge-point-17",
+                  "from": "ridge-point-25",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-19",
+                  "to": "ridge-point-13",
+                  "from": "ridge-point-25",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-20",
+                  "to": "ridge-point-1",
+                  "from": "ridge-point-25",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-21",
+                  "to": "ridge-point-18",
+                  "from": "ridge-point-15",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-22",
+                  "to": "ridge-point-17",
+                  "from": "ridge-point-19",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-23",
+                  "to": "ridge-point-12",
+                  "from": "ridge-point-16",
+                  "kind": "ridge"
+                },
+                {
+                  "id": "ridge-line-24",
+                  "to": "ridge-point-7",
+                  "from": "ridge-point-20",
+                  "kind": "ridge"
+                }
+              ],
+              "points": [
+                {
+                  "id": "ridge-point-0",
+                  "elevation": 8.717630790802717,
+                  "coordinates": [
+                    3.1980334,
+                    6.47422955
+                  ]
+                },
+                {
+                  "id": "ridge-point-1",
+                  "elevation": 8.721007790550777,
+                  "coordinates": [
+                    3.1980136000000003,
+                    6.474222
+                  ]
+                },
+                {
+                  "id": "ridge-point-2",
+                  "elevation": 7.547570320660562,
+                  "coordinates": [
+                    3.19783935,
+                    6.4742282499999995
+                  ]
+                },
+                {
+                  "id": "ridge-point-3",
+                  "elevation": 7.928501517048561,
+                  "coordinates": [
+                    3.1979103,
+                    6.4742778
+                  ]
+                },
+                {
+                  "id": "ridge-point-4",
+                  "elevation": 8.40539167893377,
+                  "coordinates": [
+                    3.19791885,
+                    6.47425015
+                  ]
+                },
+                {
+                  "id": "ridge-point-5",
+                  "elevation": 7.598902588298602,
+                  "coordinates": [
+                    3.1979045,
+                    6.47429695
+                  ]
+                },
+                {
+                  "id": "ridge-point-6",
+                  "elevation": 8.759096229024433,
+                  "coordinates": [
+                    3.1980576999999997,
+                    6.474235800000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-7",
+                  "elevation": 8.376573046530208,
+                  "coordinates": [
+                    3.19814795,
+                    6.474186700000001
+                  ]
+                },
+                {
+                  "id": "ridge-point-8",
+                  "elevation": 8.985394879014,
+                  "coordinates": [
+                    3.19811965,
+                    6.4742657
+                  ]
+                },
+                {
+                  "id": "ridge-point-9",
+                  "elevation": 7.654600427864038,
+                  "coordinates": [
+                    3.19810305,
+                    6.4743607999999995
+                  ]
+                },
+                {
+                  "id": "ridge-point-10",
+                  "elevation": 7.463392908372891,
+                  "coordinates": [
+                    3.1978344,
+                    6.4742269
+                  ]
+                },
+                {
+                  "id": "ridge-point-11",
+                  "elevation": 8.612508589039045,
+                  "coordinates": [
+                    3.19792245,
+                    6.4742381
+                  ]
+                },
+                {
+                  "id": "ridge-point-12",
+                  "elevation": 7.760306030853447,
+                  "coordinates": [
+                    3.19788115,
+                    6.474147049999999
+                  ]
+                },
+                {
+                  "id": "ridge-point-13",
+                  "elevation": 9,
+                  "coordinates": [
+                    3.1979485,
+                    6.47420865
+                  ]
+                },
+                {
+                  "id": "ridge-point-14",
+                  "elevation": 8.613263030611318,
+                  "coordinates": [
+                    3.198121,
+                    6.47430545
+                  ]
+                },
+                {
+                  "id": "ridge-point-15",
+                  "elevation": 7.758461156989588,
+                  "coordinates": [
+                    3.19821125,
+                    6.47425635
+                  ]
+                },
+                {
+                  "id": "ridge-point-16",
+                  "elevation": 7.455249559590057,
+                  "coordinates": [
+                    3.19786365,
+                    6.4741408
+                  ]
+                },
+                {
+                  "id": "ridge-point-17",
+                  "elevation": 8.414763919377371,
+                  "coordinates": [
+                    3.1979723,
+                    6.474130949999999
+                  ]
+                },
+                {
+                  "id": "ridge-point-18",
+                  "elevation": 7.44568618052672,
+                  "coordinates": [
+                    3.19822925,
+                    6.474262599999999
+                  ]
+                },
+                {
+                  "id": "ridge-point-19",
+                  "elevation": 7.820112289708732,
+                  "coordinates": [
+                    3.1979844,
+                    6.474097
+                  ]
+                },
+                {
+                  "id": "ridge-point-20",
+                  "elevation": 7.8224160186108955,
+                  "coordinates": [
+                    3.1981592,
+                    6.47415505
+                  ]
+                },
+                {
+                  "id": "ridge-point-21",
+                  "elevation": 7.944624977078708,
+                  "coordinates": [
+                    3.19786125109385,
+                    6.474239326277315
+                  ]
+                },
+                {
+                  "id": "ridge-point-22",
+                  "elevation": 8.489285045541202,
+                  "coordinates": [
+                    3.198111602190906,
+                    6.474218982219535
+                  ]
+                },
+                {
+                  "id": "ridge-point-23",
+                  "elevation": 8.09562083293891,
+                  "coordinates": [
+                    3.197898659272717,
+                    6.474174209728563
+                  ]
+                },
+                {
+                  "id": "ridge-point-24",
+                  "elevation": 8.08238792777599,
+                  "coordinates": [
+                    3.198180337687965,
+                    6.474268134350423
+                  ]
+                },
+                {
+                  "id": "ridge-point-25",
+                  "elevation": 8.439173623670698,
+                  "coordinates": [
+                    3.197981890004146,
+                    6.474177056363366
+                  ]
+                }
+              ],
+              "provenance": "Pitched roof form is visible in the matched photograph; the individual ridge layout is approximate. Approximate hip roof derived from the mapped footprint. Ridge positions, pitch and eaves are illustrative, not surveyed. Total building height and courtyard openings are retained. References: https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg"
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Three visible storeys with red roofs and cream/red-brown walls. Roof ridge positions on individual wings are unresolved. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+          "roofColour": "#bf715d",
+          "trimColour": "#985d52",
+          "wallColour": "#e6d6b7",
+          "windowColour": "#677b78",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.62,
+          "windowHeightRatio": 0.5,
+          "photoEvidence": {
+            "photoIds": [
+              "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+              "commons:112540904"
+            ],
+            "observed": [
+              "Four visible levels; cream infill with red-brown vertical framing; multiple red pitched roof sections."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Aerial image supports roof form, not surveyed ridge elevations. Owner roof retained.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:103:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:103:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:103:wall:0:0:0",
+                    "arcgis:University_Property:103:wall:0:0:1",
+                    "arcgis:University_Property:103:wall:0:0:2",
+                    "arcgis:University_Property:103:wall:0:0:3",
+                    "arcgis:University_Property:103:wall:0:0:4",
+                    "arcgis:University_Property:103:wall:0:0:5",
+                    "arcgis:University_Property:103:wall:0:0:6",
+                    "arcgis:University_Property:103:wall:0:0:7",
+                    "arcgis:University_Property:103:wall:0:0:8",
+                    "arcgis:University_Property:103:wall:0:0:9",
+                    "arcgis:University_Property:103:wall:0:0:10",
+                    "arcgis:University_Property:103:wall:0:0:11",
+                    "arcgis:University_Property:103:wall:0:0:12",
+                    "arcgis:University_Property:103:wall:0:0:13",
+                    "arcgis:University_Property:103:wall:0:0:14",
+                    "arcgis:University_Property:103:wall:0:0:15",
+                    "arcgis:University_Property:103:wall:0:0:16",
+                    "arcgis:University_Property:103:wall:0:0:17",
+                    "arcgis:University_Property:103:wall:0:0:18",
+                    "arcgis:University_Property:103:wall:0:0:19",
+                    "arcgis:University_Property:103:wall:0:0:20",
+                    "arcgis:University_Property:103:wall:0:0:21",
+                    "arcgis:University_Property:103:wall:0:0:22",
+                    "arcgis:University_Property:103:wall:0:0:23"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:103:vertex:0:0:0",
+                    "arcgis:University_Property:103:vertex:0:0:1",
+                    "arcgis:University_Property:103:vertex:0:0:2",
+                    "arcgis:University_Property:103:vertex:0:0:3",
+                    "arcgis:University_Property:103:vertex:0:0:4",
+                    "arcgis:University_Property:103:vertex:0:0:5",
+                    "arcgis:University_Property:103:vertex:0:0:6",
+                    "arcgis:University_Property:103:vertex:0:0:7",
+                    "arcgis:University_Property:103:vertex:0:0:8",
+                    "arcgis:University_Property:103:vertex:0:0:9",
+                    "arcgis:University_Property:103:vertex:0:0:10",
+                    "arcgis:University_Property:103:vertex:0:0:11",
+                    "arcgis:University_Property:103:vertex:0:0:12",
+                    "arcgis:University_Property:103:vertex:0:0:13",
+                    "arcgis:University_Property:103:vertex:0:0:14",
+                    "arcgis:University_Property:103:vertex:0:0:15",
+                    "arcgis:University_Property:103:vertex:0:0:16",
+                    "arcgis:University_Property:103:vertex:0:0:17",
+                    "arcgis:University_Property:103:vertex:0:0:18",
+                    "arcgis:University_Property:103:vertex:0:0:19",
+                    "arcgis:University_Property:103:vertex:0:0:20",
+                    "arcgis:University_Property:103:vertex:0:0:21",
+                    "arcgis:University_Property:103:vertex:0:0:22",
+                    "arcgis:University_Property:103:vertex:0:0:23"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:120",
+      "kind": "building",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                3.1996805,
+                6.4707775
+              ],
+              [
+                3.1995691,
+                6.4713443
+              ],
+              [
+                3.1998898,
+                6.4714068
+              ],
+              [
+                3.1999895,
+                6.4708284
+              ],
+              [
+                3.1996805,
+                6.4707775
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                3.1996778,
+                6.4714666
+              ],
+              [
+                3.199614,
+                6.4715059
+              ],
+              [
+                3.1996023,
+                6.4715808
+              ],
+              [
+                3.1996508,
+                6.4716496
+              ],
+              [
+                3.1997344,
+                6.4716647
+              ],
+              [
+                3.1997883,
+                6.4716264
+              ],
+              [
+                3.1998125,
+                6.4715389
+              ],
+              [
+                3.1997586,
+                6.4714728
+              ],
+              [
+                3.1996778,
+                6.4714666
+              ]
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "arcgis:University_Property:120",
+        "kind": "building",
+        "name": "LASU Senate Building",
+        "height": 0,
+        "source": "campus-review",
+        "appearance": {
+          "parts": {
+            "arcgis:University_Property:120:wing:0": {
+              "height": 21,
+              "confidence": "inferred",
+              "heightMode": "metres",
+              "provenance": "Total wing height adopted from the current visual reference when applying this roof."
+            },
+            "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wing:0": {
+              "windows": false,
+              "roofColour": "#a6b19f",
+              "trimColour": "#d6c6a8",
+              "wallColour": "#d4d5c3",
+              "windowColour": "#6f9bad",
+              "windowSpacing": 4
+            }
+          },
+          "roofs": {
+            "arcgis:University_Property:120:wing:0": {
+              "eaves": 19.2,
+              "lines": [],
+              "points": [
+                {
+                  "id": "b6a37dae-5393-48c4-bbea-a101fb6778aa",
+                  "elevation": 21,
+                  "coordinates": [
+                    3.1997670172113413,
+                    6.4710980496875
+                  ]
+                }
+              ]
+            }
+          },
+          "windows": true,
+          "confidence": "inferred",
+          "provenance": "References reviewed 2026-09-14. Seven visible floor levels and horizontal glazing bands; cream walls with red-brown vertical accents; flat parapet silhouette. August 2026 photograph corroborates older Senate photographs. 3 m per visible floor. Exact storey heights and unphotographed elevations unmeasured. Facade colours are approximate visual matches to dated photographs, not material samples. Repeated windows and trim are illustrative; their exact dimensions and unphotographed elevations are unknown. https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+          "roofColour": "#945f55",
+          "trimColour": "#d6c6a8",
+          "wallColour": "#ecdfbf",
+          "windowColour": "#647f87",
+          "windowSpacing": 4,
+          "windowFrameDepth": 0.08,
+          "windowWidthRatio": 0.86,
+          "windowHeightRatio": 0.63,
+          "photoEvidence": {
+            "photoIds": [
+              "commons:138069484",
+              "commons:198256507",
+              "commons:116073984",
+              "commons:115987634"
+            ],
+            "observed": [
+              "Seven visible levels; long blue-glazed window bands; cream horizontal bands; red diamond motifs on tall side panels."
+            ],
+            "estimated": [
+              "Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown."
+            ],
+            "needed": [
+              "Different dated views show finish changes. Exact front-wall orientation and diamond placement need review.",
+              "Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures."
+            ],
+            "checkedAt": "2026-09-24"
+          }
+        },
+        "heightEstimated": false,
+        "buildingTopology": {
+          "parts": [
+            {
+              "id": "arcgis:University_Property:120:wing:0",
+              "rings": [
+                {
+                  "id": "arcgis:University_Property:120:ring:0:0",
+                  "wallIds": [
+                    "arcgis:University_Property:120:wall:0:0:0",
+                    "arcgis:University_Property:120:wall:0:0:1",
+                    "arcgis:University_Property:120:wall:0:0:2",
+                    "arcgis:University_Property:120:wall:0:0:3"
+                  ],
+                  "vertexIds": [
+                    "arcgis:University_Property:120:vertex:0:0:0",
+                    "arcgis:University_Property:120:vertex:0:0:1",
+                    "arcgis:University_Property:120:vertex:0:0:2",
+                    "arcgis:University_Property:120:vertex:0:0:3"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wing:0",
+              "rings": [
+                {
+                  "id": "afe0ccdb-103d-464b-9898-8bbf02d9e18e:ring:0:0",
+                  "wallIds": [
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:0",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:1",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:2",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:3",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:4",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:5",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:6",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:wall:0:0:7"
+                  ],
+                  "vertexIds": [
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:0",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:1",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:2",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:3",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:4",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:5",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:6",
+                    "afe0ccdb-103d-464b-9898-8bbf02d9e18e:vertex:0:0:7"
+                  ]
+                }
+              ]
+            }
+          ],
+          "issues": []
+        }
+      }
+    }
+  ]
+}
