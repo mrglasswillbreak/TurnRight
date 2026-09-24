@@ -19,6 +19,8 @@ export default defineConfig({
   build: {
     target: 'es2022',
     outDir: 'work/performance-dist',
-    rollupOptions: { input: 'tests/performance/index.html' },
+    rollupOptions: {
+      input: ['tests/performance/index.html', 'tests/models/index.html'],
+    },
   },
 });
