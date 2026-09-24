@@ -1609,7 +1609,7 @@ function Editor({
           <button
             disabled={surveyRecording}
             onClick={async () => {
-              if (await workspace.flush()) await installUpdate?.();
+              if (await workspace.prepareUpdate()) await installUpdate?.();
             }}
           >
             Install update

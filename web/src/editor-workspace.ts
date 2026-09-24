@@ -178,6 +178,12 @@ export class EditorWorkspace {
     await this.persistNow();
     return !this.recoveryFailed;
   }
+  async prepareUpdate() {
+    // A draft may need the new editor to repair it. Server validation must not
+    // block the update, but unfinished work still requires durable recovery.
+    await this.flush();
+    return this.preserveRecovery();
+  }
   private persistNow() {
     const snapshot: WorkspaceRecovery = {
       modelInputs: this.modelInputs,

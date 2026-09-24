@@ -24,6 +24,11 @@ remain bound to the original field. Validation descriptions no longer change an
 input's accessible name. Shared-save errors identify the feature that blocks the
 batch rather than appearing to belong to whichever building is open.
 
+App updates now allow invalid drafts to remain for repair only after durable local
+recovery is verified. A further 56 workspace/reliability/building tests pass,
+including update recovery of invalid edits, history and unfinished inputs, and
+rejection when recovery storage fails.
+
 The repair checks include the complete 494-test unit suite and a final 27-test
 workspace/model run containing the new shared-save regression. Browser regressions
 exercise all seven Add tools, generated layout preservation, undo/redo, rejected
@@ -47,9 +52,9 @@ The authentication-configured production build passes all four budget scripts. A
 | Allocation | Measured | Limit |
 | --- | ---: | ---: |
 | Lazy renderer + guided editor, including shared non-startup dependencies | 167.3 KiB gzip | 300 KiB |
-| Public startup JavaScript | 418,678 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 183,457 bytes gzip | 189,440 bytes |
-| Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
+| Public startup JavaScript | 418,684 bytes gzip | 435,200 bytes |
+| Additional owner editor JavaScript | 183,493 bytes gzip | 189,440 bytes |
+| Lazy photo manager | 7,619 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |
 

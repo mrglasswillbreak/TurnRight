@@ -18,6 +18,30 @@ const edit = (name = 'Library'): MapEdit => ({
 const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
   batch.edits.map(({ edit }) => ({ ...edit, updated_at: revision }));
 describe('editor autosave and recovery', () => {
+  it('prepares an update with invalid drafts only when complete recovery is durable', async () => {
+    let stored: WorkspaceRecovery | undefined;
+    const send = vi.fn(async (batch: SaveBatch) => ack(batch));
+    const workspace = new EditorWorkspace([], send, async (value) => {
+      stored = structuredClone(value);
+    });
+    workspace.commit([
+      { ...edit(), properties: { name: 'Library', heightMode: 'floors' } },
+    ]);
+    workspace.recoverModelInput('library', 'height', '');
+    expect(await workspace.prepareUpdate()).toBe(true);
+    expect(send).not.toHaveBeenCalled();
+    const recovered = new EditorWorkspace([], send, async () => {}, stored);
+    expect(recovered.edits).toEqual(workspace.edits);
+    expect(recovered.past).toEqual(workspace.past);
+    expect(recovered.modelInputs.library.height).toBe('');
+    expect(await recovered.flush()).toBe(false);
+    const unavailable = new EditorWorkspace([], send, async () => {
+      throw new Error('disk full');
+    });
+    unavailable.recoverModelInput('library', 'height', '');
+    expect(await unavailable.prepareUpdate()).toBe(false);
+    expect(unavailable.status).toBe('Recovery unavailable');
+  });
   it('identifies the feature blocking a shared save and retains the complete batch for repair', async () => {
     const send = vi.fn(async (batch: SaveBatch) => ack(batch));
     const workspace = new EditorWorkspace([], send, async () => {});
