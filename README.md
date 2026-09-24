@@ -6,7 +6,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight natural-colour globe with campus controls and offline world imagery](docs/assets/screenshots/public-globe-desktop-light-2026-09-24.jpg)
+![TurnRight illustrated globe using the campus map colours, with subtle offline relief and campus controls](docs/assets/screenshots/public-globe-desktop-light-2026-09-24.jpg)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
@@ -38,9 +38,9 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 Captured **24 September 2026** from production builds using the verified public campus snapshot **`lasu-8577d5c85d2c`**. The globe captures show the real public application. Photo/model captures use the real workspace in an isolated fixture; no production drafts or private account information appear. Phone views are responsive browser simulations, not physical-device tests.
 
-| Realistic globe · mobile Dark mode | Photo & model · mobile |
+| Illustrated globe · mobile Dark mode | Photo & model · mobile |
 | --- | --- |
-| <img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-24.jpg" width="300" alt="Natural-colour Earth with atmosphere, LASU marker and campus navigation controls in Dark mode"> | <img src="docs/assets/screenshots/photo-model-mobile-2026-09-24.jpg" width="300" alt="Full-screen mobile Photo and model workspace with a building photograph, credits, view tabs and mapped wall selector"> |
+| <img src="docs/assets/screenshots/public-globe-mobile-dark-2026-09-24.jpg" width="300" alt="Illustrated Earth with campus greens and blues, gentle atmosphere, LASU marker and navigation controls in Dark mode"> | <img src="docs/assets/screenshots/photo-model-mobile-2026-09-24.jpg" width="300" alt="Full-screen mobile Photo and model workspace with a building photograph, credits, view tabs and mapped wall selector"> |
 
 **Photo & model on desktop:** compare the published photograph with the model, choose a mapped wall and review architectural details. Dimensions and unseen elevations remain estimates.
 
@@ -52,7 +52,7 @@ The building inspector now places its **photo preview and Manage photos controls
 
 The 24 September visual update adds a **Photo & model** workspace, framed building openings, reviewed façade details and optional photographic textures. The reviewed 19-building batch is published as **`lasu-313d8a168635`**, covering all photographed buildings in the 395-building map, using 39 photographs and preserving owner roofs and colours. Dimensions and unseen sides remain estimates; uncertain wall/photo matches require review. No photographic wall textures are approved in this initial release. [Evidence, owner workflow and comparisons](docs/PHOTO-MODELS.md).
 
-The offline globe now bundles the September 2004 **NASA Blue Marble** shaded-relief overview with Natural Earth coastlines, lakes, borders and labels, plus MapLibre atmosphere. It fades into the campus map as you zoom in. The dated imagery is an overview, not current street coverage. Globe and campus visual assets retain separate 8 MiB and 12 MiB limits. The guided editor met the measured input targets; software-GPU map movement remains slow and is documented in the [verification report](docs/PHOTO-MODEL-VERIFICATION.md).
+The offline globe uses the campus map's greens and blues, softer contrast and a gentle atmosphere for an illustrated appearance. The September 2004 **NASA Blue Marble** imagery supplies faint relief beneath Natural Earth coastlines, lakes, borders and labels, then fades into the campus map as you zoom in. The dated imagery is an overview, not current street coverage. Globe and campus visual assets retain separate 8 MiB and 12 MiB limits. The guided editor met the measured input targets; software-GPU map movement remains slow and is documented in the [verification report](docs/PHOTO-MODEL-VERIFICATION.md).
 
 The 23 September update adds [entrance guides and offline building galleries](docs/ARRIVAL-GUIDES.md), explicit entrance selection, recorded accessibility observations and private owner photo review. The [campus-wide photograph inventory](data/photos/README.md) accounts for every candidate in its documented source snapshots; only verified, reusable building matches are included.
 
@@ -81,7 +81,7 @@ These are application/editor changes. Public routing changes only after the owne
 | --- | --- |
 | Exploration | Bottom search dock, local place search, categories, aliases, saved/recent places, provenance and recorded street names. |
 | Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
-| World overview | Natural-colour September 2004 NASA imagery, shaded relief, atmosphere, Natural Earth coastlines/lakes/borders, offline labels and a return-to-campus action. |
+| World overview | Illustrated campus palette with subtle September 2004 NASA relief, gentle atmosphere, Natural Earth coastlines/lakes/borders, offline labels and a return-to-campus action. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Driving directions | Offline campus drive-and-walk journeys, vehicle permissions and one-way roads, turn restrictions, estimated ETA, parking selection, voice guidance, and a confirmed parking-to-walking handoff. Private roads and parking require separate owner driving review. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |

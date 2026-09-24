@@ -82,7 +82,8 @@ try {
     await page
       .getByRole('button', { name: 'Back to campus', exact: true })
       .waitFor();
-    await page.waitForTimeout(650);
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(2000);
     await page.screenshot({
       path: `../docs/assets/screenshots/public-globe-${width < 500 ? 'mobile' : 'desktop'}-${theme}-2026-09-24.jpg`,
       type: 'jpeg',

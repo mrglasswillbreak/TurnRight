@@ -33,7 +33,7 @@ Credit: NASA Earth Observatory, Blue Marble Next Generation. [Original imagery](
 
 [Source URLs, hashes and retrieval dates](../data/world-sources.json) and the [derived asset manifest](../web/public/world/manifest.json) make the build reproducible. Ordinary builds require no source downloads. From `web`, run `node scripts/build-world.mjs`; use `--record-sources` only when deliberately reviewing changed source snapshots.
 
-Imagery fades between zooms 5 and 8 into the vector overview. Labels have collision handling and theme-aware halos; the LASU marker and campus transition remain. MapLibre provides atmosphere. Raster tiles wrap at the antimeridian and use Web Mercator's latitude limit. Deliberately plain caps beyond 85° prevent the renderer stretching the last raster row into misleading polar detail; these caps are generalised fills, not photographic coverage.
+The display uses the same greens and blues as the campus map for a softer, illustrated globe. The original tiles remain unchanged: reduced saturation and contrast, gentle brightness grading, and 28% light-theme / 18% dark-theme opacity retain only faint relief over the vector palette. Imagery fades between zooms 5 and 8 into the vector overview. Labels have collision handling and theme-aware halos; the LASU marker and campus transition remain. MapLibre provides a restrained atmosphere. Raster tiles wrap at the antimeridian and use Web Mercator's latitude limit. Deliberately plain, palette-matched caps beyond 85° prevent the renderer stretching the last raster row into misleading polar detail; these caps are generalised fills, not photographic coverage. Styling adds no assets or download size.
 
 ## Rendering, offline delivery and compatibility
 

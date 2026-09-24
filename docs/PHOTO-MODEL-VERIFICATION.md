@@ -35,6 +35,8 @@ The final candidate contains 57 detailed models, three simplified models and 335
 
 ## Production measurements
 
+The measurements below precede the illustrated-globe palette follow-up. That follow-up changes paint properties only, retains the same verified assets and zoom transitions, and adds no download bytes. Its focused globe/theme/model regression suites passed (15 tests), alongside TypeScript, lint and production budgets; refreshed production screenshots cover desktop Light and mobile Dark appearances. Existing generalised polar caps remain an overview representation. The five-run performance benchmark was not repeated for colour grading.
+
 | p95 measurement | Previous visuals | Updated visuals |
 |---|---:|---:|
 | Globe frame interval | 366.7 ms | 549.9 ms |

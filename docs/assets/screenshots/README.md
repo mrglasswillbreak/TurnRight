@@ -1,8 +1,10 @@
 # Application screenshots
 
-## Photo models and realistic globe — 24 September 2026
+## Photo models and illustrated globe — 24 September 2026
 
 The four `2026-09-24` images are unaltered Chromium screenshots from production builds. The public globe uses the actual app with a verified local copy of published campus `lasu-8577d5c85d2c`; the guided workspace uses its real component in a production fixture. No owner session, private upload, draft, or physical GPS is used. Desktop is 1440 × 900 for the globe and 1280 × 900 for the workspace; mobile is 390 × 844. The workspace demonstrates estimated details before applying them, not a published wall assignment.
+
+The globe captures were refreshed after the illustrated-palette follow-up: campus greens and blues lead, NASA relief is faint, and the atmosphere is softer. These are rendered style changes; the original bundled imagery and geography have not been altered.
 
 Reproduce from `web`: fetch the documented evidence snapshot, build `vite.performance.config.ts`, serve its output on 5195, build the application and serve `dist` on 5196, then run `node scripts/capture-photo-model.mjs` and `node scripts/capture-visual-update.mjs`. The scripts read only public fixtures and write screenshots. They block service workers for public captures, so these particular screenshots do not claim a disconnected session; separate PWA tests verify offline reloads.
 
