@@ -1,16 +1,54 @@
 # Application screenshots
 
-## Photo models and illustrated globe — 24 September 2026
+## Current unified editor and public gallery
 
-The four `2026-09-24` images are unaltered Chromium screenshots from production builds. The public globe uses the actual app with a verified local copy of published campus `lasu-8577d5c85d2c`; the guided workspace uses its real component in a production fixture. No owner session, private upload, draft, or physical GPS is used. Desktop is 1440 × 900 for the globe and 1280 × 900 for the workspace; mobile is 390 × 844. The workspace demonstrates estimated details before applying them, not a published wall assignment.
+The README contains **19 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.
 
-The globe captures were refreshed after the illustrated-palette follow-up: campus greens and blues lead, NASA relief is faint, and the atmosphere is softer. These are rendered style changes; the original bundled imagery and geography have not been altered.
+Public and owner application views are captured by `web/playwright.docs.config.ts`; the two measured-model views use `web/scripts/benchmark-model-editor.mjs`. Public screenshots block service workers to avoid an older installed UI. Offline-download screenshots show the actual interface state, not proof of a disconnected session. Separate production PWA journeys verify preparation and offline reloads.
 
-Reproduce from `web`: fetch the documented evidence snapshot, build `vite.performance.config.ts`, serve its output on 5195, build the application and serve `dist` on 5196, then run `node scripts/capture-photo-model.mjs` and `node scripts/capture-visual-update.mjs`. The scripts read only public fixtures and write screenshots. They block service workers for public captures, so these particular screenshots do not claim a disconnected session; separate PWA tests verify offline reloads.
+| Filename prefix (all end `-2026-09-24.png`) | View |
+| --- | --- |
+| `public-place-desktop-current` | Campus and Senate destination, Light |
+| `public-panel-resized-current` | Same destination with shortened panel |
+| `public-map-mobile-current` | Compact campus map |
+| `public-place-mobile-current` | Destination and gallery |
+| `public-settings-mobile-current` | Public settings |
+| `public-offline-mobile-current` | Package status and download controls |
+| `public-globe-desktop-current` | Illustrated globe, Light |
+| `public-globe-mobile-current` | Illustrated globe, Dark |
+| `public-route-desktop-current` | Manual Clinic–Senate walking route, Dark |
+| `public-route-mobile-current` | Mobile walking preview; no GPS navigation started |
+| `editor-workspace-current` | Explorer and 3D campus |
+| `editor-building-current` | Building inspector and gallery at the top |
+| `editor-building-mobile-current` | Compact building inspector |
+| `editor-settings-mobile-current` | Owner view settings |
+| `editor-photos-current` | Visual photo manager |
+| `editor-roof-current` | Integrated roof mode |
+| `editor-outline-current` | Geographic outline mode |
+| `unified-model-desktop` | Measured canvas, hierarchy, model and photo |
+| `unified-model-mobile` | Full-screen model workspace |
 
-The globe contains reprojected/resampled NASA Earth Observatory Blue Marble Next Generation, September 2004, and Natural Earth v5.1.2. See [attribution](../../../data/ATTRIBUTION.md). The workspace shows the published Mass Communication photograph with its in-app credit; [all photo identities and rights](../../../data/photo-models/inventory.json) and [19 annotated comparison sheets](../../PHOTO-MODEL-COVERAGE.md) retain original source credits and modification notices.
+Desktop application views are 1440 × 1000, the desktop globe is 1440 × 900 and mobile views are 390 × 844. Walking previews use a manual Clinic origin with no active GPS navigation; their camera and panel are adjusted to show the route and approach notice. These are Chromium/SwiftShader browser captures, not physical-phone or human screen-reader tests. Images contain the application's own labels, credits and theme colours; no interface elements are composited or removed.
 
-## Current owner editor — 17 September 2026
+### Reproduce
+
+From `web/`, use Node 22 and installed project dependencies:
+
+```sh
+npx vite build --config vite.performance.config.ts
+node scripts/benchmark-model-editor.mjs --smoke
+npx playwright test --config playwright.docs.config.ts
+```
+
+The benchmark first retrieves and verifies the public manifest and all assets into `work/model-benchmark/public`. It needs the documented baseline fixture build for its comparison; see [the verification report](../../MODEL-EDITOR-VERIFICATION.md). Use `--capture` instead of `--smoke` to refresh model screenshots without replacing existing benchmark measurements. The documentation project builds a separate local production app, supplies isolated owner responses and serves only the verified snapshot assets. Its screenshots overwrite the current filenames; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes only the final two walking previews. Inspect all captures before updating the README; record a new date if capturing on a later date.
+
+NASA/Natural Earth globe attribution remains in [the source inventory](../../../data/ATTRIBUTION.md). Building photographs retain their public in-app credits and [source identity/rights inventory](../../../data/photo-models/inventory.json). Earlier screenshots below are dated archives and do not describe current controls.
+
+## Archived initial photo workspace and illustrated globe — 24 September 2026
+
+The previous four-image gallery (`public-globe-*-2026-09-24.jpg` and `photo-model-*-2026-09-24.jpg`) used snapshot `lasu-8577d5c85d2c` and the former staged façade form. It is superseded by the current gallery above. Original files remain as historical visual references.
+
+## Archived owner editor — 17 September 2026
 
 Unmodified JPEG captures from application revision **`b69cde0`**, using the real editor in the **Codex in-app browser**. The local preview loaded the checked-in **`lasu-4e4c8008b38b`** campus seed. A temporary development fixture supplied a local sample owner, empty drafts/reports/releases and no source updates. Save/publish requests were disabled in that fixture; no production session or private workspace was opened.
 
@@ -33,7 +71,7 @@ Actual, unmodified JPEG captures from the local production PWA in the **Codex in
 
 To reproduce: build and serve the production app, install its waiting app update if necessary, finish the campus download, stop the local server and reload. Zoom out, then adjust the wheel/pinch zoom until the entire planet fits. Capture mobile in Dark mode and desktop in Light mode, without changing the world data. These are responsive-browser checks, not physical-device airplane-mode or GPS tests.
 
-## Current public interface — 17 September 2026
+## Archived public interface — 17 September 2026
 
 Captured from the local production preview in the **Codex in-app browser**, using application revision **`d37606f`** with the mobile selection, public update-notice and desktop-resizing changes. The images document this application build and its bundled seed; publishing application code does not publish new campus map data.
 
@@ -50,7 +88,7 @@ The map uses the checked-in **`lasu-4e4c8008b38b`** campus seed. The app renders
 
 These are unmodified JPEG browser captures: no interface elements were composited, removed or recoloured. The update screenshot uses a real waiting service worker triggered by a comment-only revision to the local built `dist/sw.js`. The original built file was restored after capture; no application source or live deployment was changed for the demonstration.
 
-### Reproduce the current gallery
+### Historical capture procedure
 
 1. Build the current source and run the production preview from `web/` with `npm run build` and `npm run preview`. Use a separate local origin for captures so production preferences and recovery data are untouched.
 2. Open that preview in the **in-app browser**. Set a 1248 × 900 desktop viewport, search for Senate, and open the first LASU Senate Building result from the checked-in seed. Clear the query while retaining the selected destination.
@@ -77,7 +115,7 @@ The capture uses the checked-in `lasu-4e4c8008b38b` seed geometry and `data/visu
 
 PNG browser captures are encoded as JPEG at the original dimensions for repository size. No interface elements are composited, removed or recoloured. The map, lighting and settings backgrounds come from the application itself. No GPS fix, active walk or completed physical-device test is implied.
 
-The earlier gallery was produced using the repository’s opt-in documentation-capture fixtures. Current screenshots are captured through the in-app browser using the workflow above. Keep historical fixture images labelled with their original date and data source when retaining them.
+The earlier gallery was produced using the repository’s opt-in documentation-capture fixtures. Those captures predate the current production fixture workflow above. Keep historical fixture images labelled with their original date and data source when retaining them.
 
 ## Historical captures — 9 September 2026
 
