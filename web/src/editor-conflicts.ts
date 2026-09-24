@@ -168,6 +168,14 @@ export function mergeWorkspace(
         local: unknown,
         remote: unknown,
       ): unknown => {
+        // Resolve unchanged or identically removed subtrees before recursion.
+        // Recursing through a deleted object would otherwise resurrect it as {}.
+        if (equal(local, base)) return remote;
+        if (equal(remote, base) || equal(local, remote)) return local;
+        // A deletion competing with an edit needs an explicit whole-object choice.
+        // Independent first-time additions can still merge by stable identity.
+        if (base !== undefined && (local === undefined || remote === undefined))
+          return choose(path, base, local, remote);
         if (
           [base, local, remote].every(
             (v) =>

@@ -171,6 +171,40 @@ describe('building recovery and merging', () => {
       ...r.properties.appearance.walls,
     });
   });
+  it('preserves nested removals without resurrecting empty wall records', () => {
+    const base = make();
+    base.properties.appearance = {
+      walls: { front: { windows: true }, back: { windows: true } },
+    };
+    const local = structuredClone(base),
+      remote = structuredClone(base);
+    delete local.properties.appearance!.walls!.front;
+    remote.properties.appearance!.walls!.back.windows = false;
+    const result = mergeWorkspace([base], [local], [remote]);
+    expect(result.unresolved).toEqual([]);
+    expect(result.edits[0].properties.appearance!.walls).toEqual({
+      back: { windows: false },
+    });
+  });
+  it('requires a whole-wall choice when removal conflicts with new details', () => {
+    const base = make();
+    base.properties.appearance = { walls: { front: { windows: true } } };
+    const local = structuredClone(base),
+      remote = structuredClone(base);
+    delete local.properties.appearance!.walls!.front;
+    remote.properties.appearance!.walls!.front.windowSpacing = 3;
+    const result = mergeWorkspace([base], [local], [remote]);
+    expect(result.unresolved).toHaveLength(1);
+    expect(result.unresolved[0].field).toBe('appearance.walls.front');
+    expect(result.edits[0].properties.appearance!.walls).toEqual({});
+    const kept = mergeWorkspace([base], [local], [remote], {
+      [result.unresolved[0].key]: 'server',
+    });
+    expect(kept.edits[0].properties.appearance!.walls!.front).toEqual({
+      windows: true,
+      windowSpacing: 3,
+    });
+  });
   it('chooses geometry and dependent assignments together on concurrent changes', () => {
     const b = make(),
       l = structuredClone(b),
