@@ -187,6 +187,8 @@ export interface VisualCatalogue {
   }[];
 }
 export interface ModelMesh {
+  /** Fine relief can wait until close zoom; older readers may ignore this hint. */
+  minZoom?: number;
   uvs?: number[];
   texture?: FacadeTextureRecipe;
   positions: number[];

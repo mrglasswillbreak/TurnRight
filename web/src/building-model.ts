@@ -324,7 +324,7 @@ export function createBuildingModel(
               eaves,
               facade.wallColour!,
               facade.trimColour,
-            ),
+            ).map((mesh) => ({ ...mesh, minZoom: 19 })),
           );
       }
     scope = { partId };
@@ -427,6 +427,7 @@ export function mergeModelMeshes(meshes: ModelMesh[]): ModelMesh[] {
     const key = JSON.stringify([
       source.colour,
       source.detail,
+      source.minZoom,
       source.surfaces?.[0]?.role,
       source.texture,
     ]);
@@ -437,6 +438,7 @@ export function mergeModelMeshes(meshes: ModelMesh[]): ModelMesh[] {
         indices: [],
         colour: source.colour,
         detail: source.detail,
+        ...(source.minZoom === undefined ? {} : { minZoom: source.minZoom }),
         surfaces: [],
         ...(source.texture ? { texture: source.texture, uvs: [] } : {}),
       };

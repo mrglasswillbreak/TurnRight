@@ -91,6 +91,10 @@ export function validBuildingModel(model: BuildingModel): boolean {
       (part) =>
         !!part &&
         /^#[a-f0-9]{6}$/i.test(part.colour) &&
+        (part.minZoom === undefined ||
+          (Number.isFinite(part.minZoom) &&
+            part.minZoom >= 0 &&
+            part.minZoom <= 22)) &&
         (part.texture === undefined || validTextureRecipe(part.texture)) &&
         (part.uvs === undefined ||
           (Array.isArray(part.positions) &&

@@ -123,15 +123,48 @@ describe('photographic architecture', () => {
   });
   it('renders explicit wide glazing ratios instead of retaining the legacy narrow-window cap', () => {
     const f = structuredClone(footprint);
-    f.properties!.appearance = { windows: true, windowSpacing: 4, windowWidthRatio: 0.86 };
+    f.properties!.appearance = {
+      windows: true,
+      windowSpacing: 4,
+      windowWidthRatio: 0.86,
+    };
     const model = createBuildingModel(f, resolveBuildingVisual(f));
-    const windows = model.meshes.find(m => m.surfaces?.some(s => s.role === 'window'))!;
-    const edgeLengths = windows.indices.filter((_, i) => i % 6 === 0).map((vertex, i) => {
-      const next = windows.indices[i * 6 + 1];
-      return Math.hypot(...[0, 1, 2].map(axis => windows.positions[vertex * 3 + axis] - windows.positions[next * 3 + axis]));
-    });
+    const windows = model.meshes.find((m) =>
+      m.surfaces?.some((s) => s.role === 'window'),
+    )!;
+    const edgeLengths = windows.indices
+      .filter((_, i) => i % 6 === 0)
+      .map((vertex, i) => {
+        const next = windows.indices[i * 6 + 1];
+        return Math.hypot(
+          ...[0, 1, 2].map(
+            (axis) =>
+              windows.positions[vertex * 3 + axis] -
+              windows.positions[next * 3 + axis],
+          ),
+        );
+      });
     expect(Math.max(...edgeLengths)).toBeGreaterThan(3);
     expect(validBuildingModel(model)).toBe(true);
+  });
+  it('keeps flat openings at campus scale while reserving frame relief for close views', () => {
+    const f = structuredClone(footprint);
+    f.properties!.appearance = {
+      windows: true,
+      windowSpacing: 4,
+      windowFrameDepth: 0.08,
+    };
+    const model = createBuildingModel(f, resolveBuildingVisual(f));
+    expect(
+      model.meshes.some(
+        (m) => !m.minZoom && m.surfaces?.some((s) => s.role === 'window'),
+      ),
+    ).toBe(true);
+    const relief = model.meshes.find((m) => m.minZoom === 19)!;
+    expect(relief).toBeDefined();
+    expect(validBuildingModel(model)).toBe(true);
+    relief.minZoom = NaN;
+    expect(validBuildingModel(model)).toBe(false);
   });
   it('keeps recipes during moved/removed-wall recovery and blocks unreviewed publication', () => {
     const f = feature();

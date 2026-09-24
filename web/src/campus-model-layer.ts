@@ -203,6 +203,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
+        minZoom: part.minZoom,
         materialKey: `${part.colour}:${role}${part.texture ? ':' + textureKey(part.texture) : ''}`,
         surfaces: part.surfaces,
       };
@@ -324,9 +325,6 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           compatibleVisual(feature, visual) &&
           child.userData.revision ===
             `${visual?.geometryRevision}:${visual?.detailRevision || ''}`;
-        for (const mesh of child.children) {
-          mesh.visible = !(mesh.userData.detail && mode !== 'detailed');
-        }
       }
     }
     ambient.intensity = options.dark ? 1.25 : 1.6;
@@ -358,8 +356,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       for (const mesh of group.children)
         if (mesh instanceof Mesh)
           mesh.visible = !(
-            mesh.userData.detail &&
-            mode !== 'detailed' &&
+            ((mesh.userData.detail && mode !== 'detailed') ||
+              map.getZoom() < (mesh.userData.minZoom || 0)) &&
             group.userData.buildingId !== options.selectedId
           );
       if (group.userData.selectionKey === key) continue;

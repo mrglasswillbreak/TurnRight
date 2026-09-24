@@ -166,7 +166,9 @@ export default function PhotoModelWorkspace({
           <output aria-live="polite">
             {saved
               ? 'Saved to map draft · publication requires release review'
-              : 'Unsaved model changes · Apply saves one undoable draft edit'}
+              : draft === initial.current
+                ? 'Viewing current model · changes need Apply to save'
+                : 'Unsaved model changes · Apply saves one undoable draft edit'}
           </output>
         </header>
         <div className="photo-model-mobile-tabs">

@@ -300,6 +300,48 @@ export function installWorldLayers(
     },
     'campus-fill',
   );
+  // Mercator imagery stops at ~85°. MapLibre extends its last texel row to
+  // each pole, which otherwise turns Antarctica into a radial starburst.
+  // These deliberately plain caps describe no additional photographic detail.
+  map.addSource('world-polar-caps', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [-1, 1].map((hemisphere) => ({
+        type: 'Feature',
+        properties: { colour: hemisphere < 0 ? '#edf2f3' : '#070d21' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-180, hemisphere * 90],
+              [-180, hemisphere * 85],
+              [-90, hemisphere * 85],
+              [0, hemisphere * 85],
+              [90, hemisphere * 85],
+              [180, hemisphere * 85],
+              [180, hemisphere * 90],
+              [-180, hemisphere * 90],
+            ],
+          ],
+        },
+      })),
+    },
+  });
+  map.addLayer(
+    {
+      id: 'world-polar-caps',
+      source: 'world-polar-caps',
+      type: 'fill',
+      maxzoom: 8,
+      paint: {
+        'fill-color': ['get', 'colour'],
+        'fill-antialias': false,
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 5, 1, 8, 0],
+      },
+    },
+    'campus-fill',
+  );
   map.addLayer(
     {
       id: 'world-country-labels',
