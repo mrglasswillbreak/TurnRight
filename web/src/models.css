@@ -56,8 +56,9 @@
 }
 .building-evidence {
   font-size: 12px;
-  color: var(--muted-foreground, #637166);
+  color: var(--muted);
   margin: 8px 0 14px;
+  overflow-wrap: anywhere;
 }
 .building-evidence summary {
   cursor: pointer;
