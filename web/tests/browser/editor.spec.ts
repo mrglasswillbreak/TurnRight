@@ -3789,7 +3789,10 @@ test('building appearance: integrated view, surface inheritance, live preview, r
     )
     .toBe(14);
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
@@ -4261,7 +4264,10 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     .getByRole('button', { name: 'Done editing roof', exact: true })
     .click();
   await page
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page.reload();
   await attachMap(page);
@@ -5246,7 +5252,10 @@ test('documentation current gallery: published campus and isolated owner workflo
     await shot('editor-photos-current');
     await page.keyboard.press('Escape');
     await page
-      .getByRole('button', { name: 'Photo & model', exact: true })
+      .getByRole('button', {
+        name: /^(Photo & model|Edit selected model)$/,
+        exact: true,
+      })
       .click();
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: 'Roof', exact: true }).click();
@@ -5333,13 +5342,17 @@ test('documentation current gallery: published campus and isolated owner workflo
     await dialog.locator('.model-stage').evaluate((element) => {
       element.scrollTop = 0;
     });
+    await dialog.getByRole('button', { name: '3D', exact: true }).click();
     await dialog
       .getByRole('button', { name: 'Reset 3D view', exact: true })
       .click();
     await shot('unified-model-desktop');
 
     await dialog
-      .getByRole('button', { name: 'Close workspace', exact: true })
+      .getByRole('button', {
+        name: /^(Close workspace|← Back to Survey)$/,
+        exact: true,
+      })
       .click();
     if (process.env.TURNRIGHT_DOCS_EDITOR_ONLY) return;
     await page.goto('/');
@@ -5752,7 +5765,7 @@ for (const width of [390, 1440]) {
     await expect.poll(() => facade(1)?.needsReview).toBe(false);
     await dialog
       .getByRole('button', {
-        name: 'Close workspace',
+        name: /^(Close workspace|← Back to Survey)$/,
         exact: true,
       })
       .click();
@@ -5795,7 +5808,10 @@ async function unifiedModelFixture(
   const collapse = page.getByRole('button', { name: 'Collapse explorer' });
   if (await collapse.isVisible()) await collapse.click();
   await page
-    .getByRole('button', { name: 'Photo & model', exact: true })
+    .getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    })
     .click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
@@ -5837,6 +5853,267 @@ async function unifiedModelFixture(
         ?.facades?.['library:wall:0:0:0'],
   };
 }
+
+test('model workspace desktop docks stay bounded through resize and zoom-sized viewports', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  const failures: string[] = [];
+  page.on('pageerror', (error) => failures.push(error.message));
+  const { dialog, wall } = await unifiedModelFixture(page);
+  const width = dialog.getByLabel('Width (m)', { exact: true });
+  await width.fill('1.8');
+  await width.press('Enter');
+  await expect.poll(() => wall()?.elements[0].width).toBe(1.8);
+  for (const viewport of [
+    { width: 1280, height: 720 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+    // Available CSS pixels at 125% and 150% zoom on a 1440x900 display.
+    { width: 1152, height: 720 },
+    { width: 960, height: 600 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect
+      .poll(() =>
+        dialog.evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          return [
+            Math.round(r.x),
+            Math.round(r.y),
+            Math.round(r.width),
+            Math.round(r.height),
+          ];
+        }),
+      )
+      .toEqual([0, 0, viewport.width, viewport.height]);
+    const stage = (await dialog.locator('.model-stage').boundingBox())!;
+    const inspector = (await dialog.locator('.model-inspector').boundingBox())!;
+    expect(stage.width).toBeGreaterThan(360);
+    expect(stage.height).toBeGreaterThan(220);
+    expect(stage.x + stage.width).toBeLessThanOrEqual(inspector.x + 1);
+    expect(inspector.x + inspector.width).toBeLessThanOrEqual(viewport.width);
+    await expect(width).toHaveValue('1.8');
+    await expect(
+      dialog.getByRole('button', { name: '← Back to Survey', exact: true }),
+    ).toBeInViewport();
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.screenshot({
+    path: info.outputPath('desktop-model-workspace.png'),
+  });
+  const surface = dialog.getByRole('application', { name: /Wall canvas/ });
+  const before = (await surface.boundingBox())!.width;
+  await dialog
+    .getByRole('button', { name: 'Hide structure', exact: true })
+    .click();
+  await expect(
+    dialog.getByRole('complementary', { name: 'Building hierarchy' }),
+  ).toBeHidden();
+  await expect
+    .poll(async () => (await surface.boundingBox())!.width)
+    .toBeGreaterThan(before);
+  await dialog
+    .getByRole('button', { name: 'Show structure', exact: true })
+    .click();
+  await dialog
+    .getByRole('button', { name: 'Whole building', exact: false })
+    .click();
+  await expect(dialog.locator('.model-property-target')).toContainText(
+    'Whole building · defaults',
+  );
+  await expect(
+    dialog.getByLabel('Building or wing', { exact: true }),
+  ).toHaveValue('');
+  await expect(
+    dialog.locator('.model-detail-item[aria-pressed="true"]'),
+  ).toHaveCount(0);
+  await expect(
+    dialog.locator('[data-model-wall][aria-pressed="true"]'),
+  ).toHaveCount(0);
+  await expect(dialog.locator('.photo-model-canvas canvas')).toBeVisible();
+  await expect
+    .poll(async () => {
+      const preview = (await dialog
+        .locator('.photo-model-canvas')
+        .boundingBox())!;
+      const stage = (await dialog.locator('.model-stage').boundingBox())!;
+      return stage.width - preview.width;
+    })
+    .toBeLessThanOrEqual(26);
+  await page.screenshot({ path: info.outputPath('desktop-model-3d.png') });
+  await dialog.getByRole('button', { name: 'Outline', exact: true }).click();
+  await expect(
+    dialog.locator('.model-stage').getByLabel('Top-down building outline'),
+  ).toBeVisible();
+  await expect(
+    dialog.locator('.model-inspector').getByLabel('Outline vertex'),
+  ).toBeVisible();
+  await dialog
+    .getByRole('button', { name: '← Back to Survey', exact: true })
+    .click();
+  await expect(dialog).toBeHidden();
+  await expect(
+    page.getByRole('button', { name: 'Edit selected model', exact: true }),
+  ).toBeFocused();
+  expect(failures).toEqual([]);
+});
+
+test('model workspace creation starts with a footprint and reopens its saved model', async ({
+  page,
+}) => {
+  const server = await setup(page);
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Create model', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Finish', exact: true }),
+  ).toBeDisabled();
+  for (const point of [
+    [3.19985, 6.4602],
+    [3.19985, 6.46035],
+    [3.19995, 6.46035],
+    [3.19995, 6.4602],
+  ] as [number, number][])
+    await clickMap(page, point);
+  await page.getByRole('button', { name: 'Finish', exact: true }).click();
+  await expect
+    .poll(() => server.edits().some((edit) => edit.kind === 'building'))
+    .toBe(true);
+  await page
+    .getByRole('button', { name: 'Edit selected model', exact: true })
+    .click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await dialog.getByLabel('Building height (m)', { exact: true }).fill('8');
+  await dialog
+    .getByLabel('Building height (m)', { exact: true })
+    .press('Enter');
+  await expect
+    .poll(
+      () =>
+        server.edits().find((edit) => edit.kind === 'building')?.properties
+          .height,
+    )
+    .toBe(8);
+  await dialog
+    .getByRole('button', { name: '← Back to Survey', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Edit selected model', exact: true })
+    .click();
+  await dialog.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await expect(
+    dialog.getByLabel('Building height (m)', { exact: true }),
+  ).toHaveValue('8');
+});
+
+test.describe('model workspace touch layouts', () => {
+  test.use({ hasTouch: true });
+  test('landscape side panel and portrait input survive rotation and keyboard resize', async ({
+    page,
+  }, info) => {
+    test.setTimeout(120000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const { dialog, wall } = await unifiedModelFixture(page);
+    await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+    const width = dialog.getByLabel('Width (m)', { exact: true });
+    await width.fill('');
+    const surface = dialog.getByRole('application', { name: /Wall canvas/ });
+    const view = await surface.getAttribute('viewBox');
+    const renderer = await dialog
+      .locator('.photo-model-canvas canvas')
+      .elementHandle();
+    for (const viewport of [
+      { width: 667, height: 375 },
+      { width: 844, height: 390 },
+      { width: 1024, height: 768 },
+      { width: 1280, height: 591 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expect(dialog).toHaveClass(/model-landscape/);
+      await expect
+        .poll(() =>
+          dialog.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            return [
+              Math.round(r.x),
+              Math.round(r.y),
+              Math.round(r.width),
+              Math.round(r.height),
+            ];
+          }),
+        )
+        .toEqual([0, 0, viewport.width, viewport.height]);
+      const canvas = (await surface.boundingBox())!;
+      const panel = (await dialog.locator('.model-inspector').boundingBox())!;
+      expect(canvas.height).toBeGreaterThan(120);
+      expect(canvas.x + canvas.width).toBeLessThanOrEqual(panel.x + 1);
+      expect(panel.width).toBeLessThanOrEqual(320);
+      expect((await width.boundingBox())!.width).toBeGreaterThan(80);
+      expect(panel.y + panel.height).toBeLessThanOrEqual(viewport.height);
+      await expect(width).toHaveValue('');
+      await expect(surface).toHaveAttribute('viewBox', view!);
+      await expect(
+        dialog.getByRole('button', { name: 'Close workspace', exact: true }),
+      ).toBeInViewport();
+      const tabs = dialog.getByRole('navigation', { name: 'Editing panel' });
+      await tabs
+        .getByRole('button', { name: 'Structure', exact: true })
+        .click();
+      await expect(
+        dialog.getByRole('complementary', { name: 'Building hierarchy' }),
+      ).toBeVisible();
+      await expect(dialog.locator('.model-inspector')).toBeHidden();
+      await tabs
+        .getByRole('button', { name: 'Properties', exact: true })
+        .click();
+      await expect(width).toHaveValue('');
+    }
+    expect(await renderer!.evaluate((el) => el.isConnected)).toBe(true);
+    await page.screenshot({
+      path: info.outputPath('landscape-model-workspace.png'),
+    });
+    // Simulate the visual viewport exposed by a keyboard without rotating the device.
+    await page.evaluate(() => {
+      const viewport = window.visualViewport!;
+      Object.defineProperty(viewport, 'height', {
+        configurable: true,
+        value: 300,
+      });
+      Object.defineProperty(viewport, 'offsetTop', {
+        configurable: true,
+        value: 20,
+      });
+      viewport.dispatchEvent(new Event('resize'));
+    });
+    await expect
+      .poll(() =>
+        dialog.evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          return [Math.round(r.y), Math.round(r.height)];
+        }),
+      )
+      .toEqual([20, 300]);
+    await width.fill('1.9');
+    await width.press('Enter');
+    await expect.poll(() => wall()?.elements[0].width).toBe(1.9);
+    await page.evaluate(() => {
+      Reflect.deleteProperty(window.visualViewport!, 'height');
+      Reflect.deleteProperty(window.visualViewport!, 'offsetTop');
+      window.visualViewport!.dispatchEvent(new Event('resize'));
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(dialog).not.toHaveClass(/model-landscape/);
+    await expect(width).toHaveValue('1.9');
+    await expect(dialog.locator('.model-sheet-handle')).toBeVisible();
+    await dialog
+      .getByRole('button', { name: 'Close workspace', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Photo & model', exact: true }),
+    ).toBeFocused();
+  });
+});
 test('restoring one published building previews the repair and supports undo without changing other drafts', async ({
   page,
 }) => {
@@ -5970,7 +6247,9 @@ test('unified model preserves incomplete nonempty records for recovery', async (
   await expect(
     dialog.getByRole('button', { name: 'Remove empty wall record' }),
   ).toHaveCount(0);
-  await dialog.getByRole('button', { name: 'Close workspace' }).click();
+  await dialog
+    .getByRole('button', { name: /^(Close workspace|← Back to Survey)$/ })
+    .click();
   expect(
     server.edits()[0].properties.appearance?.facades?.['library:wall:0:0:0']
       ?.notes,
@@ -6066,10 +6345,16 @@ test('unified model retains a blocked insertion and repairs building height with
   );
   expect(wall()).toBeUndefined();
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page
-    .getByRole('button', { name: 'Photo & model', exact: true })
+    .getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    })
     .click();
   await expect(
     dialog.getByRole('button', { name: 'Save unfinished wall' }),
@@ -6191,6 +6476,7 @@ test('unified model retries failed preview without losing draft or camera', asyn
     };
   });
   const { dialog, wall } = await unifiedModelFixture(page);
+  await dialog.getByRole('button', { name: '3D', exact: true }).click();
   const canvas = await dialog.locator('canvas').elementHandle();
   await page.evaluate(() => {
     document.documentElement.dataset.failModelPreview = 'true';
@@ -6210,7 +6496,10 @@ test('unified model retries failed preview without losing draft or camera', asyn
   expect(await canvas!.evaluate((el) => el.isConnected)).toBe(true);
   await page.keyboard.press('Escape');
   await expect(
-    page.getByRole('button', { name: 'Photo & model', exact: true }),
+    page.getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole('textbox', { name: 'Name', exact: true }),
@@ -6247,10 +6536,16 @@ test('unified model duplication, patterns, undo and private input recovery', asy
   const beforeWidth = wall()!.elements[0].width;
   await dialog.getByLabel('Width (m)', { exact: true }).fill('');
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page
-    .getByRole('button', { name: 'Photo & model', exact: true })
+    .getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    })
     .click();
   await dialog.locator('.model-detail-item').first().click();
   await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue('');
@@ -6377,7 +6672,10 @@ test('3D touch hold selects a detail and opens actions without a release tap', a
     touchPoints: [],
   });
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await cdp.detach();
 });
@@ -6392,14 +6690,15 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     const { dialog, wall } = await unifiedModelFixture(page);
     const close = dialog.getByRole('button', {
-      name: 'Close workspace',
+      name: /^(Close workspace|← Back to Survey)$/,
       exact: true,
     });
     await expect(close).toHaveText('×');
     await expect(
-      dialog
-        .locator('.model-mobile-navigation')
-        .getByRole('button', { name: 'Close workspace', exact: true }),
+      dialog.locator('.model-mobile-navigation').getByRole('button', {
+        name: /^(Close workspace|← Back to Survey)$/,
+        exact: true,
+      }),
     ).toBeVisible();
     const assertClose = async () => {
       const b = (await close.boundingBox())!;
@@ -6452,10 +6751,16 @@ for (const viewport of [
     await close.click();
     await expect(dialog).toBeHidden();
     await expect(
-      page.getByRole('button', { name: 'Photo & model', exact: true }),
+      page.getByRole('button', {
+        name: /^(Photo & model|Edit selected model)$/,
+        exact: true,
+      }),
     ).toBeFocused();
     await page
-      .getByRole('button', { name: 'Photo & model', exact: true })
+      .getByRole('button', {
+        name: /^(Photo & model|Edit selected model)$/,
+        exact: true,
+      })
       .click();
     await dialog
       .getByRole('button', { name: 'Choose wall', exact: true })
@@ -6482,10 +6787,16 @@ test('unified model retains an invalid pattern privately and repairs it after re
   await expect(dialog.locator('header output')).toContainText('Unsaved input');
   expect(wall()?.elements.length).toBe(1);
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page
-    .getByRole('button', { name: 'Photo & model', exact: true })
+    .getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    })
     .click();
   await dialog
     .getByRole('button', { name: 'Pattern · Repeated details', exact: true })
@@ -6520,7 +6831,7 @@ for (const viewport of [
     await width.press('Enter');
     await expect(width).toHaveValue('1.8');
     const close = dialog.getByRole('button', {
-      name: 'Close workspace',
+      name: /^(Close workspace|← Back to Survey)$/,
       exact: true,
     });
     await close.scrollIntoViewIfNeeded();
@@ -6529,7 +6840,10 @@ for (const viewport of [
     expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
     await close.click();
     await expect(
-      page.getByRole('button', { name: 'Photo & model', exact: true }),
+      page.getByRole('button', {
+        name: /^(Photo & model|Edit selected model)$/,
+        exact: true,
+      }),
     ).toBeFocused();
   });
 test('unified model roof and outline tools share draft history', async ({
@@ -6609,7 +6923,7 @@ for (const width of [320, 390, 768, 1440])
       await page.getByRole('button', { name: 'Collapse explorer' }).click();
       await clickMap(page, [3.20012, 6.46022]);
       const trigger = page.getByRole('button', {
-        name: 'Photo & model',
+        name: /^(Photo & model|Edit selected model)$/,
         exact: true,
       });
       await trigger.click();
@@ -6663,8 +6977,7 @@ for (const width of [320, 390, 768, 1440])
       await dialog
         .getByRole('button', { name: 'Mark this wall reviewed', exact: true })
         .click();
-      if (width <= 800)
-        await dialog.getByRole('button', { name: '3D', exact: true }).click();
+      await dialog.getByRole('button', { name: '3D', exact: true }).click();
       await expect(dialog.locator('canvas')).toBeVisible();
       await expect(
         dialog.getByText('Estimated dimensions · selected wall outlined'),
@@ -6681,7 +6994,10 @@ for (const width of [320, 390, 768, 1440])
       await page.screenshot({ path: info.outputPath('photo-model.png') });
       await expect(dialog.getByText(/Saved to map draft/)).toBeVisible();
       await dialog
-        .getByRole('button', { name: 'Close workspace', exact: true })
+        .getByRole('button', {
+          name: /^(Close workspace|← Back to Survey)$/,
+          exact: true,
+        })
         .click();
       await expect(trigger).toBeFocused();
     });
@@ -6880,10 +7196,16 @@ test('mobile touch moves, resizes, cancels for pinch and restores unfinished inp
   await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
   await dialog.getByLabel('Width (m)', { exact: true }).fill('');
   await dialog
-    .getByRole('button', { name: 'Close workspace', exact: true })
+    .getByRole('button', {
+      name: /^(Close workspace|← Back to Survey)$/,
+      exact: true,
+    })
     .click();
   await page
-    .getByRole('button', { name: 'Photo & model', exact: true })
+    .getByRole('button', {
+      name: /^(Photo & model|Edit selected model)$/,
+      exact: true,
+    })
     .click();
   await expect(dialog).toBeVisible();
   await dialog

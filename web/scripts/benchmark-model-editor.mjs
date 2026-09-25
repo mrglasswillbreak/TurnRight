@@ -370,7 +370,7 @@ try {
             .getByRole('button', {
               name:
                 version === 'final'
-                  ? 'Close workspace'
+                  ? /^(Close workspace|← Back to Survey)$/
                   : 'Close without applying',
               exact: true,
             })
