@@ -5,7 +5,84 @@ import {
   validateReleaseSnapshot,
 } from '../server/release-validation';
 import { campusFixture } from './fixture';
+import { facadeWalls, campusFacadeReviewIssues } from '../src/building-facades';
+import { validateWorkspace } from '../src/editor-validation';
+import type { Feature, Polygon } from 'geojson';
+import type { FacadeDescription } from '../src/visual-types';
 describe('server release guards', () => {
+  it('shares named wall blockers with the editor while preserving draft saves and targeted approval', () => {
+    const data = campusFixture();
+    const building: Feature<Polygon> = {
+      type: 'Feature',
+      properties: {
+        id: 'theatre',
+        name: 'Lecture theatre',
+        kind: 'building',
+        height: 15,
+        heightMode: 'metres',
+        appearance: {},
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [3.204, 6.465],
+            [3.2042, 6.465],
+            [3.2042, 6.4652],
+            [3.204, 6.4652],
+            [3.204, 6.465],
+          ],
+        ],
+      },
+    };
+    const walls = facadeWalls(building).slice(0, 2);
+    const facades: Record<string, FacadeDescription> = Object.fromEntries(
+      walls.map((w) => [
+        w.wallId,
+        {
+          partId: w.partId,
+          wallId: w.wallId,
+          wallCoordinates: w.coordinates,
+          photoIds: [],
+          confidence: 'inferred',
+          notes: 'Estimated layout',
+          elements: [],
+          needsReview: true,
+          reviewedAt: '2026-09-24',
+        },
+      ]),
+    );
+    building.properties!.appearance = { facades };
+    data.map.features.push(building);
+    expect(validateWorkspace(data, []).errors).toEqual([]);
+    const messages = () =>
+      campusFacadeReviewIssues(data)
+        .map((i) => i.message)
+        .join('\n');
+    expect(campusFacadeReviewIssues(data)).toHaveLength(2);
+    expect(() =>
+      validateReleaseSnapshot(
+        { features: publishedRecords(data), edits: [] },
+        data,
+      ),
+    ).toThrow(messages());
+    facades[walls[0].wallId].needsReview = false;
+    expect(campusFacadeReviewIssues(data)).toHaveLength(1);
+    expect(messages()).toContain('Wing 1 · wall 2');
+    expect(() =>
+      validateReleaseSnapshot(
+        { features: publishedRecords(data), edits: [] },
+        data,
+      ),
+    ).toThrow(messages());
+    facades[walls[1].wallId].needsReview = false;
+    expect(
+      validateReleaseSnapshot(
+        { features: publishedRecords(data), edits: [] },
+        data,
+      ).map.features,
+    ).toHaveLength(1);
+  });
   it('rejects source endpoint errors even when the browser is bypassed', () => {
     const publicData = campusFixture(),
       base = campusFixture();

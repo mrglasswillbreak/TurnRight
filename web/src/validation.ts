@@ -20,7 +20,7 @@ export interface ValidationIssue {
   coordinates?: Position;
   featureKind?: MapEdit['kind'];
   field?: string;
-  repair?: 'choose-place' | 'connect-path' | 'review-segment';
+  repair?: 'choose-place' | 'connect-path' | 'review-segment' | 'review-model';
   severity?: 'error' | 'warning';
 }
 export function finitePosition(value: unknown): value is Position {

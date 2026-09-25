@@ -5,6 +5,7 @@ import {
   facadeErrors,
   facadeWalls,
   facadeMatches,
+  facadeReviewIssues,
   detailRevision,
   validTextureRecipe,
   projectTexture,
@@ -186,10 +187,33 @@ describe('photographic architecture', () => {
       properties: { ...remapped.properties, id: 'building' },
     };
     expect(facadeMatches(facade, changed)).toBe(false);
-    expect(facadeErrors(changed, [photo], true)).toContain(
-      'Review the changed façade assignment before publication.',
+    expect(facadeErrors(changed, [photo], true).join(' ')).toContain(
+      'Confirm the wall match',
     );
     expect(facadeErrors(f, [photo], true)).toEqual([]);
+  });
+  it('identifies each review target and distinguishes height changes from moved walls', () => {
+    const f = feature();
+    f.properties.name = 'Lecture theatre';
+    f.properties.appearance.facades[wall.wallId].needsReview = true;
+    const issues = facadeReviewIssues(f);
+    expect(issues).toMatchObject([
+      {
+        featureId: 'building',
+        featureKind: 'building',
+        field: wall.wallId,
+        repair: 'review-model',
+      },
+    ]);
+    expect(issues[0].message).toContain('Lecture theatre · Wing 1 · wall 1');
+    expect(issues[0].message).toContain('placement after the building changed');
+    // A saved review timestamp must not conceal a later invalidation.
+    expect(facadeErrors(f, [photo], true)).toEqual([issues[0].message]);
+    expect(facadeErrors(f, [photo])).toEqual([]);
+    f.properties.appearance.facades[wall.wallId].needsReview = false;
+    expect(facadeReviewIssues(f)).toEqual([]);
+    delete f.properties.appearance.facades[wall.wallId].reviewedAt;
+    expect(facadeReviewIssues(f)[0].message).toContain('details and evidence');
   });
   it('requires source photographs from the same building and rejects malformed dimensions', () => {
     const f = feature();

@@ -1,6 +1,7 @@
 import type { Feature } from 'geojson';
 import type { FacadeDescription, FacadeTextureRecipe } from './visual-types.js';
-import type { CampusPhoto } from './types.js';
+import type { CampusData, CampusPhoto } from './types.js';
+import type { ValidationIssue } from './validation.js';
 import { buildingTopology, polygonsOf } from './building-surfaces.js';
 
 export function detailRevision(feature: Feature): string | undefined {
@@ -72,6 +73,43 @@ export function facadeMatches(facade: FacadeDescription, feature: Feature) {
     JSON.stringify(wall.coordinates) === JSON.stringify(facade.wallCoordinates)
   );
 }
+/** Review is a release gate, not a draft-save error. Keep its targets available to the UI. */
+export function facadeReviewIssues(feature: Feature): ValidationIssue[] {
+  const facades = feature.properties?.appearance?.facades;
+  if (!facades || typeof facades !== 'object' || Array.isArray(facades))
+    return [];
+  const walls = facadeWalls(feature);
+  return Object.entries(facades).flatMap(([id, raw]) => {
+    const f = raw as FacadeDescription;
+    if (!f || f.wallId !== id) return [];
+    const wall = walls.find((w) => w.wallId === id && w.partId === f.partId);
+    const matches =
+      !!wall &&
+      JSON.stringify(wall.coordinates) === JSON.stringify(f.wallCoordinates);
+    if (f.reviewedAt && !f.needsReview && matches) return [];
+    const name =
+      feature.properties?.name || feature.properties?.id || 'Unnamed building';
+    return [
+      {
+        code: 'facade-review',
+        phase: 'edits',
+        severity: 'error',
+        featureId: String(feature.properties?.id),
+        featureKind: 'building',
+        field: id,
+        referenceIds: [f.partId, id],
+        coordinates: wall?.coordinates[0],
+        repair: 'review-model',
+        message: `${name} · ${wall?.label || 'Removed or reassigned wall'}: ${!matches ? 'Confirm the wall match and review its detail placement' : f.needsReview ? 'Review detail placement after the building changed' : 'Review this wall’s details and evidence'} before building a release preview.`,
+      } satisfies ValidationIssue,
+    ];
+  });
+}
+export function campusFacadeReviewIssues(data: CampusData): ValidationIssue[] {
+  return data.map.features
+    .filter((f) => f.properties?.kind === 'building')
+    .flatMap(facadeReviewIssues);
+}
 export function validTextureRecipe(value: FacadeTextureRecipe) {
   if (
     !value ||
@@ -109,7 +147,9 @@ export function facadeErrors(
     Object.keys(facades).length > 100
   )
     return ['Façades must contain at most 100 named wall assignments.'];
-  const errors: string[] = [];
+  const errors: string[] = publication
+    ? facadeReviewIssues(feature).map((i) => i.message)
+    : [];
   for (const [id, raw] of Object.entries(facades)) {
     const f = raw as FacadeDescription;
     if (
@@ -130,11 +170,6 @@ export function facadeErrors(
       );
       continue;
     }
-    if (
-      publication &&
-      (!f.reviewedAt || f.needsReview || !facadeMatches(f, feature))
-    )
-      errors.push('Review the changed façade assignment before publication.');
     if (f.confidence === 'documented' && !f.notes.trim())
       errors.push('Documented dimensions need measurement provenance.');
     if (
