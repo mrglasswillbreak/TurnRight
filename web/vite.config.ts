@@ -59,6 +59,11 @@ export default defineConfig({
       output: {
         codeSplitting: {
           groups: [
+            {
+              name: 'icons',
+              test: /node_modules[\\/]lucide-react[\\/]/,
+              entriesAware: true,
+            },
             { name: 'map', test: /node_modules[\\/]maplibre-gl/ },
             {
               name: 'react',
