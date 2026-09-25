@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { MapEdit, CampusData } from './types';
 import type {
   BuildingSelection,
@@ -19,6 +19,7 @@ import { RoofPlanEditor } from './RoofPlanEditor';
 import './building-editor.css';
 import type { EditorWorkspace } from './editor-workspace';
 import { ModelField } from './ModelField';
+import { useCompactModel } from './model-mobile';
 import { fitRoofHeight, inheritsBuildingHeight } from './model-height';
 import { buildingDisplay } from './map-display';
 import type { ValidationIssue } from './validation';
@@ -60,6 +61,8 @@ export function BuildingAppearanceEditor({
   reviewRequest?: ValidationIssue;
   onReviewOpened?: () => void;
 }) {
+  const compact = useCompactModel();
+  const workspaceTrigger = useRef<HTMLElement | null>(null);
   const [photoModelOpen, setPhotoModelOpen] = useState(false);
   const [adjustRoofHeight, setAdjustRoofHeight] = useState(true);
   const [pendingHeightMode, setPendingHeightMode] = useState<string>();
@@ -72,6 +75,7 @@ export function BuildingAppearanceEditor({
   >('details');
   useEffect(() => {
     if (!embedded && reviewRequest) {
+      workspaceTrigger.current = document.activeElement as HTMLElement;
       setWorkspaceMode('review');
       setPhotoModelOpen(true);
       onReviewOpened?.();
@@ -323,16 +327,18 @@ export function BuildingAppearanceEditor({
         <div className="model-entry-actions">
           <button
             type="button"
-            onClick={() => {
+            onClick={(event) => {
+              workspaceTrigger.current = event.currentTarget;
               setWorkspaceMode('details');
               setPhotoModelOpen(true);
             }}
           >
-            Photo &amp; model
+            {compact ? 'Photo & model' : 'Edit selected model'}
           </button>
           <button
             type="button"
-            onClick={() => {
+            onClick={(event) => {
+              workspaceTrigger.current = event.currentTarget;
               setWorkspaceMode('appearance');
               setPhotoModelOpen(true);
             }}
@@ -355,6 +361,7 @@ export function BuildingAppearanceEditor({
             onSelection={onSelection}
             onEdit={onEdit}
             onClose={() => setPhotoModelOpen(false)}
+            returnFocus={workspaceTrigger}
             workspace={workspace}
             onHistory={onHistory}
             initialMode={workspaceMode}
@@ -369,7 +376,8 @@ export function BuildingAppearanceEditor({
               type="button"
               aria-pressed={mode === m}
               disabled={locked && m !== 'roof'}
-              onClick={() => {
+              onClick={(event) => {
+                workspaceTrigger.current = event.currentTarget;
                 onMode(m);
                 setWorkspaceMode(m);
                 setPhotoModelOpen(true);
