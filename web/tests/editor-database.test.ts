@@ -51,6 +51,7 @@ beforeAll(async () => {
     '007_source_field_reviews.sql',
     '008_private_building_media.sql',
     '009_bounded_baseline_comparison.sql',
+    '011_linear_baseline_reconciliation.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -341,6 +342,60 @@ describe('published baseline reconciliation', () => {
       ),
     ).toEqual(records);
   });
+  it('reconciles a campus-sized generic plan and retains exact guards, timestamps and rollback data', async () => {
+    await database.exec(`
+      insert into source_features(id,source,entity,payload,hash)
+      select 'edge:scale:' || n, 'test', 'edge',
+        jsonb_build_object('id',n,'access','private','notes',repeat('campus ',40)),
+        'unchanged-' || n
+      from generate_series(1,5000) n;
+      set plan_cache_mode = force_generic_plan;
+    `);
+    try {
+      const before = (await sources()) as Record<string, unknown>[];
+      const records = before.map(
+        ({ updated_at: _timestamp, ...record }) => record,
+      );
+      const call = (expected: unknown[]) =>
+        database.query<{ receipt: string }>(
+          `select reconcile_published_baseline(b.actor,b.published_version,b.expected_sources,b.records) as receipt
+          from json_to_record($1::json) as b(actor uuid,published_version text,expected_sources jsonb,records jsonb)`,
+          [
+            JSON.stringify({
+              actor: owner,
+              published_version: 'published-test',
+              expected_sources: expected,
+              records,
+            }),
+          ],
+        );
+      const altered = before.map((record) =>
+        record.id === 'edge:scale:5000'
+          ? { ...record, unexpected: 'must not be ignored' }
+          : record,
+      );
+      await expect(call(altered)).rejects.toThrow('changed');
+      await expect(call(before.slice(1))).rejects.toThrow('changed');
+      const reversed = [...before].reverse();
+      const {
+        rows: [{ receipt }],
+      } = await call(reversed);
+      expect(await sources()).toEqual(before);
+      const archive = await database.query<{ before_sources: unknown }>(
+        'select before_sources from baseline_reconciliations where id=$1',
+        [receipt],
+      );
+      expect(archive.rows[0].before_sources).toEqual(reversed);
+      const access = await database.query<{ allowed: boolean }>(
+        "select has_function_privilege('authenticated','reconcile_published_baseline(uuid,text,jsonb,jsonb)','EXECUTE') as allowed",
+      );
+      expect(access.rows[0].allowed).toBe(false);
+    } finally {
+      await database.exec(
+        "reset plan_cache_mode; delete from source_features where id like 'edge:scale:%';",
+      );
+    }
+  }, 30000);
 });
 describe('private survey transactions', () => {
   const call = async (command: string, payload: unknown, actor = owner) =>
