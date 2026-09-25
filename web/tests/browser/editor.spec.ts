@@ -5703,6 +5703,74 @@ async function unifiedModelFixture(
         ?.facades?.['library:wall:0:0:0'],
   };
 }
+test('restoring one published building previews the repair and supports undo without changing other drafts', async ({
+  page,
+}) => {
+  const building = browserCampus().map.features.find(
+    (f) => f.properties?.id === 'library',
+  )!;
+  const published: MapEdit = {
+    id: 'library',
+    kind: 'building',
+    geometry: building.geometry,
+    properties: { ...building.properties, height: 15, heightMode: 'metres' },
+  };
+  const changed: MapEdit = {
+    ...published,
+    properties: { ...published.properties, height: 6 },
+  };
+  const other: MapEdit = {
+    id: 'gate',
+    kind: 'place',
+    geometry: { type: 'Point', coordinates: [3.2, 6.46] },
+    properties: { name: 'Other draft', category: 'gate' },
+  };
+  const server = await setup(page, false, false, {
+    initialEdits: [changed, other],
+    publishedEdits: [published],
+  });
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page.getByLabel('Search map features').fill('Library');
+  await page
+    .locator('.editor-feature-list button')
+    .filter({
+      has: page.locator('.editor-feature-icon.building'),
+      hasText: 'Library',
+    })
+    .first()
+    .click();
+  await page
+    .getByRole('button', { name: 'Restore published building', exact: true })
+    .click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Restore published building · review before applying',
+    }),
+  ).toBeVisible();
+  expect(
+    server.edits().find((e) => e.id === 'library')?.properties.height,
+  ).toBe(6);
+  await page
+    .getByRole('button', { name: 'Apply reviewed repair', exact: true })
+    .click();
+  await expect
+    .poll(
+      () => server.edits().find((e) => e.id === 'library')?.properties.height,
+    )
+    .toBe(15);
+  expect(server.edits().find((e) => e.id === 'gate')?.properties).toEqual(
+    other.properties,
+  );
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(
+      () => server.edits().find((e) => e.id === 'library')?.properties.height,
+    )
+    .toBe(6);
+  expect(server.edits().find((e) => e.id === 'gate')?.properties).toEqual(
+    other.properties,
+  );
+});
 test('unified model repairs empty recovered wall records without crashing or changing other properties', async ({
   page,
 }) => {

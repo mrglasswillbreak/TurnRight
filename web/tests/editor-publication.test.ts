@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { unpublishedEdits } from '../src/editor-publication';
+import {
+  unpublishedEdits,
+  publishedBuildingRestore,
+} from '../src/editor-publication';
 import type { MapEdit } from '../src/types';
 
 const edit = (id: string): MapEdit => ({
@@ -10,6 +13,33 @@ const edit = (id: string): MapEdit => ({
 });
 
 describe('unpublished editor corrections', () => {
+  it('restores one building from the matching release without reverting save identity or other edits', () => {
+    const before: MapEdit = {
+      ...edit('hall'),
+      kind: 'building',
+      properties: { height: 12, heightMode: 'metres', name: 'Hall' },
+      updated_at: 'old',
+    };
+    const current: MapEdit = {
+      ...before,
+      properties: { ...before.properties, height: 6 },
+      updated_at: 'current',
+    };
+    const published = { version: 'live', edits: [before, edit('other')] };
+    const next = publishedBuildingRestore(current, published, 'live')!;
+    expect(next.properties).toEqual(before.properties);
+    expect(next.updated_at).toBe('current');
+    expect(
+      publishedBuildingRestore(current, published, 'older'),
+    ).toBeUndefined();
+    expect(publishedBuildingRestore(before, published, 'live')).toBeUndefined();
+    expect(
+      publishedBuildingRestore(edit('other'), published, 'live'),
+    ).toBeUndefined();
+    next.properties.height = 9;
+    expect(before.properties.height).toBe(12);
+    expect(current.properties.height).toBe(6);
+  });
   it('hides published corrections without removing saved data and ignores save metadata', () => {
     const saved = edit('library');
     const current = {

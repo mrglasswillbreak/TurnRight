@@ -51,7 +51,10 @@ import { downloadJson } from './download-json';
 import { EditorConflictReview } from './EditorConflictReview';
 import type { ValidationIssue } from './validation';
 import { canonical } from './editor-conflicts';
-import { unpublishedEdits } from './editor-publication';
+import {
+  unpublishedEdits,
+  publishedBuildingRestore,
+} from './editor-publication';
 import { sourceGeometry } from './source-comparison';
 import { type SourceRecord } from './editor-model';
 import { assembleEditorSources } from './editor-validation';
@@ -550,6 +553,13 @@ function Editor({
   };
   const progress = drawingProgress(workspace.unfinished);
   const [repairFocus, setRepairFocus] = useState<ValidationIssue | null>(null);
+  const publishedBuilding = useMemo(
+    () =>
+      selected
+        ? publishedBuildingRestore(selected, publishedWorkspace, data.version)
+        : undefined,
+    [selected, publishedWorkspace, data.version],
+  );
   const [repairPreview, setRepairPreview] = useState<{
     batch: MapEdit[];
     stamp: string;
@@ -2282,6 +2292,15 @@ function Editor({
             onPick={pick}
             onDisconnect={disconnect}
             onDelete={remove}
+            onRestorePublished={
+              publishedBuilding
+                ? () =>
+                    stageRepair(
+                      [publishedBuilding],
+                      'Restore published building · review before applying',
+                    )
+                : undefined
+            }
             onClose={() => {
               workspace.endHistoryGroup();
               setFocusRequest(null);

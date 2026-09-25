@@ -14,6 +14,25 @@ const content = (edit: MapEdit) =>
     deleted: !!edit.deleted,
   });
 
+/** Restore only this building's published correction, retaining the current save identity. */
+export function publishedBuildingRestore(
+  edit: MapEdit,
+  published: PublishedWorkspace | null | undefined,
+  version: string,
+): MapEdit | undefined {
+  if (edit.kind !== 'building' || published?.version !== version) return;
+  const before = published.edits.find(
+    (e) => e.kind === 'building' && e.id === edit.id && !e.deleted,
+  );
+  if (!before || content(edit) === content(before)) return;
+  return {
+    ...edit,
+    geometry: structuredClone(before.geometry),
+    properties: structuredClone(before.properties),
+    deleted: before.deleted,
+  };
+}
+
 /** Retain source overrides; only hide corrections already in the public release. */
 export function unpublishedEdits(
   edits: MapEdit[],

@@ -27,6 +27,7 @@ export function EditorInspector({
   onPick,
   onDisconnect,
   onDelete,
+  onRestorePublished,
   onClose,
   photoOwner,
   onPhotos,
@@ -47,6 +48,7 @@ export function EditorInspector({
   onPick: (mode: 'start' | 'end' | 'join' | 'entrance-link' | 'block') => void;
   onDisconnect: (vertexId?: string) => void;
   onDelete: () => void;
+  onRestorePublished?: () => void;
   onClose: () => void;
   photoOwner: string;
   onPhotos: (change: PhotoChange) => void;
@@ -528,6 +530,11 @@ export function EditorInspector({
               <p key={issue}>{issue.replace(`${edit.id}: `, '')}</p>
             ))}
           </div>
+        )}
+        {onRestorePublished && (
+          <button className="editor-secondary" onClick={onRestorePublished}>
+            Restore published building
+          </button>
         )}
         <button
           className="editor-delete"
