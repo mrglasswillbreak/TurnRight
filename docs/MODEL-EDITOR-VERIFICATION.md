@@ -114,6 +114,12 @@ For correctness, run `npm test`, `npm run lint`, `npm run build`, `npm run check
 
 ## Coverage limits and rollout
 
+### Preview review regression · 2026-09-25
+
+The Releases panel previously reported a passing draft while the server rejected height-invalidated façade assignments with an unnamed error. The browser, model Review panel and authoritative release validator now share named wall review diagnostics. The preview action checks them again after flushing saved edits. Draft saving remains available; model approval remains targeted and undoable. Height-only invalidation no longer asks for an unnecessary wall rematch.
+
+Verification: 503 Vitest tests passed, TypeScript application/functions checks passed, lint retained seven existing warnings, and four focused browser journeys passed (390/1440-pixel release blockers, targeted review with undo/redo, keyboard model review, and height/floor/custom-roof regression). The two release journeys also passed after the final review-label refinements and captured isolated fixture screenshots. The configured production build passed all budgets: public startup 421,381/435,200 gzip bytes; additional owner editor 183,951/189,440; lazy photo workspace 7,618/12,288; renderer/editor 198.3/300 KiB; world 5.30/8 MiB; voice 5.91/8 MiB.
+
 Physical Android/iPhone devices, native mobile keyboards, browser-level 200% zoom, thermal/memory pressure and a human screen-reader session were unavailable. Automated narrow/short viewport reflow, semantic labels, keyboard input, focus restoration and touch gestures do not replace those checks. Photographs still do not establish exact dimensions or unseen elevations.
 
 Additive server validation deployed first at `a195899`; older clients cannot silently drop newer authoring metadata. No database migration or public package-schema change is required. Application deployment preserves the reviewed campus through `PUBLISHED_MAP_URL`. Architectural content continues through owner preview, publication and immutable rollback; demonstration edits and screenshots are never published as campus corrections.

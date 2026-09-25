@@ -268,7 +268,7 @@ Reference and roof batches require review; photographic support and inferred det
 1. Import source candidates with **Check now** or the scheduled source job. Incomplete imports retain the last successful source set.
 2. Compare property rows and before/after geometry; raw records remain under Details. Review baseline reconciliation when approved sources differ from a published baseline.
 3. Resolve blocking validation issues and inspect release impact: added/changed/deleted features, entrance and connectivity changes, and Clinic–Senate, Clinic–Law and Clinic–Library route results.
-4. **Build review preview** flushes pending saves and creates an immutable release snapshot. The release worker independently validates it and regenerates the visual catalogue/sectors with the same building and roof rules as the editor.
+4. Resolve any **Model release blockers** first. The panel names the building, wing and wall; **Review model** opens the affected assignment. Height or roof changes can require another placement review without changing the wall match. Then **Build review preview** flushes pending saves and creates an immutable release snapshot. The release worker independently validates it and regenerates the visual catalogue/sectors with the same building and roof rules as the editor.
 5. Review the hosted preview, then use the owner's **Publish** action. Publication is recorded only after deployment/promotion succeeds. Keep the previous release for rollback.
 
 Job status refreshes while its review panel is open. Publication and job submissions are checked before repetition; a failed action is not treated as published. Closures remain active until explicitly reopened and republished; an expected reopening date is only a review flag.
@@ -458,7 +458,7 @@ TurnRight/
 | Paths connect where they should stay separate | Turn off automatic crossings for that path or set the correct bridge/tunnel level. Use explicit joins for the connections you do want, then review and publish. |
 | An app update is available | Finish navigation, then choose **Install update** from the map notice or Settings. Use Offline Maps separately for campus-data updates. |
 | Draft changes are absent from the public map | Autosave stores a private draft. Review, validate, build a preview and publish through Releases; a code push alone does not publish it. |
-| Publish/preview is unavailable | Resolve blocking validation or reconciliation issues, pending saves and conflicts. Inspect job errors and the release state; do not repeat an uncertain submission blindly. |
+| Publish/preview is unavailable | Resolve blocking validation or reconciliation issues, pending saves and conflicts. For a façade review error, use Releases → Review model, inspect the named wall and mark that wall reviewed; build a new preview afterward. Inspect job errors and the release state; do not repeat an uncertain submission blindly. |
 | Save/export/routing failed | Use the operation-specific retry. Renew an expired session if requested. **Download local recovery** remains independent of server export. |
 | No walking connection to a destination | Review the actual missing path/entrance or disconnected component. Do not create assumed shortcuts or remove access restrictions globally. |
 | Offline reopening fails | Use a production PWA, finish preparation/download, verify readiness and use integrity repair. Preserve unsynced recovery before changing storage. |

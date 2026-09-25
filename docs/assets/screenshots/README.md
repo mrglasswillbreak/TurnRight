@@ -1,5 +1,7 @@
 # Application screenshots
 
+The additional `editor-release-review-390-2026-09-25.png` and `editor-release-review-1440-2026-09-25.png` captures show named model-release blockers using the isolated Library browser-test fixture. They are development-server regression captures, not production-campus evidence. Regenerate with `TURNRIGHT_CAPTURE_RELEASE=1` and the `release preflight opens` browser tests. The 26 varied production-build README images below remain intact.
+
 ## Current unified editor and public gallery
 
 The README contains **26 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.

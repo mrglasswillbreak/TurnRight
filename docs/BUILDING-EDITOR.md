@@ -38,6 +38,8 @@ The visual allocation remains **12 MiB for campus geometry/textures**, **8 MiB f
 
 ## Verification
 
+Before building a release preview, the Releases panel lists pending model reviews by building and wall. **Review model** opens the affected assignment. Height-only changes need a placement review, while moved or reassigned walls also need a confirmed wall match. **Mark this wall reviewed** affects one wall and supports undo; it does not approve the rest of the building. See [release review steps](UNIFIED-MODEL-EDITOR.md#publication).
+
 [Current implementation and performance evidence](MODEL-EDITOR-VERIFICATION.md) replaces the old build-count and Apply/Cancel acceptance instructions. The earlier [roof coverage](BUILDING-ROOF-COVERAGE.md) and [photographic coverage](PHOTO-MODEL-COVERAGE.md) remain dated evidence inventories, not claims about newly surveyed geometry.
 
 Physical Android/iPhone touch, real keyboards and outdoor/offline campus checks remain distinct from browser simulations. Application deployment does not publish architectural draft changes.

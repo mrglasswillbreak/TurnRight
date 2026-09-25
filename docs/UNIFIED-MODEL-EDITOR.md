@@ -60,4 +60,14 @@ Private authoring metadata stores names, groups, patterns and presets in the exi
 
 Use the normal owner preview, validation, publication and rollback workflow. Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
 
+The Releases panel checks façade reviews before enabling **Build review preview**. Each blocker names its building, wing and wall; **Review model** opens that exact wall in the workspace. A height or roof edit can invalidate placement review even when the footprint is unchanged. Inspect the retained metre positions and evidence, then **Mark this wall reviewed**. This clears only the selected wall's review flag and remains undoable. A moved or reassigned wall also requires an explicit wall match. Invalid placements still require repair; reviewing does not invent measurements or approve other walls.
+
+Older failed releases keep their original error records. After repairing the current draft, build a new immutable preview rather than trying to publish a failed or stale one.
+
+The screenshots below use an isolated Library test fixture with two pending wall reviews; no private owner draft is shown.
+
+| Desktop release review | Mobile release review |
+| --- | --- |
+| ![Named building and wall blockers before a preview build](assets/screenshots/editor-release-review-1440-2026-09-25.png) | <img src="assets/screenshots/editor-release-review-390-2026-09-25.png" width="260" alt="Mobile release review with direct links to the affected model walls"> |
+
 The workspace is lazy-loaded and included in prepared offline installations. The renderer retains batched materials, bounded texture loading, explicit disposal and the Simple 3D fallback. Continuous gestures update the editing canvas; completed actions request model regeneration, with one active request and only the newest pending request retained.
