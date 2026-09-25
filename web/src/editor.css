@@ -1387,3 +1387,22 @@
   border-radius: 3px;
   border: 1px solid #0003;
 }
+/* Model creation uses the existing footprint drawing workflow. */
+.editor-create-model {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-block: 8px;
+  border: 1px solid var(--ed-line);
+  border-radius: 8px;
+  background: var(--ed-bg);
+  color: var(--ed-text);
+}
+@media (max-width: 900px), (pointer: coarse) {
+  .editor-create-model {
+    display: none;
+  }
+}

@@ -1868,6 +1868,7 @@ function Editor({
               <span>{name}</span>
             </button>
           ))}
+
           <hr />
           <button
             aria-label="Undo"
@@ -1911,6 +1912,21 @@ function Editor({
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </label>
+              <button
+                className="editor-create-model"
+                disabled={
+                  preview ||
+                  !ready ||
+                  !!tool ||
+                  !!workspace.unfinished ||
+                  !!repairPreview
+                }
+                title="Draw a building footprint, then open Edit selected model"
+                onClick={() => begin('building')}
+              >
+                <Building2 size={20} />
+                <span>Create model</span>
+              </button>
               <div className="editor-filters">
                 {[
                   ['needs', 'Needs mapping'],
