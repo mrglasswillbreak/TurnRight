@@ -8,12 +8,20 @@ Law Clinic's geometry prerequisite regroups the existing coordinates into two ex
 
 The current mobile workspace shows the geographic roof plan in the main canvas. Use **Edit roof** for controls, **Done** to close the sheet, and **Move point** after selecting a point. Panning or a second touch does not commit roof geometry. Desktop retains the integrated plan and properties panels.
 
-Whole-building **Height & floors** now offers proportional adjustment of inherited custom roofs. It scales eaves and all roof-point elevations together while retaining plan coordinates, constraints and detail dimensions. The option is on by default; turn it off to preserve recorded roof elevations. Wing height overrides remain explicit. Existing height/roof mismatches can be fitted by an owner action. This is an estimated transformation requiring review, not new measured evidence, and the complete change is one undoable command.
+Whole-building **Appearance → Building height** now offers proportional adjustment of inherited custom roofs. It scales eaves and all roof-point elevations together while retaining plan coordinates, constraints and detail dimensions. The option is on by default; turn it off to preserve recorded roof elevations. Wing height overrides remain explicit. Existing height/roof mismatches can be fitted by an owner action. This is an estimated transformation requiring review, not new measured evidence, and the complete change is one undoable command.
 
 - Sources → Building roofs previews individual wing outlines, ridge plans, eaves and peak elevations, source links and uncertainty. The batch is explicit, validated, autosaved and one undo step. Opening the review makes no saved edit. The plans are calculated only after opening the section.
 - In the unified **Roof** mode, choose a wing and create/edit its custom roof, or preview an approximate hip proposal. Completed valid point, elevation and ridge/valley actions autosave; invalid intermediate work stays local for repair. **Done editing roof** closes its controls. The separate Sources batch still requires its explicit reviewed apply action. Close the model workspace to reach map Settings; recovery retains unfinished work. See [current model workflow](UNIFIED-MODEL-EDITOR.md).
 - The generator stores ordinary editable roof points, elevations and ridge constraints. It uses the existing constrained triangulation to keep concave footprints and courtyards intact. Four-sided wings receive a simple hip ridge; complex wings use interior triangle connections. These are illustrative ridge networks, not a surveyed roof plan or an exact straight skeleton.
 - Eaves and peaks remain inside the existing total height. Invalid outlines, incompatible constraints, zero-area geometry and model/control-point budget failures block the proposal. Source geometry and routing are unchanged by the roof batch.
+
+![Roof controls over the rendered roof](assets/screenshots/editor-roof-current-2026-09-25.png)
+
+**Edit surface** aligns above the selected wing. The same renderer stays mounted while the existing roof controller supplies points, ridges and valleys. Plan dragging changes horizontal position; metre fields edit elevation. **2D precision** is a secondary view sharing the same draft. Orbit restores the prior camera.
+
+**Add roof text** places editable plain text on that wing. Wording, dimensions, colour, alignment and rotation are properties; drag its outline or enter coordinates to move it. Labels are clipped to the actual roof triangles, following ridges and valleys. Labels must fit within the footprint and avoid courtyards; invalid edits retain valid saved geometry. No new roof/storey/room objects are introduced.
+
+![Roof lettering properties and placement](assets/screenshots/editor-model-roof-text-2026-09-25.png)
 
 ## Generation and validation
 

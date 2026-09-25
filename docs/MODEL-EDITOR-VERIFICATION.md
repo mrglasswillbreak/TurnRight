@@ -1,6 +1,74 @@
 # Unified model editor verification · updated 25 September 2026
 
-The unified workspace uses the existing owner draft and publication pipeline. This rollout changes application/editor behavior, not the published architectural content. The verified reference snapshot is **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`: **395 buildings, 220 places, 39 photographs covering 19 buildings**, and 84 package assets totaling 18,880,327 bytes.
+The unified workspace retains the owner draft and publication pipeline. This rollout
+changes the application/editor, not published architectural content. The current
+verified reference is **`lasu-623791e1184e`**, schema 2: **395 buildings, 220 places,
+39 photographs covering 19 buildings**, and **84 assets / 20,098,125 bytes**.
+
+## Surface editing, nested structure and lettering · 25 September 2026
+
+One Edit model entry opens a dedicated three-column workspace. The expandable,
+searchable ARIA tree shares selection with the viewport and properties. Wall,
+roof and footprint gestures reuse the precision controllers over the same mounted
+3D renderer. Orbit restores its camera; aligned editing uses orthographic
+projection and inverse pointer mapping. Mobile retains one focused panel; short
+landscape keeps it beside the model. Selected grouped/repeated details expose
+Ungroup/Detach instance. Walls and roofs support editable plain-text lettering.
+
+Visual review found that the preview inherited the public renderer's exclusion
+of unreviewed façades. The owner preview now renders those validated candidates
+without clearing review flags; release generation retains its review gate. Front
+elevations also account for outer/courtyard ring orientation, preserving stored
+positions and repeated-instance identities while facing outside. Roof lettering
+is clipped to actual roof triangles so ridges and valleys retain their elevations.
+
+The final unit suite passes **532 tests in 67 files**. Focused cases cover text
+validation, save-compatible meshes, draft/public review separation, courtyard
+winding, roof constraints, camera/pointer coordinates and tree references. Client
+and server TypeScript and lint pass with **seven pre-existing warnings**.
+
+**14 focused Chromium cases pass** across the final run and corrected camera-startup follow-up. Browser coverage checks creation, saving/reopening, selection/focus, ungrouping,
+detachment, text properties and invalid placement, shared roof/footprint edits,
+undo, camera restoration, renderer identity and WebGL startup fallback. Responsive
+checks include 1280×720, 1440×900, 1920×1080 and effective CSS viewport sizes for
+125%/150% zoom; 667×375, 844×390, 1024×768, short 740×390/844×320 and portrait.
+Rotation and keyboard tests simulate browser viewport events and preserve an
+unfinished field. They do not operate physical keyboards or browser zoom chrome.
+
+The configured production build retains all budgets: lazy 3D/editor 217.6 KiB
+gzip (300 KiB limit), public startup about 426 kB (435,200-byte limit), owner
+additional about 184 kB (189,440-byte limit), photo manager 7.6 kB (12,288-byte
+limit), world 5.30 MiB and voice 5.91 MiB / 362 clips (each 8 MiB limit).
+Shared icons remain outside the owner entry; auth-configured checks verify this
+boundary and offline precache inclusion.
+
+The production-build documentation workflow produces **34 current screenshots**,
+with isolated owner responses and the verified public campus. Actual image review
+covers the entry/card, structure/actions, surface text, Orbit, aligned and precision
+views, mobile panels, photos, review, sources, releases, surveys, public map,
+settings, offline controls, globe and walking previews. See the
+[capture inventory](assets/screenshots/README.md).
+
+Reproduce from `web/` with Node 22:
+
+```sh
+npm test
+npm run lint
+npm run build
+npm run check:configured-build
+npx playwright test --grep "surface workspace|model workspace touch layouts|landscape model has reachable|model workspace creation|desktop.*docks|selected detail menu supports|unified.*roof.*outline"
+npx playwright test --config playwright.webkit.config.ts --grep "model workspace touch layouts|landscape model has reachable"
+```
+
+Run GPU browser projects sequentially. Existing importer, PWA and performance
+reports below retain their original run dates; they are not new timing claims.
+Physical phones, native keyboards, screen readers and campus accuracy remain
+manual acceptance work. Deployment verification is recorded in [Production](PRODUCTION.md).
+
+## Earlier verification records
+
+The following counts, captures, package versions and performance measurements
+refer to preceding rollouts; current results are recorded above.
 
 ## Implemented behavior
 
@@ -19,7 +87,7 @@ The compact workspace applies at widths up to 900 px and on coarse-pointer scree
 
 Whole-building height and floor controls adjust inherited custom roof eaves/points proportionally by default. Owners may retain recorded elevations or explicitly remove a wing override. Choosing floor-count mode without a count remains private unfinished input until a valid count completes the command. Unit coverage verifies scaling, immutability and affected review flags; browser coverage exercises metres, floors, the worker preview and single-action undo.
 
-The current unit run passes **501 tests in 64 files**. Both TypeScript projects and lint pass with seven pre-existing warnings. **23 Python importer tests** pass using the repository's pinned data dependencies. **28 model browser cases** pass across 320/390/768/1440-pixel layouts and both themes, plus 740×390, 320×450 and touch-enabled 1024×390 layouts. Follow-up checks verify 44 px plan/texture handles, unclipped mobile 3D controls and deliberate touch gestures. Context-menu tests exercise keyboard focus, lock/hide, duplication, copy preview, delete and undo. All **nine production PWA journeys** pass again: old/new photo packages and entrances, driving voice, survey recovery/sync, saved 3D preferences, corrupt-asset repair, backend-failure cache fallback, building/roof recovery and enriched business details. The documentation project also passes with 26 public/editor captures. The mobile production comparison is documented separately in [Mobile model performance](MOBILE-MODEL-PERFORMANCE.md); the older desktop comparison below retains its original date and baseline.
+That unit run passed **501 tests in 64 files**. Both TypeScript projects and lint pass with seven pre-existing warnings. **23 Python importer tests** pass using the repository's pinned data dependencies. **28 model browser cases** pass across 320/390/768/1440-pixel layouts and both themes, plus 740×390, 320×450 and touch-enabled 1024×390 layouts. Follow-up checks verify 44 px plan/texture handles, unclipped mobile 3D controls and deliberate touch gestures. Context-menu tests exercise keyboard focus, lock/hide, duplication, copy preview, delete and undo. All **nine production PWA journeys** pass again: old/new photo packages and entrances, driving voice, survey recovery/sync, saved 3D preferences, corrupt-asset repair, backend-failure cache fallback, building/roof recovery and enriched business details. The documentation project also passes with 26 public/editor captures. The mobile production comparison is documented separately in [Mobile model performance](MOBILE-MODEL-PERFORMANCE.md); the older desktop comparison below retains its original date and baseline.
 
 ### Earlier interaction repairs · 25 September 2026
 

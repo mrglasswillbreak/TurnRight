@@ -1,5 +1,11 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Model workspace refinement and surface text
+
+Deploy this application through the existing Git/Vercel workflow with `PUBLISHED_MAP_URL` enabled. The refinement has no database migration or new API endpoint. Text records are optional appearance JSON and validated by the shared model pipeline. Application deployment preserves the published manifest and assets; labels and other architectural edits publish only through the owner's reviewed map release workflow.
+
+Use Node 22, run lint/unit and focused Chromium/WebKit workflows, the production build and `npm run check:configured-build`. Keep the shared-icon/authentication boundary and existing bundle limits intact. See [current verification](MODEL-EDITOR-VERIFICATION.md), [owner controls](UNIFIED-MODEL-EDITOR.md) and [screenshot provenance](assets/screenshots/README.md).
+
 ## Unified model editor rollout
 
 The separate baseline reconciliation timeout repair uses

@@ -36,7 +36,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 ## Screenshots
 
-Current production-build captures use the verified published campus **`lasu-313d8a168635`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
+Current production-build captures use the verified published campus **`lasu-623791e1184e`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
 
 ### Public map
 
@@ -74,7 +74,7 @@ Current production-build captures use the verified published campus **`lasu-313d
 
 ![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-25.png)
 
-**Photo & model:** a measured wall canvas, searchable hierarchy, selectable 3D preview and photograph reference share the building draft.
+**Edit model:** one workspace combines an expandable structure tree, a shared 3D viewport, surface-aligned editing, precision plans and photograph references.
 
 ![Unified desktop model workspace with selection, architectural properties and photographic reference](docs/assets/screenshots/unified-model-desktop-2026-09-25.png)
 
@@ -90,22 +90,20 @@ Current production-build captures use the verified published campus **`lasu-313d
 | --- | --- | --- |
 | <img src="docs/assets/screenshots/editor-model-outline-mobile-2026-09-25.png" width="260" alt="Light-theme outline canvas with selected geographic vertices"> | <img src="docs/assets/screenshots/editor-model-photo-mobile-2026-09-25.png" width="260" alt="Building photograph reference with independent zoom and navigation"> | <img src="docs/assets/screenshots/editor-model-review-mobile-2026-09-25.png" width="260" alt="Mobile review sheet with wall-specific issues and actions"> |
 
-These **26 distinct screenshots** cover the public app, desktop editor and every mobile model mode. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
+The gallery covers the public app, desktop editor, mobile modes, surface text and responsive editing. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
 
-The following additional captures show the latest landscape and touch-menu fixes using an isolated Library editing fixture.
-
-| Landscape tools beside the canvas | Hold a 3D detail for actions |
+| Landscape editing beside the model | Selection, grouping and nested structure |
 | --- | --- |
-| ![Short landscape model workspace with a clear Close button and scrollable review tools](docs/assets/screenshots/editor-model-landscape-2026-09-25.png) | ![3D window selected by touch hold with its action menu kept open after release](docs/assets/screenshots/editor-model-3d-hold-2026-09-25.png) |
-
-![Globe view with a simulated live location and approximate facing cone](docs/assets/screenshots/public-globe-location-2026-09-25.png)
-
-The globe capture uses simulated GPS and compass readings in the browser fixture, not a person's recorded location.
+| ![Landscape model editing with one collapsible properties panel](docs/assets/screenshots/editor-model-landscape-2026-09-25.png) | ![Nested model tree with selected-item actions and Ungroup](docs/assets/screenshots/editor-model-tree-actions-2026-09-25.png) |
 
 ## Recent changes
 
-- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **×** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop keeps its resizable panels.
-- **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Touch and hold a detail in **3D** to open the same menu; moving or adding a second finger cancels a pending hold. Keyboard shortcuts and placement previews support quick editing without a permanent button row.
+- **Dedicated model workspace:** one full-width **Edit model** button opens in 3D Orbit. The general building card keeps survey metadata, photographs and repair actions. A nested, searchable keyboard-accessible tree shares selection with the viewport and properties.
+- **Editing directly on surfaces:** **Edit surface** aligns the existing 3D canvas to walls, roofs or footprints. Wall handles, roof points/ridges and footprint vertices reuse precision-editing commands. Orbit restores the camera; 2D precision remains available, including when WebGL fails.
+- **Building lettering:** add and edit text on walls and roofs, with wording, size, colour, alignment and placement controls. Roof text follows the actual roof planes. **Ungroup** and **Detach instance** are available in selected-item actions. All use existing undo and draft persistence; publication remains a separate reviewed action.
+
+- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **×** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop uses a collapsible tree, central viewport and properties panel.
+- **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Touch and hold a detail in **3D** to open the same menu; moving or adding a second finger cancels a pending hold. Keyboard shortcuts and placement previews support quick editing with Ungroup and Detach instance also shown when applicable.
 - **Height that changes the model:** whole-building metres and floor count are editable inside Appearance. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Height/roof adjustments share one undo action.
 
 - **Unified building editing:** Details, Appearance, Roof, Outline and Review share one draft and history. Use metre-based placement, snapping, keyboard nudges, multi-selection, duplication, alignment, groups, patterns, presets and previewed copies between walls/buildings. Completed actions autosave; unfinished values recover privately. Saving does not approve evidence or publish content. [Owner guide](docs/UNIFIED-MODEL-EDITOR.md).
@@ -135,7 +133,7 @@ Release review names each pending building/wall approval before a preview is que
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
 | Owner editing | Autosave, grouped undo/redo, controlled automatic crossings and explicit joins, selection framing, publication-relative drafts, recoverable drawings/roof plans, guided repairs and conflicts. |
-| Building editing | Unified measured canvas and 3D selection; inherited styles; precise details, duplication, patterns and presets; integrated roof/outline tools; targeted evidence review and recoverable autosave. |
+| Building editing | Shared 3D surface editing and 2D precision; nested structure tree; wall/roof text; inherited styles; details, grouping, patterns and presets; targeted review and recoverable autosave. |
 | Offline | Verified, resumable package downloads, explicit updates, integrity repair, prepared owner workspaces and immediate local recovery exports. |
 | Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
 | Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
@@ -247,35 +245,39 @@ Guided repairs select the affected feature and open the relevant control. Propos
 
 ## Building appearance and roofs
 
-**Photo & model** is a lazy-loaded building workspace with a measured wall canvas, selectable 3D, photograph reference and mobile view tabs. It supports windows, doors, columns, balconies, canopies, parapets and trim, with metre-based placement, repeated patterns and independent presets. Completed actions create undoable draft edits; camera movement and selection do not. Footprint or source-photo changes flag affected assignments for review. Private names, groups and presets stay out of public downloads; no database or package-schema migration is required. [Current owner workflow](docs/UNIFIED-MODEL-EDITOR.md) · [Photographic evidence and textures](docs/PHOTO-MODELS.md) · [Coverage](docs/PHOTO-MODEL-COVERAGE.md).
+**Edit model** is the single entry from a selected building. The general card retains identification, survey metadata, photographs, validation notices and geometry repair. A read-only summary reports wings, height/floors and review status.
 
-Add buttons preserve generated windows and trim while inserting the requested detail. Blocked placements stay visible and recoverable; repair their errors and use **Save unfinished wall**. Appearance includes whole-building height/floor controls, and unfinished fields remain tied to their original wall when selections change.
+![The selected building card with its primary Edit model entry and gallery](docs/assets/screenshots/editor-building-current-2026-09-25.png)
 
-Save errors identify the feature blocking the shared draft. Conflict review preserves removed wall records; older empty records offer an undoable repair instead of crashing the workspace. Explicit app updates verify local recovery before reloading, and new edits invalidate that reload permission.
+The desktop workspace has a collapsible structure tree, centre viewport and contextual properties. Building and wing defaults are explicit; the tree contains footprints, roofs, exterior/courtyard walls, details, groups and patterns. Collection members reference the same detail records. Search reveals ancestors; arrows, Home/End, type-ahead, Enter and Space support keyboard selection without moving the camera.
 
-On mobile, use the mode selector and **Wall / 3D / Photo** or **Plan / 3D / Photo** tabs. **Choose wall**, **Add**, **Edit** and **More** open one sheet at a time; its Expand/Collapse/Done controls keep the canvas available. Tap first, then explicitly enable Move or Resize. A second touch cancels an unfinished geometry gesture before panning/zooming. Completed holds on directional nudges create one undoable command.
+![Orbit view with the nested model structure and selected detail properties](docs/assets/screenshots/editor-model-orbit-current-2026-09-25.png)
 
-Use the selected detail's **⋯** button or right-click for Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide; these actions are no longer a row in the properties panel. Ctrl/Cmd+D/C/V/A and Shift+F10 work outside text inputs. Groups, patterns, presets and copy previews remain available through More.
+**Edit surface** aligns the same 3D canvas to the selected surface. Move/resize wall details, edit roof points and ridges, or adjust footprint and courtyard boundaries. Numeric fields remain available; there are no interior room/storey objects. **Orbit** restores the previous orbit position. **2D precision** shares the target, draft and commands and opens automatically if WebGL is unavailable. Photo reference stays accessible.
 
-**Height & floors** opens the whole-building controls. Floor count uses a labelled 3 m-per-floor estimate. Custom roofs previously kept their old elevations when the height changed: the new default proportionally adjusts their eaves and control-point elevations. Disable that option to retain recorded elevations. Overridden wings are listed and only inherit after an explicit action. Unknown floor counts remain unfinished input; dimensions are never invented to unblock a save.
+| Wall lettering and details | Roof lettering on the model |
+| --- | --- |
+| ![Editable plain text on a building wall with metre-based position and size controls](docs/assets/screenshots/editor-model-wall-text-2026-09-25.png) | ![Roof text with wording, dimensions and rotation properties](docs/assets/screenshots/editor-model-roof-text-2026-09-25.png) |
 
-Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
+Use **Add text** on a wall or **Add roof text** on a wing. Wording, colour, weight and alignment are editable. Wall lettering uses detail placement, repetition and grouping; roof lettering follows slopes, ridges and valleys. Roof labels must fit inside the wing and outside courtyard openings. These are saved model details, visible publicly only after the map is reviewed and published.
 
-1. Set wall, roof, window and trim colours; window visibility/spacing; height or floors; supported roof form/pitch; and evidence notes.
-2. Building defaults flow to wings and then walls. **Use inherited value** clears an individual override. Swatches show the resolved saved colours.
-3. Use **Outline** for footprint editing. Stable part/ring/vertex/wall identities preserve styles through movement and reordering. Split walls inherit style; ambiguous joins or changed source geometry require reassignment or reset.
-4. Use **Roof** for the selected wing. Draw ridge/valley constraints, move control points, enter elevations and inspect calculated surface slopes.
-5. Completed valid roof actions save automatically as undoable commands. **Done editing roof** closes the controls. Invalid intermediate work stays local for repair; Undo restores completed actions. The separate source-proposal batch retains its explicit reviewed apply action.
+Selected details expose **Ungroup** for group membership and **Detach instance** for repeated windows or other details. The action menu retains Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Detail multiselection remains limited to one wall.
 
-Roof plans store editable control points, constraints and boundary attachments, rather than generated triangles. Attached points follow footprint vertices; moving a wing moves its roof. The shared constrained triangulator preserves concave footprints and courtyards. Invalid constraints, incompatible elevations, degenerate surfaces and heights above the declared total block applying or publishing the affected roof.
+![Selected-item actions beside the model, with group membership represented in the tree](docs/assets/screenshots/editor-model-tree-actions-2026-09-25.png)
 
-Standard flat/hip/gable controls work on supported shapes. Window spacing accepts 0.5–20 m, with a 4 m default; supported standard pitch accepts 1–60° within the footprint and height limits. Custom roofs use point elevations. Unknown heights and approximate roof proposals remain explicitly illustrative.
+On phones, use the mode selector and **Orbit / Edit surface / 2D precision / Photo** views. **Choose wall**, **Add**, **Edit** and **More** open one panel at a time. Portrait keeps focused sheets; landscape places a panel beside the canvas at about 40% width, capped at 320 CSS px. Headers and close controls remain accessible, forms scroll inside the panel, and rotation preserves entered values and selection. Tap selects; Move and Resize explicitly enable touch editing. A second touch cancels an unfinished gesture before navigation.
 
-The unified workspace rebuilds the affected model after completed actions, with one active request and the newest pending revision. Selection and façade evidence notes do not regenerate geometry. Failed workspace previews retain the draft and offer **Retry model preview**; the underlying map has its separate **Retry 3D preview** control. Selection does not hide enhanced models. Outline drawing, connection work and surveying suppress obstructing detail where needed. Settings and view changes preserve unfinished roof work.
+![Landscape editing with a visible model and scrollable properties](docs/assets/screenshots/editor-model-landscape-2026-09-25.png)
 
-Reference and roof batches require review; photographic support and inferred details are distinguished. They do not add unsupported paths, furniture or surveyed-height claims. [Building editor](docs/BUILDING-EDITOR.md) · [Roof plans](docs/BUILDING-ROOFS.md) · [Reference research](docs/BUILDING-REFERENCE-RESEARCH.md).
+Select the building row and **Appearance → Building height** to edit whole-building metres or recorded floor counts. Floor-count mode uses a labelled 3 m-per-floor estimate. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Missing values remain recoverable input rather than invented dimensions.
+
+Completed gestures and field edits create undoable commands. Autosave, validation, recovery and review use the existing workspace. Invalid candidates do not replace valid saved geometry. **Back to Survey** leaves the desktop workspace; the phone **×** control retains unfinished work. A model save does not publish the campus.
+
+[Complete model controls and recovery](docs/UNIFIED-MODEL-EDITOR.md) · [Roofs and geometry](docs/BUILDING-ROOFS.md) · [Evidence and texture coverage](docs/PHOTO-MODELS.md) · [Verification](docs/MODEL-EDITOR-VERIFICATION.md).
 
 ## Review and publication
+
+![Release review identifies unresolved model assignments before publication](docs/assets/screenshots/editor-releases-current-2026-09-25.png)
 
 **Saving a draft and deploying application code do not publish campus changes.**
 
@@ -297,6 +299,8 @@ Job status refreshes while its review panel is open. Publication and job submiss
 For campus enrichment, install `scripts/requirements-data.txt` in an isolated Python environment and run `python scripts/enrich_campus.py` from the repository root. It produces a review candidate, source receipts, coverage ledger and transportation comparison using OSM, permitted LASU ArcGIS data and bounded Overture extracts. Streets, restaurant/business details, multilingual aliases and addresses are searchable offline. See [enrichment and review](docs/ENRICHMENT.md). `node scripts/package.mjs` builds the seed package for development. Neither replaces the reviewed production release workflow.
 
 ## Walking surveys
+
+![Survey workspace with recording and review controls](docs/assets/screenshots/editor-survey-current-2026-09-25.png)
 
 On an owner phone session, choose **Survey** and prepare it online before a field visit. The workflow is **record → mark entrances → finish → adjust/connect → save survey → apply to map draft**.
 
@@ -330,9 +334,11 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 ## Map data and coverage
 
+![Source review and baseline information in the owner editor](docs/assets/screenshots/editor-sources-current-2026-09-25.png)
+
 TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The repository seed is **`lasu-b487503395f2`**. The reviewed public release verified on **24 September 2026** is **`lasu-313d8a168635`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 18,880,327 bytes**. It adds the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The repository seed is **`lasu-b487503395f2`**. The reviewed public release verified on **24 September 2026** is **`lasu-623791e1184e`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 18,880,327 bytes**. It adds the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -359,6 +365,7 @@ The roof assessment covered 380 footprints and proposed 46 wing roofs across 44 
 | UI | React 19, TypeScript, Vite 8, Tailwind CSS 4, shadcn/Base UI |
 | Map and geometry | MapLibre GL JS 6; packaged GeoJSON, Terra Draw and explicit graph connections |
 | Architecture rendering | Three.js in the shared WebGL context; sector loading, material caching, detail levels and fallback |
+| Model workspace | One mounted Three.js scene; perspective Orbit and orthographic surface views; shared gestures, selection, tree and undo commands |
 | Building generation | Shared worker/release mesh rules; Delaunator with Constrainautor for custom roofs |
 | Routing | Dedicated worker, A* and bounded alternatives |
 | Offline | Workbox, `vite-plugin-pwa`, IndexedDB and CacheStorage |
@@ -417,10 +424,12 @@ npm run test:survey-pwa
 
 `lint` includes client/server TypeScript checks. The production build includes the PWA and existing visual budgets: **300 KiB gzip for the lazy renderer and model workspace**, **12 MiB for campus geometry and textures**, **8 MiB for globe assets**, and **8 MiB for natural voice**. Separate startup budgets cover public, owner and photo-management code. `check:configured-build` repeats these checks with dummy authentication configuration to retain the production auth dependencies; its output is a measurement fixture and must not be deployed. The build verifies lazy editor/world/voice precache inclusion and voice recording hashes. The WebKit and PWA scripts retain their historical survey names but also cover editor/building workflows. Run browser projects sequentially on machines using software WebGL.
 
-Focused camera and panel regressions:
+Focused model, camera and panel regressions:
 
 ```sh
-npx vitest run tests/editor-camera.test.ts tests/public-panel.test.ts tests/world-map.test.ts tests/globe-models.test.ts
+npx vitest run tests/model-surface.test.ts tests/editor-camera.test.ts tests/public-panel.test.ts tests/world-map.test.ts tests/globe-models.test.ts
+npx playwright test --grep "surface workspace|model workspace touch layouts|landscape model has reachable"
+npx playwright test --config playwright.webkit.config.ts --grep "model workspace touch layouts|landscape model has reachable"
 ```
 
 For the current UI acceptance checks, use the in-app browser with a production preview: open and resize desktop panels, scroll their pinned controls, check mobile card heights, select a long editor path in 2D/3D, and install a locally staged service-worker update. For the globe, also check both themes, 2D/3D, world rotation, polar/date-line views, return-to-campus framing and resuming location following. Download first, stop the preview server, then reload and inspect country labels offline. A development server alone does not exercise PWA updates.
@@ -444,6 +453,9 @@ TurnRight/
 ├── web/
 │   ├── src/                 # Public UI, editor, map, buildings, routing and storage
 │   │   ├── AppearanceSettings.tsx # Shared public/editor theme control
+│   │   ├── PhotoModelWorkspace.tsx # Shared model editor and responsive panels
+│   │   ├── ModelStructureTree.tsx # Accessible model hierarchy
+│   │   ├── model-surface.tsx # Shared surface gesture/projection bridge
 │   │   ├── campus-model-layer.ts # Enhanced rendering and model lifecycle
 │   │   └── sw.ts            # Application service worker
 │   ├── api/                 # Vercel admin and report endpoints
@@ -466,7 +478,7 @@ TurnRight/
 | Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
 | Mapped-approach text is pale on a white popup in Dark mode | Install the available **app update** from the notice or Settings. Popup text and surfaces now follow the active theme; no campus-data update is required for this display fix. |
 | Editor stays in the wrong theme | Use **Editor Settings → Appearance → Light/Dark**, or **Device** to resume automatic changes. |
-| Height changes but a wing stays short | Check its explicit height/floor override and custom roof elevations in **Height & floors**. Enable roof adjustment or explicitly fit the inherited roofs; review affected details. |
+| Height changes but a wing stays short | Check its explicit height/floor override and custom roof elevations in **Edit model → Appearance → Building height**. Enable roof adjustment or explicitly fit the inherited roofs; review affected details. |
 | A roof preview is outdated | Use **Retry 3D preview** and inspect geometry/elevation errors. The last valid model and unfinished roof are retained. |
 | A long selected path extends off-screen on a phone | This preserves local map detail by limiting zoom-out. Pan along the highlighted path or use the zoom-out control to see more. |
 | Paths connect where they should stay separate | Turn off automatic crossings for that path or set the correct bridge/tunnel level. Use explicit joins for the connections you do want, then review and publish. |

@@ -34,7 +34,7 @@ Reference credit: LASU Admission facebook account · [Public domain](https://www
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** One linked image shows the campus gate and is excluded from model evidence. Low-resolution overlay photograph is not a texture source. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** One linked image shows the campus gate and is excluded from model evidence. Low-resolution overlay photograph is not a texture source. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### LASU International Library
 
@@ -50,7 +50,7 @@ Reference credit: FrankvEck · [CC BY-SA 4.0](https://creativecommons.org/licens
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Interior view does not locate the atrium roof in map coordinates. Preserve the mapped courtyard and owner roof. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Interior view does not locate the atrium roof in map coordinates. Preserve the mapped courtyard and owner roof. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Mass Communication
 
@@ -66,7 +66,7 @@ Reference credit: Abiolakintrunde · [CC BY-SA 4.0](https://creativecommons.org/
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Flat parapet visible. Air-conditioning units are omitted. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Flat parapet visible. Air-conditioning units are omitted. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Faculty of Art Language Lab
 
@@ -82,7 +82,7 @@ Reference credit: The Intellectual · [Public domain](https://theintellectualmag
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Trees obscure the end façade. Preserve owner outline and custom roof; do not infer circular footprint from perspective. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Trees obscure the end façade. Preserve owner outline and custom roof; do not infer circular footprint from perspective. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Makanjuola Lecture Theatre
 
@@ -98,7 +98,7 @@ Reference credit: Photo © PWDC · [Public domain](https://www.world-architects.
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Screen pattern is irregular: regularized model openings remain estimates. Existing owner roof retained pending review. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Screen pattern is irregular: regularized model openings remain estimates. Existing owner roof retained pending review. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### ICT
 
@@ -114,7 +114,7 @@ Reference credit: Ajokeoba · [CC BY-SA 4.0](https://creativecommons.org/license
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Fence and trees obstruct the façade. No whole-wall photographic texture is safe. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Fence and trees obstruct the façade. No whole-wall photographic texture is safe. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Student Arcade
 
@@ -130,7 +130,7 @@ Reference credit: Shedyflowz · [CC BY-SA 4.0](https://creativecommons.org/licen
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Wall orientation and relief-panel motifs need owner matching. Preserve existing solid walls. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Wall orientation and relief-panel motifs need owner matching. Preserve existing solid walls. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### SDG-PHC FACILITY
 
@@ -146,7 +146,7 @@ Reference credit: LASU · [Public domain](https://csc.lasu.edu.ng/lasu_library/)
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Strong colour grading in one image is unsuitable for texture/material sampling. External ramp does not establish routing permission. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Strong colour grading in one image is unsuitable for texture/material sampling. External ramp does not establish routing permission. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### FMS
 
@@ -162,7 +162,7 @@ Reference credit: LASU · [Public domain](https://lasu.edu.ng/home/lasuss/) · [
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Previously illustrative height can use three observed floors at an estimated 3 m per floor. Exact front-wall location remains unconfirmed. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Previously illustrative height can use three observed floors at an estimated 3 m per floor. Exact front-wall location remains unconfirmed. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### PG School
 
@@ -178,7 +178,7 @@ Reference credit: Official alade · [CC BY-SA 4.0](https://creativecommons.org/l
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Tower silhouette cannot be assigned confidently to the footprint from this view. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Tower silhouette cannot be assigned confidently to the footprint from this view. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Department of Theartre Arts and Music
 
@@ -194,7 +194,7 @@ Reference credit: Official alade · [CC BY-SA 4.0](https://creativecommons.org/l
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Trees obscure some openings. Wall position needs matching. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Trees obscure some openings. Wall position needs matching. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Faculty Of Education 3 In 1
 
@@ -210,7 +210,7 @@ Reference credit: Official alade · [CC BY-SA 4.0](https://creativecommons.org/l
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Existing custom roof retained. Photographs do not resolve all courtyard roof ridges. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Existing custom roof retained. Photographs do not resolve all courtyard roof ridges. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### LASU Radio
 
@@ -226,7 +226,7 @@ Reference credit: Justjin · [CC BY-SA 4.0](https://creativecommons.org/licenses
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Mast is separate from the building. Concealed levels and side windows remain unknown. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Mast is separate from the building. Concealed levels and side windows remain unknown. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### LASU CBT
 
@@ -242,7 +242,7 @@ Reference credit: LASU Ventures limited · [Public domain](https://www.google.co
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Interior photograph cannot establish exterior floor count. Retain existing roof and height pending survey; do not texture with the approach or interior. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Interior photograph cannot establish exterior floor count. Retain existing roof and height pending survey; do not texture with the approach or interior. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### M.B.A
 
@@ -258,7 +258,7 @@ Reference credit: Abiolakintrunde · [CC BY-SA 4.0](https://creativecommons.org/
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Trees obscure the upper façade and roof. Courtyard structure is not a surveyed footprint. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Trees obscure the upper façade and roof. Courtyard structure is not a surveyed footprint. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Law Library
 
@@ -274,7 +274,7 @@ Reference credit: Official alade · [CC BY-SA 4.0](https://creativecommons.org/l
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Exact pilaster spacing and façade orientation require matching. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Exact pilaster spacing and façade orientation require matching. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### Law Clinic
 
@@ -290,7 +290,7 @@ Reference credit: The Nation · [Public domain](https://thenationonlineng.net/do
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** New-looking dark-clad view has no capture date; material chronology unresolved. Preserve owner cream finish and custom roof. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** New-looking dark-clad view has no capture date; material chronology unresolved. Preserve owner cream finish and custom roof. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### School Of TransportC
 
@@ -306,7 +306,7 @@ Reference credit: LASU · [Public domain](https://lasu.edu.ng/home/faculties/) �
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Aerial image supports roof form, not surveyed ridge elevations. Owner roof retained. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Aerial image supports roof form, not surveyed ridge elevations. Owner roof retained. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ### LASU Senate Building
 
@@ -322,7 +322,7 @@ Reference credit: Aimee.shot.it · [CC BY-SA 4.0](https://creativecommons.org/li
 
 **Estimated:** Window-frame relief and regularized opening proportions are illustrative. Unseen elevations and exact dimensions are unknown.
 
-**Remaining:** Different dated views show finish changes. Exact front-wall orientation and diamond placement need review. Match photographic elevation to stable wall IDs in Photo & model before using wall-specific features or textures.
+**Remaining:** Different dated views show finish changes. Exact front-wall orientation and diamond placement need review. Match photographic elevation to stable wall IDs in Edit model before using wall-specific features or textures.
 
 ## All 39 image decisions
 

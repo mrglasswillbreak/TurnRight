@@ -38,3 +38,18 @@ open. A completed tap must open the place details and blue map pin using the
 release event. Dragging across a result must leave Search results open. The
 result-tap unit tests cover cancelled gestures, long presses, multiple
 fingers, duplicate clicks, mouse use and keyboard/screen-reader activation.
+
+## Unified model workspace and documentation captures
+
+The browser suite in `../browser/editor.spec.ts` supplies isolated owner, draft,
+publication and media responses. Its model fixture covers shared 3D/2D commands,
+wall and roof lettering, nested structure selection, grouping, recovery and
+WebGL fallback. `model workspace touch layouts` simulates viewport rotation and
+a reduced visual viewport while retaining an unfinished numeric field.
+
+`playwright.docs.config.ts` builds the current application and combines isolated
+owner responses with a verified copy of the published campus. Gallery edits stay
+inside the test and never write production drafts. Follow the
+[screenshot inventory](../../../docs/assets/screenshots/README.md) for capture
+commands and provenance. These fixtures do not constitute real keyboard, GPS,
+physical-phone or screen-reader acceptance.

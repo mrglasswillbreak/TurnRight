@@ -5,6 +5,18 @@
 Use [MODEL-EDITOR-VERIFICATION.md](MODEL-EDITOR-VERIFICATION.md) for the unified workspace's checks, measured performance, responsive captures and remaining hardware gaps. Its completed-command autosave replaces the old one-shot façade Apply workflow. Building review stays targeted and architectural work never grants navigation permissions. The dated records below are historical evidence, not current suite totals or proof of physical-device acceptance.
 
 
+Current model acceptance includes one Edit model entry, keyboard/search tree
+navigation, shared canvas identity, Orbit camera restoration, aligned wall/roof/
+footprint edits, wall and roof text, grouping/detachment, invalid input recovery,
+undo/reopening and WebGL fallback. Responsive checks cover the requested desktop
+CSS viewport sizes (including the effective sizes at 125%/150% zoom), phone and
+tablet landscape, portrait, panel collapse, and simulated keyboard resizing.
+Browser zoom uses equivalent CSS dimensions rather than browser chrome controls.
+Native keyboards, physical rotation and assistive-technology acceptance remain
+manual device checks. Screenshots document the rendered states, not completion
+of those hardware checks.
+
+
 ## Evidence from implementation
 
 Production was published on 9 September 2026 at the owner's explicit request.

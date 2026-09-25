@@ -14,7 +14,7 @@ No image in this snapshot has an established camera bearing tied to a specific m
 
 ## Owner workflow
 
-Select a building and open **Photo & model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. Mobile offers **Wall**, **3D** and **Photo** views. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
+Select a building and open **Edit model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. Mobile offers **Wall**, **3D** and **Photo** views. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
 
 1. Choose a mapped wall and photograph. Confirm their correspondence and check historical labels and credits. A general building photograph does not prove every elevation.
 2. Add windows, doors, columns, balconies, canopies, parapets or trim directly in metres; generated details are preserved in the same action. Conversion can also be previewed first. Dimensions and unseen sides remain estimates unless supported by measurements. Appearance (including whole-building height), roof and outline controls are modes in this same workspace.
@@ -23,7 +23,7 @@ Select a building and open **Photo & model**. Desktop combines a measured wall c
 
 Moving a footprint or moving/replacing a source photograph flags affected evidence. Removed wall assignments retain their recipes: rematch them explicitly or reset the details. Release validation blocks stale assignments. Caption and ordering changes preserve review.
 
-Sources contains **Photo & model evidence · 19 buildings**. Review observations and gaps, exclude proposals as needed, and apply supported proposals as one undoable batch. Source-photo identity and SHA-256 must match; changed evidence is withheld. Proposals fill missing settings and preserve owner overrides.
+Sources contains **Edit model evidence · 19 buildings**. Review observations and gaps, exclude proposals as needed, and apply supported proposals as one undoable batch. Source-photo identity and SHA-256 must match; changed evidence is withheld. Proposals fill missing settings and preserve owner overrides.
 
 ## Globe sources
 

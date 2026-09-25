@@ -17,6 +17,16 @@ Map sources separate campus geometry, places, closures, routes, endpoint labels 
 
 `duplicates.ts` reviews repeated names, nearby similar names and overlapping footprints. Only exact geometry/attributes with equivalent connections and associations qualify for automatic consolidation when duplicate review opens. Decisions use existing transactional map edits. `mergedInto` tombstones produce optional schema-1 `placeIdAliases` and `buildingIdAliases`; associations are retargeted, and saved/recent IDs resolve through aliases. `duplicateKeepSeparate` decisions survive source refreshes. Decision-only records do not override refreshed source geometry. Names alone never authorize merging. Undo uses the existing source-reversion receipts.
 
+### Shared viewport and surface text
+
+`model-tree.ts` derives structure and group/pattern references from existing identities. `ModelStructureTree` manages expansion, search and roving keyboard focus separately from the workspace selection. No stored storey hierarchy is introduced.
+
+`model-surface.tsx` connects the existing wall, roof and outline gesture controllers to both precision SVGs and aligned 3D editing. The same SVG screen transform used for inverse pointer mapping positions the orthographic camera through `model-surface-frame.ts`. `PhotoModelPreview` keeps its scene, canvas, renderer and orbit camera mounted, uses a stable geographic origin during geometry changes, and sizes the renderer from its container. Rotation/resize cancels incomplete gestures while committed edits and recovered field input remain intact.
+
+Surface text adds optional facade text properties and per-wing roof label records to existing appearance JSON. `surface-text.ts` validates bounded plain text and placement; the roof mesh clips labels to actual roof triangles across ridges/valleys. Local canvas glyphs feed the existing bounded texture pool, are regenerated when fonts become available and are disposed with their material owners. There are no new image uploads, API endpoints or database migrations. Public visibility follows the existing reviewed map release process.
+
+The entry-aware Lucide chunk group keeps icons shared by the workspace and owner UI from creating a dependency on the authentication entry. Existing public startup, owner editor, 3D, world and voice budgets remain enforced.
+
 ## Public device flow
 
 `App.tsx` coordinates Explore → Place details → Route preview → Navigation. Adjustable bottom panels retain pinned controls on desktop and mobile. Search reuses a normalized index of names, aliases, streets, categories, subtypes and addresses. Preferences, recent place selections, saved places and private report drafts live in IndexedDB. GPS is requested for explicit current-location use or navigation, never sent to a server. Foreground visibility controls GPS watching; screen wake lock is best effort.
