@@ -106,6 +106,8 @@ These **26 distinct screenshots** cover the public app, desktop editor and every
 
 Application deployment leaves the published campus unchanged. New photos, models, permissions and routing changes use the owner preview, publication and rollback workflow.
 
+Release review now names each pending building/wall approval before a preview is queued. **Review model** opens that assignment; **Restore published building** previews an undoable restoration of one building correction when its current draft should be discarded.
+
 ## Features
 
 | Area | Current behavior |

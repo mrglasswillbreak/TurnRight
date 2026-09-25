@@ -90,6 +90,8 @@ An already-prepared owner workspace can open from its cache after a network fail
 
 Façade approval is checked before **Build review preview** becomes available. Pending reviews name their building, wing and wall and provide **Review model** to open the exact assignment. A height or roof change can require placement review even with an unchanged footprint. Inspect the retained detail dimensions and evidence, then mark only the selected wall reviewed. Moved or reassigned walls also require confirmation of the wall match. These checks do not block ordinary draft saving. The server and release worker independently enforce the same review gate.
 
+To undo a building correction made since publication, use **Restore published building** in its inspector. Review the proposed repair and apply it; Undo restores the draft. This restores that building's saved correction from the matching published release and leaves other features alone. The action is unavailable when that release snapshot is missing or out of date.
+
 Validation issues identify their feature and offer **Choose entrance’s place**, **Connect to path**, or **Review blocked segment** where applicable. The control selects the feature and opens its relevant properties. Connection changes, guided geometry repairs and building-wing corrections show a red current / green proposed comparison before **Apply reviewed repair**. Cancel retains the current draft. Finish or cancel an active drawing before entering repair review.
 
 Source review shows changed property rows and before/after map geometry. Raw source records remain available under Details. Source and release jobs refresh while the review panel is visible; polling does not save edits or refresh geometry beneath an active drawing.

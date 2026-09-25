@@ -64,6 +64,8 @@ The Releases panel checks façade reviews before enabling **Build review preview
 
 Older failed releases keep their original error records. After repairing the current draft, build a new immutable preview rather than trying to publish a failed or stale one.
 
+If the building change itself should be undone, close the workspace and choose **Restore published building** in its inspector. The proposed repair is reviewed before application and can be undone. It restores only that building's saved correction from the current published release; other features and private unfinished inputs remain available.
+
 The screenshots below use an isolated Library test fixture with two pending wall reviews; no private owner draft is shown.
 
 | Desktop release review | Mobile release review |
