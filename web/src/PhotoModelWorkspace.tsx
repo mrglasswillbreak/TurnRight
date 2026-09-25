@@ -162,6 +162,7 @@ function ModelWorkspace({
 }: WorkspaceProps) {
   const compact = useCompactModel();
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(initialMode === 'review');
   const actionFocus = useRef<string | null>(null);
   const contextReturn = useRef<HTMLElement | null>(null);
   const [contextPoint, setContextPoint] = useState<{
@@ -1036,6 +1037,15 @@ function ModelWorkspace({
                 {state}
                 {workspace?.error ? ` · ${workspace.error}` : ''}
               </output>
+              {compact && (
+                <button
+                  className="model-close-workspace"
+                  aria-label="Close workspace"
+                  onClick={onClose}
+                >
+                  <span aria-hidden="true">×</span> Close
+                </button>
+              )}
             </header>
             {compact && (
               <div className="model-mobile-navigation">
@@ -1087,9 +1097,6 @@ function ModelWorkspace({
                   }}
                 >
                   ↷
-                </button>
-                <button aria-label="Close workspace" onClick={onClose}>
-                  ×
                 </button>
               </div>
             )}
@@ -1476,6 +1483,12 @@ function ModelWorkspace({
                           Saving preserves your draft. Only walls explicitly
                           reviewed receive approval.
                         </p>
+                        <p>
+                          Editing details clears that wall’s previous review.
+                          “Needs review” does not by itself mean the model is
+                          broken. Inspect its placement and evidence, then mark
+                          that wall reviewed to enable a release preview.
+                        </p>
                         {publishErrors.map((e, i) => (
                           <button
                             key={i}
@@ -1502,7 +1515,11 @@ function ModelWorkspace({
                                   ? 'appearance'
                                   : 'details',
                               );
-                              if (!/height|floor/i.test(e)) openPanel('more');
+                              if (!/height|floor/i.test(e)) {
+                                setReviewOpen(true);
+                                openPanel('more');
+                                setDetent('full');
+                              }
                             }}
                           >
                             {e}
@@ -1580,7 +1597,9 @@ function ModelWorkspace({
                                 onClick={() => {
                                   choose(w?.wallId || activeWall);
                                   setMode('details');
+                                  setReviewOpen(true);
                                   openPanel('more');
+                                  setDetent('full');
                                   setTab('wall');
                                 }}
                               >
@@ -2120,8 +2139,19 @@ function ModelWorkspace({
                       )}
                     </details>
                     {facade && (
-                      <details open={!!facade.needsReview}>
+                      <details
+                        className="model-wall-review"
+                        open={reviewOpen || !!facade.needsReview}
+                        onToggle={(e) => setReviewOpen(e.currentTarget.open)}
+                      >
                         <summary>Evidence &amp; wall review</summary>
+                        <p>
+                          {facade.reviewedAt &&
+                          !facade.needsReview &&
+                          facadeMatches(facade, feature)
+                            ? 'This wall is reviewed. Another detail edit will require a fresh review.'
+                            : 'Review required before preview. Check this wall’s placement and evidence, then mark only this wall reviewed.'}
+                        </p>
                         <label>
                           Evidence confidence
                           <select
@@ -2322,7 +2352,7 @@ function ModelWorkspace({
                   </div>
                 )}
                 {error && (
-                  <div role="alert">
+                  <div role="alert" className="model-mobile-alert">
                     <button
                       className="model-mobile-error"
                       onClick={() => switchMode('review')}
@@ -2341,7 +2371,9 @@ function ModelWorkspace({
                   {touchTool === 'multi'
                     ? 'Multi-select'
                     : touchTool === 'select'
-                      ? 'Tap to select'
+                      ? tab === '3d'
+                        ? 'Tap to select · hold a detail for actions'
+                        : 'Tap to select'
                       : touchTool === 'move'
                         ? 'Move enabled'
                         : 'Resize enabled'}

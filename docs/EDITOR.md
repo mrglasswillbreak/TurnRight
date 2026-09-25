@@ -66,7 +66,7 @@ Decisions autosave through the existing batch API. Keep-separate decisions do no
 
 Topology and duplicate checks run in a worker. Geometry and property feedback remain immediate, and route previews wait for the current validation result. Repeated issue rows are grouped by feature identity, with all reasons shown together.
 
-The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
+The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. The building model workspace provides all five modes on phones, with a visible **× Close** in the header and **Done** for closing only the active tool sheet. Short landscape screens keep the canvas beside a scrollable tools panel. Tap a 3D detail to select it or hold it for its action menu; an orbit drag or second touch cancels the pending hold. See [the model editor guide](UNIFIED-MODEL-EDITOR.md). Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
 
 ## Saving and recovery
 
@@ -88,7 +88,7 @@ An already-prepared owner workspace can open from its cache after a network fail
 
 ## Repair and release review
 
-Façade approval is checked before **Build review preview** becomes available. Pending reviews name their building, wing and wall and provide **Review model** to open the exact assignment. A height or roof change can require placement review even with an unchanged footprint. Inspect the retained detail dimensions and evidence, then mark only the selected wall reviewed. Moved or reassigned walls also require confirmation of the wall match. These checks do not block ordinary draft saving. The server and release worker independently enforce the same review gate.
+Façade approval is checked before **Build review preview** becomes available. Pending reviews name their building, wing and wall and provide **Review model** to open the exact assignment. Editing details clears that wall's previous review; a height or roof change can also require placement review even with an unchanged footprint. A visually normal model may therefore need review without needing geometry repair. **Inspect details and evidence** expands the affected wall's review controls. Inspect the retained dimensions and evidence, then mark only that wall reviewed. Moved or reassigned walls also require confirmation of the wall match. These checks do not block ordinary draft saving. The server and release worker independently enforce the same review gate.
 
 To undo a building correction made since publication, use **Restore published building** in its inspector. Review the proposed repair and apply it; Undo restores the draft. This restores that building's saved correction from the matching published release and leaves other features alone. The action is unavailable when that release snapshot is missing or out of date.
 

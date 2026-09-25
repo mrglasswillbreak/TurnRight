@@ -8,7 +8,9 @@ Use the searchable building hierarchy or the mapped-wall selector to choose a wi
 
 Desktop panels can be resized. At widths up to 900 px, and on touch devices in short landscape viewports, the workspace gives the canvas the remaining screen. A labelled mode selector keeps Details, Appearance, Roof, Outline and Review reachable. Switch between **Wall / 3D / Photo**, or **Plan / 3D / Photo** for roofs and outlines. Appearance initially opens 3D. Changing layouts keeps the draft and selection.
 
-**Choose wall** opens the searchable hierarchy. **Add**, **Edit** and **More** open one focused sheet at a time. Expand or collapse it with its labelled controls or drag its handle; **Done** returns to the canvas. The preview contracts above the sheet, and focused fields expand the sheet and scroll into view. Undo, Redo, Close and the save status remain in the header. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
+**Choose wall** opens the searchable hierarchy. **Add**, **Edit** and **More** open one focused sheet at a time. Expand or collapse it with its labelled controls or drag its handle; **Done** closes the tools. The clearly labelled **× Close** button in the top header leaves the whole workspace and preserves unfinished inputs. Portrait tools sit below the preview; short landscape screens put a scrollable tool panel beside it. Focused fields expand the panel and scroll into view. Undo, Redo, mode selection and save status stay reachable. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
+
+In **3D**, touch and hold a visible detail for about half a second to select it and open its action menu. Duplicate, copy, delete, lock and hide apply to that selected detail or repeated record. Dragging or adding a second finger cancels the hold and keeps orbit/pinch navigation available. Releasing a completed hold does not select again. Right-click and keyboard selection actions remain available.
 
 ## Place and repeat details
 
@@ -40,6 +42,8 @@ The **Height & floors** shortcut opens these controls directly. Floor-count mode
 
 Roof and Outline use a central geographic plan on mobile; their coordinates and options stay in the focused sheet. Tap a point first and choose **Move point** for a gesture. Review lists changes and unresolved assignments, with actions to open the affected wall or height controls. Review the selected wall explicitly. Saving a draft does not approve every wall, and model review does not establish field-surveyed accuracy.
 
+Adding, duplicating or changing details clears that wall's previous review. **Needs review** alone does not mean its geometry is invalid. Open the issue in Review, inspect the expanded **Evidence & wall review** section, then choose **Mark this wall reviewed**. Placement checks still reject details outside the wall; approval remains limited to that wall.
+
 ## Saving, undo and recovery
 
 Completed commands use the editor's shared 100-action undo/redo history, optimistic save identities and conflict handling. Selection, camera movement and panel changes remain outside model history.
@@ -67,6 +71,12 @@ Older failed releases keep their original error records. After repairing the cur
 If the building change itself should be undone, close the workspace and choose **Restore published building** in its inspector. The proposed repair is reviewed before application and can be undone. It restores only that building's saved correction from the current published release; other features and private unfinished inputs remain available.
 
 The screenshots below use an isolated Library test fixture with two pending wall reviews; no private owner draft is shown.
+
+The compact landscape workspace keeps **× Close**, mode selection and undo controls in the header. Tools scroll beside the canvas. The second capture shows the 3D selection menu after a touch hold and release. Both use the isolated Library fixture; its illustrative window is not a published campus change.
+
+| Short landscape canvas and review tools | Touch-held 3D detail actions |
+| --- | --- |
+| ![Landscape canvas beside scrollable wall review controls with a visible Close button](assets/screenshots/editor-model-landscape-2026-09-25.png) | ![A selected 3D window and its touch-held action menu](assets/screenshots/editor-model-3d-hold-2026-09-25.png) |
 
 | Desktop release review | Mobile release review |
 | --- | --- |

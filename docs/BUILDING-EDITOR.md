@@ -6,6 +6,8 @@ On mobile, the canvas fills the workspace and controls open in one focused sheet
 
 The selected detail's **⋯** button and right-click menu hold Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. **More → Selection actions** provides access from mobile sheets. Ctrl/Cmd+D duplicates; Ctrl/Cmd+C/V copies and opens a placement preview; Ctrl/Cmd+A selects the wall's details. Shift+F10 opens the menu. These shortcuts do not replace normal editing inside text inputs.
 
+Touch and hold a visible detail in **3D** to open the same actions. Moving your finger or touching with a second finger cancels the hold. **× Close** in the mobile header exits the workspace; **Done** only closes its current tool panel. Short landscape screens place tools beside the canvas, with independent scrolling.
+
 ## Select and place
 
 Use the searchable hierarchy, mapped-wall list, face-on canvas or selectable 3D preview. Walls show their mapped length and review state; dimensions are measured from the labelled endpoint and model base. Numeric fields use metres at the editing boundary while saved façade coordinates remain compatible with existing renderers.
