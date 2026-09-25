@@ -31,6 +31,7 @@ it('can render immediately after a selected wing or wall is removed by an outlin
         edit,
         data: {} as CampusData,
         mode: 'appearance',
+        embedded: true,
         selection,
         roofDraft: null,
         onMode() {},
