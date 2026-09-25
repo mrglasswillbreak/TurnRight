@@ -76,6 +76,7 @@
   touch-action: none;
 }
 .photo-model-canvas {
+  contain: size layout;
   height: 300px;
   max-height: 38dvh;
   min-height: 150px;
@@ -165,8 +166,17 @@
 }
 
 .model-workspace[data-slot='dialog-content'] {
-  width: min(1600px, calc(100vw - 24px));
-  height: calc(100dvh - 24px);
+  inset: var(--model-viewport-top, 0px) auto auto
+    var(--model-viewport-left, 0px);
+  width: var(--model-viewport-width, 100vw);
+  max-width: none;
+  height: var(--model-viewport-height, 100dvh);
+  max-height: var(--model-viewport-height, 100dvh);
+  border-radius: 0;
+  translate: none;
+  transform: none;
+  --tw-translate-x: 0px;
+  --tw-translate-y: 0px;
   padding: 16px;
   overflow: hidden;
   gap: 10px;
@@ -502,10 +512,11 @@
 
 /* Compact editor: one canvas, one in-dialog tool sheet, no nested modal. */
 .model-compact.model-workspace[data-slot='dialog-content'] {
-  inset: var(--model-viewport-top, 0px) 0 auto;
+  inset: var(--model-viewport-top, 0px) auto auto
+    var(--model-viewport-left, 0px);
   translate: none;
   transform: none;
-  width: 100%;
+  width: var(--model-viewport-width, 100vw);
   max-width: none;
   height: var(--model-viewport-height, 100dvh);
   max-height: var(--model-viewport-height, 100dvh);
@@ -895,82 +906,7 @@
     transition: none !important;
   }
 }
-/* Short landscapes use a side sheet instead of a tiny strip below the canvas. */
-@media (min-width: 600px) and (max-height: 520px) {
-  .model-compact.model-workspace[data-slot='dialog-content'] {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 44%);
-    grid-template-rows: 48px minmax(0, 1fr) 20px 44px;
-    --model-side: min(44%, 380px);
-    --model-side-top: calc(max(6px, env(safe-area-inset-top)) + 54px);
-    --model-bar: calc(76px + env(safe-area-inset-bottom));
-  }
-  .model-compact[data-detent='full'] {
-    --model-side: min(58%, 520px);
-  }
-  .model-compact header {
-    grid-area: 1 / 1;
-  }
-  .model-compact .model-mobile-navigation {
-    grid-area: 1 / 2;
-  }
-  .model-compact .model-layout {
-    grid-area: 2 / 1 / 3 / -1;
-    margin: 0;
-  }
-  .model-compact:not([data-panel='none']) .model-layout {
-    margin-bottom: 0;
-    margin-right: calc(var(--model-side) + 8px);
-  }
-  .model-compact .model-selection-strip {
-    grid-area: 3 / 1 / 4 / -1;
-  }
-  .model-compact .model-bottom-actions {
-    grid-area: 4 / 1 / 5 / -1;
-  }
-  .model-compact
-    :is(
-      .model-hierarchy,
-      .model-inspector,
-      [data-mobile-panel],
-      .model-paste-preview
-    ) {
-    inset: calc(var(--model-side-top) + 48px)
-      max(8px, env(safe-area-inset-right)) var(--model-bar) auto;
-    width: var(--model-side);
-    height: auto;
-    min-height: 0;
-  }
-  .model-compact .model-sheet-heading {
-    inset: var(--model-side-top) max(8px, env(safe-area-inset-right)) auto auto;
-    width: var(--model-side);
-  }
-  .model-compact .model-wall-view > .model-toolbar,
-  .model-compact .model-wall-view > output,
-  .model-compact .photo-model-preview > output {
-    display: none;
-  }
-  .model-compact .photo-model-view-buttons {
-    flex-wrap: nowrap;
-    overflow: auto;
-    gap: 4px;
-  }
-  .model-compact .photo-model-view-buttons button {
-    flex-shrink: 0;
-  }
-  .model-compact .model-photo-scroll {
-    height: 100%;
-    min-height: 100px;
-  }
-  .model-compact .model-mobile-alert {
-    position: absolute;
-    z-index: 7;
-    bottom: var(--model-bar);
-    left: 8px;
-    max-width: calc(100% - var(--model-side) - 24px);
-    background: var(--background);
-  }
-}
+
 .model-wall-view {
   position: relative;
 }
@@ -1031,4 +967,325 @@
 }
 .model-compact:not([data-panel='none']) .model-item-actions {
   display: none;
+}
+
+/* A dedicated workspace: one drawing surface and independently scrolling docks. */
+.model-desktop.model-workspace[data-slot='dialog-content'] {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  gap: 0;
+}
+.model-desktop > header {
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.model-desktop > header > div {
+  flex: 1;
+  min-width: 0;
+}
+.model-desktop > header output {
+  max-height: 44px;
+  overflow: auto;
+}
+.model-desktop > header [data-slot='dialog-title'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+}
+.model-desktop > header [data-slot='dialog-description'] {
+  margin-top: 6px;
+  font-size: 12px;
+}
+.model-desktop .model-back {
+  flex-shrink: 0;
+  background: transparent;
+}
+.model-desktop label:has(> input[type='checkbox']) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.model-desktop input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex-shrink: 0;
+  padding: 0;
+}
+.model-desktop .model-main-toolbar {
+  flex-wrap: nowrap;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--soft);
+}
+.model-desktop .model-main-toolbar nav {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+}
+.model-desktop .model-main-toolbar button {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.model-desktop .model-layout {
+  grid-template-columns: 220px minmax(0, 1fr) 310px;
+  gap: 0;
+  overflow: hidden;
+}
+.model-desktop[data-structure='closed'] .model-layout {
+  grid-template-columns: minmax(0, 1fr) 310px;
+}
+.model-desktop[data-structure='closed'] .model-hierarchy {
+  display: none;
+}
+.model-desktop :is(.model-hierarchy, .model-inspector) {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  resize: none;
+  border: 0;
+  border-radius: 0;
+  padding: 12px;
+  overscroll-behavior: contain;
+}
+.model-desktop .model-hierarchy {
+  border-right: 1px solid var(--border);
+}
+.model-desktop .model-inspector {
+  border-left: 1px solid var(--border);
+}
+.model-panel-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.model-property-target {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.model-property-target p {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.model-desktop .model-hierarchy button:not([aria-pressed='true']) {
+  background: transparent;
+}
+.model-desktop .model-hierarchy button:hover {
+  border-color: var(--primary);
+}
+.model-desktop .model-stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+  background: var(--soft);
+  gap: 8px;
+  scrollbar-gutter: auto;
+}
+.model-desktop .model-wall-picker {
+  font-size: 12px;
+}
+.model-desktop .model-mobile-tabs {
+  display: flex;
+  flex-shrink: 0;
+  margin: 0;
+}
+.model-desktop .model-mobile-tabs button {
+  min-width: 72px;
+}
+.model-desktop .model-view-columns {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  gap: 8px;
+}
+.model-desktop :is(.model-edit-view, .model-3d-view, .model-photo-view) {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+.model-desktop .model-edit-view {
+  display: flex;
+  flex-direction: column;
+}
+.model-desktop .model-tab-wall :is(.model-3d-view, .model-photo-view),
+.model-desktop .model-tab-3d :is(.model-edit-view, .model-photo-view),
+.model-desktop .model-tab-photo :is(.model-edit-view, .model-3d-view) {
+  display: none;
+}
+.model-desktop .model-plan-host:not([hidden]),
+.model-desktop .model-plan-navigation,
+.model-desktop .model-wall-view,
+.model-desktop .photo-model-preview {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  gap: 6px;
+}
+.model-desktop .model-plan-host:not([hidden]) ~ .model-edit-view {
+  display: none;
+}
+.model-desktop .model-plan-host[hidden] {
+  display: none;
+}
+.model-desktop
+  :is(
+    .model-wall-canvas,
+    .model-outline-canvas,
+    .roof-canvas,
+    .photo-model-canvas
+  ) {
+  flex: 1;
+  min-height: 100px;
+  height: 100%;
+  max-height: none;
+}
+.model-desktop .model-wall-view > :not(svg),
+.model-desktop .photo-model-preview > :not(.photo-model-canvas) {
+  flex-shrink: 0;
+}
+.model-desktop .model-photo-scroll {
+  max-height: none;
+}
+.model-desktop .model-add-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.model-desktop > footer {
+  padding: 6px 16px;
+  min-height: 38px;
+}
+.model-desktop > footer > button:last-child {
+  display: none;
+}
+.model-desktop[data-mode='outline'] .model-wall-picker,
+.model-desktop[data-mode='review'] .model-wall-picker,
+.model-desktop[data-mode='appearance'] .model-wall-picker {
+  display: none;
+}
+@media (max-width: 1199px) {
+  .model-desktop .model-layout {
+    grid-template-columns: 180px minmax(0, 1fr) 280px;
+  }
+  .model-desktop[data-structure='closed'] .model-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+/* Mode forms share the inspector on desktop and the existing sheet on portrait. */
+.model-compact:not([data-mode='details']) .model-inspector {
+  display: contents;
+}
+.model-compact .model-property-target,
+.model-compact .model-panel-title,
+.model-compact .model-building-target,
+.model-compact:not([data-mode='details']) .model-inspector > p {
+  display: none;
+}
+
+/* Landscape uses the same forms, alongside the canvas, at every touch size. */
+.model-landscape.model-workspace[data-slot='dialog-content'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) min(40%, 320px);
+  grid-template-rows: 48px minmax(0, 1fr) 20px 44px;
+  --model-side: min(40%, 320px);
+  --model-side-top: calc(max(6px, env(safe-area-inset-top)) + 53px);
+  --model-bar: calc(76px + env(safe-area-inset-bottom));
+}
+.model-landscape header {
+  grid-area: 1 / 1;
+}
+.model-landscape .model-mobile-navigation {
+  grid-area: 1 / 2;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) repeat(3, 44px);
+}
+.model-landscape .model-layout {
+  grid-area: 2 / 1 / 3 / -1;
+  margin: 0;
+}
+.model-landscape:not([data-panel='none']) .model-layout {
+  margin-bottom: 0;
+  margin-right: calc(var(--model-side) + 8px);
+}
+.model-landscape .model-selection-strip {
+  grid-area: 3 / 1 / 4 / -1;
+}
+.model-landscape .model-bottom-actions {
+  grid-area: 4 / 1 / 5 / -1;
+}
+.model-landscape
+  :is(
+    .model-hierarchy,
+    .model-inspector,
+    [data-mobile-panel],
+    .model-paste-preview
+  ) {
+  inset: calc(var(--model-side-top) + 48px) max(8px, env(safe-area-inset-right))
+    var(--model-bar) auto;
+  width: var(--model-side);
+  height: auto;
+  min-height: 0;
+}
+.model-landscape .model-sheet-heading {
+  inset: var(--model-side-top) max(8px, env(safe-area-inset-right)) auto auto;
+  width: var(--model-side);
+  padding: 2px;
+}
+.model-landscape .model-sheet-handle {
+  display: none;
+}
+.model-panel-tabs {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.model-landscape .model-sheet-heading button {
+  padding: 4px;
+  font-size: 12px;
+}
+.model-panel-tabs button {
+  flex: 1;
+  min-width: 0;
+}
+.model-landscape .model-wall-view > .model-toolbar,
+.model-landscape .model-wall-view > output,
+.model-landscape .photo-model-preview > output {
+  display: none;
+}
+.model-landscape .photo-model-view-buttons {
+  flex-wrap: nowrap;
+  overflow: auto;
+  gap: 4px;
+}
+.model-landscape .photo-model-view-buttons button {
+  flex-shrink: 0;
+}
+.model-landscape .model-photo-scroll {
+  height: 100%;
+  min-height: 100px;
+}
+.model-landscape .model-properties-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.model-landscape .model-mobile-alert {
+  position: absolute;
+  z-index: 7;
+  bottom: var(--model-bar);
+  left: 8px;
+  max-width: calc(100% - var(--model-side) - 24px);
+  background: var(--background);
 }
