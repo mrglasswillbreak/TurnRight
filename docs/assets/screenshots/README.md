@@ -1,14 +1,47 @@
 # Application screenshots
 
+## Current surface-editing gallery · 25 September 2026
+
+The root README contains **34 distinct, unaltered PNG screenshots** from the current production build. The verified campus is **`lasu-623791e1184e`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,098,125 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows and wall/roof lettering added in the editor are illustrative local examples, not published architectural evidence.
+
+The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Eight additional captures, also ending in `-2026-09-25.png`, cover:
+
+| Filename prefix | Current view |
+| --- | --- |
+| `editor-model-wall-text` | Wall lettering with wording and size controls |
+| `editor-model-roof-text` | Roof lettering and properties |
+| `editor-model-tree-actions` | Nested structure, selected window and Ungroup |
+| `editor-model-orbit-current` | Orbit restored after surface editing |
+| `editor-model-landscape` | Model beside one editing panel at 844 × 390 |
+| `editor-sources-current` | Source review and baseline status |
+| `editor-releases-current` | Model review blockers before publication |
+| `editor-survey-current` | Survey workspace before recording |
+
+The building card now shows one Edit model button and a read-only summary. The desktop workspace opens in Orbit. Roof and footprint captures use surface-aligned editing; mobile retains a separate 2D precision example. Desktop images are 1440 × 1000, desktop globe 1440 × 900, portrait 390 × 844, and landscape 844 × 390. Public screens block service workers to avoid an older installed UI. The offline screenshot shows download controls, not proof of a disconnected session. Walking previews use a manual Clinic origin without GPS; the survey screenshot does not start recording.
+
+### Capture the current gallery
+
+From `web/`, use Node 22 and installed dependencies. Fetch and verify the public manifest and its assets with `preservePublished('work/model-benchmark/public', 'https://turnright.vercel.app', true)` from `scripts/published-assets.mjs`, then run:
+
+```sh
+npx playwright test --config playwright.docs.config.ts
+```
+
+The project builds a local production app, supplies isolated owner responses and serves the verified campus. Screenshot paths resolve against the repository regardless of the shell working directory. Run it separately from other GPU browser suites. `TURNRIGHT_DOCS_EDITOR_ONLY=1` refreshes owner views; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes walking previews. Inspect the actual images and update provenance after recapture. Use a new date for a later capture. These Chromium/SwiftShader screenshots do not replace physical-phone, native-keyboard or screen-reader acceptance. See [current verification](../../MODEL-EDITOR-VERIFICATION.md).
+
+## Earlier capture records
+
+The records below describe earlier capture runs. Their counts, package versions and workflow labels are historical. The current gallery above supersedes the earlier 26-image run and landscape capture. Earlier `editor-model-3d-hold`, `editor-release-review-*` and `public-globe-location` files remain regression archives and are excluded from the current README gallery.
+
 The additional `editor-model-landscape-2026-09-25.png` (844 × 320) and `editor-model-3d-hold-2026-09-25.png` (740 × 390) captures show the current Close button, landscape side tools and touch-held 3D actions. They are unaltered Chromium development-server regression captures of an isolated Library fixture, with no private owner content. Run the `landscape model has` and `3D touch hold` browser journeys, then copy their `landscape-reviewed.png` and `3d-long-press-actions.png` test outputs after inspection. The earlier 26-image production-build gallery is retained.
 
 `public-globe-location-2026-09-25.png` shows the live location label and facing cone with **simulated** GPS and orientation, using the real globe renderer and isolated public place fixture. Reproduce with the `globe retains live` browser journey and its `globe-live-location.png` output. It is a UI regression capture, not field-location or sensor-accuracy evidence. Together these three additions bring the README to 29 distinct captures without removing the earlier views.
 
 The additional `editor-release-review-390-2026-09-25.png` and `editor-release-review-1440-2026-09-25.png` captures show named model-release blockers using the isolated Library browser-test fixture. They are development-server regression captures, not production-campus evidence. Regenerate with `TURNRIGHT_CAPTURE_RELEASE=1` and the `release preflight opens` browser tests. The 26 varied production-build README images below remain intact.
 
-## Current unified editor and public gallery
+## Earlier 26-image gallery record
 
-The README contains **26 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.
+That README revision contained **26 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.
 
 All current public and owner views are captured by `web/playwright.docs.config.ts`, including the eight focused mobile model views. Public screenshots block service workers to avoid an older installed UI. Offline-download screenshots show the actual interface state, not proof of a disconnected session. Separate production PWA journeys verify preparation and offline reloads.
 

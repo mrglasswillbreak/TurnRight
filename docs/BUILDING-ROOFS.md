@@ -6,7 +6,7 @@ Law Clinic's geometry prerequisite regroups the existing coordinates into two ex
 
 ## Editing
 
-The current mobile workspace shows the geographic roof plan in the main canvas. Use **Edit roof** for controls, **Done** to close the sheet, and **Move point** after selecting a point. Panning or a second touch does not commit roof geometry. Desktop retains the integrated plan and properties panels.
+The mobile workspace supports surface-aligned roof editing and a secondary geographic 2D precision view in the main viewport. Use **Edit roof** for controls, **Done** to close the sheet, and **Move point** after selecting a point. Panning or a second touch does not commit roof geometry. Desktop retains the integrated plan and properties panels.
 
 Whole-building **Appearance → Building height** now offers proportional adjustment of inherited custom roofs. It scales eaves and all roof-point elevations together while retaining plan coordinates, constraints and detail dimensions. The option is on by default; turn it off to preserve recorded roof elevations. Wing height overrides remain explicit. Existing height/roof mismatches can be fitted by an owner action. This is an estimated transformation requiring review, not new measured evidence, and the complete change is one undoable command.
 

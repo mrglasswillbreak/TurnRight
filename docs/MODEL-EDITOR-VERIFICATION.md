@@ -27,7 +27,7 @@ validation, save-compatible meshes, draft/public review separation, courtyard
 winding, roof constraints, camera/pointer coordinates and tree references. Client
 and server TypeScript and lint pass with **seven pre-existing warnings**.
 
-**14 focused Chromium cases pass** across the final run and corrected camera-startup follow-up. Browser coverage checks creation, saving/reopening, selection/focus, ungrouping,
+**Three WebKit rotation/landscape workflows pass**, repeated after the final surface fixes. **14 focused Chromium cases pass** across the final run and corrected camera-startup follow-up. Browser coverage checks creation, saving/reopening, selection/focus, ungrouping,
 detachment, text properties and invalid placement, shared roof/footprint edits,
 undo, camera restoration, renderer identity and WebGL startup fallback. Responsive
 checks include 1280×720, 1440×900, 1920×1080 and effective CSS viewport sizes for
@@ -36,8 +36,8 @@ Rotation and keyboard tests simulate browser viewport events and preserve an
 unfinished field. They do not operate physical keyboards or browser zoom chrome.
 
 The configured production build retains all budgets: lazy 3D/editor 217.6 KiB
-gzip (300 KiB limit), public startup about 426 kB (435,200-byte limit), owner
-additional about 184 kB (189,440-byte limit), photo manager 7.6 kB (12,288-byte
+gzip (300 KiB limit), public startup 425,879 gzip bytes (435,200-byte limit), owner
+additional 183,533 bytes (189,440-byte limit), photo manager 7,635 bytes (12,288-byte
 limit), world 5.30 MiB and voice 5.91 MiB / 362 clips (each 8 MiB limit).
 Shared icons remain outside the owner entry; auth-configured checks verify this
 boundary and offline precache inclusion.

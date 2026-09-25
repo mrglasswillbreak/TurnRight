@@ -14,7 +14,7 @@ The workspace opens in Orbit. Selecting a tree row or mesh shares selection with
 
 ## Select and place
 
-Use the searchable hierarchy, mapped-wall list, face-on canvas or selectable 3D preview. Walls show their mapped length and review state; dimensions are measured from the labelled endpoint and model base. Numeric fields use metres at the editing boundary while saved façade coordinates remain compatible with existing renderers.
+Use the searchable hierarchy, mapped-wall list, face-on canvas or selectable 3D preview. Walls show mapped length and review state. Front views label A → B or B → A to face outside; numeric positions retain distance from the original A endpoint and model base. Numeric fields use metres at the editing boundary while saved façade coordinates remain compatible with existing renderers.
 
 Move and resize on the canvas, enter dimensions, or nudge with arrow keys. The grid offers 0.01, 0.1 and 1 metre increments; Shift multiplies a nudge by ten and Alt bypasses snapping. Multi-selection supports alignment, equal gaps and mirroring. Groups, editable patterns, instance detachment, duplicate, copy-to-wall/building and independent named presets reuse the same command history. Copied layouts receive fresh identities and show a placement preview. Out-of-bounds details require explicit repair.
 
