@@ -1,8 +1,16 @@
 /* The spatial SVG is an application surface; the hierarchy and metre fields provide equivalent non-spatial controls. */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { FacadeElement } from './visual-types';
+import { ModelNudge, useModelMobile } from './model-mobile';
 import {
   elementBounds,
   moveElements,
@@ -23,8 +31,10 @@ export function ModelWallCanvas({
   onCommit,
   onDuplicate,
   onDelete,
-  onCancel,
   views,
+  interactive = true,
+  detailName = (e) => e.kind,
+  actions,
 }: {
   metrics: Metrics;
   elements: FacadeElement[];
@@ -36,10 +46,25 @@ export function ModelWallCanvas({
   onCommit: (elements: FacadeElement[]) => void;
   onDuplicate: () => void;
   onDelete: () => void;
-  onCancel: () => void;
   views?: Map<string, WallView>;
+  interactive?: boolean;
+  detailName?: (e: FacadeElement) => string;
+  actions?: ReactNode;
 }) {
+  const mobile = useModelMobile();
+  const pointers = useRef(new Map<number, [number, number]>()),
+    pinch = useRef<{
+      distance: number;
+      centre: [number, number];
+      view: WallView;
+      matrix: DOMMatrix;
+    } | null>(null);
+  const [overlap, setOverlap] = useState<{ id: string; instance: number }[]>(
+    [],
+  );
   const svg = useRef<SVGSVGElement>(null);
+  const region = useRef<HTMLElement>(null);
+  const [actionPosition, setActionPosition] = useState({ left: 8, top: 55 });
   const [preview, setPreview] = useState<FacadeElement[] | null>(null),
     [marquee, setMarquee] = useState<number[] | null>(null);
   const [view, setView] = useState(
@@ -61,13 +86,54 @@ export function ModelWallCanvas({
     view: typeof view;
     last: [number, number];
     matrix: DOMMatrix;
+    tap?: { id: string; instance: number };
   } | null>(null);
   useEffect(() => {
     views?.set(m.wallId, view);
   }, [views, m.wallId, view]);
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  useEffect(() => {
+    gesture.current = null;
+    candidate.current = null;
+    pinch.current = null;
+    pointers.current.clear();
+    cancelAnimationFrame(frame.current);
+    setPreview(null);
+    setMarquee(null);
+  }, [mobile.tool, interactive, mobile.compact]);
   const shown = preview || elements,
     pixel = view.width / Math.max(320, svg.current?.clientWidth || 700);
+  const selectionKey = selected.join(':');
+  useLayoutEffect(() => {
+    const position = () => {
+      const canvas = svg.current,
+        box = region.current?.getBoundingClientRect(),
+        matrix = canvas?.getScreenCTM();
+      const selectedBounds = shown
+        .filter((e) => selected.includes(e.id))
+        .map((e) => elementBounds(e, m.length));
+      if (!canvas || !box || !matrix || !selectedBounds.length) return;
+      const point = new DOMPoint(
+        Math.max(...selectedBounds.map((b) => b.right)),
+        -Math.max(...selectedBounds.map((b) => b.top)),
+      ).matrixTransform(matrix);
+      const bounds = canvas.getBoundingClientRect();
+      const next = {
+        left: Math.max(0, Math.min(box.width - 46, point.x - box.left + 8)),
+        top: Math.max(
+          bounds.top - box.top,
+          Math.min(bounds.bottom - box.top - 46, point.y - box.top - 48),
+        ),
+      };
+      setActionPosition((old) =>
+        old.left === next.left && old.top === next.top ? old : next,
+      );
+    };
+    position();
+    const observer = new ResizeObserver(position);
+    if (svg.current) observer.observe(svg.current);
+    return () => observer.disconnect();
+  }, [view, selectionKey, shown, m.length, selected]);
   const invalid = useMemo(
     () => new Set(placementErrors(shown, m.length, m.eaves).map((e) => e.id)),
     [shown, m.length, m.eaves],
@@ -85,10 +151,20 @@ export function ModelWallCanvas({
     id?: string,
     instance?: number,
   ) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || !interactive || pointers.current.size > 1) return;
     event.stopPropagation();
     svg.current?.focus();
-    if (id && locked.includes(id)) return;
+    if (mobile.compact) {
+      kind =
+        mobile.tool === 'multi'
+          ? 'marquee'
+          : mobile.tool === 'move' && id && selected.includes(id)
+            ? 'move'
+            : mobile.tool === 'resize' && id && selected.includes(id)
+              ? 'resize'
+              : 'pan';
+    }
+    if (id && locked.includes(id) && kind !== 'pan') return;
     const ids = id
       ? event.shiftKey
         ? selected.includes(id)
@@ -98,7 +174,7 @@ export function ModelWallCanvas({
           ? selected
           : [id]
       : selected;
-    if (id) onSelect(ids, instance);
+    if (id && !mobile.compact) onSelect(ids, instance);
     const start = point(event);
     gesture.current = {
       kind,
@@ -108,15 +184,43 @@ export function ModelWallCanvas({
       ids: ids.filter((id) => !locked.includes(id)),
       view,
       matrix: svg.current!.getScreenCTM()!.inverse(),
+      tap: id ? { id, instance: instance || 0 } : undefined,
     };
     svg.current!.setPointerCapture(event.pointerId);
     candidate.current = null;
   };
   const update = (event: ReactPointerEvent) => {
+    if (pointers.current.has(event.pointerId))
+      pointers.current.set(event.pointerId, [event.clientX, event.clientY]);
+    const pin = pinch.current;
+    if (pin && pointers.current.size >= 2) {
+      const [a, b] = [...pointers.current.values()];
+      const factor = Math.max(
+        0.08,
+        Math.min(
+          12,
+          pin.distance / Math.max(1, Math.hypot(a[0] - b[0], a[1] - b[1])),
+        ),
+      );
+      const c = new DOMPoint(
+        (a[0] + b[0]) / 2,
+        (a[1] + b[1]) / 2,
+      ).matrixTransform(pin.matrix);
+      setView({
+        x: pin.centre[0] - (c.x - pin.view.x) * factor,
+        y: pin.centre[1] - (c.y - pin.view.y) * factor,
+        width: pin.view.width * factor,
+        height: pin.view.height * factor,
+      });
+      return;
+    }
+    if (pin) return;
     const g = gesture.current;
     if (!g) return;
-    const position = new DOMPoint(event.clientX,event.clientY).matrixTransform(g.matrix);
-    const p: [number,number] = [position.x,-position.y];
+    const position = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      g.matrix,
+    );
+    const p: [number, number] = [position.x, -position.y];
     g.last = p;
     if (g.kind === 'pan') {
       setView({
@@ -212,11 +316,39 @@ export function ModelWallCanvas({
     cancelAnimationFrame(frame.current);
     setPreview(null);
     setMarquee(null);
-    onCancel();
   };
   const finish = (event: ReactPointerEvent) => {
+    pointers.current.delete(event.pointerId);
+    if (pinch.current) {
+      if (!pointers.current.size) pinch.current = null;
+      return;
+    }
     const g = gesture.current;
     if (!g) return;
+    if (
+      mobile.compact &&
+      g.kind === 'pan' &&
+      Math.hypot(g.last[0] - g.start[0], g.last[1] - g.start[1]) < pixel * 6
+    ) {
+      const hits = elements
+        .filter((e) => !hidden.includes(e.id))
+        .flatMap((e) =>
+          Array.from({ length: e.count }, (_, i) => ({
+            e,
+            i,
+            x: (e.x + (i - (e.count - 1) / 2) * e.spacing) * m.length,
+          })),
+        )
+        .filter(
+          ({ e, x }) =>
+            Math.abs(g.start[0] - x) <= Math.max(e.width / 2, pixel * 12) &&
+            g.start[1] >= e.bottom - pixel * 8 &&
+            g.start[1] <= e.bottom + e.height + pixel * 8,
+        )
+        .map(({ e, i }) => ({ id: e.id, instance: i }));
+      if (hits.length > 1) setOverlap(hits);
+      else onSelect(hits.length ? [hits[0].id] : [], hits[0]?.instance);
+    }
     if (g.kind === 'marquee') {
       const [x, y] = g.start,
         [a, b] = g.last;
@@ -232,7 +364,11 @@ export function ModelWallCanvas({
           );
         })
         .map((e) => e.id);
-      onSelect(event.shiftKey ? [...new Set([...selected, ...ids])] : ids);
+      onSelect(
+        event.shiftKey || mobile.compact
+          ? [...new Set([...selected, ...ids])]
+          : ids,
+      );
     } else if (candidate.current) onCommit(candidate.current);
     gesture.current = null;
     candidate.current = null;
@@ -287,11 +423,22 @@ export function ModelWallCanvas({
     (_, i) => (Math.floor(-view.y / tick) - i) * tick,
   );
   return (
-    <section className="model-wall-view" aria-label="Measured wall editor">
+    <section
+      ref={region}
+      className="model-wall-view"
+      aria-label="Measured wall editor"
+    >
+      {!!selected.length && actions && (
+        <div className="model-item-actions" style={actionPosition}>
+          {actions}
+        </div>
+      )}
       <div className="model-toolbar">
-        <button aria-pressed={pan} onClick={() => setPan((v) => !v)}>
-          Pan
-        </button>
+        {!mobile.compact && (
+          <button aria-pressed={pan} onClick={() => setPan((v) => !v)}>
+            Pan
+          </button>
+        )}
         <button onClick={() => zoom(0.8)}>Zoom in</button>
         <button onClick={() => zoom(1.25)}>Zoom out</button>
         <button onClick={fit}>Fit selection</button>
@@ -320,15 +467,40 @@ export function ModelWallCanvas({
         tabIndex={0}
         role="application"
         aria-label="Wall canvas: select and move architectural details"
+        onPointerDownCapture={(e) => {
+          if (!interactive) return;
+          pointers.current.set(e.pointerId, [e.clientX, e.clientY]);
+          if (pointers.current.size === 2) {
+            cancel();
+            const [a, b] = [...pointers.current.values()],
+              matrix = svg.current!.getScreenCTM()!.inverse();
+            const c = new DOMPoint(
+              (a[0] + b[0]) / 2,
+              (a[1] + b[1]) / 2,
+            ).matrixTransform(matrix);
+            pinch.current = {
+              distance: Math.hypot(a[0] - b[0], a[1] - b[1]),
+              centre: [c.x, c.y],
+              view,
+              matrix,
+            };
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }
+        }}
         onPointerDown={(e) => begin(e, pan ? 'pan' : 'marquee')}
         onPointerMove={update}
         onPointerUp={finish}
-        onPointerCancel={cancel}
+        onPointerCancel={(e) => {
+          pointers.current.delete(e.pointerId);
+          pinch.current = null;
+          cancel();
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             e.preventDefault();
             cancel();
           }
+          if (!interactive) return;
           if (e.key === 'Delete' || e.key === 'Backspace') {
             e.preventDefault();
             onDelete();
@@ -345,16 +517,12 @@ export function ModelWallCanvas({
           };
           if (arrows[e.key]) {
             e.preventDefault();
+            const movable = selected.filter((id) => !locked.includes(id));
+            if (!movable.length) return;
             const [x, y] = arrows[e.key],
               step = grid * (e.shiftKey ? 10 : 1);
             onCommit(
-              moveElements(
-                elements,
-                selected.filter((id) => !locked.includes(id)),
-                x * step,
-                y * step,
-                m.length,
-              ),
+              moveElements(elements, movable, x * step, y * step, m.length),
             );
           }
         }}
@@ -449,7 +617,8 @@ export function ModelWallCanvas({
               );
             }),
           )}
-        {selected.length === 1 &&
+        {(!mobile.compact || mobile.tool === 'resize') &&
+          selected.length === 1 &&
           shown
             .filter(
               (e) =>
@@ -464,7 +633,7 @@ export function ModelWallCanvas({
                 aria-label="Resize selected detail"
                 cx={e.x * m.length + e.width / 2}
                 cy={-e.bottom - e.height}
-                r={pixel * 9}
+                r={pixel * (mobile.compact ? 22 : 9)}
                 fill="#087cf0"
                 stroke="white"
                 strokeWidth={pixel * 2}
@@ -493,6 +662,51 @@ export function ModelWallCanvas({
             ))}
         </g>
       </svg>
+      {overlap.length > 0 && (
+        <fieldset
+          className="model-overlap-picker"
+          aria-label="Overlapping details"
+        >
+          <strong>Choose a detail</strong>
+          {overlap.map(({ id, instance }) => (
+            <button
+              key={`${id}:${instance}`}
+              onClick={() => {
+                onSelect([id], instance);
+                setOverlap([]);
+              }}
+            >
+              {detailName(elements.find((e) => e.id === id)!)} · {instance + 1}
+            </button>
+          ))}
+          <button onClick={() => setOverlap([])}>Cancel selection</button>
+        </fieldset>
+      )}
+      {mobile.compact &&
+        selected.some((id) => !locked.includes(id)) &&
+        mobile.tool === 'move' && (
+          <ModelNudge
+            onNudge={(x, y) => {
+              candidate.current = moveElements(
+                candidate.current || elements,
+                selected.filter((id) => !locked.includes(id)),
+                x * grid,
+                y * grid,
+                m.length,
+              );
+              setPreview(candidate.current);
+            }}
+            onFinish={() => {
+              if (candidate.current) onCommit(candidate.current);
+              candidate.current = null;
+              setPreview(null);
+            }}
+            onCancel={() => {
+              candidate.current = null;
+              setPreview(null);
+            }}
+          />
+        )}
       <output aria-live="polite">
         {invalid.size
           ? `${invalid.size} detail(s) need repositioning or resizing.`

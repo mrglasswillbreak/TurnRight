@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Menu } from '@base-ui/react/menu';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,12 @@ import { ModelOutlineCanvas } from './ModelOutlineCanvas';
 import { ModelField } from './ModelField';
 import { ModelPhotoPanel } from './ModelPhotoPanel';
 import { BuildingAppearanceEditor } from './BuildingAppearanceEditor';
+import {
+  ModelMobileContext,
+  useCompactModel,
+  type ModelPanel,
+  type ModelTouchTool,
+} from './model-mobile';
 import {
   copyElements,
   detachInstance,
@@ -148,6 +155,61 @@ function ModelWorkspace({
   onHistory,
   initialMode = 'details',
 }: WorkspaceProps) {
+  const compact = useCompactModel();
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const actionFocus = useRef<string | null>(null);
+  const contextReturn = useRef<HTMLElement | null>(null);
+  const [contextPoint, setContextPoint] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [panel, setPanel] = useState<ModelPanel>(
+      initialMode === 'details' ? 'none' : 'mode',
+    ),
+    [detent, setDetent] = useState<'half' | 'full'>('half'),
+    [touchTool, setTouchTool] = useState<ModelTouchTool>('select'),
+    [planHost, setPlanHost] = useState<HTMLDivElement | null>(null);
+  const shell = useRef<HTMLDivElement>(null),
+    sheetStart = useRef(0),
+    sheetDragged = useRef(false),
+    sheetReturn = useRef<HTMLElement | null>(null);
+  const openPanel = (next: ModelPanel) => {
+    if (next !== 'none')
+      sheetReturn.current = document.activeElement as HTMLElement;
+    setPanel(next);
+    setDetent('half');
+    setTouchTool('select');
+    if (next === 'none') sheetReturn.current?.focus();
+  };
+  useEffect(() => {
+    if (!compact) return;
+    const viewport = window.visualViewport;
+    const resize = () => {
+      shell.current?.style.setProperty(
+        '--model-viewport-height',
+        `${viewport?.height || innerHeight}px`,
+      );
+      shell.current?.style.setProperty(
+        '--model-viewport-top',
+        `${viewport?.offsetTop || 0}px`,
+      );
+    };
+    resize();
+    viewport?.addEventListener('resize', resize);
+    viewport?.addEventListener('scroll', resize);
+    return () => {
+      viewport?.removeEventListener('resize', resize);
+      viewport?.removeEventListener('scroll', resize);
+    };
+  }, [compact]);
+  useEffect(() => {
+    if (compact && panel !== 'none')
+      requestAnimationFrame(() =>
+        shell.current
+          ?.querySelector<HTMLButtonElement>('.model-sheet-handle')
+          ?.focus(),
+      );
+  }, [compact, panel]);
   const initial = useRef(edit),
     returnFocus = useRef(document.activeElement as HTMLElement | null);
   const wallViews = useRef(new Map<string, WallView>());
@@ -156,7 +218,9 @@ function ModelWorkspace({
     [wallId, setWallId] = useState(selection?.wallId || ''),
     [selected, setSelected] = useState<string[]>([]),
     [instance, setInstance] = useState(0);
-  const [tab, setTab] = useState('wall'),
+  const [tab, setTab] = useState(
+      initialMode === 'appearance' || initialMode === 'review' ? '3d' : 'wall',
+    ),
     [before, setBefore] = useState(false),
     [error, setError] = useState(''),
     [query, setQuery] = useState(''),
@@ -268,6 +332,14 @@ function ModelWorkspace({
     !!pending ||
     !!workspace?.roofDraft ||
     Object.keys(workspace?.modelInputs[edit.id] || {}).length > 0;
+  const discardInput = () => {
+    setPending(null);
+    setRoofDraft(null);
+    workspace?.draftRoof(null);
+    for (const key of Object.keys(workspace?.modelInputs[edit.id] || {}))
+      workspace?.recoverModelInput(edit.id, key);
+    setError('Unfinished input discarded; saved draft changes remain.');
+  };
   const publishErrors = useMemo(
     () => [
       ...new Set([
@@ -281,6 +353,7 @@ function ModelWorkspace({
     authoring.names[e.id] ||
     `${e.kind[0].toUpperCase() + e.kind.slice(1)}${e.count > 1 ? ` ×${e.count}` : ''}`;
   const choose = (id: string, elementId?: string, at = 0) => {
+    setTouchTool('select');
     setWallId(id);
     setSelected(elementId ? [elementId] : []);
     setInstance(at);
@@ -687,1214 +760,1895 @@ function ModelWorkspace({
     ids.every((id) => list.includes(id))
       ? list.filter((id) => !ids.includes(id))
       : [...new Set([...list, ...ids])];
+  const switchMode = (next: Mode) => {
+    setMode(next);
+    setTouchTool('select');
+    setTab(next === 'appearance' || next === 'review' ? '3d' : 'wall');
+    openPanel(next === 'details' ? 'none' : 'mode');
+  };
+  const mobilePanel = paste ? 'copy' : panel;
+  const selectionActions = (
+    <Menu.Trigger
+      className="model-selection-menu-trigger"
+      aria-label="Selected detail actions"
+      onClick={() => setContextPoint(null)}
+    >
+      ⋯
+    </Menu.Trigger>
+  );
+  const showContextActions = (x: number, y: number) => {
+    actionFocus.current = null;
+    contextReturn.current = document.activeElement as HTMLElement | null;
+    setContextPoint({ x, y });
+    setActionMenuOpen(true);
+  };
+  const actions = [
+    {
+      name: 'Edit details',
+      shortcut: 'Enter',
+      disabled: !selected.length,
+      run: () => {
+        actionFocus.current = compact
+          ? '.model-sheet-handle'
+          : '[aria-label="Detail name"]';
+        if (compact) openPanel('edit');
+        else
+          shell.current
+            ?.querySelector<HTMLInputElement>('[aria-label="Detail name"]')
+            ?.focus();
+      },
+    },
+    {
+      name: 'Duplicate',
+      shortcut: 'Ctrl+D',
+      disabled: before || !selected.length,
+      run: duplicate,
+    },
+    {
+      name: 'Copy',
+      shortcut: 'Ctrl+C',
+      disabled: !selected.length,
+      run: () => setClipboard(stamp()),
+    },
+    {
+      name: 'Paste / copy to…',
+      shortcut: 'Ctrl+V',
+      disabled: before || !clipboard,
+      run: () => {
+        actionFocus.current = '[aria-label="Target building"]';
+        setPaste(clipboard);
+        setTargetWall(activeWall);
+      },
+    },
+    {
+      name: selected.every((id) => locked.includes(id)) ? 'Unlock' : 'Lock',
+      disabled: !selected.length,
+      run: () => setLocked(toggle(locked, selected)),
+    },
+    {
+      name: selected.every((id) => hidden.includes(id))
+        ? 'Show in editor'
+        : 'Hide in editor',
+      disabled: !selected.length,
+      run: () => setHidden(toggle(hidden, selected)),
+    },
+    {
+      name: 'Select all details',
+      shortcut: 'Ctrl+A',
+      disabled: !elements.length,
+      run: () => setSelected(elements.map((e) => e.id)),
+    },
+    {
+      name: 'Clear selection',
+      disabled: !selected.length,
+      run: () => setSelected([]),
+    },
+    {
+      name: 'Add another detail',
+      disabled: before,
+      run: () => {
+        actionFocus.current = compact
+          ? '.model-sheet-handle'
+          : '.model-add-tools button';
+        if (compact) openPanel('add');
+        else
+          shell.current
+            ?.querySelector<HTMLButtonElement>('.model-add-tools button')
+            ?.focus();
+      },
+    },
+    {
+      name: 'Delete',
+      shortcut: 'Del',
+      disabled: before || !selected.some((id) => !locked.includes(id)),
+      run: remove,
+    },
+  ];
   return (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open) onClose();
+    <ModelMobileContext
+      value={{
+        compact,
+        tool: touchTool,
+        setTool: setTouchTool,
+        openPanel,
+        planHost,
       }}
     >
-      <DialogContent
-        className={`photo-model-workspace model-workspace ${before ? 'model-before' : ''}`}
-        overlayClassName="photo-model-overlay"
-        onKeyDown={(e) => {
-          if (
-            (e.ctrlKey || e.metaKey) &&
-            !['INPUT', 'TEXTAREA', 'SELECT'].includes(
-              (e.target as HTMLElement).tagName,
-            )
-          ) {
-            if (e.key.toLowerCase() === 'z') {
-              e.preventDefault();
-              setRoofDraft(null);
-              onHistory?.(e.shiftKey);
-            }
-            if (e.key.toLowerCase() === 'c' && selected.length) {
-              e.preventDefault();
-              setClipboard(stamp());
-            }
-            if (e.key.toLowerCase() === 'v' && clipboard) {
-              e.preventDefault();
-              setPaste(clipboard);
-              setTargetWall(activeWall);
-            }
-          }
-        }}
+      <Menu.Root
+        open={actionMenuOpen}
+        onOpenChange={setActionMenuOpen}
+        modal={false}
       >
-        <header>
-          <div>
-            <DialogTitle>
-              Photo &amp; model · {String(edit.properties.name || 'Building')}
-            </DialogTitle>
-            <DialogDescription>
-              Precise building tools · dimensions are estimates unless
-              documented. Model doors do not create mapped entrances.
-            </DialogDescription>
-          </div>
-          <output aria-live="polite">
-            {unsaved ? 'Unsaved input · ' : ''}
-            {state}
-            {workspace?.error ? ` · ${workspace.error}` : ''}
-          </output>
-        </header>
-        <div className="model-toolbar model-main-toolbar">
-          <nav aria-label="Building editing mode">
-            {(
-              ['details', 'appearance', 'roof', 'outline', 'review'] as Mode[]
-            ).map((m) => (
-              <button
-                key={m}
-                aria-pressed={mode === m}
-                onClick={() => setMode(m)}
-              >
-                {m[0].toUpperCase() + m.slice(1)}
-                {m === 'review' && publishErrors.length
-                  ? ` (${publishErrors.length})`
-                  : ''}
-              </button>
-            ))}
-          </nav>
-          <button
-            disabled={!onHistory || !workspace?.past.length}
-            onClick={() => {
-              setRoofDraft(null);
-              onHistory?.();
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (!open) onClose();
+          }}
+        >
+          <DialogContent
+            ref={shell}
+            className={`photo-model-workspace model-workspace ${compact ? 'model-compact' : ''} ${before ? 'model-before' : ''}`}
+            data-panel={mobilePanel}
+            data-detent={detent}
+            showCloseButton={!compact}
+            overlayClassName="photo-model-overlay"
+            onContextMenu={(e) => {
+              if (mode !== 'details' || !(e.target instanceof Element)) return;
+              const detail = e.target.closest(
+                '[data-element-id], [data-detail-id]',
+              );
+              if (!detail && !e.target.closest('.model-wall-canvas')) return;
+              e.preventDefault();
+              e.stopPropagation();
+              const id =
+                detail?.getAttribute('data-element-id') ||
+                detail?.getAttribute('data-detail-id');
+              if (id && !selected.includes(id)) setSelected([id]);
+              showContextActions(e.clientX, e.clientY);
+            }}
+            onFocusCapture={(e) => {
+              if (
+                compact &&
+                (e.target as HTMLElement).matches('input, textarea, select')
+              ) {
+                setDetent('full');
+                requestAnimationFrame(() =>
+                  (e.target as HTMLElement).scrollIntoView({
+                    block: 'nearest',
+                  }),
+                );
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.defaultPrevented) return;
+              const input = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
+                (e.target as HTMLElement).tagName,
+              );
+              if (
+                !input &&
+                mode === 'details' &&
+                selected.length &&
+                e.key === 'Delete'
+              ) {
+                e.preventDefault();
+                if (!before) remove();
+                return;
+              }
+              if (
+                !input &&
+                mode === 'details' &&
+                selected.length &&
+                e.key === 'Enter' &&
+                (e.target as Element).matches('.model-wall-canvas')
+              ) {
+                e.preventDefault();
+                actions[0].run();
+                return;
+              }
+              if (
+                !input &&
+                mode === 'details' &&
+                ((e.shiftKey && e.key === 'F10') || e.key === 'ContextMenu')
+              ) {
+                e.preventDefault();
+                const b = (e.target as Element).getBoundingClientRect();
+                showContextActions(
+                  b.left + Math.min(40, b.width / 2),
+                  b.top + Math.min(40, b.height / 2),
+                );
+                return;
+              }
+              if (
+                !input &&
+                mode === 'details' &&
+                (e.ctrlKey || e.metaKey) &&
+                e.key.toLowerCase() === 'a'
+              ) {
+                e.preventDefault();
+                setSelected(elements.map((v) => v.id));
+                return;
+              }
+              if (
+                !input &&
+                mode === 'details' &&
+                (e.ctrlKey || e.metaKey) &&
+                e.key.toLowerCase() === 'd'
+              ) {
+                e.preventDefault();
+                if (!before) duplicate();
+                return;
+              }
+              if (
+                compact &&
+                e.key === 'Escape' &&
+                mobilePanel !== 'none' &&
+                !['INPUT', 'TEXTAREA'].includes(
+                  (e.target as HTMLElement).tagName,
+                )
+              ) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (paste) setPaste(null);
+                else openPanel('none');
+                return;
+              }
+              if (
+                (e.ctrlKey || e.metaKey) &&
+                !['INPUT', 'TEXTAREA', 'SELECT'].includes(
+                  (e.target as HTMLElement).tagName,
+                )
+              ) {
+                if (e.key.toLowerCase() === 'z') {
+                  e.preventDefault();
+                  setRoofDraft(null);
+                  onHistory?.(e.shiftKey);
+                }
+                if (e.key.toLowerCase() === 'c' && selected.length) {
+                  e.preventDefault();
+                  setClipboard(stamp());
+                }
+                if (e.key.toLowerCase() === 'v' && clipboard && !before) {
+                  e.preventDefault();
+                  setPaste(clipboard);
+                  setTargetWall(activeWall);
+                }
+              }
             }}
           >
-            Undo
-          </button>
-          <button
-            disabled={!onHistory || !workspace?.future.length}
-            onClick={() => {
-              setRoofDraft(null);
-              onHistory?.(true);
-            }}
-          >
-            Redo
-          </button>
-          <button aria-pressed={before} onClick={() => setBefore((v) => !v)}>
-            {before ? 'Showing before · show changes' : 'Before / after'}
-          </button>
-        </div>
-        <div className="model-layout">
-          <aside className="model-hierarchy" aria-label="Building hierarchy">
-            <label>
-              Find walls or details
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </label>
-            {buildingTopology(feature).parts.map((part, index) => (
-              <section key={part.id}>
+            <header>
+              <div>
+                <DialogTitle>
+                  {compact ? '' : 'Photo & model · '}
+                  {String(edit.properties.name || 'Building')}
+                </DialogTitle>
+                <DialogDescription>
+                  Precise building tools · dimensions are estimates unless
+                  documented. Model doors do not create mapped entrances.
+                </DialogDescription>
+              </div>
+              <output aria-live="polite">
+                {unsaved ? 'Unsaved input · ' : ''}
+                {state}
+                {workspace?.error ? ` · ${workspace.error}` : ''}
+              </output>
+            </header>
+            {compact && (
+              <div className="model-mobile-navigation">
+                <label>
+                  Mode
+                  <select
+                    aria-label="Model editing mode"
+                    value={mode}
+                    onChange={(e) => switchMode(e.target.value as Mode)}
+                  >
+                    {(
+                      [
+                        'details',
+                        'appearance',
+                        'roof',
+                        'outline',
+                        'review',
+                      ] as Mode[]
+                    ).map((m) => (
+                      <option key={m} value={m}>
+                        {m[0].toUpperCase() + m.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
-                  className="model-wing"
+                  onClick={() => openPanel('walls')}
+                  aria-label="Choose wall"
+                >
+                  {walls.find((w) => w.wallId === activeWall)?.label ||
+                    'Choose wall'}
+                </button>
+                <button
+                  aria-label="Undo"
+                  disabled={!workspace?.past.length}
                   onClick={() => {
-                    onSelection({ buildingId: edit.id, partId: part.id });
-                    setMode('appearance');
+                    setRoofDraft(null);
+                    onHistory?.();
                   }}
                 >
-                  Wing {index + 1}
+                  ↶
                 </button>
-                {walls
-                  .filter((w) => w.partId === part.id)
-                  .map((w) => {
-                    const f = draft.properties.appearance?.facades?.[w.wallId],
-                      children =
-                        w.wallId === activeWall ? elements : f?.elements || [],
-                      title = authoring.names[w.wallId] || w.label;
-                    if (
-                      query &&
-                      !`${title} ${children.map(label).join(' ')}`
-                        .toLowerCase()
-                        .includes(query.toLowerCase())
-                    )
-                      return null;
-                    return (
-                      <div key={w.wallId} className="model-wall-item">
-                        <button
-                          aria-pressed={activeWall === w.wallId}
-                          onClick={() => choose(w.wallId)}
-                        >
-                          {title}
-                          <small>
-                            {wallLength(w.coordinates).toFixed(1)} m ·{' '}
-                            {f
-                              ? f.needsReview
-                                ? 'Rematch needed'
-                                : f.reviewedAt
-                                  ? 'Reviewed'
-                                  : 'Needs review'
-                              : 'Generated'}
-                          </small>
-                        </button>
-                        {activeWall === w.wallId && (
-                          <>
-                            {authoring.groups
-                              .filter((g) => g.wallId === w.wallId)
-                              .map((g) => (
-                                <button
-                                  key={g.id}
-                                  onClick={() =>
-                                    setSelected(
-                                      g.members.filter((id) =>
-                                        elements.some((e) => e.id === id),
-                                      ),
+                <button
+                  aria-label="Redo"
+                  disabled={!workspace?.future.length}
+                  onClick={() => {
+                    setRoofDraft(null);
+                    onHistory?.(true);
+                  }}
+                >
+                  ↷
+                </button>
+                <button aria-label="Close workspace" onClick={onClose}>
+                  ×
+                </button>
+              </div>
+            )}
+            <div className="model-toolbar model-main-toolbar">
+              <nav aria-label="Building editing mode">
+                {(
+                  [
+                    'details',
+                    'appearance',
+                    'roof',
+                    'outline',
+                    'review',
+                  ] as Mode[]
+                ).map((m) => (
+                  <button
+                    key={m}
+                    aria-pressed={mode === m}
+                    onClick={() => setMode(m)}
+                  >
+                    {m[0].toUpperCase() + m.slice(1)}
+                    {m === 'review' && publishErrors.length
+                      ? ` (${publishErrors.length})`
+                      : ''}
+                  </button>
+                ))}
+              </nav>
+              <button
+                disabled={!onHistory || !workspace?.past.length}
+                onClick={() => {
+                  setRoofDraft(null);
+                  onHistory?.();
+                }}
+              >
+                Undo
+              </button>
+              <button
+                disabled={!onHistory || !workspace?.future.length}
+                onClick={() => {
+                  setRoofDraft(null);
+                  onHistory?.(true);
+                }}
+              >
+                Redo
+              </button>
+              <button
+                aria-pressed={before}
+                onClick={() => setBefore((v) => !v)}
+              >
+                {before ? 'Showing before · show changes' : 'Before / after'}
+              </button>
+            </div>
+            <div className="model-layout">
+              <aside
+                className="model-hierarchy"
+                aria-label="Building hierarchy"
+              >
+                <label>
+                  Find walls or details
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                </label>
+                {buildingTopology(feature).parts.map((part, index) => (
+                  <section key={part.id}>
+                    <button
+                      className="model-wing"
+                      onClick={() => {
+                        onSelection({ buildingId: edit.id, partId: part.id });
+                        switchMode('appearance');
+                      }}
+                    >
+                      Wing {index + 1}
+                    </button>
+                    {walls
+                      .filter((w) => w.partId === part.id)
+                      .map((w) => {
+                        const f =
+                            draft.properties.appearance?.facades?.[w.wallId],
+                          children =
+                            w.wallId === activeWall
+                              ? elements
+                              : f?.elements || [],
+                          title = authoring.names[w.wallId] || w.label;
+                        if (
+                          query &&
+                          !`${title} ${children.map(label).join(' ')}`
+                            .toLowerCase()
+                            .includes(query.toLowerCase())
+                        )
+                          return null;
+                        return (
+                          <div key={w.wallId} className="model-wall-item">
+                            <button
+                              data-model-wall={w.wallId}
+                              aria-pressed={activeWall === w.wallId}
+                              onClick={() => {
+                                choose(w.wallId);
+                                if (compact) openPanel('none');
+                              }}
+                            >
+                              {title}
+                              <small>
+                                {wallLength(w.coordinates).toFixed(1)} m ·{' '}
+                                {f
+                                  ? f.needsReview
+                                    ? 'Rematch needed'
+                                    : f.reviewedAt
+                                      ? 'Reviewed'
+                                      : 'Needs review'
+                                  : 'Generated'}
+                              </small>
+                            </button>
+                            {activeWall === w.wallId && (
+                              <>
+                                {authoring.groups
+                                  .filter((g) => g.wallId === w.wallId)
+                                  .map((g) => (
+                                    <button
+                                      key={g.id}
+                                      onClick={() =>
+                                        setSelected(
+                                          g.members.filter((id) =>
+                                            elements.some((e) => e.id === id),
+                                          ),
+                                        )
+                                      }
+                                    >
+                                      Group · {g.name}
+                                    </button>
+                                  ))}
+                                {authoring.patterns
+                                  .filter((p) => p.wallId === w.wallId)
+                                  .map((p) => (
+                                    <button
+                                      key={p.id}
+                                      onClick={() => {
+                                        setPatternId(p.id);
+                                        setSelected(p.members);
+                                        setPattern({
+                                          rows: p.rows,
+                                          columns: p.columns,
+                                          stepX: p.stepX,
+                                          stepY: p.stepY,
+                                        });
+                                      }}
+                                    >
+                                      Pattern · {p.name}
+                                    </button>
+                                  ))}
+                                {children
+                                  .filter(
+                                    (e) =>
+                                      !query ||
+                                      label(e)
+                                        .toLowerCase()
+                                        .includes(query.toLowerCase()),
+                                  )
+                                  .map((e) => (
+                                    <button
+                                      className="model-detail-item"
+                                      data-detail-id={e.id}
+                                      aria-label={label(e)}
+                                      key={e.id}
+                                      aria-pressed={selected.includes(e.id)}
+                                      onClick={(event) => {
+                                        setSelected(
+                                          event.shiftKey ||
+                                            touchTool === 'multi'
+                                            ? toggle(selected, [e.id])
+                                            : [e.id],
+                                        );
+                                        setInstance(0);
+                                      }}
+                                      role={
+                                        compact && touchTool === 'multi'
+                                          ? 'checkbox'
+                                          : undefined
+                                      }
+                                      aria-checked={
+                                        compact && touchTool === 'multi'
+                                          ? selected.includes(e.id)
+                                          : undefined
+                                      }
+                                    >
+                                      {label(e)}
+                                      {locked.includes(e.id) ? ' · locked' : ''}
+                                      {hidden.includes(e.id) ? ' · hidden' : ''}
+                                    </button>
+                                  ))}
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </section>
+                ))}
+              </aside>
+              <main className="model-stage">
+                <label className="model-wall-picker">
+                  Mapped wall
+                  <select
+                    value={activeWall}
+                    onChange={(e) => choose(e.target.value)}
+                  >
+                    {walls.map((w) => (
+                      <option key={w.wallId} value={w.wallId}>
+                        {w.label} · {wallLength(w.coordinates).toFixed(2)} m
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <fieldset
+                  className="model-mobile-tabs"
+                  aria-label="Workspace view"
+                >
+                  {['wall', '3d', 'photo'].map((v) => (
+                    <button
+                      key={v}
+                      aria-pressed={tab === v}
+                      onClick={() => {
+                        setTab(v);
+                        openPanel('none');
+                      }}
+                    >
+                      {v === 'wall' && (mode === 'roof' || mode === 'outline')
+                        ? 'Plan'
+                        : v === '3d'
+                          ? '3D'
+                          : v[0].toUpperCase() + v.slice(1)}
+                    </button>
+                  ))}
+                </fieldset>
+                <div className={`model-view-columns model-tab-${tab}`}>
+                  <div
+                    ref={setPlanHost}
+                    className="model-plan-host"
+                    hidden={
+                      !compact ||
+                      tab !== 'wall' ||
+                      !['roof', 'outline'].includes(mode)
+                    }
+                  />
+                  <div className="model-edit-view">
+                    {mode === 'details' && metrics && (
+                      <>
+                        {!facade && !conversion && (
+                          <div className="model-notice">
+                            <p>
+                              Adding a detail preserves this wall’s generated
+                              layout. You can also preview and convert it before
+                              editing.
+                            </p>
+                            <button
+                              onClick={() =>
+                                tryAction(() =>
+                                  setConversion(
+                                    editableFacade(feature, activeWall, visual),
+                                  ),
+                                )
+                              }
+                            >
+                              Preview editable layout
+                            </button>
+                          </div>
+                        )}
+                        {conversion && (
+                          <div className="model-notice">
+                            <p>
+                              Preview:{' '}
+                              {conversion.elements.reduce(
+                                (n, e) => n + e.count,
+                                0,
+                              )}{' '}
+                              generated details become editable. Existing
+                              proportions are retained.
+                            </p>
+                            <button onClick={() => applyWall(conversion)}>
+                              Use editable layout
+                            </button>
+                            <button onClick={() => setConversion(null)}>
+                              Cancel conversion
+                            </button>
+                          </div>
+                        )}
+                        {pending?.wallId === activeWall && (
+                          <div className="model-notice">
+                            <p>
+                              Unfinished wall retained locally. Resolve its
+                              placement or building errors, then save it.
+                            </p>
+                            <button onClick={() => applyWall(pending)}>
+                              Save unfinished wall
+                            </button>
+                            <button onClick={() => switchMode('appearance')}>
+                              Check building height
+                            </button>
+                          </div>
+                        )}
+                        <ModelWallCanvas
+                          actions={selectionActions}
+                          interactive={
+                            !compact || (tab === 'wall' && panel === 'none')
+                          }
+                          detailName={label}
+                          views={wallViews.current}
+                          key={activeWall}
+                          metrics={metrics}
+                          elements={
+                            before
+                              ? initial.current.properties.appearance
+                                  ?.facades?.[activeWall]?.elements ||
+                                editableFacade(original, activeWall, visual)
+                                  .elements
+                              : elements
+                          }
+                          selected={selected}
+                          hidden={hidden}
+                          locked={locked}
+                          grid={grid}
+                          onSelect={(ids, i) => {
+                            setSelected(ids);
+                            setInstance(i || 0);
+                          }}
+                          onCommit={(next) => {
+                            if (!before) updateElements(next);
+                          }}
+                          onDuplicate={duplicate}
+                          onDelete={remove}
+                        />
+                      </>
+                    )}
+                    {(mode === 'appearance' || mode === 'roof') && (
+                      <div data-mobile-panel="mode">
+                        <BuildingAppearanceEditor
+                          embedded
+                          workspace={workspace}
+                          edit={draft}
+                          data={data}
+                          mode={mode}
+                          onMode={switchMode}
+                          selection={
+                            selection || {
+                              buildingId: edit.id,
+                              partId: metrics?.partId,
+                              wallId: activeWall,
+                            }
+                          }
+                          onSelection={(next) => {
+                            const id =
+                              next.wallId ||
+                              (next.partId !== metrics?.partId
+                                ? walls.find((w) => w.partId === next.partId)
+                                    ?.wallId
+                                : undefined);
+                            if (id && id !== activeWall) choose(id);
+                            onSelection(next);
+                          }}
+                          onEdit={(next) => commit(next)}
+                          onHeightEdit={(next) => commit(next, true)}
+                          roofDraft={roofDraft}
+                          onRoofDraft={onRoofDraft}
+                          onApplyRoof={onRoofApply}
+                        />
+                      </div>
+                    )}
+                    {mode === 'outline' && (
+                      <div data-mobile-panel="mode">
+                        <ModelOutlineCanvas
+                          edit={draft}
+                          workspace={workspace}
+                          onCommit={(next) => commit(next, true)}
+                        />
+                      </div>
+                    )}
+                    {mode === 'review' && (
+                      <section
+                        className="model-review"
+                        data-mobile-panel="mode"
+                      >
+                        <h3>Model review</h3>
+                        <p>
+                          Saving preserves your draft. Only walls explicitly
+                          reviewed receive approval.
+                        </p>
+                        {publishErrors.map((e, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              switchMode(
+                                /height|floor/i.test(e)
+                                  ? 'appearance'
+                                  : 'details',
+                              );
+                              if (!/height|floor/i.test(e)) openPanel('more');
+                            }}
+                          >
+                            {e}
+                          </button>
+                        ))}
+                        {Object.values(
+                          draft.properties.appearance?.facades || {},
+                        ).map((f) => {
+                          const w = walls.find((w) => w.wallId === f.wallId),
+                            changed =
+                              JSON.stringify(
+                                initial.current.properties.appearance
+                                  ?.facades?.[f.wallId],
+                              ) !== JSON.stringify(f);
+                          return (
+                            <article key={f.wallId}>
+                              <strong>
+                                {w?.label || 'Removed wall'}
+                                {changed ? ' · changed this session' : ''}
+                              </strong>
+                              <p>
+                                {f.confidence === 'inferred'
+                                  ? 'Illustrative estimate'
+                                  : f.confidence === 'observed'
+                                    ? 'Photo observed · estimated dimensions'
+                                    : 'Documented dimensions'}{' '}
+                                · {f.elements.length} records ·{' '}
+                                {f.reviewedAt ? 'Reviewed' : 'Needs review'}
+                              </p>
+                              {changed && (
+                                <ul>
+                                  {f.elements
+                                    .filter(
+                                      (e) =>
+                                        JSON.stringify(
+                                          initial.current.properties.appearance?.facades?.[
+                                            f.wallId
+                                          ]?.elements.find(
+                                            (old) => old.id === e.id,
+                                          ),
+                                        ) !== JSON.stringify(e),
                                     )
-                                  }
-                                >
-                                  Group · {g.name}
-                                </button>
-                              ))}
-                            {authoring.patterns
-                              .filter((p) => p.wallId === w.wallId)
-                              .map((p) => (
+                                    .map((e) => (
+                                      <li key={e.id}>
+                                        {label(e)} ·{' '}
+                                        {initial.current.properties.appearance?.facades?.[
+                                          f.wallId
+                                        ]?.elements.some(
+                                          (old) => old.id === e.id,
+                                        )
+                                          ? 'modified'
+                                          : 'added'}
+                                      </li>
+                                    ))}
+                                  {(
+                                    initial.current.properties.appearance
+                                      ?.facades?.[f.wallId]?.elements || []
+                                  )
+                                    .filter(
+                                      (e) =>
+                                        !f.elements.some(
+                                          (next) => next.id === e.id,
+                                        ),
+                                    )
+                                    .map((e) => (
+                                      <li key={e.id}>{label(e)} · removed</li>
+                                    ))}
+                                </ul>
+                              )}
+                              <button
+                                onClick={() => {
+                                  choose(w?.wallId || activeWall);
+                                  setMode('details');
+                                  openPanel('more');
+                                  setTab('wall');
+                                }}
+                              >
+                                Inspect details and evidence
+                              </button>
+                              {!w && metrics && (
                                 <button
-                                  key={p.id}
                                   onClick={() => {
-                                    setPatternId(p.id);
-                                    setSelected(p.members);
-                                    setPattern({
-                                      rows: p.rows,
-                                      columns: p.columns,
-                                      stepX: p.stepX,
-                                      stepY: p.stepY,
+                                    if (recorded) {
+                                      setError(
+                                        'The selected wall already has details. Choose an empty wall before rematching.',
+                                      );
+                                      return;
+                                    }
+                                    const oldLength = wallLength(
+                                        f.wallCoordinates,
+                                      ),
+                                      next = {
+                                        ...f,
+                                        wallId: activeWall,
+                                        partId: metrics.partId,
+                                        wallCoordinates: metrics.coordinates,
+                                        elements: f.elements.map((e) => ({
+                                          ...e,
+                                          x: (e.x * oldLength) / metrics.length,
+                                          spacing:
+                                            (e.spacing * oldLength) /
+                                            metrics.length,
+                                        })),
+                                        needsReview: true,
+                                        reviewedAt: undefined,
+                                      };
+                                    const facades = {
+                                      ...draft.properties.appearance?.facades,
+                                    };
+                                    delete facades[f.wallId];
+                                    facades[activeWall] = next;
+                                    commit({
+                                      ...draft,
+                                      properties: {
+                                        ...draft.properties,
+                                        appearance: {
+                                          ...draft.properties.appearance,
+                                          facades,
+                                        },
+                                      },
                                     });
                                   }}
                                 >
-                                  Pattern · {p.name}
+                                  Rematch to selected empty wall
                                 </button>
-                              ))}
-                            {children
-                              .filter(
-                                (e) =>
-                                  !query ||
-                                  label(e)
-                                    .toLowerCase()
-                                    .includes(query.toLowerCase()),
-                              )
-                              .map((e) => (
-                                <button
-                                  className="model-detail-item"
-                                  key={e.id}
-                                  aria-pressed={selected.includes(e.id)}
-                                  onClick={(event) => {
-                                    setSelected(
-                                      event.shiftKey
-                                        ? toggle(selected, [e.id])
-                                        : [e.id],
-                                    );
-                                    setInstance(0);
-                                  }}
-                                >
-                                  {label(e)}
-                                  {locked.includes(e.id) ? ' · locked' : ''}
-                                  {hidden.includes(e.id) ? ' · hidden' : ''}
-                                </button>
-                              ))}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-              </section>
-            ))}
-          </aside>
-          <main className="model-stage">
-            <label className="model-wall-picker">
-              Mapped wall
-              <select
-                value={activeWall}
-                onChange={(e) => choose(e.target.value)}
-              >
-                {walls.map((w) => (
-                  <option key={w.wallId} value={w.wallId}>
-                    {w.label} · {wallLength(w.coordinates).toFixed(2)} m
-                  </option>
-                ))}
-              </select>
-            </label>
-            <fieldset className="model-mobile-tabs" aria-label="Workspace view">
-              {['wall', '3d', 'photo'].map((v) => (
-                <button
-                  key={v}
-                  aria-pressed={tab === v}
-                  onClick={() => setTab(v)}
-                >
-                  {v === '3d' ? '3D' : v[0].toUpperCase() + v.slice(1)}
-                </button>
-              ))}
-            </fieldset>
-            <div className={`model-view-columns model-tab-${tab}`}>
-              <div className="model-edit-view">
-                {mode === 'details' && metrics && (
-                  <>
-                    {!facade && !conversion && (
-                      <div className="model-notice">
-                        <p>
-                          Adding a detail preserves this wall’s generated
-                          layout. You can also preview and convert it before
-                          editing.
-                        </p>
-                        <button
-                          onClick={() =>
-                            tryAction(() =>
-                              setConversion(
-                                editableFacade(feature, activeWall, visual),
-                              ),
-                            )
-                          }
-                        >
-                          Preview editable layout
-                        </button>
-                      </div>
+                              )}
+                            </article>
+                          );
+                        })}
+                        {!Object.keys(
+                          draft.properties.appearance?.facades || {},
+                        ).length && <p>No custom wall details yet.</p>}
+                      </section>
                     )}
-                    {conversion && (
-                      <div className="model-notice">
-                        <p>
-                          Preview:{' '}
-                          {conversion.elements.reduce((n, e) => n + e.count, 0)}{' '}
-                          generated details become editable. Existing
-                          proportions are retained.
-                        </p>
-                        <button onClick={() => applyWall(conversion)}>
-                          Use editable layout
-                        </button>
-                        <button onClick={() => setConversion(null)}>
-                          Cancel conversion
-                        </button>
-                      </div>
-                    )}
-                    {pending?.wallId === activeWall && (
-                      <div className="model-notice">
-                        <p>
-                          Unfinished wall retained locally. Resolve its
-                          placement or building errors, then save it.
-                        </p>
-                        <button onClick={() => applyWall(pending)}>
-                          Save unfinished wall
-                        </button>
-                        <button onClick={() => setMode('appearance')}>
-                          Check building height
-                        </button>
-                      </div>
-                    )}
-                    <ModelWallCanvas
-                      views={wallViews.current}
-                      key={activeWall}
-                      metrics={metrics}
-                      elements={
-                        before
-                          ? initial.current.properties.appearance?.facades?.[
-                              activeWall
-                            ]?.elements ||
-                            editableFacade(original, activeWall, visual)
-                              .elements
-                          : elements
-                      }
-                      selected={selected}
+                  </div>
+                  <div className="model-3d-view">
+                    <PhotoModelPreview
+                      onActions={showContextActions}
+                      active={!compact || tab === '3d'}
                       hidden={hidden}
-                      locked={locked}
-                      grid={grid}
-                      onSelect={(ids, i) => {
-                        setSelected(ids);
-                        setInstance(i || 0);
-                      }}
-                      onCommit={(next) => {
-                        if (!before) updateElements(next);
-                      }}
-                      onDuplicate={duplicate}
-                      onDelete={remove}
-                      onCancel={() => {
-                        setPending(null);
-                        workspace?.recoverModelInput(
-                          edit.id,
-                          `pending:${activeWall}`,
-                        );
-                      }}
-                    />
-                  </>
-                )}
-                {(mode === 'appearance' || mode === 'roof') && (
-                  <BuildingAppearanceEditor
-                    embedded
-                    workspace={workspace}
-                    edit={draft}
-                    data={data}
-                    mode={mode}
-                    onMode={setMode}
-                    selection={
-                      selection || {
+                      feature={before ? original : feature}
+                      visual={visual}
+                      data={data}
+                      wallId={activeWall}
+                      selection={{
                         buildingId: edit.id,
-                        partId: metrics?.partId,
                         wallId: activeWall,
-                      }
-                    }
-                    onSelection={(next) => {
-                      const id =
-                        next.wallId ||
-                        (next.partId !== metrics?.partId
-                          ? walls.find((w) => w.partId === next.partId)?.wallId
-                          : undefined);
-                      if (id && id !== activeWall) choose(id);
-                      onSelection(next);
-                    }}
-                    onEdit={(next) => commit(next)}
-                    onHeightEdit={(next) => commit(next, true)}
-                    roofDraft={roofDraft}
-                    onRoofDraft={onRoofDraft}
-                    onApplyRoof={onRoofApply}
-                  />
-                )}
-                {mode === 'outline' && (
-                  <ModelOutlineCanvas
-                    edit={draft}
-                    workspace={workspace}
-                    onCommit={(next) => commit(next, true)}
-                  />
-                )}
-                {mode === 'review' && (
-                  <section className="model-review">
-                    <h3>Model review</h3>
-                    <p>
-                      Saving preserves your draft. Only walls explicitly
-                      reviewed receive approval.
-                    </p>
-                    {publishErrors.map((e, i) => (
-                      <output key={i}>{e}</output>
-                    ))}
-                    {Object.values(
-                      draft.properties.appearance?.facades || {},
-                    ).map((f) => {
-                      const w = walls.find((w) => w.wallId === f.wallId),
-                        changed =
-                          JSON.stringify(
-                            initial.current.properties.appearance?.facades?.[
-                              f.wallId
-                            ],
-                          ) !== JSON.stringify(f);
-                      return (
-                        <article key={f.wallId}>
-                          <strong>
-                            {w?.label || 'Removed wall'}
-                            {changed ? ' · changed this session' : ''}
-                          </strong>
-                          <p>
-                            {f.confidence === 'inferred'
-                              ? 'Illustrative estimate'
-                              : f.confidence === 'observed'
-                                ? 'Photo observed · estimated dimensions'
-                                : 'Documented dimensions'}{' '}
-                            · {f.elements.length} records ·{' '}
-                            {f.reviewedAt ? 'Reviewed' : 'Needs review'}
-                          </p>
-                          {changed && (
-                            <ul>
-                              {f.elements
-                                .filter(
-                                  (e) =>
-                                    JSON.stringify(
-                                      initial.current.properties.appearance?.facades?.[
-                                        f.wallId
-                                      ]?.elements.find(
-                                        (old) => old.id === e.id,
-                                      ),
-                                    ) !== JSON.stringify(e),
-                                )
-                                .map((e) => (
-                                  <li key={e.id}>
-                                    {label(e)} ·{' '}
-                                    {initial.current.properties.appearance?.facades?.[
-                                      f.wallId
-                                    ]?.elements.some((old) => old.id === e.id)
-                                      ? 'modified'
-                                      : 'added'}
-                                  </li>
-                                ))}
-                              {(
-                                initial.current.properties.appearance
-                                  ?.facades?.[f.wallId]?.elements || []
-                              )
-                                .filter(
-                                  (e) =>
-                                    !f.elements.some(
-                                      (next) => next.id === e.id,
-                                    ),
-                                )
-                                .map((e) => (
-                                  <li key={e.id}>{label(e)} · removed</li>
-                                ))}
-                            </ul>
-                          )}
-                          <button
-                            onClick={() => {
-                              choose(w?.wallId || activeWall);
-                              setMode('details');
-                            }}
-                          >
-                            Inspect details and evidence
-                          </button>
-                          {!w && metrics && (
-                            <button
-                              onClick={() => {
-                                if (recorded) {
-                                  setError(
-                                    'The selected wall already has details. Choose an empty wall before rematching.',
-                                  );
-                                  return;
-                                }
-                                const oldLength = wallLength(f.wallCoordinates),
-                                  next = {
-                                    ...f,
-                                    wallId: activeWall,
-                                    partId: metrics.partId,
-                                    wallCoordinates: metrics.coordinates,
-                                    elements: f.elements.map((e) => ({
-                                      ...e,
-                                      x: (e.x * oldLength) / metrics.length,
-                                      spacing:
-                                        (e.spacing * oldLength) /
-                                        metrics.length,
-                                    })),
-                                    needsReview: true,
-                                    reviewedAt: undefined,
-                                  };
-                                const facades = {
-                                  ...draft.properties.appearance?.facades,
-                                };
-                                delete facades[f.wallId];
-                                facades[activeWall] = next;
-                                commit({
-                                  ...draft,
-                                  properties: {
-                                    ...draft.properties,
-                                    appearance: {
-                                      ...draft.properties.appearance,
-                                      facades,
-                                    },
-                                  },
-                                });
-                              }}
-                            >
-                              Rematch to selected empty wall
-                            </button>
-                          )}
-                        </article>
-                      );
-                    })}
-                    {!Object.keys(draft.properties.appearance?.facades || {})
-                      .length && <p>No custom wall details yet.</p>}
-                  </section>
-                )}
-              </div>
-              <div className="model-3d-view">
-                <PhotoModelPreview
-                  hidden={hidden}
-                  feature={before ? original : feature}
-                  visual={visual}
-                  data={data}
-                  wallId={activeWall}
-                  selection={{
-                    buildingId: edit.id,
-                    wallId: activeWall,
-                    elementId: selected.length === 1 ? selected[0] : undefined,
-                    instanceIndex: instance,
-                  }}
-                  onSelect={(s) => {
-                    if (s.wallId)
-                      choose(s.wallId, s.elementId, s.instanceIndex);
-                  }}
-                />
-              </div>
-              <div className="model-photo-view">
-                <button
-                  aria-expanded={reference}
-                  onClick={() => setReference((v) => !v)}
-                >
-                  {reference ? 'Hide' : 'Show'} photograph reference
-                </button>
-                {reference && (
-                  <ModelPhotoPanel
-                    key={`${edit.id}:${activeWall}:${photo?.id || ''}`}
-                    photos={photos}
-                    photo={photo}
-                    onPhoto={setPhotoId}
-                    facade={facade}
-                    workspace={workspace}
-                    buildingId={edit.id}
-                    onCommit={(next) => applyWall(next)}
-                  />
-                )}
-              </div>
-            </div>
-          </main>
-          <aside
-            className="model-inspector"
-            aria-label="Model detail properties"
-          >
-            {mode === 'details' && metrics && (
-              <>
-                <label>
-                  Snap grid
-                  <select
-                    value={grid}
-                    onChange={(e) => setGrid(Number(e.target.value))}
-                  >
-                    <option value={0.01}>0.01 m</option>
-                    <option value={0.1}>0.1 m</option>
-                    <option value={1}>1 m</option>
-                  </select>
-                </label>
-                <div className="model-add-tools">
-                  {kinds.map((k) => (
-                    <button key={k} disabled={before} onClick={() => add(k)}>
-                      Add {k}
-                    </button>
-                  ))}
-                </div>
-                <div className="model-toolbar">
-                  <button disabled={!selected.length} onClick={duplicate}>
-                    Duplicate
-                  </button>
-                  <button
-                    disabled={!selected.length}
-                    onClick={() => setClipboard(stamp())}
-                  >
-                    Copy
-                  </button>
-                  <button
-                    disabled={!clipboard}
-                    onClick={() => {
-                      setPaste(clipboard);
-                      setTargetWall(activeWall);
-                    }}
-                  >
-                    Paste / copy to…
-                  </button>
-                  <button disabled={!selected.length} onClick={remove}>
-                    Delete
-                  </button>
-                  <button
-                    disabled={!selected.length}
-                    onClick={() => setLocked(toggle(locked, selected))}
-                  >
-                    Lock / unlock
-                  </button>
-                  <button
-                    disabled={!selected.length}
-                    onClick={() => setHidden(toggle(hidden, selected))}
-                  >
-                    Hide / show in editor
-                  </button>
-                </div>
-                {selected.length > 1 && (
-                  <div className="model-toolbar">
-                    {(
-                      [
-                        'left',
-                        'centre',
-                        'right',
-                        'bottom',
-                        'top',
-                        'distribute',
-                        'mirror',
-                      ] as const
-                    ).map((action) => (
-                      <button
-                        key={action}
-                        onClick={() =>
-                          updateElements(
-                            layoutElements(
-                              elements,
-                              selected.filter((id) => !locked.includes(id)),
-                              metrics.length,
-                              action,
-                            ),
-                          )
-                        }
-                      >
-                        {action === 'distribute'
-                          ? 'Equal gaps'
-                          : action === 'mirror'
-                            ? 'Mirror layout'
-                            : `Align ${action}`}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {active && selected.length === 1 && (
-                  <>
-                    <h3>{label(active)}</h3>
-                    <ModelField
-                      label="Detail name"
-                      type="text"
-                      value={authoring.names[active.id] || ''}
-                      buildingId={edit.id}
-                      field={`name:${active.id}`}
-                      workspace={workspace}
-                      onCommit={(v) =>
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              names: {
-                                ...authoring.names,
-                                [active.id]: v.slice(0, 120),
-                              },
-                            },
-                          },
-                        })
-                      }
+                        elementId:
+                          selected.length === 1 ? selected[0] : undefined,
+                        instanceIndex: instance,
+                      }}
+                      onSelect={(s) => {
+                        if (s.wallId)
+                          choose(s.wallId, s.elementId, s.instanceIndex);
+                      }}
                     />
-                    <div className="model-properties-grid">
-                      {field(
-                        'x',
-                        'Centre from A (m)',
-                        active.x * metrics.length,
-                        0,
-                        metrics.length,
-                      )}
-                      {field('bottom', 'Bottom above base (m)', active.bottom)}
-                      {field('width', 'Width (m)', active.width, 0.01)}
-                      {field('height', 'Height (m)', active.height, 0.01)}
-                      {field('depth', 'Projection (m)', active.depth, 0, 10)}
-                      {field('count', 'Repeat count', active.count, 1, 40)}
-                      {field(
-                        'spacing',
-                        'Centre spacing (m)',
-                        active.spacing * metrics.length,
-                        0,
-                        metrics.length,
-                      )}
-                      <ModelField
-                        label="Material colour"
-                        type="color"
-                        value={active.colour}
-                        buildingId={edit.id}
-                        field={`${active.id}:colour`}
+                  </div>
+                  <div className="model-photo-view">
+                    <button
+                      aria-expanded={reference}
+                      onClick={() => setReference((v) => !v)}
+                    >
+                      {reference ? 'Hide' : 'Show'} photograph reference
+                    </button>
+                    {(reference || compact) && (
+                      <ModelPhotoPanel
+                        key={`${edit.id}:${activeWall}:${photo?.id || ''}`}
+                        photos={photos}
+                        photo={photo}
+                        onPhoto={setPhotoId}
+                        facade={facade}
                         workspace={workspace}
-                        onCommit={(v) => patch(active.id, { colour: v })}
+                        buildingId={edit.id}
+                        onCommit={(next) => applyWall(next)}
                       />
-                    </div>
-                    <p>
-                      Edges:{' '}
-                      {elementBounds(active, metrics.length).left.toFixed(2)}–
-                      {elementBounds(active, metrics.length).right.toFixed(2)} m
-                      from A.
-                    </p>
-                    {active.count > 1 && (
-                      <>
-                        <label>
-                          Repeated instance
-                          <select
-                            value={Math.min(instance, active.count - 1)}
-                            onChange={(e) =>
-                              setInstance(Number(e.target.value))
-                            }
-                          >
-                            {Array.from({ length: active.count }, (_, i) => (
-                              <option key={i} value={i}>
-                                {i + 1}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <button
-                          onClick={() =>
-                            tryAction(() => {
-                              const next = detachInstance(
-                                elements,
-                                active.id,
-                                instance,
-                              );
-                              if (updateElements(next.elements))
-                                setSelected([next.detachedId]);
-                            })
-                          }
-                        >
-                          Detach selected instance
-                        </button>
-                      </>
                     )}
-                  </>
-                )}
-                <details>
-                  <summary>Groups, patterns &amp; presets</summary>
-                  <label>
-                    Name
-                    <input
-                      value={name}
-                      maxLength={120}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </label>
-                  <div className="model-toolbar">
-                    <button
-                      disabled={!selected.length}
-                      onClick={() =>
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              groups: [
-                                ...authoring.groups,
-                                {
-                                  id: crypto.randomUUID(),
-                                  name: name.trim() || 'Detail group',
-                                  wallId: activeWall,
-                                  members: selected,
-                                },
-                              ],
-                            },
-                          },
-                        })
-                      }
-                    >
-                      Group selection
-                    </button>
-                    <button
-                      onClick={() =>
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              groups: authoring.groups.filter(
-                                (g) =>
-                                  !g.members.some((id) =>
-                                    selected.includes(id),
-                                  ),
-                              ),
-                            },
-                          },
-                        })
-                      }
-                    >
-                      Ungroup
-                    </button>
-                    <button
-                      disabled={!selected.length}
-                      onClick={() =>
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              presets: [
-                                ...authoring.presets,
-                                { id: crypto.randomUUID(), ...stamp() },
-                              ],
-                            },
-                          },
-                        })
-                      }
-                    >
-                      Save preset
-                    </button>
                   </div>
-                  <label>
-                    Pattern
-                    <select
-                      value={patternId}
-                      onChange={(e) => {
-                        setPatternId(e.target.value);
-                        const p = authoring.patterns.find(
-                          (p) => p.id === e.target.value,
-                        );
-                        if (p)
-                          setPattern({
-                            rows: p.rows,
-                            columns: p.columns,
-                            stepX: p.stepX,
-                            stepY: p.stepY,
-                          });
+                </div>
+              </main>
+              <aside
+                className="model-inspector"
+                aria-label="Model detail properties"
+              >
+                {compact && panel === 'more' && mode === 'details' && (
+                  <div className="model-more-shortcuts">
+                    <button
+                      onClick={() => {
+                        setBefore((v) => !v);
+                        openPanel('none');
                       }}
                     >
-                      <option value="">New from selection</option>
-                      {authoring.patterns
-                        .filter((p) => p.wallId === activeWall)
-                        .map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                  {(['rows', 'columns', 'stepX', 'stepY'] as const).map((k) => (
-                    <label key={k}>
-                      {
-                        {
-                          rows: 'Rows',
-                          columns: 'Columns',
-                          stepX: 'Horizontal step (m)',
-                          stepY: 'Vertical step (m)',
-                        }[k]
-                      }
-                      <input
-                        type="number"
-                        min={k === 'rows' || k === 'columns' ? 1 : 0}
-                        step={k === 'rows' || k === 'columns' ? 1 : 0.1}
-                        value={Number.isFinite(pattern[k]) ? pattern[k] : ''}
-                        onChange={(e) =>
-                          setPattern({
-                            ...pattern,
-                            [k]:
-                              e.target.value === ''
-                                ? NaN
-                                : Number(e.target.value),
-                          })
-                        }
-                      />
-                    </label>
-                  ))}
-                  <button onClick={editPattern}>
-                    {patternId ? 'Update pattern' : 'Create pattern'}
-                  </button>
-                  <button
-                    disabled={!patternId || selected.length !== 1}
-                    onClick={() => {
-                      const p = authoring.patterns.find(
-                        (p) => p.id === patternId,
-                      );
-                      if (p)
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              patterns: authoring.patterns.map((v) =>
-                                v.id === p.id
-                                  ? {
-                                      ...v,
-                                      members: v.members.filter(
-                                        (id) => !selected.includes(id),
-                                      ),
-                                      slots: patternSlots(v).filter(
-                                        (_, i) =>
-                                          !selected.includes(v.members[i]),
-                                      ),
-                                      excluded: [
-                                        ...new Set([
-                                          ...(v.excluded || []),
-                                          ...patternSlots(v).filter((_, i) =>
-                                            selected.includes(v.members[i]),
-                                          ),
-                                        ]),
-                                      ],
-                                    }
-                                  : v,
-                              ),
-                            },
-                          },
-                        });
-                    }}
-                  >
-                    Detach detail from pattern
-                  </button>
-                  {(workspace?.edits || [draft]).flatMap((e) =>
-                    (e.properties.modelAuthoring?.presets || []).map((p) => (
-                      <button
-                        key={`${e.id}:${p.id}`}
-                        onClick={() => {
-                          setPaste(p);
-                          setTargetWall(activeWall);
-                        }}
-                      >
-                        Insert preset · {p.name}
-                      </button>
-                    )),
-                  )}
-                </details>
-                {facade && (
-                  <details open={!!facade.needsReview}>
-                    <summary>Evidence &amp; wall review</summary>
-                    <label>
-                      Evidence confidence
-                      <select
-                        value={facade.confidence}
-                        onChange={(e) =>
-                          applyWall({
-                            ...facade,
-                            confidence: e.target
-                              .value as FacadeDescription['confidence'],
-                          })
-                        }
-                      >
-                        <option value="inferred">Illustrative estimate</option>
-                        <option value="observed">Observed in photograph</option>
-                        <option value="documented">
-                          Documented measurements
-                        </option>
-                      </select>
-                    </label>
-                    <ModelField
-                      type="text"
-                      label="Evidence and measurement provenance"
-                      value={facade.notes}
-                      buildingId={edit.id}
-                      field={`${activeWall}:notes`}
-                      workspace={workspace}
-                      onCommit={(v) => applyWall({ ...facade, notes: v })}
-                    />
-                    {photo && (
-                      <button
-                        onClick={() =>
-                          applyWall({
-                            ...facade,
-                            photoIds: [
-                              ...new Set([...facade.photoIds, photo.id]),
-                            ],
-                          })
-                        }
-                      >
-                        Use selected photo as evidence
-                      </button>
-                    )}
-                    {facade.photoIds.map((id) => (
-                      <p key={id}>
-                        {photos.find((p) => p.id === id)?.caption ||
-                          'Unavailable photo'}{' '}
-                        <button
-                          onClick={() =>
-                            applyWall({
-                              ...facade,
-                              photoIds: facade.photoIds.filter((p) => p !== id),
-                              texture:
-                                facade.texture?.photoId === id
-                                  ? undefined
-                                  : facade.texture,
-                            })
-                          }
-                        >
-                          Remove reference
-                        </button>
-                      </p>
-                    ))}
-                    {(facade.needsReview ||
-                      !facadeMatches(facade, feature)) && (
-                      <button
-                        onClick={() => {
-                          const length = wallLength(facade.wallCoordinates);
-                          applyWall({
-                            ...facade,
-                            wallCoordinates: metrics.coordinates,
-                            partId: metrics.partId,
-                            needsReview: false,
-                            elements: facade.elements.map((e) => ({
-                              ...e,
-                              x: (e.x * length) / metrics.length,
-                              spacing: (e.spacing * length) / metrics.length,
-                            })),
-                          });
-                        }}
-                      >
-                        Confirm wall match · preserve metre positions
-                      </button>
-                    )}
-                    <button
-                      disabled={
-                        !!facade.needsReview || !facadeMatches(facade, feature)
-                      }
-                      onClick={() => applyWall(facade, authoring, true)}
-                    >
-                      Mark this wall reviewed
+                      {before ? 'Show changes' : 'Before / after'}
                     </button>
                     <button
                       onClick={() => {
-                        const facades = {
-                          ...draft.properties.appearance?.facades,
-                        };
-                        delete facades[activeWall];
-                        commit({
-                          ...draft,
-                          properties: {
-                            ...draft.properties,
-                            modelAuthoring: {
-                              ...authoring,
-                              groups: authoring.groups.filter(
-                                (g) => g.wallId !== activeWall,
-                              ),
-                              patterns: authoring.patterns.filter(
-                                (p) => p.wallId !== activeWall,
-                              ),
-                            },
-                            appearance: {
-                              ...draft.properties.appearance,
-                              facades,
-                            },
-                          },
-                        });
+                        openPanel('walls');
+                        setTouchTool('multi');
                       }}
                     >
-                      Restore generated wall
+                      Multi-select
                     </button>
-                  </details>
+                    {!facade && !conversion && (
+                      <button
+                        onClick={() => {
+                          tryAction(() =>
+                            setConversion(
+                              editableFacade(feature, activeWall, visual),
+                            ),
+                          );
+                          openPanel('none');
+                        }}
+                      >
+                        Preview editable layout
+                      </button>
+                    )}
+                    {unsaved && (
+                      <button onClick={discardInput}>
+                        Discard unfinished input
+                      </button>
+                    )}
+                  </div>
+                )}
+                {mode === 'details' && metrics && (
+                  <>
+                    <label>
+                      Snap grid
+                      <select
+                        value={grid}
+                        onChange={(e) => setGrid(Number(e.target.value))}
+                      >
+                        <option value={0.01}>0.01 m</option>
+                        <option value={0.1}>0.1 m</option>
+                        <option value={1}>1 m</option>
+                      </select>
+                    </label>
+                    <div className="model-add-tools">
+                      {kinds.map((k) => (
+                        <button
+                          key={k}
+                          disabled={before}
+                          onClick={() => {
+                            add(k);
+                            if (compact) {
+                              setTab('wall');
+                              openPanel('none');
+                            }
+                          }}
+                        >
+                          Add {k}
+                        </button>
+                      ))}
+                    </div>
+                    {compact && panel === 'more' && (
+                      <Menu.Trigger
+                        className="model-detail-actions"
+                        onClick={() => setContextPoint(null)}
+                      >
+                        Selection actions
+                      </Menu.Trigger>
+                    )}
+                    {selected.length > 1 && (
+                      <div className="model-toolbar">
+                        {(
+                          [
+                            'left',
+                            'centre',
+                            'right',
+                            'bottom',
+                            'top',
+                            'distribute',
+                            'mirror',
+                          ] as const
+                        ).map((action) => (
+                          <button
+                            key={action}
+                            onClick={() =>
+                              updateElements(
+                                layoutElements(
+                                  elements,
+                                  selected.filter((id) => !locked.includes(id)),
+                                  metrics.length,
+                                  action,
+                                ),
+                              )
+                            }
+                          >
+                            {action === 'distribute'
+                              ? 'Equal gaps'
+                              : action === 'mirror'
+                                ? 'Mirror layout'
+                                : `Align ${action}`}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {active && selected.length === 1 && (
+                      <>
+                        <h3>{label(active)}</h3>
+                        <ModelField
+                          label="Detail name"
+                          type="text"
+                          value={authoring.names[active.id] || ''}
+                          buildingId={edit.id}
+                          field={`name:${active.id}`}
+                          workspace={workspace}
+                          onCommit={(v) =>
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  names: {
+                                    ...authoring.names,
+                                    [active.id]: v.slice(0, 120),
+                                  },
+                                },
+                              },
+                            })
+                          }
+                        />
+                        <div className="model-properties-grid">
+                          {field(
+                            'x',
+                            'Centre from A (m)',
+                            active.x * metrics.length,
+                            0,
+                            metrics.length,
+                          )}
+                          {field(
+                            'bottom',
+                            'Bottom above base (m)',
+                            active.bottom,
+                          )}
+                          {field('width', 'Width (m)', active.width, 0.01)}
+                          {field('height', 'Height (m)', active.height, 0.01)}
+                          {field(
+                            'depth',
+                            'Projection (m)',
+                            active.depth,
+                            0,
+                            10,
+                          )}
+                          {field('count', 'Repeat count', active.count, 1, 40)}
+                          {field(
+                            'spacing',
+                            'Centre spacing (m)',
+                            active.spacing * metrics.length,
+                            0,
+                            metrics.length,
+                          )}
+                          <ModelField
+                            label="Material colour"
+                            type="color"
+                            value={active.colour}
+                            buildingId={edit.id}
+                            field={`${active.id}:colour`}
+                            workspace={workspace}
+                            onCommit={(v) => patch(active.id, { colour: v })}
+                          />
+                        </div>
+                        <p>
+                          Edges:{' '}
+                          {elementBounds(active, metrics.length).left.toFixed(
+                            2,
+                          )}
+                          –
+                          {elementBounds(active, metrics.length).right.toFixed(
+                            2,
+                          )}{' '}
+                          m from A.
+                        </p>
+                        {active.count > 1 && (
+                          <>
+                            <label>
+                              Repeated instance
+                              <select
+                                value={Math.min(instance, active.count - 1)}
+                                onChange={(e) =>
+                                  setInstance(Number(e.target.value))
+                                }
+                              >
+                                {Array.from(
+                                  { length: active.count },
+                                  (_, i) => (
+                                    <option key={i} value={i}>
+                                      {i + 1}
+                                    </option>
+                                  ),
+                                )}
+                              </select>
+                            </label>
+                            <button
+                              onClick={() =>
+                                tryAction(() => {
+                                  const next = detachInstance(
+                                    elements,
+                                    active.id,
+                                    instance,
+                                  );
+                                  if (updateElements(next.elements))
+                                    setSelected([next.detachedId]);
+                                })
+                              }
+                            >
+                              Detach selected instance
+                            </button>
+                          </>
+                        )}
+                      </>
+                    )}
+                    <details>
+                      <summary>Groups, patterns &amp; presets</summary>
+                      <label>
+                        Name
+                        <input
+                          value={name}
+                          maxLength={120}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      </label>
+                      <div className="model-toolbar">
+                        <button
+                          disabled={!selected.length}
+                          onClick={() =>
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  groups: [
+                                    ...authoring.groups,
+                                    {
+                                      id: crypto.randomUUID(),
+                                      name: name.trim() || 'Detail group',
+                                      wallId: activeWall,
+                                      members: selected,
+                                    },
+                                  ],
+                                },
+                              },
+                            })
+                          }
+                        >
+                          Group selection
+                        </button>
+                        <button
+                          onClick={() =>
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  groups: authoring.groups.filter(
+                                    (g) =>
+                                      !g.members.some((id) =>
+                                        selected.includes(id),
+                                      ),
+                                  ),
+                                },
+                              },
+                            })
+                          }
+                        >
+                          Ungroup
+                        </button>
+                        <button
+                          disabled={!selected.length}
+                          onClick={() =>
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  presets: [
+                                    ...authoring.presets,
+                                    { id: crypto.randomUUID(), ...stamp() },
+                                  ],
+                                },
+                              },
+                            })
+                          }
+                        >
+                          Save preset
+                        </button>
+                      </div>
+                      <label>
+                        Pattern
+                        <select
+                          value={patternId}
+                          onChange={(e) => {
+                            setPatternId(e.target.value);
+                            const p = authoring.patterns.find(
+                              (p) => p.id === e.target.value,
+                            );
+                            if (p)
+                              setPattern({
+                                rows: p.rows,
+                                columns: p.columns,
+                                stepX: p.stepX,
+                                stepY: p.stepY,
+                              });
+                          }}
+                        >
+                          <option value="">New from selection</option>
+                          {authoring.patterns
+                            .filter((p) => p.wallId === activeWall)
+                            .map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name}
+                              </option>
+                            ))}
+                        </select>
+                      </label>
+                      {(['rows', 'columns', 'stepX', 'stepY'] as const).map(
+                        (k) => (
+                          <label key={k}>
+                            {
+                              {
+                                rows: 'Rows',
+                                columns: 'Columns',
+                                stepX: 'Horizontal step (m)',
+                                stepY: 'Vertical step (m)',
+                              }[k]
+                            }
+                            <input
+                              type="number"
+                              min={k === 'rows' || k === 'columns' ? 1 : 0}
+                              step={k === 'rows' || k === 'columns' ? 1 : 0.1}
+                              value={
+                                Number.isFinite(pattern[k]) ? pattern[k] : ''
+                              }
+                              onChange={(e) =>
+                                setPattern({
+                                  ...pattern,
+                                  [k]:
+                                    e.target.value === ''
+                                      ? NaN
+                                      : Number(e.target.value),
+                                })
+                              }
+                            />
+                          </label>
+                        ),
+                      )}
+                      <button onClick={editPattern}>
+                        {patternId ? 'Update pattern' : 'Create pattern'}
+                      </button>
+                      <button
+                        disabled={!patternId || selected.length !== 1}
+                        onClick={() => {
+                          const p = authoring.patterns.find(
+                            (p) => p.id === patternId,
+                          );
+                          if (p)
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  patterns: authoring.patterns.map((v) =>
+                                    v.id === p.id
+                                      ? {
+                                          ...v,
+                                          members: v.members.filter(
+                                            (id) => !selected.includes(id),
+                                          ),
+                                          slots: patternSlots(v).filter(
+                                            (_, i) =>
+                                              !selected.includes(v.members[i]),
+                                          ),
+                                          excluded: [
+                                            ...new Set([
+                                              ...(v.excluded || []),
+                                              ...patternSlots(v).filter(
+                                                (_, i) =>
+                                                  selected.includes(
+                                                    v.members[i],
+                                                  ),
+                                              ),
+                                            ]),
+                                          ],
+                                        }
+                                      : v,
+                                  ),
+                                },
+                              },
+                            });
+                        }}
+                      >
+                        Detach detail from pattern
+                      </button>
+                      {(workspace?.edits || [draft]).flatMap((e) =>
+                        (e.properties.modelAuthoring?.presets || []).map(
+                          (p) => (
+                            <button
+                              key={`${e.id}:${p.id}`}
+                              onClick={() => {
+                                setPaste(p);
+                                setTargetWall(activeWall);
+                              }}
+                            >
+                              Insert preset · {p.name}
+                            </button>
+                          ),
+                        ),
+                      )}
+                    </details>
+                    {facade && (
+                      <details open={!!facade.needsReview}>
+                        <summary>Evidence &amp; wall review</summary>
+                        <label>
+                          Evidence confidence
+                          <select
+                            value={facade.confidence}
+                            onChange={(e) =>
+                              applyWall({
+                                ...facade,
+                                confidence: e.target
+                                  .value as FacadeDescription['confidence'],
+                              })
+                            }
+                          >
+                            <option value="inferred">
+                              Illustrative estimate
+                            </option>
+                            <option value="observed">
+                              Observed in photograph
+                            </option>
+                            <option value="documented">
+                              Documented measurements
+                            </option>
+                          </select>
+                        </label>
+                        <ModelField
+                          type="text"
+                          label="Evidence and measurement provenance"
+                          value={facade.notes}
+                          buildingId={edit.id}
+                          field={`${activeWall}:notes`}
+                          workspace={workspace}
+                          onCommit={(v) => applyWall({ ...facade, notes: v })}
+                        />
+                        {photo && (
+                          <button
+                            onClick={() =>
+                              applyWall({
+                                ...facade,
+                                photoIds: [
+                                  ...new Set([...facade.photoIds, photo.id]),
+                                ],
+                              })
+                            }
+                          >
+                            Use selected photo as evidence
+                          </button>
+                        )}
+                        {facade.photoIds.map((id) => (
+                          <p key={id}>
+                            {photos.find((p) => p.id === id)?.caption ||
+                              'Unavailable photo'}{' '}
+                            <button
+                              onClick={() =>
+                                applyWall({
+                                  ...facade,
+                                  photoIds: facade.photoIds.filter(
+                                    (p) => p !== id,
+                                  ),
+                                  texture:
+                                    facade.texture?.photoId === id
+                                      ? undefined
+                                      : facade.texture,
+                                })
+                              }
+                            >
+                              Remove reference
+                            </button>
+                          </p>
+                        ))}
+                        {(facade.needsReview ||
+                          !facadeMatches(facade, feature)) && (
+                          <button
+                            onClick={() => {
+                              const length = wallLength(facade.wallCoordinates);
+                              applyWall({
+                                ...facade,
+                                wallCoordinates: metrics.coordinates,
+                                partId: metrics.partId,
+                                needsReview: false,
+                                elements: facade.elements.map((e) => ({
+                                  ...e,
+                                  x: (e.x * length) / metrics.length,
+                                  spacing:
+                                    (e.spacing * length) / metrics.length,
+                                })),
+                              });
+                            }}
+                          >
+                            Confirm wall match · preserve metre positions
+                          </button>
+                        )}
+                        <button
+                          disabled={
+                            !!facade.needsReview ||
+                            !facadeMatches(facade, feature)
+                          }
+                          onClick={() => applyWall(facade, authoring, true)}
+                        >
+                          Mark this wall reviewed
+                        </button>
+                        <button
+                          onClick={() => {
+                            const facades = {
+                              ...draft.properties.appearance?.facades,
+                            };
+                            delete facades[activeWall];
+                            commit({
+                              ...draft,
+                              properties: {
+                                ...draft.properties,
+                                modelAuthoring: {
+                                  ...authoring,
+                                  groups: authoring.groups.filter(
+                                    (g) => g.wallId !== activeWall,
+                                  ),
+                                  patterns: authoring.patterns.filter(
+                                    (p) => p.wallId !== activeWall,
+                                  ),
+                                },
+                                appearance: {
+                                  ...draft.properties.appearance,
+                                  facades,
+                                },
+                              },
+                            });
+                          }}
+                        >
+                          Restore generated wall
+                        </button>
+                      </details>
+                    )}
+                  </>
+                )}
+                {mode !== 'details' && (
+                  <p>
+                    Select Details to edit individual architectural elements.
+                    Roof and footprint changes may require another wall review.
+                  </p>
+                )}
+              </aside>
+            </div>
+            {compact && (
+              <>
+                {mobilePanel !== 'none' && (
+                  <div className="model-sheet-heading">
+                    <button
+                      className="model-sheet-handle"
+                      aria-label={
+                        detent === 'half' ? 'Expand tools' : 'Collapse tools'
+                      }
+                      onPointerDown={(e) => {
+                        sheetDragged.current = false;
+                        sheetStart.current = e.clientY;
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                      }}
+                      onPointerUp={(e) => {
+                        const dy = e.clientY - sheetStart.current;
+                        if (Math.abs(dy) > 25) {
+                          sheetDragged.current = true;
+                          if (dy > 90 && detent === 'half') openPanel('none');
+                          else setDetent(dy < 0 ? 'full' : 'half');
+                        }
+                      }}
+                      onClick={() => {
+                        if (!sheetDragged.current)
+                          setDetent((d) => (d === 'half' ? 'full' : 'half'));
+                      }}
+                    >
+                      ↕{' '}
+                      {mobilePanel === 'mode'
+                        ? mode
+                        : mobilePanel === 'walls'
+                          ? 'Walls & details'
+                          : mobilePanel === 'edit'
+                            ? 'Detail properties'
+                            : mobilePanel === 'more'
+                              ? 'More tools'
+                              : mobilePanel === 'photo'
+                                ? 'Photo alignment'
+                                : mobilePanel === 'copy'
+                                  ? 'Copy placement'
+                                  : 'Add detail'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        (document.activeElement as HTMLElement)?.blur();
+                        if (paste) setPaste(null);
+                        else {
+                          const multi = touchTool === 'multi';
+                          openPanel('none');
+                          if (multi) setTouchTool('multi');
+                        }
+                      }}
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+                {error && (
+                  <div role="alert">
+                    <button
+                      className="model-mobile-error"
+                      onClick={() => switchMode('review')}
+                    >
+                      {error}
+                    </button>
+                  </div>
+                )}
+                <div className="model-selection-strip" aria-live="polite">
+                  {mode === 'details' && selected.length
+                    ? `${selected.length} selected${active && selected.length === 1 ? ' · ' + label(active) : ''}`
+                    : metrics
+                      ? `${metrics.length.toFixed(1)} m · ${metrics.direction} wall`
+                      : 'Choose a wall'}{' '}
+                  ·{' '}
+                  {touchTool === 'multi'
+                    ? 'Multi-select'
+                    : touchTool === 'select'
+                      ? 'Tap to select'
+                      : touchTool === 'move'
+                        ? 'Move enabled'
+                        : 'Resize enabled'}
+                  {before ? ' · Before (read only)' : ''}
+                </div>
+                <nav
+                  className="model-bottom-actions"
+                  aria-label="Mobile model actions"
+                >
+                  {mode === 'details' ? (
+                    selected.length ? (
+                      <>
+                        <button
+                          disabled={
+                            before ||
+                            selected.every((id) => locked.includes(id))
+                          }
+                          aria-pressed={touchTool === 'move'}
+                          onClick={() => {
+                            openPanel('none');
+                            setTouchTool(
+                              touchTool === 'move' ? 'select' : 'move',
+                            );
+                            setTab('wall');
+                          }}
+                        >
+                          Move
+                        </button>
+                        <button
+                          disabled={
+                            before ||
+                            selected.length !== 1 ||
+                            selected.every((id) => locked.includes(id)) ||
+                            active?.count !== 1
+                          }
+                          aria-pressed={touchTool === 'resize'}
+                          onClick={() => {
+                            openPanel('none');
+                            setTouchTool(
+                              touchTool === 'resize' ? 'select' : 'resize',
+                            );
+                            setTab('wall');
+                          }}
+                        >
+                          Resize
+                        </button>
+                        <button onClick={() => openPanel('edit')}>Edit</button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          disabled={before}
+                          onClick={() => openPanel('add')}
+                        >
+                          Add
+                        </button>
+                        <button onClick={() => openPanel('walls')}>
+                          Walls
+                        </button>
+                        <button
+                          aria-pressed={touchTool === 'multi'}
+                          onClick={() => {
+                            openPanel('walls');
+                            setTouchTool('multi');
+                          }}
+                        >
+                          Multi-select
+                        </button>
+                      </>
+                    )
+                  ) : (
+                    <>
+                      <button onClick={() => openPanel('mode')}>
+                        {mode === 'review' ? 'Review issues' : 'Edit ' + mode}
+                      </button>
+                      <button
+                        onClick={() => {
+                          openPanel('none');
+                          setTouchTool(
+                            touchTool === 'move' ? 'select' : 'move',
+                          );
+                          setTab('wall');
+                        }}
+                        disabled={!['roof', 'outline'].includes(mode)}
+                        aria-pressed={touchTool === 'move'}
+                      >
+                        Move point
+                      </button>
+                      <button onClick={() => openPanel('walls')}>Walls</button>
+                    </>
+                  )}
+                  <button
+                    onClick={() =>
+                      openPanel(tab === 'photo' ? 'photo' : 'more')
+                    }
+                  >
+                    More
+                  </button>
+                </nav>
+                {mobilePanel === 'more' && mode !== 'details' && (
+                  <section data-mobile-panel="more">
+                    <button
+                      onClick={() => {
+                        setBefore((v) => !v);
+                        openPanel('none');
+                      }}
+                    >
+                      Before / after
+                    </button>
+                    <button onClick={() => switchMode('details')}>
+                      Edit architectural details
+                    </button>
+                    <button onClick={() => switchMode('review')}>
+                      Review changes
+                    </button>
+                    {unsaved && (
+                      <button onClick={discardInput}>
+                        Discard unfinished input
+                      </button>
+                    )}
+                  </section>
                 )}
               </>
             )}
-            {mode !== 'details' && (
-              <p>
-                Select Details to edit individual architectural elements. Roof
-                and footprint changes may require another wall review.
-              </p>
+            {paste && (
+              <section
+                className="model-paste-preview"
+                aria-label="Copy placement preview"
+              >
+                <h3>Copy {paste.elements.length} detail records</h3>
+                <div className="model-properties-grid">
+                  {(['x', 'y', 'scale'] as const).map((key) => (
+                    <ModelField
+                      key={key}
+                      label={
+                        key === 'x'
+                          ? 'Horizontal offset (m)'
+                          : key === 'y'
+                            ? 'Vertical offset (m)'
+                            : 'Explicit size multiplier'
+                      }
+                      value={pasteTransform[key]}
+                      buildingId={edit.id}
+                      field={`paste:${key}`}
+                      min={key === 'scale' ? 0.01 : -150}
+                      max={key === 'scale' ? 10 : 150}
+                      onCommit={(v) => {
+                        setPasteTransform((t) => ({ ...t, [key]: Number(v) }));
+                        return true;
+                      }}
+                    />
+                  ))}
+                </div>
+                <p>
+                  Dimensions and spacing stay in metres. New placements require
+                  owner review.
+                </p>
+                <label>
+                  Target building
+                  <select
+                    aria-label="Target building"
+                    value={targetBuilding}
+                    onChange={(e) => {
+                      setTargetBuilding(e.target.value);
+                      setTargetWall('');
+                    }}
+                  >
+                    {buildings.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Target wall
+                  <select
+                    aria-label="Target wall"
+                    value={targetWall || targetWalls[0]?.wallId || ''}
+                    onChange={(e) => setTargetWall(e.target.value)}
+                  >
+                    {targetWalls.map((w) => (
+                      <option key={w.wallId} value={w.wallId}>
+                        {w.label} · {wallLength(w.coordinates).toFixed(2)} m
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p>
+                  First detail centre:{' '}
+                  {(paste.elements[0]?.x * paste.wallLength).toFixed(2)} m from
+                  A; height {paste.elements[0]?.bottom.toFixed(2)} m.
+                </p>
+                {targetEdit &&
+                  targetWalls.length > 0 &&
+                  (() => {
+                    const id = targetWall || targetWalls[0].wallId,
+                      m = wallMetrics(
+                        modelFeature(targetEdit),
+                        id,
+                        data.visuals?.buildings.find(
+                          (v) => v.id === targetEdit.id,
+                        ),
+                      ),
+                      values = copiedPlacement(paste, m.length),
+                      bad = new Set(
+                        placementErrors(values, m.length, m.eaves).map(
+                          (e) => e.id,
+                        ),
+                      );
+                    return (
+                      <svg
+                        className="model-copy-canvas"
+                        aria-label="Copied layout preview on target wall"
+                        viewBox={`-1 ${-m.eaves - 1} ${m.length + 2} ${m.eaves + 2}`}
+                      >
+                        <rect
+                          x={0}
+                          y={-m.eaves}
+                          width={m.length}
+                          height={m.eaves}
+                          fill={m.style.wallColour || '#ddd6c5'}
+                        />
+                        {values.flatMap((e) =>
+                          Array.from({ length: e.count }, (_, i) => (
+                            <rect
+                              key={`${e.id}:${i}`}
+                              x={
+                                (e.x + (i - (e.count - 1) / 2) * e.spacing) *
+                                  m.length -
+                                e.width / 2
+                              }
+                              y={-e.bottom - e.height}
+                              width={e.width}
+                              height={e.height}
+                              fill={bad.has(e.id) ? '#db3535' : e.colour}
+                              stroke="#168aff"
+                              strokeWidth={0.08}
+                            />
+                          )),
+                        )}
+                      </svg>
+                    );
+                  })()}
+                <button onClick={confirmPaste}>Confirm placement</button>
+                <button onClick={() => setPaste(null)}>Cancel copy</button>
+              </section>
             )}
-          </aside>
-        </div>
-        {paste && (
-          <section
-            className="model-paste-preview"
-            aria-label="Copy placement preview"
-          >
-            <h3>Copy {paste.elements.length} detail records</h3>
-            <div className="model-properties-grid">
-              {(['x', 'y', 'scale'] as const).map((key) => (
-                <ModelField
-                  key={key}
-                  label={
-                    key === 'x'
-                      ? 'Horizontal offset (m)'
-                      : key === 'y'
-                        ? 'Vertical offset (m)'
-                        : 'Explicit size multiplier'
-                  }
-                  value={pasteTransform[key]}
-                  buildingId={edit.id}
-                  field={`paste:${key}`}
-                  min={key === 'scale' ? 0.01 : -150}
-                  max={key === 'scale' ? 10 : 150}
-                  onCommit={(v) => {
-                    setPasteTransform((t) => ({ ...t, [key]: Number(v) }));
-                    return true;
+            <footer>
+              {error && <p role="alert">{error}</p>}
+              <span>
+                Draft changes save automatically. Publication requires release
+                review.
+              </span>
+              {unsaved && (
+                <button
+                  onClick={() => {
+                    setPending(null);
+                    setRoofDraft(null);
+                    workspace?.draftRoof(null);
+                    for (const key of Object.keys(
+                      workspace?.modelInputs[edit.id] || {},
+                    ))
+                      workspace?.recoverModelInput(edit.id, key);
+                    setError(
+                      'Unfinished input discarded; saved draft changes remain.',
+                    );
                   }}
-                />
-              ))}
-            </div>
-            <p>
-              Dimensions and spacing stay in metres. New placements require
-              owner review.
-            </p>
-            <label>
-              Target building
-              <select
-                aria-label="Target building"
-                value={targetBuilding}
-                onChange={(e) => {
-                  setTargetBuilding(e.target.value);
-                  setTargetWall('');
+                >
+                  Discard unfinished input
+                </button>
+              )}
+              <button onClick={onClose}>Close workspace</button>
+            </footer>
+          </DialogContent>
+          <Menu.Portal>
+            <Menu.Positioner
+              anchor={
+                contextPoint
+                  ? {
+                      getBoundingClientRect: () =>
+                        new DOMRect(contextPoint.x, contextPoint.y, 0, 0),
+                    }
+                  : undefined
+              }
+              side="bottom"
+              align="start"
+              sideOffset={4}
+              collisionPadding={8}
+              style={{ zIndex: 100 }}
+            >
+              <Menu.Popup
+                className="model-action-menu"
+                aria-label="Detail actions"
+                finalFocus={() => {
+                  const target = actionFocus.current;
+                  actionFocus.current = null;
+                  if (
+                    !target &&
+                    contextPoint &&
+                    contextReturn.current?.isConnected
+                  ) {
+                    // The menu library restores HTML focus only; our keyboard canvas is SVG.
+                    contextReturn.current.focus();
+                    return false;
+                  }
+                  return target
+                    ? shell.current?.querySelector<HTMLElement>(target) || true
+                    : true;
                 }}
               >
-                {buildings.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Target wall
-              <select
-                aria-label="Target wall"
-                value={targetWall || targetWalls[0]?.wallId || ''}
-                onChange={(e) => setTargetWall(e.target.value)}
-              >
-                {targetWalls.map((w) => (
-                  <option key={w.wallId} value={w.wallId}>
-                    {w.label} · {wallLength(w.coordinates).toFixed(2)} m
-                  </option>
-                ))}
-              </select>
-            </label>
-            <p>
-              First detail centre:{' '}
-              {(paste.elements[0]?.x * paste.wallLength).toFixed(2)} m from A;
-              height {paste.elements[0]?.bottom.toFixed(2)} m.
-            </p>
-            {targetEdit &&
-              targetWalls.length > 0 &&
-              (() => {
-                const id = targetWall || targetWalls[0].wallId,
-                  m = wallMetrics(
-                    modelFeature(targetEdit),
-                    id,
-                    data.visuals?.buildings.find((v) => v.id === targetEdit.id),
-                  ),
-                  values = copiedPlacement(paste, m.length),
-                  bad = new Set(
-                    placementErrors(values, m.length, m.eaves).map((e) => e.id),
-                  );
-                return (
-                  <svg
-                    className="model-copy-canvas"
-                    aria-label="Copied layout preview on target wall"
-                    viewBox={`-1 ${-m.eaves - 1} ${m.length + 2} ${m.eaves + 2}`}
+                <p>
+                  {selected.length === 1 && active
+                    ? label(active)
+                    : `${selected.length} details selected`}
+                </p>
+                {actions.map((action) => (
+                  <Menu.Item
+                    aria-label={action.name}
+                    key={action.name}
+                    disabled={action.disabled}
+                    onClick={action.run}
+                    className={
+                      action.name === 'Delete' ? 'model-menu-danger' : undefined
+                    }
                   >
-                    <rect
-                      x={0}
-                      y={-m.eaves}
-                      width={m.length}
-                      height={m.eaves}
-                      fill={m.style.wallColour || '#ddd6c5'}
-                    />
-                    {values.flatMap((e) =>
-                      Array.from({ length: e.count }, (_, i) => (
-                        <rect
-                          key={`${e.id}:${i}`}
-                          x={
-                            (e.x + (i - (e.count - 1) / 2) * e.spacing) *
-                              m.length -
-                            e.width / 2
-                          }
-                          y={-e.bottom - e.height}
-                          width={e.width}
-                          height={e.height}
-                          fill={bad.has(e.id) ? '#db3535' : e.colour}
-                          stroke="#168aff"
-                          strokeWidth={0.08}
-                        />
-                      )),
-                    )}
-                  </svg>
-                );
-              })()}
-            <button onClick={confirmPaste}>Confirm placement</button>
-            <button onClick={() => setPaste(null)}>Cancel copy</button>
-          </section>
-        )}
-        <footer>
-          {error && <p role="alert">{error}</p>}
-          <span>
-            Draft changes save automatically. Publication requires release
-            review.
-          </span>
-          {unsaved && (
-            <button
-              onClick={() => {
-                setPending(null);
-                setRoofDraft(null);
-                workspace?.draftRoof(null);
-                for (const key of Object.keys(
-                  workspace?.modelInputs[edit.id] || {},
-                ))
-                  workspace?.recoverModelInput(edit.id, key);
-                setError(
-                  'Unfinished input discarded; saved draft changes remain.',
-                );
-              }}
-            >
-              Discard unfinished input
-            </button>
-          )}
-          <button onClick={onClose}>Close workspace</button>
-        </footer>
-      </DialogContent>
-    </Dialog>
+                    <span>{action.name}</span>
+                    {action.shortcut && <kbd>{action.shortcut}</kbd>}
+                  </Menu.Item>
+                ))}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Dialog>
+      </Menu.Root>
+    </ModelMobileContext>
   );
 }
