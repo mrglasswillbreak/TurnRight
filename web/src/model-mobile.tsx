@@ -59,18 +59,29 @@ export function useModelSvgUnits(
 
 /** Only the drawing surface changes location; its owning editor and input state stay mounted. */
 export function ModelPlanPortal({ children }: { children: ReactNode }) {
-  const { compact, planHost } = useModelMobile();
-  return compact && planHost ? createPortal(children, planHost) : children;
+  const { planHost } = useModelMobile();
+  return planHost ? createPortal(children, planHost) : children;
 }
 export function useCompactModel() {
-  const query = '(max-width: 900px), (pointer: coarse) and (max-height: 600px)';
+  return useModelMedia(
+    '(max-width: 900px), (pointer: coarse) and (max-width: 1400px)',
+  );
+}
+
+export function useLandscapeModel() {
+  return useModelMedia(
+    '(orientation: landscape) and (max-height: 600px), (orientation: landscape) and (pointer: coarse)',
+  );
+}
+
+export function useModelMedia(query: string) {
   const [compact, setCompact] = useState(() => matchMedia(query).matches);
   useEffect(() => {
     const media = matchMedia(query),
       update = () => setCompact(media.matches);
     media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
-  }, []);
+  }, [query]);
   return compact;
 }
 
@@ -212,8 +223,7 @@ export function ModelPlanTools({
 }: {
   navigation: ReturnType<typeof useModelPlanNavigation>;
 }) {
-  const { compact } = useModelMobile();
-  return compact ? (
+  return (
     <fieldset className="model-plan-tools" aria-label="Plan navigation">
       <button onClick={() => navigation.zoom(0.8)} aria-label="Zoom plan in">
         +
@@ -223,7 +233,7 @@ export function ModelPlanTools({
       </button>
       <button onClick={navigation.resetView}>Fit plan</button>
     </fieldset>
-  ) : null;
+  );
 }
 
 /** Press-and-hold changes a local candidate and submits exactly one command on release. */
