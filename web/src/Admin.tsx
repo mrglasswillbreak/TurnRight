@@ -81,6 +81,7 @@ import { remapBuildingSurfaces } from './building-surfaces';
 import { EditorInspector } from './EditorInspector';
 import { photoEdits } from './photo-workspace';
 import { EditorReview, type ReviewState } from './EditorReview';
+import { campusFacadeReviewIssues } from './building-facades';
 import {
   getPreference,
   setPreference,
@@ -917,15 +918,24 @@ function Editor({
     if (edit) {
       select(edit, true);
       setRepairFocus(issue);
+      if (issue.repair === 'review-model')
+        setBuildingSelection({
+          buildingId: edit.id,
+          partId:
+            edit.properties.appearance?.facades?.[issue.field || '']?.partId,
+          wallId: issue.field,
+        });
       setExplorer(false);
     } else if (issue.coordinates)
       mapRef.current?.flyTo({ center: issue.coordinates, zoom: 18 });
     setMessage(
-      issue.repair === 'choose-place'
-        ? 'Choose the place served by this entrance, then review the change.'
-        : issue.repair === 'connect-path'
-          ? 'Use the connection controls to choose a highlighted path or draw an approach.'
-          : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
+      issue.repair === 'review-model'
+        ? 'Review the selected wall’s placement and evidence, then mark only that wall reviewed.'
+        : issue.repair === 'choose-place'
+          ? 'Choose the place served by this entrance, then review the change.'
+          : issue.repair === 'connect-path'
+            ? 'Use the connection controls to choose a highlighted path or draw an approach.'
+            : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
     );
   };
   const begin = (
@@ -1355,6 +1365,9 @@ function Editor({
             check.errors[0] ||
               'Apply or cancel unfinished drawing and roof work before preparing a release.',
           );
+        const modelReviews = campusFacadeReviewIssues(check.data);
+        if (modelReviews.length)
+          throw new Error(modelReviews.map((i) => i.message).join('\n'));
       }
       submitted = true;
       await api(name, payload);
@@ -2191,10 +2204,14 @@ function Editor({
             onEndField={workspace.endHistoryGroup}
             buildingEditor={
               selected.kind === 'building' && (
-                <Suspense
-                  fallback={<output>Loading building tools…</output>}
-                >
+                <Suspense fallback={<output>Loading building tools…</output>}>
                   <BuildingAppearanceEditor
+                    reviewRequest={
+                      repairFocus?.repair === 'review-model'
+                        ? repairFocus
+                        : undefined
+                    }
+                    onReviewOpened={() => setRepairFocus(null)}
                     workspace={workspace}
                     onHistory={undo}
                     edit={selected}

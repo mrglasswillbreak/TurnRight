@@ -861,6 +861,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { campusFixture } from '../fixture';
+import { facadeWalls } from '../../src/building-facades';
 import { contrastFailures } from './contrast';
 import type {
   CampusData,
@@ -5514,6 +5515,117 @@ async function modelAction(page: Page, name: string) {
       .click();
   }
   await page.getByRole('menuitem', { name, exact: true }).click();
+}
+for (const width of [390, 1440]) {
+  test(`release preflight opens the exact wall and retains targeted review through undo at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const building = browserCampus().map.features.find(
+      (f) => f.properties?.id === 'library',
+    )!;
+    const walls = facadeWalls(building).slice(0, 2);
+    const server = await setup(page, false, false, {
+      initialEdits: [
+        {
+          id: 'library',
+          kind: 'building',
+          geometry: building.geometry,
+          properties: {
+            ...building.properties,
+            appearance: {
+              facades: Object.fromEntries(
+                walls.map((w) => [
+                  w.wallId,
+                  {
+                    partId: w.partId,
+                    wallId: w.wallId,
+                    wallCoordinates: w.coordinates,
+                    photoIds: [],
+                    confidence: 'inferred',
+                    notes: 'Illustrative layout; dimensions are estimates.',
+                    needsReview: true,
+                    elements: [
+                      {
+                        id: `window-${w.wallId}`,
+                        kind: 'window',
+                        x: 0.5,
+                        bottom: 1,
+                        width: 1,
+                        height: 1,
+                        depth: 0.1,
+                        count: 1,
+                        spacing: 0,
+                        colour: '#566677',
+                      },
+                    ],
+                  },
+                ]),
+              ),
+            },
+          },
+        },
+      ],
+    });
+    await page.getByRole('button', { name: 'Releases', exact: true }).click();
+    await page
+      .getByLabel('What changed?')
+      .fill('Review the changed model height');
+    const blockers = page.getByRole('region', {
+      name: 'Model release blockers',
+    });
+    await expect(blockers.getByRole('button')).toHaveCount(2);
+    if (process.env.TURNRIGHT_CAPTURE_RELEASE === '1') {
+      await blockers.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `../docs/assets/screenshots/editor-release-review-${width}-2026-09-25.png`,
+      });
+    }
+    await expect(
+      page.getByRole('button', { name: 'Build review preview' }),
+    ).toBeDisabled();
+    await blockers.getByRole('button', { name: /Wing 1 · wall 2/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    const review = dialog.locator('.model-review');
+    await review
+      .getByRole('button', { name: /Library · Wing 1 · wall 2:/ })
+      .click();
+    if (width > 900)
+      await expect(dialog.getByLabel('Mapped wall')).toHaveValue(
+        walls[1].wallId,
+      );
+    await expect(
+      dialog.getByRole('button', {
+        name: 'Confirm wall match · preserve metre positions',
+      }),
+    ).toHaveCount(0);
+    const approve = dialog.getByRole('button', {
+      name: 'Mark this wall reviewed',
+      exact: true,
+    });
+    await expect(approve).toBeEnabled();
+    await approve.click();
+    const facade = (i: number) =>
+      server.edits().find((e) => e.id === 'library')?.properties.appearance
+        ?.facades?.[walls[i].wallId];
+    await expect.poll(() => facade(1)?.needsReview).toBe(false);
+    expect(facade(1)?.reviewedAt).toBeTruthy();
+    expect(facade(0)?.needsReview).toBe(true);
+    await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect.poll(() => facade(1)?.needsReview).toBe(true);
+    await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect.poll(() => facade(1)?.needsReview).toBe(false);
+    await dialog
+      .getByRole('button', {
+        name: 'Close workspace',
+        exact: true,
+      })
+      .click();
+    await page.getByRole('button', { name: 'Releases', exact: true }).click();
+    await expect(blockers.getByRole('button')).toHaveCount(1);
+    await expect(blockers).toContainText('Wing 1 · wall 1');
+  });
 }
 async function unifiedModelFixture(
   page: Page,

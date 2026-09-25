@@ -21,6 +21,7 @@ import type { EditorWorkspace } from './editor-workspace';
 import { ModelField } from './ModelField';
 import { fitRoofHeight, inheritsBuildingHeight } from './model-height';
 import { buildingDisplay } from './map-display';
+import type { ValidationIssue } from './validation';
 const PhotoModelWorkspace = lazy(() => import('./PhotoModelWorkspace'));
 
 export type BuildingMode = 'appearance' | 'outline' | 'roof';
@@ -39,6 +40,8 @@ export function BuildingAppearanceEditor({
   embedded = false,
   workspace,
   onHistory,
+  reviewRequest,
+  onReviewOpened,
 }: {
   edit: MapEdit;
   data: CampusData;
@@ -54,6 +57,8 @@ export function BuildingAppearanceEditor({
   embedded?: boolean;
   workspace?: EditorWorkspace;
   onHistory?: (redo?: boolean) => void;
+  reviewRequest?: ValidationIssue;
+  onReviewOpened?: () => void;
 }) {
   const [photoModelOpen, setPhotoModelOpen] = useState(false);
   const [adjustRoofHeight, setAdjustRoofHeight] = useState(true);
@@ -62,9 +67,16 @@ export function BuildingAppearanceEditor({
     workspace?.modelInputs[edit.id]?.['building:heightMode'] ||
     pendingHeightMode ||
     String(edit.properties.heightMode || 'metres');
-  const [workspaceMode, setWorkspaceMode] = useState<'details' | BuildingMode>(
-    'details',
-  );
+  const [workspaceMode, setWorkspaceMode] = useState<
+    'details' | 'review' | BuildingMode
+  >('details');
+  useEffect(() => {
+    if (!embedded && reviewRequest) {
+      setWorkspaceMode('review');
+      setPhotoModelOpen(true);
+      onReviewOpened?.();
+    }
+  }, [embedded, reviewRequest, onReviewOpened]);
   const feature = useMemo(
     () => ({
       type: 'Feature' as const,

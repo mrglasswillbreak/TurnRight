@@ -16,7 +16,12 @@ import type {
   RoofDraft,
 } from './visual-types';
 import type { EditorWorkspace } from './editor-workspace';
-import { facadeErrors, facadeMatches, facadeWalls } from './building-facades';
+import {
+  facadeErrors,
+  facadeMatches,
+  facadeReviewIssues,
+  facadeWalls,
+} from './building-facades';
 import { buildingTopology } from './building-surfaces';
 import { validateEdit } from './editor-model';
 import { PhotoModelPreview } from './PhotoModelPreview';
@@ -1191,9 +1196,9 @@ function ModelWorkspace({
                               <small>
                                 {wallLength(w.coordinates).toFixed(1)} m ·{' '}
                                 {f
-                                  ? f.needsReview
+                                  ? !facadeMatches(f, feature)
                                     ? 'Rematch needed'
-                                    : f.reviewedAt
+                                    : f.reviewedAt && !f.needsReview
                                       ? 'Reviewed'
                                       : 'Needs review'
                                   : 'Generated'}
@@ -1475,6 +1480,23 @@ function ModelWorkspace({
                           <button
                             key={i}
                             onClick={() => {
+                              const issue = facadeReviewIssues(feature).find(
+                                (issue) => issue.message === e,
+                              );
+                              if (
+                                issue &&
+                                !walls.some((w) => w.wallId === issue.field)
+                              ) {
+                                setError(
+                                  'This wall was removed or reassigned. Use its rematching controls below to choose an empty wall.',
+                                );
+                                return;
+                              }
+                              if (
+                                issue?.field &&
+                                walls.some((w) => w.wallId === issue.field)
+                              )
+                                choose(issue.field);
                               switchMode(
                                 /height|floor/i.test(e)
                                   ? 'appearance'
@@ -1508,7 +1530,11 @@ function ModelWorkspace({
                                     ? 'Photo observed · estimated dimensions'
                                     : 'Documented dimensions'}{' '}
                                 · {f.elements.length} records ·{' '}
-                                {f.reviewedAt ? 'Reviewed' : 'Needs review'}
+                                {f.reviewedAt &&
+                                !f.needsReview &&
+                                facadeMatches(f, feature)
+                                  ? 'Reviewed'
+                                  : 'Needs review'}
                               </p>
                               {changed && (
                                 <ul>
@@ -2164,8 +2190,7 @@ function ModelWorkspace({
                             </button>
                           </p>
                         ))}
-                        {(facade.needsReview ||
-                          !facadeMatches(facade, feature)) && (
+                        {!facadeMatches(facade, feature) && (
                           <button
                             onClick={() => {
                               const length = wallLength(facade.wallCoordinates);
@@ -2187,11 +2212,14 @@ function ModelWorkspace({
                           </button>
                         )}
                         <button
-                          disabled={
-                            !!facade.needsReview ||
-                            !facadeMatches(facade, feature)
+                          disabled={!facadeMatches(facade, feature)}
+                          onClick={() =>
+                            applyWall(
+                              { ...facade, needsReview: false },
+                              authoring,
+                              true,
+                            )
                           }
-                          onClick={() => applyWall(facade, authoring, true)}
                         >
                           Mark this wall reviewed
                         </button>

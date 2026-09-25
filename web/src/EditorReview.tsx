@@ -1,4 +1,5 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useState, type RefObject } from 'react';
+import { campusFacadeReviewIssues } from './building-facades';
 import {
   Check,
   Flag,
@@ -87,6 +88,10 @@ export function EditorReview({
   draftCount: number;
 }) {
   const [summary, setSummary] = useState('');
+  const modelReviews = useMemo(
+    () => campusFacadeReviewIssues(validation.data),
+    [validation.data],
+  );
   const [liveState, setLiveState] = useState(state);
   const [statusError, setStatusError] = useState<Error | null>(null);
   const [statusAttempt, setStatusAttempt] = useState(0);
@@ -506,8 +511,33 @@ export function EditorReview({
                   ? 'Validation could not finish'
                   : validation.errors.length
                     ? 'Validation needs attention'
-                    : 'Draft validation passed'}
+                    : modelReviews.length
+                      ? 'Model review required before preview'
+                      : 'Draft validation passed'}
             </strong>
+            {modelReviews.length > 0 && (
+              <section aria-label="Model release blockers">
+                <p>
+                  Draft saves are safe. Review these walls in Photo &amp; model
+                  before building a preview. Height or roof changes can require
+                  another placement review.
+                </p>
+                {modelReviews.map((issue) => (
+                  <div
+                    key={`${issue.featureId}:${issue.field}`}
+                    className="form-error"
+                  >
+                    <p>{issue.message}</p>
+                    <button
+                      className="editor-secondary"
+                      onClick={() => onIssue(issue)}
+                    >
+                      Review model · {issue.message.split(': ')[0]}
+                    </button>
+                  </div>
+                ))}
+              </section>
+            )}
             {!validation.usable && (
               <p className="notice">
                 Showing the last usable map. The current draft has not passed
@@ -735,6 +765,7 @@ export function EditorReview({
               validation.pending ||
               workspace.unfinished !== null ||
               validation.errors.length > 0 ||
+              modelReviews.length > 0 ||
               baselineVersion !== publishedVersion ||
               summary.trim().length < 5 ||
               impact.pending ||
@@ -784,6 +815,7 @@ export function EditorReview({
                       busy ||
                       validation.pending ||
                       validation.errors.length > 0 ||
+                      modelReviews.length > 0 ||
                       baselineVersion !== publishedVersion ||
                       release.created_at <
                         (workspace.edits
