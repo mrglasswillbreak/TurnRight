@@ -32,6 +32,7 @@ import { createFacadeTextures } from './facade-textures';
 import { buildingRevision } from './building-visuals';
 import { detailRevision } from './building-facades';
 import { buildingOutline } from './building-outline';
+import { modelPreviewGesture } from './model-preview-gesture';
 export function PhotoModelPreview(props: {
   feature: Feature;
   visual?: BuildingVisual;
@@ -58,6 +59,7 @@ export function PhotoModelPreview(props: {
   const syncSelection = useRef<() => void>(() => {});
   const retry = useRef<() => void>(() => {});
   const resume = useRef<() => void>(() => {});
+  const cancelGesture = useRef<() => void>(() => {});
   const [failed, setFailed] = useState(false);
   const [message, setMessage] = useState('Building preview…');
   const signature = JSON.stringify([
@@ -78,6 +80,7 @@ export function PhotoModelPreview(props: {
       model: BuildingModel | undefined;
     let releases: (() => void)[] = [];
     let deadline: ReturnType<typeof setTimeout> | undefined;
+    const gestureEvents = new AbortController();
     const scene = new Scene(),
       group = new Group(),
       highlights = new Group(),
@@ -187,7 +190,7 @@ export function PhotoModelPreview(props: {
       element.appendChild(renderer.domElement);
       renderer.domElement.setAttribute(
         'aria-label',
-        'Building model. Use view buttons to rotate and zoom.',
+        'Building model. Tap a detail to select; touch and hold for actions. Drag to orbit or use view buttons.',
       );
       scene.add(new AmbientLight('#ffffff', 1.6));
       const sun = new DirectionalLight('#ffffff', 1.8);
@@ -199,42 +202,24 @@ export function PhotoModelPreview(props: {
       renderer.domElement.addEventListener('contextmenu', (e) =>
         e.preventDefault(),
       );
-      let down:
-        | { id: number; x: number; y: number; moved: boolean }
-        | undefined;
-      const pointers = new Set<number>();
-      renderer.domElement.addEventListener('pointerdown', (e) => {
-        pointers.add(e.pointerId);
-        if (pointers.size === 1)
-          down = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
-        else if (down) down.moved = true;
-      });
-      renderer.domElement.addEventListener('pointermove', (e) => {
-        if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5)
-          down.moved = true;
-      });
-      renderer.domElement.addEventListener('pointercancel', (e) => {
-        pointers.delete(e.pointerId);
-        down = undefined;
-      });
-      renderer.domElement.addEventListener('pointerup', (e) => {
-        pointers.delete(e.pointerId);
-        const tap = down;
-        down = undefined;
+      const pick = (
+        x: number,
+        y: number,
+        actions: boolean,
+        detailOnly: boolean,
+      ) => {
         if (
           !model ||
-          !tap ||
-          tap.id !== e.pointerId ||
-          tap.moved ||
+          disposed ||
           current.current.active === false ||
-          Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 5
+          (detailOnly && !current.current.onActions)
         )
-          return;
+          return false;
         const bounds = renderer!.domElement.getBoundingClientRect();
         raycaster.setFromCamera(
           new Vector2(
-            ((e.clientX - bounds.left) / bounds.width) * 2 - 1,
-            1 - ((e.clientY - bounds.top) / bounds.height) * 2,
+            ((x - bounds.left) / bounds.width) * 2 - 1,
+            1 - ((y - bounds.top) / bounds.height) * 2,
           ),
           camera,
         );
@@ -246,6 +231,8 @@ export function PhotoModelPreview(props: {
             (s) => triangle >= s.start && triangle < s.start + s.count,
           );
           if (s) {
+            // Do not pick through a wall to a detail on a hidden elevation.
+            if (detailOnly && !s.elementId) return false;
             current.current.onSelect?.({
               buildingId: model.id,
               partId: s.partId,
@@ -254,12 +241,62 @@ export function PhotoModelPreview(props: {
               elementId: s.elementId,
               instanceIndex: s.instanceIndex,
             });
-            if (e.button === 2)
-              current.current.onActions?.(e.clientX, e.clientY);
-            break;
+            if (actions) current.current.onActions?.(x, y);
+            return true;
           }
         }
+        return false;
+      };
+      const gesture = modelPreviewGesture({
+        pick,
+        holding: (held) => {
+          if (controls) controls.enabled = !held;
+        },
       });
+      cancelGesture.current = gesture.reset;
+      const gestureOptions = { signal: gestureEvents.signal };
+      for (const name of ['mousedown', 'mouseup', 'click'])
+        renderer.domElement.addEventListener(
+          name,
+          (e) => {
+            if (gesture.suppressCompatibilityMouse()) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+            }
+          },
+          { ...gestureOptions, capture: true },
+        );
+      renderer.domElement.addEventListener(
+        'pointerdown',
+        gesture.down,
+        gestureOptions,
+      );
+      renderer.domElement.addEventListener(
+        'pointermove',
+        gesture.move,
+        gestureOptions,
+      );
+      renderer.domElement.addEventListener(
+        'pointerup',
+        gesture.up,
+        gestureOptions,
+      );
+      renderer.domElement.addEventListener(
+        'pointercancel',
+        gesture.cancel,
+        gestureOptions,
+      );
+      renderer.domElement.addEventListener(
+        'lostpointercapture',
+        gesture.cancel,
+        gestureOptions,
+      );
+      window.addEventListener('blur', gesture.reset, gestureOptions);
+      document.addEventListener(
+        'visibilitychange',
+        gesture.reset,
+        gestureOptions,
+      );
       controls.addEventListener('change', draw);
       observer = new ResizeObserver(() => {
         const width = element.clientWidth,
@@ -419,6 +456,9 @@ export function PhotoModelPreview(props: {
     };
     return () => {
       disposed = true;
+      cancelGesture.current();
+      gestureEvents.abort();
+      cancelGesture.current = () => {};
       clearTimeout(deadline);
       worker.terminate();
       observer?.disconnect();
@@ -436,6 +476,7 @@ export function PhotoModelPreview(props: {
     };
   }, []);
   useEffect(() => {
+    cancelGesture.current();
     request.current();
   }, [signature]);
   const selectionKey = JSON.stringify([
@@ -446,6 +487,7 @@ export function PhotoModelPreview(props: {
   useEffect(() => syncSelection.current(), [selectionKey]);
   useEffect(() => {
     if (props.active !== false) resume.current();
+    else cancelGesture.current();
   }, [props.active]);
   return (
     <section className="photo-model-preview">
