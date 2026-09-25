@@ -4,10 +4,10 @@
 
 The separate baseline reconciliation timeout repair uses
 `supabase/migrations/011_linear_baseline_reconciliation.sql` after the existing
-migrations. It materializes parsed JSON inputs before comparison and replaces
-only the service-role reconciliation function, keeping
+migrations. It materializes parsed JSON inputs through a small RPC wrapper before
+calling a private implementation, keeping
 the owner guard, exclusive source lock, exact stale-review checks, incremental
-writes and immutable rollback snapshots. It does not raise database timeouts or
+writes and immutable rollback snapshots. Its 15-second statement budget applies only to this owner-only RPC; ordinary API and lock timeouts remain unchanged. It does not
 change map edits, package schemas or public content. Apply it before retrying
 **Use this reviewed baseline**; then review current draft errors before building.
 

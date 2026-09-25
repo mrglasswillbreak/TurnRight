@@ -1,5 +1,28 @@
 # Production deployments
 
+## Mobile controls, live globe location and baseline repair — 25 September 2026
+
+The original × close control is restored beside Undo/Redo. Short landscape tools
+remain beside the canvas, and holding a visible 3D detail opens its selection
+actions. Foreground GPS position and available facing direction remain visible
+on the globe, with stale-fix handling and manual camera control preserved.
+The README retains its 26 production screenshots and adds three documented
+mobile/editor/globe fixture captures.
+
+Migration 011 was applied to the existing database. The reconciliation RPC now
+materializes request inputs through a private implementation boundary, bounds
+record comparison work and has a scoped 15-second execution budget. Ordinary
+API/lock timeouts and owner authorization remain unchanged. The live owner
+reconciliation completed to `lasu-57b640350853`, retaining drafts and their
+history with a before/after rollback archive. The unfinished Makanjuola entrance
+is retained for the owner to map its approach; no new campus content was published.
+
+The deployed public package remains schema 2 with 395 buildings, 220 places and
+39 photographs. All 84 assets (19,917,216 bytes) passed hash/size verification.
+The close-control restoration passed five focused browser cases and production
+budgets; the database repair passes 15 real PostgreSQL tests including 5,000
+records through the RPC JSON request shape. See the [verification report](MODEL-EDITOR-VERIFICATION.md).
+
 ## Mobile canvas, height controls and selection actions — 25 September 2026
 
 The application rollout adds a canvas-first model workspace on phones, tablets
