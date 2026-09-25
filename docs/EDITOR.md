@@ -66,7 +66,7 @@ Decisions autosave through the existing batch API. Keep-separate decisions do no
 
 Topology and duplicate checks run in a worker. Geometry and property feedback remain immediate, and route previews wait for the current validation result. Repeated issue rows are grouped by feature identity, with all reasons shown together.
 
-The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. The building model workspace provides all five modes on phones, with a visible **× Close** in the header and **Done** for closing only the active tool sheet. Short landscape screens keep the canvas beside a scrollable tools panel. Tap a 3D detail to select it or hold it for its action menu; an orbit drag or second touch cancels the pending hold. See [the model editor guide](UNIFIED-MODEL-EDITOR.md). Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
+The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. The building model workspace provides all five modes on phones, with a visible **×** beside Undo/Redo and **Done** for closing only the active tool sheet. Short landscape screens keep the canvas beside a scrollable tools panel. Tap a 3D detail to select it or hold it for its action menu; an orbit drag or second touch cancels the pending hold. See [the model editor guide](UNIFIED-MODEL-EDITOR.md). Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
 
 ## Saving and recovery
 

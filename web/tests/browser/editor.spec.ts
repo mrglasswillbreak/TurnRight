@@ -6395,7 +6395,12 @@ for (const viewport of [
       name: 'Close workspace',
       exact: true,
     });
-    await expect(close).toHaveText('× Close');
+    await expect(close).toHaveText('×');
+    await expect(
+      dialog
+        .locator('.model-mobile-navigation')
+        .getByRole('button', { name: 'Close workspace', exact: true }),
+    ).toBeVisible();
     const assertClose = async () => {
       const b = (await close.boundingBox())!;
       expect(b.x).toBeGreaterThanOrEqual(0);

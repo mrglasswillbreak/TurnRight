@@ -8,7 +8,7 @@ Use the searchable building hierarchy or the mapped-wall selector to choose a wi
 
 Desktop panels can be resized. At widths up to 900 px, and on touch devices in short landscape viewports, the workspace gives the canvas the remaining screen. A labelled mode selector keeps Details, Appearance, Roof, Outline and Review reachable. Switch between **Wall / 3D / Photo**, or **Plan / 3D / Photo** for roofs and outlines. Appearance initially opens 3D. Changing layouts keeps the draft and selection.
 
-**Choose wall** opens the searchable hierarchy. **Add**, **Edit** and **More** open one focused sheet at a time. Expand or collapse it with its labelled controls or drag its handle; **Done** closes the tools. The clearly labelled **× Close** button in the top header leaves the whole workspace and preserves unfinished inputs. Portrait tools sit below the preview; short landscape screens put a scrollable tool panel beside it. Focused fields expand the panel and scroll into view. Undo, Redo, mode selection and save status stay reachable. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
+**Choose wall** opens the searchable hierarchy. **Add**, **Edit** and **More** open one focused sheet at a time. Expand or collapse it with its labelled controls or drag its handle; **Done** closes the tools. The original **×** button beside Undo/Redo leaves the whole workspace and preserves unfinished inputs. Portrait tools sit below the preview; short landscape screens put a scrollable tool panel beside it. Focused fields expand the panel and scroll into view. Undo, Redo, mode selection and save status stay reachable. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
 
 In **3D**, touch and hold a visible detail for about half a second to select it and open its action menu. Duplicate, copy, delete, lock and hide apply to that selected detail or repeated record. Dragging or adding a second finger cancels the hold and keeps orbit/pinch navigation available. Releasing a completed hold does not select again. Right-click and keyboard selection actions remain available.
 
@@ -72,7 +72,7 @@ If the building change itself should be undone, close the workspace and choose *
 
 The screenshots below use an isolated Library test fixture with two pending wall reviews; no private owner draft is shown.
 
-The compact landscape workspace keeps **× Close**, mode selection and undo controls in the header. Tools scroll beside the canvas. The second capture shows the 3D selection menu after a touch hold and release. Both use the isolated Library fixture; its illustrative window is not a published campus change.
+The compact landscape workspace keeps **×**, mode selection and undo controls in the header. Tools scroll beside the canvas. The second capture shows the 3D selection menu after a touch hold and release. Both use the isolated Library fixture; its illustrative window is not a published campus change.
 
 | Short landscape canvas and review tools | Touch-held 3D detail actions |
 | --- | --- |

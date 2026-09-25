@@ -104,7 +104,7 @@ The globe capture uses simulated GPS and compass readings in the browser fixture
 
 ## Recent changes
 
-- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **× Close** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop keeps its resizable panels.
+- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **×** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop keeps its resizable panels.
 - **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Touch and hold a detail in **3D** to open the same menu; moving or adding a second finger cancels a pending hold. Keyboard shortcuts and placement previews support quick editing without a permanent button row.
 - **Height that changes the model:** whole-building metres and floor count are editable inside Appearance. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Height/roof adjustments share one undo action.
 

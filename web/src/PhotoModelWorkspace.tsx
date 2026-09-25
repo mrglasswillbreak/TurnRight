@@ -1037,15 +1037,6 @@ function ModelWorkspace({
                 {state}
                 {workspace?.error ? ` · ${workspace.error}` : ''}
               </output>
-              {compact && (
-                <button
-                  className="model-close-workspace"
-                  aria-label="Close workspace"
-                  onClick={onClose}
-                >
-                  <span aria-hidden="true">×</span> Close
-                </button>
-              )}
             </header>
             {compact && (
               <div className="model-mobile-navigation">
@@ -1097,6 +1088,9 @@ function ModelWorkspace({
                   }}
                 >
                   ↷
+                </button>
+                <button aria-label="Close workspace" onClick={onClose}>
+                  ×
                 </button>
               </div>
             )}
