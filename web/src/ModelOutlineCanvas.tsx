@@ -6,6 +6,13 @@ import type { MapEdit } from './types';
 import type { EditorWorkspace } from './editor-workspace';
 import { polygonsOf, remapBuildingSurfaces } from './building-surfaces';
 import { ModelField } from './ModelField';
+import {
+  ModelPlanPortal,
+  ModelPlanTools,
+  useModelMobile,
+  useModelPlanNavigation,
+  useModelSvgUnits,
+} from './model-mobile';
 
 export function ModelOutlineCanvas({
   edit,
@@ -58,6 +65,18 @@ export function ModelOutlineCanvas({
   };
   const [p, r, v] = selected,
     active = polygons[p]?.[r]?.[v];
+  const mobile = useModelMobile();
+  const cancel = () => {
+    drag.current = null;
+    setPreview(null);
+  };
+  const navigation = useModelPlanNavigation(
+    [west, north, east - west, south - north],
+    cancel,
+    (target) =>
+      mobile.tool === 'move' && !!target.closest('[data-outline-vertex]'),
+  );
+  const [handleUnit] = useModelSvgUnits(svg, navigation.viewBox);
   return (
     <section aria-label="Building outline plan">
       <p>
@@ -65,73 +84,91 @@ export function ModelOutlineCanvas({
         retain wall identities where possible and flag affected details for
         review.
       </p>
-      <svg
-        ref={svg}
-        className="model-outline-canvas"
-        viewBox={`${west} ${north} ${east - west} ${south - north}`}
-        aria-label="Top-down building outline"
-        role="application"
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && drag.current) {
-            event.preventDefault();
-            event.stopPropagation();
-            drag.current = null;
-            setPreview(null);
-          }
-        }}
-        tabIndex={0}
-        onPointerMove={(e) => {
-          if (drag.current) setPreview(update(drag.current, location(e)));
-        }}
-        onPointerUp={() => {
-          if (preview) onCommit(preview);
-          drag.current = null;
-          setPreview(null);
-        }}
-        onPointerCancel={() => {
-          drag.current = null;
-          setPreview(null);
-        }}
-      >
-        {shownPolygons.map((polygon, p) => (
-          <g key={p}>
-            {polygon.map((ring, r) => (
-              <g key={r}>
-                <polygon
-                  points={ring.map((p) => xy(p).join(',')).join(' ')}
-                  fill={r ? 'var(--background)' : '#9dac98'}
-                  stroke="currentColor"
-                  strokeWidth={pixel}
-                />
-                {ring.slice(0, -1).map((point, v) => {
-                  const [x, y] = xy(point);
-                  return (
-                    <circle
-                      key={v}
-                      cx={x}
-                      cy={y}
-                      r={pixel * 7}
-                      fill={
-                        selected.join(':') === [p, r, v].join(':')
-                          ? '#087cf0'
-                          : '#ffffff'
-                      }
-                      stroke="#087cf0"
-                      strokeWidth={pixel * 2}
-                      onPointerDown={(e) => {
-                        svg.current!.focus();
-                        drag.current = [p, r, v];
-                        setSelected([p, r, v]);
-                        svg.current!.setPointerCapture(e.pointerId);
-                      }}
+      <ModelPlanPortal>
+        <div className="model-plan-navigation">
+          <ModelPlanTools navigation={navigation} />
+          <svg
+            ref={svg}
+            className="model-outline-canvas"
+            viewBox={navigation.viewBox}
+            {...navigation.handlers}
+            aria-label="Top-down building outline"
+            role="application"
+            onKeyDown={(event) => {
+              if (event.key === 'Escape' && drag.current) {
+                event.preventDefault();
+                event.stopPropagation();
+                drag.current = null;
+                setPreview(null);
+              }
+            }}
+            tabIndex={0}
+            onPointerMove={(e) => {
+              if (drag.current) setPreview(update(drag.current, location(e)));
+            }}
+            onPointerUp={() => {
+              if (preview) onCommit(preview);
+              drag.current = null;
+              setPreview(null);
+            }}
+            onPointerCancel={() => {
+              drag.current = null;
+              setPreview(null);
+            }}
+          >
+            {shownPolygons.map((polygon, p) => (
+              <g key={p}>
+                {polygon.map((ring, r) => (
+                  <g key={r}>
+                    <polygon
+                      points={ring.map((p) => xy(p).join(',')).join(' ')}
+                      fill={r ? 'var(--background)' : '#9dac98'}
+                      stroke="currentColor"
+                      strokeWidth={pixel}
                     />
-                  );
-                })}
+                    {ring.slice(0, -1).map((point, v) => {
+                      const [x, y] = xy(point);
+                      return (
+                        <circle
+                          key={v}
+                          cx={x}
+                          cy={y}
+                          r={mobile.compact ? handleUnit * 22 : pixel * 7}
+                          data-outline-vertex={`${p}:${r}:${v}`}
+                          fill={
+                            selected.join(':') === [p, r, v].join(':')
+                              ? '#087cf0'
+                              : '#ffffff'
+                          }
+                          stroke="#087cf0"
+                          strokeWidth={pixel * 2}
+                          onPointerDown={(e) => {
+                            svg.current!.focus();
+                            if (!mobile.compact || mobile.tool === 'move') {
+                              drag.current = [p, r, v];
+                              setSelected([p, r, v]);
+                              svg.current!.setPointerCapture(e.pointerId);
+                            }
+                          }}
+                          onClick={() => setSelected([p, r, v])}
+                        />
+                      );
+                    })}
+                  </g>
+                ))}
               </g>
             ))}
-          </g>
-        ))}
-      </svg>
+          </svg>
+          {mobile.compact && (
+            <output>
+              Vertex {v + 1} ·{' '}
+              {mobile.tool === 'move'
+                ? 'Move point enabled'
+                : 'Tap a vertex, then choose Move point'}
+            </output>
+          )}
+        </div>
+      </ModelPlanPortal>
       <label>
         Outline vertex
         <select

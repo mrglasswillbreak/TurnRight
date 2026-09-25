@@ -40,6 +40,8 @@ export function PhotoModelPreview(props: {
   selection?: BuildingSelection;
   onSelect?: (selection: BuildingSelection) => void;
   hidden?: string[];
+  active?: boolean;
+  onActions?: (x: number, y: number) => void;
   onMetrics?: (metrics: {
     drawMs: number;
     calls: number;
@@ -55,6 +57,7 @@ export function PhotoModelPreview(props: {
     action = useRef<(a: string) => void>(() => {});
   const syncSelection = useRef<() => void>(() => {});
   const retry = useRef<() => void>(() => {});
+  const resume = useRef<() => void>(() => {});
   const [failed, setFailed] = useState(false);
   const [message, setMessage] = useState('Building preview…');
   const signature = JSON.stringify([
@@ -84,7 +87,7 @@ export function PhotoModelPreview(props: {
     scene.add(highlights);
     camera.up.set(0, 0, 1);
     const draw = () => {
-      if (!disposed && renderer) {
+      if (!disposed && renderer && current.current.active !== false) {
         scene.background = new Color(
           document.documentElement.classList.contains('dark')
             ? '#202b32'
@@ -193,12 +196,39 @@ export function PhotoModelPreview(props: {
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = false;
       const raycaster = new Raycaster();
-      let down = [0, 0];
+      renderer.domElement.addEventListener('contextmenu', (e) =>
+        e.preventDefault(),
+      );
+      let down:
+        | { id: number; x: number; y: number; moved: boolean }
+        | undefined;
+      const pointers = new Set<number>();
       renderer.domElement.addEventListener('pointerdown', (e) => {
-        down = [e.clientX, e.clientY];
+        pointers.add(e.pointerId);
+        if (pointers.size === 1)
+          down = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+        else if (down) down.moved = true;
+      });
+      renderer.domElement.addEventListener('pointermove', (e) => {
+        if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5)
+          down.moved = true;
+      });
+      renderer.domElement.addEventListener('pointercancel', (e) => {
+        pointers.delete(e.pointerId);
+        down = undefined;
       });
       renderer.domElement.addEventListener('pointerup', (e) => {
-        if (!model || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5)
+        pointers.delete(e.pointerId);
+        const tap = down;
+        down = undefined;
+        if (
+          !model ||
+          !tap ||
+          tap.id !== e.pointerId ||
+          tap.moved ||
+          current.current.active === false ||
+          Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 5
+        )
           return;
         const bounds = renderer!.domElement.getBoundingClientRect();
         raycaster.setFromCamera(
@@ -224,6 +254,8 @@ export function PhotoModelPreview(props: {
               elementId: s.elementId,
               instanceIndex: s.instanceIndex,
             });
+            if (e.button === 2)
+              current.current.onActions?.(e.clientX, e.clientY);
             break;
           }
         }
@@ -272,6 +304,10 @@ export function PhotoModelPreview(props: {
     }
     const send = () => {
       if (disposed) return;
+      if (current.current.active === false) {
+        pending = true;
+        return;
+      }
       if (dead) {
         const message = worker.onmessage;
         worker.terminate();
@@ -322,6 +358,10 @@ export function PhotoModelPreview(props: {
       send();
     };
     retry.current = () => request.current();
+    resume.current = () => {
+      if (pending) send();
+      else draw();
+    };
     worker.onerror = () => fail('3D preview stopped. Your draft is retained.');
     worker.onmessage = ({ data: reply }) => {
       if (reply?.revision !== active) return;
@@ -392,6 +432,7 @@ export function PhotoModelPreview(props: {
       action.current = () => {};
       syncSelection.current = () => {};
       retry.current = () => {};
+      resume.current = () => {};
     };
   }, []);
   useEffect(() => {
@@ -403,6 +444,9 @@ export function PhotoModelPreview(props: {
     props.hidden,
   ]);
   useEffect(() => syncSelection.current(), [selectionKey]);
+  useEffect(() => {
+    if (props.active !== false) resume.current();
+  }, [props.active]);
   return (
     <section className="photo-model-preview">
       <div ref={host} className="photo-model-canvas" />

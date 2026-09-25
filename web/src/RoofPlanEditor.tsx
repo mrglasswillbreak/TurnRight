@@ -13,6 +13,13 @@ import { customRoofSurface, type RoofSurface } from './custom-roof';
 import { buildingDisplay } from './map-display';
 import { buildingTopology } from './building-surfaces';
 import { proposeHipRoof } from './roof-proposal';
+import {
+  ModelPlanPortal,
+  ModelPlanTools,
+  useModelMobile,
+  useModelPlanNavigation,
+  useModelSvgUnits,
+} from './model-mobile';
 
 export function RoofPlanEditor({
   edit,
@@ -43,10 +50,14 @@ export function RoofPlanEditor({
   autoSave?: boolean;
   workspace?: import('./editor-workspace').EditorWorkspace;
 }) {
+  const mobile = useModelMobile();
   const [tool, setTool] = useState<'select' | 'point' | 'ridge' | 'valley'>(
     'select',
   );
   const [proposalError, setProposalError] = useState('');
+  useEffect(() => {
+    if (mobile.compact && mobile.tool === 'move') setTool('select');
+  }, [mobile.compact, mobile.tool]);
   const [selected, setSelected] = useState(''),
     [from, setFrom] = useState(''),
     [surface, setSurface] = useState<number | null>(null);
@@ -177,6 +188,23 @@ export function RoofPlanEditor({
     pick(point.id, next);
   };
   const active = roof.points.find((p) => p.id === selected);
+  const cancel = () => {
+    dragging.current = null;
+    if (gestureRoof.current) update(gestureRoof.current, true);
+    latestRoof.current = null;
+    gestureRoof.current = null;
+  };
+  const navigation = useModelPlanNavigation(
+    [0, 0, 300, 300],
+    cancel,
+    (target) => mobile.tool === 'move' && !!target.closest('[data-roof-point]'),
+  );
+  const [handleUnit] = useModelSvgUnits(svg, navigation.viewBox + hasDraft);
+  const cancelRef = useRef(cancel);
+  cancelRef.current = cancel;
+  useEffect(() => {
+    cancelRef.current();
+  }, [tool]);
   const patch = (value: Partial<RoofPoint>) =>
     update({
       ...roof,
@@ -278,10 +306,16 @@ export function RoofPlanEditor({
                 onClick={() => {
                   setTool(t);
                   setFrom('');
+                  if (mobile.compact) {
+                    mobile.openPanel('none');
+                    mobile.setTool('select');
+                  }
                 }}
               >
                 {t === 'select'
-                  ? 'Select / move'
+                  ? mobile.compact
+                    ? 'Select point'
+                    : 'Select / move'
                   : t === 'point'
                     ? 'Add point'
                     : `Draw ${t}`}
@@ -344,154 +378,198 @@ export function RoofPlanEditor({
         </>
       )}
       {roof.provenance && <p className="small-note">{roof.provenance}</p>}
-      <svg
-        ref={svg}
-        viewBox="0 0 300 300"
-        aria-label="Roof plan drawing"
-        role="application"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape' && dragging.current) {
-            e.preventDefault();
-            e.stopPropagation();
-            dragging.current = null;
-            if (gestureRoof.current) update(gestureRoof.current, true);
-            latestRoof.current = null;
-            gestureRoof.current = null;
-          }
-        }}
-        className="roof-canvas"
-        onPointerDown={(e) => {
-          e.currentTarget.focus();
-          if (
-            !draft ||
-            tool === 'select' ||
-            (e.target as Element).closest('[data-roof-point]')
-          )
-            return;
-          const coordinates = location(e.clientX, e.clientY);
-          if (coordinates) add(coordinates);
-        }}
-        onPointerMove={(e) => {
-          if (!dragging.current) return;
-          const coordinates = location(e.clientX, e.clientY);
-          if (coordinates) {
-            const attached = snap(coordinates);
-            update(
-              {
-                ...roof,
-                points: roof.points.map((p) =>
-                  p.id === dragging.current
-                    ? {
-                        ...p,
-                        ...attached,
-                        vertexId: attached.vertexId,
-                        elevation: attached.vertexId ? roof.eaves : p.elevation,
-                      }
-                    : p,
-                ),
-              },
-              true,
-            );
-          }
-        }}
-        onPointerUp={() => {
-          dragging.current = null;
-          if (autoSave && latestRoof.current) apply(latestRoof.current);
-          latestRoof.current = null;
-          gestureRoof.current = null;
-        }}
-        onPointerCancel={() => {
-          dragging.current = null;
-          if (gestureRoof.current) update(gestureRoof.current, true);
-          latestRoof.current = null;
-          gestureRoof.current = null;
-        }}
-      >
-        <path
-          d={polygon
-            .map(
-              (r) => 'M' + r.map((p) => project(p).join(',')).join(' L') + ' Z',
-            )
-            .join(' ')}
-          fill="#e8e2cf"
-          fillRule="evenodd"
-          stroke="#586251"
-          strokeWidth="2"
-        />
-        {shown?.triangles.map((t, i) => (
-          <polygon
-            key={i}
-            points={t
-              .map((id) => project(shown.points[id]).join(','))
-              .join(' ')}
-            fill={i === surface ? '#72b9c988' : '#9bb8a333'}
-            stroke="#677c6888"
-            strokeWidth="0.8"
-            onClick={() => {
-              if (tool === 'select') {
-                setSurface(i);
-                onSurface(i);
-                setSelected('');
+      <ModelPlanPortal>
+        <div className="model-plan-navigation">
+          <ModelPlanTools navigation={navigation} />
+          <svg
+            ref={svg}
+            viewBox={navigation.viewBox}
+            {...navigation.handlers}
+            aria-label="Roof plan drawing"
+            role="application"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && dragging.current) {
+                e.preventDefault();
+                e.stopPropagation();
+                dragging.current = null;
+                if (gestureRoof.current) update(gestureRoof.current, true);
+                latestRoof.current = null;
+                gestureRoof.current = null;
               }
             }}
-          />
-        ))}
-        {roof.lines.map((line) => {
-          const a = roof.points.find((p) => p.id === line.from),
-            b = roof.points.find((p) => p.id === line.to);
-          if (!a || !b) return null;
-          const [x1, y1] = project(a.coordinates),
-            [x2, y2] = project(b.coordinates);
-          return (
-            <line
-              key={line.id}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke={line.kind === 'ridge' ? '#af4f35' : '#267f9c'}
-              strokeWidth="3"
-              strokeDasharray={line.kind === 'valley' ? '5 3' : undefined}
-              pointerEvents="none"
+            className="roof-canvas"
+            onPointerDown={(e) => {
+              e.currentTarget.focus();
+              if (mobile.compact) return;
+              if (
+                !draft ||
+                tool === 'select' ||
+                (e.target as Element).closest('[data-roof-point]')
+              )
+                return;
+              const coordinates = location(e.clientX, e.clientY);
+              if (coordinates) add(coordinates);
+            }}
+            onClick={(e) => {
+              if (
+                !mobile.compact ||
+                !draft ||
+                tool === 'select' ||
+                (e.target as Element).closest('[data-roof-point]')
+              )
+                return;
+              const coordinates = location(e.clientX, e.clientY);
+              if (coordinates) add(coordinates);
+            }}
+            onPointerMove={(e) => {
+              if (!dragging.current) return;
+              const coordinates = location(e.clientX, e.clientY);
+              if (coordinates) {
+                const attached = snap(coordinates);
+                update(
+                  {
+                    ...roof,
+                    points: roof.points.map((p) =>
+                      p.id === dragging.current
+                        ? {
+                            ...p,
+                            ...attached,
+                            vertexId: attached.vertexId,
+                            elevation: attached.vertexId
+                              ? roof.eaves
+                              : p.elevation,
+                          }
+                        : p,
+                    ),
+                  },
+                  true,
+                );
+              }
+            }}
+            onPointerUp={() => {
+              dragging.current = null;
+              if (autoSave && latestRoof.current) apply(latestRoof.current);
+              latestRoof.current = null;
+              gestureRoof.current = null;
+            }}
+            onPointerCancel={() => {
+              dragging.current = null;
+              if (gestureRoof.current) update(gestureRoof.current, true);
+              latestRoof.current = null;
+              gestureRoof.current = null;
+            }}
+          >
+            <path
+              d={polygon
+                .map(
+                  (r) =>
+                    'M' + r.map((p) => project(p).join(',')).join(' L') + ' Z',
+                )
+                .join(' ')}
+              fill="#e8e2cf"
+              fillRule="evenodd"
+              stroke="#586251"
+              strokeWidth="2"
             />
-          );
-        })}
-        {roof.points.map((p, i) => {
-          const [cx, cy] = project(p.coordinates);
-          return (
-            <g key={p.id} data-roof-point={p.id}>
-              <circle
-                cx={cx}
-                cy={cy}
-                r={10}
-                fill={p.id === selected ? '#fbe87a' : '#ffffff'}
-                stroke="#265b46"
-                strokeWidth="2"
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  if (!draft) return;
-                  pick(p.id);
+            {shown?.triangles.map((t, i) => (
+              <polygon
+                key={i}
+                points={t
+                  .map((id) => project(shown.points[id]).join(','))
+                  .join(' ')}
+                fill={i === surface ? '#72b9c988' : '#9bb8a333'}
+                stroke="#677c6888"
+                strokeWidth="0.8"
+                onClick={() => {
                   if (tool === 'select') {
-                    dragging.current = p.id;
-                    gestureRoof.current = structuredClone(roof);
-                    svg.current?.setPointerCapture(e.pointerId);
+                    setSurface(i);
+                    onSurface(i);
+                    setSelected('');
                   }
                 }}
               />
-              <text
-                x={cx}
-                y={cy + 3}
-                textAnchor="middle"
-                fontSize="9"
-                pointerEvents="none"
-              >
-                {i + 1}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+            ))}
+            {roof.lines.map((line) => {
+              const a = roof.points.find((p) => p.id === line.from),
+                b = roof.points.find((p) => p.id === line.to);
+              if (!a || !b) return null;
+              const [x1, y1] = project(a.coordinates),
+                [x2, y2] = project(b.coordinates);
+              return (
+                <line
+                  key={line.id}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={line.kind === 'ridge' ? '#af4f35' : '#267f9c'}
+                  strokeWidth="3"
+                  strokeDasharray={line.kind === 'valley' ? '5 3' : undefined}
+                  pointerEvents="none"
+                />
+              );
+            })}
+            {roof.points.map((p, i) => {
+              const [cx, cy] = project(p.coordinates);
+              return (
+                <g key={p.id} data-roof-point={p.id}>
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={mobile.compact ? handleUnit * 22 : 10}
+                    fill={p.id === selected ? '#fbe87a' : '#ffffff'}
+                    stroke="#265b46"
+                    strokeWidth="2"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      if (!draft) return;
+                      if (!mobile.compact) pick(p.id);
+                      if (
+                        tool === 'select' &&
+                        (!mobile.compact || mobile.tool === 'move')
+                      ) {
+                        setSelected(p.id);
+                        dragging.current = p.id;
+                        gestureRoof.current = structuredClone(roof);
+                        svg.current?.setPointerCapture(e.pointerId);
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (mobile.compact && draft) pick(p.id);
+                    }}
+                  />
+                  <text
+                    x={cx}
+                    y={cy + 3}
+                    textAnchor="middle"
+                    fontSize="9"
+                    pointerEvents="none"
+                  >
+                    {i + 1}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+          {mobile.compact && (
+            <output>
+              {active
+                ? `Point ${roof.points.indexOf(active) + 1} · ${active.elevation} m`
+                : 'Select a roof point'}{' '}
+              ·{' '}
+              {mobile.tool === 'move'
+                ? 'Move point enabled'
+                : tool === 'select'
+                  ? 'Tap to select'
+                  : tool === 'point'
+                    ? 'Tap to add a point'
+                    : `Choose two ${tool} endpoints`}
+            </output>
+          )}
+        </div>
+      </ModelPlanPortal>
       {error && (
         <p role="alert" className="notice">
           {error} Last valid roof preview is retained. Correct the plan before

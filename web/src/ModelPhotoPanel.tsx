@@ -5,6 +5,7 @@ import type { CampusPhoto } from './types';
 import type { FacadeDescription, FacadeTextureRecipe } from './visual-types';
 import type { EditorWorkspace } from './editor-workspace';
 import { ModelField } from './ModelField';
+import { useModelMobile, useModelSvgUnits } from './model-mobile';
 export function ModelPhotoPanel({
   photos,
   photo,
@@ -22,6 +23,10 @@ export function ModelPhotoPanel({
   buildingId: string;
   onCommit: (f: FacadeDescription) => boolean;
 }) {
+  const mobile = useModelMobile();
+  const [align, setAlign] = useState(false),
+    [corner, setCorner] = useState(0);
+  const pointers = useRef(new Set<number>());
   const [zoom, setZoom] = useState(1),
     [recipe, setRecipe] = useState<FacadeTextureRecipe | null>(null),
     [error, setError] = useState('');
@@ -29,6 +34,22 @@ export function ModelPhotoPanel({
     image = useRef<HTMLDivElement>(null),
     latest = useRef<FacadeTextureRecipe | null>(null);
   const texture = recipe || facade?.texture;
+  const svg = useRef<SVGSVGElement>(null);
+  const [unitX, unitY] = useModelSvgUnits(
+    svg,
+    `${texture?.photoId}:${zoom}:${align}`,
+  );
+  const gestureStart = useRef<FacadeTextureRecipe | null>(null);
+  const cancel = () => {
+    if (dragging.current === null) return;
+    dragging.current = null;
+    latest.current = null;
+    setRecipe(gestureStart.current);
+    gestureStart.current = null;
+  };
+  useEffect(() => {
+    cancel();
+  }, [align, photo?.id, facade?.wallId, mobile.tool]);
   const recoveryWall = facade?.wallId;
   useEffect(() => {
     const saved =
@@ -72,10 +93,18 @@ export function ModelPhotoPanel({
   };
   if (!photo)
     return (
-      <p>
-        No approved photograph for this building. Illustrative details remain
-        available.
-      </p>
+      <>
+        <p>
+          No approved photograph for this building. Illustrative details remain
+          available.
+        </p>
+        {mobile.compact && (
+          <p data-mobile-panel="photo">
+            No approved photograph for this building. Add and review photographs
+            through Manage photos in the building inspector.
+          </p>
+        )}
+      </>
     );
   return (
     <section aria-label="Building photograph reference">
@@ -100,6 +129,17 @@ export function ModelPhotoPanel({
           Enlarge photo
         </button>
         <button onClick={() => setZoom(1)}>Fit photo</button>
+        {mobile.compact && facade && (
+          <button
+            aria-pressed={align}
+            onClick={() => {
+              setAlign((v) => !v);
+              mobile.openPanel('none');
+            }}
+          >
+            {align ? 'Navigate photo' : 'Align texture'}
+          </button>
+        )}
       </div>
       <div className="model-photo-scroll">
         <div
@@ -113,10 +153,23 @@ export function ModelPhotoPanel({
           <img src={photo.url} alt={photo.alt} loading="lazy" />
           {texture?.photoId === photo.id && (
             <svg
+              ref={svg}
               role="application"
               aria-label="Texture alignment. Select a corner or use its numeric coordinates below."
               viewBox="0 0 1 1"
               preserveAspectRatio="none"
+              style={{
+                pointerEvents: mobile.compact && !align ? 'none' : undefined,
+                touchAction: align ? 'none' : 'pan-x pan-y pinch-zoom',
+              }}
+              onPointerDownCapture={(e) => {
+                pointers.current.add(e.pointerId);
+                if (pointers.current.size > 1) {
+                  cancel();
+                  setAlign(false);
+                  e.stopPropagation();
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Escape' && dragging.current !== null) {
                   e.preventDefault();
@@ -150,16 +203,17 @@ export function ModelPhotoPanel({
                 setRecipe(next);
               }}
               onPointerUp={() => {
+                pointers.current.clear();
                 dragging.current = null;
                 if (latest.current) {
                   apply(latest.current);
                   latest.current = null;
                 }
+                gestureStart.current = null;
               }}
               onPointerCancel={() => {
-                dragging.current = null;
-                latest.current = null;
-                setRecipe(null);
+                pointers.current.clear();
+                cancel();
               }}
             >
               <polygon
@@ -171,18 +225,23 @@ export function ModelPhotoPanel({
               />
               {texture.corners.map((p, i) => (
                 <g key={i}>
-                  <circle
+                  <ellipse
                     tabIndex={0}
                     role="button"
                     aria-label={`${['Top left', 'Top right', 'Bottom right', 'Bottom left'][i]} texture corner. Arrow keys adjust alignment.`}
                     cx={p[0]}
                     cy={p[1]}
-                    r={0.025}
+                    rx={mobile.compact ? unitX * 22 : 0.025}
+                    ry={mobile.compact ? unitY * 22 : 0.025}
                     fill="#087cf0"
                     stroke="white"
                     strokeWidth={0.004}
                     onPointerDown={(e) => {
                       e.currentTarget.focus();
+                      setCorner(i);
+                      if (mobile.compact && (!align || mobile.tool !== 'move'))
+                        return;
+                      gestureStart.current = recipe;
                       dragging.current = i;
                       e.currentTarget.setPointerCapture(e.pointerId);
                     }}
@@ -239,8 +298,30 @@ export function ModelPhotoPanel({
         {photo.historical ? ' · Historical view' : ''}
       </p>
       <small>{photo.attribution}</small>
+      {mobile.compact && align && (
+        <div className="model-toolbar">
+          <output>
+            Corner{' '}
+            {['top left', 'top right', 'bottom right', 'bottom left'][corner]} ·{' '}
+            {mobile.tool === 'move'
+              ? 'Move enabled'
+              : 'Tap a corner, then Move corner'}
+          </output>
+          <button
+            aria-pressed={mobile.tool === 'move'}
+            onClick={() =>
+              mobile.setTool(mobile.tool === 'move' ? 'select' : 'move')
+            }
+          >
+            Move corner
+          </button>
+          <button onClick={() => mobile.openPanel('photo')}>
+            Edit alignment
+          </button>
+        </div>
+      )}
       {facade && (
-        <details>
+        <details data-mobile-panel="photo" open={mobile.compact || undefined}>
           <summary>Photographic texture alignment</summary>
           <p>
             Choose an unobstructed wall clockwise from top left. This changes a
@@ -298,6 +379,13 @@ export function ModelPhotoPanel({
           )}
           {error && <p role="alert">{error}</p>}
         </details>
+      )}
+      {!facade && (
+        <p data-mobile-panel={mobile.compact ? 'photo' : undefined}>
+          Choose a wall and add an architectural detail before aligning a
+          photographic texture. The photograph can still be enlarged and
+          inspected.
+        </p>
       )}
     </section>
   );

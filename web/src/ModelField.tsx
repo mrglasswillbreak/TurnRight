@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { EditorWorkspace } from './editor-workspace';
+import { useModelMobile } from './model-mobile';
 const display = (value: string | number, step: number) =>
   typeof value === 'number' && Number.isFinite(value)
     ? String(
@@ -41,6 +42,7 @@ function ModelFieldInput({
   step = 0.01,
   disabled = false,
 }: ModelFieldProps) {
+  const { compact } = useModelMobile();
   const errorId = useId();
   const recovered = workspace?.modelInputs[buildingId]?.[field];
   const [text, setText] = useState(recovered ?? display(value, step)),
@@ -68,21 +70,21 @@ function ModelFieldInput({
     dirty.current = false;
     workspace?.recoverModelInput(buildingId, field);
   };
-  const save = () => {
+  const save = (nextText = text) => {
     if (!dirty.current) return;
     if (
       type === 'number' &&
-      (!text.trim() ||
-        !Number.isFinite(Number(text)) ||
-        (min !== undefined && Number(text) < min) ||
-        (max !== undefined && Number(text) > max))
+      (!nextText.trim() ||
+        !Number.isFinite(Number(nextText)) ||
+        (min !== undefined && Number(nextText) < min) ||
+        (max !== undefined && Number(nextText) > max))
     ) {
       setError(
         `Enter ${label.toLowerCase()}${min !== undefined ? ` ≥ ${min}` : ''}${max !== undefined ? ` and ≤ ${max}` : ''}.`,
       );
       return;
     }
-    if (onCommit(text)) {
+    if (onCommit(nextText)) {
       clear();
       setError('');
     } else
@@ -93,42 +95,89 @@ function ModelFieldInput({
   return (
     <label className="model-field">
       {label}
-      <input
-        type={type}
-        value={text}
-        min={min}
-        max={max}
-        step={step}
-        disabled={disabled}
-        aria-label={label}
-        aria-invalid={!!error}
-        aria-describedby={error ? errorId : undefined}
-        onFocus={() => {
-          focused.current = true;
-        }}
-        onChange={(e) => {
-          setText(e.target.value);
-          dirty.current = true;
-          setError('');
-          workspace?.recoverModelInput(buildingId, field, e.target.value);
-        }}
-        onBlur={() => {
-          focused.current = false;
-          save();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            save();
-          }
-          if (e.key === 'Escape') {
-            e.stopPropagation();
-            clear();
-            setText(display(value, step));
+      <span
+        className={
+          compact && type === 'number' ? 'model-field-stepper' : undefined
+        }
+      >
+        {compact && type === 'number' && (
+          <button
+            type="button"
+            disabled={
+              disabled || !text.trim() || !Number.isFinite(Number(text))
+            }
+            aria-label={`Decrease ${label.toLowerCase()}`}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const next = display(Number(text) - step, step);
+              setText(next);
+              dirty.current = true;
+              workspace?.recoverModelInput(buildingId, field, next);
+              save(next);
+            }}
+          >
+            −
+          </button>
+        )}
+        <input
+          type={type}
+          value={text}
+          min={min}
+          max={max}
+          step={step}
+          inputMode={type === 'number' ? 'decimal' : undefined}
+          enterKeyHint="done"
+          disabled={disabled}
+          aria-label={label}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
+          onFocus={() => {
+            focused.current = true;
+          }}
+          onChange={(e) => {
+            setText(e.target.value);
+            dirty.current = true;
             setError('');
-          }
-        }}
-      />
+            workspace?.recoverModelInput(buildingId, field, e.target.value);
+          }}
+          onBlur={() => {
+            focused.current = false;
+            save();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              save();
+              if (compact) e.currentTarget.blur();
+            }
+            if (e.key === 'Escape') {
+              e.stopPropagation();
+              clear();
+              setText(display(value, step));
+              setError('');
+            }
+          }}
+        />
+        {compact && type === 'number' && (
+          <button
+            type="button"
+            disabled={
+              disabled || !text.trim() || !Number.isFinite(Number(text))
+            }
+            aria-label={`Increase ${label.toLowerCase()}`}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const next = display(Number(text) + step, step);
+              setText(next);
+              dirty.current = true;
+              workspace?.recoverModelInput(buildingId, field, next);
+              save(next);
+            }}
+          >
+            +
+          </button>
+        )}
+      </span>
       {error && (
         <small id={errorId} role="alert">
           {error}
