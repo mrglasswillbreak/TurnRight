@@ -111,8 +111,11 @@ saves and a single upload-owning tab protect unfinished work. Photo-only edits
 reuse validated topology and map models; release review always runs full
 validation. See [the recovery guide](ARRIVAL-GUIDES.md#recovery-and-privacy) and
 [performance verification](PERFORMANCE.md).
-Migration 009 prevents full-campus baseline comparisons from timing out while
-retaining owner authorization, exact record checks and reconciliation history.
+Migration 011 completes the baseline comparison repair after migration 009:
+parsed RPC inputs are copied into owned array values, and current records are
+materialized once and compared with a full join. This bounds repeated work in
+the API request path and cached database plans. The exact locked comparison,
+owner authorization, unchanged timestamps and rollback history remain intact.
 See [arrival editing, private uploads and publication](ARRIVAL-GUIDES.md) for the
 review flow and photo package guarantees.
 

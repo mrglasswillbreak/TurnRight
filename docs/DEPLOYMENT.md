@@ -2,7 +2,16 @@
 
 ## Unified model editor rollout
 
-No migration or public package-schema change is required. Deploy additive model-authoring validation and the older-writer guard before dependent clients. The guard rejects edits to buildings whose newer private authoring metadata would be dropped, while unaffected older-editor changes remain supported. Private metadata stays in owner draft JSON and is excluded from public packages. Keep `PUBLISHED_MAP_URL` enabled for application builds; reviewed architectural changes publish only through the existing immutable release workflow.
+The separate baseline reconciliation timeout repair uses
+`supabase/migrations/011_linear_baseline_reconciliation.sql` after the existing
+migrations. It materializes parsed JSON inputs before comparison and replaces
+only the service-role reconciliation function, keeping
+the owner guard, exclusive source lock, exact stale-review checks, incremental
+writes and immutable rollback snapshots. It does not raise database timeouts or
+change map edits, package schemas or public content. Apply it before retrying
+**Use this reviewed baseline**; then review current draft errors before building.
+
+The unified model editor itself requires no migration or public package-schema change. Deploy additive model-authoring validation and the older-writer guard before dependent clients. The guard rejects edits to buildings whose newer private authoring metadata would be dropped, while unaffected older-editor changes remain supported. Private metadata stays in owner draft JSON and is excluded from public packages. Keep `PUBLISHED_MAP_URL` enabled for application builds; reviewed architectural changes publish only through the existing immutable release workflow.
 
 
 Campus enrichment adds migration `007_source_field_reviews.sql`. Apply it before
