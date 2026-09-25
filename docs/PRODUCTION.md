@@ -1,5 +1,40 @@
 # Production deployments
 
+## Shared model surfaces, lettering and refreshed documentation — 25 September 2026
+
+Application revision **`50ef0e0`** deployed successfully through the existing
+Git/Vercel production workflow. Verification at **22:44:44 UTC** confirmed the
+public app, `/admin` and `/sw.js` return 200; an unauthenticated `/api/admin`
+request returns 401. The served workspace is
+`PhotoModelWorkspace-Cs-ANkiB.js`, SHA-256
+`6e6937e030112acee4c5cb296539fe329d6f95a137bed60090646630b834da46`.
+The workspace and appearance chunks are included in the offline precache and
+contain the new surface controls, tree search, detachment and roof-text fields.
+
+The update provides one Edit model entry, a searchable nested structure tree,
+shared Orbit/surface/2D editing, selected-item Ungroup and Detach instance,
+wall/roof lettering, and responsive desktop/portrait/landscape controls.
+Draft previews display validated unreviewed details without approving them.
+Wall views face outside for either ring winding, including courtyard walls.
+Text follows roof planes and respects wall projection. No migration, new API
+endpoint or map publication was performed.
+
+The published manifest is **identical to the pre-deployment baseline**:
+**`lasu-623791e1184e`**, schema 2, 395 buildings, 220 places and 39 photographs.
+All **84 assets / 20,098,125 bytes** passed live byte-length and SHA-256 checks.
+Architectural edits and labels remain subject to the owner's normal review and
+publication workflow.
+
+Verification passes **532 unit tests in 67 files**, **14 focused Chromium cases**,
+**three WebKit rotation/landscape workflows**, client/server TypeScript, lint
+(seven existing warnings), production and authentication-configured builds and
+all existing budgets. The root README and related guides now include **34 current
+screenshots**, with isolated owner responses and explicit capture provenance.
+See [model verification](MODEL-EDITOR-VERIFICATION.md) and the
+[screenshot inventory](assets/screenshots/README.md). Physical-phone, native
+keyboard and screen-reader acceptance remain outstanding.
+
+
 ## Mobile controls, live globe location and baseline repair — 25 September 2026
 
 The original × close control is restored beside Undo/Redo. Short landscape tools
