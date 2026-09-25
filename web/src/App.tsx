@@ -267,7 +267,7 @@ export default function App() {
     muted,
     setToast,
   );
-  useMotionSession(navigating && !nav.arrived);
+  useMotionSession(gps.tracking || (navigating && !nav.arrived));
   useEffect(() => {
     panelContent.current?.scrollTo(0, 0);
   }, [selected?.id, routeView, navigating, query, category, savedOnly]);
@@ -920,6 +920,7 @@ export default function App() {
         aria-label={gps.tracking ? 'Follow me' : 'Find my location'}
         className={follow ? 'active' : ''}
         onClick={() => {
+          void motionService().requestFromGesture();
           gps.start();
           setFollow(true);
           if (!gps.fix)
@@ -962,7 +963,7 @@ export default function App() {
         simple={simple3D}
         buildingOpacity={navigating ? 0.65 : 0.92}
         follow={follow}
-        motionActive={navigating && !nav.arrived}
+        motionActive={gps.tracking || (navigating && !nav.arrived)}
         onSelect={selectPlace}
         onBuildingSelect={(feature) => {
           if (navigatingRef.current) return;

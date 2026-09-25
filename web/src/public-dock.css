@@ -2,7 +2,9 @@
 .app-shell .map-canvas {
   background: var(--background);
 }
-.app-shell .map-canvas[data-world-view='true'] .maplibregl-marker {
+.app-shell
+  .map-canvas[data-world-view='true']
+  .maplibregl-marker:not(.motion-marker) {
   display: none;
 }
 .app-shell .explore-panel {

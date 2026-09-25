@@ -4,7 +4,7 @@ Status: **Awaiting device verification**. Browser simulations are software check
 
 ## Permissions and controls
 
-The shared page service uses `deviceorientation`, `deviceorientationabsolute` and `devicemotion`. It does not require the Generic Sensor API. Where supported, orientation and motion `requestPermission` methods are invoked independently and synchronously from the first Start tap, before audio, storage or GPS awaits. HTTPS is required. Denials and the assistance preference are remembered on this device; an explicit **Enable/Retry sensors** action retries. **Turn off sensors** stops acquisition. A denied or absent sensor never blocks GPS.
+The shared page service uses `deviceorientation`, `deviceorientationabsolute` and `devicemotion`. It does not require the Generic Sensor API. Where supported, orientation and motion `requestPermission` methods are invoked independently and synchronously from the first **Find my location** or navigation/survey **Start** tap, before asynchronous work. HTTPS is required. Denials and the assistance preference are remembered on this device; an explicit **Enable/Retry sensors** action retries. **Turn off sensors** stops acquisition. A denied or absent sensor never blocks GPS.
 
 Public Settings and active navigation offer **Travel-up** (default), **North-up** and **Phone-up**. The active walk and Survey have expandable **Compass & motion controls**. Each capability reports inactive, requesting, available, denied, unavailable or temporarily missing readings. An exposed API is insufficient: usable readings must arrive. If no data arrives within five seconds, the capability is unavailable; interrupted data is shown as missing. Missing permission or readings can require browser/site settings before Retry succeeds.
 
@@ -13,6 +13,8 @@ The response Permissions-Policy permits accelerometer, gyroscope and magnetomete
 ## Direction and movement
 
 Phone direction and GPS course remain separate. A purple cone shows approximate phone direction at a usable GPS fix; a blue arrow shows GPS travel direction when speed/course are usable. Without usable GPS, only compass status is shown. Apple compass readings reference magnetic north and are labelled approximate. Otherwise only explicitly absolute orientation can supply north; relative alpha is never a compass.
+
+Foreground location tracking keeps the position dot and compass active while exploring, including after zooming out to the globe without an active route. The globe labels the fresh fix **You are here** and switches to **Last known location** after 12 seconds without a new fix. Stale or unusable direction readings disappear. Arrows use the projected local direction on the globe and are hidden behind it. Position/heading updates do not pull the camera back after a manual pan or zoom; **Follow me** resumes following. Location and direction still require the device's GPS and optional sensors; an offline map does not simulate either.
 
 Heading normalization projects the screen's top edge onto the ground using device tilt and screen rotation. Near-vertical singularities hide the heading and suggest holding the phone flatter. Invalid readings or Apple reported compass error above 30 degrees hide it; absent accuracy is labelled unreported. Circular smoothing handles 359/0 degrees. Fresh quiet gyroscope readings may corroborate an unchanged sparse compass; rotation without a corresponding orientation update invalidates it. Interruptions reset filters.
 
@@ -24,7 +26,7 @@ Initial thresholds in `motion-model.ts` are provisional: acceleration RMS below 
 
 `motion-service.ts` owns one listener set for active consumers. `motion-model.ts` normalizes readings and maintains transient filters. `MotionAssistance.tsx` confines subscriptions to status/overlays instead of rerendering the application for each event. Processing is capped at 30 Hz per input stream and sensor UI notifications at 10 Hz.
 
-Hidden pages and inactive consumers stop sensor listeners and clear readings. An existing navigation session may reacquire on returning. Survey pause, entrance capture, finish, exit and sign-out release acquisition; backgrounded/recovered surveys require explicit Resume. Installing an app update retains existing survey/editor recovery rules and never reloads an active recording automatically.
+Hidden pages and inactive consumers stop sensor listeners and clear readings. Existing location-tracking/navigation sessions may reacquire on returning. Survey pause, entrance capture, finish, exit and sign-out release acquisition; backgrounded/recovered surveys require explicit Resume. Installing an app update retains existing survey/editor recovery rules and never reloads an active recording automatically.
 
 Only `turnright:motion-assistance:v1` preferences are saved: enabled/asked flags, denied channels and map orientation. Raw events, heading, motion windows and device identifiers stay out of storage, surveys, analytics, backups and public packages. Source geometry and GPS types are unchanged.
 

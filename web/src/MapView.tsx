@@ -652,6 +652,27 @@ export function MapView({
           'circle-stroke-width': 3,
         },
       });
+      if (!editor)
+        map.addLayer({
+          id: 'gps-label',
+          type: 'symbol',
+          source: 'position',
+          maxzoom: CAMPUS_MIN_ZOOM,
+          filter: ['==', ['geometry-type'], 'Point'],
+          layout: {
+            'text-field': ['get', 'locationLabel'],
+            'text-font': ['Open Sans Semibold'],
+            'text-size': 13,
+            'text-anchor': 'bottom',
+            'text-offset': [0, -1.3],
+            'text-allow-overlap': true,
+          },
+          paint: {
+            'text-color': '#1558c7',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        });
       const label = map
         .getStyle()
         .layers.find(
@@ -808,7 +829,7 @@ export function MapView({
       }
       if (!editor) {
         for (const layer of map.getStyle().layers) {
-          if (layer.id !== 'background')
+          if (layer.id !== 'background' && !layer.id.startsWith('gps-'))
             map.setLayerZoomRange(
               layer.id,
               Math.max(CAMPUS_MIN_ZOOM, layer.minzoom || 0),
@@ -1185,7 +1206,12 @@ export function MapView({
         features: [
           {
             type: 'Feature',
-            properties: {},
+            properties: {
+              locationLabel:
+                Date.now() - fix.timestamp <= 12000
+                  ? 'You are here'
+                  : 'Last known location',
+            },
             geometry: { type: 'Point', coordinates: fix.coordinates },
           },
           {
@@ -1200,8 +1226,11 @@ export function MapView({
       if (ready.current) apply();
     });
     if (!ready.current) map.once('load', apply);
+    const expiry =
+      fix && setTimeout(apply, Math.max(0, fix.timestamp + 12001 - Date.now()));
     return () => {
       cancelAnimationFrame(frame);
+      if (expiry) clearTimeout(expiry);
       map.off('load', apply);
     };
   }, [fix, panelBesideMap]);

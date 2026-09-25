@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Marker, type Map as MapInstance } from 'maplibre-gl';
 import type { GpsFix } from './types';
 import { motionService } from './motion-service';
-import { followZoom } from './world-map';
+import { CAMPUS_MIN_ZOOM, followZoom } from './world-map';
+import { projectedHeading } from './projected-heading';
 import {
   angleDelta,
   cameraDirection,
@@ -83,7 +84,10 @@ export function MotionStatus({
       )}
       {state.reason && <p>{state.reason}</p>}
       {!state.active && (
-        <p>Readings run only during an active walk or survey recording.</p>
+        <p>
+          Readings run while location tracking, navigation or survey recording
+          is active.
+        </p>
       )}
       <p className="motion-explanation">
         Purple cone: approximate phone direction. Blue arrow: GPS travel
@@ -206,6 +210,7 @@ export function MotionMap({
         element: e,
         rotationAlignment: 'map',
         pitchAlignment: 'map',
+        opacityWhenCovered: 0,
       })
         .setLngLat([0, 0])
         .addTo(map);
@@ -232,10 +237,8 @@ export function MotionMap({
     overlay.travel.getElement().style.display =
       valid && travel !== null ? '' : 'none';
     if (valid && fix) {
-      if (phone)
-        overlay.phone.setLngLat(fix.coordinates).setRotation(phone.degrees);
-      if (travel !== null)
-        overlay.travel.setLngLat(fix.coordinates).setRotation(travel);
+      if (phone) overlay.phone.setLngLat(fix.coordinates);
+      if (travel !== null) overlay.travel.setLngLat(fix.coordinates);
     }
     if (survey) return; // Survey recording owns GPS following; review never follows sensors.
     const previous = camera.current;
@@ -277,5 +280,48 @@ export function MotionMap({
       previous.lastBearingUpdate = now;
     }
   }, [map, fix, follow, active, survey, driving, state, expiry]);
+  useEffect(() => {
+    let frame = 0;
+    const draw = () => {
+      frame = 0;
+      const overlay = markers.current;
+      if (!overlay || !fix) return;
+      const world = !survey && map.getZoom() < CAMPUS_MIN_ZOOM;
+      for (const [marker, degrees] of [
+        [overlay.phone, active ? (state.heading?.degrees ?? null) : null],
+        [overlay.travel, travelHeading(fix)],
+      ] as const) {
+        if (degrees === null) continue;
+        const rotation = world
+          ? projectedHeading(fix.coordinates, degrees, (p) => map.project(p))
+          : degrees;
+        const alignment = world ? 'viewport' : 'map';
+        if (marker.getRotationAlignment() !== alignment)
+          marker.setRotationAlignment(alignment);
+        if (marker.getPitchAlignment() !== alignment)
+          marker.setPitchAlignment(alignment);
+        if (rotation !== null) {
+          if (marker.getRotation() !== rotation) marker.setRotation(rotation);
+          marker.getElement().style.display = usableGps(
+            fix,
+            Date.now(),
+            survey ? 15 : 35,
+            survey ? 10000 : 12000,
+          )
+            ? ''
+            : 'none';
+        } else marker.getElement().style.display = 'none';
+      }
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(draw);
+    };
+    schedule();
+    map.on('move', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      map.off('move', schedule);
+    };
+  }, [map, fix, active, survey, state.heading]);
   return null;
 }
