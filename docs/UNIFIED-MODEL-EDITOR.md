@@ -6,7 +6,9 @@ The building workspace brings architectural details, appearance, roofs, outlines
 
 Use the searchable building hierarchy or the mapped-wall selector to choose a wing and wall. The wall canvas is face-on: horizontal distances start at the labelled endpoint, and vertical distances are measured from the model base. The 3D preview provides geographic orientation. Selecting a surface or detail does not create a model-history entry.
 
-Desktop panels can be resized. On a phone, switch between **Wall**, **3D** and **Photo** views; properties and the hierarchy remain available below the view. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
+Desktop panels can be resized. At widths up to 900 px, and on touch devices in short landscape viewports, the workspace gives the canvas the remaining screen. A labelled mode selector keeps Details, Appearance, Roof, Outline and Review reachable. Switch between **Wall / 3D / Photo**, or **Plan / 3D / Photo** for roofs and outlines. Appearance initially opens 3D. Changing layouts keeps the draft and selection.
+
+**Choose wall** opens the searchable hierarchy. **Add**, **Edit** and **More** open one focused sheet at a time. Expand or collapse it with its labelled controls or drag its handle; **Done** returns to the canvas. The preview contracts above the sheet, and focused fields expand the sheet and scroll into view. Undo, Redo, Close and the save status remain in the header. Fit-to-selection, reset and photograph zoom help with small details. Before/after comparison uses the building as it was when the workspace opened.
 
 ## Place and repeat details
 
@@ -14,11 +16,13 @@ Supported details are windows, doors, columns, balconies, canopies, parapets and
 
 1. Use **Add window**, **Add door** or another detail button to insert it immediately. Existing generated windows and trim are preserved in the same undoable action. **Preview editable layout** remains available when you want to inspect conversion first.
 2. Select a detail on the wall, from the hierarchy or in 3D. Shift-click and a marquee allow multiple selections.
-3. Drag to move or use numeric position, dimensions and projection in metres. A resize handle is available for an individual detail.
-4. Choose a 0.01, 0.1 or 1 metre grid. Arrow keys nudge by that increment; Shift multiplies it by ten. Alt temporarily bypasses snapping during a gesture. Floor guides are illustrative estimates.
+3. On mobile, tap to select, then choose **Move** or **Resize** explicitly. Dragging in selection mode pans. Two fingers pan/zoom; starting a second touch cancels an unfinished edit before navigation. On desktop, drag the selected detail or use its resize handle. **Edit** provides numeric position, dimensions and projection in metres, with decimal input and increment/decrement controls.
+4. Choose a 0.01, 0.1 or 1 metre grid. Arrow keys nudge by that increment; Shift multiplies it by ten. Mobile Move also exposes directional nudges; holding a direction creates one command on release. Alt temporarily bypasses snapping during a gesture. Floor guides are illustrative estimates.
 5. Complete a drag or finish a numeric field to create one undoable command. Escape cancels the gesture or restores the field. An empty or incomplete numeric field remains editable and is never converted to zero.
 
-Duplicate makes independent copies with fresh identities. Copy/paste and copy-to-wall/building show a placement preview. Physical dimensions are retained across walls of different lengths; repositioning or scaling requires an explicit action. Invalid placements are highlighted rather than silently clipped.
+Open the **⋯ button on the selected detail**, right-click a detail in the wall/hierarchy/3D view, or press **Shift+F10** to open its actions. Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide live here instead of occupying the properties form. **More → Selection actions** keeps them available when a sheet is open or the selection is hidden. Keyboard shortcuts include Ctrl/Cmd+D, C, V and A; text inputs retain normal text-editing behavior. Escape closes the menu without closing the workspace.
+
+Duplicate makes independent copies with fresh identities. Copy/paste and copy-to-wall/building show a placement preview. Physical dimensions are retained across walls of different lengths; repositioning or scaling requires an explicit action. Invalid placements are highlighted rather than silently clipped. Mobile **Multi-select** provides named checkboxes and a canvas selection tool; overlapping details offer a named selection list.
 
 Groups, alignment, equal-gap distribution and horizontal mirroring work with selected details. Row/column patterns use explicit counts and metre spacing. Presets are named design copies; changing a preset does not update its earlier insertions. Hiding or locking a detail affects editing only, not the published model.
 
@@ -26,13 +30,15 @@ Groups, alignment, equal-gap distribution and horizontal mirroring work with sel
 
 Illustrative details may be added without photographs and remain labelled as inferred. Observed details need a matching building photograph. Documented dimensions need measurement provenance. Copying a design to another building does not transfer photographic evidence or texture approval.
 
-Use the photograph panel to compare the selected wall and align a texture with labelled corners. The original gallery image remains unchanged. Keep plain materials where the photograph does not establish an unobstructed, useful wall view.
+Use the photograph panel to compare the selected wall and align a texture with labelled corners. Mobile **Align texture** is separate from photo navigation: select a corner, then enable **Move corner**, or use **Edit alignment** for numeric coordinates. Enlarging or navigating the photo does not change the alignment. The original gallery image remains unchanged. Keep plain materials where the photograph does not establish an unobstructed, useful wall view.
 
 Appearance controls retain building defaults and wing/wall overrides. Roof and outline modes use the existing geographic geometry and roof operations. Changing a footprint, wall length, roof or height can invalidate an assignment. Affected details remain available for placement review or rematching; they must not silently stretch onto a different wall.
 
 **Appearance → Building height** edits the whole-building height, recorded floor count, approximate flag and source notes without leaving the workspace. These controls are separate from wing overrides. A missing floor count cannot be invented: enter the recorded value, or explicitly choose height in metres/unknown. Switching wall selectors keeps Appearance and Details on the same wall.
 
-The **Review** mode lists changes and unresolved assignments. Review the selected wall explicitly. Saving a draft does not approve every wall, and model review does not establish field-surveyed accuracy.
+The **Height & floors** shortcut opens these controls directly. Floor-count mode estimates height at 3 m per floor; selecting that mode without a count stays unfinished until a valid count is entered. Custom roof elevations previously held walls at their old height. **Adjust custom roof elevations with height** now scales the roof's vertical dimensions proportionally by default, flags its wall assignments for review and leaves detail dimensions unchanged. Turn it off to retain recorded roof elevations. **Fit inherited custom roofs** repairs an existing mismatch explicitly. Wings with their own height/floor settings are listed and retain their overrides until **Use building height** is chosen. The complete height/roof adjustment is undoable.
+
+Roof and Outline use a central geographic plan on mobile; their coordinates and options stay in the focused sheet. Tap a point first and choose **Move point** for a gesture. Review lists changes and unresolved assignments, with actions to open the affected wall or height controls. Review the selected wall explicitly. Saving a draft does not approve every wall, and model review does not establish field-surveyed accuracy.
 
 ## Saving, undo and recovery
 

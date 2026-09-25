@@ -2,6 +2,8 @@
 
 ## Current building workspace
 
+The mobile workspace now uses a full-screen canvas and focused sheets. Wall gestures update lightweight selection geometry; completed actions alone request model generation. Hidden mobile 3D previews pause drawing and defer work until shown, retaining their camera. Opening a sheet, selecting a detail, or typing an unfinished value does not rebuild the model. [Mobile production measurements](MOBILE-MODEL-PERFORMANCE.md) compare the previous long form with the canvas workflow separately from the earlier desktop and upload studies.
+
 The unified model editor extends this work with a measured canvas, commit-on-completion numeric fields, shared history and private input recovery. Appearance-only changes reuse routing results; wall selection and façade evidence notes do not rebuild models. Preview generation is bounded to one active and one newest pending request, with explicit resource disposal and retry. The [current model-editor report](MODEL-EDITOR-VERIFICATION.md) records five-run production comparisons at published campus scale and a 100-detail wall, including 4× CPU throttling. The photo-upload measurements below retain their original scope and dates.
 
 

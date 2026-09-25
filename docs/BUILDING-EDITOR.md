@@ -2,6 +2,10 @@
 
 The current owner workflow is the [unified Photo & model workspace](UNIFIED-MODEL-EDITOR.md). Open it from a selected building, or use **Appearance**, **Roof** or **Outline** to open a particular mode. **Details** and **Review** share the same building draft and history. The former long façade form and its one-shot Apply action are superseded.
 
+On mobile, the canvas fills the workspace and controls open in one focused sheet. Use the labelled mode selector, **Choose wall**, and **Wall / 3D / Photo** views (or **Plan** for roofs/outlines). Tap selects; Move or Resize explicitly enables geometry editing. Pinch navigation cancels an unfinished edit. The sheet has Expand/Collapse/Done controls, safe-area spacing and focused-input scrolling. Desktop retains resizable panels.
+
+The selected detail's **⋯** button and right-click menu hold Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. **More → Selection actions** provides access from mobile sheets. Ctrl/Cmd+D duplicates; Ctrl/Cmd+C/V copies and opens a placement preview; Ctrl/Cmd+A selects the wall's details. Shift+F10 opens the menu. These shortcuts do not replace normal editing inside text inputs.
+
 ## Select and place
 
 Use the searchable hierarchy, mapped-wall list, face-on canvas or selectable 3D preview. Walls show their mapped length and review state; dimensions are measured from the labelled endpoint and model base. Numeric fields use metres at the editing boundary while saved façade coordinates remain compatible with existing renderers.
@@ -13,6 +17,8 @@ Generated windows and trim can be previewed and converted into editable details.
 ## Appearance and geometry
 
 Building defaults flow to wings and then walls. **Use inherited value** removes an override. Window spacing defaults to 4 m and supports 0.5–20 m. Unknown heights remain illustrative; a model is not a survey. Standard hip/gable roofs require a convex four-sided wing without a courtyard and a pitch that fits the height. Complex wings use the existing custom-roof triangulation.
+
+**Height & floors** opens whole-building controls inside Appearance. Floor count uses an explicit 3 m-per-floor estimate. A missing count remains recoverable input until completed. Height changes adjust inherited custom roofs proportionally by default, including eaves and roof-point elevations; the checkbox can retain recorded elevations instead. Wing overrides remain explicit. Existing mismatches offer **Fit inherited custom roofs to current building height**. Height and roof changes share one undo action and flag affected wall assignments; physical detail dimensions and roof plan coordinates are preserved.
 
 Roof mode stores geographic control points, elevations, ridge/valley constraints and footprint attachments. Outline mode edits the existing mapped vertices rather than a second footprint. Courtyards remain open. Completed valid roof actions save automatically; an invalid intermediate plan remains local for repair. **Done editing roof** closes the roof controls. Outline and height changes can invalidate associated details or textures. Physical dimensions are preserved for explicit placement review; removed assignments stay recoverable through rematching.
 

@@ -6,7 +6,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
-![TurnRight campus map with the Senate Building destination and published architecture](docs/assets/screenshots/public-place-desktop-current-2026-09-24.png)
+![TurnRight campus map with the Senate Building destination and published architecture](docs/assets/screenshots/public-place-desktop-current-2026-09-25.png)
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
@@ -42,45 +42,61 @@ Current production-build captures use the verified published campus **`lasu-313d
 
 | Campus and destination · desktop | Adjustable destination panel · desktop |
 | --- | --- |
-| ![Campus and Senate destination in Light mode](docs/assets/screenshots/public-place-desktop-current-2026-09-24.png) | ![Desktop panel shortened using its keyboard-accessible resize handle](docs/assets/screenshots/public-panel-resized-current-2026-09-24.png) |
+| ![Campus and Senate destination in Light mode](docs/assets/screenshots/public-place-desktop-current-2026-09-25.png) | ![Desktop panel shortened using its keyboard-accessible resize handle](docs/assets/screenshots/public-panel-resized-current-2026-09-25.png) |
 
 | Compact mobile map | Destination details | Settings | Offline download |
 | --- | --- | --- | --- |
-| <img src="docs/assets/screenshots/public-map-mobile-current-2026-09-24.png" width="240" alt="Mobile campus map with compact search dock"> | <img src="docs/assets/screenshots/public-place-mobile-current-2026-09-24.png" width="240" alt="Mobile destination details and building photograph"> | <img src="docs/assets/screenshots/public-settings-mobile-current-2026-09-24.png" width="240" alt="Mobile public appearance and navigation settings"> | <img src="docs/assets/screenshots/public-offline-mobile-current-2026-09-24.png" width="240" alt="Mobile offline package status and download controls"> |
+| <img src="docs/assets/screenshots/public-map-mobile-current-2026-09-25.png" width="240" alt="Mobile campus map with compact search dock"> | <img src="docs/assets/screenshots/public-place-mobile-current-2026-09-25.png" width="240" alt="Mobile destination details and building photograph"> | <img src="docs/assets/screenshots/public-settings-mobile-current-2026-09-25.png" width="240" alt="Mobile public appearance and navigation settings"> | <img src="docs/assets/screenshots/public-offline-mobile-current-2026-09-25.png" width="240" alt="Mobile offline package status and download controls"> |
 
 | Illustrated globe · desktop Light | Illustrated globe · mobile Dark |
 | --- | --- |
-| ![Offline globe with campus colours, geographic labels and gentle relief](docs/assets/screenshots/public-globe-desktop-current-2026-09-24.png) | <img src="docs/assets/screenshots/public-globe-mobile-current-2026-09-24.png" width="260" alt="Dark globe and campus return control on a phone-sized screen"> |
+| ![Offline globe with campus colours, geographic labels and gentle relief](docs/assets/screenshots/public-globe-desktop-current-2026-09-25.png) | <img src="docs/assets/screenshots/public-globe-mobile-current-2026-09-25.png" width="260" alt="Dark globe and campus return control on a phone-sized screen"> |
 
 | Walking route · desktop Dark | Walking route · mobile Dark |
 | --- | --- |
-| ![Offline-capable Clinic to Senate walking route preview](docs/assets/screenshots/public-route-desktop-current-2026-09-24.png) | <img src="docs/assets/screenshots/public-route-mobile-current-2026-09-24.png" width="260" alt="Mobile walking route with manual origin and mapped approach notice"> |
+| ![Offline-capable Clinic to Senate walking route preview](docs/assets/screenshots/public-route-desktop-current-2026-09-25.png) | <img src="docs/assets/screenshots/public-route-mobile-current-2026-09-25.png" width="260" alt="Mobile walking route with manual origin and mapped approach notice"> |
 
 ### Owner editor
 
 | Workspace and feature explorer | Selected building with photographs at the top |
 | --- | --- |
-| ![Owner workspace, feature explorer and 3D campus](docs/assets/screenshots/editor-workspace-current-2026-09-24.png) | ![Building inspector with gallery preview, Manage photos and architectural tools](docs/assets/screenshots/editor-building-current-2026-09-24.png) |
+| ![Owner workspace, feature explorer and 3D campus](docs/assets/screenshots/editor-workspace-current-2026-09-25.png) | ![Building inspector with gallery preview, Manage photos and architectural tools](docs/assets/screenshots/editor-building-current-2026-09-25.png) |
 
 | Mobile building inspector | Mobile editor settings | Unified model · mobile |
 | --- | --- | --- |
-| <img src="docs/assets/screenshots/editor-building-mobile-current-2026-09-24.png" width="260" alt="Selected building and compact inspector on mobile"> | <img src="docs/assets/screenshots/editor-settings-mobile-current-2026-09-24.png" width="260" alt="Mobile owner appearance, tilt and model settings"> | <img src="docs/assets/screenshots/unified-model-mobile-2026-09-24.png" width="260" alt="Full-screen mobile model workspace with measured wall canvas and precision controls"> |
+| <img src="docs/assets/screenshots/editor-building-mobile-current-2026-09-25.png" width="260" alt="Selected building and compact inspector on mobile"> | <img src="docs/assets/screenshots/editor-settings-mobile-current-2026-09-25.png" width="260" alt="Mobile owner appearance, tilt and model settings"> | <img src="docs/assets/screenshots/editor-model-canvas-mobile-2026-09-25.png" width="260" alt="Full-screen mobile model workspace with measured wall canvas and precision controls"> |
+
+**Selected-item actions:** the ⋯ menu keeps common commands beside the selection, with right-click and keyboard access.
+
+<img src="docs/assets/screenshots/editor-model-actions-mobile-2026-09-25.png" width="300" alt="Selected detail action menu with edit, duplicate, copy, lock, hide and delete commands">
 
 **Photo management:** review, arrange and edit building photographs independently from model details.
 
-![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-24.png)
+![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-25.png)
 
 **Photo & model:** a measured wall canvas, searchable hierarchy, selectable 3D preview and photograph reference share the building draft.
 
-![Unified desktop model workspace with selection, architectural properties and photographic reference](docs/assets/screenshots/unified-model-desktop-2026-09-24.png)
+![Unified desktop model workspace with selection, architectural properties and photographic reference](docs/assets/screenshots/unified-model-desktop-2026-09-25.png)
 
 | Roof tools | Outline tools |
 | --- | --- |
-| ![Integrated roof mode and geographic roof plan](docs/assets/screenshots/editor-roof-current-2026-09-24.png) | ![Integrated footprint view with mapped vertices and geographic context](docs/assets/screenshots/editor-outline-current-2026-09-24.png) |
+| ![Integrated roof mode and geographic roof plan](docs/assets/screenshots/editor-roof-current-2026-09-25.png) | ![Integrated footprint view with mapped vertices and geographic context](docs/assets/screenshots/editor-outline-current-2026-09-25.png) |
 
-These **19 distinct screenshots** restore broad public/editor coverage. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
+| Precise detail properties | Building height and floors | Mobile roof plan |
+| --- | --- | --- |
+| <img src="docs/assets/screenshots/editor-model-properties-mobile-2026-09-25.png" width="260" alt="Detail dimensions in a focused mobile sheet above the action bar"> | <img src="docs/assets/screenshots/editor-model-height-mobile-2026-09-25.png" width="260" alt="Building height controls inside the mobile Appearance mode"> | <img src="docs/assets/screenshots/editor-model-roof-mobile-2026-09-25.png" width="260" alt="Geographic custom roof plan with deliberate Move point control"> |
+
+| Mobile outline plan | Photograph reference | Targeted review |
+| --- | --- | --- |
+| <img src="docs/assets/screenshots/editor-model-outline-mobile-2026-09-25.png" width="260" alt="Light-theme outline canvas with selected geographic vertices"> | <img src="docs/assets/screenshots/editor-model-photo-mobile-2026-09-25.png" width="260" alt="Building photograph reference with independent zoom and navigation"> | <img src="docs/assets/screenshots/editor-model-review-mobile-2026-09-25.png" width="260" alt="Mobile review sheet with wall-specific issues and actions"> |
+
+These **26 distinct screenshots** cover the public app, desktop editor and every mobile model mode. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
 
 ## Recent changes
+
+- **Canvas-first mobile modelling:** all five modes use a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. Pinch navigation, multi-selection, held nudges, decimal inputs and reachable sheet controls support phones, tablets and short landscape screens. Desktop keeps its resizable panels.
+- **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Keyboard shortcuts and placement previews support quick editing without a permanent button row.
+- **Height that changes the model:** whole-building metres and floor count are editable inside Appearance. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Height/roof adjustments share one undo action.
 
 - **Unified building editing:** Details, Appearance, Roof, Outline and Review share one draft and history. Use metre-based placement, snapping, keyboard nudges, multi-selection, duplication, alignment, groups, patterns, presets and previewed copies between walls/buildings. Completed actions autosave; unfinished values recover privately. Saving does not approve evidence or publish content. [Owner guide](docs/UNIFIED-MODEL-EDITOR.md).
 - **Published photographic architecture:** the reviewed release contains 39 photographs covering 19 of 395 buildings. Roofs, colours and stable identities remain owner-managed. Dimensions and unseen sides remain estimates; there are no approved photographic wall textures in this release. [Evidence and coverage](docs/PHOTO-MODELS.md).
@@ -222,6 +238,12 @@ Guided repairs select the affected feature and open the relevant control. Propos
 Add buttons preserve generated windows and trim while inserting the requested detail. Blocked placements stay visible and recoverable; repair their errors and use **Save unfinished wall**. Appearance includes whole-building height/floor controls, and unfinished fields remain tied to their original wall when selections change.
 
 Save errors identify the feature blocking the shared draft. Conflict review preserves removed wall records; older empty records offer an undoable repair instead of crashing the workspace. Explicit app updates verify local recovery before reloading, and new edits invalidate that reload permission.
+
+On mobile, use the mode selector and **Wall / 3D / Photo** or **Plan / 3D / Photo** tabs. **Choose wall**, **Add**, **Edit** and **More** open one sheet at a time; its Expand/Collapse/Done controls keep the canvas available. Tap first, then explicitly enable Move or Resize. A second touch cancels an unfinished geometry gesture before panning/zooming. Completed holds on directional nudges create one undoable command.
+
+Use the selected detail's **⋯** button or right-click for Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide; these actions are no longer a row in the properties panel. Ctrl/Cmd+D/C/V/A and Shift+F10 work outside text inputs. Groups, patterns, presets and copy previews remain available through More.
+
+**Height & floors** opens the whole-building controls. Floor count uses a labelled 3 m-per-floor estimate. Custom roofs previously kept their old elevations when the height changed: the new default proportionally adjusts their eaves and control-point elevations. Disable that option to retain recorded elevations. Overridden wings are listed and only inherit after an explicit action. Unknown floor counts remain unfinished input; dimensions are never invented to unblock a save.
 
 Select a building to open **Appearance**, then choose the building, a wing or a wall through the inspector or model picking.
 
@@ -430,6 +452,7 @@ TurnRight/
 | Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
 | Mapped-approach text is pale on a white popup in Dark mode | Install the available **app update** from the notice or Settings. Popup text and surfaces now follow the active theme; no campus-data update is required for this display fix. |
 | Editor stays in the wrong theme | Use **Editor Settings → Appearance → Light/Dark**, or **Device** to resume automatic changes. |
+| Height changes but a wing stays short | Check its explicit height/floor override and custom roof elevations in **Height & floors**. Enable roof adjustment or explicitly fit the inherited roofs; review affected details. |
 | A roof preview is outdated | Use **Retry 3D preview** and inspect geometry/elevation errors. The last valid model and unfinished roof are retained. |
 | A long selected path extends off-screen on a phone | This preserves local map detail by limiting zoom-out. Pan along the highlighted path or use the zoom-out control to see more. |
 | Paths connect where they should stay separate | Turn off automatic crossings for that path or set the correct bridge/tunnel level. Use explicit joins for the connections you do want, then review and publish. |

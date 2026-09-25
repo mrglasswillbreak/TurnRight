@@ -1,5 +1,36 @@
 # Production deployments
 
+## Mobile canvas, height controls and selection actions — 25 September 2026
+
+The application rollout adds a canvas-first model workspace on phones, tablets
+and short touch-landscape screens. All five modes remain available through the
+mode selector, with one focused sheet, explicit Move/Resize, pinch cancellation,
+44 px plan/texture handles, directional nudges and keyboard-aware sizing. The
+selected detail's ⋯ button and right-click menu replace the permanent action row;
+keyboard shortcuts, focus restoration, lock/hide, copy previews and undo remain
+available. Sheet reservation now uses viewport lengths consistently, preventing
+sheets from covering the preview.
+
+Height and floor changes can proportionally adjust inherited custom roofs;
+recorded roof elevations and explicit wing overrides can instead be retained.
+An incomplete floor count stays private until completed. Height/roof adjustments
+use one history action and flag affected wall assignments for review.
+
+Verification passes 501 unit tests, 23 Python importer tests, 28 distinct model
+browser cases with focused follow-ups, all nine production PWA journeys, both
+TypeScript projects, lint and the configured production budgets. The documentation
+capture provides 26 public/editor screenshots. See [verification](MODEL-EDITOR-VERIFICATION.md)
+and the separate [five-trial mobile comparison](MOBILE-MODEL-PERFORMANCE.md).
+Physical mobile devices and native keyboard/screen-reader acceptance remain
+unavailable; the reports distinguish simulated coverage.
+
+No server API, database migration, public package schema or map publication is
+part of this rollout. The reviewed campus remains **`lasu-313d8a168635`**, schema 2,
+with **395 buildings, 220 places, 39 photographs** and **84 immutable assets**
+totaling **18,880,327 bytes**. Application updates retain the existing verified
+recovery guard. Model/content changes continue through owner preview, publication
+and rollback.
+
 ## Model insertion and recovered-draft repairs — 25 September 2026
 
 Application repairs through **`2051f02`** are served at

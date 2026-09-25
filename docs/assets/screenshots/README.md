@@ -2,11 +2,11 @@
 
 ## Current unified editor and public gallery
 
-The README contains **19 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.
+The README contains **26 distinct unaltered PNG captures** from production builds, using published snapshot **`lasu-313d8a168635`**, SHA-256 `b2927184603beeeefdbb96bc42d4460e46f05ec3a8f58f8238a70b383201954c`. There are 395 buildings, 220 places and 39 photographs. The owner/API fixtures are isolated: no production account, private upload, survey or draft is captured or modified. Model examples include local illustrative detail edits; they are not a newly published building design.
 
-Public and owner application views are captured by `web/playwright.docs.config.ts`; the two measured-model views use `web/scripts/benchmark-model-editor.mjs`. Public screenshots block service workers to avoid an older installed UI. Offline-download screenshots show the actual interface state, not proof of a disconnected session. Separate production PWA journeys verify preparation and offline reloads.
+All current public and owner views are captured by `web/playwright.docs.config.ts`, including the eight focused mobile model views. Public screenshots block service workers to avoid an older installed UI. Offline-download screenshots show the actual interface state, not proof of a disconnected session. Separate production PWA journeys verify preparation and offline reloads.
 
-| Filename prefix (all end `-2026-09-24.png`) | View |
+| Filename prefix (all end `-2026-09-25.png`) | View |
 | --- | --- |
 | `public-place-desktop-current` | Campus and Senate destination, Light |
 | `public-panel-resized-current` | Same destination with shortened panel |
@@ -26,7 +26,14 @@ Public and owner application views are captured by `web/playwright.docs.config.t
 | `editor-roof-current` | Integrated roof mode |
 | `editor-outline-current` | Geographic outline mode |
 | `unified-model-desktop` | Measured canvas, hierarchy, model and photo |
-| `unified-model-mobile` | Full-screen model workspace |
+| `editor-model-canvas-mobile` | Canvas, selected detail and explicit Move/Resize actions |
+| `editor-model-actions-mobile` | Selection menu with commands and shortcuts |
+| `editor-model-properties-mobile` | Precise dimensions and focused edit sheet |
+| `editor-model-height-mobile` | Whole-building height/floors inside Appearance |
+| `editor-model-roof-mobile` | Central geographic roof plan |
+| `editor-model-outline-mobile` | Outline plan in Light appearance |
+| `editor-model-photo-mobile` | Shared building photograph and independent zoom |
+| `editor-model-review-mobile` | Targeted review sheet |
 
 Desktop application views are 1440 × 1000, the desktop globe is 1440 × 900 and mobile views are 390 × 844. Walking previews use a manual Clinic origin with no active GPS navigation; their camera and panel are adjusted to show the route and approach notice. These are Chromium/SwiftShader browser captures, not physical-phone or human screen-reader tests. Images contain the application's own labels, credits and theme colours; no interface elements are composited or removed.
 
@@ -36,11 +43,11 @@ From `web/`, use Node 22 and installed project dependencies:
 
 ```sh
 npx vite build --config vite.performance.config.ts
-node scripts/benchmark-model-editor.mjs --capture
+node scripts/benchmark-mobile-model.mjs --prepare
 npx playwright test --config playwright.docs.config.ts
 ```
 
-The benchmark first retrieves and verifies the public manifest and all assets into `work/model-benchmark/public`. Its comparison mode needs the documented baseline fixture build; see [the verification report](../../MODEL-EDITOR-VERIFICATION.md). `--capture` refreshes model screenshots without replacing existing benchmark measurements. The documentation project builds a separate local production app, supplies isolated owner responses and serves only the verified snapshot assets. Its screenshots overwrite the current filenames; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes only the final two walking previews. Inspect all captures before updating the README; record a new date if capturing on a later date.
+The benchmark retrieves and verifies the public manifest and all assets into `work/model-benchmark/public`. Its comparison mode needs the documented baseline fixture build; see [the mobile report](../../MOBILE-MODEL-PERFORMANCE.md). The screenshot project itself does not run the timing study. The documentation project builds a separate local production app, supplies isolated owner responses and serves only the verified snapshot assets. Its screenshots overwrite the current filenames; `TURNRIGHT_DOCS_ROUTES_ONLY=1` refreshes only the final two walking previews; `TURNRIGHT_DOCS_EDITOR_ONLY=1` refreshes the owner views. Inspect all captures before updating the README; record a new date if capturing on a later date.
 
 NASA/Natural Earth globe attribution remains in [the source inventory](../../../data/ATTRIBUTION.md). Building photographs retain their public in-app credits and [source identity/rights inventory](../../../data/photo-models/inventory.json). Earlier screenshots below are dated archives and do not describe current controls.
 

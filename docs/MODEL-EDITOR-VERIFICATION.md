@@ -13,7 +13,15 @@ The unified workspace uses the existing owner draft and publication pipeline. Th
 
 ## Automated verification
 
-### Interaction repairs · 25 September 2026
+### Mobile canvas and selected-item actions · 25 September 2026
+
+The compact workspace applies at widths up to 900 px and on coarse-pointer screens at most 600 px high. It retains all five modes, Wall/Plan/3D/Photo views, one detented sheet, deliberate Move/Resize, pinch cancellation, continuous-press nudges and reachable precision fields. Desktop panels remain available. The selected-detail menu replaces the permanent properties-button row and supports right-click, Shift+F10, focus restoration, shortcuts, lock/hide, copies and undo.
+
+Whole-building height and floor controls adjust inherited custom roof eaves/points proportionally by default. Owners may retain recorded elevations or explicitly remove a wing override. Choosing floor-count mode without a count remains private unfinished input until a valid count completes the command. Unit coverage verifies scaling, immutability and affected review flags; browser coverage exercises metres, floors, the worker preview and single-action undo.
+
+The current unit run passes **501 tests in 64 files**. Both TypeScript projects and lint pass with seven pre-existing warnings. **23 Python importer tests** pass using the repository's pinned data dependencies. **28 model browser cases** pass across 320/390/768/1440-pixel layouts and both themes, plus 740×390, 320×450 and touch-enabled 1024×390 layouts. Follow-up checks verify 44 px plan/texture handles, unclipped mobile 3D controls and deliberate touch gestures. Context-menu tests exercise keyboard focus, lock/hide, duplication, copy preview, delete and undo. All **nine production PWA journeys** pass again: old/new photo packages and entrances, driving voice, survey recovery/sync, saved 3D preferences, corrupt-asset repair, backend-failure cache fallback, building/roof recovery and enriched business details. The documentation project also passes with 26 public/editor captures. The mobile production comparison is documented separately in [Mobile model performance](MOBILE-MODEL-PERFORMANCE.md); the older desktop comparison below retains its original date and baseline.
+
+### Earlier interaction repairs · 25 September 2026
 
 Add buttons now preserve generated details and insert the requested primitive in
 one undoable command. Failed placements or building validation retain the proposed
@@ -34,7 +42,7 @@ removal conflicts with edits. Recovered empty assignments previously crashed the
 workspace; a guarded repair view now removes only an explicitly selected empty
 entry. Incomplete nonempty records retain their observations and other data.
 
-The latest complete run passes **498 Vitest tests in 63 files**. Focused workspace
+The earlier repair run passed **498 Vitest tests in 63 files**. Focused workspace
 tests pass after the final reload-guard change. **22 distinct model/appearance
 browser cases** pass across the repair runs, including all seven Add tools,
 generated-layout preservation, blocked additions, height repair, field identity,
@@ -46,7 +54,7 @@ build budgets pass. The five-trial timing study below predates these repairs.
 
 The initial 24 September rollout also passed **23 Python importer tests**, **five
 entrance/driving browser journeys**, and the production documentation capture.
-Those suites were not repeated for these frontend/recovery fixes. Browser cases
+Those suites were not repeated in that earlier repair pass; current verification is recorded above. Browser cases
 use actual React, MapLibre and Three.js with isolated owner responses; the narrow
 setup selects buildings through the feature list to avoid toolbar overlap.
 
@@ -56,16 +64,16 @@ The authentication-configured production build passes all four budget scripts. A
 
 | Allocation | Measured | Limit |
 | --- | ---: | ---: |
-| Lazy renderer + guided editor, including shared non-startup dependencies | 167.7 KiB gzip | 300 KiB |
-| Public startup JavaScript | 418,682 bytes gzip | 435,200 bytes |
-| Additional owner editor JavaScript | 183,598 bytes gzip | 189,440 bytes |
-| Lazy photo manager | 7,618 bytes gzip | 12,288 bytes |
+| Lazy renderer + guided editor, including shared non-startup dependencies | 198.2 KiB gzip | 300 KiB |
+| Public startup JavaScript | 421,095 bytes gzip | 435,200 bytes |
+| Additional owner editor JavaScript | 183,632 bytes gzip | 189,440 bytes |
+| Lazy photo manager | 7,617 bytes gzip | 12,288 bytes |
 | Offline world | 5.30 MiB | 8 MiB |
 | Natural voice | 5.91 MiB / 362 clips | 8 MiB |
 
 World/voice hashes and precache inclusion pass. The campus geometry/texture budget remains 12 MiB and resident building textures remain limited to 64 MiB. The published snapshot has no approved wall textures; synthetic pool/asset tests cover malformed textures, bounded residency and release.
 
-## Production-build measurements
+## Earlier desktop production-build measurements · 24 September 2026
 
 Each group has five trials on Windows, Chromium headless and SwiftShader, at a 1440 × 1000 viewport. Both versions use the same verified campus; the dense fixture adds 100 details to one wall. The baseline is commit `9bb1ef7`. The final fixture includes real `EditorWorkspace` commands and IndexedDB recovery; the baseline uses the former staged form. No other browser suite ran concurrently with these trials.
 
@@ -102,7 +110,7 @@ npx playwright test --config playwright.docs.config.ts
 
 `--smoke` runs one published-data trial per version. `--final` keeps the recorded baseline and repeats the final groups after a change. `--capture` captures current desktop/mobile model views without replacing the performance report. All versions fetch and hash-check public assets into `web/work/model-benchmark/public`; no owner authentication or production write is performed. Run these measurements separately from browser/PWA suites on software-GPU machines.
 
-For correctness, run `npm test`, `npm run lint`, `npm run build`, `npm run check:configured-build`, relevant editor browser journeys and `npm run test:survey-pwa`. The configured build uses nonfunctional auth placeholders and must not be deployed. The [screenshot inventory](assets/screenshots/README.md) records all 19 README views and their sources.
+For correctness, run `npm test`, `npm run lint`, `npm run build`, `npm run check:configured-build`, relevant editor browser journeys and `npm run test:survey-pwa`. The configured build uses nonfunctional auth placeholders and must not be deployed. The [screenshot inventory](assets/screenshots/README.md) records all 26 current README views and their sources.
 
 ## Coverage limits and rollout
 
