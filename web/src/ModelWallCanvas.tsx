@@ -24,14 +24,14 @@ import {
 type Metrics = ReturnType<typeof wallMetrics>;
 export type WallView = { x: number; y: number; width: number; height: number };
 export function ModelWallCanvas({
-  metrics: m,
-  elements,
+  metrics: sourceMetrics,
+  elements: sourceElements,
   selected,
   hidden,
   locked,
   grid,
-  onSelect,
-  onCommit,
+  onSelect: selectSource,
+  onCommit: commitSource,
   onDuplicate,
   onDelete,
   views,
@@ -54,6 +54,36 @@ export function ModelWallCanvas({
   detailName?: (e: FacadeElement) => string;
   actions?: ReactNode;
 }) {
+  const reverse = sourceMetrics.reverse;
+  const m = useMemo(
+    () =>
+      reverse
+        ? {
+            ...sourceMetrics,
+            coordinates: [...sourceMetrics.coordinates].reverse(),
+          }
+        : sourceMetrics,
+    [sourceMetrics, reverse],
+  );
+  const elements = useMemo(
+    () =>
+      reverse
+        ? sourceElements.map((e) => ({ ...e, x: 1 - e.x }))
+        : sourceElements,
+    [sourceElements, reverse],
+  );
+  const toSource = (values: FacadeElement[]) =>
+    reverse ? values.map((e) => ({ ...e, x: 1 - e.x })) : values;
+  const onCommit = (values: FacadeElement[]) => commitSource(toSource(values));
+  const onSelect = (ids: string[], instance?: number) => {
+    const element = sourceElements.find((e) => e.id === ids[0]);
+    selectSource(
+      ids,
+      reverse && instance !== undefined && element
+        ? element.count - 1 - instance
+        : instance,
+    );
+  };
   const mobile = useModelMobile();
   const pointers = useRef(new Map<number, [number, number]>()),
     pinch = useRef<{
@@ -438,7 +468,7 @@ export function ModelWallCanvas({
     ],
     JSON.stringify([view, m.coordinates, m.eaves]),
     cancel,
-    preview ? { wallId: m.wallId, elements: preview } : null,
+    preview ? { wallId: m.wallId, elements: toSource(preview) } : null,
   );
   return (
     <section
@@ -486,9 +516,9 @@ export function ModelWallCanvas({
         </ModelButton>
       </div>
       <p className="small-note">
-        {m.length.toFixed(2)} m wide · {m.eaves.toFixed(2)} m to eaves · A → B (
-        {m.direction}). Floor guides are estimates. Arrow keys move; Shift ×10;
-        Alt disables snapping.
+        {m.length.toFixed(2)} m wide · {m.eaves.toFixed(2)} m to eaves ·{' '}
+        {reverse ? 'B → A' : 'A → B'} ({m.direction}). Floor guides are
+        estimates. Arrow keys move; Shift ×10; Alt disables snapping.
       </p>
       <svg
         ref={svg}
@@ -641,8 +671,8 @@ export function ModelWallCanvas({
                     }
                   >
                     <title>
-                      {e.kind} · {(x + e.width / 2).toFixed(2)} m from A ·{' '}
-                      {e.bottom.toFixed(2)} m above base
+                      {e.kind} · {(x + e.width / 2).toFixed(2)} m from{' '}
+                      {reverse ? 'B' : 'A'} · {e.bottom.toFixed(2)} m above base
                       {locked.includes(e.id) ? ' · locked' : ''}
                     </title>
                   </rect>

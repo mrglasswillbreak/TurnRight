@@ -13,7 +13,7 @@ import {
   buildingTopology,
   resolveBuildingVisual,
 } from '../src/building-surfaces';
-import { emptyAuthoring } from '../src/model-authoring';
+import { emptyAuthoring, wallMetrics } from '../src/model-authoring';
 import { createBuildingModel } from '../src/building-model';
 import { validBuildingModel } from '../src/building-visuals';
 import {
@@ -240,4 +240,57 @@ it('roof lettering follows the actual roof planes on both sides of a ridge', () 
     ).size,
   ).toBeGreaterThan(1);
   expect(validBuildingModel(model)).toBe(true);
+});
+
+it('draft preview renders unreviewed lettering without approving or publishing it', () => {
+  const f = feature(),
+    wall = facadeWalls(f)[0];
+  f.properties!.appearance = {
+    facades: {
+      [wall.wallId]: {
+        ...wall,
+        wallCoordinates: wall.coordinates,
+        elements: [detail],
+        confidence: 'inferred',
+        notes: '',
+        photoIds: [],
+        needsReview: true,
+      },
+    },
+  };
+  const visual = resolveBuildingVisual(f);
+  expect(createBuildingModel(f, visual).meshes.some((m) => m.text)).toBe(false);
+  const preview = createBuildingModel(f, visual, { previewUnreviewed: true });
+  expect(preview.meshes.some((m) => m.text?.text === 'Library')).toBe(true);
+  expect(f.properties!.appearance.facades[wall.wallId].needsReview).toBe(true);
+});
+
+it('front elevations face outside for either outer and courtyard ring winding', () => {
+  for (const reversed of [false, true]) {
+    const f = feature();
+    f.geometry.coordinates.push([
+      [3.2001, 6.4601],
+      [3.2001, 6.4602],
+      [3.2002, 6.4602],
+      [3.2002, 6.4601],
+      [3.2001, 6.4601],
+    ]);
+    if (reversed) f.geometry.coordinates.forEach((r) => r.reverse());
+    for (const wall of facadeWalls(f)) {
+      const metrics = wallMetrics(f, wall.wallId);
+      expect(metrics.reverse).toBe(reversed);
+      const ends = metrics.reverse
+        ? [...wall.coordinates].reverse()
+        : wall.coordinates;
+      const a = ends[0],
+        b = ends[1],
+        mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const outward = [b[1] - a[1], a[0] - b[0]];
+      const towardCentre = [3.20015 - mid[0], 6.46015 - mid[1]];
+      const courtyard = wall.label.includes('courtyard');
+      expect(
+        outward[0] * towardCentre[0] + outward[1] * towardCentre[1] > 0,
+      ).toBe(courtyard);
+    }
+  }
 });

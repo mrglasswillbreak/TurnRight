@@ -98,11 +98,22 @@ export function wallMetrics(
     part?.floors ||
     visual.floors ||
     Math.max(1, Math.round(height / 3));
+  const ringIndex = topology.parts[index].rings.findIndex((ring) =>
+    ring.wallIds.includes(wallId),
+  );
+  const ring = polygon[ringIndex];
+  const signedArea = ring.slice(0, -1).reduce((sum, a, i) => {
+    const b = ring[i + 1];
+    return sum + a[0] * b[1] - b[0] * a[1];
+  }, 0);
+  // Front elevation runs left-to-right as seen from outside, including courtyards.
+  const reverse = signedArea > 0 !== (ringIndex === 0);
   const [a, b] = wall.coordinates;
   const angle =
     ((Math.atan2(b[0] - a[0], b[1] - a[1]) * 180) / Math.PI + 360) % 360;
   return {
     ...wall,
+    reverse,
     length: wallLength(wall.coordinates, latitude),
     height,
     eaves,

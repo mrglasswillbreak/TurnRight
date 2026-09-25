@@ -32,7 +32,9 @@ self.onmessage = ({
       if (errors.length) throw new Error(errors.join(' '));
       visual.geometryRevision = buildingRevision(feature);
       visual.detailRevision = detailRevision(feature);
-      const model = createBuildingModel(feature, visual);
+      const model = createBuildingModel(feature, visual, {
+        previewUnreviewed: true,
+      });
       if (!validBuildingModel(model))
         throw new Error(
           'Building model exceeds the supported geometry budget.',

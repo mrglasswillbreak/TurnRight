@@ -136,7 +136,10 @@ export function facadeMeshes(
           detail: true,
           text: textRecipe(e),
           surfaces: [],
-          uvs: [0, 0, 1, 0, 1, 1, 0, 1],
+          uvs:
+            dy * outward[0] - dx * outward[1] < 0
+              ? [1, 0, 0, 0, 0, 1, 1, 1]
+              : [0, 0, 1, 0, 1, 1, 0, 1],
         };
         roles.set(label, 'trim');
         face(label, [

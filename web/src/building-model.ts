@@ -74,6 +74,7 @@ export function footprintAssessment(feature: Feature<Polygon | MultiPolygon>) {
 export function createBuildingModel(
   feature: Feature<Polygon | MultiPolygon>,
   visual: BuildingVisual,
+  options: { previewUnreviewed?: boolean } = {},
 ): BuildingModel {
   const polygons =
     feature.geometry.type === 'Polygon'
@@ -225,7 +226,7 @@ export function createBuildingModel(
         const description = appearance.facades?.[wallId];
         if (
           description &&
-          !description.needsReview &&
+          (!description.needsReview || options.previewUnreviewed) &&
           facadeMatches(description, feature)
         ) {
           detailedMeshes.push(
