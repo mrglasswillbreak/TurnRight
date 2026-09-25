@@ -66,7 +66,7 @@ export function modelTree({
         ...topology.parts.map(
           (part, index): ModelTreeNode => ({
             key: `part:${part.id}`,
-            label: `Wing ${index + 1}`,
+            label: authoring.names[part.id] || `Wing ${index + 1}`,
             target: { kind: 'part', partId: part.id },
             children: [
               {

@@ -1596,3 +1596,26 @@
   color: var(--link);
   border-color: var(--link);
 }
+
+.model-landscape .model-stage {
+  position: relative;
+}
+.model-landscape .model-selected-actions {
+  position: absolute;
+  z-index: 5;
+  bottom: 4px;
+  left: 4px;
+  background: var(--background);
+  border-radius: 8px;
+  box-shadow: 0 1px 5px #0002;
+  max-width: calc(100% - 8px);
+}
+
+.model-review > .model-button,
+.model-mobile-error.model-button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+  height: auto;
+  padding-block: 10px;
+}

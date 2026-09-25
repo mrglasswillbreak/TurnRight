@@ -1748,7 +1748,7 @@ function ModelWorkspace({
                               ? walls.find((w) => w.wallId === selection.wallId)
                                   ?.label
                               : selection?.partId
-                                ? `Wing ${buildingTopology(feature).parts.findIndex((p) => p.id === selection.partId) + 1} · defaults`
+                                ? `Wing ${buildingTopology(feature).parts.findIndex((p) => p.id === selection.partId) + 1} · ${mode === 'roof' ? (selection.elementId ? 'Roof text' : 'Roof') : 'defaults'}`
                                 : 'Whole building · defaults'}
                     </p>
                   </div>
@@ -2028,7 +2028,9 @@ function ModelWorkspace({
                                 setReviewOpen(true);
                                 openPanel('more');
                                 setDetent('full');
-                                setTab('wall');
+                                setTab((view) =>
+                                  view === 'surface' ? view : 'wall',
+                                );
                               }}
                             >
                               Inspect details and evidence
@@ -2157,7 +2159,9 @@ function ModelWorkspace({
                             onClick={() => {
                               add(k);
                               if (compact) {
-                                setTab('wall');
+                                setTab((view) =>
+                                  view === 'surface' ? view : 'wall',
+                                );
                                 openPanel('none');
                               }
                             }}
@@ -2876,7 +2880,9 @@ function ModelWorkspace({
                               setTouchTool(
                                 touchTool === 'move' ? 'select' : 'move',
                               );
-                              setTab('wall');
+                              setTab((view) =>
+                                view === 'surface' ? view : 'wall',
+                              );
                             }}
                           >
                             Move
@@ -2895,7 +2901,9 @@ function ModelWorkspace({
                               setTouchTool(
                                 touchTool === 'resize' ? 'select' : 'resize',
                               );
-                              setTab('wall');
+                              setTab((view) =>
+                                view === 'surface' ? view : 'wall',
+                              );
                             }}
                           >
                             Resize
@@ -2949,7 +2957,9 @@ function ModelWorkspace({
                             setTouchTool(
                               touchTool === 'move' ? 'select' : 'move',
                             );
-                            setTab('wall');
+                            setTab((view) =>
+                              view === 'surface' ? view : 'wall',
+                            );
                           }}
                           disabled={!['roof', 'outline'].includes(mode)}
                           aria-pressed={touchTool === 'move'}
