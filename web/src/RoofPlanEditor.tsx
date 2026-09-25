@@ -1,5 +1,13 @@
+import {
+  Check as ActionCheck,
+  Plus as ActionPlus,
+  Trash2 as ActionTrash2,
+} from 'lucide-react';
+import { ModelButton } from './ModelButton';
 /* The roof SVG supports spatial gestures; point lists and numeric fields provide equivalent keyboard controls. */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
+import { useRoofText } from './use-roof-text';
+import { useModelSurface } from './model-surface';
 import { ModelField } from './ModelField';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MapEdit, Position } from './types';
@@ -33,6 +41,8 @@ export function RoofPlanEditor({
   onApply,
   onSurface,
   focusedSurface,
+  focusedText,
+  onTextSelect,
   autoSave = false,
   workspace,
 }: {
@@ -47,6 +57,8 @@ export function RoofPlanEditor({
   onApply: (edit: MapEdit) => void;
   onSurface: (index: number | undefined) => void;
   focusedSurface?: number;
+  focusedText?: string;
+  onTextSelect: (id?: string) => void;
   autoSave?: boolean;
   workspace?: import('./editor-workspace').EditorWorkspace;
 }) {
@@ -188,7 +200,20 @@ export function RoofPlanEditor({
     pick(point.id, next);
   };
   const active = roof.points.find((p) => p.id === selected);
+  const textTools = useRoofText({
+    edit,
+    partId,
+    roof: shown,
+    project,
+    unproject,
+    svg,
+    workspace,
+    onApply,
+    selectedId: focusedText,
+    onSelect: onTextSelect,
+  });
   const cancel = () => {
+    textTools.cancel();
     dragging.current = null;
     if (gestureRoof.current) update(gestureRoof.current, true);
     latestRoof.current = null;
@@ -197,7 +222,9 @@ export function RoofPlanEditor({
   const navigation = useModelPlanNavigation(
     [0, 0, 300, 300],
     cancel,
-    (target) => mobile.tool === 'move' && !!target.closest('[data-roof-point]'),
+    (target) =>
+      mobile.tool === 'move' &&
+      !!target.closest('[data-roof-point], [data-roof-text]'),
   );
   const [handleUnit] = useModelSvgUnits(svg, navigation.viewBox + hasDraft);
   const cancelRef = useRef(cancel);
@@ -248,6 +275,19 @@ export function RoofPlanEditor({
       },
     });
   };
+  useModelSurface(
+    svg,
+    partId,
+    'roof',
+    (x, y) => [...unproject(x, y), roof.eaves],
+    navigation.viewBox + JSON.stringify([west, south, scale, roof.eaves]),
+    cancel,
+    textTools.preview
+      ? { edit: textTools.preview }
+      : draft
+        ? { roof: draft }
+        : null,
+  );
   return (
     <section className="roof-plan" aria-label="Wing roof plan">
       <p className="small-note">
@@ -255,13 +295,20 @@ export function RoofPlanEditor({
         {illustrative ? ' (illustrative; actual height unknown)' : ''}. Boundary
         points follow outline vertices. Courtyards remain open.
       </p>
+      {textTools.properties}
       {!draft ? (
         <>
-          <button ref={editButton} className="editor-primary" onClick={start}>
+          <ModelButton
+            variant="outline"
+            ref={editButton}
+            className="editor-primary"
+            onClick={start}
+          >
             {existing ? 'Edit custom roof' : 'Create custom roof'}
-          </button>
+          </ModelButton>
           {!existing && (
-            <button
+            <ModelButton
+              variant="outline"
               className="editor-secondary"
               onClick={() => {
                 try {
@@ -273,7 +320,7 @@ export function RoofPlanEditor({
               }}
             >
               Preview approximate hip roof
-            </button>
+            </ModelButton>
           )}
           {proposalError && (
             <p className="form-error" role="alert">
@@ -281,7 +328,9 @@ export function RoofPlanEditor({
             </p>
           )}
           {existing && (
-            <button
+            <ModelButton
+              variant="outline"
+              icon={<ActionCheck />}
               onClick={() => {
                 const appearance = structuredClone(edit.properties.appearance!);
                 delete appearance.roofs?.[partId];
@@ -292,14 +341,15 @@ export function RoofPlanEditor({
               }}
             >
               Use standard roof
-            </button>
+            </ModelButton>
           )}
         </>
       ) : (
         <>
           <fieldset className="roof-tools" aria-label="Roof drawing tools">
             {(['select', 'point', 'ridge', 'valley'] as const).map((t) => (
-              <button
+              <ModelButton
+                variant="outline"
                 key={t}
                 ref={t === 'select' ? selectTool : undefined}
                 aria-pressed={tool === t}
@@ -319,7 +369,7 @@ export function RoofPlanEditor({
                   : t === 'point'
                     ? 'Add point'
                     : `Draw ${t}`}
-              </button>
+              </ModelButton>
             ))}
           </fieldset>
           <output className="small-note">
@@ -389,7 +439,8 @@ export function RoofPlanEditor({
             role="application"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === 'Escape' && dragging.current) {
+              if (e.key === 'Escape') {
+                textTools.cancel();
                 e.preventDefault();
                 e.stopPropagation();
                 dragging.current = null;
@@ -467,6 +518,7 @@ export function RoofPlanEditor({
                     'M' + r.map((p) => project(p).join(',')).join(' L') + ' Z',
                 )
                 .join(' ')}
+              data-surface-background
               fill="#e8e2cf"
               fillRule="evenodd"
               stroke="#586251"
@@ -552,6 +604,7 @@ export function RoofPlanEditor({
                 </g>
               );
             })}
+            {textTools.overlay}
           </svg>
           {mobile.compact && (
             <output>
@@ -616,14 +669,16 @@ export function RoofPlanEditor({
               ))}
             </select>
           </label>
-          <button
+          <ModelButton
+            variant="default"
+            icon={<ActionPlus />}
             onClick={() => {
               const c: Position = [(west + east) / 2, (south + north) / 2];
               add(c);
             }}
           >
             Add point with coordinates
-          </button>
+          </ModelButton>
           {active && (
             <>
               {autoSave ? (
@@ -699,11 +754,16 @@ export function RoofPlanEditor({
                 </>
               )}
               {active.vertexId && (
-                <button onClick={() => patch({ vertexId: undefined })}>
+                <ModelButton
+                  variant="outline"
+                  onClick={() => patch({ vertexId: undefined })}
+                >
                   Detach from outline vertex
-                </button>
+                </ModelButton>
               )}
-              <button
+              <ModelButton
+                variant="destructive"
+                icon={<ActionTrash2 />}
                 onClick={() => {
                   update({
                     ...roof,
@@ -717,14 +777,16 @@ export function RoofPlanEditor({
                 }}
               >
                 Remove selected point and its lines
-              </button>
+              </ModelButton>
             </>
           )}
           <ul className="roof-line-list">
             {roof.lines.map((l, i) => (
               <li key={l.id}>
                 {l.kind} {i + 1}
-                <button
+                <ModelButton
+                  variant="destructive"
+                  icon={<ActionTrash2 />}
                   aria-label={`Remove ${l.kind} ${i + 1}`}
                   onClick={() =>
                     update({
@@ -734,19 +796,21 @@ export function RoofPlanEditor({
                   }
                 >
                   Remove
-                </button>
+                </ModelButton>
               </li>
             ))}
           </ul>
           <div className="roof-apply">
-            <button
+            <ModelButton
+              variant="outline"
               className="editor-primary"
               disabled={!!error}
               onClick={() => apply()}
             >
               {autoSave ? 'Save valid roof' : 'Apply roof'}
-            </button>
-            <button
+            </ModelButton>
+            <ModelButton
+              variant="outline"
               onClick={() => {
                 onDraft(null);
                 setFrom('');
@@ -754,7 +818,7 @@ export function RoofPlanEditor({
               }}
             >
               {autoSave ? 'Done editing roof' : 'Cancel roof'}
-            </button>
+            </ModelButton>
           </div>
           <p className="small-note">
             {autoSave

@@ -13,6 +13,7 @@ import {
   Mesh,
   MeshLambertMaterial,
   PerspectiveCamera,
+  OrthographicCamera,
   Scene,
   Vector3,
   WebGLRenderer,
@@ -32,6 +33,10 @@ import { createFacadeTextures } from './facade-textures';
 import { buildingRevision } from './building-visuals';
 import { detailRevision } from './building-facades';
 import { buildingOutline } from './building-outline';
+import type { SurfaceFrame } from './model-surface';
+import { surfaceCameraFrame, surfaceLocal } from './model-surface-frame';
+import { ModelButton } from './ModelButton';
+import { Focus, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
 import { modelPreviewGesture } from './model-preview-gesture';
 export function PhotoModelPreview(props: {
   feature: Feature;
@@ -42,6 +47,9 @@ export function PhotoModelPreview(props: {
   onSelect?: (selection: BuildingSelection) => void;
   hidden?: string[];
   active?: boolean;
+  surface?: SurfaceFrame | null;
+  surfaceEditing?: boolean;
+  onUnavailable?: () => void;
   onActions?: (x: number, y: number) => void;
   onMetrics?: (metrics: {
     drawMs: number;
@@ -56,6 +64,7 @@ export function PhotoModelPreview(props: {
   current.current = props;
   const request = useRef<() => void>(() => {}),
     action = useRef<(a: string) => void>(() => {});
+  const syncSurface = useRef<() => void>(() => {});
   const syncSelection = useRef<() => void>(() => {});
   const retry = useRef<() => void>(() => {});
   const resume = useRef<() => void>(() => {});
@@ -85,13 +94,52 @@ export function PhotoModelPreview(props: {
     const scene = new Scene(),
       group = new Group(),
       highlights = new Group(),
-      camera = new PerspectiveCamera(40, 1, 0.1, 5000);
+      orbitCamera = new PerspectiveCamera(40, 1, 0.1, 5000),
+      alignedCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
+    let camera: PerspectiveCamera | OrthographicCamera = orbitCamera;
+    let stableOrigin: number[] | undefined;
+    const align = () => {
+      const frame = current.current.surface;
+      if (controls) controls.enabled = !current.current.surfaceEditing;
+      if (
+        !current.current.surfaceEditing ||
+        !frame ||
+        !stableOrigin ||
+        !renderer
+      ) {
+        camera = orbitCamera;
+        element.dataset.projection = 'orbit';
+        return;
+      }
+      camera = alignedCamera;
+      const pose = surfaceCameraFrame(
+        frame,
+        stableOrigin,
+        renderer.domElement.getBoundingClientRect(),
+      );
+      const centre = new Vector3(...pose.centre),
+        right = new Vector3(...pose.right).normalize(),
+        up = new Vector3(...pose.up).normalize();
+      const normal = right.clone().cross(up).normalize();
+      camera.left = -pose.width / 2;
+      camera.right = pose.width / 2;
+      camera.top = pose.height / 2;
+      camera.bottom = -pose.height / 2;
+      camera.up.copy(up);
+      camera.position.copy(centre).addScaledVector(normal, 4000);
+      camera.lookAt(centre);
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
+      element.dataset.projection = frame.kind;
+    };
     scene.background = new Color('#dfe6e9');
     scene.add(group);
     scene.add(highlights);
     camera.up.set(0, 0, 1);
     const draw = () => {
       if (!disposed && renderer && current.current.active !== false) {
+        align();
+        element.dataset.camera = JSON.stringify(orbitCamera.position.toArray());
         scene.background = new Color(
           document.documentElement.classList.contains('dark')
             ? '#202b32'
@@ -107,6 +155,10 @@ export function PhotoModelPreview(props: {
           textureBytes: textures.stats().bytes,
         });
       }
+    };
+    syncSurface.current = () => {
+      syncSelection.current();
+      draw();
     };
     const textures = createFacadeTextures(draw);
     const themeObserver = new MutationObserver(draw);
@@ -125,12 +177,21 @@ export function PhotoModelPreview(props: {
     };
     syncSelection.current = () => {
       clearHighlights();
-      const { selection, wallId, hidden = [] } = current.current;
+      const {
+        selection,
+        wallId,
+        hidden = [],
+        surfaceEditing,
+        surface: frame,
+      } = current.current;
       if (!model) return;
       for (const mesh of group.children) {
         if (!(mesh instanceof Mesh)) continue;
         const part = mesh.userData.part as ModelMesh;
-        if (JSON.stringify(mesh.userData.hidden) !== JSON.stringify(hidden)) {
+        if (
+          mesh.userData.filterKey !==
+          JSON.stringify([hidden, surfaceEditing, frame?.kind, frame?.key])
+        ) {
           const triangles: number[] = [],
             excluded = new Set(hidden);
           let surface = 0;
@@ -141,14 +202,33 @@ export function PhotoModelPreview(props: {
             )
               surface++;
             const s = part.surfaces?.[surface];
-            if (!s?.elementId || !excluded.has(s.elementId)) triangles.push(t);
+            const inSurface =
+              !surfaceEditing ||
+              !frame ||
+              frame.kind === 'footprint' ||
+              (frame.kind === 'wall'
+                ? s?.wallId === frame.key
+                : s?.partId === frame.key);
+            if (inSurface && (!s?.elementId || !excluded.has(s.elementId)))
+              triangles.push(t);
           }
           mesh.geometry.setIndex(
             triangles.flatMap((t) => part.indices.slice(t * 3, t * 3 + 3)),
           );
-          mesh.userData.hidden = [...hidden];
+          mesh.userData.filterKey = JSON.stringify([
+            hidden,
+            surfaceEditing,
+            frame?.kind,
+            frame?.key,
+          ]);
           mesh.userData.triangles = triangles;
         }
+        const material = mesh.material as MeshLambertMaterial;
+        material.transparent =
+          !!part.text || (!!surfaceEditing && frame?.kind === 'footprint');
+        material.opacity =
+          surfaceEditing && frame?.kind === 'footprint' ? 0.22 : 1;
+        material.depthWrite = !material.transparent;
         const selected = selection || { buildingId: model.id, wallId };
         if (!selected.wallId && !selected.elementId && !selected.partId)
           continue;
@@ -198,7 +278,7 @@ export function PhotoModelPreview(props: {
       const sun = new DirectionalLight('#ffffff', 1.8);
       sun.position.set(-60, -90, 130);
       scene.add(sun);
-      controls = new OrbitControls(camera, renderer.domElement);
+      controls = new OrbitControls(orbitCamera, renderer.domElement);
       controls.enableDamping = false;
       const raycaster = new Raycaster();
       renderer.domElement.addEventListener('contextmenu', (e) =>
@@ -214,6 +294,7 @@ export function PhotoModelPreview(props: {
           !model ||
           disposed ||
           current.current.active === false ||
+          current.current.surfaceEditing ||
           (detailOnly && !current.current.onActions)
         )
           return false;
@@ -242,6 +323,10 @@ export function PhotoModelPreview(props: {
               role: s.role,
               elementId: s.elementId,
               instanceIndex: s.instanceIndex,
+              roofTriangle:
+                s.role === 'roof' && !s.elementId
+                  ? triangle - s.start
+                  : undefined,
             });
             if (actions) current.current.onActions?.(x, y);
             return true;
@@ -252,7 +337,8 @@ export function PhotoModelPreview(props: {
       const gesture = modelPreviewGesture({
         pick,
         holding: (held) => {
-          if (controls) controls.enabled = !held;
+          if (controls)
+            controls.enabled = !held && !current.current.surfaceEditing;
         },
       });
       cancelGesture.current = gesture.reset;
@@ -309,8 +395,8 @@ export function PhotoModelPreview(props: {
             height = element.clientHeight;
           if (!width || !height || disposed) return;
           renderer!.setSize(width, height);
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
+          orbitCamera.aspect = width / height;
+          orbitCamera.updateProjectionMatrix();
           draw();
         });
       });
@@ -345,6 +431,7 @@ export function PhotoModelPreview(props: {
       setMessage(
         '3D preview unavailable on this device. Your draft is retained.',
       );
+      current.current.onUnavailable?.();
     }
     const send = () => {
       if (disposed) return;
@@ -427,6 +514,11 @@ export function PhotoModelPreview(props: {
       }
       const first = !model;
       model = result.model;
+      stableOrigin ||= model!.origin;
+      group.position.fromArray(
+        surfaceLocal([...model!.origin, 0], stableOrigin),
+      );
+      highlights.position.copy(group.position);
       const { data } = current.current;
       clear();
       for (const part of model!.meshes) {
@@ -446,10 +538,12 @@ export function PhotoModelPreview(props: {
         const rendered = new Mesh(geometry, material);
         rendered.userData.part = part;
         group.add(rendered);
-        if (part.texture)
+        if (part.texture || part.text)
           releases.push(
-            textures.acquire(part.texture, data, (t) => {
+            textures.acquire((part.texture || part.text)!, data, (t) => {
               material.map = t;
+              material.transparent = !!part.text;
+              material.alphaTest = part.text ? 0.03 : 0;
               material.color.set('#ffffff');
               material.needsUpdate = true;
             }),
@@ -479,6 +573,7 @@ export function PhotoModelPreview(props: {
       request.current = () => {};
       action.current = () => {};
       syncSelection.current = () => {};
+      syncSurface.current = () => {};
       retry.current = () => {};
       resume.current = () => {};
     };
@@ -487,6 +582,8 @@ export function PhotoModelPreview(props: {
     cancelGesture.current();
     request.current();
   }, [signature]);
+  const surfaceKey = JSON.stringify([props.surface, props.surfaceEditing]);
+  useEffect(() => syncSurface.current(), [surfaceKey]);
   const selectionKey = JSON.stringify([
     props.selection,
     props.wallId,
@@ -504,22 +601,35 @@ export function PhotoModelPreview(props: {
       {failed && (
         <button onClick={() => retry.current()}>Retry model preview</button>
       )}
-      <div className="photo-model-view-buttons">
-        <button onClick={() => action.current('fit')}>
-          Fit selected detail
-        </button>
-        <button onClick={() => action.current('reset')}>Reset 3D view</button>
-        {['left', 'right', 'in', 'out'].map((a) => (
-          <button
-            key={a}
-            type="button"
-            onClick={() => action.current(a)}
-            aria-label={`${a === 'in' || a === 'out' ? 'Zoom' : 'Rotate'} ${a}`}
+      {!props.surfaceEditing && (
+        <div className="photo-model-view-buttons">
+          <ModelButton icon={<Focus />} onClick={() => action.current('fit')}>
+            Fit selection
+          </ModelButton>
+          <ModelButton
+            icon={<RotateCcw />}
+            onClick={() => action.current('reset')}
           >
-            {a === 'left' ? '↶' : a === 'right' ? '↷' : a === 'in' ? '+' : '−'}
-          </button>
-        ))}
-      </div>
+            Reset view
+          </ModelButton>
+          {(
+            [
+              ['left', RotateCcw],
+              ['right', RotateCw],
+              ['in', ZoomIn],
+              ['out', ZoomOut],
+            ] as const
+          ).map(([a, Icon]) => (
+            <ModelButton
+              key={a}
+              icon={<Icon />}
+              title={`${a === 'in' || a === 'out' ? 'Zoom' : 'Rotate'} ${a}`}
+              aria-label={`${a === 'in' || a === 'out' ? 'Zoom' : 'Rotate'} ${a}`}
+              onClick={() => action.current(a)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

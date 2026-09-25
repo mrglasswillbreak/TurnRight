@@ -1,3 +1,5 @@
+import { Trash2 as ActionTrash2 } from 'lucide-react';
+import { ModelButton } from './ModelButton';
 /* The interactive SVG has equivalent vertex-selection and numeric controls below it. */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
 import { useMemo, useRef, useState } from 'react';
@@ -5,6 +7,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { MapEdit } from './types';
 import type { EditorWorkspace } from './editor-workspace';
 import { polygonsOf, remapBuildingSurfaces } from './building-surfaces';
+import { useModelSurface } from './model-surface';
 import { ModelField } from './ModelField';
 import {
   ModelPlanPortal,
@@ -77,6 +80,15 @@ export function ModelOutlineCanvas({
       mobile.tool === 'move' && !!target.closest('[data-outline-vertex]'),
   );
   const [handleUnit] = useModelSvgUnits(svg, navigation.viewBox);
+  useModelSurface(
+    svg,
+    edit.id,
+    'footprint',
+    (x, y) => [origin[0] + x / sx, origin[1] - y / k, 0],
+    navigation.viewBox + JSON.stringify(origin),
+    cancel,
+    preview ? { edit: preview } : null,
+  );
   return (
     <section aria-label="Building outline plan">
       <p>
@@ -122,6 +134,7 @@ export function ModelOutlineCanvas({
                   <g key={r}>
                     <polygon
                       points={ring.map((p) => xy(p).join(',')).join(' ')}
+                      data-surface-background
                       fill={r ? 'var(--background)' : '#9dac98'}
                       stroke="currentColor"
                       strokeWidth={pixel}
@@ -208,7 +221,8 @@ export function ModelOutlineCanvas({
         </div>
       )}
       <div className="model-toolbar">
-        <button
+        <ModelButton
+          variant="outline"
           onClick={() => {
             const next = structuredClone(polygons),
               ring = next[p][r],
@@ -228,8 +242,10 @@ export function ModelOutlineCanvas({
           }}
         >
           Insert midpoint after vertex
-        </button>
-        <button
+        </ModelButton>
+        <ModelButton
+          variant="destructive"
+          icon={<ActionTrash2 />}
           disabled={!active || polygons[p][r].length <= 4}
           onClick={() => {
             const next = structuredClone(polygons),
@@ -250,7 +266,7 @@ export function ModelOutlineCanvas({
           }}
         >
           Remove vertex
-        </button>
+        </ModelButton>
       </div>
     </section>
   );

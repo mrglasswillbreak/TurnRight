@@ -1,3 +1,5 @@
+import { RotateCcw as ActionRotateCcw, X as ActionX } from 'lucide-react';
+import { ModelButton } from './ModelButton';
 /* The spatial SVG is an application surface; the hierarchy and metre fields provide equivalent non-spatial controls. */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
 import {
@@ -9,6 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
+import { useModelSurface } from './model-surface';
 import type { FacadeElement } from './visual-types';
 import { ModelNudge, useModelMobile } from './model-mobile';
 import {
@@ -422,6 +425,21 @@ export function ModelWallCanvas({
     { length: Math.min(160, Math.ceil(view.height / tick) + 1) },
     (_, i) => (Math.floor(-view.y / tick) - i) * tick,
   );
+  useModelSurface(
+    svg,
+    m.wallId,
+    'wall',
+    (x, y) => [
+      m.coordinates[0][0] +
+        ((m.coordinates[1][0] - m.coordinates[0][0]) * x) / m.length,
+      m.coordinates[0][1] +
+        ((m.coordinates[1][1] - m.coordinates[0][1]) * x) / m.length,
+      -y,
+    ],
+    JSON.stringify([view, m.coordinates, m.eaves]),
+    cancel,
+    preview ? { wallId: m.wallId, elements: preview } : null,
+  );
   return (
     <section
       ref={region}
@@ -435,14 +453,26 @@ export function ModelWallCanvas({
       )}
       <div className="model-toolbar">
         {!mobile.compact && (
-          <button aria-pressed={pan} onClick={() => setPan((v) => !v)}>
+          <ModelButton
+            variant="outline"
+            aria-pressed={pan}
+            onClick={() => setPan((v) => !v)}
+          >
             Pan
-          </button>
+          </ModelButton>
         )}
-        <button onClick={() => zoom(0.8)}>Zoom in</button>
-        <button onClick={() => zoom(1.25)}>Zoom out</button>
-        <button onClick={fit}>Fit selection</button>
-        <button
+        <ModelButton variant="outline" onClick={() => zoom(0.8)}>
+          Zoom in
+        </ModelButton>
+        <ModelButton variant="outline" onClick={() => zoom(1.25)}>
+          Zoom out
+        </ModelButton>
+        <ModelButton variant="outline" onClick={fit}>
+          Fit selection
+        </ModelButton>
+        <ModelButton
+          variant="outline"
+          icon={<ActionRotateCcw />}
           onClick={() =>
             setView({
               x: -1,
@@ -453,7 +483,7 @@ export function ModelWallCanvas({
           }
         >
           Reset view
-        </button>
+        </ModelButton>
       </div>
       <p className="small-note">
         {m.length.toFixed(2)} m wide · {m.eaves.toFixed(2)} m to eaves · A → B (
@@ -498,6 +528,7 @@ export function ModelWallCanvas({
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             e.preventDefault();
+            e.stopPropagation();
             cancel();
           }
           if (!interactive) return;
@@ -532,6 +563,7 @@ export function ModelWallCanvas({
           y={-m.eaves}
           width={m.length}
           height={m.eaves}
+          data-surface-background
           fill={m.style.wallColour || '#ddd6c5'}
           stroke="currentColor"
           strokeWidth={pixel}
@@ -586,34 +618,67 @@ export function ModelWallCanvas({
               )
                 return null;
               return (
-                <rect
-                  key={`${e.id}:${i}`}
-                  data-element-id={e.id}
-                  data-instance={i}
-                  x={x}
-                  y={-e.bottom - e.height}
-                  width={Math.max(0.01, e.width)}
-                  height={Math.max(0.01, e.height)}
-                  fill={e.colour}
-                  fillOpacity={locked.includes(e.id) ? 0.45 : 0.85}
-                  stroke={
-                    invalid.has(e.id)
-                      ? '#db3535'
-                      : selected.includes(e.id)
-                        ? '#087cf0'
-                        : '#535b62'
-                  }
-                  strokeWidth={pixel * (selected.includes(e.id) ? 3 : 1)}
-                  onPointerDown={(event) =>
-                    begin(event, pan ? 'pan' : 'move', e.id, i)
-                  }
-                >
-                  <title>
-                    {e.kind} · {(x + e.width / 2).toFixed(2)} m from A ·{' '}
-                    {e.bottom.toFixed(2)} m above base
-                    {locked.includes(e.id) ? ' · locked' : ''}
-                  </title>
-                </rect>
+                <g key={`${e.id}:${i}`}>
+                  <rect
+                    data-element-id={e.id}
+                    data-instance={i}
+                    x={x}
+                    y={-e.bottom - e.height}
+                    width={Math.max(0.01, e.width)}
+                    height={Math.max(0.01, e.height)}
+                    fill={e.kind === 'text' ? 'transparent' : e.colour}
+                    fillOpacity={locked.includes(e.id) ? 0.45 : 0.85}
+                    stroke={
+                      invalid.has(e.id)
+                        ? '#db3535'
+                        : selected.includes(e.id)
+                          ? '#087cf0'
+                          : '#535b62'
+                    }
+                    strokeWidth={pixel * (selected.includes(e.id) ? 3 : 1)}
+                    onPointerDown={(event) =>
+                      begin(event, pan ? 'pan' : 'move', e.id, i)
+                    }
+                  >
+                    <title>
+                      {e.kind} · {(x + e.width / 2).toFixed(2)} m from A ·{' '}
+                      {e.bottom.toFixed(2)} m above base
+                      {locked.includes(e.id) ? ' · locked' : ''}
+                    </title>
+                  </rect>
+                  {e.kind === 'text' && (
+                    <text
+                      className="model-wall-text-label"
+                      pointerEvents="none"
+                      x={
+                        x +
+                        e.width *
+                          (e.textAlign === 'left'
+                            ? 0.02
+                            : e.textAlign === 'right'
+                              ? 0.98
+                              : 0.5)
+                      }
+                      y={-e.bottom - e.height / 2}
+                      textAnchor={
+                        e.textAlign === 'left'
+                          ? 'start'
+                          : e.textAlign === 'right'
+                            ? 'end'
+                            : 'middle'
+                      }
+                      dominantBaseline="central"
+                      fontSize={Math.min(
+                        e.height * 0.75,
+                        (e.width / Math.max(1, (e.text || '').length)) * 1.6,
+                      )}
+                      fontWeight={e.textWeight === 'regular' ? 400 : 700}
+                      fill={e.colour}
+                    >
+                      {e.text}
+                    </text>
+                  )}
+                </g>
               );
             }),
           )}
@@ -669,7 +734,8 @@ export function ModelWallCanvas({
         >
           <strong>Choose a detail</strong>
           {overlap.map(({ id, instance }) => (
-            <button
+            <ModelButton
+              variant="outline"
               key={`${id}:${instance}`}
               onClick={() => {
                 onSelect([id], instance);
@@ -677,9 +743,15 @@ export function ModelWallCanvas({
               }}
             >
               {detailName(elements.find((e) => e.id === id)!)} · {instance + 1}
-            </button>
+            </ModelButton>
           ))}
-          <button onClick={() => setOverlap([])}>Cancel selection</button>
+          <ModelButton
+            variant="outline"
+            icon={<ActionX />}
+            onClick={() => setOverlap([])}
+          >
+            Cancel selection
+          </ModelButton>
         </fieldset>
       )}
       {mobile.compact &&
