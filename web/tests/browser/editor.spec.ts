@@ -5064,7 +5064,7 @@ test('documentation current gallery: published campus and isolated owner workflo
       .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
       .toBe(false);
     await page.screenshot({
-      path: `../docs/assets/screenshots/${name}-2026-09-24.png`,
+      path: `../docs/assets/screenshots/${name}-2026-09-25.png`,
     });
   };
   await page.emulateMedia({ colorScheme: 'dark' });
@@ -5131,9 +5131,82 @@ test('documentation current gallery: published campus and isolated owner workflo
     if (await doneRoof.isVisible()) await doneRoof.click();
     await dialog.getByRole('button', { name: 'Outline', exact: true }).click();
     await shot('editor-outline-current');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await dialog.getByLabel('Model editing mode').selectOption('details');
+    await dialog
+      .getByRole('button', { name: 'Choose wall', exact: true })
+      .click();
+    if (await dialog.locator('.model-detail-item').count()) {
+      await dialog.locator('.model-detail-item').first().click();
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+    } else {
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+      await dialog
+        .getByRole('button', { name: 'Add window', exact: true })
+        .click();
+    }
+    await dialog
+      .getByRole('button', { name: 'Fit selection', exact: true })
+      .click();
+    await shot('editor-model-canvas-mobile');
+    await dialog
+      .getByRole('button', { name: 'Selected detail actions', exact: true })
+      .click();
+    await shot('editor-model-actions-mobile');
+    await page.keyboard.press('Escape');
+    await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+    await dialog.getByLabel('Width (m)', { exact: true }).click();
+    await shot('editor-model-properties-mobile');
+    await dialog.getByLabel('Model editing mode').selectOption('appearance');
+    await dialog
+      .getByRole('spinbutton', {
+        name: 'Building height (m)',
+        exact: true,
+      })
+      .focus();
+    await expect
+      .poll(async () => {
+        const canvas = await dialog
+          .locator('.photo-model-canvas')
+          .boundingBox();
+        const sheet = await dialog.locator('.model-sheet-handle').boundingBox();
+        return canvas!.y + canvas!.height <= sheet!.y + 2;
+      })
+      .toBe(true);
+    await shot('editor-model-height-mobile');
+    await dialog.getByLabel('Model editing mode').selectOption('roof');
+    if (await editRoof.isVisible()) await editRoof.click();
+    await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+    await expect(
+      dialog.getByRole('application', {
+        name: 'Roof plan drawing',
+        exact: true,
+      }),
+    ).toBeVisible();
+    await shot('editor-model-roof-mobile');
+    await dialog.getByLabel('Model editing mode').selectOption('outline');
+    await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+    await page.emulateMedia({ colorScheme: 'light' });
+    await shot('editor-model-outline-mobile');
+    await dialog.getByRole('button', { name: 'Photo', exact: true }).click();
+    await shot('editor-model-photo-mobile');
+    await dialog.getByLabel('Model editing mode').selectOption('review');
+    await shot('editor-model-review-mobile');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await dialog.getByRole('button', { name: 'Details', exact: true }).click();
+    await dialog.locator('.model-stage').evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await dialog
+      .getByRole('button', { name: 'Reset 3D view', exact: true })
+      .click();
+    await shot('unified-model-desktop');
+
     await dialog
       .getByRole('button', { name: 'Close workspace', exact: true })
       .click();
+    if (process.env.TURNRIGHT_DOCS_EDITOR_ONLY) return;
     await page.goto('/');
     await attachMap(page);
     await page.emulateMedia({ colorScheme: 'light' });
@@ -5419,6 +5492,29 @@ test('driving road approval persists separately from walking access', async ({
     'Campus visitors',
   );
 });
+async function modelAction(page: Page, name: string) {
+  const dialog = page.getByRole('dialog');
+  const attached = dialog.getByRole('button', {
+    name: 'Selected detail actions',
+    exact: true,
+  });
+  if (await attached.isVisible()) await attached.click();
+  else if (
+    await dialog
+      .getByRole('button', { name: 'Selection actions', exact: true })
+      .isVisible()
+  )
+    await dialog
+      .getByRole('button', { name: 'Selection actions', exact: true })
+      .click();
+  else {
+    await dialog.getByRole('button', { name: 'More', exact: true }).click();
+    await dialog
+      .getByRole('button', { name: 'Selection actions', exact: true })
+      .click();
+  }
+  await page.getByRole('menuitem', { name, exact: true }).click();
+}
 async function unifiedModelFixture(
   page: Page,
   options: {
@@ -5456,15 +5552,26 @@ async function unifiedModelFixture(
     .getByRole('button', { name: 'Photo & model', exact: true })
     .click();
   const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
   if (options.repairMode) return { server, dialog, wall: () => undefined };
-  await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
+  if (await dialog.getByLabel('Model editing mode').isVisible()) {
+    await dialog
+      .getByRole('button', { name: 'Choose wall', exact: true })
+      .click();
+    await dialog.locator('[data-model-wall="library:wall:0:0:0"]').click();
+  } else
+    await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
   if (options.prepareWall !== false) {
+    if (await dialog.getByLabel('Model editing mode').isVisible())
+      await dialog.getByRole('button', { name: 'More', exact: true }).click();
     await dialog
       .getByRole('button', { name: 'Preview editable layout', exact: true })
       .click();
     await dialog
       .getByRole('button', { name: 'Use editable layout', exact: true })
       .click();
+    if (await dialog.getByLabel('Model editing mode').isVisible())
+      await dialog.getByRole('button', { name: 'Add', exact: true }).click();
     await dialog
       .getByRole('button', { name: 'Add window', exact: true })
       .click();
@@ -5569,6 +5676,8 @@ for (const width of [390, 1440])
         appearance: { windows: true, roofForm: 'flat' },
       },
     });
+    if (width <= 900)
+      await dialog.getByRole('button', { name: 'Add', exact: true }).click();
     await dialog.getByRole('button', { name: 'Add door', exact: true }).click();
     await expect
       .poll(() => wall()?.elements.some((e) => e.kind === 'door'))
@@ -5583,9 +5692,20 @@ for (const width of [390, 1440])
     await expect(
       dialog.getByText('0 selected · 0 details', { exact: true }),
     ).toBeVisible();
+    if (width <= 900)
+      await dialog.getByRole('button', { name: 'More', exact: true }).click();
+    if (width <= 900)
+      await dialog
+        .getByRole('button', { name: 'Selection actions', exact: true })
+        .click();
+    else
+      await dialog
+        .getByRole('application', { name: /Wall canvas/ })
+        .click({ button: 'right' });
     await expect(
-      dialog.getByRole('button', { name: 'Duplicate', exact: true }),
+      page.getByRole('menuitem', { name: 'Duplicate', exact: true }),
     ).toBeDisabled();
+    await page.keyboard.press('Escape');
     await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
     await expect.poll(() => wall()?.elements).toEqual(first.elements);
     for (const kind of [
@@ -5597,6 +5717,13 @@ for (const width of [390, 1440])
       'trim',
     ]) {
       const count = wall()!.elements.length;
+      if (
+        width <= 900 &&
+        !(await dialog
+          .getByRole('button', { name: `Add ${kind}`, exact: true })
+          .isVisible())
+      )
+        await dialog.getByRole('button', { name: 'More', exact: true }).click();
       await dialog
         .getByRole('button', { name: `Add ${kind}`, exact: true })
         .click();
@@ -5779,7 +5906,7 @@ test('unified model duplication, patterns, undo and private input recovery', asy
   page,
 }) => {
   const { server, dialog, wall } = await unifiedModelFixture(page);
-  await dialog.getByRole('button', { name: 'Duplicate', exact: true }).click();
+  await modelAction(page, 'Duplicate');
   await expect.poll(() => wall()?.elements.length).toBe(2);
   expect(new Set(wall()!.elements.map((e) => e.id)).size).toBe(2);
   await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
@@ -5827,16 +5954,14 @@ test('unified model keyboard placement, locking, copy preview and targeted revie
   await canvas.focus();
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => wall()?.elements[0].x || 0).toBeGreaterThan(before);
-  await dialog.getByRole('button', { name: 'Lock / unlock' }).click();
+  await modelAction(page, 'Lock');
   const locked = wall()!.elements[0].x;
   await canvas.focus();
   await page.keyboard.press('ArrowRight');
   expect(wall()!.elements[0].x).toBe(locked);
-  await dialog.getByRole('button', { name: 'Lock / unlock' }).click();
-  await dialog.getByRole('button', { name: 'Copy', exact: true }).click();
-  await dialog
-    .getByRole('button', { name: 'Paste / copy to…', exact: true })
-    .click();
+  await modelAction(page, 'Unlock');
+  await modelAction(page, 'Copy');
+  await modelAction(page, 'Paste / copy to…');
   await dialog
     .getByLabel('Target wall', { exact: true })
     .selectOption('library:wall:0:0:1');
@@ -5850,6 +5975,45 @@ test('unified model keyboard placement, locking, copy preview and targeted revie
   await dialog.getByText('Evidence & wall review', { exact: true }).click();
   await dialog.getByRole('button', { name: 'Mark this wall reviewed' }).click();
   expect(wall()?.reviewedAt).toBeUndefined();
+});
+
+test('selected detail menu supports context actions, keyboard focus and undo', async ({
+  page,
+}) => {
+  const { dialog, wall } = await unifiedModelFixture(page);
+  const canvas = dialog.getByRole('application', { name: /Wall canvas/ });
+  const selected = canvas.locator('[data-element-id]').first();
+  await selected.click({ button: 'right' });
+  await expect(
+    page.getByRole('menuitem', { name: 'Duplicate', exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole('menuitem', { name: 'Edit details', exact: true })
+    .click();
+  await expect(dialog.getByLabel('Detail name', { exact: true })).toBeFocused();
+  await canvas.focus();
+  await page.keyboard.press('Shift+F10');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeVisible();
+  await expect(canvas).toBeFocused();
+  await modelAction(page, 'Hide in editor');
+  await expect(canvas.locator('[data-element-id]')).toHaveCount(0);
+  await modelAction(page, 'Show in editor');
+  await expect(canvas.locator('[data-element-id]')).toHaveCount(1);
+  await canvas.focus();
+  await page.keyboard.press('Enter');
+  await expect(dialog.getByLabel('Detail name', { exact: true })).toBeFocused();
+  await modelAction(page, 'Duplicate');
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  await modelAction(page, 'Delete');
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  await canvas.focus();
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Shift+F10');
+  await expect(page.getByRole('menu')).toContainText('2 details selected');
+  await page.keyboard.press('Escape');
 });
 test('unified model retains an invalid pattern privately and repairs it after reopening', async ({
   page,
@@ -5895,6 +6059,7 @@ for (const viewport of [
   }) => {
     await page.setViewportSize(viewport);
     const { dialog } = await unifiedModelFixture(page);
+    await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
     const width = dialog.getByLabel('Width (m)', { exact: true });
     await width.fill('1.8');
     await width.press('Enter');
@@ -5994,16 +6159,30 @@ for (const width of [320, 390, 768, 1440])
       });
       await trigger.click();
       const dialog = page.getByRole('dialog');
-      await dialog.getByLabel('Mapped wall').selectOption('library:wall:0:0:0');
+      await expect(dialog).toBeVisible();
+      if (width <= 900) {
+        await dialog
+          .getByRole('button', { name: 'Choose wall', exact: true })
+          .click();
+        await dialog.locator('[data-model-wall="library:wall:0:0:0"]').click();
+        await dialog.getByRole('button', { name: 'More', exact: true }).click();
+      } else
+        await dialog
+          .getByLabel('Mapped wall')
+          .selectOption('library:wall:0:0:0');
       await dialog
         .getByRole('button', { name: 'Preview editable layout', exact: true })
         .click();
       await dialog
         .getByRole('button', { name: 'Use editable layout', exact: true })
         .click();
+      if (width <= 900)
+        await dialog.getByRole('button', { name: 'Add', exact: true }).click();
       await dialog
         .getByRole('button', { name: 'Add window', exact: true })
         .click();
+      if (width <= 900)
+        await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
       await dialog.getByLabel('Width (m)', { exact: true }).fill('1.8');
       await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
       await expect
@@ -6017,6 +6196,8 @@ for (const width of [320, 390, 768, 1440])
               ]?.elements.at(-1)?.width,
         )
         .toBe(1.8);
+      if (width <= 900)
+        await dialog.getByRole('button', { name: 'More', exact: true }).click();
       await dialog.getByText('Evidence & wall review', { exact: true }).click();
       await dialog
         .getByLabel('Evidence and measurement provenance')
@@ -6049,3 +6230,364 @@ for (const width of [320, 390, 768, 1440])
         .click();
       await expect(trigger).toBeFocused();
     });
+
+test('mobile canvas editing uses focused sheets and deliberate move tools', async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const failures: string[] = [];
+  page.on('pageerror', (e) => failures.push(e.message));
+  const { dialog, wall } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: { height: 6, appearance: { windows: false, roofForm: 'flat' } },
+  });
+  await expect(
+    dialog.getByRole('application', { name: /Wall canvas/ }),
+  ).toBeVisible();
+  await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  const initial = structuredClone(wall()!.elements[0]);
+  const shape = dialog.locator(`[data-element-id="${initial.id}"]`).first();
+  const b = (await shape.boundingBox())!;
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width / 2 + 25, b.y + b.height / 2, {
+    steps: 8,
+  });
+  await page.mouse.up();
+  expect(wall()!.elements[0]).toEqual(initial);
+  await dialog.getByRole('button', { name: 'Reset view', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Move', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Nudge right', exact: true })
+    .click();
+  await expect
+    .poll(() => wall()?.elements[0].x || 0)
+    .toBeGreaterThan(initial.x);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()?.elements[0].x).toBe(initial.x);
+  await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+  const width = dialog.getByLabel('Width (m)', { exact: true });
+  await width.fill('1.8');
+  await width.press('Enter');
+  await expect.poll(() => wall()?.elements[0].width).toBe(1.8);
+  await page.screenshot({ path: info.outputPath('mobile-edit.png') });
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await dialog.getByRole('button', { name: 'More', exact: true }).click();
+  await modelAction(page, 'Duplicate');
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await dialog.getByLabel('Model editing mode').selectOption('outline');
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(
+    dialog.getByRole('application', { name: 'Top-down building outline' }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('mobile-outline.png') });
+  await dialog.getByLabel('Model editing mode').selectOption('appearance');
+  await expect(
+    dialog.getByLabel('Building height (m)', { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1))
+    .toBe(true);
+  expect(failures).toEqual([]);
+});
+
+test('model editor height and floor count resize custom roofs with undo', async ({
+  page,
+}) => {
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: {
+      height: 6,
+      heightMode: 'metres',
+      appearance: {
+        windows: false,
+        roofForm: 'flat',
+        roofs: { 'library:wing:0': { eaves: 6, points: [], lines: [] } },
+      },
+    },
+  });
+  await dialog.getByRole('button', { name: 'Appearance', exact: true }).click();
+  const height = dialog.getByLabel('Building height (m)', { exact: true });
+  await height.fill('14');
+  await height.press('Enter');
+  await expect
+    .poll(
+      () =>
+        server.edits()[0].properties.appearance?.roofs?.['library:wing:0']
+          .eaves,
+    )
+    .toBe(14);
+  await dialog.getByLabel('Building height information').selectOption('floors');
+  const floors = dialog.getByLabel('Building floors', { exact: true });
+  await floors.fill('5');
+  await floors.press('Enter');
+  await expect
+    .poll(
+      () =>
+        server.edits()[0].properties.appearance?.roofs?.['library:wing:0']
+          .eaves,
+    )
+    .toBe(15);
+  await expect(
+    dialog.getByText('Estimated dimensions · selected wall outlined'),
+  ).toBeVisible();
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        server.edits()[0].properties.appearance?.roofs?.['library:wing:0']
+          .eaves,
+    )
+    .toBe(14);
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        server.edits()[0].properties.appearance?.roofs?.['library:wing:0']
+          .eaves,
+    )
+    .toBe(15);
+});
+
+test('mobile touch moves, resizes, cancels for pinch and restores unfinished inputs', async ({
+  page,
+  context,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  const { dialog, wall } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: { height: 9, appearance: { windows: false, roofForm: 'flat' } },
+  });
+  await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Add window', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  await dialog
+    .getByRole('button', { name: 'Fit selection', exact: true })
+    .click();
+  const send = async (
+    type: string,
+    points: { x: number; y: number; id: number }[],
+  ) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points });
+  const drag = async (x: number, y: number, dx: number, dy: number) => {
+    await send('touchStart', [{ id: 1, x, y }]);
+    for (let i = 1; i <= 5; i++)
+      await send('touchMove', [
+        { id: 1, x: x + (dx * i) / 5, y: y + (dy * i) / 5 },
+      ]);
+    await send('touchEnd', []);
+  };
+  let b = (await dialog.locator('[data-element-id]').first().boundingBox())!;
+  const initial = structuredClone(wall()!.elements);
+  await drag(b.x + b.width / 2, b.y + b.height / 2, 20, 10);
+  expect(wall()!.elements).toEqual(initial);
+  await dialog.getByRole('button', { name: 'Reset view', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Fit selection', exact: true })
+    .click();
+  await dialog.getByRole('button', { name: 'Move', exact: true }).click();
+  b = (await dialog.locator('[data-element-id]').first().boundingBox())!;
+  await drag(b.x + b.width / 2, b.y + b.height / 2, 25, -10);
+  await expect
+    .poll(() => wall()?.elements[0].x || 0)
+    .toBeGreaterThan(initial[0].x);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()?.elements).toEqual(initial);
+  await dialog.getByRole('button', { name: 'Resize', exact: true }).click();
+  b = (await dialog
+    .getByLabel('Resize selected detail', { exact: true })
+    .boundingBox())!;
+  await drag(b.x + b.width / 2, b.y + b.height / 2, 25, -15);
+  await expect
+    .poll(() => wall()?.elements[0].width || 0)
+    .toBeGreaterThan(initial[0].width);
+  await dialog.getByRole('button', { name: 'Move', exact: true }).click();
+  b = (await dialog.locator('[data-element-id]').first().boundingBox())!;
+  const stable = structuredClone(wall()!.elements),
+    x = b.x + b.width / 2,
+    y = b.y + b.height / 2;
+  await send('touchStart', [{ id: 1, x, y }]);
+  await send('touchMove', [{ id: 1, x: x + 12, y }]);
+  await send('touchStart', [
+    { id: 1, x: x + 12, y },
+    { id: 2, x: x + 40, y: y + 50 },
+  ]);
+  await send('touchMove', [
+    { id: 1, x: x + 8, y },
+    { id: 2, x: x + 55, y: y + 65 },
+  ]);
+  await send('touchEnd', []);
+  expect(wall()!.elements).toEqual(stable);
+  await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('');
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Photo & model', exact: true })
+    .click();
+  await expect(dialog).toBeVisible();
+  await dialog
+    .getByRole('button', { name: 'Choose wall', exact: true })
+    .click();
+  await dialog.locator('.model-detail-item').first().click();
+  await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue('');
+  expect(wall()!.elements).toEqual(stable);
+  await page.screenshot({ path: info.outputPath('mobile-recovery.png') });
+});
+
+test.describe('compact plan and photograph tools', () => {
+  test.use({ hasTouch: true });
+  for (const viewport of [
+    { width: 320, height: 720 },
+    { width: 768, height: 900 },
+    { width: 1024, height: 390 },
+  ])
+    test(`all modes preserve the canvas at ${viewport.width}x${viewport.height}`, async ({
+      page,
+    }, info) => {
+      await page.setViewportSize(viewport);
+      const failures: string[] = [];
+      page.on('pageerror', (e) => failures.push(e.message));
+      const sample = JSON.parse(
+        readFileSync(
+          new URL('../../../data/photos/catalogue.json', import.meta.url),
+          'utf8',
+        ),
+      )[0] as CampusPhoto;
+      await page.route(`**${sample.url}`, (r) =>
+        r.fulfill({
+          body: readFileSync(
+            new URL(
+              `../../../data/photos/${sample.sha256}.webp`,
+              import.meta.url,
+            ),
+          ),
+          contentType: 'image/webp',
+        }),
+      );
+      const { dialog, server, wall } = await unifiedModelFixture(page, {
+        prepareWall: false,
+        properties: {
+          height: 9,
+          appearance: { windows: false, roofForm: 'flat' },
+          photos: [{ ...sample, buildingId: 'library' }],
+        },
+      });
+      await expect(dialog.getByLabel('Model editing mode')).toBeVisible();
+      await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+      await dialog
+        .getByRole('button', { name: 'Add window', exact: true })
+        .click();
+      await expect.poll(() => wall()?.elements.length).toBe(1);
+      await dialog.getByRole('button', { name: 'More', exact: true }).click();
+      await dialog
+        .getByRole('button', { name: 'Multi-select', exact: true })
+        .click();
+      await expect(
+        dialog.getByRole('checkbox', { name: 'Window', exact: true }),
+      ).toBeVisible();
+      await dialog
+        .getByRole('checkbox', { name: 'Window', exact: true })
+        .click();
+      await dialog
+        .getByRole('checkbox', { name: 'Window', exact: true })
+        .click();
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      await dialog.getByLabel('Model editing mode').selectOption('roof');
+      await dialog
+        .getByRole('button', { name: 'Create custom roof', exact: true })
+        .click();
+      await dialog
+        .getByRole('button', {
+          name: 'Add point with coordinates',
+          exact: true,
+        })
+        .click();
+      await expect
+        .poll(
+          () =>
+            server.edits()[0].properties.appearance?.roofs?.['library:wing:0']
+              ?.points.length,
+        )
+        .toBe(1);
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      const roof = dialog.getByRole('application', {
+        name: 'Roof plan drawing',
+        exact: true,
+      });
+      await expect(roof).toBeVisible();
+      const roofValue = structuredClone(
+        server.edits()[0].properties.appearance!.roofs,
+      );
+      const circle = roof.locator('[data-roof-point] circle').first(),
+        b = (await circle.boundingBox())!;
+      expect(b.width).toBeGreaterThanOrEqual(43.9);
+      expect(b.height).toBeGreaterThanOrEqual(43.9);
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(b.x + b.width / 2 + 20, b.y + b.height / 2, {
+        steps: 5,
+      });
+      await page.mouse.up();
+      expect(server.edits()[0].properties.appearance!.roofs).toEqual(roofValue);
+      await dialog.getByLabel('Model editing mode').selectOption('outline');
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      await expect(
+        dialog.getByRole('application', {
+          name: 'Top-down building outline',
+          exact: true,
+        }),
+      ).toBeVisible();
+      await dialog.getByLabel('Model editing mode').selectOption('details');
+      await dialog.getByRole('button', { name: 'Photo', exact: true }).click();
+      await dialog.getByRole('button', { name: 'More', exact: true }).click();
+      await dialog
+        .getByRole('button', { name: 'Start / reset alignment', exact: true })
+        .click();
+      await expect.poll(() => wall()?.texture?.corners.length).toBe(4);
+      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      const recipe = structuredClone(wall()!.texture);
+      await dialog
+        .getByRole('button', { name: 'Enlarge photo', exact: true })
+        .click();
+      await dialog
+        .getByRole('button', { name: 'Fit photo', exact: true })
+        .click();
+      expect(wall()!.texture).toEqual(recipe);
+      await dialog
+        .getByRole('button', { name: 'Align texture', exact: true })
+        .click();
+      await dialog
+        .getByRole('button', { name: 'Move corner', exact: true })
+        .click();
+      const corner = await dialog
+        .getByRole('button', { name: /Top left texture corner/ })
+        .boundingBox();
+      expect(corner!.width).toBeGreaterThanOrEqual(43.9);
+      expect(corner!.height).toBeGreaterThanOrEqual(43.9);
+      await dialog
+        .getByRole('button', { name: 'Edit alignment', exact: true })
+        .click();
+      await expect(
+        dialog.getByLabel('Top left X', { exact: true }),
+      ).toBeVisible();
+      await dialog.getByLabel('Top left X', { exact: true }).fill('0.12');
+      await dialog.getByLabel('Top left X', { exact: true }).press('Enter');
+      await expect.poll(() => wall()?.texture?.corners[0][0]).toBe(0.12);
+      await dialog.getByLabel('Model editing mode').selectOption('review');
+      await expect(dialog.locator('.model-review')).toBeVisible();
+      await expect
+        .poll(() =>
+          dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+        )
+        .toBe(true);
+      await page.screenshot({ path: info.outputPath('compact-review.png') });
+      expect(failures).toEqual([]);
+    });
+});
