@@ -1921,7 +1921,7 @@ function Editor({
                   !!workspace.unfinished ||
                   !!repairPreview
                 }
-                title="Draw a building footprint, then open Edit selected model"
+                title="Draw a building footprint, then open Edit model"
                 onClick={() => begin('building')}
               >
                 <Building2 size={20} />

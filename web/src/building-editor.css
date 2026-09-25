@@ -137,3 +137,31 @@ fieldset.roof-tools {
   min-width: 0;
   border: 0;
 }
+
+.model-entry-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.model-entry-button[data-slot='button'] {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  gap: 10px;
+}
+
+.model-entry-button span {
+  flex: 1;
+  text-align: left;
+}
+
+.model-entry-summary {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ed-muted);
+}
+
+.model-entry-summary span {
+  display: block;
+}

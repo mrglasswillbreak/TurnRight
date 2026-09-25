@@ -19,7 +19,8 @@ import { RoofPlanEditor } from './RoofPlanEditor';
 import './building-editor.css';
 import type { EditorWorkspace } from './editor-workspace';
 import { ModelField } from './ModelField';
-import { useCompactModel } from './model-mobile';
+import { Button } from '@/components/ui/button';
+import { Box, ArrowUpRight } from 'lucide-react';
 import { fitRoofHeight, inheritsBuildingHeight } from './model-height';
 import { buildingDisplay } from './map-display';
 import type { ValidationIssue } from './validation';
@@ -30,7 +31,7 @@ export function BuildingAppearanceEditor({
   edit,
   data,
   mode,
-  onMode,
+  onMode: _onMode,
   selection,
   onSelection,
   onEdit,
@@ -61,7 +62,6 @@ export function BuildingAppearanceEditor({
   reviewRequest?: ValidationIssue;
   onReviewOpened?: () => void;
 }) {
-  const compact = useCompactModel();
   const workspaceTrigger = useRef<HTMLElement | null>(null);
   const [photoModelOpen, setPhotoModelOpen] = useState(false);
   const [adjustRoofHeight, setAdjustRoofHeight] = useState(true);
@@ -325,26 +325,40 @@ export function BuildingAppearanceEditor({
     >
       {!embedded && (
         <div className="model-entry-actions">
-          <button
-            type="button"
+          <Button
+            className="model-entry-button"
+
             onClick={(event) => {
               workspaceTrigger.current = event.currentTarget;
+
               setWorkspaceMode('details');
+
               setPhotoModelOpen(true);
             }}
           >
-            {compact ? 'Photo & model' : 'Edit selected model'}
-          </button>
-          <button
-            type="button"
-            onClick={(event) => {
-              workspaceTrigger.current = event.currentTarget;
-              setWorkspaceMode('appearance');
-              setPhotoModelOpen(true);
-            }}
-          >
-            Height &amp; floors
-          </button>
+            <Box aria-hidden="true" />
+            <span>Edit model</span>
+            <ArrowUpRight aria-hidden="true" />
+          </Button>
+
+          <p className="model-entry-summary">
+            {topology.parts.length}{' '}
+            {topology.parts.length === 1 ? 'wing' : 'wings'} ·{' '}
+            {edit.properties.heightMode === 'floors' && edit.properties.floors
+              ? `${edit.properties.floors} floors`
+              : edit.properties.height
+                ? `${edit.properties.height} m`
+                : 'Height unknown'}
+            <span>
+              {Object.values(appearance.facades || {}).some(
+                (f) => !f.reviewedAt || f.needsReview,
+              )
+                ? 'Details need review'
+                : Object.keys(appearance.facades || {}).length
+                  ? 'Details reviewed'
+                  : 'Generated model'}
+            </span>
+          </p>
         </div>
       )}
       {photoModelOpen && (
@@ -368,27 +382,7 @@ export function BuildingAppearanceEditor({
           />
         </Suspense>
       )}
-      {!embedded && !photoModelOpen && (
-        <fieldset className="building-modes" aria-label="Building editing mode">
-          {(['appearance', 'outline', 'roof'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              aria-pressed={mode === m}
-              disabled={locked && m !== 'roof'}
-              onClick={(event) => {
-                workspaceTrigger.current = event.currentTarget;
-                onMode(m);
-                setWorkspaceMode(m);
-                setPhotoModelOpen(true);
-              }}
-            >
-              {m[0].toUpperCase() + m.slice(1)}
-            </button>
-          ))}
-        </fieldset>
-      )}
-      {(!photoModelOpen || embedded) && (
+      {embedded && (
         <>
           <label className="field-label">
             Building / wing
