@@ -6,6 +6,7 @@ declare global {
     previewBuilds: string[][];
     surveyGps?: (fix: GeolocationPosition) => void;
     surveyGpsWatchCount: number;
+    globeTrace?: { coordinates: [number, number]; timer: number };
     motionTest: {
       permission: 'granted' | 'denied';
       requests: { channel: string; activated: boolean; gpsWatches: number }[];
@@ -253,6 +254,139 @@ test('motion assistance public permission timing, orientation modes, fallback an
     page.getByText('Compass & motion off', { exact: true }),
   ).toBeVisible();
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
+});
+
+test('globe retains live location and facing direction while exploring without navigation', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  await page.setViewportSize({ width: 900, height: 650 });
+  await surveyGps(page);
+  await sensorHardware(page);
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  const expand = page.getByRole('button', { name: 'Expand card', exact: true });
+  if (await expand.isVisible()) await expand.click();
+  expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
+  await page
+    .getByRole('button', { name: 'Find my location', exact: true })
+    .click();
+  await pushSurveyFix(page, [3.2, 6.46]);
+  await page.evaluate(() => {
+    window.globeTrace = {
+      coordinates: [3.2, 6.46],
+      timer: window.setInterval(() => {
+        const coordinates = window.globeTrace!.coordinates;
+        window.surveyGps?.({
+          coords: {
+            longitude: coordinates[0],
+            latitude: coordinates[1],
+            accuracy: 5,
+            heading: null,
+            speed: null,
+          },
+          timestamp: Date.now(),
+        } as GeolocationPosition);
+      }, 500),
+    };
+  });
+  await expect(page.locator('.motion-phone')).toBeVisible();
+  await page.evaluate(() => window.editorTestMap.fire('dragstart'));
+  await page.waitForTimeout(100);
+  await page.waitForFunction(() => !!window.editorTestMap.getSource('world'));
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [3.2, 6.46],
+      zoom: 2,
+      pitch: 0,
+      bearing: 0,
+    }),
+  );
+  await expect(
+    page.getByLabel('Interactive world map', { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          window.editorTestMap.queryRenderedFeatures(
+            window.editorTestMap.project([3.2, 6.46]),
+            { layers: ['gps-dot'] },
+          ).length,
+      ),
+    )
+    .toBeGreaterThan(0);
+  const phone = page.locator('.motion-phone');
+  await expect(phone).toBeVisible();
+  const before = await phone.evaluate(
+    (e) => (e as HTMLElement).style.transform,
+  );
+  await page.evaluate(() => {
+    window.motionTest.heading = 180;
+  });
+  await expect
+    .poll(() => phone.evaluate((e) => (e as HTMLElement).style.transform))
+    .not.toBe(before);
+  await expect(phone).toBeVisible();
+  await page.screenshot({ path: info.outputPath('globe-live-location.png') });
+  expect(await page.evaluate(() => window.editorTestMap.getZoom())).toBe(2);
+  const oldPosition = (await phone.boundingBox())!;
+  await page.evaluate(() => {
+    window.globeTrace!.coordinates = [-0.12, 51.5];
+  });
+  await pushSurveyFix(page, [-0.12, 51.5]);
+  await expect
+    .poll(async () => {
+      const next = await phone.boundingBox();
+      return !!next && Math.abs(next.y - oldPosition.y) > 10;
+    })
+    .toBe(true);
+  expect(await page.evaluate(() => window.editorTestMap.getZoom())).toBe(2);
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({ center: [179, 0], zoom: 1 }),
+  );
+  await pushSurveyFix(page, [179.99, 0]);
+  await page.evaluate(() => {
+    window.globeTrace!.coordinates = [179.99, 0];
+  });
+  await expect(phone).toBeVisible();
+  await page.evaluate(() => {
+    window.motionTest.emit = false;
+    clearInterval(window.globeTrace!.timer);
+  });
+  await expect(phone).toBeHidden({ timeout: 5000 });
+  await page.evaluate(() =>
+    window.surveyGps?.({
+      coords: {
+        longitude: 179.99,
+        latitude: 0,
+        accuracy: 5,
+        heading: null,
+        speed: null,
+      },
+      timestamp: Date.now() - 20000,
+    } as GeolocationPosition),
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const data = (await (
+          window.editorTestMap.getSource(
+            'position',
+          ) as import('maplibre-gl').GeoJSONSource
+        ).getData()) as GeoJSON.FeatureCollection;
+        return data.features.some(
+          (f) => f.properties?.locationLabel === 'Last known location',
+        );
+      }),
+    )
+    .toBe(true);
+  await setPageHidden(page, true);
+  await expect
+    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+    .toBe(0);
+  await expect.poll(() => page.evaluate(() => !!window.surveyGps)).toBe(false);
 });
 
 test('motion assistance survey denial retry, stable entrance crosshair and paused recovery', async ({
@@ -6195,6 +6329,142 @@ test('selected detail menu supports context actions, keyboard focus and undo', a
   await expect(page.getByRole('menu')).toContainText('2 details selected');
   await page.keyboard.press('Escape');
 });
+test('3D touch hold selects a detail and opens actions without a release tap', async ({
+  page,
+  context,
+}, info) => {
+  await page.setViewportSize({ width: 740, height: 390 });
+  const { dialog, wall } = await unifiedModelFixture(page);
+  await dialog.getByRole('button', { name: '3D', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Fit selected detail', exact: true })
+    .click();
+  const canvas = dialog.locator('.photo-model-canvas canvas');
+  await expect(canvas).toBeVisible();
+  const box = (await canvas.boundingBox())!;
+  const x = box.x + box.width / 2,
+    y = box.y + box.height / 2;
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x, y, id: 1 }],
+  });
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+  await expect(menu).toContainText('Window');
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
+  await expect(menu).toBeVisible();
+  await page.screenshot({ path: info.outputPath('3d-long-press-actions.png') });
+  await page.getByRole('menuitem', { name: 'Duplicate', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(2);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()?.elements.length).toBe(1);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x, y, id: 2 }],
+  });
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [{ x: x + 25, y, id: 2 }],
+  });
+  await page.waitForTimeout(650);
+  await expect(menu).toBeHidden();
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
+  await dialog
+    .getByRole('button', { name: 'Close workspace', exact: true })
+    .click();
+  await cdp.detach();
+});
+
+for (const viewport of [
+  { width: 740, height: 390 },
+  { width: 844, height: 320 },
+])
+  test(`landscape model has reachable close and useful canvas and tool areas at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize(viewport);
+    const { dialog, wall } = await unifiedModelFixture(page);
+    const close = dialog.getByRole('button', {
+      name: 'Close workspace',
+      exact: true,
+    });
+    await expect(close).toHaveText('× Close');
+    const assertClose = async () => {
+      const b = (await close.boundingBox())!;
+      expect(b.x).toBeGreaterThanOrEqual(0);
+      expect(b.y).toBeGreaterThanOrEqual(0);
+      expect(b.x + b.width).toBeLessThanOrEqual(viewport.width);
+      expect(b.y + b.height).toBeLessThanOrEqual(viewport.height);
+      expect(b.height).toBeGreaterThanOrEqual(44);
+    };
+    await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+    const canvas = dialog.getByRole('application', { name: /Wall canvas/ });
+    const properties = dialog.getByRole('complementary', {
+      name: 'Model detail properties',
+    });
+    const c = (await canvas.boundingBox())!,
+      p = (await properties.boundingBox())!;
+    expect(c.height).toBeGreaterThan(120);
+    expect(p.height).toBeGreaterThan(135);
+    expect(c.x + c.width).toBeLessThanOrEqual(p.x + 1);
+    await dialog.getByLabel('Width (m)', { exact: true }).fill('');
+    for (const mode of ['appearance', 'roof', 'outline', 'review']) {
+      await dialog.getByLabel('Model editing mode').selectOption(mode);
+      await assertClose();
+      await expect
+        .poll(() =>
+          dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+        )
+        .toBe(true);
+    }
+    await expect(
+      dialog.getByText(/Needs review.*does not by itself/),
+    ).toBeVisible();
+    await dialog
+      .getByRole('button', {
+        name: 'Inspect details and evidence',
+        exact: true,
+      })
+      .click();
+    await expect(
+      dialog.getByRole('button', {
+        name: 'Mark this wall reviewed',
+        exact: true,
+      }),
+    ).toBeVisible();
+    await dialog
+      .getByRole('button', { name: 'Mark this wall reviewed', exact: true })
+      .click();
+    await expect.poll(() => wall()?.reviewedAt).toBeTruthy();
+    await page.screenshot({ path: info.outputPath('landscape-reviewed.png') });
+    await close.click();
+    await expect(dialog).toBeHidden();
+    await expect(
+      page.getByRole('button', { name: 'Photo & model', exact: true }),
+    ).toBeFocused();
+    await page
+      .getByRole('button', { name: 'Photo & model', exact: true })
+      .click();
+    await dialog
+      .getByRole('button', { name: 'Choose wall', exact: true })
+      .click();
+    await dialog.locator('[data-model-wall="library:wall:0:0:0"]').click();
+    await dialog.getByRole('button', { name: 'Walls', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Window', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Edit', exact: true }).click();
+    await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue(
+      '',
+    );
+    await assertClose();
+  });
+
 test('unified model retains an invalid pattern privately and repairs it after reopening', async ({
   page,
 }) => {
