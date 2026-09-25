@@ -1,3 +1,8 @@
+import {
+  validSurfaceText,
+  textRecipe,
+  roofTextErrors,
+} from './surface-text.js';
 import type { Feature } from 'geojson';
 import type { FacadeDescription, FacadeTextureRecipe } from './visual-types.js';
 import type { CampusData, CampusPhoto } from './types.js';
@@ -8,6 +13,7 @@ export function detailRevision(feature: Feature): string | undefined {
   const appearance = feature.properties?.appearance || {};
   const value = appearance.facades;
   const settings = [
+    appearance.roofTexts,
     appearance.windowFrameDepth,
     appearance.windowWidthRatio,
     appearance.windowHeightRatio,
@@ -139,7 +145,8 @@ export function facadeErrors(
   publication = false,
 ): string[] {
   const facades = feature.properties?.appearance?.facades;
-  if (facades === undefined) return [];
+  const textErrors = roofTextErrors(feature);
+  if (facades === undefined) return textErrors;
   if (
     !facades ||
     typeof facades !== 'object' ||
@@ -147,9 +154,10 @@ export function facadeErrors(
     Object.keys(facades).length > 100
   )
     return ['Façades must contain at most 100 named wall assignments.'];
-  const errors: string[] = publication
-    ? facadeReviewIssues(feature).map((i) => i.message)
-    : [];
+  const errors: string[] = [
+    ...textErrors,
+    ...(publication ? facadeReviewIssues(feature).map((i) => i.message) : []),
+  ];
   for (const [id, raw] of Object.entries(facades)) {
     const f = raw as FacadeDescription;
     if (
@@ -206,7 +214,9 @@ export function facadeErrors(
           'canopy',
           'parapet',
           'trim',
+          'text',
         ].includes(e.kind) ||
+        (e.kind === 'text' && !validSurfaceText(textRecipe(e))) ||
         !/^#[a-f0-9]{6}$/i.test(e.colour) ||
         !Number.isFinite(e.x) ||
         e.x < 0 ||

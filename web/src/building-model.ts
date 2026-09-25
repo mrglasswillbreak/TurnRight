@@ -1,3 +1,4 @@
+import { roofTextMesh } from './surface-text.js';
 import {
   buildingTopology,
   styleFor,
@@ -410,6 +411,8 @@ export function createBuildingModel(
           tri.map((i) => [...points[i], height]),
         );
     }
+    for (const text of appearance.roofTexts?.[partId] || [])
+      detailedMeshes.push(roofTextMesh(text, partId, roofMesh, local));
   }
   return {
     id: visual.id,
@@ -430,17 +433,20 @@ export function mergeModelMeshes(meshes: ModelMesh[]): ModelMesh[] {
       source.minZoom,
       source.surfaces?.[0]?.role,
       source.texture,
+      source.text,
     ]);
     let target = merged.get(key);
     if (!target) {
       target = {
+        text: source.text,
         positions: [],
         indices: [],
         colour: source.colour,
         detail: source.detail,
         ...(source.minZoom === undefined ? {} : { minZoom: source.minZoom }),
         surfaces: [],
-        ...(source.texture ? { texture: source.texture, uvs: [] } : {}),
+        ...(source.texture ? { texture: source.texture } : {}),
+        ...(source.uvs ? { uvs: [] } : {}),
       };
       merged.set(key, target);
     }

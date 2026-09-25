@@ -40,6 +40,7 @@ export interface BuildingAppearance extends SurfaceStyle {
     checkedAt: string;
   };
   facades?: Record<string, FacadeDescription>;
+  roofTexts?: Record<string, RoofText[]>;
   modelId?: string;
   parts?: Record<string, SurfaceStyle>;
   walls?: Record<string, SurfaceStyle>;
@@ -52,8 +53,30 @@ export type FacadeElementKind =
   | 'balcony'
   | 'canopy'
   | 'parapet'
-  | 'trim';
+  | 'trim'
+  | 'text';
+export interface SurfaceTextRecipe {
+  text: string;
+  colour: string;
+  weight: 'regular' | 'bold';
+  align: 'left' | 'center' | 'right';
+  aspect: number;
+}
+export interface RoofText {
+  id: string;
+  text: string;
+  coordinates: Position;
+  width: number;
+  height: number;
+  rotation: number;
+  colour: string;
+  textWeight?: 'regular' | 'bold';
+  textAlign?: 'left' | 'center' | 'right';
+}
 export interface FacadeElement {
+  text?: string;
+  textWeight?: 'regular' | 'bold';
+  textAlign?: 'left' | 'center' | 'right';
   id: string;
   kind: FacadeElementKind;
   /** Centre along the original wall, 0..1. Dimensions are metres, not survey measurements. */
@@ -217,6 +240,7 @@ export interface VisualCatalogue {
   }[];
 }
 export interface ModelMesh {
+  text?: SurfaceTextRecipe;
   /** Fine relief can wait until close zoom; older readers may ignore this hint. */
   minZoom?: number;
   uvs?: number[];

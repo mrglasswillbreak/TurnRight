@@ -1,3 +1,4 @@
+import { validSurfaceText } from './surface-text.js';
 import type { Feature } from 'geojson';
 import type {
   BuildingModel,
@@ -96,6 +97,8 @@ export function validBuildingModel(model: BuildingModel): boolean {
             part.minZoom >= 0 &&
             part.minZoom <= 22)) &&
         (part.texture === undefined || validTextureRecipe(part.texture)) &&
+        (part.text === undefined ||
+          (validSurfaceText(part.text) && part.uvs !== undefined)) &&
         (part.uvs === undefined ||
           (Array.isArray(part.positions) &&
             Array.isArray(part.uvs) &&

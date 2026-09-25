@@ -42,7 +42,7 @@ import { CAMPUS_MIN_ZOOM } from './world-map';
 import { meshMaterialRole, type MaterialRole } from './map-palette';
 import { textureKey } from './building-facades';
 import { createFacadeTextures } from './facade-textures';
-import type { FacadeTextureRecipe } from './visual-types';
+import type { FacadeTextureRecipe, SurfaceTextRecipe } from './visual-types';
 
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
@@ -88,7 +88,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       role: MaterialRole;
       themeKey?: string;
       releaseTexture?: () => void;
-      recipe?: FacadeTextureRecipe;
+      recipe?: FacadeTextureRecipe | SurfaceTextRecipe;
     }
   >();
   let renderer: WebGLRenderer | undefined;
@@ -150,9 +150,9 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   function material(
     colour: string,
     role: MaterialRole,
-    recipe?: FacadeTextureRecipe,
+    recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
   ) {
-    const key = `${colour}:${role}${recipe ? ':' + textureKey(recipe) : ''}`;
+    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}`;
     let entry = materials.get(key);
     if (!entry) {
       entry = {
@@ -198,13 +198,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       const role = meshMaterialRole(part.surfaces, part);
       const mesh = new Mesh(
         geometry,
-        material(part.colour, role, part.texture),
+        material(part.colour, role, part.texture || part.text),
       );
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
         minZoom: part.minZoom,
-        materialKey: `${part.colour}:${role}${part.texture ? ':' + textureKey(part.texture) : ''}`,
+        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}`,
         surfaces: part.surfaces,
       };
       group.add(mesh);
@@ -420,6 +420,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           options.data,
           (texture) => {
             entry.value.map = texture;
+            entry.value.transparent = !!entry.recipe && 'text' in entry.recipe;
+            entry.value.alphaTest = entry.value.transparent ? 0.03 : 0;
             entry.value.color.set('#ffffff');
             entry.value.needsUpdate = true;
           },

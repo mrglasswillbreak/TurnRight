@@ -3,6 +3,7 @@ import type {
   ModelMesh,
   BuildingSelection,
 } from './visual-types.js';
+import { textRecipe } from './surface-text.js';
 /** Small architectural primitives share one mesh per material and preserve surface picking. */
 export function facadeMeshes(
   f: FacadeDescription,
@@ -127,7 +128,25 @@ export function facadeMeshes(
         e.colour,
         e.kind === 'window' ? 'window' : e.kind === 'door' ? 'wall' : 'trim',
       );
-      if (e.flat) {
+      if (e.kind === 'text') {
+        const label: ModelMesh = {
+          positions: [],
+          indices: [],
+          colour: '#ffffff',
+          detail: true,
+          text: textRecipe(e),
+          surfaces: [],
+          uvs: [0, 0, 1, 0, 1, 1, 0, 1],
+        };
+        roles.set(label, 'trim');
+        face(label, [
+          point(x - e.width / 2, e.bottom, 0.04),
+          point(x + e.width / 2, e.bottom, 0.04),
+          point(x + e.width / 2, e.bottom + e.height, 0.04),
+          point(x - e.width / 2, e.bottom + e.height, 0.04),
+        ]);
+        meshes.set(`text:${e.id}:${i}`, label);
+      } else if (e.flat) {
         face(m, [
           point(x - e.width / 2, e.bottom, 0.018),
           point(x + e.width / 2, e.bottom, 0.018),

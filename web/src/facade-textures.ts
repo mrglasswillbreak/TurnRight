@@ -5,7 +5,8 @@ import {
   LinearMipmapLinearFilter,
 } from 'three';
 import type { CampusData } from './types';
-import type { FacadeTextureRecipe } from './visual-types';
+import { surfaceTextPixels } from './surface-text-canvas';
+import type { FacadeTextureRecipe, SurfaceTextRecipe } from './visual-types';
 import { textureKey } from './building-facades';
 import { ASSET_CACHE, hashBytes } from './offline';
 export const TEXTURE_MEMORY_LIMIT = 64 * 1024 * 1024;
@@ -43,11 +44,11 @@ export function createFacadeTextures(repaint: () => void) {
   };
   schedulers.add(pump);
   function acquire(
-    recipe: FacadeTextureRecipe,
+    recipe: FacadeTextureRecipe | SurfaceTextRecipe,
     data: CampusData,
     onReady: (t: DataTexture) => void,
   ) {
-    const key = textureKey(recipe);
+    const key = 'text' in recipe ? JSON.stringify(recipe) : textureKey(recipe);
     let e = entries.get(key);
     if (e) {
       e.users++;
@@ -56,6 +57,43 @@ export function createFacadeTextures(repaint: () => void) {
       return () => release(key, onReady);
     }
     if (reservedBytes + cost > TEXTURE_MEMORY_LIMIT) return () => {};
+    if ('text' in recipe) {
+      const entry: Entry = {
+        users: 1,
+        controller: new AbortController(),
+        callbacks: new Set([onReady]),
+      };
+      entries.set(key, entry);
+      reservedBytes += cost;
+      const paint = () => {
+        if (disposed || entries.get(key) !== entry) return;
+        try {
+          const pixels = surfaceTextPixels(recipe);
+          const texture = new DataTexture(
+            pixels.data,
+            pixels.width,
+            pixels.height,
+            RGBAFormat,
+          );
+          texture.flipY = true;
+          texture.colorSpace = SRGBColorSpace;
+          texture.generateMipmaps = true;
+          texture.minFilter = LinearMipmapLinearFilter;
+          texture.needsUpdate = true;
+          const old = entry.texture;
+          entry.texture = texture;
+          for (const callback of entry.callbacks) callback(texture);
+          old?.dispose();
+          repaint();
+        } catch {
+          /* A failed local glyph render must not discard the model. */
+        }
+      };
+      paint();
+      if (document.fonts.status !== 'loaded')
+        void document.fonts.ready.then(paint);
+      return () => release(key, onReady);
+    }
     const asset =
       data.visuals?.textures?.find((t) => t.id === key) ||
       data.photos?.find((p) => p.id === recipe.photoId);
