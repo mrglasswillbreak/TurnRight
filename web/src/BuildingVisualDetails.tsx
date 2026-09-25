@@ -43,7 +43,7 @@ export function BuildingVisualDetails({
               ? `${record.level === 'extrusion' ? (record.heightKind === 'illustrative' ? 'Illustrative' : 'Source extrusion') : record.level === 'detailed' ? 'Detailed' : 'Simplified'} 3D · model evidence`
               : correctionPending
                 ? 'Model pending footprint correction'
-                : 'Model needs rebuilding after geometry changes'}
+                : 'Published model differs from this draft'}
           </summary>
           <p>
             <strong>Supported:</strong> {record.observed.join(' ')}

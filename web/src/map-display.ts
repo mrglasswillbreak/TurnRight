@@ -33,7 +33,7 @@ export function buildingDisplay(
       metres: height,
       kind: estimated ? 'floor-derived' : 'recorded',
       description: estimated
-        ? `Approximately ${height} m · derived from floors`
+        ? `Approximately ${height} m · estimated height`
         : `${height} m · recorded height`,
     };
   }

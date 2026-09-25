@@ -19,6 +19,8 @@ import { RoofPlanEditor } from './RoofPlanEditor';
 import './building-editor.css';
 import type { EditorWorkspace } from './editor-workspace';
 import { ModelField } from './ModelField';
+import { fitRoofHeight, inheritsBuildingHeight } from './model-height';
+import { buildingDisplay } from './map-display';
 const PhotoModelWorkspace = lazy(() => import('./PhotoModelWorkspace'));
 
 export type BuildingMode = 'appearance' | 'outline' | 'roof';
@@ -54,6 +56,12 @@ export function BuildingAppearanceEditor({
   onHistory?: (redo?: boolean) => void;
 }) {
   const [photoModelOpen, setPhotoModelOpen] = useState(false);
+  const [adjustRoofHeight, setAdjustRoofHeight] = useState(true);
+  const [pendingHeightMode, setPendingHeightMode] = useState<string>();
+  const heightMode =
+    workspace?.modelInputs[edit.id]?.['building:heightMode'] ||
+    pendingHeightMode ||
+    String(edit.properties.heightMode || 'metres');
   const [workspaceMode, setWorkspaceMode] = useState<'details' | BuildingMode>(
     'details',
   );
@@ -144,15 +152,31 @@ export function BuildingAppearanceEditor({
       delete target.heightMode;
     } else if (value === undefined) delete target[field];
     else Object.assign(target, { [field]: value });
-    return onEdit(
-      {
-        ...edit,
-        properties: {
-          ...edit.properties,
-          appearance: next,
-          buildingTopology: topology,
-        },
+    let updated: MapEdit = {
+      ...edit,
+      properties: {
+        ...edit.properties,
+        appearance: next,
+        buildingTopology: topology,
       },
+    };
+    if (
+      partId &&
+      !wallId &&
+      adjustRoofHeight &&
+      ['height', 'floors', 'heightMode'].includes(field)
+    ) {
+      const part = updated.properties.appearance?.parts?.[partId];
+      const height =
+        part?.heightMode === 'floors'
+          ? Number(part.floors) * 3
+          : part?.heightMode === 'unknown'
+            ? 6
+            : (part?.height ?? buildingDisplay(edit.properties).metres);
+      updated = fitRoofHeight(updated, partId, height);
+    }
+    return onEdit(
+      updated,
       continuous
         ? `${partId || 'building'}:${wallId || ''}:${field}`
         : undefined,
@@ -216,11 +240,49 @@ export function BuildingAppearanceEditor({
   );
   const choose = (partId?: string, wallId?: string) =>
     onSelection({ buildingId: edit.id, partId, wallId });
-  const changeHeight = (field: string, value: unknown) =>
-    (onHeightEdit || onEdit)({
+  const changeHeight = (field: string, value: unknown) => {
+    if (
+      field === 'heightMode' &&
+      value === 'floors' &&
+      !(
+        Number.isInteger(edit.properties.floors) &&
+        Number(edit.properties.floors) > 0
+      )
+    ) {
+      if (workspace)
+        workspace.recoverModelInput(edit.id, 'building:heightMode', 'floors');
+      else setPendingHeightMode('floors');
+      return true;
+    }
+    let next: MapEdit = {
       ...edit,
-      properties: { ...edit.properties, [field]: value },
-    }) !== false;
+      properties: {
+        ...edit.properties,
+        ...(['height', 'floors'].includes(field) ? { heightMode } : {}),
+        [field]: value,
+      },
+    };
+    if (
+      adjustRoofHeight &&
+      ['height', 'floors', 'heightMode'].includes(field)
+    ) {
+      const p = next.properties;
+      const valid =
+        p.heightMode === 'floors'
+          ? Number.isInteger(p.floors) && Number(p.floors) > 0
+          : Number(p.height) > 0;
+      if (valid)
+        for (const part of topology.parts)
+          if (inheritsBuildingHeight(p.appearance?.parts?.[part.id]))
+            next = fitRoofHeight(next, part.id, buildingDisplay(p).metres);
+    }
+    const accepted = (onHeightEdit || onEdit)(next) !== false;
+    if (accepted && ['height', 'floors', 'heightMode'].includes(field)) {
+      workspace?.recoverModelInput(edit.id, 'building:heightMode');
+      setPendingHeightMode(undefined);
+    }
+    return accepted;
+  };
   const wingHeight =
     own.heightMode === 'floors'
       ? Number(own.floors) * 3
@@ -246,15 +308,26 @@ export function BuildingAppearanceEditor({
       aria-label="Building appearance editor"
     >
       {!embedded && (
-        <button
-          type="button"
-          onClick={() => {
-            setWorkspaceMode('details');
-            setPhotoModelOpen(true);
-          }}
-        >
-          Photo &amp; model
-        </button>
+        <div className="model-entry-actions">
+          <button
+            type="button"
+            onClick={() => {
+              setWorkspaceMode('details');
+              setPhotoModelOpen(true);
+            }}
+          >
+            Photo &amp; model
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setWorkspaceMode('appearance');
+              setPhotoModelOpen(true);
+            }}
+          >
+            Height &amp; floors
+          </button>
+        </div>
       )}
       {photoModelOpen && (
         <Suspense
@@ -467,7 +540,7 @@ export function BuildingAppearanceEditor({
                   <label>
                     Building height information
                     <select
-                      value={String(edit.properties.heightMode || 'metres')}
+                      value={heightMode}
                       onChange={(e) =>
                         changeHeight('heightMode', e.target.value)
                       }
@@ -478,7 +551,7 @@ export function BuildingAppearanceEditor({
                       <option value="floors">Documented floor count</option>
                     </select>
                   </label>
-                  {edit.properties.heightMode === 'floors' ? (
+                  {heightMode === 'floors' ? (
                     <ModelField
                       label="Building floors"
                       value={Number(edit.properties.floors) || ''}
@@ -523,6 +596,11 @@ export function BuildingAppearanceEditor({
                               properties,
                             }) !== false;
                           if (accepted) {
+                            setPendingHeightMode(undefined);
+                            workspace?.recoverModelInput(
+                              edit.id,
+                              'building:heightMode',
+                            );
                             workspace?.recoverModelInput(
                               edit.id,
                               'building:height',
@@ -561,6 +639,77 @@ export function BuildingAppearanceEditor({
                     Enter only recorded information. Unknown height uses an
                     illustrative block; a floor count estimates 3 m per floor.
                   </p>
+                  {Object.keys(appearance.roofs || {}).length > 0 && (
+                    <>
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={adjustRoofHeight}
+                          onChange={(e) =>
+                            setAdjustRoofHeight(e.target.checked)
+                          }
+                        />
+                        Adjust custom roof elevations with height; preserve roof
+                        proportions
+                      </label>
+                      <p className="small-note">
+                        Fixed roof elevations control the visible wall height.
+                        Turning this off keeps those elevations. Details retain
+                        their physical dimensions and affected walls need
+                        review.
+                      </p>
+                      <button
+                        onClick={() => {
+                          let next = edit;
+                          for (const part of topology.parts)
+                            if (
+                              inheritsBuildingHeight(
+                                appearance.parts?.[part.id],
+                              )
+                            )
+                              next = fitRoofHeight(
+                                next,
+                                part.id,
+                                buildingDisplay(edit.properties).metres,
+                              );
+                          (onHeightEdit || onEdit)(next);
+                        }}
+                      >
+                        Fit inherited custom roofs to current building height
+                      </button>
+                    </>
+                  )}
+                  {topology.parts
+                    .filter(
+                      (p) => !inheritsBuildingHeight(appearance.parts?.[p.id]),
+                    )
+                    .map((p) => (
+                      <p className="model-height-override" key={p.id}>
+                        Wing {topology.parts.indexOf(p) + 1} has its own height.{' '}
+                        <button
+                          onClick={() => {
+                            const next = structuredClone(edit);
+                            const own =
+                              next.properties.appearance!.parts![p.id];
+                            delete own.height;
+                            delete own.floors;
+                            delete own.heightMode;
+                            (onHeightEdit || onEdit)(
+                              adjustRoofHeight
+                                ? fitRoofHeight(
+                                    next,
+                                    p.id,
+                                    buildingDisplay(next.properties).metres,
+                                  )
+                                : next,
+                            );
+                          }}
+                        >
+                          Use building height for Wing{' '}
+                          {topology.parts.indexOf(p) + 1}
+                        </button>
+                      </p>
+                    ))}
                 </fieldset>
               )}
               <p className="small-note">
@@ -718,6 +867,18 @@ export function BuildingAppearanceEditor({
                       </select>
                     </label>
                     {reset('heightMode')}
+                    {appearance.roofs?.[partId!] && (
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={adjustRoofHeight}
+                          onChange={(e) =>
+                            setAdjustRoofHeight(e.target.checked)
+                          }
+                        />
+                        Adjust custom roof elevations with wing height
+                      </label>
+                    )}
                   </div>
                   {own.heightMode === 'floors' ? (
                     numeric('Wing floors', 'floors', resolved.floors, 1, 50, 1)
