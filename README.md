@@ -92,10 +92,20 @@ Current production-build captures use the verified published campus **`lasu-313d
 
 These **26 distinct screenshots** cover the public app, desktop editor and every mobile model mode. [Capture inventory and reproduction](docs/assets/screenshots/README.md) records provenance and older archives. [Nineteen building comparison sheets](docs/PHOTO-MODEL-COVERAGE.md) provide separate photographic evidence and gaps.
 
+The following additional captures show the latest landscape and touch-menu fixes using an isolated Library editing fixture.
+
+| Landscape tools beside the canvas | Hold a 3D detail for actions |
+| --- | --- |
+| ![Short landscape model workspace with a clear Close button and scrollable review tools](docs/assets/screenshots/editor-model-landscape-2026-09-25.png) | ![3D window selected by touch hold with its action menu kept open after release](docs/assets/screenshots/editor-model-3d-hold-2026-09-25.png) |
+
+![Globe view with a simulated live location and approximate facing cone](docs/assets/screenshots/public-globe-location-2026-09-25.png)
+
+The globe capture uses simulated GPS and compass readings in the browser fixture, not a person's recorded location.
+
 ## Recent changes
 
-- **Canvas-first mobile modelling:** all five modes use a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. Pinch navigation, multi-selection, held nudges, decimal inputs and reachable sheet controls support phones, tablets and short landscape screens. Desktop keeps its resizable panels.
-- **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Keyboard shortcuts and placement previews support quick editing without a permanent button row.
+- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **× Close** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop keeps its resizable panels.
+- **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Touch and hold a detail in **3D** to open the same menu; moving or adding a second finger cancels a pending hold. Keyboard shortcuts and placement previews support quick editing without a permanent button row.
 - **Height that changes the model:** whole-building metres and floor count are editable inside Appearance. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Height/roof adjustments share one undo action.
 
 - **Unified building editing:** Details, Appearance, Roof, Outline and Review share one draft and history. Use metre-based placement, snapping, keyboard nudges, multi-selection, duplication, alignment, groups, patterns, presets and previewed copies between walls/buildings. Completed actions autosave; unfinished values recover privately. Saving does not approve evidence or publish content. [Owner guide](docs/UNIFIED-MODEL-EDITOR.md).
@@ -106,7 +116,7 @@ These **26 distinct screenshots** cover the public app, desktop editor and every
 
 Application deployment leaves the published campus unchanged. New photos, models, permissions and routing changes use the owner preview, publication and rollback workflow.
 
-Release review now names each pending building/wall approval before a preview is queued. **Review model** opens that assignment; **Restore published building** previews an undoable restoration of one building correction when its current draft should be discarded.
+Release review names each pending building/wall approval before a preview is queued. Editing details resets the affected wall's review, even if its layout still looks correct. **Review model** opens that assignment and **Inspect details and evidence** exposes its review controls. Approve only the inspected wall. **Restore published building** previews an undoable restoration of one building correction when its current draft should be discarded.
 
 ## Features
 
@@ -160,6 +170,8 @@ Open [127.0.0.1:4173](http://127.0.0.1:4173), choose **Offline → Download camp
 The public map opens with a compact search bar at the bottom. Tap the search field or the arrow to open Explore, Saved, Offline and Settings. On desktop, panels and dialogs open at full height and can then be shortened with their top handle. Navigation and map controls stay pinned above the panel’s scrolling content. On mobile, view and compass controls sit on the left of the map, with zoom and location controls on the right. Drag the handle at the top of a card or dialog to change its height. Your chosen mobile heights are remembered on this device. With a keyboard, focus the handle and use Up/Down, Home or End. Collapse the card to see more of the map, including during a walk.
 
 Zoom out with the minus button or a pinch/scroll gesture to reveal the globe. Drag to explore and use **Back to campus**, the **LASU Ojo** marker or a campus search result to return. The globe works with either 2D/3D preference; detailed buildings return at campus zoom. **Follow me** restores walking zoom after globe exploration without ending an active route. World geography is an overview only: place search, streets and walking directions remain limited to the downloaded campus.
+
+After **Find my location**, the globe retains your live position and, when sensors are enabled, approximate phone-facing direction as you move or turn. Manual globe exploration stays under your control. A stale fix becomes **Last known location**, and stale direction indicators disappear. GPS travel direction remains separate from the compass; location and sensor permissions remain optional.
 
 When a new app version is ready, a notice appears over the public map with an **Install update** button. Updates are checked while the app is visible and when you return online. Installation waits until you finish navigation. You can also install from Settings.
 

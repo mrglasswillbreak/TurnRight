@@ -1,5 +1,9 @@
 # Application screenshots
 
+The additional `editor-model-landscape-2026-09-25.png` (844 × 320) and `editor-model-3d-hold-2026-09-25.png` (740 × 390) captures show the current Close button, landscape side tools and touch-held 3D actions. They are unaltered Chromium development-server regression captures of an isolated Library fixture, with no private owner content. Run the `landscape model has` and `3D touch hold` browser journeys, then copy their `landscape-reviewed.png` and `3d-long-press-actions.png` test outputs after inspection. The earlier 26-image production-build gallery is retained.
+
+`public-globe-location-2026-09-25.png` shows the live location label and facing cone with **simulated** GPS and orientation, using the real globe renderer and isolated public place fixture. Reproduce with the `globe retains live` browser journey and its `globe-live-location.png` output. It is a UI regression capture, not field-location or sensor-accuracy evidence. Together these three additions bring the README to 29 distinct captures without removing the earlier views.
+
 The additional `editor-release-review-390-2026-09-25.png` and `editor-release-review-1440-2026-09-25.png` captures show named model-release blockers using the isolated Library browser-test fixture. They are development-server regression captures, not production-campus evidence. Regenerate with `TURNRIGHT_CAPTURE_RELEASE=1` and the `release preflight opens` browser tests. The 26 varied production-build README images below remain intact.
 
 ## Current unified editor and public gallery
