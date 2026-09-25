@@ -390,6 +390,10 @@ describe('published baseline reconciliation', () => {
         "select has_function_privilege('authenticated','reconcile_published_baseline(uuid,text,jsonb,jsonb)','EXECUTE') as allowed",
       );
       expect(access.rows[0].allowed).toBe(false);
+      const privateAccess = await database.query<{ allowed: boolean }>(
+        "select has_function_privilege('service_role','_reconcile_published_baseline(uuid,text,jsonb,jsonb)','EXECUTE') as allowed",
+      );
+      expect(privateAccess.rows[0].allowed).toBe(false);
     } finally {
       await database.exec(
         "reset plan_cache_mode; delete from source_features where id like 'edge:scale:%';",

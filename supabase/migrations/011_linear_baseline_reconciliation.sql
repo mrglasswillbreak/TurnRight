@@ -1,16 +1,14 @@
 -- Bound comparison work even when a cached RPC plan underestimates the JSON array.
 -- Materialize each current record once and use a full join, which cannot become
 -- a nested-loop scan of the full campus for every expected record.
-create or replace function public.reconcile_published_baseline(actor uuid, published_version text, expected_sources jsonb, records jsonb)
+create or replace function public._reconcile_published_baseline(actor uuid, published_version text, expected_sources jsonb, records jsonb)
 returns uuid language plpgsql security definer set search_path=public as $$
 declare receipt uuid; baseline_matches boolean;
 begin
   if not exists(select 1 from admin_users where id=actor) then raise exception 'Administrator required'; end if;
   if jsonb_typeof(records) is distinct from 'array' or jsonb_array_length(records) < 1 or jsonb_array_length(records) > 30000 then raise exception 'Invalid source snapshot'; end if;
   if jsonb_typeof(expected_sources) is distinct from 'array' then raise exception 'Invalid expected source snapshot'; end if;
-  -- PostgREST supplies fields from json_to_record. Own the array values before
-  -- nested queries reuse them; retaining those record-backed argument buffers
-  -- makes the same comparison dramatically slower than direct SQL arguments.
+  -- Also bind owned values in the implementation's statement context.
   expected_sources := expected_sources || '[]'::jsonb;
   records := records || '[]'::jsonb;
   if (select count(*) <> count(distinct x.id) from jsonb_to_recordset(records) as x(id text)) then raise exception 'Invalid source snapshot: duplicate key or missing ID'; end if;
@@ -48,5 +46,21 @@ begin
     on conflict(id) do update set source=excluded.source,entity=excluded.entity,payload=excluded.payload,hash=excluded.hash,updated_at=now();
   return receipt;
 end; $$;
+-- Keep the implementation private. A PL/pgSQL call boundary materializes RPC
+-- record fields before the implementation's nested queries use them. Copying
+-- parameters inside the same function was insufficient in the live RPC probe.
+revoke all on function public._reconcile_published_baseline(uuid,text,jsonb,jsonb) from public,anon,authenticated,service_role;
+create or replace function public.reconcile_published_baseline(actor uuid, published_version text, expected_sources jsonb, records jsonb)
+returns uuid language plpgsql security definer set search_path=public set statement_timeout='15s' as $$
+begin
+  if jsonb_typeof(expected_sources) is distinct from 'array' then raise exception 'Invalid expected source snapshot'; end if;
+  if jsonb_typeof(records) is distinct from 'array' then raise exception 'Invalid source snapshot'; end if;
+  expected_sources := expected_sources || '[]'::jsonb;
+  records := records || '[]'::jsonb;
+  return public._reconcile_published_baseline(actor,published_version,expected_sources,records);
+end; $$;
 revoke all on function public.reconcile_published_baseline(uuid,text,jsonb,jsonb) from public,anon,authenticated;
 grant execute on function public.reconcile_published_baseline(uuid,text,jsonb,jsonb) to service_role;
+-- PostgREST hoists this function's bounded timeout for the RPC transaction.
+-- Other API operations and the existing lock timeout remain unchanged.
+notify pgrst, 'reload schema';
