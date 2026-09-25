@@ -28,6 +28,8 @@ Each completed numeric edit or pointer gesture is one undoable command. The shar
 
 Review is targeted: **Mark this wall reviewed** only reviews that wall. Copies and affected geometry require review. Source-photo replacement invalidates relevant evidence; captions and ordering do not establish a new wall match. Publication independently validates the immutable snapshot and assets through the normal preview/publish/rollback workflow.
 
+To abandon one building's saved changes, use **Restore published building** in its inspector when a matching published correction is available. Inspect the proposed repair and choose **Apply reviewed repair**. Other draft corrections remain intact; Undo restores the previous building draft. This does not publish or roll back the whole campus.
+
 ## Rendering and compatibility
 
 Enhanced rendering remains the default, with Simple 3D and automatic performance fallback. Public/editor theme preferences are shared; building colours remain recognizable in both themes. The model workspace preserves its camera during selection and completed detail edits. Lightweight drag previews do not regenerate the full mesh on every pointer move.
