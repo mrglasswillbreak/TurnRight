@@ -77,6 +77,7 @@ export function PhotoModelPreview(props: {
       pending = false,
       generation = 0,
       active = 0,
+      resizeFrame = 0,
       model: BuildingModel | undefined;
     let releases: (() => void)[] = [];
     let deadline: ReturnType<typeof setTimeout> | undefined;
@@ -149,7 +150,8 @@ export function PhotoModelPreview(props: {
           mesh.userData.triangles = triangles;
         }
         const selected = selection || { buildingId: model.id, wallId };
-        if (!selected.wallId && !selected.elementId) continue;
+        if (!selected.wallId && !selected.elementId && !selected.partId)
+          continue;
         const positions = buildingOutline(part, selected);
         if (positions.length) {
           const geometry = new BufferGeometry();
@@ -299,13 +301,18 @@ export function PhotoModelPreview(props: {
       );
       controls.addEventListener('change', draw);
       observer = new ResizeObserver(() => {
-        const width = element.clientWidth,
-          height = element.clientHeight;
-        if (!width || !height) return;
-        renderer!.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        draw();
+        // Canvas sizing can itself affect layout. Commit in the next frame so
+        // docking/rotation does not write layout inside observer delivery.
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(() => {
+          const width = element.clientWidth,
+            height = element.clientHeight;
+          if (!width || !height || disposed) return;
+          renderer!.setSize(width, height);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          draw();
+        });
       });
       observer.observe(element);
       action.current = (a) => {
@@ -462,6 +469,7 @@ export function PhotoModelPreview(props: {
       clearTimeout(deadline);
       worker.terminate();
       observer?.disconnect();
+      cancelAnimationFrame(resizeFrame);
       themeObserver.disconnect();
       controls?.dispose();
       clear();
