@@ -183,7 +183,7 @@ export function roofElevation(
   }
 }
 
-/** Drape a bounded text grid over roof slopes without adding a separate image asset. */
+/** Clip lettering to each roof triangle so it follows ridges and valleys exactly. */
 export function roofTextMesh(
   text: RoofText,
   partId: string,
@@ -200,31 +200,77 @@ export function roofTextMesh(
     surfaces: [],
   };
   const [cx, cy] = local(text.coordinates),
-    angle = (text.rotation * Math.PI) / 180;
-  const cols = 16,
-    rows = 8;
-  for (let y = 0; y <= rows; y++)
-    for (let x = 0; x <= cols; x++) {
-      const dx = (x / cols - 0.5) * text.width,
-        dy = (y / rows - 0.5) * text.height;
-      const px = cx + dx * Math.cos(angle) - dy * Math.sin(angle),
-        py = cy + dx * Math.sin(angle) + dy * Math.cos(angle);
-      const z = roofElevation(roof, partId, px, py);
-      if (z === undefined)
-        throw new Error(
-          'Roof text must fit entirely on its roof, outside courtyard openings.',
+    angle = (text.rotation * Math.PI) / 180,
+    cos = Math.cos(angle),
+    sin = Math.sin(angle);
+  // Work in the lettering's local plane, carrying the roof elevation through clipping.
+  const clip = (
+    points: number[][],
+    axis: number,
+    edge: number,
+    sign: number,
+  ) => {
+    const result: number[][] = [];
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i],
+        b = points[(i + 1) % points.length],
+        insideA = (a[axis] - edge) * sign >= -1e-9,
+        insideB = (b[axis] - edge) * sign >= -1e-9;
+      if (insideA) result.push(a);
+      if (insideA !== insideB) {
+        const t = (edge - a[axis]) / (b[axis] - a[axis]);
+        result.push(a.map((v, j) => v + (b[j] - v) * t));
+      }
+    }
+    return result;
+  };
+  for (const surface of roof.surfaces || []) {
+    if (
+      surface.partId !== partId ||
+      surface.role !== 'roof' ||
+      surface.elementId
+    )
+      continue;
+    for (let t = surface.start; t < surface.start + surface.count; t++) {
+      let points = [0, 1, 2].map((i) => {
+        const v = roof.indices[t * 3 + i] * 3,
+          dx = roof.positions[v] - cx,
+          dy = roof.positions[v + 1] - cy;
+        return [
+          dx * cos + dy * sin,
+          -dx * sin + dy * cos,
+          roof.positions[v + 2],
+        ];
+      });
+      points = clip(
+        clip(
+          clip(clip(points, 0, -text.width / 2, 1), 0, text.width / 2, -1),
+          1,
+          -text.height / 2,
+          1,
+        ),
+        1,
+        text.height / 2,
+        -1,
+      );
+      if (points.length < 3) continue;
+      const start = m.positions.length / 3;
+      for (const [x, y, z] of points) {
+        m.positions.push(
+          cx + x * cos - y * sin,
+          cy + x * sin + y * cos,
+          z + 0.035,
         );
-      m.positions.push(px, py, z + 0.035);
-      m.uvs!.push(x / cols, y / rows);
+        m.uvs!.push(x / text.width + 0.5, y / text.height + 0.5);
+      }
+      for (let i = 1; i < points.length - 1; i++)
+        m.indices.push(start, start + i, start + i + 1);
     }
-  for (let y = 0; y < rows; y++)
-    for (let x = 0; x < cols; x++) {
-      const a = y * (cols + 1) + x,
-        b = a + 1,
-        c = a + cols + 1,
-        d = c + 1;
-      m.indices.push(a, b, d, a, d, c);
-    }
+  }
+  if (!m.indices.length)
+    throw new Error(
+      'Roof text must fit entirely on its roof, outside courtyard openings.',
+    );
   m.surfaces!.push({
     start: 0,
     count: m.indices.length / 3,
