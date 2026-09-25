@@ -120,6 +120,7 @@ function ModelFieldInput({
           </button>
         )}
         <input
+          data-model-field={field}
           type={type}
           value={text}
           min={min}

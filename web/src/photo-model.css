@@ -37,7 +37,7 @@
 .photo-model-workspace :is(button, input, select, summary) {
   min-height: 44px;
 }
-.photo-model-workspace button {
+.photo-model-workspace button:not([data-slot]):not(.model-tree-disclosure) {
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -1032,7 +1032,7 @@
   font-size: 13px;
 }
 .model-desktop .model-layout {
-  grid-template-columns: 220px minmax(0, 1fr) 310px;
+  grid-template-columns: 260px minmax(0, 1fr) 310px;
   gap: 0;
   overflow: hidden;
 }
@@ -1288,4 +1288,311 @@
   left: 8px;
   max-width: calc(100% - var(--model-side) - 24px);
   background: var(--background);
+}
+
+/* Model controls share the application's button, toggle and menu primitives. */
+.model-workspace :is([data-slot='button'], [data-slot='toggle-group-item']) {
+  min-height: 36px;
+  height: auto;
+  gap: 7px;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+.model-button-tip {
+  display: inline-flex;
+  align-items: stretch;
+}
+.model-button svg {
+  width: 16px;
+  height: 16px;
+}
+.model-toolbar-divider {
+  height: 24px;
+  width: 1px;
+  background: var(--border);
+  margin: 0 2px;
+}
+.model-main-toolbar {
+  align-items: center;
+  gap: 6px;
+}
+.model-main-toolbar [data-slot='toggle-group'] {
+  background: color-mix(in srgb, var(--foreground) 5%, var(--background));
+  padding: 3px;
+  gap: 2px;
+}
+.model-main-toolbar [data-slot='toggle-group-item'][aria-pressed='true'] {
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: 0 1px 3px #0002;
+}
+.model-compact :is([data-slot='button'], [data-slot='toggle-group-item']) {
+  min-height: 44px;
+}
+.model-tree-search {
+  position: relative;
+  margin-bottom: 10px;
+}
+.model-tree-search > svg {
+  position: absolute;
+  left: 9px;
+  top: 13px;
+  color: var(--muted-foreground);
+}
+.model-tree-search input {
+  padding-left: 32px !important;
+  width: 100%;
+}
+.model-tree {
+  min-width: 0;
+}
+.model-tree .model-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding-block: 5px;
+  padding-right: 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  user-select: none;
+}
+.model-tree .model-tree-row:hover {
+  background: color-mix(in srgb, var(--foreground) 5%, var(--background));
+}
+.model-tree [aria-selected='true'] > .model-tree-row {
+  background: color-mix(in srgb, var(--primary) 13%, var(--background));
+  color: var(--foreground);
+  box-shadow: inset 2px 0 var(--primary);
+}
+.model-tree .model-tree-row > svg {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+.model-tree-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.45;
+}
+.model-tree-label small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.model-workspace .model-tree-disclosure {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+}
+.model-tree-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+.model-compact .model-tree .model-tree-row {
+  min-height: 44px;
+}
+.model-compact .model-tree-disclosure {
+  min-height: 44px;
+}
+.model-tree [role='treeitem']:focus-visible > .model-tree-row {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+/* One model canvas stays mounted beneath the surface's shared editing controls. */
+.model-workspace .model-view-columns {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.model-workspace .model-plan-host[hidden] {
+  display: none !important;
+}
+.model-workspace .model-plan-host:not([hidden]),
+.model-workspace .model-plan-host > .model-wall-view,
+.model-workspace .model-plan-host > .model-plan-navigation {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+.model-workspace .model-plan-host .model-wall-canvas,
+.model-workspace .model-plan-host .roof-canvas,
+.model-workspace .model-plan-host .model-outline-canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 60px;
+  max-height: none;
+}
+.model-workspace .model-tab-surface .model-3d-view {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.model-workspace .model-tab-surface .photo-model-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.model-workspace .model-tab-surface .photo-model-canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.model-workspace .model-tab-surface .photo-model-preview > output {
+  display: none;
+}
+.model-workspace .model-tab-surface .model-plan-host {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+}
+.model-workspace .model-tab-surface :is(.model-edit-view, .model-photo-view) {
+  display: none !important;
+}
+.model-workspace
+  .model-tab-surface
+  :is(.model-wall-canvas, .roof-canvas, .model-outline-canvas) {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+}
+.model-tab-surface [data-surface-background] {
+  fill: transparent;
+}
+.model-tab-surface [data-element-id] {
+  fill-opacity: 0.08;
+}
+.model-tab-surface .model-grid {
+  opacity: 0.24;
+}
+.model-tab-surface .model-wall-view > .small-note,
+.model-tab-surface .model-wall-view > output,
+.model-tab-surface .model-plan-navigation > output {
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.model-viewport-tabs {
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.model-viewport-tabs .model-button {
+  white-space: nowrap;
+}
+.model-selected-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.model-selected-actions > span {
+  color: var(--muted-foreground);
+  margin-right: auto;
+}
+.model-compact .model-selected-actions > span {
+  display: none;
+}
+.model-compact .model-viewport-tabs {
+  flex-wrap: nowrap;
+}
+.model-compact .model-viewport-tabs .model-button {
+  padding: 6px;
+  flex: 1;
+  font-size: 11px;
+  gap: 4px;
+}
+.model-compact .model-viewport-tabs .model-button-tip {
+  flex: 1;
+}
+@media (max-width: 420px) {
+  .model-viewport-tabs .model-button > svg {
+    display: none;
+  }
+}
+
+.model-tab-surface :is(.model-wall-text-label, .model-roof-text-label) {
+  display: none;
+}
+.model-roof-text-properties {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.model-desktop .model-panel-title {
+  position: sticky;
+  top: -12px;
+  z-index: 3;
+  background: var(--background);
+  padding: 12px 0;
+  margin-top: -12px;
+}
+
+.model-tree [role='treeitem'] {
+  outline: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.model-workspace {
+  --primary: #1764ed;
+  --primary-foreground: #fff;
+  --muted-foreground: var(--muted);
+  --ring: #89b1ff;
+}
+.model-workspace .model-button[data-model-variant='outline'] {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+.model-workspace .model-button[data-model-variant='secondary'] {
+  border: 1px solid transparent;
+  background: var(--info-background);
+  color: var(--link);
+}
+.model-workspace .model-button[data-model-variant='default'] {
+  border: 1px solid transparent;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.model-workspace .model-button[data-model-variant='destructive'] {
+  border: 1px solid transparent;
+  background: var(--error-background);
+  color: var(--error-text);
+}
+.model-workspace .model-button[data-model-variant='ghost'] {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+}
+.model-workspace .model-button:not(:disabled):hover {
+  filter: brightness(0.96);
+}
+.model-workspace .model-button[aria-pressed='true'] {
+  background: var(--info-background);
+  color: var(--link);
+  border-color: var(--link);
 }

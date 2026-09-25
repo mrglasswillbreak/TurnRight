@@ -2233,8 +2233,11 @@ function Editor({
                 <Suspense fallback={<output>Loading building tools…</output>}>
                   <BuildingAppearanceEditor
                     reviewRequest={
-                      repairFocus?.repair === 'review-model'
-                        ? repairFocus
+                      repairFocus?.repair === 'review-model' ||
+                      /^(height|floors|appearance|roof|wall)/i.test(
+                        repairFocus?.field || '',
+                      )
+                        ? repairFocus || undefined
                         : undefined
                     }
                     onReviewOpened={() => setRepairFocus(null)}

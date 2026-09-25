@@ -1,3 +1,8 @@
+import {
+  Check as ActionCheck,
+  RotateCcw as ActionRotateCcw,
+} from 'lucide-react';
+import { ModelButton } from './ModelButton';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { MapEdit, CampusData } from './types';
 import type {
@@ -70,17 +75,31 @@ export function BuildingAppearanceEditor({
     workspace?.modelInputs[edit.id]?.['building:heightMode'] ||
     pendingHeightMode ||
     String(edit.properties.heightMode || 'metres');
+  const [workspaceField, setWorkspaceField] = useState<string>();
   const [workspaceMode, setWorkspaceMode] = useState<
     'details' | 'review' | BuildingMode
   >('details');
   useEffect(() => {
     if (!embedded && reviewRequest) {
       workspaceTrigger.current = document.activeElement as HTMLElement;
-      setWorkspaceMode('review');
+      setWorkspaceMode(
+        reviewRequest.repair === 'review-model'
+          ? 'review'
+          : /roof/i.test(reviewRequest.field || '')
+            ? 'roof'
+            : 'appearance',
+      );
+      setWorkspaceField(
+        reviewRequest.repair === 'review-model'
+          ? undefined
+          : reviewRequest.field,
+      );
+      if (reviewRequest.repair !== 'review-model')
+        onSelection({ buildingId: edit.id });
       setPhotoModelOpen(true);
       onReviewOpened?.();
     }
-  }, [embedded, reviewRequest, onReviewOpened]);
+  }, [embedded, reviewRequest, onReviewOpened, onSelection, edit.id]);
   const feature = useMemo(
     () => ({
       type: 'Feature' as const,
@@ -200,13 +219,15 @@ export function BuildingAppearanceEditor({
   };
   const reset = (key: keyof SurfaceStyle) =>
     own[key] !== undefined && (
-      <button
+      <ModelButton
+        variant="outline"
+        icon={<ActionCheck />}
         type="button"
         className="inherit-value"
         onClick={() => change(key, undefined)}
       >
         Use inherited value<span className="sr-only"> for {key}</span>
-      </button>
+      </ModelButton>
     );
   const numeric = (
     label: string,
@@ -379,6 +400,7 @@ export function BuildingAppearanceEditor({
             workspace={workspace}
             onHistory={onHistory}
             initialMode={workspaceMode}
+            initialField={workspaceField}
           />
         </Suspense>
       )}
@@ -427,7 +449,8 @@ export function BuildingAppearanceEditor({
                   ? 'Surface identities no longer match the outline. Review a reset before continuing.'
                   : 'Some appearance settings refer to removed surfaces.'}
               </p>
-              <button
+              <ModelButton
+                variant="outline"
                 onClick={() =>
                   onEdit(resetBuildingAssignments(edit, !brokenTopology))
                 }
@@ -435,14 +458,16 @@ export function BuildingAppearanceEditor({
                 {brokenTopology
                   ? 'Reset surface identities and assignments'
                   : 'Reset unassigned surfaces'}
-              </button>
+              </ModelButton>
             </div>
           )}
           {(topology.issues || []).map((issue) => (
             <div className="notice" role="alert" key={issue.id}>
               <p>{issue.message}</p>
               {issue.candidates.map((candidate, i) => (
-                <button
+                <ModelButton
+                  variant="outline"
+                  icon={<ActionCheck />}
                   key={i}
                   onClick={() => {
                     const next = structuredClone(appearance);
@@ -469,9 +494,11 @@ export function BuildingAppearanceEditor({
                 >
                   Use former style {i + 1} (
                   {candidate.wallColour || 'inherited'})
-                </button>
+                </ModelButton>
               ))}
-              <button
+              <ModelButton
+                variant="outline"
+                icon={<ActionRotateCcw />}
                 onClick={() => {
                   const next = structuredClone(appearance);
                   if (issue.wallId) delete next.walls?.[issue.wallId];
@@ -495,7 +522,7 @@ export function BuildingAppearanceEditor({
                 }}
               >
                 Reset surface assignments
-              </button>
+              </ModelButton>
             </div>
           ))}
           {mode === 'outline' ? (
@@ -529,6 +556,15 @@ export function BuildingAppearanceEditor({
                 }
                 onDraft={onRoofDraft}
                 focusedSurface={selection?.roofTriangle}
+                focusedText={selection?.elementId}
+                onTextSelect={(elementId) =>
+                  onSelection({
+                    buildingId: edit.id,
+                    partId: part.id,
+                    role: 'roof',
+                    elementId,
+                  })
+                }
                 onSurface={(index) =>
                   onSelection({
                     buildingId: edit.id,
@@ -596,7 +632,9 @@ export function BuildingAppearanceEditor({
                         max={150}
                         onCommit={(v) => changeHeight('height', Number(v))}
                       />
-                      <button
+                      <ModelButton
+                        variant="outline"
+                        icon={<ActionCheck />}
                         onClick={() => {
                           const properties: MapEdit['properties'] = {
                             ...edit.properties,
@@ -627,7 +665,7 @@ export function BuildingAppearanceEditor({
                         }}
                       >
                         Use unknown building height
-                      </button>
+                      </ModelButton>
                       <label>
                         <input
                           type="checkbox"
@@ -672,7 +710,8 @@ export function BuildingAppearanceEditor({
                         their physical dimensions and affected walls need
                         review.
                       </p>
-                      <button
+                      <ModelButton
+                        variant="outline"
                         onClick={() => {
                           let next = edit;
                           for (const part of topology.parts)
@@ -690,7 +729,7 @@ export function BuildingAppearanceEditor({
                         }}
                       >
                         Fit inherited custom roofs to current building height
-                      </button>
+                      </ModelButton>
                     </>
                   )}
                   {topology.parts
@@ -700,7 +739,9 @@ export function BuildingAppearanceEditor({
                     .map((p) => (
                       <p className="model-height-override" key={p.id}>
                         Wing {topology.parts.indexOf(p) + 1} has its own height.{' '}
-                        <button
+                        <ModelButton
+                          variant="outline"
+                          icon={<ActionCheck />}
                           onClick={() => {
                             const next = structuredClone(edit);
                             const own =
@@ -721,7 +762,7 @@ export function BuildingAppearanceEditor({
                         >
                           Use building height for Wing{' '}
                           {topology.parts.indexOf(p) + 1}
-                        </button>
+                        </ModelButton>
                       </p>
                     ))}
                 </fieldset>

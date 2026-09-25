@@ -18,7 +18,7 @@ export function ModelButton({
   const button = (
     <Button
       variant="ghost"
-      data-model-variant={props.variant || "ghost"}
+      data-model-variant={props.variant || 'ghost'}
       {...props}
       className={`model-button ${props.className || ''}`}
       title={title}
