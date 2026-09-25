@@ -143,10 +143,10 @@ export function facadeMeshes(
         };
         roles.set(label, 'trim');
         face(label, [
-          point(x - e.width / 2, e.bottom, 0.04),
-          point(x + e.width / 2, e.bottom, 0.04),
-          point(x + e.width / 2, e.bottom + e.height, 0.04),
-          point(x - e.width / 2, e.bottom + e.height, 0.04),
+          point(x - e.width / 2, e.bottom, Math.max(0.02, e.depth)),
+          point(x + e.width / 2, e.bottom, Math.max(0.02, e.depth)),
+          point(x + e.width / 2, e.bottom + e.height, Math.max(0.02, e.depth)),
+          point(x - e.width / 2, e.bottom + e.height, Math.max(0.02, e.depth)),
         ]);
         meshes.set(`text:${e.id}:${i}`, label);
       } else if (e.flat) {

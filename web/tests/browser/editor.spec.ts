@@ -5207,14 +5207,16 @@ test('documentation current gallery: published campus and isolated owner workflo
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
       .toBe(false);
-    await page.screenshot({
-      path: fileURLToPath(
-        new URL(
-          `../../../docs/assets/screenshots/${name}-2026-09-25.png`,
-          import.meta.url,
+    await expect(async () => {
+      await page.screenshot({
+        path: fileURLToPath(
+          new URL(
+            `../../../docs/assets/screenshots/${name}-2026-09-25.png`,
+            import.meta.url,
+          ),
         ),
-      ),
-    });
+      });
+    }).toPass({ timeout: 5000 });
   };
   await page.emulateMedia({ colorScheme: 'dark' });
   await setup(page, false, false, { snapshot: { data, manifest } });
@@ -5323,6 +5325,8 @@ test('documentation current gallery: published campus and isolated owner workflo
     await dialog
       .getByRole('button', { name: 'Fit selection', exact: true })
       .click();
+    await dialog.getByLabel('Projection (m)', { exact: true }).fill('0.2');
+    await dialog.getByLabel('Projection (m)', { exact: true }).press('Enter');
     await shot('editor-model-wall-text');
     await dialog
       .getByRole('button', { name: 'Reset view', exact: true })

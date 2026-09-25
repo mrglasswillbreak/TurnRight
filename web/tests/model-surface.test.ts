@@ -14,6 +14,7 @@ import {
   resolveBuildingVisual,
 } from '../src/building-surfaces';
 import { emptyAuthoring, wallMetrics } from '../src/model-authoring';
+import { facadeMeshes } from '../src/facade-mesh';
 import { createBuildingModel } from '../src/building-model';
 import { validBuildingModel } from '../src/building-visuals';
 import {
@@ -293,4 +294,27 @@ it('front elevations face outside for either outer and courtyard ring winding', 
       ).toBe(courtyard);
     }
   }
+});
+
+it('wall lettering respects its editable projection depth', () => {
+  const wall = facadeWalls(feature())[0];
+  const meshes = facadeMeshes(
+    {
+      ...wall,
+      wallCoordinates: wall.coordinates,
+      elements: [{ ...detail, depth: 0.25 }],
+      confidence: 'inferred',
+      notes: '',
+      photoIds: [],
+    },
+    [0, 0],
+    [10, 0],
+    [0, -1],
+    9,
+    '#ffffff',
+  );
+  const label = meshes.find((m) => m.text)!;
+  expect(label.positions.filter((_, i) => i % 3 === 1)).toEqual([
+    -0.25, -0.25, -0.25, -0.25,
+  ]);
 });
