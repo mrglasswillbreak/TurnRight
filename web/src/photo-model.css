@@ -1742,3 +1742,40 @@
 .model-workspace [data-reference-split='true'] .model-photo-scroll {
   max-height: none;
 }
+.model-mesh-panel > fieldset,
+.model-mesh-panel > details,
+.model-file-panel > fieldset {
+  margin-block: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 0;
+}
+.model-mesh-panel legend {
+  font-weight: 600;
+  font-size: 13px;
+  padding-inline: 4px;
+}
+.model-mesh-panel label {
+  display: block;
+  margin-block: 8px;
+  overflow-wrap: anywhere;
+}
+.model-mesh-panel :is(input, select) {
+  max-width: 100%;
+  min-width: 0;
+}
+.model-mesh-panel .model-toolbar {
+  gap: 6px;
+  margin-block: 10px;
+}
+.model-mesh-panel :is(p, small, li) {
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.model-mesh-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding-block: 8px;
+}

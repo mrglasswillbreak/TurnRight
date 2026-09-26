@@ -123,7 +123,8 @@ export function ModelStructureTree({
             const Icon =
               node.target?.kind === 'building'
                 ? Building2
-                : node.target?.kind === 'part'
+                : node.target?.kind === 'part' ||
+                    node.target?.kind === 'meshObject'
                   ? Box
                   : node.target?.kind === 'roof'
                     ? House

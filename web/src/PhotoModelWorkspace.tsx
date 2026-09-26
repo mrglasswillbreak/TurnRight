@@ -11,6 +11,8 @@ import {
   useMemo,
   useRef,
   useState,
+  lazy,
+  Suspense,
   type RefObject,
 } from 'react';
 import { Menu } from '@base-ui/react/menu';
@@ -32,6 +34,7 @@ import {
   ScanFace,
   Ungroup,
   Split,
+  Box,
 } from 'lucide-react';
 import { ModelButton } from './ModelButton';
 import { reviewModelWalls } from './model-review';
@@ -112,8 +115,11 @@ import {
 } from './model-authoring';
 import './photo-model.css';
 import { useModelReference } from './use-model-reference';
+import type { ModelDocument, MeshSelection } from './model-document';
+import type { ModelPreviewScene } from './model-preview-scene';
+const ModelMeshPanel = lazy(() => import('./ModelMeshPanel'));
 
-type Mode = 'details' | 'appearance' | 'roof' | 'outline' | 'review';
+type Mode = 'details' | 'appearance' | 'roof' | 'outline' | 'review' | 'mesh';
 const kinds: FacadeElementKind[] = [
   'window',
   'door',
@@ -346,6 +352,13 @@ function ModelWorkspace({
     [error, setError] = useState(''),
     [grid, setGrid] = useState(0.1);
   const referenceLayout = useModelReference();
+  const [meshPreview, setMeshPreview] = useState<ModelDocument | null>(null);
+  const [meshSelection, setMeshSelection] = useState<MeshSelection | null>(
+    null,
+  );
+  const [previewScene, setPreviewScene] = useState<ModelPreviewScene | null>(
+    null,
+  );
   // Photo remains a full-screen option when the remembered split cannot fit.
   useEffect(() => {
     if (referenceLayout.active && tab === 'photo') setTab('3d');
@@ -457,6 +470,7 @@ function ModelWorkspace({
       ...feature,
       properties: {
         ...feature.properties,
+        ...(meshPreview ? { modelDocument: meshPreview } : {}),
         appearance: {
           ...feature.properties?.appearance,
           facades: {
@@ -497,6 +511,7 @@ function ModelWorkspace({
     generatedFacades,
     pending,
     activeWall,
+    meshPreview,
   ]);
   const active = elements.find((e) => e.id === selected[0]);
   const photos = useMemo(
@@ -1024,6 +1039,11 @@ function ModelWorkspace({
   };
   const selectTreeTarget = (target: ModelTreeTarget, multi: boolean) => {
     const { kind, partId, wallId, id } = target;
+    if (kind === 'meshObject' && id) {
+      setMeshSelection({ objectId: id, kind: 'object', ids: [] });
+      switchMode('mesh');
+      return;
+    }
     if (
       kind === 'wall' ||
       kind === 'detail' ||
@@ -1243,7 +1263,7 @@ function ModelWorkspace({
   return (
     <ModelSurfaceContext
       value={{
-        active: tab === 'surface' && !webglUnavailable,
+        active: tab === 'surface' && mode !== 'mesh' && !webglUnavailable,
         revision: `${mode}:${activeWall}:${selection?.partId || ''}`,
         onFrame: receiveSurfaceFrame,
         onPreview: setSurfacePreview,
@@ -1445,6 +1465,7 @@ function ModelWorkspace({
                           'appearance',
                           'roof',
                           'outline',
+                          'mesh',
                           'review',
                         ] as Mode[]
                       ).map((m) => (
@@ -1528,6 +1549,7 @@ function ModelWorkspace({
                       ['appearance', Paintbrush],
                       ['roof', House],
                       ['outline', Pentagon],
+                      ['mesh', Box],
                       ['review', ListChecks],
                     ] as const
                   ).map(([m, Icon]) => (
@@ -1606,6 +1628,7 @@ function ModelWorkspace({
                   <h3 className="model-panel-title">Structure</h3>
                   <ModelStructureTree
                     nodes={modelTree({
+                      objects: draft.properties.modelDocument?.objects,
                       name: String(edit.properties.name || 'Building'),
                       topology: buildingTopology(feature),
                       walls,
@@ -1624,27 +1647,31 @@ function ModelWorkspace({
                       hidden,
                     })}
                     selected={
-                      mode === 'outline'
-                        ? ['footprint']
-                        : mode === 'roof' && selection?.partId
-                          ? [
-                              selection.elementId
-                                ? `roof-text:${selection.elementId}`
-                                : `roof:${selection.partId}`,
-                            ]
-                          : mode === 'appearance'
+                      mode === 'mesh'
+                        ? meshSelection
+                          ? [`mesh:${meshSelection.objectId}`]
+                          : []
+                        : mode === 'outline'
+                          ? ['footprint']
+                          : mode === 'roof' && selection?.partId
                             ? [
-                                selection?.wallId
-                                  ? `wall:${selection.wallId}`
-                                  : selection?.partId
-                                    ? `part:${selection.partId}`
-                                    : 'building',
+                                selection.elementId
+                                  ? `roof-text:${selection.elementId}`
+                                  : `roof:${selection.partId}`,
                               ]
-                            : selected.length
-                              ? selected.map(
-                                  (id) => `detail:${activeWall}:${id}`,
-                                )
-                              : [`wall:${activeWall}`]
+                            : mode === 'appearance'
+                              ? [
+                                  selection?.wallId
+                                    ? `wall:${selection.wallId}`
+                                    : selection?.partId
+                                      ? `part:${selection.partId}`
+                                      : 'building',
+                                ]
+                              : selected.length
+                                ? selected.map(
+                                    (id) => `detail:${activeWall}:${id}`,
+                                  )
+                                : [`wall:${activeWall}`]
                     }
                     onSelect={selectTreeTarget}
                   />
@@ -1689,10 +1716,11 @@ function ModelWorkspace({
                       icon={<ScanFace />}
                       aria-pressed={tab === 'surface'}
                       disabled={
-                        before || !['details', 'roof', 'outline'].includes(mode)
+                        before ||
+                        !['details', 'roof', 'outline', 'mesh'].includes(mode)
                       }
                       title={
-                        !['details', 'roof', 'outline'].includes(mode)
+                        !['details', 'roof', 'outline', 'mesh'].includes(mode)
                           ? 'Select a wall, roof, or footprint to edit its surface'
                           : 'Align the model and edit this surface'
                       }
@@ -1795,12 +1823,18 @@ function ModelWorkspace({
                     />
                     <div className="model-3d-view">
                       <PhotoModelPreview
+                        onScene={setPreviewScene}
+                        meshEditing={mode === 'mesh'}
                         onActions={showContextActions}
                         active={
                           !webglUnavailable &&
                           (tab === '3d' || tab === 'surface')
                         }
-                        surfaceEditing={tab === 'surface' && !webglUnavailable}
+                        surfaceEditing={
+                          tab === 'surface' &&
+                          mode !== 'mesh' &&
+                          !webglUnavailable
+                        }
                         surface={surfaceFrame}
                         onUnavailable={() => {
                           setWebglUnavailable(true);
@@ -1834,7 +1868,14 @@ function ModelWorkspace({
                               }
                         }
                         onSelect={(s) => {
-                          if (s.wallId) {
+                          if (s.objectId) {
+                            setMeshSelection({
+                              objectId: s.objectId,
+                              kind: 'object',
+                              ids: [],
+                            });
+                            switchMode('mesh');
+                          } else if (s.wallId) {
                             setMode('details');
                             choose(s.wallId, s.elementId, s.instanceIndex);
                           } else if (s.partId) {
@@ -1886,16 +1927,19 @@ function ModelWorkspace({
                           ? `${selected.length} selected · ${active ? label(active) : 'Details'}`
                           : walls.find((w) => w.wallId === activeWall)?.label ||
                             'Choose a wall'
-                        : mode === 'outline'
-                          ? 'Building footprint'
-                          : mode === 'review'
-                            ? 'Building review'
-                            : selection?.wallId
-                              ? walls.find((w) => w.wallId === selection.wallId)
-                                  ?.label
-                              : selection?.partId
-                                ? `Wing ${buildingTopology(feature).parts.findIndex((p) => p.id === selection.partId) + 1} · ${mode === 'roof' ? (selection.elementId ? 'Roof text' : 'Roof') : 'defaults'}`
-                                : 'Whole building · defaults'}
+                        : mode === 'mesh'
+                          ? 'Mesh objects and components'
+                          : mode === 'outline'
+                            ? 'Building footprint'
+                            : mode === 'review'
+                              ? 'Building review'
+                              : selection?.wallId
+                                ? walls.find(
+                                    (w) => w.wallId === selection.wallId,
+                                  )?.label
+                                : selection?.partId
+                                  ? `Wing ${buildingTopology(feature).parts.findIndex((p) => p.id === selection.partId) + 1} · ${mode === 'roof' ? (selection.elementId ? 'Roof text' : 'Roof') : 'defaults'}`
+                                  : 'Whole building · defaults'}
                     </p>
                   </div>
                   <div className="model-properties-body">
@@ -2044,6 +2088,22 @@ function ModelWorkspace({
                           onApplyRoof={onRoofApply}
                         />
                       </div>
+                    )}
+                    {mode === 'mesh' && (
+                      <Suspense fallback={<p>Loading mesh tools…</p>}>
+                        <ModelMeshPanel
+                          edit={draft}
+                          data={data}
+                          scene={previewScene}
+                          selection={meshSelection}
+                          onSelection={setMeshSelection}
+                          onCommit={(next) => commit(next, true)}
+                          onPreview={setMeshPreview}
+                          workspace={workspace}
+                          view={tab}
+                          disabled={before || webglUnavailable}
+                        />
+                      </Suspense>
                     )}
                     {mode === 'outline' && (
                       <div data-mobile-panel="mode">

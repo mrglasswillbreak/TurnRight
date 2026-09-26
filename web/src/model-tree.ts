@@ -7,6 +7,7 @@ import type {
 } from './visual-types';
 import type { facadeWalls } from './building-facades';
 import { detailInstanceId, expandDetailInstances } from './model-instances';
+import type { ModelObject } from './model-document';
 
 export type ModelTreeTarget = {
   kind:
@@ -18,7 +19,8 @@ export type ModelTreeTarget = {
     | 'wall'
     | 'detail'
     | 'group'
-    | 'pattern';
+    | 'pattern'
+    | 'meshObject';
   partId?: string;
   wallId?: string;
   id?: string;
@@ -35,6 +37,7 @@ export type ModelTreeNode = {
 };
 
 export function modelTree({
+  objects = [],
   name,
   topology,
   walls,
@@ -47,6 +50,7 @@ export function modelTree({
   roofTexts = {},
   generatedWalls = [],
 }: {
+  objects?: ModelObject[];
   roofTexts?: Record<string, RoofText[]>;
   name: string;
   topology: BuildingTopology;
@@ -59,6 +63,18 @@ export function modelTree({
   hidden: string[];
   generatedWalls?: string[];
 }): ModelTreeNode[] {
+  const meshNodes = (parentId?: string): ModelTreeNode[] =>
+    objects
+      .filter((o) => o.parentId === parentId)
+      .map((o) => ({
+        key: `mesh:${o.id}`,
+        label: o.name,
+        target: { kind: 'meshObject', id: o.id },
+        locked: o.locked,
+        hidden: o.hidden,
+        note: o.curve ? 'Editable curve' : `${o.faces.length} faces`,
+        children: meshNodes(o.id),
+      }));
   return [
     {
       key: 'building',
@@ -67,6 +83,15 @@ export function modelTree({
       note: 'Whole-building defaults',
       children: [
         { key: 'footprint', label: 'Footprint', target: { kind: 'footprint' } },
+        ...(objects.length
+          ? [
+              {
+                key: 'mesh-objects',
+                label: 'Mesh objects',
+                children: meshNodes(),
+              },
+            ]
+          : []),
         ...topology.parts.map(
           (part, index): ModelTreeNode => ({
             key: `part:${part.id}`,
@@ -91,96 +116,105 @@ export function modelTree({
                 (ring, ri): ModelTreeNode => ({
                   key: `ring:${ring.id}`,
                   label: ri ? `Courtyard ${ri} walls` : 'Exterior walls',
-                  children: ring.wallIds.map((wallId): ModelTreeNode => {
-                    const wall = walls.find((w) => w.wallId === wallId),
-                      facade = facades[wallId];
-                    const details =
-                      wallId === activeWall ? elements : facade?.elements || [];
-                    const detail = (
-                      e: FacadeElement,
-                      prefix = '',
-                    ): ModelTreeNode => ({
-                      key: `${prefix}detail:${wallId}:${e.id}`,
-                      label:
-                        authoring.names[e.id] ||
-                        `${e.kind === 'text' ? `Text · ${e.text || ''}` : e.kind[0].toUpperCase() + e.kind.slice(1)}${e.count > 1 ? ` ×${e.count}` : ''}`,
-                      target: {
-                        kind: 'detail',
-                        partId: part.id,
-                        wallId,
-                        id: e.id,
-                        wholeRow: e.count > 1,
-                      },
-                      locked: locked.includes(e.id),
-                      hidden: hidden.includes(e.id),
-                      children:
-                        e.count > 1
-                          ? expandDetailInstances([e]).map((value, index) => ({
-                              key: `${prefix}detail:${wallId}:${detailInstanceId(e.id, index)}`,
-                              label:
-                                authoring.names[value.id] ||
-                                `${e.kind[0].toUpperCase() + e.kind.slice(1)} ${index + 1}`,
-                              target: {
-                                kind: 'detail' as const,
-                                partId: part.id,
-                                wallId,
-                                id: value.id,
-                              },
-                              locked:
-                                locked.includes(value.id) ||
-                                locked.includes(e.id),
-                              hidden:
-                                hidden.includes(value.id) ||
-                                hidden.includes(e.id),
-                            }))
-                          : undefined,
-                    });
-                    const collections = (
-                      kind: 'group' | 'pattern',
-                      items: ModelAuthoring['groups'],
-                    ): ModelTreeNode[] =>
-                      items
-                        .filter((g) => g.wallId === wallId)
-                        .map((g) => ({
-                          key: `${kind}:${g.id}`,
-                          label: g.name,
-                          target: { kind, partId: part.id, wallId, id: g.id },
-                          children: details
-                            .filter((e) => g.members.includes(e.id))
-                            .map((e) => detail(e, `${kind}:${g.id}:`)),
-                        }));
-                    return {
-                      key: `wall:${wallId}`,
-                      label: authoring.names[wallId] || wall?.label || 'Wall',
-                      target: { kind: 'wall', partId: part.id, wallId },
-                      note:
-                        facade && !generatedWalls.includes(wallId)
-                          ? facade.reviewedAt && !facade.needsReview
-                            ? 'Reviewed'
-                            : 'Needs review'
-                          : 'Generated',
-                      children: [
-                        {
-                          key: `details:${wallId}`,
-                          label: `Details (${details.length})`,
-                          children: details.map((e) => detail(e)),
+                  children: ring.wallIds
+                    .filter((id) => walls.some((w) => w.wallId === id))
+                    .map((wallId): ModelTreeNode => {
+                      const wall = walls.find((w) => w.wallId === wallId),
+                        facade = facades[wallId];
+                      const details =
+                        wallId === activeWall
+                          ? elements
+                          : facade?.elements || [];
+                      const detail = (
+                        e: FacadeElement,
+                        prefix = '',
+                      ): ModelTreeNode => ({
+                        key: `${prefix}detail:${wallId}:${e.id}`,
+                        label:
+                          authoring.names[e.id] ||
+                          `${e.kind === 'text' ? `Text · ${e.text || ''}` : e.kind[0].toUpperCase() + e.kind.slice(1)}${e.count > 1 ? ` ×${e.count}` : ''}`,
+                        target: {
+                          kind: 'detail',
+                          partId: part.id,
+                          wallId,
+                          id: e.id,
+                          wholeRow: e.count > 1,
                         },
-                        {
-                          key: `groups:${wallId}`,
-                          label: 'Groups',
-                          children: collections('group', authoring.groups),
-                        },
-                        {
-                          key: `patterns:${wallId}`,
-                          label: 'Patterns',
-                          children: collections('pattern', authoring.patterns),
-                        },
-                      ].filter(
-                        (n) =>
-                          n.children.length || n.key.startsWith('details:'),
-                      ),
-                    };
-                  }),
+                        locked: locked.includes(e.id),
+                        hidden: hidden.includes(e.id),
+                        children:
+                          e.count > 1
+                            ? expandDetailInstances([e]).map(
+                                (value, index) => ({
+                                  key: `${prefix}detail:${wallId}:${detailInstanceId(e.id, index)}`,
+                                  label:
+                                    authoring.names[value.id] ||
+                                    `${e.kind[0].toUpperCase() + e.kind.slice(1)} ${index + 1}`,
+                                  target: {
+                                    kind: 'detail' as const,
+                                    partId: part.id,
+                                    wallId,
+                                    id: value.id,
+                                  },
+                                  locked:
+                                    locked.includes(value.id) ||
+                                    locked.includes(e.id),
+                                  hidden:
+                                    hidden.includes(value.id) ||
+                                    hidden.includes(e.id),
+                                }),
+                              )
+                            : undefined,
+                      });
+                      const collections = (
+                        kind: 'group' | 'pattern',
+                        items: ModelAuthoring['groups'],
+                      ): ModelTreeNode[] =>
+                        items
+                          .filter((g) => g.wallId === wallId)
+                          .map((g) => ({
+                            key: `${kind}:${g.id}`,
+                            label: g.name,
+                            target: { kind, partId: part.id, wallId, id: g.id },
+                            children: details
+                              .filter((e) => g.members.includes(e.id))
+                              .map((e) => detail(e, `${kind}:${g.id}:`)),
+                          }));
+                      return {
+                        key: `wall:${wallId}`,
+                        label: authoring.names[wallId] || wall?.label || 'Wall',
+                        target: { kind: 'wall', partId: part.id, wallId },
+                        note:
+                          facade && !generatedWalls.includes(wallId)
+                            ? facade.reviewedAt && !facade.needsReview
+                              ? 'Reviewed'
+                              : 'Needs review'
+                            : 'Generated',
+                        children: [
+                          {
+                            key: `details:${wallId}`,
+                            label: `Details (${details.length})`,
+                            children: details.map((e) => detail(e)),
+                          },
+                          {
+                            key: `groups:${wallId}`,
+                            label: 'Groups',
+                            children: collections('group', authoring.groups),
+                          },
+                          {
+                            key: `patterns:${wallId}`,
+                            label: 'Patterns',
+                            children: collections(
+                              'pattern',
+                              authoring.patterns,
+                            ),
+                          },
+                        ].filter(
+                          (n) =>
+                            n.children.length || n.key.startsWith('details:'),
+                        ),
+                      };
+                    }),
                 }),
               ),
             ],
