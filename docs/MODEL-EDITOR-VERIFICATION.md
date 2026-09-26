@@ -2,8 +2,57 @@
 
 The unified workspace retains the owner draft and publication pipeline. This rollout
 changes the application/editor, not published architectural content. The current
-verified reference is **`lasu-623791e1184e`**, schema 2: **395 buildings, 220 places,
-39 photographs covering 19 buildings**, and **84 assets / 20,098,125 bytes**.
+verified reference is **`lasu-7343cb96c9a5`**, schema 2: **395 buildings, 220 places,
+39 photographs covering 19 buildings**, and **84 assets / 20,228,832 bytes**.
+
+## Reference editing, globe and authored models · 26 September 2026
+
+The authoring extension adds remembered reference panes, animated globe controls,
+exterior/curved boundary commands, stable mesh component editing and worker-based
+GLB/glTF/OBJ/STL interchange. Private immutable model sources use migration 012;
+only reviewed revisions compile into public model assets. The legacy public-model
+fixtures below remain frozen and still pass. The newer campus release above was
+published by the owner before this application rollout and is its preservation
+baseline. A fresh audit of all **395** entries in that release finds **zero incompatible models**.
+
+The complete unit suite passes **577 tests in 79 files**. Coverage includes stable
+topology and UV seams, restrictions on invalid face operations, curve validation,
+curved-wall pointer inversion (including courtyards), immutable asset upload/read
+integrity, older-client write protection, release review gates and private-field
+exclusion. Client/server TypeScript and lint pass with eight warnings (seven
+pre-existing, one raw glTF JSON type).
+
+Chromium workflows cover reference resizing and keyboard divider controls,
+renderer identity, mesh face editing/undo, curved walls and courtyard apply/undo,
+four-format textured round trips, import/save/reopen/export, globe pause controls,
+and desktop/touch regressions. WebKit covers reference resizing, file workers,
+phone rotation and both compact landscape layouts. Viewport checks exercise
+1280×720, 1440×900, 1920×1080, effective 125%/150% CSS sizes, tablet landscape,
+portrait and short landscape panels. These are browser simulations, not physical
+device, native keyboard or browser-chrome zoom acceptance.
+
+The authentication-configured build stays inside unchanged budgets: **432,096 /
+435,200 gzip bytes** public startup; **185,158 / 189,440** additional owner code;
+**7,653 / 12,288** photo management; **234.9 / 300 KiB** lazy renderer/editor.
+Offline world assets are 5.30 MiB and voice 5.91 MiB, each under 8 MiB. Import and
+advanced editing remain lazy-loaded.
+
+Reproduce the additions from `web/` using Node 22:
+
+```sh
+npm test
+npm run lint
+npm run build
+npm run check:configured-build
+npx playwright test --grep "reference split|decorative globe|model file workers|model import preview|mesh components|curved exterior|model workspace desktop|model workspace touch|landscape model has reachable"
+npx playwright test --config playwright.webkit.config.ts --grep "reference split|model file workers|model workspace touch|landscape model has reachable"
+npx playwright test --config playwright.docs.config.ts
+```
+
+Run GPU projects sequentially. The [authoring guide](MODEL-AUTHORING.md) describes
+topology restrictions and private/public limits; the [capture inventory](assets/screenshots/README.md)
+distinguishes current campus views from isolated illustrative model fixtures.
+Earlier records below retain their original measurements.
 
 ## Individual windows, public handoff and bulk review · 26 September 2026
 

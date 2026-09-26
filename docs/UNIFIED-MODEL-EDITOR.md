@@ -6,6 +6,8 @@ The building workspace brings architectural details, appearance, roofs, outlines
 
 ## Choose a surface
 
+The workspace also supports [reference split, exterior curves, mesh editing and model files](MODEL-AUTHORING.md). **Reference split** keeps a photograph beside Orbit/Edit surface when the centre has at least 720 × 320 CSS pixels; its divider and preference are remembered. **Outline → Add wall** creates exterior boundaries, wings or courtyards. **Mesh** provides primitives, profiles, component selection and import/export while preserving the same canvas and history.
+
 Use the searchable building hierarchy or the mapped-wall selector to choose a wing and wall. The workspace opens in **Orbit**. Selecting a part updates its properties without moving the camera. **Edit surface** aligns the same 3D canvas to the selected wall, roof or footprint; **Orbit** restores the previous camera position. If WebGL is unavailable, **Edit surface** automatically uses a 2D drawing with the same editing target, numeric fields, snapping and commands. Wall views face outside, including courtyard walls, and label their A → B or B → A direction. Numeric positions retain their original distance from A; vertical distances are measured from the model base. Selecting a surface or detail does not create a model-history entry.
 
 Desktop uses an icon-toggle structure tree, centre viewport and a 360 px properties panel (320 px below 1200 px). The properties header stays visible while its form scrolls; fields stack at narrower widths. At widths up to 900 px, and on touch devices in short landscape viewports, the workspace gives the canvas the remaining screen. A labelled mode selector keeps Details, Appearance, Roof, Outline and Review reachable. Switch between **Orbit / Edit surface / Photo**. Changing layouts keeps the draft and selection.
@@ -82,7 +84,7 @@ Conflict merging preserves removed wall assignments. If a removal competes with 
 
 Installing an app update attempts a server save and then verifies local recovery. A validation error can remain for repair after updating, but failed recovery storage blocks installation so unfinished inputs and history are not lost.
 
-Private authoring metadata stores names, groups, patterns and presets in the existing draft JSON. It is excluded from public campus downloads. Compatible server validation must deploy before the new client. Older editors receive an update message when they would otherwise drop this metadata. Public package schemas 1–3 and the database schema remain unchanged.
+Private names, groups, patterns and presets remain in draft JSON and are excluded from public downloads. Expanded authored models use immutable version-1 model documents referenced by drafts, with migration 012 and a newer-writer guard. Compatible readers and storage deploy before the writing client. Public package schemas 1–3 remain supported; authored materials, normals and textures are additive optional content. See [authoring storage and publication](MODEL-AUTHORING.md#save-review-and-publish).
 
 ## Review all recorded walls
 

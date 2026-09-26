@@ -2,11 +2,13 @@
 
 ## Current application gallery · 26 September 2026
 
-The gallery was recaptured after repairing compatibility with published model
-fingerprints. Public views now retain the 19 detailed building models that the
-initial roof-text update incorrectly treated as outdated.
+The gallery shows the current reference-editing, globe and authored-model
+workspace alongside the existing public-map and owner workflows. Published model
+compatibility remains covered by the frozen legacy regression fixtures.
 
-The root README contains **38 distinct, unaltered PNG screenshots** from the current production build. The verified campus is **`lasu-623791e1184e`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,098,125 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows and wall/roof lettering added in the editor are illustrative local examples, not published architectural evidence.
+The root README contains **46 distinct, unaltered PNG screenshots**. The production-build gallery uses verified campus **`lasu-7343cb96c9a5`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,228,832 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows, lettering, curved boundaries and mesh objects added in editor captures are illustrative local examples, not published architectural evidence.
+
+Eight additions, also dated `2026-09-26`, cover the current extension. `reference-editing` uses the production gallery and an approved campus photograph at 1920×1080. The other seven are unaltered Chromium regression captures from the current source with isolated fixtures: `animated-globe`, `curved-wall-outline`, `add-wall-courtyard`, `mesh-editing`, `mesh-orbit`, `model-import-preview`, and `model-export`. The fixture building has intentionally simple geometry so its editing handles and commands are visible. The globe is a still of the animated layer; motion is checked separately by the browser workflow.
 
 The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Twelve additional captures, all ending in `-2026-09-26.png`, cover:
 

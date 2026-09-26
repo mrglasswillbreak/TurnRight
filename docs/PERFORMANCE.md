@@ -1,5 +1,9 @@
 # Responsiveness and recovery
 
+## Expanded authoring bounds
+
+Reference split retains one renderer and camera. Mesh gestures coalesce previews and commit one undo entry. Cancellable file workers are lazy-loaded outside public startup. Sources are capped at 100 objects, 100,000 vertices, 200,000 faces and 25 MiB; textures have a 16-megapixel document limit. Verified authored textures use a reference-counted 32-megapixel renderer pool. Cloud redraws run at approximately 30 fps at globe scale; hidden pages stop animation and reduced-motion clouds are static. Existing bundle budgets remain enforced. See [verification](MODEL-EDITOR-VERIFICATION.md).
+
 ## Current building workspace
 
 The mobile workspace now uses a full-screen canvas and focused sheets. Wall gestures update lightweight selection geometry; completed actions alone request model generation. Hidden mobile 3D previews pause drawing and defer work until shown, retaining their camera. Opening a sheet, selecting a detail, or typing an unfinished value does not rebuild the model. [Mobile production measurements](MOBILE-MODEL-PERFORMANCE.md) compare the previous long form with the canvas workflow separately from the earlier desktop and upload studies.

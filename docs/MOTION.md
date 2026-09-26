@@ -1,5 +1,11 @@
 # Compass and motion assistance
 
+## Decorative globe animation
+
+Automatic rotation moves 1.5 degrees per second through zoom 3 and slows to a stop at zoom 5. Interaction, camera transitions, selected destinations, guidance and location following pause it; it resumes after eight eligible idle seconds. Held pointers prevent rotation and hidden pages suspend animation. Separate rotation/cloud toggles remember preferences. Reduced motion starts rotation off and clouds static. Clouds drift independently, fade between zooms 4 and 6, and use globe projection helpers with horizon clipping. They are decorative, not live weather. Cloud failure leaves the map usable; no sensor permission is needed.
+
+![Clouds and animation controls](assets/screenshots/animated-globe-2026-09-26.png)
+
 Status: **Awaiting device verification**. Browser simulations are software checks; they do not establish physical sensor accuracy or battery performance.
 
 ## Permissions and controls

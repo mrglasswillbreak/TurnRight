@@ -22,6 +22,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 - [Appearance and 3D](#appearance-and-3d)
 - [Owner editor](#owner-editor)
 - [Building appearance and roofs](#building-appearance-and-roofs)
+- [Reference editing and authored models](#reference-editing-and-authored-models)
 - [Review and publication](#review-and-publication)
 - [Walking surveys](#walking-surveys)
 - [Offline operation and recovery](#offline-operation-and-recovery)
@@ -36,7 +37,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 
 ## Screenshots
 
-Current production-build captures use the verified published campus **`lasu-623791e1184e`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
+Current production-build captures use the verified published campus **`lasu-7343cb96c9a5`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
 
 ### Public map
 
@@ -106,6 +107,11 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 
 ## Recent changes
 
+- **Reference split:** keep Orbit or Edit surface beside a photograph on roomy desktops/tablets, with a remembered, keyboard-accessible divider and automatic narrow-screen fallback.
+- **Expanded modelling:** draw exterior walls, wings and courtyards; edit arcs, Bézier edges and rounded outlines; create primitives and extruded profiles; edit vertices, edges and faces in the shared canvas.
+- **Model files:** preview and import GLB/glTF, OBJ with MTL/textures, and STL. Export GLB, embedded glTF, OBJ packages or binary STL with explicit unit conversion.
+- **Private authored assets:** immutable source documents, owner-scoped recovery, versioned save guards and reviewed publication preserve existing campus compatibility. New database migration 012 is required.
+- **Animated globe:** gentle idle rotation and independently drifting decorative clouds, with separate controls and reduced-motion defaults.
 - **Published models restored:** optional roof-text support preserves existing model fingerprints. All 395 published models pass compatibility checks; genuine geometry or detail changes still invalidate outdated models.
 - **Individual windows:** click a generated or recorded window and edit it directly. Selection does not change saved geometry; the first change separates only that window in one undoable command. Deliberate row, group and pattern editing remains available.
 - **Simpler model controls:** Orbit, Edit surface and Photo share the same draft. The structure toggle is icon-only, desktop properties have a fixed header and wider scrolling body, and editor opacity starts at 100%.
@@ -289,6 +295,34 @@ Completed gestures and field edits create undoable commands. Autosave, validatio
 
 [Complete model controls and recovery](docs/UNIFIED-MODEL-EDITOR.md) · [Roofs and geometry](docs/BUILDING-ROOFS.md) · [Evidence and texture coverage](docs/PHOTO-MODELS.md) · [Verification](docs/MODEL-EDITOR-VERIFICATION.md).
 
+## Reference editing and authored models
+
+Enable **Reference split** to keep a photograph beside Orbit or Edit surface. The divider and preference are remembered; small viewports return to tabs automatically without discarding edits or replacing the renderer.
+
+![Reference photograph beside the model viewport](docs/assets/screenshots/reference-editing-2026-09-26.png)
+
+**Outline → Add wall** creates replacement exterior boundaries, wings and courtyards. Arcs, Bézier edges, rounded corners and circular/elliptical outlines retain editable controls and logical wall identities. Curved-wall details use distance along the wall, with section-aligned editing.
+
+| Curved exterior boundary | Adding a courtyard boundary |
+| --- | --- |
+| ![Curved wall controls and model outline](docs/assets/screenshots/curved-wall-outline-2026-09-26.png) | ![Add wall with an elliptical courtyard preview](docs/assets/screenshots/add-wall-courtyard-2026-09-26.png) |
+
+**Mesh** adds primitives, editable extruded profiles and Object/Vertex/Edge/Face selection. Move, rotate, scale, extrude, inset, subdivide, merge, duplicate and delete through shared undoable commands. A native building needs an explicit editable mesh copy; the source remains intact. Numeric tools, axis constraints and snapping complement on-model handles.
+
+| Face editing in the shared model canvas | Import preview and conversion |
+| --- | --- |
+| ![Face selection, extrusion and mesh properties](docs/assets/screenshots/mesh-editing-2026-09-26.png) | ![Model import preview with dimensions, units and up-axis controls](docs/assets/screenshots/model-import-preview-2026-09-26.png) |
+
+Import GLB/glTF, OBJ with supplied MTL/textures, or STL in cancellable workers. Export a whole building or selected objects as GLB, embedded glTF, an OBJ/MTL/texture ZIP, or binary STL. Unsupported features and missing dependencies are reported before commit. Private source assets, offline recovery and review gates protect unfinished work; publication alone exposes authored content. Geographic footprints remain authoritative for routing. See the [complete authoring guide](docs/MODEL-AUTHORING.md) for workflows, file compatibility and complexity limits.
+
+| Orbit with authored geometry | Export units and format |
+| --- | --- |
+| ![Authored object in Orbit with mesh editing tools](docs/assets/screenshots/mesh-orbit-2026-09-26.png) | ![Export preparation and format options](docs/assets/screenshots/model-export-2026-09-26.png) |
+
+At globe scale, separate controls enable gentle automatic rotation and decorative drifting clouds. Interaction, selection, guidance and location following pause rotation; it resumes after eight eligible idle seconds. Reduced-motion preferences disable rotation and keep clouds static by default.
+
+![Globe with decorative cloud layer and independent animation controls](docs/assets/screenshots/animated-globe-2026-09-26.png)
+
 ## Review and publication
 
 ![Release review identifies unresolved model assignments before publication](docs/assets/screenshots/editor-releases-current-2026-09-26.png)
@@ -352,7 +386,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The repository seed is **`lasu-b487503395f2`**. The reviewed public release verified on **24 September 2026** is **`lasu-623791e1184e`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 18,880,327 bytes**. It adds the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The reviewed public release verified on **26 September 2026** is **`lasu-7343cb96c9a5`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 20,228,832 bytes**. Its release summary is “Roofing detail additions and map building clean up”. The earlier photographic assessment used `lasu-623791e1184e`. That earlier release added the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -514,6 +548,7 @@ TurnRight/
 | [Entrance guides](docs/ARRIVAL-GUIDES.md) / [Photograph collection](data/photos/README.md) | Entrance selection, accessibility observations, private media review, reusable image coverage and offline galleries |
 | [Driving](docs/DRIVING.md) / [Campus enrichment](docs/ENRICHMENT.md) | Independent vehicle permissions, drive-and-walk journeys, imports, source evidence and review |
 | [Unified model workflow](docs/UNIFIED-MODEL-EDITOR.md) / [Building editor](docs/BUILDING-EDITOR.md) | Precision tools, duplication, patterns, roofs/outlines, evidence, undo and recovery |
+| [Model authoring](docs/MODEL-AUTHORING.md) | Photo reference split, walls/curves, mesh commands, file interchange, private assets and publication |
 | [Model verification](docs/MODEL-EDITOR-VERIFICATION.md) / [Performance](docs/PERFORMANCE.md) | Current production measurements, regressions, resource budgets and unavailable device coverage |
 | [Roof plans](docs/BUILDING-ROOFS.md) / [Roof coverage](docs/BUILDING-ROOF-COVERAGE.md) | Constraints, validation, approximate proposals and evidence |
 | [Building references](docs/BUILDING-REFERENCE-RESEARCH.md) / [Appearance coverage](docs/BUILDING-APPEARANCE-COVERAGE.md) | Reference sources, uncertainty and facade assessments |

@@ -1,5 +1,9 @@
 # TurnRight account configuration
 
+## Model storage extension · 26 September 2026
+
+Migration `012_editable_model_assets.sql` is applied to the existing project. Verification returned `model_assets`, `save_editor_model_batch(uuid,uuid,jsonb)`, a private `building-models` bucket and no direct authenticated metadata SELECT privilege. No credentials, environment variables, public access grants or paid services were added. Public readers deployed before the writing client. See [authoring](MODEL-AUTHORING.md) and [production](PRODUCTION.md).
+
 Initially configured and verified on 8 September 2026. **Production is now live
 at https://turnright.vercel.app/** following the owner's explicit publication
 request on 9 September. See [PRODUCTION.md](PRODUCTION.md) for the current

@@ -1,5 +1,9 @@
 # Building appearance and model editing
 
+## Expanded modelling
+
+**Reference split** keeps a photograph beside Orbit/Edit surface. **Outline → Add wall** draws exterior replacements, wings and courtyards; edge controls support arcs, Bézier curves and rounded corners. **Mesh** adds primitives, profiles, component selection and model files. Native architecture requires an explicit editable mesh copy; replacing its visual is a separate undoable choice. See [workflows and limits](MODEL-AUTHORING.md).
+
 The current owner workflow is the [unified Edit model workspace](UNIFIED-MODEL-EDITOR.md). Open **Edit model** from a selected building; choose Appearance, Roof or Outline inside the dedicated workspace. **Details** and **Review** share the same building draft and history. The former long façade form and its one-shot Apply action are superseded.
 
 On mobile, the canvas fills the workspace and controls open in one focused sheet. Use the labelled mode selector, **Choose wall**, and **Orbit / Edit surface / Photo** views. Tap selects; Move or Resize explicitly enables geometry editing. Pinch navigation cancels an unfinished edit. The sheet has Expand/Collapse/Done controls, safe-area spacing and focused-input scrolling. Desktop has a collapsible tree, a central viewport and a properties panel.
@@ -48,7 +52,7 @@ Enhanced rendering remains the default, with Simple 3D and automatic performance
 
 Meshes batch repeated geometry by material while carrying detail and repeated-instance picking identities. One model build runs at a time and only the newest pending revision is retained. Closing releases preview workers and GPU resources; failed builds retain the draft and offer **Retry model preview**. Architectural details have a separate revision from legacy geometry; selection and façade evidence notes do not request a rebuild.
 
-The visual allocation remains **12 MiB for campus geometry/textures**, **8 MiB for globe assets**, and **64 MiB resident building textures**. Prepared offline installations include the lazy workspace. Public package schemas 1–3 and the database schema are unchanged. Private names, groups, patterns and presets use versioned draft JSON and are omitted from downloads. Older clients receive an update message before they can drop this metadata.
+The visual allocation remains **12 MiB for campus geometry/textures**, **8 MiB for globe assets**, and **64 MiB resident building textures**. Prepared offline installations include the lazy workspace. Public package schemas 1–3 remain compatible; expanded authored source storage adds migration 012. Private names, groups, patterns and presets use versioned draft JSON and are omitted from downloads. Older clients receive an update message before they can drop this metadata.
 
 ## Verification
 

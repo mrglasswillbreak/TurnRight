@@ -1,5 +1,9 @@
 # Editing the campus map
 
+## Reference, mesh and model files
+
+The unified workspace includes a remembered model/photo split, exterior wall and curve tools, and Mesh mode with Object/Vertex/Edge/Face selection. Import GLB/glTF, OBJ/MTL/textures or STL; export whole buildings or selected objects. Commands share undo, optimistic saves and owner-scoped recovery. Immutable private assets require migration 012, and authored revisions need review before publication. See [the complete guide](MODEL-AUTHORING.md).
+
 On the public map, **Editor** opens and centres the selected building’s general card. The `/admin?building=<id>` handoff survives sign-in, resolves building aliases, and waits for recovered drawings or roof drafts to be resolved. Missing buildings show a notice; an ordinary `/admin` visit has no forced selection.
 
 ![Selected public building opened in the editor](assets/screenshots/editor-public-building-handoff-2026-09-26.png)

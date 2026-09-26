@@ -1,5 +1,9 @@
 # Editable campus roof plans
 
+## Reference and boundary editing
+
+Roof editing can run beside a photograph using Reference split. New walls, curved outlines and courtyards can invalidate a prior roof plan: repair and review the retained draft before publishing. Imported objects attach to the building without silently changing native roof parameters. See [expanded authoring](MODEL-AUTHORING.md).
+
 The September 15, 2026 roof pass assessed all 380 published building footprints. After reviewing Law Clinic's separate-wing correction, it proposes **46 wing roofs across 44 buildings**: three buildings with photo-supported pitched forms (Law Clinic, School of Transport and Faculty of Education 3 In 1), plus 41 clearly labelled illustrative hip roofs. All generated ridge positions and pitches are approximate. Known flat/parapet silhouettes, explicit owner roof choices, existing custom roofs, unresolved competing models and unknown heights are retained. See [the full coverage list](BUILDING-ROOF-COVERAGE.md).
 
 Law Clinic's geometry prerequisite regroups the existing coordinates into two exterior wings. It does not move vertices or change its identity or entrance associations. The auxiliary wing retains its visible palette and explicitly illustrative 6 m height. Its roof is not presented as a surveyed reconstruction.

@@ -1,5 +1,9 @@
 # Miniature campus implementation · 14 September 2026
 
+## Current authored-model extension
+
+[Expanded authoring](MODEL-AUTHORING.md) adds curves, editable topology and model files. Public compilation adds optional normals, PBR materials and hashed textures while preserving legacy fingerprints. The globe supports gentle rotation and decorative clouds through MapLibre projection helpers. The dated assessment below remains historical.
+
 This historical assessment is supplemented by the [24 September photographic model and globe release](PHOTO-MODELS.md), covering the current 395-building map and all 19 photographed buildings. Its budgets, texture pipeline and coverage supersede the earlier figures below.
 
 The application retains MapLibre, local campus data and Terra Draw. Architectural models use a lazy Three.js custom layer sharing MapLibre's WebGL context. Application deployment and campus-data publication remain separate operations.

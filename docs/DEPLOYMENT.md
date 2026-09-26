@@ -1,5 +1,11 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Expanded model authoring rollout
+
+Deploy compatible public readers first, apply `supabase/migrations/012_editable_model_assets.sql`, then deploy the writing editor/API. Migration 012 creates private immutable model assets and a server-only versioned save wrapper; older clients cannot erase authored references. Keep `PUBLISHED_MAP_URL` enabled. Model uploads use owner-authorized signed URLs; no new environment secret is required. The publication workflow hydrates reviewed immutable documents and packages authored textures. Application deployment does not publish model drafts.
+
+Production migration 012 was applied and verified on 26 September 2026: the `building-models` bucket is private, authenticated clients have no direct metadata SELECT grant, and `save_editor_model_batch` is present. Retain the guard when rolling back application code. [Authoring limits and formats](MODEL-AUTHORING.md) and [deployment verification](PRODUCTION.md) describe the rollout. The migration-free statements below refer to the earlier surface-text release only.
+
 ## Model workspace refinement and surface text
 
 Deploy this application through the existing Git/Vercel workflow with `PUBLISHED_MAP_URL` enabled. The refinement has no database migration or new API endpoint. Text records are optional appearance JSON and validated by the shared model pipeline. Application deployment preserves the published manifest and assets; labels and other architectural edits publish only through the owner's reviewed map release workflow.
