@@ -77,6 +77,8 @@ export function useModelReference() {
     divider: (
       <div
         className="model-reference-divider"
+        // This is an interactive splitter with value/keyboard semantics, not a thematic break.
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="separator"
         tabIndex={active ? 0 : -1}
         aria-label="Resize model and photograph panes"

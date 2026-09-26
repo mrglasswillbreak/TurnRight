@@ -31,13 +31,17 @@ export default function WorldAnimation({
     () => matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
   const [error, setError] = useState(false);
+  const wakeAnimation = useRef(() => {});
   const clouds = useRef({
     time: 0,
     enabled: settings.clouds,
     zoom: map.getZoom(),
   });
-  const latest = useRef({ ...settings, blocked, reduced });
-  latest.current = { ...settings, blocked, reduced };
+  const latest = useRef({ ...settings, blocked, reduced, error });
+  latest.current = { ...settings, blocked, reduced, error };
+  useEffect(() => {
+    wakeAnimation.current();
+  }, [settings, blocked, reduced, error]);
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(settings));
@@ -63,12 +67,21 @@ export default function WorldAnimation({
       lastPaint = previous,
       lastInteraction = previous,
       ownMove = false;
+    const held = new Set<number>();
     const interaction = () => {
       lastInteraction = performance.now();
       wake();
     };
     const movement = () => {
       if (!ownMove) interaction();
+    };
+    const down = (event: PointerEvent) => {
+      held.add(event.pointerId);
+      interaction();
+    };
+    const up = (event: PointerEvent) => {
+      held.delete(event.pointerId);
+      interaction();
     };
     const layer = worldClouds(state, () => setError(true));
     const install = () => {
@@ -97,7 +110,7 @@ export default function WorldAnimation({
       if (
         mayRotateGlobe({
           enabled: current.rotation,
-          blocked: current.blocked || input,
+          blocked: current.blocked || input || held.size > 0,
           hidden: document.hidden,
           moving: map.isMoving(),
           lastInteraction,
@@ -115,14 +128,26 @@ export default function WorldAnimation({
         });
         ownMove = false;
       }
-      if (current.clouds && !current.reduced && state.zoom < 6) {
+      if (
+        current.clouds &&
+        !current.error &&
+        !current.reduced &&
+        state.zoom < 6
+      ) {
         state.time += dt;
         if (now - lastPaint >= 33) {
           map.triggerRepaint();
           lastPaint = now;
         }
       }
-      if (state.zoom < 6) frame = requestAnimationFrame(tick);
+      if (
+        (current.clouds &&
+          !current.error &&
+          !current.reduced &&
+          state.zoom < 6) ||
+        (current.rotation && !current.blocked && state.zoom < 5)
+      )
+        frame = requestAnimationFrame(tick);
     };
     function wake() {
       state.enabled = latest.current.clouds;
@@ -133,6 +158,10 @@ export default function WorldAnimation({
       }
     }
     const canvas = map.getCanvasContainer();
+    wakeAnimation.current = interaction;
+    canvas.addEventListener('pointerdown', down);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
     for (const event of ['pointerdown', 'pointermove', 'wheel', 'keydown'])
       canvas.addEventListener(event, interaction, { passive: true });
     map.on('movestart', movement);
@@ -144,6 +173,10 @@ export default function WorldAnimation({
     wake();
     return () => {
       cancelAnimationFrame(frame);
+      wakeAnimation.current = () => {};
+      canvas.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       for (const event of ['pointerdown', 'pointermove', 'wheel', 'keydown'])
         canvas.removeEventListener(event, interaction);
       map.off('movestart', movement);
@@ -172,7 +205,7 @@ export default function WorldAnimation({
       >
         {settings.clouds ? 'Hide clouds' : 'Show clouds'}
       </button>
-      {error && <span role="status">Clouds unavailable</span>}
+      {error && <output>Clouds unavailable</output>}
       {reduced && (
         <span className="sr-only">
           Cloud motion is disabled by your reduced-motion preference.
