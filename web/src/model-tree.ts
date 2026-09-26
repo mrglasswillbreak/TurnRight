@@ -6,6 +6,7 @@ import type {
   RoofText,
 } from './visual-types';
 import type { facadeWalls } from './building-facades';
+import { detailInstanceId, expandDetailInstances } from './model-instances';
 
 export type ModelTreeTarget = {
   kind:
@@ -21,6 +22,7 @@ export type ModelTreeTarget = {
   partId?: string;
   wallId?: string;
   id?: string;
+  wholeRow?: boolean;
 };
 export type ModelTreeNode = {
   key: string;
@@ -105,9 +107,31 @@ export function modelTree({
                         partId: part.id,
                         wallId,
                         id: e.id,
+                        wholeRow: e.count > 1,
                       },
                       locked: locked.includes(e.id),
                       hidden: hidden.includes(e.id),
+                      children:
+                        e.count > 1
+                          ? expandDetailInstances([e]).map((value, index) => ({
+                              key: `${prefix}detail:${wallId}:${detailInstanceId(e.id, index)}`,
+                              label:
+                                authoring.names[value.id] ||
+                                `${e.kind[0].toUpperCase() + e.kind.slice(1)} ${index + 1}`,
+                              target: {
+                                kind: 'detail' as const,
+                                partId: part.id,
+                                wallId,
+                                id: value.id,
+                              },
+                              locked:
+                                locked.includes(value.id) ||
+                                locked.includes(e.id),
+                              hidden:
+                                hidden.includes(value.id) ||
+                                hidden.includes(e.id),
+                            }))
+                          : undefined,
                     });
                     const collections = (
                       kind: 'group' | 'pattern',

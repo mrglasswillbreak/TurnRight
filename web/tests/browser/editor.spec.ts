@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Color } from 'three';
+import { expandDetailInstances } from '../../src/model-instances';
 declare global {
   interface Window {
     editorTestMap: MapInstance;
@@ -7563,6 +7564,64 @@ test('surface workspace shares renderer, wall edits, tree and selected actions',
   ).toHaveCount(0);
   await expect(page.locator('.building-modes')).toHaveCount(0);
   expect(errors).toEqual([]);
+});
+
+test('individual generated windows edit, undo and reopen without ungrouping', async ({
+  page,
+}) => {
+  const { dialog, wall, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: {
+      height: 9,
+      floors: 3,
+      appearance: { windows: true, roofForm: 'flat' },
+    },
+  });
+  expect(wall()).toBeUndefined();
+  const windows = dialog.locator(
+    '.model-wall-canvas rect[data-element-id*="generated:0"]',
+  );
+  expect(await windows.count()).toBeGreaterThan(1);
+  await windows.first().click();
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toBeVisible();
+  expect(wall()).toBeUndefined();
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('1.25');
+  await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+  await expect
+    .poll(() => wall()?.elements.some((e) => e.width === 1.25))
+    .toBe(true);
+  const first = expandDetailInstances(wall()!.elements);
+  const edited = first.find((e) => e.width === 1.25)!;
+  expect(edited.count).toBe(1);
+  expect(wall()!.elements.some((e) => e.count > 1)).toBe(true);
+  await dialog.getByLabel('Height (m)', { exact: true }).fill('1.7');
+  await dialog.getByLabel('Height (m)', { exact: true }).press('Enter');
+  await expect
+    .poll(() => wall()?.elements.find((e) => e.id === edited.id)?.height)
+    .toBe(1.7);
+  const after = expandDetailInstances(wall()!.elements);
+  expect(after.filter((e) => e.id !== edited.id)).toEqual(
+    first.filter((e) => e.id !== edited.id),
+  );
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => wall()?.elements.find((e) => e.id === edited.id)?.height)
+    .toBe(edited.height);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => wall()).toBeUndefined();
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(() => wall()?.elements.some((e) => e.id === edited.id))
+    .toBe(true);
+  await dialog
+    .getByRole('button', { name: 'Back to Survey', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Edit model', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Find model parts').fill('Window');
+  expect(
+    server.edits().find((e) => e.id === 'library')?.properties.appearance
+      ?.facades,
+  ).toBeTruthy();
 });
 
 test('surface workspace roof and footprint share aligned model and precision controls', async ({

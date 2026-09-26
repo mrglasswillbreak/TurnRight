@@ -168,7 +168,10 @@ export function ModelWallCanvas({
     return () => observer.disconnect();
   }, [view, selectionKey, shown, m.length, selected]);
   const invalid = useMemo(
-    () => new Set(placementErrors(shown, m.length, m.eaves).map((e) => e.id)),
+    () =>
+      new Set(
+        placementErrors(shown, m.length, m.eaves, false).map((e) => e.id),
+      ),
     [shown, m.length, m.eaves],
   );
   const point = (event: ReactPointerEvent): [number, number] => {

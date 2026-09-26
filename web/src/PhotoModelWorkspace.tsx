@@ -50,6 +50,12 @@ import {
 import { ModelStructureTree } from './ModelStructureTree';
 import { modelTree, type ModelTreeTarget } from './model-tree';
 import {
+  commitDetailInstances,
+  detailInstanceId,
+  detailInstanceSelection,
+  expandDetailInstances,
+} from './model-instances';
+import {
   Dialog,
   DialogContent,
   DialogTitle,
@@ -98,7 +104,6 @@ import {
   modelFeature,
   patternSlots,
   regeneratePattern,
-  reconcilePatternEdit,
   placementErrors,
   wallLength,
   wallMetrics,
@@ -337,6 +342,7 @@ function ModelWorkspace({
     [before, setBefore] = useState(false),
     [error, setError] = useState(''),
     [grid, setGrid] = useState(0.1);
+  const [wholeRows, setWholeRows] = useState<string[]>([]);
   const [hidden, setHidden] = useState<string[]>([]),
     [locked, setLocked] = useState<string[]>([]),
     [clipboard, setClipboard] = useState<Stamp | null>(null),
@@ -398,8 +404,31 @@ function ModelWorkspace({
     draft.properties.modelAuthoring ||
     emptyAuthoring();
   const recorded = draft.properties.appearance?.facades?.[activeWall];
-  const facade = pending?.wallId === activeWall ? pending : recorded;
-  const elements = facade?.elements || conversion?.elements || emptyElements;
+  const generatedFacades = useMemo(
+    () =>
+      Object.fromEntries(
+        walls.flatMap((wall) => {
+          if (feature.properties?.appearance?.facades?.[wall.wallId]) return [];
+          try {
+            return [
+              [wall.wallId, editableFacade(feature, wall.wallId, visual)],
+            ];
+          } catch {
+            return [];
+          }
+        }),
+      ),
+    [walls, feature, visual],
+  );
+  const facade =
+    pending?.wallId === activeWall
+      ? pending
+      : recorded || conversion || generatedFacades[activeWall];
+  const sourceElements = facade?.elements || emptyElements;
+  const elements = useMemo(
+    () => expandDetailInstances(sourceElements, wholeRows),
+    [sourceElements, wholeRows],
+  );
   useEffect(() => {
     setSelected((current) => {
       const next = current.filter((id) => elements.some((e) => e.id === id));
@@ -408,9 +437,25 @@ function ModelWorkspace({
   }, [elements]);
   const renderedFeature = useMemo(() => {
     if (before) return original;
-    if (tab !== 'surface' || !surfacePreview) return feature;
+    const previewFeature: ReturnType<typeof modelFeature> = {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        appearance: {
+          ...feature.properties?.appearance,
+          facades: {
+            ...generatedFacades,
+            ...feature.properties?.appearance?.facades,
+            ...(pending?.wallId === activeWall
+              ? { [activeWall]: pending }
+              : {}),
+          },
+        },
+      },
+    };
+    if (tab !== 'surface' || !surfacePreview) return previewFeature;
     if ('edit' in surfacePreview) return modelFeature(surfacePreview.edit);
-    const next = structuredClone(feature);
+    const next = structuredClone(previewFeature);
     next.properties ||= {};
     next.properties.appearance ||= {};
     if ('roof' in surfacePreview)
@@ -426,7 +471,17 @@ function ModelWorkspace({
       };
     }
     return next;
-  }, [feature, original, before, tab, surfacePreview, visual]);
+  }, [
+    feature,
+    original,
+    before,
+    tab,
+    surfacePreview,
+    visual,
+    generatedFacades,
+    pending,
+    activeWall,
+  ]);
   const active = elements.find((e) => e.id === selected[0]);
   const photos = useMemo(
     () => (data.photos || []).filter((p) => p.buildingId === edit.id),
@@ -495,9 +550,18 @@ function ModelWorkspace({
     authoring.names[e.id] ||
     `${e.kind[0].toUpperCase() + e.kind.slice(1)}${e.count > 1 ? ` ×${e.count}` : ''}`;
   const choose = (id: string, elementId?: string, at = 0) => {
+    const records =
+      (id === activeWall
+        ? sourceElements
+        : feature.properties?.appearance?.facades?.[id]?.elements ||
+          generatedFacades[id]?.elements) || [];
+    const record = records.find((e: FacadeElement) => e.id === elementId);
+    const target =
+      record && record.count > 1 ? detailInstanceId(record.id, at) : elementId;
+    setWholeRows([]);
     setTouchTool('select');
     setWallId(id);
-    setSelected(elementId ? [elementId] : []);
+    setSelected(target ? [target] : []);
     setInstance(at);
     setPatternId('');
     setPending(null);
@@ -648,10 +712,14 @@ function ModelWorkspace({
   const updateElements = (next: FacadeElement[], metadata = authoring) => {
     if (!facade) return false;
     try {
-      const result =
-        metadata === authoring
-          ? reconcilePatternEdit(metadata, activeWall, elements, next)
-          : { elements: next, authoring: metadata };
+      const result = commitDetailInstances(
+        sourceElements,
+        next,
+        metadata,
+        activeWall,
+        wholeRows,
+        wholeRows.length > 0 && metadata === authoring,
+      );
       return applyWall(
         { ...facade, elements: result.elements },
         result.authoring,
@@ -661,10 +729,14 @@ function ModelWorkspace({
       return false;
     }
   };
-  const patch = (id: string, values: Partial<FacadeElement>) =>
-    updateElements(
+  const patch = (id: string, values: Partial<FacadeElement>) => {
+    if (locked.includes(id)) return false;
+    const saved = updateElements(
       elements.map((e) => (e.id === id ? { ...e, ...values } : e)),
     );
+    if (saved && values.count && values.count > 1) setWholeRows([id]);
+    return saved;
+  };
   const tryAction = (fn: () => void) => {
     try {
       fn();
@@ -680,33 +752,21 @@ function ModelWorkspace({
   const duplicate = () => {
     if (!selected.length || !metrics) return;
     const values = copyElements(
-      elements.filter((e) => selected.includes(e.id)),
+      elements.filter((e) => selected.includes(e.id) && !locked.includes(e.id)),
       metrics.length,
       metrics.length,
       grid,
       0,
     );
-    updateElements([...elements, ...values]);
-    setSelected(values.map((e) => e.id));
+    if (updateElements([...elements, ...values]))
+      setSelected(values.map((e) => e.id));
   };
   const remove = () => {
     const ids = selected.filter((id) => !locked.includes(id));
-    const metadata = {
-      ...authoring,
-      groups: authoring.groups
-        .map((g) => ({
-          ...g,
-          members: g.members.filter((id) => !ids.includes(id)),
-        }))
-        .filter((g) => g.members.length),
-      patterns: authoring.patterns.filter(
-        (p) => !p.members.some((id) => ids.includes(id)),
-      ),
-    };
     if (
       updateElements(
         elements.filter((e) => !ids.includes(e.id)),
-        metadata,
+        authoring,
       )
     )
       setSelected([]);
@@ -955,17 +1015,22 @@ function ModelWorkspace({
       const previous = activeWall === wallId ? selected : [];
       switchMode('details');
       choose(wallId, kind === 'detail' ? id : undefined);
-      if (kind === 'detail' && id)
+      if (kind === 'detail' && id) {
+        setWholeRows(target.wholeRow ? [id] : []);
         setSelected(
           multi || touchTool === 'multi' ? toggle(previous, [id]) : [id],
         );
+      }
       const collection =
         kind === 'group'
           ? authoring.groups.find((g) => g.id === id)
           : kind === 'pattern'
             ? authoring.patterns.find((p) => p.id === id)
             : undefined;
-      if (collection) setSelected(collection.members);
+      if (collection) {
+        setWholeRows(collection.members);
+        setSelected(collection.members);
+      }
       if (kind === 'pattern') {
         const p = authoring.patterns.find((p) => p.id === id);
         if (p) {
@@ -1013,7 +1078,14 @@ function ModelWorkspace({
   };
   const grouped = authoring.groups.some(
     (g) =>
-      g.wallId === activeWall && g.members.some((id) => selected.includes(id)),
+      g.wallId === activeWall &&
+      g.members.some((id) =>
+        selected.some(
+          (s) =>
+            s === id ||
+            detailInstanceSelection(sourceElements, s).elementId === id,
+        ),
+      ),
   );
   const ungroupSelection = () =>
     commit({
@@ -1025,7 +1097,13 @@ function ModelWorkspace({
           groups: authoring.groups.filter(
             (g) =>
               g.wallId !== activeWall ||
-              !g.members.some((id) => selected.includes(id)),
+              !g.members.some((id) =>
+                selected.some(
+                  (s) =>
+                    s === id ||
+                    detailInstanceSelection(sourceElements, s).elementId === id,
+                ),
+              ),
           ),
         },
       },
@@ -1503,11 +1581,14 @@ function ModelWorkspace({
                       name: String(edit.properties.name || 'Building'),
                       topology: buildingTopology(feature),
                       walls,
-                      facades: draft.properties.appearance?.facades || {},
+                      facades: {
+                        ...generatedFacades,
+                        ...draft.properties.appearance?.facades,
+                      },
                       roofTexts: draft.properties.appearance?.roofTexts,
                       authoring,
                       activeWall,
-                      elements,
+                      elements: sourceElements,
                       locked,
                       hidden,
                     })}
@@ -1684,11 +1765,20 @@ function ModelWorkspace({
                             : {
                                 buildingId: edit.id,
                                 wallId: activeWall,
-                                elementId:
-                                  selected.length === 1
-                                    ? selected[0]
-                                    : undefined,
-                                instanceIndex: instance,
+                                ...(surfacePreview &&
+                                'elements' in surfacePreview
+                                  ? {
+                                      elementId:
+                                        selected.length === 1
+                                          ? selected[0]
+                                          : undefined,
+                                    }
+                                  : detailInstanceSelection(
+                                      sourceElements,
+                                      selected.length === 1
+                                        ? selected[0]
+                                        : undefined,
+                                    )),
                               }
                         }
                         onSelect={(s) => {
@@ -1755,7 +1845,7 @@ function ModelWorkspace({
                   <div className="model-canvas-controller">
                     {mode === 'details' && metrics && (
                       <>
-                        {!facade && !conversion && (
+                        {!recorded && !conversion && (
                           <div className="model-notice">
                             <p>
                               Adding a detail preserves this wall’s generated
@@ -2110,7 +2200,7 @@ function ModelWorkspace({
                       >
                         Multi-select
                       </ModelButton>
-                      {!facade && !conversion && (
+                      {!recorded && !conversion && (
                         <ModelButton
                           variant="outline"
                           onClick={() => {
@@ -2227,17 +2317,11 @@ function ModelWorkspace({
                             field={`name:${active.id}`}
                             workspace={workspace}
                             onCommit={(v) =>
-                              commit({
-                                ...draft,
-                                properties: {
-                                  ...draft.properties,
-                                  modelAuthoring: {
-                                    ...authoring,
-                                    names: {
-                                      ...authoring.names,
-                                      [active.id]: v.slice(0, 120),
-                                    },
-                                  },
+                              updateElements(elements, {
+                                ...authoring,
+                                names: {
+                                  ...authoring.names,
+                                  [active.id]: v.slice(0, 120),
                                 },
                               })
                             }
@@ -2399,23 +2483,17 @@ function ModelWorkspace({
                             icon={<ActionGroup />}
                             disabled={!selected.length}
                             onClick={() =>
-                              commit({
-                                ...draft,
-                                properties: {
-                                  ...draft.properties,
-                                  modelAuthoring: {
-                                    ...authoring,
-                                    groups: [
-                                      ...authoring.groups,
-                                      {
-                                        id: crypto.randomUUID(),
-                                        name: name.trim() || 'Detail group',
-                                        wallId: activeWall,
-                                        members: selected,
-                                      },
-                                    ],
+                              updateElements(elements, {
+                                ...authoring,
+                                groups: [
+                                  ...authoring.groups,
+                                  {
+                                    id: crypto.randomUUID(),
+                                    name: name.trim() || 'Detail group',
+                                    wallId: activeWall,
+                                    members: selected,
                                   },
-                                },
+                                ],
                               })
                             }
                           >

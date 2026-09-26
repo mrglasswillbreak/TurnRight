@@ -38,6 +38,7 @@ import { surfaceCameraFrame, surfaceLocal } from './model-surface-frame';
 import { ModelButton } from './ModelButton';
 import { Focus, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
 import { modelPreviewGesture } from './model-preview-gesture';
+import { detailInstanceId } from './model-instances';
 export function PhotoModelPreview(props: {
   feature: Feature;
   visual?: BuildingVisual;
@@ -209,7 +210,14 @@ export function PhotoModelPreview(props: {
               (frame.kind === 'wall'
                 ? s?.wallId === frame.key
                 : s?.partId === frame.key);
-            if (inSurface && (!s?.elementId || !excluded.has(s.elementId)))
+            if (
+              inSurface &&
+              (!s?.elementId ||
+                (!excluded.has(s.elementId) &&
+                  !excluded.has(
+                    detailInstanceId(s.elementId, s.instanceIndex || 0),
+                  )))
+            )
               triangles.push(t);
           }
           mesh.geometry.setIndex(

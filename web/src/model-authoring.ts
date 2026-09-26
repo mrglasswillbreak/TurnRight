@@ -131,7 +131,7 @@ export function generatedElements(
   const result: FacadeElement[] = [],
     bays = Math.max(1, Math.floor(m.length / (m.style.windowSpacing || 4)));
   const add = (value: Omit<FacadeElement, 'id'>) =>
-    result.push({ ...value, id: crypto.randomUUID() });
+    result.push({ ...value, id: `${m.wallId}:generated:${result.length}` });
   for (let floor = 0; floor < m.floors; floor++) {
     const low = ((floor + 0.3) * m.eaves) / m.floors,
       high = Math.min(
@@ -216,9 +216,10 @@ export function placementErrors(
   elements: FacadeElement[],
   length: number,
   eaves: number,
+  checkRecordLimit = true,
 ) {
   const errors: { id: string; message: string }[] = [];
-  if (elements.length > 100)
+  if (checkRecordLimit && elements.length > 100)
     errors.push({
       id: '',
       message: 'At most 100 detail records are supported per wall.',
