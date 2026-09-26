@@ -221,7 +221,8 @@ export async function mapImportAction(
       typeof p.name !== 'string' ||
       p.name.length > 180 ||
       !/\.(geojson|json|zip|gpkg|kml|kmz|gpx|csv|osm|xml|pbf)$/i.test(p.name) ||
-      /[\\/\x00-\x1f]/.test(p.name) ||
+      /[\\/]/.test(p.name) ||
+      [...p.name].some((c) => c.charCodeAt(0) < 32) ||
       !Number.isSafeInteger(p.bytes) ||
       Number(p.bytes) <= 0 ||
       Number(p.bytes) > MAP_IMPORT_LIMITS.uploadBytes ||
@@ -234,7 +235,7 @@ export async function mapImportAction(
       );
     const id = randomUUID(),
       path = `${currentCampusId()}/${job.id}/${id}.${p.name.split('.').pop()!.toLowerCase()}`;
-    const asset = await db<{ id: string }>('rpc/add_import_asset', 'POST', {
+    const asset = await db<{ id: string; path: string }>('rpc/add_import_asset', 'POST', {
       asset: {
         id,
         import_id: job.id,
@@ -245,7 +246,7 @@ export async function mapImportAction(
       },
     });
     const signed = await (
-      await storage(`object/upload/sign/campus-imports/${path}`, 'POST', {
+      await storage(`object/upload/sign/campus-imports/${asset.path}`, 'POST', {
         upsert: false,
       })
     ).json();

@@ -16,6 +16,7 @@ create table public.campus_imports (
  campus_id text not null default public.current_campus_id() references public.campuses(id),
  source_id uuid not null,
  status text not null default 'draft' check(status in ('draft','queued','running','mapping','preview','reviewed','cancelled','failed')),
+ auto_queue boolean not null default false,
  phase text not null default 'inspect' check(phase in ('inspect','preview')),
  configuration jsonb not null,
  run_token uuid not null,
@@ -57,6 +58,11 @@ declare job campus_imports; total bigint; saved campus_import_assets;
 begin
  select * into job from campus_imports where campus_id=current_campus_id() and id=(asset->>'import_id')::uuid for update;
  if not found or job.status <> 'draft' then raise exception 'Uploads are closed for this import'; end if;
+ select * into saved from campus_import_assets where campus_id=current_campus_id() and import_id=job.id and name=asset->>'name';
+ if found then
+  if saved.sha256 <> asset->>'sha256' or saved.bytes <> (asset->>'bytes')::bigint then raise exception 'A different file already uses this name. Start a replacement import.'; end if;
+  return to_jsonb(saved);
+ end if;
  select coalesce(sum(bytes),0) into total from campus_import_assets where campus_id=current_campus_id() and import_id=job.id;
  if total+(asset->>'bytes')::bigint > 52428800 then raise exception 'Import upload batch exceeds 50 MiB'; end if;
  insert into campus_import_assets(id,import_id,path,name,bytes,sha256)

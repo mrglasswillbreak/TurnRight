@@ -54,6 +54,7 @@ export interface ImportLayer {
   fields: { name: string; alias?: string; values?: string[] }[];
   crs?: string;
   suggestedRole: ImportRole;
+  requiresCoordinates?: boolean;
 }
 export interface ImportPreview {
   layers: ImportLayer[];
