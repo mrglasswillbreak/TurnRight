@@ -41,6 +41,14 @@ fingers, duplicate clicks, mouse use and keyboard/screen-reader activation.
 
 ## Unified model workspace and documentation captures
 
+`published-model-revisions.json` contains the public Senate and School of
+Transport features and catalogue records from `lasu-623791e1184e`. Their recorded
+fingerprints predate roof-text support. Compatibility tests retain these expected
+values unchanged, covering explicit facades and generated window settings.
+Browser cases render the saved fingerprints on desktop and phone and assert
+actual WebGL draw calls, so regenerating both expected and actual identities
+cannot hide a published-model regression.
+
 The browser suite in `../browser/editor.spec.ts` supplies isolated owner, draft,
 publication and media responses. Its model fixture covers shared 3D/2D commands,
 wall and roof lettering, nested structure selection, individual generated and

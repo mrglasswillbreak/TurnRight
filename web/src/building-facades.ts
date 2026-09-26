@@ -13,11 +13,14 @@ export function detailRevision(feature: Feature): string | undefined {
   const appearance = feature.properties?.appearance || {};
   const value = appearance.facades;
   const settings = [
-    appearance.roofTexts,
     appearance.windowFrameDepth,
     appearance.windowWidthRatio,
     appearance.windowHeightRatio,
   ];
+  // Preserve published fingerprints when the new optional text field is absent.
+  // Otherwise even an unchanged legacy model is rejected as an outdated draft.
+  if (appearance.roofTexts !== undefined)
+    settings.unshift(appearance.roofTexts);
   if (
     (!value || !Object.keys(value).length) &&
     settings.every((v) => v === undefined)
