@@ -1383,9 +1383,8 @@ export default function App() {
                 key={selected.id}
                 photos={buildingPhotos(data, placeBuildingId(data, selected))}
                 actions={
-                  <div
+                  <fieldset
                     className="place-primary-actions"
-                    role="group"
                     aria-label="Place actions"
                   >
                     <Button
@@ -1440,7 +1439,7 @@ export default function App() {
                         />
                       </label>
                     )}
-                  </div>
+                  </fieldset>
                 }
               />
               <ArrivalSection

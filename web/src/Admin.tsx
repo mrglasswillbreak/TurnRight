@@ -2588,8 +2588,8 @@ function Editor({
             </div>
           )}
         {handoffNotice && (
-          <div className="editor-recovery editor-card" role="status">
-            <p>{handoffNotice}</p>
+          <div className="editor-recovery editor-card">
+            <output>{handoffNotice}</output>
             <button
               onClick={() => {
                 requestedBuilding.current = undefined;

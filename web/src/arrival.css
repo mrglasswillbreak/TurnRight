@@ -35,6 +35,9 @@
 }
 .place-primary-actions {
   display: grid;
+  border: 0;
+  padding: 0;
+  min-width: 0;
   gap: 8px;
   margin-block: 16px;
 }
