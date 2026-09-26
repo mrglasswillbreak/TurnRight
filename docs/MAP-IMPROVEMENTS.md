@@ -1,5 +1,7 @@
 # Map and editor improvements — September 2026
 
+> Historical implementation and verification record. Current guides are [Editor](EDITOR.md), [Campuses](CAMPUS-IMPORTS.md) and [Model authoring](MODEL-AUTHORING.md); later deployments supersede the rollout statements below.
+
 Implemented on `codex/map-editor-improvements`, starting from `35afe0f`, in small commits. This is an application change. No campus package, source baseline, access correction or production deployment was changed.
 
 The owner subsequently requested deployment. Application revision `932a216` reached production on 13 September 2026, preserving the published campus package; see the [deployment verification](PRODUCTION.md).

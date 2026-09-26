@@ -8,6 +8,8 @@ The public map shares general building photographs across its linked occupants.
 Doorway photographs belong to a specific entrance. A photograph never establishes
 an entrance connection, access approval, step-free route or permission to drive.
 
+Photos, arrival guides, report targets and private upload recovery are scoped to the selected campus. Public links preserve campus plus place/building identity. New imported campuses need their own source/photograph permissions; LASU’s permission records do not grant rights elsewhere.
+
 ## Using the map
 
 Open a destination's **Building photographs** and **Entrances & arrival** sections.

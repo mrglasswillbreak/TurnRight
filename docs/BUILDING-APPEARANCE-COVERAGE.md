@@ -1,5 +1,7 @@
 # Building appearance coverage
 
+> Historical appearance assessment for the package named below. Counts and proposals are retained as evidence; current editing tools and deployment state are in [Model authoring](MODEL-AUTHORING.md) and [Production](PRODUCTION.md).
+
 Assessed 380 buildings from lasu-5cff24fd045f. 53 proposed updates: 11 photo references and 42 illustrative facades. 327 retained pending evidence or review. No footprint, entrance or routing changes. The owner must review a release before public publication.
 
 | Building | ID | Result | Basis / outstanding work |

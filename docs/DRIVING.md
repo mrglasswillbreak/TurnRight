@@ -2,6 +2,8 @@
 
 TurnRight supports passenger-car navigation within the downloaded campus network. Walking remains the first-use default; the selected travel mode is remembered on the device. There is no live traffic, parking occupancy, external routing service, or background navigation.
 
+Each journey uses one selected campus’s reviewed network. Switching campuses ends the active route explicitly; there is no cross-campus routing. A published map without a reviewed network shows directions unavailable. Generic imported lines and GPX tracks do not acquire vehicle or walking access automatically.
+
 ## Journey behavior
 
 Directions can combine a driving leg and a walking leg. The app ranks complete journeys by estimated total time and offers up to two sufficiently different alternatives. Users can choose a mapped parking or drop-off point. Rerouting during the driving leg retains that choice; unavailable connections produce an explanation rather than a substitute parking destination.

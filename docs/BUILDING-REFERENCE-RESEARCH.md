@@ -1,5 +1,7 @@
 # Building reference research · 14 September 2026
 
+> Dated LASU research record. Source observations and original package counts are preserved; use [Model authoring](MODEL-AUTHORING.md) for current tools and [Production](PRODUCTION.md) for the current release.
+
 This pass inventories every building in the published `lasu-5cff24fd045f` package (380 footprints) and proposes appearance edits against the editor's current data. Geometry, entrances, roads and source identities are retained. Application deployment makes the proposals available; the owner's reviewed campus release publishes applied drafts.
 
 ## Sources and matching

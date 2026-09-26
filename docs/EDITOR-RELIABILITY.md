@@ -2,11 +2,15 @@
 
 The editor provides operation-specific recovery, private local recovery downloads, grouped field undo, three-way conflict review, prepared-workspace fallback, guided repairs, explicit duplicate cleanup, release impact review, source comparisons, destination sharing and recorded steps information.
 
+## Campus isolation
+
+Editor recovery, private photo/model drafts, survey state and reports are scoped to the owner and campus. A campus switch checks unfinished drawings, roof work, recording and pending saves. Public-to-editor links retain both the campus and building through sign-in and recovery guards. Campus restore uses a fresh preview with other campuses’ current packages; it never rolls back the whole site.
+
 ## Building workspace integration
 
 The unified model editor uses this same history and save path. A completed numeric edit or pointer gesture is one command; a temporary roof preview is excluded from the history snapshot so Undo does not trap Redo behind an unfinished roof. Selection and cameras do not consume history. Server acknowledgements retain save-operation identities and cannot replace newer local commands.
 
-Optional private `modelInputs` recovery records retain blank/incomplete numeric text, invalid placement work and texture alignment by building and field. Pending layouts retain their pattern/group metadata too. Discarding unfinished input clears mounted fields as well as storage. Private authoring metadata is versioned, excluded from public downloads and guarded against older editors dropping it. No database or public package migration is required. See [current workflow](UNIFIED-MODEL-EDITOR.md) and [current verification](MODEL-EDITOR-VERIFICATION.md); the earlier check counts below are historical.
+Optional private `modelInputs` recovery records retain blank/incomplete numeric text, invalid placement work and texture alignment by building and field. Pending layouts retain their pattern/group metadata too. Discarding unfinished input clears mounted fields as well as storage. Private authoring metadata is versioned, excluded from public downloads and guarded against older editors dropping it. That native-input recovery extension required no migration; expanded model assets now require migration 012 and campus scoping requires 013–015. See [current workflow](UNIFIED-MODEL-EDITOR.md) and [current verification](MODEL-EDITOR-VERIFICATION.md); the earlier check counts below are historical.
 
 Shared-save validation names the blocking feature and retains the atomic batch locally.
 Nested wall removals remain removed during conflict merging; removal versus edited
@@ -23,7 +27,7 @@ revision, so later edits restore the usual leave protection.
 - Validation issues carry feature identity/kind, severity, affected field and a supported repair action. Existing error/warning strings remain available to server release validation and older callers.
 - Place sharing uses `/?place=<encoded stable ID>` and existing public place aliases. No account or device location is included.
 - Public package readers support schemas 1–3; these reliability repairs do not change the schema. Steps remain optional booleans in routing edges; missing information remains unknown. A private edit can explicitly reset steps knowledge to unknown, which omits the public edge flag.
-- No database migration is required. This work does not publish campus corrections or change the approved source baseline.
+- The original reliability patch required no database migration. Current installations must follow migrations 001–015 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
 
 ## Validation
 

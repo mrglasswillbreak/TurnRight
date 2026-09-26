@@ -2,6 +2,8 @@
 
 The model workspace combines native building surfaces with editable objects. Open a building's **Edit model** button. Architectural height, floors, roofs, windows and text remain available; **Mesh** adds object and component editing. Authored objects attach to the building. Its geographic footprint remains authoritative for routing.
 
+Choose the campus first. Buildings, authored model assets, photos, recovery and release snapshots belong to that campus; identically named or identified buildings in another campus do not share their drafts. [Campus workflow](CAMPUS-IMPORTS.md).
+
 ## Work beside a photograph
 
 Turn on **Reference split** to show the existing photograph panel beside one model pane. Orbit and Edit surface change that pane without replacing the renderer. Photograph selection, zoom and texture alignment remain independent. The preference and divider position are remembered on this device.
@@ -62,9 +64,9 @@ Export the whole building or selected objects with their descendants. Curves are
 
 ## Save, review and publish
 
-Version-1 model documents contain curves, explicit topology, transforms, materials, images and stable IDs. Authenticated saves upload immutable private JSON assets, verify SHA-256 and content limits, then store a small reference in the existing optimistic save transaction. Textures travel inside the private document; publication extracts them into independently hashed package assets. Local recovery remains owner-scoped, including unfinished imports and rejected candidates.
+Version-1 model documents contain curves, explicit topology, transforms, materials, images and stable IDs. Authenticated saves upload immutable private JSON assets, verify SHA-256 and content limits, then store a small reference in the existing optimistic save transaction. Textures travel inside the private document; publication extracts them into independently hashed package assets. Local recovery remains owner- and campus-scoped, including unfinished imports and rejected candidates.
 
-Migration **012_editable_model_assets.sql** creates the private `building-models` bucket and metadata table, enforces immutable asset identity and guards newer drafts against older clients. It is additive; geographic map storage and public package schema remain compatible. Deploy public readers and storage before enabling new-format writes. Do not roll a writing deployment back to a client that drops authored references.
+Migration **013_campus_isolation.sql** adds campus identity to asset metadata and draft saves. Migration **012_editable_model_assets.sql** creates the private `building-models` bucket and metadata table, enforces immutable asset identity and guards newer drafts against older clients. It is additive; geographic map storage and public package schema remain compatible. Deploy public readers and storage before enabling new-format writes. Do not roll a writing deployment back to a client that drops authored references.
 
 The current authored revision must be marked reviewed in Mesh tools. Any subsequent geometry or material change requires another review. Releases hydrate and validate the immutable source, compile authored geometry and package supported textures. Only the existing owner **review → preview → publish** workflow changes public campus content. Ordinary application deployment preserves the published campus package.
 

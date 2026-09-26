@@ -1,5 +1,7 @@
 # Mobile model editing: production comparison
 
+> Dated benchmark with its original fixture and control labels. Current controls are Orbit / Edit surface / Photo plus optional Reference split; the [authoring guide](MODEL-AUTHORING.md) describes the current workspace. These timings are not measurements of later GIS imports or mesh tools.
+
 This study compares the previous mobile model form at `0fc9dca` with the canvas-and-sheet workspace. Both builds use the same published `lasu-313d8a168635` campus (395 buildings, 220 places, 39 photographs), real `EditorWorkspace` commands and owner-scoped IndexedDB recovery. A second fixture adds 100 details to one wall. No production owner data is changed.
 
 ## Method

@@ -89,7 +89,7 @@ Decisions autosave through the existing batch API. Keep-separate decisions do no
 
 Topology and duplicate checks run in a worker. Geometry and property feedback remain immediate, and route previews wait for the current validation result. Repeated issue rows are grouped by feature identity, with all reasons shown together.
 
-The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. The building model workspace provides all five modes on phones, with a visible **×** beside Undo/Redo and **Done** for closing only the active tool sheet. Short landscape screens keep the canvas beside a scrollable tools panel. Tap a 3D detail to select it or hold it for its action menu; an orbit drag or second touch cancels the pending hold. See [the model editor guide](UNIFIED-MODEL-EDITOR.md). Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
+The desktop layout provides the full workspace. Smaller screens support review, property changes, point placement, and moving features. The building model workspace provides the architectural modes and WebGL mesh tools on phones, with a visible **×** beside Undo/Redo and **Done** for closing only the active tool sheet. Short landscape screens keep the canvas beside a scrollable tools panel. Tap a 3D detail to select it or hold it for its action menu; an orbit drag or second touch cancels the pending hold. See [the model editor guide](UNIFIED-MODEL-EDITOR.md). Green draft geometry is new, purple is modified, amber needs attention, and red marks deletion.
 
 ## Saving and recovery
 
@@ -97,7 +97,7 @@ Completed edits autosave after 750 ms of inactivity. Related changes, such as an
 
 Typing in a text field is one undo step, including when autosave runs during the field session. Leaving the field, pressing Enter, selecting another feature or running another edit ends the group. Recovery snapshots continue to retain the latest input.
 
-The status distinguishes **Saving**, **Saved**, and **Saved locally**. Interrupted requests retry with the same operation ID. The browser keeps an owner-scoped IndexedDB recovery copy, including unfinished drawings and undo history. Reopening the editor offers **Resume drawing**. A failed storage write is reported rather than represented as a successful recovery save.
+The status distinguishes **Saving**, **Saved**, and **Saved locally**. Interrupted requests retry with the same operation ID. The browser keeps an owner- and campus-scoped IndexedDB recovery copy, including unfinished drawings and undo history. Reopening the editor offers **Resume drawing**. A failed storage write is reported rather than represented as a successful recovery save.
 
 If another session changes a draft, local work is preserved. **Review conflicts** compares original, local and server values. Independent property changes are combined; conflicting fields require an explicit choice. Geometry and its connection references are reviewed together. **Apply reviewed choices** checks the server again before saving; a newer revision requires another review. History preceding a changed remote snapshot is cleared after reconciliation so Undo cannot overwrite the reviewed remote changes.
 
@@ -111,7 +111,7 @@ An already-prepared owner workspace can open from its cache after a network fail
 
 ## Repair and release review
 
-Façade approval is checked before **Build review preview** becomes available. Pending reviews name their building, wing and wall and provide **Review model** to open the exact assignment. Editing details clears that wall's previous review; a height or roof change can also require placement review even with an unchanged footprint. A visually normal model may therefore need review without needing geometry repair. **Inspect details and evidence** expands the affected wall's review controls. Inspect the retained dimensions and evidence, then mark only that wall reviewed. Moved or reassigned walls also require confirmation of the wall match. These checks do not block ordinary draft saving. The server and release worker independently enforce the same review gate.
+Façade approval is checked before **Build review preview** becomes available. Pending reviews name their building, wing and wall and provide **Review model** to open the exact assignment. Editing details clears that wall's previous review; a height or roof change can also require placement review even with an unchanged footprint. A visually normal model may therefore need review without needing geometry repair. **Inspect details and evidence** expands the affected wall's review controls. Inspect the retained dimensions and evidence, then mark the wall reviewed. In **Model Review**, **Mark all as reviewed** applies one command to eligible recorded walls in the current building; invalid or unresolved walls remain blocked. Moved or reassigned walls also require confirmation of the wall match. These checks do not block ordinary draft saving. The server and release worker independently enforce the same review gate.
 
 To undo a building correction made since publication, use **Restore published building** in its inspector. Review the proposed repair and apply it; Undo restores the draft. This restores that building's saved correction from the matching published release and leaves other features alone. The action is unavailable when that release snapshot is missing or out of date.
 
@@ -124,6 +124,8 @@ Release impact compares the working map with the public package loaded by the ap
 Path properties distinguish unknown steps information, recorded steps, and recorded absence of steps. Public route details report those records without claiming verified step-free access. Public place details provide **Copy link**, native **Share** where available, and a selectable-link fallback. Shared destinations resolve published aliases; unavailable destinations offer campus search.
 
 ## Upgrade and verification
+
+Current installations require migrations **001–015** in order. Production has completed the reader → migration → writer rollout; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share the same owner authorization and explicit campus context. The notes below retain the history of earlier incremental upgrades.
 
 Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo owner guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the draft and publish through Releases; author-provided photographs without external URLs require package schema 3 and compatible readers.
 
@@ -142,13 +144,13 @@ owner authorization, unchanged timestamps and rollback history remain intact.
 See [arrival editing, private uploads and publication](ARRIVAL-GUIDES.md) for the
 review flow and photo package guarantees.
 
-Apply `supabase/migrations/003_editor_batches.sql` once to the existing database **before deploying this editor and API**. For a new database, apply migrations 001, 002, and 003 in order. Migration 003 adds the service-role-only batch function and operation receipts; it does not modify published map packages. Retain operation receipts so delayed retries remain idempotent.
+The original September 11 editor upgrade required migration `003_editor_batches.sql` after 001–002; it is not the complete setup sequence for the current app. Migration 003 adds the service-role-only batch function and operation receipts; it does not modify published map packages. Retain operation receipts so delayed retries remain idempotent.
 
 Migration 003 was applied to the TurnRight Supabase project on 11 September 2026. Live verification confirmed that receipt RLS is enabled, anonymous and authenticated roles cannot execute the function, and the service role can. The implementation passed 85 unit/database tests, seven real MapLibre/Terra Draw browser tests, seven Python tests, lint (existing warnings), and a production build on Node 22.23.2. Browser coverage includes undoing the first saved correction to a source building and retaining that building after reload.
 
 The editor/API revision `562fa4d8931f5355b53656bf233026d54d443343` was verified in [Vercel preview](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/AfnjaqHZRmqSXx2WZTrVvxkbSzVM), then deployed to [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/3ym4sa7Z4h3Novt781vUUYw5Tgay). Live owner login, source loading, 3D building selection, an authenticated metadata autosave and its saved undo passed in preview. The temporary verification note was reverted; only audit/undo receipts remain. Production `/admin` returned 200 and an unauthenticated admin request returned 401. The published campus package remains `lasu-4e4c8008b38b`, schema version 1. No source proposals or campus-data releases were published by this rollout.
 
-The existing approved database baseline predates some corrections in the published campus package. Review those pending source proposals before an editor-led map release, as documented in [PRODUCTION.md](PRODUCTION.md). This code deployment preserves the currently published package.
+That historical rollout found a baseline predating published corrections. Later reconciliation and publication are recorded in [Production](PRODUCTION.md). Inspect the current workspace’s reconciliation state rather than repeating an old baseline repair.
 
 Use Node 22.13 or later in the 22.x line:
 
@@ -164,4 +166,4 @@ npm run test:browser
 
 Unit tests exercise topology, entrances, route selection, recovery, and concurrency. Database tests run the real SQL migrations in PGlite PostgreSQL; only the unused PostGIS extension declaration is omitted. Browser tests use the actual MapLibre renderer and Terra Draw interactions with test-only authentication and API responses, including both views, dragging, undo/redo, reload recovery, full campus rendering, and smaller screens.
 
-Deploy to a configured Vercel preview after applying the migration. Check a real owner login, a saved entrance/approach batch, source review, and release preparation against Supabase before promoting the application. Publishing new campus data remains a separate reviewed operation.
+Deploy to a configured Vercel preview after applying all required migrations. Check a real owner login, a saved entrance/approach batch, source review, and release preparation against Supabase before promoting the application. Publishing new campus data remains a separate reviewed operation.

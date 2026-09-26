@@ -1,6 +1,6 @@
 # Offline voice directions
 
-TurnRight uses one built-in British female voice: **Kokoro v1.0, `bf_emma`**. Complete recorded sentences play locally; there is no speech API, runtime AI model, browser speech synthesis or invented landmark guidance. Search and routing remain campus-only.
+TurnRight uses one built-in British female voice: **Kokoro v1.0, `bf_emma`**. Complete recorded sentences play locally; there is no speech API, runtime AI model, browser speech synthesis or invented landmark guidance. Search and routing use the selected campus only. The shared pack handles generic guidance across campuses; campus-specific names are spoken only when a recorded clip exists, with ordinary on-screen instructions retained otherwise.
 
 ## Driving additions
 

@@ -42,7 +42,7 @@ Roof mode stores geographic control points, elevations, ridge/valley constraints
 
 Each completed numeric edit or pointer gesture is one undoable command. The shared editor retains 100 actions, operation identities, owner-scoped IndexedDB recovery and optimistic conflicts. Selection, cameras, panel resizing and visibility/locking are editing state, not public model changes. Closing preserves unfinished fields and roof work. Storage failure is reported; it must not be treated as a successful local save.
 
-Review is targeted: **Mark this wall reviewed** only reviews that wall. Copies and affected geometry require review. Source-photo replacement invalidates relevant evidence; captions and ordering do not establish a new wall match. Publication independently validates the immutable snapshot and assets through the normal preview/publish/rollback workflow.
+Review is targeted: **Mark this wall reviewed** only reviews that wall. **Review → Mark all as reviewed** applies one undoable command to eligible recorded walls in this building, leaving invalid and unresolved assignments for repair. Copies and affected geometry require review. Source-photo replacement invalidates relevant evidence; captions and ordering do not establish a new wall match. Publication independently validates the immutable snapshot and assets through the normal preview/publish/rollback workflow.
 
 To abandon one building's saved changes, use **Restore published building** in its inspector when a matching published correction is available. Inspect the proposed repair and choose **Apply reviewed repair**. Other draft corrections remain intact; Undo restores the previous building draft. This does not publish or roll back the whole campus.
 

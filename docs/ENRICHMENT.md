@@ -1,4 +1,6 @@
-# Campus enrichment
+# LASU campus enrichment
+
+This guide describes the LASU-specific research/enrichment pipeline. For importing other locations, use [Campuses and map imports](CAMPUS-IMPORTS.md): sources, boundaries, licenses, access reviews and jobs are separate per campus. The September 22 ledger below remains a dated candidate/research record; later publications are listed in [Production](PRODUCTION.md).
 
 The [initial candidate and complete review ledger](../data/enrichment/2026-09-22/README.md)
 include a verified production comparison and bounded input archive for offline

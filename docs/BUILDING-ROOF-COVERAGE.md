@@ -1,5 +1,7 @@
 # Roof coverage
 
+> Historical roof assessment for the package named below. This is an evidence inventory, not a current feature count. See [roof editing](BUILDING-ROOFS.md) and [Production](PRODUCTION.md) for the current workflow and release.
+
 Assessed 380 buildings from lasu-4e5df8b7df07. 44 proposed buildings / 46 wings: 3 photo-supported roof forms and 41 illustrative roofs. All ridge positions are approximate. No footprint or routing changes. Existing custom roofs and confirmed flat/parapet silhouettes retained.
 
 | Building | ID | Result | Detail |

@@ -6,6 +6,10 @@ Shared light/dark tokens also cover link text, informational surfaces, errors, w
 
 Use `--background` / `--foreground` for public UI and `--ed-bg` / `--ed-text` inside the editor. Use matching semantic background/text tokens for coloured notices. Do not add a fixed white fallback paired with inherited theme text.
 
+The Campuses workspace binds its card surface to the shared theme background and uses the semantic error-text token. Live verification caught its previously undefined card variable falling back to white. A focused Chromium/WebKit regression requires at least 4.5:1 contrast for the header, campus search, import form and text fields in both themes, retaining the source name through theme changes.
+
+![Dark campus import form with themed header and fields](assets/screenshots/campus-dark-2026-09-26.png)
+
 The `readable interface` browser cases inspect computed colours and composited CSS backgrounds for visible text and placeholders. They require 4.5:1 contrast for normal text and 3:1 for large text. Coverage includes editing tips, notifications, place and route details, public settings and offline dialogs, editor Workspace/Settings/Sources/Duplicates/Reports/Releases, building/roof inspectors and survey controls. The checks exercise desktop light/dark themes and phone dark mode. Hidden text, disabled controls, decorative graphics and labels painted inside the map canvas are outside this DOM contrast check; screenshots provide an additional visual check.
 
 From `web`:

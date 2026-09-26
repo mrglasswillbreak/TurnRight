@@ -4,6 +4,8 @@ The building workspace brings architectural details, appearance, roofs, outlines
 
 ![Desktop model workspace in Orbit](assets/screenshots/editor-model-orbit-current-2026-09-26.png)
 
+Model selection and edits belong to the current campus. A public **Editor** link opens the selected building’s general editing card in that campus, with sign-in/recovery safeguards. Open **Edit model** from there. [Campus switching and imports](CAMPUS-IMPORTS.md).
+
 ## Choose a surface
 
 The workspace also supports [reference split, exterior curves, mesh editing and model files](MODEL-AUTHORING.md). **Reference split** keeps a photograph beside Orbit/Edit surface when the centre has at least 720 × 320 CSS pixels; its divider and preference are remembered. **Outline → Add wall** creates exterior boundaries, wings or courtyards. **Mesh** provides primitives, profiles, component selection and import/export while preserving the same canvas and history.
@@ -94,7 +96,7 @@ In **Review**, choose **Mark all as reviewed** to approve eligible recorded wall
 
 ## Publication
 
-Use the normal owner preview, validation, publication and rollback workflow. Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
+Use the current campus’s owner review, preview and publication workflow. Restoring a campus uses a new preview that preserves other campuses; see [campus releases](CAMPUS-IMPORTS.md#review-then-publish). Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
 
 The Releases panel checks façade reviews before enabling **Build review preview**. Each blocker names its building, wing and wall; **Review model** opens that exact wall in the workspace. A height or roof edit can invalidate placement review even when the footprint is unchanged. Inspect the retained metre positions and evidence, then **Mark this wall reviewed**. This clears only the selected wall's review flag and remains undoable. A moved or reassigned wall also requires an explicit wall match. Invalid placements still require repair; reviewing does not invent measurements or approve other walls.
 

@@ -2,6 +2,8 @@
 
 Status: implemented; **awaiting physical field verification**. The feature remains owner-only. Survey evidence is private and applying it never publishes a campus release.
 
+Choose the target campus in **Campuses** before recording. Survey sessions, recovery, revision chunks and applied map drafts are isolated by owner and campus; switching requires pausing recording and resolving pending edits. LASU access exceptions do not transfer to a new campus.
+
 ## Phone workflow
 
 Open `/admin` and choose **Survey**. **Record new path** requests GPS after creating durable local recovery. Recording starts in north-up 2D. Panning stops location following; **Follow me** restores it. Keep TurnRight visible. Screen locking, changing apps, navigating away and signing out stop recording; returning requires **Resume**. Poor GPS keeps the recorder waiting, but the next accepted fix starts a separate segment.
@@ -42,11 +44,13 @@ The `turnright-surveys` IndexedDB database stores samples independently of edito
 
 **Prepare for offline survey** verifies the owner through the server, downloads and checks the campus package, checks the service worker, and caches the editor context. Preparation must succeed while online. Offline startup uses the previously verified owner's cache. Server sync still requires authenticated owner access; cached identity does not authorize API mutations.
 
-Private sync uses immutable revisions, chunks of at most 250 samples and operation identities. A revision becomes current only after all chunks exist. Lost responses replay the same operation. Concurrent versions are retained for explicit resolution in **Saved surveys**. Retrieval fetches chunks in bounded pages only when opening a survey; normal editor state never includes tracks. Raw samples, sample timestamps and private evidence links are not assembled into public campus packages. Public schema version remains 1.
+Private sync uses immutable revisions, chunks of at most 250 samples and operation identities. A revision becomes current only after all chunks exist. Lost responses replay the same operation. Concurrent versions are retained for explicit resolution in **Saved surveys**. Retrieval fetches chunks in bounded pages only when opening a survey; normal editor state never includes tracks. Raw samples, sample timestamps and private evidence links are not assembled into public campus packages. Survey samples remain private and do not change the public package schema; the current reader supports package schemas 1–3.
 
 The editor's **Install update** notice requires paused recording and flushed recovery/draft writes. A service-worker update from another tab does not automatically reload an active recorder.
 
 ## Migration and deployment
+
+For a current installation, apply all migrations through 015 as described in [Deployment](DEPLOYMENT.md). Migration 013 scopes the original survey tables and save RPC by campus with composite foreign keys. The numbered steps and verification below describe the original migration-004 rollout on 12 September, not a complete current installation.
 
 1. Run `supabase/migrations/004_private_surveys.sql` in a transaction on the existing Supabase project, after migration 003. It adds `surveys`, `survey_revisions`, `survey_chunks` and the service-role-only `save_survey_revision` function. Authenticated reads are restricted to each row's owner.
 2. Verify owner reads, denied direct authenticated writes, unauthorized API rejection, a chunked upload, a retry and a concurrent-version conflict.

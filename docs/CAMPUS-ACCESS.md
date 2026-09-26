@@ -2,7 +2,7 @@
 
 The sections below record the first ordinary-road correction. A subsequent
 [Law and Library connection review](CONNECTION-REVIEW.md) adds one separately
-confirmed driveway and gate. Current checked-in coverage is 201 approaches on
+confirmed driveway and gate. The historical checked-in snapshot below has 201 approaches on
 the main network and five path components in package `lasu-4e4c8008b38b`.
 
 On 9 September 2026 the project owner confirmed that LASU's main internal roads

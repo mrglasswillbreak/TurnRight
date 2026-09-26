@@ -1,5 +1,9 @@
 # Responsiveness and recovery
 
+## Multi-campus processing
+
+Campus/import controls are lazy-loaded. GDAL/PROJ and Pyosmium run in isolated Linux jobs, never in the browser. Imports enforce 50 MiB per upload batch, 250 MiB expanded input, 100,000 normalized features and a 20-minute processing limit; public package/model budgets remain independent. Catalogue builds preserve and verify every published campus. [Import limits](CAMPUS-IMPORTS.md#implementation-and-limits) and [current release evidence](PRODUCTION.md).
+
 ## Expanded authoring bounds
 
 Reference split retains one renderer and camera. Mesh gestures coalesce previews and commit one undo entry. Cancellable file workers are lazy-loaded outside public startup. Sources are capped at 100 objects, 100,000 vertices, 200,000 faces and 25 MiB; textures have a 16-megapixel document limit. Verified authored textures use a reference-counted 32-megapixel renderer pool. Cloud redraws run at approximately 30 fps at globe scale; hidden pages stop animation and reduced-motion clouds are static. Existing bundle budgets remain enforced. See [verification](MODEL-EDITOR-VERIFICATION.md).
