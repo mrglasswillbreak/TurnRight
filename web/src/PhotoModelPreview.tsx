@@ -39,7 +39,11 @@ import { ModelButton } from './ModelButton';
 import { Focus, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
 import { modelPreviewGesture } from './model-preview-gesture';
 import { detailInstanceId } from './model-instances';
+import { createModelRenderMaterial } from './model-render-material';
+import type { ModelPreviewScene } from './model-preview-scene';
 export function PhotoModelPreview(props: {
+  onScene?: (scene: ModelPreviewScene | null) => void;
+  meshEditing?: boolean;
   feature: Feature;
   visual?: BuildingVisual;
   data: CampusData;
@@ -82,6 +86,7 @@ export function PhotoModelPreview(props: {
     let disposed = false,
       renderer: WebGLRenderer | undefined,
       controls: OrbitControls | undefined,
+      alignedControls: OrbitControls | undefined,
       observer: ResizeObserver | undefined;
     let running = false,
       pending = false,
@@ -98,10 +103,44 @@ export function PhotoModelPreview(props: {
       orbitCamera = new PerspectiveCamera(40, 1, 0.1, 5000),
       alignedCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
     let camera: PerspectiveCamera | OrthographicCamera = orbitCamera;
+    let meshPose: Parameters<ModelPreviewScene['alignMesh']>[0] = null,
+      meshPoseKey = '',
+      meshGesture = false;
     let stableOrigin: number[] | undefined;
     const align = () => {
       const frame = current.current.surface;
-      if (controls) controls.enabled = !current.current.surfaceEditing;
+      if (controls)
+        controls.enabled =
+          !current.current.surfaceEditing && !meshPose && !meshGesture;
+      if (alignedControls) alignedControls.enabled = !!meshPose && !meshGesture;
+      if (meshPose && renderer) {
+        camera = alignedCamera;
+        if (meshPoseKey !== meshPose.key) {
+          meshPoseKey = meshPose.key;
+          const normal = new Vector3(...meshPose.normal).normalize(),
+            centre = new Vector3(...meshPose.centre);
+          camera.up.set(0, 0, 1);
+          if (Math.abs(normal.z) > 0.95) camera.up.set(0, 1, 0);
+          camera.position.copy(centre).addScaledVector(normal, 4000);
+          camera.lookAt(centre);
+          camera.zoom = 1;
+          alignedControls?.target.copy(centre);
+        }
+        const width = meshPose.width,
+          ratio = Math.max(
+            0.1,
+            element.clientWidth / Math.max(1, element.clientHeight),
+          );
+        camera.left = -width / 2;
+        camera.right = width / 2;
+        camera.top = width / ratio / 2;
+        camera.bottom = -width / ratio / 2;
+        camera.updateProjectionMatrix();
+        camera.updateMatrixWorld();
+        element.dataset.projection = 'mesh';
+        return;
+      }
+      meshPoseKey = '';
       if (
         !current.current.surfaceEditing ||
         !frame ||
@@ -232,10 +271,19 @@ export function PhotoModelPreview(props: {
           mesh.userData.triangles = triangles;
         }
         const material = mesh.material as MeshLambertMaterial;
+        const obscuring =
+          !!meshPose &&
+          !part.surfaces?.some((s) => s.objectId === meshPose!.objectId);
         material.transparent =
-          !!part.text || (!!surfaceEditing && frame?.kind === 'footprint');
-        material.opacity =
-          surfaceEditing && frame?.kind === 'footprint' ? 0.22 : 1;
+          obscuring ||
+          !!part.text ||
+          (part.material?.opacity ?? 1) < 1 ||
+          (!!surfaceEditing && frame?.kind === 'footprint');
+        material.opacity = obscuring
+          ? 0.12
+          : surfaceEditing && frame?.kind === 'footprint'
+            ? 0.22
+            : (part.material?.opacity ?? 1);
         material.depthWrite = !material.transparent;
         const selected = selection || { buildingId: model.id, wallId };
         if (!selected.wallId && !selected.elementId && !selected.partId)
@@ -288,6 +336,11 @@ export function PhotoModelPreview(props: {
       scene.add(sun);
       controls = new OrbitControls(orbitCamera, renderer.domElement);
       controls.enableDamping = false;
+      alignedControls = new OrbitControls(alignedCamera, renderer.domElement);
+      alignedControls.enableRotate = false;
+      alignedControls.enableDamping = false;
+      alignedControls.enabled = false;
+      alignedControls.addEventListener('change', draw);
       const raycaster = new Raycaster();
       renderer.domElement.addEventListener('contextmenu', (e) =>
         e.preventDefault(),
@@ -302,6 +355,7 @@ export function PhotoModelPreview(props: {
           !model ||
           disposed ||
           current.current.active === false ||
+          current.current.meshEditing ||
           current.current.surfaceEditing ||
           (detailOnly && !current.current.onActions)
         )
@@ -331,6 +385,8 @@ export function PhotoModelPreview(props: {
               role: s.role,
               elementId: s.elementId,
               instanceIndex: s.instanceIndex,
+              objectId: s.objectId,
+              faceId: s.faceId,
               roofTriangle:
                 s.role === 'roof' && !s.elementId
                   ? triangle - s.start
@@ -394,6 +450,25 @@ export function PhotoModelPreview(props: {
         gestureOptions,
       );
       controls.addEventListener('change', draw);
+      current.current.onScene?.({
+        scene,
+        group,
+        renderer,
+        controls,
+        camera: () => camera,
+        origin: () => stableOrigin,
+        draw,
+        setGestureActive: (active) => {
+          meshGesture = active;
+          align();
+        },
+        alignMesh: (pose) => {
+          const changed = meshPose?.key !== pose?.key;
+          meshPose = pose;
+          if (changed) syncSelection.current();
+          draw();
+        },
+      });
       observer = new ResizeObserver(() => {
         // Canvas sizing can itself affect layout. Commit in the next frame so
         // docking/rotation does not write layout inside observer delivery.
@@ -536,13 +611,24 @@ export function PhotoModelPreview(props: {
           new Float32BufferAttribute(part.positions, 3),
         );
         geometry.setIndex(part.indices);
-        geometry.computeVertexNormals();
+        if (part.normals)
+          geometry.setAttribute(
+            'normal',
+            new Float32BufferAttribute(part.normals, 3),
+          );
+        else geometry.computeVertexNormals();
         if (part.uvs)
           geometry.setAttribute('uv', new Float32BufferAttribute(part.uvs, 2));
-        const material = new MeshLambertMaterial({
-          color: part.colour,
-          side: DoubleSide,
-        });
+        const authored = part.material
+          ? createModelRenderMaterial(part.material, draw)
+          : undefined;
+        if (authored) releases.push(authored.release);
+        const material =
+          authored?.material ||
+          new MeshLambertMaterial({
+            color: part.colour,
+            side: DoubleSide,
+          });
         const rendered = new Mesh(geometry, material);
         rendered.userData.part = part;
         group.add(rendered);
@@ -565,6 +651,7 @@ export function PhotoModelPreview(props: {
     };
     return () => {
       disposed = true;
+      current.current.onScene?.(null);
       cancelGesture.current();
       gestureEvents.abort();
       cancelGesture.current = () => {};
@@ -574,6 +661,7 @@ export function PhotoModelPreview(props: {
       cancelAnimationFrame(resizeFrame);
       themeObserver.disconnect();
       controls?.dispose();
+      alignedControls?.dispose();
       clear();
       textures.dispose();
       renderer?.dispose();
