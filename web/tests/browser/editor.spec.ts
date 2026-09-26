@@ -2608,6 +2608,101 @@ test('review separate building wings, edit their geometry, save and undo without
   expect(errors).toEqual([]);
 });
 for (const phone of [false, true])
+  test(`published legacy models remain visible on the ${phone ? 'phone' : 'desktop'} public map`, async ({
+    page,
+  }, info) => {
+    if (phone) await page.setViewportSize({ width: 390, height: 844 });
+    const {
+      buildings: [{ feature, visual }],
+    } = JSON.parse(
+      readFileSync(
+        new URL('../fixtures/published-model-revisions.json', import.meta.url),
+        'utf8',
+      ),
+    ) as {
+      buildings: {
+        feature: CampusData['map']['features'][number];
+        visual: BuildingVisual;
+      }[];
+    };
+    const sectorUrl = '/packages/visual-abcdef/published-legacy.json';
+    const sectorBody = JSON.stringify({
+      schemaVersion: 1,
+      id: 'published-legacy',
+      models: [
+        {
+          ...createBuildingModel(feature, visual),
+          detailRevision: visual.detailRevision,
+        },
+      ],
+    });
+    await page
+      .context()
+      .route(`**${sectorUrl}`, (route) =>
+        route.fulfill({ body: sectorBody, contentType: 'application/json' }),
+      );
+    await setup(page, true, false, {
+      mutateCampus(data) {
+        data.map.features = data.map.features.map((f) =>
+          f.properties?.id === visual.id ? feature : f,
+        );
+        data.visuals = {
+          schemaVersion: 1,
+          revision: 'published-legacy',
+          buildings: [visual],
+          references: [],
+          bytes: Buffer.byteLength(sectorBody),
+          sectors: [
+            {
+              id: 'published-legacy',
+              url: sectorUrl,
+              bytes: Buffer.byteLength(sectorBody),
+              sha256: createHash('sha256').update(sectorBody).digest('hex'),
+              bounds: data.bounds,
+              buildingIds: [visual.id],
+            },
+          ],
+        };
+      },
+    });
+    await page.goto('/');
+    await attachMap(page);
+    await focusModels(page, phone);
+    const calls = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          const map = window.editorTestMap;
+          const layer = (
+            map.getLayer('campus-models') as unknown as {
+              implementation: import('maplibre-gl').CustomLayerInterface;
+            }
+          ).implementation;
+          const render = layer.render;
+          layer.render = function (gl, args) {
+            const draw = gl.drawElements;
+            let calls = 0;
+            gl.drawElements = function (...args) {
+              calls++;
+              return draw.apply(this, args);
+            };
+            try {
+              render.call(this, gl, args);
+            } finally {
+              gl.drawElements = draw;
+              layer.render = render;
+              resolve(calls);
+            }
+          };
+          map.triggerRepaint();
+        }),
+    );
+    expect(calls).toBeGreaterThan(0);
+    await page.screenshot({
+      path: info.outputPath('published-legacy-model.png'),
+    });
+  });
+
+for (const phone of [false, true])
   test(`miniature models: ${phone ? 'phone' : 'desktop'} LOD, picking, appearance and simple preference`, async ({
     page,
   }) => {
