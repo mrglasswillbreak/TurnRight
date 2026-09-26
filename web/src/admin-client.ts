@@ -74,7 +74,7 @@ export async function adminRequest<T>(
 ): Promise<T> {
   const api = <V>(action: string, payload: unknown) =>
     wireAdminRequest<V>(action, payload, token, options);
-  const ownerKey = token || 'local-test';
+  const ownerKey = `${token || 'local-test'}:${requestedCampus()}`;
   const batch = payload as {
     edits?: Array<{ edit?: { properties?: { modelDocument?: unknown } } }>;
   } | null;

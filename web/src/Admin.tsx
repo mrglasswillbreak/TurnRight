@@ -112,6 +112,8 @@ const BuildingAppearanceEditor = lazy(() =>
 );
 
 interface EditorState extends ReviewState {
+  base?: CampusData;
+  campus?: import('./campus-context').CampusIdentity;
   edits: MapEdit[];
 }
 
@@ -190,6 +192,7 @@ export default function Admin({
             api<EditorState>('state'),
             api<{ features: SourceRecord[] }>('sources'),
           ]);
+          if (state.base) initialCampus.current = state.base;
           rememberOfflineOwner(owner);
           const syncedAt = new Date().toISOString();
           const cached = await readSurveyContext<OfflineEditor>(owner).catch(
@@ -348,7 +351,7 @@ export default function Admin({
   return (
     <PhotoSession key={owner} owner={owner!}>
       <Editor
-        data={data}
+        data={state.base || data}
         dark={dark}
         appearance={appearance}
         onAppearance={onAppearance}

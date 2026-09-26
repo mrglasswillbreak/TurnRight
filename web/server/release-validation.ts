@@ -1,3 +1,5 @@
+import { currentCampusId } from './campus-scope.js';
+import { emptyCampus, validCatalogue } from '../src/campus-context.js';
 import { withPublishedVisuals } from '../src/editor-visuals.js';
 import { createHash } from 'node:crypto';
 import { assembleSources, type SourceRecord } from '../src/editor-model.js';
@@ -47,7 +49,26 @@ export async function publishedCampus(): Promise<CampusData> {
   const root = new URL(origin);
   if (root.protocol !== 'https:')
     throw new HttpError(503, 'The published map must use HTTPS.');
-  const response = await fetch(new URL('/packages/latest.json', root), {
+  let manifestUrl = '/packages/latest.json';
+  if (currentCampusId() !== 'lasu') {
+    const { activeCampus } = await import('./campuses.js');
+    const campus = await activeCampus();
+    const catalogResponse = await fetch(
+      new URL('/packages/campuses.json', root),
+      { cache: 'no-store', signal: AbortSignal.timeout(15000) },
+    );
+    if (catalogResponse.status === 404)
+      return emptyCampus(campus, campus.boundary);
+    if (!catalogResponse.ok)
+      throw new HttpError(503, 'Cannot verify the published campus directory.');
+    const catalogue: unknown = await catalogResponse.json();
+    if (!validCatalogue(catalogue))
+      throw new HttpError(503, 'The public campus directory is invalid.');
+    const published = catalogue.campuses.find((c) => c.id === campus.id);
+    if (!published) return emptyCampus(campus, campus.boundary);
+    manifestUrl = published.manifestUrl!;
+  }
+  const response = await fetch(new URL(manifestUrl, root), {
     cache: 'no-store',
     signal: AbortSignal.timeout(15000),
   });

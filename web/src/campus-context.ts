@@ -1,4 +1,4 @@
-import type { CampusData, CampusPackage, Position } from './types';
+import type { CampusData, CampusPackage, Position } from './types.js';
 
 export const DEFAULT_CAMPUS = 'lasu';
 export interface CampusIdentity {

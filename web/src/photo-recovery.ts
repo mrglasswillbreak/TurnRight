@@ -1,3 +1,4 @@
+import { campusKey } from './campus-context';
 import { openDB } from 'idb';
 import type { PhotoJob } from './photo-queue-store';
 const connection = () =>
@@ -14,6 +15,7 @@ export function recoveryPhoto(job: PhotoJob) {
   return record;
 }
 export async function readPhotoRecovery(owner: string): Promise<PhotoJob[]> {
+  owner = campusKey(owner);
   const db = await connection();
   try {
     const prefix = `turnright:photo-drafts:${owner}:`;
@@ -54,6 +56,7 @@ export async function writePhotoRecovery(
   owner: string,
   changes: Map<string, PhotoJob | null>,
 ) {
+  owner = campusKey(owner);
   const db = await connection();
   try {
     const tx = db.transaction('jobs', 'readwrite');

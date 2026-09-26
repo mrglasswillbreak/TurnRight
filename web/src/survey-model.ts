@@ -69,6 +69,7 @@ export interface ReplacementTarget {
   anchors: SurveyVertex[];
 }
 export interface SurveySession {
+  campusId?: string;
   localVersion?: number;
   pendingMarker?: SurveyMarker;
   appliedTarget?: { fingerprint: string; revision?: string };
