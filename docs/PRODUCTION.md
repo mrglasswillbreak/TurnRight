@@ -1,6 +1,98 @@
 # Production deployments
 
-## Multi-campus compatible readers — 26 September 2026
+Entries are dated receipts. Later entries supersede earlier deployment status,
+package counts and interface labels; older evidence is retained for audit.
+
+## Project documentation and public dock — 26 September 2026
+
+Runtime revision **`e6106447c3066f`** is Ready in
+[production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/8QLkbo35d1Hrtva2oYwWzp1rwrUV).
+Reviewing the refreshed screenshots exposed the floating campus chooser covering
+the expanded navigation. It now occupies a 44px globe button beside search,
+reachable with the card collapsed or expanded. Chromium and WebKit checks pass
+at desktop, tablet, landscape and 320px/390px phone widths. The deployed UI also
+confirms a 44×44 control with no navigation overlap.
+
+Live verification at **11:19:36 UTC** confirmed `/`, `/admin` and `/sw.js` return
+200, unauthenticated `/api/admin` returns 401, and the LASU-only catalogue still
+references the unchanged `lasu-7343cb96c9a5` package. All **84 assets /
+20,228,832 bytes** retain their recorded lengths and SHA-256 hashes. Served
+`CampusSwitcher--6rCefdm.js` has SHA-256
+`08bfe8de1d60b6f2d1807b52bd86b8d8e4ff73d42d5cd593be6c13f32bad7355`.
+No campus data or map release was changed.
+
+Lint and the configured production build pass, with the existing eight
+explicit-any warnings. Public startup remains **433,772 / 435,200** gzip bytes;
+the additional owner bundle is **185,800 / 189,440**. The full production-build
+documentation journey passes and refreshes public navigation and isolated owner
+views. The README now covers the whole project with **55 distinct screenshots**,
+an expanded module tree and a task-based documentation index. Related guides
+cover campus scoping, current setup through migration 015 and scoped restore
+previews; historical evidence retains its original date and package. Local
+links, anchors, image paths and Unicode checks pass across all 43 Markdown files.
+
+## Campus contrast and documentation follow-up — 26 September 2026
+
+Runtime revision **`820351fa2018cf77240f1b2aa433b1e4749aa37f`** is Ready in
+[production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/CDDwCUC1eyH7ecbZcmDh8XhxKR81).
+Live screenshot review found an undefined card token making the Campuses header
+and fields white against dark-theme text. The fix pairs those surfaces with the
+active theme and uses semantic error text. Chromium and WebKit contrast checks
+pass in both themes and preserve entered source text through switching.
+
+Verification at **11:04:21 UTC** confirmed the served correction in
+`CampusWorkspace-BtdEXSmy.css`, SHA-256
+`5996d7a951eb5fb2edb5a450ce8d421d8a376a831e03a13d687a29fcffd2e599`.
+Public/admin/shell routes return 200 and unauthenticated admin requests return
+401. The catalogue still lists only LASU, and the manifest plus all **84 assets /
+20,228,832 bytes** remain identical to the preserved baseline. No map release
+was published by this code fix.
+
+Lint, production and configured builds pass; the existing eight explicit-any
+warnings remain. The configured build measures **433,772 / 435,200** public
+startup gzip bytes and **185,804 / 189,440** additional owner bytes. The README
+now describes the whole project, its current module tree and **55 screenshots**.
+The documentation index separates workflow/setup guides from historical research.
+Setup now consistently requires migrations 001–015, and campus restoration
+consistently means preparing a new preview with other campuses' current packages.
+All 43 Markdown files pass local link, anchor, screenshot-path and Unicode checks.
+
+## Multi-campus imports — 26 September 2026
+
+Initial campus revision **`262db1b302dbf1096b878fba57c59047abde6a51`** deployed through
+the [production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/8q8B17a6dvq26Shso2c4u6cFg7iJ).
+[PR #2](https://github.com/mrglasswillbreak/TurnRight/pull/2) was merged with its
+nine focused commits preserved. The Campuses workspace, GIS import controls,
+public switcher and scoped publication/restore API are enabled.
+
+Migrations **013–015** were applied together in one transaction through the
+Supabase SQL editor before deploying the writing release. Post-migration checks
+confirmed all four new tables have RLS and no anonymous/authenticated SELECT
+grants; the five campus/import/release RPCs permit service-role execution only.
+The `campus-imports` bucket is private with a **50 MiB** upload limit. LASU is the
+only campus record. Before/after record counts and fingerprints match for:
+
+| Preserved private data | Records |
+| --- | ---: |
+| Source features | 4,777 |
+| Owner edits | 133 |
+| Releases | 32 |
+| Surveys | 2 |
+| Building media | 25 |
+| Model assets | 1 |
+
+Live verification at **10:46:33 UTC** returned 200 for `/`, `/admin` and `/sw.js`
+and the expected 401 for unauthenticated `/api/admin`. The new public catalogue
+contains only LASU and points to the unchanged **`lasu-7343cb96c9a5`** manifest.
+All **84 assets / 20,228,832 bytes** pass byte-length and SHA-256 checks.
+Served `CampusWorkspace-QQ-MHxNw.js` has SHA-256
+`9686424744a303637841c4997964720f239776405f6e57cc08cc0285df0f3c1e`;
+`CampusSwitcher-DNB9se9i.js` has SHA-256
+`85189196cc56c8ab1eca66d578fac3a29a6e441d2bcafa51fb9797ddf8700957`.
+No second campus or demonstration data was published. Importing and publishing
+another campus still requires the owner's source and map review.
+
+### Compatible-reader stage
 
 Reader revision **`f17f7b1`** deployed through the existing
 [Vercel integration](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/FZGvkES73dorL9GBF22Hjq66W7ra).
@@ -12,13 +104,9 @@ all **84 assets / 20,228,832 bytes** pass SHA-256 and byte-length verification.
 Served workspace `PhotoModelWorkspace-Cr6rd58w.js` has SHA-256
 `98852ee27fadc2032f73172aea0b7a0d406ab4d113afe5faaac1298df5ad3892`.
 
-The writing API, Campuses workspace, GIS adapters and scoped publication/restore
-implementation are committed on **`codex/multi-campus-imports`**, through
-`8a78b47`. They are **not yet enabled in production**: authenticated Supabase
-access is required to apply and verify migrations **013–015** before the writer
-deployment. No production campus was created, no second-campus data was
-published, and no existing private records were migrated during this reader
-rollout. Follow [the staged rollout](DEPLOYMENT.md#multi-campus-rollout).
+The reader deployment preceded database changes and the writing release above.
+Follow [the staged rollout](DEPLOYMENT.md#multi-campus-rollout) for future
+installations and retain the server-side protection when reverting clients.
 
 Implementation verification passes **591 unit tests**, the focused Chromium and
 WebKit import workflows, lint (eight existing warnings), production/configured
