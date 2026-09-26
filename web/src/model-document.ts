@@ -112,6 +112,7 @@ export const MODEL_LIMITS = {
   documentBytes: 25 * 1024 * 1024,
   imageBytes: 4 * 1024 * 1024,
   images: 32,
+  imagePixels: 16 * 1024 * 1024,
 };
 export const modelId = () => crypto.randomUUID();
 export const identityTransform = (): ModelTransform => ({
@@ -378,7 +379,14 @@ export function modelDocumentErrors(value: unknown): string[] {
     const entries = Object.entries(object.vertices);
     vertices += entries.length;
     faces += object.faces.length;
-    if (entries.some(([key, p]) => !id(key) || !vector(p)))
+    if (
+      entries.some(
+        ([key, p]) =>
+          !id(key) ||
+          !vector(p) ||
+          !vector(transformPoint(p, object.transform)),
+      )
+    )
       return [
         'Mesh vertices must have stable identities and finite local coordinates within 2 km.',
       ];

@@ -227,12 +227,18 @@ export async function importModelFiles(
     root.updateMatrixWorld(true);
     const materials = new Map<string, string>(),
       images = new Map<string, string>();
+    let imagePixels = 0;
     const saveImage = async (texture: Texture) => {
       if (images.has(texture.source.uuid))
         return images.get(texture.source.uuid)!;
       const source = texture.image as ImageBitmap;
       if (!source || !source.width || !source.height)
         throw new Error('A texture could not be decoded.');
+      imagePixels += source.width * source.height;
+      if (imagePixels > MODEL_LIMITS.imagePixels)
+        throw new Error(
+          'Model textures exceed 16 megapixels in total. Reduce their resolution before importing.',
+        );
       if (source.width > 4096 || source.height > 4096)
         throw new Error(
           'Reduce textures to 4096 × 4096 pixels or smaller before importing.',
@@ -327,15 +333,15 @@ export async function importModelFiles(
         mesh.name || primary,
         ids[0],
         true,
+        (triangle) =>
+          ids[
+            geometry.groups.find(
+              (g) =>
+                triangle * 3 >= g.start && triangle * 3 < g.start + g.count,
+            )?.materialIndex || 0
+          ] || ids[0],
       );
       object.source = { kind: 'import', name: primary };
-      for (let i = 0; i < object.faces.length; i++) {
-        const group = geometry.groups.find(
-          (g) => i * 3 >= g.start && i * 3 < g.start + g.count,
-        );
-        if (group)
-          object.faces[i].material = ids[group.materialIndex || 0] || ids[0];
-      }
       document.objects.push(object);
       geometry.dispose();
     }

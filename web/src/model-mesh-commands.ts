@@ -13,6 +13,7 @@ import {
   sub3,
   transformPoint,
   inverseTransformPoint,
+  identityTransform,
   type MeshSelection,
   type ModelCorner,
   type ModelFace,
@@ -39,6 +40,34 @@ const uvBetween = (a: ModelCorner, b: ModelCorner): Pick<ModelCorner, 'uv'> =>
   a.uv && b.uv
     ? { uv: [(a.uv[0] + b.uv[0]) / 2, (a.uv[1] + b.uv[1]) / 2] }
     : {};
+function uvAtPoint(object: ModelObject, corners: ModelCorner[], point: Vec3) {
+  if (!corners.every((c) => c.uv)) return undefined;
+  const dot = (a: Vec3, b: Vec3) => a.reduce((n, v, i) => n + v * b[i], 0),
+    a = object.vertices[corners[0].vertex];
+  for (let i = 1; i < corners.length - 1; i++) {
+    const b = object.vertices[corners[i].vertex],
+      c = object.vertices[corners[i + 1].vertex],
+      u = sub3(b, a),
+      v = sub3(c, a),
+      p = sub3(point, a),
+      uu = dot(u, u),
+      uv = dot(u, v),
+      vv = dot(v, v),
+      denominator = uu * vv - uv * uv;
+    if (Math.abs(denominator) < 1e-10) continue;
+    const w1 = (dot(p, u) * vv - dot(p, v) * uv) / denominator,
+      w2 = (dot(p, v) * uu - dot(p, u) * uv) / denominator,
+      w0 = 1 - w1 - w2;
+    if (Math.min(w0, w1, w2) >= -1e-6)
+      return [0, 1].map(
+        (j) =>
+          corners[0].uv![j] * w0 +
+          corners[i].uv![j] * w1 +
+          corners[i + 1].uv![j] * w2,
+      ) as [number, number];
+  }
+  return undefined;
+}
 
 export function meshCommand(
   source: ModelObject,
@@ -50,6 +79,30 @@ export function meshCommand(
     throw new Error(
       'Convert the curve to an editable mesh before editing vertices or faces.',
     );
+  if (
+    (command.kind === 'extrude' || command.kind === 'inset') &&
+    JSON.stringify(source.transform) !== JSON.stringify(identityTransform())
+  ) {
+    const world = {
+      ...source,
+      transform: identityTransform(),
+      vertices: Object.fromEntries(
+        Object.entries(source.vertices).map(([id, point]) => [
+          id,
+          transformPoint(point, source.transform),
+        ]),
+      ),
+    };
+    const result = meshCommand(world, selection, command);
+    result.object.vertices = Object.fromEntries(
+      Object.entries(result.object.vertices).map(([id, point]) => [
+        id,
+        inverseTransformPoint(point, source.transform),
+      ]),
+    );
+    result.object.transform = structuredClone(source.transform);
+    return result;
+  }
   const object = structuredClone(source),
     ids = selectedVertices(object, selection),
     vertices = new Set(ids);
@@ -67,9 +120,11 @@ export function meshCommand(
       command.value.some((v) => Math.abs(v) < 0.00001)
     )
       throw new Error('Scale must not collapse an axis.');
-    const centre = centre3(ids.map((id) => transformPoint(object.vertices[id],object.transform)));
+    const centre = centre3(
+      ids.map((id) => transformPoint(object.vertices[id], object.transform)),
+    );
     for (const id of ids) {
-      const point = transformPoint(object.vertices[id],object.transform),
+      const point = transformPoint(object.vertices[id], object.transform),
         local = sub3(point, centre);
       object.vertices[id] = inverseTransformPoint(
         command.kind === 'move'
@@ -79,7 +134,9 @@ export function meshCommand(
               command.kind === 'rotate'
                 ? rotate3(local, command.value)
                 : (local.map((v, i) => v * command.value[i]) as Vec3),
-            ),object.transform);
+            ),
+        object.transform,
+      );
     }
     // Imported normals no longer describe the modified surface.
     for (const face of object.faces)
@@ -236,6 +293,20 @@ export function meshCommand(
       throw new Error('Inset distance must be positive.');
     const old = structuredClone(face.corners);
     const normal = faceNormal(object, face);
+    if (
+      old.some(
+        (c) =>
+          Math.abs(
+            sub3(object.vertices[c.vertex], centre).reduce(
+              (n, v, i) => n + v * normal[i],
+              0,
+            ),
+          ) > 0.001,
+      )
+    )
+      throw new Error(
+        'Inset requires a planar face. Flatten it or select a triangle.',
+      );
     face.corners = old.map((c, i) => {
       const p = object.vertices[c.vertex],
         previous =
@@ -254,7 +325,12 @@ export function meshCommand(
         throw new Error('Inset requires a convex face and a smaller distance.');
       const id = modelId();
       object.vertices[id] = add3(p, scale3(direction, distance));
-      return { ...c, vertex: id, normal: undefined };
+      return {
+        ...c,
+        vertex: id,
+        uv: uvAtPoint(source, old, object.vertices[id]) || c.uv,
+        normal: undefined,
+      };
     });
     old.forEach((c, i) => {
       const j = (i + 1) % old.length;
@@ -308,14 +384,25 @@ export function meshCommand(
         b = face.corners[(i + 1) % face.corners.length],
         edge = edges.find((e) => e.id === edgeId(a.vertex, b.vertex))!;
       if (edge.faces.filter((id) => selected.has(id)).length !== 1) continue;
+      const sideLength = length3(
+        sub3(object.vertices[b.vertex], object.vertices[a.vertex]),
+      );
       object.faces.push({
         id: modelId(),
         material: face.material,
         corners: [
-          a,
-          b,
-          { ...b, vertex: duplicate.get(b.vertex)! },
-          { ...a, vertex: duplicate.get(a.vertex)! },
+          { ...a, uv: [0, 0] as [number, number] },
+          { ...b, uv: [sideLength, 0] as [number, number] },
+          {
+            ...b,
+            vertex: duplicate.get(b.vertex)!,
+            uv: [sideLength, Math.abs(command.amount)] as [number, number],
+          },
+          {
+            ...a,
+            vertex: duplicate.get(a.vertex)!,
+            uv: [0, Math.abs(command.amount)] as [number, number],
+          },
         ].map((c) => ({ ...c, normal: undefined })),
       });
     }

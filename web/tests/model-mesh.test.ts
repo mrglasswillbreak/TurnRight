@@ -97,6 +97,17 @@ describe('mesh commands with stable component identities', () => {
       meshCommand(o, face(o), { kind: 'scale', value: [0, 1, 1] }),
     ).toThrow(/collapse/);
   });
+  it('interpolates inset UVs and preserves the untouched outer border', () => {
+    const o = quad();
+    const next = meshCommand(o, face(o), { kind: 'inset', amount: 1 }).object;
+    const inner = next.faces.find((f) => f.id === 'front')!;
+    for (const corner of inner.corners) {
+      const p = next.vertices[corner.vertex];
+      expect(corner.uv?.[0]).toBeCloseTo(p[0] / 4);
+      expect(corner.uv?.[1]).toBeCloseTo(p[1] / 4);
+    }
+    expect(next.vertices.a).toEqual(o.vertices.a);
+  });
   it('validates every primitive and detects dangling references and hierarchy cycles', () => {
     for (const kind of [
       'box',
