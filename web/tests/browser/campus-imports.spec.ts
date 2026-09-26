@@ -39,6 +39,7 @@ const summary: ImportPreview = {
       count: 24,
       geometryTypes: ['Polygon'],
       crs: 'EPSG:4326',
+      sourceCrs: 'EPSG:3857',
       suggestedRole: 'building',
       fields: [
         { name: 'id', alias: 'Building identifier' },
@@ -311,6 +312,13 @@ test('campus imports preserve mappings through rotation and queue only a reviewe
     1,
   );
   expect(state.calls.every((c) => c.campus === 'lasu')).toBe(true);
+  const preview = state.calls.find(
+    (c) => c.action === 'import-run' && c.payload.phase === 'preview',
+  );
+  const mappings = (
+    preview!.payload.configuration as { layers: { crs?: string }[] }
+  ).layers;
+  expect(mappings[0].crs).toBeUndefined();
 });
 
 test('campus imports restore campus creation and public handoff keeps the campus context', async ({

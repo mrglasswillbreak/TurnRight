@@ -139,7 +139,10 @@ def inspect_file(path, configuration, work, label=None):
             if not re.fullmatch(r'(?:EPSG:)?[0-9]{3,7}',mapping['crs'],re.I): raise ValueError('Choose a valid EPSG coordinate reference system.')
             spatial.ImportFromEPSG(int(mapping['crs'].split(':')[-1]))
         transform = None
+        source_crs = None
         if spatial:
+            authority, code = spatial.GetAuthorityName(None), spatial.GetAuthorityCode(None)
+            source_crs = f'{authority}:{code}' if authority and code else spatial.GetName()
             spatial.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             transform = osr.CoordinateTransformation(spatial,target)
         definition = layer.GetLayerDefn()
@@ -157,5 +160,5 @@ def inspect_file(path, configuration, work, label=None):
                 geometry = json.loads(geometry.ExportToJson())
                 types.add(geometry['type'])
             features.append({'type':'Feature','id':record.GetFID(),'geometry':geometry,'properties':props})
-        result.append({'name':name,'features':features,'fields':fields,'crs':'EPSG:4326' if spatial else None,'geometryTypes':sorted(types),'suggestedRole':guess_role(name,types)})
+        result.append({'name':name,'features':features,'fields':fields,'crs':'EPSG:4326' if spatial else None,'sourceCrs':source_crs,'geometryTypes':sorted(types),'suggestedRole':guess_role(name,types)})
     return result

@@ -53,6 +53,7 @@ export interface ImportLayer {
   geometryTypes: string[];
   fields: { name: string; alias?: string; values?: string[] }[];
   crs?: string;
+  sourceCrs?: string;
   suggestedRole: ImportRole;
   requiresCoordinates?: boolean;
 }

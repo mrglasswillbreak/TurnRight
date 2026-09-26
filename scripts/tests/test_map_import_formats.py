@@ -49,6 +49,9 @@ class GISFormatTests(unittest.TestCase):
                 self.assertEqual(inspected[0]['crs'],'EPSG:4326')
                 self.assertEqual(inspected[0]['features'][0]['properties']['name'],'Library')
                 self.assertLess(abs(inspected[0]['features'][0]['geometry']['coordinates'][0][0][0]),180)
+                self.assertEqual(inspected[0]['sourceCrs'],'EPSG:3857')
+                preview=inspect_file(path,{'layers':[{'layer':inspected[0]['name'],'role':'building','nameField':'name'}]},folder/'expanded')
+                self.assertEqual(preview[0]['features'][0]['geometry'],inspected[0]['features'][0]['geometry'])
             archive=folder/'campus.zip'
             with zipfile.ZipFile(archive,'w') as z:
                 for p in folder.glob('buildings.*'):

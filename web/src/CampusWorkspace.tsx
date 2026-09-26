@@ -652,7 +652,9 @@ export default function CampusWorkspace({
                           <strong>{layer.name}</strong>
                           <span>
                             {layer.count.toLocaleString()} features ·{' '}
-                            {layer.crs || 'Projection required'}
+                            {layer.sourceCrs ||
+                              layer.crs ||
+                              'Projection required'}
                           </span>
                         </summary>
                         <div className="campus-fields">
@@ -675,10 +677,18 @@ export default function CampusWorkspace({
                           <label>
                             Source projection
                             <input
-                              value={m.crs || layer.crs || ''}
+                              value={m.crs || ''}
                               onChange={(e) => update({ crs: e.target.value })}
-                              placeholder="EPSG:4326"
+                              placeholder={
+                                layer.sourceCrs || layer.crs || 'EPSG:4326'
+                              }
                             />
+                            {layer.crs && !layer.requiresCoordinates && (
+                              <small>
+                                Leave empty to use the file’s detected
+                                projection.
+                              </small>
+                            )}
                           </label>
                           {(
                             [
@@ -1097,7 +1107,6 @@ function suggestMappings(job: CampusImport): ImportConfiguration {
           nameField: field(['name', 'title', 'building_name']),
           heightField: field(['height']),
           floorsField: field(['floors', 'building:levels']),
-          crs: layer.crs,
         }
       );
     }),
