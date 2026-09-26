@@ -1,8 +1,8 @@
 # TurnRight
 
-**Find your way around LASU Ojo — online or offline.**
+**Explore campus maps online or offline — with LASU Ojo as the default.**
 
-TurnRight is a campus walking and driving navigation PWA for Lagos State University, Ojo, with a private owner editor for maintaining paths, entrances, building appearances and reviewed releases. Search, routing, GPS processing and navigation audio run on the device.
+TurnRight is a campus walking and driving navigation PWA with a private owner workspace for importing and maintaining separate campus maps, paths, entrances, building models and reviewed releases. LASU Ojo remains the default public campus. Search, routing, GPS processing and navigation audio run on the device.
 
 [Open TurnRight](https://turnright.vercel.app/) · [Owner editor](https://turnright.vercel.app/admin) · [Deployment guide](docs/DEPLOYMENT.md) · [Report a software issue](https://github.com/mrglasswillbreak/TurnRight/issues)
 
@@ -20,6 +20,7 @@ TurnRight is a campus walking and driving navigation PWA for Lagos State Univers
 - [Driving on campus](#driving-on-campus)
 - [Entrance guides and photographs](#entrance-guides-and-photographs)
 - [Appearance and 3D](#appearance-and-3d)
+- [Campuses and map imports](#campuses-and-map-imports)
 - [Owner editor](#owner-editor)
 - [Building appearance and roofs](#building-appearance-and-roofs)
 - [Reference editing and authored models](#reference-editing-and-authored-models)
@@ -57,7 +58,39 @@ Current production-build captures use the verified published campus **`lasu-7343
 | --- | --- |
 | ![Offline-capable Clinic to Senate walking route preview](docs/assets/screenshots/public-route-desktop-current-2026-09-26.png) | <img src="docs/assets/screenshots/public-route-mobile-current-2026-09-26.png" width="260" alt="Mobile walking route with manual origin and mapped approach notice"> |
 
-### Owner editor
+### Campuses and map imports
+
+The implementation below is on `codex/multi-campus-imports`. Compatible readers
+are deployed; production import controls await the database migration. See
+[the current rollout status](docs/PRODUCTION.md).
+
+Open **Editor → Campuses** to create a campus, draw or import its boundary, and add sources. GeoJSON, zipped Shapefiles, GeoPackage, KML/KMZ, GPX, coordinate CSV and complete OSM XML/PBF extracts become editable vector layers. Online sources include OpenStreetMap through Overpass and public ArcGIS Web Maps, embedded collections and queryable services.
+
+| Create a campus and preview its boundary | Choose files, OpenStreetMap or public ArcGIS |
+| --- | --- |
+| ![Campus creation with a geographic boundary preview](docs/assets/screenshots/campus-creation-2026-09-26.png) | ![Public ArcGIS source configuration](docs/assets/screenshots/campus-sources-2026-09-26.png) |
+
+| Map fields, identifiers and projections | Review proposed changes and routing gaps |
+| --- | --- |
+| ![Layer mapping with field aliases and height units](docs/assets/screenshots/campus-mapping-2026-09-26.png) | ![Map import preview with additions, changes, removals and review controls](docs/assets/screenshots/campus-review-2026-09-26.png) |
+
+Imports remain private review candidates. Stable source identities protect repeat imports; owner corrections and authored models are not automatically replaced. Long-running jobs can be reopened, cancelled and retried. Sources default to manual refresh; optional daily checks queue changes for review. Public ArcGIS access does not establish redistribution permission. [Formats, mapping, limits and attribution](docs/CAMPUS-IMPORTS.md).
+
+![Campuses workspace with independent source and import histories](docs/assets/screenshots/campus-workspace-2026-09-26.png)
+
+Public **Campuses** search and globe markers list published campuses. `?campus=<slug>` composes with existing place/building links; old links remain LASU-only. Each campus has its own saved places, report drafts, editor recovery and offline download. A campus can publish before routing is ready, with a clear directions-unavailable state.
+
+| Published-campus switcher | Download one campus independently |
+| --- | --- |
+| ![Searchable public campus selector](docs/assets/screenshots/campus-switcher-2026-09-26.png) | ![Campus-specific offline map controls](docs/assets/screenshots/campus-offline-2026-09-26.png) |
+
+![Import review in a phone landscape viewport](docs/assets/screenshots/campus-landscape-2026-09-26.png)
+
+Publication replaces only the reviewed campus entry while preserving the other campuses and all their assets. Restoring a historical campus creates a fresh preview with the other campuses' current maps. The existing LASU `/packages/latest.json` compatibility link and public model fingerprints are retained. [Deployment order and production status](docs/DEPLOYMENT.md).
+
+These new screenshots use isolated owner/API fixtures and illustrative second-campus names. They are not evidence that a second campus has been published. The remaining gallery continues to show the verified LASU package and existing model/navigation workflows.
+
+## Owner editor
 
 | Workspace and feature explorer | Selected building with photographs at the top |
 | --- | --- |
@@ -106,6 +139,8 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 | ![Directions and place actions above photo credits and arrival options](docs/assets/screenshots/public-building-actions-2026-09-26.png) | ![Public-map selection carried into the general building editing card](docs/assets/screenshots/editor-public-building-handoff-2026-09-26.png) |
 
 ## Recent changes
+
+- Multi-campus imports add a resumable Campuses workspace, isolated data and offline state, complete GIS/OSM/ArcGIS processing, and independent review, publication and restore previews. Migrations 013–015 follow compatible reader deployment. [Guide](docs/CAMPUS-IMPORTS.md) · [Rollout status](docs/PRODUCTION.md).
 
 - **Reference split:** keep Orbit or Edit surface beside a photograph on roomy desktops/tablets, with a remembered, keyboard-accessible divider and automatic narrow-screen fallback.
 - **Expanded modelling:** draw exterior walls, wings and courtyards; edit arcs, Bézier edges and rounded outlines; create primitives and extruded profiles; edit vertices, edges and faces in the shared canvas.
@@ -541,6 +576,8 @@ TurnRight/
 | Local admin/report API fails | Vite does not host Vercel functions. Use a configured hosted environment and verify OAuth, variables and owner authorization. |
 
 ## Documentation
+
+- [Campuses and map imports](docs/CAMPUS-IMPORTS.md): creation, supported sources, mapping, review, refresh, public switching and offline downloads.
 
 | Guide | Topics |
 | --- | --- |

@@ -1,5 +1,38 @@
 # TurnRight verification and release checklist
 
+## Multi-campus import verification — 26 September 2026
+
+- **591 unit tests pass**, including campus identity/storage isolation, concurrent
+  request scoping, OAuth handoff, boundary topology, migration-backed save/review
+  isolation, cancelled import rejection, resumable upload limits and independent
+  catalogue publication/restores. Lint passes with eight existing explicit-any
+  warnings. A run alongside browser rendering hit three existing 5-second test
+  timeouts; the full suite passes when run without that competing workload.
+- **14 Linux GIS tests pass** in the pinned GDAL/PROJ/Pyosmium image without parser
+  network access. Coverage includes all supported file formats, projected
+  coordinates through inspection and mapping, missing projections, multipart
+  courtyards, Unicode, incomplete OSM topology, ArcGIS ID batches/embedded layers,
+  repeated source imports, retained authored properties, restricted paths,
+  unsafe archives, combined expansion limits and external KML references.
+  [Run evidence](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36225606793).
+  Local Python lacks GDAL and skips two driver integration tests; the Linux run
+  supplies their evidence.
+- **Three Chromium and three WebKit workflows pass** for resumable mappings,
+  source preview/queueing, campus creation recovery, public editor handoff,
+  campus search and responsive controls. Layouts include 1280×720, 1440×900,
+  1920×1080, 1024×768, 667×375, 844×390 and 390×844, plus CSS zoom at 125%/150%.
+  These are automated viewport changes, not physical rotation or browser-chrome
+  zoom acceptance. Screenshots were reviewed for clipping and contrast.
+- Production and configured builds pass existing startup, editor, renderer,
+  world and voice budgets. Frozen LASU model compatibility fixtures are unchanged.
+  Live verification of the compatible-reader deployment preserves all 84 LASU
+  assets. Writer deployment, live database migration checks, real source jobs and
+  a second-campus publication remain pending authenticated Supabase access and
+  subsequent owner review; fixture tests do not claim those operations happened.
+
+Use [CAMPUS-IMPORTS.md](CAMPUS-IMPORTS.md) for reproducible commands and screenshot
+provenance, and [PRODUCTION.md](PRODUCTION.md) for exact deployed state.
+
 ## Current model editor verification
 
 Use [MODEL-EDITOR-VERIFICATION.md](MODEL-EDITOR-VERIFICATION.md) for the unified workspace's checks, measured performance, responsive captures and remaining hardware gaps. Its completed-command autosave replaces the old one-shot façade Apply workflow. Building review stays targeted and architectural work never grants navigation permissions. The dated records below are historical evidence, not current suite totals or proof of physical-device acceptance.

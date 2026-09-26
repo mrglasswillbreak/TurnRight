@@ -1,5 +1,12 @@
 # Source attribution
 
+## Additional campuses and imported sources
+
+Each campus retains its own source URL, download timestamp/hash, attribution, licence and redistribution declaration. Original uploaded attributes and snapshots are private; approved geometry and applicable attribution enter its public/offline package. The source declaration is checked before publication. Public ArcGIS availability is not permission to redistribute: confirm the specific dataset's terms. Existing LASU source permissions do not authorize another campus's data.
+
+OpenStreetMap imports retain **© OpenStreetMap contributors**, **ODbL-1.0** and [the copyright/licence link](https://www.openstreetmap.org/copyright). Overpass is a download service, not a separate map-data licence. The public map renders the selected campus's attribution. Original world/globe and photograph credits below remain applicable. [Import and refresh guide](../docs/CAMPUS-IMPORTS.md).
+
+
 - September 2026 globe update: NASA Earth Observatory, Blue Marble Next Generation, **September 2004**, shaded topography. Selected source: 21,600 × 10,800 pixels, approximately 2 km/pixel at the equator. Reprojected, resampled and WebP-compressed into local z0–4 overview tiles. [NASA original](https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/) · [reuse guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/). No NASA endorsement is implied. Natural Earth v5.1.2 1:50m countries, lakes and selected cities are public domain. Exact source hashes and dates are in [world-sources.json](world-sources.json); derived assets retain their credits in the offline world manifest. This dated overview does not provide campus routing evidence.
 - Photographic architecture: [39-image inventory](photo-models/inventory.json), assessed against the published campus on 24 September 2026. Each reusable image retains its own author and licence. Wall texture derivatives retain the same source rights and add crop, perspective-rectification, resampling and compression notices. Comparison sheets combine unchanged reference-photo content with illustrative model renders; image credits and applicable share-alike terms accompany each sheet in [the coverage report](../docs/PHOTO-MODEL-COVERAGE.md).
 
