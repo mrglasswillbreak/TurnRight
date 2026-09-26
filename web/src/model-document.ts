@@ -31,9 +31,19 @@ export interface ModelMaterial {
   emissive?: string;
   emissiveMap?: string;
   alphaTest?: number;
-  textureSettings?: Partial<Record<'baseMap'|'normalMap'|'roughnessMap'|'metalnessMap'|'emissiveMap',{
-    flipY:boolean;wrapS:number;wrapT:number;offset:Vec2;repeat:Vec2;rotation:number;
-  }>>;
+  textureSettings?: Partial<
+    Record<
+      'baseMap' | 'normalMap' | 'roughnessMap' | 'metalnessMap' | 'emissiveMap',
+      {
+        flipY: boolean;
+        wrapS: number;
+        wrapT: number;
+        offset: Vec2;
+        repeat: Vec2;
+        rotation: number;
+      }
+    >
+  >;
 }
 export interface ModelImage {
   id: string;
@@ -217,10 +227,43 @@ export function transformPoint(point: Vec3, transform: ModelTransform): Vec3 {
     transform.position,
   );
 }
-export function inverseTransformPoint(point: Vec3, transform: ModelTransform): Vec3 {
-  let result=sub3(point,transform.position);
-  for(let axis=2;axis>=0;axis--){const angles:Vec3=[0,0,0];angles[axis]=-transform.rotation[axis];result=rotate3(result,angles);}
-  return result.map((n,i)=>n/transform.scale[i]) as Vec3;
+export function inverseTransformPoint(
+  point: Vec3,
+  transform: ModelTransform,
+): Vec3 {
+  let result = sub3(point, transform.position);
+  for (let axis = 2; axis >= 0; axis--) {
+    const angles: Vec3 = [0, 0, 0];
+    angles[axis] = -transform.rotation[axis];
+    result = rotate3(result, angles);
+  }
+  return result.map((n, i) => n / transform.scale[i]) as Vec3;
+}
+export function validTextureSettings(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  return Object.entries(value).every(
+    ([slot, s]) =>
+      [
+        'baseMap',
+        'normalMap',
+        'roughnessMap',
+        'metalnessMap',
+        'emissiveMap',
+      ].includes(slot) &&
+      s &&
+      typeof s.flipY === 'boolean' &&
+      [1000, 1001, 1002].includes(s.wrapS) &&
+      [1000, 1001, 1002].includes(s.wrapT) &&
+      [s.offset, s.repeat].every(
+        (v) =>
+          Array.isArray(v) &&
+          v.length === 2 &&
+          v.every((n) => Number.isFinite(n) && Math.abs(n) < 1e6),
+      ) &&
+      Number.isFinite(s.rotation) &&
+      Math.abs(s.rotation) < 1e6,
+  );
 }
 export function modelDocumentErrors(value: unknown): string[] {
   if (value === undefined) return [];
@@ -230,7 +273,9 @@ export function modelDocumentErrors(value: unknown): string[] {
     v.length === 3 &&
     v.every((n) => Number.isFinite(n) && Math.abs(n) <= limit);
   const id = (v: unknown): v is string =>
-    typeof v === 'string' && /^[\w:.-]{1,240}$/.test(v);
+    typeof v === 'string' &&
+    /^[\w:.-]{1,240}$/.test(v) &&
+    !['__proto__', 'constructor', 'prototype'].includes(v);
   const colour = (v: unknown) =>
     typeof v === 'string' && /^#[a-f\d]{6}$/i.test(v);
   if (
@@ -287,6 +332,7 @@ export function modelDocumentErrors(value: unknown): string[] {
           (n) => Number.isFinite(n) && n >= 0 && n <= 1,
         ) ||
         typeof m.doubleSided !== 'boolean' ||
+        !validTextureSettings(m.textureSettings) ||
         [
           m.baseMap,
           m.normalMap,
