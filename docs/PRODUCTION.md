@@ -1,5 +1,40 @@
 # Production deployments
 
+## Reference editing and authored models — 26 September 2026
+
+Application revision **`5407e3880abe864f428d3f3e7aaeaf5ca2b0614a`** deployed
+successfully through the existing [Vercel workflow](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/2v3B88ZTCt7Xdo876YFNuXttqEnu).
+The rollout adds remembered model/photo reference panes, globe rotation/clouds,
+exterior and curved boundary editing, stable mesh component tools and
+GLB/glTF/OBJ/STL interchange. The private model document and publication path
+remain behind owner authentication and explicit review.
+
+Compatible readers were deployed at `25e2f1e` before migration
+`012_editable_model_assets.sql` and the writing editor/API. Production checks
+confirmed a private `building-models` bucket, no authenticated direct metadata
+SELECT grant and the versioned `save_editor_model_batch` RPC. The migration
+created no model assets or campus content. Older writers cannot silently drop
+new document references.
+
+Live verification at **04:33:26 UTC** returned 200 for `/`, `/admin` and `/sw.js`,
+and the expected unauthenticated 401 from `/api/admin`. Served workspace
+`PhotoModelWorkspace-B2tYHipm.js` has SHA-256
+`02fb819161d49ab8d3f8b3b655e4136b33160871ece830afa7af7a9ee5f5111b`;
+the Mesh, private-asset client and globe chunks were also fetched and checked.
+
+The owner had published **`lasu-7343cb96c9a5`** at 02:14:29 UTC before this
+application rollout. That release is the preservation baseline: its manifest
+is unchanged and all **84 assets / 20,228,832 bytes** pass SHA-256 and byte-length
+verification. A fresh compatibility audit of **395 models** finds zero rejected
+fingerprints. No campus release was triggered by this deployment.
+
+Validation passes **577 unit tests**, focused Chromium and WebKit workflows,
+client/server TypeScript, lint (eight warnings), production/configured builds
+and all existing budgets. The production screenshot workflow passes; the root
+README now includes **46 unaltered screenshots**, including real reference-photo
+editing and isolated mesh/curve/file examples. See [verification](MODEL-EDITOR-VERIFICATION.md),
+[model authoring](MODEL-AUTHORING.md) and [screenshot provenance](assets/screenshots/README.md).
+
 ## Published model compatibility repair — 26 September 2026
 
 Revision **`22478badad256a7d7b0f979151f6322d0d38d0a9`** deployed successfully
