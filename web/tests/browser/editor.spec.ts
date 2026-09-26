@@ -7807,6 +7807,46 @@ test('surface workspace tree keyboard focus, search and repeated detail detachme
   expect(wall()?.elements[0].count).toBe(2);
 });
 
+test('properties header stays visible and fields fit the scrollable panel', async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  const { dialog } = await unifiedModelFixture(page);
+  const inspector = dialog.getByLabel('Model detail properties', {
+    exact: true,
+  });
+  const header = inspector.locator('.model-property-target');
+  const body = inspector.locator('.model-properties-body');
+  expect((await inspector.boundingBox())!.width).toBe(360);
+  const top = (await header.boundingBox())!.y;
+  await inspector
+    .getByText('Groups, patterns & presets', { exact: true })
+    .click();
+  await body.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect(header).toBeVisible();
+  expect((await header.boundingBox())!.y).toBe(top);
+  expect(
+    await body.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+  ).toBe(true);
+  await body.evaluate((el) => {
+    el.scrollTop = 0;
+  });
+  await page.screenshot({ path: info.outputPath('properties-desktop.png') });
+  await dialog
+    .getByRole('button', { name: 'Hide structure', exact: true })
+    .click();
+  await expect(
+    dialog.getByRole('button', { name: 'Show structure', exact: true }),
+  ).toHaveText('');
+  await page.setViewportSize({ width: 1024, height: 768 });
+  expect((await inspector.boundingBox())!.width).toBe(320);
+  expect(
+    await body.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+  ).toBe(true);
+});
+
 test('surface workspace falls back to precision editing when WebGL is unavailable', async ({
   page,
 }) => {

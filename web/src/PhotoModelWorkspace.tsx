@@ -1834,989 +1834,1023 @@ function ModelWorkspace({
                                 : 'Whole building · defaults'}
                     </p>
                   </div>
-                  <div className="model-canvas-controller">
-                    {mode === 'details' && metrics && (
-                      <>
-                        {!recorded && !conversion && (
-                          <div className="model-notice">
-                            <p>
-                              Adding a detail preserves this wall’s generated
-                              layout. You can also preview and convert it before
-                              editing.
-                            </p>
-                            <ModelButton
-                              variant="outline"
-                              onClick={() =>
-                                tryAction(() =>
-                                  setConversion(
-                                    editableFacade(feature, activeWall, visual),
-                                  ),
-                                )
-                              }
-                            >
-                              Preview editable layout
-                            </ModelButton>
-                          </div>
-                        )}
-                        {conversion && (
-                          <div className="model-notice">
-                            <p>
-                              Preview:{' '}
-                              {conversion.elements.reduce(
-                                (n, e) => n + e.count,
-                                0,
-                              )}{' '}
-                              generated details become editable. Existing
-                              proportions are retained.
-                            </p>
-                            <ModelButton
-                              variant="outline"
-                              icon={<ActionCheck />}
-                              onClick={() => applyWall(conversion)}
-                            >
-                              Use editable layout
-                            </ModelButton>
-                            <ModelButton
-                              variant="outline"
-                              icon={<ActionX />}
-                              onClick={() => setConversion(null)}
-                            >
-                              Cancel conversion
-                            </ModelButton>
-                          </div>
-                        )}
-                        {pending?.wallId === activeWall && (
-                          <div className="model-notice">
-                            <p>
-                              Unfinished wall retained locally. Resolve its
-                              placement or building errors, then save it.
-                            </p>
-                            <ModelButton
-                              variant="outline"
-                              onClick={() => applyWall(pending)}
-                            >
-                              Save unfinished wall
-                            </ModelButton>
-                            <ModelButton
-                              variant="outline"
-                              onClick={() => switchMode('appearance')}
-                            >
-                              Check building height
-                            </ModelButton>
-                          </div>
-                        )}
-                        <ModelPlanPortal>
-                          <ModelWallCanvas
-                            interactive={
-                              tab === 'surface' &&
-                              (!compact || landscape || panel === 'none')
-                            }
-                            detailName={label}
-                            views={wallViews.current}
-                            key={activeWall}
-                            metrics={metrics}
-                            elements={
-                              before
-                                ? initial.current.properties.appearance
-                                    ?.facades?.[activeWall]?.elements ||
-                                  editableFacade(original, activeWall, visual)
-                                    .elements
-                                : elements
-                            }
-                            selected={selected}
-                            hidden={hidden}
-                            locked={locked}
-                            grid={grid}
-                            onSelect={(ids, i) => {
-                              setSelected(ids);
-                              setInstance(i || 0);
-                            }}
-                            onCommit={(next) => {
-                              if (!before) updateElements(next);
-                            }}
-                            onDuplicate={duplicate}
-                            onDelete={remove}
-                          />
-                        </ModelPlanPortal>
-                      </>
-                    )}
-                  </div>
-                  {(mode === 'appearance' || mode === 'roof') && (
-                    <div data-mobile-panel="mode">
-                      <BuildingAppearanceEditor
-                        embedded
-                        workspace={workspace}
-                        edit={draft}
-                        data={data}
-                        mode={mode}
-                        onMode={switchMode}
-                        selection={
-                          selection || {
-                            buildingId: edit.id,
-                            partId: metrics?.partId,
-                            wallId: activeWall,
-                          }
-                        }
-                        onSelection={(next) => {
-                          setSelected([]);
-                          const id =
-                            next.wallId ||
-                            (next.partId !== metrics?.partId
-                              ? walls.find((w) => w.partId === next.partId)
-                                  ?.wallId
-                              : undefined);
-                          if (id && id !== activeWall) choose(id);
-                          onSelection(next);
-                        }}
-                        onEdit={(next) => commit(next)}
-                        onHeightEdit={(next) => commit(next, true)}
-                        roofDraft={roofDraft}
-                        onRoofDraft={onRoofDraft}
-                        onApplyRoof={onRoofApply}
-                      />
-                    </div>
-                  )}
-                  {mode === 'outline' && (
-                    <div data-mobile-panel="mode">
-                      <ModelOutlineCanvas
-                        edit={draft}
-                        workspace={workspace}
-                        onCommit={(next) => commit(next, true)}
-                      />
-                    </div>
-                  )}
-                  {mode === 'review' && (
-                    <section className="model-review" data-mobile-panel="mode">
-                      <h3>Model review</h3>
-                      <p>
-                        Saving preserves your draft. Only walls explicitly
-                        reviewed receive approval.
-                      </p>
-                      <p>
-                        Editing details clears that wall’s previous review.
-                        “Needs review” does not by itself mean the model is
-                        broken. Inspect its placement and evidence, then mark
-                        that wall reviewed to enable a release preview.
-                      </p>
-                      {publishErrors.map((e, i) => (
-                        <ModelButton
-                          variant="outline"
-                          key={i}
-                          onClick={() => {
-                            const issue = facadeReviewIssues(feature).find(
-                              (issue) => issue.message === e,
-                            );
-                            if (
-                              issue &&
-                              !walls.some((w) => w.wallId === issue.field)
-                            ) {
-                              setError(
-                                'This wall was removed or reassigned. Use its rematching controls below to choose an empty wall.',
-                              );
-                              return;
-                            }
-                            if (
-                              issue?.field &&
-                              walls.some((w) => w.wallId === issue.field)
-                            )
-                              choose(issue.field);
-                            switchMode(
-                              /height|floor/i.test(e)
-                                ? 'appearance'
-                                : 'details',
-                            );
-                            if (!/height|floor/i.test(e)) {
-                              setReviewOpen(true);
-                              openPanel('more');
-                              setDetent('full');
-                            }
-                          }}
-                        >
-                          {e}
-                        </ModelButton>
-                      ))}
-                      {Object.values(
-                        draft.properties.appearance?.facades || {},
-                      ).map((f) => {
-                        const w = walls.find((w) => w.wallId === f.wallId),
-                          changed =
-                            JSON.stringify(
-                              initial.current.properties.appearance?.facades?.[
-                                f.wallId
-                              ],
-                            ) !== JSON.stringify(f);
-                        return (
-                          <article key={f.wallId}>
-                            <strong>
-                              {w?.label || 'Removed wall'}
-                              {changed ? ' · changed this session' : ''}
-                            </strong>
-                            <p>
-                              {f.confidence === 'inferred'
-                                ? 'Illustrative estimate'
-                                : f.confidence === 'observed'
-                                  ? 'Photo observed · estimated dimensions'
-                                  : 'Documented dimensions'}{' '}
-                              · {f.elements.length} records ·{' '}
-                              {f.reviewedAt &&
-                              !f.needsReview &&
-                              facadeMatches(f, feature)
-                                ? 'Reviewed'
-                                : 'Needs review'}
-                            </p>
-                            {changed && (
-                              <ul>
-                                {f.elements
-                                  .filter(
-                                    (e) =>
-                                      JSON.stringify(
-                                        initial.current.properties.appearance?.facades?.[
-                                          f.wallId
-                                        ]?.elements.find(
-                                          (old) => old.id === e.id,
-                                        ),
-                                      ) !== JSON.stringify(e),
-                                  )
-                                  .map((e) => (
-                                    <li key={e.id}>
-                                      {label(e)} ·{' '}
-                                      {initial.current.properties.appearance?.facades?.[
-                                        f.wallId
-                                      ]?.elements.some((old) => old.id === e.id)
-                                        ? 'modified'
-                                        : 'added'}
-                                    </li>
-                                  ))}
-                                {(
-                                  initial.current.properties.appearance
-                                    ?.facades?.[f.wallId]?.elements || []
-                                )
-                                  .filter(
-                                    (e) =>
-                                      !f.elements.some(
-                                        (next) => next.id === e.id,
+                  <div className="model-properties-body">
+                    <div className="model-canvas-controller">
+                      {mode === 'details' && metrics && (
+                        <>
+                          {!recorded && !conversion && (
+                            <div className="model-notice">
+                              <p>
+                                Adding a detail preserves this wall’s generated
+                                layout. You can also preview and convert it
+                                before editing.
+                              </p>
+                              <ModelButton
+                                variant="outline"
+                                onClick={() =>
+                                  tryAction(() =>
+                                    setConversion(
+                                      editableFacade(
+                                        feature,
+                                        activeWall,
+                                        visual,
                                       ),
+                                    ),
                                   )
-                                  .map((e) => (
-                                    <li key={e.id}>{label(e)} · removed</li>
-                                  ))}
-                              </ul>
-                            )}
-                            <ModelButton
-                              variant="outline"
-                              onClick={() => {
-                                choose(w?.wallId || activeWall);
-                                setMode('details');
+                                }
+                              >
+                                Preview editable layout
+                              </ModelButton>
+                            </div>
+                          )}
+                          {conversion && (
+                            <div className="model-notice">
+                              <p>
+                                Preview:{' '}
+                                {conversion.elements.reduce(
+                                  (n, e) => n + e.count,
+                                  0,
+                                )}{' '}
+                                generated details become editable. Existing
+                                proportions are retained.
+                              </p>
+                              <ModelButton
+                                variant="outline"
+                                icon={<ActionCheck />}
+                                onClick={() => applyWall(conversion)}
+                              >
+                                Use editable layout
+                              </ModelButton>
+                              <ModelButton
+                                variant="outline"
+                                icon={<ActionX />}
+                                onClick={() => setConversion(null)}
+                              >
+                                Cancel conversion
+                              </ModelButton>
+                            </div>
+                          )}
+                          {pending?.wallId === activeWall && (
+                            <div className="model-notice">
+                              <p>
+                                Unfinished wall retained locally. Resolve its
+                                placement or building errors, then save it.
+                              </p>
+                              <ModelButton
+                                variant="outline"
+                                onClick={() => applyWall(pending)}
+                              >
+                                Save unfinished wall
+                              </ModelButton>
+                              <ModelButton
+                                variant="outline"
+                                onClick={() => switchMode('appearance')}
+                              >
+                                Check building height
+                              </ModelButton>
+                            </div>
+                          )}
+                          <ModelPlanPortal>
+                            <ModelWallCanvas
+                              interactive={
+                                tab === 'surface' &&
+                                (!compact || landscape || panel === 'none')
+                              }
+                              detailName={label}
+                              views={wallViews.current}
+                              key={activeWall}
+                              metrics={metrics}
+                              elements={
+                                before
+                                  ? initial.current.properties.appearance
+                                      ?.facades?.[activeWall]?.elements ||
+                                    editableFacade(original, activeWall, visual)
+                                      .elements
+                                  : elements
+                              }
+                              selected={selected}
+                              hidden={hidden}
+                              locked={locked}
+                              grid={grid}
+                              onSelect={(ids, i) => {
+                                setSelected(ids);
+                                setInstance(i || 0);
+                              }}
+                              onCommit={(next) => {
+                                if (!before) updateElements(next);
+                              }}
+                              onDuplicate={duplicate}
+                              onDelete={remove}
+                            />
+                          </ModelPlanPortal>
+                        </>
+                      )}
+                    </div>
+                    {(mode === 'appearance' || mode === 'roof') && (
+                      <div data-mobile-panel="mode">
+                        <BuildingAppearanceEditor
+                          embedded
+                          workspace={workspace}
+                          edit={draft}
+                          data={data}
+                          mode={mode}
+                          onMode={switchMode}
+                          selection={
+                            selection || {
+                              buildingId: edit.id,
+                              partId: metrics?.partId,
+                              wallId: activeWall,
+                            }
+                          }
+                          onSelection={(next) => {
+                            setSelected([]);
+                            const id =
+                              next.wallId ||
+                              (next.partId !== metrics?.partId
+                                ? walls.find((w) => w.partId === next.partId)
+                                    ?.wallId
+                                : undefined);
+                            if (id && id !== activeWall) choose(id);
+                            onSelection(next);
+                          }}
+                          onEdit={(next) => commit(next)}
+                          onHeightEdit={(next) => commit(next, true)}
+                          roofDraft={roofDraft}
+                          onRoofDraft={onRoofDraft}
+                          onApplyRoof={onRoofApply}
+                        />
+                      </div>
+                    )}
+                    {mode === 'outline' && (
+                      <div data-mobile-panel="mode">
+                        <ModelOutlineCanvas
+                          edit={draft}
+                          workspace={workspace}
+                          onCommit={(next) => commit(next, true)}
+                        />
+                      </div>
+                    )}
+                    {mode === 'review' && (
+                      <section
+                        className="model-review"
+                        data-mobile-panel="mode"
+                      >
+                        <h3>Model review</h3>
+                        <p>
+                          Saving preserves your draft. Only walls explicitly
+                          reviewed receive approval.
+                        </p>
+                        <p>
+                          Editing details clears that wall’s previous review.
+                          “Needs review” does not by itself mean the model is
+                          broken. Inspect its placement and evidence, then mark
+                          that wall reviewed to enable a release preview.
+                        </p>
+                        {publishErrors.map((e, i) => (
+                          <ModelButton
+                            variant="outline"
+                            key={i}
+                            onClick={() => {
+                              const issue = facadeReviewIssues(feature).find(
+                                (issue) => issue.message === e,
+                              );
+                              if (
+                                issue &&
+                                !walls.some((w) => w.wallId === issue.field)
+                              ) {
+                                setError(
+                                  'This wall was removed or reassigned. Use its rematching controls below to choose an empty wall.',
+                                );
+                                return;
+                              }
+                              if (
+                                issue?.field &&
+                                walls.some((w) => w.wallId === issue.field)
+                              )
+                                choose(issue.field);
+                              switchMode(
+                                /height|floor/i.test(e)
+                                  ? 'appearance'
+                                  : 'details',
+                              );
+                              if (!/height|floor/i.test(e)) {
                                 setReviewOpen(true);
                                 openPanel('more');
                                 setDetent('full');
-                                setTab((view) =>
-                                  view === 'surface' ? view : 'surface',
-                                );
-                              }}
-                            >
-                              Inspect details and evidence
-                            </ModelButton>
-                            {!w && metrics && (
-                              <ModelButton
-                                variant="outline"
-                                onClick={() => {
-                                  if (recorded) {
-                                    setError(
-                                      'The selected wall already has details. Choose an empty wall before rematching.',
-                                    );
-                                    return;
-                                  }
-                                  const oldLength = wallLength(
-                                      f.wallCoordinates,
-                                    ),
-                                    next = {
-                                      ...f,
-                                      wallId: activeWall,
-                                      partId: metrics.partId,
-                                      wallCoordinates: metrics.coordinates,
-                                      elements: f.elements.map((e) => ({
-                                        ...e,
-                                        x: (e.x * oldLength) / metrics.length,
-                                        spacing:
-                                          (e.spacing * oldLength) /
-                                          metrics.length,
-                                      })),
-                                      needsReview: true,
-                                      reviewedAt: undefined,
-                                    };
-                                  const facades = {
-                                    ...draft.properties.appearance?.facades,
-                                  };
-                                  delete facades[f.wallId];
-                                  facades[activeWall] = next;
-                                  commit({
-                                    ...draft,
-                                    properties: {
-                                      ...draft.properties,
-                                      appearance: {
-                                        ...draft.properties.appearance,
-                                        facades,
-                                      },
-                                    },
-                                  });
-                                }}
-                              >
-                                Rematch to selected empty wall
-                              </ModelButton>
-                            )}
-                          </article>
-                        );
-                      })}
-                      {!Object.keys(draft.properties.appearance?.facades || {})
-                        .length && <p>No custom wall details yet.</p>}
-                    </section>
-                  )}
-                  {compact && panel === 'more' && mode === 'details' && (
-                    <div className="model-more-shortcuts">
-                      <ModelButton
-                        variant="outline"
-                        onClick={() => {
-                          setBefore((v) => !v);
-                          openPanel('none');
-                        }}
-                      >
-                        {before ? 'Show changes' : 'Before / after'}
-                      </ModelButton>
-                      <ModelButton
-                        variant="outline"
-                        onClick={() => {
-                          openPanel('walls');
-                          setTouchTool('multi');
-                        }}
-                      >
-                        Multi-select
-                      </ModelButton>
-                      {!recorded && !conversion && (
-                        <ModelButton
-                          variant="outline"
-                          onClick={() => {
-                            tryAction(() =>
-                              setConversion(
-                                editableFacade(feature, activeWall, visual),
-                              ),
-                            );
-                            openPanel('more');
-                          }}
-                        >
-                          Preview editable layout
-                        </ModelButton>
-                      )}
-                      {unsaved && (
-                        <ModelButton
-                          variant="outline"
-                          icon={<ActionRotateCcw />}
-                          onClick={discardInput}
-                        >
-                          Discard unfinished input
-                        </ModelButton>
-                      )}
-                    </div>
-                  )}
-                  {mode === 'details' && metrics && (
-                    <>
-                      <label>
-                        Snap grid
-                        <select
-                          value={grid}
-                          onChange={(e) => setGrid(Number(e.target.value))}
-                        >
-                          <option value={0.01}>0.01 m</option>
-                          <option value={0.1}>0.1 m</option>
-                          <option value={1}>1 m</option>
-                        </select>
-                      </label>
-                      <div className="model-add-tools">
-                        {kinds.map((k) => (
-                          <ModelButton
-                            variant="outline"
-                            icon={<ActionPlus />}
-                            key={k}
-                            disabled={before}
-                            onClick={() => {
-                              add(k);
-                              if (compact) {
-                                setTab((view) =>
-                                  view === 'surface' ? view : 'surface',
-                                );
-                                openPanel('none');
                               }
                             }}
                           >
-                            Add {k}
+                            {e}
                           </ModelButton>
                         ))}
-                      </div>
-                      {compact && panel === 'more' && (
-                        <Menu.Trigger
-                          className="model-detail-actions"
-                          onClick={() => setContextPoint(null)}
+                        {Object.values(
+                          draft.properties.appearance?.facades || {},
+                        ).map((f) => {
+                          const w = walls.find((w) => w.wallId === f.wallId),
+                            changed =
+                              JSON.stringify(
+                                initial.current.properties.appearance
+                                  ?.facades?.[f.wallId],
+                              ) !== JSON.stringify(f);
+                          return (
+                            <article key={f.wallId}>
+                              <strong>
+                                {w?.label || 'Removed wall'}
+                                {changed ? ' · changed this session' : ''}
+                              </strong>
+                              <p>
+                                {f.confidence === 'inferred'
+                                  ? 'Illustrative estimate'
+                                  : f.confidence === 'observed'
+                                    ? 'Photo observed · estimated dimensions'
+                                    : 'Documented dimensions'}{' '}
+                                · {f.elements.length} records ·{' '}
+                                {f.reviewedAt &&
+                                !f.needsReview &&
+                                facadeMatches(f, feature)
+                                  ? 'Reviewed'
+                                  : 'Needs review'}
+                              </p>
+                              {changed && (
+                                <ul>
+                                  {f.elements
+                                    .filter(
+                                      (e) =>
+                                        JSON.stringify(
+                                          initial.current.properties.appearance?.facades?.[
+                                            f.wallId
+                                          ]?.elements.find(
+                                            (old) => old.id === e.id,
+                                          ),
+                                        ) !== JSON.stringify(e),
+                                    )
+                                    .map((e) => (
+                                      <li key={e.id}>
+                                        {label(e)} ·{' '}
+                                        {initial.current.properties.appearance?.facades?.[
+                                          f.wallId
+                                        ]?.elements.some(
+                                          (old) => old.id === e.id,
+                                        )
+                                          ? 'modified'
+                                          : 'added'}
+                                      </li>
+                                    ))}
+                                  {(
+                                    initial.current.properties.appearance
+                                      ?.facades?.[f.wallId]?.elements || []
+                                  )
+                                    .filter(
+                                      (e) =>
+                                        !f.elements.some(
+                                          (next) => next.id === e.id,
+                                        ),
+                                    )
+                                    .map((e) => (
+                                      <li key={e.id}>{label(e)} · removed</li>
+                                    ))}
+                                </ul>
+                              )}
+                              <ModelButton
+                                variant="outline"
+                                onClick={() => {
+                                  choose(w?.wallId || activeWall);
+                                  setMode('details');
+                                  setReviewOpen(true);
+                                  openPanel('more');
+                                  setDetent('full');
+                                  setTab((view) =>
+                                    view === 'surface' ? view : 'surface',
+                                  );
+                                }}
+                              >
+                                Inspect details and evidence
+                              </ModelButton>
+                              {!w && metrics && (
+                                <ModelButton
+                                  variant="outline"
+                                  onClick={() => {
+                                    if (recorded) {
+                                      setError(
+                                        'The selected wall already has details. Choose an empty wall before rematching.',
+                                      );
+                                      return;
+                                    }
+                                    const oldLength = wallLength(
+                                        f.wallCoordinates,
+                                      ),
+                                      next = {
+                                        ...f,
+                                        wallId: activeWall,
+                                        partId: metrics.partId,
+                                        wallCoordinates: metrics.coordinates,
+                                        elements: f.elements.map((e) => ({
+                                          ...e,
+                                          x: (e.x * oldLength) / metrics.length,
+                                          spacing:
+                                            (e.spacing * oldLength) /
+                                            metrics.length,
+                                        })),
+                                        needsReview: true,
+                                        reviewedAt: undefined,
+                                      };
+                                    const facades = {
+                                      ...draft.properties.appearance?.facades,
+                                    };
+                                    delete facades[f.wallId];
+                                    facades[activeWall] = next;
+                                    commit({
+                                      ...draft,
+                                      properties: {
+                                        ...draft.properties,
+                                        appearance: {
+                                          ...draft.properties.appearance,
+                                          facades,
+                                        },
+                                      },
+                                    });
+                                  }}
+                                >
+                                  Rematch to selected empty wall
+                                </ModelButton>
+                              )}
+                            </article>
+                          );
+                        })}
+                        {!Object.keys(
+                          draft.properties.appearance?.facades || {},
+                        ).length && <p>No custom wall details yet.</p>}
+                      </section>
+                    )}
+                    {compact && panel === 'more' && mode === 'details' && (
+                      <div className="model-more-shortcuts">
+                        <ModelButton
+                          variant="outline"
+                          onClick={() => {
+                            setBefore((v) => !v);
+                            openPanel('none');
+                          }}
                         >
-                          Selection actions
-                        </Menu.Trigger>
-                      )}
-                      {selected.length > 1 && (
-                        <div className="model-toolbar">
-                          {(
-                            [
-                              'left',
-                              'centre',
-                              'right',
-                              'bottom',
-                              'top',
-                              'distribute',
-                              'mirror',
-                            ] as const
-                          ).map((action) => (
+                          {before ? 'Show changes' : 'Before / after'}
+                        </ModelButton>
+                        <ModelButton
+                          variant="outline"
+                          onClick={() => {
+                            openPanel('walls');
+                            setTouchTool('multi');
+                          }}
+                        >
+                          Multi-select
+                        </ModelButton>
+                        {!recorded && !conversion && (
+                          <ModelButton
+                            variant="outline"
+                            onClick={() => {
+                              tryAction(() =>
+                                setConversion(
+                                  editableFacade(feature, activeWall, visual),
+                                ),
+                              );
+                              openPanel('more');
+                            }}
+                          >
+                            Preview editable layout
+                          </ModelButton>
+                        )}
+                        {unsaved && (
+                          <ModelButton
+                            variant="outline"
+                            icon={<ActionRotateCcw />}
+                            onClick={discardInput}
+                          >
+                            Discard unfinished input
+                          </ModelButton>
+                        )}
+                      </div>
+                    )}
+                    {mode === 'details' && metrics && (
+                      <>
+                        <label>
+                          Snap grid
+                          <select
+                            value={grid}
+                            onChange={(e) => setGrid(Number(e.target.value))}
+                          >
+                            <option value={0.01}>0.01 m</option>
+                            <option value={0.1}>0.1 m</option>
+                            <option value={1}>1 m</option>
+                          </select>
+                        </label>
+                        <div className="model-add-tools">
+                          {kinds.map((k) => (
                             <ModelButton
                               variant="outline"
-                              key={action}
-                              onClick={() =>
-                                updateElements(
-                                  layoutElements(
-                                    elements,
-                                    selected.filter(
-                                      (id) => !locked.includes(id),
-                                    ),
-                                    metrics.length,
-                                    action,
-                                  ),
-                                )
-                              }
+                              icon={<ActionPlus />}
+                              key={k}
+                              disabled={before}
+                              onClick={() => {
+                                add(k);
+                                if (compact) {
+                                  setTab((view) =>
+                                    view === 'surface' ? view : 'surface',
+                                  );
+                                  openPanel('none');
+                                }
+                              }}
                             >
-                              {action === 'distribute'
-                                ? 'Equal gaps'
-                                : action === 'mirror'
-                                  ? 'Mirror layout'
-                                  : `Align ${action}`}
+                              Add {k}
                             </ModelButton>
                           ))}
                         </div>
-                      )}
-                      {active && selected.length === 1 && (
-                        <>
-                          <h3>{label(active)}</h3>
-                          <ModelField
-                            label="Detail name"
-                            type="text"
-                            value={authoring.names[active.id] || ''}
-                            buildingId={edit.id}
-                            field={`name:${active.id}`}
-                            workspace={workspace}
-                            onCommit={(v) =>
-                              updateElements(elements, {
-                                ...authoring,
-                                names: {
-                                  ...authoring.names,
-                                  [active.id]: v.slice(0, 120),
-                                },
-                              })
-                            }
-                          />
-                          {active.kind === 'text' && (
-                            <>
-                              <ModelField
-                                label="Surface text"
-                                type="text"
-                                value={active.text || ''}
-                                buildingId={edit.id}
-                                field={`text:${active.id}`}
-                                workspace={workspace}
-                                disabled={locked.includes(active.id)}
-                                onCommit={(text) => patch(active.id, { text })}
-                              />
-                              <label>
-                                Text weight
-                                <select
-                                  aria-label="Text weight"
-                                  value={active.textWeight || 'bold'}
-                                  disabled={locked.includes(active.id)}
-                                  onChange={(e) =>
-                                    patch(active.id, {
-                                      textWeight: e.target.value as
-                                        | 'regular'
-                                        | 'bold',
-                                    })
-                                  }
-                                >
-                                  <option value="regular">Regular</option>
-                                  <option value="bold">Bold</option>
-                                </select>
-                              </label>
-                              <label>
-                                Text alignment
-                                <select
-                                  aria-label="Text alignment"
-                                  value={active.textAlign || 'center'}
-                                  disabled={locked.includes(active.id)}
-                                  onChange={(e) =>
-                                    patch(active.id, {
-                                      textAlign: e.target.value as
-                                        | 'left'
-                                        | 'center'
-                                        | 'right',
-                                    })
-                                  }
-                                >
-                                  <option value="left">Left</option>
-                                  <option value="center">Centre</option>
-                                  <option value="right">Right</option>
-                                </select>
-                              </label>
-                            </>
-                          )}
-                          <div className="model-properties-grid">
-                            {field(
-                              'x',
-                              'Centre from A (m)',
-                              active.x * metrics.length,
-                              0,
-                              metrics.length,
-                            )}
-                            {field(
-                              'bottom',
-                              'Bottom above base (m)',
-                              active.bottom,
-                            )}
-                            {field('width', 'Width (m)', active.width, 0.01)}
-                            {field('height', 'Height (m)', active.height, 0.01)}
-                            {field(
-                              'depth',
-                              'Projection (m)',
-                              active.depth,
-                              0,
-                              10,
-                            )}
-                            {field(
-                              'count',
-                              'Repeat count',
-                              active.count,
-                              1,
-                              40,
-                            )}
-                            {field(
-                              'spacing',
-                              'Centre spacing (m)',
-                              active.spacing * metrics.length,
-                              0,
-                              metrics.length,
-                            )}
-                            <ModelField
-                              label="Material colour"
-                              type="color"
-                              value={active.colour}
-                              buildingId={edit.id}
-                              field={`${active.id}:colour`}
-                              workspace={workspace}
-                              onCommit={(v) => patch(active.id, { colour: v })}
-                            />
-                          </div>
-                          <p>
-                            Edges:{' '}
-                            {elementBounds(active, metrics.length).left.toFixed(
-                              2,
-                            )}
-                            –
-                            {elementBounds(
-                              active,
-                              metrics.length,
-                            ).right.toFixed(2)}{' '}
-                            m from A.
-                          </p>
-                          {active.count > 1 && (
-                            <>
-                              <label>
-                                Repeated instance
-                                <select
-                                  value={Math.min(instance, active.count - 1)}
-                                  onChange={(e) =>
-                                    setInstance(Number(e.target.value))
-                                  }
-                                >
-                                  {Array.from(
-                                    { length: active.count },
-                                    (_, i) => (
-                                      <option key={i} value={i}>
-                                        {i + 1}
-                                      </option>
-                                    ),
-                                  )}
-                                </select>
-                              </label>
-                              <ModelButton
-                                icon={<Split />}
-                                disabled={before || locked.includes(active.id)}
-                                onClick={detachSelectedInstance}
-                              >
-                                Detach selected instance
-                              </ModelButton>
-                            </>
-                          )}
-                        </>
-                      )}
-                      <details>
-                        <summary>Groups, patterns &amp; presets</summary>
-                        <label>
-                          Name
-                          <input
-                            value={name}
-                            maxLength={120}
-                            onChange={(e) => setName(e.target.value)}
-                          />
-                        </label>
-                        <div className="model-toolbar">
-                          <ModelButton
-                            variant="outline"
-                            icon={<ActionGroup />}
-                            disabled={!selected.length}
-                            onClick={() =>
-                              updateElements(elements, {
-                                ...authoring,
-                                groups: [
-                                  ...authoring.groups,
-                                  {
-                                    id: crypto.randomUUID(),
-                                    name: name.trim() || 'Detail group',
-                                    wallId: activeWall,
-                                    members: selected,
-                                  },
-                                ],
-                              })
-                            }
+                        {compact && panel === 'more' && (
+                          <Menu.Trigger
+                            className="model-detail-actions"
+                            onClick={() => setContextPoint(null)}
                           >
-                            Group selection
-                          </ModelButton>
-                          <ModelButton
-                            icon={<Ungroup />}
-                            disabled={
-                              !grouped ||
-                              before ||
-                              selected.some((id) => locked.includes(id))
-                            }
-                            onClick={ungroupSelection}
-                          >
-                            Ungroup
-                          </ModelButton>
-                          <ModelButton
-                            variant="outline"
-                            disabled={!selected.length}
-                            onClick={() =>
-                              commit({
-                                ...draft,
-                                properties: {
-                                  ...draft.properties,
-                                  modelAuthoring: {
-                                    ...authoring,
-                                    presets: [
-                                      ...authoring.presets,
-                                      { id: crypto.randomUUID(), ...stamp() },
-                                    ],
-                                  },
-                                },
-                              })
-                            }
-                          >
-                            Save preset
-                          </ModelButton>
-                        </div>
-                        <label>
-                          Pattern
-                          <select
-                            value={patternId}
-                            onChange={(e) => {
-                              setPatternId(e.target.value);
-                              const p = authoring.patterns.find(
-                                (p) => p.id === e.target.value,
-                              );
-                              if (p)
-                                setPattern({
-                                  rows: p.rows,
-                                  columns: p.columns,
-                                  stepX: p.stepX,
-                                  stepY: p.stepY,
-                                });
-                            }}
-                          >
-                            <option value="">New from selection</option>
-                            {authoring.patterns
-                              .filter((p) => p.wallId === activeWall)
-                              .map((p) => (
-                                <option key={p.id} value={p.id}>
-                                  {p.name}
-                                </option>
-                              ))}
-                          </select>
-                        </label>
-                        {(['rows', 'columns', 'stepX', 'stepY'] as const).map(
-                          (k) => (
-                            <label key={k}>
-                              {
-                                {
-                                  rows: 'Rows',
-                                  columns: 'Columns',
-                                  stepX: 'Horizontal step (m)',
-                                  stepY: 'Vertical step (m)',
-                                }[k]
-                              }
-                              <input
-                                type="number"
-                                min={k === 'rows' || k === 'columns' ? 1 : 0}
-                                step={k === 'rows' || k === 'columns' ? 1 : 0.1}
-                                value={
-                                  Number.isFinite(pattern[k]) ? pattern[k] : ''
-                                }
-                                onChange={(e) =>
-                                  setPattern({
-                                    ...pattern,
-                                    [k]:
-                                      e.target.value === ''
-                                        ? NaN
-                                        : Number(e.target.value),
-                                  })
-                                }
-                              />
-                            </label>
-                          ),
+                            Selection actions
+                          </Menu.Trigger>
                         )}
-                        <ModelButton variant="outline" onClick={editPattern}>
-                          {patternId ? 'Update pattern' : 'Create pattern'}
-                        </ModelButton>
-                        <ModelButton
-                          variant="outline"
-                          disabled={!patternId || selected.length !== 1}
-                          onClick={() => {
-                            const p = authoring.patterns.find(
-                              (p) => p.id === patternId,
-                            );
-                            if (p)
-                              commit({
-                                ...draft,
-                                properties: {
-                                  ...draft.properties,
-                                  modelAuthoring: {
-                                    ...authoring,
-                                    patterns: authoring.patterns.map((v) =>
-                                      v.id === p.id
-                                        ? {
-                                            ...v,
-                                            members: v.members.filter(
-                                              (id) => !selected.includes(id),
-                                            ),
-                                            slots: patternSlots(v).filter(
-                                              (_, i) =>
-                                                !selected.includes(
-                                                  v.members[i],
-                                                ),
-                                            ),
-                                            excluded: [
-                                              ...new Set([
-                                                ...(v.excluded || []),
-                                                ...patternSlots(v).filter(
-                                                  (_, i) =>
-                                                    selected.includes(
-                                                      v.members[i],
-                                                    ),
-                                                ),
-                                              ]),
-                                            ],
-                                          }
-                                        : v,
-                                    ),
-                                  },
-                                },
-                              });
-                          }}
-                        >
-                          Detach detail from pattern
-                        </ModelButton>
-                        {(workspace?.edits || [draft]).flatMap((e) =>
-                          (e.properties.modelAuthoring?.presets || []).map(
-                            (p) => (
+                        {selected.length > 1 && (
+                          <div className="model-toolbar">
+                            {(
+                              [
+                                'left',
+                                'centre',
+                                'right',
+                                'bottom',
+                                'top',
+                                'distribute',
+                                'mirror',
+                              ] as const
+                            ).map((action) => (
                               <ModelButton
                                 variant="outline"
-                                key={`${e.id}:${p.id}`}
-                                onClick={() => {
-                                  setPaste(p);
-                                  setTargetWall(activeWall);
-                                }}
+                                key={action}
+                                onClick={() =>
+                                  updateElements(
+                                    layoutElements(
+                                      elements,
+                                      selected.filter(
+                                        (id) => !locked.includes(id),
+                                      ),
+                                      metrics.length,
+                                      action,
+                                    ),
+                                  )
+                                }
                               >
-                                Insert preset · {p.name}
+                                {action === 'distribute'
+                                  ? 'Equal gaps'
+                                  : action === 'mirror'
+                                    ? 'Mirror layout'
+                                    : `Align ${action}`}
                               </ModelButton>
-                            ),
-                          ),
+                            ))}
+                          </div>
                         )}
-                      </details>
-                      {facade && (
-                        <details
-                          className="model-wall-review"
-                          open={reviewOpen || !!facade.needsReview}
-                          onToggle={(e) => setReviewOpen(e.currentTarget.open)}
-                        >
-                          <summary>Evidence &amp; wall review</summary>
-                          <p>
-                            {facade.reviewedAt &&
-                            !facade.needsReview &&
-                            facadeMatches(facade, feature)
-                              ? 'This wall is reviewed. Another detail edit will require a fresh review.'
-                              : 'Review required before preview. Check this wall’s placement and evidence, then mark only this wall reviewed.'}
-                          </p>
-                          <label>
-                            Evidence confidence
-                            <select
-                              value={facade.confidence}
-                              onChange={(e) =>
-                                applyWall({
-                                  ...facade,
-                                  confidence: e.target
-                                    .value as FacadeDescription['confidence'],
+                        {active && selected.length === 1 && (
+                          <>
+                            <h3>{label(active)}</h3>
+                            <ModelField
+                              label="Detail name"
+                              type="text"
+                              value={authoring.names[active.id] || ''}
+                              buildingId={edit.id}
+                              field={`name:${active.id}`}
+                              workspace={workspace}
+                              onCommit={(v) =>
+                                updateElements(elements, {
+                                  ...authoring,
+                                  names: {
+                                    ...authoring.names,
+                                    [active.id]: v.slice(0, 120),
+                                  },
                                 })
                               }
-                            >
-                              <option value="inferred">
-                                Illustrative estimate
-                              </option>
-                              <option value="observed">
-                                Observed in photograph
-                              </option>
-                              <option value="documented">
-                                Documented measurements
-                              </option>
-                            </select>
+                            />
+                            {active.kind === 'text' && (
+                              <>
+                                <ModelField
+                                  label="Surface text"
+                                  type="text"
+                                  value={active.text || ''}
+                                  buildingId={edit.id}
+                                  field={`text:${active.id}`}
+                                  workspace={workspace}
+                                  disabled={locked.includes(active.id)}
+                                  onCommit={(text) =>
+                                    patch(active.id, { text })
+                                  }
+                                />
+                                <label>
+                                  Text weight
+                                  <select
+                                    aria-label="Text weight"
+                                    value={active.textWeight || 'bold'}
+                                    disabled={locked.includes(active.id)}
+                                    onChange={(e) =>
+                                      patch(active.id, {
+                                        textWeight: e.target.value as
+                                          | 'regular'
+                                          | 'bold',
+                                      })
+                                    }
+                                  >
+                                    <option value="regular">Regular</option>
+                                    <option value="bold">Bold</option>
+                                  </select>
+                                </label>
+                                <label>
+                                  Text alignment
+                                  <select
+                                    aria-label="Text alignment"
+                                    value={active.textAlign || 'center'}
+                                    disabled={locked.includes(active.id)}
+                                    onChange={(e) =>
+                                      patch(active.id, {
+                                        textAlign: e.target.value as
+                                          | 'left'
+                                          | 'center'
+                                          | 'right',
+                                      })
+                                    }
+                                  >
+                                    <option value="left">Left</option>
+                                    <option value="center">Centre</option>
+                                    <option value="right">Right</option>
+                                  </select>
+                                </label>
+                              </>
+                            )}
+                            <div className="model-properties-grid">
+                              {field(
+                                'x',
+                                'Centre from A (m)',
+                                active.x * metrics.length,
+                                0,
+                                metrics.length,
+                              )}
+                              {field(
+                                'bottom',
+                                'Bottom above base (m)',
+                                active.bottom,
+                              )}
+                              {field('width', 'Width (m)', active.width, 0.01)}
+                              {field(
+                                'height',
+                                'Height (m)',
+                                active.height,
+                                0.01,
+                              )}
+                              {field(
+                                'depth',
+                                'Projection (m)',
+                                active.depth,
+                                0,
+                                10,
+                              )}
+                              {field(
+                                'count',
+                                'Repeat count',
+                                active.count,
+                                1,
+                                40,
+                              )}
+                              {field(
+                                'spacing',
+                                'Centre spacing (m)',
+                                active.spacing * metrics.length,
+                                0,
+                                metrics.length,
+                              )}
+                              <ModelField
+                                label="Material colour"
+                                type="color"
+                                value={active.colour}
+                                buildingId={edit.id}
+                                field={`${active.id}:colour`}
+                                workspace={workspace}
+                                onCommit={(v) =>
+                                  patch(active.id, { colour: v })
+                                }
+                              />
+                            </div>
+                            <p>
+                              Edges:{' '}
+                              {elementBounds(
+                                active,
+                                metrics.length,
+                              ).left.toFixed(2)}
+                              –
+                              {elementBounds(
+                                active,
+                                metrics.length,
+                              ).right.toFixed(2)}{' '}
+                              m from A.
+                            </p>
+                            {active.count > 1 && (
+                              <>
+                                <label>
+                                  Repeated instance
+                                  <select
+                                    value={Math.min(instance, active.count - 1)}
+                                    onChange={(e) =>
+                                      setInstance(Number(e.target.value))
+                                    }
+                                  >
+                                    {Array.from(
+                                      { length: active.count },
+                                      (_, i) => (
+                                        <option key={i} value={i}>
+                                          {i + 1}
+                                        </option>
+                                      ),
+                                    )}
+                                  </select>
+                                </label>
+                                <ModelButton
+                                  icon={<Split />}
+                                  disabled={
+                                    before || locked.includes(active.id)
+                                  }
+                                  onClick={detachSelectedInstance}
+                                >
+                                  Detach selected instance
+                                </ModelButton>
+                              </>
+                            )}
+                          </>
+                        )}
+                        <details>
+                          <summary>Groups, patterns &amp; presets</summary>
+                          <label>
+                            Name
+                            <input
+                              value={name}
+                              maxLength={120}
+                              onChange={(e) => setName(e.target.value)}
+                            />
                           </label>
-                          <ModelField
-                            type="text"
-                            label="Evidence and measurement provenance"
-                            value={facade.notes}
-                            buildingId={edit.id}
-                            field={`${activeWall}:notes`}
-                            workspace={workspace}
-                            onCommit={(v) => applyWall({ ...facade, notes: v })}
-                          />
-                          {photo && (
+                          <div className="model-toolbar">
                             <ModelButton
                               variant="outline"
-                              icon={<ActionCheck />}
+                              icon={<ActionGroup />}
+                              disabled={!selected.length}
                               onClick={() =>
-                                applyWall({
-                                  ...facade,
-                                  photoIds: [
-                                    ...new Set([...facade.photoIds, photo.id]),
+                                updateElements(elements, {
+                                  ...authoring,
+                                  groups: [
+                                    ...authoring.groups,
+                                    {
+                                      id: crypto.randomUUID(),
+                                      name: name.trim() || 'Detail group',
+                                      wallId: activeWall,
+                                      members: selected,
+                                    },
                                   ],
                                 })
                               }
                             >
-                              Use selected photo as evidence
+                              Group selection
                             </ModelButton>
+                            <ModelButton
+                              icon={<Ungroup />}
+                              disabled={
+                                !grouped ||
+                                before ||
+                                selected.some((id) => locked.includes(id))
+                              }
+                              onClick={ungroupSelection}
+                            >
+                              Ungroup
+                            </ModelButton>
+                            <ModelButton
+                              variant="outline"
+                              disabled={!selected.length}
+                              onClick={() =>
+                                commit({
+                                  ...draft,
+                                  properties: {
+                                    ...draft.properties,
+                                    modelAuthoring: {
+                                      ...authoring,
+                                      presets: [
+                                        ...authoring.presets,
+                                        { id: crypto.randomUUID(), ...stamp() },
+                                      ],
+                                    },
+                                  },
+                                })
+                              }
+                            >
+                              Save preset
+                            </ModelButton>
+                          </div>
+                          <label>
+                            Pattern
+                            <select
+                              value={patternId}
+                              onChange={(e) => {
+                                setPatternId(e.target.value);
+                                const p = authoring.patterns.find(
+                                  (p) => p.id === e.target.value,
+                                );
+                                if (p)
+                                  setPattern({
+                                    rows: p.rows,
+                                    columns: p.columns,
+                                    stepX: p.stepX,
+                                    stepY: p.stepY,
+                                  });
+                              }}
+                            >
+                              <option value="">New from selection</option>
+                              {authoring.patterns
+                                .filter((p) => p.wallId === activeWall)
+                                .map((p) => (
+                                  <option key={p.id} value={p.id}>
+                                    {p.name}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                          {(['rows', 'columns', 'stepX', 'stepY'] as const).map(
+                            (k) => (
+                              <label key={k}>
+                                {
+                                  {
+                                    rows: 'Rows',
+                                    columns: 'Columns',
+                                    stepX: 'Horizontal step (m)',
+                                    stepY: 'Vertical step (m)',
+                                  }[k]
+                                }
+                                <input
+                                  type="number"
+                                  min={k === 'rows' || k === 'columns' ? 1 : 0}
+                                  step={
+                                    k === 'rows' || k === 'columns' ? 1 : 0.1
+                                  }
+                                  value={
+                                    Number.isFinite(pattern[k])
+                                      ? pattern[k]
+                                      : ''
+                                  }
+                                  onChange={(e) =>
+                                    setPattern({
+                                      ...pattern,
+                                      [k]:
+                                        e.target.value === ''
+                                          ? NaN
+                                          : Number(e.target.value),
+                                    })
+                                  }
+                                />
+                              </label>
+                            ),
                           )}
-                          {facade.photoIds.map((id) => (
-                            <p key={id}>
-                              {photos.find((p) => p.id === id)?.caption ||
-                                'Unavailable photo'}{' '}
-                              <ModelButton
-                                variant="destructive"
-                                icon={<ActionTrash2 />}
-                                onClick={() =>
+                          <ModelButton variant="outline" onClick={editPattern}>
+                            {patternId ? 'Update pattern' : 'Create pattern'}
+                          </ModelButton>
+                          <ModelButton
+                            variant="outline"
+                            disabled={!patternId || selected.length !== 1}
+                            onClick={() => {
+                              const p = authoring.patterns.find(
+                                (p) => p.id === patternId,
+                              );
+                              if (p)
+                                commit({
+                                  ...draft,
+                                  properties: {
+                                    ...draft.properties,
+                                    modelAuthoring: {
+                                      ...authoring,
+                                      patterns: authoring.patterns.map((v) =>
+                                        v.id === p.id
+                                          ? {
+                                              ...v,
+                                              members: v.members.filter(
+                                                (id) => !selected.includes(id),
+                                              ),
+                                              slots: patternSlots(v).filter(
+                                                (_, i) =>
+                                                  !selected.includes(
+                                                    v.members[i],
+                                                  ),
+                                              ),
+                                              excluded: [
+                                                ...new Set([
+                                                  ...(v.excluded || []),
+                                                  ...patternSlots(v).filter(
+                                                    (_, i) =>
+                                                      selected.includes(
+                                                        v.members[i],
+                                                      ),
+                                                  ),
+                                                ]),
+                                              ],
+                                            }
+                                          : v,
+                                      ),
+                                    },
+                                  },
+                                });
+                            }}
+                          >
+                            Detach detail from pattern
+                          </ModelButton>
+                          {(workspace?.edits || [draft]).flatMap((e) =>
+                            (e.properties.modelAuthoring?.presets || []).map(
+                              (p) => (
+                                <ModelButton
+                                  variant="outline"
+                                  key={`${e.id}:${p.id}`}
+                                  onClick={() => {
+                                    setPaste(p);
+                                    setTargetWall(activeWall);
+                                  }}
+                                >
+                                  Insert preset · {p.name}
+                                </ModelButton>
+                              ),
+                            ),
+                          )}
+                        </details>
+                        {facade && (
+                          <details
+                            className="model-wall-review"
+                            open={reviewOpen || !!facade.needsReview}
+                            onToggle={(e) =>
+                              setReviewOpen(e.currentTarget.open)
+                            }
+                          >
+                            <summary>Evidence &amp; wall review</summary>
+                            <p>
+                              {facade.reviewedAt &&
+                              !facade.needsReview &&
+                              facadeMatches(facade, feature)
+                                ? 'This wall is reviewed. Another detail edit will require a fresh review.'
+                                : 'Review required before preview. Check this wall’s placement and evidence, then mark only this wall reviewed.'}
+                            </p>
+                            <label>
+                              Evidence confidence
+                              <select
+                                value={facade.confidence}
+                                onChange={(e) =>
                                   applyWall({
                                     ...facade,
-                                    photoIds: facade.photoIds.filter(
-                                      (p) => p !== id,
-                                    ),
-                                    texture:
-                                      facade.texture?.photoId === id
-                                        ? undefined
-                                        : facade.texture,
+                                    confidence: e.target
+                                      .value as FacadeDescription['confidence'],
                                   })
                                 }
                               >
-                                Remove reference
+                                <option value="inferred">
+                                  Illustrative estimate
+                                </option>
+                                <option value="observed">
+                                  Observed in photograph
+                                </option>
+                                <option value="documented">
+                                  Documented measurements
+                                </option>
+                              </select>
+                            </label>
+                            <ModelField
+                              type="text"
+                              label="Evidence and measurement provenance"
+                              value={facade.notes}
+                              buildingId={edit.id}
+                              field={`${activeWall}:notes`}
+                              workspace={workspace}
+                              onCommit={(v) =>
+                                applyWall({ ...facade, notes: v })
+                              }
+                            />
+                            {photo && (
+                              <ModelButton
+                                variant="outline"
+                                icon={<ActionCheck />}
+                                onClick={() =>
+                                  applyWall({
+                                    ...facade,
+                                    photoIds: [
+                                      ...new Set([
+                                        ...facade.photoIds,
+                                        photo.id,
+                                      ]),
+                                    ],
+                                  })
+                                }
+                              >
+                                Use selected photo as evidence
                               </ModelButton>
-                            </p>
-                          ))}
-                          {!facadeMatches(facade, feature) && (
+                            )}
+                            {facade.photoIds.map((id) => (
+                              <p key={id}>
+                                {photos.find((p) => p.id === id)?.caption ||
+                                  'Unavailable photo'}{' '}
+                                <ModelButton
+                                  variant="destructive"
+                                  icon={<ActionTrash2 />}
+                                  onClick={() =>
+                                    applyWall({
+                                      ...facade,
+                                      photoIds: facade.photoIds.filter(
+                                        (p) => p !== id,
+                                      ),
+                                      texture:
+                                        facade.texture?.photoId === id
+                                          ? undefined
+                                          : facade.texture,
+                                    })
+                                  }
+                                >
+                                  Remove reference
+                                </ModelButton>
+                              </p>
+                            ))}
+                            {!facadeMatches(facade, feature) && (
+                              <ModelButton
+                                variant="outline"
+                                onClick={() => {
+                                  const length = wallLength(
+                                    facade.wallCoordinates,
+                                  );
+                                  applyWall({
+                                    ...facade,
+                                    wallCoordinates: metrics.coordinates,
+                                    partId: metrics.partId,
+                                    needsReview: false,
+                                    elements: facade.elements.map((e) => ({
+                                      ...e,
+                                      x: (e.x * length) / metrics.length,
+                                      spacing:
+                                        (e.spacing * length) / metrics.length,
+                                    })),
+                                  });
+                                }}
+                              >
+                                Confirm wall match · preserve metre positions
+                              </ModelButton>
+                            )}
                             <ModelButton
                               variant="outline"
+                              icon={<ActionCheck />}
+                              disabled={!facadeMatches(facade, feature)}
+                              onClick={() =>
+                                applyWall(
+                                  { ...facade, needsReview: false },
+                                  authoring,
+                                  true,
+                                )
+                              }
+                            >
+                              Mark this wall reviewed
+                            </ModelButton>
+                            <ModelButton
+                              variant="outline"
+                              icon={<ActionRotateCcw />}
                               onClick={() => {
-                                const length = wallLength(
-                                  facade.wallCoordinates,
-                                );
-                                applyWall({
-                                  ...facade,
-                                  wallCoordinates: metrics.coordinates,
-                                  partId: metrics.partId,
-                                  needsReview: false,
-                                  elements: facade.elements.map((e) => ({
-                                    ...e,
-                                    x: (e.x * length) / metrics.length,
-                                    spacing:
-                                      (e.spacing * length) / metrics.length,
-                                  })),
+                                const facades = {
+                                  ...draft.properties.appearance?.facades,
+                                };
+                                delete facades[activeWall];
+                                commit({
+                                  ...draft,
+                                  properties: {
+                                    ...draft.properties,
+                                    modelAuthoring: {
+                                      ...authoring,
+                                      groups: authoring.groups.filter(
+                                        (g) => g.wallId !== activeWall,
+                                      ),
+                                      patterns: authoring.patterns.filter(
+                                        (p) => p.wallId !== activeWall,
+                                      ),
+                                    },
+                                    appearance: {
+                                      ...draft.properties.appearance,
+                                      facades,
+                                    },
+                                  },
                                 });
                               }}
                             >
-                              Confirm wall match · preserve metre positions
+                              Restore generated wall
                             </ModelButton>
-                          )}
-                          <ModelButton
-                            variant="outline"
-                            icon={<ActionCheck />}
-                            disabled={!facadeMatches(facade, feature)}
-                            onClick={() =>
-                              applyWall(
-                                { ...facade, needsReview: false },
-                                authoring,
-                                true,
-                              )
-                            }
-                          >
-                            Mark this wall reviewed
-                          </ModelButton>
-                          <ModelButton
-                            variant="outline"
-                            icon={<ActionRotateCcw />}
-                            onClick={() => {
-                              const facades = {
-                                ...draft.properties.appearance?.facades,
-                              };
-                              delete facades[activeWall];
-                              commit({
-                                ...draft,
-                                properties: {
-                                  ...draft.properties,
-                                  modelAuthoring: {
-                                    ...authoring,
-                                    groups: authoring.groups.filter(
-                                      (g) => g.wallId !== activeWall,
-                                    ),
-                                    patterns: authoring.patterns.filter(
-                                      (p) => p.wallId !== activeWall,
-                                    ),
-                                  },
-                                  appearance: {
-                                    ...draft.properties.appearance,
-                                    facades,
-                                  },
-                                },
-                              });
-                            }}
-                          >
-                            Restore generated wall
-                          </ModelButton>
-                        </details>
-                      )}
-                    </>
-                  )}
-                  {mode !== 'details' && (
-                    <p>
-                      Select Details to edit individual architectural elements.
-                      Roof and footprint changes may require another wall
-                      review.
-                    </p>
-                  )}
+                          </details>
+                        )}
+                      </>
+                    )}
+                    {mode !== 'details' && (
+                      <p>
+                        Select Details to edit individual architectural
+                        elements. Roof and footprint changes may require another
+                        wall review.
+                      </p>
+                    )}
+                  </div>
                 </aside>
               </div>
               {compact && (

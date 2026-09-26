@@ -304,7 +304,7 @@
 .model-field input {
   width: 100%;
 }
-.model-inspector > *,
+.model-properties-body > *,
 .model-inspector details > * {
   margin-block: 8px;
 }
@@ -764,12 +764,14 @@
 .model-compact[data-panel='copy'] .model-paste-preview {
   display: block;
 }
-.model-compact[data-panel='add'] .model-inspector > :not(.model-add-tools),
+.model-compact[data-panel='add']
+  .model-properties-body
+  > :not(.model-add-tools),
 .model-compact[data-panel='edit']
-  .model-inspector
+  .model-properties-body
   > :is(.model-add-tools, .model-detail-actions, details),
 .model-compact[data-panel='more']
-  .model-inspector
+  .model-properties-body
   > :is(.model-field, .model-properties-grid, h3) {
   display: none;
 }
@@ -1032,12 +1034,12 @@
   font-size: 13px;
 }
 .model-desktop .model-layout {
-  grid-template-columns: 260px minmax(0, 1fr) 310px;
+  grid-template-columns: 260px minmax(0, 1fr) 360px;
   gap: 0;
   overflow: hidden;
 }
 .model-desktop[data-structure='closed'] .model-layout {
-  grid-template-columns: minmax(0, 1fr) 310px;
+  grid-template-columns: minmax(0, 1fr) 360px;
 }
 .model-desktop[data-structure='closed'] .model-hierarchy {
   display: none;
@@ -1178,10 +1180,10 @@
 }
 @media (max-width: 1199px) {
   .model-desktop .model-layout {
-    grid-template-columns: 180px minmax(0, 1fr) 280px;
+    grid-template-columns: 180px minmax(0, 1fr) 320px;
   }
   .model-desktop[data-structure='closed'] .model-layout {
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 320px;
   }
 }
 
@@ -1192,7 +1194,7 @@
 .model-compact .model-property-target,
 .model-compact .model-panel-title,
 .model-compact .model-building-target,
-.model-compact:not([data-mode='details']) .model-inspector > p {
+.model-compact:not([data-mode='details']) .model-properties-body > p {
   display: none;
 }
 
@@ -1541,20 +1543,72 @@
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
-.model-desktop .model-panel-title {
-  position: sticky;
-  top: -12px;
-  z-index: 3;
-  background: var(--background);
-  padding: 12px 0;
-  margin-top: -12px;
-}
 
 .model-tree [role='treeitem'] {
   outline: none;
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+/* Headers stay in the shell; one form body owns scrolling at desktop sizes. */
+.model-properties-body {
+  display: contents;
+}
+.model-desktop .model-inspector {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+.model-desktop .model-property-target {
+  flex: 0 0 auto;
+  padding: 12px;
+  margin: 0;
+  min-width: 0;
+}
+.model-desktop .model-property-target p {
+  margin: 6px 0 0;
+}
+.model-desktop .model-properties-body {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  scrollbar-gutter: stable;
+}
+.model-workspace .model-properties-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+}
+.model-workspace .model-properties-body :is(label, fieldset, legend) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.model-workspace
+  .model-properties-body
+  label:not(:has(> input[type='checkbox'])) {
+  display: grid;
+  gap: 5px;
+}
+.model-properties-body .model-field > span:not(.model-field-stepper) {
+  display: block;
+  min-width: 0;
+}
+.model-workspace .model-properties-body :is(input, select, textarea) {
+  max-width: 100%;
+  min-width: 0;
+}
+.model-properties-body .model-toolbar {
+  flex-wrap: wrap;
+}
+.model-properties-body .model-button {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
 }
 
 .model-workspace {
