@@ -1298,8 +1298,51 @@ async function setup(
     .route('**/packages/fixture/campus.json', (route) =>
       route.fulfill({ body: bytes, contentType: 'application/json' }),
     );
+  const modelFiles = new Map<string, Buffer>(),
+    modelRefs = new Map<
+      string,
+      { id: string; version: 1; sha256: string; bytes: number }
+    >();
+  await page.route('**/__model-assets/*', async (route) => {
+    const id = route.request().url().split('/').at(-1)!;
+    if (route.request().method() === 'PUT') {
+      modelFiles.set(id, route.request().postDataBuffer()!);
+      return route.fulfill({ json: { ok: true } });
+    }
+    return route.fulfill({
+      body: modelFiles.get(id),
+      contentType: 'application/json',
+    });
+  });
   await page.route('**/api/admin', async (route) => {
     const { action, payload } = route.request().postDataJSON();
+    if (action === 'model-asset-begin') {
+      let reference = modelRefs.get(payload.sha256);
+      if (!reference) {
+        reference = {
+          id: crypto.randomUUID(),
+          version: 1,
+          sha256: payload.sha256,
+          bytes: payload.bytes,
+        };
+        modelRefs.set(payload.sha256, reference);
+      }
+      return route.fulfill({
+        json: {
+          reference,
+          ready: modelFiles.has(reference.id),
+          url: `http://127.0.0.1:5183/__model-assets/${reference.id}`,
+        },
+      });
+    }
+    if (action === 'model-asset-confirm')
+      return route.fulfill({ json: { reference: payload.reference } });
+    if (action === 'model-asset-read')
+      return route.fulfill({
+        json: {
+          url: `http://127.0.0.1:5183/__model-assets/${payload.reference.id}`,
+        },
+      });
     if (action === 'state')
       return route.fulfill({
         json: {
@@ -1353,7 +1396,19 @@ async function setup(
   ).toBeEnabled();
   await attachMap(page);
   return {
-    edits: () => edits,
+    edits: () =>
+      edits.map((edit) => {
+        const ref = edit.properties.modelDocumentAsset;
+        return ref && modelFiles.has(ref.id)
+          ? {
+              ...edit,
+              properties: {
+                ...edit.properties,
+                modelDocument: JSON.parse(modelFiles.get(ref.id)!.toString()),
+              },
+            }
+          : edit;
+      }),
     setEdits: (value: MapEdit[]) => {
       edits = value;
     },
@@ -5433,6 +5488,20 @@ test('documentation current gallery: published campus and isolated owner workflo
       'Estimated dimensions',
     );
     await shot('unified-model-desktop');
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await dialog
+      .getByRole('button', { name: 'Reference split', exact: true })
+      .click();
+    await expect(dialog.locator('.model-view-columns')).toHaveAttribute(
+      'data-reference-split',
+      'true',
+    );
+    await expect(dialog.locator('.model-photo-view img').first()).toBeVisible();
+    await shot('reference-editing');
+    await dialog
+      .getByRole('button', { name: 'Reference split', exact: true })
+      .click();
+    await page.setViewportSize({ width: 1440, height: 1000 });
     const treeRow = (name: string) =>
       dialog
         .getByRole('treeitem', { name, exact: true })
@@ -6134,7 +6203,7 @@ async function unifiedModelFixture(
 
 test('reference split preserves the renderer and edits through resizing', async ({
   page,
-}) => {
+}, info) => {
   const { dialog, wall } = await unifiedModelFixture(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   const canvas = await dialog
@@ -6175,6 +6244,7 @@ test('reference split preserves the renderer and edits through resizing', async 
     .getByRole('button', { name: 'Edit surface', exact: true })
     .click();
   await expect(dialog.locator('.model-photo-view')).toBeVisible();
+  await page.screenshot({ path: info.outputPath('reference-editing.png') });
 });
 
 test('model workspace desktop docks stay bounded through resize and zoom-sized viewports', async ({
@@ -8379,6 +8449,241 @@ test('surface workspace canvas stays bounded across desktop zoom sizes and phone
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.evaluate(() => document.documentElement.classList.add('dark'));
   await page.screenshot({ path: info.outputPath('surface-dark.png') });
+});
+
+test('model file workers round trip GLB glTF OBJ and STL without external requests', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+  });
+  await dialog.getByRole('button', { name: 'Mesh', exact: true }).click();
+  await dialog
+    .getByRole('button', { name: 'Add primitive', exact: true })
+    .click();
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === 'library')?.properties.modelDocument
+          ?.objects.length,
+    )
+    .toBe(1);
+  const document = server.edits().find((e) => e.id === 'library')!
+    .properties.modelDocument!;
+  const results = await page.evaluate(async (document) => {
+    // @ts-expect-error Vite serves the same lazy worker entry used by the workspace.
+    const { modelFileTask } = await import('/src/model-file-client.ts');
+    const source = structuredClone(document),
+      canvas = globalThis.document.createElement('canvas');
+    canvas.width = canvas.height = 8;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, 4, 8);
+    ctx.fillStyle = '#0000ff';
+    ctx.fillRect(4, 0, 4, 8);
+    source.images.push({
+      id: 'test-image',
+      name: 'Two colours',
+      mime: 'image/png',
+      data: canvas.toDataURL().split(',')[1],
+    });
+    source.materials[1].baseMap = 'test-image';
+    const results = [];
+    for (const format of ['glb', 'gltf', 'obj', 'stl']) {
+      const files = await modelFileTask(
+        {
+          kind: 'export',
+          document: source,
+          options: { format, scale: 1, up: 'z' },
+        },
+        new AbortController().signal,
+      );
+      const imported = await modelFileTask(
+        { kind: 'import', files, primary: files[0].name },
+        new AbortController().signal,
+      );
+      results.push({
+        format,
+        faces: imported.faces,
+        dimensions: imported.dimensions,
+        images: imported.document.images.length,
+        missing: imported.missing,
+      });
+    }
+    return results;
+  }, document);
+  for (const result of results) {
+    expect(result.faces).toBe(12);
+    expect(
+      result.dimensions.every((n: number) => Math.abs(n - 4) < 0.001),
+    ).toBe(true);
+    expect(result.missing).toEqual([]);
+    expect(result.images).toBe(result.format === 'stl' ? 0 : 1);
+  }
+});
+
+test('model import preview adds one undoable object and survives save and reopen', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+  });
+  await dialog.getByRole('button', { name: 'Mesh', exact: true }).click();
+  await dialog.getByText('Import and export', { exact: true }).click();
+  await dialog.getByLabel('Model and companion files').setInputFiles({
+    name: 'triangle.obj',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('o Canopy\nv 0 0 8\nv 4 0 8\nv 0 4 8\nf 1 2 3'),
+  });
+  await dialog
+    .getByRole('button', { name: 'Inspect import', exact: true })
+    .click();
+  await expect(dialog.getByText(/3 vertices · 1 faces/)).toBeVisible();
+  await dialog.getByRole('button', { name: 'Preview on building' }).click();
+  await page.screenshot({ path: info.outputPath('model-import-preview.png') });
+  await dialog.getByRole('button', { name: 'Add imported model' }).click();
+  const doc = () =>
+    server.edits().find((e) => e.id === 'library')?.properties.modelDocument;
+  await expect.poll(() => doc()?.objects.length).toBe(1);
+  expect(doc()!.objects[0].name).toBe('Canopy');
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => doc()?.objects.length || 0).toBe(0);
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect.poll(() => doc()?.objects.length).toBe(1);
+  await dialog
+    .getByRole('button', { name: 'Back to Survey', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Edit model', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Mesh', exact: true }).click();
+  await expect(
+    dialog.getByRole('combobox', { name: 'Model object', exact: true }),
+  ).toContainText('Canopy');
+  await dialog.getByText('Import and export', { exact: true }).click();
+  await dialog
+    .getByRole('combobox', { name: 'Export format', exact: true })
+    .selectOption('stl');
+  await dialog
+    .getByRole('button', { name: 'Prepare export', exact: true })
+    .click();
+  await expect(
+    dialog.getByRole('link', { name: /Download .*stl/ }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('model-export.png') });
+});
+
+test('mesh components use the mounted model, commit one command, and undo', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+  });
+  await dialog.getByRole('button', { name: 'Mesh', exact: true }).click();
+  const canvas = await dialog
+    .locator('.photo-model-canvas canvas')
+    .elementHandle();
+  await dialog
+    .getByRole('button', { name: 'Add primitive', exact: true })
+    .click();
+  const doc = () =>
+    server.edits().find((e) => e.id === 'library')?.properties.modelDocument;
+  await expect.poll(() => doc()?.objects.length).toBe(1);
+  const original = JSON.stringify(doc()!.objects[0].vertices);
+  await dialog
+    .getByRole('combobox', { name: 'Mesh selection', exact: true })
+    .selectOption('face');
+  await dialog
+    .getByRole('combobox', { name: /^Mesh component/ })
+    .selectOption({ index: 1 });
+  await dialog
+    .getByRole('button', { name: 'Extrude faces', exact: true })
+    .click();
+  await expect
+    .poll(() => JSON.stringify(doc()?.objects[0].vertices))
+    .not.toBe(original);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => JSON.stringify(doc()?.objects[0].vertices))
+    .toBe(original);
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(() => JSON.stringify(doc()?.objects[0].vertices))
+    .not.toBe(original);
+  await dialog
+    .getByRole('button', { name: 'Edit surface', exact: true })
+    .click();
+  expect(
+    await canvas!.evaluate(
+      (el) => el === document.querySelector('.photo-model-canvas canvas'),
+    ),
+  ).toBe(true);
+  await page.screenshot({ path: info.outputPath('mesh-editing.png') });
+  await dialog.getByRole('button', { name: 'Orbit', exact: true }).click();
+  await dialog
+    .getByRole('combobox', { name: 'Mesh selection', exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath('mesh-orbit.png') });
+});
+
+test('curved exterior walls retain details and undo while new courtyard boundaries stay recoverable', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  const { dialog, server, wall } = await unifiedModelFixture(page);
+  const original = JSON.stringify(wall()!.elements);
+  const canvas = await dialog
+    .locator('.photo-model-canvas canvas')
+    .elementHandle();
+  await dialog.getByRole('button', { name: 'Outline', exact: true }).click();
+  await dialog.getByText('Curves and rounded corners', { exact: true }).click();
+  await dialog.getByLabel('Arc bulge (m)', { exact: true }).fill('-3');
+  await dialog
+    .getByRole('button', { name: 'Apply edge shape', exact: true })
+    .click();
+  const saved = () => server.edits().find((e) => e.id === 'library');
+  await expect
+    .poll(() => saved()?.properties.modelDocument?.curves.length)
+    .toBe(1);
+  expect(JSON.stringify(wall()!.elements)).toBe(original);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => saved()?.properties.modelDocument?.curves.length || 0)
+    .toBe(0);
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(() => saved()?.properties.modelDocument?.curves.length)
+    .toBe(1);
+  await page.screenshot({ path: info.outputPath('curved-wall-outline.png') });
+  await dialog.getByRole('button', { name: 'Add wall', exact: true }).click();
+  await dialog
+    .getByRole('combobox', { name: 'Boundary operation', exact: true })
+    .selectOption('courtyard');
+  await dialog
+    .getByRole('combobox', { name: 'Boundary shape', exact: true })
+    .selectOption('ellipse');
+  await dialog.getByLabel('Boundary east (m)', { exact: true }).fill('0');
+  await dialog.getByLabel('Boundary north (m)', { exact: true }).fill('0');
+  await dialog
+    .getByRole('button', { name: 'Add boundary point', exact: true })
+    .click();
+  await page.screenshot({ path: info.outputPath('add-wall-courtyard.png') });
+  await dialog
+    .getByRole('button', { name: 'Apply boundary', exact: true })
+    .click();
+  await expect
+    .poll(() => saved()?.properties.modelDocument?.curves.length)
+    .toBe(5);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => saved()?.properties.modelDocument?.curves.length)
+    .toBe(1);
+  expect(
+    await canvas!.evaluate(
+      (el) => el === document.querySelector('.photo-model-canvas canvas'),
+    ),
+  ).toBe(true);
 });
 
 test('surface workspace touch tools retain the aligned viewport', async ({
