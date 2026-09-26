@@ -5368,7 +5368,7 @@ test('documentation current gallery: published campus and isolated owner workflo
     const done = dialog.getByRole('button', { name: 'Done', exact: true });
     if (await done.isVisible()) await done.click();
     await dialog
-      .getByRole('button', { name: '2D precision', exact: true })
+      .getByRole('button', { name: 'Edit surface', exact: true })
       .click();
     await dialog
       .getByRole('button', { name: 'Fit selection', exact: true })
@@ -5898,7 +5898,7 @@ async function unifiedModelFixture(
   await expect(dialog).toBeVisible();
   if (options.repairMode) return { server, dialog, wall: () => undefined };
   await dialog
-    .getByRole('button', { name: '2D precision', exact: true })
+    .getByRole('button', { name: 'Edit surface', exact: true })
     .click();
   if (await dialog.getByLabel('Model editing mode').isVisible()) {
     await dialog

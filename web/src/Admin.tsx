@@ -497,7 +497,7 @@ function Editor({
   });
   const [simple3D, setSimple3D] = useSimple3D();
   const settingsTrigger = useRef<HTMLButtonElement>(null);
-  const [opacity, setOpacity] = useState(0.8),
+  const [opacity, setOpacity] = useState(1),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
   const [message, setMessage] = useState(

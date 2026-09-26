@@ -30,7 +30,6 @@ import {
   Image,
   Orbit,
   ScanFace,
-  Ruler,
   Ungroup,
   Split,
 } from 'lucide-react';
@@ -997,9 +996,7 @@ function ModelWorkspace({
         ? '3d'
         : current === 'surface'
           ? 'surface'
-          : current === 'wall'
-            ? 'wall'
-            : '3d',
+          : '3d',
     );
     openPanel(next === 'details' ? 'none' : 'mode');
   };
@@ -1218,7 +1215,7 @@ function ModelWorkspace({
   return (
     <ModelSurfaceContext
       value={{
-        active: tab === 'surface',
+        active: tab === 'surface' && !webglUnavailable,
         revision: `${mode}:${activeWall}:${selection?.partId || ''}`,
         onFrame: receiveSurfaceFrame,
         onPreview: setSurfacePreview,
@@ -1481,12 +1478,15 @@ function ModelWorkspace({
               <div className="model-toolbar model-main-toolbar">
                 <ModelButton
                   icon={<PanelLeft />}
+                  size="icon"
+                  aria-label={
+                    structureOpen ? 'Hide structure' : 'Show structure'
+                  }
+                  title={structureOpen ? 'Hide structure' : 'Show structure'}
                   aria-expanded={structureOpen}
                   aria-controls="model-structure"
                   onClick={() => setStructureOpen(!structureOpen)}
-                >
-                  {structureOpen ? 'Hide structure' : 'Show structure'}
-                </ModelButton>
+                />
                 <ToggleGroup
                   aria-label="Building editing mode"
                   value={[mode]}
@@ -1644,7 +1644,7 @@ function ModelWorkspace({
                       disabled={webglUnavailable}
                       title={
                         webglUnavailable
-                          ? '3D unavailable on this device; use 2D precision'
+                          ? '3D unavailable on this device; use Edit surface'
                           : 'Orbit the model'
                       }
                       onClick={() => {
@@ -1658,9 +1658,7 @@ function ModelWorkspace({
                       icon={<ScanFace />}
                       aria-pressed={tab === 'surface'}
                       disabled={
-                        before ||
-                        webglUnavailable ||
-                        !['details', 'roof', 'outline'].includes(mode)
+                        before || !['details', 'roof', 'outline'].includes(mode)
                       }
                       title={
                         !['details', 'roof', 'outline'].includes(mode)
@@ -1673,17 +1671,6 @@ function ModelWorkspace({
                       }}
                     >
                       Edit surface
-                    </ModelButton>
-                    <ModelButton
-                      icon={<Ruler />}
-                      aria-pressed={tab === 'wall'}
-                      disabled={!['details', 'roof', 'outline'].includes(mode)}
-                      onClick={() => {
-                        setTab('wall');
-                        openPanel('none');
-                      }}
-                    >
-                      2D precision
                     </ModelButton>
                     <ModelButton
                       icon={<Image />}
@@ -1731,28 +1718,33 @@ function ModelWorkspace({
                   )}
                   {webglUnavailable && (
                     <p className="small-note">
-                      3D is unavailable. Continue editing with 2D precision;
-                      your draft is retained.
+                      3D is unavailable. Edit surface uses a 2D drawing; your
+                      draft is retained.
                     </p>
                   )}
-                  <div className={`model-view-columns model-tab-${tab}`}>
+                  <div
+                    className={`model-view-columns model-tab-${tab === 'surface' && webglUnavailable ? 'wall' : tab}`}
+                  >
                     <div
                       ref={setPlanHost}
                       className="model-plan-host"
                       hidden={
-                        !['wall', 'surface'].includes(tab) ||
+                        !(tab === 'surface') ||
                         !['details', 'roof', 'outline'].includes(mode)
                       }
                     />
                     <div className="model-3d-view">
                       <PhotoModelPreview
                         onActions={showContextActions}
-                        active={tab === '3d' || tab === 'surface'}
-                        surfaceEditing={tab === 'surface'}
+                        active={
+                          !webglUnavailable &&
+                          (tab === '3d' || tab === 'surface')
+                        }
+                        surfaceEditing={tab === 'surface' && !webglUnavailable}
                         surface={surfaceFrame}
                         onUnavailable={() => {
                           setWebglUnavailable(true);
-                          setTab('wall');
+                          setTab('surface');
                         }}
                         hidden={hidden}
                         feature={renderedFeature}
@@ -1916,7 +1908,7 @@ function ModelWorkspace({
                         <ModelPlanPortal>
                           <ModelWallCanvas
                             interactive={
-                              ['wall', 'surface'].includes(tab) &&
+                              tab === 'surface' &&
                               (!compact || landscape || panel === 'none')
                             }
                             detailName={label}
@@ -2119,7 +2111,7 @@ function ModelWorkspace({
                                 openPanel('more');
                                 setDetent('full');
                                 setTab((view) =>
-                                  view === 'surface' ? view : 'wall',
+                                  view === 'surface' ? view : 'surface',
                                 );
                               }}
                             >
@@ -2250,7 +2242,7 @@ function ModelWorkspace({
                               add(k);
                               if (compact) {
                                 setTab((view) =>
-                                  view === 'surface' ? view : 'wall',
+                                  view === 'surface' ? view : 'surface',
                                 );
                                 openPanel('none');
                               }
@@ -2959,7 +2951,7 @@ function ModelWorkspace({
                                 touchTool === 'move' ? 'select' : 'move',
                               );
                               setTab((view) =>
-                                view === 'surface' ? view : 'wall',
+                                view === 'surface' ? view : 'surface',
                               );
                             }}
                           >
@@ -2980,7 +2972,7 @@ function ModelWorkspace({
                                 touchTool === 'resize' ? 'select' : 'resize',
                               );
                               setTab((view) =>
-                                view === 'surface' ? view : 'wall',
+                                view === 'surface' ? view : 'surface',
                               );
                             }}
                           >
@@ -3036,7 +3028,7 @@ function ModelWorkspace({
                               touchTool === 'move' ? 'select' : 'move',
                             );
                             setTab((view) =>
-                              view === 'surface' ? view : 'wall',
+                              view === 'surface' ? view : 'surface',
                             );
                           }}
                           disabled={!['roof', 'outline'].includes(mode)}
