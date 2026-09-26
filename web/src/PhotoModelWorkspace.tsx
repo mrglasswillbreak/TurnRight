@@ -34,6 +34,7 @@ import {
   Split,
 } from 'lucide-react';
 import { ModelButton } from './ModelButton';
+import { reviewModelWalls } from './model-review';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
   DropdownMenu,
@@ -342,6 +343,7 @@ function ModelWorkspace({
     [error, setError] = useState(''),
     [grid, setGrid] = useState(0.1);
   const [wholeRows, setWholeRows] = useState<string[]>([]);
+  const [reviewResult, setReviewResult] = useState('');
   const [hidden, setHidden] = useState<string[]>([]),
     [locked, setLocked] = useState<string[]>([]),
     [clipboard, setClipboard] = useState<Stamp | null>(null),
@@ -528,6 +530,13 @@ function ModelWorkspace({
     !!pending ||
     !!workspace?.roofDraft ||
     Object.keys(workspace?.modelInputs[edit.id] || {}).length > 0;
+  const reviewReady = useMemo(
+    () => (mode === 'review' ? reviewModelWalls(draft, data) : null),
+    [mode, draft, data],
+  );
+  useEffect(() => {
+    if (reviewReady?.reviewed.length) setReviewResult('');
+  }, [reviewReady]);
   const discardInput = () => {
     setPending(null);
     setRoofDraft(null);
@@ -1996,6 +2005,42 @@ function ModelWorkspace({
                         data-mobile-panel="mode"
                       >
                         <h3>Model review</h3>
+                        <ModelButton
+                          variant="default"
+                          icon={<ActionCheck />}
+                          disabled={
+                            before || unsaved || !reviewReady?.reviewed.length
+                          }
+                          title={
+                            before
+                              ? 'Return to your changes before reviewing'
+                              : unsaved
+                                ? 'Finish or discard pending inputs before reviewing all walls'
+                                : !reviewReady?.reviewed.length
+                                  ? 'No eligible wall details need review'
+                                  : 'Review all eligible recorded walls in this building in one undoable action'
+                          }
+                          onClick={() => {
+                            const result = reviewModelWalls(draft, data);
+                            if (
+                              result.reviewed.length &&
+                              commit(result.edit, true)
+                            )
+                              setReviewResult(
+                                `Reviewed ${result.reviewed.length} wall${result.reviewed.length === 1 ? '' : 's'}.${result.blocked.length ? ` ${result.blocked.length} still need repairs or evidence.` : ''}`,
+                              );
+                          }}
+                        >
+                          Mark all as reviewed
+                        </ModelButton>
+                        {reviewResult && <output>{reviewResult}</output>}
+                        {!!reviewReady?.blocked.length && (
+                          <ul aria-label="Walls still needing attention">
+                            {reviewReady.blocked.map((issue) => (
+                              <li key={issue.wallId}>{issue.message}</li>
+                            ))}
+                          </ul>
+                        )}
                         <p>
                           Saving preserves your draft. Only walls explicitly
                           reviewed receive approval.

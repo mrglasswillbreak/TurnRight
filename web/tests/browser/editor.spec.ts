@@ -7807,6 +7807,77 @@ test('surface workspace tree keyboard focus, search and repeated detail detachme
   expect(wall()?.elements[0].count).toBe(2);
 });
 
+test('mark all as reviewed approves current building walls in one undoable action', async ({
+  page,
+}) => {
+  const building = browserCampus().map.features.find(
+    (f) => f.properties?.id === 'library',
+  )!;
+  const walls = facadeWalls(building).slice(0, 2);
+  const facades = Object.fromEntries(
+    walls.map((w) => [
+      w.wallId,
+      {
+        partId: w.partId,
+        wallId: w.wallId,
+        wallCoordinates: w.coordinates,
+        photoIds: [],
+        confidence: 'inferred',
+        notes: 'Illustrative details',
+        needsReview: true,
+        elements: [
+          {
+            id: `window-${w.wallId}`,
+            kind: 'window',
+            x: 0.5,
+            bottom: 1,
+            width: 1,
+            height: 1,
+            depth: 0.1,
+            count: 1,
+            spacing: 0,
+            colour: '#566677',
+          },
+        ],
+      },
+    ]),
+  );
+  const { dialog, server } = await unifiedModelFixture(page, {
+    prepareWall: false,
+    properties: { appearance: { facades } },
+  });
+  await dialog.getByRole('button', { name: /^Review/ }).click();
+  const approve = dialog.getByRole('button', {
+    name: 'Mark all as reviewed',
+    exact: true,
+  });
+  await expect(approve).toBeEnabled();
+  await approve.click();
+  const saved = () =>
+    Object.values(
+      server.edits().find((e) => e.id === 'library')!.properties.appearance!
+        .facades!,
+    );
+  await expect
+    .poll(() => saved().every((f) => f.reviewedAt && !f.needsReview))
+    .toBe(true);
+  expect(saved()).toHaveLength(2);
+  expect(saved()[0].reviewedAt).toBe(saved()[1].reviewedAt);
+  await expect(
+    dialog.locator('.model-review').getByRole('status'),
+  ).toContainText('Reviewed 2 walls');
+  await expect(approve).toBeDisabled();
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => saved().every((f) => f.needsReview && !f.reviewedAt))
+    .toBe(true);
+  await expect(approve).toBeEnabled();
+  await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect
+    .poll(() => saved().every((f) => f.reviewedAt && !f.needsReview))
+    .toBe(true);
+});
+
 test('public Editor opens the selected building card and consumes the handoff once', async ({
   page,
 }) => {
