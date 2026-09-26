@@ -100,7 +100,7 @@ def inspect_file(path, configuration, work, label=None):
             features.append({'type':'Feature','id':index,'geometry':geom,'properties':row})
         return [{'name':name,'features':features,'fields':[{'name':f} for f in reader.fieldnames],'crs':mapping.get('crs'),'geometryTypes':['Point'],'suggestedRole':'place','requiresCoordinates':True}]
     gdal.UseExceptions()
-    gdal.SetConfigOption('OGR_SQLITE_LOAD_EXTENSIONS','NO')
+    gdal.SetConfigOption('OGR_SQLITE_LOAD_EXTENSIONS','')
     gdal.SetConfigOption('OGR_SQLITE_LIST_VIRTUAL_OGR','NO')
     dataset = gdal.OpenEx(str(path.resolve()),gdal.OF_VECTOR,allowed_drivers=DRIVERS)
     if dataset is None: raise ValueError('Unsupported or damaged vector dataset.')
