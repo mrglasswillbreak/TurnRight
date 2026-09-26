@@ -140,26 +140,41 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             public_feature = {'type':'Feature','geometry':geometry,'properties':props}
             add('feature',ident,public_feature)
             if len(preview) < 2000: preview.append(public_feature)
-            if role in ('place','building') and name:
+            if role in ('place','building','entrance') and (name or role=='entrance'):
                 point = geom.representative_point()
                 place_id = ident + ':place'
-                place = {'id':place_id,'name':name,'category':category,'coordinates':[point.x,point.y],'aliases':[],'source':owner_source,'sourceId':str(native),'arrivalKind':'unmapped'}
+                place = {'id':place_id,'name':name or 'Unassigned entrance','category':'gate' if role=='entrance' else category,'coordinates':[point.x,point.y],'aliases':[],'source':owner_source,'sourceId':str(native),'arrivalKind':'unmapped'}
                 if role=='building': place['buildingId']=ident
                 add('place',place_id,place)
             if role=='entrance': warnings.append('Imported entrance pins require an explicit building/place assignment and path connection in the editor.')
     # Detect overlaps with other sources. They are review candidates, never auto-merged.
     from shapely.strtree import STRtree
-    existing = [r for r in previous if r['entity']=='feature' and r['source']!=owner_source and r.get('payload',{}).get('properties',{}).get('kind')=='building']
+    incoming_buildings = [r for r in records.values() if r['entity']=='feature' and r['payload']['properties']['kind']=='building']
+    existing = [r for r in previous if r['entity']=='feature' and r['source']!=owner_source and r.get('payload',{}).get('properties',{}).get('kind')=='building'] + incoming_buildings
     shapes = [shape(r['payload']['geometry']) for r in existing]
     tree = STRtree(shapes)
     for record in records.values():
         if record['entity'] != 'feature' or record['payload']['properties']['kind'] != 'building': continue
         geom = shape(record['payload']['geometry'])
         for index in tree.query(geom):
+            if existing[index]['id'] == record['id']: continue
+            if existing[index]['source']==owner_source and existing[index]['id']>record['id']: continue
             candidate = shapes[index]
             if candidate.is_valid and geom.intersection(candidate).area / max(geom.area,candidate.area,1e-20) > 0.6:
                 duplicates.append({'incomingId':record['payload']['properties']['id'],'existingId':existing[index]['payload']['properties']['id'],'name':record['payload']['properties']['name']})
     old = {r['id']:r for r in previous if r['source']==owner_source}
+    parents={}
+    def component(node):
+        parents.setdefault(node,node)
+        while parents[node]!=node:
+            parents[node]=parents[parents[node]]; node=parents[node]
+        return node
+    for r in [p for p in previous if p['source']!=owner_source]+list(records.values()):
+        if r['entity']=='edge' and r['payload'].get('walkingAccess') not in ('private','no'):
+            a,b=r['payload']['from'],r['payload']['to']; parents[component(a)]=component(b)
+    components=len({component(n) for n in parents})
+    if not components: warnings.append('Directions unavailable: there are no reviewed, permitted walking paths. A map-only campus can still be published.')
+    elif components>1: warnings.append(f'Routing gap: {components} disconnected walking networks. Review endpoint connections and entrances; bridges and tunnels are never joined by proximity.')
     proposals=[]
     for key in sorted(set(old)|set(records)):
         before,after = old.get(key),records.get(key)

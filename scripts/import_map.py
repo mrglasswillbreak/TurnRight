@@ -102,9 +102,18 @@ def run_job():
                     (folder/filename).write_bytes(content)
                     files.append({'path':filename,'label':Path(asset['name']).stem})
             else:
+                if source['kind']=='osm' and not job.get('snapshot_path'):
+                    recent=db(f"campus_imports?source_id=eq.{source['id']}&snapshot_path=not.is.null&status=in.(mapping,preview,reviewed)&order=updated_at.desc&limit=1")
+                    if recent:
+                        age=(datetime.now(timezone.utc)-datetime.fromisoformat(recent[0]['updated_at'].replace('Z','+00:00'))).total_seconds()
+                        if age<900 and recent[0]['snapshot_path'].startswith(f"{campus_id}/{recent[0]['id']}/"):
+                            raw_snapshot=remote('storage/v1/object/campus-imports/'+recent[0]['snapshot_path'],raw=True)
+                            warnings.append('Reused the source snapshot downloaded within the last 15 minutes.')
                 if job.get('snapshot_path'):
                     if not job['snapshot_path'].startswith(f'{campus_id}/{import_id}/'): raise ValueError('Snapshot identity mismatch.')
                     raw_snapshot=remote('storage/v1/object/campus-imports/'+job['snapshot_path'],raw=True)
+                elif raw_snapshot is not None:
+                    pass
                 elif source['kind']=='arcgis':
                     layers,warnings=discover(source['url'],campus['bounds'])
                     raw_snapshot=encoded({'layers':layers,'warnings':warnings})
