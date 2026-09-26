@@ -99,6 +99,7 @@ import type {
   Route,
 } from './types';
 const Admin = lazy(() => import('./Admin'));
+const CampusSwitcher = lazy(() => import('./CampusSwitcher'));
 const categories: {
   id: Category | 'all';
   label: string;
@@ -274,6 +275,7 @@ export default function App() {
     panelContent.current?.scrollTo(0, 0);
   }, [selected?.id, routeView, navigating, query, category, savedOnly]);
   const [checkingDownload, setCheckingDownload] = useState(false);
+  const [campusMap, setCampusMap] = useState<MapInstance | null>(null);
   const downloadGeneration = useRef(0);
   const reloadData = () => {
     const generation = ++downloadGeneration.current;
@@ -614,13 +616,13 @@ export default function App() {
                 ? 'Academic building'
                 : place.category.charAt(0).toUpperCase() +
                   place.category.slice(1)}{' '}
-              · Ojo campus
+              · {manifest?.campus?.name || 'Ojo campus'}
             </span>
           </span>
           <ChevronRight size={17} />
         </button>
       )),
-    [places, visiblePlaceCount, mobileSearch, selectPlace],
+    [places, visiblePlaceCount, mobileSearch, selectPlace, manifest?.campus?.name],
   );
   const openDestinationLink = useEffectEvent(() => {
     if (!data || location.pathname.startsWith('/admin')) return;
@@ -862,7 +864,7 @@ export default function App() {
         <h1>
           TurnRight<span>.</span>
         </h1>
-        <p>{loadError || 'Opening LASU campus…'}</p>
+        <p>{loadError || 'Opening campus map…'}</p>
         {loadError && <Button onClick={reloadData}>Retry</Button>}
       </main>
     );
@@ -881,6 +883,7 @@ export default function App() {
         />
       </Suspense>
     );
+  const campusName = manifest.campus?.name || 'LASU · Ojo';
   const BrandTag = worldView ? 'button' : 'div';
   const mapControls = (
     <div className="map-controls">
@@ -982,6 +985,7 @@ export default function App() {
         onManualPan={() => setFollow(false)}
         onWorldViewChange={setWorldView}
         onReady={(instance) => {
+          setCampusMap(instance);
           map.current = instance;
           instance.on('contextmenu', (e) => {
             if (navigatingRef.current || instance.getZoom() < CAMPUS_MIN_ZOOM)
@@ -993,6 +997,13 @@ export default function App() {
         }}
       />
 
+      <Suspense fallback={null}>
+        <CampusSwitcher
+          map={campusMap}
+          navigating={navigating}
+          onStop={stopNavigation}
+        />
+      </Suspense>
       {mobileMapControls && mapControls}
       {updateReady && (
         <AppUpdateNotice
@@ -1003,7 +1014,7 @@ export default function App() {
       )}
       <BrandTag
         className="public-brand"
-        aria-label={worldView ? 'Back to campus' : 'TurnRight · LASU Ojo'}
+        aria-label={worldView ? 'Back to campus' : `TurnRight · ${campusName}`}
         onClick={
           worldView
             ? () => {
@@ -1018,7 +1029,7 @@ export default function App() {
         </span>
         <span>
           <strong>{worldView ? 'Back to campus' : 'TurnRight'}</strong>
-          <small>LASU · OJO</small>
+          <small>{campusName}</small>
         </span>
       </BrandTag>
       {/* Focus tracking only; this region has no pointer or keyboard actions. */}
@@ -1052,7 +1063,7 @@ export default function App() {
               <input
                 aria-label="Search campus"
                 ref={searchInput}
-                placeholder="Search LASU campus"
+                placeholder={`Search ${campusName}`}
                 value={query}
                 onFocus={() => {
                   setSearching(true);
@@ -1198,6 +1209,11 @@ export default function App() {
               >
                 Search campus places
               </button>
+            </output>
+          )}
+          {!data.graph.edges.some((edge) => edge.walkingAccess !== 'no' && edge.walkingAccess !== 'private') && (
+            <output className="notice dock-notice">
+              Directions are not available for this campus yet. You can browse buildings and places while paths and connections are reviewed.
             </output>
           )}
           {routeView && selected ? (
@@ -1382,7 +1398,7 @@ export default function App() {
                 <Building2 />
               </div>
               <span className="eyebrow">
-                {selected.category.toUpperCase()} · LASU OJO
+                {selected.category.toUpperCase()} · {campusName}
               </span>
               <h1>{selected.name}</h1>
               <PhotoGallery
@@ -1467,11 +1483,7 @@ export default function App() {
                   )
                 );
               })()}
-              <p>
-                {selected.department ||
-                  selected.faculty ||
-                  'Lagos State University, Ojo campus'}
-              </p>
+              <p>{selected.department || selected.faculty || campusName}</p>
               <div className="detail-facts">
                 <div>
                   <MapPin />
@@ -1568,7 +1580,7 @@ export default function App() {
               {dialog === 'building'
                 ? 'Building footprint and source information.'
                 : dialog === 'offline'
-                  ? 'Take LASU campus with you.'
+                  ? `Take ${campusName} with you.`
                   : dialog === 'report'
                     ? 'Help make campus easier to navigate.'
                     : 'Make TurnRight work for you.'}
@@ -1801,7 +1813,7 @@ export default function App() {
                   Location and navigation history stay on your phone. Student
                   reports only send the pin and description you submit.
                   TurnRight is an independent personal project, not an official
-                  LASU service.
+                  university service.
                 </p>
                 <h3 className="subheading">Sources & attribution</h3>
                 {data.sources.map((source) => (

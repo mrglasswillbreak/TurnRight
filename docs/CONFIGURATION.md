@@ -1,5 +1,12 @@
 # TurnRight account configuration
 
+## Multi-campus configuration
+
+The campus extension reuses the configured Supabase, GitHub Actions and Vercel projects, existing owner and existing secrets. Migrations 013–015 must be applied before the writing release. Compatible readers preserve LASU-only requests and `/packages/latest.json`. See [production rollout status](PRODUCTION.md) before assuming new tables are live.
+
+Optional `OVERPASS_URL` is a GitHub repository variable. `OVERPASS_SCHEDULE_ALLOWED=true` must be present in both the Vercel server environment and GitHub repository variables to offer daily OSM checks; leave it unset for public endpoints without scheduled-use permission. `.github/workflows/map-source-check.yml` checks opted-in sources at 03:47 UTC. LASU's existing 02:17 UTC schedule is retained. Source settings, mappings and campus bounds live in private tables rather than environment variables.
+
+
 ## Model storage extension · 26 September 2026
 
 Migration `012_editable_model_assets.sql` is applied to the existing project. Verification returned `model_assets`, `save_editor_model_batch(uuid,uuid,jsonb)`, a private `building-models` bucket and no direct authenticated metadata SELECT privilege. No credentials, environment variables, public access grants or paid services were added. Public readers deployed before the writing client. See [authoring](MODEL-AUTHORING.md) and [production](PRODUCTION.md).

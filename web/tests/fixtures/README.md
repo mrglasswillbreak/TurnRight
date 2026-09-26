@@ -1,5 +1,10 @@
 # Live editor regression
 
+## Multi-campus regressions
+
+`campus-context`, `campus-publication`, `editor-database`, `offline` and `editor-link` tests cover legacy LASU defaults, scoped identity/recovery, independent downloads, stale catalogue rejection and per-campus restore previews. `browser/campus-imports.spec.ts` supplies isolated source jobs and illustrative campus names; it does not create production campuses. Python GIS fixtures are generated in temporary directories by `scripts/tests/test_map_import*.py` and exercised in the pinned Linux container. Existing frozen published-model revisions remain unchanged.
+
+
 `editor-2026-09-14.json.gz` contains the approved campus snapshot and correction
 records exported through the owner editor on 14 September 2026 (local time).
 Database actor identities and history are omitted; the complete export remains

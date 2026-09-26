@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { discardReportDraft, getPreference, setPreference } from "./offline";
-import type { Place, Position, ReportDraft } from "./types";
+import { requestedCampus } from './campus-context';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { discardReportDraft, getPreference, setPreference } from './offline';
+import type { Place, Position, ReportDraft } from './types';
 export function ReportForm({
   place,
   coordinates,
@@ -13,15 +14,18 @@ export function ReportForm({
   onDone: () => void;
   onDraftSaved: () => void;
 }) {
-  const [category, setCategory] = useState("incorrect-place"),
-    [description, setDescription] = useState(""),
-    [error, setError] = useState(""),
+  const [category, setCategory] = useState('incorrect-place'),
+    [description, setDescription] = useState(''),
+    [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false),
-    [website, setWebsite] = useState("");
-  const draftKey = `report:${place?.id || coordinates?.join(",") || "general"}`;
+    [website, setWebsite] = useState('');
+  const draftKey = `report:${place?.id || coordinates?.join(',') || 'general'}`;
   useEffect(() => {
-    getPreference(draftKey, { description: "", category: "incorrect-place" }).then((d) => {
+    getPreference(draftKey, {
+      description: '',
+      category: 'incorrect-place',
+    }).then((d) => {
       setDescription(d.description);
       setCategory(d.category);
     });
@@ -29,16 +33,17 @@ export function ReportForm({
   const submit = async () => {
     const point = place?.coordinates || coordinates;
     if (!point) {
-      setError("Choose a place or a map pin first.");
+      setError('Choose a place or a map pin first.');
       return;
     }
     setBusy(true);
-    setError("");
+    setError('');
     try {
-      const response = await fetch("/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          campus: requestedCampus(),
           coordinates: point,
           placeId: place?.id,
           category,
@@ -48,9 +53,10 @@ export function ReportForm({
       });
       const result = await response.json().catch(() => ({
         error:
-          "Report submission needs the Vercel and Supabase setup. You can save a draft on this device.",
+          'Report submission needs the Vercel and Supabase setup. You can save a draft on this device.',
       }));
-      if (!response.ok || result.error) throw new Error(result.error || "Could not submit report");
+      if (!response.ok || result.error)
+        throw new Error(result.error || 'Could not submit report');
       await discardReportDraft(draftKey).catch(() => {});
       onDraftSaved();
       onDone();
@@ -62,7 +68,7 @@ export function ReportForm({
   };
   return (
     <div className="settings-content">
-      <div aria-hidden="true" style={{ position: "absolute", left: -10000 }}>
+      <div aria-hidden="true" style={{ position: 'absolute', left: -10000 }}>
         <label>
           Website
           <input
@@ -74,8 +80,9 @@ export function ReportForm({
         </label>
       </div>
       <p>
-        Tell us what needs correcting at <strong>{place?.name || "this map pin"}</strong>. Reports
-        are private and reviewed before the map changes.
+        Tell us what needs correcting at{' '}
+        <strong>{place?.name || 'this map pin'}</strong>. Reports are private
+        and reviewed before the map changes.
       </p>
       <label className="field-label">
         What’s wrong?
@@ -101,7 +108,8 @@ export function ReportForm({
         />
       </label>
       <p className="small-note">
-        No account or contact details needed. Please don’t include anyone’s personal information.
+        No account or contact details needed. Please don’t include anyone’s
+        personal information.
       </p>
       <div className="button-row">
         <Button
@@ -109,15 +117,18 @@ export function ReportForm({
           onClick={async () => {
             try {
               await setPreference(draftKey, { description, category });
-              const drafts = await getPreference<ReportDraft[]>("report-drafts", []);
+              const drafts = await getPreference<ReportDraft[]>(
+                'report-drafts',
+                [],
+              );
               await setPreference(
-                "report-drafts",
+                'report-drafts',
                 [
                   {
                     key: draftKey,
                     placeId: place?.id,
                     coordinates: place?.coordinates || coordinates,
-                    name: place?.name || "Map pin",
+                    name: place?.name || 'Map pin',
                   },
                   ...drafts.filter((d) => d.key !== draftKey),
                 ].slice(0, 30),
@@ -125,17 +136,19 @@ export function ReportForm({
               setSaved(true);
               onDraftSaved();
             } catch {
-              setError("This browser could not save the draft. Keep this page open and retry.");
+              setError(
+                'This browser could not save the draft. Keep this page open and retry.',
+              );
             }
           }}
         >
-          {saved ? "Draft saved" : "Save draft"}
+          {saved ? 'Draft saved' : 'Save draft'}
         </Button>
         <Button
           disabled={busy || description.trim().length < 10 || !navigator.onLine}
           onClick={submit}
         >
-          {busy ? "Submitting…" : "Submit report"}
+          {busy ? 'Submitting…' : 'Submit report'}
         </Button>
       </div>
       <Button
@@ -147,14 +160,16 @@ export function ReportForm({
             onDraftSaved();
             onDone();
           } catch {
-            setError("This browser could not delete the draft. Please retry.");
+            setError('This browser could not delete the draft. Please retry.');
           }
         }}
       >
         Discard draft
       </Button>
       {!navigator.onLine && (
-        <p className="notice">You’re offline. Save a draft and submit it when connected.</p>
+        <p className="notice">
+          You’re offline. Save a draft and submit it when connected.
+        </p>
       )}
       {error && (
         <p role="alert" className="form-error">

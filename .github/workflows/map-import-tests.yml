@@ -1,0 +1,20 @@
+name: GIS import regression tests
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/map_import/**'
+      - 'scripts/import_map.py'
+      - 'scripts/tests/test_map_import*.py'
+      - '.github/workflows/map-import-tests.yml'
+permissions:
+  contents: read
+jobs:
+  gis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t turnright-gis-import -f scripts/map_import/Dockerfile scripts/map_import
+      - name: Exercise every driver without network access
+        run: docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -v "${{ github.workspace }}/scripts:/app:ro" --entrypoint python3 turnright-gis-import -m unittest discover -s /app/tests -p 'test_map_import*.py' -v

@@ -53,6 +53,9 @@ beforeAll(async () => {
     '009_bounded_baseline_comparison.sql',
     '011_linear_baseline_reconciliation.sql',
     '012_editable_model_assets.sql',
+    '013_campus_isolation.sql',
+    '014_map_import_jobs.sql',
+    '015_campus_release_restores.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -668,4 +671,203 @@ describe('transactional editor migration', () => {
     );
     await database.exec('reset role;');
   });
+});
+
+describe('campus isolation', () => {
+  it('saves identical feature IDs independently, scopes review and snapshots, and rejects moving a record', async () => {
+    await database.exec(
+      "insert into campuses(id,slug,name,boundary,bounds) select 'campus-two','second-campus','Second campus',boundary,bounds from campuses where id='lasu'",
+    );
+    const lasu = await save(randomUUID(), [
+      item('shared-campus-door', 'LASU door'),
+    ]);
+    await database.exec(
+      "insert into source_features(id,source,entity,payload,hash) values('feature:shared','test','feature','{}','lasu-hash')",
+    );
+    try {
+      await database.query("select set_config('request.headers',$1,false)", [
+        JSON.stringify({ 'x-turnright-campus': 'campus-two' }),
+      ]);
+      await save(randomUUID(), [item('shared-campus-door', 'Second door')]);
+      await database.exec(
+        "insert into source_features(id,source,entity,payload,hash) values('feature:shared','test','feature','{}','second-hash')",
+      );
+      const after = {
+        id: 'feature:shared',
+        source: 'test',
+        entity: 'feature',
+        payload: { name: 'Reviewed second' },
+        hash: 'reviewed-hash',
+      };
+      await database.query(
+        "insert into map_changes(id,source_id,kind,after,base_hash,summary) values('shared-change','feature:shared','modify',$1,'second-hash','Review second')",
+        [JSON.stringify(after)],
+      );
+      await database.exec("select review_map_change('shared-change',true)");
+      const revision = await database.query<{ id: string }>(
+        "select snapshot_release('Second campus only') as id",
+      );
+      const release = await database.query<{
+        snapshot: {
+          features: { campus_id: string }[];
+          edits: { campus_id: string }[];
+        };
+      }>('select snapshot from releases where id=$1', [revision.rows[0].id]);
+      expect(
+        release.rows[0].snapshot.features.every(
+          (r) => r.campus_id === 'campus-two',
+        ),
+      ).toBe(true);
+      expect(
+        release.rows[0].snapshot.edits.every(
+          (r) => r.campus_id === 'campus-two',
+        ),
+      ).toBe(true);
+      await expect(
+        database.exec(
+          "update map_edits set campus_id='lasu' where campus_id='campus-two'",
+        ),
+      ).rejects.toThrow(/immutable/);
+    } finally {
+      await database.exec("select set_config('request.headers','{}',false)");
+    }
+    const original = await database.query<{
+      updated_at: string;
+      properties: { name: string };
+    }>(
+      "select updated_at,properties from map_edits where campus_id='lasu' and id='shared-campus-door'",
+    );
+    expect(original.rows[0].properties.name).toBe('LASU door');
+    expect(new Date(original.rows[0].updated_at).toISOString()).toBe(
+      new Date(lasu[0].updated_at).toISOString(),
+    );
+    expect(
+      (
+        await database.query<{ hash: string }>(
+          "select hash from source_features where campus_id='lasu' and id='feature:shared'",
+        )
+      ).rows[0].hash,
+    ).toBe('lasu-hash');
+  });
+});
+
+it('bounds private import uploads and prevents cancelled candidates from reaching review', async () => {
+  const sourceId = randomUUID(),
+    importId = randomUUID(),
+    token = randomUUID();
+  await database.query(
+    "insert into campus_sources(id,name,kind) values($1,'Buildings','file')",
+    [sourceId],
+  );
+  await database.query(
+    "insert into campus_imports(id,source_id,configuration,run_token) values($1,$2,'{}',$3)",
+    [importId, sourceId, token],
+  );
+  const asset = {
+    id: randomUUID(),
+    import_id: importId,
+    path: 'test/import/file.zip',
+    name: 'file.zip',
+    bytes: 40 * 1024 * 1024,
+    sha256: 'd'.repeat(64),
+  };
+  await database.query('select add_import_asset($1)', [JSON.stringify(asset)]);
+  await database.query('select add_import_asset($1)', [
+    JSON.stringify({ ...asset, id: randomUUID() }),
+  ]);
+  expect(
+    (
+      await database.query<{ count: number }>(
+        'select count(*)::integer as count from campus_import_assets where import_id=$1',
+        [importId],
+      )
+    ).rows[0].count,
+  ).toBe(1);
+  await expect(
+    database.query('select add_import_asset($1)', [
+      JSON.stringify({
+        ...asset,
+        id: randomUUID(),
+        path: 'test/import/second.zip',
+        name: 'second.zip',
+        bytes: 20 * 1024 * 1024,
+      }),
+    ]),
+  ).rejects.toThrow(/50 MiB/);
+  await database.query(
+    "update campus_imports set status='cancelled' where id=$1",
+    [importId],
+  );
+  await expect(
+    database.query("select queue_campus_import($1,$2,'[]','[]')", [
+      importId,
+      token,
+    ]),
+  ).rejects.toThrow(/no longer ready/);
+  expect(
+    (
+      await database.query<{ public: boolean }>(
+        "select public from storage.buckets where id='campus-imports'",
+      )
+    ).rows[0].public,
+  ).toBe(false);
+  expect(
+    (
+      await database.query<{ allowed: boolean }>(
+        "select has_table_privilege('authenticated','campus_imports','SELECT') as allowed",
+      )
+    ).rows[0].allowed,
+  ).toBe(false);
+});
+
+it('restores only the selected campus into a fresh preview with the current catalogue baseline', async () => {
+  const campus = 'restore-campus',
+    historical = randomUUID(),
+    other = randomUUID();
+  await database.exec(
+    `insert into campuses(id,slug,name,boundary,bounds) select '${campus}','restore-test','Restore test',boundary,bounds from campuses where id='lasu'`,
+  );
+  const snapshot = { features: [], edits: [], version: 'historical' };
+  await database.query(
+    "insert into releases(id,campus_id,status,summary,snapshot,version) values($1,$2,'published','Historical',$3,'restore-test-abc123'),($4,'lasu','published','Other',$3,'lasu-def456')",
+    [historical, campus, JSON.stringify(snapshot), other],
+  );
+  try {
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    await expect(
+      database.query("select restore_campus_release($1,'new-catalogue')", [
+        other,
+      ]),
+    ).rejects.toThrow('from this campus');
+    const result = await database.query<{ id: string }>(
+      "select restore_campus_release($1,'new-catalogue') as id",
+      [historical],
+    );
+    const restored = await database.query<{
+      campus_id: string;
+      status: string;
+      snapshot: unknown;
+      restored_from: string;
+      catalogue_revision: string;
+    }>('select * from releases where id=$1', [result.rows[0].id]);
+    expect(restored.rows[0]).toMatchObject({
+      campus_id: campus,
+      status: 'queued',
+      snapshot,
+      restored_from: historical,
+      catalogue_revision: 'new-catalogue',
+    });
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from releases where id=$1',
+          [other],
+        )
+      ).rows[0].status,
+    ).toBe('published');
+  } finally {
+    await database.exec("select set_config('request.headers','{}',false)");
+  }
 });

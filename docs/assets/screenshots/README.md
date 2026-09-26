@@ -1,12 +1,25 @@
 # Application screenshots
 
+## Multi-campus addition · 26 September 2026
+
+Eight `campus-*-2026-09-26.png` captures add the directory, creation/boundary preview, source selection, field mapping, preview/review, phone landscape, public switcher and per-campus offline controls. They are unaltered Chromium captures of the current source with isolated owner/import API responses and the checked-in LASU `lasu-4e4c8008b38b` geography. Second-campus names, feature counts and source URLs are illustrative fixtures. No private account, uploaded file or production draft is exposed; no second production campus is implied.
+
+Regenerate from `web/` with `UPDATE_CAMPUS_SCREENSHOTS=true npx playwright test campus-imports.spec.ts` (PowerShell: set `$env:UPDATE_CAMPUS_SCREENSHOTS='true'` first). Review every image after capture. The offline capture shows the campus's download controls, not proof of a disconnected session. The existing 46-image model/navigation gallery below remains; the root README now includes these eight additional workflows.
+
+
 ## Current application gallery · 26 September 2026
 
 The gallery shows the current reference-editing, globe and authored-model
 workspace alongside the existing public-map and owner workflows. Published model
 compatibility remains covered by the frozen legacy regression fixtures.
 
-The root README contains **46 distinct, unaltered PNG screenshots**. The production-build gallery uses verified campus **`lasu-7343cb96c9a5`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,228,832 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows, lettering, curved boundaries and mesh objects added in editor captures are illustrative local examples, not published architectural evidence.
+Before the campus-import additions above, the root README contained **46 distinct,
+unaltered PNG screenshots**. This production-build gallery uses verified campus
+**`lasu-7343cb96c9a5`**: 395 buildings, 220 places, 39 photographs covering 19
+buildings, and 84 package assets totaling 20,228,832 bytes. Owner/API responses are
+isolated. No production account, private upload, survey or draft is captured or
+modified. Windows, lettering, curved boundaries and mesh objects added in editor
+captures are illustrative local examples, not published architectural evidence.
 
 Eight additions, also dated `2026-09-26`, cover the current extension. `reference-editing` uses the production gallery and an approved campus photograph at 1920×1080. The other seven are unaltered Chromium regression captures from the current source with isolated fixtures: `animated-globe`, `curved-wall-outline`, `add-wall-courtyard`, `mesh-editing`, `mesh-orbit`, `model-import-preview`, and `model-export`. The fixture building has intentionally simple geometry so its editing handles and commands are visible. The globe is a still of the animated layer; motion is checked separately by the browser workflow.
 

@@ -1,4 +1,4 @@
-import { campusKey } from './campus-context';
+import { campusKey, requestedCampus } from './campus-context';
 import { openDB } from 'idb';
 import {
   pauseSurvey,
@@ -27,6 +27,9 @@ export async function saveSurveyLocal(
   session: SurveySession,
   sample?: SurveySample,
 ) {
+  session.campusId ??= requestedCampus();
+  if (session.campusId !== requestedCampus())
+    throw new Error('Switch back to the survey campus before saving.');
   const db = await database();
   try {
     const tx = db.transaction(['sessions', 'samples', 'uploads'], 'readwrite', {
@@ -35,6 +38,8 @@ export async function saveSurveyLocal(
     const previous = await tx
       .objectStore('sessions')
       .get([session.owner, session.id]);
+    if (previous && (previous.campusId || 'lasu') !== requestedCampus())
+      throw new Error('This survey belongs to another campus.');
     const expected = versions.get(keyFor(session)) ?? session.localVersion ?? 0;
     if ((previous?.localVersion ?? 0) !== expected) {
       tx.abort();
@@ -67,6 +72,9 @@ export async function saveSurveyLocal(
   }
 }
 export async function storeRecording(recording: SurveyRecording) {
+  recording.session.campusId ??= requestedCampus();
+  if (recording.session.campusId !== requestedCampus())
+    throw new Error('Switch back to the survey campus before saving.');
   const db = await database();
   try {
     const tx = db.transaction(['sessions', 'samples', 'uploads'], 'readwrite', {
@@ -76,6 +84,8 @@ export async function storeRecording(recording: SurveyRecording) {
     const previous = await tx
       .objectStore('sessions')
       .get([session.owner, session.id]);
+    if (previous && (previous.campusId || 'lasu') !== requestedCampus())
+      throw new Error('This survey belongs to another campus.');
     const expected = versions.get(keyFor(session)) ?? session.localVersion ?? 0;
     if ((previous?.localVersion ?? 0) !== expected) {
       tx.abort();
@@ -121,7 +131,10 @@ export async function listLocalSurveys(
   const db = await database();
   try {
     return (await db.getAll('sessions'))
-      .filter((s) => s.owner === owner)
+      .filter(
+        (s) =>
+          s.owner === owner && (s.campusId || 'lasu') === requestedCampus(),
+      )
       .map((s: SurveySession) => {
         if (s.state === 'recording')
           pauseSurvey(s, 'Recovered recording. Tap Resume when ready.');
@@ -141,7 +154,8 @@ export async function loadSurveyLocal(
     const session = (await db.get('sessions', [owner, id])) as
       | (SurveySession & { pendingUploadId?: string })
       | undefined;
-    if (!session) return null;
+    if (!session || (session.campusId || 'lasu') !== requestedCampus())
+      return null;
     if (session.pendingUploadId)
       session.pendingUpload = await db.get('uploads', [owner, id]);
     delete session.pendingUploadId;

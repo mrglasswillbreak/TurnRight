@@ -1,5 +1,14 @@
 # Editing the campus map
 
+## Campuses and imports
+
+**Campuses** opens the owner directory and import workspace. Create a boundary, upload supported vector files or connect public OSM/ArcGIS sources, map fields and projections, then inspect a candidate before queuing it for source review. Each campus retains separate drafts, models, reports, survey sessions, source history and releases. Switching protects unfinished edits and pending saves. Public Editor links preserve the campus and selected building through sign-in.
+
+![Campus source and field mapping](assets/screenshots/campus-mapping-2026-09-26.png)
+
+See [Campuses and map imports](CAMPUS-IMPORTS.md) for the full workflow. Review and publication remain separate; a historical campus is restored through a new preview that preserves every other campus.
+
+
 ## Reference, mesh and model files
 
 The unified workspace includes a remembered model/photo split, exterior wall and curve tools, and Mesh mode with Object/Vertex/Edge/Face selection. Import GLB/glTF, OBJ/MTL/textures or STL; export whole buildings or selected objects. Commands share undo, optimistic saves and owner-scoped recovery. Immutable private assets require migration 012, and authored revisions need review before publication. See [the complete guide](MODEL-AUTHORING.md).

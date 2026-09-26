@@ -1,4 +1,4 @@
-import type { CampusData, CampusPackage, Position } from './types';
+import type { CampusData, CampusPackage, Position } from './types.js';
 
 export const DEFAULT_CAMPUS = 'lasu';
 export interface CampusIdentity {
@@ -36,6 +36,7 @@ export function campusKey(key: string, campus = requestedCampus()) {
 export function campusUrl(path: string, campus = requestedCampus()) {
   const url = new URL(path, 'https://turnright.local');
   if (campus !== DEFAULT_CAMPUS) url.searchParams.set('campus', campus);
+  else if (url.searchParams.has('campus')) url.searchParams.delete('campus');
   return url.pathname + url.search + url.hash;
 }
 export function validCatalogue(value: unknown): value is CampusCatalogue {

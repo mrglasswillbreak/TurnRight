@@ -1,5 +1,36 @@
 # Production deployments
 
+## Multi-campus compatible readers — 26 September 2026
+
+Reader revision **`f17f7b1`** deployed through the existing
+[Vercel integration](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/FZGvkES73dorL9GBF22Hjq66W7ra).
+It understands campus identities and isolated offline package pointers while
+retaining the original LASU defaults. Live verification at **07:04:19 UTC**
+returned 200 for `/`, `/admin` and `/sw.js`, and the expected 401 for unauthenticated
+`/api/admin`. The LASU manifest remains unchanged at **`lasu-7343cb96c9a5`**;
+all **84 assets / 20,228,832 bytes** pass SHA-256 and byte-length verification.
+Served workspace `PhotoModelWorkspace-Cr6rd58w.js` has SHA-256
+`98852ee27fadc2032f73172aea0b7a0d406ab4d113afe5faaac1298df5ad3892`.
+
+The writing API, Campuses workspace, GIS adapters and scoped publication/restore
+implementation are committed on **`codex/multi-campus-imports`**, through
+`8a78b47`. They are **not yet enabled in production**: authenticated Supabase
+access is required to apply and verify migrations **013–015** before the writer
+deployment. No production campus was created, no second-campus data was
+published, and no existing private records were migrated during this reader
+rollout. Follow [the staged rollout](DEPLOYMENT.md#multi-campus-rollout).
+
+Implementation verification passes **591 unit tests**, the focused Chromium and
+WebKit import workflows, lint (eight existing warnings), production/configured
+builds and all bundle/asset budgets. The pinned Linux GIS image passes all
+**14 import tests**, including every supported file driver and the source
+projection regression ([workflow evidence](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36225606793)).
+The configured build measures **433,769 / 435,200** gzip bytes for public startup
+and **185,802 / 189,440** additional owner-editor bytes. Frozen LASU model fixtures
+are unchanged. Eight new unaltered fixture screenshots bring the root README to
+**54 screenshots**; they demonstrate the implementation, not a second live map.
+See [campus imports](CAMPUS-IMPORTS.md) and [acceptance](ACCEPTANCE.md).
+
 ## Reference editing and authored models — 26 September 2026
 
 Application revision **`5407e3880abe864f428d3f3e7aaeaf5ca2b0614a`** deployed

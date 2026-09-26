@@ -1,3 +1,4 @@
+import { campusUrl, lasuCampus } from './campus-context';
 import { PhotoSession } from './PhotoSession';
 import { canonicalBuildingId } from './arrival';
 import {
@@ -5,6 +6,7 @@ import {
   editorHandoffStorage,
   editorSignInReturn,
   requestedEditorBuilding,
+  restoreEditorCampusReturn,
 } from './editor-link';
 import type { BuildingSelection } from './visual-types';
 import {
@@ -12,6 +14,7 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -105,6 +108,7 @@ import { placeHasConnection } from './routing';
 import type { CampusData, MapChange, MapEdit, Position, Route } from './types';
 import './editor.css';
 
+const CampusWorkspace = lazy(() => import('./CampusWorkspace'));
 const BuildingAppearanceEditor = lazy(() =>
   import('./BuildingAppearanceEditor').then((module) => ({
     default: module.BuildingAppearanceEditor,
@@ -112,6 +116,8 @@ const BuildingAppearanceEditor = lazy(() =>
 );
 
 interface EditorState extends ReviewState {
+  base?: CampusData;
+  campus?: import('./campus-context').CampusIdentity;
   edits: MapEdit[];
 }
 
@@ -138,6 +144,10 @@ export default function Admin({
   updateReady?: boolean;
   installUpdate?: () => Promise<void>;
 }) {
+  useLayoutEffect(() => {
+    const restored=restoreEditorCampusReturn(location.href,editorHandoffStorage());
+    if(restored)history.replaceState(null,'',restored);
+  }, []);
   const [owner, setOwner] = useState<string | null>(null);
   const [state, setState] = useState<EditorState | null>(null);
   const [sources, setSources] = useState<SourceRecord[]>([]);
@@ -190,6 +200,7 @@ export default function Admin({
             api<EditorState>('state'),
             api<{ features: SourceRecord[] }>('sources'),
           ]);
+          if (state.base) initialCampus.current = state.base;
           rememberOfflineOwner(owner);
           const syncedAt = new Date().toISOString();
           const cached = await readSurveyContext<OfflineEditor>(owner).catch(
@@ -274,7 +285,7 @@ export default function Admin({
   if (!workspace || !state)
     return (
       <main className="loading-screen">
-        <a className="brandmark" href="/">
+        <a className="brandmark" href={campusUrl('/')}>
           <ArrowUpRight />
         </a>
         <LockKeyhole size={28} />
@@ -342,13 +353,13 @@ export default function Admin({
             Sign out
           </button>
         )}
-        <a href="/">Back to campus map</a>
+        <a href={campusUrl('/')}>Back to campus map</a>
       </main>
     );
   return (
     <PhotoSession key={owner} owner={owner!}>
       <Editor
-        data={data}
+        data={state.base || data}
         dark={dark}
         appearance={appearance}
         onAppearance={onAppearance}
@@ -1706,7 +1717,7 @@ function Editor({
         </output>
       )}
       <header className="editor-header">
-        <a className="editor-brand" href="/">
+        <a className="editor-brand" href={campusUrl('/')}>
           <span className="brandmark">
             <ArrowUpRight size={23} />
           </span>
@@ -1717,6 +1728,7 @@ function Editor({
         <nav className="editor-navigation" aria-label="Editor sections">
           {[
             ['map', 'Workspace'],
+            ['campuses', 'Campuses'],
             ['changes', 'Sources'],
             ['duplicates', 'Duplicates'],
             ['reports', 'Reports'],
@@ -1959,7 +1971,9 @@ function Editor({
           {explorer ? (
             <section className="editor-card">
               <div className="editor-explorer-top">
-                <span className="editor-eyebrow">LASU · OJO CAMPUS</span>
+                <span className="editor-eyebrow">
+                  {state.campus?.name || 'LASU · OJO CAMPUS'}
+                </span>
                 <button
                   className="editor-icon"
                   aria-label="Collapse explorer"
@@ -2122,6 +2136,37 @@ function Editor({
             {preview ? 'Back to draft' : 'Compare base'}
           </button>
         </div>
+        {tab === 'campuses' && (
+          <Suspense
+            fallback={<p className="campus-workspace">Opening campuses…</p>}
+          >
+            <CampusWorkspace
+              owner={owner}
+              current={state.campus || lasuCampus}
+              dark={dark}
+              onClose={() => setTab('map')}
+              onSwitch={async (campus) => {
+                if (
+                  workspace.unfinished ||
+                  workspace.roofDraft ||
+                  surveyRecording
+                )
+                  throw new Error(
+                    'Finish the current edit or pause recording before switching campuses.',
+                  );
+                if (!(await workspace.flush()))
+                  throw new Error(
+                    'Resolve pending saves before switching campuses. Your local edits are retained.',
+                  );
+                location.assign(campusUrl('/admin', campus.slug));
+              }}
+              onReview={async () => {
+                await refresh();
+                setTab('changes');
+              }}
+            />
+          </Suspense>
+        )}
         {tab === 'settings' && (
           <EditorSettings
             appearance={appearance}
@@ -2139,7 +2184,7 @@ function Editor({
             }}
           />
         )}
-        {tab !== 'map' && tab !== 'settings' ? (
+        {tab !== 'map' && tab !== 'settings' && tab !== 'campuses' ? (
           <aside className="editor-review-panel editor-card">
             <div className="editor-panel-heading">
               <span className="editor-eyebrow">PRIVATE WORKSPACE</span>

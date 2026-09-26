@@ -1,0 +1,36 @@
+name: Inspect and preview campus imports
+on:
+  workflow_dispatch:
+    inputs:
+      campus_id:
+        required: true
+      import_id:
+        required: true
+      run_token:
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: map-import-${{ inputs.campus_id }}-${{ inputs.import_id }}
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CAMPUS_ID: ${{ inputs.campus_id }}
+      IMPORT_ID: ${{ inputs.import_id }}
+      RUN_TOKEN: ${{ inputs.run_token }}
+      OVERPASS_URL: ${{ vars.OVERPASS_URL || 'https://overpass-api.de/api/interpreter' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pinned isolated GIS runtime
+        run: docker build -t turnright-gis-import -f scripts/map_import/Dockerfile scripts/map_import
+      - name: Inspect or preview private campus data
+        timeout-minutes: 20
+        run: python3 scripts/import_map.py
+      - name: Record interrupted job
+        if: failure() || cancelled()
+        run: python3 scripts/import_map.py fail

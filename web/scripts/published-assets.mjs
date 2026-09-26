@@ -22,11 +22,12 @@ export async function preservePublished(
   origin,
   activate = false,
   expectedVersion,
+  manifestPath = '/packages/latest.json',
 ) {
   const base = new URL(origin);
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
-  const response = await fetch(new URL('/packages/latest.json', base), {
+  const response = await fetch(new URL(manifestPath, base), {
     cache: 'no-store',
     signal: AbortSignal.timeout(20000),
   });
@@ -42,7 +43,7 @@ export async function preservePublished(
   if (
     !manifest ||
     ![1, 2, 3].includes(manifest.schemaVersion) ||
-    !/^lasu-[a-f0-9]+$/.test(manifest.version) ||
+    !/^[a-z0-9][a-z0-9-]*-[a-f0-9]+$/.test(manifest.version) ||
     !Array.isArray(manifest.assets) ||
     !Number.isSafeInteger(manifest.bytes) || manifest.bytes <= 0
   )

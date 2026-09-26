@@ -1,3 +1,4 @@
+import { currentCampusId, scopeDatabaseRequest } from './campus-scope.js';
 import { createHash } from 'node:crypto';
 export interface RequestLike {
   method?: string;
@@ -31,6 +32,7 @@ export async function db<T = any>(
   prefer = 'return=representation',
 ): Promise<T> {
   requireConfig();
+  ({ path, body } = scopeDatabaseRequest(path, method, body));
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${path}`, {
     method,
     headers: {
@@ -38,6 +40,7 @@ export async function db<T = any>(
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       'Content-Type': 'application/json',
       Prefer: prefer,
+      'X-TurnRight-Campus': currentCampusId(),
     },
     ...(body !== undefined && method !== 'GET'
       ? { body: JSON.stringify(body) }
@@ -55,7 +58,7 @@ export async function db<T = any>(
 }
 export async function allRows(table: string) {
   const rows: any[] = [];
-  for (let offset = 0; offset < 30000; offset += 1000) {
+  for (let offset = 0; offset < 300000; offset += 1000) {
     const page = await db(
       `${table}?select=*&order=id&limit=1000&offset=${offset}`,
     );

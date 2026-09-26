@@ -1,5 +1,19 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Multi-campus rollout
+
+1. Deploy compatible readers before enabling campus writes. Keep `PUBLISHED_MAP_URL` set so code builds preserve reviewed public assets.
+2. Back up/verify the current private record counts and apply migrations **013_campus_isolation.sql**, **014_map_import_jobs.sql**, then **015_campus_release_restores.sql** in order. Run the database isolation tests first. They are additive backfills and scoped-function replacements, not a reset of LASU drafts.
+3. Deploy the writing API and Campuses controls only after verifying the new tables, private storage bucket, scoped RPCs and LASU record counts. The existing owner remains the only administrator. No new secrets are required.
+4. Verify `.github/workflows/map-import-tests.yml` on Linux. The worker image pins GDAL/PROJ by digest and Pyosmium/Shapely by version. The host performs authorized downloads; the parser container has no network and no credentials.
+5. Optionally set `OVERPASS_URL`. Enable `OVERPASS_SCHEDULE_ALLOWED=true` in both Vercel and GitHub variables only for an endpoint permitting scheduled use. Manual is the default; LASU's original schedule is unchanged.
+6. Verify the served revision, `/packages/latest.json`, all LASU asset hashes and `/packages/campuses.json`. Publish a second campus only after its own source/geometry/access/attribution review.
+
+The release workflow takes `campus_id` (legacy default `lasu`). Its operations are `preview` and `publish`; restore requests create a new scoped preview. Never promote an old whole-site deployment to roll back one campus. Catalogue changes invalidate stale previews. `/packages/campuses.json` and mutable compatibility manifests use revalidation headers; versioned packages remain immutable.
+
+[Owner guide](CAMPUS-IMPORTS.md) · [Exact production status](PRODUCTION.md). Reader deployment alone does not mean the database migration or import controls are live.
+
+
 ## Expanded model authoring rollout
 
 Deploy compatible public readers first, apply `supabase/migrations/012_editable_model_assets.sql`, then deploy the writing editor/API. Migration 012 creates private immutable model assets and a server-only versioned save wrapper; older clients cannot erase authored references. Keep `PUBLISHED_MAP_URL` enabled. Model uploads use owner-authorized signed URLs; no new environment secret is required. The publication workflow hydrates reviewed immutable documents and packages authored textures. Application deployment does not publish model drafts.

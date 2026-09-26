@@ -1,5 +1,17 @@
 import { createHash } from "node:crypto";
+const scopedTables = new Set(['source_features','map_edits','map_changes','edit_history','reports','jobs','releases','editor_operations','surveys','survey_revisions','survey_chunks','baseline_reconciliations','source_field_reviews','building_media','model_assets','campus_sources','campus_imports','campus_import_assets']);
 export async function db(route, method = "GET", body, prefer = "return=representation") {
+  const campus = process.env.CAMPUS_ID || 'lasu';
+  const table = route.split('?')[0];
+  if (scopedTables.has(table)) {
+    const query = new URLSearchParams(route.split('?')[1] || '');
+    query.set('campus_id', `eq.${campus}`);
+    route = `${table}?${query}`;
+    if (method === 'POST') {
+      const scoped = row => ({...row,campus_id:campus});
+      body = Array.isArray(body) ? body.map(scoped) : scoped(body);
+    }
+  }
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error("Supabase job secrets are not configured");
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${route}`, {
@@ -9,6 +21,7 @@ export async function db(route, method = "GET", body, prefer = "return=represent
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       "Content-Type": "application/json",
       Prefer: prefer,
+      'X-TurnRight-Campus': campus,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(30000),
@@ -20,7 +33,7 @@ export async function db(route, method = "GET", body, prefer = "return=represent
 }
 export async function allRows(table) {
   const all = [];
-  for (let offset = 0; offset < 30000; offset += 1000) {
+  for (let offset = 0; offset < 300000; offset += 1000) {
     const page = await db(`${table}?select=*&order=id&limit=1000&offset=${offset}`);
     all.push(...page);
     if (page.length < 1000) return all;
@@ -103,7 +116,7 @@ export function preserveReviewedMetadata(previous, candidate) {
   for (const record of previous) {
     if (
       !ids.has(record.id) &&
-      (record.source === "campus-review" ||
+      ((record.source === "campus-review" || record.source?.startsWith("import:")) ||
         record.payload.source === "campus-review" ||
         (record.entity === "feature" && ownerFeatures.has(record.payload.properties.id)) ||
         (record.entity === "edge" && ownerFeatures.has(record.payload.sourceId)) ||
@@ -136,6 +149,7 @@ export function preserveReviewedMetadata(previous, candidate) {
       ],
     };
   }
+  meta.payload.sources = [...(meta.payload.sources || []).filter(s=>!s.id.startsWith('import:')), ...(old.sources || []).filter(s=>s.id.startsWith('import:'))];
   meta.hash = hash(meta.payload);
   for (const record of candidate) {
     const previousRecord = previous.find((r) => r.id === record.id);
