@@ -137,6 +137,7 @@ export function publishedRecords(data: CampusData): SourceRecord[] {
 export function validateReleaseSnapshot(
   snapshot: { features: SourceRecord[]; edits: MapEdit[] },
   published: CampusData,
+  options: { restoring?: boolean } = {},
 ) {
   if (!snapshot?.features?.length || !Array.isArray(snapshot.edits))
     throw new HttpError(400, 'The release has no complete source snapshot.');
@@ -161,15 +162,28 @@ export function validateReleaseSnapshot(
         );
     }
   }
-  const base = withPublishedVisuals(
-    assembleSources(snapshot.features, published),
-    published,
-  );
-  if (base.version !== published.version)
+  const assembled = assembleSources(snapshot.features, published);
+  const base = options.restoring
+    ? assembled
+    : withPublishedVisuals(assembled, published);
+  if (!options.restoring && base.version !== published.version)
     throw new HttpError(
       409,
       'This baseline predates the public package. Reconcile it and build a new preview.',
     );
+  for (const source of base.sources) {
+    if (
+      source.id.startsWith('import:') &&
+      (!(source as typeof source & { redistributionConfirmed?: boolean })
+        .redistributionConfirmed ||
+        !source.attribution ||
+        !source.license)
+    )
+      throw new HttpError(
+        400,
+        `${source.name}: record attribution and redistribution permission before publication.`,
+      );
+  }
   const result = validateWorkspace(base, snapshot.edits);
   if (result.errors.length) throw new HttpError(400, result.errors.join('\n'));
   const facadeIssues = result.data.map.features

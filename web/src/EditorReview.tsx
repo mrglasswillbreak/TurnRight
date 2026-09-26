@@ -847,17 +847,17 @@ export function EditorReview({
                   onClick={() => {
                     if (
                       window.confirm(
-                        'Restore this previously published release?',
+                        'Prepare a preview restoring this campus release? Other campuses will stay unchanged.',
                       )
                     )
                       void action(
                         'rollback',
                         { id: release.id },
-                        'Restore requested. Refresh to verify the result.',
+                        'Restore preview requested. Review the new preview before publishing.',
                       );
                   }}
                 >
-                  Restore this release
+                  Prepare restore preview
                 </Button>
               )}
             </div>

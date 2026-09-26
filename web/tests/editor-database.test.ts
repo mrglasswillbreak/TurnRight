@@ -55,6 +55,7 @@ beforeAll(async () => {
     '012_editable_model_assets.sql',
     '013_campus_isolation.sql',
     '014_map_import_jobs.sql',
+    '015_campus_release_restores.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -771,12 +772,24 @@ it('bounds private import uploads and prevents cancelled candidates from reachin
     sha256: 'd'.repeat(64),
   };
   await database.query('select add_import_asset($1)', [JSON.stringify(asset)]);
+  await database.query('select add_import_asset($1)', [
+    JSON.stringify({ ...asset, id: randomUUID() }),
+  ]);
+  expect(
+    (
+      await database.query<{ count: number }>(
+        'select count(*)::integer as count from campus_import_assets where import_id=$1',
+        [importId],
+      )
+    ).rows[0].count,
+  ).toBe(1);
   await expect(
     database.query('select add_import_asset($1)', [
       JSON.stringify({
         ...asset,
         id: randomUUID(),
         path: 'test/import/second.zip',
+        name: 'second.zip',
         bytes: 20 * 1024 * 1024,
       }),
     ]),
@@ -805,4 +818,56 @@ it('bounds private import uploads and prevents cancelled candidates from reachin
       )
     ).rows[0].allowed,
   ).toBe(false);
+});
+
+it('restores only the selected campus into a fresh preview with the current catalogue baseline', async () => {
+  const campus = 'restore-campus',
+    historical = randomUUID(),
+    other = randomUUID();
+  await database.exec(
+    `insert into campuses(id,slug,name,boundary,bounds) select '${campus}','restore-test','Restore test',boundary,bounds from campuses where id='lasu'`,
+  );
+  const snapshot = { features: [], edits: [], version: 'historical' };
+  await database.query(
+    "insert into releases(id,campus_id,status,summary,snapshot,version) values($1,$2,'published','Historical',$3,'restore-test-abc123'),($4,'lasu','published','Other',$3,'lasu-def456')",
+    [historical, campus, JSON.stringify(snapshot), other],
+  );
+  try {
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    await expect(
+      database.query("select restore_campus_release($1,'new-catalogue')", [
+        other,
+      ]),
+    ).rejects.toThrow('from this campus');
+    const result = await database.query<{ id: string }>(
+      "select restore_campus_release($1,'new-catalogue') as id",
+      [historical],
+    );
+    const restored = await database.query<{
+      campus_id: string;
+      status: string;
+      snapshot: unknown;
+      restored_from: string;
+      catalogue_revision: string;
+    }>('select * from releases where id=$1', [result.rows[0].id]);
+    expect(restored.rows[0]).toMatchObject({
+      campus_id: campus,
+      status: 'queued',
+      snapshot,
+      restored_from: historical,
+      catalogue_revision: 'new-catalogue',
+    });
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from releases where id=$1',
+          [other],
+        )
+      ).rows[0].status,
+    ).toBe('published');
+  } finally {
+    await database.exec("select set_config('request.headers','{}',false)");
+  }
 });

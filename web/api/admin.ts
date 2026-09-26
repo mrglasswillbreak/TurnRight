@@ -1,3 +1,4 @@
+import { readPublishedCatalogue } from '../scripts/published-campus-catalogue.mjs';
 import { mapImportAction } from '../server/map-imports.js';
 import { withCampusId } from '../server/campus-scope.js';
 import { resolveCampus, campusAction } from '../server/campuses.js';
@@ -369,6 +370,30 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'check-sources': {
+          if (campus.id !== 'lasu') {
+            const listed = (await mapImportAction('import-list', {})) as {
+              sources: import('../src/map-import-types.js').CampusSource[];
+            };
+            const online = listed.sources.filter((s) => s.kind !== 'file');
+            if (!online.length)
+              throw new HttpError(
+                400,
+                'Add an online source in Campuses, or upload a replacement file.',
+              );
+            for (const source of online) {
+              const result = (await mapImportAction('import-start', {
+                sourceId: source.id,
+              })) as { job: { id: string } };
+              await mapImportAction('import-run', {
+                importId: result.job.id,
+                phase: source.configuration.layers.length
+                  ? 'preview'
+                  : 'inspect',
+              });
+            }
+            res.status(202).json({ started: online.length });
+            break;
+          }
           const recent = await db(
             'jobs?kind=eq.import&status=in.(queued,running)&order=created_at.desc&limit=1',
           );
@@ -403,7 +428,11 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               400,
               'Provide a release summary between 5 and 500 characters.',
             );
+          const { revision: catalogueHash } = await readPublishedCatalogue(
+            process.env.PUBLISHED_MAP_URL!,
+          );
           const id = await db<string>('rpc/snapshot_release', 'POST', {
+            catalogue_hash: catalogueHash,
             release_summary: payload.summary.trim(),
           });
           try {
@@ -420,6 +449,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             await dispatch('release.yml', {
               release_id: id,
               operation: 'preview',
+              campus_id: campus.id,
             });
           } catch (e) {
             await db(`releases?id=eq.${id}`, 'PATCH', {
@@ -436,7 +466,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           if (typeof payload.id !== 'string')
             throw new HttpError(400, 'Choose a release');
           const [release] = await db(
-            `releases?id=eq.${encodeURIComponent(payload.id)}&select=id,status,deployment_id,snapshot`,
+            `releases?id=eq.${encodeURIComponent(payload.id)}&select=id,status,deployment_id,snapshot,catalogue_revision,restored_from`,
           );
           if (
             !release?.deployment_id ||
@@ -446,6 +476,35 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             throw new HttpError(
               400,
               'This release is not ready for that action.',
+            );
+          const { revision: catalogueHash } = await readPublishedCatalogue(
+            process.env.PUBLISHED_MAP_URL!,
+          );
+          if (action === 'rollback') {
+            const id = await db<string>('rpc/restore_campus_release', 'POST', {
+              previous_id: release.id,
+              catalogue_hash: catalogueHash,
+            });
+            try {
+              await dispatch('release.yml', {
+                release_id: id,
+                operation: 'preview',
+                campus_id: campus.id,
+              });
+            } catch (error) {
+              await db(`releases?id=eq.${id}`, 'PATCH', {
+                status: 'failed',
+                error: (error as Error).message,
+              });
+              throw error;
+            }
+            res.status(202).json({ id, previewRequired: true });
+            break;
+          }
+          if (release.catalogue_revision !== catalogueHash)
+            throw new HttpError(
+              409,
+              'Another campus was published after this preview. Build a fresh preview.',
             );
           if (action === 'publish-release') {
             const [published, features, edits] = await Promise.all([
@@ -459,8 +518,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
                 edits: await hydrateModelEdits(release.snapshot.edits, user.id),
               },
               published,
+              { restoring: !!release.restored_from },
             );
             if (
+              !release.restored_from &&
               snapshotHash(
                 release.snapshot.features,
                 release.snapshot.edits,
@@ -473,7 +534,8 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           }
           await dispatch('release.yml', {
             release_id: release.id,
-            operation: action === 'rollback' ? 'rollback' : 'publish',
+            operation: 'publish',
+            campus_id: campus.id,
           });
           res.status(202).json({ id: release.id });
           break;

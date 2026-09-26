@@ -5,10 +5,14 @@ on:
       release_id:
         description: Immutable release snapshot ID
         required: true
+      campus_id:
+        description: Campus identity; legacy requests default to LASU
+        default: lasu
+        required: false
       operation:
         description: Release operation
         type: choice
-        options: [preview, publish, rollback]
+        options: [preview, publish]
         required: true
 permissions:
   contents: read
@@ -25,6 +29,7 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      CAMPUS_ID: ${{ inputs.campus_id || 'lasu' }}
       RELEASE_ID: ${{ inputs.release_id }}
       RELEASE_OPERATION: ${{ inputs.operation }}
       PUBLISHED_MAP_URL: ${{ vars.PUBLISHED_MAP_URL || 'https://turnright.vercel.app' }}

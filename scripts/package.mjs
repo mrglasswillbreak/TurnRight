@@ -11,7 +11,7 @@ const publicDir = path.join(root, "web/public");
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const input = process.env.CAMPUS_INPUT || "data/seed/campus.json";
 const data = publicCampus(JSON.parse(await fs.readFile(path.join(root, input), "utf8")));
-if (![1, 2, 3].includes(data.schemaVersion) || !data.graph?.edges?.length)
+if (![1, 2, 3].includes(data.schemaVersion) || !Array.isArray(data.graph?.edges))
   throw new Error("No valid campus graph to package");
 const audioDir = path.join(root, "data/audio");
 const files = (await fs.readdir(audioDir)).filter((f) => f.endsWith(".wav")).sort();
@@ -44,7 +44,10 @@ data.schemaVersion = data.photos?.some((p) => p.sourceKind === "author-upload" &
   : data.driving
     ? 2
     : 1;
-const version = "lasu-" + hash(JSON.stringify({ data, audio })).slice(0, 12);
+const campusId = process.env.CAMPUS_ID || 'lasu';
+const campusSlug = process.env.CAMPUS_SLUG || 'lasu';
+if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(campusSlug)) throw Error('Invalid campus slug');
+const version = campusSlug + '-' + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
 await asset(dataUrl, Buffer.from(JSON.stringify(data)), "application/json");
@@ -54,6 +57,7 @@ await asset(
   "application/json",
 );
 const manifest = {
+  ...(campusId !== 'lasu' ? {campus:{id:campusId,slug:campusSlug,name:process.env.CAMPUS_NAME}} : {}),
   schemaVersion: data.schemaVersion,
   version,
   createdAt: data.createdAt,
@@ -68,7 +72,9 @@ const manifest = {
 };
 const manifestJson = JSON.stringify(manifest, null, 2);
 await fs.writeFile(path.join(publicDir, "packages", version, "manifest.json"), manifestJson);
-await fs.writeFile(path.join(publicDir, "packages/latest.json"), manifestJson);
+const latestPath = path.join(publicDir, campusId === 'lasu' ? 'packages/latest.json' : `packages/${campusSlug}/latest.json`);
+await fs.mkdir(path.dirname(latestPath),{recursive:true});
+await fs.writeFile(latestPath, manifestJson);
 await fs.writeFile(
   path.join(root, "data/coverage-report.json"),
   JSON.stringify(data.coverage, null, 2),

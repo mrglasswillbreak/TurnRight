@@ -116,7 +116,7 @@ export function preserveReviewedMetadata(previous, candidate) {
   for (const record of previous) {
     if (
       !ids.has(record.id) &&
-      (record.source === "campus-review" ||
+      ((record.source === "campus-review" || record.source?.startsWith("import:")) ||
         record.payload.source === "campus-review" ||
         (record.entity === "feature" && ownerFeatures.has(record.payload.properties.id)) ||
         (record.entity === "edge" && ownerFeatures.has(record.payload.sourceId)) ||
@@ -149,6 +149,7 @@ export function preserveReviewedMetadata(previous, candidate) {
       ],
     };
   }
+  meta.payload.sources = [...(meta.payload.sources || []).filter(s=>!s.id.startsWith('import:')), ...(old.sources || []).filter(s=>s.id.startsWith('import:'))];
   meta.hash = hash(meta.payload);
   for (const record of candidate) {
     const previousRecord = previous.find((r) => r.id === record.id);

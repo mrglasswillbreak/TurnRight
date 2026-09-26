@@ -235,16 +235,20 @@ export async function mapImportAction(
       );
     const id = randomUUID(),
       path = `${currentCampusId()}/${job.id}/${id}.${p.name.split('.').pop()!.toLowerCase()}`;
-    const asset = await db<{ id: string; path: string }>('rpc/add_import_asset', 'POST', {
-      asset: {
-        id,
-        import_id: job.id,
-        path,
-        name: p.name,
-        bytes: p.bytes,
-        sha256: p.sha256,
+    const asset = await db<{ id: string; path: string }>(
+      'rpc/add_import_asset',
+      'POST',
+      {
+        asset: {
+          id,
+          import_id: job.id,
+          path,
+          name: p.name,
+          bytes: p.bytes,
+          sha256: p.sha256,
+        },
       },
-    });
+    );
     const signed = await (
       await storage(`object/upload/sign/campus-imports/${asset.path}`, 'POST', {
         upsert: false,
