@@ -1,3 +1,4 @@
+import { requestedCampus } from './campus-context';
 import { measureOperation } from './performance';
 export class AdminRequestError extends Error {
   constructor(
@@ -143,7 +144,7 @@ async function wireAdminRequest<T>(
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ action, payload }),
+        body: JSON.stringify({ action, payload, campus: requestedCampus() }),
       });
       if (response.status === 401 || response.status === 403)
         throw new AdminRequestError(

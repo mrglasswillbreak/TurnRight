@@ -1,11 +1,12 @@
+import { campusUrl, campusKey, requestedCampus } from './campus-context';
 import { canonicalBuildingId, placeBuildingId } from './arrival';
 import type { CampusData, Place } from './types';
 
-const key = 'turnright:editor-building-handoff';
+const key = () => campusKey('turnright:editor-building-handoff');
 type HandoffStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 const valid = (id: string | null) => (id && id.length <= 200 ? id : undefined);
 export const editorHref = (id?: string) =>
-  id ? `/admin?building=${encodeURIComponent(id)}` : '/admin';
+  campusUrl(id ? `/admin?building=${encodeURIComponent(id)}` : '/admin');
 export function publicEditorHref(
   data: CampusData,
   place: Place | null,
@@ -22,7 +23,7 @@ export function requestedEditorBuilding(url: string, storage?: HandoffStorage) {
   const query = new URL(url).searchParams;
   if (query.has('building')) return valid(query.get('building'));
   try {
-    return valid(storage?.getItem(key) || null);
+    return valid(storage?.getItem(key()) || null);
   } catch {
     return undefined;
   }
@@ -33,18 +34,22 @@ export function editorSignInReturn(url: string, storage?: HandoffStorage) {
   let retained = false;
   try {
     if (id && storage) {
-      storage.setItem(key, id);
+      storage.setItem(key(), id);
       retained = true;
     }
   } catch {
     /* Query redirect remains a fallback. */
   }
-  return new URL(retained ? '/admin' : editorHref(id), new URL(url).origin)
-    .href;
+  return new URL(
+    retained
+      ? campusUrl('/admin', requestedCampus(new URL(url).search))
+      : campusUrl(editorHref(id), requestedCampus(new URL(url).search)),
+    new URL(url).origin,
+  ).href;
 }
 export function consumeEditorBuilding(url: string, storage?: HandoffStorage) {
   try {
-    storage?.removeItem(key);
+    storage?.removeItem(key());
   } catch {
     /* The URL still consumes its request. */
   }

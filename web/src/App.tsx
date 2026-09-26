@@ -1,3 +1,4 @@
+import { requestedCampus, DEFAULT_CAMPUS } from './campus-context';
 import type { TravelMode } from './types';
 import { placeMatches, streetResults } from './place-details';
 import { PlaceInformation } from './PlaceInformation';
@@ -276,7 +277,11 @@ export default function App() {
   const downloadGeneration = useRef(0);
   const reloadData = () => {
     const generation = ++downloadGeneration.current;
-    return loadCampus()
+    return loadCampus(
+      location.pathname.startsWith('/admin')
+        ? DEFAULT_CAMPUS
+        : requestedCampus(),
+    )
       .then((result) => {
         if (generation !== downloadGeneration.current) return;
         setData(result.data);

@@ -12,6 +12,7 @@ import {
 import type { CampusPackage } from '../src/types';
 const saved = new Map<string, Response>();
 const cache = {
+  delete: async (url: string) => saved.delete(url),
   match: async (url: string) => saved.get(url)?.clone(),
   put: async (url: string, response: Response) => {
     saved.set(url, response.clone());
@@ -513,4 +514,30 @@ describe('offline package transactions', () => {
     ).rejects.toThrow(/cancelled/);
     expect(await getActivePackage()).toBeNull();
   });
+});
+
+it('keeps campus downloads independent when removing one campus', async () => {
+  const first = await pkg('lasu-isolation'),
+    second = await pkg('other-isolation');
+  second.manifest.campus = {
+    id: 'campus-two',
+    slug: 'other',
+    name: 'Other campus',
+  };
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      async (url: string) =>
+        new Response(
+          url === first.manifest.dataUrl ? first.bytes : second.bytes,
+        ),
+    ),
+  );
+  await installPackage(first.manifest, () => {});
+  await installPackage(second.manifest, () => {});
+  expect((await loadCampus('lasu')).manifest.version).toBe('lasu-isolation');
+  expect((await loadCampus('other')).manifest.version).toBe('other-isolation');
+  await deletePackages('other');
+  expect(saved.has(second.manifest.dataUrl)).toBe(false);
+  expect((await loadCampus('lasu')).manifest.version).toBe('lasu-isolation');
 });

@@ -1,3 +1,4 @@
+import { campusKey } from './campus-context';
 import { openDB } from 'idb';
 import {
   pauseSurvey,
@@ -159,7 +160,7 @@ export async function loadSurveyLocal(
 export async function writeSurveyContext(owner: string, context: unknown) {
   const db = await database();
   try {
-    await db.put('context', context, owner);
+    await db.put('context', context, campusKey(owner));
   } finally {
     db.close();
   }
@@ -169,7 +170,7 @@ export async function readSurveyContext<T>(
 ): Promise<T | undefined> {
   const db = await database();
   try {
-    return await db.get('context', owner);
+    return await db.get('context', campusKey(owner));
   } finally {
     db.close();
   }

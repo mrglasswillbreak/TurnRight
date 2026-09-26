@@ -1,3 +1,9 @@
+import {
+  campusKey,
+  requestedCampus,
+  packageCampus,
+  DEFAULT_CAMPUS,
+} from './campus-context';
 import { structuralIssues } from './validation';
 import { openDB } from 'idb';
 import { boundedMap } from './asset-pool';
@@ -48,7 +54,12 @@ export const hashBytes = async (bytes: ArrayBuffer) =>
   Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
+const preferenceKey = (key: string) =>
+  /^(saved$|recent$|report|editor-workspace:|photo-)/.test(key)
+    ? campusKey(key)
+    : key;
 export async function getPreference<T>(key: string, fallback: T): Promise<T> {
+  key = preferenceKey(key);
   try {
     return (await (await database()).get('preferences', key)) ?? fallback;
   } catch {
@@ -56,6 +67,7 @@ export async function getPreference<T>(key: string, fallback: T): Promise<T> {
   }
 }
 export async function setPreference(key: string, value: unknown) {
+  key = preferenceKey(key);
   await (await database()).put('preferences', value, key);
 }
 export async function discardReportDraft(key: string) {
@@ -64,16 +76,28 @@ export async function discardReportDraft(key: string) {
     'readwrite',
   );
   const drafts: ReportDraft[] =
-    (await transaction.store.get('report-drafts')) || [];
-  await transaction.store.delete(key);
+    (await transaction.store.get(campusKey('report-drafts'))) || [];
+  await transaction.store.delete(preferenceKey(key));
   await transaction.store.put(
     drafts.filter((draft) => draft.key !== key),
-    'report-drafts',
+    campusKey('report-drafts'),
   );
   await transaction.done;
 }
-export async function latestPackage(): Promise<CampusPackage> {
-  const response = await fetch('/packages/latest.json', {
+export async function latestPackage(
+  campus = requestedCampus(),
+): Promise<CampusPackage> {
+  let url = '/packages/latest.json';
+  if (campus !== DEFAULT_CAMPUS) {
+    const { loadCampusCatalogue } = await import('./campus-catalogue');
+    const identity = (await loadCampusCatalogue()).campuses.find(
+      (c) => c.slug === campus,
+    );
+    if (!identity?.manifestUrl)
+      throw new Error('This campus is not published or is unavailable.');
+    url = identity.manifestUrl;
+  }
+  const response = await fetch(url, {
     cache: 'no-store',
     signal: AbortSignal.timeout(15000),
   });
@@ -84,6 +108,8 @@ export async function latestPackage(): Promise<CampusPackage> {
   const manifest = (await response.json()) as CampusPackage;
   if (![1, 2, 3].includes(manifest.schemaVersion) || !manifest.assets?.length)
     throw new Error('This map version needs a newer app.');
+  if (packageCampus(manifest) !== campus)
+    throw new Error('Campus package identity does not match this link.');
   return manifest;
 }
 export async function getActivePackage(): Promise<{
@@ -93,7 +119,7 @@ export async function getActivePackage(): Promise<{
   visualsComplete: boolean;
 } | null> {
   const db = await database();
-  const version = await db.get('meta', 'active');
+  const version = await db.get('meta', campusKey('active'));
   const record = version && (await db.get('packages', version));
   if (!record) return null;
   const visualUrls = new Set<string>([
@@ -214,16 +240,20 @@ async function verifiedAsset(response: Response, asset: PackageAsset) {
     (await hashBytes(bytes)) === asset.sha256
   );
 }
-export async function loadCampus(): Promise<{
+export async function loadCampus(campus = requestedCampus()): Promise<{
   data: CampusData;
   manifest: CampusPackage;
   downloaded: boolean;
   verification?: Promise<boolean>;
 }> {
   const db = await database().catch(() => null);
-  const version = db && (await db.get('meta', 'active'));
+  const version = db && (await db.get('meta', campusKey('active', campus)));
   const active = version && (await db!.get('packages', version));
-  if (active && [1, 2, 3].includes(active.manifest.schemaVersion)) {
+  if (
+    active &&
+    packageCampus(active.manifest) === campus &&
+    [1, 2, 3].includes(active.manifest.schemaVersion)
+  ) {
     const manifest: CampusPackage = active.manifest;
     const core = manifest.assets.find((a) => a.url === manifest.dataUrl);
     const response =
@@ -248,7 +278,7 @@ export async function loadCampus(): Promise<{
         };
     }
   }
-  const manifest = await latestPackage();
+  const manifest = await latestPackage(campus);
   const response = await fetch(manifest.dataUrl, {
     signal: AbortSignal.timeout(20000),
   }).catch((error) => {
@@ -382,14 +412,17 @@ export async function installPackage(
   await tx.objectStore('packages').put({ manifest, data }, manifest.version);
   await tx
     .objectStore('meta')
-    .put(manifest.version, activate ? 'active' : 'pending');
+    .put(
+      manifest.version,
+      campusKey(activate ? 'active' : 'pending', packageCampus(manifest)),
+    );
   await tx.done;
   await navigator.storage?.persist?.().catch(() => false);
   return data;
 }
 export async function activatePending() {
   const db = await database(),
-    pending = await db.get('meta', 'pending');
+    pending = await db.get('meta', campusKey('pending'));
   if (!pending) return false;
   const record = await db.get('packages', pending);
   if (
@@ -399,16 +432,28 @@ export async function activatePending() {
   )
     return false;
   const tx = db.transaction('meta', 'readwrite');
-  await tx.store.put(pending, 'active');
-  await tx.store.delete('pending');
+  await tx.store.put(pending, campusKey('active'));
+  await tx.store.delete(campusKey('pending'));
   await tx.done;
   return true;
 }
-export async function deletePackages() {
+export async function deletePackages(campus = requestedCampus()) {
   const db = await database();
+  const records = await db.getAll('packages');
+  const removed = records.filter((r) => packageCampus(r.manifest) === campus);
+  const retainedUrls = new Set(
+    records
+      .filter((r) => packageCampus(r.manifest) !== campus)
+      .flatMap((r) => r.manifest.assets.map((a: PackageAsset) => a.url)),
+  );
   const tx = db.transaction(['packages', 'meta'], 'readwrite');
-  await tx.objectStore('packages').clear();
-  await tx.objectStore('meta').clear();
+  for (const record of removed)
+    await tx.objectStore('packages').delete(record.manifest.version);
+  await tx.objectStore('meta').delete(campusKey('active', campus));
+  await tx.objectStore('meta').delete(campusKey('pending', campus));
   await tx.done;
-  await caches.delete(ASSET_CACHE);
+  const cache = await caches.open(ASSET_CACHE);
+  for (const record of removed)
+    for (const asset of record.manifest.assets)
+      if (!retainedUrls.has(asset.url)) await cache.delete(asset.url);
 }

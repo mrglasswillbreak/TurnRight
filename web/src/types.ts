@@ -267,6 +267,7 @@ export interface PackageAsset {
   bytes: number;
 }
 export interface CampusPackage {
+  campus?: { id: string; slug: string; name: string };
   schemaVersion: 1 | 2 | 3;
   version: string;
   createdAt: string;
