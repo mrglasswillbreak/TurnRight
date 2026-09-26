@@ -9,6 +9,7 @@ import type { CampusData, CampusPhoto } from './types.js';
 import type { ValidationIssue } from './validation.js';
 import { buildingTopology, polygonsOf } from './building-surfaces.js';
 import { curvedWall } from './building-curves.js';
+import { modelDocumentRevision } from './model-document-revision.js';
 
 export function detailRevision(feature: Feature): string | undefined {
   const appearance = feature.properties?.appearance || {};
@@ -63,17 +64,24 @@ export function facadeWalls(feature: Feature) {
   return buildingTopology(feature).parts.flatMap((part, p) =>
     part.rings.flatMap((ring, r) =>
       ring.wallIds.flatMap((wallId, w) => {
-        const curve=curvedWall(feature,wallId);
-        if(curve && curve.wallIds[0]!==wallId)return [];
-        return [{
-        partId: part.id,
-        wallId,
-        label: `Wing ${p + 1} · ${r ? 'courtyard ' : ''}${curve?'curved ':''}wall ${w + 1}`,
-        coordinates: (curve ? curve.vertexIds.map(id=>polygons[p][r][ring.vertexIds.indexOf(id)]) : [polygons[p][r][w], polygons[p][r][w + 1]]) as [
-          number,
-          number,
-        ][],
-      }];}),
+        const curve = curvedWall(feature, wallId);
+        if (curve && curve.wallIds[0] !== wallId) return [];
+        return [
+          {
+            partId: part.id,
+            wallId,
+            label: `Wing ${p + 1} · ${r ? 'courtyard ' : ''}${curve ? 'curved ' : ''}wall ${w + 1}`,
+            coordinates: (curve
+              ? curve.vertexIds.map(
+                  (id) => polygons[p][r][ring.vertexIds.indexOf(id)],
+                )
+              : [polygons[p][r][w], polygons[p][r][w + 1]]) as [
+              number,
+              number,
+            ][],
+          },
+        ];
+      }),
     ),
   );
 }
@@ -121,7 +129,26 @@ export function facadeReviewIssues(feature: Feature): ValidationIssue[] {
 export function campusFacadeReviewIssues(data: CampusData): ValidationIssue[] {
   return data.map.features
     .filter((f) => f.properties?.kind === 'building')
-    .flatMap(facadeReviewIssues);
+    .flatMap((feature) => {
+      const issues = facadeReviewIssues(feature),
+        document = feature.properties?.modelDocument;
+      if (
+        document &&
+        feature.properties?.reviewedModelRevision !==
+          modelDocumentRevision(document)
+      )
+        issues.push({
+          code: 'authored-model-review',
+          phase: 'edits',
+          severity: 'error',
+          featureId: String(feature.properties?.id),
+          featureKind: 'building',
+          field: 'modelDocument',
+          repair: 'review-model',
+          message: `${feature.properties?.name || 'Building'}: Review authored geometry and materials in Mesh tools before building a release preview.`,
+        });
+      return issues;
+    });
 }
 export function validTextureRecipe(value: FacadeTextureRecipe) {
   if (

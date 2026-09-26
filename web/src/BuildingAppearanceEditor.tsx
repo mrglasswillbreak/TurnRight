@@ -77,17 +77,19 @@ export function BuildingAppearanceEditor({
     String(edit.properties.heightMode || 'metres');
   const [workspaceField, setWorkspaceField] = useState<string>();
   const [workspaceMode, setWorkspaceMode] = useState<
-    'details' | 'review' | BuildingMode
+    'details' | 'review' | 'mesh' | BuildingMode
   >('details');
   useEffect(() => {
     if (!embedded && reviewRequest) {
       workspaceTrigger.current = document.activeElement as HTMLElement;
       setWorkspaceMode(
-        reviewRequest.repair === 'review-model'
-          ? 'review'
-          : /roof/i.test(reviewRequest.field || '')
-            ? 'roof'
-            : 'appearance',
+        reviewRequest.field === 'modelDocument'
+          ? 'mesh'
+          : reviewRequest.repair === 'review-model'
+            ? 'review'
+            : /roof/i.test(reviewRequest.field || '')
+              ? 'roof'
+              : 'appearance',
       );
       setWorkspaceField(
         reviewRequest.repair === 'review-model'

@@ -78,7 +78,9 @@ for (const sourceFeature of buildings) {
   const observedFloors =
     display.kind === 'recorded' ? undefined : record?.floors;
   const height = observedFloors ? observedFloors * 3 : display.metres;
-  const level = record?.level || (supported ? 'simplified' : 'extrusion');
+  const level = p.modelDocument
+    ? 'detailed'
+    : record?.level || (supported ? 'simplified' : 'extrusion');
   const roof = p.appearance?.roofForm || record?.roofForm || 'flat';
   const visual: BuildingVisual = {
     id,
@@ -279,6 +281,36 @@ for (const sourceFeature of buildings) {
   catalogue.buildings.push(visual);
 }
 await fs.mkdir(output, { recursive: true });
+const authoredTextures = new Map<
+  string,
+  { url: string; sha256: string; bytes: number; contentType: string }
+>();
+for (const sector of sectors.values())
+  for (const model of sector.models)
+    for (const mesh of model.meshes)
+      for (const [slot, url] of Object.entries(mesh.material?.maps || {})) {
+        const match = /^data:image\/(png|jpeg|webp);base64,(.+)$/.exec(url);
+        if (!match)
+          throw new Error(
+            `${model.id}: authored textures must be embedded, verified images.`,
+          );
+        const content = Buffer.from(match[2], 'base64'),
+          sha256 = hash(content),
+          ext = match[1] === 'jpeg' ? 'jpg' : match[1],
+          assetUrl = `/packages/model-texture-${sha256}.${ext}`;
+        if (!content.length || content.length > 4 * 1024 * 1024)
+          throw new Error(`${model.id}: authored texture exceeds 4 MiB.`);
+        authoredTextures.set(assetUrl, {
+          url: assetUrl,
+          sha256,
+          bytes: content.length,
+          contentType: `image/${match[1]}`,
+        });
+        await fs.writeFile(path.join(output, path.basename(assetUrl)), content);
+        mesh.material!.maps![slot as 'baseMap'] = assetUrl;
+      }
+if (authoredTextures.size)
+  catalogue.modelTextures = [...authoredTextures.values()];
 const textures = await buildFacadeTextures(data, output);
 if (textures.length) catalogue.textures = textures;
 for (const sector of [...sectors.values()].sort((a, b) =>
@@ -314,7 +346,10 @@ for (const sector of [...sectors.values()].sort((a, b) =>
   });
 }
 catalogue.bytes = catalogue.sectors.reduce((s, g) => s + g.bytes, 0);
-const textureBytes = textures.reduce((sum, texture) => sum + texture.bytes, 0);
+const textureBytes = [...textures, ...authoredTextures.values()].reduce(
+  (sum, texture) => sum + texture.bytes,
+  0,
+);
 if (catalogue.bytes + textureBytes > 12 * 1024 * 1024)
   throw new Error(
     'Campus geometry and textures exceed 12 MiB. Optimize the meshes or textures.',

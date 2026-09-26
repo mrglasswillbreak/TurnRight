@@ -956,19 +956,21 @@ function Editor({
           buildingId: edit.id,
           partId:
             edit.properties.appearance?.facades?.[issue.field || '']?.partId,
-          wallId: issue.field,
+          wallId: issue.field === 'modelDocument' ? undefined : issue.field,
         });
       setExplorer(false);
     } else if (issue.coordinates)
       mapRef.current?.flyTo({ center: issue.coordinates, zoom: 18 });
     setMessage(
-      issue.repair === 'review-model'
-        ? 'Review the selected wall’s placement and evidence, then mark only that wall reviewed.'
-        : issue.repair === 'choose-place'
-          ? 'Choose the place served by this entrance, then review the change.'
-          : issue.repair === 'connect-path'
-            ? 'Use the connection controls to choose a highlighted path or draw an approach.'
-            : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
+      issue.field === 'modelDocument'
+        ? 'Review authored geometry and materials, then mark this model reviewed in Mesh tools.'
+        : issue.repair === 'review-model'
+          ? 'Review the selected wall’s placement and evidence, then mark only that wall reviewed.'
+          : issue.repair === 'choose-place'
+            ? 'Choose the place served by this entrance, then review the change.'
+            : issue.repair === 'connect-path'
+              ? 'Use the connection controls to choose a highlighted path or draw an approach.'
+              : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
     );
   };
   const begin = (

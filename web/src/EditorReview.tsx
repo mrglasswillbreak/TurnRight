@@ -518,9 +518,9 @@ export function EditorReview({
             {modelReviews.length > 0 && (
               <section aria-label="Model release blockers">
                 <p>
-                  Draft saves are safe. Review these walls in Edit model before
-                  building a preview. Height or roof changes can require another
-                  placement review.
+                  Draft saves are safe. Review these surfaces and authored
+                  models in Edit model before building a preview. Geometry and
+                  material changes require another review.
                 </p>
                 {modelReviews.map((issue) => (
                   <div

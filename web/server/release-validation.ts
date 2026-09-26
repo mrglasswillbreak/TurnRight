@@ -6,6 +6,8 @@ import { structuralIssues } from '../src/validation.js';
 import type { CampusData, CampusPackage, MapEdit } from '../src/types.js';
 import { HttpError } from './backend.js';
 import { facadeErrors } from '../src/building-facades.js';
+import { modelDocumentRevision } from '../src/model-document-revision.js';
+import { modelDocumentErrors } from '../src/model-document.js';
 
 function stable(value: unknown, source = false): unknown {
   if (Array.isArray(value)) return value.map((v) => stable(v, source));
@@ -117,6 +119,27 @@ export function validateReleaseSnapshot(
 ) {
   if (!snapshot?.features?.length || !Array.isArray(snapshot.edits))
     throw new HttpError(400, 'The release has no complete source snapshot.');
+  for (const edit of snapshot.edits) {
+    if (edit.deleted) continue;
+    const document = edit.properties.modelDocument;
+    if (edit.properties.modelDocumentAsset && !document)
+      throw new HttpError(
+        400,
+        `${edit.properties.name || edit.id}: the private model must be loaded before release validation.`,
+      );
+    if (document) {
+      const errors = modelDocumentErrors(document);
+      if (errors.length) throw new HttpError(400, errors.join(' '));
+      if (
+        edit.properties.reviewedModelRevision !==
+        modelDocumentRevision(document)
+      )
+        throw new HttpError(
+          400,
+          `${edit.properties.name || edit.id}: review the authored geometry in Mesh before publishing.`,
+        );
+    }
+  }
   const base = withPublishedVisuals(
     assembleSources(snapshot.features, published),
     published,

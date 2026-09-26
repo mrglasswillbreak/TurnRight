@@ -10,6 +10,10 @@ const privateKeys = new Set([
   "detailSource",
   "detailCheckedAt",
   "_sourceIssues",
+  "modelDocument",
+  "modelDocumentAsset",
+  "modelAuthoring",
+  "reviewedModelRevision",
 ]);
 const evidenceKeys = new Set([
   "sourceId",

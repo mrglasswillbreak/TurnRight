@@ -11,6 +11,8 @@ import {
 import { preservePublished } from "../web/scripts/published-assets.mjs";
 import { prepareReleasePhotos } from './photo-release.mjs';
 import { arrivalIssues } from '../web/src/arrival';
+import {hydrateModelEdits} from '../web/server/model-assets';
+import {modelDocumentRevision} from '../web/src/model-document-revision';
 import { vercelApi, uploadSource, waitForDeployment, publishDeployment } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
@@ -32,7 +34,8 @@ try {
     if (!release.snapshot.features.length)
       throw new Error("No approved source baseline. Run bootstrap first.");
     const published = await publishedCampus();
-    const data = validateReleaseSnapshot(release.snapshot, published);
+    const data = validateReleaseSnapshot({...release.snapshot,edits:await hydrateModelEdits(release.snapshot.edits)}, published);
+    for(const feature of data.map.features){const doc=feature.properties?.modelDocument;if(doc){feature.properties!.authoredModelRevision=modelDocumentRevision(doc);if(doc.curves.length)feature.properties!.surfaceCurves=doc.curves;}}
     await prepareReleasePhotos(data, root);
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
@@ -121,7 +124,7 @@ try {
     if (!release.deployment_id) throw new Error("Deployment is missing");
     await db(`releases?id=eq.${id}`, "PATCH", { error: null });
     if (operation === "publish") {
-      validateReleaseSnapshot(release.snapshot, await publishedCampus());
+      validateReleaseSnapshot({...release.snapshot,edits:await hydrateModelEdits(release.snapshot.edits)}, await publishedCampus());
       const [features, edits] = await Promise.all([
         allRows("source_features"),
         allRows("map_edits"),

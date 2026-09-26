@@ -126,7 +126,9 @@ function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
     textureUrls = manifest.textures?.assetUrls || [];
   if (
     new Set(textureUrls).size !== textureUrls.length ||
-    new Set(textures.map((t) => t.url)).size !== textureUrls.length ||
+    new Set(
+      [...textures, ...(data.visuals?.modelTextures || [])].map((t) => t.url),
+    ).size !== textureUrls.length ||
     new Set(textures.map((t) => t.id)).size !== textures.length ||
     !textures.every(
       (t) =>
@@ -141,6 +143,19 @@ function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
         !!t.license &&
         !!t.attribution &&
         data.photos?.some((p) => p.id === t.photoId) &&
+        manifest.assets.some(
+          (a) =>
+            a.url === t.url && a.bytes === t.bytes && a.sha256 === t.sha256,
+        ),
+    ) ||
+    !(data.visuals?.modelTextures || []).every(
+      (t) =>
+        textureUrls.includes(t.url) &&
+        /^\/packages\/model-texture-[a-f0-9]{64}\.(png|jpg|webp)$/.test(
+          t.url,
+        ) &&
+        t.bytes > 0 &&
+        t.bytes <= 4 * 1024 * 1024 &&
         manifest.assets.some(
           (a) =>
             a.url === t.url && a.bytes === t.bytes && a.sha256 === t.sha256,

@@ -226,6 +226,7 @@ export interface VisualSector extends PackageAsset {
   buildingIds: string[];
 }
 export interface VisualCatalogue {
+  modelTextures?: PackageAsset[];
   textures?: VisualTexture[];
   schemaVersion: 1;
   revision: string;
