@@ -1,5 +1,43 @@
 # Production deployments
 
+## Individual windows, public handoff and bulk review — 26 September 2026
+
+Application revision **`1f1fac4327b47d4c165ebf0679d47b131329f26f`** deployed
+successfully through the existing Git/Vercel production workflow. The
+[deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/52gFfcN6Q6YFP5pYwhafXi93zwVu)
+completed at **00:55:48 UTC**. Live verification at **00:56:22 UTC** confirmed
+200 responses from `/`, `/admin` and `/sw.js`, and the expected 401 from an
+unauthenticated `/api/admin` request.
+
+The served workspace is `PhotoModelWorkspace-DFxe7hCS.js`, SHA-256
+`d9631d7fe4c8df288e27e78c66f15e905494866aaac16a190b916862527f54a1`.
+Offline-precache bundles contain the new **Mark all as reviewed** action,
+surface/text tools and tree search; the separate **2D precision** label is absent.
+Public bundles include the contextual building URL, sign-in handoff storage and
+reordered place actions.
+
+The release makes generated and repeated windows individually editable, retains
+compact rows until a change, and preserves selection and individual lock/hide
+actions through undo. It combines surface views, widens desktop properties,
+uses an accessible icon-only structure toggle and starts normal editor opacity
+at 100%. Public Editor opens the selected building's general editing card while
+respecting recovery. Model Review can approve eligible recorded walls together
+in one undoable command.
+
+The published manifest is **identical to the pre-deployment baseline**:
+**`lasu-623791e1184e`**, schema 2, 395 buildings, 220 places, and 39 photographs
+covering 19 buildings. All **84 assets / 20,098,125 bytes** passed live byte-length
+and SHA-256 checks. No database migration, endpoint addition or campus publication
+was performed.
+
+Verification includes **547 unit tests in 70 files**, focused Chromium workflows,
+**three WebKit landscape/rotation workflows**, TypeScript, lint with seven existing
+warnings, production and authentication-configured builds, and all bundle budgets.
+The README and related guides include **38 current screenshots**; the final
+production-build gallery run passed. See [model verification](MODEL-EDITOR-VERIFICATION.md)
+and [capture provenance](assets/screenshots/README.md) for coverage and the limits
+of simulated devices, keyboards and zoom.
+
 ## Shared model surfaces, lettering and refreshed documentation — 25 September 2026
 
 Application revision **`50ef0e0`** deployed successfully through the existing
