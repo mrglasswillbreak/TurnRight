@@ -2,6 +2,10 @@
 
 ## Current application gallery · 26 September 2026
 
+The gallery was recaptured after repairing compatibility with published model
+fingerprints. Public views now retain the 19 detailed building models that the
+initial roof-text update incorrectly treated as outdated.
+
 The root README contains **38 distinct, unaltered PNG screenshots** from the current production build. The verified campus is **`lasu-623791e1184e`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,098,125 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows and wall/roof lettering added in the editor are illustrative local examples, not published architectural evidence.
 
 The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Twelve additional captures, all ending in `-2026-09-26.png`, cover:

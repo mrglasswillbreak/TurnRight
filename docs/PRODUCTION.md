@@ -1,5 +1,35 @@
 # Production deployments
 
+## Published model compatibility repair — 26 September 2026
+
+Revision **`22478badad256a7d7b0f979151f6322d0d38d0a9`** deployed successfully
+through the existing [Vercel workflow](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/EPoUNCoX2H8K41uDHFh2skXDyNvA).
+Roof-text support had added an empty slot to fingerprints even when a building
+had no roof text. This incorrectly rejected **19** unchanged published models,
+including Senate and Mass Communication, and displayed fallback blocks. The
+repair preserves legacy fingerprints when the optional field is absent while
+retaining validation for genuinely changed geometry, details and lettering.
+
+All **395** models in `lasu-623791e1184e` now pass compatibility checks. After
+installing the app update in the existing public browser tab, Senate and Mass
+Communication visibly rendered their detailed architecture again, including
+with the older downloaded campus package. No map-data update was needed.
+
+Live verification at **01:13:15 UTC** confirmed 200 responses from `/`, `/admin`
+and `/sw.js`, plus the expected unauthenticated 401 from `/api/admin`. The served
+workspace is `PhotoModelWorkspace-B2S-UlIT.js`, SHA-256
+`ce1ac8dac45d859588146753b566b4d944c42d19c045e5d92176e702c521e4dd`.
+The published manifest remains byte-for-byte equivalent to the baseline; all
+**84 assets / 20,098,125 bytes** pass byte-length and SHA-256 verification.
+
+The repair passes **39 focused unit tests**, three Chromium cases and the new
+phone WebKit rendering case. Frozen published fingerprints prevent tests from
+regenerating both sides of the compatibility comparison. TypeScript, lint
+(seven existing warnings), production/configured builds and all budgets pass.
+The 38-image production documentation gallery was recaptured successfully and
+the affected public-map and workspace screenshots now show restored models.
+See [verification](MODEL-EDITOR-VERIFICATION.md) for details.
+
 ## Individual windows, public handoff and bulk review — 26 September 2026
 
 Application revision **`1f1fac4327b47d4c165ebf0679d47b131329f26f`** deployed

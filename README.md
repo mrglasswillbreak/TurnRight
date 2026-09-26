@@ -106,6 +106,7 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 
 ## Recent changes
 
+- **Published models restored:** optional roof-text support preserves existing model fingerprints. All 395 published models pass compatibility checks; genuine geometry or detail changes still invalidate outdated models.
 - **Individual windows:** click a generated or recorded window and edit it directly. Selection does not change saved geometry; the first change separates only that window in one undoable command. Deliberate row, group and pattern editing remains available.
 - **Simpler model controls:** Orbit, Edit surface and Photo share the same draft. The structure toggle is icon-only, desktop properties have a fixed header and wider scrolling body, and editor opacity starts at 100%.
 - **Public building handoff:** Editor opens the selected building’s general card, including after sign-in. Directions, Share, Copy link, Save and Report appear below the photo and above credits and arrival options.

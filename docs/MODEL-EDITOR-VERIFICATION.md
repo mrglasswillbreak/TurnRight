@@ -7,6 +7,19 @@ verified reference is **`lasu-623791e1184e`**, schema 2: **395 buildings, 220 pl
 
 ## Individual windows, public handoff and bulk review · 26 September 2026
 
+**Published-model compatibility repair:** roof-text support initially inserted
+an absent text field into every detail fingerprint, incorrectly hiding 19
+unchanged published models. Fingerprints now retain their original form when
+roof text is absent. An audit of all **395** catalogue entries in
+`lasu-623791e1184e` now finds **zero incompatible models**, down from 19.
+Frozen public Senate/School of Transport fixtures cover facade and window-setting
+fingerprints; changes to geometry, window settings or roof text still invalidate
+old models. The repair passes **39 focused unit tests** and **three Chromium
+workflows**, including desktop/phone WebGL rendering and zoom/detail recovery.
+The new phone rendering case also passes in WebKit.
+Production and configured builds pass; configured startup is 426,253 gzip bytes
+and additional owner code is 183,755 bytes, within the unchanged budgets.
+
 Compact window rows now expose individual instances in 3D, surface handles,
 properties and the tree. Selection does not change stored geometry. The first
 individual command splits only the affected instance; stable identities preserve
