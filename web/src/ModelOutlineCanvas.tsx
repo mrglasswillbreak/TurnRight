@@ -2,14 +2,20 @@ import { Trash2 as ActionTrash2 } from 'lucide-react';
 import { ModelButton } from './ModelButton';
 /* The interactive SVG has equivalent vertex-selection and numeric controls below it. */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { MapEdit } from './types';
 import type { EditorWorkspace } from './editor-workspace';
-import { polygonsOf, remapBuildingSurfaces } from './building-surfaces';
+import {
+  buildingTopology,
+  polygonsOf,
+  remapBuildingSurfaces,
+} from './building-surfaces';
+import { modelFeature } from './model-authoring';
 import { useModelSurface } from './model-surface';
 import { ModelField } from './ModelField';
 import { useOutlineTools } from './use-outline-tools';
+import { moveBoundaryVertex } from './model-architecture';
 import {
   ModelPlanPortal,
   ModelPlanTools,
@@ -45,21 +51,38 @@ export function ModelOutlineCanvas({
     drag = useRef<number[] | null>(null),
     [selected, setSelected] = useState<number[]>([0, 0, 0]),
     [preview, setPreview] = useState<MapEdit | null>(null);
-  const tools=useOutlineTools(edit,selected,onCommit,workspace);
+  const [error, setError] = useState('');
+  const topology = buildingTopology(modelFeature(edit)),
+    curves = edit.properties.modelDocument?.curves || [];
+  const vertexId = (p: number, r: number, v: number) =>
+    topology.parts[p]?.rings[r]?.vertexIds[v];
+  const generated = (p: number, r: number, v: number) =>
+    curves.some(
+      (c) =>
+        c.vertexIds.includes(vertexId(p, r, v)) &&
+        c.startVertexId !== vertexId(p, r, v) &&
+        c.endVertexId !== vertexId(p, r, v),
+    );
+  const affectsCurve = (p: number, r: number, v: number) =>
+    curves.some((c) => c.vertexIds.includes(vertexId(p, r, v)));
+  const tapStart = useRef<{
+    x: number;
+    y: number;
+    id: number;
+    point: number[];
+    exact: boolean;
+  } | null>(null);
+  useEffect(() => {
+    if (!polygons[selected[0]]?.[selected[1]]?.[selected[2]])
+      setSelected([0, 0, 0]);
+  }, [polygons, selected]);
+  const tools = useOutlineTools(edit, selected, onCommit, workspace);
   const shown = preview || edit,
     shownPolygons = polygonsOf(shown.geometry),
     pixel = (east - west) / 600;
   const update = (indices: number[], point: number[]) => {
-    const next = structuredClone(polygons),
-      [p, r, v] = indices;
-    next[p][r][v] = point;
-    if (v === 0) next[p][r][next[p][r].length - 1] = [...point];
-    return remapBuildingSurfaces(
-      edit,
-      edit.geometry.type === 'Polygon'
-        ? { type: 'Polygon', coordinates: next[0] }
-        : { type: 'MultiPolygon', coordinates: next },
-    );
+    const [p, r, v] = indices;
+    return moveBoundaryVertex(edit, p, r, v, point);
   };
   const location = (event: ReactPointerEvent) => {
     const matrix = svg.current!.getScreenCTM()!;
@@ -89,7 +112,7 @@ export function ModelOutlineCanvas({
     (x, y) => [origin[0] + x / sx, origin[1] - y / k, 0],
     navigation.viewBox + JSON.stringify(origin),
     cancel,
-    preview ? { edit: preview } : null,
+    preview || tools.preview ? { edit: (preview || tools.preview)! } : null,
   );
   return (
     <section aria-label="Building outline plan">
@@ -109,7 +132,12 @@ export function ModelOutlineCanvas({
             aria-label="Top-down building outline"
             role="application"
             onKeyDown={(event) => {
-              if(event.key==='Escape'&&tools.drawing){event.preventDefault();event.stopPropagation();tools.cancel();return;}
+              if (event.key === 'Escape' && tools.drawing) {
+                event.preventDefault();
+                event.stopPropagation();
+                tools.cancel();
+                return;
+              }
               if (event.key === 'Escape' && drag.current) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -118,22 +146,55 @@ export function ModelOutlineCanvas({
               }
             }}
             tabIndex={0}
-            onPointerDownCapture={e=>{
-              if(!tools.drawing||e.button!==0)return;
-              const id=(e.target as Element).getAttribute('data-outline-vertex');
-              const point=id?id.split(':').map(Number):null;
-              tools.tap(point?polygons[point[0]][point[1]][point[2]]:location(e),!!point);
-              e.preventDefault();e.stopPropagation();
+            onPointerDownCapture={(e) => {
+              if (!tools.drawing || e.button !== 0) return;
+              if (!e.isPrimary) {
+                tapStart.current = null;
+                return;
+              }
+              const id = (e.target as Element).getAttribute(
+                'data-outline-vertex',
+              );
+              const point = id ? id.split(':').map(Number) : null;
+              tapStart.current = {
+                x: e.clientX,
+                y: e.clientY,
+                id: e.pointerId,
+                point: point
+                  ? polygons[point[0]][point[1]][point[2]]
+                  : location(e),
+                exact: !!point,
+              };
+              svg.current?.setPointerCapture(e.pointerId);
+              e.preventDefault();
+              e.stopPropagation();
             }}
             onPointerMove={(e) => {
-              if (drag.current) setPreview(update(drag.current, location(e)));
+              if (drag.current)
+                try {
+                  setPreview(update(drag.current, location(e)));
+                  setError('');
+                } catch (error) {
+                  setError(
+                    error instanceof Error ? error.message : String(error),
+                  );
+                }
             }}
-            onPointerUp={() => {
+            onPointerUp={(e) => {
+              const tap = tapStart.current;
+              tapStart.current = null;
+              if (
+                tap &&
+                tap.id === e.pointerId &&
+                Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 8
+              )
+                tools.tap(tap.point, tap.exact);
               if (preview) onCommit(preview);
               drag.current = null;
               setPreview(null);
             }}
             onPointerCancel={() => {
+              tapStart.current = null;
               drag.current = null;
               setPreview(null);
             }}
@@ -167,7 +228,10 @@ export function ModelOutlineCanvas({
                           strokeWidth={pixel * 2}
                           onPointerDown={(e) => {
                             svg.current!.focus();
-                            if (!mobile.compact || mobile.tool === 'move') {
+                            if (
+                              (!mobile.compact || mobile.tool === 'move') &&
+                              !generated(p, r, v)
+                            ) {
                               drag.current = [p, r, v];
                               setSelected([p, r, v]);
                               svg.current!.setPointerCapture(e.pointerId);
@@ -181,7 +245,29 @@ export function ModelOutlineCanvas({
                 ))}
               </g>
             ))}
-            {tools.drawing&&<g pointerEvents="none"><polyline points={tools.path.map(p=>xy(p).join(',')).join(' ')} fill="none" stroke="#1764ed" strokeWidth={pixel*3} strokeDasharray={`${pixel*8} ${pixel*4}`}/>{tools.path.map((p,i)=>{const [x,y]=xy(p);return <circle key={i} cx={x} cy={y} r={pixel*5} fill="#1764ed"/>;})}</g>}
+            {tools.drawing && (
+              <g pointerEvents="none">
+                <polyline
+                  points={tools.path.map((p) => xy(p).join(',')).join(' ')}
+                  fill="none"
+                  stroke="#1764ed"
+                  strokeWidth={pixel * 3}
+                  strokeDasharray={`${pixel * 8} ${pixel * 4}`}
+                />
+                {tools.path.map((p, i) => {
+                  const [x, y] = xy(p);
+                  return (
+                    <circle
+                      key={i}
+                      cx={x}
+                      cy={y}
+                      r={pixel * 5}
+                      fill="#1764ed"
+                    />
+                  );
+                })}
+              </g>
+            )}
           </svg>
           {mobile.compact && (
             <output>
@@ -212,6 +298,13 @@ export function ModelOutlineCanvas({
         </select>
       </label>
       {tools.controls}
+      {generated(p, r, v) && (
+        <p>
+          This point is generated by a curve. Use Curves and rounded corners to
+          edit its controls.
+        </p>
+      )}
+      {error && <p role="alert">{error}</p>}
       {active && (
         <div className="model-properties-grid">
           {(['Longitude', 'Latitude'] as const).map((label, axis) => (
@@ -223,10 +316,18 @@ export function ModelOutlineCanvas({
               field={`outline:${selected}:${axis}`}
               workspace={workspace}
               step={0.000001}
+              disabled={generated(p, r, v)}
               onCommit={(value) => {
                 const next = [...active];
                 next[axis] = Number(value);
-                return onCommit(update(selected, next));
+                try {
+                  return onCommit(update(selected, next));
+                } catch (error) {
+                  setError(
+                    error instanceof Error ? error.message : String(error),
+                  );
+                  return false;
+                }
               }}
             />
           ))}
@@ -235,6 +336,12 @@ export function ModelOutlineCanvas({
       <div className="model-toolbar">
         <ModelButton
           variant="outline"
+          disabled={!active || affectsCurve(p, r, v)}
+          title={
+            affectsCurve(p, r, v)
+              ? 'Edit the parametric curve or change it to Straight before inserting points.'
+              : undefined
+          }
           onClick={() => {
             const next = structuredClone(polygons),
               ring = next[p][r],
@@ -258,7 +365,14 @@ export function ModelOutlineCanvas({
         <ModelButton
           variant="destructive"
           icon={<ActionTrash2 />}
-          disabled={!active || polygons[p][r].length <= 4}
+          disabled={
+            !active || polygons[p][r].length <= 4 || affectsCurve(p, r, v)
+          }
+          title={
+            affectsCurve(p, r, v)
+              ? 'Change the adjoining curves to Straight before removing their anchor.'
+              : undefined
+          }
           onClick={() => {
             const next = structuredClone(polygons),
               ring = next[p][r];

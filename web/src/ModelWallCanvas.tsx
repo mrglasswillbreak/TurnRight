@@ -8,10 +8,13 @@ import {
   useMemo,
   useRef,
   useState,
+  useContext,
+  useCallback,
   type ReactNode,
 } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { useModelSurface } from './model-surface';
+import { useModelSurface, ModelSurfaceContext } from './model-surface';
+import { curvedSurface } from './model-curved-surface';
 import type { FacadeElement } from './visual-types';
 import { detailInstanceId } from './model-instances';
 import { ModelNudge, useModelMobile } from './model-mobile';
@@ -73,6 +76,27 @@ export function ModelWallCanvas({
         : sourceElements,
     [sourceElements, reverse],
   );
+  const surfaceActive = useContext(ModelSurfaceContext).active;
+  const [section, setSection] = useState(0);
+  const curve = useMemo(
+    () =>
+      m.coordinates.length > 2 && surfaceActive
+        ? curvedSurface(m.coordinates, m.length, section)
+        : null,
+    [m.coordinates, m.length, section, surfaceActive],
+  );
+  const projectX = useCallback((x: number) => curve?.project(x) ?? x, [curve]),
+    inverseX = (x: number) => curve?.inverse(x) ?? x;
+  const curveSelectionKey = selected.join(':'),
+    curveSelection = useRef({ curve, selected, elements, length: m.length });
+  curveSelection.current = { curve, selected, elements, length: m.length };
+  useEffect(() => {
+    const { curve, selected, elements, length } = curveSelection.current;
+    if (curve && selected[0]) {
+      const item = elements.find((e) => e.id === selected[0]);
+      if (item) setSection(curve.sectionAt(item.x * length));
+    }
+  }, [curveSelectionKey, surfaceActive]);
   const toSource = (values: FacadeElement[]) =>
     reverse ? values.map((e) => ({ ...e, x: 1 - e.x })) : values;
   const onCommit = (values: FacadeElement[]) => commitSource(toSource(values));
@@ -148,7 +172,7 @@ export function ModelWallCanvas({
         .map((e) => elementBounds(e, m.length));
       if (!canvas || !box || !matrix || !selectedBounds.length) return;
       const point = new DOMPoint(
-        Math.max(...selectedBounds.map((b) => b.right)),
+        projectX(Math.max(...selectedBounds.map((b) => b.right))),
         -Math.max(...selectedBounds.map((b) => b.top)),
       ).matrixTransform(matrix);
       const bounds = canvas.getBoundingClientRect();
@@ -167,7 +191,7 @@ export function ModelWallCanvas({
     const observer = new ResizeObserver(position);
     if (svg.current) observer.observe(svg.current);
     return () => observer.disconnect();
-  }, [view, selectionKey, shown, m.length, selected]);
+  }, [view, selectionKey, shown, m.length, selected, projectX]);
   const invalid = useMemo(
     () =>
       new Set(
@@ -180,7 +204,7 @@ export function ModelWallCanvas({
     const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       matrix.inverse(),
     );
-    return [p.x, -p.y];
+    return [inverseX(p.x), -p.y];
   };
   const begin = (
     event: ReactPointerEvent,
@@ -260,12 +284,12 @@ export function ModelWallCanvas({
     const position = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       g.matrix,
     );
-    const p: [number, number] = [position.x, -position.y];
+    const p: [number, number] = [inverseX(position.x), -position.y];
     g.last = p;
     if (g.kind === 'pan') {
       setView({
         ...g.view,
-        x: g.view.x + g.start[0] - p[0],
+        x: g.view.x + projectX(g.start[0]) - position.x,
         y: g.view.y + p[1] - g.start[1],
       });
       return;
@@ -469,14 +493,17 @@ export function ModelWallCanvas({
     svg,
     m.wallId,
     'wall',
-    (x, y) => [
-      m.coordinates[0][0] +
-        ((m.coordinates[1][0] - m.coordinates[0][0]) * x) / m.length,
-      m.coordinates[0][1] +
-        ((m.coordinates[1][1] - m.coordinates[0][1]) * x) / m.length,
-      -y,
-    ],
-    JSON.stringify([view, m.coordinates, m.eaves]),
+    (x, y) =>
+      curve
+        ? curve.frame(x, y)
+        : [
+            m.coordinates[0][0] +
+              ((m.coordinates[1][0] - m.coordinates[0][0]) * x) / m.length,
+            m.coordinates[0][1] +
+              ((m.coordinates[1][1] - m.coordinates[0][1]) * x) / m.length,
+            -y,
+          ],
+    JSON.stringify([view, m.coordinates, m.eaves, section]),
     cancel,
     preview ? { wallId: m.wallId, elements: toSource(preview) } : null,
   );
@@ -492,6 +519,25 @@ export function ModelWallCanvas({
         </div>
       )}
       <div className="model-toolbar">
+        {curve && (
+          <label>
+            Curve section
+            <select
+              aria-label="Curve section"
+              value={section}
+              onChange={(e) => {
+                cancel();
+                setSection(Number(e.target.value));
+              }}
+            >
+              {curve.distances.slice(0, -1).map((d, i) => (
+                <option key={i} value={i}>
+                  {d.toFixed(1)}–{curve.distances[i + 1].toFixed(1)} m
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {!mobile.compact && (
           <ModelButton
             variant="outline"
@@ -656,6 +702,9 @@ export function ModelWallCanvas({
               const x =
                 (e.x + (i - (e.count - 1) / 2) * e.spacing) * m.length -
                 e.width / 2;
+              if (curve && !curve.visible(x + e.width / 2)) return null;
+              const displayX = projectX(x),
+                displayWidth = projectX(x + e.width) - displayX;
               if (
                 x + e.width < view.x ||
                 x > view.x + view.width ||
@@ -668,9 +717,9 @@ export function ModelWallCanvas({
                   <rect
                     data-element-id={e.id}
                     data-instance={i}
-                    x={x}
+                    x={displayX}
                     y={-e.bottom - e.height}
-                    width={Math.max(0.01, e.width)}
+                    width={Math.max(0.01, displayWidth)}
                     height={Math.max(0.01, e.height)}
                     fill={e.kind === 'text' ? 'transparent' : e.colour}
                     fillOpacity={locked.includes(e.id) ? 0.45 : 0.85}
@@ -697,8 +746,8 @@ export function ModelWallCanvas({
                       className="model-wall-text-label"
                       pointerEvents="none"
                       x={
-                        x +
-                        e.width *
+                        displayX +
+                        displayWidth *
                           (e.textAlign === 'left'
                             ? 0.02
                             : e.textAlign === 'right'
@@ -742,7 +791,7 @@ export function ModelWallCanvas({
               <circle
                 key={e.id}
                 aria-label="Resize selected detail"
-                cx={e.x * m.length + e.width / 2}
+                cx={projectX(e.x * m.length + e.width / 2)}
                 cy={-e.bottom - e.height}
                 r={pixel * (mobile.compact ? 22 : 9)}
                 fill="#087cf0"
