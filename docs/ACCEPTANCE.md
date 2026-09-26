@@ -23,12 +23,16 @@
   1920×1080, 1024×768, 667×375, 844×390 and 390×844, plus CSS zoom at 125%/150%.
   These are automated viewport changes, not physical rotation or browser-chrome
   zoom acceptance. Screenshots were reviewed for clipping and contrast.
+- The additional dark/light import regression passes in **Chromium and WebKit**,
+  checking header/form contrast and retained input through theme changes. The
+  final style fix also passes lint, production/configured builds and budgets.
 - Production and configured builds pass existing startup, editor, renderer,
   world and voice budgets. Frozen LASU model compatibility fixtures are unchanged.
-  Live verification of the compatible-reader deployment preserves all 84 LASU
-  assets. Writer deployment, live database migration checks, real source jobs and
-  a second-campus publication remain pending authenticated Supabase access and
-  subsequent owner review; fixture tests do not claim those operations happened.
+  The production writer deployment and migrations 013–015 are verified. All six
+  private-record fingerprints match before/after migration, all 84 published LASU
+  assets are unchanged, and authenticated Campuses/public-switcher reads pass.
+  Real imported-source jobs and a second-campus publication still require owner
+  data and review; fixture tests do not claim those operations happened.
 
 Use [CAMPUS-IMPORTS.md](CAMPUS-IMPORTS.md) for reproducible commands and screenshot
 provenance, and [PRODUCTION.md](PRODUCTION.md) for exact deployed state.
@@ -69,7 +73,7 @@ complete.
 - Browser checks at 390 × 844 and 1440 × 900 covered light/dark appearance, 2D/3D, manual route selection without requesting GPS, and keeping the route visible after resizing. A private report draft survived a reload and resumed from Settings. The unconfigured editor showed its Supabase setup gate.
 - Dependency audit reported zero known vulnerabilities at the implementation check. Repeat before public release; an audit is not a substitute for review.
 
-Live configuration evidence is recorded in [CONFIGURATION.md](CONFIGURATION.md): Supabase RLS/grants, denied anonymous reads of private tables, source baseline initialization, owner GitHub login, private report submission/dismissal, an editor-triggered source check, and an immutable Vercel release preview have been exercised. The release is `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`, application revision `568f468`. Editor refresh and campus rendering were checked on that preview, and its package downloaded and verified to **Ready offline** in hosted Chrome. No test map correction was saved and no production promotion was performed. Physical-phone performance, campus walks, live non-owner sign-in, and production rollback remain unverified. Treat the following checklist as acceptance work unless completion is explicitly recorded.
+The following is the initial September 9 configuration evidence, retained for history; [Production](PRODUCTION.md) records later promotions and the current state. At that check: Supabase RLS/grants, denied anonymous reads of private tables, source baseline initialization, owner GitHub login, private report submission/dismissal, an editor-triggered source check, and an immutable Vercel release preview have been exercised. The release is `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`, application revision `568f468`. Editor refresh and campus rendering were checked on that preview, and its package downloaded and verified to **Ready offline** in hosted Chrome. No test map correction was saved and no production promotion was performed. Physical-phone performance, campus walks, live non-owner sign-in, and production rollback remain unverified. Treat the following checklist as acceptance work unless completion is explicitly recorded.
 
 ## Local and desktop browser checks
 
@@ -103,9 +107,9 @@ Record model, OS, browser version, package version and date. Test on at least on
 - Complete `DEPLOYMENT.md`. Sign in as the allowlisted GitHub owner and as a separate non-owner test account. Only the owner may open drafts/reports/source data or call admin mutations. Use the anonymous key to query private tables directly: no private rows should be returned.
 - Submit a test report through the public endpoint. Verify it is private, rate limited, bounded to campus, and cannot change routes. Mark it resolved in the editor.
 - Edit a name; import a conflicting source name. The correction must remain. Review additions, geometry changes and removals. Force an incomplete import; no baseline records may be deleted.
-- Draw a new path crossing another without an explicit connection: no junction should appear. Add an explicit endpoint connection within five metres and verify routing. Check dragging vertices, undo/redo, draft saving, existing junction preservation and building conflicts.
+- Import generic lines or draw a path with **Connect crossings automatically** disabled: a crossing alone must not create a junction. Enable it on a suitable editor-authored path and verify same-level connections while bridges, tunnels, barriers and restrictions remain respected. Add an explicit endpoint connection within five metres and verify routing, undo/redo, saved junctions and building conflicts.
 - Connect an entrance only to the correct place and path. Confirm private/no-access paths and both directions of selected closures are excluded. Set an overdue reopening date: closure must remain until explicitly reopened and republished.
-- Build a reviewed snapshot and verify its Vercel preview. Make a subsequent draft change: it must not alter the immutable preview. Simulate a failed build/promotion in a staging setup; the old production release must remain. Publish, inspect the production domain and metadata, then roll back to the preceding retained deployment.
+- Build a reviewed snapshot and verify its Vercel preview. Make a subsequent draft change: it must not alter the immutable preview. Simulate a failed build/promotion in a staging setup; the old production release must remain. Publish, inspect the production domain and metadata, then prepare and publish a restore preview for that campus while asserting every other campus’s manifest and assets remain unchanged.
 - Export approved records and edit history. Rehearse a restore to a separate test project and compare stable IDs and routes.
 
 ## LASU field survey

@@ -1,137 +1,88 @@
 # TurnRight account configuration
 
-## Multi-campus configuration
+This is the current configuration guide. [Deployment](DEPLOYMENT.md) contains the setup sequence; [Production](PRODUCTION.md) records dated changes and live verification. Credentials belong in service secret stores, never in this repository or browser screenshots.
 
-The campus extension reuses the configured Supabase, GitHub Actions and Vercel projects, existing owner and existing secrets. Migrations 013–015 must be applied before the writing release. Compatible readers preserve LASU-only requests and `/packages/latest.json`. See [production rollout status](PRODUCTION.md) before assuming new tables are live.
+## Projects and owner access
 
-Optional `OVERPASS_URL` is a GitHub repository variable. `OVERPASS_SCHEDULE_ALLOWED=true` must be present in both the Vercel server environment and GitHub repository variables to offer daily OSM checks; leave it unset for public endpoints without scheduled-use permission. `.github/workflows/map-source-check.yml` checks opted-in sources at 03:47 UTC. LASU's existing 02:17 UTC schedule is retained. Source settings, mappings and campus bounds live in private tables rather than environment variables.
+| Service | Existing project and responsibility |
+| --- | --- |
+| Public app | [turnright.vercel.app](https://turnright.vercel.app/); [owner editor](https://turnright.vercel.app/admin) |
+| Vercel | `turnright`, frontend root `web`, Node 22, `npm ci`, `npm run build`, output `dist` |
+| Supabase | `TurnRight`, reference `mrmdfvcztzhypmlfblwh`, existing MRGLASS project |
+| GitHub | `mrglasswillbreak/TurnRight`; code deployment from `main`, private processing/release jobs through Actions |
+| Authentication | Existing GitHub owner, checked by `ADMIN_USER_ID` and the singleton database allowlist |
 
+Visitors do not need accounts. Other GitHub users cannot gain editor access by signing in. Browser configuration uses only the public Supabase key; service-role credentials remain in Vercel/GitHub. OAuth uses the exact configured `/admin` callback. The requested campus/building survives sign-in separately from that callback; broad cross-project redirect wildcards are unnecessary.
 
-## Model storage extension · 26 September 2026
+## Database and private storage
 
-Migration `012_editable_model_assets.sql` is applied to the existing project. Verification returned `model_assets`, `save_editor_model_batch(uuid,uuid,jsonb)`, a private `building-models` bucket and no direct authenticated metadata SELECT privilege. No credentials, environment variables, public access grants or paid services were added. Public readers deployed before the writing client. See [authoring](MODEL-AUTHORING.md) and [production](PRODUCTION.md).
+Production has migrations **001–015**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
-Initially configured and verified on 8 September 2026. **Production is now live
-at https://turnright.vercel.app/** following the owner's explicit publication
-request on 9 September. See [PRODUCTION.md](PRODUCTION.md) for the current
-deployment, corrected automatic-build setting, production OAuth redirect and
-verification. The preview details below retain the initial setup history.
+| Migrations | Responsibility |
+| --- | --- |
+| 001–003 | Sources, edits, reports, releases, privileges, optimistic batches and receipts |
+| 004 | Private survey revisions and chunks |
+| 005–007 | Baseline reconciliation and field-level source review |
+| 008–011 | Private photographs, guarded drafts and bounded reconciliation |
+| 012 | Private authored-model assets and older-writer protection |
+| 013 | Campus identity, LASU backfill, scoped keys/functions and media/survey/model isolation |
+| 014 | Source configurations, cancellable import jobs and private uploads |
+| 015 | Campus restore previews and catalogue revisions |
 
-## Review this release
+| Private bucket | Purpose | Per-object limit |
+| --- | --- | ---: |
+| `building-media` | Owner photograph originals/derivatives | 10 MiB |
+| `building-models` | Immutable model documents | 25 MiB |
+| `campus-imports` | GIS uploads and private job artifacts | 50 MiB |
 
-- [Campus map](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/)
-- [Protected editor](https://turnright-gj0bbezgi-muhammed-abdulhadi-s-projects.vercel.app/admin)
-- [Successful release workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34286932800)
-- Release: `4c193c03-25da-4237-88c4-f4c41ca52217`; status: `preview`.
-- Package: `lasu-240581101c35`.
-- Application revision: `568f4687967a0b947dcd387c9830859243b928b3`.
+Bucket limits do not replace operation limits: GIS upload batches total at most 50 MiB, and expanded/model/texture/publication limits are separate. Campus/import/model metadata and mutation RPCs are server-only. Existing owner-readable tables retain their policies; private writes pass authenticated server validation. Making a bucket public is not an upload repair.
 
-The Vercel preview retains deployment protection, so open it while signed into
-the owner's Vercel account. Editor access additionally requires the allowlisted
-GitHub account `mrglasswillbreak`. Later documentation commits do not change this
-immutable application/map preview.
+## Environment and secret placement
 
-## Accounts and access
+Set application variables in Vercel Preview and Production when previews can be promoted without rebuilding.
 
-Supabase: `TurnRight`, project reference `mrmdfvcztzhypmlfblwh`, London
-(`eu-west-2`), in the existing MRGLASS Free organization. Automatic table exposure
-is disabled and automatic row level security is enabled. Both numbered SQL
-migrations were applied successfully in one transaction.
+| Name | Location and purpose |
+| --- | --- |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Public Vercel client configuration |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Vercel server and GitHub Actions secrets |
+| `ADMIN_USER_ID` | Vercel server; allowlisted Auth user UUID |
+| `REPORT_RATE_SALT` | Vercel server secret for anonymous report rate buckets |
+| `GITHUB_REPOSITORY`, `GITHUB_WORKFLOW_TOKEN` | Vercel workflow dispatch; repository-scoped Actions access |
+| `SOURCE_REDISTRIBUTION_APPROVED` | Build setting after confirming LASU redistribution rights |
+| `PUBLISHED_MAP_URL` | Stable production HTTPS origin in Vercel; same origin for the GitHub release variable |
+| `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub Actions secrets for preview/publication |
+| `OVERPASS_URL` | Optional GitHub repository variable for the authorized endpoint |
+| `OVERPASS_SCHEDULE_ALLOWED` | Optional Vercel server environment **and** GitHub variable; enable only if the endpoint permits scheduled checks |
 
-Live SQL checks returned all nine application tables with RLS enabled, no
-anonymous SELECT privileges, no authenticated INSERT privileges, and server
-INSERT privileges. Direct requests with the public browser key could not read
-`reports`, `map_edits`, or `admin_users` (401 / permission denied).
+[`web/.env.example`](../web/.env.example) lists base application variables. Campus imports need no new secret. `CAMPUS_ID`, `IMPORT_ID`, `RUN_TOKEN`, `RELEASE_ID` and `RELEASE_OPERATION` are workflow/request context, not a global restriction to one campus. Requests without campus context remain LASU-only.
 
-GitHub OAuth is enabled through **TurnRight LASU Editor** (app `3845767`). Other
-providers and anonymous sign-ins are disabled. After the owner's initial login,
-further signups were disabled. The owner's UUID
-`a1ba436b-bcd3-4e03-8293-f864633bd288` was verified against GitHub identity
-`mrglasswillbreak`, added to the singleton database allowlist, and saved as
-`ADMIN_USER_ID` in both Vercel environments. Existing-owner login was retested.
-Supabase's Site URL and an exact allowed redirect point to this preview's
-`/admin` page. OAuth client secrets remain in Supabase.
+`PUBLISHED_MAP_URL` makes code builds verify the full public catalogue and all published packages. Unverifiable assets stop the build. Omit it only before a new installation's first public release. Code deployment never publishes model/source drafts.
 
-Vercel: `turnright`, in the existing personal Hobby account, GitHub repository
-`mrglasswillbreak/TurnRight`, frontend root `web`. Project identifier:
-`prj_C4HRU1Wis8DQSfhHVq2hPqrMCwDe`; team: `team_rlnBERg7tMCZMP9rl2QYsCAN`.
-Build settings are Vite, Node.js 22, `npm ci`, and the free Basic build machine.
-Files outside the root are included; on-demand concurrent builds are disabled.
-No paid upgrades or paid runners were enabled.
+## Source refresh and publication
 
-## Saved configuration
+| Workflow | Trigger and behavior |
+| --- | --- |
+| `source-update.yml` | LASU daily 02:17 UTC and manual checks |
+| `map-import.yml` | Inspection/preview for one campus/import/run token |
+| `map-source-check.yml` | Daily 03:47 UTC; opted-in sources and OSM endpoint permission gate |
+| `map-import-tests.yml` | Full pinned Linux GIS regressions |
+| `release.yml` | Serialized `preview` or `publish`; explicit campus, legacy default LASU |
+| `bootstrap.yml`, `preview.yml` | Initial baseline and seed preview for new installations |
 
-Preview and Production both have:
+Sources default to manual. File refresh uses a replacement upload; identities, accepted snapshots and mappings remain private. Daily checks queue candidates, never publish. LASU's original schedule remains independent.
 
-- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (public publishable key)
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-- `REPORT_RATE_SALT`, `ADMIN_USER_ID`
-- `GITHUB_REPOSITORY`, `GITHUB_WORKFLOW_TOKEN`
-- `SOURCE_REDISTRIBUTION_APPROVED=true`
+Publication replaces one campus and preserves every other campus. **Prepare restore preview** creates a fresh deployment with that campus's historical package and the others' current packages. Never promote an old whole-site deployment as a campus rollback. Retain immutable packages and snapshots; rebuild previews when the catalogue baseline changes.
 
-GitHub Actions has `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `VERCEL_TOKEN`,
-`VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` saved as secrets. Credentials are not
-included in this repository. The daily source-import workflow runs at 02:17 UTC;
-the editor's **Check now** uses the same workflow.
+## Operational verification
 
-The deployment token is scoped to TurnRight. The GitHub workflow token is scoped
-to this repository with Actions read/write and mandatory Metadata read-only.
-**Both expire on 7 December 2026.** Rotate them in the relevant service secret
-stores before then. Free-tier quota interruptions still require owner attention;
-no account-wide GitHub spending-budget change was made.
+After deployment verify the source revision, owner login/Campuses list, public switcher, unauthenticated admin rejection, catalogue, LASU manifest and asset hashes. Install waiting PWA updates through **Install update** so recovery guards remain active.
 
-## Live verification
+The September 26 migration preserved fingerprints for 4,777 source features, 133 edits, 32 releases, two surveys, 25 media records and one model asset. LASU remained the only campus and all 84 published assets were unchanged. No second campus or test import was published. See [Production](PRODUCTION.md) for the exact receipt.
 
-- The source baseline workflow succeeded and initialized 1,171 accepted source
-  features. A subsequent editor **Check now** completed successfully in
-  [run 34286518370](https://github.com/mrglasswillbreak/TurnRight/actions/runs/34286518370).
-- Owner GitHub login, private editor loading, and editor refresh worked. The
-  editor map visibly rendered campus geometry and labels after refresh.
-- A clearly labelled setup-test report was submitted through the public form,
-  appeared in the owner's private inbox, and was dismissed. It did not modify
-  map data or routes. No test map correction was saved.
-- The final immutable release workflow passed validation, tests, package build,
-  and Vercel deployment. The editor exposes its exact preview and a separate
-  publish action. No publish action was taken.
-- The final package `lasu-240581101c35` completed download and hash verification
-  in hosted Chrome, reaching **Ready offline** and retaining readiness after a
-  reload (approximately 2.15 MiB of map and voice assets, plus the separately
-  cached application shell). This is not
-  a physical-phone airplane-mode test.
-- Local checks passed all 40 tests, frontend and NodeNext server compilation,
-  and the Vite/PWA production build. Lint had no errors (eight existing
-  explicit-any warnings). The dependency audit reported zero known
-  vulnerabilities at this check.
+The initial September 9 preview was release `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`; its old counts and preview state are historical evidence in [Production](PRODUCTION.md). The original token record listed an expiry of 7 December 2026; check current secret-store expiry when maintaining credentials rather than assuming it has not changed.
 
-Live verification found and fixed Vercel build-helper packaging, Node ESM import
-extensions, editor drawing-tool disposal and map framing, and the release job's
-ESM entry point. The earlier release attempt is correctly recorded as failed;
-the successful retry is a new immutable snapshot. Direct compiled-function
-checks returned 401 for unauthenticated admin access and 400 for invalid reports.
+Quotas, paused services and expired tokens can interrupt owner jobs while published/offline navigation keeps working. Inspect the exact failure before retrying; do not duplicate an uncertain job. Preserve required assets explicitly instead of assuming hosting retention settings. Physical Android/iPhone checks, campus walks, live non-owner login and a second-campus publish/restore rehearsal remain separate [acceptance work](ACCEPTANCE.md).
 
-## Before public launch
+## Source permissions
 
-The initial **Only build pre-production** rule was changed to **Automatic** on
-9 September at the owner's request. Production now serves the latest requested
-revision, and `PUBLISHED_MAP_URL` points to `https://turnright.vercel.app` in both
-environments. The production `/admin` OAuth redirect is configured and tested.
-See [PRODUCTION.md](PRODUCTION.md) for the current state and the distinction
-between this first Git publication and future reviewed map releases.
-
-Physical Android/iPhone checks, campus field walks, a live non-owner login test,
-and an actual production promotion/rollback rehearsal remain outstanding. See
-[ACCEPTANCE.md](ACCEPTANCE.md); automated tests do not establish campus accuracy.
-The dataset contains 219 places, 54 mapped approaches, zero confirmed connected
-entrances, seven disconnected path components, and 28 excluded directed segments.
-
-Vercel Hobby's default retention is 30 days, with exceptions for the most recent
-ready deployments. Preserve the preceding release and confirm it is retained
-before relying on rollback; do not delete it manually. See
-[Vercel's retention policy](https://vercel.com/docs/deployment-retention).
-
-## Source permission record
-
-The project owner confirmed in this task that permission for the LASU ArcGIS data
-covers offline redistribution. The source item itself has no public license;
-this records the owner's confirmation, not an independent review of the agreement.
-Keep the actual permission correspondence with the project records.
+The owner previously confirmed permission to redistribute LASU ArcGIS data offline. That is an owner confirmation, not a public licence or a grant for other campuses. Keep the correspondence with project records. New sources need their own attribution/licence/redistribution record; OSM retains ODbL attribution in public and offline packages. See [Attribution](../data/ATTRIBUTION.md) and [imports](CAMPUS-IMPORTS.md).

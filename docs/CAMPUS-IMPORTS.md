@@ -2,9 +2,9 @@
 
 TurnRight keeps separate campus maps under the existing owner account. LASU is the default; links without a campus parameter retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
 
-**Rollout status:** the compatible readers are live. The Campuses controls and
-writing API are implemented but await migrations 013–015 before production
-enablement. [Production evidence](PRODUCTION.md) records the current deployment.
+**Rollout status:** migrations 013–015, the Campuses controls and the writing API
+are live. Existing LASU records and all published assets were verified unchanged.
+[Production evidence](PRODUCTION.md) records the deployment and checks.
 
 ![Campuses workspace](assets/screenshots/campus-workspace-2026-09-26.png)
 
@@ -74,7 +74,7 @@ In **Releases**, prepare and inspect a preview, then publish. The preview freeze
 
 ## Public switching and offline maps
 
-The public **Campuses** button searches published campuses only. Globe markers open the same catalogue entries. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. Switching while directions are active asks to stop the current route. The owner workspace also protects unfinished drawings, roof drafts, recording and pending saves.
+The public globe button beside search (**Choose a campus**) searches published campuses only. It stays reachable with the card collapsed or expanded. Globe markers open the same catalogue entries. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. Switching while directions are active asks to stop the current route. The owner workspace also protects unfinished drawings, roof drafts, recording and pending saves.
 
 ![Published campus selector](assets/screenshots/campus-switcher-2026-09-26.png)
 
@@ -113,5 +113,16 @@ npx playwright test --config playwright.webkit.config.ts campus-imports.spec.ts
 npm run build
 npm run check:configured-build
 ```
+
+Run the complete GIS suite on Linux with Docker from the repository root, or use the **GIS import regression tests** GitHub workflow:
+
+```sh
+docker build -t turnright-gis-import -f scripts/map_import/Dockerfile scripts/map_import
+docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -v "$PWD/scripts:/app:ro" --entrypoint python3 turnright-gis-import -m unittest discover -s /app/tests -p 'test_map_import*.py' -v
+```
+
+The app's dark/light/system preference also applies to the import header, forms and validation. Source fields retain entered values through a theme change. On narrow screens, the directory and form stack and scroll inside the workspace.
+
+![Import source controls in Dark mode](assets/screenshots/campus-dark-2026-09-26.png)
 
 Screenshots are unaltered local application captures with isolated owner/source responses, illustrative campus names and a checked-in LASU geographic fixture. They demonstrate controls, not a second published production campus. Physical-device keyboards and native browser zoom remain separate manual checks. See [screenshot provenance](assets/screenshots/README.md) and [production evidence](PRODUCTION.md).
