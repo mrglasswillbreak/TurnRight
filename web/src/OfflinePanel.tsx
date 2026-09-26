@@ -61,9 +61,9 @@ export function OfflinePanel({
       </div>
       <h2>Your campus. Anywhere.</h2>
       <p>
-        Download LASU Ojo once. Search, campus routes, arrival guides,
-        photographs and voice directions stay with you when the connection
-        doesn’t.
+        Download {target.campus?.name || 'LASU Ojo'} once. Search, campus
+        routes, arrival guides, photographs and voice directions stay with you
+        when the connection doesn’t.
       </p>
       <div className="download-card">
         <div className="download-title">
@@ -71,7 +71,7 @@ export function OfflinePanel({
             <MapGrid />
           </span>
           <div>
-            <strong>LASU · Ojo campus</strong>
+            <strong>{target.campus?.name || 'LASU · Ojo campus'}</strong>
             <span>
               {(target.bytes / 1048576).toFixed(2)} MB · Map & voice directions
               {target.visuals ? ' + enhanced 3D' : ''}
@@ -96,7 +96,8 @@ export function OfflinePanel({
           </span>
         </div>
         <p className="small-note">
-          Version {manifest.version} · LASU Ojo campus only
+          Version {manifest.version} · {target.campus?.name || 'LASU Ojo'} only.
+          Other campus downloads are kept separately.
         </p>
         {target.visuals && (
           <p className="small-note">
@@ -211,8 +212,8 @@ export function OfflinePanel({
       )}
       <p className="small-note">
         The world overview is saved with the app. Zoom out to explore land,
-        oceans and countries offline; detailed places and walking routes cover
-        LASU Ojo only.
+        oceans and countries offline. Detailed places and reviewed routes are
+        available for each campus you download. Routes do not cross campuses.
       </p>
       <p className="small-note">
         Your phone supplies location. Keep the app open during navigation.

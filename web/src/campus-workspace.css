@@ -1,0 +1,401 @@
+.campus-workspace {
+  --primary: #176e5c;
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background: var(--background, #f7f9f9);
+  color: var(--foreground, #17242a);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.campus-workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--border, #dce5e7);
+  background: var(--card, #fff);
+}
+.campus-workspace h2,
+.campus-workspace h3,
+.campus-workspace h4 {
+  margin: 0;
+  font-weight: 650;
+}
+.campus-workspace [data-slot='button'] {
+  min-height: 36px;
+}
+.campus-workspace [data-variant='default'] {
+  background: var(--primary);
+  color: #fff;
+}
+.campus-workspace [data-variant='default']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 85%, black);
+}
+.campus-workspace h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+}
+.campus-workspace h3 {
+  font-size: 23px;
+}
+.campus-workspace h4 {
+  font-size: 16px;
+  margin: 24px 0 12px;
+}
+.campus-workspace p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 8px 0 14px;
+  overflow-wrap: anywhere;
+}
+.campus-workspace-body {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 0;
+  flex: 1;
+}
+.campus-directory {
+  padding: 20px;
+  border-right: 1px solid var(--border, #dce5e7);
+  overflow: auto;
+}
+.campus-search {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.campus-search input {
+  min-width: 0;
+}
+.campus-directory-list {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0;
+}
+.campus-directory-list > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  min-height: 64px;
+}
+.campus-directory-list > button.selected {
+  background: color-mix(in srgb, var(--primary, #0d9488) 11%, transparent);
+  border-color: color-mix(in srgb, var(--primary, #0d9488) 35%, transparent);
+}
+.campus-directory-list strong,
+.campus-import-row strong {
+  font-size: 14px;
+  display: block;
+}
+.campus-directory-list small,
+.campus-import-row small {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 3px;
+}
+.campus-list-icon {
+  color: var(--primary, #0d9488);
+}
+.campus-content {
+  padding: 26px 32px;
+  overflow: auto;
+  min-width: 0;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+}
+.campus-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.campus-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 14px 0;
+}
+.campus-workspace label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 550;
+  min-width: 0;
+}
+.campus-workspace input:not([type='checkbox']):not([type='file']),
+.campus-workspace select,
+.campus-workspace textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #cfdcde);
+  color: inherit;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font: inherit;
+}
+.campus-workspace input:focus-visible,
+.campus-workspace select:focus-visible,
+.campus-workspace textarea:focus-visible,
+.campus-workspace button:focus-visible {
+  outline: 2px solid var(--primary, #0d9488);
+  outline-offset: 3px;
+}
+.campus-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.campus-actions > input {
+  flex: 1;
+  min-width: 180px !important;
+}
+.campus-source {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  border: 1px solid var(--border, #dce5e7);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 12px 0;
+  background: var(--card, #fff);
+}
+.campus-source p {
+  margin: 4px 0;
+}
+.campus-source .campus-actions {
+  margin: 0;
+}
+.campus-source label {
+  font-size: 11px;
+}
+.campus-import-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 0;
+  border-bottom: 1px solid var(--border, #dce5e7);
+  padding: 16px 8px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 60px;
+}
+.campus-import-row > span:first-child {
+  flex: 1;
+}
+.import-source-form,
+.import-upload {
+  border: 1px solid var(--border, #dce5e7);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 18px 0;
+  background: var(--card, #fff);
+}
+.import-source-form > label {
+  margin: 14px 0;
+}
+.campus-source-choices {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.import-steps {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.import-steps li {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--foreground, #17242a) 7%, transparent);
+  color: var(--foreground, #17242a);
+}
+.import-steps li.active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--primary, #0d9488) 15%, transparent);
+  font-weight: 650;
+}
+.import-layer {
+  border: 1px solid var(--border, #dce5e7);
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin: 12px 0;
+  background: var(--card, #fff);
+}
+.import-layer summary {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+  cursor: pointer;
+  min-height: 36px;
+}
+.import-layer summary span {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: auto;
+}
+.import-map {
+  height: 360px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--border, #dce5e7);
+  border-radius: 12px;
+  margin: 18px 0;
+}
+.import-map.drawing .maplibregl-canvas {
+  cursor: crosshair;
+}
+.import-counts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.import-counts span {
+  background: color-mix(in srgb, var(--foreground, #17242a) 7%, transparent);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.import-counts strong {
+  font-size: 20px;
+  margin-right: 6px;
+}
+.campus-file {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: 1px dashed var(--primary, #0d9488);
+  border-radius: 10px;
+  cursor: pointer;
+  min-height: 48px;
+}
+.campus-file input {
+  max-width: 230px;
+}
+.campus-check {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px !important;
+  margin: 18px 0;
+  line-height: 1.5;
+}
+.campus-check input {
+  margin-top: 3px;
+}
+.campus-error {
+  color: #b42318;
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.campus-notice {
+  background: color-mix(in srgb, var(--primary, #0d9488) 10%, transparent);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+@media (max-width: 900px) {
+  .campus-workspace-body {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .campus-content {
+    padding: 20px;
+  }
+  .campus-source {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .campus-fields {
+    grid-template-columns: 1fr;
+  }
+  .campus-workspace button,
+  .campus-workspace [data-slot='button'] {
+    min-height: 44px;
+  }
+  .campus-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 640px) {
+  .campus-workspace-body {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .campus-directory {
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--border, #dce5e7);
+    padding: 14px;
+  }
+  .campus-directory-list {
+    display: flex;
+    overflow: auto;
+    margin: 10px 0;
+  }
+  .campus-directory-list > button {
+    min-width: 180px;
+  }
+  .campus-directory > .small-note {
+    display: none;
+  }
+  .campus-content {
+    overflow: visible;
+    padding: 16px;
+  }
+  .campus-workspace-header {
+    padding: 16px;
+  }
+  .import-map {
+    height: 290px;
+  }
+  .campus-workspace h3 {
+    font-size: 20px;
+  }
+}
+@media (max-height: 440px) {
+  .campus-workspace-header {
+    padding: 10px 20px;
+  }
+  .campus-workspace-header p {
+    display: none;
+  }
+  .import-map {
+    height: 240px;
+  }
+}

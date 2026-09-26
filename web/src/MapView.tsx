@@ -360,9 +360,24 @@ export function MapView({
       new maplibregl.AttributionControl({
         compact: true,
         customAttribution: [
-          '© OpenStreetMap contributors',
-          'LASU / MangroveandpartnersLimited',
-        ],
+          ...new Set(
+            latestData.current.sources
+              .map((s) => s.attribution)
+              .filter(Boolean),
+          ),
+        ].map((value) =>
+          value.replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+              })[c]!,
+          ),
+        ),
       }),
       'bottom-right',
     );
@@ -1253,9 +1268,7 @@ export function MapView({
         ref={container}
         data-world-view={worldView}
         aria-label={
-          worldView
-            ? 'Interactive world map'
-            : 'Interactive map of LASU Ojo campus'
+          worldView ? 'Interactive world map' : 'Interactive campus map'
         }
       />
       {!editor && worldError && (

@@ -1,3 +1,4 @@
+import { requestedCampus } from './campus-context';
 import { api } from './supabase';
 import {
   surveyId,
@@ -73,6 +74,7 @@ export function syncSurvey(
 const evidenceSignature = (session: SurveySession) =>
   JSON.stringify({
     ...session,
+    campusId: session.campusId || 'lasu',
     remoteRevision: null,
     localVersion: undefined,
     pendingUpload: undefined,
@@ -84,6 +86,9 @@ async function performSync(
   progress: (s: string) => void,
 ) {
   const session = recording.session;
+  session.campusId ??= requestedCampus();
+  if (session.campusId !== requestedCampus())
+    throw new Error('Switch back to the survey campus before syncing.');
   if (session.state === 'recording')
     throw new Error('Pause recording before saving privately.');
   if (!session.pendingUpload) {
