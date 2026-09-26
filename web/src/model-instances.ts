@@ -35,6 +35,60 @@ export function detailInstanceSelection(records: FacadeElement[], id?: string) {
   }
   return { elementId: id, instanceIndex: undefined };
 }
+/** Local visibility/locks use instance IDs; a locked child also protects a batch row. */
+export function detailInstanceFlags(
+  records: FacadeElement[],
+  flags: string[],
+  protectRow = false,
+) {
+  const result = new Set(flags);
+  for (const record of records) {
+    if (record.count === 1) continue;
+    const children = expandDetailInstances([record]).map((e) => e.id);
+    if (flags.includes(record.id)) children.forEach((id) => result.add(id));
+    if (
+      protectRow
+        ? children.some((id) => flags.includes(id))
+        : children.every((id) => flags.includes(id))
+    )
+      result.add(record.id);
+  }
+  return [...result];
+}
+export function toggleDetailInstanceFlags(
+  records: FacadeElement[],
+  flags: string[],
+  selection: string[],
+) {
+  const expanded = expandDetailInstances(records);
+  const targets = expanded
+    .filter(
+      (e) =>
+        selection.includes(e.id) ||
+        selection.includes(detailInstanceSelection(records, e.id).elementId!),
+    )
+    .map((e) => e.id);
+  const current = new Set(
+    expanded
+      .filter(
+        (e) =>
+          flags.includes(e.id) ||
+          flags.includes(detailInstanceSelection(records, e.id).elementId!),
+      )
+      .map((e) => e.id),
+  );
+  const remove = targets.every((id) => current.has(id));
+  for (const id of targets) {
+    if (remove) current.delete(id);
+    else current.add(id);
+  }
+  // Keep flags belonging to other walls.
+  const here = new Set([
+    ...records.map((e) => e.id),
+    ...expanded.map((e) => e.id),
+  ]);
+  return [...flags.filter((id) => !here.has(id)), ...current];
+}
 const equal = (a: FacadeElement, b: FacadeElement) =>
   (Object.keys(a) as (keyof FacadeElement)[]).every((key) =>
     typeof a[key] === 'number' && typeof b[key] === 'number'

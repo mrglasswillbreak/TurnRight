@@ -45,6 +45,7 @@ export function modelTree({
   locked,
   hidden,
   roofTexts = {},
+  generatedWalls = [],
 }: {
   roofTexts?: Record<string, RoofText[]>;
   name: string;
@@ -56,6 +57,7 @@ export function modelTree({
   elements: FacadeElement[];
   locked: string[];
   hidden: string[];
+  generatedWalls?: string[];
 }): ModelTreeNode[] {
   return [
     {
@@ -151,11 +153,12 @@ export function modelTree({
                       key: `wall:${wallId}`,
                       label: authoring.names[wallId] || wall?.label || 'Wall',
                       target: { kind: 'wall', partId: part.id, wallId },
-                      note: facade
-                        ? facade.reviewedAt && !facade.needsReview
-                          ? 'Reviewed'
-                          : 'Needs review'
-                        : 'Generated',
+                      note:
+                        facade && !generatedWalls.includes(wallId)
+                          ? facade.reviewedAt && !facade.needsReview
+                            ? 'Reviewed'
+                            : 'Needs review'
+                          : 'Generated',
                       children: [
                         {
                           key: `details:${wallId}`,

@@ -13,6 +13,7 @@ import {
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useModelSurface } from './model-surface';
 import type { FacadeElement } from './visual-types';
+import { detailInstanceId } from './model-instances';
 import { ModelNudge, useModelMobile } from './model-mobile';
 import {
   elementBounds,
@@ -200,7 +201,10 @@ export function ModelWallCanvas({
               ? 'resize'
               : 'pan';
     }
-    if (id && locked.includes(id) && kind !== 'pan') return;
+    if (id && locked.includes(id) && kind !== 'pan') {
+      onSelect([id], instance);
+      return;
+    }
     const ids = id
       ? event.shiftKey
         ? selected.includes(id)
@@ -376,7 +380,10 @@ export function ModelWallCanvas({
           })),
         )
         .filter(
-          ({ e, x }) =>
+          ({ e, i, x }) =>
+            !hidden.includes(
+              detailInstanceId(e.id, reverse ? e.count - 1 - i : i),
+            ) &&
             Math.abs(g.start[0] - x) <= Math.max(e.width / 2, pixel * 12) &&
             g.start[1] >= e.bottom - pixel * 8 &&
             g.start[1] <= e.bottom + e.height + pixel * 8,
@@ -640,6 +647,12 @@ export function ModelWallCanvas({
           .filter((e) => !hidden.includes(e.id))
           .flatMap((e) =>
             Array.from({ length: e.count }, (_, i) => {
+              if (
+                hidden.includes(
+                  detailInstanceId(e.id, reverse ? e.count - 1 - i : i),
+                )
+              )
+                return null;
               const x =
                 (e.x + (i - (e.count - 1) / 2) * e.spacing) * m.length -
                 e.width / 2;

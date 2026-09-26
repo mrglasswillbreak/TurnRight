@@ -54,6 +54,8 @@ import {
   detailInstanceId,
   detailInstanceSelection,
   expandDetailInstances,
+  detailInstanceFlags,
+  toggleDetailInstanceFlags,
 } from './model-instances';
 import {
   Dialog,
@@ -336,7 +338,7 @@ function ModelWorkspace({
   const [local, setLocal] = useState(edit),
     [mode, setMode] = useState<Mode>(initialMode),
     [wallId, setWallId] = useState(selection?.wallId || ''),
-    [selected, setSelected] = useState<string[]>([]),
+    [selectionKeys, setSelected] = useState<string[]>([]),
     [instance, setInstance] = useState(0);
   const [tab, setTab] = useState('3d'),
     [before, setBefore] = useState(false),
@@ -344,8 +346,8 @@ function ModelWorkspace({
     [grid, setGrid] = useState(0.1);
   const [wholeRows, setWholeRows] = useState<string[]>([]);
   const [reviewResult, setReviewResult] = useState('');
-  const [hidden, setHidden] = useState<string[]>([]),
-    [locked, setLocked] = useState<string[]>([]),
+  const [hiddenItems, setHidden] = useState<string[]>([]),
+    [lockedItems, setLocked] = useState<string[]>([]),
     [clipboard, setClipboard] = useState<Stamp | null>(null),
     [paste, setPaste] = useState<Stamp | null>(null),
     [pending, setPending] = useState<FacadeDescription | null>(null);
@@ -430,12 +432,19 @@ function ModelWorkspace({
     () => expandDetailInstances(sourceElements, wholeRows),
     [sourceElements, wholeRows],
   );
-  useEffect(() => {
-    setSelected((current) => {
-      const next = current.filter((id) => elements.some((e) => e.id === id));
-      return next.length === current.length ? current : next;
-    });
-  }, [elements]);
+  // Keep identities through deletion/Undo without showing missing targets.
+  const selected = useMemo(
+    () => selectionKeys.filter((id) => elements.some((e) => e.id === id)),
+    [selectionKeys, elements],
+  );
+  const locked = useMemo(
+    () => detailInstanceFlags(sourceElements, lockedItems, true),
+    [sourceElements, lockedItems],
+  );
+  const hidden = useMemo(
+    () => detailInstanceFlags(sourceElements, hiddenItems),
+    [sourceElements, hiddenItems],
+  );
   const renderedFeature = useMemo(() => {
     if (before) return original;
     const previewFeature: ReturnType<typeof modelFeature> = {
@@ -766,18 +775,16 @@ function ModelWorkspace({
       grid,
       0,
     );
+    if (!values.length) return;
     if (updateElements([...elements, ...values]))
       setSelected(values.map((e) => e.id));
   };
   const remove = () => {
     const ids = selected.filter((id) => !locked.includes(id));
-    if (
-      updateElements(
-        elements.filter((e) => !ids.includes(e.id)),
-        authoring,
-      )
-    )
-      setSelected([]);
+    updateElements(
+      elements.filter((e) => !ids.includes(e.id)),
+      authoring,
+    );
   };
   const add = (kind: FacadeElementKind) => {
     if (!metrics || before) return;
@@ -1180,14 +1187,20 @@ function ModelWorkspace({
     {
       name: selected.every((id) => locked.includes(id)) ? 'Unlock' : 'Lock',
       disabled: !selected.length,
-      run: () => setLocked(toggle(locked, selected)),
+      run: () =>
+        setLocked(
+          toggleDetailInstanceFlags(sourceElements, lockedItems, selected),
+        ),
     },
     {
       name: selected.every((id) => hidden.includes(id))
         ? 'Show in editor'
         : 'Hide in editor',
       disabled: !selected.length,
-      run: () => setHidden(toggle(hidden, selected)),
+      run: () =>
+        setHidden(
+          toggleDetailInstanceFlags(sourceElements, hiddenItems, selected),
+        ),
     },
     {
       name: 'Select all details',
@@ -1594,6 +1607,9 @@ function ModelWorkspace({
                         ...generatedFacades,
                         ...draft.properties.appearance?.facades,
                       },
+                      generatedWalls: Object.keys(generatedFacades).filter(
+                        (id) => pending?.wallId !== id,
+                      ),
                       roofTexts: draft.properties.appearance?.roofTexts,
                       authoring,
                       activeWall,
@@ -2600,13 +2616,16 @@ function ModelWorkspace({
                                 const p = authoring.patterns.find(
                                   (p) => p.id === e.target.value,
                                 );
-                                if (p)
+                                if (p) {
+                                  setWholeRows(p.members);
+                                  setSelected(p.members);
                                   setPattern({
                                     rows: p.rows,
                                     columns: p.columns,
                                     stepX: p.stepX,
                                     stepY: p.stepY,
                                   });
+                                }
                               }}
                             >
                               <option value="">New from selection</option>

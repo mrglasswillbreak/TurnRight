@@ -4,6 +4,8 @@ import {
   detailInstanceId,
   detailInstanceSelection,
   expandDetailInstances,
+  detailInstanceFlags,
+  toggleDetailInstanceFlags,
 } from '../src/model-instances';
 import {
   emptyAuthoring,
@@ -34,6 +36,18 @@ const sameWindows = (actual: FacadeElement[], expected: FacadeElement[]) => {
   });
 };
 describe('individual windows with compact storage', () => {
+  it('locks and hides individual windows without changing neighbours or losing row protection', () => {
+    const ids = expandDetailInstances([row]).map((e) => e.id);
+    const flags = toggleDetailInstanceFlags([row], [], [ids[2]]);
+    expect(flags).toEqual([ids[2]]);
+    expect(detailInstanceFlags([row], flags, true)).toContain(row.id);
+    expect(detailInstanceFlags([row], flags)).not.toContain(row.id);
+    expect(toggleDetailInstanceFlags([row], flags, [ids[2]])).toEqual([]);
+    const all = toggleDetailInstanceFlags([row], [], [row.id]);
+    expect(all).toEqual(ids);
+    const unlocked = toggleDetailInstanceFlags([row], all, [ids[2]]);
+    expect(unlocked).toEqual(ids.filter((id) => id !== ids[2]));
+  });
   it('selects without changing saved geometry and retains an untouched row', () => {
     const view = expandDetailInstances([row]);
     expect(view).toHaveLength(7);
