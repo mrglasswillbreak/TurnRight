@@ -6068,6 +6068,51 @@ async function unifiedModelFixture(
   };
 }
 
+test('reference split preserves the renderer and edits through resizing', async ({
+  page,
+}) => {
+  const { dialog, wall } = await unifiedModelFixture(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const canvas = await dialog
+    .locator('.photo-model-canvas canvas')
+    .elementHandle();
+  await dialog
+    .getByRole('button', { name: 'Reference split', exact: true })
+    .click();
+  const host = dialog.locator('.model-view-columns');
+  await expect(host).toHaveAttribute('data-reference-split', 'true');
+  const divider = dialog.getByRole('separator', {
+    name: 'Resize model and photograph panes',
+  });
+  await divider.focus();
+  await divider.press('Home');
+  await expect(divider).toHaveAttribute('aria-valuenow', '420');
+  const photo = await dialog.locator('.model-photo-view').boundingBox();
+  const model = await dialog.locator('.model-3d-view').boundingBox();
+  expect(photo!.x).toBeGreaterThanOrEqual(model!.x + model!.width);
+  await dialog.getByLabel('Width (m)', { exact: true }).fill('1.7');
+  await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+  await expect.poll(() => wall()?.elements[0].width).toBe(1.7);
+  await page.setViewportSize({ width: 960, height: 600 });
+  await expect(host).toHaveAttribute('data-reference-split', 'false');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(host).toHaveAttribute('data-reference-split', 'true');
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue(
+    '1.7',
+  );
+  expect(
+    await canvas!.evaluate(
+      (node) => node === document.querySelector('.photo-model-canvas canvas'),
+    ),
+  ).toBe(true);
+  await dialog.getByRole('button', { name: 'Orbit', exact: true }).click();
+  await expect(dialog.locator('.model-photo-view')).toBeVisible();
+  await dialog
+    .getByRole('button', { name: 'Edit surface', exact: true })
+    .click();
+  await expect(dialog.locator('.model-photo-view')).toBeVisible();
+});
+
 test('model workspace desktop docks stay bounded through resize and zoom-sized viewports', async ({
   page,
 }, info) => {

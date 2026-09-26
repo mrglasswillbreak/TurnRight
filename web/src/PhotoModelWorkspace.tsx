@@ -111,6 +111,7 @@ import {
   wallMetrics,
 } from './model-authoring';
 import './photo-model.css';
+import { useModelReference } from './use-model-reference';
 
 type Mode = 'details' | 'appearance' | 'roof' | 'outline' | 'review';
 const kinds: FacadeElementKind[] = [
@@ -344,6 +345,11 @@ function ModelWorkspace({
     [before, setBefore] = useState(false),
     [error, setError] = useState(''),
     [grid, setGrid] = useState(0.1);
+  const referenceLayout = useModelReference();
+  // Photo remains a full-screen option when the remembered split cannot fit.
+  useEffect(() => {
+    if (referenceLayout.active && tab === 'photo') setTab('3d');
+  }, [referenceLayout.active, tab]);
   const [wholeRows, setWholeRows] = useState<string[]>([]);
   const [reviewResult, setReviewResult] = useState('');
   const [hiddenItems, setHidden] = useState<string[]>([]),
@@ -1701,11 +1707,37 @@ function ModelWorkspace({
                       icon={<Image />}
                       aria-pressed={tab === 'photo'}
                       onClick={() => {
-                        setTab('photo');
+                        if (referenceLayout.active)
+                          shell.current
+                            ?.querySelector<HTMLElement>(
+                              '.model-photo-view select',
+                            )
+                            ?.focus();
+                        else setTab('photo');
                         openPanel('none');
                       }}
                     >
                       Photo
+                    </ModelButton>
+                    <ModelButton
+                      icon={<Columns2 />}
+                      aria-pressed={referenceLayout.enabled}
+                      title={
+                        referenceLayout.enabled && !referenceLayout.fits
+                          ? 'Reference split will return when there is room for both panes'
+                          : 'Show the model beside its reference photograph'
+                      }
+                      onClick={() => {
+                        if (!referenceLayout.enabled && !referenceLayout.fits) {
+                          setStructureOpen(false);
+                          openPanel('none');
+                        }
+                        if (!referenceLayout.enabled && tab === 'photo')
+                          setTab('3d');
+                        referenceLayout.toggle();
+                      }}
+                    >
+                      Reference split
                     </ModelButton>
                   </fieldset>
                   {selected.length > 0 && (
@@ -1748,6 +1780,9 @@ function ModelWorkspace({
                     </p>
                   )}
                   <div
+                    ref={referenceLayout.host}
+                    data-reference-split={referenceLayout.active}
+                    style={referenceLayout.style}
                     className={`model-view-columns model-tab-${tab === 'surface' && webglUnavailable ? 'wall' : tab}`}
                   >
                     <div
@@ -1812,6 +1847,7 @@ function ModelWorkspace({
                         }}
                       />
                     </div>
+                    {referenceLayout.divider}
                     <div className="model-photo-view">
                       <ModelButton
                         variant="outline"
@@ -1820,9 +1856,12 @@ function ModelWorkspace({
                       >
                         {reference ? 'Hide' : 'Show'} photograph reference
                       </ModelButton>
-                      {(reference || compact || tab === 'photo') && (
+                      {(reference ||
+                        compact ||
+                        tab === 'photo' ||
+                        referenceLayout.active) && (
                         <ModelPhotoPanel
-                          key={`${edit.id}:${activeWall}:${photo?.id || ''}`}
+                          key={edit.id}
                           photos={photos}
                           photo={photo}
                           onPhoto={setPhotoId}
