@@ -5,6 +5,7 @@ import type {
   ModelImport,
 } from './model-file-types';
 import type { ModelMesh } from './visual-types';
+import { encodeModelImage, type ModelImageJob } from './model-image-codec';
 export function modelFileTask(
   payload: { kind: 'import'; files: ModelFile[]; primary: string },
   signal: AbortSignal,
@@ -40,6 +41,31 @@ export function modelFileTask(
       worker.terminate();
     };
     worker.onmessage = ({ data }) => {
+      if (data.imageWork !== undefined) {
+        const job = data.job as ModelImageJob;
+        void encodeModelImage(job)
+          .then(
+            (bytes) => {
+              if (!signal.aborted)
+                worker.postMessage({ imageReply: data.imageWork, bytes }, [
+                  bytes,
+                ]);
+            },
+            (error) => {
+              if (!signal.aborted)
+                worker.postMessage({
+                  imageReply: data.imageWork,
+                  error: String(error),
+                });
+            },
+          )
+          .finally(() =>
+            new Set([job.image, job.metalness, job.roughness]).forEach(
+              (image) => image?.close(),
+            ),
+          );
+        return;
+      }
       done();
       if (data.error) reject(new Error(data.error));
       else resolve(data.result);

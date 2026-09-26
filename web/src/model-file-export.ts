@@ -10,7 +10,7 @@ import {
   DoubleSide,
   FrontSide,
 } from 'three';
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { workerImageExporter } from './model-gltf-worker-images';
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import { compileModelDocument } from './model-document-compiler';
 import type { ModelMesh } from './visual-types';
@@ -195,11 +195,14 @@ export async function exportModel(
     }
     // GLTFExporter's non-binary image path expects a DOM canvas. Export binary in
     // the worker, then expose the same buffer as a data URI for self-contained glTF.
-    const result = (await new GLTFExporter().parseAsync(root, {
-      binary: true,
-      onlyVisible: true,
-      maxTextureSize: 4096,
-    })) as ArrayBuffer;
+    const result = (await workerImageExporter(textures, bitmaps).parseAsync(
+      root,
+      {
+        binary: true,
+        onlyVisible: true,
+        maxTextureSize: 4096,
+      },
+    )) as ArrayBuffer;
     if (options.format === 'glb') return [{ name: 'model.glb', data: result }];
     const view = new DataView(result),
       jsonLength = view.getUint32(12, true),

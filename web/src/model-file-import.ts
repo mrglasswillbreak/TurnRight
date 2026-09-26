@@ -2,6 +2,7 @@ import {
   BufferGeometry,
   Color,
   LoadingManager,
+  ImageBitmapLoader,
   Mesh,
   MeshStandardMaterial,
   Object3D,
@@ -11,6 +12,7 @@ import {
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { encodeModelImage } from './model-image-codec';
 import {
   defaultModelMaterial,
   identityTransform,
@@ -208,10 +210,14 @@ export async function importModelFiles(
             );
           }
         }
-      const gltf = await new GLTFLoader(manager).parseAsync(
-        JSON.stringify(json),
-        '',
-      );
+      const loader = new GLTFLoader(manager);
+      // Safari's user-agent fallback selects a DOM TextureLoader, which cannot
+      // run in a worker. Decode using the available worker API explicitly.
+      loader.register((parser) => {
+        parser.textureLoader = new ImageBitmapLoader(manager);
+        return { name: 'TURNRIGHT_worker_images' };
+      });
+      const gltf = await loader.parseAsync(JSON.stringify(json), '');
       root = gltf.scene;
     } else if (ext === 'obj')
       root = new OBJLoader(manager).parse(decoder.decode(file.data));
@@ -243,10 +249,8 @@ export async function importModelFiles(
         throw new Error(
           'Reduce textures to 4096 × 4096 pixels or smaller before importing.',
         );
-      const canvas = new OffscreenCanvas(source.width, source.height);
-      canvas.getContext('2d')!.drawImage(source, 0, 0);
-      const blob = await canvas.convertToBlob({ type: 'image/png' });
-      if (blob.size > MODEL_LIMITS.imageBytes)
+      const bytes = await encodeModelImage({ image: source });
+      if (bytes.byteLength > MODEL_LIMITS.imageBytes)
         throw new Error(
           'A decoded texture exceeds 4 MiB. Reduce its dimensions before importing.',
         );
@@ -255,7 +259,7 @@ export async function importModelFiles(
         id,
         name: `Texture ${document.images.length + 1}`,
         mime: 'image/png',
-        data: base64(new Uint8Array(await blob.arrayBuffer())),
+        data: base64(new Uint8Array(bytes)),
       });
       images.set(texture.source.uuid, id);
       return id;

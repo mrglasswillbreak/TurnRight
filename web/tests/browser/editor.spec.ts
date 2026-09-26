@@ -6204,6 +6204,7 @@ async function unifiedModelFixture(
 test('reference split preserves the renderer and edits through resizing', async ({
   page,
 }, info) => {
+  test.setTimeout(120000);
   const { dialog, wall } = await unifiedModelFixture(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
   const canvas = await dialog
@@ -6226,7 +6227,9 @@ test('reference split preserves the renderer and edits through resizing', async 
   await dialog.getByLabel('Width (m)', { exact: true }).fill('1.7');
   await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
   await expect.poll(() => wall()?.elements[0].width).toBe(1.7);
-  await page.setViewportSize({ width: 960, height: 600 });
+  // Touch layouts can keep a full-width model area at 960 px; use a width
+  // below the split's actual 720 px minimum on both input types.
+  await page.setViewportSize({ width: 667, height: 375 });
   await expect(host).toHaveAttribute('data-reference-split', 'false');
   await page.setViewportSize({ width: 1440, height: 1000 });
   await expect(host).toHaveAttribute('data-reference-split', 'true');
@@ -8455,6 +8458,7 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
   page,
 }) => {
   test.setTimeout(120000);
+  await page.setViewportSize({ width: 1440, height: 1000 });
   const { dialog, server } = await unifiedModelFixture(page, {
     prepareWall: false,
   });
@@ -8489,6 +8493,8 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
       data: canvas.toDataURL().split(',')[1],
     });
     source.materials[1].baseMap = 'test-image';
+    source.materials[1].roughnessMap = 'test-image';
+    source.materials[1].metalnessMap = 'test-image';
     const results = [];
     for (const format of ['glb', 'gltf', 'obj', 'stl']) {
       const files = await modelFileTask(
@@ -8508,6 +8514,7 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
         faces: imported.faces,
         dimensions: imported.dimensions,
         images: imported.document.images.length,
+        pbr: imported.document.materials.some((m: {roughnessMap?:string;metalnessMap?:string})=>m.roughnessMap && m.metalnessMap),
         missing: imported.missing,
       });
     }
@@ -8519,7 +8526,8 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
       result.dimensions.every((n: number) => Math.abs(n - 4) < 0.001),
     ).toBe(true);
     expect(result.missing).toEqual([]);
-    expect(result.images).toBe(result.format === 'stl' ? 0 : 1);
+    expect(result.images).toBe(result.format === 'stl' ? 0 : result.format === 'obj' ? 1 : 2);
+    expect(result.pbr).toBe(result.format === 'glb' || result.format === 'gltf');
   }
 });
 

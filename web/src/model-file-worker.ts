@@ -4,6 +4,7 @@ import { exportModel } from './model-file-export';
 import type { ModelDocument } from './model-document';
 import type { ModelExportOptions, ModelFile } from './model-file-types';
 import type { ModelMesh } from './visual-types';
+import { handleModelImageReply } from './model-image-codec';
 declare const self: DedicatedWorkerGlobalScope;
 self.onmessage = async (
   event: MessageEvent<
@@ -16,6 +17,7 @@ self.onmessage = async (
       }
   >,
 ) => {
+  if (handleModelImageReply(event.data as { imageReply?: number })) return;
   try {
     const r = event.data,
       result =
