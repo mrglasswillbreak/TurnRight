@@ -2,9 +2,9 @@
 
 ## Multi-campus addition · 26 September 2026
 
-Eight `campus-*-2026-09-26.png` captures add the directory, creation/boundary preview, source selection, field mapping, preview/review, phone landscape, public switcher and per-campus offline controls. They are unaltered Chromium captures of the current source with isolated owner/import API responses and the checked-in LASU `lasu-4e4c8008b38b` geography. Second-campus names, feature counts and source URLs are illustrative fixtures. No private account, uploaded file or production draft is exposed; no second production campus is implied.
+Nine `campus-*-2026-09-26.png` captures cover the directory, creation/boundary preview, source selection, field mapping, preview/review, phone landscape, public switcher, per-campus offline controls and the corrected dark-theme import form. They are unaltered Chromium captures with isolated owner/import API responses. The original eight use checked-in LASU `lasu-4e4c8008b38b` geography; `campus-dark` uses the small automated campus fixture. Second-campus names, counts and URLs are illustrative. No private account, uploaded file or production draft is exposed; no second production campus is implied.
 
-Regenerate from `web/` with `UPDATE_CAMPUS_SCREENSHOTS=true npx playwright test campus-imports.spec.ts` (PowerShell: set `$env:UPDATE_CAMPUS_SCREENSHOTS='true'` first). Review every image after capture. The offline capture shows the campus's download controls, not proof of a disconnected session. The existing 46-image model/navigation gallery below remains; the root README now includes these eight additional workflows.
+Regenerate from `web/` with `UPDATE_CAMPUS_SCREENSHOTS=true npx playwright test campus-imports.spec.ts` (PowerShell: set `$env:UPDATE_CAMPUS_SCREENSHOTS='true'` first). `--grep 'readable headers'` refreshes just the dark form. Review every image after capture. Offline captures show controls, not proof of a disconnected session. The root README includes **55 distinct screenshots**: the existing 46-image model/navigation gallery plus these nine campus views.
 
 
 ## Current application gallery · 26 September 2026
@@ -12,6 +12,13 @@ Regenerate from `web/` with `UPDATE_CAMPUS_SCREENSHOTS=true npx playwright test 
 The gallery shows the current reference-editing, globe and authored-model
 workspace alongside the existing public-map and owner workflows. Published model
 compatibility remains covered by the frozen legacy regression fixtures.
+
+The complete production-build gallery was rerun after runtime revision
+`e610644` on 26 September. Public views now show the globe campus chooser beside
+search, with no floating button over navigation. Owner views include the
+Campuses entry. The capture workflow passes; screenshot review includes desktop,
+portrait, landscape and both themes. These captures retain the same published
+campus and isolated owner data described below.
 
 Before the campus-import additions above, the root README contained **46 distinct,
 unaltered PNG screenshots**. This production-build gallery uses verified campus

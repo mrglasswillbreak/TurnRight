@@ -10,6 +10,16 @@ TurnRight is a campus walking and driving navigation PWA with a private owner wo
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
+The project has three connected parts: a public offline navigation app, a private campus/GIS workspace, and a building authoring editor. The same owner reviews and publishes each campus independently. LASU is currently the only published campus; other campus names in screenshots are test fixtures. Application releases and reviewed map releases have separate versions.
+
+| Project area | Current scope |
+| --- | --- |
+| Public map | Published-campus search and switching, walking/driving routes, entrances, photos, sharing, reports, voice, GPS, globe animation and per-campus offline downloads. |
+| Campus authoring | Campus creation, vector-file/OSM/public ArcGIS imports, projection and field mapping, source comparison, topology repair, surveys, private recovery and independent preview/publish/restore. |
+| Building authoring | Surface editing, individual windows, wall/roof text, reference photographs, exterior walls and curves, object/component mesh editing, GLB/glTF/OBJ/STL exchange and reviewed model publication. |
+
+[Documentation index](docs/README.md) separates current guides from dated research and verification records.
+
 ## Contents
 
 - [Screenshots](#screenshots)
@@ -60,9 +70,9 @@ Current production-build captures use the verified published campus **`lasu-7343
 
 ### Campuses and map imports
 
-The implementation below is on `codex/multi-campus-imports`. Compatible readers
-are deployed; production import controls await the database migration. See
-[the current rollout status](docs/PRODUCTION.md).
+Campuses and map imports are live. Migrations 013–015 and the owner controls
+were deployed on 26 September 2026, preserving the existing LASU map and drafts.
+See [the verified rollout](docs/PRODUCTION.md).
 
 Open **Editor → Campuses** to create a campus, draw or import its boundary, and add sources. GeoJSON, zipped Shapefiles, GeoPackage, KML/KMZ, GPX, coordinate CSV and complete OSM XML/PBF extracts become editable vector layers. Online sources include OpenStreetMap through Overpass and public ArcGIS Web Maps, embedded collections and queryable services.
 
@@ -78,7 +88,9 @@ Imports remain private review candidates. Stable source identities protect repea
 
 ![Campuses workspace with independent source and import histories](docs/assets/screenshots/campus-workspace-2026-09-26.png)
 
-Public **Campuses** search and globe markers list published campuses. `?campus=<slug>` composes with existing place/building links; old links remain LASU-only. Each campus has its own saved places, report drafts, editor recovery and offline download. A campus can publish before routing is ready, with a clear directions-unavailable state.
+![Dark theme import form with readable fields and preserved input](docs/assets/screenshots/campus-dark-2026-09-26.png)
+
+The globe button beside public search (**Choose a campus**) and globe markers list published campuses. `?campus=<slug>` composes with existing place/building links; old links remain LASU-only. Each campus has its own saved places, report drafts, editor recovery and offline download. A campus can publish before routing is ready, with a clear directions-unavailable state.
 
 | Published-campus switcher | Download one campus independently |
 | --- | --- |
@@ -90,7 +102,7 @@ Publication replaces only the reviewed campus entry while preserving the other c
 
 These new screenshots use isolated owner/API fixtures and illustrative second-campus names. They are not evidence that a second campus has been published. The remaining gallery continues to show the verified LASU package and existing model/navigation workflows.
 
-## Owner editor
+### Owner editor gallery
 
 | Workspace and feature explorer | Selected building with photographs at the top |
 | --- | --- |
@@ -157,7 +169,7 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 - **Editing directly on surfaces:** **Edit surface** aligns the existing 3D canvas to walls, roofs or footprints. Wall handles, roof points/ridges and footprint vertices reuse precision-editing commands. Orbit restores the camera. Edit surface automatically falls back to a 2D drawing when WebGL is unavailable, retaining the same tools and numeric fields.
 - **Building lettering:** add and edit text on walls and roofs, with wording, size, colour, alignment and placement controls. Roof text follows the actual roof planes. **Ungroup** and **Detach instance** are available in selected-item actions. All use existing undo and draft persistence; publication remains a separate reviewed action.
 
-- **Canvas-first mobile modelling:** all five modes share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **×** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop uses a collapsible tree, central viewport and properties panel.
+- **Canvas-first mobile modelling:** architectural and mesh tools share a full-screen preview and one focused tool sheet. Tap selects; Move and Resize explicitly edit. **×** leaves the workspace and preserves unfinished work; **Done** closes only its tools. Short landscape screens put scrollable tools beside the canvas. Pinch navigation, multi-selection, held nudges and decimal inputs support precise editing. Desktop uses a collapsible tree, central viewport and properties panel.
 - **Actions beside the selection:** the selected detail's ⋯ button, right-click and Shift+F10 open Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Touch and hold a detail in **3D** to open the same menu; moving or adding a second finger cancels a pending hold. Keyboard shortcuts and placement previews support quick editing with Ungroup and Detach instance also shown when applicable.
 - **Height that changes the model:** whole-building metres and floor count are editable inside Appearance. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Height/roof adjustments share one undo action.
 
@@ -177,7 +189,7 @@ Release review names each pending building/wall approval before a preview is que
 | --- | --- |
 | Exploration | Bottom search dock, local place search, categories, aliases, saved/recent places, provenance and recorded street names. |
 | Map controls and panels | Adjustable mobile/desktop cards and dialogs; full-height desktop opening; pinned navigation; view/compass controls on the left and zoom/location on the right. |
-| World overview | Illustrated campus palette with subtle September 2004 NASA relief, gentle atmosphere, Natural Earth coastlines/lakes/borders, offline labels and a return-to-campus action. |
+| World overview | Illustrated campus palette, dated NASA relief, Natural Earth geography, published-campus markers, idle rotation and decorative clouds with reduced-motion controls. |
 | App updates | Visible update-ready notice, explicit installation, foreground/online checks and navigation safeguards. |
 | Driving directions | Offline campus drive-and-walk journeys, vehicle permissions and one-way roads, turn restrictions, estimated ETA, parking selection, voice guidance, and a confirmed parking-to-walking handoff. Private roads and parking require separate owner driving review. |
 | Walking directions | Worker-based A* routing, the shortest permitted walk and up to two sufficiently different alternatives when available. Recorded steps are shown; missing data stays unknown. |
@@ -188,16 +200,17 @@ Release review names each pending building/wall approval before a preview is que
 | Appearance | Shared Device/Light/Dark settings in the public map and editor, a single opposite-action 2D/3D button, Enhanced by default and a remembered Simple option. |
 | Enhanced buildings | Modeled walls, windows, trim, wings and roofs; original material colours in both themes, with automatic detail levels and simple fallback. |
 | Owner editing | Autosave, grouped undo/redo, controlled automatic crossings and explicit joins, selection framing, publication-relative drafts, recoverable drawings/roof plans, guided repairs and conflicts. |
-| Building editing | Shared surface editing with automatic 2D fallback; nested structure tree; wall/roof text; inherited styles; details, grouping, patterns and presets; targeted review and recoverable autosave. |
+| Building editing | Shared surface editing, automatic 2D fallback, individual window selection, nested tree, wall/roof text, reference split, exterior curves, mesh components, model-file import/export and recoverable autosave. |
 | Offline | Verified, resumable package downloads, explicit updates, integrity repair, prepared owner workspaces and immediate local recovery exports. |
-| Data maintenance | Source comparison, reference/roof proposals, validation, release-impact and route checks, immutable preview/publish/rollback. |
+| Campus imports | Separate campus boundaries and sources; GIS files, OSM/Overpass and public ArcGIS; resumable jobs, CRS/field mapping, explicit review and manual or opted-in daily refresh. |
+| Data maintenance | Source comparison, validation, model/route review, immutable previews, independent campus publication and restore previews that preserve other campuses. |
 | Reports and surveys | Private student reports with local offline drafts; owner-only walking surveys, entrance markers, touch review and recoverable private sync. |
 
-Cycling, indoor positioning, current campus satellite imagery, background navigation, public user accounts and public user reviews are outside this release.
+Cycling, cross-campus routing, indoor layouts/positioning, sculpting, advanced mesh modifiers, live weather, current campus satellite imagery, background navigation, public user accounts and public reviews are outside this release. GIS imports exclude imagery/PDF alignment, private ArcGIS authentication and File Geodatabases. Model files preserve supported static geometry and materials, not animation or rigging.
 
 ## Quick start
 
-Use **Node.js 22.13+ within the 22.x line**, npm, Git and a WebGL-capable browser. Python 3.12+ is needed for importer scripts and their tests.
+Use **Node.js 22.13+ within the 22.x line**, npm, Git and a WebGL-capable browser. Python 3.12+ is needed for importer scripts and their tests. Full GIS conversion requires the pinned Linux Docker runtime in `scripts/map_import/Dockerfile`; GDAL/PROJ and Pyosmium stay outside the browser bundle.
 
 ```sh
 git clone https://github.com/mrglasswillbreak/TurnRight.git
@@ -364,18 +377,21 @@ At globe scale, separate controls enable gentle automatic rotation and decorativ
 
 **Saving a draft and deploying application code do not publish campus changes.**
 
-1. Import source candidates with **Check now** or the scheduled source job. Incomplete imports retain the last successful source set.
+1. Select the target campus. Use **Campuses → Import data** for new sources, or refresh an existing source. LASU also retains its original **Check now** and daily source workflow. Incomplete imports retain the last successful source set.
 2. Compare property rows and before/after geometry; raw records remain under Details. Review baseline reconciliation when approved sources differ from a published baseline.
-3. Resolve blocking validation issues and inspect release impact: added/changed/deleted features, entrance and connectivity changes, and Clinic–Senate, Clinic–Law and Clinic–Library route results.
+3. Resolve blocking validation issues and inspect release impact: added/changed/deleted features, entrance and connectivity changes, and representative routes. LASU retains Clinic–Senate, Clinic–Law and Clinic–Library comparisons; new campuses use their own reviewed network. Map-only campuses can publish with directions explicitly unavailable.
 4. Resolve any **Model release blockers** first. The panel names the building, wing and wall; **Review model** opens the affected assignment. Height or roof changes can require another placement review without changing the wall match. Then **Build review preview** flushes pending saves and creates an immutable release snapshot. The release worker independently validates it and regenerates the visual catalogue/sectors with the same building and roof rules as the editor.
-5. Review the hosted preview, then use the owner's **Publish** action. Publication is recorded only after deployment/promotion succeeds. Keep the previous release for rollback.
+5. Review the hosted preview, then use the owner's **Publish** action. Publication is recorded only after deployment/promotion succeeds. Keep previous immutable packages for restoration. **Prepare restore preview** combines that campus’s historical package with every other campus’s current package; review and publish the new preview.
 
 Job status refreshes while its review panel is open. Publication and job submissions are checked before repetition; a failed action is not treated as published. Closures remain active until explicitly reopened and republished; an expected reopening date is only a review flag.
 
 | Workflow | Purpose |
 | --- | --- |
-| `source-update.yml` | Daily/on-demand source import and comparison |
-| `release.yml` | Reviewed preview, publication and rollback |
+| `source-update.yml` | Original LASU daily/on-demand source comparison, 02:17 UTC |
+| `map-import.yml` | Inspect and preview a private campus import with a run token |
+| `map-source-check.yml` | Check opted-in sources daily at 03:47 UTC; never auto-publish |
+| `map-import-tests.yml` | Pinned Linux GIS driver and adapter regression tests |
+| `release.yml` | Serialized campus preview/publish; restores create a fresh preview |
 | `preview.yml` | Manual seed-based preview deployment |
 | `bootstrap.yml` | Initial accepted source baseline without overwriting an existing baseline |
 
@@ -391,7 +407,7 @@ Recording uses foreground GPS in north-up 2D. Pause/resume is explicit; backgrou
 
 Review supports trimming, splitting, vertex movement and explicit endpoint connections. Correcting an existing path retains geometry outside the selected section and preserves boundary junctions and metadata. Paths crossing at the same level connect automatically. Each path has **Connect crossings automatically** and **Crossing level** controls; bridges, tunnels, restrictions and missing gate spans remain separate where appropriate. See [connection controls](docs/EDITOR.md#control-automatic-connections).
 
-Local recordings are owner-scoped and recoverable. Private sync preserves conflicting versions for review; raw sample tracks and timestamps are excluded from public packages. Field verification on physical Android and iPhone remains outstanding. [Survey guide and field record](docs/SURVEY.md).
+Local recordings are owner- and campus-scoped and recoverable. Private sync preserves conflicting versions for review; raw sample tracks and timestamps are excluded from public packages. Field verification on physical Android and iPhone remains outstanding. [Survey guide and field record](docs/SURVEY.md).
 
 ## Offline operation and recovery
 
@@ -401,13 +417,16 @@ An initial online visit and a completed download are required. Installation and 
 | --- | --- |
 | App shell, UI, fonts, map/model/routing workers, world overview and natural voice | Service-worker precache; world data and natural audio are included automatically |
 | Campus geometry, routing, arrival guides, approved photographs and credits, glyphs, legacy fallback audio, visual catalogue and model sectors | Size/hash-verified CacheStorage assets with IndexedDB package records |
-| Preferences, saved places, private editor/survey recovery and report drafts | Local browser storage, scoped where appropriate |
+| Saved places, report drafts and package pointers | Device-local, isolated by campus; shared app/theme preferences stay global |
+| Private editor, survey, photo and model recovery | Device-local, scoped to owner and campus |
 
 The natural voice pack is saved automatically with the **app**, independently of the campus download, with an 8 MiB total budget. Ordinary deployments reuse its checked-in recordings; no speech model runs on a phone. Existing campus-packaged recordings remain available as a fallback. Finish saving the app **and** downloading the campus map before disconnecting.
 
 The world overview adds **about 5.30 MiB**, including 341 local 512-pixel raster tiles at zooms 0–4 and Natural Earth vectors. It uses the bundled label font. World assets are hash-verified before a new service worker activates; a failed installation keeps the working app. Wait for **Ready offline** before disconnecting; no external tiles or fonts are needed to explore the saved globe. A failed world-data load leaves the campus usable and offers **Retry world map**.
 
 Downloads are resumable and activate atomically after integrity checks. Interrupted or corrupt updates retain the working package and can reuse valid assets. **Offline** shows the actual downloaded version, coverage and model readiness. A known newer map requires an explicit download; it waits to activate during navigation. The public **App update ready** notice and **Settings → Install update** activate a waiting application update with editing/navigation safeguards. App-update checks run once a minute while visible and online, and on returning to the app or reconnecting. Installing remains an explicit action; it is disabled during an active walk.
+
+Choose the campus first, then use **Offline** to download or remove its package independently. Removing one campus does not remove another campus’s map or reset its saved places. Switching stops the current route explicitly; the app never joins networks across campuses.
 
 The campus download includes **every approved release photograph** and its required credits. Photo totals above 20 MiB produce a size warning, not silent omissions. Every required asset must verify before activation; integrity repair and immutable older assets support recovery and rollback. Older packages remain readable with absent guides and galleries omitted.
 
@@ -419,9 +438,9 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 ![Source review and baseline information in the owner editor](docs/assets/screenshots/editor-sources-current-2026-09-26.png)
 
-TurnRight combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
+The LASU map combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Other campuses retain their own boundaries, mappings, source identities, attribution and access reviews. LASU’s confirmed road/gate exceptions are never applied to other campuses. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The reviewed public release verified on **26 September 2026** is **`lasu-7343cb96c9a5`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 20,228,832 bytes**. Its release summary is “Roofing detail additions and map building clean up”. The earlier photographic assessment used `lasu-623791e1184e`. That earlier release added the 19-building photographic assessment to the previous `lasu-8577d5c85d2c` baseline; feature identities, footprints, photographs, routing graph and access permissions are unchanged. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The reviewed public release verified on **26 September 2026** is **`lasu-7343cb96c9a5`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 20,228,832 bytes**. Its release summary is “Roofing detail additions and map building clean up”. The earlier 19-building photographic assessment used `lasu-8577d5c85d2c` and was published as `lasu-313d8a168635` on 24 September. Its historical comparison preserved feature identities, footprints, photographs, routing and access permissions; later owner publications have their own release records. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -453,28 +472,32 @@ The roof assessment covered 380 footprints and proposed 46 wing roofs across 44 
 | Routing | Dedicated worker, A* and bounded alternatives |
 | Offline | Workbox, `vite-plugin-pwa`, IndexedDB and CacheStorage |
 | Audio and sensors | Packaged Web Audio clips, optional local speech, foreground GPS and optional motion/orientation |
-| Administration | Supabase Auth/PostgreSQL/PostGIS, RLS and single-owner API authorization |
+| Campus isolation | Explicit campus IDs/URL slugs, request-scoped REST/RPC operations, immutable public catalogue and independent device state |
+| GIS processing | Pinned GDAL/PROJ and Pyosmium in network-isolated Linux workers; private uploads and cancellable jobs |
+| Model documents | Versioned private immutable topology/material assets, lazy Three.js file workers and reviewed public compilation |
+| Administration | Supabase Auth/PostgreSQL/PostGIS/Storage, RLS and single-owner API authorization |
 | Hosting/jobs | Vercel application/API; GitHub Actions with Python and Node scripts |
 
 ```mermaid
 flowchart LR
-    Sources[Recorded map sources] --> Import[Import and compare]
-    Import --> Editor[Owner review and draft edits]
-    Editor --> Snapshot[Validate immutable snapshot]
-    Snapshot --> Preview[Build map and models / preview]
-    Preview --> Publish[Owner publishes release]
-    Publish --> App[Public app and verified offline package]
+    Sources[GIS files / OSM / public ArcGIS] --> Import[Private import and comparison]
+    Import --> Editor[Owner review in selected campus]
+    Models[Surfaces / curves / mesh files / photos] --> Editor
+    Editor --> Snapshot[Validate campus snapshot and authored assets]
+    Snapshot --> Preview[Build preview with current campus catalogue]
+    Preview --> Publish[Owner publishes one campus]
+    Publish --> App[Public switcher and verified campus packages]
     App --> Device[Local search / routing / GPS / audio]
     Reports[Private reports and surveys] --> Editor
 ```
 
-Published navigation does not require the admin database to be available. Model appearance and optional recovery fields use existing JSON properties; source geometry and routing remain separate from display classifications. [Architecture details](docs/ARCHITECTURE.md).
+Published navigation does not require the admin database to be available. Native appearance uses building JSON; expanded authored geometry uses versioned private documents compiled into public assets at release time. GIS source attributes and survey samples stay private. Geographic footprints and reviewed paths remain routing authority. [Architecture details](docs/ARCHITECTURE.md).
 
 ## Configuration and hosting
 
 Public seed exploration requires no credentials. Connected administration/reports need [web/.env.example](web/.env.example), Supabase GitHub OAuth, the owner allowlist, database migrations and workflow configuration.
 
-The unified model editor adds no migration or public package schema. Deploy its compatible authoring-metadata validation before dependent clients. For a new installation, apply the existing migrations in order through **[011_linear_baseline_reconciliation.sql](supabase/migrations/011_linear_baseline_reconciliation.sql)**. Migration [007](supabase/migrations/007_source_field_reviews.sql) adds field-level source reviews; [008](supabase/migrations/008_private_building_media.sql) adds private building media storage and owner-only metadata; [009](supabase/migrations/009_bounded_baseline_comparison.sql) bounds source comparisons and writes only changed baseline rows while retaining authorization, stale-review checks and rollback records. Migration [011](supabase/migrations/011_linear_baseline_reconciliation.sql) materializes parsed RPC inputs and further bounds baseline comparisons under cached plans, reuses the verified snapshot for rollback, and keeps authorization and scopes a 15-second budget to this owner-only bulk operation. Migration [010](supabase/migrations/010_private_photo_drafts.sql) adds private photo drafts, original filenames, target associations and guarded revisions while preserving immutable approvals. Author-uploaded photographs may omit a source website; releases containing them use package schema 3. Deploy compatible readers before publishing schema-3 content; schemas 1 and 2 remain readable. Follow the deployment guide's base setup and the production record.
+For a new installation, apply the migrations in order through **[015_campus_release_restores.sql](supabase/migrations/015_campus_release_restores.sql)**. Deploy compatible readers before enabling new writers. Migration [012](supabase/migrations/012_editable_model_assets.sql) adds private authored-model assets and versioned save protection; [013](supabase/migrations/013_campus_isolation.sql) scopes existing data to LASU; [014](supabase/migrations/014_map_import_jobs.sql) adds private import jobs and assets; [015](supabase/migrations/015_campus_release_restores.sql) adds per-campus release restoration. The earlier unified-editor layout redesign itself required no schema change. Migration [007](supabase/migrations/007_source_field_reviews.sql) adds field-level source reviews; [008](supabase/migrations/008_private_building_media.sql) adds private building media storage and owner-only metadata; [009](supabase/migrations/009_bounded_baseline_comparison.sql) bounds source comparisons and writes only changed baseline rows while retaining authorization, stale-review checks and rollback records. Migration [011](supabase/migrations/011_linear_baseline_reconciliation.sql) materializes parsed RPC inputs and further bounds baseline comparisons under cached plans, reuses the verified snapshot for rollback, and keeps authorization and scopes a 15-second budget to this owner-only bulk operation. Migration [010](supabase/migrations/010_private_photo_drafts.sql) adds private photo drafts, original filenames, target associations and guarded revisions while preserving immutable approvals. Author-uploaded photographs may omit a source website; releases containing them use package schema 3. Deploy compatible readers before publishing schema-3 content; schemas 1 and 2 remain readable. Follow the deployment guide's base setup and the production record.
 
 | Variables | Scope |
 | --- | --- |
@@ -487,7 +510,7 @@ The unified model editor adds no migration or public package schema. Deploy its 
 
 Do not put privileged keys in `VITE_` variables or commit real environment files. Additional GitHub Actions deployment secrets are listed in [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-Vercel uses **`web` as the project root**, **Node 22**, **`npm run build`** and **`dist`** output, with repository files outside the root available. Main-branch code changes deploy the application. `PUBLISHED_MAP_URL` fetches and verifies the currently published package so a UI deployment cannot silently revert it to the seed; failure stops the build. Owner-reviewed releases use their immutable snapshot instead.
+Vercel uses **`web` as the project root**, **Node 22**, **`npm run build`** and **`dist`** output, with repository files outside the root available. Main-branch code changes deploy the application. `PUBLISHED_MAP_URL` fetches and verifies the full published-campus catalogue and its packages so a UI deployment cannot silently revert it to the seed; failure stops the build. Owner-reviewed releases use their immutable snapshot instead.
 
 The project is configured on Vercel Hobby and Supabase Free. Hosting quotas or paused backend services can interrupt connected operations; already downloaded navigation remains local. See [configuration](docs/CONFIGURATION.md) and [production history](docs/PRODUCTION.md).
 
@@ -531,32 +554,79 @@ Acceptance records separate automated/browser checks from unfinished physical wo
 
 ## Repository structure
 
+This is a guide to the active modules, not an exhaustive file listing. Filenames are repository paths; grouped families such as `model-*` are files, not additional directories.
+
 ```text
 TurnRight/
-├── web/
-│   ├── src/                 # Public UI, editor, map, buildings, routing and storage
-│   │   ├── AppearanceSettings.tsx # Shared public/editor theme control
-│   │   ├── PhotoModelWorkspace.tsx # Shared model editor and responsive panels
-│   │   ├── ModelStructureTree.tsx # Accessible model hierarchy
-│   │   ├── model-surface.tsx # Shared surface gesture/projection bridge
-│   │   ├── campus-model-layer.ts # Enhanced rendering and model lifecycle
-│   │   └── sw.ts            # Application service worker
-│   ├── api/                 # Vercel admin and report endpoints
-│   ├── server/              # Server-only validation and authorization
-│   ├── tests/               # Unit, browser and offline regression coverage
-│   ├── public/              # Development seed and packaged static assets
-│   └── .env.example         # Configuration names without credentials
-├── data/                    # Sources, visuals, reference/roof assessments and attribution
-├── scripts/                 # Import, compare, validate, package and release jobs
-├── supabase/migrations/     # Database schema, policies and reconciliation
-├── .github/workflows/       # Source and release automation
-└── docs/                    # Workflow guides, acceptance records and screenshots
+├── web/                              # React/Vite PWA and Vercel application
+│   ├── src/
+│   │   ├── App.tsx, MapView.tsx       # Public campus map and navigation shell
+│   │   ├── CampusSwitcher.tsx        # Published campus search and globe markers
+│   │   ├── campus-context.ts         # Campus identity, URLs and LASU compatibility
+│   │   ├── campus-catalogue.ts       # Public catalogue loading/offline fallback
+│   │   ├── Admin.tsx                 # Authenticated owner workspace
+│   │   ├── CampusWorkspace.tsx       # Campus creation, imports, mapping and jobs
+│   │   ├── ImportMapPreview.tsx      # Boundary and candidate map preview
+│   │   ├── editor-*.ts               # Commands, topology, recovery and persistence
+│   │   ├── PhotoModelWorkspace.tsx   # Shared model workspace and responsive panels
+│   │   ├── ModelStructureTree.tsx    # Nested tree and accessible selection
+│   │   ├── ModelMeshPanel.tsx        # Object/vertex/edge/face tools
+│   │   ├── ModelFilePanel.tsx        # Model import preview and export controls
+│   │   ├── model-*.ts / model-*.tsx   # Documents, mesh commands, curves and gestures
+│   │   ├── building-*.ts             # Architectural generation and surface identity
+│   │   ├── surface-text.ts           # Wall/roof lettering and validation
+│   │   ├── campus-model-layer.ts     # Published/draft Three.js model rendering
+│   │   ├── PhotoManager.tsx          # Private photo uploads, recovery and approvals
+│   │   ├── SurveyPanel.tsx           # GPS recording and reviewed path application
+│   │   ├── routing.worker.ts         # Device-local routing
+│   │   ├── WorldAnimation.tsx        # Globe rotation/cloud controls
+│   │   ├── world-clouds.ts           # Globe-aware decorative cloud layer
+│   │   ├── offline.ts, sw.ts         # Campus caches, recovery and app updates
+│   │   └── components/ui/            # Shared accessible UI controls
+│   ├── api/                         # Authenticated admin and public report endpoints
+│   ├── server/
+│   │   ├── campus-scope.ts           # Request-local database/RPC campus context
+│   │   ├── campuses.ts               # Campus resolution and creation
+│   │   ├── map-imports.ts            # Signed uploads and import job lifecycle
+│   │   ├── model-assets.ts           # Private immutable model documents
+│   │   └── release-validation.ts     # Server-side publication validation
+│   ├── scripts/                     # Build preservation, budgets and benchmarks
+│   │   └── published-campus-catalogue.mjs # Preserve/replace one campus atomically
+│   ├── tests/                       # Unit/database tests, fixtures, browser workflows
+│   ├── public/                      # Seed packages, world/voice/glyph/static assets
+│   ├── playwright*.config.ts         # Chromium, WebKit, PWA, docs and performance runs
+│   ├── package.json                 # Node 22 scripts and pinned dependencies
+│   └── .env.example                 # Configuration names without credentials
+├── scripts/
+│   ├── import_map.py                # Private GIS job and isolated parser entry point
+│   ├── map_import/                  # GDAL formats, OSM, ArcGIS, network and normalization
+│   │   └── Dockerfile               # Pinned Linux GDAL/PROJ/Pyosmium runtime
+│   ├── check_map_sources.py         # Opted-in source refresh scheduler
+│   ├── import_campus.py             # Original LASU source importer
+│   ├── enrich_campus.py             # LASU enrichment/research candidate generation
+│   ├── release.mts                  # Reviewed campus preview, publication and restore
+│   ├── package.mjs                  # Immutable map package generation
+│   ├── visual-package.mjs           # Native/authored model compilation and textures
+│   ├── cloud.mjs                    # Scoped database and release helpers
+│   └── tests/                       # GIS, access, routing and enrichment regressions
+├── data/                            # Attribution, source policy and evidence inventories
+├── supabase/migrations/             # Ordered migrations 001–015, including campus isolation
+├── .github/workflows/               # LASU refresh, GIS jobs/tests, preview and release jobs
+├── docs/                            # Current guides, dated evidence and screenshot inventory
+│   ├── README.md                    # Documentation index by workflow
+│   └── assets/screenshots/           # Unaltered application captures with provenance
+└── README.md                        # Project scope, workflows and visual overview
 ```
 
 ## Troubleshooting
 
 | Symptom | What to do |
 | --- | --- |
+| Campuses is missing after deployment | Use the app’s **Install update** prompt; it preserves recovery and installs the new shell. Reopening alone can still use a waiting older service worker. |
+| Import header or fields are unreadable in Dark mode | Install the current app update; campus surfaces and validation text use the shared theme tokens. |
+| A map import cannot finish | Open its job details; check missing projections/files, feature or expanded-size limits, attribution and source completeness. Correct the source/mapping and retry; failed jobs do not replace accepted data. |
+| A campus is missing from public search | Private campus creation/import does not publish it. Review the candidate, then build and publish that campus’s release. |
+| A second-campus preview is stale | Another publication changed the catalogue. Build a fresh preview so every other campus’s current assets are preserved. |
 | Models look like basic blocks | Check **Settings → 3D rendering → Enhanced**, then zoom closer. Inspect the model status or retry failed assets. Some footprints have no enhanced model. |
 | Building colours look different in dark mode | Enhanced models retain saved colours with lighting/shadows; Simple blocks and 2D footprints use slate styling. Install a waiting app update if enhanced materials still appear slate. |
 | Mapped-approach text is pale on a white popup in Dark mode | Install the available **app update** from the notice or Settings. Popup text and surfaces now follow the active theme; no campus-data update is required for this display fix. |
@@ -576,6 +646,8 @@ TurnRight/
 | Local admin/report API fails | Vite does not host Vercel functions. Use a configured hosted environment and verify OAuth, variables and owner authorization. |
 
 ## Documentation
+
+Start with the [documentation index](docs/README.md), which groups guides by task and identifies historical evidence.
 
 - [Campuses and map imports](docs/CAMPUS-IMPORTS.md): creation, supported sources, mapping, review, refresh, public switching and offline downloads.
 
