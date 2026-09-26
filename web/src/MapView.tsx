@@ -1,6 +1,6 @@
 import { useBuildingPreview } from './useBuildingPreview';
 import type { BuildingSelection } from './visual-types';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { MotionMap } from './MotionAssistance';
 import { publicMapPadding } from './public-map-layout';
 import {
@@ -33,7 +33,9 @@ import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
 const noRoutes: Route[] = [];
+const WorldAnimation = lazy(() => import('./WorldAnimation'));
 export interface MapViewProps {
+  animationPaused?: boolean;
   selectedStreet?: string | null;
   data: CampusData;
   selected?: Place | null;
@@ -57,6 +59,7 @@ export interface MapViewProps {
   onReady?: (map: MapInstance) => void | (() => void);
 }
 export function MapView({
+  animationPaused = false,
   data,
   selectedStreet,
   selected,
@@ -1262,6 +1265,21 @@ export function MapView({
             Retry world map
           </button>
         </output>
+      )}
+      {!editor && worldView && motionMap && (
+        <Suspense fallback={null}>
+          <WorldAnimation
+            map={motionMap}
+            blocked={
+              animationPaused ||
+              !!selectedBuildingId ||
+              !!selected ||
+              routes.length > 0 ||
+              follow ||
+              motionActive
+            }
+          />
+        </Suspense>
       )}
       {threeD &&
         !simple &&

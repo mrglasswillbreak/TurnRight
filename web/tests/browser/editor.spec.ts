@@ -258,6 +258,70 @@ test('motion assistance public permission timing, orientation modes, fallback an
   expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
 });
 
+test('decorative globe clouds render and rotation yields to controls and reduced motion', async ({
+  page,
+}, info) => {
+  test.setTimeout(120000);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  await page.waitForFunction(() => !!window.editorTestMap.getSource('world'));
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({
+      center: [0, 20],
+      zoom: 1,
+      pitch: 0,
+      bearing: 0,
+    }),
+  );
+  await expect(
+    page.getByRole('button', { name: 'Hide clouds', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => !!window.editorTestMap.getLayer('world-clouds')),
+    )
+    .toBe(true);
+  await expect(
+    page.getByText('Clouds unavailable', { exact: true }),
+  ).toHaveCount(0);
+  const longitude = await page.evaluate(
+    () => window.editorTestMap.getCenter().lng,
+  );
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getCenter().lng), {
+      timeout: 15000,
+    })
+    .toBeLessThan(longitude - 0.3);
+  await page
+    .getByRole('button', { name: 'Pause rotation', exact: true })
+    .click();
+  const stopped = await page.evaluate(
+    () => window.editorTestMap.getCenter().lng,
+  );
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.editorTestMap.getCenter().lng)).toBe(
+    stopped,
+  );
+  await page.screenshot({ path: info.outputPath('animated-globe.png') });
+  await page.getByRole('button', { name: 'Hide clouds', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Show clouds', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'false');
+  await page.getByRole('button', { name: 'Rotate globe', exact: true }).click();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(
+    page.getByRole('button', { name: 'Rotate globe', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'false');
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({ center: [3.2, 6.46], zoom: 17 }),
+  );
+  await expect(
+    page.getByRole('button', { name: 'Rotate globe', exact: true }),
+  ).toHaveCount(0);
+});
+
 test('globe retains live location and facing direction while exploring without navigation', async ({
   page,
 }, info) => {

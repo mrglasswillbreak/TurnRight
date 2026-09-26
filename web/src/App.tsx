@@ -954,6 +954,7 @@ export default function App() {
       }
     >
       <MapView
+        animationPaused={!!dialog || !!selectedStreet}
         selectedStreet={selectedStreet}
         data={data}
         selected={selected}

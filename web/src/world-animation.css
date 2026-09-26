@@ -1,0 +1,29 @@
+.world-animation-controls {
+  position: absolute;
+  z-index: 3;
+  bottom: max(42px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: 0 3px 14px #0002;
+  max-width: calc(100% - 100px);
+}
+.world-animation-controls button {
+  min-height: 44px;
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 8px;
+}
+.world-animation-controls button[aria-pressed='true'] {
+  color: var(--link);
+  background: var(--info-background);
+}
+.world-animation-controls span {
+  font-size: 12px;
+}
