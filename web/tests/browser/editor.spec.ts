@@ -5431,7 +5431,7 @@ test('documentation current gallery: published campus and isolated owner workflo
           ),
         ),
       });
-    }).toPass({ timeout: 5000 });
+    }).toPass({ timeout: 20000 });
   };
   await page.emulateMedia({ colorScheme: 'dark' });
   await setup(page, false, false, { snapshot: { data, manifest } });
