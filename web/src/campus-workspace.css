@@ -1,5 +1,6 @@
 .campus-workspace {
   --primary: #176e5c;
+  --card: var(--background, #fff);
   position: absolute;
   inset: 0;
   z-index: 35;
@@ -318,7 +319,7 @@
   margin-top: 3px;
 }
 .campus-error {
-  color: #b42318;
+  color: var(--error-text, #b42318);
   background: color-mix(in srgb, #ef4444 10%, transparent);
   border-radius: 8px;
   padding: 12px 16px;
