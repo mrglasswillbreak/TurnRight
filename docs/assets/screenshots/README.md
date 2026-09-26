@@ -1,10 +1,10 @@
 # Application screenshots
 
-## Current surface-editing gallery · 25 September 2026
+## Current application gallery · 26 September 2026
 
-The root README contains **34 distinct, unaltered PNG screenshots** from the current production build. The verified campus is **`lasu-623791e1184e`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,098,125 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows and wall/roof lettering added in the editor are illustrative local examples, not published architectural evidence.
+The root README contains **38 distinct, unaltered PNG screenshots** from the current production build. The verified campus is **`lasu-623791e1184e`**: 395 buildings, 220 places, 39 photographs covering 19 buildings, and 84 package assets totaling 20,098,125 bytes. Owner/API responses are isolated. No production account, private upload, survey or draft is captured or modified. Windows and wall/roof lettering added in the editor are illustrative local examples, not published architectural evidence.
 
-The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Eight additional captures, also ending in `-2026-09-25.png`, cover:
+The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Twelve additional captures, all ending in `-2026-09-26.png`, cover:
 
 | Filename prefix | Current view |
 | --- | --- |
@@ -16,8 +16,12 @@ The 26 filename prefixes listed in the earlier inventory below have all been ref
 | `editor-sources-current` | Source review and baseline status |
 | `editor-releases-current` | Model review blockers before publication |
 | `editor-survey-current` | Survey workspace before recording |
+| `editor-model-window-instance` | One window edited independently, with unchanged neighbours |
+| `editor-model-bulk-review` | Building Review and Mark all as reviewed |
+| `public-building-actions` | Directions and place actions before credits and arrival options |
+| `editor-public-building-handoff` | Selected public building opened in its general editing card |
 
-The building card now shows one Edit model button and a read-only summary. The desktop workspace opens in Orbit. Roof and footprint captures use surface-aligned editing; mobile retains a separate 2D precision example. Desktop images are 1440 × 1000, desktop globe 1440 × 900, portrait 390 × 844, and landscape 844 × 390. Public screens block service workers to avoid an older installed UI. The offline screenshot shows download controls, not proof of a disconnected session. Walking previews use a manual Clinic origin without GPS; the survey screenshot does not start recording.
+The building card now shows one Edit model button and a read-only summary. The desktop workspace opens in Orbit. Roof and footprint captures use surface-aligned editing; mobile uses the same Edit surface control, with an automatic 2D renderer fallback when needed. Normal editor opacity is 100%; property headers remain outside the scrolling desktop form. Desktop images are 1440 × 1000, desktop globe 1440 × 900, portrait 390 × 844, and landscape 844 × 390. Public screens block service workers to avoid an older installed UI. The offline screenshot shows download controls, not proof of a disconnected session. Walking previews use a manual Clinic origin without GPS; the survey screenshot does not start recording.
 
 ### Capture the current gallery
 
@@ -31,7 +35,7 @@ The project builds a local production app, supplies isolated owner responses and
 
 ## Earlier capture records
 
-The records below describe earlier capture runs. Their counts, package versions and workflow labels are historical. The current gallery above supersedes the earlier 26-image run and landscape capture. Earlier `editor-model-3d-hold`, `editor-release-review-*` and `public-globe-location` files remain regression archives and are excluded from the current README gallery.
+The records below describe earlier capture runs. Their counts, package versions and workflow labels are historical. The current gallery above supersedes the 25 September 34-image gallery and earlier runs. Their dated files remain as archives. Earlier `editor-model-3d-hold`, `editor-release-review-*` and `public-globe-location` files remain regression archives and are excluded from the current README gallery.
 
 The additional `editor-model-landscape-2026-09-25.png` (844 × 320) and `editor-model-3d-hold-2026-09-25.png` (740 × 390) captures show the current Close button, landscape side tools and touch-held 3D actions. They are unaltered Chromium development-server regression captures of an isolated Library fixture, with no private owner content. Run the `landscape model has` and `3D touch hold` browser journeys, then copy their `landscape-reviewed.png` and `3d-long-press-actions.png` test outputs after inspection. The earlier 26-image production-build gallery is retained.
 

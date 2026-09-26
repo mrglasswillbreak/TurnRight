@@ -1,9 +1,68 @@
-# Unified model editor verification · updated 25 September 2026
+# Unified model editor verification · updated 26 September 2026
 
 The unified workspace retains the owner draft and publication pipeline. This rollout
 changes the application/editor, not published architectural content. The current
 verified reference is **`lasu-623791e1184e`**, schema 2: **395 buildings, 220 places,
 39 photographs covering 19 buildings**, and **84 assets / 20,098,125 bytes**.
+
+## Individual windows, public handoff and bulk review · 26 September 2026
+
+Compact window rows now expose individual instances in 3D, surface handles,
+properties and the tree. Selection does not change stored geometry. The first
+individual command splits only the affected instance; stable identities preserve
+neighbours, group references and selection through undo and reopening. Locks and
+visibility can target one instance. Explicit row/group/pattern operations and
+Ungroup remain available. Generated windows use the same editing path.
+
+Orbit, Edit surface and Photo are the visible viewport choices. Edit surface also
+provides the existing 2D fallback when WebGL cannot start. The structure toggle is
+icon-only with an accessible name. Desktop properties have a separate header and
+scrolling body, 360 px wide or 320 px below 1200 px; mobile arrangements retain
+their width cap. Normal owner opacity starts at 100%.
+
+The public Editor link carries the canonical building into its general editing
+card, including sign-in return and unlinked footprints. Recovery continues to
+protect pending drawing work; unavailable targets produce a notice. Public
+actions follow the photograph and gallery navigation, before credits and arrival
+options. Model Review offers Mark all as reviewed for valid, recorded walls in
+the current building, with one undo command and explicit reasons for skipped walls.
+
+The unit suite passes **547 tests in 70 files**. Focused Chromium workflows cover
+instance edits, locks/visibility, deletion/undo, saving/reopening, surface tools,
+bulk review, property scrolling, public action order, linked/unlinked building
+handoff, sign-in return and recovery. **Three WebKit rotation/landscape workflows
+pass**. Client/server TypeScript and lint pass with seven pre-existing warnings.
+
+Responsive checks use 1280×720, 1440×900, 1920×1080 and effective CSS viewport sizes
+for 125%/150% zoom, phone portrait and landscape, and tablet landscape. Rotation
+and keyboard checks simulate viewport events; they do not operate physical
+devices, native keyboards or browser zoom chrome. Earlier importer, PWA and
+performance runs below retain their original dates.
+
+Production and authentication-configured builds pass all existing budgets. The
+configured build measures public startup at **426,237 / 435,200 gzip bytes**,
+additional owner code at **183,754 / 189,440 bytes**, the lazy photo workspace at
+**7,635 / 12,288 bytes**, and lazy 3D/editor code at **219.5 / 300 KiB**. Offline
+world assets remain 5.30 MiB and voice 5.91 MiB with 362 clips (8 MiB limits).
+The production-build gallery contains **38 current screenshots**, all embedded
+in the root README, with dedicated individual-window, bulk-review and public
+handoff examples. Owner edits in those captures are isolated illustrative drafts.
+
+Reproduce the focused additions from `web/` with Node 22:
+
+```sh
+npm test
+npm run lint
+npm run build
+npm run check:configured-build
+npx playwright test --grep "individual generated windows|mark all as reviewed|properties header|public Editor|public editor|surface workspace|model workspace touch layouts"
+npx playwright test --config playwright.webkit.config.ts --grep "model workspace touch layouts|landscape model has reachable"
+npx playwright test --config playwright.docs.config.ts
+```
+
+Run GPU browser projects sequentially. Screenshot provenance is in the
+[capture inventory](assets/screenshots/README.md); deployment verification is in
+[Production](PRODUCTION.md).
 
 ## Surface editing, nested structure and lettering · 25 September 2026
 

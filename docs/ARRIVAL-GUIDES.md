@@ -1,5 +1,9 @@
 # Entrance guides and building photographs
 
+Public building cards show the photograph and gallery navigation first, then **Directions**, **Share**, **Copy link**, **Save** and **Report**, followed by **Photo credits & license** and **Entrances & arrival**. Actions remain available when no photograph is recorded or an image cannot load. Credits follow the selected photograph.
+
+![Public actions above credits and arrival options](assets/screenshots/public-building-actions-2026-09-26.png)
+
 The public map shares general building photographs across its linked occupants.
 Doorway photographs belong to a specific entrance. A photograph never establishes
 an entrance connection, access approval, step-free route or permission to drive.

@@ -1,5 +1,9 @@
 # Editing the campus map
 
+On the public map, **Editor** opens and centres the selected building’s general card. The `/admin?building=<id>` handoff survives sign-in, resolves building aliases, and waits for recovered drawings or roof drafts to be resolved. Missing buildings show a notice; an ordinary `/admin` visit has no forced selection.
+
+![Selected public building opened in the editor](assets/screenshots/editor-public-building-handoff-2026-09-26.png)
+
 The private `/admin` workspace edits the existing campus map in 2D or a tilted 3D view. Drafts stay visible while you work. Campus navigation changes only after a release is reviewed and published.
 
 **Drafts** and the colored map highlights show corrections made since the latest publication. Published corrections stay saved to protect your work during source updates, but stop appearing as pending drafts. Editing a published feature makes it a draft again; restoring an older release compares your current corrections with that restored version.
@@ -36,7 +40,7 @@ Automatic connections cover actual intersections, touching endpoints and overlap
 | Settings → 3D rendering | Choose Enhanced (the default) or Simple. The choice is shared with the public map's Settings. |
 | Settings → Tilt | Adjust the 3D camera angle; the slider follows the current tilt. |
 | Rotation / north arrow | Orient the map. Mouse rotation also works. |
-| Settings → Building opacity | Adjust building transparency; entrance and outline tools automatically expose ground footprints. |
+| Settings → Building opacity | Starts at 100%; adjust building transparency. Entrance and outline tools temporarily expose ground footprints. |
 | Compare base | Temporarily show approved source geometry without draft corrections. Finish an active drawing first. |
 | E / P / B / M | Add entrance / draw path / draw building / add place. |
 | Enter / Escape | Finish / cancel a drawing. |
@@ -52,17 +56,17 @@ Settings remains available during unfinished drawings and roof work. Opening and
 
 The photo strip and **Manage photos** controls appear directly below the building title. Photo management covers uploads, captions, rights, cover ordering and private recovery; it remains separate from architectural modelling.
 
-**Edit model** opens the dedicated building workspace. Appearance, Roof and Outline are workspace modes; duplicate model forms have been removed from the general building card. **Details** uses a measured wall canvas linked to selectable 3D and a collapsible photograph reference. It supports precise placement, duplicate/copy previews, groups, row/column patterns and independent presets. Mobile uses a full-screen canvas, a labelled mode selector and one focused tool sheet. Orbit, Edit surface, 2D precision and Photo share the selected target. Tap selects; Move and Resize explicitly edit. Pinching cancels an unfinished edit before navigation. Expand/Collapse/Done keep the sheet manageable, and focused inputs scroll into view.
+**Edit model** opens the dedicated building workspace. Appearance, Roof and Outline are workspace modes; duplicate model forms have been removed from the general building card. **Details** uses a measured wall canvas linked to selectable 3D and a collapsible photograph reference. It supports precise placement, duplicate/copy previews, groups, row/column patterns and independent presets. Mobile uses a full-screen canvas, a labelled mode selector and one focused tool sheet. Orbit, Edit surface and Photo share the selected target. Tap selects; Move and Resize explicitly edit. Pinching cancels an unfinished edit before navigation. Expand/Collapse/Done keep the sheet manageable, and focused inputs scroll into view.
 
 The selected detail's **⋯** button, right-click menu or Shift+F10 opens Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Mobile **More → Selection actions** retains access from a sheet. The keyboard shortcuts also work outside text inputs. **Appearance → Building height** edits building metres or recorded floor count inside Appearance; custom roof elevations follow proportionally by default, with explicit options to retain them or use building height for an overridden wing. **Review** identifies changed details, evidence gaps and wall assignments that need attention and opens the affected controls.
 
 Completed actions autosave as individual commands in the shared 100-action history. Numeric input commits on Enter or blur; unfinished input remains private and recoverable. A drag commits on release. Closing the workspace retains unfinished work; explicit discard removes it. Saving does not approve all walls or publish the map. [Full controls and recovery guide](UNIFIED-MODEL-EDITOR.md) · [Appearance, roofs and rendering](BUILDING-EDITOR.md).
 
-![Nested tree and shared 3D model viewport](assets/screenshots/editor-model-orbit-current-2026-09-25.png)
+![Nested tree and shared 3D model viewport](assets/screenshots/editor-model-orbit-current-2026-09-26.png)
 
-The structure tree has building/wing defaults, footprints, roofs, exterior and courtyard walls, details, groups and patterns. **Edit surface** aligns the same renderer to a selected wall/roof/footprint; **Orbit** restores its camera. Text can be added to walls and roofs. Selected-item actions include **Ungroup** and **Detach instance** where applicable.
+The structure tree has building/wing defaults, footprints, roofs, exterior and courtyard walls, details, groups and patterns. **Edit surface** aligns the same renderer to a selected wall/roof/footprint; **Orbit** restores its camera. Text can be added to walls and roofs. Individual windows are selected and edited without ungrouping; whole rows and collections remain explicit tree targets. Selected-item actions retain **Ungroup** and **Detach instance** for explicit groups/rows. **Mark all as reviewed** in Review approves eligible recorded walls in the current building with one undo.
 
-![Landscape model editor with tools beside the viewport](assets/screenshots/editor-model-landscape-2026-09-25.png)
+![Landscape model editor with tools beside the viewport](assets/screenshots/editor-model-landscape-2026-09-26.png)
 
 ## Duplicate review
 

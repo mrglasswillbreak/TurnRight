@@ -2,6 +2,12 @@
 
 ## Unified model authoring
 
+The editor projects compact repeated facade records into stable per-window editing identities. Selection, visibility and locks remain editor-local; a completed command compacts unchanged runs and separates changed instances once. Explicit collection selection keeps batch commands available, while individual changes exclude affected linked-pattern slots. No saved-model schema change is needed. The tree, projected surface controls and property fields share this adapter.
+
+Orbit, Edit surface and Photo are the visible viewport modes. Edit surface reuses its controller with an automatic 2D rendering fallback when WebGL is unavailable. Model Review validates recorded walls before one building-scoped review command; pending inputs and invalid assignments retain their recovery and repair paths.
+
+Public Editor links carry a canonical building ID into the general building card. Same-tab session storage retains it through the configured OAuth callback; the editor consumes it after loading and recovery guards. Photo galleries expose an action slot between navigation and credits, keeping DOM and keyboard order aligned.
+
 The lazy building workspace routes completed commands through `EditorWorkspace`; its existing 100-action history, operation IDs and optimistic saves remain authoritative. Metre controls convert at the boundary to compatible façade fractions/repetitions. Private `modelAuthoring.version = 1` stores names, groups, patterns, detached slots and independent presets in draft JSON; `applyEdits` excludes it from public map features. Unfinished strings and pending roof/detail work use owner-scoped IndexedDB recovery.
 
 Building inspector tools load when a building is selected. Shared controls and validation use entry-aware chunks so the model workspace does not import the owner authentication entry, and public startup does not pull in building controls. All lazy dependencies are precached for prepared offline use. Configured-build checks retain authentication dependencies, enforce the existing budgets and verify these boundaries.

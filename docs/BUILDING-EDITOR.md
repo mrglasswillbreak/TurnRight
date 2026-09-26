@@ -2,13 +2,13 @@
 
 The current owner workflow is the [unified Edit model workspace](UNIFIED-MODEL-EDITOR.md). Open **Edit model** from a selected building; choose Appearance, Roof or Outline inside the dedicated workspace. **Details** and **Review** share the same building draft and history. The former long façade form and its one-shot Apply action are superseded.
 
-On mobile, the canvas fills the workspace and controls open in one focused sheet. Use the labelled mode selector, **Choose wall**, and **Orbit / Edit surface / 2D precision / Photo** views. Tap selects; Move or Resize explicitly enables geometry editing. Pinch navigation cancels an unfinished edit. The sheet has Expand/Collapse/Done controls, safe-area spacing and focused-input scrolling. Desktop has a collapsible tree, a central viewport and a properties panel.
+On mobile, the canvas fills the workspace and controls open in one focused sheet. Use the labelled mode selector, **Choose wall**, and **Orbit / Edit surface / Photo** views. Tap selects; Move or Resize explicitly enables geometry editing. Pinch navigation cancels an unfinished edit. The sheet has Expand/Collapse/Done controls, safe-area spacing and focused-input scrolling. Desktop has a collapsible tree, a central viewport and a properties panel.
 
 The selected detail's **⋯** button and right-click menu hold Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. **More → Selection actions** provides access from mobile sheets. Ctrl/Cmd+D duplicates; Ctrl/Cmd+C/V copies and opens a placement preview; Ctrl/Cmd+A selects the wall's details. Shift+F10 opens the menu. These shortcuts do not replace normal editing inside text inputs.
 
 Touch and hold a visible detail in **3D** to open the same actions. Moving your finger or touching with a second finger cancels the hold. **×** beside Undo/Redo exits the workspace; **Done** only closes its current tool panel. Short landscape screens place tools beside the canvas, with independent scrolling.
 
-![Dedicated model workspace with a nested structure tree](assets/screenshots/editor-model-orbit-current-2026-09-25.png)
+![Dedicated model workspace with a nested structure tree](assets/screenshots/editor-model-orbit-current-2026-09-26.png)
 
 The workspace opens in Orbit. Selecting a tree row or mesh shares selection with properties without moving the camera. **Edit surface** uses an orthographic view of the actual wall, roof or footprint; returning to Orbit restores the previous position. Precision views reuse the same commands and provide a WebGL fallback. The nested tree supports disclosure, search, keyboard navigation and same-wall detail multiselection. Group/pattern children reference existing records; floor counts remain properties.
 
@@ -22,7 +22,7 @@ Generated windows and trim can be previewed and converted into editable details.
 
 **Ungroup** appears in selected-item actions when any selected detail belongs to a group. **Detach instance** makes one repeated occurrence independent. Both actions preserve the remaining details and support undo.
 
-![Wall lettering and selected detail controls](assets/screenshots/editor-model-wall-text-2026-09-25.png)
+![Wall lettering and selected detail controls](assets/screenshots/editor-model-wall-text-2026-09-26.png)
 
 **Add text** creates wall lettering; **Add roof text** creates wing lettering. Edit wording, size, colour, weight, alignment and placement. Roof labels follow the actual roof planes and must remain outside courtyard openings. Text uses the existing draft/release flow.
 

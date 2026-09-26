@@ -6,7 +6,7 @@ Law Clinic's geometry prerequisite regroups the existing coordinates into two ex
 
 ## Editing
 
-The mobile workspace supports surface-aligned roof editing and a secondary geographic 2D precision view in the main viewport. Use **Edit roof** for controls, **Done** to close the sheet, and **Move point** after selecting a point. Panning or a second touch does not commit roof geometry. Desktop retains the integrated plan and properties panels.
+The mobile workspace supports surface-aligned roof editing in the main viewport, with automatic 2D fallback when WebGL is unavailable. Use **Edit roof** for controls, **Done** to close the sheet, and **Move point** after selecting a point. Panning or a second touch does not commit roof geometry. Desktop retains the integrated plan and properties panels.
 
 Whole-building **Appearance → Building height** now offers proportional adjustment of inherited custom roofs. It scales eaves and all roof-point elevations together while retaining plan coordinates, constraints and detail dimensions. The option is on by default; turn it off to preserve recorded roof elevations. Wing height overrides remain explicit. Existing height/roof mismatches can be fitted by an owner action. This is an estimated transformation requiring review, not new measured evidence, and the complete change is one undoable command.
 
@@ -15,13 +15,13 @@ Whole-building **Appearance → Building height** now offers proportional adjust
 - The generator stores ordinary editable roof points, elevations and ridge constraints. It uses the existing constrained triangulation to keep concave footprints and courtyards intact. Four-sided wings receive a simple hip ridge; complex wings use interior triangle connections. These are illustrative ridge networks, not a surveyed roof plan or an exact straight skeleton.
 - Eaves and peaks remain inside the existing total height. Invalid outlines, incompatible constraints, zero-area geometry and model/control-point budget failures block the proposal. Source geometry and routing are unchanged by the roof batch.
 
-![Roof controls over the rendered roof](assets/screenshots/editor-roof-current-2026-09-25.png)
+![Roof controls over the rendered roof](assets/screenshots/editor-roof-current-2026-09-26.png)
 
-**Edit surface** aligns above the selected wing. The same renderer stays mounted while the existing roof controller supplies points, ridges and valleys. Plan dragging changes horizontal position; metre fields edit elevation. **2D precision** is a secondary view sharing the same draft. Orbit restores the prior camera.
+**Edit surface** aligns above the selected wing. The same renderer stays mounted while the existing roof controller supplies points, ridges and valleys. Plan dragging changes horizontal position; metre fields edit elevation. **Edit surface** automatically uses a 2D drawing if WebGL is unavailable, retaining the same draft and precision controls. Orbit restores the prior camera.
 
 **Add roof text** places editable plain text on that wing. Wording, dimensions, colour, alignment and rotation are properties; drag its outline or enter coordinates to move it. Labels are clipped to the actual roof triangles, following ridges and valleys. Labels must fit within the footprint and avoid courtyards; invalid edits retain valid saved geometry. No new roof/storey/room objects are introduced.
 
-![Roof lettering properties and placement](assets/screenshots/editor-model-roof-text-2026-09-25.png)
+![Roof lettering properties and placement](assets/screenshots/editor-model-roof-text-2026-09-26.png)
 
 ## Generation and validation
 

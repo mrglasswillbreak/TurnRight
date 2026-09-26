@@ -2,7 +2,7 @@
 
 This is the historical **23 September collection audit**, against published map
 **lasu-a81135d18314**. Its counts describe that research corpus. The current
-25 September gallery uses **lasu-623791e1184e**, with 395 buildings and 39
+26 September gallery uses **lasu-623791e1184e**, with 395 buildings and 39
 photographs covering 19 buildings. See [current photo/model coverage](../../docs/PHOTO-MODEL-COVERAGE.md)
 and the [application screenshot inventory](../../docs/assets/screenshots/README.md).
 
