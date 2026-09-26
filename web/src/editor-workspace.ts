@@ -33,6 +33,7 @@ export interface WorkspaceSnapshot {
 }
 export interface SaveBatch {
   modelAuthoringVersion?: 1;
+  modelDocumentVersion?: 1;
   operationId: string;
   edits: { edit: MapEdit; expectedUpdatedAt: string | null }[];
 }
@@ -462,6 +463,7 @@ export class EditorWorkspace {
           const saved = new Map(this.saved.map((e) => [editKey(e), e]));
           this.pending = {
             modelAuthoringVersion: 1,
+            modelDocumentVersion: 1,
             operationId: crypto.randomUUID(),
             edits: changes.map((edit) => ({
               edit: structuredClone(edit),

@@ -24,6 +24,7 @@ import {
 } from '../server/release-validation.js';
 import { validateWorkspace } from '../src/editor-validation.js';
 import { publishedWorkspace } from '../server/published-workspace.js';
+import { modelAssetAction, hydrateModelEdits } from '../server/model-assets.js';
 import {
   sourceReviewQuery,
   SOURCE_REVIEW_PAGE_SIZE,
@@ -34,6 +35,11 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     const user = await requireAdmin(req);
     const { action, payload = {} } = bodyOf(req, 3_000_000);
     switch (action) {
+      case 'model-asset-begin':
+      case 'model-asset-confirm':
+      case 'model-asset-read':
+        res.status(200).json(await modelAssetAction(user.id, action, payload));
+        break;
       case 'media-begin':
       case 'media-list':
       case 'media-process':
@@ -188,6 +194,37 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           };
         });
         await validateMediaEdits(clean.map((item) => item.edit));
+        if (clean.some((i) => i.edit.properties.modelDocument))
+          throw new HttpError(
+            400,
+            'Upload the editable model as a verified private asset before saving.',
+          );
+        const currentModels = (await allRows('map_edits')) as MapEdit[];
+        const authored = clean.some(
+          (i) =>
+            i.edit.properties.modelDocumentAsset ||
+            currentModels.some(
+              (old) =>
+                old.kind === i.edit.kind &&
+                old.id === i.edit.id &&
+                old.properties.modelDocumentAsset,
+            ),
+        );
+        if (authored && payload.modelDocumentVersion !== 1)
+          throw new HttpError(
+            409,
+            'Update the app before editing this authored model. Your local work is retained.',
+          );
+        if (authored) {
+          const hydrated = await hydrateModelEdits(
+            clean.map((i) => i.edit),
+            user.id,
+          );
+          for (const edit of hydrated) {
+            const errors = validateEdit(edit);
+            if (errors.length) throw new HttpError(400, errors.join(' '));
+          }
+        }
         if (
           payload.modelAuthoringVersion !== 1 &&
           clean.some((item) => item.edit.kind === 'building')
@@ -210,11 +247,15 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               'Update the app before editing this building. Its model uses newer authoring controls. Your changes are retained locally.',
             );
         }
-        const result = await db('rpc/save_editor_batch', 'POST', {
-          operation_id: operationId,
-          actor_id: user.id,
-          items: clean,
-        });
+        const result = await db(
+          authored ? 'rpc/save_editor_model_batch' : 'rpc/save_editor_batch',
+          'POST',
+          {
+            operation_id: operationId,
+            actor_id: user.id,
+            items: clean,
+          },
+        );
         res.status(200).json(action === 'save-edit' ? result[0] : result);
         break;
       }
@@ -332,7 +373,13 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           const [release] = await db(
             `releases?id=eq.${encodeURIComponent(id)}&select=snapshot`,
           );
-          validateReleaseSnapshot(release.snapshot, await publishedCampus());
+          validateReleaseSnapshot(
+            {
+              ...release.snapshot,
+              edits: await hydrateModelEdits(release.snapshot.edits, user.id),
+            },
+            await publishedCampus(),
+          );
           await dispatch('release.yml', {
             release_id: id,
             operation: 'preview',
@@ -369,7 +416,13 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             allRows('source_features'),
             allRows('map_edits'),
           ]);
-          validateReleaseSnapshot(release.snapshot, published);
+          validateReleaseSnapshot(
+            {
+              ...release.snapshot,
+              edits: await hydrateModelEdits(release.snapshot.edits, user.id),
+            },
+            published,
+          );
           if (
             snapshotHash(release.snapshot.features, release.snapshot.edits) !==
             snapshotHash(features, edits)

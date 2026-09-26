@@ -69,6 +69,49 @@ export async function adminRequest<T>(
   action: string,
   payload: unknown,
   token?: string,
+  options: Parameters<typeof wireAdminRequest>[3] = {},
+): Promise<T> {
+  const api = <V>(action: string, payload: unknown) =>
+    wireAdminRequest<V>(action, payload, token, options);
+  const ownerKey = token || 'local-test';
+  const batch = payload as {
+    edits?: Array<{ edit?: { properties?: { modelDocument?: unknown } } }>;
+  } | null;
+  if (
+    action === 'save-edits' &&
+    batch?.edits?.some((i) => i.edit?.properties?.modelDocument)
+  ) {
+    const { prepareModelSave, hydrateModelResponse } =
+      await import('./model-asset-client');
+    return hydrateModelResponse(
+      await api<T>(action, await prepareModelSave(payload, api, ownerKey)),
+      api,
+      ownerKey,
+    );
+  }
+  const result = await api<T>(action, payload);
+  type ResponseEdits = {
+    edits?: Array<{ properties?: { modelDocumentAsset?: unknown } }>;
+  };
+  const envelope = result as ResponseEdits & { published?: ResponseEdits };
+  const edits = Array.isArray(result)
+    ? result
+    : [...(envelope?.edits || []), ...(envelope?.published?.edits || [])];
+  if (
+    Array.isArray(edits) &&
+    edits.some((e) => e?.properties?.modelDocumentAsset)
+  )
+    return (await import('./model-asset-client')).hydrateModelResponse(
+      result,
+      api,
+      ownerKey,
+    );
+  return result;
+}
+async function wireAdminRequest<T>(
+  action: string,
+  payload: unknown,
+  token?: string,
   options: {
     timeoutMs?: number;
     retries?: number;

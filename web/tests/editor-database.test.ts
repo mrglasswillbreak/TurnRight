@@ -52,6 +52,7 @@ beforeAll(async () => {
     '008_private_building_media.sql',
     '009_bounded_baseline_comparison.sql',
     '011_linear_baseline_reconciliation.sql',
+    '012_editable_model_assets.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -73,6 +74,68 @@ afterAll(async () => {
   await database?.close();
 });
 describe('private media migration', () => {
+  it('guards authored drafts against older writers and verifies private asset ownership', async () => {
+    const id = randomUUID(),
+      reference = { version: 1, id, sha256: 'a'.repeat(64), bytes: 100 };
+    await database.query(
+      "insert into model_assets(id,owner,version,sha256,bytes,path,status) values($1,$2,1,$3,100,$4,'ready')",
+      [id, owner, reference.sha256, `${owner}/${id}.json`],
+    );
+    await expect(
+      database.query('update model_assets set sha256=$2 where id=$1', [
+        id,
+        'b'.repeat(64),
+      ]),
+    ).rejects.toThrow(/immutable/);
+    const entry = {
+      ...item('authored-building'),
+      edit: {
+        ...item('authored-building').edit,
+        kind: 'building',
+        properties: {
+          name: 'Authored building',
+          modelDocumentAsset: reference,
+        },
+      },
+    };
+    await expect(
+      database.query('select save_editor_batch($1::uuid,$2::uuid,$3::jsonb)', [
+        randomUUID(),
+        owner,
+        JSON.stringify([entry]),
+      ]),
+    ).rejects.toThrow(/Update the editor/);
+    const result = await database.query<{ saved: { updated_at: string }[] }>(
+      'select save_editor_model_batch($1::uuid,$2::uuid,$3::jsonb) as saved',
+      [randomUUID(), owner, JSON.stringify([entry])],
+    );
+    const oldWriter = {
+      ...entry,
+      expectedUpdatedAt: result.rows[0].saved[0].updated_at,
+      edit: { ...entry.edit, properties: { name: 'Attempt to erase model' } },
+    };
+    await expect(
+      database.query('select save_editor_batch($1::uuid,$2::uuid,$3::jsonb)', [
+        randomUUID(),
+        owner,
+        JSON.stringify([oldWriter]),
+      ]),
+    ).rejects.toThrow(/Update the editor/);
+    expect(
+      (
+        await database.query<{ public: boolean }>(
+          "select public from storage.buckets where id='building-models'",
+        )
+      ).rows[0].public,
+    ).toBe(false);
+    expect(
+      (
+        await database.query<{ allowed: boolean }>(
+          "select has_table_privilege('authenticated','model_assets','SELECT') as allowed",
+        )
+      ).rows[0].allowed,
+    ).toBe(false);
+  });
   it('keeps originals private and makes reviewed metadata immutable', async () => {
     const id = randomUUID();
     await database.query(
