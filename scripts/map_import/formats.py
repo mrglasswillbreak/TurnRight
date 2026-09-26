@@ -5,10 +5,25 @@ import re
 import stat
 import zipfile
 from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
 
 MAX_EXPANDED = 250 * 1024 * 1024
 MAX_FEATURES = 100000
 DRIVERS = ['GeoJSON', 'ESRI Shapefile', 'GPKG', 'LIBKML', 'KML', 'GPX', 'CSV', 'ESRIJSON']
+
+
+def check_expanded_batch(paths, limit=MAX_EXPANDED):
+    total = 0
+    for path in paths:
+        path = Path(path)
+        if path.suffix.lower() in ('.zip','.kmz'):
+            with zipfile.ZipFile(path) as archive:
+                total += sum(item.file_size for item in archive.infolist())
+        else:
+            total += path.stat().st_size
+        if total > limit:
+            raise ValueError('The combined expanded upload batch exceeds 250 MiB. Import smaller batches.')
 
 
 def unpack(path, directory):
@@ -34,6 +49,13 @@ def safe_xml(path):
     flat = content.replace(b'\x00',b'').lower()
     if b'<!doctype' in flat or b'<!entity' in flat or b'<networklink' in flat:
         raise ValueError('External XML entities and KML network links are not supported.')
+    if path.suffix.lower() == '.kml':
+        for element in ET.fromstring(content).iter():
+            tag = element.tag.rsplit('}',1)[-1].lower()
+            if tag not in ('href','styleurl') or not element.text: continue
+            value = element.text.strip().replace('\\','/')
+            if urlsplit(value).scheme or value.startswith('/') or '..' in PurePosixPath(value).parts:
+                raise ValueError('External KML references are not supported. Include local styles in the supplied file.')
 
 
 def guess_role(name, types, properties=None):

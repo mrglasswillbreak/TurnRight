@@ -11,7 +11,7 @@ import zipfile
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from map_import.arcgis import layer_features, discover
-from map_import.formats import unpack, safe_xml
+from map_import.formats import unpack, safe_xml, check_expanded_batch
 from map_import.network import public_addresses
 from map_import.normalise import digest, normalise
 
@@ -38,6 +38,33 @@ class MapImportTests(unittest.TestCase):
         for addresses in [['127.0.0.1'],['10.1.2.3'],['::1'],['8.8.8.8','192.168.1.2']]:
             with patch.object(socket,'getaddrinfo',return_value=[(0,0,0,'',(ip,443)) for ip in addresses]):
                 with self.assertRaises(ValueError): public_addresses('source.example')
+
+    def test_combined_archive_budget_and_external_kml_styles(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = [Path(tmp)/'one.zip',Path(tmp)/'two.zip']
+            for path in paths:
+                with zipfile.ZipFile(path,'w') as z: z.writestr('data.shp',b'123456')
+            check_expanded_batch(paths,12)
+            with self.assertRaisesRegex(ValueError,'combined expanded'): check_expanded_batch(paths,10)
+            kml=Path(tmp)/'styles.kml'
+            kml.write_text('<kml><Placemark><styleUrl>https://private.example/style.kml</styleUrl></Placemark></kml>')
+            with self.assertRaisesRegex(ValueError,'External KML'):safe_xml(kml)
+            kml.write_text('<kml><Placemark><styleUrl>#local-style</styleUrl></Placemark></kml>')
+            safe_xml(kml)
+
+    def test_multipart_courtyards_are_preserved_without_exposing_original_attributes(self):
+        layer=copy.deepcopy(LAYER)
+        outer=layer['features'][0]['geometry']['coordinates'][0]
+        hole=[[3.2002,6.4602],[3.2004,6.4602],[3.2004,6.4604],[3.2002,6.4604],[3.2002,6.4602]]
+        second=[[x+0.002,y] for x,y in outer]
+        layer['features'][0]['geometry']={'type':'MultiPolygon','coordinates':[[outer,hole],[second]]}
+        layer['features'][0]['properties']['internal_note']='private source attribute'
+        result=normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')
+        self.assertFalse(result['summary']['errors'])
+        building=next(p['after'] for p in result['proposals'] if p['after'] and p['after']['entity']=='feature')
+        self.assertEqual(len(building['payload']['geometry']['coordinates']),2)
+        self.assertEqual(len(building['payload']['geometry']['coordinates'][0]),2)
+        self.assertNotIn('internal_note',building['payload']['properties'])
 
     def test_arcgis_checks_every_id_and_stops_incomplete_download(self):
         calls=[]

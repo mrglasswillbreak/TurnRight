@@ -10,7 +10,7 @@ import tempfile
 import urllib.request
 from datetime import datetime, timezone
 
-from map_import.formats import inspect_file
+from map_import.formats import inspect_file, check_expanded_batch
 from map_import.network import MAX_BYTES, fetch_public
 
 
@@ -22,6 +22,7 @@ def convert(folder):
     from map_import.normalise import normalise
     folder = Path(folder)
     request = json.loads((folder/'request.json').read_text(encoding='utf-8'))
+    check_expanded_batch([folder/f['path'] for f in request['files']])
     layers, warnings = [], request.get('warnings',[])
     for source_file in request['files']:
         data = inspect_file(folder/source_file['path'],request['configuration'],folder/'expanded',source_file.get('label'))
@@ -135,6 +136,7 @@ def run_job():
                 else:
                     (folder/'source.osm').write_bytes(raw_snapshot); files=[{'path':'source.osm'}]
                 if not job.get('snapshot_path'):
+                    if len(raw_snapshot)>MAX_BYTES: raise ValueError('The downloaded source exceeds 50 MiB. Choose a smaller boundary or individual layers.')
                     snapshot_path=f'{campus_id}/{import_id}/snapshot-{token}.json'
                     remote('storage/v1/object/campus-imports/'+snapshot_path,'POST',raw_snapshot)
                     db(selector+'&status=eq.running','PATCH',{'snapshot_path':snapshot_path,'source_hash':hashlib.sha256(raw_snapshot).hexdigest()})
@@ -167,7 +169,9 @@ def run_job():
             update={'status':'mapping' if job['phase']=='inspect' else 'preview','summary':result['summary'],'message':'Choose layer mappings' if job['phase']=='inspect' else 'Preview ready; review before applying','updated_at':datetime.now(timezone.utc).isoformat()}
             if job['phase']=='preview':
                 path=f'{campus_id}/{import_id}/candidate-{token}.json'
-                remote('storage/v1/object/campus-imports/'+path,'POST',encoded(result))
+                candidate_bytes=encoded(result)
+                if len(candidate_bytes)>MAX_BYTES: raise ValueError('The normalized candidate exceeds 50 MiB. Split this source into smaller layers before retrying.')
+                remote('storage/v1/object/campus-imports/'+path,'POST',candidate_bytes)
                 update['candidate_path']=path
             changed=db(selector+'&status=eq.running','PATCH',update)
             if changed and job.get('auto_queue') and job['phase']=='preview' and not result['summary']['errors']:

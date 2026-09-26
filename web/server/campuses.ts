@@ -6,6 +6,7 @@ import { finitePosition, structuralIssues } from '../src/validation.js';
 import { db, HttpError } from './backend.js';
 import { currentCampusId } from './campus-scope.js';
 import { publishedRecords } from './release-validation.js';
+import { validCampusBoundary } from './campus-boundary.js';
 
 export interface CampusRow extends CampusIdentity {
   boundary: CampusData['boundary'];
@@ -86,7 +87,14 @@ export async function campusAction(
     boundary,
   };
   const data = emptyCampus(campus, boundary);
-  if (structuralIssues(data).length)
+  if (
+    structuralIssues(data).length ||
+    !validCampusBoundary(
+      boundary.geometry as
+        | import('geojson').Polygon
+        | import('geojson').MultiPolygon,
+    )
+  )
     throw new HttpError(
       400,
       'Repair the boundary before creating this campus.',

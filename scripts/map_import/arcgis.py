@@ -69,10 +69,13 @@ def discover(url, bounds, get=public_json, _visited=None):
         if entry.get('layers') and not entry.get('url'):
             for child in entry['layers']: visit(child)
         elif entry.get('featureCollection'):
-            for index, layer in enumerate(entry['featureCollection'].get('layers', [])):
+            embedded = entry['featureCollection'].get('layers', [])
+            for index, layer in enumerate(embedded):
                 feature_set = layer.get('featureSet', {})
                 definition = layer.get('layerDefinition', {})
-                layers.append({**definition, **feature_set, 'name':entry.get('title', definition.get('name', f'Layer {index+1}')), 'fields':definition.get('fields', feature_set.get('fields', []))})
+                name = entry.get('title', definition.get('name', f'Layer {index+1}'))
+                if len(embedded)>1: name += ' / ' + str(definition.get('name') or definition.get('id',index+1))
+                layers.append({**definition, **feature_set, 'name':name, 'fields':definition.get('fields', feature_set.get('fields', []))})
         elif entry.get('url'):
             if any(s in entry.get('layerType','').lower() for s in ('tile','imagery','image')):
                 warnings.append(f"Skipped non-vector layer: {entry.get('title',entry['url'])}")
