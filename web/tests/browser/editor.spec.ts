@@ -7807,6 +7807,54 @@ test('surface workspace tree keyboard focus, search and repeated detail detachme
   expect(wall()?.elements[0].count).toBe(2);
 });
 
+test('public Editor opens the selected building card and consumes the handoff once', async ({
+  page,
+}) => {
+  const server = await setup(page);
+  await page.goto('/?place=library');
+  const link = page.getByRole('link', { name: 'Editor', exact: true });
+  await expect(link).toHaveAttribute('href', '/admin?building=library');
+  await expect(
+    page.getByRole('group', { name: 'Place actions' }),
+  ).toBeVisible();
+  await link.click();
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/admin$/);
+  expect(server.edits()).toHaveLength(0);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(
+    page.getByLabel('Building opacity', { exact: true }),
+  ).toHaveValue('1');
+});
+
+test('editor handoff survives a sign-in return and reports unavailable buildings', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.evaluate(() =>
+    sessionStorage.setItem('turnright:editor-building-handoff', 'library'),
+  );
+  await page.goto('/admin');
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem('turnright:editor-building-handoff'),
+    ),
+  ).toBeNull();
+  await page.goto('/admin?building=missing');
+  await expect(
+    page.getByText(/building selected on the public map is unavailable/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toHaveCount(0);
+  await expect(page).toHaveURL(/\/admin$/);
+});
+
 test('properties header stays visible and fields fit the scrollable panel', async ({
   page,
 }, info) => {

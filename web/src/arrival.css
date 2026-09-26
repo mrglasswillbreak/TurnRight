@@ -33,6 +33,16 @@
   justify-content: space-between;
   gap: 0.5rem;
 }
+.place-primary-actions {
+  display: grid;
+  gap: 8px;
+  margin-block: 16px;
+}
+.photo-gallery > details {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+  margin-top: 12px;
+}
 .gallery-controls button {
   min-height: 44px;
   padding: 0.5rem 0.8rem;

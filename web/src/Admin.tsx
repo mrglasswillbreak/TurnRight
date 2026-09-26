@@ -1,4 +1,11 @@
 import { PhotoSession } from './PhotoSession';
+import { canonicalBuildingId } from './arrival';
+import {
+  consumeEditorBuilding,
+  editorHandoffStorage,
+  editorSignInReturn,
+  requestedEditorBuilding,
+} from './editor-link';
 import type { BuildingSelection } from './visual-types';
 import {
   lazy,
@@ -285,7 +292,12 @@ export default function Admin({
             onClick={() =>
               supabase!.auth.signInWithOAuth({
                 provider: 'github',
-                options: { redirectTo: location.origin + '/admin' },
+                options: {
+                  redirectTo: editorSignInReturn(
+                    location.href,
+                    editorHandoffStorage(),
+                  ),
+                },
               })
             }
           >
@@ -305,7 +317,12 @@ export default function Admin({
                 try {
                   const result = await supabase?.auth.signInWithOAuth({
                     provider: 'github',
-                    options: { redirectTo: location.origin + '/admin' },
+                    options: {
+                      redirectTo: editorSignInReturn(
+                        location.href,
+                        editorHandoffStorage(),
+                      ),
+                    },
                   });
                   if (result?.error) throw result.error;
                 } catch (error) {
@@ -447,7 +464,9 @@ function Editor({
     try {
       const result = await supabase?.auth.signInWithOAuth({
         provider: 'github',
-        options: { redirectTo: location.origin + '/admin' },
+        options: {
+          redirectTo: editorSignInReturn(location.href, editorHandoffStorage()),
+        },
       });
       if (result?.error) throw result.error;
     } catch (error) {
@@ -500,6 +519,10 @@ function Editor({
   const [opacity, setOpacity] = useState(1),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
+  const requestedBuilding = useRef(
+    requestedEditorBuilding(location.href, editorHandoffStorage()),
+  );
+  const [handoffNotice, setHandoffNotice] = useState('');
   const [message, setMessage] = useState(
       'Select a place or building to start mapping.',
     ),
@@ -1253,6 +1276,47 @@ function Editor({
       mapRef.current = null;
     };
   };
+  useEffect(() => {
+    const requested = requestedBuilding.current;
+    if (!requested || !ready) return;
+    const id = canonicalBuildingId(validation.data, requested);
+    if (
+      workspace.unfinished ||
+      (workspace.roofDraft && workspace.roofDraft.buildingId !== id)
+    ) {
+      setHandoffNotice(
+        'Finish or discard the recovered drawing or roof before opening the building selected on the public map.',
+      );
+      return;
+    }
+    requestedBuilding.current = undefined;
+    history.replaceState(
+      history.state,
+      '',
+      consumeEditorBuilding(location.href, editorHandoffStorage()),
+    );
+    const target = featureEdit(
+      validation.data,
+      'building',
+      id,
+      workspace.edits,
+    );
+    if (!target || target.deleted) {
+      setHandoffNotice(
+        'The building selected on the public map is unavailable in this workspace. It may have been removed or replaced.',
+      );
+      return;
+    }
+    setHandoffNotice('');
+    live.current.selectId('building', id, true);
+    setExplorer(false);
+  }, [
+    ready,
+    validation.data,
+    workspace,
+    workspace.unfinished,
+    workspace.roofDraft,
+  ]);
   useEffect(() => {
     controller.current?.update(
       validation.data,
@@ -2523,6 +2587,24 @@ function Editor({
               </button>
             </div>
           )}
+        {handoffNotice && (
+          <div className="editor-recovery editor-card" role="status">
+            <p>{handoffNotice}</p>
+            <button
+              onClick={() => {
+                requestedBuilding.current = undefined;
+                history.replaceState(
+                  history.state,
+                  '',
+                  consumeEditorBuilding(location.href, editorHandoffStorage()),
+                );
+                setHandoffNotice('');
+              }}
+            >
+              Dismiss building request
+            </button>
+          </div>
+        )}
         {workspace.unfinished && !tool && (
           <div className="editor-recovery editor-card">
             <strong>Unfinished drawing recovered</strong>

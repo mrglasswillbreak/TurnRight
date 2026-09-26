@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import './arrival.css';
 import {
   buildingPhotos,
@@ -11,13 +11,15 @@ import type { ArrivalGuide, CampusData, CampusPhoto, Place } from './types';
 export function PhotoGallery({
   photos,
   label = 'Building photographs',
+  actions,
 }: {
   photos: CampusPhoto[];
   label?: string;
+  actions?: ReactNode;
 }) {
   const [index, setIndex] = useState(0),
     [failed, setFailed] = useState<string>();
-  if (!photos.length) return null;
+  if (!photos.length) return <>{actions}</>;
   const photo = photos[Math.min(index, photos.length - 1)];
   return (
     <section className="photo-gallery" aria-label={label}>
@@ -57,30 +59,6 @@ export function PhotoGallery({
               : 'Capture date not recorded. '}
             Source checked {photo.checkedAt.slice(0, 10)}.
           </p>
-          <details>
-            <summary>Photo credits & license</summary>
-            <p>{photo.attribution}</p>
-            <p>
-              {photo.sourceUrl ? (
-                <a href={photo.sourceUrl} target="_blank" rel="noreferrer">
-                  Original source
-                </a>
-              ) : (
-                <span>Photograph provided by the author</span>
-              )}{' '}
-              ·{' '}
-              <a href={photo.licenseUrl} target="_blank" rel="noreferrer">
-                {photo.license}
-              </a>
-            </p>
-            <p>{photo.modifications}</p>
-            {photo.license === 'CC BY-SA 4.0' && (
-              <p>
-                This adapted photograph is shared under the same CC BY-SA 4.0
-                license.
-              </p>
-            )}
-          </details>
         </figcaption>
       </figure>
       {photos.length > 1 && (
@@ -109,6 +87,31 @@ export function PhotoGallery({
           </button>
         </div>
       )}
+      {actions}
+      <details>
+        <summary>Photo credits & license</summary>
+        <p>{photo.attribution}</p>
+        <p>
+          {photo.sourceUrl ? (
+            <a href={photo.sourceUrl} target="_blank" rel="noreferrer">
+              Original source
+            </a>
+          ) : (
+            <span>Photograph provided by the author</span>
+          )}{' '}
+          ·{' '}
+          <a href={photo.licenseUrl} target="_blank" rel="noreferrer">
+            {photo.license}
+          </a>
+        </p>
+        <p>{photo.modifications}</p>
+        {photo.license === 'CC BY-SA 4.0' && (
+          <p>
+            This adapted photograph is shared under the same CC BY-SA 4.0
+            license.
+          </p>
+        )}
+      </details>
     </section>
   );
 }

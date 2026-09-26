@@ -4,6 +4,7 @@ import { PlaceInformation } from './PlaceInformation';
 import { placeHasConnection } from './routing';
 import { destinationLink, sharedDestination } from './destination-sharing';
 import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
+import { publicEditorHref } from './editor-link';
 import {
   lazy,
   Suspense,
@@ -546,6 +547,7 @@ export default function App() {
       setShareFallback('');
       setSharedLinkMissing(false);
       setSelected(place);
+      setUnlinkedBuilding(null);
       setEntranceId('');
       setParkingId('');
       setActiveLeg(0);
@@ -1154,7 +1156,16 @@ export default function App() {
                 <Settings />
                 <span>Settings</span>
               </button>
-              <a href="/admin" className="rail-item">
+              <a
+                href={publicEditorHref(
+                  data,
+                  selected,
+                  unlinkedBuilding
+                    ? String(unlinkedBuilding.properties?.id || '')
+                    : undefined,
+                )}
+                className="rail-item"
+              >
                 <Shield />
                 <span>Editor</span>
               </a>
@@ -1352,7 +1363,13 @@ export default function App() {
             </>
           ) : (
             <div className="place-detail">
-              <button className="text-button" onClick={() => setSelected(null)}>
+              <button
+                className="text-button"
+                onClick={() => {
+                  setSelected(null);
+                  setUnlinkedBuilding(null);
+                }}
+              >
                 <ArrowLeft size={17} /> Back to places
               </button>
               <div className={`detail-icon ${selected.category}`}>
@@ -1362,10 +1379,69 @@ export default function App() {
                 {selected.category.toUpperCase()} · LASU OJO
               </span>
               <h1>{selected.name}</h1>
-              <PlaceInformation place={selected} sources={data.sources} />
               <PhotoGallery
                 key={selected.id}
                 photos={buildingPhotos(data, placeBuildingId(data, selected))}
+                actions={
+                  <div
+                    className="place-primary-actions"
+                    role="group"
+                    aria-label="Place actions"
+                  >
+                    <Button
+                      className="primary-action"
+                      onClick={() => void previewRoute()}
+                    >
+                      <Navigation size={18} /> Directions
+                    </Button>
+                    <div className="button-row place-actions">
+                      {typeof navigator.share === 'function' && (
+                        <Button
+                          variant="outline"
+                          onClick={() => void shareDestination()}
+                        >
+                          <Share2 /> Share
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        onClick={() => void shareDestination(true)}
+                      >
+                        <Copy /> Copy link
+                      </Button>
+                      <Button variant="outline" onClick={toggleSaved}>
+                        <Heart
+                          fill={
+                            saved.includes(selected.id)
+                              ? 'currentColor'
+                              : 'none'
+                          }
+                        />
+                        {saved.includes(selected.id) ? 'Saved' : 'Save'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setReportPin(undefined);
+                          setDialog('report');
+                        }}
+                      >
+                        <Flag /> Report
+                      </Button>
+                    </div>
+                    {shareFallback && (
+                      <label className="field-label">
+                        Destination link
+                        <input
+                          aria-label="Destination link"
+                          readOnly
+                          value={shareFallback}
+                          onFocus={(event) => event.target.select()}
+                        />
+                      </label>
+                    )}
+                  </div>
+                }
               />
               <ArrivalSection
                 data={data}
@@ -1373,6 +1449,7 @@ export default function App() {
                 entranceId={entranceId}
                 onEntrance={setEntranceId}
               />
+              <PlaceInformation place={selected} sources={data.sources} />
               {(() => {
                 const building = data.map.features.find(
                   (f) =>
@@ -1390,54 +1467,6 @@ export default function App() {
                   selected.faculty ||
                   'Lagos State University, Ojo campus'}
               </p>
-              <Button
-                className="primary-action"
-                onClick={() => void previewRoute()}
-              >
-                <Navigation size={18} /> Directions
-              </Button>
-              <div className="button-row place-actions">
-                {typeof navigator.share === 'function' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => void shareDestination()}
-                  >
-                    <Share2 /> Share
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  onClick={() => void shareDestination(true)}
-                >
-                  <Copy /> Copy link
-                </Button>
-                <Button variant="outline" onClick={toggleSaved}>
-                  <Heart
-                    fill={saved.includes(selected.id) ? 'currentColor' : 'none'}
-                  />
-                  {saved.includes(selected.id) ? 'Saved' : 'Save'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setReportPin(undefined);
-                    setDialog('report');
-                  }}
-                >
-                  <Flag /> Report
-                </Button>
-              </div>
-              {shareFallback && (
-                <label className="field-label">
-                  Destination link
-                  <input
-                    aria-label="Destination link"
-                    readOnly
-                    value={shareFallback}
-                    onFocus={(event) => event.target.select()}
-                  />
-                </label>
-              )}
               <div className="detail-facts">
                 <div>
                   <MapPin />
@@ -1550,6 +1579,16 @@ export default function App() {
                     String(unlinkedBuilding.properties?.id || ''),
                   )}
                 />
+                <a
+                  className="editor-primary"
+                  href={publicEditorHref(
+                    data,
+                    null,
+                    String(unlinkedBuilding.properties?.id || ''),
+                  )}
+                >
+                  <Shield size={18} /> Editor
+                </a>
                 <p>
                   Source:{' '}
                   {String(unlinkedBuilding.properties?.source || 'Campus map')}.

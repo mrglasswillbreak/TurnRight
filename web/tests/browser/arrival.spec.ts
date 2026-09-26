@@ -111,6 +111,29 @@ for (const width of [1440, 390])
     await expect(
       page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
     ).toBeVisible();
+    await expect(
+      page.getByRole('group', { name: 'Place actions' }),
+    ).toBeVisible();
+    expect(
+      await page.locator('.place-detail').evaluate((el) => {
+        const nodes = [
+          el.querySelector('.photo-gallery img'),
+          el.querySelector('.gallery-controls'),
+          el.querySelector('.place-primary-actions'),
+          el.querySelector('.photo-gallery > details'),
+          el.querySelector('.arrival-section'),
+        ];
+        return nodes.every(
+          (node, i) =>
+            node &&
+            (!i ||
+              !!(
+                nodes[i - 1]!.compareDocumentPosition(node) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+              )),
+        );
+      }),
+    ).toBe(true);
     await page.getByRole('button', { name: 'Next photograph' }).focus();
     await page.keyboard.press('Enter');
     await expect(
