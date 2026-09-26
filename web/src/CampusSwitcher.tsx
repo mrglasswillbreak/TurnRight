@@ -129,10 +129,11 @@ export default function CampusSwitcher({
         className="public-campus-switcher"
         variant="outline"
         aria-label="Choose a campus"
+        title="Choose a campus"
         onClick={() => setOpen(true)}
       >
-        <Globe2 size={17} />
-        <span>Campuses</span>
+        <Globe2 size={20} />
+        <span className="sr-only">Campuses</span>
       </Button>
       <Dialog
         open={open}

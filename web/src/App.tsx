@@ -997,13 +997,6 @@ export default function App() {
         }}
       />
 
-      <Suspense fallback={null}>
-        <CampusSwitcher
-          map={campusMap}
-          navigating={navigating}
-          onStop={stopNavigation}
-        />
-      </Suspense>
       {mobileMapControls && mapControls}
       {updateReady && (
         <AppUpdateNotice
@@ -1044,6 +1037,13 @@ export default function App() {
       >
         <SheetHandle sheet={panelSheet} label="Resize search panel" />
         <div className="dock-search-row">
+          <Suspense fallback={null}>
+            <CampusSwitcher
+              map={campusMap}
+              navigating={navigating}
+              onStop={stopNavigation}
+            />
+          </Suspense>
           {navigating ? (
             <div className="navigation-summary" aria-live="polite">
               <Navigation size={21} />

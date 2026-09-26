@@ -462,6 +462,58 @@ test('campus imports responsive screens and documentation captures', async ({
   await capture('offline');
 });
 
+test('campus imports public chooser stays in the search row without covering navigation', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.goto('/');
+  const chooser = page.getByRole('button', {
+    name: 'Choose a campus',
+    exact: true,
+  });
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+    { width: 844, height: 390 },
+    { width: 390, height: 844 },
+    { width: 320, height: 568 },
+  ]) {
+    await page.setViewportSize(size);
+    for (const expanded of [false, true]) {
+      if (expanded)
+        await page
+          .getByRole('button', { name: 'Expand card', exact: true })
+          .click();
+      await expect(chooser).toBeInViewport();
+      const box = (await chooser.boundingBox())!;
+      const search = (await page
+        .getByRole('textbox', { name: 'Search campus' })
+        .boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x + box.width).toBeLessThanOrEqual(search.x);
+      expect(search.width).toBeGreaterThan(70);
+      if (expanded) {
+        const navigation = (await page
+          .getByRole('navigation', { name: 'Main navigation' })
+          .boundingBox())!;
+        expect(box.y + box.height).toBeLessThanOrEqual(navigation.y);
+      }
+      await chooser.click();
+      await expect(
+        page.getByRole('dialog', { name: 'Choose a campus' }),
+      ).toBeVisible();
+      await page
+        .getByRole('button', { name: 'LASU · Ojo', exact: true })
+        .click();
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+    }
+    await page
+      .getByRole('button', { name: 'Collapse card', exact: true })
+      .click();
+  }
+});
+
 test('campus imports retain readable headers and fields in light and dark themes', async ({
   page,
 }) => {
