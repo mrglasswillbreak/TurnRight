@@ -71,21 +71,52 @@ export function modelDescendants(document: ModelDocument, id: string) {
 }
 
 /** Imported hierarchy is organisational; apply world transforms to its descendants once. */
-export function transformModelHierarchy(document: ModelDocument, id: string, kind: 'move' | 'rotate' | 'scale', value: Vec3): ModelDocument {
+export function transformModelHierarchy(
+  document: ModelDocument,
+  id: string,
+  kind: 'move' | 'rotate' | 'scale',
+  value: Vec3,
+): ModelDocument {
   const members = modelDescendants(document, id);
-  if (members.some((object) => object.locked)) throw new Error('Unlock the object and its children before editing this group.');
-  const points = members.flatMap((object) => Object.values(object.vertices).map((p) => transformPoint(p, object.transform)));
-  const pivot = points.length ? centre3(points) : [0, 0, 0] as Vec3;
-  const replacements = new Map(members.map((object) => {
-    const ownPoints = Object.values(object.vertices).map((p) => transformPoint(p, object.transform));
-    const centre = ownPoints.length ? centre3(ownPoints) : object.transform.position;
-    const next = transformModelObject(object, kind, value);
-    if (kind !== 'move') {
-      const offset = sub3(centre, pivot);
-      const target = add3(pivot, kind === 'rotate' ? rotate3(offset, value) : offset.map((n, i) => n * value[i]) as Vec3);
-      next.transform.position = add3(next.transform.position, sub3(target, centre));
-    }
-    return [object.id, next];
-  }));
-  return {...document, objects: document.objects.map((object) => replacements.get(object.id) || object)};
+  if (members.some((object) => object.locked))
+    throw new Error(
+      'Unlock the object and its children before editing this group.',
+    );
+  const worldPoints = (object: ModelObject) =>
+    Object.values(
+      object.curve
+        ? curveMesh(object.curve, object.name).vertices
+        : object.vertices,
+    ).map((p) => transformPoint(p, object.transform));
+  const points = members.flatMap(worldPoints);
+  const pivot = points.length ? centre3(points) : ([0, 0, 0] as Vec3);
+  const replacements = new Map(
+    members.map((object) => {
+      const ownPoints = worldPoints(object);
+      const centre = ownPoints.length
+        ? centre3(ownPoints)
+        : object.transform.position;
+      const next = transformModelObject(object, kind, value);
+      if (kind !== 'move') {
+        const offset = sub3(centre, pivot);
+        const target = add3(
+          pivot,
+          kind === 'rotate'
+            ? rotate3(offset, value)
+            : (offset.map((n, i) => n * value[i]) as Vec3),
+        );
+        next.transform.position = add3(
+          next.transform.position,
+          sub3(target, centre),
+        );
+      }
+      return [object.id, next];
+    }),
+  );
+  return {
+    ...document,
+    objects: document.objects.map(
+      (object) => replacements.get(object.id) || object,
+    ),
+  };
 }

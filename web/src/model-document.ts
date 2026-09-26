@@ -1,3 +1,8 @@
+import {
+  assertSimpleProfile,
+  curvePoint,
+  curveProfile,
+} from './model-curves.js';
 /** Private editable source. Render triangles are derived and never serve as editing identities. */
 export type Vec3 = [number, number, number];
 export type Vec2 = [number, number];
@@ -433,6 +438,42 @@ export function modelDocumentErrors(value: unknown): string[] {
         object.parentId === object.id)
     )
       return ['Missing model parent.'];
+    if (object.curve) {
+      try {
+        const points = curveProfile(object.curve);
+        assertSimpleProfile(points);
+        if (
+          !object.curve.closed ||
+          points.length < 3 ||
+          points.length > 4096 ||
+          points.some(
+            (p) =>
+              !vector(transformPoint(p, object.transform)) ||
+              !vector(
+                transformPoint(
+                  [p[0], p[1], p[2] + object.curve!.depth],
+                  object.transform,
+                ),
+              ) ||
+              Math.abs(p[2] - points[0][2]) > 0.001,
+          )
+        )
+          return [
+            'A curve profile needs a closed horizontal outline within the model bounds, with at most 4096 points.',
+          ];
+        let area = 0;
+        for (let i = 0; i < points.length; i++)
+          area +=
+            points[i][0] * points[(i + 1) % points.length][1] -
+            points[(i + 1) % points.length][0] * points[i][1];
+        if (Math.abs(area) < 0.0002)
+          return ['The curve profile has no surface area.'];
+      } catch (error) {
+        return [
+          error instanceof Error ? error.message : 'Invalid curve profile.',
+        ];
+      }
+    }
     const visited = new Set([object.id]);
     let parent = object.parentId;
     while (parent) {
@@ -459,6 +500,13 @@ export function modelDocumentErrors(value: unknown): string[] {
     )
   )
     return ['Invalid architectural curve references.'];
+  try {
+    for (const curve of d.curves) curvePoint(curve.start, curve.segment, 0.5);
+  } catch (error) {
+    return [
+      error instanceof Error ? error.message : 'Invalid architectural curve.',
+    ];
+  }
   if (
     d.replaceVisual &&
     !d.objects.some((o) => !o.hidden && (o.faces.length || o.curve))

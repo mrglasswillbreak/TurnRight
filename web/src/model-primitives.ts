@@ -16,7 +16,11 @@ import {
   type ModelObject,
   type Vec3,
 } from './model-document.js';
-import { curveProfile, ellipseCurve } from './model-curves.js';
+import {
+  assertSimpleProfile,
+  curveProfile,
+  ellipseCurve,
+} from './model-curves.js';
 
 export type PrimitiveKind =
   | 'box'
@@ -93,35 +97,7 @@ export function curveMesh(
   const area = ShapeUtils.area(points.map((p) => new Vector2(p[0], p[1])));
   if (Math.abs(area) < 0.0001)
     throw new Error('The curve profile has no surface area.');
-  if (points.length > 4096)
-    throw new Error('Simplify this profile to at most 4096 generated points.');
-  const cross = (a: Vec3, b: Vec3, c: Vec3) =>
-    (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-  for (let i = 0; i < points.length; i++) {
-    const a = points[i],
-      b = points[(i + 1) % points.length];
-    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-7)
-      throw new Error('Remove overlapping profile points.');
-    for (let j = i + 2; j < points.length; j++) {
-      if (i === 0 && j === points.length - 1) continue;
-      const c = points[j],
-        d = points[(j + 1) % points.length];
-      if (
-        Math.max(a[0], b[0]) < Math.min(c[0], d[0]) ||
-        Math.max(c[0], d[0]) < Math.min(a[0], b[0]) ||
-        Math.max(a[1], b[1]) < Math.min(c[1], d[1]) ||
-        Math.max(c[1], d[1]) < Math.min(a[1], b[1])
-      )
-        continue;
-      if (
-        cross(a, b, c) * cross(a, b, d) <= 0 &&
-        cross(c, d, a) * cross(c, d, b) <= 0
-      )
-        throw new Error(
-          'The profile crosses itself. Move its control points before extrusion.',
-        );
-    }
-  }
+  assertSimpleProfile(points);
   if (area < 0) points.reverse();
   const object: ModelObject = {
     id: modelId(),

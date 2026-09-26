@@ -132,6 +132,18 @@ describe('mesh commands with stable component identities', () => {
   });
 });
 describe('curve source and deterministic tessellation', () => {
+  it('rejects invalid profile edits and extrusion beyond the model bounds', () => {
+    const document = newModelDocument([3.2, 6.46]);
+    const object = primitive('ellipse');
+    document.objects = [object];
+    object.curve!.closed = false;
+    expect(modelDocumentErrors(document).join(' ')).toMatch(/profile/);
+    object.curve!.closed = true;
+    object.transform.position[2] = 1999;
+    expect(modelDocumentErrors(document).join(' ')).toMatch(
+      /bounds|within 2 km/,
+    );
+  });
   it('samples circular arcs through the supplied middle point', () => {
     const segment = {
       id: 'arc',
