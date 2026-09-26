@@ -9,6 +9,8 @@ import type {
 import { finitePosition } from './validation.js';
 import type { Position } from './types.js';
 import { detailRevision, validTextureRecipe } from './building-facades.js';
+import { modelDocumentRevision } from './model-document-revision.js';
+import { validModelRenderMaterial } from './model-render-types.js';
 
 /** Content identity for stale-model rejection, independent of feature or package ordering. */
 export function buildingRevision(feature: Feature): string {
@@ -40,6 +42,13 @@ export function buildingRevision(feature: Feature): string {
     appearance.modelId,
     ...(Object.keys(extension).length || p.buildingTopology
       ? [extension, p.buildingTopology]
+      : []),
+    ...(p.modelDocument || p.authoredModelRevision
+      ? [
+          p.modelDocument
+            ? modelDocumentRevision(p.modelDocument)
+            : p.authoredModelRevision,
+        ]
       : []),
   ]);
   let a = 2166136261,
@@ -92,6 +101,7 @@ export function validBuildingModel(model: BuildingModel): boolean {
       (part) =>
         !!part &&
         /^#[a-f0-9]{6}$/i.test(part.colour) &&
+        (part.material===undefined||validModelRenderMaterial(part.material)) &&
         (part.minZoom === undefined ||
           (Number.isFinite(part.minZoom) &&
             part.minZoom >= 0 &&
@@ -103,7 +113,17 @@ export function validBuildingModel(model: BuildingModel): boolean {
           (Array.isArray(part.positions) &&
             Array.isArray(part.uvs) &&
             part.uvs.length === (part.positions.length / 3) * 2 &&
-            part.uvs.every((n) => Number.isFinite(n) && n >= 0 && n <= 1))) &&
+            part.uvs.every(
+              (n) =>
+                Number.isFinite(n) &&
+                (part.material ? Math.abs(n) < 1e6 : n >= 0 && n <= 1),
+            ))) &&
+        (part.normals === undefined ||
+          (Array.isArray(part.normals) &&
+            Array.isArray(part.positions) && part.normals.length === part.positions.length &&
+            part.normals.every(
+              (n) => Number.isFinite(n) && Math.abs(n) <= 1.001,
+            ))) &&
         (part.texture === undefined || part.uvs !== undefined) &&
         Array.isArray(part.positions) &&
         Array.isArray(part.indices) &&

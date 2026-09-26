@@ -6,6 +6,10 @@ import {
 } from './building-surfaces.js';
 import { customRoofSurface } from './custom-roof.js';
 import { detailRevision, facadeMatches } from './building-facades.js';
+import { compileModelDocument } from './model-document-compiler.js';
+import type { ModelDocument } from './model-document.js';
+import { curvedWall, alongPath, pathDistances } from './building-curves.js';
+import { editableFacade } from './model-authoring.js';
 import { facadeMeshes } from './facade-mesh.js';
 import { ShapeUtils, Vector2 } from 'three';
 import type { Feature, Polygon, MultiPolygon } from 'geojson';
@@ -206,8 +210,10 @@ export function createBuildingModel(
               Math.hypot(b[0] - x[0], b[1] - x[1]) < 0.001)
           );
         });
-        const wallId =
+        const segmentWallId =
           topology.parts[partIndex].rings[ringIndex].wallIds[wallIndex];
+        const curve=curvedWall(feature,segmentWallId);
+        const wallId=curve?.wallIds[0]||segmentWallId;
         scope = { partId, wallId };
         const facade = styleFor(appearance, surfaceVisual, partId, wallId);
         const wallMesh = mesh(facade.wallColour!);
@@ -223,6 +229,25 @@ export function createBuildingModel(
           [...b, eaves],
           [...a, eaves],
         ]);
+        if(curve) {
+          if(segmentWallId===curve.wallIds[0]) {
+            const sourceRing=topology.parts[partIndex].rings[ringIndex];
+            const path=curve.vertexIds.map(id=>original[sourceRing.vertexIds.indexOf(id)]);
+            const total=pathDistances(path).total;
+            const description=appearance.facades?.[wallId] || editableFacade(feature,wallId,visual);
+            if((!description.needsReview||options.previewUnreviewed)&&facadeMatches(description,feature)) {
+              const firstRight=alongPath(path,0).right;
+              const sign=firstRight[0]*(b[1]-a[1])/length-firstRight[1]*(b[0]-a[0])/length>0?1:-1;
+              const details=facadeMeshes(description,[0,0],[total,0],[0,-1],eaves,facade.wallColour!,facade.trimColour);
+              for(const detail of details)for(let v=0;v<detail.positions.length;v+=3) {
+                const at=alongPath(path,detail.positions[v]),out=-detail.positions[v+1]*sign;
+                detail.positions[v]=at.point[0]+at.right[0]*out;detail.positions[v+1]=at.point[1]+at.right[1]*out;
+              }
+              detailedMeshes.push(...details);
+            }
+          }
+          continue;
+        }
         const description = appearance.facades?.[wallId];
         if (
           description &&
@@ -415,12 +440,20 @@ export function createBuildingModel(
     for (const text of appearance.roofTexts?.[partId] || [])
       detailedMeshes.push(roofTextMesh(text, partId, roofMesh, local));
   }
+  const document = feature.properties?.modelDocument as
+    | ModelDocument
+    | undefined;
   return {
     id: visual.id,
     geometryRevision: visual.geometryRevision,
     detailRevision: detailRevision(feature),
     origin,
-    meshes: mergeModelMeshes([...allMeshes.values(), ...detailedMeshes]),
+    meshes: [
+      ...(document?.replaceVisual
+        ? []
+        : mergeModelMeshes([...allMeshes.values(), ...detailedMeshes])),
+      ...(document ? compileModelDocument(document, origin) : []),
+    ],
   };
 }
 /** Wall-specific authoring must not imply a draw call per frame or wall. */

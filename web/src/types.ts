@@ -344,6 +344,8 @@ export interface MapEdit {
   kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure';
   geometry: Geometry;
   properties: Record<string, unknown> & {
+    modelDocument?: import('./model-document.js').ModelDocument;
+    modelDocumentAsset?: import('./model-document.js').ModelAssetReference;
     appearance?: BuildingAppearance;
     modelAuthoring?: import('./visual-types.js').ModelAuthoring;
     buildingTopology?: BuildingTopology;

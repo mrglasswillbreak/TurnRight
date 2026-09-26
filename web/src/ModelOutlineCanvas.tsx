@@ -9,6 +9,7 @@ import type { EditorWorkspace } from './editor-workspace';
 import { polygonsOf, remapBuildingSurfaces } from './building-surfaces';
 import { useModelSurface } from './model-surface';
 import { ModelField } from './ModelField';
+import { useOutlineTools } from './use-outline-tools';
 import {
   ModelPlanPortal,
   ModelPlanTools,
@@ -44,6 +45,7 @@ export function ModelOutlineCanvas({
     drag = useRef<number[] | null>(null),
     [selected, setSelected] = useState<number[]>([0, 0, 0]),
     [preview, setPreview] = useState<MapEdit | null>(null);
+  const tools=useOutlineTools(edit,selected,onCommit,workspace);
   const shown = preview || edit,
     shownPolygons = polygonsOf(shown.geometry),
     pixel = (east - west) / 600;
@@ -107,6 +109,7 @@ export function ModelOutlineCanvas({
             aria-label="Top-down building outline"
             role="application"
             onKeyDown={(event) => {
+              if(event.key==='Escape'&&tools.drawing){event.preventDefault();event.stopPropagation();tools.cancel();return;}
               if (event.key === 'Escape' && drag.current) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -115,6 +118,13 @@ export function ModelOutlineCanvas({
               }
             }}
             tabIndex={0}
+            onPointerDownCapture={e=>{
+              if(!tools.drawing||e.button!==0)return;
+              const id=(e.target as Element).getAttribute('data-outline-vertex');
+              const point=id?id.split(':').map(Number):null;
+              tools.tap(point?polygons[point[0]][point[1]][point[2]]:location(e),!!point);
+              e.preventDefault();e.stopPropagation();
+            }}
             onPointerMove={(e) => {
               if (drag.current) setPreview(update(drag.current, location(e)));
             }}
@@ -171,6 +181,7 @@ export function ModelOutlineCanvas({
                 ))}
               </g>
             ))}
+            {tools.drawing&&<g pointerEvents="none"><polyline points={tools.path.map(p=>xy(p).join(',')).join(' ')} fill="none" stroke="#1764ed" strokeWidth={pixel*3} strokeDasharray={`${pixel*8} ${pixel*4}`}/>{tools.path.map((p,i)=>{const [x,y]=xy(p);return <circle key={i} cx={x} cy={y} r={pixel*5} fill="#1764ed"/>;})}</g>}
           </svg>
           {mobile.compact && (
             <output>
@@ -200,6 +211,7 @@ export function ModelOutlineCanvas({
           )}
         </select>
       </label>
+      {tools.controls}
       {active && (
         <div className="model-properties-grid">
           {(['Longitude', 'Latitude'] as const).map((label, axis) => (

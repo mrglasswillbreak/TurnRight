@@ -11,11 +11,14 @@ import {
   Matrix4,
   Mesh,
   MeshLambertMaterial,
+  MeshStandardMaterial,
   Raycaster,
   Scene,
   Vector3,
   WebGLRenderer,
 } from 'three';
+import { createModelRenderMaterial } from './model-render-material';
+import type { ModelRenderMaterial } from './model-render-types';
 import {
   MercatorCoordinate,
   type CustomLayerInterface,
@@ -82,7 +85,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   const materials = new Map<
     string,
     {
-      value: MeshLambertMaterial;
+      value: MeshLambertMaterial | MeshStandardMaterial;
+      authoredOpacity?: number;
       users: number;
       colour: string;
       role: MaterialRole;
@@ -151,12 +155,14 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     colour: string,
     role: MaterialRole,
     recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
+    authored?: ModelRenderMaterial,
   ) {
-    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}`;
+    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':'+JSON.stringify(authored) : ''}`;
     let entry = materials.get(key);
     if (!entry) {
+      const custom=authored?createModelRenderMaterial(authored,()=>map.triggerRepaint()):undefined;
       entry = {
-        value: new MeshLambertMaterial({
+        value: custom?.material || new MeshLambertMaterial({
           color: colour,
           side: DoubleSide,
           flatShading: true,
@@ -165,6 +171,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         colour,
         role,
         recipe,
+        releaseTexture:custom?.release,
+        authoredOpacity:authored?.opacity,
       };
       materials.set(key, entry);
     }
@@ -193,18 +201,19 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       geometry.setIndex(part.indices);
       if (part.uvs)
         geometry.setAttribute('uv', new Float32BufferAttribute(part.uvs, 2));
-      geometry.computeVertexNormals();
+      if(part.normals)geometry.setAttribute('normal',new Float32BufferAttribute(part.normals,3));
+      else geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
       const role = meshMaterialRole(part.surfaces, part);
       const mesh = new Mesh(
         geometry,
-        material(part.colour, role, part.texture || part.text),
+        material(part.colour, role, part.texture || part.text,part.material),
       );
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
         minZoom: part.minZoom,
-        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}`,
+        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}${part.material ? ':'+JSON.stringify(part.material) : ''}`,
         surfaces: part.surfaces,
       };
       group.add(mesh);
@@ -337,8 +346,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     for (const entry of materials.values()) {
       if (entry.themeKey === themeKey) continue;
       entry.themeKey = themeKey;
-      entry.value.color.set(entry.value.map ? '#ffffff' : entry.colour);
-      entry.value.opacity = options.opacity ?? 1;
+      entry.value.color.set(entry.value.map && entry.authoredOpacity===undefined ? '#ffffff' : entry.colour);
+      entry.value.opacity = (options.opacity ?? 1)*(entry.authoredOpacity ?? 1);
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
     }

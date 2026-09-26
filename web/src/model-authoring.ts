@@ -33,12 +33,12 @@ export function wallLength(
   latitude = (coordinates[0][1] + coordinates[1][1]) / 2,
 ) {
   const k = (Math.PI / 180) * 6371008.8;
-  return Math.hypot(
-    (coordinates[1][0] - coordinates[0][0]) *
+  return coordinates.slice(1).reduce((total,point,i)=>total+Math.hypot(
+    (point[0] - coordinates[i][0]) *
       k *
       Math.cos((latitude * Math.PI) / 180),
-    (coordinates[1][1] - coordinates[0][1]) * k,
-  );
+    (point[1] - coordinates[i][1]) * k,
+  ),0);
 }
 export function wallMetrics(
   feature: Feature,

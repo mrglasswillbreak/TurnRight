@@ -161,6 +161,8 @@ export interface BuildingTopology {
   }[];
 }
 export interface BuildingSelection {
+  objectId?: string;
+  faceId?: string;
   buildingId: string;
   partId?: string;
   wallId?: string;
@@ -240,6 +242,8 @@ export interface VisualCatalogue {
   }[];
 }
 export interface ModelMesh {
+  normals?: number[];
+  material?: import('./model-render-types.js').ModelRenderMaterial;
   text?: SurfaceTextRecipe;
   /** Fine relief can wait until close zoom; older readers may ignore this hint. */
   minZoom?: number;
@@ -257,6 +261,8 @@ export interface ModelMesh {
     role: NonNullable<BuildingSelection['role']>;
     elementId?: string;
     instanceIndex?: number;
+    objectId?: string;
+    faceId?: string;
   }[];
 }
 export interface BuildingModel {

@@ -11,6 +11,8 @@ import {
   scale3,
   selectedVertices,
   sub3,
+  transformPoint,
+  inverseTransformPoint,
   type MeshSelection,
   type ModelCorner,
   type ModelFace,
@@ -65,11 +67,11 @@ export function meshCommand(
       command.value.some((v) => Math.abs(v) < 0.00001)
     )
       throw new Error('Scale must not collapse an axis.');
-    const centre = centre3(ids.map((id) => object.vertices[id]));
+    const centre = centre3(ids.map((id) => transformPoint(object.vertices[id],object.transform)));
     for (const id of ids) {
-      const point = object.vertices[id],
+      const point = transformPoint(object.vertices[id],object.transform),
         local = sub3(point, centre);
-      object.vertices[id] =
+      object.vertices[id] = inverseTransformPoint(
         command.kind === 'move'
           ? add3(point, command.value)
           : add3(
@@ -77,7 +79,7 @@ export function meshCommand(
               command.kind === 'rotate'
                 ? rotate3(local, command.value)
                 : (local.map((v, i) => v * command.value[i]) as Vec3),
-            );
+            ),object.transform);
     }
     // Imported normals no longer describe the modified surface.
     for (const face of object.faces)

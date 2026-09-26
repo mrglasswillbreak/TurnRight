@@ -31,6 +31,9 @@ export interface ModelMaterial {
   emissive?: string;
   emissiveMap?: string;
   alphaTest?: number;
+  textureSettings?: Partial<Record<'baseMap'|'normalMap'|'roughnessMap'|'metalnessMap'|'emissiveMap',{
+    flipY:boolean;wrapS:number;wrapT:number;offset:Vec2;repeat:Vec2;rotation:number;
+  }>>;
 }
 export interface ModelImage {
   id: string;
@@ -213,6 +216,11 @@ export function transformPoint(point: Vec3, transform: ModelTransform): Vec3 {
     ),
     transform.position,
   );
+}
+export function inverseTransformPoint(point: Vec3, transform: ModelTransform): Vec3 {
+  let result=sub3(point,transform.position);
+  for(let axis=2;axis>=0;axis--){const angles:Vec3=[0,0,0];angles[axis]=-transform.rotation[axis];result=rotate3(result,angles);}
+  return result.map((n,i)=>n/transform.scale[i]) as Vec3;
 }
 export function modelDocumentErrors(value: unknown): string[] {
   if (value === undefined) return [];

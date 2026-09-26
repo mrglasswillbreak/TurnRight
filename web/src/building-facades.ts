@@ -8,6 +8,7 @@ import type { FacadeDescription, FacadeTextureRecipe } from './visual-types.js';
 import type { CampusData, CampusPhoto } from './types.js';
 import type { ValidationIssue } from './validation.js';
 import { buildingTopology, polygonsOf } from './building-surfaces.js';
+import { curvedWall } from './building-curves.js';
 
 export function detailRevision(feature: Feature): string | undefined {
   const appearance = feature.properties?.appearance || {};
@@ -61,15 +62,18 @@ export function facadeWalls(feature: Feature) {
   const polygons = polygonsOf(feature.geometry);
   return buildingTopology(feature).parts.flatMap((part, p) =>
     part.rings.flatMap((ring, r) =>
-      ring.wallIds.map((wallId, w) => ({
+      ring.wallIds.flatMap((wallId, w) => {
+        const curve=curvedWall(feature,wallId);
+        if(curve && curve.wallIds[0]!==wallId)return [];
+        return [{
         partId: part.id,
         wallId,
-        label: `Wing ${p + 1} · ${r ? 'courtyard ' : ''}wall ${w + 1}`,
-        coordinates: [polygons[p][r][w], polygons[p][r][w + 1]] as [
+        label: `Wing ${p + 1} · ${r ? 'courtyard ' : ''}${curve?'curved ':''}wall ${w + 1}`,
+        coordinates: (curve ? curve.vertexIds.map(id=>polygons[p][r][ring.vertexIds.indexOf(id)]) : [polygons[p][r][w], polygons[p][r][w + 1]]) as [
           number,
           number,
         ][],
-      })),
+      }];}),
     ),
   );
 }
