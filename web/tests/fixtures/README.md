@@ -43,8 +43,12 @@ fingers, duplicate clicks, mouse use and keyboard/screen-reader activation.
 
 The browser suite in `../browser/editor.spec.ts` supplies isolated owner, draft,
 publication and media responses. Its model fixture covers shared 3D/2D commands,
-wall and roof lettering, nested structure selection, grouping, recovery and
-WebGL fallback. `model workspace touch layouts` simulates viewport rotation and
+wall and roof lettering, nested structure selection, individual generated and
+repeated windows, grouping, instance locks/visibility, recovery, bulk wall review
+and WebGL fallback. Public handoff cases cover linked and unlinked buildings,
+sign-in return, unavailable targets and pending drawing protection. Arrival
+tests assert actions appear between the photograph and its credits.
+`model workspace touch layouts` simulates viewport rotation and
 a reduced visual viewport while retaining an unfinished numeric field.
 
 `playwright.docs.config.ts` builds the current application and combines isolated

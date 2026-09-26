@@ -5212,7 +5212,7 @@ test('documentation current gallery: published campus and isolated owner workflo
       await page.screenshot({
         path: fileURLToPath(
           new URL(
-            `../../../docs/assets/screenshots/${name}-2026-09-25.png`,
+            `../../../docs/assets/screenshots/${name}-2026-09-26.png`,
             import.meta.url,
           ),
         ),
@@ -5329,6 +5329,25 @@ test('documentation current gallery: published campus and isolated owner workflo
     await dialog.getByLabel('Projection (m)', { exact: true }).fill('0.2');
     await dialog.getByLabel('Projection (m)', { exact: true }).press('Enter');
     await shot('editor-model-wall-text');
+    await dialog.getByLabel('Find model parts').fill('Window');
+    await dialog.locator('[data-tree-key*="~instance:"]').first().click();
+    await dialog.getByLabel('Find model parts').fill('');
+    await dialog
+      .getByRole('button', { name: 'Edit surface', exact: true })
+      .click();
+    await dialog.getByLabel('Width (m)', { exact: true }).fill('1.25');
+    await dialog.getByLabel('Width (m)', { exact: true }).press('Enter');
+    await dialog
+      .getByRole('button', { name: 'Fit selection', exact: true })
+      .click();
+    for (let i = 0; i < 3; i++)
+      await dialog
+        .getByRole('button', { name: 'Zoom out', exact: true })
+        .click();
+    await dialog
+      .getByLabel('Width (m)', { exact: true })
+      .scrollIntoViewIfNeeded();
+    await shot('editor-model-window-instance');
     await dialog
       .getByRole('button', { name: 'Reset view', exact: true })
       .click();
@@ -5410,6 +5429,7 @@ test('documentation current gallery: published campus and isolated owner workflo
     await dialog.getByLabel('Model editing mode').selectOption('review');
     await shot('editor-model-review-mobile');
     await page.setViewportSize({ width: 1440, height: 1000 });
+    await shot('editor-model-bulk-review');
     await dialog
       .getByRole('button', { name: 'Back to Survey', exact: true })
       .click();
@@ -5437,6 +5457,21 @@ test('documentation current gallery: published campus and isolated owner workflo
       .first()
       .click();
     await shot('public-place-desktop-current');
+    await page
+      .getByRole('group', { name: 'Place actions', exact: true })
+      .evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await shot('public-building-actions');
+    await page.getByRole('link', { name: 'Editor', exact: true }).click();
+    await attachMap(page);
+    await expect(
+      page.getByRole('button', { name: 'Edit model', exact: true }),
+    ).toBeVisible();
+    await shot('editor-public-building-handoff');
+    const publicSenate = data.places.find(
+      (place) => place.name === 'LASU Senate Building',
+    )!;
+    await page.goto('/?place=' + encodeURIComponent(publicSenate.id));
+    await attachMap(page);
     const handle = page.getByRole('slider', { name: 'Resize search panel' });
     await handle.focus();
     await handle.press('Home');
@@ -7618,6 +7653,29 @@ test('individual generated windows edit, undo and reopen without ungrouping', as
     .click();
   await page.getByRole('button', { name: 'Edit model', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Find model parts').fill('Window');
+  await dialog
+    .locator(`[data-tree-key="detail:library:wall:0:0:0:${edited.id}"]`)
+    .click();
+  await modelAction(page, 'Lock');
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toBeDisabled();
+  await modelAction(page, 'Unlock');
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toBeEnabled();
+  await modelAction(page, 'Hide in editor');
+  await expect(
+    dialog.locator(`.model-wall-canvas [data-element-id="${edited.id}"]`),
+  ).toHaveCount(0);
+  await modelAction(page, 'Show in editor');
+  await modelAction(page, 'Delete');
+  await expect
+    .poll(() => wall()?.elements.some((e) => e.id === edited.id))
+    .toBe(false);
+  await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect
+    .poll(() => wall()?.elements.some((e) => e.id === edited.id))
+    .toBe(true);
+  await expect(dialog.getByLabel('Width (m)', { exact: true })).toHaveValue(
+    '1.25',
+  );
   expect(
     server.edits().find((e) => e.id === 'library')?.properties.appearance
       ?.facades,
@@ -7898,6 +7956,77 @@ test('public Editor opens the selected building card and consumes the handoff on
   await expect(
     page.getByLabel('Building opacity', { exact: true }),
   ).toHaveValue('1');
+});
+
+test('public footprint dialog opens its unlinked building in the editor', async ({
+  page,
+}) => {
+  await setup(page, false, false, {
+    mutateCampus: (data) => {
+      const building = data.map.features.find(
+        (f) => f.properties?.id === 'library',
+      )!;
+      building.properties = {
+        ...building.properties,
+        id: 'unlinked-library',
+        name: 'Unlinked library',
+        placeId: undefined,
+      };
+      data.places = data.places.filter((p) => p.id !== 'library');
+    },
+  });
+  await page.goto('/');
+  await attachMap(page);
+  const expand = page.getByRole('button', { name: 'Expand card', exact: true });
+  if (await expand.isVisible()) await expand.click();
+  await expect(
+    page.getByRole('link', { name: 'Editor', exact: true }),
+  ).toHaveAttribute('href', '/admin');
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({ center: [3.20012, 6.46022], zoom: 20 }),
+  );
+  await clickMap(page, [3.20012, 6.46022]);
+  const link = page
+    .getByRole('dialog')
+    .getByRole('link', { name: 'Editor', exact: true });
+  await expect(link).toHaveAttribute(
+    'href',
+    '/admin?building=unlinked-library',
+  );
+  await link.click();
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Unlinked library', { exact: true }).first(),
+  ).toBeVisible();
+});
+
+test('public building handoff waits for a recovered drawing', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.getByRole('button', { name: 'Draw path', exact: true }).click();
+  await clickMap(page, [3.2002, 6.4602]);
+  await page.waitForTimeout(400);
+  page.on('dialog', (dialog) => dialog.accept());
+  await page.goto('/admin?building=library');
+  await expect(
+    page.getByText('Unfinished drawing recovered', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Finish or discard the recovered drawing/),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'Discard drawing', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/admin$/);
 });
 
 test('editor handoff survives a sign-in return and reports unavailable buildings', async ({
