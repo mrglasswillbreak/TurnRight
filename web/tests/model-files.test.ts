@@ -10,10 +10,21 @@ import {
 import { primitive } from '../src/model-primitives';
 import { placeImportedModel } from '../src/model-import-placement';
 import { modelFileZip } from '../src/model-file-zip';
-import { transformModelObject } from '../src/model-object-transform';
+import { transformModelObject, transformModelHierarchy } from '../src/model-object-transform';
 const file = (name: string, text: string) => ({
   name,
   data: new TextEncoder().encode(text).buffer,
+});
+it('transforms imported groups together and protects locked descendants', () => {
+  const doc = newModelDocument([0, 0]), a = primitive('box'), b = primitive('box');
+  a.id = 'group'; a.faces = []; a.vertices = {};
+  b.parentId = a.id; b.transform.position = [5, 0, 0];
+  doc.objects = [a, b];
+  const moved = transformModelHierarchy(doc, a.id, 'move', [2, 3, 4]);
+  expect(moved.objects[1].transform.position).toEqual([7, 3, 4]);
+  expect(doc.objects[1].transform.position).toEqual([5, 0, 0]);
+  b.locked = true;
+  expect(() => transformModelHierarchy(doc, a.id, 'move', [1, 0, 0])).toThrow(/Unlock/);
 });
 it('round trips OBJ geometry, normals, UVs, diffuse colour and explicit units', async () => {
   const doc = newModelDocument([3.2, 6.46]);
