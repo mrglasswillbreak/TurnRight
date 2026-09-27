@@ -1,6 +1,33 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ProcessMonitor, processFraction } from '../src/process-monitor';
 describe('process monitor', () => {
+  it('notifies once for a batch and does not rerender unchanged statuses', () => {
+    const monitor = new ProcessMonitor(),
+      listener = vi.fn();
+    monitor.subscribe(listener);
+    const update = () => {
+      for (let i = 0; i < 30; i++)
+        monitor.set({
+          id: String(i),
+          title: 'Import',
+          stage: 'Reading',
+          state: 'running',
+        });
+    };
+    monitor.batch(update);
+    expect(listener).toHaveBeenCalledTimes(1);
+    monitor.batch(update);
+    monitor.remove('missing');
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(() =>
+      monitor.batch(() => {
+        monitor.remove('0');
+        throw Error('failure');
+      }),
+    ).toThrow('failure');
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(monitor.snapshot()).toHaveLength(29);
+  });
   it('uses the recorded server completion time for historical jobs', () => {
     const m = new ProcessMonitor();
     m.set({

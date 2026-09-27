@@ -105,25 +105,32 @@ export class PhotoQueueStore {
       );
   }
   private notify() {
-    for (const job of this.jobs)
-      processes.set({
-        id: `photo:${job.key}`,
-        title: `Photo: ${job.filename}`,
-        stage:
-          job.error ||
-          (job.state === 'queued' && !navigator.onLine
-            ? 'Waiting for connection'
-            : job.state),
-        state:
-          job.state === 'failed'
-            ? 'failed'
-            : ['ready', 'needs details'].includes(job.state)
-              ? 'complete'
-              : job.state === 'queued'
-                ? 'waiting'
-                : 'running',
-        retry: job.state === 'failed' ? () => this.retry(job.key) : undefined,
-      });
+    const previous = new Map(processes.snapshot().map((p) => [p.id, p]));
+    processes.batch(() => {
+      for (const job of this.jobs)
+        processes.set({
+          id: `photo:${job.key}`,
+          title: `Photo: ${job.filename}`,
+          stage:
+            job.error ||
+            (job.state === 'queued' && !navigator.onLine
+              ? 'Waiting for connection'
+              : job.state),
+          state:
+            job.state === 'failed'
+              ? 'failed'
+              : ['ready', 'needs details'].includes(job.state)
+                ? 'complete'
+                : job.state === 'queued'
+                  ? 'waiting'
+                  : 'running',
+          retry:
+            job.state === 'failed'
+              ? previous.get(`photo:${job.key}`)?.retry ||
+                (() => this.retry(job.key))
+              : undefined,
+        });
+    });
     this.status = `${this.jobs.filter((j) => ['queued', 'uploading', 'processing'].includes(j.state)).length} uploading or queued · ${this.jobs.length} private drafts${this.paused ? ' · Paused' : ''}${!this.leader && this.ready ? ' · Active in another tab' : ''} · ${this.localPending ? 'Saving recovery…' : 'Recovery saved'}${this.storageError ? ` · ${this.storageError}` : ''}`;
     this.listeners.forEach((fn) => fn());
   }

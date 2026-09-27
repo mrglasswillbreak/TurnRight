@@ -78,84 +78,92 @@ export default function ProcessMonitor() {
             ? 'Background status could not refresh. Retrying while online; last known stages are shown.'
             : '',
         );
-        if (results[0].status === 'fulfilled') {
-          for (const j of results[0].value.jobs || [])
-            processes.set({
-              id: `job:${j.id}`,
-              title: j.kind.startsWith('release:')
-                ? `Release ${j.kind.endsWith(':publish') ? 'publication' : 'build'}`
-                : j.kind.replaceAll('-', ' '),
-              stage: j.message || j.status,
-              started: Date.parse(j.created_at),
-              finished: j.completed_at ? Date.parse(j.completed_at) : undefined,
-              elapsedKnown:
-                !!j.completed_at || /running|queue|pending/.test(j.status),
-              state: /fail|error/.test(j.status)
-                ? 'failed'
-                : /complete|succeed|success|done/.test(j.status)
-                  ? 'complete'
-                  : /cancel/.test(j.status)
-                    ? 'cancelled'
-                    : /queue|pending/.test(j.status)
-                      ? 'waiting'
-                      : 'running',
-            });
-          for (const r of results[0].value.releases || []) {
-            if (
-              results[0].value.jobs?.some((j) =>
-                j.kind.startsWith(`release:${r.id}:`),
-              )
-            )
-              continue;
-            processes.set({
-              id: `release:${r.id}`,
-              title: `Release: ${r.summary}`,
-              stage: r.error || r.status,
-              started: Date.parse(r.created_at),
-              elapsedKnown: !['failed', 'preview', 'published'].includes(
-                r.status,
-              ),
-              state:
-                r.status === 'failed'
+        processes.batch(() => {
+          if (results[0].status === 'fulfilled') {
+            for (const j of results[0].value.jobs || [])
+              processes.set({
+                id: `job:${j.id}`,
+                title: j.kind.startsWith('release:')
+                  ? `Release ${j.kind.endsWith(':publish') ? 'publication' : 'build'}`
+                  : j.kind.replaceAll('-', ' '),
+                stage: j.message || j.status,
+                started: Date.parse(j.created_at),
+                finished: j.completed_at
+                  ? Date.parse(j.completed_at)
+                  : undefined,
+                elapsedKnown:
+                  !!j.completed_at || /running|queue|pending/.test(j.status),
+                state: /fail|error/.test(j.status)
                   ? 'failed'
-                  : ['preview', 'published'].includes(r.status)
+                  : /complete|succeed|success|done/.test(j.status)
                     ? 'complete'
-                    : r.status === 'queued'
+                    : /cancel/.test(j.status)
+                      ? 'cancelled'
+                      : /queue|pending/.test(j.status)
+                        ? 'waiting'
+                        : 'running',
+              });
+            for (const r of results[0].value.releases || []) {
+              if (
+                results[0].value.jobs?.some((j) =>
+                  j.kind.startsWith(`release:${r.id}:`),
+                )
+              ) {
+                processes.remove(`release:${r.id}`);
+                continue;
+              }
+              processes.set({
+                id: `release:${r.id}`,
+                title: `Release: ${r.summary}`,
+                stage: r.error || r.status,
+                started: Date.parse(r.created_at),
+                elapsedKnown: !['failed', 'preview', 'published'].includes(
+                  r.status,
+                ),
+                state:
+                  r.status === 'failed'
+                    ? 'failed'
+                    : ['preview', 'published'].includes(r.status)
+                      ? 'complete'
+                      : r.status === 'queued'
+                        ? 'waiting'
+                        : 'running',
+              });
+            }
+          }
+          if (results[0].status === 'fulfilled')
+            for (const j of results[0].value.imports || []) {
+              if (j.status === 'draft') continue;
+              processes.set({
+                id: `import:${j.id}`,
+                title: `Map import ${j.phase === 'inspect' ? 'inspection' : 'preview'} · ${j.id.slice(0, 6)}`,
+                stage: j.message || j.status,
+                started: Date.parse(j.created_at),
+                finished: ['running', 'queued'].includes(j.status)
+                  ? undefined
+                  : Date.parse(j.updated_at),
+                state:
+                  j.status === 'running'
+                    ? 'running'
+                    : j.status === 'queued'
                       ? 'waiting'
-                      : 'running',
-            });
-          }
-        }
-        if (results[0].status === 'fulfilled')
-          for (const j of results[0].value.imports || []) {
-            if (j.status === 'draft') continue;
-            processes.set({
-              id: `import:${j.id}`,
-              title: `Map import ${j.phase === 'inspect' ? 'inspection' : 'preview'} · ${j.id.slice(0, 6)}`,
-              stage: j.message || j.status,
-              started: Date.parse(j.created_at),
-              finished: ['running', 'queued'].includes(j.status)
-                ? undefined
-                : Date.parse(j.updated_at),
-              state:
-                j.status === 'running'
-                  ? 'running'
-                  : j.status === 'queued'
-                    ? 'waiting'
-                    : j.status === 'failed'
-                      ? 'failed'
-                      : j.status === 'cancelled'
-                        ? 'cancelled'
-                        : 'complete',
-              cancel: ['running', 'queued'].includes(j.status)
-                ? () => {
-                    void api('import-cancel', { importId: j.id }).catch((e) =>
-                      setError(e.message),
-                    );
-                  }
-                : undefined,
-            });
-          }
+                      : j.status === 'failed'
+                        ? 'failed'
+                        : j.status === 'cancelled'
+                          ? 'cancelled'
+                          : 'complete',
+                cancel: ['running', 'queued'].includes(j.status)
+                  ? processes.snapshot().find((p) => p.id === `import:${j.id}`)
+                      ?.cancel ||
+                    (() => {
+                      void api('import-cancel', { importId: j.id }).catch((e) =>
+                        setError(e.message),
+                      );
+                    })
+                  : undefined,
+              });
+            }
+        });
       }
       if (!stopped) timer = setTimeout(poll, 5000);
     };

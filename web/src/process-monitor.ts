@@ -24,6 +24,27 @@ export class ProcessMonitor {
   private listeners = new Set<() => void>();
   private dismissed = new Map<string, string>();
   private epoch = 0;
+  private batchDepth = 0;
+  private changed = false;
+  private emit() {
+    if (this.batchDepth) {
+      this.changed = true;
+      return;
+    }
+    this.listeners.forEach((fn) => fn());
+  }
+  batch(work: () => void) {
+    this.batchDepth++;
+    try {
+      work();
+    } finally {
+      this.batchDepth--;
+      if (!this.batchDepth && this.changed) {
+        this.changed = false;
+        this.emit();
+      }
+    }
+  }
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => {
@@ -63,19 +84,20 @@ export class ProcessMonitor {
     this.records = this.records.filter(
       (r) => !r.finished || finished.indexOf(r) < 30,
     );
-    this.listeners.forEach((fn) => fn());
+    this.emit();
   }
   remove = (id: string) => {
     const record = this.records.find((r) => r.id === id);
+    if (!record) return;
     if (record) this.dismissed.set(id, `${record.state}:${record.stage}`);
     this.records = this.records.filter((r) => r.id !== id);
-    this.listeners.forEach((fn) => fn());
+    this.emit();
   };
   clear = () => {
     this.epoch++;
     this.dismissed.clear();
     this.records = [];
-    this.listeners.forEach((fn) => fn());
+    this.emit();
   };
   begin(title: string, stage: string, cancel?: () => void) {
     const id = crypto.randomUUID();
