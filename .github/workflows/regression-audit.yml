@@ -1,0 +1,93 @@
+name: Application regression audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/unilag-globe]
+    paths: [.github/workflows/regression-audit.yml]
+permissions:
+  contents: read
+concurrency:
+  group: regression-audit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm test -- --maxWorkers=2
+      - run: npm run lint
+      - run: npm run check:configured-build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r scripts/requirements-data.txt
+        working-directory: .
+      - run: python -m unittest discover -s scripts/tests -v
+        working-directory: .
+  browsers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Chromium workflows
+        if: matrix.browser == 'chromium'
+        run: npx playwright test --timeout=120000 --output=../test-results/chromium
+      - name: WebKit touch and responsive workflows
+        if: matrix.browser == 'webkit'
+        run: npx playwright test --config playwright.webkit.config.ts --output=../test-results/webkit
+      - name: WebKit image editor
+        if: matrix.browser == 'webkit'
+        run: npx playwright test --config playwright.photos.webkit.config.ts --output=../test-results/webkit-photos
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 14
+  offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --config playwright.pwa.config.ts --output=../test-results/offline
+      - run: npx playwright test --config playwright.photos.pwa.config.ts --output=../test-results/offline-photos
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-offline
+          path: test-results/
+          retention-days: 14
