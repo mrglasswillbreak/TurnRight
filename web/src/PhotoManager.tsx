@@ -1,5 +1,7 @@
 import {
   memo,
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -32,6 +34,9 @@ import { api } from './supabase';
 import type { CampusData, CampusPhoto, MapEdit } from './types';
 import type { PhotoChange } from './photo-workspace';
 import './photo-manager.css';
+import type { PhotoOptimizerRequest } from './PhotoOptimizer';
+import { associateLocalPhoto } from './photo-local';
+const PhotoOptimizer = lazy(() => import('./PhotoOptimizer'));
 
 // Stable event handlers read the current render without invalidating unrelated cards.
 function useLiveCallback<T extends (...args: never[]) => unknown>(
@@ -203,6 +208,9 @@ export function PhotoManager({
     [tab, setTab] = useState<'gallery' | 'review' | 'private' | 'preview'>(
       'gallery',
     );
+  const [optimizing, setOptimizing] = useState<PhotoOptimizerRequest | null>(
+    null,
+  );
   const [selected, setSelected] = useState<string>(),
     [busy, setBusy] = useState<string | false>(false),
     [message, setMessage] = useState(''),
@@ -314,11 +322,7 @@ export function PhotoManager({
       'Resized, oriented and converted to WebP; source metadata removed.',
   });
   const addFiles = (files: File[]) => {
-    queue.enqueue(files, defaults());
-    setTab('review');
-    setMessage(
-      'Photos stay private until reviewed and added to the map draft.',
-    );
+    if (files.length) setOptimizing({ files, metadata: defaults() });
   };
   const apply = (
     photos: CampusPhoto[],
@@ -509,6 +513,8 @@ export function PhotoManager({
           savedDetails: JSON.stringify(photoDetails(photo)),
         });
         approved.push(photo);
+        if (item.localImageId)
+          await associateLocalPhoto(owner, item.localImageId, photo.id);
         if (item.previewUrl)
           setPreviewUrls((p) => ({ ...p, [photo.id]: item.previewUrl! }));
       }
@@ -649,6 +655,29 @@ export function PhotoManager({
             onUrl={(url) => patch(job.key, { previewUrl: url })}
           />
           <div className="photo-actions">
+            <button
+              disabled={
+                !editable || ['uploading', 'processing'].includes(job.state)
+              }
+              onClick={() =>
+                setOptimizing({
+                  localId: job.localImageId,
+                  photo: job.localImageId
+                    ? undefined
+                    : job.metadata.sha256 && job.previewUrl
+                      ? ({
+                          ...job.metadata,
+                          url: job.previewUrl || job.metadata.url,
+                        } as CampusPhoto)
+                      : undefined,
+                  metadata: job.metadata,
+                  replacesJob: job.key,
+                  original: job.original,
+                })
+              }
+            >
+              Edit & optimise
+            </button>
             <button
               disabled={queueOrder.indexOf(job.key) === 0}
               onClick={() =>
@@ -886,6 +915,27 @@ export function PhotoManager({
   if (!['building', 'entrance', 'place'].includes(edit.kind)) return null;
   return (
     <section className="photo-launcher" aria-label="Building photos">
+      {optimizing && (
+        <Suspense fallback={<output>Loading image tools…</output>}>
+          <PhotoOptimizer
+            owner={owner}
+            target={target}
+            request={optimizing}
+            protectedIds={store.jobs.flatMap((j) =>
+              j.localImageId ? [j.localImageId] : [],
+            )}
+            onClose={() => setOptimizing(null)}
+            onReady={(photos, replacesJob) => {
+              store.enqueuePrepared(target, photos);
+              if (replacesJob) store.remove(replacesJob);
+              setTab('review');
+              setMessage(
+                'Optimised images queued for private upload. Review their final quality and details before adding to the map draft.',
+              );
+            }}
+          />
+        </Suspense>
+      )}
       <div className="photo-strip">
         {gallery.slice(0, 4).map((p) => (
           <PhotoImage key={p.id} photo={p} />
@@ -990,6 +1040,9 @@ export function PhotoManager({
               )}
               {tab === 'gallery' && (
                 <>
+                  <button onClick={() => setOptimizing({})}>
+                    Local image drafts · edit offline
+                  </button>
                   <div
                     className="photo-drop"
                     onDragOver={(e) => e.preventDefault()}
@@ -1014,7 +1067,8 @@ export function PhotoManager({
                     </label>
                     <p>
                       Choose files or drop them here. JPEG, PNG or WebP · up to
-                      10 MiB each.
+                      25 MiB each for local optimisation. Originals remain on
+                      this device.
                     </p>
                   </div>
                   {!gallery.length && (
@@ -1056,6 +1110,19 @@ export function PhotoManager({
                                 {p.historical ? ' · Historical' : ''}
                               </p>
                               <div className="photo-actions">
+                                <button
+                                  disabled={!queue.editable || busy === p.id}
+                                  onClick={() =>
+                                    setOptimizing({
+                                      photo: {
+                                        ...p,
+                                        url: previewUrls[p.id] || p.url,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Edit & optimise
+                                </button>
                                 <button
                                   disabled={!queue.editable || busy === p.id}
                                   onClick={() => void editPhoto(p)}

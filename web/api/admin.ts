@@ -110,7 +110,9 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         }
         case 'process-status': {
           const [jobs, releases, imports] = await Promise.all([
-            db('jobs?select=id,kind,status,message,created_at,completed_at&order=created_at.desc&limit=30'),
+            db(
+              'jobs?select=id,kind,status,message,created_at,completed_at&order=created_at.desc&limit=30',
+            ),
             db(
               'releases?select=id,status,summary,created_at,error&order=created_at.desc&limit=20',
             ),

@@ -1,0 +1,229 @@
+.photo-optimizer[data-slot='dialog-content'] {
+  inset: max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  width: auto;
+  height: auto;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  z-index: 60;
+  overflow: hidden;
+}
+.photo-optimizer > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+.photo-opt-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.photo-opt-layout {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 280px;
+  min-height: 0;
+  flex: 1;
+  gap: 16px;
+}
+.photo-opt-layout > nav,
+.photo-opt-controls {
+  overflow: auto;
+  min-width: 0;
+}
+.photo-opt-layout > nav button {
+  display: block;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+  min-height: 44px;
+}
+.photo-opt-layout > nav button[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, var(--background));
+  color: var(--foreground);
+}
+.photo-opt-layout small {
+  display: block;
+  opacity: 0.75;
+}
+.photo-opt-controls fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.photo-optimizer label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.photo-opt-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.photo-opt-controls input:not([type='range']),
+.photo-opt-controls select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  background: var(--background);
+  color: inherit;
+}
+.photo-opt-preview {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  gap: 8px;
+  overflow: auto;
+}
+.photo-opt-preview > :not(.photo-opt-scroll) {
+  flex-shrink: 0;
+}
+.photo-opt-preview p {
+  margin: 0;
+  font-size: 13px;
+}
+.photo-opt-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  box-shadow: 0 0 2px #000;
+  pointer-events: none;
+}
+.photo-opt-scroll {
+  display: flex;
+  overflow: auto;
+  flex: 1;
+  min-height: 100px;
+  background: repeating-conic-gradient(#b2bac422 0% 25%, #75839922 0% 50%)
+    50%/20px 20px;
+  border-radius: 10px;
+}
+.photo-opt-image {
+  position: relative;
+  flex-shrink: 0;
+  margin: auto;
+  line-height: 0;
+}
+.photo-opt-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+.photo-opt-image .photo-opt-before {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.photo-opt-box {
+  position: absolute;
+  border: 2px solid #1688ff;
+  background: #1688ff22;
+  pointer-events: none;
+}
+.photo-optimizer footer {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.photo-optimizer > p {
+  margin: 0;
+  font-size: 13px;
+}
+.photo-optimizer :focus-visible {
+  outline: 3px solid #4488ff;
+  outline-offset: 2px;
+}
+@media (max-width: 1000px) {
+  .photo-opt-layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+  .photo-opt-layout > nav {
+    grid-column: 1/-1;
+    display: flex;
+    max-height: 76px;
+    gap: 8px;
+  }
+  .photo-opt-layout > nav button {
+    min-width: 150px;
+    width: auto;
+    max-width: 200px;
+  }
+  .photo-opt-layout {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .photo-optimizer[data-slot='dialog-content'] {
+    inset: 0;
+    border-radius: 0;
+    padding: 12px;
+  }
+  .photo-opt-layout {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .photo-opt-layout > nav {
+    flex-shrink: 0;
+  }
+  .photo-opt-preview {
+    min-height: 260px;
+    flex-shrink: 0;
+  }
+  .photo-opt-scroll {
+    max-height: 50dvh;
+  }
+  .photo-opt-controls {
+    overflow: visible;
+  }
+  .photo-optimizer footer {
+    max-height: 24dvh;
+    overflow: auto;
+  }
+  .photo-optimizer button {
+    min-height: 44px;
+  }
+  .photo-opt-toolbar > span {
+    font-size: 12px;
+  }
+}
+@media (max-height: 500px) and (min-width: 601px) {
+  .photo-opt-layout {
+    grid-template-columns: 100px minmax(0, 1fr) 240px;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .photo-opt-layout > nav {
+    grid-column: auto;
+    display: block;
+    max-height: none;
+  }
+  .photo-opt-layout > nav button {
+    min-width: 0;
+    width: 100%;
+  }
+  .photo-optimizer footer p,
+  .photo-optimizer header p {
+    display: none;
+  }
+}

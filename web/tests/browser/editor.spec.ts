@@ -1564,6 +1564,10 @@ for (const width of [1440, 390])
         ),
       })),
     );
+    await page
+      .getByRole('dialog', { name: 'Edit & optimise photos' })
+      .getByRole('button', { name: 'Use batch for map', exact: true })
+      .click();
     await expect(
       dialog.getByText('Interrupted processing. Retry this photo.', {
         exact: true,
@@ -1774,6 +1778,10 @@ test('an upload keeps its original building when the inspector changes mid-uploa
         new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
       ),
     });
+    await page
+      .getByRole('dialog', { name: 'Edit & optimise photos' })
+      .getByRole('button', { name: 'Use selected for map', exact: true })
+      .click();
     await expect.poll(() => started).toBe(true);
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
     await page
@@ -8514,7 +8522,10 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
         faces: imported.faces,
         dimensions: imported.dimensions,
         images: imported.document.images.length,
-        pbr: imported.document.materials.some((m: {roughnessMap?:string;metalnessMap?:string})=>m.roughnessMap && m.metalnessMap),
+        pbr: imported.document.materials.some(
+          (m: { roughnessMap?: string; metalnessMap?: string }) =>
+            m.roughnessMap && m.metalnessMap,
+        ),
         missing: imported.missing,
       });
     }
@@ -8526,8 +8537,12 @@ test('model file workers round trip GLB glTF OBJ and STL without external reques
       result.dimensions.every((n: number) => Math.abs(n - 4) < 0.001),
     ).toBe(true);
     expect(result.missing).toEqual([]);
-    expect(result.images).toBe(result.format === 'stl' ? 0 : result.format === 'obj' ? 1 : 2);
-    expect(result.pbr).toBe(result.format === 'glb' || result.format === 'gltf');
+    expect(result.images).toBe(
+      result.format === 'stl' ? 0 : result.format === 'obj' ? 1 : 2,
+    );
+    expect(result.pbr).toBe(
+      result.format === 'glb' || result.format === 'gltf',
+    );
   }
 });
 
@@ -8737,4 +8752,217 @@ test('surface workspace touch tools retain the aligned viewport', async ({
     dialog.getByRole('button', { name: 'Edit surface', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
   expect(await canvas!.evaluate((el) => el.isConnected)).toBe(true);
+});
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+]) {
+  test(`offline image editor controls, recovery and progress at ${viewport.width}px`, async ({
+    page,
+  }, info) => {
+    test.setTimeout(150000);
+    await page.setViewportSize(viewport);
+    await setup(page);
+    let uploads = 0;
+    await page.route('**/api/admin', async (route) => {
+      const { action } = route.request().postDataJSON();
+      if (action === 'media-begin') uploads++;
+      if (action === 'process-status')
+        return route.fulfill({
+          json: {
+            jobs: [
+              {
+                id: 'inspection-test',
+                kind: 'import',
+                status: 'running',
+                message: 'Inspecting buildings: 3 of 5 files',
+                created_at: new Date().toISOString(),
+              },
+            ],
+            releases: [],
+            imports: [],
+          },
+        });
+      return route.fallback();
+    });
+    await focusCampus(page);
+    const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+    if (await collapse.isVisible()) await collapse.click();
+    await clickMap(page, [3.20012, 6.46022]);
+    await page.getByRole('button', { name: /Manage photos/ }).click();
+    const gallery = page.getByRole('dialog', { name: 'Photos · Library' });
+    const sample = JSON.parse(
+      readFileSync(
+        new URL('../../../data/photos/catalogue.json', import.meta.url),
+        'utf8',
+      ),
+    )[0];
+    await gallery.getByLabel('Add photos', { exact: true }).setInputFiles({
+      name: 'building.webp',
+      mimeType: 'image/webp',
+      buffer: readFileSync(
+        new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
+      ),
+    });
+    const editor = page.getByRole('dialog', { name: 'Edit & optimise photos' });
+    await expect(
+      editor.getByRole('button', { name: 'Preview changes', exact: true }),
+    ).toBeEnabled();
+    await editor.getByLabel('Longest edge (px)', { exact: true }).fill('800');
+    await editor
+      .getByRole('button', { name: 'Preview changes', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', {
+        name: 'Download edited image',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await page.screenshot({
+      path: info.outputPath(`photo-compression-${viewport.width}.png`),
+    });
+    expect(uploads).toBe(0);
+    await editor
+      .getByRole('button', { name: 'Rotate right', exact: true })
+      .click();
+    await expect(editor.getByLabel('Straighten', { exact: true })).toHaveValue(
+      '90',
+    );
+    await editor.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect(editor.getByLabel('Straighten', { exact: true })).toHaveValue(
+      '0',
+    );
+    await editor.getByRole('button', { name: 'Redo', exact: true }).click();
+    await expect(editor.getByLabel('Straighten', { exact: true })).toHaveValue(
+      '90',
+    );
+    await editor
+      .getByRole('button', { name: 'Preview changes', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', {
+        name: 'Download edited image',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await editor.getByRole('button', { name: 'Close image editor' }).click();
+    await gallery.getByRole('button', { name: 'Gallery', exact: true }).click();
+    await gallery
+      .getByRole('button', { name: 'Local image drafts · edit offline' })
+      .click();
+    await expect(
+      editor.getByLabel('Longest edge (px)', { exact: true }),
+    ).toHaveValue('800');
+    await expect(editor.getByLabel('Straighten', { exact: true })).toHaveValue(
+      '90',
+    );
+    const bounds = await editor.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+    await page.screenshot({
+      path: info.outputPath(`photo-optimise-${viewport.width}.png`),
+    });
+    await editor.getByRole('button', { name: 'Close image editor' }).click();
+    await gallery.getByRole('button', { name: 'Close', exact: true }).click();
+    await page.getByRole('button', { name: /Activity/ }).click();
+    await expect(
+      page.getByText('Inspecting buildings: 3 of 5 files', { exact: true }),
+    ).toBeVisible();
+    await page.screenshot({ path: info.outputPath('activity-monitor.png') });
+    expect(uploads).toBe(0);
+  });
+}
+
+test('prepared offline image tools reload originals and recipes and queue without uploading', async ({
+  page,
+  context,
+}, info) => {
+  test.skip(
+    !info.config.configFile?.includes('photos.pwa.config'),
+    'Requires production service worker.',
+  );
+  test.setTimeout(180000);
+  await setup(page);
+  let offline = false;
+  let uploads = 0;
+  await page.route('**/api/admin', async (route) => {
+    if (offline) return route.abort('internetdisconnected');
+    if (route.request().postDataJSON()?.action === 'media-begin') uploads++;
+    return route.fallback();
+  });
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.getByRole('button', { name: 'Survey', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+    .click();
+  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+  await page.getByRole('button', { name: 'Close survey', exact: true }).click();
+  await focusCampus(page);
+  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: /Manage photos/ }).click();
+  const gallery = page.getByRole('dialog', { name: 'Photos · Library' });
+  const editor = page.getByRole('dialog', { name: 'Edit & optimise photos' });
+  const sample = JSON.parse(
+    readFileSync(
+      new URL('../../../data/photos/catalogue.json', import.meta.url),
+      'utf8',
+    ),
+  )[0];
+  await gallery.getByLabel('Add photos', { exact: true }).setInputFiles({
+    name: 'offline-building.webp',
+    mimeType: 'image/webp',
+    buffer: readFileSync(
+      new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
+    ),
+  });
+  await editor
+    .getByRole('button', { name: 'Prepare for offline use', exact: true })
+    .click();
+  await expect(editor.getByText(/Image tools ready offline/)).toBeVisible();
+  offline = true;
+  await context.setOffline(true);
+  await editor.getByLabel('Longest edge (px)', { exact: true }).fill('640');
+  await editor
+    .getByRole('button', { name: 'Preview changes', exact: true })
+    .click();
+  await expect(
+    editor.getByRole('button', { name: 'Download edited image', exact: true }),
+  ).toBeEnabled();
+  const download = page.waitForEvent('download');
+  await editor
+    .getByRole('button', { name: 'Download edited image', exact: true })
+    .click();
+  expect((await download).suggestedFilename()).toMatch(/webp$/);
+  await editor.getByRole('button', { name: 'Close image editor' }).click();
+  await page.reload();
+  await attachMap(page);
+  await focusCampus(page);
+  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  if (await collapse.isVisible()) await collapse.click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: /Manage photos/ }).click();
+  await gallery
+    .getByRole('button', { name: 'Local image drafts · edit offline' })
+    .click();
+  await expect(
+    editor.getByLabel('Longest edge (px)', { exact: true }),
+  ).toHaveValue('640');
+  await editor
+    .getByRole('button', { name: 'Preview changes', exact: true })
+    .click();
+  await expect(
+    editor.getByRole('button', { name: 'Download edited image', exact: true }),
+  ).toBeEnabled();
+  await page.screenshot({ path: info.outputPath('photo-editing-offline.png') });
+  await editor
+    .getByRole('button', { name: 'Use selected for map', exact: true })
+    .click();
+  await expect(editor).toHaveCount(0);
+  await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
+  expect(uploads).toBe(0);
 });
