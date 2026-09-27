@@ -7396,9 +7396,13 @@ test('unified model retains an invalid pattern privately and repairs it after re
   await dialog.getByLabel('Find model parts').fill('Repeated details');
   await dialog
     .getByRole('treeitem', { name: 'Repeated details', exact: true })
+    .locator(':scope > .model-tree-row')
     .click();
   await dialog.getByLabel('Find model parts').fill('');
   await dialog.getByText('Groups, patterns & presets', { exact: true }).click();
+  await expect(
+    dialog.getByRole('combobox', { name: 'Pattern', exact: true }),
+  ).not.toHaveValue('');
   await dialog.getByLabel('Horizontal step (m)', { exact: true }).fill('2');
   await dialog
     .getByRole('button', { name: 'Update pattern', exact: true })
@@ -7893,7 +7897,9 @@ test.describe('compact plan and photograph tools', () => {
               ?.points.length,
         )
         .toBe(1);
-      await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+      await dialog
+        .getByRole('button', { name: 'Edit surface', exact: true })
+        .click();
       const roof = dialog.getByRole('application', {
         name: 'Roof plan drawing',
         exact: true,
@@ -7957,6 +7963,24 @@ test.describe('compact plan and photograph tools', () => {
       await dialog.getByLabel('Top left X', { exact: true }).fill('0.12');
       await dialog.getByLabel('Top left X', { exact: true }).press('Enter');
       await expect.poll(() => wall()?.texture?.corners[0][0]).toBe(0.12);
+      await expect
+        .poll(() =>
+          dialog.getByLabel('Top left X', { exact: true }).evaluate((el) => {
+            const box = el.getBoundingClientRect();
+            return (
+              box.top >= 0 &&
+              box.bottom <= innerHeight &&
+              document.elementFromPoint(
+                box.x + box.width / 2,
+                box.y + box.height / 2,
+              ) === el
+            );
+          }),
+        )
+        .toBe(true);
+      await page.screenshot({
+        path: info.outputPath('compact-photo-alignment.png'),
+      });
       await dialog.getByLabel('Model editing mode').selectOption('review');
       await expect(dialog.locator('.model-review')).toBeVisible();
       await expect

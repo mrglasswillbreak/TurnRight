@@ -1422,6 +1422,13 @@
   isolation: isolate;
   overflow: hidden;
 }
+/* Photo controls use the workspace's tool sheet, outside the scrolling photo.
+   The shared surface's positioning must not trap this sheet under the header. */
+.model-compact .model-tab-photo {
+  position: static;
+  isolation: auto;
+  overflow: visible;
+}
 .model-workspace .model-plan-host[hidden] {
   display: none !important;
 }
