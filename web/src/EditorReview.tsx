@@ -1,3 +1,4 @@
+import { requestedCampus } from './campus-context';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
 import {
@@ -174,6 +175,7 @@ export function EditorReview({
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
+          {requestedCampus() === 'lasu' && <>
           <EnrichmentReview
             onLocate={(center) => mapRef.current?.flyTo({ center, zoom: 19 })}
           />
@@ -218,6 +220,7 @@ export function EditorReview({
             onApply={onApplyAppearances}
             onLocate={onLocateBuilding}
           />
+          </>}
           <p className="small-note">
             Daily checks propose changes. Your campus corrections always take
             precedence.
@@ -500,8 +503,8 @@ export function EditorReview({
           {baselineVersion !== publishedVersion && (
             <p className="notice">
               The editor baseline differs from the public map. Reconcile the
-              published baseline before replacing campus geometry; retain the
-              reviewed Law and Library access corrections.
+              published baseline before replacing campus geometry; retain all
+              reviewed access corrections for this campus.
             </p>
           )}
           <div className="validation-card">
