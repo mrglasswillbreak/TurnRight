@@ -1,3 +1,4 @@
+import type { MappingArea } from './campus-context';
 import { watchGps } from './gps-acquisition';
 import { registerSurveyRecovery } from './update-safety';
 import {
@@ -18,6 +19,7 @@ export class SurveyRecorder {
   private queue: Promise<void> = Promise.resolve();
   private disposed = false;
   private unregister: () => void;
+  mappingArea?: MappingArea;
   error = '';
   awake = false;
   pendingWrites = 0;
@@ -94,7 +96,7 @@ export class SurveyRecorder {
         (fix) => {
           if (this.recording.session.state !== 'recording' || document.hidden)
             return;
-          const sample = acceptSample(this.recording, fix);
+          const sample = acceptSample(this.recording, fix, Date.now(), this.mappingArea);
           this.latest = sample;
           void this.save(sample)
             .then(() => this.changed())
