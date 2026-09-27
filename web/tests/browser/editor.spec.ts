@@ -8964,5 +8964,14 @@ test('prepared offline image tools reload originals and recipes and queue withou
     .click();
   await expect(editor).toHaveCount(0);
   await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
+  await gallery.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.reload();
+  await attachMap(page);
+  await focusCampus(page);
+  if (await collapse.isVisible()) await collapse.click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: /Manage photos/ }).click();
+  await gallery.getByRole('button', { name: /Review uploads/ }).click();
+  await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
   expect(uploads).toBe(0);
 });

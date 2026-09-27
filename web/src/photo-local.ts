@@ -15,6 +15,7 @@ export interface LocalPhoto {
   original?: CampusPhoto;
   metadata: Partial<CampusPhoto>;
   photoId?: string;
+  sourceModifications?: string;
   updated: number;
 }
 const connection = () =>

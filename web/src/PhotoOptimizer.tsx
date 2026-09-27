@@ -223,6 +223,7 @@ export default function PhotoOptimizer({
             recipe: defaultPhotoRecipe(),
             original: request.original || request.photo,
             metadata: request.photo,
+            sourceModifications: request.photo.modifications,
             updated: Date.now(),
           });
           setNotice(
@@ -253,6 +254,7 @@ export default function PhotoOptimizer({
             source: file,
             recipe: defaultPhotoRecipe(),
             metadata: request.metadata || {},
+            sourceModifications: request.metadata?.modifications,
             updated: Date.now(),
           });
         }
@@ -365,7 +367,12 @@ export default function PhotoOptimizer({
           height: out.height,
           metadata: {
             ...p.metadata,
-            modifications: photoModifications(recipe),
+            modifications: [
+              p.sourceModifications ?? p.original?.modifications,
+              photoModifications(recipe),
+            ]
+              .filter(Boolean)
+              .join('; '),
           },
         };
         await saveLocalPhoto(owner, next);
