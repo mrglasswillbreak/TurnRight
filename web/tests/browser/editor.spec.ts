@@ -1174,7 +1174,7 @@ async function openBuildingModel(
 async function closeBuildingModel(page: Page) {
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: 'Back to Survey', exact: true })
+    .getByRole('button', { name: /^(Back to Survey|Close workspace)$/ })
     .click();
   await expect(page.getByRole('dialog')).toBeHidden();
 }
@@ -2136,6 +2136,14 @@ async function clickMap(page: Page, coordinates: Position) {
     .toBe(false);
   const p = await position(page, coordinates);
   await page.mouse.click(p.x, p.y);
+  // Selection framing is scheduled by a React effect on the next frame.
+  // Observe that frame before testing isMoving, which can still be false here.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
@@ -4063,8 +4071,8 @@ test('building appearance: integrated view, surface inheritance, live preview, r
   await page
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
-  await page.getByLabel('Point elevation (m)').fill('14');
-  await page.getByLabel('Point elevation (m)').press('Enter');
+  await page.getByLabel('Point elevation (m)', { exact: true }).fill('14');
+  await page.getByLabel('Point elevation (m)', { exact: true }).press('Enter');
   await expect
     .poll(
       () =>
@@ -4445,6 +4453,7 @@ test.describe('building roof touch editing', () => {
     await model
       .getByRole('button', { name: 'Edit surface', exact: true })
       .click();
+    await model.getByRole('button', { name: 'Edit roof', exact: true }).click();
     await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
     const plan = page.getByLabel('Roof plan drawing', { exact: true });
     for (const [x, y] of [
@@ -4458,22 +4467,24 @@ test.describe('building roof touch editing', () => {
         box.y + (y / 300) * box.height,
       );
     }
-    await model.getByRole('button', { name: 'More', exact: true }).click();
+    await model.getByRole('button', { name: 'Edit roof', exact: true }).click();
     await expect(
       page.getByRole('button', { name: 'Remove ridge 1' }),
     ).toBeVisible();
-    await page.getByLabel('Point elevation (m)').fill('50');
-    await page.getByLabel('Point elevation (m)').press('Enter');
-    await expect(page.getByLabel('Point elevation (m)')).toHaveAttribute(
-      'aria-invalid',
-      'true',
-    );
-    await page.getByLabel('Point elevation (m)').fill('14.5');
-    await page.getByLabel('Point elevation (m)').press('Enter');
-    await expect(page.getByLabel('Point elevation (m)')).toHaveAttribute(
-      'aria-invalid',
-      'false',
-    );
+    await page.getByLabel('Point elevation (m)', { exact: true }).fill('50');
+    await page
+      .getByLabel('Point elevation (m)', { exact: true })
+      .press('Enter');
+    await expect(
+      page.getByLabel('Point elevation (m)', { exact: true }),
+    ).toHaveAttribute('aria-invalid', 'true');
+    await page.getByLabel('Point elevation (m)', { exact: true }).fill('14.5');
+    await page
+      .getByLabel('Point elevation (m)', { exact: true })
+      .press('Enter');
+    await expect(
+      page.getByLabel('Point elevation (m)', { exact: true }),
+    ).toHaveAttribute('aria-invalid', 'false');
     await expect
       .poll(
         () =>
@@ -4541,8 +4552,8 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await page
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
-  await page.getByLabel('Point elevation (m)').fill('14');
-  await page.getByLabel('Point elevation (m)').press('Enter');
+  await page.getByLabel('Point elevation (m)', { exact: true }).fill('14');
+  await page.getByLabel('Point elevation (m)', { exact: true }).press('Enter');
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
   await page.getByLabel('Eaves elevation (m)').fill('');
   await expect(page.getByRole('dialog').locator('header output')).toContainText(
@@ -4780,8 +4791,8 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
   await page
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
-  await page.getByLabel('Point elevation (m)').fill('14');
-  await page.getByLabel('Point elevation (m)').press('Enter');
+  await page.getByLabel('Point elevation (m)', { exact: true }).fill('14');
+  await page.getByLabel('Point elevation (m)', { exact: true }).press('Enter');
   await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
   const selectedPoint = await page.getByLabel('Control point').inputValue();
   const camera = await page.evaluate(() => ({
@@ -4792,7 +4803,9 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
   }));
   await closeBuildingModel(page);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await expect(page.getByLabel('Point elevation (m)')).toBeHidden();
+  await expect(
+    page.getByLabel('Point elevation (m)', { exact: true }),
+  ).toBeHidden();
   for (const appearance of ['Light', 'Dark'] as const) {
     const option = page.getByRole('radio', { name: appearance, exact: true });
     await option.focus();
@@ -4825,7 +4838,9 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
     .click();
   await page.getByLabel('Control point').selectOption(selectedPoint);
   await expect(page.getByLabel('Control point')).toHaveValue(selectedPoint);
-  await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
+  await expect(
+    page.getByLabel('Point elevation (m)', { exact: true }),
+  ).toHaveValue('14');
   await expect(
     page.getByRole('button', { name: 'Draw ridge', exact: true }),
   ).toHaveAttribute('aria-pressed', 'false');
@@ -4994,6 +5009,23 @@ test.describe('view settings touch', () => {
     });
     await expect(page.locator('.map-rendering-options')).toHaveCount(0);
   });
+});
+
+test('public phone search keeps a mouse click through search-field blur', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Search campus' }).fill('Library');
+  await page
+    .getByRole('button', { name: 'Library Library · Ojo campus', exact: true })
+    .click();
+  await expect(
+    page.getByRole('heading', { name: 'Library', exact: true }),
+  ).toBeVisible({ timeout: 5000 });
 });
 
 for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
@@ -8597,9 +8629,23 @@ test('surface workspace canvas stays bounded across desktop zoom sizes and phone
       'data-projection',
       'wall',
     );
-    const b = (await dialog.locator('.photo-model-canvas').boundingBox())!;
-    expect(b.width).toBeGreaterThan(180);
-    expect(b.height).toBeGreaterThan(90);
+    // ResizeObserver and the responsive shell update on subsequent frames.
+    await expect
+      .poll(
+        async () =>
+          (await dialog.locator('.photo-model-canvas').boundingBox())?.width ||
+          0,
+        { message: `canvas width at ${width}x${height}` },
+      )
+      .toBeGreaterThan(180);
+    await expect
+      .poll(
+        async () =>
+          (await dialog.locator('.photo-model-canvas').boundingBox())?.height ||
+          0,
+        { message: `canvas height at ${width}x${height}` },
+      )
+      .toBeGreaterThan(90);
     expect(
       await canvas!.evaluate(
         (el) => el === document.querySelector('.photo-model-canvas canvas'),

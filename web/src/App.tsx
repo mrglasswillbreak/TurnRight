@@ -584,6 +584,14 @@ export default function App() {
             if (resultTap.current.begin(event, mobileSearch)) {
               event.preventDefault();
               event.currentTarget.setPointerCapture(event.pointerId);
+            } else if (
+              mobileSearch &&
+              event.pointerType === 'mouse' &&
+              event.button === 0
+            ) {
+              // WebKit does not focus buttons on mouse-down. Keep search from
+              // collapsing on blur before this result receives its click.
+              event.preventDefault();
             }
           }}
           onPointerMove={(event) => resultTap.current.move(event)}
