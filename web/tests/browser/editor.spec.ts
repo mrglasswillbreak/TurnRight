@@ -7963,6 +7963,23 @@ test.describe('compact plan and photograph tools', () => {
       await dialog.getByLabel('Top left X', { exact: true }).fill('0.12');
       await dialog.getByLabel('Top left X', { exact: true }).press('Enter');
       await expect.poll(() => wall()?.texture?.corners[0][0]).toBe(0.12);
+      const photoSheet = dialog.locator('[data-mobile-panel="photo"]');
+      const sheetHeading = dialog.locator('.model-sheet-heading');
+      const sheetBounds = (await photoSheet.boundingBox())!;
+      const headingBounds = (await sheetHeading.boundingBox())!;
+      expect(Math.abs(sheetBounds.x - headingBounds.x)).toBeLessThan(3);
+      expect(Math.abs(sheetBounds.width - headingBounds.width)).toBeLessThan(3);
+      expect(sheetBounds.y).toBeGreaterThanOrEqual(
+        headingBounds.y + headingBounds.height - 1,
+      );
+      if (viewport.width > viewport.height) {
+        const photoBounds = (await dialog
+          .locator('.model-photo-scroll')
+          .boundingBox())!;
+        expect(sheetBounds.x).toBeGreaterThanOrEqual(
+          photoBounds.x + photoBounds.width,
+        );
+      }
       await expect
         .poll(() =>
           dialog.getByLabel('Top left X', { exact: true }).evaluate((el) => {

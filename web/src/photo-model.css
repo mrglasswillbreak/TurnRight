@@ -1662,7 +1662,8 @@
   border-color: var(--link);
 }
 
-.model-landscape .model-stage {
+/* Photo's numeric sheet is anchored to the workspace, not the preview stage. */
+.model-landscape .model-stage:not(:has(.model-tab-photo)) {
   position: relative;
 }
 .model-landscape .model-selected-actions {

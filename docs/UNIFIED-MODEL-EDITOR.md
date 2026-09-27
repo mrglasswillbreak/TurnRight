@@ -28,6 +28,8 @@ This is an unaltered WebKit capture with isolated test data, not a published wal
 assignment. The [September audit](AUDIT-2026-09-27.md) covers pointer reachability,
 selection, recovery and responsive-layout repairs.
 
+![Landscape photo reference with its alignment form in the side panel](assets/screenshots/editor-photo-alignment-landscape-2026-09-27.png)
+
 The structure tree opens building and wing levels initially. Walls contain Details, Groups and Patterns; collection children reference existing details. Disclosure chevrons, search and selected-ancestor expansion keep the target reachable. Arrow keys navigate and expand, Home/End move to the first/last visible row, typing finds names, Enter selects, and Space toggles detail selection on the current wall. Clearing search restores the previous expansion state. Focus and selection have distinct styling.
 
 ![Nested structure and selected-item grouping actions](assets/screenshots/editor-model-tree-actions-2026-09-26.png)
