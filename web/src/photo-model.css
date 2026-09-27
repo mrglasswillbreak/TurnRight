@@ -1385,6 +1385,10 @@
   display: block;
   font-size: 10px;
   color: var(--muted-foreground);
+  opacity: 1;
+}
+.model-tree [aria-selected='true'] .model-tree-label small {
+  color: var(--foreground);
 }
 .model-workspace .model-tree-disclosure {
   flex: 0 0 20px;

@@ -149,7 +149,7 @@ fieldset.roof-tools {
   border: 1px solid transparent;
   border-radius: 8px;
   background: var(--ed-accent, #1764ed);
-  color: #fff;
+  color: var(--ed-accent-foreground, #fff);
   font-weight: 600;
   box-shadow: 0 1px 2px #0002;
   width: 100%;

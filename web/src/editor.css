@@ -5,6 +5,7 @@
   --ed-line: #e4e9e5;
   --ed-soft: #f4f7f4;
   --ed-accent: #24785a;
+  --ed-accent-foreground: #fff;
   position: fixed;
   inset: 0;
   display: flex;
@@ -21,6 +22,7 @@
   --ed-line: #39464a;
   --ed-soft: #29383a;
   --ed-accent: #5cbb94;
+  --ed-accent-foreground: #132d22;
 }
 .editor-shell button {
   font: inherit;
