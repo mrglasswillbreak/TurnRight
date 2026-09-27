@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   defaultPhotoRecipe,
   validatePhotoRecipe,
@@ -57,5 +57,30 @@ describe('local image drafts', () => {
     await removeLocalPhoto('one', 'same-id');
     expect(await localPhoto('one', 'same-id')).toBeUndefined();
     expect(await localPhoto('two', 'same-id')).toBeDefined();
+  });
+  it('keeps local originals within their campus even if location changes during an IndexedDB write', async () => {
+    const draft = {
+      id: 'campus-image',
+      owner: 'one',
+      target: 'building:one',
+      filename: 'lasu.png',
+      source: new Blob(['original']),
+      recipe: defaultPhotoRecipe(),
+      metadata: {},
+      updated: 0,
+    };
+    try {
+      vi.stubGlobal('location', { search: '' });
+      const write = saveLocalPhoto('one', draft);
+      vi.stubGlobal('location', { search: '?campus=unilag' });
+      await write;
+      expect(await localPhoto('one', draft.id)).toBeUndefined();
+      await saveLocalPhoto('one', { ...draft, filename: 'unilag.png' });
+      expect((await localPhoto('one', draft.id))?.filename).toBe('unilag.png');
+      vi.stubGlobal('location', { search: '' });
+      expect((await localPhoto('one', draft.id))?.filename).toBe('lasu.png');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

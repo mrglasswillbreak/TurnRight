@@ -21,6 +21,7 @@ export const photoDetailKeys = [
   'capturedAt',
   'checkedAt',
   'historical',
+  'modifications',
 ] as const;
 export function photoDetails(value: unknown): Partial<CampusPhoto> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};

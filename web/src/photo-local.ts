@@ -26,10 +26,31 @@ const connection = () =>
       );
     },
   });
+type StoredPhoto = LocalPhoto & {
+  sourceBytes?: ArrayBuffer;
+  sourceType?: string;
+  outputBytes?: ArrayBuffer;
+  outputType?: string;
+};
+function restore(value: StoredPhoto): LocalPhoto {
+  const { sourceBytes, sourceType, outputBytes, outputType, ...photo } = value;
+  return {
+    ...photo,
+    source: sourceBytes
+      ? new Blob([sourceBytes], { type: sourceType })
+      : photo.source,
+    output: outputBytes
+      ? new Blob([outputBytes], { type: outputType })
+      : photo.output,
+  };
+}
 export async function localPhotos(owner: string): Promise<LocalPhoto[]> {
+  const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
-    return await db.getAllFromIndex('images', 'owner', campusKey(owner));
+    return (await db.getAllFromIndex('images', 'owner', scopedOwner)).map(
+      restore,
+    );
   } finally {
     db.close();
   }
@@ -38,19 +59,29 @@ export async function localPhoto(
   owner: string,
   id: string,
 ): Promise<LocalPhoto | undefined> {
+  const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
-    return await db.get('images', [campusKey(owner), id]);
+    const value = await db.get('images', [scopedOwner, id]);
+    return value ? restore(value) : undefined;
   } finally {
     db.close();
   }
 }
 export async function saveLocalPhoto(owner: string, value: LocalPhoto) {
+  const scopedOwner = campusKey(owner);
+  const { source, output, ...metadata } = value;
+  const sourceBytes = await source.arrayBuffer();
+  const outputBytes = output ? await output.arrayBuffer() : undefined;
   const db = await connection();
   try {
     await db.put('images', {
-      ...value,
-      owner: campusKey(owner),
+      ...metadata,
+      sourceBytes,
+      sourceType: source.type,
+      outputBytes,
+      outputType: output?.type,
+      owner: scopedOwner,
       updated: Date.now(),
     });
   } finally {
@@ -58,9 +89,10 @@ export async function saveLocalPhoto(owner: string, value: LocalPhoto) {
   }
 }
 export async function removeLocalPhoto(owner: string, id: string) {
+  const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
-    await db.delete('images', [campusKey(owner), id]);
+    await db.delete('images', [scopedOwner, id]);
   } finally {
     db.close();
   }

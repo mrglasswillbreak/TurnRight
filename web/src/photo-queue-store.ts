@@ -4,6 +4,8 @@ import type { CampusPhoto } from './types';
 import { readPhotoRecovery, writePhotoRecovery } from './photo-recovery';
 import { PhotoPreviews, type SignedPreview } from './photo-previews';
 import { measureOperation } from './performance';
+import { localPhoto, type LocalPhoto } from './photo-local';
+import { processes } from './process-monitor';
 export interface PhotoJob extends SignedPreview {
   key: string;
   order?: number;
@@ -26,6 +28,8 @@ export interface PhotoJob extends SignedPreview {
   rightsReviewed: boolean;
   authorshipConfirmed: boolean;
   savedDetails?: string;
+  localImageId?: string;
+  preparedFile?: Blob;
 }
 export interface PrivatePhoto extends SignedPreview {
   id: string;
@@ -76,7 +80,13 @@ export class PhotoQueueStore {
   getStatus = () => this.status;
   getAvailability = () => `${this.ready && this.leader}:${this.storageError}`;
   get needsLeaveWarning() {
-    return this.files.size > 0 || this.localPending || this.writing;
+    return (
+      [...this.files.keys()].some(
+        (key) => !this.jobs.find((j) => j.key === key)?.localImageId,
+      ) ||
+      this.localPending ||
+      this.writing
+    );
   }
   get signal() {
     return this.controller.signal;
@@ -85,18 +95,42 @@ export class PhotoQueueStore {
     await this.persist();
     if (this.storageError || this.pending.size)
       throw Error('Photo recovery could not be saved. Keep this tab open.');
-    if (this.files.size)
+    if (
+      [...this.files.keys()].some(
+        (key) => !this.jobs.find((j) => j.key === key)?.localImageId,
+      )
+    )
       throw Error(
         'Finish uploading the remaining photographs before installing an app update.',
       );
   }
   private notify() {
+    for (const job of this.jobs)
+      processes.set({
+        id: `photo:${job.key}`,
+        title: `Photo: ${job.filename}`,
+        stage:
+          job.error ||
+          (job.state === 'queued' && !navigator.onLine
+            ? 'Waiting for connection'
+            : job.state),
+        state:
+          job.state === 'failed'
+            ? 'failed'
+            : ['ready', 'needs details'].includes(job.state)
+              ? 'complete'
+              : job.state === 'queued'
+                ? 'waiting'
+                : 'running',
+        retry: job.state === 'failed' ? () => this.retry(job.key) : undefined,
+      });
     this.status = `${this.jobs.filter((j) => ['queued', 'uploading', 'processing'].includes(j.state)).length} uploading or queued · ${this.jobs.length} private drafts${this.paused ? ' · Paused' : ''}${!this.leader && this.ready ? ' · Active in another tab' : ''} · ${this.localPending ? 'Saving recovery…' : 'Recovery saved'}${this.storageError ? ` · ${this.storageError}` : ''}`;
     this.listeners.forEach((fn) => fn());
   }
   async start() {
     if (this.started) return;
     this.started = true;
+    window.addEventListener('online', this.reconnect);
     try {
       await this.restore();
     } catch {
@@ -156,6 +190,24 @@ export class PhotoQueueStore {
             ? undefined
             : 'Reselect the original file; it did not finish uploading.',
       }));
+    for (const job of this.jobs)
+      if (job.localImageId && !job.metadata.sha256) {
+        const prepared =
+          job.preparedFile ||
+          (await localPhoto(this.owner, job.localImageId))?.output;
+        if (prepared) {
+          this.files.set(
+            job.key,
+            new File(
+              [prepared],
+              job.filename.replace(/\.[^.]+$/, '') + '.webp',
+              { type: prepared.type },
+            ),
+          );
+          job.state = 'queued';
+          job.error = undefined;
+        }
+      }
     this.nextOrder = Math.max(0, ...this.jobs.map((j) => j.order || 0));
     this.targets.clear();
     for (const j of this.jobs)
@@ -261,6 +313,51 @@ export class PhotoQueueStore {
     this.update(target, (items) => [...items, ...entries]);
     this.nextThumbnail();
   };
+  enqueuePrepared = (target: string, photos: LocalPhoto[]) => {
+    if (!this.leader) return;
+    for (const photo of photos) {
+      if (
+        !photo.output ||
+        photo.output.type !== 'image/webp' ||
+        photo.output.size > 250 * 1024 ||
+        !photo.width ||
+        !photo.height ||
+        Math.max(photo.width, photo.height) > 1600
+      )
+        throw Error(
+          'Prepare a WebP up to 1600px and 250 KiB before uploading.',
+        );
+    }
+    const entries: PhotoJob[] = photos.map((photo) => {
+      const key = crypto.randomUUID();
+      this.files.set(
+        key,
+        new File(
+          [photo.output!],
+          photo.filename.replace(/\.[^.]+$/, '') + '.webp',
+          { type: 'image/webp' },
+        ),
+      );
+      return {
+        key,
+        target,
+        filename: photo.filename,
+        localImageId: photo.id,
+        preparedFile: photo.output,
+        original: photo.original,
+        metadata: {
+          ...photoDetails(photo.metadata),
+          modifications: photo.metadata.modifications,
+        },
+        revision: 0,
+        state: 'queued',
+        reviewed: false,
+        rightsReviewed: !!photo.original,
+        authorshipConfirmed: photo.metadata.sourceKind === 'author-upload',
+      };
+    });
+    this.update(target, (items) => [...items, ...entries]);
+  };
   private nextThumbnail() {
     if (this.stopped || this.decoding) return;
     const key = this.thumbnails.shift();
@@ -337,7 +434,14 @@ export class PhotoQueueStore {
     this.pump();
   };
   private pump() {
-    if (this.active || this.paused || !this.leader || this.stopped) return;
+    if (
+      this.active ||
+      this.paused ||
+      !this.leader ||
+      this.stopped ||
+      !navigator.onLine
+    )
+      return;
     const job = this.jobs.find((j) => j.state === 'queued');
     if (!job) return;
     this.active = true;
@@ -346,6 +450,7 @@ export class PhotoQueueStore {
       this.pump();
     });
   }
+  private reconnect = () => this.pump();
   private async process(job: PhotoJob) {
     let id = job.mediaId;
     const request = <T>(action: string, payload: unknown) =>
@@ -411,7 +516,10 @@ export class PhotoQueueStore {
       });
     } catch (e) {
       if (!this.stopped)
-        this.patch(job.key, { state: 'failed', error: (e as Error).message });
+        this.patch(job.key, {
+          state: navigator.onLine ? 'failed' : 'queued',
+          error: navigator.onLine ? (e as Error).message : undefined,
+        });
     }
   }
   private clearSave(key: string) {
@@ -478,6 +586,7 @@ export class PhotoQueueStore {
   stop() {
     this.stopped = true;
     this.controller.abort();
+    window.removeEventListener('online', this.reconnect);
     void this.persist().finally(() => this.release?.());
     this.leader = false;
     this.thumbnail?.terminate();

@@ -47,7 +47,23 @@ export async function readPhotoRecovery(owner: string): Promise<PhotoJob[]> {
       await tx.done;
       localStorage.removeItem(key);
     }
-    return await db.getAllFromIndex('jobs', 'owner', owner);
+    const stored = await db.getAllFromIndex('jobs', 'owner', owner);
+    return stored.map(
+      (
+        record: PhotoJob & {
+          preparedBytes?: ArrayBuffer;
+          preparedType?: string;
+        },
+      ) => {
+        const { preparedBytes, preparedType, ...job } = record;
+        return preparedBytes
+          ? {
+              ...job,
+              preparedFile: new Blob([preparedBytes], { type: preparedType }),
+            }
+          : job;
+      },
+    );
   } finally {
     db.close();
   }
@@ -57,14 +73,29 @@ export async function writePhotoRecovery(
   changes: Map<string, PhotoJob | null>,
 ) {
   owner = campusKey(owner);
+  const prepared = await Promise.all(
+    [...changes].map(async ([key, job]) => {
+      if (!job) return { key, record: null };
+      const { preparedFile, ...record } = recoveryPhoto(job);
+      return {
+        key,
+        record: {
+          ...record,
+          owner,
+          preparedBytes: preparedFile
+            ? await preparedFile.arrayBuffer()
+            : undefined,
+          preparedType: preparedFile?.type,
+        },
+      };
+    }),
+  );
   const db = await connection();
   try {
     const tx = db.transaction('jobs', 'readwrite');
     await Promise.all(
-      [...changes].map(([key, job]) =>
-        job
-          ? tx.store.put({ ...recoveryPhoto(job), owner })
-          : tx.store.delete([owner, key]),
+      prepared.map(({ key, record }) =>
+        record ? tx.store.put(record) : tx.store.delete([owner, key]),
       ),
     );
     await tx.done;
