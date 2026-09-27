@@ -86,6 +86,7 @@ export default function CampusWorkspace({
   const [job, setJob] = useState<CampusImport | null>(null),
     [configuration, setConfiguration] = useState<ImportConfiguration>(blank),
     [scheduledOsm, setScheduledOsm] = useState(false);
+  const [uncertainReview, setUncertainReview] = useState<string | null>(null);
   const [centre, setCentre] = useState(''),
     [previewCampus, setPreviewCampus] = useState(current);
   const [boundaryIndex, setBoundaryIndex] = useState(0);
@@ -233,7 +234,9 @@ export default function CampusWorkspace({
   const reviewBlocker =
     job?.status !== 'preview'
       ? ''
-      : busy
+      : uncertainReview === job.id
+        ? 'Check review status before submitting this import again.'
+        : busy
         ? 'Wait for the current operation to finish.'
         : !job.summary
           ? 'Preview details are unavailable. Reopen this import or rebuild its preview.'
@@ -921,16 +924,40 @@ export default function CampusWorkspace({
                     }
                     onClick={() =>
                       void run(async () => {
-                        await api('import-queue', { importId: job.id });
+                        try {
+                          await api('import-queue', { importId: job.id });
+                        } catch (error) {
+                          // A lost response does not mean the transaction failed.
+                          const result = await api<{ job: CampusImport }>(
+                            'import-get', { importId: job.id },
+                          ).catch(() => null);
+                          if (result?.job.status !== 'reviewed') {
+                            setUncertainReview(job.id);
+                            throw error;
+                          }
+                        }
                         setJob({ ...job, status: 'reviewed' });
-                        await refresh();
+                        setUncertainReview(null);
                         setNotice(
                           'Changes are queued. Review source changes before publishing.',
                         );
+                        void refresh().catch(() => {});
                       })
                     }
                   >
                     <Check /> Queue for review
+                  </Button>
+                )}
+                {uncertainReview === job.id && (
+                  <Button variant="outline" disabled={busy} onClick={() => void run(async () => {
+                    const result = await api<{ job: CampusImport }>('import-get', { importId: job.id });
+                    setJob(result.job);
+                    setUncertainReview(null);
+                    setNotice(result.job.status === 'reviewed'
+                      ? 'Changes are queued. Review source changes before publishing.'
+                      : 'The server has not queued this preview. You can retry when it is ready.');
+                  })}>
+                    <RefreshCw /> Check review status
                   </Button>
                 )}
                 {job.status === 'reviewed' && (
