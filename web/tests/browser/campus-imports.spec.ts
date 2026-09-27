@@ -8,7 +8,8 @@ import type {
   CampusSource,
   ImportPreview,
 } from '../../src/map-import-types';
-import type { CampusData, CampusPackage } from '../../src/types';
+import type { CampusData, CampusPackage, MapEdit } from '../../src/types';
+import type { SaveBatch } from '../../src/editor-workspace';
 
 const north: CampusIdentity = {
   id: 'campus-north',
@@ -67,7 +68,7 @@ const summary: ImportPreview = {
   totalFeatures: 44,
 };
 
-async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
+async function setup(page: Page, { photo = false, outsideLasu = false }: { photo?: boolean; outsideLasu?: boolean } = {}) {
   const data: CampusData = photo
     ? JSON.parse(
         readFileSync(
@@ -79,6 +80,20 @@ async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
         ),
       )
     : campusFixture();
+  const activeNorth = outsideLasu
+    ? { ...north, bounds: [[3.383488, 6.499619], [3.404971, 6.524281]] as CampusIdentity['bounds'] }
+    : north;
+  if (outsideLasu) {
+    data.bounds = activeNorth.bounds;
+    data.boundary = { type: 'Feature', properties: { name: north.name }, geometry: {
+      type: 'Polygon', coordinates: [[[3.383488, 6.499619], [3.404971, 6.499619], [3.404971, 6.524281], [3.383488, 6.524281], [3.383488, 6.499619]]],
+    } };
+    data.map.features = [{ type: 'Feature', properties: { id: 'unilag-road', kind: 'path', name: 'OZOLUA RD.', walkingAccess: 'private' }, geometry: { type: 'LineString', coordinates: [[3.391, 6.51], [3.392, 6.511]] } }];
+    data.places = [];
+    data.graph.nodes = [];
+    data.graph.edges = [];
+  }
+  let saved: MapEdit[] = [];
   const bytes = JSON.stringify(data);
   const manifest: CampusPackage = {
     schemaVersion: 1,
@@ -106,7 +121,7 @@ async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
   const sources: CampusSource[] = [];
   const campuses = [
     { ...lasuCampus, boundary },
-    { ...north, boundary },
+    { ...activeNorth, boundary: data.boundary },
   ];
   const calls: {
     action: string;
@@ -181,14 +196,18 @@ async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
     if (action === 'state')
       result = {
         base: data,
-        campus: request.campus === 'north-campus' ? north : lasuCampus,
-        edits: [],
+        campus: request.campus === 'north-campus' ? activeNorth : lasuCampus,
+        edits: saved,
         changes: [],
         reports: [],
         jobs: [],
         releases: [],
         published: null,
       };
+    if (action === 'save-edits') {
+      saved = (payload as SaveBatch).edits.map(({ edit }) => ({ ...edit, updated_at: new Date().toISOString() }));
+      result = saved;
+    }
     if (action === 'sources') result = { features: [] };
     if (action === 'survey-list') result = [];
     if (action === 'review-status')
@@ -686,4 +705,25 @@ test('campus imports retain readable headers and fields in light and dark themes
         path: '../docs/assets/screenshots/campus-dark-2026-09-26.png',
       });
   }
+});
+
+test('campus imports save and reopen paths outside LASU after rotation', async ({ page }, info) => {
+  const state = await setup(page, { outsideLasu: true });
+  await page.goto('/admin?campus=north-campus');
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Search map features' }).fill('OZOLUA');
+  await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
+  await page.getByRole('combobox', { name: 'Walking access', exact: true }).selectOption('yes');
+  await expect.poll(() => state.calls.filter((c) => c.action === 'save-edits').length).toBeGreaterThan(0);
+  await expect(page.getByRole('status').filter({ hasText: /^Saved$/ })).toBeVisible();
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
+  await page.screenshot({ path: info.outputPath('unilag-path-saved.png') });
+  await page.reload();
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Search map features' }).fill('OZOLUA');
+  await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
+  await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
+  await expect(page.getByText('All coordinates must be within the LASU Ojo mapping area.', { exact: true })).toHaveCount(0);
+  expect(state.calls.filter((c) => c.action === 'save-edits').every((c) => c.campus === 'north-campus')).toBe(true);
 });
