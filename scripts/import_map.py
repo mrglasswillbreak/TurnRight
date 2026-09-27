@@ -77,10 +77,20 @@ def remote(path, method='GET', body=None, raw=False):
     base=os.environ['SUPABASE_URL'].rstrip('/')
     key=os.environ['SUPABASE_SERVICE_ROLE_KEY']
     request=urllib.request.Request(base+'/'+path, method=method, data=body if isinstance(body,bytes) else encoded(body) if body is not None else None, headers={'Authorization':'Bearer '+key,'apikey':key,'Content-Type':'application/json','Prefer':'return=representation','X-TurnRight-Campus':os.environ.get('CAMPUS_ID','lasu')})
-    with urllib.request.urlopen(request,timeout=90) as response:
-        content=response.read(250*1024*1024+1)
-        if len(content)>250*1024*1024: raise ValueError('Private import artifact exceeds its limit.')
-        return content if raw else json.loads(content) if content else None
+    try:
+        with urllib.request.urlopen(request,timeout=90) as response:
+            content=response.read(250*1024*1024+1)
+            if len(content)>250*1024*1024: raise ValueError('Private import artifact exceeds its limit.')
+            return content if raw else json.loads(content) if content else None
+    except urllib.error.HTTPError as error:
+        # Keep HTTPError identity for missing-upload recovery. Only expose the
+        # bounded service message, never request headers, credentials or payloads.
+        try:
+            detail=json.loads(error.read(16384)).get('message')
+            if isinstance(detail,str): error.add_note('Import service: '+detail[:1000])
+        except (ValueError,UnicodeError,AttributeError):
+            pass
+        raise
 
 
 def db(table, method='GET', body=None):
