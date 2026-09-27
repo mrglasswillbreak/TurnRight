@@ -18,6 +18,16 @@ Desktop uses an icon-toggle structure tree, centre viewport and a 360 px propert
 
 In **3D**, touch and hold a visible detail for about half a second to select it and open its action menu. Duplicate, copy, delete, lock and hide target the selected instance. Whole-row, group and pattern edits require an explicit tree selection. Dragging or adding a second finger cancels the hold and keeps orbit/pinch navigation available. Releasing a completed hold does not select again. Right-click and keyboard selection actions remain available.
 
+In **Photo**, open **Align texture → Edit alignment** to adjust corner coordinates.
+The form scrolls inside the tool sheet without covering the workspace header.
+The photograph and its zoom remain independent of these numeric fields.
+
+![Photo alignment in the 320px phone workspace](assets/screenshots/editor-photo-alignment-phone-2026-09-27.png)
+
+This is an unaltered WebKit capture with isolated test data, not a published wall
+assignment. The [September audit](AUDIT-2026-09-27.md) covers pointer reachability,
+selection, recovery and responsive-layout repairs.
+
 The structure tree opens building and wing levels initially. Walls contain Details, Groups and Patterns; collection children reference existing details. Disclosure chevrons, search and selected-ancestor expansion keep the target reachable. Arrow keys navigate and expand, Home/End move to the first/last visible row, typing finds names, Enter selects, and Space toggles detail selection on the current wall. Clearing search restores the previous expansion state. Focus and selection have distinct styling.
 
 ![Nested structure and selected-item grouping actions](assets/screenshots/editor-model-tree-actions-2026-09-26.png)

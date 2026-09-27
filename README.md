@@ -354,6 +354,12 @@ Selected details expose **Ungroup** for group membership and **Detach instance**
 
 On phones, use the mode selector and **Orbit / Edit surface / Photo** views. **Choose wall**, **Add**, **Edit** and **More** open one panel at a time. Portrait keeps focused sheets; landscape places a panel beside the canvas at about 40% width, capped at 320 CSS px. Headers and close controls remain accessible, forms scroll inside the panel, and rotation preserves entered values and selection. Tap selects; Move and Resize explicitly enable touch editing. A second touch cancels an unfinished gesture before navigation.
 
+![Phone photo-alignment sheet with reachable numeric controls](docs/assets/screenshots/editor-photo-alignment-phone-2026-09-27.png)
+
+The photo-alignment sheet keeps its header and coordinate fields reachable at
+320px width. This WebKit screenshot uses isolated test data; it does not show a
+published wall assignment. [Current reliability and performance audit](docs/AUDIT-2026-09-27.md).
+
 ![Landscape editing with a visible model and scrollable properties](docs/assets/screenshots/editor-model-landscape-2026-09-26.png)
 
 Select the building row and **Appearance → Building height** to edit whole-building metres or recorded floor counts. Floor-count mode uses a labelled 3 m-per-floor estimate. Custom roof elevations adjust proportionally by default; owners can retain recorded elevations, fit an existing mismatch or explicitly remove a wing override. Missing values remain recoverable input rather than invented dimensions.
