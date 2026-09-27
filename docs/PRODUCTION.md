@@ -3,6 +3,48 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Reliability and responsiveness audit · 27 September 2026
+
+Runtime revision **`74be164`** is Ready in
+[production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/FuTVDuJ86aV4JQM36QtCQpgbnHaG).
+The [audit report](AUDIT-2026-09-27.md) records 16 fixes spanning campus-safe
+retries, import consistency, offline recovery, local image storage, Activity,
+search, model selection and responsive controls. Image recipe-write median fell
+from **10.7 ms to 0.6 ms** in five controlled storage runs. Dense model selection
+under 4× CPU throttling remains above the 200 ms target; the report preserves the
+measurements and physical-device limitations.
+
+[Final CI](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36309823050)
+is green: **623 unit tests**, lint/typechecks, configured production budgets,
+five focused Chromium repairs, four focused WebKit workflows, four WebKit image
+workflows, nine production offline workflows and the separate offline-image
+workflow pass. The preceding full run passed 152 Chromium and 51 WebKit cases;
+all four Chromium failures subsequently passed their focused checks. Twelve
+production-only/documentation cases are excluded from the development suite.
+One WebKit browser termination passed on an unchanged job rerun; the audit keeps
+that history. Python discovery has 40 passes and three driver-dependent skips;
+the pinned GIS run separately passed all 18 import cases. Eight existing lint
+warnings remain.
+
+Verification at **2026-09-27T09:47:39.358Z** confirmed `/`, `/admin` and `/sw.js`
+return 200, unauthenticated `/api/admin` returns 401, and the served model CSS
+contains both photo-sheet positioning repairs. Its file is
+`PhotoModelWorkspace-D0zf-ApE.css`, SHA-256
+`88a530813e3ebd89215a9d46d136df4e61f24b0d3243448882baa9ae8df7f5f6`.
+All **121 published assets / 19,986,835 bytes** passed length and SHA-256 checks.
+The LASU-only catalogue and `lasu-49f832190110` manifest are unchanged. The
+in-app browser installed the waiting update and verified the corrected Clinic
+search and its retained gallery. Six newly approved photographs remain private
+building drafts; unmatched candidates remain unassigned. No campus release or
+database migration was performed.
+
+Final budgets: public startup **434,433 / 435,200 gzip bytes**, additional owner
+code **188,674 / 189,440**, photo workspace **8,494 / 12,288**, lazy 3D
+**235.4 / 300 KiB**, world **5.30 / 8 MiB**, and voice **5.91 / 8 MiB**. Updated
+guides include unaltered phone and landscape photo-alignment captures, with
+**62 distinct README screenshots**. Local image storage migrates atomically to
+IndexedDB version 2; this does not change Supabase or published model schemas.
+
 ## Offline photo editing and Activity · 27 September 2026
 
 Runtime revision **`332c333`** is Ready as the current Production deployment in [Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/5dAp7EyiibzFpfiAXCUDReThKMzR). The editor adds retained local originals, editable image recipes, crop/colour/privacy tools, comparison and batch compression. Activity exposes import, release, model, photo and offline-processing stages. No database migration is required. [Photo workflow](PHOTO-EDITING.md) · [Progress coverage](PROGRESS-MONITOR.md).
