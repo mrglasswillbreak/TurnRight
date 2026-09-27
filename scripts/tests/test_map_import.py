@@ -120,6 +120,20 @@ class MapImportTests(unittest.TestCase):
             return value
         with self.assertRaisesRegex(ValueError,'incomplete'): layer_features('https://services.example/FeatureServer/0',CAMPUS['bounds'],partial)
 
+    def test_arcgis_rejects_same_count_identity_changes_and_reuses_layer_metadata(self):
+        ids_calls=0
+        metadata={'name':'Buildings','capabilities':'Query','objectIdField':'OBJECTID','maxRecordCount':2,'geometryType':'esriGeometryPolygon'}
+        def get(url,form=None):
+            nonlocal ids_calls
+            self.assertIsNotNone(form, 'Known metadata must not be fetched again')
+            if 'returnCountOnly' in form: return {'count':2}
+            if 'returnIdsOnly' in form:
+                ids_calls+=1
+                return {'objectIds':[1,2] if ids_calls==1 else [1,3]}
+            return {'features':[{'attributes':{'OBJECTID':1}},{'attributes':{'OBJECTID':2}}]}
+        with self.assertRaisesRegex(ValueError,'identifiers changed'):
+            layer_features('https://example.org/FeatureServer/0',CAMPUS['bounds'],get,metadata=metadata)
+
     def test_embedded_arcgis_layers_and_unsupported_tiles(self):
         layers,warnings=discover('https://example.org/map',CAMPUS['bounds'],lambda *args: {'operationalLayers':[{'title':'Trees','featureCollection':{'layers':[{'layerDefinition':{'fields':[]},'featureSet':{'features':[]}}]}},{'title':'Imagery','url':'https://example.org/tiles','layerType':'ArcGISTiledMapServiceLayer'}]})
         self.assertEqual(layers[0]['name'],'Trees')

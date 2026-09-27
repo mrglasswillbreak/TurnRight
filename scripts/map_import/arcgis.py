@@ -11,9 +11,9 @@ def endpoint(url, operation=None):
     return urlunsplit((parts.scheme, parts.netloc, path, '', ''))
 
 
-def layer_features(url, bounds, get=public_json, progress=lambda message: None):
+def layer_features(url, bounds, get=public_json, progress=lambda message: None, metadata=None):
     progress('Checking ArcGIS layer capabilities')
-    meta = get(endpoint(url) + '?f=json')
+    meta = metadata if metadata is not None else get(endpoint(url) + '?f=json')
     if 'Query' not in meta.get('capabilities', ''):
         raise ValueError(f"{meta.get('name', url)} does not support feature queries.")
     params = {'f':'json','where':'1=1','geometry':json.dumps({'xmin':bounds[0][0],'ymin':bounds[0][1],'xmax':bounds[1][0],'ymax':bounds[1][1],'spatialReference':{'wkid':4326}}), 'geometryType':'esriGeometryEnvelope','inSR':4326,'spatialRel':'esriSpatialRelIntersects'}
@@ -41,6 +41,10 @@ def layer_features(url, bounds, get=public_json, progress=lambda message: None):
         progress(f"ArcGIS {meta.get('name','layer')}: {len(records)} of {expected} features verified")
     if get(query, {**params,'returnCountOnly':'true'}).get('count') != expected:
         raise ValueError('ArcGIS changed during import. Retry to obtain a complete snapshot.')
+    final_ids = get(query, {**params,'returnIdsOnly':'true'})
+    final_values = final_ids.get('objectIds') or []
+    if final_ids.get('exceededTransferLimit') or len(final_values) != expected or set(final_values) != set(ids):
+        raise ValueError('ArcGIS identifiers changed during import. Retry to obtain a complete snapshot.')
     return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'objectIdFieldName':field, 'sourceUrl':url}
 
 
@@ -105,9 +109,11 @@ def discover(url, bounds, get=public_json, _visited=None, progress=lambda messag
             if 'Query' not in meta.get('capabilities',''):
                 warnings.append('Skipped non-queryable layer: '+str(layer.get('name',child)))
             else:
-                layers.append(layer_features(child,bounds,get,progress))
+                layers.append(layer_features(child,bounds,get,progress,meta))
+                if sum(len(layer.get('features', [])) for layer in layers) > 100000:
+                    raise ValueError('ArcGIS source exceeds the layer or feature limit.')
     elif 'geometryType' in value:
-        layers.append(layer_features(url,bounds,get,progress))
+        layers.append(layer_features(url,bounds,get,progress,value))
     else:
         raise ValueError('Use a public Web Map, FeatureServer or queryable MapServer layer URL.')
     if len(layers) > 100 or sum(len(layer.get('features', [])) for layer in layers) > 100000:
