@@ -40,6 +40,7 @@ export interface ReviewState {
     status: string;
     message: string;
     created_at: string;
+    completed_at?: string;
   }[];
   releases: Release[];
 }

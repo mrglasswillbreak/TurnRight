@@ -28,12 +28,12 @@ if (
 )
   throw new Error("Release/Vercel workflow secrets are missing");
 let progressJob: string | undefined;
-const progress = async (message: string) => { if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {message}); };
+const progress = async (message: string) => { if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {message}).catch(()=>console.warn('Progress status update unavailable')); };
 try {
   const [release] = await db(`releases?id=eq.${encodeURIComponent(id)}`);
   if (!release) throw new Error("Release not found");
-  const [job] = await db('jobs','POST',{kind:`release:${id}:${operation}`,status:'running',message:'Validating release snapshot'});
-  progressJob=job.id;
+  const [job] = await db('jobs','POST',{kind:`release:${id}:${operation}`,status:'running',message:'Validating release snapshot'}).catch(()=>[]);
+  progressJob=job?.id;
   const campus = await activeCampus();
   const catalog = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
   if (!release.catalogue_revision || catalog.revision !== release.catalogue_revision) throw Error('The campus directory changed. Create a fresh reviewed preview.');
@@ -177,7 +177,7 @@ try {
     });
     console.log("Production release and domain assignment verified.");
   } else throw new Error("Unknown release operation");
-  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'succeeded',message:operation==='preview'?'Preview ready for review':'Publication verified',completed_at:new Date().toISOString()});
+  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'succeeded',message:operation==='preview'?'Preview ready for review':'Publication verified',completed_at:new Date().toISOString()}).catch(()=>{});
 } catch (error) {
   const message = (error as Error).message;
   if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'failed',message,completed_at:new Date().toISOString()}).catch(()=>{});

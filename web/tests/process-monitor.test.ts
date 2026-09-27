@@ -1,6 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { ProcessMonitor, processFraction } from '../src/process-monitor';
 describe('process monitor', () => {
+  it('uses the recorded server completion time for historical jobs', () => {
+    const m = new ProcessMonitor();
+    m.set({
+      id: 'historic',
+      title: 'Import',
+      stage: 'Done',
+      state: 'complete',
+      started: 1000,
+      finished: 2000,
+    });
+    expect(m.snapshot()[0].finished).toBe(2000);
+  });
   it('reports measured progress only and never fabricates a percent', () => {
     expect(processFraction({})).toBeUndefined();
     expect(processFraction({ completed: 1, total: 0 })).toBeUndefined();

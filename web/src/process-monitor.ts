@@ -12,6 +12,7 @@ export interface ProcessRecord {
   started: number;
   updated: number;
   finished?: number;
+  elapsedKnown?: boolean;
   completed?: number;
   total?: number;
   unit?: string;
@@ -51,7 +52,9 @@ export class ProcessMonitor {
       ...old,
       ...record,
       updated: Date.now(),
-      finished: terminal ? old?.finished || Date.now() : undefined,
+      finished: terminal
+        ? record.finished || old?.finished || Date.now()
+        : undefined,
     };
     this.records = [...this.records.filter((r) => r.id !== record.id), next];
     const finished = this.records

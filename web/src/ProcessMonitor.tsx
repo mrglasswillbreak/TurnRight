@@ -34,7 +34,10 @@ export function ProcessProgress({ record }: { record: ProcessRecord }) {
         />
       )}
       <small>
-        {record.state} · {Math.floor(elapsed / 60)}m {elapsed % 60}s
+        {record.state}
+        {record.elapsedKnown !== false
+          ? ` · ${Math.floor(elapsed / 60)}m ${elapsed % 60}s`
+          : ''}
         {fraction !== undefined
           ? ` · ${record.completed} / ${record.total} ${record.unit || ''}`
           : ''}
@@ -84,6 +87,9 @@ export default function ProcessMonitor() {
                 : j.kind.replaceAll('-', ' '),
               stage: j.message || j.status,
               started: Date.parse(j.created_at),
+              finished: j.completed_at ? Date.parse(j.completed_at) : undefined,
+              elapsedKnown:
+                !!j.completed_at || /running|queue|pending/.test(j.status),
               state: /fail|error/.test(j.status)
                 ? 'failed'
                 : /complete|succeed|success|done/.test(j.status)
@@ -106,6 +112,9 @@ export default function ProcessMonitor() {
               title: `Release: ${r.summary}`,
               stage: r.error || r.status,
               started: Date.parse(r.created_at),
+              elapsedKnown: !['failed', 'preview', 'published'].includes(
+                r.status,
+              ),
               state:
                 r.status === 'failed'
                   ? 'failed'
@@ -125,6 +134,9 @@ export default function ProcessMonitor() {
               title: `Map import ${j.phase === 'inspect' ? 'inspection' : 'preview'} · ${j.id.slice(0, 6)}`,
               stage: j.message || j.status,
               started: Date.parse(j.created_at),
+              finished: ['running', 'queued'].includes(j.status)
+                ? undefined
+                : Date.parse(j.updated_at),
               state:
                 j.status === 'running'
                   ? 'running'
