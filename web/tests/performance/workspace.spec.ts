@@ -154,6 +154,14 @@ test('twenty uploads survive selection changes; a failure preserves the rest', a
       buffer: image,
     })),
   );
+  const optimizer = page.getByRole('dialog', {
+    name: 'Edit & optimise photos',
+  });
+  await expect(optimizer).toBeVisible();
+  await optimizer
+    .getByRole('button', { name: 'Use batch for map', exact: true })
+    .click();
+  await expect(optimizer).toBeHidden({ timeout: 30000 });
   await page
     .getByRole('dialog')
     .getByRole('button', { name: 'Close', exact: true })
