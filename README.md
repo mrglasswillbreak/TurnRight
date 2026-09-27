@@ -48,7 +48,7 @@ The project has three connected parts: a public offline navigation app, a privat
 
 ## Screenshots
 
-Current production-build captures use the verified published campus **`lasu-7343cb96c9a5`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
+The 26 September production-build captures use the then-published campus **`lasu-7343cb96c9a5`**: 395 buildings, 220 places and 39 photographs. Public screens render the real application; editor screens use isolated owner/API fixtures and never expose a private account or change production drafts. The model canvas examples include explicitly illustrative local edits. Phone views are browser simulations.
 
 ### Public map
 
@@ -96,6 +96,8 @@ The globe button beside public search (**Choose a campus**) opens the globe and 
 
 ![Campus search beside the globe](docs/assets/screenshots/globe-campus-chooser-2026-09-27.png)
 
+<img src="docs/assets/screenshots/globe-portrait-chooser-2026-09-27.png" width="280" alt="Portrait globe centred above the campus chooser, with visible stars">
+
 The [UNILAG download guide](docs/UNILAG-DOWNLOADS.md) reproduces separate ArcGIS/OSM files for Akoka and a 500 m access-road buffer, complete-record checks, illustrated manual instructions and a checksum-verified ZIP. Downloading does not import or publish UNILAG.
 
 | Published-campus switcher | Download one campus independently |
@@ -122,9 +124,20 @@ These new screenshots use isolated owner/API fixtures and illustrative second-ca
 
 <img src="docs/assets/screenshots/editor-model-actions-mobile-2026-09-26.png" width="300" alt="Selected detail action menu with edit, duplicate, copy, lock, hide and delete commands">
 
-**Photo management:** review, arrange and edit building photographs independently from model details.
+**Photo management:** edit and compress images offline, then review, arrange and publish building photographs independently from model details.
 
 ![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-26.png)
+
+**Offline image editor:** retain originals, crop/rotate, adjust colour, flatten privacy areas, compare quality and compress batches. Map-ready copies enter the existing rights-review workflow. [Photo editing guide](docs/PHOTO-EDITING.md).
+
+![Offline photo editor with original retention and compression controls](docs/assets/screenshots/photo-optimise-desktop-2026-09-27.png)
+
+| Landscape image editing | Build and import activity |
+| --- | --- |
+| ![Landscape image editor with scrollable controls](docs/assets/screenshots/photo-optimise-landscape-2026-09-27.png) | ![Activity drawer with stages and measured progress](docs/assets/screenshots/activity-monitor-2026-09-27.png) |
+
+**Activity:** follow import inspection, release builds, model files, photos and offline downloads through named stages. Real counts drive percentages where available; failures retain recovery information. [Progress monitor](docs/PROGRESS-MONITOR.md).
+
 
 **Edit model:** one workspace combines an expandable structure tree, a shared 3D viewport, surface-aligned editing, precision plans and photograph references.
 
@@ -274,7 +287,7 @@ Open a destination's **Building photographs** and **Entrances & arrival** sectio
 
 The map distinguishes connected entrances, unconfirmed connections and mapped approaches. **Mapped approach …; final entrance not verified** means the route ends on a mapped path near the destination. It does not confirm a doorway connection. Recorded steps, ramps, surfaces and measured doorway widths remain observations, with unknown details left unknown; no accessible-route guarantee is implied.
 
-The building inspector shows its gallery preview and **Manage photos** button at the top. Owners edit arrival guides separately from this photo workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Original uploads and reviewer records remain private. Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
+The building inspector shows its gallery preview and **Manage photos** button at the top. Owners edit arrival guides separately from this photo workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Local full-resolution originals stay on the device; prepared upload copies and reviewer records remain private. The offline editor accepts JPEG/PNG/WebP, retains editable recipes and provides crop, rotation, colour, privacy and batch compression controls. [Editing and compression](docs/PHOTO-EDITING.md). Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
 
 ## Appearance and 3D
 
@@ -446,7 +459,7 @@ Storage can be evicted or unavailable. Keep recovery exports for important work;
 
 The LASU map combines OpenStreetMap and permitted LASU ArcGIS layers with reviewed owner corrections. Other campuses retain their own boundaries, mappings, source identities, attribution and access reviews. LASU’s confirmed road/gate exceptions are never applied to other campuses. Source IDs, access tags and provenance remain available. The world overview uses the fixed September 2004 NASA Blue Marble shaded-topography composite (about 2 km per original pixel at the equator) and public-domain Natural Earth v5.1.2 at 1:50m scale. It does not add worldwide roads, current campus imagery or routing coverage. Tiles are bundled locally. [Sources, dates, checksums and credits](data/world-sources.json).
 
-The reviewed public release verified on **26 September 2026** is **`lasu-7343cb96c9a5`**, containing **395 buildings, 220 places and 39 photographs**, with **84 assets / 20,228,832 bytes**. Its release summary is “Roofing detail additions and map building clean up”. The earlier 19-building photographic assessment used `lasu-8577d5c85d2c` and was published as `lasu-313d8a168635` on 24 September. Its historical comparison preserved feature identities, footprints, photographs, routing and access permissions; later owner publications have their own release records. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
+The reviewed public release verified on **27 September 2026** is **`lasu-49f832190110`**, containing **395 buildings, 220 places and 39 photographs**, with **121 assets / 19,986,835 bytes**. Its release summary is “building cleanup and texture feature test”. The globe/import software deployment preserves this owner-published package unchanged. The earlier 19-building photographic assessment used `lasu-8577d5c85d2c` and was published as `lasu-313d8a168635` on 24 September. Its historical comparison preserved feature identities, footprints, photographs, routing and access permissions; later owner publications have their own release records. The [coverage report](docs/PHOTO-MODEL-COVERAGE.md) records comparisons against that previous baseline. The live/downloaded version can advance independently; the app's Offline screen is authoritative for the user's installed package.
 
 Seed coverage is a reproducible baseline, not a claim about later owner releases:
 
@@ -583,6 +596,13 @@ TurnRight/
 │   │   ├── surface-text.ts           # Wall/roof lettering and validation
 │   │   ├── campus-model-layer.ts     # Published/draft Three.js model rendering
 │   │   ├── PhotoManager.tsx          # Private photo uploads, recovery and approvals
+│   │   ├── PhotoOptimizer.tsx        # Offline crop, colour, privacy and compression UI
+│   │   ├── photo-edit*.ts            # Recipes, worker client and processing worker
+│   │   ├── photo-processing-local.ts # Native decode, pixel edits and bounded encoding
+│   │   ├── photo-local.ts            # Owner/campus original and recipe storage
+│   │   ├── photo-queue-store.ts      # Sequential uploads and immutable prepared copies
+│   │   ├── ProcessMonitor.tsx        # Activity drawer and scoped server status
+│   │   ├── process-monitor.ts        # Shared local task lifecycle and measured counts
 │   │   ├── SurveyPanel.tsx           # GPS recording and reviewed path application
 │   │   ├── routing.worker.ts         # Device-local routing
 │   │   ├── WorldAnimation.tsx        # Remembered rotation/cloud/star controls
@@ -636,6 +656,7 @@ TurnRight/
 | Import header or fields are unreadable in Dark mode | Install the current app update; campus surfaces and validation text use the shared theme tokens. |
 | A map import cannot finish | Open its job details; check missing projections/files, feature or expanded-size limits, attribution and source completeness. Correct the source/mapping and retry; failed jobs do not replace accepted data. |
 | An old inspection failed with `/work/request.json` permission denied | The worker now matches the private folder's owner. Install the current app update and retry the existing import. |
+| An ArcGIS inspection failed with `Failed to read GeoJSON data` | ArcGIS snapshots now explicitly use the ESRIJSON driver. Retry the existing job; the production UNILAG service has been verified through field mapping. |
 | An upload is missing or interrupted | Open the failed import, choose the same files again, then Inspect layers. Completed reserved uploads are reused. |
 | GeoJSON reports `exceededTransferLimit` | The export is incomplete. Use the underlying ArcGIS layer or its Query link for complete batching, or download every ID batch yourself. Do not remove the flag to accept partial data. |
 | A campus is missing from public search | Private campus creation/import does not publish it. Review the candidate, then build and publish that campus’s release. |
@@ -667,6 +688,7 @@ Start with the [documentation index](docs/README.md), which groups guides by tas
 | Guide | Topics |
 | --- | --- |
 | [Editor](docs/EDITOR.md) / [Reliability](docs/EDITOR-RELIABILITY.md) | Drawing, connections, recovery, conflict and operation-specific errors |
+| [Offline image editing](docs/PHOTO-EDITING.md) / [Progress monitor](docs/PROGRESS-MONITOR.md) | Local image tools, recovery, compression and task-stage visibility |
 | [Entrance guides](docs/ARRIVAL-GUIDES.md) / [Photograph collection](data/photos/README.md) | Entrance selection, accessibility observations, private media review, reusable image coverage and offline galleries |
 | [Driving](docs/DRIVING.md) / [Campus enrichment](docs/ENRICHMENT.md) | Independent vehicle permissions, drive-and-walk journeys, imports, source evidence and review |
 | [Unified model workflow](docs/UNIFIED-MODEL-EDITOR.md) / [Building editor](docs/BUILDING-EDITOR.md) | Precision tools, duplication, patterns, roofs/outlines, evidence, undo and recovery |

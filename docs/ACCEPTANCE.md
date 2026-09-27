@@ -20,6 +20,16 @@
   0700 upload directory. It covers GeoJSON filenames, ESRI JSON, query URLs,
   truncated exports and identifier uniqueness. Local Windows lacks the GDAL and
   Pyosmium drivers; Linux supplies that integration evidence.
+- The [follow-up run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36296175970)
+  passes 17 parser tests and the private worker smoke test with a large ArcGIS
+  record preceding its schema. Explicit JSON-driver selection fixes the
+  additional failure found by live verification. The real existing ArcGIS job
+  reaches field mapping with 14 layers; no preview was queued or published.
+- A software Chromium repaint comparison records median whole-map latency of
+  553 ms with stars and 534 ms without, including scheduling and GPU completion.
+  This noisy software-renderer sample is not a phone frame-rate claim. With
+  rotation/cloud animation off, stars produce zero idle repaint events in the
+  observation window; they do not add a separate animation loop.
 - User-provided UNILAG files were inspected without modification: Greenland is
   an explicitly truncated export, Parcel's unique identifier is `OBJECTID_1`,
   and Road width contains one invalid polygon. Complete downloads, private
@@ -150,3 +160,13 @@ Use a log such as:
 | Pending | Representative gate → building | Pending survey | Pending | — | — | Unverified |
 
 Publish only after the user accepts the preview and the relevant checks pass. Keep untested destinations and sections explicitly unverified.
+
+
+## Offline image tools and activity · 27 September 2026
+
+- Exercise desktop, portrait and landscape crop, orientation, quality, comparison, reset and local recovery. Inspect actual screenshots for clipped forms and image fit.
+- Check JPEG/PNG/WebP output, orientation metadata, transparent PNG, flattened privacy pixels, size limits and cancellation. Preview before drawing a privacy area; moving geometry clears existing areas with a notice.
+- Prepare the production service worker, disconnect, reload, edit the retained original, download the result and queue without sending an upload. Reconnect to finish rights review and attach to the draft.
+- Verify owner/campus isolation and immutable queued copies. Exercise storage failure and removal protection; no failed save should be described as recovered.
+- Check Activity for import, release, model and photo stages; actual file counts, indeterminate phases, cancellation, errors, dismissals and a failed status refresh. Hidden/offline pages must not keep polling.
+- Run the focused commands in [photo editing](PHOTO-EDITING.md) and [progress monitoring](PROGRESS-MONITOR.md), plus lint, configured build and existing budgets. Browser simulations do not replace checking physical-device keyboards or storage pressure.

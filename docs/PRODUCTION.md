@@ -3,6 +3,14 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Globe and import inspection repairs · 27 September 2026
+
+Runtime revision **`c28da32`** is Ready in [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/GgGLCJn8TRpJtc8337gnTFcfNXjQ). Portrait/landscape campus search now fits within the visible viewport and globe framing responds to dock/chooser size. Stars are brighter in both themes; Light retains the horizon glow. Production was checked in the in-app browser after installing the new service worker.
+
+The earlier importer fixes select the actual ArcGIS JSON dialect and run the restricted converter with the host runner UID/GID. Live private inspections succeeded for the owner's ArcGIS service (14 layers / 10,516 features) and five complete supplied GeoJSON files (1,404 features). The supplied Greenland file is incomplete: 1,000 of the service's 2,425 records, so its rejection is retained. These inspections did not publish or apply source data. [Import receipts and recovery](CAMPUS-IMPORTS.md).
+
+The production catalogue remains LASU-only, with **`lasu-49f832190110`**, 395 buildings, 220 places and 39 photographs. Its manifest and all **121 assets / 19,986,835 bytes** passed baseline hash/length verification after deployment. The UNILAG research download remains a separate local delivery; no second campus was published.
+
 ## Project documentation and public dock — 26 September 2026
 
 Runtime revision **`e6106447c3066f`** is Ready in

@@ -1,10 +1,19 @@
 # Application screenshots
 
+## Image editing, activity and portrait globe · 27 September 2026
+
+The new `photo-optimise-*`, `photo-controls-portrait`, `photo-editing-offline` and `activity-monitor` captures are unaltered local application screenshots. The desktop/phone images use Chromium with an isolated owner API and a published, attributed School of Communication photograph; the fixture gallery is deliberately called Library and is not a claim about that building identity. The portrait image is scrolled to compression controls. The offline screenshot comes from the production-service-worker test after disconnecting and reloading. The activity import stage is an explicit test fixture, not a live production import.
+
+Run `playwright.photos.webkit.config.ts`, `playwright.photos.pwa.config.ts`, and the Chromium `offline image editor|image worker|photo workspace` journeys as described in [photo editing](../../PHOTO-EDITING.md). The final focused results are six Chromium workflows, four WebKit workflows and one disconnected PWA workflow. Reviewed captures show fit-to-panel previews, independently scrolling landscape regions and contained phone controls.
+
+The theme and chooser globe captures were refreshed from the configured production build with the brighter star field. `globe-portrait-chooser` is 390×844; the desktop chooser is 1280×720. The globe/chooser data are isolated fixtures and do not imply a second published campus. The still screenshots demonstrate the controls and star orientation; animation and occlusion have separate pixel/workflow assertions.
+
+
 ## Globe and import recovery · 27 September 2026
 
 The new `globe-*-2026-09-27.png` captures show the current navy star background, different globe orientations, Light's retained sunlit horizon, Dark without horizon glow, the campus chooser and a centred mobile landscape globe. `import-resume-2026-09-27.png` shows recovery from an unavailable uploaded file. These replace the affected September 26 globe/chooser views in current guides; older files remain dated archives.
 
-They are unaltered application captures from `tests/browser/globe-search.spec.ts` and the `campus imports resume failed uploads` journey, with real MapLibre rendering and isolated public/owner responses. Example campus names and the small place fixture are illustrative, not newly published campuses. Theme views are 1440×900, landscape is 667×375 and the chooser is 1440×1000. Both Chromium and Windows WebKit workflows are exercised; the displayed theme and upload-recovery captures use WebKit, while landscape and the chooser use Chromium. They do not establish physical-phone performance or GPS accuracy.
+They are unaltered application captures from `tests/browser/globe-search.spec.ts` and the `campus imports resume failed uploads` journey, with real MapLibre rendering and isolated public/owner responses. Example campus names and the small place fixture are illustrative, not newly published campuses. Theme views are 1440×900 and landscape is 667×375. Both Chromium and Windows WebKit workflows are exercised; the refreshed theme/chooser captures use Chromium, and upload recovery uses WebKit. The landscape file retains its earlier date-matched capture. They do not establish physical-phone performance or GPS accuracy.
 
 Run the focused journeys sequentially, inspect their `test-results` PNG files, and copy reviewed captures to this directory with their date:
 

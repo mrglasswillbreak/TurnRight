@@ -74,3 +74,12 @@ Keep this label until Android and iPhone checks, including installed apps, pass.
 
 - [W3C Device Orientation and Motion](https://www.w3.org/TR/orientation-event/) — event coordinates, absolute references, permissions and lifecycle requirements.
 - [Apple DeviceOrientationEvent](https://developer.apple.com/documentation/webkitjs/deviceorientationevent) — WebKit compass properties.
+
+
+### Phone chooser and star visibility · 27 September 2026
+
+The campus chooser is constrained to the visible viewport in portrait and landscape, including simulated keyboard height changes. Whole-globe framing accounts for the actual chooser/dock region and rotation to another screen size. The brighter 6,144-point star field retains deterministic orientation, Earth occlusion and the Light-only horizon glow. The production public map was checked in the in-app browser after installing the updated service worker.
+
+![Portrait campus chooser and globe within the visible screen](assets/screenshots/globe-portrait-chooser-2026-09-27.png)
+
+The regression suites cover simulated viewports and actual WebGL pixels. Windows WebKit can produce blank canvas screenshots immediately after certain resizes even when its pixel assertions pass; physical Safari rotation remains a separate device check. [Screenshot provenance](assets/screenshots/README.md).

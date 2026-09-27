@@ -110,3 +110,8 @@ derivatives, combined with owner galleries by the reviewed publication workflow.
 Research queues and raw snapshots are not public app downloads. This collection
 covers the documented sources and searches; it does **not** claim to contain
 every photograph online, every real campus building, or any Google Maps imagery.
+
+
+## Owner image editing
+
+The current gallery also has [offline editing and compression](../../docs/PHOTO-EDITING.md): retained local originals, reversible recipes, crop/rotation, colour, privacy areas and sequential batch preparation. Prepared map copies still use the 1,600-pixel / 250-KiB WebP limits and existing attribution review. This does not alter the historical collection counts or research decisions above. Full-resolution originals introduced through this tool stay on the owner's device unless separately exported.

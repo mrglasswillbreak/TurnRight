@@ -48,7 +48,11 @@ GeoJSON exports containing `exceededTransferLimit` (including inside collection 
 
 ### September 27 inspection repair
 
-Failed production jobs reported `PermissionError: /work/request.json` before parsing. Matching the container's UID/GID to the runner fixes access to the private 0700 directory while retaining network/capability restrictions. The [Linux regression run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36294682742) verifies the real worker command/mount and every supported driver. Missing-upload errors now explain how to reselect the same files; resumable uploads invalidate stale run tokens and candidates.
+Failed production jobs reported `PermissionError: /work/request.json` before parsing. Matching the container's UID/GID to the runner fixes access to the private 0700 directory while retaining network/capability restrictions. The [Linux regression run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36296175970) verifies the real worker command/mount and every supported driver. Missing-upload errors now explain how to reselect the same files; resumable uploads invalidate stale run tokens and candidates.
+
+Large ArcGIS snapshots also exposed a JSON-driver ambiguity: when feature records precede the schema, GDAL's header probe can select GeoJSON and fail before reading the later ArcGIS geometry type. Inspection now identifies the dialect from the parsed document and explicitly selects the [GDAL ESRIJSON driver](https://gdal.org/en/stable/drivers/vector/esrijson.html). The regression fixture puts a long feature record before the schema. The existing production UNILAG ArcGIS job then [completed inspection successfully](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36296250634), exposing 14 layers for private field mapping, including 633 buildings and the complete 2,425-feature Greenland layer. No review candidates or public map changes were applied by this verification.
+
+The five complete user-supplied files also [passed a production file inspection](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36296393964): 633 building footprints, 157 road lines, 179 road-width polygons, 426 parcels and nine greenspaces, totaling 1,404 features. The private source **UNILAG supplied vectors — inspection** remains at Map fields. Parcel uses `OBJECTID_1`, road-width polygons are suggested as land cover, and walking access remains restricted until reviewed. The original batch containing truncated Greenland remains recoverable with its explicit completeness error. Inspection success does not certify geometry validity, redistribution rights or publication readiness.
 
 The six supplied UNILAG examples were also checked locally without changing their contents. Greenland contains 1,000 valid polygons but explicitly reports truncation, so it needs a complete export. Parcel contains 426 features and requires its unique `OBJECTID_1` (the older `OBJECTID` repeats). Greenspace has nine features; Roads has 157 lines; Building_footprint has 633 polygons. Road width contains 179 polygons, one geometrically invalid, to resolve in preview/review. These checks do not establish source completeness for files without a source count or grant redistribution rights.
 
@@ -113,6 +117,10 @@ The default limits are 50 MiB per upload batch, 250 MiB expanded archives, 100,0
 `campuses`, `campus_sources`, `campus_imports` and `campus_import_assets` hold private identity, configuration and jobs. Migrations 013–015 add campus scoping to source records, edits, reviews, reports, surveys, media, model assets and releases. Legacy requests and backfilled records remain LASU-only. The server resolves public slugs and passes an explicit campus context to REST and transactional RPCs; private storage grants are not exposed to anonymous or authenticated browser clients.
 
 The public `/packages/campuses.json` catalogue is versioned separately from immutable manifests. `/packages/latest.json` remains LASU's compatibility entry point. New manifests carry campus identity; LASU's existing feature IDs and public model fingerprints are unchanged. See [architecture](ARCHITECTURE.md) and [rollout](DEPLOYMENT.md).
+
+## Process visibility
+
+Open **Activity** while inspecting or building a preview. It shows upload/file counts, verified ArcGIS retrieval batches, conversion and final job stages. The job remains visible in the campus workspace too. Status refreshes while online; cancellation still invalidates the run token so stale processing cannot apply results. [Progress monitor](PROGRESS-MONITOR.md).
 
 ## Verification
 

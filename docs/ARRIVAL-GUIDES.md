@@ -48,9 +48,10 @@ kept visible.
   Editing keeps the original position. Changing **Pictured building** or
   **Photograph of** moves the photo and updates affected galleries in one batch.
 - **Add photos:** select several JPEG, PNG or WebP files, or drop them onto the
-  desktop upload area. Each file is limited to 10 MiB. Files upload and process
-  sequentially; a failed file has its own retry/reselection controls and does
-  not discard other uploads.
+  desktop upload area. The [offline image editor](PHOTO-EDITING.md) accepts up to
+  25 MiB per image and 20 images / 100 MiB per batch. Edit and preview locally,
+  then choose **Use selected for map** or **Use batch for map** to upload bounded
+  WebP copies. Files process sequentially; failures retain the other results.
 - **Review uploads:** use the large preview and Previous/Next controls. Give each
   photo a caption, useful image description and correct building/entrance match.
   The image itself must be checked for identity and visual quality individually.
@@ -103,11 +104,13 @@ rejected instead of overwriting a newer session; recover the latest private
 upload before continuing. Removing an item from the local queue does not delete
 its private upload. Approved records are immutable; edits create a new revision.
 
-Originals and upload/reviewer records remain in the private `building-media`
+Prepared upload copies (and originals from the earlier direct-upload flow) and reviewer records remain in the private `building-media`
 bucket and owner-authorized `building_media` table. The server rejects malformed,
 animated, oversized or unsupported images and creates a metadata-free WebP at
-most 1,600 pixels on its longest side and 250 KiB. Cropping, rotation controls and
-image alteration are outside this workflow. Explicit owner galleries, including
+most 1,600 pixels on its longest side and 250 KiB. Valid metadata-free WebP copies
+within those limits pass through without another lossy encode. Local full-resolution
+originals and editing recipes remain on this device; [crop, rotation, privacy areas
+and compression](PHOTO-EDITING.md) happen before upload review. Explicit owner galleries, including
 empty galleries, override the research catalogue through aliases and merges.
 
 New installations apply migrations in order through

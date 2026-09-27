@@ -16,7 +16,7 @@ No image in this snapshot has an established camera bearing tied to a specific m
 
 ## Owner workflow
 
-Select a building and open **Edit model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. Mobile offers **Wall**, **3D** and **Photo** views. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
+Select a building and open **Edit model**. Desktop combines a measured wall canvas, selectable 3D, properties and a photograph reference. The shared views are **Orbit**, **Edit surface** and **Photo**. A remembered **Reference split** places the model beside a photograph when enough space is available. Edit surface supplies the precision controls and automatic 2D fallback. [The complete current workspace guide](UNIFIED-MODEL-EDITOR.md) covers precision controls, groups, patterns, presets, recovery and targeted review.
 
 1. Choose a mapped wall and photograph. Confirm their correspondence and check historical labels and credits. A general building photograph does not prove every elevation.
 2. Add windows, doors, columns, balconies, canopies, parapets or trim directly in metres; generated details are preserved in the same action. Conversion can also be previewed first. Dimensions and unseen sides remain estimates unless supported by measurements. Appearance (including whole-building height), roof and outline controls are modes in this same workspace.
@@ -29,7 +29,7 @@ Sources contains **Edit model evidence · 19 buildings**. Review observations an
 
 ## Globe sources
 
-The globe uses the fixed **September 2004 NASA Blue Marble Next Generation shaded-topography composite**, at 21,600 × 10,800 source pixels (approximately **2 km per source pixel at the equator**). It is resampled to 8,192 × 4,096 and reprojected into 341 local 512-pixel WebP tiles for zooms 0–4. This is a dated global overview, not current campus imagery. Relief is baked in; there are no global terrain meshes, animated clouds or automatic rotation.
+The globe uses the fixed **September 2004 NASA Blue Marble Next Generation shaded-topography composite**, at 21,600 × 10,800 source pixels (approximately **2 km per source pixel at the equator**). It is resampled to 8,192 × 4,096 and reprojected into 341 local 512-pixel WebP tiles for zooms 0–4. This is a dated global overview, not current campus imagery. Relief is baked in; there are no global terrain meshes. Optional gentle automatic rotation and decorative animated clouds now accompany the overview; these are not live weather. A deterministic navy star background responds to globe orientation in both themes. Light retains the sunlit horizon; Dark omits it.
 
 Credit: NASA Earth Observatory, Blue Marble Next Generation. [Original imagery](https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography/) · [NASA media guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/). The image is reprojected, resampled and compressed; no NASA affiliation or endorsement is implied. Natural Earth v5.1.2 supplies 1:50m countries/coastlines, lakes and selected populated places under its [public-domain terms](https://www.naturalearthdata.com/about/terms-of-use/). Original label spelling is retained in `sourceName` when display labels require transliteration for bundled glyphs.
 

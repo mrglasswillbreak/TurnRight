@@ -8,10 +8,16 @@ Migrations 013–015 backfill campus IDs without rewriting feature identities or
 
 GIS processing stays outside browser bundles. Owner-signed uploads feed resumable jobs, a restricted GDAL/PROJ container and Pyosmium topology ingestion. HTTPS adapters validate public DNS/redirects and complete ArcGIS ID batches. Candidates compare against an exact accepted source snapshot and are queued atomically with run-token checks; source corrections and publication remain separate steps. Manual refresh is default. Optional daily checks never publish automatically.
 
-The container uses the host runner's UID/GID to access its private 0700 temporary directory while retaining disabled network access, dropped capabilities and a read-only root filesystem. The Linux regression workflow exercises that actual mount/command as well as individual drivers. Inspection rejects truncated GeoJSON/ESRIJSON exports before GDAL conversion, reports unique candidate ID fields, and accepts a layer's `/query` URL with an explicit notice that query filters are replaced by campus-bound inspection. Failed uploads can resume their reserved storage objects; resetting the job invalidates its old run token and candidate.
+The container uses the host runner's UID/GID to access its private 0700 temporary directory while retaining disabled network access, dropped capabilities and a read-only root filesystem. The Linux regression workflow exercises that actual mount/command as well as individual drivers. Inspection selects the GeoJSON/ESRIJSON driver from the parsed JSON dialect rather than a short header probe, rejects truncated exports before GDAL conversion, reports unique candidate ID fields, and accepts a layer's `/query` URL with an explicit notice that query filters are replaced by campus-bound inspection. Failed uploads can resume their reserved storage objects; resetting the job invalidates its old run token and candidate.
 
 Code builds preserve all published campus assets. Release snapshots record the catalogue baseline, and serialized publication rejects stale previews. Campus rollback copies its historical immutable package into a new preview alongside the other current campuses. See [formats and workflows](CAMPUS-IMPORTS.md).
 
+
+## Local images and process monitoring
+
+`PhotoOptimizer.tsx` is a lazy image-editing dialog. Versioned recipes feed `photo-edit.worker.ts` and `photo-processing-local.ts`; native decoding/encoding, bounded image dimensions and sequential batches keep large images outside the startup path. Edits always begin from the retained source. IndexedDB stores original/output bytes and MIME types, reconstructing Blobs when opened to avoid browser-specific Blob persistence failures. Keys isolate owner and campus. Prepared queue copies are immutable and survive offline reloads. Server validation passes through bounded metadata-free WebP without another lossy encode; existing uploads still receive sanitisation. [Workflow and limits](PHOTO-EDITING.md).
+
+`process-monitor.ts` collects local stage events and real completion totals. The lazy owner Activity drawer also polls campus-scoped `process-status` while visible/online. Import worker run-token checks protect progress as well as results. Release stage recording is best effort and never makes a valid release depend on monitoring availability. No new schema is required. [Coverage and lifecycle](PROGRESS-MONITOR.md).
 
 ## Authored model extension
 
