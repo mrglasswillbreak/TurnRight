@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.request
+import urllib.error
 from datetime import datetime, timezone
 
 from map_import.formats import inspect_file, check_expanded_batch
@@ -16,6 +17,18 @@ from map_import.network import MAX_BYTES, fetch_public
 
 def encoded(value):
     return json.dumps(value,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()
+
+
+def conversion_command(folder, token):
+    # TemporaryDirectory is deliberately 0700. Dropping every capability means
+    # container root cannot bypass its runner-owned permissions. Match its owner
+    # instead of making private uploads world-readable or restoring DAC bypass.
+    return ['docker','run','--name','campus-import-'+token,'--rm',
+            '--user',f'{os.getuid()}:{os.getgid()}',
+            '--network','none','--cap-drop','ALL','--security-opt','no-new-privileges',
+            '--read-only','--memory','2g','--cpus','2','--tmpfs','/tmp:rw,size=512m',
+            '-v',f'{folder}:/work','-v',f'{Path(__file__).resolve().parent}:/app:ro',
+            os.environ.get('GIS_IMPORT_IMAGE','turnright-gis-import'),'/work']
 
 
 def convert(folder):
@@ -97,7 +110,12 @@ def run_job():
                 if sum(a['bytes'] for a in assets)>MAX_BYTES: raise ValueError('Upload batch exceeds 50 MiB.')
                 for index,asset in enumerate(assets):
                     if not asset['path'].startswith(f'{campus_id}/{import_id}/'): raise ValueError('Import asset identity mismatch.')
-                    content=remote('storage/v1/object/campus-imports/'+asset['path'],raw=True)
+                    try:
+                        content=remote('storage/v1/object/campus-imports/'+asset['path'],raw=True)
+                    except urllib.error.HTTPError as error:
+                        if error.code in (400,404):
+                            raise ValueError(f"Uploaded file {asset['name']} is missing or unavailable. Select the same files to resume the upload, then inspect again.") from error
+                        raise
                     if len(content)!=asset['bytes'] or hashlib.sha256(content).hexdigest()!=asset['sha256']: raise ValueError('Upload is incomplete or failed its integrity check. Start a new upload.')
                     filename=f'input-{index}'+Path(asset['name']).suffix.lower()
                     (folder/filename).write_bytes(content)
@@ -143,9 +161,8 @@ def run_job():
             live()
             request={'files':files,'warnings':warnings,'source':source,'campus':campus,'previous':previous,'configuration':job['configuration'],'phase':job['phase'],'importId':import_id}
             (folder/'request.json').write_bytes(encoded(request))
-            scripts=Path(__file__).resolve().parent
             container_name='campus-import-'+token
-            command=['docker','run','--name',container_name,'--rm','--network','none','--cap-drop','ALL','--security-opt','no-new-privileges','--read-only','--memory','2g','--cpus','2','--tmpfs','/tmp:rw,size=512m','-v',f'{folder}:/work','-v',f'{scripts}:/app:ro',os.environ.get('GIS_IMPORT_IMAGE','turnright-gis-import'),'/work']
+            command=conversion_command(folder,token)
             process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             try:
                 import time

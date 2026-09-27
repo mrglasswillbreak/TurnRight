@@ -62,7 +62,8 @@ def guess_role(name, types, properties=None):
     text = name.lower()
     tags = properties or {}
     if tags.get('building') or 'building' in text or 'footprint' in text: return 'building'
-    if tags.get('highway') or any(v in text for v in ['road','path','track','route']): return 'path'
+    if tags.get('highway') or any(v in text for v in ['road','path','track','route']):
+        return 'landcover' if any('Polygon' in t for t in types) else 'path'
     if tags.get('barrier') or 'barrier' in text: return 'barrier'
     if tags.get('entrance') or 'entrance' in text: return 'entrance'
     if 'boundary' in text: return 'boundary'
@@ -71,10 +72,23 @@ def guess_role(name, types, properties=None):
     return 'skip'
 
 
+def check_json_export(path):
+    value = json.loads(Path(path).read_text(encoding='utf-8-sig'))
+    if not isinstance(value, dict):
+        raise ValueError('Choose a GeoJSON Feature/FeatureCollection or an ArcGIS feature response.')
+    properties = value.get('properties') or {}
+    if value.get('exceededTransferLimit') or (isinstance(properties, dict) and properties.get('exceededTransferLimit')):
+        raise ValueError('This export is truncated (exceededTransferLimit). Download every object-ID batch or import the ArcGIS layer URL, then upload the complete file. Nothing was imported.')
+    if value.get('error'):
+        raise ValueError('This file contains an ArcGIS error response rather than map features. Download the layer again.')
+
+
 def inspect_file(path, configuration, work, label=None):
-    from osgeo import gdal, osr
     path = Path(path)
     suffix = path.suffix.lower()
+    if suffix in ('.json', '.geojson'):
+        check_json_export(path)
+    from osgeo import gdal, osr
     if suffix in ('.osm','.xml'):
         safe_xml(path)
     if suffix == '.xml':

@@ -1,5 +1,6 @@
 """Complete queryable ArcGIS layers, including embedded Web Map collections."""
 import json
+import re
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from .network import public_json
 
@@ -42,6 +43,11 @@ def layer_features(url, bounds, get=public_json):
 
 
 def discover(url, bounds, get=public_json, _visited=None):
+    parts = urlsplit(url)
+    if re.search(r'/(?:FeatureServer|MapServer)/[0-9]+/query/?$', parts.path, re.I):
+        layer_url = urlunsplit((parts.scheme, parts.netloc, re.sub(r'/query/?$', '', parts.path, flags=re.I), '', ''))
+        layers, warnings = discover(layer_url, bounds, get, _visited)
+        return layers, ['Using the layer behind the Query URL. All features within the campus bounds are checked; query filters and export settings are not applied.'] + warnings
     visited = set() if _visited is None else _visited
     identity = endpoint(url) + '?' + urlsplit(url).query
     if identity in visited or len(visited) >= 100:

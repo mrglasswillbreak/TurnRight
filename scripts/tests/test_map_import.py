@@ -11,7 +11,7 @@ import zipfile
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from map_import.arcgis import layer_features, discover
-from map_import.formats import unpack, safe_xml, check_expanded_batch
+from map_import.formats import unpack, safe_xml, check_expanded_batch, check_json_export, guess_role
 from map_import.network import public_addresses
 from map_import.normalise import digest, normalise
 
@@ -25,6 +25,33 @@ META={'id':'meta:campus','entity':'meta','source':'combined','payload':{'sources
 
 
 class MapImportTests(unittest.TestCase):
+    def test_downloaded_geojson_json_and_truncated_arcgis_exports(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/'Greenland.geojson.json'
+            for value in ({'type':'FeatureCollection','features':[FEATURE]}, {'features':[], 'geometryType':'esriGeometryPolygon'}):
+                file.write_text(json.dumps(value),encoding='utf-8-sig')
+                check_json_export(file)
+            for value in ({'properties':{'exceededTransferLimit':True}}, {'exceededTransferLimit':True}, {'error':{'message':'Invalid query'}}):
+                file.write_text(json.dumps(value),encoding='utf-8')
+                with self.assertRaises(ValueError): check_json_export(file)
+        self.assertEqual(guess_role('Road width.geojson',['Polygon']),'landcover')
+        self.assertEqual(guess_role('Roads.geojson',['LineString']),'path')
+
+    def test_query_export_url_resolves_to_layer_and_reports_ignored_filters(self):
+        calls=[]
+        def get(url,form=None):
+            calls.append((url,form))
+            if form is None:
+                self.assertEqual(url,'https://services.example/FeatureServer/2?f=json')
+                return {'name':'Buildings','capabilities':'Query','objectIdField':'OBJECTID','geometryType':'esriGeometryPolygon'}
+            if 'returnCountOnly' in form: return {'count':1}
+            if 'returnIdsOnly' in form: return {'objectIds':[7]}
+            return {'features':[{'attributes':{'OBJECTID':7},'geometry':{'rings':[]}}]}
+        layers,warnings=discover('https://services.example/FeatureServer/2/query?where=1%3D1&outSR=4326&f=geojson',CAMPUS['bounds'],get)
+        self.assertEqual(len(layers),1)
+        self.assertIn('query filters',warnings[0])
+        self.assertTrue(all('/query/query' not in url for url,_ in calls))
+
     def test_archive_and_xml_safety(self):
         with tempfile.TemporaryDirectory() as tmp:
             archive=Path(tmp)/'unsafe.zip'
