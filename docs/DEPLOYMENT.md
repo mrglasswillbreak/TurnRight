@@ -1,5 +1,11 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Import review queue repair (27 September 2026)
+
+On an existing installation through migration 015, apply `016_bulk_import_review_queue.sql` followed by `017_import_queue_deadline.sql`. Both are applied and verified in production. They retain campus scoping, the advisory lock, exact source comparison, run-token validation and service-only execution. The queue RPC has a 60-second database allowance; its server transport waits up to 75 seconds. Ordinary API and lock deadlines remain unchanged. Deploy the matching backend before retrying large batches.
+
+The live UNILAG job queued 10,176 proposals successfully. The PostgreSQL regression covers a 1,500-record batch, duplicate counts, rejected candidates, atomic rollback and cross-campus isolation. See [import status](CAMPUS-IMPORTS.md#september-27-unilag-import-outcome) and [production evidence](PRODUCTION.md).
+
 ## Multi-campus rollout
 
 1. Deploy compatible readers before enabling campus writes. Keep `PUBLISHED_MAP_URL` set so code builds preserve reviewed public assets.
@@ -58,7 +64,7 @@ Vercel builds intentionally require `SOURCE_REDISTRIBUTION_APPROVED=true`. Set i
 
 ## 2. Create Supabase Free and configure GitHub login
 
-Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. For a new database, apply every checked-in SQL migration in numeric order from `001_campus.sql` through `015_campus_release_restores.sql`. The initial 001–003 migrations establish the base schema and editor batches; 004–011 add surveys, source review, media and reconciliation; 012 adds model assets; 013–015 add campus isolation, imports and scoped restores. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, transactional editor saves, and server-only publication/import functions. Do not rerun the first migration on an initialized database. For existing installations, first check which migrations are present and apply only the missing migrations before enabling their dependent writers; see [the editor upgrade guide](EDITOR.md).
+Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. For a new database, apply every checked-in SQL migration in numeric order from `001_campus.sql` through `017_import_queue_deadline.sql`. The initial 001–003 migrations establish the base schema and editor batches; 004–011 add surveys, source review, media and reconciliation; 012 adds model assets; 013–015 add campus isolation, imports and scoped restores; 016–017 bulk-insert review proposals and bound large queue transactions. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, transactional editor saves, and server-only publication/import functions. Do not rerun the first migration on an initialized database. For existing installations, first check which migrations are present and apply only the missing migrations before enabling their dependent writers; see [the editor upgrade guide](EDITOR.md).
 
 Enable GitHub under Authentication → Sign In / Providers. Create a GitHub OAuth App with the callback URL shown by Supabase (`https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`), then store its client ID and client secret in the Supabase GitHub provider settings. The OAuth client secret belongs there, not in the PWA. Use the real Supabase callback URL, not the PWA `/admin` URL. [Supabase GitHub login instructions](https://supabase.com/docs/guides/auth/social-login/auth-github).
 
