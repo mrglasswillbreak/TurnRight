@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { adminRequest, boundedSession } from './admin-client';
+import { requestedCampus } from './campus-context';
 const url = import.meta.env.VITE_SUPABASE_URL,
   anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = url && anon ? createClient(url, anon) : null;
@@ -36,6 +37,7 @@ export async function api<T = unknown>(
   payload: unknown = {},
   options: Parameters<typeof adminRequest>[3] = {},
 ): Promise<T> {
+  const campus = requestedCampus();
   const session = supabase
     ? (await boundedSession(action, supabase.auth.getSession())).data.session
     : null;
@@ -55,6 +57,7 @@ export async function api<T = unknown>(
       payload,
       session?.access_token,
       options,
+      campus,
     );
     tracked?.finish(
       /release|import-run|rollback/.test(action)

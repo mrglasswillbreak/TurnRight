@@ -71,10 +71,11 @@ export async function adminRequest<T>(
   payload: unknown,
   token?: string,
   options: Parameters<typeof wireAdminRequest>[3] = {},
+  campus = requestedCampus(),
 ): Promise<T> {
   const api = <V>(action: string, payload: unknown) =>
-    wireAdminRequest<V>(action, payload, token, options);
-  const ownerKey = `${token || 'local-test'}:${requestedCampus()}`;
+    wireAdminRequest<V>(action, payload, token, options, campus);
+  const ownerKey = `${token || 'local-test'}:${campus}`;
   const batch = payload as {
     edits?: Array<{ edit?: { properties?: { modelDocument?: unknown } } }>;
   } | null;
@@ -120,6 +121,7 @@ async function wireAdminRequest<T>(
     delay?: (ms: number) => Promise<void>;
     signal?: AbortSignal;
   } = {},
+  campus = requestedCampus(),
 ): Promise<T> {
   const fetcher = options.fetcher || fetch;
   const retries =
@@ -144,7 +146,7 @@ async function wireAdminRequest<T>(
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ action, payload, campus: requestedCampus() }),
+        body: JSON.stringify({ action, payload, campus }),
       });
       if (response.status === 401 || response.status === 403)
         throw new AdminRequestError(

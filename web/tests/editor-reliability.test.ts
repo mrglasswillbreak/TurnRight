@@ -26,9 +26,35 @@ const workspace = (server: MapEdit[] = [feature()]) =>
       })),
     async () => {},
   );
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 describe('operation-specific admin requests', () => {
+  it('retains the original campus across a save retry after navigation', async () => {
+    vi.stubGlobal('location', { search: '?campus=lasu' });
+    const campuses: string[] = [];
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockImplementation(async (_url, init) => {
+        campuses.push(JSON.parse(String(init?.body)).campus);
+        if (campuses.length === 1) throw new TypeError('Lost response');
+        return new Response('[]');
+      });
+    await adminRequest(
+      'save-edits',
+      { operationId: 'same-save', edits: [] },
+      'owner',
+      {
+        fetcher,
+        delay: async () => {
+          vi.stubGlobal('location', { search: '?campus=unilag' });
+        },
+      },
+    );
+    expect(campuses).toEqual(['lasu', 'lasu']);
+  });
   it('retries a lost save acknowledgement with the identical operation and payload', async () => {
     const fetcher = vi
       .fn<typeof fetch>()
