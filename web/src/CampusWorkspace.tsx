@@ -909,9 +909,9 @@ export default function CampusWorkspace({
               )}
               <div className="campus-actions">
                 {reviewBlocker && (
-                  <p id="import-review-blocker" role="status" className="small-note">
+                  <output id="import-review-blocker" className="small-note">
                     {reviewBlocker}
-                  </p>
+                  </output>
                 )}
                 {job.status === 'preview' && (
                   <Button
