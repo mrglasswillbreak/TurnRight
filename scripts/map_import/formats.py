@@ -81,13 +81,23 @@ def check_json_export(path):
         raise ValueError('This export is truncated (exceededTransferLimit). Download every object-ID batch or import the ArcGIS layer URL, then upload the complete file. Nothing was imported.')
     if value.get('error'):
         raise ValueError('This file contains an ArcGIS error response rather than map features. Download the layer again.')
+    # ArcGIS snapshots put records before their schema. GDAL's short header
+    # probe can see "features" but miss geometryType and incorrectly choose
+    # GeoJSON. Select the JSON dialect from the parsed document, not key order.
+    if str(value.get('geometryType', '')).startswith('esriGeometry') or value.get('objectIdFieldName'):
+        return 'ESRIJSON'
+    features = value.get('features')
+    if isinstance(features, list) and any(isinstance(f, dict) and 'attributes' in f for f in features):
+        return 'ESRIJSON'
+    return 'GeoJSON'
 
 
 def inspect_file(path, configuration, work, label=None):
     path = Path(path)
     suffix = path.suffix.lower()
+    json_driver = None
     if suffix in ('.json', '.geojson'):
-        check_json_export(path)
+        json_driver = check_json_export(path)
     from osgeo import gdal, osr
     if suffix in ('.osm','.xml'):
         safe_xml(path)
@@ -138,7 +148,8 @@ def inspect_file(path, configuration, work, label=None):
     gdal.UseExceptions()
     gdal.SetConfigOption('OGR_SQLITE_LOAD_EXTENSIONS','')
     gdal.SetConfigOption('OGR_SQLITE_LIST_VIRTUAL_OGR','NO')
-    dataset = gdal.OpenEx(str(path.resolve()),gdal.OF_VECTOR,allowed_drivers=DRIVERS)
+    source = f'{json_driver}:{path.resolve()}' if json_driver else str(path.resolve())
+    dataset = gdal.OpenEx(source,gdal.OF_VECTOR,allowed_drivers=[json_driver] if json_driver else DRIVERS)
     if dataset is None: raise ValueError('Unsupported or damaged vector dataset.')
     result = []
     target = osr.SpatialReference(); target.ImportFromEPSG(4326); target.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)

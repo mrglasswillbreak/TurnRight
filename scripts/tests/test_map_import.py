@@ -25,6 +25,16 @@ META={'id':'meta:campus','entity':'meta','source':'combined','payload':{'sources
 
 
 class MapImportTests(unittest.TestCase):
+    def test_json_dialect_does_not_depend_on_header_order_or_size(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/'arcgis.json'
+            file.write_text(json.dumps({'features':[{'attributes':{'OBJECTID':7,'Description':'x'*12000},'geometry':{'x':3.2,'y':6.4}}],'geometryType':'esriGeometryPoint'}))
+            self.assertEqual(check_json_export(file),'ESRIJSON')
+            file.write_text(json.dumps({'type':'FeatureCollection','features':[FEATURE]}))
+            self.assertEqual(check_json_export(file),'GeoJSON')
+            file.write_text(json.dumps({'features':None}))
+            self.assertEqual(check_json_export(file),'GeoJSON')
+
     def test_downloaded_geojson_json_and_truncated_arcgis_exports(self):
         with tempfile.TemporaryDirectory() as tmp:
             file=Path(tmp)/'Greenland.geojson.json'

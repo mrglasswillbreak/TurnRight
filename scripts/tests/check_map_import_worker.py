@@ -28,7 +28,9 @@ with tempfile.TemporaryDirectory(prefix='private-import-test-') as tmp:
         (folder/path).write_text(json.dumps({'type':'FeatureCollection','crs':{'type':'name','properties':{'name':'EPSG:4326'}},'features':[{'type':'Feature','properties':{'OBJECTID':i+1,'Id':0,'Name':'Bâtiment'},'geometry':geometry}, {'type':'Feature','properties':{'OBJECTID':i+11,'Id':0,'Name':'Courtyard'},'geometry':geometry}]}),encoding='utf-8')
         files.append({'path':path,'label':Path(name).stem})
     # Online ArcGIS uses the same private mount, with ESRIJSON attributes/rings.
-    (folder/'arcgis.json').write_text(json.dumps({'name':'ArcGIS buildings','geometryType':'esriGeometryPolygon','spatialReference':{'wkid':4326},'fields':[{'name':'OBJECTID','type':'esriFieldTypeOID'}],'features':[{'attributes':{'OBJECTID':7},'geometry':{'rings':geometries['Building_footprint.geojson']['coordinates']}}]}))
+    # Match layer_features' actual serialization order, with the schema beyond
+    # GDAL's header probe. The old automatic driver chose GeoJSON and failed.
+    (folder/'arcgis.json').write_text(json.dumps({'name':'ArcGIS buildings','features':[{'attributes':{'OBJECTID':7,'Description':'x'*12000},'geometry':{'rings':geometries['Building_footprint.geojson']['coordinates']}}],'fields':[{'name':'OBJECTID','type':'esriFieldTypeOID'},{'name':'Description','type':'esriFieldTypeString'}],'geometryType':'esriGeometryPolygon','spatialReference':{'wkid':4326},'objectIdFieldName':'OBJECTID'}))
     files.append({'path':'arcgis.json','label':'ArcGIS buildings'})
     (folder/'request.json').write_text(json.dumps({'files':files,'configuration':{'layers':[]},'phase':'inspect'}))
     command=conversion_command(folder,str(uuid.uuid4()))
