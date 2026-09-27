@@ -45,10 +45,12 @@ export default function WorldAnimation({
   latest.current = { ...settings, blocked, reduced, error };
   useEffect(() => {
     let height = map.getContainer().clientHeight,
+      width = map.getContainer().clientWidth,
       frame = 0;
     const resize = () => {
       const next = map.getContainer().clientHeight;
-      if (next < height && map.getZoom() < 5) {
+      const nextWidth = map.getContainer().clientWidth;
+      if ((next < height || nextWidth < width) && map.getZoom() < 5) {
         cancelAnimationFrame(frame);
         frame = requestAnimationFrame(() => {
           const fit = globeCamera(map);
@@ -61,6 +63,7 @@ export default function WorldAnimation({
         });
       }
       height = next;
+      width = nextWidth;
     };
     map.on('resize', resize);
     return () => {

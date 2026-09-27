@@ -36,6 +36,7 @@ export default function CampusSwitcher({
   onBrowse: () => void;
 }) {
   const trigger = useRef<HTMLButtonElement>(null);
+  const title = useRef<HTMLHeadingElement>(null);
   const callbacks = useRef({ onOpenChange, onBrowse, bounds });
   callbacks.current = { onOpenChange, onBrowse, bounds };
   const [campuses, setCampuses] = useState<CampusIdentity[]>([lasuCampus]),
@@ -43,6 +44,32 @@ export default function CampusSwitcher({
     [query, setQuery] = useState(''),
     [error, setError] = useState(''),
     [choice, setChoice] = useState<CampusIdentity | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const viewport = window.visualViewport;
+    const style = document.documentElement.style;
+    const resize = () => {
+      style.setProperty(
+        '--campus-visible-height',
+        `${viewport?.height ?? innerHeight}px`,
+      );
+      style.setProperty(
+        '--campus-keyboard-offset',
+        `${Math.max(0, innerHeight - (viewport?.height ?? innerHeight) - (viewport?.offsetTop ?? 0))}px`,
+      );
+    };
+    resize();
+    viewport?.addEventListener('resize', resize);
+    viewport?.addEventListener('scroll', resize);
+    window.addEventListener('resize', resize);
+    return () => {
+      viewport?.removeEventListener('resize', resize);
+      viewport?.removeEventListener('scroll', resize);
+      window.removeEventListener('resize', resize);
+      style.removeProperty('--campus-visible-height');
+      style.removeProperty('--campus-keyboard-offset');
+    };
+  }, [open]);
   useEffect(() => {
     callbacks.current.onOpenChange(open);
     if (navigating || !map) return;
@@ -206,13 +233,19 @@ export default function CampusSwitcher({
         }}
       >
         <DialogContent
-          className="campus-chooser"
+          positioning="viewport"
+          className="campus-chooser rounded-xl"
           data-campus-open={open}
+          initialFocus={() =>
+            matchMedia('(max-width: 599px)').matches ? title.current : true
+          }
           finalFocus={trigger}
           overlayClassName="campus-chooser-backdrop"
         >
           <DialogHeader>
-            <DialogTitle>Choose a campus</DialogTitle>
+            <DialogTitle ref={title} tabIndex={-1}>
+              Choose a campus
+            </DialogTitle>
             <DialogDescription>
               Explore published maps. Each campus has its own places, routes and
               offline download.

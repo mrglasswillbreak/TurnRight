@@ -175,14 +175,82 @@ async function pixels(page: Page) {
   return Buffer.from(encoded, 'base64');
 }
 
+test('globe search portrait stays inside the visible viewport through keyboard and rotation', async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setup(page);
+  await open(page);
+  await settledWorld(page);
+  const dialog = page.getByRole('dialog', { name: 'Choose a campus' });
+  const input = page.getByRole('searchbox', {
+    name: 'Search published campuses',
+  });
+  await expect(
+    page.getByRole('heading', { name: 'Choose a campus', exact: true }),
+  ).toBeFocused();
+  const inside = async (width: number, height: number) => {
+    const box = await dialog.boundingBox();
+    expect(box).toBeTruthy();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(height);
+  };
+  await inside(390, 844);
+  await page.screenshot({
+    path: info.outputPath('globe-portrait-chooser.png'),
+  });
+  await input.fill('LAS');
+  // Mobile keyboards can resize only visualViewport, leaving 100dvh unchanged.
+  await page.evaluate(() => {
+    Object.defineProperty(visualViewport!, 'height', {
+      configurable: true,
+      value: 400,
+    });
+    visualViewport!.dispatchEvent(new Event('resize'));
+  });
+  await expect
+    .poll(async () => {
+      const box = await dialog.boundingBox();
+      return box!.y + box!.height;
+    })
+    .toBeLessThanOrEqual(400);
+  await inside(390, 400);
+  await expect(input).toHaveValue('LAS');
+  await page.evaluate(() => {
+    Reflect.deleteProperty(visualViewport!, 'height');
+    visualViewport!.dispatchEvent(new Event('resize'));
+  });
+  await page.setViewportSize({ width: 844, height: 390 });
+  await inside(844, 390);
+  await expect(input).toHaveValue('LAS');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await inside(390, 844);
+  await page.waitForFunction(() => !window.editorTestMap.isMoving());
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Choose a campus', exact: true }),
+  ).toBeFocused();
+});
+
 test('globe search frames the current campus, restores focus, and preserves the mounted map', async ({
   page,
 }, info) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
   await setup(page);
   await open(page);
   await expect.poll(async () => (await camera(page)).zoom).toBeLessThan(4);
   await page.waitForFunction(() => !window.editorTestMap.isMoving());
   await settledWorld(page);
+  const chooser = await page
+    .getByRole('dialog', { name: 'Choose a campus' })
+    .boundingBox();
+  expect(chooser).toBeTruthy();
+  expect(chooser!.x).toBeGreaterThanOrEqual(0);
+  expect(chooser!.y).toBeGreaterThanOrEqual(0);
+  expect(chooser!.x + chooser!.width).toBeLessThanOrEqual(1280);
+  expect(chooser!.y + chooser!.height).toBeLessThanOrEqual(720);
   await pixels(page);
   await page.screenshot({ path: info.outputPath('globe-campus-chooser.png') });
   expect((await camera(page)).pitch).toBe(0);
