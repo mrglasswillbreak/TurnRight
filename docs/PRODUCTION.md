@@ -3,6 +3,16 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Offline photo editing and Activity · 27 September 2026
+
+Runtime revision **`332c333`** is Ready as the current Production deployment in [Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/5dAp7EyiibzFpfiAXCUDReThKMzR). The editor adds retained local originals, editable image recipes, crop/colour/privacy tools, comparison and batch compression. Activity exposes import, release, model, photo and offline-processing stages. No database migration is required. [Photo workflow](PHOTO-EDITING.md) · [Progress coverage](PROGRESS-MONITOR.md).
+
+Verification at **2026-09-27T06:33:58.621Z** confirmed public/admin/service-worker routes, the unauthenticated admin boundary, served PhotoOptimizer/ProcessMonitor chunks and unchanged LASU catalogue/manifest. All **121 published assets / 19,986,835 bytes** passed hash and length verification. Campus content remains `lasu-49f832190110`; no photographs or second campus were published by this rollout. The production Activity interface was checked in the in-app browser after installing the waiting update.
+
+The final checks pass: **26 focused unit tests, six Chromium workflows, four WebKit workflows, and a production PWA workflow** that disconnects, reloads originals/recipes, exports, queues a prepared copy and reloads that offline queue. Linux GIS drivers and the restricted private-worker smoke test pass in [Actions run 36300301280](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36300301280); the local Python suite has 14 passing checks. Lint retains the eight existing explicit-any warnings.
+
+The configured build remains within all existing budgets: public startup **434,399 / 435,200 gzip bytes**, additional owner code **188,059 / 189,440**, photo workspace **8,495 / 12,288**, lazy 3D **235.3 / 300 KiB**, world **5.30 / 8 MiB**, and voice **5.91 / 8 MiB**. The updated guides pass local link/anchor/image checks across **46 Markdown files**, with **61 distinct README screenshots**. Screenshots are unaltered isolated application captures; physical-device storage pressure and native keyboards remain manual checks.
+
 ## Globe and import inspection repairs · 27 September 2026
 
 Runtime revision **`c28da32`** is Ready in [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/GgGLCJn8TRpJtc8337gnTFcfNXjQ). Portrait/landscape campus search now fits within the visible viewport and globe framing responds to dock/chooser size. Stars are brighter in both themes; Light retains the horizon glow. Production was checked in the in-app browser after installing the new service worker.
