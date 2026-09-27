@@ -2,8 +2,9 @@
 
 TurnRight keeps separate campus maps under the existing owner account. LASU is the default; links without a campus parameter retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
 
-**Rollout status:** migrations 013–015, the Campuses controls and the writing API
-are live. Existing LASU records and all published assets were verified unchanged.
+**Rollout status:** migrations 013–017, the Campuses controls and the writing API
+are live. Code deployments preserve published campus packages; publishing an
+explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 
 ![Campuses workspace](assets/screenshots/campus-workspace-2026-09-26.png)
@@ -88,6 +89,8 @@ reverting the change restores the existing preview without another build.
 Reopening a completed import retains recoverable mapping edits and the same
 checks. A successful background job alone does not bypass validation.
 
+Large validated batches use a bulk transaction (migration 016) with a bounded 60-second database allowance (migration 017). The server waits up to 75 seconds for this queue RPC; other database requests retain their usual limit. If a queue attempt fails, its transaction rolls back and the validated preview remains recoverable. Reopen the import before retrying to distinguish a completed queue from a failed request.
+
 Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace owner corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
 
 Authored model assignments on matching building identities survive refreshes. Owner corrections remain separate from the source layer. Geometry changes can still require wall, roof, connection or duplicate review before publication.
@@ -158,3 +161,10 @@ The app's dark/light/system preference also applies to the import header, forms 
 ![Import source controls in Dark mode](assets/screenshots/campus-dark-2026-09-26.png)
 
 Screenshots are unaltered local application captures with isolated owner/source responses, illustrative campus names and a checked-in LASU geographic fixture. They demonstrate controls, not a second published production campus. Physical-device keyboards and native browser zoom remain separate manual checks. See [screenshot provenance](assets/screenshots/README.md) and [production evidence](PRODUCTION.md).
+## September 27 UNILAG import outcome
+
+The requested building footprints, Roads, Parcel, Greenspace and complete Greenland layers were applied to the private UNILAG workspace from its existing ArcGIS source. The queue contained 10,175 additions and one attribution-metadata change; acceptance used the existing campus-scoped review operation. The private baseline now contains 3,646 geographic features, 2,281 routing nodes, 4,248 directed edges and one campus metadata record. Generic road access remains restricted pending connectivity/access review. UNILAG was not published, and redistribution permission remains unconfirmed.
+
+The Road width layer remains excluded and recoverable: feature 96 has a ring self-intersection near longitude 3.39490293674406, latitude 6.51373591493023. Repair and inspect that polygon before adding the layer. The truncated 1,000-feature Greenland upload was replaced by the complete 2,425-feature ArcGIS layer. Original uploads and source attributes remain private.
+
+[Successful production import job](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36332555168). LASU source fingerprints were checked unchanged during UNILAG acceptance. The separately requested LASU release is `lasu-0b8025eb23b8` with 45 photographs; see [production evidence](PRODUCTION.md).
