@@ -8,7 +8,7 @@ permissions:
   contents: read
 concurrency:
   group: regression-audit-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   quality:
     runs-on: ubuntu-24.04
@@ -41,7 +41,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, webkit]
+        include:
+          - { browser: chromium, part: 1, total: 4 }
+          - { browser: chromium, part: 2, total: 4 }
+          - { browser: chromium, part: 3, total: 4 }
+          - { browser: chromium, part: 4, total: 4 }
+          - { browser: webkit, part: 1, total: 2 }
+          - { browser: webkit, part: 2, total: 2 }
     defaults:
       run:
         working-directory: web
@@ -56,17 +62,17 @@ jobs:
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Chromium workflows
         if: matrix.browser == 'chromium'
-        run: npx playwright test --timeout=120000 --output=../test-results/chromium
+        run: npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/chromium
       - name: WebKit touch and responsive workflows
         if: matrix.browser == 'webkit'
-        run: npx playwright test --config playwright.webkit.config.ts --output=../test-results/webkit
+        run: npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/webkit
       - name: WebKit image editor
-        if: matrix.browser == 'webkit'
-        run: npx playwright test --config playwright.photos.webkit.config.ts --output=../test-results/webkit-photos
+        if: ${{ !cancelled() && matrix.browser == 'webkit' && matrix.part == 1 }}
+        run: npx playwright test --config playwright.photos.webkit.config.ts --reporter=line --output=../test-results/webkit-photos
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: regression-${{ matrix.browser }}
+          name: regression-${{ matrix.browser }}-${{ matrix.part }}
           path: test-results/
           retention-days: 14
   offline:
@@ -84,8 +90,9 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test --config playwright.pwa.config.ts --output=../test-results/offline
-      - run: npx playwright test --config playwright.photos.pwa.config.ts --output=../test-results/offline-photos
+      - run: npx playwright test --config playwright.pwa.config.ts --reporter=line --output=../test-results/offline
+      - if: ${{ !cancelled() }}
+        run: npx playwright test --config playwright.photos.pwa.config.ts --reporter=line --output=../test-results/offline-photos
       - uses: actions/upload-artifact@v4
         if: always()
         with:
