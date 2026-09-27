@@ -40,6 +40,18 @@ Imagery, scanned maps, PDF alignment, File Geodatabases, private ArcGIS authenti
 
 Upload files directly to private storage; the application server issues a short-lived signed URL rather than receiving the file body. Select the same files to retry an interrupted upload. A different file with an already reserved name needs a replacement import. **Inspect layers** starts a background job; leaving the screen does not discard it. Reopen it in **Recent imports**. Cancel invalidates the run token, so a late worker cannot apply its result.
 
+Failed jobs also expose **Choose map files**. Re-select the original files to resume their reserved uploads, then inspect again; a retry creates a new run token and clears an unusable candidate. An ArcGIS layer's `/query?...` export link is accepted: inspection resolves the underlying layer and reports that it is using the campus bounds rather than the link's query filters or export settings.
+
+GeoJSON exports containing `exceededTransferLimit` (including inside collection `properties`) are incomplete and are rejected with a download-all-records explanation. Use the source layer URL for complete ID batching, or download all batches yourself. `.geojson.json` filenames are supported. Road-width polygons are suggested as land cover; routing paths require line geometry. Identifier suggestions prefer fields verified unique across the inspected layer, so a repeated legacy `Id` does not take precedence over a unique `OBJECTID` or `OBJECTID_1`.
+
+![Resuming a failed file import](assets/screenshots/import-resume-2026-09-27.png)
+
+### September 27 inspection repair
+
+Failed production jobs reported `PermissionError: /work/request.json` before parsing. Matching the container's UID/GID to the runner fixes access to the private 0700 directory while retaining network/capability restrictions. The [Linux regression run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36294682742) verifies the real worker command/mount and every supported driver. Missing-upload errors now explain how to reselect the same files; resumable uploads invalidate stale run tokens and candidates.
+
+The six supplied UNILAG examples were also checked locally without changing their contents. Greenland contains 1,000 valid polygons but explicitly reports truncation, so it needs a complete export. Parcel contains 426 features and requires its unique `OBJECTID_1` (the older `OBJECTID` repeats). Greenspace has nine features; Roads has 157 lines; Building_footprint has 633 polygons. Road width contains 179 polygons, one geometrically invalid, to resolve in preview/review. These checks do not establish source completeness for files without a source count or grant redistribution rights.
+
 ## Map fields and check placement
 
 Choose an import role for each layer: building, path, place, entrance, barrier, land cover, boundary or skip. Suggested mappings are editable. Names, categories, heights, floors and access fields map to the existing editor model. ArcGIS aliases and coded-value labels appear in the selectors. Height units can be metres or feet; floor counts remain properties.
@@ -76,9 +88,9 @@ In **Releases**, prepare and inspect a preview, then publish. The preview freeze
 
 ## Public switching and offline maps
 
-The public globe button beside search (**Choose a campus**) searches published campuses only. It stays reachable with the card collapsed or expanded. Globe markers open the same catalogue entries. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. Switching while directions are active asks to stop the current route. The owner workspace also protects unfinished drawings, roof drafts, recording and pending saves.
+The public globe button beside search (**Choose a campus**) opens the globe and searchable published-campus chooser together. It stays reachable with the card collapsed or expanded. Closing the chooser leaves the globe visible; choosing the current campus returns to its map. Active directions retain their camera and following when search opens, and switching campuses still requires confirmation. Globe markers open the same catalogue entries. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. The owner workspace also protects unfinished drawings, roof drafts, recording and pending saves.
 
-![Published campus selector](assets/screenshots/campus-switcher-2026-09-26.png)
+![Globe and published campus selector](assets/screenshots/globe-campus-chooser-2026-09-27.png)
 
 Download or remove each campus from its own Offline panel. Saved places, recents, report drafts, active package pointers and editor recovery are scoped to campus. Deleting one download retains shared assets and every other campus package. The world overview is shared by the application.
 

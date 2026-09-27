@@ -1,5 +1,22 @@
 # Application screenshots
 
+## Globe and import recovery · 27 September 2026
+
+The new `globe-*-2026-09-27.png` captures show the current navy star background, different globe orientations, Light's retained sunlit horizon, Dark without horizon glow, the campus chooser and a centred mobile landscape globe. `import-resume-2026-09-27.png` shows recovery from an unavailable uploaded file. These replace the affected September 26 globe/chooser views in current guides; older files remain dated archives.
+
+They are unaltered application captures from `tests/browser/globe-search.spec.ts` and the `campus imports resume failed uploads` journey, with real MapLibre rendering and isolated public/owner responses. Example campus names and the small place fixture are illustrative, not newly published campuses. Theme views are 1440×900, landscape is 667×375 and the chooser is 1440×1000. Both Chromium and Windows WebKit workflows are exercised; the displayed theme and upload-recovery captures use WebKit, while landscape and the chooser use Chromium. They do not establish physical-phone performance or GPS accuracy.
+
+Run the focused journeys sequentially, inspect their `test-results` PNG files, and copy reviewed captures to this directory with their date:
+
+```sh
+cd web
+npx playwright test tests/browser/globe-search.spec.ts
+npx playwright test --config playwright.webkit.config.ts tests/browser/globe-search.spec.ts
+npx playwright test tests/browser/campus-imports.spec.ts --grep "resume failed uploads"
+```
+
+Renderer checks read actual pixels for deterministic star orientation and Earth occlusion, and wait for the globe to render after landscape resizing. The documentation also explains that stars are a decorative sky, while NASA/Natural Earth geographic attribution remains unchanged. UNILAG guide illustrations are generated field diagrams and a geographic comparison in the separate Downloads package; they are not app screenshots.
+
 ## Multi-campus addition · 26 September 2026
 
 Nine `campus-*-2026-09-26.png` captures cover the directory, creation/boundary preview, source selection, field mapping, preview/review, phone landscape, public switcher, per-campus offline controls and the corrected dark-theme import form. They are unaltered Chromium captures with isolated owner/import API responses. The original eight use checked-in LASU `lasu-4e4c8008b38b` geography; `campus-dark` uses the small automated campus fixture. Second-campus names, counts and URLs are illustrative. No private account, uploaded file or production draft is exposed; no second production campus is implied.

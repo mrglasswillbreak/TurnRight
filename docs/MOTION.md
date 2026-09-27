@@ -2,9 +2,15 @@
 
 ## Decorative globe animation
 
-Automatic rotation moves 1.5 degrees per second through zoom 3 and slows to a stop at zoom 5. Interaction, camera transitions, selected destinations, guidance and location following pause it; it resumes after eight eligible idle seconds. Held pointers prevent rotation and hidden pages suspend animation. Separate rotation/cloud toggles remember preferences. Reduced motion starts rotation off and clouds static. Clouds drift independently, fade between zooms 4 and 6, and use globe projection helpers with horizon clipping. They are decorative, not live weather. Cloud failure leaves the map usable; no sensor permission is needed.
+Automatic rotation moves 1.5 degrees per second through zoom 3 and slows to a stop at zoom 5. Interaction, camera transitions, an open campus chooser, selected destinations, guidance and location following pause it; it resumes after eight eligible idle seconds. Held pointers prevent rotation and hidden pages suspend animation. Separate rotation/cloud/star toggles remember preferences. Reduced motion starts rotation off and clouds static. Clouds drift independently, fade between zooms 4 and 6, and use globe projection helpers with horizon clipping. They are decorative, not live weather. Cloud failure leaves the map usable; no sensor permission is needed.
 
-![Clouds and animation controls](assets/screenshots/animated-globe-2026-09-26.png)
+Stars form a deterministic decorative sky: rotating the globe changes the visible stars, and returning to an orientation restores the same pattern. They have no independent drift, twinkle or timer. Navy space appears in both themes; Light retains its sunlit atmospheric horizon, while Dark has no horizon glow. Stars default on, including for older preferences, and **Hide stars** leaves plain navy space. Both space treatment and stars fade between zooms 4 and 6. Context recovery reinstalls the custom layers; rendering failure does not disable the map.
+
+![Light globe with sunlit horizon and stars](assets/screenshots/globe-light-africa-2026-09-27.png)
+
+![Dark globe facing the Pacific, without horizon glow](assets/screenshots/globe-dark-pacific-2026-09-27.png)
+
+**Choose a campus** frames the whole globe and opens search, pausing rotation. During active directions it leaves the camera, following and route unchanged. Closing search leaves the globe visible; choosing the current campus returns to the campus map. The canvas observes its actual container size so the globe stays centred above the mobile landscape dock when browser chrome or orientation changes.
 
 Status: **Awaiting device verification**. Browser simulations are software checks; they do not establish physical sensor accuracy or battery performance.
 

@@ -60,9 +60,11 @@ Current production-build captures use the verified published campus **`lasu-7343
 | --- | --- | --- | --- |
 | <img src="docs/assets/screenshots/public-map-mobile-current-2026-09-26.png" width="240" alt="Mobile campus map with compact search dock"> | <img src="docs/assets/screenshots/public-place-mobile-current-2026-09-26.png" width="240" alt="Mobile destination details and building photograph"> | <img src="docs/assets/screenshots/public-settings-mobile-current-2026-09-26.png" width="240" alt="Mobile public appearance and navigation settings"> | <img src="docs/assets/screenshots/public-offline-mobile-current-2026-09-26.png" width="240" alt="Mobile offline package status and download controls"> |
 
-| Illustrated globe · desktop Light | Illustrated globe · mobile Dark |
+| Sunlit horizon · Light | Star-filled globe · Dark |
 | --- | --- |
-| ![Offline globe with campus colours, geographic labels and gentle relief](docs/assets/screenshots/public-globe-desktop-current-2026-09-26.png) | <img src="docs/assets/screenshots/public-globe-mobile-current-2026-09-26.png" width="260" alt="Dark globe and campus return control on a phone-sized screen"> |
+| ![Light globe with its sunlit horizon against navy space and stars](docs/assets/screenshots/globe-light-africa-2026-09-27.png) | ![Dark Pacific globe with a different star view and no horizon glow](docs/assets/screenshots/globe-dark-pacific-2026-09-27.png) |
+
+![Globe centred above the mobile landscape dock](docs/assets/screenshots/globe-landscape-2026-09-27.png)
 
 | Walking route · desktop Dark | Walking route · mobile Dark |
 | --- | --- |
@@ -90,7 +92,11 @@ Imports remain private review candidates. Stable source identities protect repea
 
 ![Dark theme import form with readable fields and preserved input](docs/assets/screenshots/campus-dark-2026-09-26.png)
 
-The globe button beside public search (**Choose a campus**) and globe markers list published campuses. `?campus=<slug>` composes with existing place/building links; old links remain LASU-only. Each campus has its own saved places, report drafts, editor recovery and offline download. A campus can publish before routing is ready, with a clear directions-unavailable state.
+The globe button beside public search (**Choose a campus**) opens the globe and searchable published-campus chooser together. Closing it leaves the globe visible; selecting the current campus returns to its map. During active directions, opening search leaves the camera and following unchanged, and switching still requires confirmation. `?campus=<slug>` composes with existing place/building links; old links remain LASU-only. Each campus has its own saved places, report drafts, editor recovery and offline download. A campus can publish before routing is ready, with a clear directions-unavailable state.
+
+![Campus search beside the globe](docs/assets/screenshots/globe-campus-chooser-2026-09-27.png)
+
+The [UNILAG download guide](docs/UNILAG-DOWNLOADS.md) reproduces separate ArcGIS/OSM files for Akoka and a 500 m access-road buffer, complete-record checks, illustrated manual instructions and a checksum-verified ZIP. Downloading does not import or publish UNILAG.
 
 | Published-campus switcher | Download one campus independently |
 | --- | --- |
@@ -158,7 +164,7 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 - **Expanded modelling:** draw exterior walls, wings and courtyards; edit arcs, Bézier edges and rounded outlines; create primitives and extruded profiles; edit vertices, edges and faces in the shared canvas.
 - **Model files:** preview and import GLB/glTF, OBJ with MTL/textures, and STL. Export GLB, embedded glTF, OBJ packages or binary STL with explicit unit conversion.
 - **Private authored assets:** immutable source documents, owner-scoped recovery, versioned save guards and reviewed publication preserve existing campus compatibility. New database migration 012 is required.
-- **Animated globe:** gentle idle rotation and independently drifting decorative clouds, with separate controls and reduced-motion defaults.
+- **Animated globe:** gentle idle rotation, decorative clouds and orientation-aware stars, with separate remembered controls and reduced-motion defaults. Both themes use navy space; only Light retains the sunlit horizon.
 - **Published models restored:** optional roof-text support preserves existing model fingerprints. All 395 published models pass compatibility checks; genuine geometry or detail changes still invalidate outdated models.
 - **Individual windows:** click a generated or recorded window and edit it directly. Selection does not change saved geometry; the first change separates only that window in one undoable command. Deliberate row, group and pattern editing remains available.
 - **Simpler model controls:** Orbit, Edit surface and Photo share the same draft. The structure toggle is icon-only, desktop properties have a fixed header and wider scrolling body, and editor opacity starts at 100%.
@@ -367,9 +373,9 @@ Import GLB/glTF, OBJ with supplied MTL/textures, or STL in cancellable workers. 
 | --- | --- |
 | ![Authored object in Orbit with mesh editing tools](docs/assets/screenshots/mesh-orbit-2026-09-26.png) | ![Export preparation and format options](docs/assets/screenshots/model-export-2026-09-26.png) |
 
-At globe scale, separate controls enable gentle automatic rotation and decorative drifting clouds. Interaction, selection, guidance and location following pause rotation; it resumes after eight eligible idle seconds. Reduced-motion preferences disable rotation and keep clouds static by default.
+At globe scale, separate controls enable gentle automatic rotation, decorative drifting clouds and stars. Interaction, an open campus chooser, selection, guidance and location following pause rotation; it resumes after eight eligible idle seconds. Reduced-motion preferences disable rotation and keep clouds static by default. Stars respond only to the globe's viewing direction and restore the same pattern at the same orientation. They stay behind Earth, fade with navy space between zooms 4 and 6, and use the existing map canvas. Light retains its sunlit horizon; Dark has no atmospheric glow.
 
-![Globe with decorative cloud layer and independent animation controls](docs/assets/screenshots/animated-globe-2026-09-26.png)
+![Light globe facing the Pacific with stars following the changed orientation](docs/assets/screenshots/globe-light-pacific-2026-09-27.png)
 
 ## Review and publication
 
@@ -579,8 +585,10 @@ TurnRight/
 │   │   ├── PhotoManager.tsx          # Private photo uploads, recovery and approvals
 │   │   ├── SurveyPanel.tsx           # GPS recording and reviewed path application
 │   │   ├── routing.worker.ts         # Device-local routing
-│   │   ├── WorldAnimation.tsx        # Globe rotation/cloud controls
+│   │   ├── WorldAnimation.tsx        # Remembered rotation/cloud/star controls
 │   │   ├── world-clouds.ts           # Globe-aware decorative cloud layer
+│   │   ├── world-stars.ts            # Seeded spherical stars in the map's WebGL context
+│   │   ├── world-camera.ts           # Globe silhouette fitting and chooser framing
 │   │   ├── offline.ts, sw.ts         # Campus caches, recovery and app updates
 │   │   └── components/ui/            # Shared accessible UI controls
 │   ├── api/                         # Authenticated admin and public report endpoints
@@ -604,6 +612,8 @@ TurnRight/
 │   ├── check_map_sources.py         # Opted-in source refresh scheduler
 │   ├── import_campus.py             # Original LASU source importer
 │   ├── enrich_campus.py             # LASU enrichment/research candidate generation
+│   ├── download-unilag.py           # Separate ArcGIS/OSM research downloads and comparison
+│   ├── unilag-guide.py              # Illustrated manual instructions and verified ZIP
 │   ├── release.mts                  # Reviewed campus preview, publication and restore
 │   ├── package.mjs                  # Immutable map package generation
 │   ├── visual-package.mjs           # Native/authored model compilation and textures
@@ -625,6 +635,9 @@ TurnRight/
 | Campuses is missing after deployment | Use the app’s **Install update** prompt; it preserves recovery and installs the new shell. Reopening alone can still use a waiting older service worker. |
 | Import header or fields are unreadable in Dark mode | Install the current app update; campus surfaces and validation text use the shared theme tokens. |
 | A map import cannot finish | Open its job details; check missing projections/files, feature or expanded-size limits, attribution and source completeness. Correct the source/mapping and retry; failed jobs do not replace accepted data. |
+| An old inspection failed with `/work/request.json` permission denied | The worker now matches the private folder's owner. Install the current app update and retry the existing import. |
+| An upload is missing or interrupted | Open the failed import, choose the same files again, then Inspect layers. Completed reserved uploads are reused. |
+| GeoJSON reports `exceededTransferLimit` | The export is incomplete. Use the underlying ArcGIS layer or its Query link for complete batching, or download every ID batch yourself. Do not remove the flag to accept partial data. |
 | A campus is missing from public search | Private campus creation/import does not publish it. Review the candidate, then build and publish that campus’s release. |
 | A second-campus preview is stale | Another publication changed the catalogue. Build a fresh preview so every other campus’s current assets are preserved. |
 | Models look like basic blocks | Check **Settings → 3D rendering → Enhanced**, then zoom closer. Inspect the model status or retry failed assets. Some footprints have no enhanced model. |
