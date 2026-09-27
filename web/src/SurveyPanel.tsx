@@ -159,6 +159,7 @@ export function SurveyPanel({
   const open = (r: SurveyRecording) => {
     controller.current?.dispose();
     controller.current = new SurveyRecorder(r, changed);
+    controller.current.mappingArea = data;
     setRecording(r);
     setScreen('survey');
     setSelection(null);
