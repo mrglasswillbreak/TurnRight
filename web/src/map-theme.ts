@@ -242,6 +242,18 @@ export function applyMapTheme(map: MapInstance, dark: boolean) {
     map.setLayoutProperty(layer, 'text-offset', badges ? [0, 0] : [0, 1]);
     map.setLayoutProperty(layer, 'text-padding', badges ? 6 : 12);
   }
+  if ((changed || updated.has('world-ocean')) && map.getLayer('world-ocean'))
+    map.setSky?.({
+      'sky-color': dark ? '#080f20' : '#c7dff4',
+      'horizon-color': dark ? '#080f20' : '#d8e8f2',
+      'fog-color': dark ? '#080f20' : '#d8e8f2',
+      'sky-horizon-blend': 0.5,
+      'horizon-fog-blend': 0.5,
+      'fog-ground-blend': 0,
+      'atmosphere-blend': dark
+        ? 0
+        : ['interpolate', ['linear'], ['zoom'], 0, 0.55, 5, 0.55, 8, 0],
+    });
   if (changed)
     map.setLight({
       color: dark ? '#c3d4e8' : '#ffffff',

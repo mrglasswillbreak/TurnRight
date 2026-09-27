@@ -207,6 +207,7 @@ export default function CampusSwitcher({
       >
         <DialogContent
           className="campus-chooser"
+          data-campus-open={open}
           finalFocus={trigger}
           overlayClassName="campus-chooser-backdrop"
         >

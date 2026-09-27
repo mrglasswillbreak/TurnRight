@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { worldClouds } from './world-clouds';
+import { worldStars, spaceOpacity } from './world-stars';
+import { globeCamera } from './world-camera';
 import { globeRotationSpeed, mayRotateGlobe } from './world-motion';
 import './world-animation.css';
 
@@ -14,9 +16,10 @@ function preferences() {
           ? value.rotation
           : !matchMedia('(prefers-reduced-motion: reduce)').matches,
       clouds: value.clouds !== false,
+      stars: value.stars !== false,
     };
   } catch {
-    return { rotation: false, clouds: true };
+    return { rotation: false, clouds: true, stars: true };
   }
 }
 export default function WorldAnimation({
@@ -31,6 +34,7 @@ export default function WorldAnimation({
     () => matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
   const [error, setError] = useState(false);
+  const [starError, setStarError] = useState(false);
   const wakeAnimation = useRef(() => {});
   const clouds = useRef({
     time: 0,
@@ -39,6 +43,64 @@ export default function WorldAnimation({
   });
   const latest = useRef({ ...settings, blocked, reduced, error });
   latest.current = { ...settings, blocked, reduced, error };
+  useEffect(() => {
+    let height = map.getContainer().clientHeight,
+      frame = 0;
+    const resize = () => {
+      const next = map.getContainer().clientHeight;
+      if (next < height && map.getZoom() < 5) {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const fit = globeCamera(map);
+          map.jumpTo({
+            ...fit,
+            zoom: Math.min(map.getZoom(), fit.zoom),
+            pitch: 0,
+            roll: 0,
+          });
+        });
+      }
+      height = next;
+    };
+    map.on('resize', resize);
+    return () => {
+      cancelAnimationFrame(frame);
+      map.off('resize', resize);
+    };
+  }, [map]);
+  useEffect(() => {
+    let layer = worldStars(() => latest.current.stars, setStarError);
+    const install = () => {
+      if (!map.getLayer('world-ocean') || map.getLayer(layer.id)) return;
+      try {
+        map.addLayer(layer, 'world-ocean');
+      } catch {
+        setStarError(true);
+      }
+    };
+    const restore = () => {
+      if (map.getLayer(layer.id)) map.removeLayer(layer.id);
+      layer = worldStars(() => latest.current.stars, setStarError);
+      setStarError(false);
+      install();
+    };
+    const background = () =>
+      map
+        .getContainer()
+        .style.setProperty('--space', `${spaceOpacity(map.getZoom()) * 100}%`);
+    background();
+    map.on('zoom', background);
+    map.on('styledata', install);
+    map.on('webglcontextrestored', restore);
+    install();
+    return () => {
+      map.off('zoom', background);
+      map.off('styledata', install);
+      map.off('webglcontextrestored', restore);
+      map.getContainer().style.removeProperty('--space');
+      if (map.getLayer(layer.id)) map.removeLayer(layer.id);
+    };
+  }, [map]);
   useEffect(() => {
     wakeAnimation.current();
   }, [settings, blocked, reduced, error]);
@@ -83,7 +145,7 @@ export default function WorldAnimation({
       held.delete(event.pointerId);
       interaction();
     };
-    const layer = worldClouds(state, () => setError(true));
+    let layer = worldClouds(state, () => setError(true));
     const install = () => {
       if (!map.getLayer('world-country-labels') || map.getLayer(layer.id))
         return;
@@ -158,6 +220,14 @@ export default function WorldAnimation({
       }
     }
     const canvas = map.getCanvasContainer();
+    const restore = () => {
+      if (map.getLayer(layer.id)) map.removeLayer(layer.id);
+      layer = worldClouds(state, () => setError(true));
+      setError(false);
+      install();
+      wake();
+    };
+    map.on('webglcontextrestored', restore);
     wakeAnimation.current = interaction;
     canvas.addEventListener('pointerdown', down);
     window.addEventListener('pointerup', up);
@@ -183,6 +253,7 @@ export default function WorldAnimation({
       map.off('moveend', movement);
       map.off('zoom', wake);
       map.off('idle', install);
+      map.off('webglcontextrestored', restore);
       document.removeEventListener('visibilitychange', interaction);
       if (map.getLayer(layer.id)) map.removeLayer(layer.id);
     };
@@ -206,6 +277,15 @@ export default function WorldAnimation({
         {settings.clouds ? 'Hide clouds' : 'Show clouds'}
       </button>
       {error && <output>Clouds unavailable</output>}
+      <button
+        aria-pressed={settings.stars}
+        disabled={starError}
+        title="Decorative stars follow the globe's viewing direction"
+        onClick={() => setSettings((old) => ({ ...old, stars: !old.stars }))}
+      >
+        {settings.stars ? 'Hide stars' : 'Show stars'}
+      </button>
+      {starError && <output>Stars unavailable</output>}
       {reduced && (
         <span className="sr-only">
           Cloud motion is disabled by your reduced-motion preference.

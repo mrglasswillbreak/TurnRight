@@ -7,6 +7,45 @@ import { meshMaterialRole, nightMaterial } from '../src/map-palette';
 import { campusFixture } from './fixture';
 
 describe('map presentation without campus edits', () => {
+  it('preserves the light horizon and removes atmospheric glow in dark mode, including late world loading', () => {
+    const layers = new Map<string, object>();
+    const sky = vi.fn();
+    const map = {
+      getLayer: (id: string) => layers.get(id),
+      hasImage: () => false,
+      setPaintProperty: vi.fn(),
+      setLayoutProperty: vi.fn(),
+      setLight: vi.fn(),
+      setSky: sky,
+    } as unknown as MapInstance;
+    applyMapTheme(map, true);
+    expect(sky).not.toHaveBeenCalled();
+    layers.set('world-ocean', {});
+    applyMapTheme(map, true);
+    expect(sky).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        'atmosphere-blend': 0,
+        'horizon-color': '#080f20',
+      }),
+    );
+    applyMapTheme(map, false);
+    expect(sky).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        'atmosphere-blend': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0,
+          0.55,
+          5,
+          0.55,
+          8,
+          0,
+        ],
+        'horizon-color': '#d8e8f2',
+      }),
+    );
+  });
   it('avoids repainting an unchanged theme but themes newly mounted or replaced layers', () => {
     const layers = new Map<string, object>([['background', {}]]);
     const paint = vi.fn();

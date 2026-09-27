@@ -1,7 +1,9 @@
 .world-animation-controls {
   position: absolute;
   z-index: 3;
-  bottom: max(42px, env(safe-area-inset-bottom));
+  bottom: calc(
+    var(--sheet-height, 96px) + var(--sheet-bottom-offset, 0px) + 24px
+  );
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -12,6 +14,42 @@
   background: var(--background);
   box-shadow: 0 3px 14px #0002;
   max-width: calc(100% - 100px);
+}
+.map-canvas[data-world-view='true'] {
+  background: color-mix(
+    in srgb,
+    #080f20 var(--space, 100%),
+    var(--background)
+  ) !important;
+}
+.world-animation-controls button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+@media (min-width: 1001px) {
+  .world-animation-controls {
+    left: auto;
+    right: 16px;
+    transform: none;
+    bottom: 42px;
+  }
+}
+@media (max-height: 500px) {
+  .world-animation-controls {
+    top: 12px;
+    bottom: auto;
+    left: auto;
+    right: 12px;
+    transform: none;
+  }
+}
+@media (max-width: 400px) {
+  .world-animation-controls {
+    max-width: calc(100% - 24px);
+  }
+  .world-animation-controls button {
+    padding-inline: 8px;
+  }
 }
 .world-animation-controls button {
   min-height: 44px;

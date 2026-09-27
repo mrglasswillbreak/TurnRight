@@ -16,7 +16,7 @@ export function publicMapPadding(container: HTMLElement, globe = false) {
     // On short screens the corner brand must not push the whole Earth down.
     if (map.width > map.height && map.height <= 500) padding.top = 12;
     const chooser = document
-      .querySelector('.campus-chooser')
+      .querySelector('.campus-chooser[data-campus-open="true"]')
       ?.getBoundingClientRect();
     if (chooser) {
       if (map.width >= 600)
