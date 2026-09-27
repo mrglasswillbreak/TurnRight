@@ -78,6 +78,16 @@ the mapping step cannot reinterpret projected metres as degrees.
 
 ## Review, then publish
 
+A completed preview enables **Queue for review** when its validation has no
+blocking errors and its field mappings still match the preview. Database JSON
+key ordering does not count as a mapping change. If the button is disabled, the
+message beside it explains whether an operation is still running, preview
+details are unavailable, validation needs repair, or settings have changed.
+Use **Rebuild preview** after changing a mapping, attribution or permission;
+reverting the change restores the existing preview without another build.
+Reopening a completed import retains recoverable mapping edits and the same
+checks. A successful background job alone does not bypass validation.
+
 Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace owner corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
 
 Authored model assignments on matching building identities survive refreshes. Owner corrections remain separate from the source layer. Geometry changes can still require wall, roof, connection or duplicate review before publication.
