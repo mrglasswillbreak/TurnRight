@@ -61,9 +61,9 @@ function records(data: CampusData) {
   data.closures.forEach((c) => add('closure', c.id, c.reason, c));
   return records;
 }
-function clinicReachable(data: CampusData): Set<string> {
+function reachableFrom(data: CampusData, originId?: string): Set<string> {
   const origin = data.places.find(
-    (p) => p.id === resolvePlaceId(data, releaseWalks[0].origin),
+    (p) => p.id === (originId ? resolvePlaceId(data, originId) : undefined),
   );
   if (!origin) return new Set();
   const blocked = new Set(
@@ -164,8 +164,28 @@ export function releaseImpact(published: CampusData, draft: CampusData) {
         change: !b ? 'added' : !a ? 'deleted' : 'changed',
       });
   }
-  const oldReachable = clinicReachable(published),
-    newReachable = clinicReachable(draft);
+  // Keep LASU route comparisons; other campuses use their own places.
+  const hasClinic = [...published.places, ...draft.places].some(
+    (p) => p.id === releaseWalks[0].origin,
+  );
+  const candidates = [...published.places, ...draft.places]
+    .filter((p, index, all) => all.findIndex((other) => other.id === p.id) === index)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const origin = hasClinic
+    ? releaseWalks[0].origin
+    : candidates.find((p) =>
+        placeHasConnection(published, p) || placeHasConnection(draft, p),
+      )?.id;
+  const walks = hasClinic ? releaseWalks : candidates
+    .filter((p) => p.id !== origin)
+    .slice(0, 3)
+    .flatMap((p) => origin ? [{
+      name: `${candidates.find((item) => item.id === origin)?.name}–${p.name}`,
+      origin,
+      destination: p.id,
+    }] : []);
+  const oldReachable = reachableFrom(published, origin),
+    newReachable = reachableFrom(draft, origin);
   const newlyDisconnected = published.places
     .filter((p) => {
       const next = draft.places.find(
@@ -194,7 +214,7 @@ export function releaseImpact(published: CampusData, draft: CampusData) {
             after: drive(draft, origin.id, destination.id),
           })),
       ),
-    walks: releaseWalks.map((r) => ({
+    walks: walks.map((r) => ({
       name: r.name,
       before: walk(published, r.origin, r.destination),
       after: walk(draft, r.origin, r.destination),
