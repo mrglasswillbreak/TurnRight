@@ -5,7 +5,8 @@ export function assetTask<T>(work: () => Promise<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     pending.push(() => {
       active++;
-      void work()
+      void Promise.resolve()
+        .then(work)
         .then(resolve, reject)
         .finally(() => {
           active--;

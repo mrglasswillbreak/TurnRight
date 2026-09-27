@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { campusFixture } from './fixture';
 import { campusPhotoIndex } from '../src/campus-photo-index';
 import {
@@ -13,7 +13,7 @@ import { featureEdit } from '../src/editor-features';
 import { readPhotoRecovery, writePhotoRecovery } from '../src/photo-recovery';
 import { PhotoQueueStore, type PhotoJob } from '../src/photo-queue-store';
 import { PhotoPreviews } from '../src/photo-previews';
-import { boundedMap } from '../src/asset-pool';
+import { assetTask, boundedMap } from '../src/asset-pool';
 import { api } from '../src/supabase';
 import { thumbnailSize } from '../src/photo-thumbnail';
 import type { CampusPhoto } from '../src/types';
@@ -27,6 +27,10 @@ vi.mock('../src/supabase', () => ({
   },
 }));
 const stores: PhotoQueueStore[] = [];
+beforeEach(() => {
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('navigator', { onLine: true });
+});
 afterEach(() => {
   stores.forEach((s) => s.stop());
   stores.length = 0;
@@ -38,6 +42,7 @@ it('hands queue ownership to the next tab only after persisting the latest metad
   localStorageFake();
   let lock = Promise.resolve();
   vi.stubGlobal('navigator', {
+    onLine: true,
     locks: {
       request: (
         _name: string,
@@ -514,4 +519,17 @@ it('bounds combined download/audit work and drains failures before returning', a
   ]);
   expect(max).toBe(3);
   expect(active).toBe(0);
+});
+it('releases asset slots when work throws before returning a promise', async () => {
+  const failed = await Promise.allSettled(
+    Array.from({ length: 6 }, () =>
+      assetTask(() => {
+        throw Error('Invalid asset before fetching');
+      }),
+    ),
+  );
+  expect(failed.every((r) => r.status === 'rejected')).toBe(true);
+  expect(await boundedMap([1, 2, 3, 4], async (n) => n * 2)).toEqual([
+    2, 4, 6, 8,
+  ]);
 });
