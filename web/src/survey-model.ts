@@ -1,3 +1,4 @@
+import { insideCampusMappingArea, type MappingArea } from './campus-context';
 import { distance, projectSegment } from './geo';
 import type {
   CampusData,
@@ -254,23 +255,17 @@ export function newSurvey(
     samples: [],
   };
 }
-export function insideMappingArea(p: Position) {
-  return (
-    p.length === 2 &&
-    p.every(Number.isFinite) &&
-    p[0] >= 3.19 &&
-    p[0] <= 3.215 &&
-    p[1] >= 6.455 &&
-    p[1] <= 6.5
-  );
+export function insideMappingArea(p: Position, area?: MappingArea) {
+  return insideCampusMappingArea(p, area);
 }
 export function classifyFix(
   fix: GpsFix,
   previous: SurveySample | undefined,
   lastTimestamp: number,
   now: number,
+  area?: MappingArea,
 ): SampleStatus {
-  if (!insideMappingArea(fix.coordinates)) return 'outside';
+  if (!insideMappingArea(fix.coordinates, area)) return 'outside';
   if (
     !Number.isFinite(fix.timestamp) ||
     fix.timestamp > now + 1000 ||
@@ -296,6 +291,7 @@ export function acceptSample(
   recording: SurveyRecording,
   fix: GpsFix,
   now = Date.now(),
+  area?: MappingArea,
 ): SurveySample {
   const { session, samples } = recording;
   const last = samples.at(-1);
@@ -323,6 +319,7 @@ export function acceptSample(
     session.activeSegment ? prior : undefined,
     latestTimestamp,
     now,
+    area,
   );
   if (!['accepted', 'duplicate'].includes(status)) {
     session.activeSegment = undefined;
