@@ -708,6 +708,7 @@ test('campus imports retain readable headers and fields in light and dark themes
 });
 
 test('campus imports save and reopen paths outside LASU after rotation', async ({ page }, info) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   const state = await setup(page, { outsideLasu: true });
   await page.goto('/admin?campus=north-campus');
   await page.getByRole('button', { name: 'All', exact: true }).click();
@@ -719,6 +720,7 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
   await page.screenshot({ path: info.outputPath('unilag-path-saved.png') });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.reload();
   await page.getByRole('button', { name: 'All', exact: true }).click();
   await page.getByRole('searchbox', { name: 'Search map features' }).fill('OZOLUA');
@@ -726,4 +728,24 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
   await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
   await expect(page.getByText('All coordinates must be within the LASU Ojo mapping area.', { exact: true })).toHaveCount(0);
   expect(state.calls.filter((c) => c.action === 'save-edits').every((c) => c.campus === 'north-campus')).toBe(true);
+});
+
+test('campus imports reconcile a lost queue response without submitting twice', async ({ page }) => {
+  const state = await setup(page);
+  await workspace(page);
+  await fileImport(page);
+  await page.getByRole('button', { name: 'Build preview', exact: true }).click();
+  const queue = page.getByRole('button', { name: 'Queue for review', exact: true });
+  await expect(queue).toBeEnabled({ timeout: 15000 });
+  let submissions = 0;
+  await page.route('**/api/admin', async (route) => {
+    if (route.request().postDataJSON().action !== 'import-queue') return route.fallback();
+    submissions++;
+    state.jobs[0].status = 'reviewed';
+    return route.fulfill({ status: 504, json: { error: 'The request timed out.' } });
+  });
+  await queue.click();
+  await expect(page.getByRole('button', { name: 'Open source review' })).toBeVisible();
+  expect(submissions).toBe(1);
+  await expect(queue).toHaveCount(0);
 });
