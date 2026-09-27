@@ -267,7 +267,7 @@ export function MapView({
     const mapPadding = () => {
       return panelBesideMap
         ? { top: 60, right: 40, bottom: 60, left: 40 }
-        : publicMapPadding(map.getContainer());
+        : publicMapPadding(map.getContainer(), wasWorld);
     };
     const panel =
       !panelBesideMap &&
@@ -336,8 +336,10 @@ export function MapView({
           pitch: map.getPitch(),
         });
     };
+    let resizeFrame = 0;
     const resize = () => {
-      requestAnimationFrame(() => {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
         if (mapRef.current !== map) return;
         const center = map.getCenter();
         map.resize();
@@ -345,8 +347,11 @@ export function MapView({
         map.jumpTo({ center, padding: mapPadding() });
       });
     };
+    // Dynamic browser chrome and CSS/keyboard changes need not emit window.resize.
+    const mapResize = new ResizeObserver(resize);
+    mapResize.observe(map.getContainer());
     window.addEventListener('resize', resize);
-    const viewportResize = () => requestAnimationFrame(requestPadding);
+    const viewportResize = resize;
     window.visualViewport?.addEventListener('resize', viewportResize);
     window.visualViewport?.addEventListener('scroll', viewportResize);
     map.on('error', (event) => console.error('Campus map:', event.error));
@@ -872,6 +877,8 @@ export function MapView({
       });
     return () => {
       window.removeEventListener('resize', resize);
+      cancelAnimationFrame(resizeFrame);
+      mapResize.disconnect();
       window.visualViewport?.removeEventListener('resize', viewportResize);
       window.visualViewport?.removeEventListener('scroll', viewportResize);
       map.off('moveend', syncPadding);

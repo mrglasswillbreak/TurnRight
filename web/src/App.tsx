@@ -132,6 +132,7 @@ export default function App() {
     [follow, setFollow] = useState(false);
   const [entranceId, setEntranceId] = useState('');
   const [worldView, setWorldView] = useState(false);
+  const [campusSearch, setCampusSearch] = useState(false);
   const mobileMapControls = useIsMobile(
     '(max-width: 767px), (max-width: 1000px) and (max-height: 500px)',
   );
@@ -622,7 +623,13 @@ export default function App() {
           <ChevronRight size={17} />
         </button>
       )),
-    [places, visiblePlaceCount, mobileSearch, selectPlace, manifest?.campus?.name],
+    [
+      places,
+      visiblePlaceCount,
+      mobileSearch,
+      selectPlace,
+      manifest?.campus?.name,
+    ],
   );
   const openDestinationLink = useEffectEvent(() => {
     if (!data || location.pathname.startsWith('/admin')) return;
@@ -962,7 +969,7 @@ export default function App() {
       }
     >
       <MapView
-        animationPaused={!!dialog || !!selectedStreet}
+        animationPaused={!!dialog || !!selectedStreet || campusSearch}
         selectedStreet={selectedStreet}
         data={data}
         selected={selected}
@@ -1042,6 +1049,9 @@ export default function App() {
               map={campusMap}
               navigating={navigating}
               onStop={stopNavigation}
+              bounds={data.bounds}
+              onOpenChange={setCampusSearch}
+              onBrowse={() => setFollow(false)}
             />
           </Suspense>
           {navigating ? (
@@ -1211,9 +1221,13 @@ export default function App() {
               </button>
             </output>
           )}
-          {!data.graph.edges.some((edge) => edge.walkingAccess !== 'no' && edge.walkingAccess !== 'private') && (
+          {!data.graph.edges.some(
+            (edge) =>
+              edge.walkingAccess !== 'no' && edge.walkingAccess !== 'private',
+          ) && (
             <output className="notice dock-notice">
-              Directions are not available for this campus yet. You can browse buildings and places while paths and connections are reviewed.
+              Directions are not available for this campus yet. You can browse
+              buildings and places while paths and connections are reviewed.
             </output>
           )}
           {routeView && selected ? (

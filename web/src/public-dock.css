@@ -1,4 +1,30 @@
 /* The public map has one floating panel. Its top edge sets the visible height. */
+.campus-chooser[data-slot='dialog-content'] {
+  top: 16px;
+  right: 16px;
+  left: auto;
+  width: 320px;
+  max-height: calc(100dvh - 32px);
+  transform: none;
+  translate: none;
+  overflow: auto;
+}
+.campus-chooser-backdrop[data-slot='dialog-overlay'] {
+  background: transparent;
+  backdrop-filter: none;
+}
+@media (max-width: 599px) {
+  .campus-chooser[data-slot='dialog-content'] {
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    right: 12px;
+    width: calc(100% - 24px);
+    max-height: 45dvh;
+  }
+}
+@media (min-width: 600px) and (max-height: 500px) {
+  .campus-chooser[data-slot='dialog-content'] { width: 280px; }
+}
 .app-shell .map-canvas {
   background: var(--background);
 }

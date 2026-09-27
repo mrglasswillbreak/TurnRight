@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Globe2, MapPin, Search } from 'lucide-react';
 import type { Map as MapInstance, MapLayerMouseEvent } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,9 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { loadCampusCatalogue } from './campus-catalogue';
+import { frameGlobe } from './world-camera';
+import { returnToCampus } from './world-map';
+import { publicMapPadding } from './public-map-layout';
 import {
   campusUrl,
   lasuCampus,
@@ -21,16 +24,71 @@ export default function CampusSwitcher({
   map,
   navigating = false,
   onStop,
+  bounds,
+  onOpenChange,
+  onBrowse,
 }: {
   map: MapInstance | null;
   navigating?: boolean;
   onStop: () => Promise<void>;
+  bounds: CampusIdentity['bounds'];
+  onOpenChange: (open: boolean) => void;
+  onBrowse: () => void;
 }) {
+  const trigger = useRef<HTMLButtonElement>(null);
+  const callbacks = useRef({ onOpenChange, onBrowse, bounds });
+  callbacks.current = { onOpenChange, onBrowse, bounds };
   const [campuses, setCampuses] = useState<CampusIdentity[]>([lasuCampus]),
     [open, setOpen] = useState(false),
     [query, setQuery] = useState(''),
     [error, setError] = useState(''),
     [choice, setChoice] = useState<CampusIdentity | null>(null);
+  useEffect(() => {
+    callbacks.current.onOpenChange(open);
+    if (navigating || !map) return;
+    if (!open) {
+      let frame = 0;
+      const refresh = () => {
+        frame = requestAnimationFrame(() => {
+          if (map.getZoom() < 12 && !map.isMoving())
+            map.setPadding(publicMapPadding(map.getContainer(), true));
+        });
+      };
+      if (map.isMoving()) map.once('moveend', refresh);
+      else refresh();
+      return () => {
+        cancelAnimationFrame(frame);
+        map.off('moveend', refresh);
+      };
+    }
+    let framed = false,
+      frame = 0;
+    const attempt = () => {
+      if (
+        framed ||
+        !map.getLayer('world-country-labels') ||
+        map.getMinZoom() > 0
+      )
+        return;
+      framed = true;
+      callbacks.current.onBrowse();
+      const b = callbacks.current.bounds;
+      frameGlobe(map, [(b[0][0] + b[1][0]) / 2, (b[0][1] + b[1][1]) / 2]);
+    };
+    // Wait for the dialog layout and for a pending world install to complete.
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(attempt);
+    };
+    schedule();
+    map.on('styledata', schedule);
+    map.on('idle', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      map.off('styledata', schedule);
+      map.off('idle', schedule);
+    };
+  }, [open, map, navigating]);
   useEffect(() => {
     void loadCampusCatalogue()
       .then((c) => setCampuses(c.campuses))
@@ -39,6 +97,8 @@ export default function CampusSwitcher({
   const choose = (campus: CampusIdentity) => {
     if (campus.slug === requestedCampus()) {
       setOpen(false);
+      setChoice(null);
+      if (map && !navigating) returnToCampus(map, callbacks.current.bounds);
       return;
     }
     if (navigating) {
@@ -126,10 +186,13 @@ export default function CampusSwitcher({
   return (
     <>
       <Button
+        ref={trigger}
         className="public-campus-switcher"
         variant="outline"
         aria-label="Choose a campus"
         title="Choose a campus"
+        aria-expanded={open}
+        aria-haspopup="dialog"
         onClick={() => setOpen(true)}
       >
         <Globe2 size={20} />
@@ -142,7 +205,11 @@ export default function CampusSwitcher({
           if (!value) setChoice(null);
         }}
       >
-        <DialogContent>
+        <DialogContent
+          className="campus-chooser"
+          finalFocus={trigger}
+          overlayClassName="campus-chooser-backdrop"
+        >
           <DialogHeader>
             <DialogTitle>Choose a campus</DialogTitle>
             <DialogDescription>
@@ -186,6 +253,10 @@ export default function CampusSwitcher({
               <Button
                 onClick={() =>
                   void (async () => {
+                    if (choice.slug === requestedCampus()) {
+                      choose(choice);
+                      return;
+                    }
                     if (navigating) await onStop();
                     location.assign(campusUrl('/', choice.slug));
                   })()

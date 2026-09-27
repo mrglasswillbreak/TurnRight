@@ -1,6 +1,6 @@
 // Keep places, routes and the followed location in the portion of the map
 // exposed by the movable public panel, including above the phone keyboard.
-export function publicMapPadding(container: HTMLElement) {
+export function publicMapPadding(container: HTMLElement, globe = false) {
   const map = container.getBoundingClientRect();
   const panel = container
     .closest('.app-shell')
@@ -11,6 +11,22 @@ export function publicMapPadding(container: HTMLElement) {
     if (map.width >= 900 && panel.height > 180)
       padding.left = Math.max(24, panel.right - map.left + 20);
     else padding.bottom = Math.max(32, map.bottom - panel.top + 20);
+  }
+  if (globe) {
+    // On short screens the corner brand must not push the whole Earth down.
+    if (map.width > map.height && map.height <= 500) padding.top = 12;
+    const chooser = document
+      .querySelector('.campus-chooser')
+      ?.getBoundingClientRect();
+    if (chooser) {
+      if (map.width >= 600)
+        padding.right = Math.max(padding.right, map.right - chooser.left + 16);
+      else
+        padding.bottom = Math.max(
+          padding.bottom,
+          map.bottom - chooser.top + 16,
+        );
+    }
   }
   for (const [a, b, size] of [
     ['left', 'right', map.width],
