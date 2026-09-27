@@ -263,6 +263,11 @@ export default function Admin({
         }
       });
   }, [owner, loadEpoch]);
+  useEffect(() => {
+    if (state?.campus?.name)
+      document.title = `TurnRight · ${state.campus.name} editor`;
+  }, [state?.campus?.name]);
+
   const refresh = async () => {
     const [result, source] = await Promise.all([
       api<EditorState>('state'),
