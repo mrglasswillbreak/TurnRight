@@ -155,6 +155,7 @@ export function installWorldLayers(
   map: MapInstance,
   data: WorldData,
   bounds: CampusData['bounds'],
+  campusName = 'LASU Ojo',
 ) {
   if (map.getSource('world')) return;
   map.addSource('world-imagery', {
@@ -399,7 +400,7 @@ export function installWorldLayers(
     type: 'symbol',
     maxzoom: 12,
     layout: {
-      'text-field': 'LASU Ojo',
+      'text-field': campusName,
       'text-font': ['Open Sans Semibold'],
       'text-size': 13,
       'text-anchor': 'top',
