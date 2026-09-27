@@ -8820,6 +8820,12 @@ for (const viewport of [
         exact: true,
       }),
     ).toBeEnabled();
+    const imagePreview = editor.getByAltText('Edited photograph preview');
+    const originalAspect = await imagePreview.evaluate(
+      (el) =>
+        (el as HTMLImageElement).naturalWidth /
+        (el as HTMLImageElement).naturalHeight,
+    );
     await page.screenshot({
       path: info.outputPath(`photo-compression-${viewport.width}.png`),
     });
@@ -8838,6 +8844,26 @@ for (const viewport of [
     await expect(editor.getByLabel('Straighten', { exact: true })).toHaveValue(
       '90',
     );
+    await editor
+      .getByRole('button', { name: 'Preview changes', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', {
+        name: 'Download edited image',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await editor.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect
+      .poll(() =>
+        imagePreview.evaluate(
+          (el) =>
+            (el as HTMLImageElement).naturalWidth /
+            (el as HTMLImageElement).naturalHeight,
+        ),
+      )
+      .toBeCloseTo(originalAspect, 2);
+    await editor.getByRole('button', { name: 'Redo', exact: true }).click();
     await editor
       .getByRole('button', { name: 'Preview changes', exact: true })
       .click();

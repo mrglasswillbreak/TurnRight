@@ -4,14 +4,30 @@ import {
   defaultPhotoRecipe,
   validatePhotoRecipe,
   photoModifications,
+  rotatePhoto,
 } from '../src/photo-edit';
 import {
   localPhotos,
   localPhoto,
   saveLocalPhoto,
   removeLocalPhoto,
+  updateLocalPhoto,
+  associateLocalPhoto,
 } from '../src/photo-local';
 describe('local image drafts', () => {
+  it('rotates through all four orientations and retains a straighten adjustment', () => {
+    for (const step of [90, -90]) {
+      let angle = 0;
+      const orientations = [];
+      for (let i = 0; i < 4; i++) {
+        angle = rotatePhoto(angle, step);
+        orientations.push(angle);
+      }
+      expect(new Set(orientations).size).toBe(4);
+      expect(angle).toBe(0);
+    }
+    expect(rotatePhoto(95, 90)).toBe(-175);
+  });
   it('rejects invalid geometry, unbounded decoding controls and formats', () => {
     expect(() => validatePhotoRecipe(defaultPhotoRecipe())).not.toThrow();
     for (const patch of [
@@ -57,6 +73,56 @@ describe('local image drafts', () => {
     await removeLocalPhoto('one', 'same-id');
     expect(await localPhoto('one', 'same-id')).toBeUndefined();
     expect(await localPhoto('two', 'same-id')).toBeDefined();
+  });
+  it('updates recipes without copying originals, scopes gallery reads and retains concurrent photo associations', async () => {
+    const owner = crypto.randomUUID();
+    const original = new Blob([new Uint8Array(4 * 1024 * 1024)], {
+      type: 'image/png',
+    });
+    const draft = {
+      id: 'large',
+      owner,
+      target: 'building:one',
+      filename: 'large.png',
+      source: original,
+      recipe: defaultPhotoRecipe(),
+      metadata: {},
+      updated: 0,
+      output: new Blob(['old output'], { type: 'image/webp' }),
+    };
+    await saveLocalPhoto(owner, draft);
+    await saveLocalPhoto(owner, {
+      ...draft,
+      id: 'other',
+      target: 'building:two',
+    });
+    const put = vi.spyOn(IDBObjectStore.prototype, 'put');
+    await Promise.all([
+      updateLocalPhoto(
+        owner,
+        draft.id,
+        { recipe: { ...draft.recipe, quality: 0.7 } },
+        true,
+      ),
+      associateLocalPhoto(owner, draft.id, 'published-id'),
+    ]);
+    expect(put.mock.instances.every((store) => store.name === 'images')).toBe(
+      true,
+    );
+    put.mockRestore();
+    const rows = await localPhotos(owner, 'building:one');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].recipe.quality).toBe(0.7);
+    expect(rows[0].photoId).toBe('published-id');
+    expect(rows[0].output).toBeUndefined();
+    expect(await rows[0].source.arrayBuffer()).toEqual(
+      await original.arrayBuffer(),
+    );
+    expect((await localPhotos(owner, 'building:two'))[0].output?.size).toBe(10);
+    await removeLocalPhoto(owner, draft.id);
+    await expect(
+      updateLocalPhoto(owner, draft.id, { filename: 'No resurrection' }),
+    ).rejects.toThrow('unavailable');
   });
   it('keeps local originals within their campus even if location changes during an IndexedDB write', async () => {
     const draft = {

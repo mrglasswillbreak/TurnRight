@@ -37,6 +37,8 @@ export const defaultPhotoRecipe = (): PhotoRecipe => ({
   targetKiB: 250,
   masks: [],
 });
+export const rotatePhoto = (angle: number, step: number) =>
+  ((((angle + step + 180) % 360) + 360) % 360) - 180;
 export function validatePhotoRecipe(r: PhotoRecipe) {
   const bounded = (n: number, min: number, max: number) =>
     Number.isFinite(n) && n >= min && n <= max;

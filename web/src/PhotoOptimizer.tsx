@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   defaultPhotoRecipe,
+  rotatePhoto,
   photoModifications,
   type PhotoRecipe,
 } from './photo-edit';
@@ -26,6 +27,7 @@ import { editPhotoTask } from './photo-edit-client';
 import {
   localPhotos,
   saveLocalPhoto,
+  updateLocalPhoto,
   removeLocalPhoto,
   type LocalPhoto,
 } from './photo-local';
@@ -166,7 +168,9 @@ export default function PhotoOptimizer({
     setItems((old) => old.map((p) => (p.id === value.id ? value : p)));
     pending.current = pending.current
       .catch(() => {})
-      .then(() => saveLocalPhoto(owner, value));
+      .then(() =>
+        updateLocalPhoto(owner, value.id, { recipe: value.recipe }, true),
+      );
     const write = pending.current;
     void write.then(
       () => {
@@ -186,9 +190,8 @@ export default function PhotoOptimizer({
     const abort = new AbortController();
     void (async () => {
       try {
-        let existing = (await localPhotos(owner)).filter(
-          (p) => p.target === target,
-        );
+        let existing = await localPhotos(owner, target);
+        if (abort.signal.aborted) return;
         const added: LocalPhoto[] = [];
         if (request.photo) {
           const original = existing.find(
@@ -309,6 +312,10 @@ export default function PhotoOptimizer({
     const list = undo ? past : future,
       r = list.at(-1);
     if (!r) return;
+    setLastPreview(undefined);
+    setTool('navigate');
+    setBox(null);
+    drag.current = null;
     (undo ? setPast : setFuture)(list.slice(0, -1));
     (undo ? setFuture : setPast)((v) => [...v, current.recipe]);
     save({ ...current, recipe: r, output: undefined });
@@ -872,10 +879,7 @@ export default function PhotoOptimizer({
                       aria-label="Rotate left"
                       onClick={() =>
                         change({
-                          rotation:
-                            current.recipe.rotation <= -90
-                              ? 0
-                              : current.recipe.rotation - 90,
+                          rotation: rotatePhoto(current.recipe.rotation, -90),
                           masks: [],
                         })
                       }
@@ -887,10 +891,7 @@ export default function PhotoOptimizer({
                       aria-label="Rotate right"
                       onClick={() =>
                         change({
-                          rotation:
-                            current.recipe.rotation >= 90
-                              ? 0
-                              : current.recipe.rotation + 90,
+                          rotation: rotatePhoto(current.recipe.rotation, 90),
                           masks: [],
                         })
                       }

@@ -1,4 +1,4 @@
-import { openDB } from 'idb';
+import { openDB, type IDBPDatabase } from 'idb';
 import { campusKey } from './campus-context';
 import type { PhotoRecipe } from './photo-edit';
 import type { CampusPhoto } from './types';
@@ -19,12 +19,59 @@ export interface LocalPhoto {
   updated: number;
 }
 const connection = () =>
-  openDB('turnright-local-images', 1, {
-    upgrade(db) {
-      db.createObjectStore('images', { keyPath: ['owner', 'id'] }).createIndex(
-        'owner',
-        'owner',
-      );
+  openDB('turnright-local-images', 2, {
+    upgrade(db, oldVersion, _newVersion, tx) {
+      if (oldVersion < 1)
+        db.createObjectStore('images', {
+          keyPath: ['owner', 'id'],
+        }).createIndex('owner', 'owner');
+      const images = tx.objectStore('images');
+      images.createIndex('ownerTarget', ['owner', 'target']);
+      const content = db.createObjectStore('content', {
+        keyPath: ['owner', 'id', 'kind'],
+      });
+      // Keep migration atomic. Legacy binary values move inside this transaction;
+      // no decoding or external promises can interrupt its lifetime.
+      void (async () => {
+        let cursor = await images.openCursor();
+        while (cursor) {
+          const {
+            source,
+            output,
+            sourceBytes,
+            sourceType,
+            outputBytes,
+            outputType,
+            ...metadata
+          } = cursor.value as StoredPhoto;
+          await content.put({
+            owner: metadata.owner,
+            id: metadata.id,
+            kind: 'source',
+            bytes: sourceBytes,
+            type: sourceType,
+            blob: source,
+          });
+          if (outputBytes || output)
+            await content.put({
+              owner: metadata.owner,
+              id: metadata.id,
+              kind: 'output',
+              bytes: outputBytes,
+              type: outputType,
+              blob: output,
+            });
+          await cursor.update(metadata);
+          cursor = await cursor.continue();
+        }
+      })().catch(() => {
+        // Opening the database rejects when migration aborts; version 1 stays intact.
+        try {
+          tx.abort();
+        } catch {
+          /* The failing request already aborted it. */
+        }
+      });
     },
   });
 type StoredPhoto = LocalPhoto & {
@@ -33,25 +80,44 @@ type StoredPhoto = LocalPhoto & {
   outputBytes?: ArrayBuffer;
   outputType?: string;
 };
-function restore(value: StoredPhoto): LocalPhoto {
-  const { sourceBytes, sourceType, outputBytes, outputType, ...photo } = value;
+async function restore(
+  db: IDBPDatabase,
+  photo: Omit<LocalPhoto, 'source' | 'output'>,
+): Promise<LocalPhoto> {
+  const tx = db.transaction('content');
+  const [source, output] = await Promise.all(
+    ['source', 'output'].map((kind) =>
+      tx.store.get([photo.owner, photo.id, kind]),
+    ),
+  );
+  await tx.done;
+  if (!source)
+    throw Error(
+      'The local original is unavailable. Reselect the original image.',
+    );
+  const blob = (value: { bytes?: ArrayBuffer; type?: string; blob?: Blob }) =>
+    value.bytes ? new Blob([value.bytes], { type: value.type }) : value.blob!;
   return {
     ...photo,
-    source: sourceBytes
-      ? new Blob([sourceBytes], { type: sourceType })
-      : photo.source,
-    output: outputBytes
-      ? new Blob([outputBytes], { type: outputType })
-      : photo.output,
+    source: blob(source),
+    output: output ? blob(output) : undefined,
   };
 }
-export async function localPhotos(owner: string): Promise<LocalPhoto[]> {
+export async function localPhotos(
+  owner: string,
+  target?: string,
+): Promise<LocalPhoto[]> {
   const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
-    return (await db.getAllFromIndex('images', 'owner', scopedOwner)).map(
-      restore,
+    const metadata = await db.getAllFromIndex(
+      'images',
+      target === undefined ? 'owner' : 'ownerTarget',
+      target === undefined ? scopedOwner : [scopedOwner, target],
     );
+    const photos: LocalPhoto[] = [];
+    for (const photo of metadata) photos.push(await restore(db, photo));
+    return photos;
   } finally {
     db.close();
   }
@@ -64,7 +130,7 @@ export async function localPhoto(
   const db = await connection();
   try {
     const value = await db.get('images', [scopedOwner, id]);
-    return value ? restore(value) : undefined;
+    return value ? await restore(db, value) : undefined;
   } finally {
     db.close();
   }
@@ -76,15 +142,63 @@ export async function saveLocalPhoto(owner: string, value: LocalPhoto) {
   const outputBytes = output ? await output.arrayBuffer() : undefined;
   const db = await connection();
   try {
-    await db.put('images', {
+    const tx = db.transaction(['images', 'content'], 'readwrite');
+    await tx.objectStore('images').put({
       ...metadata,
-      sourceBytes,
-      sourceType: source.type,
-      outputBytes,
-      outputType: output?.type,
       owner: scopedOwner,
       updated: Date.now(),
     });
+    const content = tx.objectStore('content');
+    await content.put({
+      owner: scopedOwner,
+      id: value.id,
+      kind: 'source',
+      bytes: sourceBytes,
+      type: source.type,
+    });
+    if (outputBytes)
+      await content.put({
+        owner: scopedOwner,
+        id: value.id,
+        kind: 'output',
+        bytes: outputBytes,
+        type: output!.type,
+      });
+    else await content.delete([scopedOwner, value.id, 'output']);
+    await tx.done;
+  } finally {
+    db.close();
+  }
+}
+/** Recipe and association writes never read or clone the original image bytes. */
+export async function updateLocalPhoto(
+  owner: string,
+  id: string,
+  patch: Partial<Omit<LocalPhoto, 'id' | 'owner' | 'source' | 'output'>>,
+  clearOutput = false,
+) {
+  const scopedOwner = campusKey(owner);
+  const db = await connection();
+  try {
+    const tx = db.transaction(['images', 'content'], 'readwrite');
+    const images = tx.objectStore('images');
+    const previous = await images.get([scopedOwner, id]);
+    if (!previous) {
+      await tx.done;
+      throw Error(
+        'The local original is unavailable. Reselect the original image.',
+      );
+    }
+    await images.put({
+      ...previous,
+      ...patch,
+      owner: scopedOwner,
+      id,
+      updated: Date.now(),
+    });
+    if (clearOutput)
+      await tx.objectStore('content').delete([scopedOwner, id, 'output']);
+    await tx.done;
   } finally {
     db.close();
   }
@@ -93,7 +207,13 @@ export async function removeLocalPhoto(owner: string, id: string) {
   const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
-    await db.delete('images', [scopedOwner, id]);
+    const tx = db.transaction(['images', 'content'], 'readwrite');
+    await Promise.all([
+      tx.objectStore('images').delete([scopedOwner, id]),
+      tx.objectStore('content').delete([scopedOwner, id, 'source']),
+      tx.objectStore('content').delete([scopedOwner, id, 'output']),
+    ]);
+    await tx.done;
   } finally {
     db.close();
   }
@@ -103,6 +223,5 @@ export async function associateLocalPhoto(
   id: string,
   photoId: string,
 ) {
-  const value = await localPhoto(owner, id);
-  if (value) await saveLocalPhoto(owner, { ...value, photoId });
+  await updateLocalPhoto(owner, id, { photoId });
 }
