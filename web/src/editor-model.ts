@@ -1,3 +1,4 @@
+import { insideCampusMappingArea, type MappingArea } from './campus-context.js';
 import {
   validVehicleRules,
   validParking,
@@ -62,7 +63,7 @@ export function pathWalkingAccess(data: CampusData, id: string): WalkingAccess {
   if (!edges.length || edges.some((e) => !e.accessible)) return 'private';
   return edges.some((e) => e.walkingAccess === 'campus') ? 'campus' : 'yes';
 }
-export function validateEdit(edit: MapEdit): string[] {
+export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
   const errors: string[] = [];
   if (
     !edit ||
@@ -266,18 +267,10 @@ export function validateEdit(edit: MapEdit): string[] {
   walk(geometry.coordinates);
   if (positions.length > 2000)
     errors.push('A single edit is limited to 2,000 vertices.');
-  if (
-    positions.some(
-      (p) =>
-        p.length !== 2 ||
-        p.some((n) => typeof n !== 'number' || !Number.isFinite(n)) ||
-        p[0] < 3.19 ||
-        p[0] > 3.215 ||
-        p[1] < 6.455 ||
-        p[1] > 6.5,
-    )
-  )
-    errors.push('All coordinates must be within the LASU Ojo mapping area.');
+  if (positions.some((p) => !insideCampusMappingArea(p, area)))
+    errors.push(area
+      ? 'All coordinates must be within the selected campus mapping area (including its 500 m approach buffer).'
+      : 'Use finite WGS84 longitude/latitude coordinates.');
   if (geometry.type === 'LineString' && positions.length < 2)
     errors.push('A path needs at least two points.');
   if (
@@ -418,7 +411,7 @@ export function applyEdits(
       e.deleted &&
       !e.properties.revertToSource &&
       e.properties.mergedInto &&
-      !validateEdit(e).length,
+      !validateEdit(e, base).length,
   );
   data.placeIdAliases = Object.fromEntries([
     ...Object.entries(data.placeIdAliases || {}),
@@ -448,7 +441,7 @@ export function applyEdits(
     applyConnections(
       data,
       nodes,
-      edits.filter((e) => !validateEdit(e).length),
+      edits.filter((e) => !validateEdit(e, base).length),
       errors,
       issues,
       aliases,
@@ -470,7 +463,7 @@ export function applyEdits(
   );
   for (const edit of ordered) {
     if (edit.deleted && edit.properties?.revertToSource === true) continue;
-    const invalid = validateEdit(edit);
+    const invalid = validateEdit(edit, base);
     if (invalid.length) {
       invalid.forEach((message) =>
         issue(`${edit.id}: ${message}`, edit.id, edit.kind),
@@ -1049,7 +1042,7 @@ export function applyEdits(
   }
   applyDrivingEdits(
     data,
-    edits.filter((e) => !validateEdit(e).length),
+    edits.filter((e) => !validateEdit(e, base).length),
   );
   if (data.driving) {
     for (const p of data.driving.parking) {
