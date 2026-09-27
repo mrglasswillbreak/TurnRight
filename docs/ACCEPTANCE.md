@@ -1,5 +1,30 @@
 # TurnRight verification and release checklist
 
+## Globe navigation and import repair — 27 September 2026
+
+- Six focused globe journeys pass in Chromium and Windows WebKit, covering
+  chooser framing, directions protection, deferred loading, offline search,
+  landscape/container resizing, deterministic stars, Earth occlusion, theme
+  lighting, persisted controls and WebGL recovery. Camera and drawing-buffer
+  checks cover 667×375, 844×390 and 1024×768. Chromium landscape screenshots show
+  the centred globe. Windows WebKit's resized-page screenshots omit the WebGL
+  canvas even in a fresh diagnostic with the stars layer disabled; actual
+  render-buffer pixels and feature queries pass. Physical Safari rotation remains
+  a visual acceptance check, not a claimed result of that screenshot run.
+- The upload-resume workflow passes in both browsers. Import configuration and
+  recovery tests pass, as do the 24 focused world tests and three frozen published
+  model compatibility cases. Production/configured builds and existing budgets
+  pass; lint retains the existing eight explicit-any warnings.
+- [The Linux GIS run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36294682742)
+  passes 16 parser tests plus a real host-to-container smoke test using a private
+  0700 upload directory. It covers GeoJSON filenames, ESRI JSON, query URLs,
+  truncated exports and identifier uniqueness. Local Windows lacks the GDAL and
+  Pyosmium drivers; Linux supplies that integration evidence.
+- User-provided UNILAG files were inspected without modification: Greenland is
+  an explicitly truncated export, Parcel's unique identifier is `OBJECTID_1`,
+  and Road width contains one invalid polygon. Complete downloads, private
+  inspection and publication are distinct steps; see [the import guide](CAMPUS-IMPORTS.md).
+
 ## Multi-campus import verification — 26 September 2026
 
 - **591 unit tests pass**, including campus identity/storage isolation, concurrent

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { writeFile } from 'node:fs/promises';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { campusFixture } from '../fixture';
 import { lasuCampus } from '../../src/campus-context';
@@ -131,6 +132,19 @@ async function camera(page: Page) {
     };
   });
 }
+async function settledWorld(page: Page) {
+  await page.waitForFunction(() => {
+    const map = window.editorTestMap;
+    return (
+      map.loaded() &&
+      !map.isMoving() &&
+      !!map.getLayer('world-stars') &&
+      map.queryRenderedFeatures({ layers: ['world-country-labels'] }).length > 5
+    );
+  });
+  // The map's label fade continues after tiles become queryable.
+  await page.waitForTimeout(350);
+}
 async function pixels(page: Page) {
   const encoded = await page.evaluate(
     () =>
@@ -163,11 +177,14 @@ async function pixels(page: Page) {
 
 test('globe search frames the current campus, restores focus, and preserves the mounted map', async ({
   page,
-}) => {
+}, info) => {
   await setup(page);
   await open(page);
   await expect.poll(async () => (await camera(page)).zoom).toBeLessThan(4);
   await page.waitForFunction(() => !window.editorTestMap.isMoving());
+  await settledWorld(page);
+  await pixels(page);
+  await page.screenshot({ path: info.outputPath('globe-campus-chooser.png') });
   expect((await camera(page)).pitch).toBe(0);
   expect((await camera(page)).bearing).toBe(0);
   await page.evaluate(() =>
@@ -226,6 +243,7 @@ test('globe search cancels deferred framing when closed and remains usable on wo
 
 test('globe search protects active directions and follow until a campus switch is confirmed', async ({
   page,
+  browserName,
 }) => {
   await page.addInitScript(() =>
     Object.defineProperty(navigator, 'geolocation', {
@@ -242,10 +260,12 @@ test('globe search protects active directions and follow until a campus switch i
   );
   await setup(page);
   await page.getByRole('textbox', { name: 'Search campus' }).fill('Library');
-  await page
-    .getByRole('button', { name: /Library/ })
-    .first()
-    .click();
+  const result = page.getByRole('button', {
+    name: 'Library Library · Ojo campus',
+    exact: true,
+  });
+  if (browserName === 'webkit') await result.tap();
+  else await result.click();
   await page.getByRole('button', { name: 'Directions', exact: true }).click();
   await page.getByLabel('Starting place').selectOption('gate');
   await page
@@ -311,7 +331,12 @@ test('globe search mobile landscape observes container changes without a window 
       )
       .toBe(size.height);
     await open(page);
-    await page.waitForFunction(() => !window.editorTestMap.isMoving());
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPadding().right))
+      .toBeGreaterThan(200);
+    await page.waitForFunction(
+      () => window.editorTestMap.loaded() && !window.editorTestMap.isMoving(),
+    );
     const layout = await page.evaluate(() => {
       const m = window.editorTestMap,
         r = m.getContainer().getBoundingClientRect(),
@@ -327,6 +352,61 @@ test('globe search mobile landscape observes container changes without a window 
     expect(layout.pitch).toBe(0);
     await page.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeHidden();
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPadding().right))
+      .toBe(24);
+    await page.waitForFunction(
+      () => window.editorTestMap.loaded() && !window.editorTestMap.isMoving(),
+    );
+    await settledWorld(page);
+    const rendered = await pixels(page);
+    const centrePixel = await page.evaluate(() => {
+      const map = window.editorTestMap,
+        c = map.getCanvas(),
+        p = map.project(map.getCenter()),
+        ratio = c.width / c.clientWidth;
+      return (
+        (Math.round(c.height - p.y * ratio) * c.width +
+          Math.round(p.x * ratio)) *
+        4
+      );
+    });
+    expect([...rendered.subarray(centrePixel, centrePixel + 3)]).not.toEqual([
+      8, 15, 32,
+    ]);
+    await writeFile(
+      info.outputPath(`landscape-${size.width}-camera.json`),
+      JSON.stringify(
+        {
+          camera: await camera(page),
+          centrePixel,
+          rgba: [...rendered.subarray(centrePixel, centrePixel + 4)],
+          length: rendered.length,
+          layout: await page.evaluate(() => {
+            const map = window.editorTestMap,
+              c = map.getCanvas(),
+              gl = c.getContext('webgl2')!;
+            return {
+              canvas: {
+                width: c.width,
+                height: c.height,
+                rect: c.getBoundingClientRect().toJSON(),
+              },
+              viewport: {
+                width: visualViewport?.width,
+                height: visualViewport?.height,
+              },
+              gl: [gl.drawingBufferWidth, gl.drawingBufferHeight],
+              pad: map.getPadding(),
+              container: map.getContainer().getBoundingClientRect().toJSON(),
+            };
+          }),
+        },
+        null,
+        2,
+      ),
+    );
+    expect(rendered[centrePixel + 3]).toBe(255);
     await page.screenshot({
       path: info.outputPath(`globe-${size.width}x${size.height}.png`),
     });
@@ -536,4 +616,68 @@ test('globe search keeps navy stars in both themes and the sunlit horizon only i
         ),
     )
     .toBe('0%');
+});
+
+test('globe search stars reuse repaint events without an idle animation loop', async ({
+  page,
+}, info) => {
+  await setup(page);
+  await open(page);
+  await settledWorld(page);
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.waitForFunction(
+    () => window.editorTestMap.loaded() && !window.editorTestMap.isMoving(),
+  );
+  await page.waitForTimeout(500);
+  const timings: Record<string, number[]> = {};
+  for (const stars of [true, false]) {
+    if (!stars)
+      await page
+        .getByRole('button', { name: 'Hide stars', exact: true })
+        .click();
+    timings[String(stars)] = await page.evaluate(async () => {
+      const map = window.editorTestMap;
+      const times: number[] = [];
+      for (let i = 0; i < 15; i++) {
+        const start = performance.now();
+        await new Promise<void>((resolve) => {
+          map.once('render', () => {
+            map.getCanvas().getContext('webgl2')!.finish();
+            resolve();
+          });
+          map.triggerRepaint();
+        });
+        if (i >= 3) times.push(performance.now() - start);
+      }
+      return times;
+    });
+  }
+  await page.getByRole('button', { name: 'Show stars', exact: true }).click();
+  await page.waitForTimeout(500);
+  const idleFrames = await page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        const map = window.editorTestMap;
+        let frames = 0;
+        const count = () => frames++;
+        map.on('render', count);
+        setTimeout(() => {
+          map.off('render', count);
+          resolve(frames);
+        }, 500);
+      }),
+  );
+  expect(idleFrames).toBe(0);
+  await writeFile(
+    info.outputPath('star-render-cost.json'),
+    JSON.stringify(
+      {
+        timings,
+        idleFrames,
+        note: 'Whole-map repaint latency including requestAnimationFrame and GPU completion; software browser, not device performance.',
+      },
+      null,
+      2,
+    ),
+  );
 });
