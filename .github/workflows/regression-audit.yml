@@ -1,6 +1,12 @@
 name: Application regression audit
 on:
   workflow_dispatch:
+    inputs:
+      browser_grep:
+        description: 'Optional Playwright title filter for focused repair verification (empty runs the full suite)'
+        required: false
+        default: ''
+        type: string
   push:
     branches: [codex/unilag-globe]
     paths: [.github/workflows/regression-audit.yml]
@@ -62,10 +68,20 @@ jobs:
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Chromium workflows
         if: matrix.browser == 'chromium'
-        run: npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/chromium
+        env:
+          AUDIT_GREP: ${{ inputs.browser_grep }}
+        run: |
+          args=()
+          if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
+          npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/chromium "${args[@]}"
       - name: WebKit touch and responsive workflows
         if: matrix.browser == 'webkit'
-        run: npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/webkit
+        env:
+          AUDIT_GREP: ${{ inputs.browser_grep }}
+        run: |
+          args=()
+          if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
+          npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/webkit "${args[@]}"
       - name: WebKit image editor
         if: ${{ !cancelled() && matrix.browser == 'webkit' && matrix.part == 1 }}
         run: npx playwright test --config playwright.photos.webkit.config.ts --reporter=line --output=../test-results/webkit-photos
