@@ -2,9 +2,36 @@
 
 This is the historical **23 September collection audit**, against published map
 **lasu-a81135d18314**. Its counts describe that research corpus. The current
-26 September gallery uses **lasu-623791e1184e**, with 395 buildings and 39
+27 September published gallery uses **lasu-49f832190110**, with 395 buildings and 39
 photographs covering 19 buildings. See [current photo/model coverage](../../docs/PHOTO-MODEL-COVERAGE.md)
 and the [application screenshot inventory](../../docs/assets/screenshots/README.md).
+
+## Owner review on 27 September
+
+Six retained, licensed Commons photographs were added to **private building drafts**
+after the owner approved the proposed matches. They are not part of the 39-photo
+published package or the historical 21-photo research catalogue yet.
+
+| Building | Approved historical views |
+| --- | --- |
+| C.P.S | Centre for Planning Studies exterior, 2022 |
+| School Library | Fatiu Ademola Akesode Library exterior, 2022 |
+| Sports Center | Hussam Okoya-Thomas Sports Hall, 2022 |
+| LASU Clinic (`arcgis:University_Property:11`) | Health Centre reception, 2021 |
+| LASU International Library | Construction views from 2021 and 2023 |
+
+The [review receipt](research/owner-review-2026-09-27.json) preserves original
+checksums, authors, CC BY-SA 4.0 licences, dates, source links and the owner's
+assignment decision. The [fresh metadata response](research/owner-review-source-metadata-2026-09-27.json.gz)
+retains the source evidence. These are owner-approved plausible associations,
+not independently surveyed footprint matches. In particular, the Health Centre
+source has an Epe category; its LASU Clinic association is the owner's choice.
+Existing gallery photographs remain intact. No entrance, wall, model geometry,
+access permission or public release was changed by these attachments.
+
+The other 18 retained Commons candidates, including eight gate photographs,
+remain unassigned. The historical audit below is unchanged; do not read its
+September 23 status counts as the current private review state.
 
 ## Original collection audit
 The inventory covers **420 buildings**: 130 have searchable names/linked aliases,
