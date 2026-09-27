@@ -27,6 +27,7 @@ import type {
   ImportLayerMapping,
   ImportSourceKind,
 } from './map-import-types';
+import { suggestedImportIdentifier } from './map-import-types';
 import './campus-workspace.css';
 
 type Identity = CampusIdentity & { boundary: CampusData['boundary'] };
@@ -1111,7 +1112,7 @@ function suggestMappings(job: CampusImport): ImportConfiguration {
         existing || {
           layer: layer.name,
           role: layer.suggestedRole,
-          idField: field(['id', 'objectid', 'fid', 'globalid']),
+          idField: suggestedImportIdentifier(layer),
           nameField: field(['name', 'title', 'building_name']),
           heightField: field(['height']),
           floorsField: field(['floors', 'building:levels']),

@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='private-import-test-') as tmp:
     files=[]
     for i,(name,geometry) in enumerate(geometries.items()):
         path=f'input-{i}'+Path(name).suffix
-        (folder/path).write_text(json.dumps({'type':'FeatureCollection','crs':{'type':'name','properties':{'name':'EPSG:4326'}},'features':[{'type':'Feature','properties':{'OBJECTID':i+1,'Name':'Bâtiment'},'geometry':geometry}]}),encoding='utf-8')
+        (folder/path).write_text(json.dumps({'type':'FeatureCollection','crs':{'type':'name','properties':{'name':'EPSG:4326'}},'features':[{'type':'Feature','properties':{'OBJECTID':i+1,'Id':0,'Name':'Bâtiment'},'geometry':geometry}, {'type':'Feature','properties':{'OBJECTID':i+11,'Id':0,'Name':'Courtyard'},'geometry':geometry}]}),encoding='utf-8')
         files.append({'path':path,'label':Path(name).stem})
     # Online ArcGIS uses the same private mount, with ESRIJSON attributes/rings.
     (folder/'arcgis.json').write_text(json.dumps({'name':'ArcGIS buildings','geometryType':'esriGeometryPolygon','spatialReference':{'wkid':4326},'fields':[{'name':'OBJECTID','type':'esriFieldTypeOID'}],'features':[{'attributes':{'OBJECTID':7},'geometry':{'rings':geometries['Building_footprint.geojson']['coordinates']}}]}))
@@ -35,9 +35,12 @@ with tempfile.TemporaryDirectory(prefix='private-import-test-') as tmp:
     assert command[command.index('--user')+1] == f'{os.getuid()}:{os.getgid()}'
     subprocess.run(command,check=True,timeout=90)
     result=json.loads((folder/'result.json').read_text())['summary']
-    assert result['totalFeatures']==4, result
+    assert result['totalFeatures']==7, result
     assert len(result['layers'])==4
     assert all(l['crs']=='EPSG:4326' for l in result['layers'])
     assert next(l for l in result['layers'] if l['name'].startswith('Road width'))['suggestedRole']=='landcover'
     assert (folder/'result.json').stat().st_uid == os.getuid()
+    fields=result['layers'][0]['fields']
+    assert next(f for f in fields if f['name']=='OBJECTID')['unique'] is True
+    assert next(f for f in fields if f['name']=='Id')['unique'] is False
     print('Private 0700 workspace: uploaded GeoJSON/JSON and online ArcGIS inspection passed; output belongs to the runner.')

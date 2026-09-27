@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import re
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -49,6 +50,9 @@ def convert(folder):
                 if codes:
                     field['values']=[str(c['name']) for c in codes]
                     field['codedValues']={str(c['code']):str(c['name']) for c in codes}
+                if re.fullmatch(r'(?:id|objectid(?:_[0-9]+)?|fid|globalid)',field['name'],re.I):
+                    values=[f.get('properties',{}).get(field['name']) for f in layer['features']]
+                    field['unique']=bool(values) and all(v is not None and str(v).strip() for v in values) and len(set(map(str,values)))==len(values)
             layers.append(layer)
     if len(layers)>100 or sum(len(l['features']) for l in layers)>100000:
         raise ValueError('Import exceeds the layer or feature limit.')

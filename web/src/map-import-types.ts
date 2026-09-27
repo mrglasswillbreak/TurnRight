@@ -51,11 +51,25 @@ export interface ImportLayer {
   name: string;
   count: number;
   geometryTypes: string[];
-  fields: { name: string; alias?: string; values?: string[] }[];
+  fields: {
+    name: string;
+    alias?: string;
+    values?: string[];
+    unique?: boolean;
+  }[];
   crs?: string;
   sourceCrs?: string;
   suggestedRole: ImportRole;
   requiresCoordinates?: boolean;
+}
+export function suggestedImportIdentifier(layer: ImportLayer) {
+  const fields = layer.fields.filter((f) =>
+    /^(id|objectid(?:_\d+)?|fid|globalid)$/i.test(f.name),
+  );
+  return (
+    fields.find((f) => f.unique === true) ||
+    fields.find((f) => f.unique === undefined)
+  )?.name;
 }
 export interface ImportPreview {
   layers: ImportLayer[];
