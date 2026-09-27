@@ -1160,14 +1160,15 @@ async function openBuildingModel(
   await page.getByRole('button', { name: 'Edit model', exact: true }).click();
   const dialog = page.getByRole('dialog');
   const compact = dialog.getByLabel('Model editing mode', { exact: true });
+  const desktop = dialog.getByRole('button', {
+    name: mode[0].toUpperCase() + mode.slice(1),
+    exact: true,
+  });
+  await expect(
+    compact.or(desktop).filter({ visible: true }).first(),
+  ).toBeVisible();
   if (await compact.isVisible()) await compact.selectOption(mode);
-  else
-    await dialog
-      .getByRole('button', {
-        name: mode[0].toUpperCase() + mode.slice(1),
-        exact: true,
-      })
-      .click();
+  else await desktop.click();
   return dialog;
 }
 async function closeBuildingModel(page: Page) {
@@ -4103,13 +4104,18 @@ test('building previews survive revisiting unedited buildings without rebuilding
 }) => {
   await page.addInitScript(() => {
     window.previewBuilds = [];
-    let mapWorker: Worker | undefined;
+    const mapWorkers = new WeakSet<Worker>();
+    let foundMapWorker = false;
     const send = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function (
       message,
       ...rest: [Transferable[]?]
     ) {
-      if (message?.features && (mapWorker ||= this) === this)
+      if (message?.features && !foundMapWorker) {
+        mapWorkers.add(this);
+        foundMapWorker = true;
+      }
+      if (message?.features && mapWorkers.has(this))
         window.previewBuilds.push(
           message.features.map(
             (f: { properties: { id: string } }) => f.properties.id,
