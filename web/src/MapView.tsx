@@ -136,6 +136,9 @@ export function MapView({
     [worldAttempt, setWorldAttempt] = useState(0),
     [worldView, setWorldView] = useState(false);
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
+  useEffect(() => {
+    if (!editor) document.title = 'TurnRight · ' + String(data.boundary.properties?.name || 'Campus map');
+  }, [editor, data.boundary]);
   const selectedId = selected?.id || '';
   useEffect(() => {
     const map = mapRef.current;
@@ -904,7 +907,8 @@ export function MapView({
     void loadWorld(controller.signal)
       .then((world) => {
         if (controller.signal.aborted || mapRef.current !== motionMap) return;
-        installWorldLayers(motionMap, world, latestData.current.bounds);
+        installWorldLayers(motionMap, world, latestData.current.bounds,
+          String(latestData.current.boundary.properties?.name || 'Campus'));
         applyMapTheme(motionMap, camera.current.dark);
       })
       .catch(() => {
