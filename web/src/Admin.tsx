@@ -225,6 +225,7 @@ export default function Admin({
         !navigator.onLine,
       );
       if (request === generation.current) {
+        initialCampus.current = loaded.context.data;
         setOfflineContext(loaded.offline);
         setSyncedAt(loaded.context.syncedAt);
       }
@@ -248,6 +249,7 @@ export default function Admin({
             (batch) => api<MapEdit[]>('save-edits', batch),
             (snapshot) => setPreference(key, snapshot),
             recovery,
+            result.campus || initialCampus.current,
           ),
         );
         setError('');
