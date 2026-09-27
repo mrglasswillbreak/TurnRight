@@ -7960,7 +7960,17 @@ test.describe('compact plan and photograph tools', () => {
       await expect(
         dialog.getByLabel('Top left X', { exact: true }),
       ).toBeVisible();
+      // A touch user opens the keyboard before typing. WebKit's native number
+      // fill can otherwise race the focus-triggered sheet expansion rerender.
+      await dialog.getByLabel('Top left X', { exact: true }).click();
+      await expect(dialog).toHaveAttribute('data-detent', 'full');
+      await expect(
+        dialog.getByLabel('Top left X', { exact: true }),
+      ).toBeFocused();
       await dialog.getByLabel('Top left X', { exact: true }).fill('0.12');
+      await expect(
+        dialog.getByLabel('Top left X', { exact: true }),
+      ).toHaveValue('0.12');
       await dialog.getByLabel('Top left X', { exact: true }).press('Enter');
       await expect.poll(() => wall()?.texture?.corners[0][0]).toBe(0.12);
       const photoSheet = dialog.locator('[data-mobile-panel="photo"]');
