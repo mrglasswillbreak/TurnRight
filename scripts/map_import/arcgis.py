@@ -11,7 +11,8 @@ def endpoint(url, operation=None):
     return urlunsplit((parts.scheme, parts.netloc, path, '', ''))
 
 
-def layer_features(url, bounds, get=public_json):
+def layer_features(url, bounds, get=public_json, progress=lambda message: None):
+    progress('Checking ArcGIS layer capabilities')
     meta = get(endpoint(url) + '?f=json')
     if 'Query' not in meta.get('capabilities', ''):
         raise ValueError(f"{meta.get('name', url)} does not support feature queries.")
@@ -37,16 +38,17 @@ def layer_features(url, bounds, get=public_json):
         if page.get('exceededTransferLimit') or len(received) != len(batch) or set(received) != set(batch):
             raise ValueError('ArcGIS feature download was incomplete or changed during import. Retry the preview.')
         records.extend(features)
+        progress(f"ArcGIS {meta.get('name','layer')}: {len(records)} of {expected} features verified")
     if get(query, {**params,'returnCountOnly':'true'}).get('count') != expected:
         raise ValueError('ArcGIS changed during import. Retry to obtain a complete snapshot.')
     return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'objectIdFieldName':field, 'sourceUrl':url}
 
 
-def discover(url, bounds, get=public_json, _visited=None):
+def discover(url, bounds, get=public_json, _visited=None, progress=lambda message: None):
     parts = urlsplit(url)
     if re.search(r'/(?:FeatureServer|MapServer)/[0-9]+/query/?$', parts.path, re.I):
         layer_url = urlunsplit((parts.scheme, parts.netloc, re.sub(r'/query/?$', '', parts.path, flags=re.I), '', ''))
-        layers, warnings = discover(layer_url, bounds, get, _visited)
+        layers, warnings = discover(layer_url, bounds, get, _visited, progress)
         return layers, ['Using the layer behind the Query URL. All features within the campus bounds are checked; query filters and export settings are not applied.'] + warnings
     visited = set() if _visited is None else _visited
     identity = endpoint(url) + '?' + urlsplit(url).query
@@ -65,7 +67,7 @@ def discover(url, bounds, get=public_json, _visited=None):
         if metadata.get('type') == 'Web Map':
             value = get(root + '/data?f=json')
         elif metadata.get('url'):
-            return discover(metadata['url'], bounds, get, visited)
+            return discover(metadata['url'], bounds, get, visited, progress)
         else:
             raise ValueError('This ArcGIS item does not contain a supported vector map.')
     else:
@@ -86,7 +88,7 @@ def discover(url, bounds, get=public_json, _visited=None):
             if any(s in entry.get('layerType','').lower() for s in ('tile','imagery','image')):
                 warnings.append(f"Skipped non-vector layer: {entry.get('title',entry['url'])}")
                 return
-            child_layers, notes = discover(entry['url'], bounds, get, visited)
+            child_layers, notes = discover(entry['url'], bounds, get, visited, progress)
             layers.extend(child_layers); warnings.extend(notes)
         else:
             warnings.append('Skipped unsupported Web Map layer: ' + str(entry.get('title','unnamed')))
@@ -103,9 +105,9 @@ def discover(url, bounds, get=public_json, _visited=None):
             if 'Query' not in meta.get('capabilities',''):
                 warnings.append('Skipped non-queryable layer: '+str(layer.get('name',child)))
             else:
-                layers.append(layer_features(child,bounds,get))
+                layers.append(layer_features(child,bounds,get,progress))
     elif 'geometryType' in value:
-        layers.append(layer_features(url,bounds,get))
+        layers.append(layer_features(url,bounds,get,progress))
     else:
         raise ValueError('Use a public Web Map, FeatureServer or queryable MapServer layer URL.')
     if len(layers) > 100 or sum(len(layer.get('features', [])) for layer in layers) > 100000:

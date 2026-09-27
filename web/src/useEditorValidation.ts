@@ -3,6 +3,7 @@ import type { EditorValidation as Validation } from './editor-validation';
 import type { ValidationIssue } from './validation';
 import type { CampusData, MapEdit } from './types';
 import { RevisionWorker } from './revision-worker';
+import { processes } from './process-monitor';
 import {
   LatestPreview,
   type ValidationDelta,
@@ -106,6 +107,12 @@ export function useEditorValidation(
         return Promise.reject(
           new Error('Validation is starting. Please try again.'),
         );
+      const progress = full
+        ? processes.begin(
+            'Validate campus',
+            'Checking geometry, routing and model assignments',
+          )
+        : undefined;
       return worker.current
         .request(base, { edits: snapshot, full })
         .then((result) => {
@@ -118,8 +125,13 @@ export function useEditorValidation(
               'Validation response is out of sequence. Retry validation.',
             );
           const data = { ...previous.data, ...result.data } as CampusData;
+          progress?.finish('Validation complete');
           decoded.current = { base, data, sequence: result.sequence };
           return { ...result, data };
+        })
+        .catch((error) => {
+          progress?.fail(error);
+          throw error;
         });
     },
     [base, sourceIssues, attempt],

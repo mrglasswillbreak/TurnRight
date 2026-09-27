@@ -1,5 +1,7 @@
 import {
   useEffect,
+  lazy,
+  Suspense,
   useState,
   useSyncExternalStore,
   type ReactNode,
@@ -8,6 +10,7 @@ import { PhotoQueueStore } from './photo-queue-store';
 import { PhotoQueueContext } from './use-photo-queue';
 import './photo-manager.css';
 import { registerPhotoRecovery } from './update-safety';
+const ProcessMonitor = lazy(() => import('./ProcessMonitor'));
 function UploadStatus({ store }: { store: PhotoQueueStore }) {
   const status = useSyncExternalStore(store.subscribe, store.getStatus);
   if (!store.jobs.length && !store.storageError) return null;
@@ -60,6 +63,9 @@ export function PhotoSession({
     <PhotoQueueContext value={store}>
       {children}
       <UploadStatus store={store} />
+      <Suspense fallback={null}>
+        <ProcessMonitor />
+      </Suspense>
     </PhotoQueueContext>
   );
 }

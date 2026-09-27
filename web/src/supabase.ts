@@ -23,11 +23,13 @@ export async function uploadPhotoOriginal(
       fetch: (input, init) => fetch(input, { ...init, signal: bounded }),
     },
   });
-  return client.storage
+  const result = await client.storage
     .from(signed.bucket)
     .uploadToSignedUrl(signed.path, signed.token, file, {
       contentType: file.type,
     });
+  if (result.error) throw result.error;
+  return result;
 }
 export async function api<T = unknown>(
   action: string,
@@ -38,5 +40,30 @@ export async function api<T = unknown>(
     ? (await boundedSession(action, supabase.auth.getSession())).data.session
     : null;
   options.signal?.throwIfAborted();
-  return adminRequest<T>(action, payload, session?.access_token, options);
+  const tracked =
+    /^(prepare-release|publish-release|rollback|refresh-source|import-run|import-upload|import-queue|media-process|media-approve|model-upload|model-save|survey-upload)$/.test(
+      action,
+    )
+      ? (await import('./process-monitor')).processes.begin(
+          action.replaceAll('-', ' '),
+          'Waiting for server',
+        )
+      : undefined;
+  try {
+    const result = await adminRequest<T>(
+      action,
+      payload,
+      session?.access_token,
+      options,
+    );
+    tracked?.finish(
+      /release|import-run|rollback/.test(action)
+        ? 'Request accepted; background job status appears in Activity'
+        : 'Complete',
+    );
+    return result;
+  } catch (error) {
+    tracked?.fail(error);
+    throw error;
+  }
 }

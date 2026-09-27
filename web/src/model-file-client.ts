@@ -6,6 +6,7 @@ import type {
 } from './model-file-types';
 import type { ModelMesh } from './visual-types';
 import { encodeModelImage, type ModelImageJob } from './model-image-codec';
+import { processes } from './process-monitor';
 export function modelFileTask(
   payload: { kind: 'import'; files: ModelFile[]; primary: string },
   signal: AbortSignal,
@@ -25,12 +26,22 @@ export function modelFileTask(
 ): Promise<unknown> {
   return new Promise((resolve, reject) => {
     signal.throwIfAborted();
+    const kind = (payload as { kind: string }).kind;
+    const process = processes.begin(
+      `Model ${kind}`,
+      kind === 'import'
+        ? 'Parsing geometry and materials'
+        : 'Encoding geometry, materials and textures',
+    );
     const worker = new Worker(
       new URL('./model-file-worker.ts', import.meta.url),
       { type: 'module' },
     );
     const abort = () => {
       worker.terminate();
+      process.fail(
+        new DOMException('Model file operation cancelled', 'AbortError'),
+      );
       reject(
         new Error('File operation cancelled. Your building is unchanged.'),
       );
@@ -42,6 +53,7 @@ export function modelFileTask(
     };
     worker.onmessage = ({ data }) => {
       if (data.imageWork !== undefined) {
+        process.update('Encoding model textures');
         const job = data.job as ModelImageJob;
         void encodeModelImage(job)
           .then(
@@ -67,11 +79,17 @@ export function modelFileTask(
         return;
       }
       done();
-      if (data.error) reject(new Error(data.error));
-      else resolve(data.result);
+      if (data.error) {
+        process.fail(new Error(data.error));
+        reject(new Error(data.error));
+      } else {
+        process.finish();
+        resolve(data.result);
+      }
     };
     worker.onerror = () => {
       done();
+      process.fail(new Error('Model file processing failed'));
       reject(
         new Error(
           'The model file could not be processed. Check its format, size, and dependencies.',

@@ -29,6 +29,7 @@ import type {
 } from './map-import-types';
 import { suggestedImportIdentifier } from './map-import-types';
 import './campus-workspace.css';
+import { processes } from './process-monitor';
 
 type Identity = CampusIdentity & { boundary: CampusData['boundary'] };
 const blank: ImportConfiguration = {
@@ -234,39 +235,54 @@ export default function CampusWorkspace({
         50 * 1024 * 1024
       )
         throw new Error('Choose an upload batch no larger than 50 MiB.');
-      for (const file of Array.from(files)) {
-        const bytes = await file.arrayBuffer(),
-          sha256 = await hashBytes(bytes);
-        const result = await api<{ url: string; job?: CampusImport }>(
-          'import-upload',
-          {
-            importId: job.id,
-            name: file.name,
-            bytes: file.size,
-            sha256,
-          },
-        );
-        if (result.job) setJob(result.job);
-        const response = await fetch(result.url, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'x-upsert': 'false',
-          },
-          body: file,
-          signal: AbortSignal.timeout(120000),
-        });
-        const failed = !response.ok
-          ? await response.json().catch(() => ({}))
-          : null;
-        if (
-          !response.ok &&
-          failed?.error !== 'Duplicate' &&
-          failed?.statusCode !== '409'
-        )
-          throw new Error(
-            'Upload was interrupted. Select the same files to resume; completed uploads will be retained.',
+      const progress = processes.begin('Map file upload', 'Preparing files');
+      let uploaded = 0;
+      try {
+        for (const file of Array.from(files)) {
+          progress.update(
+            `Uploading ${file.name}`,
+            uploaded,
+            files.length,
+            'files',
           );
+          const bytes = await file.arrayBuffer(),
+            sha256 = await hashBytes(bytes);
+          const result = await api<{ url: string; job?: CampusImport }>(
+            'import-upload',
+            {
+              importId: job.id,
+              name: file.name,
+              bytes: file.size,
+              sha256,
+            },
+          );
+          if (result.job) setJob(result.job);
+          const response = await fetch(result.url, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'x-upsert': 'false',
+            },
+            body: file,
+            signal: AbortSignal.timeout(120000),
+          });
+          const failed = !response.ok
+            ? await response.json().catch(() => ({}))
+            : null;
+          if (
+            !response.ok &&
+            failed?.error !== 'Duplicate' &&
+            failed?.statusCode !== '409'
+          )
+            throw new Error(
+              'Upload was interrupted. Select the same files to resume; completed uploads will be retained.',
+            );
+          uploaded++;
+        }
+        progress.finish(`${uploaded} files uploaded; ready to inspect`);
+      } catch (error) {
+        progress.fail(error);
+        throw error;
       }
       setNotice(`${files.length} file(s) uploaded. Inspect the layers next.`);
     });

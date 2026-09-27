@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Check, Download, HardDrive, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deletePackages, installPackage } from './offline';
@@ -34,19 +34,32 @@ export function OfflinePanel({
     [confirmDelete, setConfirmDelete] = useState(false);
   const target = latest || manifest,
     update = target.version !== manifest.version;
+  const controller = useRef<AbortController | null>(null);
   const install = async () => {
     setError('');
     setProgress(0);
+    const abort = new AbortController();
+    controller.current = abort;
+    const task = (await import('./process-monitor')).processes.begin(
+      'Campus download',
+      'Downloading and verifying assets',
+      () => abort.abort(),
+    );
     try {
       const data = await installPackage(
         target,
-        setProgress,
-        undefined,
+        (value) => {
+          setProgress(value);
+          task.update('Downloading and verifying assets', value, 100, '%');
+        },
+        abort.signal,
         !navigating,
       );
       onInstall(data, target, navigating);
+      task.finish('Campus package verified');
     } catch (e) {
       setError((e as Error).message);
+      task.fail(e);
     } finally {
       setProgress(null);
     }
@@ -132,6 +145,9 @@ export function OfflinePanel({
           <div className="download-progress">
             <progress value={progress} max={100} />
             <span>Downloading and verifying… {progress}%</span>
+            <button onClick={() => controller.current?.abort()}>
+              Cancel download
+            </button>
           </div>
         ) : (
           <Button

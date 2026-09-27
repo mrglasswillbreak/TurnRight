@@ -35,10 +35,15 @@ def conversion_command(folder, token):
 def convert(folder):
     from map_import.normalise import normalise
     folder = Path(folder)
+    def progress(message):
+        temporary=folder/'progress.tmp'
+        temporary.write_bytes(encoded({'message':message}))
+        temporary.replace(folder/'progress.json')
     request = json.loads((folder/'request.json').read_text(encoding='utf-8'))
     check_expanded_batch([folder/f['path'] for f in request['files']])
     layers, warnings = [], request.get('warnings',[])
-    for source_file in request['files']:
+    for index,source_file in enumerate(request['files']):
+        progress(f"Inspecting file {index+1} of {len(request['files'])}: {source_file.get('label',source_file['path'])}")
         data = inspect_file(folder/source_file['path'],request['configuration'],folder/'expanded',source_file.get('label'))
         for layer in data:
             # Expose aliases and domain labels in the mapping UI without losing original values.
@@ -62,6 +67,7 @@ def convert(folder):
         summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers],'counts':{'added':0,'modified':0,'removed':0,'skipped':0},'warnings':warnings,'errors':[],'duplicates':[],'features':{'type':'FeatureCollection','features':[f for l in layers if l.get('crs')=='EPSG:4326' for f in l['features'] if f.get('geometry')][:2000]},'totalFeatures':sum(len(l['features']) for l in layers)}
         output={'summary':summary}
     else:
+        progress(f"Validating and comparing {sum(len(l['features']) for l in layers)} features")
         output=normalise(layers,request['source'],request['campus'],request['previous'],request['configuration'],request['importId'])
         output['summary']['warnings']=list(dict.fromkeys(warnings+output['summary']['warnings']))
     (folder/'result.json').write_bytes(encoded(output))
@@ -96,10 +102,14 @@ def run_job():
     job=claimed[0]
     def live():
         if not db(selector+'&status=eq.running'): raise ValueError('Import cancelled or replaced by another run.')
+    def progress(message):
+        if not db(selector+'&status=eq.running','PATCH',{'message':message[:500],'updated_at':datetime.now(timezone.utc).isoformat()}):
+            raise ValueError('Import cancelled or replaced by another run.')
     try:
         source=db('campus_sources?id=eq.'+job['source_id'])[0]
         campus=db('campuses?id=eq.'+campus_id)[0]
         previous=[]
+        progress('Reading existing campus records')
         for offset in range(0,300000,1000):
             page=db(f'source_features?order=id&limit=1000&offset={offset}')
             previous.extend(page)
@@ -113,6 +123,7 @@ def run_job():
                 if not assets: raise ValueError('Upload at least one map file before inspection.')
                 if sum(a['bytes'] for a in assets)>MAX_BYTES: raise ValueError('Upload batch exceeds 50 MiB.')
                 for index,asset in enumerate(assets):
+                    progress(f"Downloading and verifying file {index+1} of {len(assets)}: {asset['name']}")
                     if not asset['path'].startswith(f'{campus_id}/{import_id}/'): raise ValueError('Import asset identity mismatch.')
                     try:
                         content=remote('storage/v1/object/campus-imports/'+asset['path'],raw=True)
@@ -138,9 +149,10 @@ def run_job():
                 elif raw_snapshot is not None:
                     pass
                 elif source['kind']=='arcgis':
-                    layers,warnings=discover(source['url'],campus['bounds'])
+                    layers,warnings=discover(source['url'],campus['bounds'],progress=progress)
                     raw_snapshot=encoded({'layers':layers,'warnings':warnings})
                 else:
+                    progress('Downloading complete OpenStreetMap geometry and relation members')
                     polygon=campus['boundary']['geometry']
                     rings=[polygon['coordinates'][0]] if polygon['type']=='Polygon' else [p[0] for p in polygon['coordinates']]
                     queries=[]
@@ -168,6 +180,7 @@ def run_job():
             container_name='campus-import-'+token
             command=conversion_command(folder,token)
             process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            progress('Inspecting formats and coordinate systems in the isolated converter')
             try:
                 import time
                 deadline=time.monotonic()+1100
@@ -177,6 +190,8 @@ def run_job():
                         break
                     except subprocess.TimeoutExpired:
                         live()
+                        if (folder/'progress.json').exists():
+                            progress(json.loads((folder/'progress.json').read_text(encoding='utf-8'))['message'])
                         if time.monotonic()>=deadline: raise ValueError('Import conversion exceeded its time limit.')
             finally:
                 if process.poll() is None:
@@ -187,6 +202,7 @@ def run_job():
                 raise ValueError(message[:1000])
             live()
             result=json.loads((folder/'result.json').read_text(encoding='utf-8'))
+            progress(f"Saving inspection results: {result['summary']['totalFeatures']} features")
             update={'status':'mapping' if job['phase']=='inspect' else 'preview','summary':result['summary'],'message':'Choose layer mappings' if job['phase']=='inspect' else 'Preview ready; review before applying','updated_at':datetime.now(timezone.utc).isoformat()}
             if job['phase']=='preview':
                 path=f'{campus_id}/{import_id}/candidate-{token}.json'

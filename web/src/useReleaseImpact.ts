@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CampusData } from './types';
 import type { ReleaseImpact } from './release-impact';
+import { processes } from './process-monitor';
 export function useReleaseImpact(
   published: CampusData,
   draft: CampusData,
@@ -16,11 +17,18 @@ export function useReleaseImpact(
   }>();
   useEffect(() => {
     if (!enabled) return;
+    const progress = processes.begin(
+      'Release impact',
+      'Comparing destinations, routes and model changes',
+    );
+    let settled = false;
     const worker = new Worker(
       new URL('./release-impact.worker.ts', import.meta.url),
       { type: 'module' },
     );
     const fail = (message: string) => {
+      settled = true;
+      progress.fail(new Error(message));
       worker.terminate();
       setState({ published, draft, attempt, error: message });
     };
@@ -29,6 +37,9 @@ export function useReleaseImpact(
       30_000,
     );
     worker.onmessage = (event) => {
+      settled = true;
+      if (event.data.error) progress.fail(new Error(event.data.error));
+      else progress.finish('Release impact ready');
       clearTimeout(timeout);
       setState({ published, draft, attempt, ...event.data });
       worker.terminate();
@@ -39,6 +50,13 @@ export function useReleaseImpact(
     };
     worker.postMessage({ published, draft });
     return () => {
+      if (!settled)
+        progress.fail(
+          new DOMException(
+            'Comparison replaced by a newer draft',
+            'AbortError',
+          ),
+        );
       clearTimeout(timeout);
       worker.terminate();
     };

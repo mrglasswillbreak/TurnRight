@@ -27,9 +27,13 @@ if (
   !process.env.VERCEL_ORG_ID
 )
   throw new Error("Release/Vercel workflow secrets are missing");
+let progressJob: string | undefined;
+const progress = async (message: string) => { if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {message}); };
 try {
   const [release] = await db(`releases?id=eq.${encodeURIComponent(id)}`);
   if (!release) throw new Error("Release not found");
+  const [job] = await db('jobs','POST',{kind:`release:${id}:${operation}`,status:'running',message:'Validating release snapshot'});
+  progressJob=job.id;
   const campus = await activeCampus();
   const catalog = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
   if (!release.catalogue_revision || catalog.revision !== release.catalogue_revision) throw Error('The campus directory changed. Create a fresh reviewed preview.');
@@ -52,9 +56,11 @@ try {
     const published = await publishedCampus();
     const data = validateReleaseSnapshot({...release.snapshot,edits:await hydrateModelEdits(release.snapshot.edits)}, published, {restoring:!!release.restored_from});
     for(const feature of data.map.features){const doc=feature.properties?.modelDocument;if(doc){feature.properties!.authoredModelRevision=modelDocumentRevision(doc);if(doc.curves.length)feature.properties!.surfaceCurves=doc.curves;}}
+    await progress('Preparing reviewed photographs and model textures');
     await prepareReleasePhotos(data, root);
     data.createdAt = new Date().toISOString();
     await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
+    await progress('Building reviewed 3D models');
     execFileSync(
       process.execPath,
       [
@@ -72,6 +78,7 @@ try {
         timeout: 120000,
       },
     );
+    await progress('Packaging map, routing graph and offline assets');
     execFileSync(process.execPath, [path.join(root, "scripts/package.mjs")], {
       cwd: root,
       env: {
@@ -87,6 +94,7 @@ try {
     });
     manifest = JSON.parse(await fs.readFile(path.join(web,'public',manifestPath),'utf8'));
     }
+    await progress('Verifying and retaining other published campuses');
     const preserved = await preserveCampusCatalogue(path.join(web,'public'),process.env.PUBLISHED_MAP_URL!,{
       expectedRevision:release.catalogue_revision,replacement:{campus,manifest}
     });
@@ -100,6 +108,7 @@ try {
     const project = await vercelApi(
       `/v9/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID!)}`,
     );
+    await progress('Uploading release source for deployment');
     const files = await uploadSource(root);
     const created = await vercelApi("/v13/deployments", {
       method: "POST",
@@ -126,6 +135,7 @@ try {
       version: manifest.version,
       published_catalogue_revision: preserved.revision,
     });
+    await progress('Building deployment and checking asset budgets');
     const deployment = await waitForDeployment(created.id);
     const url = `https://${deployment.url}`;
     await db(`releases?id=eq.${id}`, "PATCH", { status: "preview", preview_url: url });
@@ -148,6 +158,7 @@ try {
         throw new Error("Preview is stale. Create a fresh reviewed preview.");
     }
     if((await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !== release.catalogue_revision) throw Error('Another campus changed before publication. Build a fresh preview.');
+    await progress('Publishing reviewed preview and verifying production');
     const deployment = await publishDeployment(release.deployment_id, {
       releaseId: id,
       operation,
@@ -166,8 +177,10 @@ try {
     });
     console.log("Production release and domain assignment verified.");
   } else throw new Error("Unknown release operation");
+  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'succeeded',message:operation==='preview'?'Preview ready for review':'Publication verified',completed_at:new Date().toISOString()});
 } catch (error) {
   const message = (error as Error).message;
+  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'failed',message,completed_at:new Date().toISOString()}).catch(()=>{});
   await db(
     `releases?id=eq.${id}`,
     "PATCH",
