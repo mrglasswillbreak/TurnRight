@@ -232,7 +232,16 @@ async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
       Object.assign(job, {
         status: 'queued',
         phase: payload.phase,
-        configuration: payload.configuration,
+        // PostgreSQL JSONB does not preserve object-key insertion order.
+        configuration: {
+          redistributionConfirmed: payload.configuration.redistributionConfirmed,
+          license: payload.configuration.license,
+          attribution: payload.configuration.attribution,
+          layers: payload.configuration.layers.map(
+            (layer: Record<string, unknown>) =>
+              Object.fromEntries(Object.entries(layer).reverse()),
+          ),
+        },
       });
       result = { job };
     }
@@ -309,6 +318,40 @@ test('campus imports preserve mappings through rotation and queue only a reviewe
   await expect(
     page.getByRole('button', { name: 'Queue for review', exact: true }),
   ).toBeEnabled({ timeout: 15000 });
+  const queue = page.getByRole('button', {
+    name: 'Queue for review',
+    exact: true,
+  });
+  const submitted = state.calls.find(
+    (c) => c.action === 'import-run' && c.payload.phase === 'preview',
+  )!.payload.configuration;
+  expect(JSON.stringify(submitted)).not.toBe(
+    JSON.stringify(state.jobs[0].configuration),
+  );
+  await page.getByLabel('Attribution', { exact: true }).fill('Changed credit');
+  await expect(queue).toBeDisabled();
+  await expect(page.getByText('Settings changed since this preview was built.', {
+    exact: false,
+  })).toBeVisible();
+  await expect(queue).toHaveAttribute('aria-describedby', 'import-review-blocker');
+  await page.getByLabel('Attribution', { exact: true }).fill(config.attribution);
+  await expect(queue).toBeEnabled();
+  state.summary.errors.push('A building boundary needs repair.');
+  await page.getByRole('button', { name: 'Back to sources' }).click();
+  await page.getByRole('button', {
+    name: /Campus buildings and paths.*preview/,
+  }).click();
+  await expect(queue).toBeDisabled();
+  await expect(page.getByText('Resolve the preview errors shown above, then rebuild the preview.', {
+    exact: true,
+  })).toBeVisible();
+  state.summary.errors.length = 0;
+  await page.getByRole('button', { name: 'Back to sources' }).click();
+  await page.getByRole('button', {
+    name: /Campus buildings and paths.*preview/,
+  }).click();
+  await expect(queue).toBeEnabled();
+  expect(state.calls.some((c) => c.action === 'import-queue')).toBe(false);
   await page
     .getByRole('button', { name: 'Queue for review', exact: true })
     .click();

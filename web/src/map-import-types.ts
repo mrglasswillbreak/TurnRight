@@ -101,3 +101,23 @@ export interface CampusImport {
   created_at: string;
   updated_at: string;
 }
+
+// JSONB and restored drafts can return the same mapping with different key order.
+// Preserve layer order and every value: actual edits still require a new preview.
+export function sameImportConfiguration(
+  left: ImportConfiguration,
+  right: ImportConfiguration,
+): boolean {
+  const snapshot = (configuration: ImportConfiguration) =>
+    JSON.stringify([
+      configuration.attribution,
+      configuration.license,
+      configuration.redistributionConfirmed,
+      configuration.layers.map((layer) =>
+        Object.entries(layer)
+          .filter(([, value]) => value !== undefined)
+          .sort(([a], [b]) => a.localeCompare(b)),
+      ),
+    ]);
+  return snapshot(left) === snapshot(right);
+}
