@@ -503,7 +503,15 @@ test('globe search stars change with orientation, occlude behind Earth, persist 
   await expect(
     page.getByRole('button', { name: 'Hide stars', exact: true }),
   ).toBeVisible();
-  await page.waitForFunction(() => !window.editorTestMap.isMoving());
+  // Closing the chooser restores symmetric horizontal framing on the next RAF.
+  // Capture only after that lens change: camera longitude alone is insufficient
+  // for a pixel-identical comparison (the chooser had shifted the sky by 144px).
+  await page.waitForFunction(() => {
+    const map = window.editorTestMap;
+    const padding = map.getPadding();
+    return !map.isMoving() && padding.left === padding.right;
+  });
+  await settledWorld(page);
   const initial = await camera(page),
     a = await pixels(page);
   await page.screenshot({ path: info.outputPath('stars-africa.png') });
