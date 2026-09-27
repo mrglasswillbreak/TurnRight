@@ -63,14 +63,35 @@ export default function ProcessMonitor() {
     [error, setError] = useState('');
   useEffect(() => {
     let stopped = false,
+      polling = false,
+      lastPoll = 0,
       timer: ReturnType<typeof setTimeout>;
     const controller = new AbortController();
     const poll = async () => {
+      if (stopped || polling) return;
+      polling = true;
+      lastPoll = Date.now();
       if (!document.hidden && navigator.onLine) {
+        const watching = processes.snapshot().filter((p) => !p.finished);
+        const watched = (prefix: string) =>
+          watching
+            .filter((p) => p.id.startsWith(`${prefix}:`))
+            .map((p) => p.id.slice(prefix.length + 1))
+            .filter((id) => /^[a-f0-9-]{36}$/i.test(id));
         const results = await Promise.allSettled([
           api<
             Pick<ReviewState, 'jobs' | 'releases'> & { imports: CampusImport[] }
-          >('process-status', {}, { signal: controller.signal }),
+          >(
+            'process-status',
+            {
+              watch: {
+                jobs: watched('job'),
+                releases: watched('release'),
+                imports: watched('import'),
+              },
+            },
+            { signal: controller.signal },
+          ),
         ]);
         if (stopped) return;
         setError(
@@ -165,11 +186,29 @@ export default function ProcessMonitor() {
             }
         });
       }
-      if (!stopped) timer = setTimeout(poll, 5000);
+      polling = false;
+      if (!stopped)
+        timer = setTimeout(
+          poll,
+          processes.snapshot().some((p) => !p.finished) ? 5000 : 30000,
+        );
     };
+    const wake = () => {
+      if (stopped || polling || document.hidden || !navigator.onLine) return;
+      clearTimeout(timer);
+      timer = setTimeout(poll, Math.max(0, 5000 - (Date.now() - lastPoll)));
+    };
+    const unsubscribe = processes.subscribe(() => {
+      if (processes.snapshot().some((p) => !p.finished)) wake();
+    });
+    document.addEventListener('visibilitychange', wake);
+    window.addEventListener('online', wake);
     void poll();
     return () => {
       stopped = true;
+      unsubscribe();
+      document.removeEventListener('visibilitychange', wake);
+      window.removeEventListener('online', wake);
       controller.abort();
       clearTimeout(timer);
       processes.clear();

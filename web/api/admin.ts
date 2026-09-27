@@ -1,3 +1,4 @@
+import { processStatus } from '../server/process-status.js';
 import { readPublishedCatalogue } from '../scripts/published-campus-catalogue.mjs';
 import { mapImportAction } from '../server/map-imports.js';
 import { withCampusId } from '../server/campus-scope.js';
@@ -109,18 +110,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'process-status': {
-          const [jobs, releases, imports] = await Promise.all([
-            db(
-              'jobs?select=id,kind,status,message,created_at,completed_at&order=created_at.desc&limit=30',
-            ),
-            db(
-              'releases?select=id,status,summary,created_at,error&order=created_at.desc&limit=20',
-            ),
-            db(
-              'campus_imports?select=id,source_id,campus_id,status,phase,message,created_at,updated_at&order=updated_at.desc&limit=30',
-            ),
-          ]);
-          res.status(200).json({ jobs, releases, imports });
+          res.status(200).json(await processStatus(payload?.watch));
           break;
         }
         case 'review-status': {
