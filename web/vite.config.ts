@@ -49,7 +49,18 @@ export default defineConfig({
     }),
   ],
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
-  optimizeDeps: { exclude: ['maplibre-gl'] },
+  optimizeDeps: {
+    exclude: ['maplibre-gl'],
+    // Worker-only loaders are first reached during file import/export. Discover
+    // them at startup so dependency optimization cannot reload an open draft.
+    include: [
+      'three/addons/loaders/GLTFLoader.js',
+      'three/addons/loaders/OBJLoader.js',
+      'three/addons/loaders/STLLoader.js',
+      'three/addons/exporters/GLTFExporter.js',
+      'three/addons/exporters/STLExporter.js',
+    ],
+  },
   worker: { format: 'es' },
   css: { postcss: { plugins: [tailwindcss()] } },
   build: {
