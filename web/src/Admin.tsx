@@ -1792,7 +1792,7 @@ function Editor({
           </output>
           <details className="editor-backup-menu">
             <summary aria-label="Backup options">
-              <Download size={17} /> Backup
+              <Download size={17} /> <span>Backup</span>
             </summary>
             <div className="editor-card">
               <button className="editor-secondary" onClick={localRecovery}>

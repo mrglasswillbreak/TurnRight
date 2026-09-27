@@ -607,6 +607,7 @@ export function SurveyPanel({
         <strong>Survey</strong>
         <span>Awaiting field verification</span>
         <button
+          disabled={busy}
           onClick={() =>
             void attempt(async () => {
               await controller.current?.pause();
