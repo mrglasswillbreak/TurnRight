@@ -1,4 +1,4 @@
-import type { MappingArea } from './campus-context';
+import { lasuCampus, type MappingArea } from './campus-context';
 import type { RoofDraft } from './visual-types';
 import type { Geometry } from 'geojson';
 import type { MapEdit } from './types';
@@ -90,7 +90,7 @@ export class EditorWorkspace {
     private send: (batch: SaveBatch) => Promise<MapEdit[]>,
     private persist: (state: WorkspaceRecovery) => Promise<void>,
     recovery?: WorkspaceRecovery | null,
-    private mappingArea?: MappingArea,
+    private mappingArea: MappingArea = lasuCampus,
   ) {
     this.saved = structuredClone(server);
     this.edits = structuredClone(server);
