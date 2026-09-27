@@ -1153,6 +1153,56 @@ function browserCampus(): CampusData {
   ];
   return data;
 }
+async function openBuildingModel(
+  page: Page,
+  mode: 'appearance' | 'roof' | 'outline' = 'appearance',
+) {
+  await page.getByRole('button', { name: 'Edit model', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  const compact = dialog.getByLabel('Model editing mode', { exact: true });
+  if (await compact.isVisible()) await compact.selectOption(mode);
+  else
+    await dialog
+      .getByRole('button', {
+        name: mode[0].toUpperCase() + mode.slice(1),
+        exact: true,
+      })
+      .click();
+  return dialog;
+}
+async function closeBuildingModel(page: Page) {
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Back to Survey', exact: true })
+    .click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+}
+async function browserRecovery(page: Page) {
+  return page.evaluate(
+    () =>
+      new Promise<
+        import('../../src/editor-workspace').WorkspaceRecovery | undefined
+      >((resolve, reject) => {
+        const request = indexedDB.open('turnright');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result;
+          const read = db
+            .transaction('preferences')
+            .objectStore('preferences')
+            .get('editor-workspace:owner');
+          read.onerror = () => {
+            db.close();
+            reject(read.error);
+          };
+          read.onsuccess = () => {
+            db.close();
+            resolve(read.result);
+          };
+        };
+      }),
+  );
+}
 async function setup(
   page: Page,
   realCampus = false,
@@ -2714,15 +2764,19 @@ test('review separate building wings, edit their geometry, save and undo without
       );
   await expect.poll(() => building()?.geometry.type).toBe('MultiPolygon');
   const before = structuredClone(building()!.geometry);
-  await page.getByRole('button', { name: 'Outline', exact: true }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
-    .toBe(false);
-  const from = await position(page, [3.1996805, 6.4707775]),
-    to = await position(page, [3.19967, 6.47078]);
-  await page.mouse.move(from.x, from.y);
+  const model = await openBuildingModel(page, 'outline');
+  await model
+    .getByRole('button', { name: 'Edit surface', exact: true })
+    .click();
+  const handle = model.locator('[data-outline-vertex]').first();
+  const from = (await handle.boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
-  await page.mouse.move(to.x, to.y, { steps: 6 });
+  await page.mouse.move(
+    from.x + from.width / 2 + 10,
+    from.y + from.height / 2,
+    { steps: 6 },
+  );
   await page.mouse.up();
   await expect
     .poll(() => JSON.stringify(building()?.geometry))
@@ -3633,6 +3687,9 @@ test('undoes the first saved source correction and keeps its building after relo
     .getByRole('complementary', { name: 'Feature properties' })
     .getByLabel('Name', { exact: true });
   const original = await name.inputValue();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
   const camera = await page.evaluate(() => {
     const m = window.editorTestMap;
     return [m.getCenter().lng, m.getCenter().lat, m.getZoom(), m.getPitch()];
@@ -3723,6 +3780,10 @@ test('recovers unfinished geometry and preserves it when switching 2D/3D', async
   await focusCampus(page);
   await page.getByRole('button', { name: 'Draw path', exact: true }).click();
   await expect(page.locator('.drawing-progress')).toContainText('first point');
+  await expect
+    .poll(async () => (await browserRecovery(page))?.unfinished?.kind)
+    .toBe('path');
+  page.once('dialog', (dialog) => dialog.accept());
   await page.reload();
   await attachMap(page);
   await expect(page.getByText('Unfinished drawing recovered')).toBeVisible();
@@ -3735,6 +3796,13 @@ test('recovers unfinished geometry and preserves it when switching 2D/3D', async
   await clickMap(page, [3.2006, 6.4601]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect(page.locator('.editor-save-state')).toHaveText('Saved locally');
+  await expect
+    .poll(async () => {
+      const geometry = (await browserRecovery(page))?.unfinished?.geometry;
+      return geometry?.type === 'LineString' ? geometry.coordinates.length : 0;
+    })
+    .toBe(2);
+  page.once('dialog', (dialog) => dialog.accept());
   await page.reload();
   await attachMap(page);
   await expect(page.getByText('Unfinished drawing recovered')).toBeVisible();
@@ -3791,7 +3859,7 @@ for (const phone of [false, true]) {
     ).toBeEnabled();
     await page
       .locator('.building-reference-item:visible')
-      .filter({ hasText: 'Library' })
+      .filter({ has: page.getByText('library', { exact: true }) })
       .locator('summary')
       .click();
     await expect(page.locator('.reference-values')).toContainText(
@@ -3929,8 +3997,8 @@ test('building appearance: integrated view, surface inheritance, live preview, r
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await expect(
-    page.getByRole('button', { name: 'Appearance', exact: true }),
-  ).toHaveAttribute('aria-pressed', 'true');
+    page.getByRole('button', { name: 'Edit model', exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByText('Updating 3D preview…', { exact: true }),
   ).toHaveCount(0);
@@ -3950,6 +4018,7 @@ test('building appearance: integrated view, surface inheritance, live preview, r
       ),
     )
     .toContain('library');
+  await openBuildingModel(page);
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
   await page
     .getByLabel('Wall', { exact: true })
@@ -4020,7 +4089,7 @@ test('building appearance: integrated view, surface inheritance, live preview, r
     .click();
   await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
-  await page.getByRole('button', { name: 'Roof', exact: true }).click();
+  await openBuildingModel(page, 'roof');
   await dialog
     .getByRole('button', { name: 'Edit custom roof', exact: true })
     .click();
@@ -4034,12 +4103,13 @@ test('building previews survive revisiting unedited buildings without rebuilding
 }) => {
   await page.addInitScript(() => {
     window.previewBuilds = [];
+    let mapWorker: Worker | undefined;
     const send = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function (
       message,
       ...rest: [Transferable[]?]
     ) {
-      if (message?.features)
+      if (message?.features && (mapWorker ||= this) === this)
         window.previewBuilds.push(
           message.features.map(
             (f: { properties: { id: string } }) => f.properties.id,
@@ -4073,6 +4143,7 @@ test('building previews survive revisiting unedited buildings without rebuilding
     ['library'],
     ['unknown-building'],
   ]);
+  await openBuildingModel(page);
   await page.getByLabel('Wall colour', { exact: true }).fill('#123456');
   await page.getByLabel('Wall colour', { exact: true }).blur();
   await expect
@@ -4083,6 +4154,7 @@ test('building previews survive revisiting unedited buildings without rebuilding
     )
     .toBe('#123456');
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
+  await closeBuildingModel(page);
   await page.getByLabel('Name', { exact: true }).fill('Renamed library');
   await page.getByLabel('Name', { exact: true }).blur();
   await expect
@@ -4109,7 +4181,11 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
       JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
     );
   await expect.poll(rendered).toContain('library');
-  const colour = page.getByLabel('Wall colour', { exact: true });
+  const changeColour = async (value: string) => {
+    await openBuildingModel(page);
+    await page.getByLabel('Wall colour', { exact: true }).fill(value);
+    await closeBuildingModel(page);
+  };
   for (const [failure, value, message] of [
     ['timeout', '#223344', '3D preview timed out.'],
     ['crash', '#334455', '3D preview stopped.'],
@@ -4137,7 +4213,7 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
         return send.call(this, message, rest[0] || []);
       };
     }, failure);
-    await colour.fill(value);
+    await changeColour(value);
     await expect(page.getByText(message, { exact: false })).toBeVisible({
       timeout: 25000,
     });
@@ -4145,7 +4221,7 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
     await page.evaluate(() =>
       window.dispatchEvent(new Event('restore-preview-worker')),
     );
-    if (failure === 'crash') await colour.fill('#335577');
+    if (failure === 'crash') await changeColour('#335577');
     else
       await page
         .getByRole('button', { name: 'Retry 3D preview', exact: true })
@@ -4180,14 +4256,14 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
       return send.call(this, message, rest[0] || []);
     };
   });
-  await colour.fill('#445566');
+  await changeColour('#445566');
   await page.waitForTimeout(1000);
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
   await expect(page.getByText('3D preview is outdated')).toHaveCount(0);
   await expect.poll(rendered).toContain('library');
 });
 
-test('enhanced editing keeps models through slow frames, outline work and renderer retry', async ({
+test('enhanced editing keeps models through slow frames, map editing and renderer retry', async ({
   page,
 }) => {
   test.setTimeout(100000);
@@ -4201,7 +4277,7 @@ test('enhanced editing keeps models through slow frames, outline work and render
       JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
     );
   await expect.poll(rendered).toContain('library');
-  const camera = await page.evaluate(() => [
+  let camera = await page.evaluate(() => [
     window.editorTestMap.getCenter().toArray(),
     window.editorTestMap.getZoom(),
     window.editorTestMap.getPitch(),
@@ -4246,14 +4322,26 @@ test('enhanced editing keeps models through slow frames, outline work and render
     page.getByText('Detail reduced for smoother movement'),
   ).toBeVisible();
   await expect.poll(rendered).toContain('library');
-  await page.getByRole('button', { name: 'Outline', exact: true }).click();
+  await page.getByRole('button', { name: 'Draw path', exact: true }).click();
   await expect.poll(rendered).not.toContain('library');
   await expect(
     page.getByText('Enhanced models paused for map editing'),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
+    .toBe(false);
+  camera = await page.evaluate(() => [
+    window.editorTestMap.getCenter().toArray(),
+    window.editorTestMap.getZoom(),
+    window.editorTestMap.getPitch(),
+    window.editorTestMap.getBearing(),
+  ]);
   await expect.poll(rendered).toContain('library');
+  await openBuildingModel(page);
   await page.getByLabel('Wall colour', { exact: true }).fill('#996633');
+  await closeBuildingModel(page);
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
   await page.evaluate(
     () =>
@@ -4295,6 +4383,7 @@ test('enhanced editing keeps models through slow frames, outline work and render
   await expect(
     page.getByText('Detail reduced for smoother movement'),
   ).toHaveCount(0);
+  await openBuildingModel(page);
   await expect(page.getByLabel('Wall colour', { exact: true })).toHaveValue(
     '#996633',
   );
@@ -4344,9 +4433,12 @@ test.describe('building roof touch editing', () => {
         ),
       )
       .toContain('library');
+    const model = await openBuildingModel(page, 'roof');
     await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
-    await page.getByRole('button', { name: 'Roof', exact: true }).click();
     await page.getByRole('button', { name: 'Create custom roof' }).click();
+    await model
+      .getByRole('button', { name: 'Edit surface', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
     const plan = page.getByLabel('Roof plan drawing', { exact: true });
     for (const [x, y] of [
@@ -4360,6 +4452,7 @@ test.describe('building roof touch editing', () => {
         box.y + (y / 300) * box.height,
       );
     }
+    await model.getByRole('button', { name: 'More', exact: true }).click();
     await expect(
       page.getByRole('button', { name: 'Remove ridge 1' }),
     ).toBeVisible();
@@ -4449,36 +4542,13 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await expect(page.getByRole('dialog').locator('header output')).toContainText(
     'Unsaved input',
   );
-  // Reload only after the asynchronous recovery write is durable. The header
-  // describes unfinished geometry input, not completion of an IndexedDB write.
+  // The unfinished-input label does not acknowledge completion of an IDB write.
   await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          new Promise((resolve, reject) => {
-            const request = indexedDB.open('turnright');
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => {
-              const db = request.result;
-              const read = db
-                .transaction('preferences')
-                .objectStore('preferences')
-                .get('editor-workspace:owner');
-              read.onerror = () => {
-                db.close();
-                reject(read.error);
-              };
-              read.onsuccess = () => {
-                db.close();
-                resolve(
-                  read.result?.modelInputs?.library?.[
-                    'roof:library:wing:0:eaves'
-                  ],
-                );
-              };
-            };
-          }),
-      ),
+    .poll(
+      async () =>
+        (await browserRecovery(page))?.modelInputs?.library?.[
+          'roof:library:wing:0:eaves'
+        ],
     )
     .toBe('');
   await context.setOffline(true);
@@ -4686,7 +4756,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await page.screenshot({ path: 'test-results/view-settings-public.png' });
 });
 
-test('view settings: preserves the map, roof selection and unfinished drawing', async ({
+test('view settings: preserves the map, saved roof and unfinished drawing', async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -4698,13 +4768,14 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
+  await openBuildingModel(page, 'roof');
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
-  await page.getByRole('button', { name: 'Roof', exact: true }).click();
   await page.getByRole('button', { name: 'Create custom roof' }).click();
   await page
     .getByRole('button', { name: 'Add point with coordinates' })
     .click();
   await page.getByLabel('Point elevation (m)').fill('14');
+  await page.getByLabel('Point elevation (m)').press('Enter');
   await page.getByRole('button', { name: 'Draw ridge', exact: true }).click();
   const selectedPoint = await page.getByLabel('Control point').inputValue();
   const camera = await page.evaluate(() => ({
@@ -4713,6 +4784,7 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
     pitch: window.editorTestMap.getPitch(),
     zoom: window.editorTestMap.getZoom(),
   }));
+  await closeBuildingModel(page);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(page.getByLabel('Point elevation (m)')).toBeHidden();
   for (const appearance of ['Light', 'Dark'] as const) {
@@ -4740,11 +4812,17 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   await page
     .getByRole('button', { name: 'Close settings', exact: true })
     .click();
+  await openBuildingModel(page, 'roof');
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByRole('button', { name: 'Edit custom roof', exact: true })
+    .click();
+  await page.getByLabel('Control point').selectOption(selectedPoint);
   await expect(page.getByLabel('Control point')).toHaveValue(selectedPoint);
   await expect(page.getByLabel('Point elevation (m)')).toHaveValue('14');
   await expect(
     page.getByRole('button', { name: 'Draw ridge', exact: true }),
-  ).toHaveAttribute('aria-pressed', 'true');
+  ).toHaveAttribute('aria-pressed', 'false');
   expect(
     await page.evaluate(() => ({
       center: window.editorTestMap.getCenter().toArray(),
@@ -4760,6 +4838,7 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
         document.querySelector('.maplibregl-canvas'),
     ),
   ).toBe(true);
+  await closeBuildingModel(page);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(
     page.getByLabel('Building opacity', { exact: true }),
@@ -4774,12 +4853,12 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   await page
     .getByRole('button', { name: 'Close settings', exact: true })
     .click();
-  await page.getByRole('button', { name: 'Cancel roof', exact: true }).click();
   await page.getByRole('button', { name: 'Close properties' }).click();
   await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
+  const savedBeforeDrawing = structuredClone(state.edits());
   await page.getByRole('button', { name: 'Draw path', exact: true }).click();
   await clickMap(page, [3.2005, 6.4601]);
   await clickMap(page, [3.2006, 6.4601]);
@@ -4806,8 +4885,12 @@ test('view settings: preserves the map, roof selection and unfinished drawing', 
   await expect(
     page.getByRole('button', { name: 'Finish', exact: true }),
   ).toBeEnabled();
-  expect(state.edits()).toHaveLength(0);
+  expect(state.edits()).toEqual(savedBeforeDrawing);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect
+    .poll(async () => (await browserRecovery(page))?.unfinished?.kind)
+    .toBe('path');
+  page.once('dialog', (dialog) => dialog.accept());
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Resume drawing' }).click();
@@ -4958,11 +5041,12 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
       await page.getByRole('button', { name: 'Collapse explorer' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     await expect(
-      page.getByRole('button', { name: 'Appearance', exact: true }),
+      page.getByRole('button', { name: 'Edit model', exact: true }),
     ).toBeVisible();
     await audit('building inspector');
-    await page.getByRole('button', { name: 'Roof', exact: true }).click();
+    await openBuildingModel(page, 'roof');
     await audit('roof inspector');
+    await closeBuildingModel(page);
     await page.getByRole('button', { name: 'Survey', exact: true }).click();
     await expect(page.locator('.survey-sheet')).toBeVisible();
     await audit('survey');
@@ -5092,7 +5176,7 @@ for (const phone of [false, true]) {
     expect(errors).toEqual([]);
   });
 }
-test('roof proposal draft survives settings, view changes and recovery before apply', async ({
+test('roof proposal retains its saved geometry and unfinished input through settings and recovery', async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -5101,36 +5185,55 @@ test('roof proposal draft survives settings, view changes and recovery before ap
   await focusCampus(page);
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
+  await openBuildingModel(page, 'roof');
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
-  await page.getByRole('button', { name: 'Roof', exact: true }).click();
   await page
     .getByRole('button', { name: 'Preview approximate hip roof' })
     .click();
-  await expect(
-    page.getByRole('button', { name: 'Apply roof', exact: true }),
-  ).toBeEnabled();
-  expect(state.edits()).toHaveLength(0);
-  await page.emulateMedia({ colorScheme: 'light' });
-  await page.emulateMedia({ colorScheme: 'dark' });
+  const savedRoof = () =>
+    state.edits().find((e) => e.id === 'library')?.properties.appearance
+      ?.roofs?.['library:wing:0'];
+  await expect.poll(() => savedRoof()?.points.length).toBeGreaterThan(0);
+  const validRoof = structuredClone(savedRoof());
+  await page.getByLabel('Eaves elevation (m)').fill('');
+  await closeBuildingModel(page);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Apply roof', exact: true }),
-  ).toBeEnabled();
+  await page.getByRole('radio', { name: 'Light', exact: true }).check();
+  await page
+    .getByRole('button', { name: 'Close settings', exact: true })
+    .click();
+  await openBuildingModel(page, 'roof');
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByRole('button', { name: 'Edit custom roof', exact: true })
+    .click();
+  await expect(page.getByLabel('Eaves elevation (m)')).toHaveValue('');
+  expect(savedRoof()).toEqual(validRoof);
+  page.once('dialog', (dialog) => dialog.accept());
   await page.reload();
   await attachMap(page);
-  await page.getByRole('button', { name: 'Resume roof', exact: true }).click();
-  await expect(page.getByText(/Approximate hip roof derived/)).toBeVisible();
-  await page.getByRole('button', { name: 'Apply roof', exact: true }).click();
-  await expect
-    .poll(
-      () =>
-        state.edits().find((e) => e.id === 'library')?.properties.appearance
-          ?.roofs?.['library:wing:0']?.points.length,
-    )
-    .toBeGreaterThan(0);
+  await focusCampus(page);
+  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  if (await collapse.isVisible()) await collapse.click();
+  await clickMap(page, [3.20012, 6.46022]);
+  await openBuildingModel(page, 'roof');
+  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+  await page
+    .getByRole('button', { name: 'Edit custom roof', exact: true })
+    .click();
+  await expect(page.getByLabel('Eaves elevation (m)')).toHaveValue('');
+  expect(savedRoof()).toEqual(validRoof);
+  await page.getByLabel('Eaves elevation (m)').fill(String(validRoof!.eaves));
+  await page.getByLabel('Eaves elevation (m)').press('Enter');
+  await page
+    .getByRole('button', { name: 'Done editing roof', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Edit custom roof', exact: true }),
+  ).toBeVisible();
 });
+
 test('roof campus batch: complex roof plans generate without fallback or camera jumps', async ({
   page,
 }, testInfo) => {
@@ -6726,18 +6829,21 @@ for (const width of [390, 1440])
     await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
     await expect.poll(() => wall()).toBeUndefined();
     await expect(
-      dialog.getByText('0 selected · 0 details', { exact: true }),
-    ).toBeVisible();
+      dialog.locator('.model-detail-item[aria-selected="true"]'),
+    ).toHaveCount(0);
     if (width <= 900)
       await dialog.getByRole('button', { name: 'More', exact: true }).click();
     if (width <= 900)
       await dialog
         .getByRole('button', { name: 'Selection actions', exact: true })
         .click();
-    else
+    else {
       await dialog
-        .getByRole('application', { name: /Wall canvas/ })
-        .click({ button: 'right' });
+        .getByRole('button', { name: 'Edit surface', exact: true })
+        .click();
+      await dialog.getByRole('application', { name: /Wall canvas/ }).focus();
+      await page.keyboard.press('Shift+F10');
+    }
     await expect(
       page.getByRole('menuitem', { name: 'Duplicate', exact: true }),
     ).toBeDisabled();
@@ -6853,7 +6959,7 @@ test('unified model rejected appearance input stays with its wall and selection 
   await dialog
     .getByLabel('Wall', { exact: true })
     .selectOption('library:wall:0:0:1');
-  await expect(dialog.getByLabel('Mapped wall')).toHaveValue(
+  await expect(dialog.getByLabel('Wall', { exact: true })).toHaveValue(
     'library:wall:0:0:1',
   );
   await expect(spacing).not.toHaveValue('12');
@@ -7079,7 +7185,7 @@ test('3D touch hold selects a detail and opens actions without a release tap', a
   const { dialog, wall } = await unifiedModelFixture(page);
   await dialog.getByRole('button', { name: 'Orbit', exact: true }).click();
   await dialog
-    .getByRole('button', { name: 'Fit selected detail', exact: true })
+    .getByRole('button', { name: 'Fit selection', exact: true })
     .click();
   const canvas = dialog.locator('.photo-model-canvas canvas');
   await expect(canvas).toBeVisible();
@@ -7249,9 +7355,11 @@ test('unified model retains an invalid pattern privately and repairs it after re
       exact: true,
     })
     .click();
+  await dialog.getByLabel('Find model parts').fill('Repeated details');
   await dialog
-    .getByRole('button', { name: 'Pattern · Repeated details', exact: true })
+    .getByRole('treeitem', { name: 'Repeated details', exact: true })
     .click();
+  await dialog.getByLabel('Find model parts').fill('');
   await dialog.getByText('Groups, patterns & presets', { exact: true }).click();
   await dialog.getByLabel('Horizontal step (m)', { exact: true }).fill('2');
   await dialog
@@ -7719,15 +7827,16 @@ test.describe('compact plan and photograph tools', () => {
       await dialog
         .getByRole('button', { name: 'Multi-select', exact: true })
         .click();
-      await expect(
-        dialog.getByRole('checkbox', { name: 'Window', exact: true }),
-      ).toBeVisible();
-      await dialog
-        .getByRole('checkbox', { name: 'Window', exact: true })
-        .click();
-      await dialog
-        .getByRole('checkbox', { name: 'Window', exact: true })
-        .click();
+      const windowRow = dialog.getByRole('treeitem', {
+        name: 'Window',
+        exact: true,
+      });
+      await expect(windowRow).toBeVisible();
+      await expect(windowRow).toHaveAttribute('aria-selected', 'true');
+      await windowRow.press('Space');
+      await expect(windowRow).toHaveAttribute('aria-selected', 'false');
+      await windowRow.press('Space');
+      await expect(windowRow).toHaveAttribute('aria-selected', 'true');
       await dialog.getByRole('button', { name: 'Done', exact: true }).click();
       await dialog.getByLabel('Model editing mode').selectOption('roof');
       await dialog
