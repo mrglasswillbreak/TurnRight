@@ -217,7 +217,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             throw new HttpError(400, 'Invalid edit batch.');
           const keys = new Set<string>();
           const clean = items.map((item) => {
-            const errors = validateEdit(item?.edit);
+            const errors = validateEdit(item?.edit, campus);
             if (errors.length) throw new HttpError(400, errors.join(' '));
             if (
               item.expectedUpdatedAt !== null &&
@@ -263,7 +263,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               user.id,
             );
             for (const edit of hydrated) {
-              const errors = validateEdit(edit);
+              const errors = validateEdit(edit, campus);
               if (errors.length) throw new HttpError(400, errors.join(' '));
             }
           }
