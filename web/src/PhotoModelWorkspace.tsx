@@ -602,7 +602,10 @@ function ModelWorkspace({
     setSelected(target ? [target] : []);
     setInstance(at);
     setPatternId('');
-    setPending(null);
+    if (id !== activeWall) {
+      setPending(null);
+      setPendingAuthoring(null);
+    }
     setConversion(null);
     setError('');
     const w = walls.find((w) => w.wallId === id);
@@ -1052,9 +1055,12 @@ function ModelWorkspace({
     ) {
       if (!wallId) return;
       const previous = activeWall === wallId ? selected : [];
-      switchMode('details');
+      if (mode !== 'details') switchMode('details');
       choose(wallId, kind === 'detail' ? id : undefined);
       if (kind === 'detail' && id) {
+        // Choosing another detail must retain the mobile multi-select tool and
+        // the open tree; otherwise the first toggle closes its own controls.
+        if (touchTool === 'multi') setTouchTool('multi');
         setWholeRows(target.wholeRow ? [id] : []);
         setSelected(
           multi || touchTool === 'multi' ? toggle(previous, [id]) : [id],
