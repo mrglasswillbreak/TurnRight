@@ -19,7 +19,9 @@ export const searchKey = (value: string) =>
     .normalize('NFKD')
     .replace(/\p{M}/gu, '')
     .toLocaleLowerCase()
-    .replace(/[_-]/g, ' ');
+    .replace(/[_-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 const placeSearch = new WeakMap<Place, string>();
 const streetSearch = new WeakMap<
   CampusData['map'],

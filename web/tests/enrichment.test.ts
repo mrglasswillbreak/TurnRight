@@ -6,6 +6,7 @@ import {
   editedPlaceDetails,
   detailErrors,
   publicEvidence,
+  searchKey,
 } from '../src/place-details';
 import { applyEdits } from '../src/editor-model';
 import { featureEdit } from '../src/editor-features';
@@ -42,6 +43,22 @@ const evidence = {
 };
 
 describe('campus enrichment', () => {
+  it('finds imported names and roads despite repeated or non-breaking spaces', () => {
+    expect(searchKey('  LÁSÚ\u00a0  Clinic ')).toBe(searchKey('lasu clinic'));
+    const data = campusFixture();
+    data.map.features.push({
+      type: 'Feature',
+      properties: { id: 'road-spaces', kind: 'path', name: 'Faculty   Road' },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [3.2, 6.46],
+          [3.201, 6.46],
+        ],
+      },
+    });
+    expect(streetResults(data, ' Faculty Road ')).toHaveLength(1);
+  });
   it('includes offline glyph ranges for Yoruba names and uppercase street labels', () => {
     const data = campusFixture();
     data.places[0].name = 'Ọ̀nà';

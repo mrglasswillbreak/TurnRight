@@ -1,6 +1,7 @@
 import { campusUrl, lasuCampus } from './campus-context';
 import { PhotoSession } from './PhotoSession';
 import { canonicalBuildingId } from './arrival';
+import { searchKey } from './place-details';
 import {
   consumeEditorBuilding,
   editorHandoffStorage,
@@ -145,8 +146,11 @@ export default function Admin({
   installUpdate?: () => Promise<void>;
 }) {
   useLayoutEffect(() => {
-    const restored=restoreEditorCampusReturn(location.href,editorHandoffStorage());
-    if(restored)history.replaceState(null,'',restored);
+    const restored = restoreEditorCampusReturn(
+      location.href,
+      editorHandoffStorage(),
+    );
+    if (restored) history.replaceState(null, '', restored);
   }, []);
   const [owner, setOwner] = useState<string | null>(null);
   const [state, setState] = useState<EditorState | null>(null);
@@ -1644,9 +1648,10 @@ function Editor({
     }
     return [...grouped.values()];
   }, [validation, workspace.edits, drafts, invalid]);
+  const featureQuery = searchKey(search);
   const visibleTasks = tasks.filter(
     (t) =>
-      `${t.name} ${t.reason}`.toLowerCase().includes(search.toLowerCase()) &&
+      searchKey(`${t.name} ${t.reason}`).includes(featureQuery) &&
       (filter === 'all' ||
         (filter === 'needs' &&
           (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||

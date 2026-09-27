@@ -9001,3 +9001,27 @@ test('prepared offline image tools reload originals and recipes and queue withou
   await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
   expect(uploads).toBe(0);
 });
+
+test('editor reliability: imported names with extra spaces remain searchable without renaming', async ({
+  page,
+}) => {
+  const server = await setup(page, false, false, {
+    mutateCampus: (data) => {
+      const building = data.map.features.find(
+        (f) => f.properties?.kind === 'building',
+      )!;
+      building.properties!.name = 'LASU  Clinic';
+    },
+  });
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('  lasu clinic  ');
+  const result = page.locator('.editor-feature-list button');
+  await expect(result).toHaveCount(1);
+  await result.click();
+  await expect(
+    page.getByRole('textbox', { name: 'Name', exact: true }),
+  ).toHaveValue('LASU  Clinic');
+  expect(server.edits()).toHaveLength(0);
+});

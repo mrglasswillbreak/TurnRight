@@ -1,5 +1,6 @@
 import { DrivingEditor } from './DrivingEditor';
 import { ArrivalEditor } from './ArrivalEditor';
+import { searchKey } from './place-details';
 import { lazy, Suspense } from 'react';
 const PhotoManager = lazy(() =>
   import('./PhotoManager').then((m) => ({ default: m.PhotoManager })),
@@ -230,7 +231,6 @@ export function EditorInspector({
                 geometry: edit.geometry,
               }}
             />
-
           </>
         )}
         {edit.kind === 'entrance' && (
@@ -255,7 +255,7 @@ export function EditorInspector({
                   .filter(
                     (place) =>
                       place.id === p.placeId ||
-                      place.name.toLowerCase().includes(search.toLowerCase()),
+                      searchKey(place.name).includes(searchKey(search)),
                   )
                   .map((place) => (
                     <option value={place.id} key={place.id}>
