@@ -12,6 +12,24 @@ afterAll(async () => {
   for (const dir of temporary) await rm(dir, { recursive: true, force: true });
 });
 describe('private building photograph processing', () => {
+  it('validates and retains a compliant optimised WebP without a second lossy encode', async () => {
+    const original = await sharp({
+      create: { width: 120, height: 80, channels: 3, background: '#548ca0' },
+    })
+      .webp({ quality: 83 })
+      .toBuffer();
+    const result = await photoDerivative(original);
+    expect(result.bytes.equals(original)).toBe(true);
+    const tagged = await sharp(original)
+      .withExif({ IFD0: { Artist: 'Private' } })
+      .webp()
+      .toBuffer();
+    const clean = await photoDerivative(tagged);
+    expect((await sharp(clean.bytes).metadata()).exif).toBeUndefined();
+    await expect(
+      photoDerivative(original.subarray(0, original.length - 8)),
+    ).rejects.toThrow();
+  });
   it('orients, bounds and strips original metadata without publishing originals', async () => {
     const original = await sharp({
       create: { width: 2200, height: 1200, channels: 3, background: '#abcdef' },

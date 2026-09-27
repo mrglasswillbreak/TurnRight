@@ -3,6 +3,22 @@ import { createHash } from 'node:crypto';
 import { HttpError } from './backend.js';
 
 export const MAX_ORIGINAL_BYTES = 10 * 1024 * 1024;
+function plainWebp(bytes: Buffer) {
+  if (
+    bytes.toString('ascii', 0, 4) !== 'RIFF' ||
+    bytes.toString('ascii', 8, 12) !== 'WEBP' ||
+    bytes.readUInt32LE(4) + 8 !== bytes.length
+  )
+    return false;
+  let offset = 12;
+  while (offset + 8 <= bytes.length) {
+    const tag = bytes.toString('ascii', offset, offset + 4),
+      size = bytes.readUInt32LE(offset + 4);
+    if (!['VP8X', 'ALPH', 'VP8 ', 'VP8L'].includes(tag)) return false;
+    offset += 8 + size + (size % 2);
+  }
+  return offset === bytes.length;
+}
 /** Decode, orient, resize and re-encode. Sharp discards source EXIF/GPS/XMP by default. */
 export async function photoDerivative(bytes: Buffer) {
   if (!bytes.length || bytes.length > MAX_ORIGINAL_BYTES)
@@ -19,6 +35,28 @@ export async function photoDerivative(bytes: Buffer) {
       (info.pages || 1) !== 1
     )
       throw Error('Unsupported image');
+    // Verify the complete pixel stream even when retaining compliant browser output.
+    // No client flag can bypass decoding, format, metadata or resource limits.
+    if (
+      info.format === 'webp' &&
+      plainWebp(bytes) &&
+      (info.width || Infinity) <= 1600 &&
+      (info.height || Infinity) <= 1600 &&
+      bytes.length <= 250 * 1024 &&
+      !info.exif &&
+      !info.xmp &&
+      !info.icc &&
+      !info.orientation
+    ) {
+      await input.clone().raw().toBuffer();
+      return {
+        bytes,
+        width: info.width!,
+        height: info.height!,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+        originalSha256: createHash('sha256').update(bytes).digest('hex'),
+      };
+    }
     // Decode/orient the potentially 40 MP source once. Subsequent attempts use
     // a bounded raw raster, avoiding repeated JPEG/PNG decoding and rotation.
     const oriented = await input
