@@ -8,7 +8,7 @@ it('stars are deterministic directions on an infinite sphere with restrained bri
     south = 0;
   for (let i = 0; i < stars.length; i += 4) {
     expect(Math.hypot(stars[i], stars[i + 1], stars[i + 2])).toBeCloseTo(1, 5);
-    expect(stars[i + 3]).toBeGreaterThanOrEqual(0.25);
+    expect(stars[i + 3]).toBeGreaterThanOrEqual(0.42 - 1e-6);
     expect(stars[i + 3]).toBeLessThanOrEqual(1);
     if (stars[i + 1] > 0) north++;
     else south++;

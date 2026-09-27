@@ -4,7 +4,7 @@ export const spaceOpacity = (zoom: number) =>
   Math.max(0, Math.min(1, (6 - zoom) / 2));
 
 /** Seeded, uniform directions on a sphere. A decorative sky, not a catalogue. */
-export function starField(count = 4096) {
+export function starField(count = 6144) {
   let seed = 0x51a7f13d;
   const random = () => {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -20,7 +20,7 @@ export function starField(count = 4096) {
         radius * Math.cos(angle),
         y,
         radius * Math.sin(angle),
-        0.25 + random() ** 3 * 0.75,
+        0.42 + random() ** 2 * 0.58,
       ],
       i * 4,
     );
@@ -142,7 +142,7 @@ export function worldStars(
             // supplies current longitude, latitude, bearing, pitch and roll.
             vec4 clip = u_matrix * vec4(a_star.xyz, 0.0);
             gl_Position = clip.w > 0.0 ? vec4(clip.xy, clip.w, clip.w) : vec4(2.0,2.0,1.0,1.0);
-            gl_PointSize = (0.8 + a_star.w * 1.3) * u_pixel_ratio;
+            gl_PointSize = (1.4 + a_star.w * 1.7) * u_pixel_ratio;
             v_brightness = a_star.w;
           }`,
             `in float v_brightness; uniform float u_opacity; out vec4 colour;
