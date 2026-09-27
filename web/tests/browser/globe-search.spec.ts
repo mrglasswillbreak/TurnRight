@@ -721,7 +721,15 @@ test('globe search stars reuse repaint events without an idle animation loop', a
     });
   }
   await page.getByRole('button', { name: 'Show stars', exact: true }).click();
-  await page.waitForTimeout(500);
+  // Wait for the toggle's repaint and pending map work, not an arbitrary delay.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.editorTestMap;
+        map.once('idle', () => resolve());
+        map.triggerRepaint();
+      }),
+  );
   const idleFrames = await page.evaluate(
     () =>
       new Promise<number>((resolve) => {
