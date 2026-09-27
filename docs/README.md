@@ -7,6 +7,7 @@ TurnRight combines a public campus navigation PWA, a private GIS/map workspace a
 | Task | Guide |
 | --- | --- |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
+| Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
 | Edit places, paths, entrances, access and source changes | [Owner editor](EDITOR.md) |
 | Edit windows, walls, roofs, footprints, text and model review | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
 | Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL | [Model authoring](MODEL-AUTHORING.md) |

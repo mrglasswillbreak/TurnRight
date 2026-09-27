@@ -18,6 +18,8 @@ Campus identity is permanent; the public slug identifies links such as `/?campus
 
 ## Connect sources
 
+For UNILAG Akoka, the [download and source-comparison guide](UNILAG-DOWNLOADS.md) produces separate ArcGIS/OSM files with a 500 m access-road buffer, completeness checks and illustrated manual instructions. Downloading that package does not create or publish a campus.
+
 Choose **Import data** inside the target campus. Several sources can contribute layers to one campus. Existing sources retain their configuration for replacement files and manual checks.
 
 | Input | Supported content and requirements |
