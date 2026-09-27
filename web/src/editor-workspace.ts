@@ -252,6 +252,18 @@ export class EditorWorkspace {
   get dirty() {
     return this.changes().length > 0 || !!this.pending;
   }
+  get needsLeaveWarning() {
+    return (
+      this.dirty ||
+      !!this.unfinished ||
+      !!this.roofDraft ||
+      this.writingRecovery ||
+      this.status === 'Recovery unavailable' ||
+      Object.values(this.modelInputs).some(
+        (inputs) => Object.keys(inputs).length > 0,
+      )
+    );
+  }
   get canAutosave() {
     return (
       this.dirty &&

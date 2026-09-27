@@ -4449,7 +4449,40 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await expect(page.getByRole('dialog').locator('header output')).toContainText(
     'Unsaved input',
   );
+  // Reload only after the asynchronous recovery write is durable. The header
+  // describes unfinished geometry input, not completion of an IndexedDB write.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          new Promise((resolve, reject) => {
+            const request = indexedDB.open('turnright');
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+              const db = request.result;
+              const read = db
+                .transaction('preferences')
+                .objectStore('preferences')
+                .get('editor-workspace:owner');
+              read.onerror = () => {
+                db.close();
+                reject(read.error);
+              };
+              read.onsuccess = () => {
+                db.close();
+                resolve(
+                  read.result?.modelInputs?.library?.[
+                    'roof:library:wing:0:eaves'
+                  ],
+                );
+              };
+            };
+          }),
+      ),
+    )
+    .toBe('');
   await context.setOffline(true);
+  page.once('dialog', (dialog) => dialog.accept());
   await page.reload();
   await attachMap(page);
   await focusCampus(page);

@@ -18,6 +18,31 @@ const edit = (name = 'Library'): MapEdit => ({
 const ack = (batch: SaveBatch, revision = '2026-09-11T12:00:00Z') =>
   batch.edits.map(({ edit }) => ({ ...edit, updated_at: revision }));
 describe('editor autosave and recovery', () => {
+  it('protects unfinished model fields and pending recovery writes when leaving', async () => {
+    let finishWrite!: () => void;
+    const workspace = new EditorWorkspace(
+      [],
+      async () => [],
+      () =>
+        new Promise<void>((resolve) => {
+          finishWrite = resolve;
+        }),
+    );
+    expect(workspace.needsLeaveWarning).toBe(false);
+    workspace.recoverModelInput('library', 'eaves', '');
+    expect(workspace.dirty).toBe(false);
+    expect(workspace.needsLeaveWarning).toBe(true);
+    await vi.waitFor(() => expect(finishWrite).toBeTypeOf('function'));
+    finishWrite();
+    await workspace.preserveRecovery();
+    expect(workspace.needsLeaveWarning).toBe(true);
+    workspace.recoverModelInput('library', 'eaves');
+    await Promise.resolve();
+    expect(workspace.needsLeaveWarning).toBe(true);
+    finishWrite();
+    await workspace.preserveRecovery();
+    expect(workspace.needsLeaveWarning).toBe(false);
+  });
   it('prepares an update with invalid drafts only when complete recovery is durable', async () => {
     let stored: WorkspaceRecovery | undefined;
     const send = vi.fn(async (batch: SaveBatch) => ack(batch));

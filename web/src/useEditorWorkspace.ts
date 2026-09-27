@@ -21,11 +21,7 @@ export function useEditorWorkspace(workspace: EditorWorkspace) {
       // An explicit update has already verified recovery for this revision.
       // Any subsequent edit invalidates this exemption automatically.
       if (workspace.canReloadForUpdate) return;
-      if (
-        workspace.dirty ||
-        workspace.unfinished ||
-        workspace.status === 'Recovery unavailable'
-      ) {
+      if (workspace.needsLeaveWarning) {
         event.preventDefault();
         event.returnValue = '';
       }
