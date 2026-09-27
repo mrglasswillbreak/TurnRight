@@ -225,9 +225,9 @@ export default function CampusWorkspace({
   }, [job, configuration, recoveryKey]);
   const selectedSource = sources.find((s) => s.id === job?.source_id);
   const counts = job?.summary?.counts;
-  const filesChanged = async (files: FileList | null) =>
+  const filesChanged = async (files: File[]) =>
     run(async () => {
-      if (!files || !job) return;
+      if (!files.length || !job) return;
       if (
         Array.from(files).reduce((sum, f) => sum + f.size, 0) >
         50 * 1024 * 1024
@@ -236,12 +236,16 @@ export default function CampusWorkspace({
       for (const file of Array.from(files)) {
         const bytes = await file.arrayBuffer(),
           sha256 = await hashBytes(bytes);
-        const result = await api<{ url: string }>('import-upload', {
-          importId: job.id,
-          name: file.name,
-          bytes: file.size,
-          sha256,
-        });
+        const result = await api<{ url: string; job?: CampusImport }>(
+          'import-upload',
+          {
+            importId: job.id,
+            name: file.name,
+            bytes: file.size,
+            sha256,
+          },
+        );
+        if (result.job) setJob(result.job);
         const response = await fetch(result.url, {
           method: 'PUT',
           headers: {
@@ -589,7 +593,7 @@ export default function CampusWorkspace({
                       ? 'Inspect the proposed changes before adding them to source review.'
                       : 'Add your files, then inspect the available layers.')}
               </output>
-              {job.status === 'draft' && (
+              {(job.status === 'draft' || job.status === 'failed') && (
                 <div className="import-upload">
                   {selectedSource?.kind === 'file' && (
                     <label className="campus-file">
@@ -599,7 +603,11 @@ export default function CampusWorkspace({
                         type="file"
                         accept=".geojson,.json,.zip,.gpkg,.kml,.kmz,.gpx,.csv,.osm,.xml,.pbf"
                         disabled={busy}
-                        onChange={(e) => void filesChanged(e.target.files)}
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          e.target.value = '';
+                          void filesChanged(files);
+                        }}
                       />
                     </label>
                   )}

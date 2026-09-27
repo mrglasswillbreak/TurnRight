@@ -219,8 +219,15 @@ async function setup(page: Page, { photo = false }: { photo?: boolean } = {}) {
       result = { job };
     }
     const job = jobs.find((j) => j.id === payload?.importId);
-    if (action === 'import-upload')
-      result = { url: 'http://127.0.0.1:5183/__campus-upload' };
+    if (action === 'import-upload') {
+      if (job?.status === 'failed')
+        Object.assign(job, {
+          status: 'draft',
+          phase: 'inspect',
+          summary: undefined,
+        });
+      result = { url: 'http://127.0.0.1:5183/__campus-upload', job };
+    }
     if (action === 'import-run' && job) {
       Object.assign(job, {
         status: 'queued',
@@ -319,6 +326,65 @@ test('campus imports preserve mappings through rotation and queue only a reviewe
     preview!.payload.configuration as { layers: { crs?: string }[] }
   ).layers;
   expect(mappings[0].crs).toBeUndefined();
+});
+
+test('campus imports resume failed uploads and allow selecting the same file again', async ({
+  page,
+}, info) => {
+  const state = await setup(page);
+  await workspace(page);
+  await fileImport(page);
+  Object.assign(state.jobs[0], {
+    status: 'failed',
+    phase: 'inspect',
+    summary: undefined,
+    message:
+      'Uploaded file is unavailable. Select the same files to resume the upload, then inspect again.',
+  });
+  await page.getByRole('button', { name: 'Back to sources' }).click();
+  await page
+    .getByRole('button', { name: /Campus buildings and paths.*failed/ })
+    .click();
+  await expect(
+    page.getByText('Uploaded file is unavailable.', { exact: false }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('import-resume.png') });
+  const file = {
+    name: 'Road width.geojson.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(
+      JSON.stringify({ type: 'FeatureCollection', features: [] }),
+    ),
+  };
+  await page.route('**/__campus-upload', (r) =>
+    r.fulfill({ status: 503, json: { error: 'temporary failure' } }),
+  );
+  await page.locator('input[type=file]').setInputFiles(file);
+  await expect(
+    page.getByText('Upload was interrupted.', { exact: false }),
+  ).toBeVisible();
+  await page.unroute('**/__campus-upload');
+  await page.route('**/__campus-upload', (r) =>
+    r.fulfill({ json: { ok: true } }),
+  );
+  await page.locator('input[type=file]').setInputFiles(file);
+  await expect(
+    page.getByText('1 file(s) uploaded. Inspect the layers next.', {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Inspect layers', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Build preview', exact: true }),
+  ).toBeEnabled({ timeout: 15000 });
+  expect(
+    state.calls.filter(
+      (c) => c.action === 'import-upload' && c.payload.name === file.name,
+    ),
+  ).toHaveLength(2);
+  expect(state.calls.some((c) => c.action === 'import-queue')).toBe(false);
 });
 
 test('campus imports restore campus creation and public handoff keeps the campus context', async ({

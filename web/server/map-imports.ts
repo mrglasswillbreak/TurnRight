@@ -215,7 +215,7 @@ export async function mapImportAction(
       ),
     };
   if (action === 'import-upload') {
-    if (job.status !== 'draft')
+    if (!['draft', 'failed'].includes(job.status))
       throw new HttpError(409, 'Start a new import to add files.');
     if (
       typeof p.name !== 'string' ||
@@ -233,6 +233,28 @@ export async function mapImportAction(
         400,
         'Choose a supported map file within the 50 MiB batch limit.',
       );
+    let uploadJob = job;
+    if (job.status === 'failed') {
+      const rows = await db<CampusImport[]>(
+        `campus_imports?id=eq.${job.id}&run_token=eq.${job.run_token}&status=eq.failed`,
+        'PATCH',
+        {
+          status: 'draft',
+          phase: 'inspect',
+          run_token: randomUUID(),
+          summary: null,
+          candidate_path: null,
+          message: 'Resume the upload, then inspect the layers again.',
+          updated_at: new Date().toISOString(),
+        },
+      );
+      if (!rows.length)
+        throw new HttpError(
+          409,
+          'This import changed in another session. Reopen it before uploading.',
+        );
+      uploadJob = rows[0];
+    }
     const id = randomUUID(),
       path = `${currentCampusId()}/${job.id}/${id}.${p.name.split('.').pop()!.toLowerCase()}`;
     const asset = await db<{ id: string; path: string }>(
@@ -257,7 +279,7 @@ export async function mapImportAction(
     const url = new URL(signed.url, process.env.SUPABASE_URL);
     if (!url.pathname.startsWith('/storage/v1/'))
       url.pathname = `/storage/v1${url.pathname}`;
-    return { asset, url: url.href };
+    return { asset, url: url.href, job: uploadJob };
   }
   if (action === 'import-cancel') {
     if (job.status === 'reviewed')
