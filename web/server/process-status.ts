@@ -37,13 +37,22 @@ export async function processStatus(watch: unknown) {
         throw new HttpError(400, 'Invalid monitored process IDs.');
       const ids = (raw || []) as string[];
       const table = kind === 'imports' ? 'campus_imports' : kind;
-      const base = `${table}?select=${config.fields}&order=${config.order}.desc`;
+      const base = `${table}?select=${config.fields}&order=${config.order}.desc,id`;
       const filter = `status.in.(queued,pending,running,building,publishing)${ids.length ? `,id.in.(${ids.join(',')})` : ''}`;
       const [recent, active] = await Promise.all([
         db<{ id: string }[]>(`${base}&limit=${config.recent}`),
-        db<{ id: string }[]>(`${base}&or=(${filter})&limit=1001`),
+        db<{ id: string }[]>(`${base}&or=(${filter})&limit=1000`),
       ]);
-      if (active.length > 1000)
+      // PostgREST commonly caps responses at 1000 even when limit=1001.
+      // Probe the next row so excess work produces an explanation, not silent loss.
+      if (
+        active.length === 1000 &&
+        (
+          await db<{ id: string }[]>(
+            `${base}&or=(${filter})&limit=1&offset=1000`,
+          )
+        ).length
+      )
         throw new HttpError(
           413,
           'Too many active processes to display. Review stalled jobs before starting more.',

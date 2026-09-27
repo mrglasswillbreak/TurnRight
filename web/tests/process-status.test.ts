@@ -49,3 +49,31 @@ it('rejects query injection and excessive watched IDs', async () => {
     }),
   ).rejects.toMatchObject({ status: 400 });
 });
+it('detects overflow even when the database caps each response at 1000 rows', async () => {
+  vi.mocked(db).mockImplementation(async (path) => {
+    if (!path.startsWith('jobs?') || !path.includes('&or=')) return [] as never;
+    const offset = Number(
+      new URLSearchParams(path.split('?')[1]).get('offset'),
+    );
+    return (
+      offset === 1000
+        ? [{ id: 'overflow' }]
+        : Array.from({ length: 1000 }, (_, i) => ({ id: `active-${i}` }))
+    ) as never;
+  });
+  await expect(processStatus({})).rejects.toMatchObject({ status: 413 });
+});
+it('retains exactly 1000 active rows after checking for overflow', async () => {
+  vi.mocked(db).mockImplementation(async (path) => {
+    if (!path.startsWith('jobs?') || !path.includes('&or=')) return [] as never;
+    return (
+      path.includes('&offset=1000')
+        ? []
+        : Array.from({ length: 1000 }, (_, i) => ({ id: `active-${i}` }))
+    ) as never;
+  });
+  expect((await processStatus({})).jobs).toHaveLength(1000);
+  expect(
+    vi.mocked(db).mock.calls.some(([path]) => path.includes('&offset=1000')),
+  ).toBe(true);
+});
