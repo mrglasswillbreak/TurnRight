@@ -27,7 +27,10 @@ import type {
   ImportLayerMapping,
   ImportSourceKind,
 } from './map-import-types';
-import { suggestedImportIdentifier } from './map-import-types';
+import {
+  sameImportConfiguration,
+  suggestedImportIdentifier,
+} from './map-import-types';
 import './campus-workspace.css';
 import { processes } from './process-monitor';
 
@@ -227,6 +230,18 @@ export default function CampusWorkspace({
   }, [job, configuration, recoveryKey]);
   const selectedSource = sources.find((s) => s.id === job?.source_id);
   const counts = job?.summary?.counts;
+  const reviewBlocker =
+    job?.status !== 'preview'
+      ? ''
+      : busy
+        ? 'Wait for the current operation to finish.'
+        : !job.summary
+          ? 'Preview details are unavailable. Reopen this import or rebuild its preview.'
+          : job.summary.errors.length
+            ? 'Resolve the preview errors shown above, then rebuild the preview.'
+            : !sameImportConfiguration(configuration, job.configuration)
+              ? 'Settings changed since this preview was built. Rebuild preview to include your changes.'
+              : '';
   const filesChanged = async (files: File[]) =>
     run(async () => {
       if (!files.length || !job) return;
@@ -893,13 +908,16 @@ export default function CampusWorkspace({
                 </>
               )}
               <div className="campus-actions">
+                {reviewBlocker && (
+                  <p id="import-review-blocker" role="status" className="small-note">
+                    {reviewBlocker}
+                  </p>
+                )}
                 {job.status === 'preview' && (
                   <Button
-                    disabled={
-                      busy ||
-                      !!job.summary?.errors.length ||
-                      JSON.stringify(configuration) !==
-                        JSON.stringify(job.configuration)
+                    disabled={!!reviewBlocker}
+                    aria-describedby={
+                      reviewBlocker ? 'import-review-blocker' : undefined
                     }
                     onClick={() =>
                       void run(async () => {
