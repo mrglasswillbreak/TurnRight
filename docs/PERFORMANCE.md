@@ -1,5 +1,31 @@
 # Responsiveness and recovery
 
+## 27 September audit
+
+The [current reliability and performance audit](AUDIT-2026-09-27.md) records
+reproduced issues, fixes, measurements and verification limits. Image recipe
+updates now write metadata separately from retained image bytes, Activity polls
+batch their notifications, and synchronous asset failures cannot exhaust the
+offline download pool. Historical measurements below retain their original date
+and fixture; they are not measurements of every subsequent release.
+
+The sequential five-run image-storage comparison measured recipe-write p95 at
+21.7 ms before and 1.4 ms after. The current production photo harness measured
+caption/selection/tab p95 at 15.9/15.3/18.2 ms on desktop and 38.6/42.3/66.1 ms
+with a mobile viewport and 4× CPU throttling. All three interactions meet the
+existing 100/200 ms lab targets. [Storage samples](image-storage-performance-2026-09-27.json)
+and [photo interaction samples](photo-performance-audit-2026-09-27.json) preserve
+each trial. These are controlled lab timings, not field INP.
+
+The [20-run model audit](model-editor-audit-2026-09-27.json) recorded no model
+generation during typing, no extra preview workers after closing, and consistent
+retained GPU counts within each fixture.
+At 4× CPU throttling, published-fixture input/click p95 was 104.3/197.5 ms;
+the 100-detail fixture reached 185.4/309.4 ms. Dense selection and property
+rendering remain a performance follow-up, especially on physical low-end phones.
+Use `node scripts/benchmark-model-editor.mjs --audit` for the current workspace
+without overwriting the historical before/after report.
+
 ## Multi-campus processing
 
 Campus/import controls are lazy-loaded. GDAL/PROJ and Pyosmium run in isolated Linux jobs, never in the browser. Imports enforce 50 MiB per upload batch, 250 MiB expanded input, 100,000 normalized features and a 20-minute processing limit; public package/model budgets remain independent. Catalogue builds preserve and verify every published campus. [Import limits](CAMPUS-IMPORTS.md#implementation-and-limits) and [current release evidence](PRODUCTION.md).

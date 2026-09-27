@@ -100,17 +100,20 @@ const browser = await chromium.launch({
   headless: true,
   args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
 });
-const runs = process.argv.includes('--final')
-  ? JSON.parse(
-      await fs.readFile('../docs/model-editor-performance.json', 'utf8'),
-    ).runs.filter((r) => r.version === 'baseline')
-  : [];
+const audit = process.argv.includes('--audit');
+const runs =
+  process.argv.includes('--final') && !audit
+    ? JSON.parse(
+        await fs.readFile('../docs/model-editor-performance.json', 'utf8'),
+      ).runs.filter((r) => r.version === 'baseline')
+    : [];
 function quantile(values, q = 0.95) {
   const a = [...values].sort((a, b) => a - b);
   return a[Math.max(0, Math.ceil(a.length * q) - 1)] || 0;
 }
 try {
-  for (const version of process.argv.includes('--final') ||
+  for (const version of audit ||
+  process.argv.includes('--final') ||
   process.argv.includes('--capture')
     ? ['final']
     : ['baseline', 'final'])
@@ -349,6 +352,7 @@ try {
             };
           });
           if (
+            !audit &&
             version === 'final' &&
             fixture === 'published' &&
             rate === 1 &&
@@ -370,7 +374,7 @@ try {
             .getByRole('button', {
               name:
                 version === 'final'
-                  ? /^(Close workspace|← Back to Survey)$/
+                  ? /^(Close workspace|(?:← )?Back to Survey)$/
                   : 'Close without applying',
               exact: true,
             })
@@ -410,7 +414,7 @@ try {
   baseline.server.close();
   final.server.close();
   const summary = [];
-  for (const version of ['baseline', 'final'])
+  for (const version of audit ? ['final'] : ['baseline', 'final'])
     for (const fixture of ['published', 'dense'])
       for (const rate of [1, 4]) {
         const selected = runs.filter(
@@ -431,11 +435,15 @@ try {
       }
   if (!process.argv.includes('--capture'))
     await fs.writeFile(
-      '../docs/model-editor-performance.json',
+      audit
+        ? '../docs/model-editor-audit-2026-09-27.json'
+        : '../docs/model-editor-performance.json',
       JSON.stringify(
         {
           date: new Date().toISOString(),
-          baselineCommit: '9bb1ef7',
+          ...(audit
+            ? { note: 'Current workspace audit; no historical baseline rerun.' }
+            : { baselineCommit: '9bb1ef7' }),
           campus: manifest.version,
           campusSha256: asset.sha256,
           buildings: campus.map.features.filter(
@@ -443,7 +451,8 @@ try {
           ).length,
           places: campus.places.length,
           environment:
-            'Windows Chromium headless, SwiftShader software GPU; desktop 1440x1000, 1x/4x CPU, no physical devices. Input/click capture to post-animation-frame task; network excluded. New fixture includes real EditorWorkspace and IndexedDB recovery, baseline has the former staged form.',
+            'Windows Chromium headless, SwiftShader software GPU; desktop 1440x1000, 1x/4x CPU, no physical devices. Input/click capture to post-animation-frame task; network excluded. Current fixture includes real EditorWorkspace and IndexedDB recovery.' +
+            (audit ? '' : ' Historical baseline has the former staged form.'),
           summary,
           runs,
         },

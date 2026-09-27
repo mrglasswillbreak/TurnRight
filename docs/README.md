@@ -32,6 +32,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
 | Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
+| Current bug reproductions, fixes and broad workflow checks | [27 September audit](AUDIT-2026-09-27.md) |
 | Theme tokens and text contrast | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md) |
 | Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
 | Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |

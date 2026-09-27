@@ -569,6 +569,14 @@ Coverage includes source normalization, appearance persistence/storage failures,
 
 Current results, five-run production benchmarks, build budgets and reproducible commands are recorded in [Model editor verification](docs/MODEL-EDITOR-VERIFICATION.md). Earlier voice, photo and globe measurements remain dated in their respective reports and in [Production](docs/PRODUCTION.md). This README no longer repeats obsolete test counts or superseded asset sizes.
 
+The [27 September reliability and responsiveness audit](docs/AUDIT-2026-09-27.md)
+tracks reproduced failures, fixes and current verification. It includes campus-safe
+save retries, offline asset-pool recovery, ArcGIS snapshot completeness, efficient
+local image storage, image history/rotation, active-job reporting and resilient
+feature search. Six newly reviewed licensed photos are saved in private building
+galleries; [their assignments and source evidence](data/photos/README.md#owner-review-on-27-september)
+remain separate from the published photo count.
+
 Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
 ## Repository structure

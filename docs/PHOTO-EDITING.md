@@ -40,6 +40,12 @@ While online, use **Survey → Prepare for offline survey** to cache the owner w
 
 Original bytes, recipes and previews use owner- and campus-scoped IndexedDB. They remain on this browser profile until removed; they are not an online backup. Clearing site data or browser storage eviction can remove them. Download important originals. **Remove local files** deletes a selected local draft; remove its pending upload from the queue first. Storage errors keep the panel open and explain recovery instead of claiming the changes were saved.
 
+Storage version 2 separates image bytes from recipe metadata. Editing a field
+updates only the metadata; opening a gallery reads that gallery's local images.
+The upgrade preserves existing originals, prepared outputs and recipes in one
+transaction. Undo and redo discard outdated previews, and repeated 90-degree
+rotation reaches all four orientations. [Audit and measurements](AUDIT-2026-09-27.md).
+
 The lazy worker uses native image decoding and encoding, with a canvas fallback where supported. No external image service receives local editing inputs. The image editor does not add Squoosh as a dependency; it supplies an integrated offline workflow with the formats above.
 
 ## Verification
@@ -48,7 +54,7 @@ Focused tests cover recipe validation, owner/campus isolation, metadata strippin
 
 ```sh
 cd web
-npx vitest run tests/photo-edit.test.ts tests/media.test.ts tests/photo-workspace.test.ts
+npx vitest run tests/photo-edit.test.ts tests/photo-local-migration.test.ts tests/media.test.ts tests/photo-workspace.test.ts
 npx playwright test --grep "offline image editor|image worker|photo workspace"
 npx playwright test --config playwright.photos.webkit.config.ts
 npx playwright test --config playwright.photos.pwa.config.ts
