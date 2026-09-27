@@ -1,4 +1,4 @@
-import { insideCampusMappingArea, type MappingArea } from './campus-context';
+import { insideCampusMappingArea, lasuCampus, type MappingArea } from './campus-context';
 import { distance, projectSegment } from './geo';
 import type {
   CampusData,
@@ -256,7 +256,7 @@ export function newSurvey(
   };
 }
 export function insideMappingArea(p: Position, area?: MappingArea) {
-  return insideCampusMappingArea(p, area);
+  return insideCampusMappingArea(p, area || lasuCampus);
 }
 export function classifyFix(
   fix: GpsFix,
