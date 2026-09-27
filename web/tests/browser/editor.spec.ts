@@ -4426,6 +4426,11 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await page.getByRole('button', { name: 'Collapse explorer' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit model', exact: true }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Appearance', exact: true })
+    .click();
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
   await page
     .getByLabel('Wall', { exact: true })
@@ -4476,6 +4481,7 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   const collapse = page.getByRole('button', { name: 'Collapse explorer' });
   if (await collapse.isVisible()) await collapse.click();
   await clickMap(page, [3.20012, 6.46022]);
+  await page.getByRole('button', { name: 'Edit model', exact: true }).click();
   await page.getByRole('button', { name: 'Roof', exact: true }).click();
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
   await page
