@@ -3,6 +3,18 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Import review repair and LASU publication · 27 September 2026
+
+Application revision `dd671c7` is Ready in production. [PR #3](https://github.com/mrglasswillbreak/TurnRight/pull/3) fixes the disabled review button by comparing mapping values independently of database JSON key order, while retaining real-change and validation blockers. Migrations 016–017 replace row-by-row insertion with a bulk transaction and allow up to 60 seconds for this service-only RPC; its API transport waits up to 75 seconds. The source lock, campus identity, run token, validation and exact baseline checks remain enforced.
+
+[Audit run 10](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36333082433) passed all eight jobs: 625 unit tests across 90 files, lint, configured production build/budgets, focused Chromium/WebKit campus-import workflows, offline workflows and Python checks. The new PostgreSQL regression covers 1,500 proposals, duplicate counting, stale/cancelled candidates, wrong campus/token, invalid batches and atomic rollback. [GIS run 16](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36331794114) passed the pinned GIS suite.
+
+The owner-requested LASU draft was validated, previewed and [published by release run 52](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36331136542). The served package is `lasu-0b8025eb23b8`, with 127 assets / 21,238,475 bytes and 45 photographs, including the six previously approved building-photo drafts. PG School authored geometry was reviewed without changing its geometry. Release impact reported no newly disconnected destinations, retaining the Clinic–Senate, Clinic–Law and Clinic–Library routes. The public browser verified the C.P.S photograph and downloaded the updated offline package, including all 45 photographs. Subsequent code deployments retain this manifest.
+
+[UNILAG import run 36](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36332555168) queued 10,175 additions and one metadata change. The five valid requested layers were accepted into the private UNILAG workspace through the existing review operation, with LASU source fingerprints checked unchanged. The resulting baseline contains 3,646 geographic features, 2,281 nodes, 4,248 directed edges and campus metadata. The editor shows the imported geography and no pending proposals from this batch. UNILAG remains unpublished, road access remains restricted for review, and redistribution permission remains unconfirmed. Road width is still excluded because polygon 96 self-intersects; [import guide](CAMPUS-IMPORTS.md#september-27-unilag-import-outcome) records its location and recovery.
+
+All changes in this repair were committed and verified through GitHub Actions, Vercel and the in-app browser because the local command host could not start. The local checkout was not updated, and no new local screenshot artifacts were produced.
+
 ## Reliability and responsiveness audit · 27 September 2026
 
 Runtime revision **`74be164`** is Ready in
