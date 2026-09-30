@@ -306,14 +306,23 @@ function ModelWorkspace({
     };
   }, []);
   useEffect(() => {
-    if (compact && panel !== 'none')
-      requestAnimationFrame(() =>
-        shell.current
-          ?.querySelector<HTMLButtonElement>(
-            landscape ? '.model-panel-tabs button' : '.model-sheet-handle',
-          )
-          ?.focus(),
-      );
+    if (!compact || panel === 'none') return;
+    const previous = document.activeElement;
+    const frame = requestAnimationFrame(() => {
+      // A user may already have focused a tree row or field before this frame.
+      // Do not redirect their next keystroke to the sheet handle.
+      if (
+        document.activeElement !== previous &&
+        shell.current?.contains(document.activeElement)
+      )
+        return;
+      shell.current
+        ?.querySelector<HTMLButtonElement>(
+          landscape ? '.model-panel-tabs button' : '.model-sheet-handle',
+        )
+        ?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [compact, panel, landscape]);
   useEffect(() => {
     if (!initialField) return;
