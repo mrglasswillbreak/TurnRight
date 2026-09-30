@@ -49,7 +49,7 @@ try {
   if (!historical?.version || !historical.deployment_url)
     throw Error("Rollback package record missing");
   const { preservePublished } = await import("../web/scripts/published-assets.mjs");
-  await withDeploymentAccess(historical.deployment_url, (headers) =>
+  await withRetainedPackageAccess(historical, (headers, retainedOrigin) =>
     preservePublished(
       "work/rollback-verification",
       retainedOrigin,
