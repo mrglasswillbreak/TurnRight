@@ -6211,6 +6211,8 @@ test('driving road approval persists separately from walking access', async ({
   );
 });
 async function modelAction(page: Page, name: string) {
+  // Wait for the previous popup and its focus restoration to finish before reopening.
+  await expect(page.locator('.model-action-menu')).toHaveCount(0);
   const dialog = page.getByRole('dialog');
   const attached = dialog.getByRole('button', {
     name: 'Selected detail actions',
@@ -6232,6 +6234,7 @@ async function modelAction(page: Page, name: string) {
       .click();
   }
   await page.getByRole('menuitem', { name, exact: true }).click();
+  await expect(page.locator('.model-action-menu')).toHaveCount(0);
 }
 for (const width of [390, 1440]) {
   test(`release preflight opens the exact wall and retains targeted review through undo at ${width}px`, async ({
