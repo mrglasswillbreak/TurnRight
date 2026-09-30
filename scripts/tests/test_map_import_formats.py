@@ -89,6 +89,7 @@ class GISFormatTests(unittest.TestCase):
                     ds=engine.CreateDataSource(str(path))
                     srs=osr.SpatialReference();srs.ImportFromEPSG(4326);srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
                     layer=ds.CreateLayer('survey',srs,ogr.wkbPoint)
+                    if driver != 'DXF': layer.CreateField(ogr.FieldDefn('name',ogr.OFTString))
                     feature=ogr.Feature(layer.GetLayerDefn());feature.SetGeometry(ogr.CreateGeometryFromWkt('POINT (3.2 6.46)'));layer.CreateFeature(feature);ds=None
                     inspected=inspect_file(path,{'layers':[]},folder/'expanded')
                     self.assertTrue(any(l['features'] for l in inspected))

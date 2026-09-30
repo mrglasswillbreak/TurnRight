@@ -48,7 +48,7 @@ import type { Map as MapInstance } from 'maplibre-gl';
 import type { Feature, Geometry } from 'geojson';
 import { MapView } from './MapView';
 import { MapViewControl } from './MapViewControl';
-import { useSimple3D } from './MapRenderingSettings';
+import { useSimple3D } from './useSimple3D';
 import { EditorSettings } from './EditorSettings';
 import type { Appearance } from './appearance';
 import { api, supabase } from './supabase';

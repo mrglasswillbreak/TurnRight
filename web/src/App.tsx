@@ -63,8 +63,8 @@ import { publicMapPadding } from './public-map-layout';
 import { ResultTap } from './result-tap';
 import { CAMPUS_MIN_ZOOM, returnToCampus } from './world-map';
 import './public-dock.css';
-import { MapRenderingSettings, useSimple3D } from './MapRenderingSettings';
-import { AppearanceSettings } from './AppearanceSettings';
+import { useSimple3D } from './useSimple3D';
+
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
 import { BuildingVisualDetails } from './BuildingVisualDetails';
@@ -79,7 +79,7 @@ import {
   setPreference,
 } from './offline';
 import { OfflinePanel } from './OfflinePanel';
-import { ReportForm } from './ReportForm';
+
 import { RoutePanel } from './RoutePanel';
 import { OfflineVoice } from './audio';
 import { useVoiceGuidance } from './useVoiceGuidance';
@@ -98,6 +98,19 @@ import type {
   Position,
   Route,
 } from './types';
+const AppearanceSettings = lazy(() =>
+  import('./AppearanceSettings').then((m) => ({
+    default: m.AppearanceSettings,
+  })),
+);
+const MapRenderingSettings = lazy(() =>
+  import('./MapRenderingSettings').then((m) => ({
+    default: m.MapRenderingSettings,
+  })),
+);
+const ReportForm = lazy(() =>
+  import('./ReportForm').then((m) => ({ default: m.ReportForm })),
+);
 const Admin = lazy(() => import('./Admin'));
 const CampusSwitcher = lazy(() => import('./CampusSwitcher'));
 const categories: {
@@ -1685,29 +1698,33 @@ export default function App() {
               />
             )}{' '}
             {dialog === 'report' && (
-              <ReportForm
-                onDraftSaved={refreshDrafts}
-                place={selected}
-                coordinates={reportPin}
-                onDone={() => {
-                  setDialog(null);
-                  setToast(
-                    'Report submitted. Thank you for helping improve the map.',
-                  );
-                }}
-              />
+              <Suspense fallback={<p>Loading report form...</p>}>
+                <ReportForm
+                  onDraftSaved={refreshDrafts}
+                  place={selected}
+                  coordinates={reportPin}
+                  onDone={() => {
+                    setDialog(null);
+                    setToast(
+                      'Report submitted. Thank you for helping improve the map.',
+                    );
+                  }}
+                />
+              </Suspense>
             )}{' '}
             {dialog === 'settings' && (
               <div className="settings-content">
-                <AppearanceSettings
-                  preference={appearance}
-                  dark={dark}
-                  onChange={setAppearance}
-                />
-                <MapRenderingSettings
-                  simple={simple3D}
-                  onSimple={setSimple3D}
-                />
+                <Suspense fallback={<p>Loading appearance settings...</p>}>
+                  <AppearanceSettings
+                    preference={appearance}
+                    dark={dark}
+                    onChange={setAppearance}
+                  />
+                  <MapRenderingSettings
+                    simple={simple3D}
+                    onSimple={setSimple3D}
+                  />
+                </Suspense>
                 <div className="settings-row">
                   <span>Voice directions</span>
                   <button
