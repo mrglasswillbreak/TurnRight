@@ -1,5 +1,11 @@
 # Responsiveness and recovery
 
+## 30 September layers and public startup
+
+The layer explorer uses a virtualized attribute table and bounded selection. Land/overlay editing supports 20,000 vertices, while rendering vertex handles progressively in windows of 100. Projected split/merge and derived-surface generation run in a cancellable worker loaded on demand; page exit terminates pending work. Full GIS format conversion remains server-side. Polygon 96 is edited without simplifying its 6,094 vertices or 56 holes.
+
+Campus restoration reads one small browser preference before React mounts and adds no network request. Public/editor/photo budgets remain 425/185/12 KiB gzip, with independent 3D, world and voice checks. [Production receipts](PRODUCTION.md) contain the measured released sizes; historical timings below are not new whole-campus measurements.
+
 ## 30 September image workspace
 
 New photos compress automatically in a sequential, cancellable worker batch.
@@ -15,7 +21,7 @@ not be interpreted as new measurements of the full-screen editor or AVIF encodin
 
 ## 27 September audit
 
-The [current reliability and performance audit](AUDIT-2026-09-27.md) records
+The [dated reliability and performance audit](AUDIT-2026-09-27.md) records
 reproduced issues, fixes, measurements and verification limits. Image recipe
 updates now write metadata separately from retained image bytes, Activity polls
 batch their notifications, and synchronous asset failures cannot exhaust the
@@ -54,9 +60,10 @@ The mobile workspace now uses a full-screen canvas and focused sheets. Wall gest
 The unified model editor extends this work with a measured canvas, commit-on-completion numeric fields, shared history and private input recovery. Appearance-only changes reuse routing results; wall selection and façade evidence notes do not rebuild models. Preview generation is bounded to one active and one newest pending request, with explicit resource disposal and retry. The [current model-editor report](MODEL-EDITOR-VERIFICATION.md) records five-run production comparisons at published campus scale and a 100-detail wall, including 4× CPU throttling. The photo-upload measurements below retain their original scope and dates.
 
 
-The September 2026 update targets photo management, repeated editor work and
-offline startup. It leaves public package schemas 1–3 and the database schema
-unchanged. Published campus content and routing approvals are unchanged.
+The historical photo-management update below targeted repeated editor work and
+offline startup without changing package schemas or the database. The later
+campus-layer release adds migrations 020–021 and optional reviewed layer metadata;
+it retains routing approvals.
 
 ## Implementation
 
