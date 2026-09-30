@@ -4,21 +4,25 @@ Open **Manage photos** on a building and use its sliders icon to open one editor
 
 ## Compare and compress
 
-The workspace follows Squoosh's desktop/mobile arrangement: a full-screen image, an original/edited wipe, bottom byte-size and download controls, and floating dark settings with blue and pink accents. Desktop controls float beside the image; phones use one collapsible settings panel. The header keeps Close, local files, details, settings and **Use for map** reachable.
+The workspace combines a Squoosh-inspired full-screen comparison with TurnRight's blue actions, rounded controls, Inter typography and shared light/dark theme. Settings float in white or slate panels beside the image. Phone portrait starts with a horizontal divider: original above, edited output below, and two compact download/settings bars at the bottom. Expand a bar's chevron for local files or compression settings. Desktop and landscape keep the vertical divider. The header keeps Close, details and **Use for map** reachable.
 
 ![Desktop comparison with measured output size](assets/screenshots/photo-editor-desktop-2026-09-30.png)
 
 | Phone portrait | Phone landscape |
 | --- | --- |
-| <img src="assets/screenshots/photo-editor-portrait-2026-09-30.png" width="280" alt="Phone photo editor with collapsible settings and original/edited downloads"> | ![Landscape comparison and scrollable settings](assets/screenshots/photo-editor-landscape-2026-09-30.png) |
+| <img src="assets/screenshots/photo-editor-portrait-2026-09-30.png" width="280" alt="Portrait horizontal comparison with two collapsed bottom bars"> | ![Landscape comparison and scrollable settings](assets/screenshots/photo-editor-landscape-2026-09-30.png) |
 
 1. Choose still JPEG, PNG or WebP inputs: up to 25 MiB and 40 megapixels each, or 20 images / 100 MiB per batch. Animated inputs are rejected. **Adding files automatically compresses every new image** to WebP, at most 1,600 pixels, starting at quality 84 with a 250 KiB target and a quality floor of 65. Originals are saved first. Progress, pause and cancellation remain visible; one encoding failure retains that original and does not stop other valid files.
 2. **Crop & orientation** offers drawing, numeric percentages, aspect ratios, rotation, straighten and flips. **Light & colour** adjusts exposure, contrast, saturation and temperature. **Resize** sets the longest edge while retaining proportions and never enlarging the original.
 3. Choose WebP, MozJPEG, OxiPNG or AVIF. These are Squoosh's local WebAssembly encoders, not a remote image service. WebP offers lossless mode, JPEG offers progressive output, PNG is lossless, and compression effort trades time for size. JPEG flattens transparency over white.
-4. Changes trigger a cancellable preview after a short debounce. The divider supports dragging and keyboard arrows/Home/End. Pan with a pointer or the canvas arrow keys; pinch or scroll to zoom. Fit resets pan and zoom. Both versions share the same navigation transform; after crop/rotation the original is fitted into the edited frame for reference rather than pretending the pixels still align.
+4. Changes trigger a cancellable preview after a short debounce. Drag the portrait divider up/down or use keyboard Up/Down and Home/End; desktop/landscape move it left/right. Rotation retains its position and the current recipe. Pan with a pointer or the canvas arrow keys; pinch or scroll to zoom. Fit resets pan and zoom. Both versions share the same navigation transform; after crop/rotation the original is fitted into the edited frame for reference rather than pretending the pixels still align.
 5. Inspect the actual bytes and percentage change. A downward arrow means smaller; an upward arrow means larger. **Download edited image** exports the result; the other download retains the original. Undo, redo and reset affect the recipe, never the source.
 
 **Advanced settings** offers an optional size target and a minimum quality. A bounded search chooses the highest successful quality it measured; it never silently resizes or drops below the floor. Lossless modes do not search lossy qualities. Impossible targets remain recoverable and explain what to change. Set the target to zero to encode at exactly the selected quality. A smaller output is not guaranteed for already optimised originals; compare visually before using it.
+
+| Expanded settings · light | Expanded settings · dark |
+| --- | --- |
+| <img src="assets/screenshots/photo-editor-portrait-controls-2026-09-30.png" width="280" alt="Expanded portrait compression settings above the two download bars"> | <img src="assets/screenshots/photo-editor-portrait-dark-controls-2026-09-30.png" width="280" alt="Expanded settings with TurnRight's slate panels, readable fields and blue focus ring"> |
 
 A photographic regression fixture at 800 × 600 produced 77,784-byte WebP, 87,777-byte JPEG and 111,320-byte AVIF from a 723,600-byte PNG at quality 85. Mean absolute pixel errors were 2.11, 2.48 and 1.48 out of 255 respectively. These are fixture measurements, not quality guarantees for every image.
 

@@ -2,12 +2,15 @@
 
 ## Photo comparison workspace · 30 September 2026
 
-`photo-editor-desktop`, `photo-editor-portrait` and `photo-editor-landscape` are
+`photo-editor-desktop`, `photo-editor-portrait`, `photo-editor-portrait-controls`,
+`photo-editor-portrait-dark`, `photo-editor-portrait-dark-controls` and `photo-editor-landscape` are
 unaltered captures of the current PhotoOptimizer/PhotoCompare components at
 1440×900, 390×844 and 844×390. The isolated component fixture uses the licensed
 School of Communication photograph. These views show actual codec output at an
 800-pixel longest edge, without assigning the photograph to a different map
-building. They replace the September 27 layouts in current guides; older
+building. Portrait shows the horizontal divider and two compact bottom bars;
+the controls captures expand compression settings. The dark captures use the
+app's root theme, with the same recipe and output as light mode. They replace the September 27 layouts in current guides; older
 captures remain dated evidence. Reproduce with
 `npx playwright test photo-processing --output ../test-results/photos-refinement`.
 

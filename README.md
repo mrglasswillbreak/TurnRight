@@ -130,7 +130,11 @@ These new screenshots use isolated owner/API fixtures and illustrative second-ca
 
 **Offline image editor:** adding photos automatically compresses every image with map-ready defaults while retaining its original. A Squoosh-style comparison workspace uses its WebP, MozJPEG, OxiPNG and AVIF encoders locally. Preview updates automatically; pan, pinch, zoom, crop/rotate, colour and privacy tools retain the original. A bounded quality search respects the chosen floor and shows actual size changes. Map-ready copies enter rights review. [Photo editing guide and measurements](docs/PHOTO-EDITING.md).
 
-<img src="docs/assets/screenshots/photo-editor-portrait-2026-09-30.png" width="300" alt="Phone comparison workspace with a collapsible settings panel and separate downloads">
+Phone portrait uses a horizontal original/edited split and two expandable bottom bars, keeping the image visible while comparing. The workspace follows TurnRight's light/dark theme, blue actions and rounded panels.
+
+| Light mode | Dark mode |
+| --- | --- |
+| <img src="docs/assets/screenshots/photo-editor-portrait-2026-09-30.png" width="300" alt="Phone horizontal comparison with original above, edited image below and two compact download bars"> | <img src="docs/assets/screenshots/photo-editor-portrait-dark-2026-09-30.png" width="300" alt="The same horizontal photo comparison using TurnRight's slate dark theme and blue controls"> |
 
 | Landscape image editing | Build and import activity |
 | --- | --- |
