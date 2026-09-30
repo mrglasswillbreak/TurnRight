@@ -110,13 +110,21 @@ export function MapView({
   const [roadGeometry, setRoadGeometry] = useState<FeatureCollection>();
   useEffect(() => {
     let cancelled = false;
+    let dispose: (() => void) | undefined;
     setRoadGeometry(undefined);
-    if (campusGeometry.features.some(f => ['road','sidewalk','parking'].includes(f.properties?.landClass)))
-      void import('./road-surfaces').then(({exposedRoads}) => {
-        const geometry = exposedRoads(campusGeometry);
-        if (!cancelled) setRoadGeometry(geometry);
+    if (
+      campusGeometry.features.some((f) =>
+        ['road', 'sidewalk', 'parking'].includes(f.properties?.landClass),
+      )
+    )
+      void import('./road-display').then(({ requestRoadDisplay }) => {
+        if (!cancelled)
+          dispose = requestRoadDisplay(campusGeometry, setRoadGeometry);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      dispose?.();
+    };
   }, [campusGeometry]);
   const placesGeometry = useMemo(
     () => placeFeatures(data.places),
@@ -134,7 +142,13 @@ export function MapView({
       places: placesGeometry,
       closures: closuresGeometry,
     }),
-    [campusGeometry, roadGeometry, data.boundary, placesGeometry, closuresGeometry],
+    [
+      campusGeometry,
+      roadGeometry,
+      data.boundary,
+      placesGeometry,
+      closuresGeometry,
+    ],
   );
   const latestSources = useRef(sourceData);
   latestSources.current = sourceData;
@@ -152,16 +166,22 @@ export function MapView({
     if (!motionMap) return;
     let cancelled = false;
     const apply = () => {
-      void import('./map-extra-layers').then(({extraMapLayers}) => {
-        if (!cancelled && motionMap.getLayer('building-contact')) extraMapLayers(motionMap, dark);
+      void import('./map-extra-layers').then(({ extraMapLayers }) => {
+        if (!cancelled && motionMap.getLayer('building-contact'))
+          extraMapLayers(motionMap, dark);
       });
     };
     if (motionMap.getLayer('building-contact')) apply();
     else motionMap.once('load', apply);
-    return () => { cancelled = true; motionMap.off('load', apply); };
+    return () => {
+      cancelled = true;
+      motionMap.off('load', apply);
+    };
   }, [motionMap, dark]);
   useEffect(() => {
-    if (!editor) document.title = 'TurnRight · ' + String(data.boundary.properties?.name || 'Campus map');
+    if (!editor)
+      document.title =
+        'TurnRight · ' + String(data.boundary.properties?.name || 'Campus map');
   }, [editor, data.boundary]);
   const selectedId = selected?.id || '';
   useEffect(() => {
@@ -434,8 +454,22 @@ export function MapView({
         id: 'land',
         type: 'fill',
         source: 'campus',
-        filter: ['all', ['==', ['get', 'kind'], 'land'], ['!=', ['get','visible'], false]],
-        layout: { 'fill-sort-key': ['match', ['get','landClass'], 'parcel', -10, ['road','sidewalk','parking'], 10, 0] },
+        filter: [
+          'all',
+          ['==', ['get', 'kind'], 'land'],
+          ['!=', ['get', 'visible'], false],
+        ],
+        layout: {
+          'fill-sort-key': [
+            'match',
+            ['get', 'landClass'],
+            'parcel',
+            -10,
+            ['road', 'sidewalk', 'parking'],
+            10,
+            0,
+          ],
+        },
         paint: {
           'fill-color': [
             'match',
@@ -932,8 +966,12 @@ export function MapView({
     void loadWorld(controller.signal)
       .then((world) => {
         if (controller.signal.aborted || mapRef.current !== motionMap) return;
-        installWorldLayers(motionMap, world, latestData.current.bounds,
-          String(latestData.current.boundary.properties?.name || 'Campus'));
+        installWorldLayers(
+          motionMap,
+          world,
+          latestData.current.bounds,
+          String(latestData.current.boundary.properties?.name || 'Campus'),
+        );
         applyMapTheme(motionMap, camera.current.dark);
       })
       .catch(() => {

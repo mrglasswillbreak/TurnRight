@@ -4,9 +4,13 @@ on:
     inputs:
       operation:
         type: choice
-        options: [audit, prepare, apply]
+        options: [audit, prepare, apply, snapshot]
         default: prepare
       expected_snapshot:
+        type: string
+        required: false
+      supersedes:
+        description: Optional older preview to retire after creating the replacement snapshot
         type: string
         required: false
   push:
@@ -41,12 +45,17 @@ jobs:
       - if: github.event_name == 'workflow_dispatch' && inputs.operation != 'audit'
         run: node ../scripts/preserve-unilag-road.mjs
         working-directory: web
-      - if: github.event_name == 'workflow_dispatch' && inputs.operation != 'audit'
+      - if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'prepare' || inputs.operation == 'apply')
         run: mkdir -p work && npx tsx ../scripts/prepare-unilag-upgrade.mts
         working-directory: web
         env:
           APPLY_UNILAG: ${{ inputs.operation == 'apply' && 'true' || 'false' }}
           EXPECTED_UNILAG_SNAPSHOT: ${{ inputs.expected_snapshot }}
+      - if: github.event_name == 'workflow_dispatch' && inputs.operation == 'snapshot'
+        run: mkdir -p work && npx tsx ../scripts/snapshot-unilag-release.mts
+        working-directory: web
+        env:
+          SUPERSEDES_UNILAG_RELEASE: ${{ inputs.supersedes }}
       - uses: actions/upload-artifact@v4
         with:
           name: unilag-baseline-receipt
