@@ -22,11 +22,12 @@ export async function vercelApi(endpoint, options = {}) {
   return response.status === 204 ? null : response.json().catch(() => null);
 }
 /** Read an immutable deployment owned by this project without disabling protection. */
-export async function withDeploymentAccess(origin, read) {
+export async function withDeploymentAccess(origin, read, deploymentId) {
   const url = new URL(origin);
   if (url.protocol !== 'https:' || url.username || url.password || !url.hostname.endsWith('.vercel.app')) throw Error('Unexpected historical deployment origin');
-  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(url.hostname)}`);
+  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(deploymentId || url.hostname)}`);
   if (deployment.projectId !== process.env.VERCEL_PROJECT_ID) throw Error('Historical deployment belongs to another project');
+  if (deploymentId && deployment.url !== url.hostname) throw Error('Historical deployment URL does not match its stored ID');
   const secret = randomBytes(16).toString('hex');
   if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${secret}`);
   const endpoint = `/v1/projects/${process.env.VERCEL_PROJECT_ID}/protection-bypass`;
