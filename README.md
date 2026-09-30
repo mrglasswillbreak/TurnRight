@@ -31,7 +31,11 @@ The dated campus captures show real packages. Editor examples use isolated owner
 
 | UNILAG · mobile | LASU · campus detail |
 | --- | --- |
-| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU map using the shared visual language](docs/assets/screenshots/lasu-desktop-light-3d-2026-09-30.png) |
+| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU published road surfaces and controls above the desktop panel](docs/assets/screenshots/chromium-lasu-desktop-light-3d-2026-09-30.png) |
+
+| LASU · mobile dark 2D | Road and landscape workflow |
+| --- | --- |
+| <img src="docs/assets/screenshots/webkit-lasu-mobile-dark-2d-2026-09-30.png" width="280" alt="LASU road surfaces in mobile dark 2D"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
 
 | Private GIS workspace | Building authoring |
 | --- | --- |
@@ -151,7 +155,7 @@ Resource limits remain 50 MiB uploaded per batch, 250 MiB expanded archives, 100
 
 ## Configuration and hosting
 
-Apply migrations in order through **020_campus_layer_records.sql** before enabling layer writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
+Apply migrations in order through **021_reviewed_release_snapshot.sql** before enabling their dependent writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
 
 Set up the owner allowlist, GitHub OAuth, private storage and repository/Vercel secrets using [Deployment](docs/DEPLOYMENT.md) and [Configuration](docs/CONFIGURATION.md). `PUBLISHED_MAP_URL` makes application builds preserve current campus packages. Worker workflows run from `main`, so release the shared registry/API/worker changes together. Restore one campus through a fresh release preview, preserving other campuses' current packages.
 
