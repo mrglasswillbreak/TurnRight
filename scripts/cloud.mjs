@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 const scopedTables = new Set(['source_features','map_edits','map_changes','edit_history','reports','jobs','releases','editor_operations','surveys','survey_revisions','survey_chunks','baseline_reconciliations','source_field_reviews','building_media','model_assets','campus_sources','campus_imports','campus_import_assets']);
-export async function db(route, method = "GET", body, prefer = "return=representation") {
+export async function db(route, method = "GET", body, prefer = "return=representation", timeoutMs = 30000) {
   const campus = process.env.CAMPUS_ID || 'lasu';
   const table = route.split('?')[0];
   if (scopedTables.has(table)) {
@@ -24,7 +24,7 @@ export async function db(route, method = "GET", body, prefer = "return=represent
       'X-TurnRight-Campus': campus,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   const data = await response.json().catch(() => null);
   if (!response.ok)

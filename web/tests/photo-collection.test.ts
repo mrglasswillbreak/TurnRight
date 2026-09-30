@@ -73,6 +73,12 @@ describe('reviewed campus photograph collection', () => {
     const catalogue: CampusPhoto[] = JSON.parse(
       await readFile(path.join(root, 'catalogue.json'), 'utf8'),
     );
+    const unilag = JSON.parse(await readFile(path.join(root, '../unilag-enrichment/photo-review.json'),'utf8'));
+    const unilagPhotos: CampusPhoto[] = JSON.parse(await readFile(path.join(root, '../unilag-enrichment/photos.json'),'utf8'));
+    const unilagIds = new Set(unilagPhotos.map(p => p.id));
+    const lasuCatalogue = catalogue.filter(p => !unilagIds.has(p.id));
+    expect(unilag.candidates.filter(c => c.status === 'included').map(c => c.id).sort()).toEqual([...unilagIds].sort());
+    expect(catalogue.filter(p => unilagIds.has(p.id))).toEqual(unilagPhotos);
     const candidates = [
       ...commons.candidates,
       ...commons.excludedFormats,
@@ -99,14 +105,14 @@ describe('reviewed campus photograph collection', () => {
         .filter((c) => c.status === 'included')
         .map((c) => c.id)
         .sort(),
-    ).toEqual(catalogue.map((p) => p.id).sort());
+    ).toEqual(lasuCatalogue.map((p) => p.id).sort());
     expect(publication.candidates.some((c) => c.status === 'included')).toBe(
       false,
     );
     expect(commons.after.photographedBuildings).toBe(
-      new Set(catalogue.map((p) => p.buildingId)).size,
+      new Set(lasuCatalogue.map((p) => p.buildingId)).size,
     );
-    for (const p of catalogue)
+    for (const p of lasuCatalogue)
       expect(
         commons.buildings.some(
           (b) => b.id === p.buildingId && b.photoIds.includes(p.id),

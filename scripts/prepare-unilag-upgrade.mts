@@ -67,7 +67,7 @@ if(process.env.APPLY_UNILAG==='true'){
   if(!owner)throw Error('Campus owner missing');
   // Transaction compares every source row and saves a rollback receipt. Existing
   // private drafts are not written, deleted, consumed or renumbered.
-  report.reconciliationId=await db('rpc/reconcile_published_baseline','POST',{actor:owner.id,published_version:published.version,expected_sources:previous,records:records.map(({id,entity,source,payload,hash})=>({id,entity,source,payload,hash}))});
+  report.reconciliationId=await db('rpc/reconcile_published_baseline','POST',{actor:owner.id,published_version:published.version,expected_sources:previous,records:records.map(({id,entity,source,payload,hash})=>({id,entity,source,payload,hash}))},'return=representation',75000);
   if(hash(await allRows('map_edits'))!==hash(edits))throw Error('Drafts changed during preparation; pause publication and review.');
   process.env.CAMPUS_ID='lasu';const lasuAfter={features:hash(await allRows('source_features')),edits:hash(await allRows('map_edits'))};process.env.CAMPUS_ID=oldCampus;
   if(hash(lasuAfter)!==hash(lasuBefore))throw Error('LASU state changed during preparation; investigate before publication');
