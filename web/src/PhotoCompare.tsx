@@ -255,7 +255,6 @@ export default function PhotoCompare({
             }}
           />
           <ChevronsLeftRight className="photo-wipe-arrows" aria-hidden="true" />
-          <span className="photo-wipe-vertical" aria-hidden="true" />
         </div>
       )}
       <div className="photo-view-tools">

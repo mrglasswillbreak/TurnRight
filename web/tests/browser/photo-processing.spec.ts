@@ -215,12 +215,15 @@ for (const viewport of [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
   { width: 844, height: 390 },
+  { width: 390, height: 844, theme: 'dark' },
 ])
-  test(`photo comparison edits and restores local recipes at ${viewport.width}px`, async ({
+  test(`photo comparison edits and restores local recipes at ${viewport.width}px${viewport.theme ? ' in dark mode' : ''}`, async ({
     page,
   }, info) => {
     await page.setViewportSize(viewport);
     await page.goto('/tests/browser/photo-harness.html');
+    if (viewport.theme === 'dark')
+      await page.evaluate(() => document.documentElement.classList.add('dark'));
     const sample = JSON.parse(
       readFileSync(
         new URL('../../../data/photos/catalogue.json', import.meta.url),

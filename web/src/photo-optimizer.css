@@ -1,7 +1,8 @@
-/* Squoosh-inspired layout and colours (Google Inc., Apache-2.0). Codec licences: /photo-codecs/e8d35e0/. */
+/* Squoosh-inspired comparison layout, using TurnRight's shared theme tokens.
+   Codec licences: /photo-codecs/e8d35e0/. */
 .photo-optimizer[data-slot='dialog-content'] {
-  --photo-pink: #ff3385;
-  --photo-blue: #5fb4e4;
+  --photo-accent: #1764ed;
+  --photo-shadow: 0 6px 24px #071b3226;
   inset: 0;
   width: 100%;
   height: 100dvh;
@@ -12,17 +13,11 @@
   border: 0;
   border-radius: 0;
   overflow: hidden;
-  color: #fff;
-  background: #ededed;
+  color: var(--foreground);
+  background: var(--soft);
   z-index: 60;
-  font-family: Inter, Arial, sans-serif;
+  font-family: 'Inter Variable', sans-serif;
   font-size: 13px;
-  --foreground: #fff;
-  --background: #1d1d1d;
-  --border: #555;
-  --muted-foreground: #ddd;
-  --primary: #5fb4e4;
-  --primary-foreground: #142630;
 }
 .photo-optimizer button,
 .photo-optimizer input,
@@ -43,7 +38,7 @@
   flex-shrink: 0;
 }
 .photo-optimizer :focus-visible {
-  outline: 3px solid #ffdf59;
+  outline: 3px solid #8cb4fb;
   outline-offset: 2px;
 }
 .photo-editor-header {
@@ -61,35 +56,41 @@
   pointer-events: auto;
 }
 .photo-editor-back {
-  background: var(--photo-pink);
-  border-radius: 44% 56% 55% 45%;
-  width: 58px;
-  height: 58px;
+  background: var(--background);
+  border-radius: 16px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
-  border: none;
-  color: white;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  box-shadow: var(--photo-shadow);
 }
 .photo-editor-back svg {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
 }
 .photo-editor-filename {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 35vw;
-  background: #000a;
-  padding: 7px 10px;
-  border-radius: 4px;
+  background: var(--background);
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--photo-shadow);
+  font-weight: 500;
 }
 .photo-editor-actions {
   display: flex;
   gap: 4px;
   margin-left: auto;
-  background: #1d1d1df2;
+  background: var(--background);
   padding: 4px;
-  border-radius: 7px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--photo-shadow);
 }
 .photo-editor-actions > button {
   min-width: 44px;
@@ -97,13 +98,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: 10px;
   padding: 8px;
   gap: 8px;
 }
 .photo-editor-actions > button[aria-pressed='true'] {
-  background: #333;
-  color: var(--photo-blue);
+  background: var(--info-background);
+  color: var(--link);
 }
 .photo-editor-status {
   position: absolute;
@@ -116,9 +117,10 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: #181818ed;
-  border-radius: 7px;
-  box-shadow: 0 2px 10px #0002;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--photo-shadow);
 }
 .photo-editor-status button {
   min-width: 44px;
@@ -128,7 +130,7 @@
 .photo-compare {
   position: absolute;
   inset: 0;
-  color: white;
+  color: var(--foreground);
 }
 .photo-compare-canvas {
   position: absolute;
@@ -136,8 +138,11 @@
   touch-action: none;
   overflow: hidden;
   cursor: grab;
-  background: repeating-conic-gradient(#ececec 0% 25%, #d5d5d5 0% 50%) 50%/20px
-    20px;
+  background: repeating-conic-gradient(
+      var(--soft) 0% 25%,
+      var(--background) 0% 50%
+    )
+    50%/20px 20px;
 }
 .photo-compare-canvas:active {
   cursor: grabbing;
@@ -156,8 +161,8 @@
 }
 .photo-opt-box {
   position: absolute;
-  border: 2px solid #1688ff;
-  background: #1688ff33;
+  border: 2px solid var(--photo-accent);
+  background: #1764ed26;
   pointer-events: none;
 }
 .photo-wipe {
@@ -171,7 +176,7 @@
   left: -29px;
   transform: translateY(-50%);
   background: none;
-  color: var(--photo-blue);
+  color: var(--photo-accent);
   width: calc(100% + 58px);
   height: 58px;
   border-radius: 0;
@@ -189,7 +194,10 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #ff3385 0 15%, #000 15% 85%, #5fb4e4 85%);
+  background: var(--photo-accent);
+  box-shadow:
+    0 0 0 2px #fff,
+    var(--photo-shadow);
   cursor: ew-resize;
   pointer-events: auto;
 }
@@ -198,7 +206,10 @@
   height: 58px;
   border: 0;
   border-radius: 50%;
-  background: linear-gradient(90deg, #ff3385 0 15%, #000 15% 85%, #5fb4e4 85%);
+  background: var(--photo-accent);
+  box-shadow:
+    0 0 0 2px #fff,
+    var(--photo-shadow);
   cursor: ew-resize;
   pointer-events: auto;
 }
@@ -206,11 +217,11 @@
   outline: none;
 }
 .photo-wipe-handle:focus-visible::-webkit-slider-thumb {
-  outline: 3px solid #ffdf59;
+  outline: 3px solid #8cb4fb;
   outline-offset: 2px;
 }
 .photo-wipe-handle:focus-visible::-moz-range-thumb {
-  outline: 3px solid #ffdf59;
+  outline: 3px solid #8cb4fb;
   outline-offset: 2px;
 }
 .photo-wipe::before {
@@ -220,8 +231,8 @@
   bottom: 0;
   width: 2px;
   left: var(--photo-split);
-  background: #0007;
-  box-shadow: 0 0 0 1px #fff3;
+  background: #fff;
+  box-shadow: 0 0 0 1px #071b324d;
 }
 .photo-optimizer .photo-wipe-arrows {
   position: absolute;
@@ -231,6 +242,7 @@
   height: 26px;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  color: #fff;
 }
 .photo-view-tools {
   position: absolute;
@@ -239,15 +251,19 @@
   bottom: max(16px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  background: #000c;
-  border-radius: 5px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 4px;
+  box-shadow: var(--photo-shadow);
   z-index: 4;
 }
 .photo-view-tools button {
   display: grid;
   place-items: center;
-  width: 40px;
+  width: 44px;
   height: 40px;
+  border-radius: 10px;
 }
 .photo-optimizer .photo-view-tools label {
   display: flex;
@@ -258,7 +274,7 @@
   width: 48px;
   appearance: textfield;
   background: transparent;
-  color: white;
+  color: var(--foreground);
   text-align: right;
   border: 0;
 }
@@ -270,17 +286,18 @@
   position: absolute;
   bottom: calc(82px + env(safe-area-inset-bottom));
   width: 300px;
-  background: #1d1d1d;
-  border-radius: 7px 7px 0 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   z-index: 5;
   overflow: hidden;
-  box-shadow: 0 5px 20px #0002;
+  box-shadow: var(--photo-shadow);
 }
 .photo-source-panel {
-  left: max(0px, env(safe-area-inset-left));
+  left: max(12px, env(safe-area-inset-left));
 }
 .photo-floating-panel {
-  right: max(0px, env(safe-area-inset-right));
+  right: max(12px, env(safe-area-inset-right));
   max-height: calc(100% - 180px - env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
@@ -291,17 +308,14 @@
   font-weight: 650;
   margin: 0;
   padding: 0 14px;
-  min-height: 42px;
-  background: var(--photo-blue);
-  color: #142630;
+  min-height: 48px;
+  background: var(--soft);
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-}
-.photo-source-panel h3 {
-  background: #000;
-  color: #fff;
 }
 .photo-source-name {
   margin: 10px 14px;
@@ -309,12 +323,12 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  background: #333;
-  border-radius: 3px;
+  background: var(--soft);
+  border-radius: 8px;
 }
 .photo-floating-panel h3 button {
-  min-width: 40px;
-  min-height: 42px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -328,17 +342,17 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   min-height: 0;
-  scrollbar-color: #777 #1d1d1d;
+  scrollbar-color: var(--muted) var(--background);
   padding: 12px 14px;
 }
 .photo-panel-scroll p {
   font-size: 12px;
   line-height: 1.5;
   margin: 8px 0;
-  color: #ddd;
+  color: var(--muted);
 }
 .photo-panel-scroll a {
-  color: #8dd4ff;
+  color: var(--link);
   text-decoration: underline;
 }
 .photo-opt-controls fieldset {
@@ -358,15 +372,15 @@
 .photo-details-panel select {
   width: 100%;
   min-width: 0;
-  border: 1px solid #555;
-  border-radius: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   padding: 9px;
-  background: #333;
-  color: white;
+  background: var(--soft);
+  color: var(--foreground);
 }
 .photo-opt-controls input[type='range'] {
   width: 100%;
-  accent-color: var(--photo-blue);
+  accent-color: var(--photo-accent);
   min-height: 28px;
 }
 .photo-opt-controls output {
@@ -375,14 +389,15 @@
 }
 .photo-opt-controls h4 {
   margin: 0 -14px;
-  background: var(--photo-blue);
-  color: #142630;
+  background: var(--soft);
+  color: var(--foreground);
+  border-block: 1px solid var(--border);
   padding: 12px 14px;
   font-size: 15px;
   font-weight: 650;
 }
 .photo-opt-controls details {
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
 }
 .photo-opt-controls summary,
@@ -425,30 +440,25 @@
   width: 100%;
   text-align: left;
   padding: 10px;
-  border: 1px solid #555;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   margin-bottom: 8px;
   overflow-wrap: anywhere;
 }
 .photo-panel-scroll small {
   display: block;
-  color: #ddd;
+  color: var(--muted);
   font-size: 11px;
 }
 .photo-panel-scroll nav button[aria-pressed='true'] {
-  border-color: var(--photo-blue);
-  background: #263844;
+  border-color: var(--link);
+  background: var(--info-background);
 }
 .photo-files-panel,
 .photo-details-panel {
-  left: max(0px, env(safe-area-inset-left));
+  left: max(12px, env(safe-area-inset-left));
   right: auto;
   z-index: 6;
-}
-.photo-files-panel h3,
-.photo-details-panel h3 {
-  background: var(--photo-pink);
-  color: white;
 }
 .photo-details-panel {
   width: 340px;
@@ -462,13 +472,13 @@
   gap: 12px;
 }
 .photo-details-panel .photo-error {
-  color: #ff9ba9;
+  color: var(--error-text);
 }
 .photo-details-panel .photo-primary {
   min-height: 44px;
-  background: var(--photo-pink);
+  background: var(--photo-accent);
   color: white;
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 10px;
 }
 .photo-result {
@@ -478,7 +488,7 @@
   align-items: center;
   gap: 12px;
   z-index: 6;
-  color: white;
+  color: var(--foreground);
   font-variant-numeric: tabular-nums;
 }
 .photo-result-original {
@@ -488,13 +498,14 @@
   right: 12px;
 }
 .photo-result > span {
-  background: #1d1d1dde;
+  background: var(--background);
   padding: 10px;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 .photo-result small {
   display: block;
-  color: #ddd;
+  color: var(--muted);
   font-size: 10px;
 }
 .photo-result button {
@@ -502,20 +513,36 @@
   place-items: center;
   width: 62px;
   height: 62px;
-  background: #000;
-  border-radius: 50% 42% 50% 44%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--photo-shadow);
 }
 .photo-result-output button {
-  background: #09f;
+  background: var(--photo-accent);
+  border-color: transparent;
+  color: #fff;
+}
+@media (hover: hover) {
+  .photo-editor-back:hover,
+  .photo-editor-actions > button:not([data-slot]):hover,
+  .photo-view-tools button:hover,
+  .photo-result .photo-result-toggle:hover {
+    background: var(--info-background);
+    color: var(--link);
+  }
+  .photo-result-output button:not(.photo-result-toggle):hover {
+    background: #1257d2;
+  }
 }
 .photo-result button svg {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
 }
 .photo-result .photo-saving {
   order: -1;
-  background: var(--photo-blue);
-  color: #142630;
+  background: var(--info-background);
+  color: var(--link);
   font-size: 22px;
   font-weight: 700;
   padding: 12px;
@@ -526,8 +553,7 @@
 .photo-result .photo-result-toggle,
 .photo-result .photo-result-name,
 .photo-result .photo-result-format,
-.photo-result .photo-original-saving,
-.photo-wipe-vertical {
+.photo-result .photo-original-saving {
   display: none;
 }
 .photo-compare[data-horizontal='true'] .photo-wipe::before {
@@ -550,39 +576,15 @@
 }
 .photo-compare[data-horizontal='true']
   .photo-wipe-handle::-webkit-slider-thumb {
-  background: #000;
   cursor: ns-resize;
 }
 .photo-compare[data-horizontal='true'] .photo-wipe-handle::-moz-range-thumb {
-  background: #000;
   cursor: ns-resize;
 }
 .photo-compare[data-horizontal='true'] .photo-wipe-arrows {
-  display: none;
-}
-.photo-compare[data-horizontal='true'] .photo-wipe-vertical {
-  display: block;
-  position: absolute;
   left: 50%;
   top: var(--photo-split);
-  transform: translate(-50%, -50%);
-  width: 26px;
-  height: 32px;
-}
-.photo-wipe-vertical::before,
-.photo-wipe-vertical::after {
-  content: '';
-  position: absolute;
-  border-left: 13px solid transparent;
-  border-right: 13px solid transparent;
-}
-.photo-wipe-vertical::before {
-  top: 0;
-  border-bottom: 12px solid #09f;
-}
-.photo-wipe-vertical::after {
-  bottom: 0;
-  border-top: 12px solid var(--photo-pink);
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 @media (max-width: 859px) {
   .photo-view-tools {
@@ -691,8 +693,10 @@
     height: 62px;
     gap: 6px;
     padding: 6px;
-    background: #111d;
-    border-radius: 12px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--photo-shadow);
   }
   .photo-result-original {
     bottom: calc(80px + env(safe-area-inset-bottom));
@@ -701,9 +705,10 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    background: #444b;
+    background: var(--soft);
     padding: 5px 10px;
-    border-radius: 30px;
+    border: 0;
+    border-radius: 10px;
   }
   .photo-result small {
     white-space: nowrap;
@@ -723,7 +728,10 @@
     width: 44px;
     height: 48px;
     background: none;
-    border-radius: 5px;
+    border: 0;
+    border-radius: 10px;
+    color: var(--muted);
+    box-shadow: none;
   }
   .photo-result-toggle svg {
     width: 24px !important;
@@ -738,7 +746,8 @@
     font-size: 22px;
     font-weight: 500;
     background: none;
-    color: white;
+    border: 0;
+    color: var(--foreground);
   }
   .photo-original-download {
     order: 0;
