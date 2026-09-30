@@ -174,6 +174,9 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
         : undefined;
     return [{ ...base, payload_patch, ...(properties_patch ? { properties_patch } : {}) }];
   });
+  const [activeRelease] = await db("releases?status=in.(queued,building)&select=id,status&limit=1");
+  if (activeRelease)
+    throw Error("A release is already being built. Complete it before applying campus layers.");
   report.patchCount = patches.length;
   await fs.writeFile(`work/${slug}-layer-receipt.json`, JSON.stringify(report, null, 2));
   if (patches.length) report.reconciliationId = await db(
