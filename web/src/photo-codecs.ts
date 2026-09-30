@@ -13,14 +13,58 @@ type Encoder = {
   ) => Uint8Array | null;
 };
 const modules = new Map<string, Promise<Encoder>>();
+async function codecBytes(file: string, signal?: AbortSignal) {
+  const expected = hashes[file as keyof typeof hashes];
+  if (!expected) throw Error('Unknown image encoder asset.');
+  const url = `${base}/${file}`;
+  const cache =
+    typeof caches === 'undefined'
+      ? undefined
+      : await caches.open('turnright-assets-v1');
+  const cached = await cache?.match(url);
+  const response = cached || (await fetch(url, { signal }));
+  if (!response.ok)
+    throw Error(
+      'Image encoder unavailable. Prepare offline tools while connected.',
+    );
+  const bytes = await response.arrayBuffer();
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  if (
+    Array.from(new Uint8Array(digest), (b) =>
+      b.toString(16).padStart(2, '0'),
+    ).join('') !== expected
+  ) {
+    if (cached) await cache?.delete(url);
+    throw Error(
+      'Image encoder verification failed. Prepare offline tools again while connected.',
+    );
+  }
+  return bytes;
+}
+async function codecModule(file: string) {
+  // Dedicated-worker module imports are not reliably intercepted by the SW.
+  // Import only pinned, verified bytes; WASM receives its bytes separately too.
+  const url = URL.createObjectURL(
+    new Blob([await codecBytes(file)], { type: 'text/javascript' }),
+  );
+  try {
+    return await import(/* @vite-ignore */ url);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
 async function encoder(name: string) {
   if (!modules.has(name))
     modules.set(
       name,
       (async () => {
-        const module = await import(/* @vite-ignore */ `${base}/${name}.js`);
+        const [module, wasmBinary] = await Promise.all([
+          codecModule(`${name}.js`),
+          codecBytes(`${name}.wasm`),
+        ]);
         return module.default({
           noInitialRun: true,
+          wasmBinary: new Uint8Array(wasmBinary),
           locateFile: (file: string) => `${base}/${file}`,
         }) as Promise<Encoder>;
       })().catch((error) => {
@@ -50,12 +94,16 @@ export async function encodePhotoPixels(
   let result: Uint8Array | null;
   if (recipe.format === 'image/png') {
     png ||= (async () => {
-      const module = await import(
-        /* @vite-ignore */ `${base}/squoosh_oxipng.js`
-      );
-      await module.default(`${base}/squoosh_oxipng_bg.wasm`);
+      const [module, bytes] = await Promise.all([
+        codecModule('squoosh_oxipng.js'),
+        codecBytes('squoosh_oxipng_bg.wasm'),
+      ]);
+      await module.default(bytes);
       return module;
-    })();
+    })().catch((error) => {
+      png = undefined;
+      throw error;
+    });
     result = (await png).optimise(
       data,
       width,
