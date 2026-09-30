@@ -63,6 +63,8 @@ def safe_xml(path):
 def guess_role(name, types, properties=None):
     text = name.lower()
     tags = properties or {}
+    dimensions = {0 if t in ('Point','MultiPoint') else 1 if t in ('LineString','MultiLineString') else 2 if t in ('Polygon','MultiPolygon') else 3 for t in types}
+    if len(dimensions)>1 or 3 in dimensions: return 'overlay'
     if tags.get('building') or 'building' in text or 'footprint' in text: return 'building'
     if tags.get('highway') or any(v in text for v in ['road','path','track','route']):
         return 'road-surface' if any('Polygon' in t for t in types) else 'path'

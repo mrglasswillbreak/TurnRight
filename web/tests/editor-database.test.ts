@@ -58,6 +58,7 @@ beforeAll(async () => {
     '015_campus_release_restores.sql',
     '016_bulk_import_review_queue.sql',
     '017_import_queue_deadline.sql',
+    '018_vector_layer_edits.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -874,39 +875,143 @@ it('restores only the selected campus into a fresh preview with the current cata
   }
 });
 it('queues a large import atomically without losing campus, token, validation or source guards', async () => {
-  const campus = 'bulk-import-test', source = randomUUID(), job = randomUUID(), token = randomUUID();
-  await database.exec("insert into campuses(id,slug,name,boundary,bounds) select 'bulk-import-test','bulk-import-test','Bulk import',boundary,bounds from campuses where id='lasu'");
-  await database.query("insert into campus_sources(id,campus_id,name,kind) values($1,$2,'Bulk vectors','file')", [source,campus]);
-  await database.query("insert into campus_imports(id,campus_id,source_id,configuration,run_token,status,summary) values($1,$2,$3,'{}',$4,'preview',$5)", [job,campus,source,token,JSON.stringify({errors:[]})]);
-  const proposals = Array.from({length:1500}, (_,i) => ({
-    id: 'bulk-review-' + i, source_id: 'feature:bulk-' + i, kind:'add', before:null,
-    after:{id:'feature:bulk-' + i,source:'import:' + source,entity:'feature',hash:'hash-' + i,payload:{name:'Building ' + i}},
-    base_hash:null,summary:'Imported building ' + i,
-  }));
-  const queue = (rows = proposals, runToken = token, expected: unknown[] = []) => database.query<{count:number}>(
-    'select queue_campus_import($1,$2,$3,$4) as count', [job,runToken,JSON.stringify(rows),JSON.stringify(expected)],
+  const campus = 'bulk-import-test',
+    source = randomUUID(),
+    job = randomUUID(),
+    token = randomUUID();
+  await database.exec(
+    "insert into campuses(id,slug,name,boundary,bounds) select 'bulk-import-test','bulk-import-test','Bulk import',boundary,bounds from campuses where id='lasu'",
   );
+  await database.query(
+    "insert into campus_sources(id,campus_id,name,kind) values($1,$2,'Bulk vectors','file')",
+    [source, campus],
+  );
+  await database.query(
+    "insert into campus_imports(id,campus_id,source_id,configuration,run_token,status,summary) values($1,$2,$3,'{}',$4,'preview',$5)",
+    [job, campus, source, token, JSON.stringify({ errors: [] })],
+  );
+  const proposals = Array.from({ length: 1500 }, (_, i) => ({
+    id: 'bulk-review-' + i,
+    source_id: 'feature:bulk-' + i,
+    kind: 'add',
+    before: null,
+    after: {
+      id: 'feature:bulk-' + i,
+      source: 'import:' + source,
+      entity: 'feature',
+      hash: 'hash-' + i,
+      payload: { name: 'Building ' + i },
+    },
+    base_hash: null,
+    summary: 'Imported building ' + i,
+  }));
+  const queue = (
+    rows = proposals,
+    runToken = token,
+    expected: unknown[] = [],
+  ) =>
+    database.query<{ count: number }>(
+      'select queue_campus_import($1,$2,$3,$4) as count',
+      [job, runToken, JSON.stringify(rows), JSON.stringify(expected)],
+    );
   await expect(queue()).rejects.toThrow(/no longer ready/);
   try {
-    await database.query("select set_config('request.headers',$1,false)", [JSON.stringify({'x-turnright-campus':campus})]);
-    await expect(queue(proposals,randomUUID())).rejects.toThrow(/no longer ready/);
-    await database.query("update campus_imports set summary=$2 where id=$1", [job,JSON.stringify({errors:['Invalid polygon']})]);
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    await expect(queue(proposals, randomUUID())).rejects.toThrow(
+      /no longer ready/,
+    );
+    await database.query('update campus_imports set summary=$2 where id=$1', [
+      job,
+      JSON.stringify({ errors: ['Invalid polygon'] }),
+    ]);
     await expect(queue()).rejects.toThrow(/Repair import errors/);
-    await database.query("update campus_imports set summary=$2 where id=$1", [job,JSON.stringify({errors:[]})]);
-    await expect(queue(proposals,token,[{id:'stale'}])).rejects.toThrow(/campus changed/);
-    await expect(queue([...proposals,{...proposals[0],id:'invalid-kind',kind:'invalid'}])).rejects.toThrow();
-    expect((await database.query("select id from map_changes where campus_id=$1",[campus])).rows).toHaveLength(0);
-    expect((await database.query<{status:string}>('select status from campus_imports where id=$1',[job])).rows[0].status).toBe('preview');
-    const result = await queue([...proposals,proposals[0]]);
+    await database.query('update campus_imports set summary=$2 where id=$1', [
+      job,
+      JSON.stringify({ errors: [] }),
+    ]);
+    await expect(queue(proposals, token, [{ id: 'stale' }])).rejects.toThrow(
+      /campus changed/,
+    );
+    await expect(
+      queue([
+        ...proposals,
+        { ...proposals[0], id: 'invalid-kind', kind: 'invalid' },
+      ]),
+    ).rejects.toThrow();
+    expect(
+      (
+        await database.query('select id from map_changes where campus_id=$1', [
+          campus,
+        ])
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from campus_imports where id=$1',
+          [job],
+        )
+      ).rows[0].status,
+    ).toBe('preview');
+    const result = await queue([...proposals, proposals[0]]);
     expect(result.rows[0].count).toBe(1500);
-    expect((await database.query("select id from map_changes where campus_id=$1 and status='pending'",[campus])).rows).toHaveLength(1500);
-    expect((await database.query('select id from source_features where campus_id=$1',[campus])).rows).toHaveLength(0);
-    expect((await database.query<{status:string}>('select status from campus_imports where id=$1',[job])).rows[0].status).toBe('reviewed');
+    expect(
+      (
+        await database.query(
+          "select id from map_changes where campus_id=$1 and status='pending'",
+          [campus],
+        )
+      ).rows,
+    ).toHaveLength(1500);
+    expect(
+      (
+        await database.query(
+          'select id from source_features where campus_id=$1',
+          [campus],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from campus_imports where id=$1',
+          [job],
+        )
+      ).rows[0].status,
+    ).toBe('reviewed');
     await expect(queue()).rejects.toThrow(/no longer ready/);
-    expect((await database.query("select id from map_changes where campus_id='lasu' and id like 'bulk-review-%'")).rows).toHaveLength(0);
-    const grants = await database.query<{service:boolean; browser:boolean}>("select has_function_privilege('service_role','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') service, has_function_privilege('authenticated','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') browser");
-    expect(grants.rows[0]).toEqual({service:true,browser:false});
+    expect(
+      (
+        await database.query(
+          "select id from map_changes where campus_id='lasu' and id like 'bulk-review-%'",
+        )
+      ).rows,
+    ).toHaveLength(0);
+    const grants = await database.query<{ service: boolean; browser: boolean }>(
+      "select has_function_privilege('service_role','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') service, has_function_privilege('authenticated','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') browser",
+    );
+    expect(grants.rows[0]).toEqual({ service: true, browser: false });
   } finally {
     await database.exec("select set_config('request.headers','{}',false)");
   }
 }, 30000);
+
+it('persists land and overlay edits through the transactional history workflow', async () => {
+  for (const kind of ['land', 'overlay']) {
+    const entry = item('vector-' + kind);
+    const saved = await save(randomUUID(), [
+      {
+        ...entry,
+        edit: { ...entry.edit, kind, properties: { name: 'Survey overlay' } },
+      },
+    ]);
+    expect(saved[0].id).toBe('vector-' + kind);
+    const history = await database.query(
+      'select count(*)::int as n from edit_history where edit_id=$1',
+      ['vector-' + kind],
+    );
+    expect(history.rows[0].n).toBe(1);
+  }
+});

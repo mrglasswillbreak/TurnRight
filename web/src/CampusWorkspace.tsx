@@ -242,14 +242,14 @@ export default function CampusWorkspace({
       : uncertainReview === job.id
         ? 'Check review status before submitting this import again.'
         : busy
-        ? 'Wait for the current operation to finish.'
-        : !job.summary
-          ? 'Preview details are unavailable. Reopen this import or rebuild its preview.'
-          : job.summary.errors.length
-            ? 'Resolve the preview errors shown above, then rebuild the preview.'
-            : !sameImportConfiguration(configuration, job.configuration)
-              ? 'Settings changed since this preview was built. Rebuild preview to include your changes.'
-              : '';
+          ? 'Wait for the current operation to finish.'
+          : !job.summary
+            ? 'Preview details are unavailable. Reopen this import or rebuild its preview.'
+            : job.summary.errors.length
+              ? 'Resolve the preview errors shown above, then rebuild the preview.'
+              : !sameImportConfiguration(configuration, job.configuration)
+                ? 'Settings changed since this preview was built. Rebuild preview to include your changes.'
+                : '';
   const filesChanged = async (files: File[]) =>
     run(async () => {
       if (!files.length || !job) return;
@@ -671,14 +671,33 @@ export default function CampusWorkspace({
               )}
               {['mapping', 'preview', 'failed'].includes(job.status) && (
                 <>
-                  <label className="field-label">Update existing data
-                    <select value={configuration.refreshMode || 'merge'} onChange={e => setConfiguration(c => ({...c,refreshMode:e.target.value as ImportConfiguration['refreshMode']}))}>
-                      <option value="merge">Add and update selected layers; retain existing records</option>
-                      <option value="replace-layer">Replace selected layers, including missing records</option>
-                      <option value="replace-source">Replace the complete source, including missing layers</option>
+                  <label className="field-label">
+                    Update existing data
+                    <select
+                      value={configuration.refreshMode || 'merge'}
+                      onChange={(e) =>
+                        setConfiguration((c) => ({
+                          ...c,
+                          refreshMode: e.target
+                            .value as ImportConfiguration['refreshMode'],
+                        }))
+                      }
+                    >
+                      <option value="merge">
+                        Add and update selected layers; retain existing records
+                      </option>
+                      <option value="replace-layer">
+                        Replace selected layers, including missing records
+                      </option>
+                      <option value="replace-source">
+                        Replace the complete source, including missing layers
+                      </option>
                     </select>
                   </label>
-                  <p className="hint">Routine geometry fixes are automatic and listed in the preview. Uncertain repairs need review.</p>
+                  <p className="hint">
+                    Routine geometry fixes are automatic and listed in the
+                    preview. Uncertain repairs need review.
+                  </p>
                   {job.summary?.layers.map((layer) => {
                     const index = configuration.layers.findIndex(
                         (m) => m.layer === layer.name,
@@ -747,9 +766,31 @@ export default function CampusWorkspace({
                               </small>
                             )}
                           </label>
-                          <label>Existing layer identity
-                            <input value={m.identity || ''} placeholder={layer.name} onChange={e => update({identity:e.target.value || undefined})} list="accepted-layer-identities" />
-                            <small>Keep the accepted layer identity when a replacement file is renamed.</small>
+                          <label>
+                            Existing layer identity
+                            <input
+                              value={m.identity || ''}
+                              placeholder={layer.name}
+                              onChange={(e) => {
+                                const prior = sources
+                                  .find((s) => s.id === job.source_id)
+                                  ?.configuration.layers.find(
+                                    (l) =>
+                                      (l.identity || l.layer) ===
+                                      e.target.value,
+                                  );
+                                update({
+                                  ...prior,
+                                  layer: layer.name,
+                                  identity: e.target.value || undefined,
+                                });
+                              }}
+                              list="accepted-layer-identities"
+                            />
+                            <small>
+                              Keep the accepted layer identity when a
+                              replacement file is renamed.
+                            </small>
                           </label>
                           {(
                             [
@@ -759,7 +800,13 @@ export default function CampusWorkspace({
                               'heightField',
                               'floorsField',
                               'accessField',
-                              'roadClassField', 'surfaceField', 'widthField', 'landUseField', 'vegetationField', 'labelField', 'geometryField',
+                              'roadClassField',
+                              'surfaceField',
+                              'widthField',
+                              'landUseField',
+                              'vegetationField',
+                              'labelField',
+                              'geometryField',
                               ...(layer.requiresCoordinates || !layer.crs
                                 ? ['longitudeField', 'latitudeField']
                                 : []),
@@ -775,7 +822,13 @@ export default function CampusWorkspace({
                                     heightField: 'Height',
                                     floorsField: 'Floors',
                                     accessField: 'Access',
-                                    roadClassField: 'Road class', surfaceField: 'Surface', widthField: 'Width', landUseField: 'Land use / class', vegetationField: 'Vegetation', labelField: 'Overlay label', geometryField: 'WKT geometry (CSV)',
+                                    roadClassField: 'Road class',
+                                    surfaceField: 'Surface',
+                                    widthField: 'Width',
+                                    landUseField: 'Land use / class',
+                                    vegetationField: 'Vegetation',
+                                    labelField: 'Overlay label',
+                                    geometryField: 'WKT geometry (CSV)',
                                     longitudeField: 'Longitude / X',
                                     latitudeField: 'Latitude / Y',
                                   } as Record<string, string>
@@ -834,18 +887,82 @@ export default function CampusWorkspace({
                               </select>
                             </label>
                           )}
-                          {m.widthField && <label>Width units<select value={m.widthUnit || 'm'} onChange={e => update({widthUnit:e.target.value as 'm'|'ft'})}><option value="m">Metres</option><option value="ft">Feet</option></select></label>}
-                          {m.role === 'overlay' && <>
-                            <label>Colour<input type="color" value={m.color || '#2563eb'} onChange={e => update({color:e.target.value})} /></label>
-                            <label>Opacity<input type="number" min="0" max="1" step="0.1" value={m.opacity ?? 0.5} onChange={e => update({opacity:Number(e.target.value)})} /></label>
-                            <label>Layer order<input type="number" min="-1000" max="1000" value={m.order ?? 0} onChange={e => update({order:Number(e.target.value)})} /></label>
-                            <label><input type="checkbox" checked={m.visible !== false} onChange={e => update({visible:e.target.checked})} />Visible</label>
-                          </>}
+                          {m.widthField && (
+                            <label>
+                              Width units
+                              <select
+                                value={m.widthUnit || 'm'}
+                                onChange={(e) =>
+                                  update({
+                                    widthUnit: e.target.value as 'm' | 'ft',
+                                  })
+                                }
+                              >
+                                <option value="m">Metres</option>
+                                <option value="ft">Feet</option>
+                              </select>
+                            </label>
+                          )}
+                          {m.role === 'overlay' && (
+                            <>
+                              <label>
+                                Colour
+                                <input
+                                  type="color"
+                                  value={m.color || '#2563eb'}
+                                  onChange={(e) =>
+                                    update({ color: e.target.value })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Opacity
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="1"
+                                  step="0.1"
+                                  value={m.opacity ?? 0.5}
+                                  onChange={(e) =>
+                                    update({ opacity: Number(e.target.value) })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Layer order
+                                <input
+                                  type="number"
+                                  min="-1000"
+                                  max="1000"
+                                  value={m.order ?? 0}
+                                  onChange={(e) =>
+                                    update({ order: Number(e.target.value) })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={m.visible !== false}
+                                  onChange={(e) =>
+                                    update({ visible: e.target.checked })
+                                  }
+                                />
+                                Visible
+                              </label>
+                            </>
+                          )}
                         </div>
                       </details>
                     );
                   })}
-                  <datalist id="accepted-layer-identities">{sources.find(s => s.id===job.source_id)?.configuration.layers.map(m => <option key={m.layer} value={m.identity || m.layer} />)}</datalist>
+                  <datalist id="accepted-layer-identities">
+                    {sources
+                      .find((s) => s.id === job.source_id)
+                      ?.configuration.layers.map((m) => (
+                        <option key={m.layer} value={m.identity || m.layer} />
+                      ))}
+                  </datalist>
                   <div className="campus-fields">
                     <label>
                       Attribution
@@ -899,10 +1016,48 @@ export default function CampusWorkspace({
               )}
               {job.summary && (
                 <>
-                  <details><summary>Supported vector formats</summary>{mapFormats.map(f => <p key={f.name}>{f.name}: {f.extensions.join(', ')}</p>)}</details>
-                  {job.summary.sampling?.some(s => s.shown<s.total) && <p className="notice">Preview is sampled across layers; validation includes every feature. {job.summary.sampling.map(s => `${s.layer}: ${s.shown}/${s.total}`).join(' · ')}</p>}
-                  {!!job.summary.repairs?.length && <details open><summary>{job.summary.repairs.length} automatic geometry repairs</summary>{job.summary.repairs.map((r,i) => <p key={i}>{r.layer} · {r.sourceId}: {r.actions.join(', ')}{r.areaChangePercent !== undefined ? ` (${r.areaChangePercent.toPrecision(3)}% area change)` : ''}</p>)}</details>}
-                  {!!job.summary.diagnostics?.length && <details><summary>Retained owner corrections</summary>{job.summary.diagnostics.map((d,i) => <p key={i}>{d.sourceId}: {d.message}</p>)}</details>}
+                  <details>
+                    <summary>Supported vector formats</summary>
+                    {mapFormats.map((f) => (
+                      <p key={f.name}>
+                        {f.name}: {f.extensions.join(', ')}
+                      </p>
+                    ))}
+                  </details>
+                  {job.summary.sampling?.some((s) => s.shown < s.total) && (
+                    <p className="notice">
+                      Preview is sampled across layers; validation includes
+                      every feature.{' '}
+                      {job.summary.sampling
+                        .map((s) => `${s.layer}: ${s.shown}/${s.total}`)
+                        .join(' · ')}
+                    </p>
+                  )}
+                  {!!job.summary.repairs?.length && (
+                    <details open>
+                      <summary>
+                        {job.summary.repairs.length} automatic geometry repairs
+                      </summary>
+                      {job.summary.repairs.map((r, i) => (
+                        <p key={i}>
+                          {r.layer} · {r.sourceId}: {r.actions.join(', ')}
+                          {r.areaChangePercent !== undefined
+                            ? ` (${r.areaChangePercent.toPrecision(3)}% area change)`
+                            : ''}
+                        </p>
+                      ))}
+                    </details>
+                  )}
+                  {!!job.summary.diagnostics?.length && (
+                    <details>
+                      <summary>Retained owner corrections</summary>
+                      {job.summary.diagnostics.map((d, i) => (
+                        <p key={i}>
+                          {d.sourceId}: {d.message}
+                        </p>
+                      ))}
+                    </details>
+                  )}
                   <ImportMapPreview
                     campus={current}
                     base={currentData}
@@ -962,7 +1117,8 @@ export default function CampusWorkspace({
                         } catch (error) {
                           // A lost response does not mean the transaction failed.
                           const result = await api<{ job: CampusImport }>(
-                            'import-get', { importId: job.id },
+                            'import-get',
+                            { importId: job.id },
                           ).catch(() => null);
                           if (result?.job.status !== 'reviewed') {
                             setUncertainReview(job.id);
@@ -982,14 +1138,25 @@ export default function CampusWorkspace({
                   </Button>
                 )}
                 {uncertainReview === job.id && (
-                  <Button variant="outline" disabled={busy} onClick={() => void run(async () => {
-                    const result = await api<{ job: CampusImport }>('import-get', { importId: job.id });
-                    setJob(result.job);
-                    setUncertainReview(null);
-                    setNotice(result.job.status === 'reviewed'
-                      ? 'Changes are queued. Review source changes before publishing.'
-                      : 'The server has not queued this preview. You can retry when it is ready.');
-                  })}>
+                  <Button
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() =>
+                      void run(async () => {
+                        const result = await api<{ job: CampusImport }>(
+                          'import-get',
+                          { importId: job.id },
+                        );
+                        setJob(result.job);
+                        setUncertainReview(null);
+                        setNotice(
+                          result.job.status === 'reviewed'
+                            ? 'Changes are queued. Review source changes before publishing.'
+                            : 'The server has not queued this preview. You can retry when it is ready.',
+                        );
+                      })
+                    }
+                  >
                     <RefreshCw /> Check review status
                   </Button>
                 )}
@@ -1201,15 +1368,30 @@ function suggestMappings(job: CampusImport): ImportConfiguration {
         (l) => l.layer === layer.name,
       );
       const field = (names: string[]) =>
-        layer.fields.find((f) => names.includes(f.name.toLowerCase()))?.name;
+        layer.fields.find(
+          (f) =>
+            names.includes(f.name.toLowerCase()) ||
+            (!!f.alias && names.includes(f.alias.toLowerCase())),
+        )?.name;
       return (
         existing || {
           layer: layer.name,
           role: layer.suggestedRole,
           idField: suggestedImportIdentifier(layer),
           nameField: field(['name', 'title', 'building_name']),
-          heightField: field(['height']),
-          floorsField: field(['floors', 'building:levels']),
+          heightField: field(['height', 'building_height', 'height_m']),
+          categoryField: field(['category', 'building_category', 'amenity']),
+          roadClassField: field(['highway', 'road_class', 'roadtype']),
+          surfaceField: field(['surface', 'surface_type']),
+          widthField: field(['width', 'road_width']),
+          landUseField: field(['landuse', 'land_use', 'natural']),
+          vegetationField: field(['vegetation', 'vegetation_type']),
+          floorsField: field([
+            'floors',
+            'building:levels',
+            'storeys',
+            'levels',
+          ]),
         }
       );
     }),

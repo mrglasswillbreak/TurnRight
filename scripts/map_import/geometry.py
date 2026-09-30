@@ -18,6 +18,7 @@ def prepare_geometry(value):
     from shapely.ops import transform
     from shapely.validation import explain_validity
     from pyproj import CRS, Transformer
+    original = copy.deepcopy(value)
     value = copy.deepcopy(value)
     fixes = []
     def clean(points, ring=False):
@@ -51,15 +52,22 @@ def prepare_geometry(value):
         operation = Transformer.from_crs('EPSG:4326', projection, always_xy=True).transform
         before, after = transform(operation, geom).area, transform(operation, repaired).area
         change = abs(after-before) / max(before, 1e-12)
-        if change > .01: raise ValueError(reason + ': repair changes area by more than 1%; review the source geometry.')
-        receipt = {'reason': reason, 'beforeType': kind, 'afterType': repaired.geom_type, 'areaChangePercent': change*100}
+        original_parts = len(geom.geoms) if geom.geom_type=='MultiPolygon' else 1
+        repaired_parts = len(repaired.geoms) if repaired.geom_type=='MultiPolygon' else 1
+        if repaired_parts < original_parts: raise ValueError(reason + ': repair merges polygon components; review required.')
+        if not math.isfinite(change) or change > .01: raise ValueError(reason + ': repair changes area by more than 1%; review the source geometry.')
+        receipt = {'reason': reason, 'beforeType': kind, 'afterType': repaired.geom_type, 'areaChangePercent': change*100, 'beforeAreaM2':before, 'afterAreaM2':after, 'beforeValid':False, 'afterValid':True, 'discardedComponents':0}
         geom = repaired
         fixes.append('Repaired polygon self-intersection')
+    polygons = list(geom.geoms) if geom.geom_type=='MultiPolygon' else [geom] if geom.geom_type=='Polygon' else []
+    if any(not p.exterior.is_ccw or any(r.is_ccw for r in p.interiors) for p in polygons): fixes.append('Normalized polygon winding')
     if geom.geom_type == 'Polygon': geom = orient(geom, sign=1)
     elif geom.geom_type == 'MultiPolygon':
         from shapely.geometry import MultiPolygon
         geom = MultiPolygon([orient(p, sign=1) for p in geom.geoms])
-    return geom, ({**(receipt or {}), 'actions': sorted(set(fixes))} if fixes else None)
+    import hashlib, json
+    trace = hashlib.sha256(json.dumps(original,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    return geom, ({'originalGeometrySha256':trace, **(receipt or {}), 'actions': sorted(set(fixes))} if fixes else None)
 
 
 def preview_features(layers, limit=2000):

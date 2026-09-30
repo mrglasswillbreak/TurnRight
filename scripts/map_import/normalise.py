@@ -57,14 +57,21 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         if not m.get('idField') and not is_osm:
             warnings.append(layer['name'] + ': using feature IDs or content identities. Select a stable field to match records whose contents change.')
         expanded = []
+        seen_identities = set()
         for feature in layer['features']:
             for component, geometry in geometry_components(feature.get('geometry')):
-                expanded.append({**feature, 'geometry':geometry, '_component':component})
+                if geometry and geometry.get('type')=='MultiPoint' and role in ('place','entrance'):
+                    for index, coordinates in enumerate(geometry['coordinates']):
+                        expanded.append({**feature,'geometry':{'type':'Point','coordinates':coordinates},'_component':component+':point:'+str(index)})
+                else:
+                    expanded.append({**feature, 'geometry':geometry, '_component':component})
         mapped_layer = {**layer, 'features':[], 'suggestedRole':role, 'crs':'EPSG:4326'}
         mapped_layers.append(mapped_layer)
         for feature in expanded:
             feature_count += 1
             if feature_count > MAX_FEATURES: raise ValueError('Import exceeds the feature limit.')
+            attrs = feature.get('properties') or {}
+            receipt_id = str(attrs.get(m.get('idField')) if m.get('idField') else feature.get('id','')) + feature.get('_component','')
             if feature.get('geometry') is None:
                 errors.append(layer['name'] + ': missing geometry or coordinate mapping.'); continue
             try: geom = shape(feature['geometry'])
@@ -83,7 +90,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             except Exception as error:
                 errors.append(f"{layer['name']} {feature.get('id','')}: {error}"); continue
             if repair:
-                repairs.append({'layer':layer['name'],'sourceId':str(feature.get('id','')),**repair})
+                repairs.append({'layer':layer['name'],'sourceId':receipt_id,**repair})
             if not region.intersects(geom): skipped += 1; continue
             attrs = feature.get('properties') or {}
             def mapped_value(field, fallback):
@@ -97,6 +104,9 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             if native is None or str(native) == '':
                 errors.append(layer['name'] + ': a feature is missing its selected identifier.'); continue
             native = str(native) + feature.get('_component','')
+            if native in seen_identities:
+                errors.append(f"{layer['name']}: duplicate source identity {native}; select a unique identifier or repair the source."); continue
+            seen_identities.add(native)
             layer_identity = m.get('identity') or layer['name']
             ident = f"{owner_source}:{digest(layer_identity)[:8]}:{native}"
             if len(ident) > 180: ident = f"{owner_source}:{digest([layer['name'],native])}"

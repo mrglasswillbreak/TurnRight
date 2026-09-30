@@ -81,7 +81,7 @@ import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
 import { EditorMap } from './editor-map';
 import { editorCamera, focusEditorSelection } from './editor-camera';
 import { drawingProgress } from './drawing-state';
-import { SurveyPanel } from './SurveyPanel';
+
 import { disconnectedSurveyPaths } from './survey-model';
 import { readSurveyContext, writeSurveyContext } from './survey-storage';
 import {
@@ -109,6 +109,9 @@ import { placeHasConnection } from './routing';
 import type { CampusData, MapChange, MapEdit, Position, Route } from './types';
 import './editor.css';
 
+const SurveyPanel = lazy(() =>
+  import('./SurveyPanel').then((m) => ({ default: m.SurveyPanel })),
+);
 const CampusWorkspace = lazy(() => import('./CampusWorkspace'));
 const BuildingAppearanceEditor = lazy(() =>
   import('./BuildingAppearanceEditor').then((module) => ({
@@ -1885,54 +1888,57 @@ function Editor({
           onReady={mapReady}
         />
         {survey && ready > 0 && mapRef.current && (
-          <SurveyPanel
-            owner={owner}
-            map={mapRef.current}
-            data={validation.data}
-            edits={workspace.edits}
-            selected={selected}
-            close={() => setSurvey(false)}
-            prepareOffline={prepareOffline}
-            recordingChanged={setSurveyRecording}
-            view2D={() => setThreeD(false)}
-            apply={async (edits, previousIds) => {
-              const removed = workspace.edits
-                .filter(
-                  (e) =>
-                    previousIds.includes(e.id) &&
-                    !edits.some((n) => n.id === e.id),
+          <Suspense fallback={<output>Loading survey tools...</output>}>
+            <SurveyPanel
+              owner={owner}
+              map={mapRef.current}
+              data={validation.data}
+              edits={workspace.edits}
+              selected={selected}
+              close={() => setSurvey(false)}
+              prepareOffline={prepareOffline}
+              recordingChanged={setSurveyRecording}
+              view2D={() => setThreeD(false)}
+              apply={async (edits, previousIds) => {
+                const removed = workspace.edits
+                  .filter(
+                    (e) =>
+                      previousIds.includes(e.id) &&
+                      !edits.some((n) => n.id === e.id),
+                  )
+                  .map((e) => ({ ...e, deleted: true }));
+                edits = [...edits, ...removed];
+                const next = [
+                  ...workspace.edits.filter(
+                    (e) =>
+                      !edits.some((n) => n.kind === e.kind && n.id === e.id),
+                  ),
+                  ...edits,
+                ];
+                const checked = await validation.check(next);
+                const addedErrors = checked.errors.filter(
+                  (e) => !validation.errors.includes(e),
+                );
+                if (addedErrors.length) throw new Error(addedErrors.join(' '));
+                if (
+                  disconnectedSurveyPaths(validation.data, checked.data, edits)
+                    .length
                 )
-                .map((e) => ({ ...e, deleted: true }));
-              edits = [...edits, ...removed];
-              const next = [
-                ...workspace.edits.filter(
-                  (e) => !edits.some((n) => n.kind === e.kind && n.id === e.id),
-                ),
-                ...edits,
-              ];
-              const checked = await validation.check(next);
-              const addedErrors = checked.errors.filter(
-                (e) => !validation.errors.includes(e),
-              );
-              if (addedErrors.length) throw new Error(addedErrors.join(' '));
-              if (
-                disconnectedSurveyPaths(validation.data, checked.data, edits)
-                  .length
-              )
-                throw new Error(
-                  'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                  throw new Error(
+                    'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                  );
+                workspace.commit(next, null);
+                if (navigator.onLine && !(await workspace.flush()))
+                  throw new Error(
+                    'Map changes are saved locally. Resolve the draft save issue before retrying.',
+                  );
+                return edits.map(
+                  (e) =>
+                    featureEdit(checked.data, e.kind, e.id, store.edits) || e,
                 );
-              workspace.commit(next, null);
-              if (navigator.onLine && !(await workspace.flush()))
-                throw new Error(
-                  'Map changes are saved locally. Resolve the draft save issue before retrying.',
-                );
-              return edits.map(
-                (e) =>
-                  featureEdit(checked.data, e.kind, e.id, store.edits) || e,
-              );
-            }}
-          />
+              }}
+            />
+          </Suspense>
         )}
         <div
           className="editor-tools editor-card"

@@ -52,6 +52,18 @@ class VectorLayerTests(unittest.TestCase):
         self.assertEqual(feature['payload']['properties']['surface'],'unpaved')
         self.assertFalse(any(r['entity'] in ('node','edge') for r in records))
 
+    def test_duplicate_identifiers_are_reported_even_for_identical_features(self):
+        layer=copy.deepcopy(LAYER);layer['features']*=2
+        result=normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')
+        self.assertTrue(any('duplicate source identity' in e for e in result['summary']['errors']))
+
+    def test_multipoint_destinations_keep_every_component(self):
+        layer=copy.deepcopy(LAYER);layer['features'][0]['geometry']={'type':'MultiPoint','coordinates':[[3.2,6.46],[3.20001,6.46001]]}
+        config={**CONFIG,'layers':[{**CONFIG['layers'][0],'role':'place'}]}
+        result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
+        self.assertFalse(result['summary']['errors'])
+        self.assertEqual(len([p for p in result['proposals'] if p.get('after',{}).get('entity')=='place']),2)
+
     def test_collapsed_polygon_requires_review(self):
         with self.assertRaisesRegex(ValueError,'components|dimension'):
             prepare_geometry({'type':'Polygon','coordinates':[[[3.2,6.46],[3.201,6.46],[3.202,6.46],[3.2,6.46]]]})

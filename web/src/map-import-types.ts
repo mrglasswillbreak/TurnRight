@@ -92,7 +92,12 @@ export function suggestedImportIdentifier(layer: ImportLayer) {
 }
 export interface ImportPreview {
   sampling?: { layer: string; shown: number; total: number }[];
-  repairs?: { layer: string; sourceId: string; actions: string[]; areaChangePercent?: number }[];
+  repairs?: {
+    layer: string;
+    sourceId: string;
+    actions: string[];
+    areaChangePercent?: number;
+  }[];
   diagnostics?: { sourceId: string; message: string }[];
   layers: ImportLayer[];
   counts: { added: number; modified: number; removed: number; skipped: number };

@@ -66,7 +66,11 @@ export function displayGeometry(
             properties: {
               ...feature.properties,
               landClass: landClass(feature.properties),
-              unpaved: /unpaved|untarred|dirt|gravel|sand/i.test(String(feature.properties.surface || feature.properties.name || '')),
+              unpaved: /unpaved|untarred|dirt|gravel|sand/i.test(
+                String(
+                  feature.properties.surface || feature.properties.name || '',
+                ),
+              ),
             },
           },
         ];
