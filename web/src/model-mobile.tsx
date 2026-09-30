@@ -10,6 +10,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { ModelSurfaceContext } from './model-surface';
 
 export type ModelTouchTool = 'select' | 'move' | 'resize' | 'multi';
 export type ModelPanel =
@@ -36,6 +37,7 @@ export function useModelSvgUnits(
   revision: string,
 ) {
   const { compact, planHost } = useModelMobile();
+  const { active, revision: surfaceRevision } = useContext(ModelSurfaceContext);
   const [units, setUnits] = useState<[number, number]>([1, 1]);
   useLayoutEffect(() => {
     const svg = ref.current;
@@ -49,11 +51,23 @@ export function useModelSvgUnits(
       if (Number.isFinite(x) && Number.isFinite(y))
         setUnits((old) => (old[0] === x && old[1] === y ? old : [x, y]));
     };
+    // WebKit can report the previous SVG scale in the resize notification.
+    // Read it after layout, including when the mounted plan becomes visible.
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
     measure();
-    const observer = new ResizeObserver(measure);
+    schedule();
+    const observer = new ResizeObserver(schedule);
     observer.observe(svg);
-    return () => observer.disconnect();
-  }, [ref, revision, compact, planHost]);
+    if (planHost) observer.observe(planHost);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [ref, revision, compact, planHost, active, surfaceRevision]);
   return units;
 }
 
