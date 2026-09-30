@@ -7958,7 +7958,26 @@ test.describe('compact plan and photograph tools', () => {
       );
       const circle = roof.locator('[data-roof-point] circle').first(),
         b = (await circle.boundingBox())!;
-      expect(b.width).toBeGreaterThanOrEqual(43.9);
+      const diagnostic =
+        b.width < 43.9
+          ? JSON.stringify(
+              await circle.evaluate(async (node) => {
+                const snapshots = [];
+                for (let i = 0; i < 5; i++) {
+                  const svg = node.ownerSVGElement!;
+                  snapshots.push({
+                    radius: node.getAttribute('r'),
+                    circle: node.getBoundingClientRect().toJSON(),
+                    svg: svg.getBoundingClientRect().toJSON(),
+                    matrix: svg.getScreenCTM()?.toString(),
+                  });
+                  await new Promise(requestAnimationFrame);
+                }
+                return snapshots;
+              }),
+            )
+          : 'Roof handle must remain at least 44 CSS pixels';
+      expect(b.width, diagnostic).toBeGreaterThanOrEqual(43.9);
       expect(b.height).toBeGreaterThanOrEqual(43.9);
       await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
       await page.mouse.down();
