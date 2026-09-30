@@ -209,12 +209,13 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
   report.workspaceHash = snapshotHash(accepted, savedDrafts);
   report.releaseId = randomUUID();
   await fs.writeFile(`work/${slug}-layer-receipt.json`, JSON.stringify(report, null, 2));
-  // Return only an acknowledgement; serializing the full snapshot can time out.
-  await db("releases", "POST", {
-    id: report.releaseId,
-    summary: `${slug.toUpperCase()} reviewed campus layers: ${slug === "lasu" ? "82 labelled road-width surfaces and refreshed landscape classification" : "parcel classification corrections and 179 editable road surfaces"}. Routing unchanged. ${excluded.length} unrelated draft changes retained privately.`,
-    catalogue_revision: catalogue.revision,
-    snapshot: {
+  // The service-only RPC bounds large snapshot insertion to sixty seconds.
+  await db("rpc/create_reviewed_release_snapshot", "POST", {
+    actor: owner.id,
+    release_identity: report.releaseId,
+    release_summary: `${slug.toUpperCase()} reviewed campus layers: ${slug === "lasu" ? "82 labelled road-width surfaces and refreshed landscape classification" : "parcel classification corrections and 179 editable road surfaces"}. Routing unchanged. ${excluded.length} unrelated draft changes retained privately.`,
+    catalogue_hash: catalogue.revision,
+    release_snapshot: {
       features: release.records,
       edits: priorEdits,
       workspaceHash: report.workspaceHash,
@@ -224,7 +225,7 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
         excludedDrafts: excluded.length,
       },
     },
-  }, "return=minimal");
+  }, "return=representation", 75000);
   const [created] = await db(`releases?id=eq.${report.releaseId}&select=id,status`);
   if (created?.id !== report.releaseId) throw Error("Release creation readback failed");
 }
