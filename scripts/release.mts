@@ -23,7 +23,7 @@ import {
   uploadSource,
   waitForDeployment,
   publishDeployment,
-  withDeploymentAccess,
+  withRetainedPackageAccess,
 } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
@@ -69,10 +69,10 @@ try {
       if (!historical?.deployment_url || !historical.version)
         throw Error("The historical campus package is unavailable.");
       // Reuse the immutable reviewed package, but build a fresh site with the current other campuses.
-      manifest = await withDeploymentAccess(historical.deployment_url, (headers) =>
+      manifest = await withRetainedPackageAccess(historical, (headers, retainedOrigin) =>
         preservePublished(
           path.join(web, "public"),
-          historical.deployment_url,
+          retainedOrigin,
           false,
           historical.version,
           `/packages/${historical.version}/manifest.json`,
