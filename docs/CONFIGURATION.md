@@ -44,7 +44,7 @@ Bucket limits do not replace operation limits: GIS upload batches total at most 
 
 ## Environment and secret placement
 
-Set application variables in Vercel Preview and Production when previews can be promoted without rebuilding.
+Set application variables in both Vercel Preview and Production. Publication builds Production from the frozen reviewed source; it does not promote the preview deployment object.
 
 | Name | Location and purpose |
 | --- | --- |
@@ -83,7 +83,7 @@ Publication replaces one campus and preserves every other campus. **Prepare rest
 
 ## Operational verification
 
-After deployment verify the source revision, owner login/Campuses list, public switcher and plain-home campus memory, unauthenticated admin rejection, catalogue, LASU manifest and asset hashes. Install waiting PWA updates through **Install update** so recovery guards remain active.
+After deployment verify the source revision, owner login/Campuses list, public switcher and plain-home campus memory, unauthenticated admin rejection, catalogue, both campus manifests and asset hashes. Install waiting PWA updates through **Install update** so recovery guards remain active.
 
 The September 26 migration preserved fingerprints for 4,777 source features, 133 edits, 32 releases, two surveys, 25 media records and one model asset. At that checkpoint LASU was the only published campus and all 84 assets were unchanged. UNILAG was published later; those dated counts are not the current catalogue. See [Production](PRODUCTION.md) for the exact receipt.
 
