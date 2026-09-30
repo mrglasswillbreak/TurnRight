@@ -27,7 +27,7 @@ The dated campus captures show real packages. Editor examples use isolated owner
 
 | UNILAG · light, 3D | UNILAG · dark, 2D |
 | --- | --- |
-| ![UNILAG campus and Senate in 3D](docs/assets/screenshots/unilag-desktop-light-3d-2026-09-30.png) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |
+| ![Published UNILAG roads, landscape and controls above the desktop panel](docs/assets/screenshots/unilag-desktop-layer-controls-2026-10-01.jpg) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |
 
 | UNILAG · mobile | LASU · campus detail |
 | --- | --- |
