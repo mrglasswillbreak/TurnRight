@@ -13,13 +13,20 @@ export function requestRoadDisplay(
   }
   let stopped = false;
   let worker: Worker | undefined;
+  const lifecycle = typeof window === 'undefined' ? undefined : window;
+  const stop = () => {
+    stopped = true;
+    worker?.terminate();
+    lifecycle?.removeEventListener('pagehide', stop);
+  };
   const deliver = (value: FeatureCollection) => {
     if (stopped) return;
     cache.set(map, value);
     receive(value);
-    worker?.terminate();
+    stop();
   };
-  const fallback = () =>
+  const fallback = () => {
+    if (stopped) return;
     void import('./road-surfaces')
       .then(({ exposedRoads }) => {
         if (!stopped) deliver(exposedRoads(map));
@@ -33,10 +40,9 @@ export function requestRoadDisplay(
             features: map.features.filter((f) => f.properties?.kind === 'path'),
           });
       });
-  const stop = () => {
-    stopped = true;
-    worker?.terminate();
   };
+  // Cancel pending module loading before WebKit unloads the owning document.
+  lifecycle?.addEventListener('pagehide', stop, { once: true });
   try {
     worker = new Worker(new URL('./road-surfaces.worker.ts', import.meta.url), {
       type: 'module',

@@ -35,3 +35,24 @@ it('retains road display when a browser synchronously refuses a worker during re
   expect(rendered.features[0].geometry).toEqual(source.features[0].geometry);
   expect(source).toEqual(before);
 });
+
+it('terminates pending work on pagehide without starting a fallback import', async () => {
+  const lifecycle = new EventTarget();
+  vi.stubGlobal('window', lifecycle);
+  const terminate = vi.fn();
+  let worker: Worker;
+  vi.stubGlobal('Worker', class {
+    onerror: Worker['onerror'] = null;
+    onmessage: Worker['onmessage'] = null;
+    terminate = terminate;
+    postMessage() {}
+    constructor() { worker = this as unknown as Worker; }
+  });
+  const receive = vi.fn();
+  requestRoadDisplay({ type: 'FeatureCollection', features: [] }, receive);
+  lifecycle.dispatchEvent(new Event('pagehide'));
+  expect(terminate).toHaveBeenCalledOnce();
+  worker!.onerror!(new Event('error') as ErrorEvent);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  expect(receive).not.toHaveBeenCalled();
+});
