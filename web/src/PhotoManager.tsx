@@ -36,6 +36,9 @@ import type { PhotoChange } from './photo-workspace';
 import './photo-manager.css';
 import type { PhotoOptimizerRequest } from './PhotoOptimizer';
 import { associateLocalPhoto } from './photo-local';
+import { GripVertical, SlidersHorizontal, Trash2 } from 'lucide-react';
+import { usePhotoOrder } from './use-photo-order';
+import type { PhotoJob } from './photo-queue-store';
 const PhotoOptimizer = lazy(() => import('./PhotoOptimizer'));
 
 // Stable event handlers read the current render without invalidating unrelated cards.
@@ -134,6 +137,7 @@ function PhotoImage({
     </Placeholder>
   ) : (
     <img
+      draggable={false}
       className={className}
       src={url || photo.url}
       alt={photo.alt || photo.caption || 'Photograph preview'}
@@ -221,6 +225,7 @@ export function PhotoManager({
     else if (tab === 'review') setReviewVisited(true);
   }, [open, tab]);
   const [removed, setRemoved] = useState(false),
+    [reordered, setReordered] = useState(false),
     [query, setQuery] = useState(''),
     [library, setLibrary] = useState<PrivatePhoto[]>([]),
     [nextOffset, setNextOffset] = useState<number | null>(null);
@@ -333,6 +338,7 @@ export function PhotoManager({
       onApply({ photos, removeIds, replaces });
       setError('');
       setRemoved(false);
+      setReordered(false);
       setMessage(
         'Saved to map draft. Preview and publish the release to make this public.',
       );
@@ -347,6 +353,7 @@ export function PhotoManager({
     if (existing) {
       setSelected(existing.key);
       setTab('review');
+      openPhotoEditor(existing);
       return;
     }
     setBusy(photo.id);
@@ -392,11 +399,26 @@ export function PhotoManager({
       ]);
       setSelected(key);
       setTab('review');
+      openPhotoEditor(store.snapshot(target).find((j) => j.key === key)!);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
     }
+  };
+  const openPhotoEditor = (item: PhotoJob) => {
+    setSelected(item.key);
+    setOptimizing({
+      localId: item.localImageId,
+      photo: item.localImageId
+        ? undefined
+        : item.metadata.sha256 && item.previewUrl
+          ? ({ ...item.metadata, url: item.previewUrl } as CampusPhoto)
+          : undefined,
+      metadata: item.metadata,
+      replacesJob: item.key,
+      original: item.original,
+    });
   };
   const change = useLiveCallback((key: keyof CampusPhoto, value: unknown) => {
     if (!job || job.approved) return;
@@ -477,10 +499,12 @@ export function PhotoManager({
     const next = store
       .snapshot(target)
       .find((j) => j.key !== job.key && j.state === 'needs details');
-    if (next) setSelected(next.key);
+    if (next && !optimizing) setSelected(next.key);
   });
-  const attach = async () => {
-    const ready = queue.jobs.filter((j) => j.state === 'ready');
+  const attach = async (only?: string) => {
+    const ready = queue.jobs.filter(
+      (j) => j.state === 'ready' && (!only || j.key === only),
+    );
     if (!ready.length) return;
     setBusy('attach');
     setAttaching(ready.map((j) => j.key));
@@ -535,6 +559,7 @@ export function PhotoManager({
         );
         setSelected(undefined);
         setTab('gallery');
+        if (only) setOptimizing(null);
       }
     } catch (e) {
       setError((e as Error).message);
@@ -598,9 +623,21 @@ export function PhotoManager({
     const [p] = next.splice(index, 1);
     next.splice(to, 0, p);
     galleryFocus.current = p.id;
-    if (apply(next)) setGalleryPage(Math.floor(to / 20));
-    else galleryFocus.current = null;
+    if (apply(next)) {
+      setGalleryPage(Math.floor(to / 20));
+      setReordered(true);
+      setMessage(
+        'Photo order saved to the map draft. The first photo is the cover.',
+      );
+    } else galleryFocus.current = null;
   };
+  const ordering = usePhotoOrder(
+    gallery,
+    panel,
+    open && tab === 'gallery' && editable && !busy,
+    move,
+    setGalleryPage,
+  );
   const chosenBuilding = job?.metadata.buildingId;
   const buildingError = fieldErrors.buildingId;
   const buildingPicker = useMemo(
@@ -921,17 +958,76 @@ export function PhotoManager({
             owner={owner}
             target={target}
             request={optimizing}
+            details={
+              optimizing.replacesJob && job?.key === optimizing.replacesJob ? (
+                <>
+                  <p>
+                    Save caption and credits here. Use for map applies image
+                    edits and returns them for a final quality check.
+                  </p>
+                  {error && (
+                    <p role="alert" className="photo-error">
+                      {error}
+                    </p>
+                  )}
+                  {reviewForm}
+                  <button
+                    className="photo-primary"
+                    disabled={
+                      busy === 'attach' || job.state !== 'ready' || !editable
+                    }
+                    onClick={() => void attach(job.key)}
+                  >
+                    Save reviewed details to draft
+                  </button>
+                </>
+              ) : undefined
+            }
             protectedIds={store.jobs.flatMap((j) =>
               j.localImageId ? [j.localImageId] : [],
             )}
             onClose={() => setOptimizing(null)}
             onReady={(photos, replacesJob) => {
-              store.enqueuePrepared(target, photos);
+              const previous = replacesJob
+                ? store.snapshot(target).find((j) => j.key === replacesJob)
+                : undefined;
+              if (
+                previous &&
+                ['queued', 'uploading', 'processing'].includes(previous.state)
+              )
+                throw Error(
+                  'Wait for the current private upload to finish before replacing it. Your image edits are saved locally.',
+                );
+              const keys = store.enqueuePrepared(
+                target,
+                photos.map((p) => ({
+                  ...p,
+                  metadata: {
+                    ...p.metadata,
+                    ...photoDetails(previous?.metadata || p.metadata),
+                    modifications: p.metadata.modifications,
+                  },
+                })),
+              );
+              if (!keys?.length)
+                throw Error(
+                  'Another tab is processing photos. Resume this queue here first.',
+                );
               if (replacesJob) store.remove(replacesJob);
               setTab('review');
               setMessage(
                 'Optimised images queued for private upload. Review their final quality and details before adding to the map draft.',
               );
+              if (replacesJob) {
+                const next = store
+                  .snapshot(target)
+                  .find((j) => j.key === keys[0]);
+                if (next) {
+                  openPhotoEditor(next);
+                  return true;
+                }
+              }
+              return false;
             }}
           />
         </Suspense>
@@ -1002,16 +1098,17 @@ export function PhotoManager({
               {message && (
                 <output className="photo-notice">
                   {message}{' '}
-                  {removed && (
+                  {(removed || reordered) && (
                     <button
                       data-photo-undo
                       onClick={() => {
                         onUndo();
                         setRemoved(false);
-                        setMessage('Removal undone.');
+                        setReordered(false);
+                        setMessage('Photo change undone.');
                       }}
                     >
-                      Undo removal
+                      {removed ? 'Undo removal' : 'Undo reorder'}
                     </button>
                   )}
                 </output>
@@ -1077,7 +1174,15 @@ export function PhotoManager({
                       visitors recognise this place.
                     </p>
                   )}
-                  <div className="photo-grid">
+                  <p id={ordering.instructionsId} className="small-note">
+                    Drag the grip to arrange photos. The first photo is the
+                    cover. With a keyboard, press Space on a grip, use arrow
+                    keys or Home/End, then Space to drop. Escape cancels.
+                  </p>
+                  <output className="sr-only" aria-live="polite">
+                    {ordering.announcement}
+                  </output>
+                  <div className="photo-grid" aria-label="Gallery order">
                     {gallery
                       .slice(galleryPage * 20, (galleryPage + 1) * 20)
                       .map((p, localIndex) => {
@@ -1086,11 +1191,17 @@ export function PhotoManager({
                           <StableCard
                             key={p.id}
                             value={p}
-                            detail={`${i}:${busy}:${queue.editable}`}
+                            detail={`${i}:${busy}:${queue.editable}:${ordering.preview?.id}:${ordering.preview?.to}`}
                           >
                             <article
                               className="photo-card"
                               data-photo-id={p.id}
+                              data-dragging={
+                                ordering.preview?.id === p.id || undefined
+                              }
+                              data-drop-target={
+                                ordering.preview?.to === i || undefined
+                              }
                             >
                               <PhotoImage
                                 photo={{
@@ -1111,50 +1222,31 @@ export function PhotoManager({
                               </p>
                               <div className="photo-actions">
                                 <button
-                                  disabled={!queue.editable || busy === p.id}
-                                  onClick={() =>
-                                    setOptimizing({
-                                      photo: {
-                                        ...p,
-                                        url: previewUrls[p.id] || p.url,
-                                      },
-                                    })
-                                  }
+                                  className="photo-icon photo-drag-handle"
+                                  title="Drag to reorder; Space and arrow keys with a keyboard"
+                                  {...ordering.handle(p, i)}
                                 >
-                                  Edit & optimise
+                                  <GripVertical aria-hidden="true" />
                                 </button>
                                 <button
-                                  disabled={!queue.editable || busy === p.id}
+                                  className="photo-icon"
+                                  title="Edit photo"
+                                  aria-label={`Edit photo: ${p.caption}`}
+                                  disabled={!queue.editable || !!busy}
                                   onClick={() => void editPhoto(p)}
                                 >
-                                  Edit details
+                                  <SlidersHorizontal aria-hidden="true" />
                                 </button>
                                 <button
-                                  disabled={i === 0}
-                                  onClick={() => move(i, 0)}
-                                >
-                                  Make cover
-                                </button>
-                                <button
-                                  aria-label={`Move ${p.caption} earlier`}
-                                  disabled={i === 0}
-                                  onClick={() => move(i, i - 1)}
-                                >
-                                  Move earlier
-                                </button>
-                                <button
-                                  aria-label={`Move ${p.caption} later`}
-                                  disabled={i === gallery.length - 1}
-                                  onClick={() => move(i, i + 1)}
-                                >
-                                  Move later
-                                </button>
-                                <button
+                                  className="photo-icon photo-delete"
+                                  title="Delete from gallery"
+                                  aria-label={`Delete photo: ${p.caption}`}
+                                  disabled={!queue.editable || !!busy}
                                   onClick={() => {
                                     if (apply([], [p.id])) setRemoved(true);
                                   }}
                                 >
-                                  Remove
+                                  <Trash2 aria-hidden="true" />
                                 </button>
                               </div>
                             </article>
@@ -1389,7 +1481,7 @@ export function PhotoManager({
                         label="Uploads"
                       />
                     </aside>
-                    {reviewForm}
+                    {!optimizing && reviewForm}
                   </div>
                 </div>
               )}

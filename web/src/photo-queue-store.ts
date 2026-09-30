@@ -1,5 +1,5 @@
 import { api, supabase, uploadPhotoOriginal } from './supabase';
-import { photoDetails } from './photo-details';
+import { photoDetails, samePhotoRights } from './photo-details';
 import type { CampusPhoto } from './types';
 import { readPhotoRecovery, writePhotoRecovery } from './photo-recovery';
 import { PhotoPreviews, type SignedPreview } from './photo-previews';
@@ -359,11 +359,13 @@ export class PhotoQueueStore {
         revision: 0,
         state: 'queued',
         reviewed: false,
-        rightsReviewed: !!photo.original,
+        rightsReviewed:
+          !!photo.original && samePhotoRights(photo.metadata, photo.original),
         authorshipConfirmed: photo.metadata.sourceKind === 'author-upload',
       };
     });
     this.update(target, (items) => [...items, ...entries]);
+    return entries.map((entry) => entry.key);
   };
   private nextThumbnail() {
     if (this.stopped || this.decoding) return;

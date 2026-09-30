@@ -1617,8 +1617,19 @@ for (const width of [1440, 390])
     );
     await page
       .getByRole('dialog', { name: 'Edit & optimise photos' })
+      .getByRole('button', { name: 'Local image drafts', exact: true })
+      .click();
+    await page
+      .getByRole('dialog', { name: 'Edit & optimise photos' })
+      .getByText('Batch tools', { exact: true })
+      .click();
+    await page
+      .getByRole('dialog', { name: 'Edit & optimise photos' })
       .getByRole('button', { name: 'Use batch for map', exact: true })
       .click();
+    await expect(
+      page.getByRole('dialog', { name: 'Edit & optimise photos' }),
+    ).toBeHidden({ timeout: 60000 });
     await expect(
       dialog.getByText('Interrupted processing. Retry this photo.', {
         exact: true,
@@ -1701,11 +1712,44 @@ for (const width of [1440, 390])
         () => server.edits().find((e) => e.id === 'library')?.properties.photos,
       )
       .toHaveLength(2);
-    await dialog
-      .locator('.photo-card')
-      .filter({ hasText: 'Courtyard view' })
-      .getByRole('button', { name: 'Make cover' })
-      .click();
+    const reorder = dialog.getByRole('button', {
+      name: 'Reorder Courtyard view',
+      exact: true,
+    });
+    await reorder.press('Space');
+    await reorder.press('Home');
+    await reorder.press('Enter');
+    await expect(dialog.locator('.photo-card').first()).toContainText(
+      'Courtyard view',
+    );
+    await expect(
+      dialog.getByRole('button', {
+        name: /Make cover|Move earlier|Move later/,
+      }),
+    ).toHaveCount(0);
+    if (width === 1440) {
+      const grip = await reorder.boundingBox();
+      const target = await dialog.locator('.photo-card').last().boundingBox();
+      await page.mouse.move(
+        grip!.x + grip!.width / 2,
+        grip!.y + grip!.height / 2,
+      );
+      await page.mouse.down();
+      await page.mouse.move(target!.x + target!.width / 2, target!.y + 50, {
+        steps: 8,
+      });
+      await page.mouse.up();
+      await expect(dialog.locator('.photo-card').first()).toContainText(
+        'Front view',
+      );
+      await dialog.getByRole('button', { name: 'Undo reorder' }).click();
+      await expect(dialog.locator('.photo-card').first()).toContainText(
+        'Courtyard view',
+      );
+    }
+    await reorder.press('Space');
+    await reorder.press('End');
+    await reorder.press('Escape');
     await expect(dialog.locator('.photo-card').first()).toContainText(
       'Courtyard view',
     );
@@ -1726,7 +1770,7 @@ for (const width of [1440, 390])
     await dialog
       .locator('.photo-card')
       .first()
-      .getByRole('button', { name: 'Remove', exact: true })
+      .getByRole('button', { name: /^Delete photo:/ })
       .click();
     await expect(dialog.locator('.photo-card')).toHaveCount(1);
     await dialog.getByRole('button', { name: 'Undo removal' }).click();
@@ -1831,7 +1875,7 @@ test('an upload keeps its original building when the inspector changes mid-uploa
     });
     await page
       .getByRole('dialog', { name: 'Edit & optimise photos' })
-      .getByRole('button', { name: 'Use selected for map', exact: true })
+      .getByRole('button', { name: 'Use for map', exact: true })
       .click();
     await expect.poll(() => started).toBe(true);
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
@@ -1923,9 +1967,13 @@ for (const width of [1440, 390])
     await panel
       .getByRole('button', { name: 'Manage photos · 1', exact: true })
       .click();
-    const photosDialog = page.getByRole('dialog');
+    const galleryDialog = page.getByRole('dialog', { name: /Photos ·/ });
+    await galleryDialog.getByRole('button', { name: /^Edit photo:/ }).click();
+    const photosDialog = page.getByRole('dialog', {
+      name: 'Edit & optimise photos',
+    });
     await photosDialog
-      .getByRole('button', { name: 'Edit details', exact: true })
+      .getByRole('button', { name: 'Photo details', exact: true })
       .click();
     await photosDialog
       .getByLabel('Caption', { exact: true })
@@ -1937,9 +1985,9 @@ for (const width of [1440, 390])
       .getByRole('button', { name: 'Mark ready', exact: true })
       .click();
     await photosDialog
-      .getByRole('button', { name: 'Add reviewed photos to draft' })
+      .getByRole('button', { name: 'Save reviewed details to draft' })
       .click();
-    await photosDialog
+    await galleryDialog
       .getByRole('button', { name: 'Close', exact: true })
       .click();
     await expect(page.locator('.editor-save-state')).toHaveText('Saved');
@@ -9061,6 +9109,7 @@ for (const viewport of [
     await expect(
       editor.getByRole('button', { name: 'Preview changes', exact: true }),
     ).toBeEnabled();
+    await editor.getByText('Resize', { exact: true }).click();
     await editor.getByLabel('Longest edge (px)', { exact: true }).fill('800');
     await editor
       .getByRole('button', { name: 'Preview changes', exact: true })
@@ -9081,6 +9130,7 @@ for (const viewport of [
       path: info.outputPath(`photo-compression-${viewport.width}.png`),
     });
     expect(uploads).toBe(0);
+    await editor.getByText('Crop & orientation', { exact: true }).click();
     await editor
       .getByRole('button', { name: 'Rotate right', exact: true })
       .click();
@@ -9129,6 +9179,8 @@ for (const viewport of [
     await gallery
       .getByRole('button', { name: 'Local image drafts · edit offline' })
       .click();
+    await editor.getByText('Resize', { exact: true }).click();
+    await editor.getByText('Crop & orientation', { exact: true }).click();
     await expect(
       editor.getByLabel('Longest edge (px)', { exact: true }),
     ).toHaveValue('800');
@@ -9198,11 +9250,28 @@ test('prepared offline image tools reload originals and recipes and queue withou
     ),
   });
   await editor
+    .getByRole('button', { name: 'Local image drafts', exact: true })
+    .click();
+  await editor
     .getByRole('button', { name: 'Prepare for offline use', exact: true })
     .click();
-  await expect(editor.getByText(/Image tools ready offline/)).toBeVisible();
+  await expect(
+    editor.getByRole('button', { name: 'Ready offline', exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  expect(
+    await page.evaluate(
+      async () =>
+        (await (await caches.open('turnright-assets-v1')).keys()).filter((r) =>
+          new URL(r.url).pathname.startsWith('/photo-codecs/'),
+        ).length,
+    ),
+  ).toBe(8);
   offline = true;
   await context.setOffline(true);
+  await editor
+    .getByRole('button', { name: 'Image settings', exact: true })
+    .click();
+  await editor.getByText('Resize', { exact: true }).click();
   await editor.getByLabel('Longest edge (px)', { exact: true }).fill('640');
   await editor
     .getByRole('button', { name: 'Preview changes', exact: true })
@@ -9226,6 +9295,7 @@ test('prepared offline image tools reload originals and recipes and queue withou
   await gallery
     .getByRole('button', { name: 'Local image drafts · edit offline' })
     .click();
+  await editor.getByText('Resize', { exact: true }).click();
   await expect(
     editor.getByLabel('Longest edge (px)', { exact: true }),
   ).toHaveValue('640');
@@ -9237,7 +9307,7 @@ test('prepared offline image tools reload originals and recipes and queue withou
   ).toBeEnabled();
   await page.screenshot({ path: info.outputPath('photo-editing-offline.png') });
   await editor
-    .getByRole('button', { name: 'Use selected for map', exact: true })
+    .getByRole('button', { name: 'Use for map', exact: true })
     .click();
   await expect(editor).toHaveCount(0);
   await expect(gallery.getByText('queued', { exact: true })).toBeVisible();

@@ -159,6 +159,40 @@
   font-size: 12px;
   padding: 6px 9px;
 }
+.photo-card .photo-actions .photo-icon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+}
+.photo-icon svg {
+  width: 19px;
+  height: 19px;
+}
+.photo-drag-handle {
+  touch-action: none;
+  cursor: grab !important;
+}
+.photo-drag-handle[aria-pressed='true'] {
+  cursor: grabbing !important;
+}
+.photo-card .photo-delete {
+  color: var(--error-text);
+  margin-left: auto;
+}
+.photo-card[data-dragging] {
+  opacity: 0.65;
+}
+.photo-card[data-drop-target] {
+  outline: 3px solid var(--link);
+  outline-offset: -3px;
+}
+.photo-workspace button:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 2px;
+}
 .photo-notice {
   display: block;
   padding: 12px;
