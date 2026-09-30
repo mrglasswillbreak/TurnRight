@@ -45,6 +45,32 @@ export async function withDeploymentAccess(origin, read, deploymentId) {
     await update({revoke:{secret,regenerate:false}});
   }
 }
+/** Recover immutable package assets retained by the current site after deployment expiry. */
+export async function withRetainedPackageAccess(historical, read) {
+  try {
+    return await withDeploymentAccess(
+      historical.deployment_url,
+      (headers) => read(headers, historical.deployment_url),
+      historical.deployment_id,
+    );
+  } catch (error) {
+    if (!/^Vercel 404:/.test(error.message)) throw error;
+    const project = await vercelApi(
+      '/v9/projects/' + encodeURIComponent(process.env.VERCEL_PROJECT_ID),
+    );
+    const current = project.targets?.production;
+    if (!current?.id || !current.url)
+      throw Error('Historical deployment expired and no current package host is available');
+    const retainedOrigin = 'https://' + current.url;
+    console.log('Historical deployment expired; checking its immutable package on the current production host');
+    // The caller still verifies the exact historical version and every asset hash.
+    return withDeploymentAccess(
+      retainedOrigin,
+      (headers) => read(headers, retainedOrigin),
+      current.id,
+    );
+  }
+}
 export async function uploadSource(root) {
   const files = [];
   // Explicit scope excludes .env, secrets, raw imports, Git history, and dependencies.
