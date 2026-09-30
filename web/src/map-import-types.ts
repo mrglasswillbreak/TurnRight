@@ -91,6 +91,12 @@ export function suggestedImportIdentifier(layer: ImportLayer) {
   )?.name;
 }
 export interface ImportPreview {
+  reportCounts?: {
+    repairs: number;
+    diagnostics: number;
+    errors: number;
+    duplicates: number;
+  };
   sampling?: { layer: string; shown: number; total: number }[];
   repairs?: {
     layer: string;

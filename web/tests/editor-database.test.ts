@@ -59,6 +59,7 @@ beforeAll(async () => {
     '016_bulk_import_review_queue.sql',
     '017_import_queue_deadline.sql',
     '018_vector_layer_edits.sql',
+    '019_additive_source_patch.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -78,6 +79,133 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+it('applies an additive campus patch atomically with stale guards and rollback while retaining drafts', async () => {
+  const campus = 'campus-patch-test';
+  await database.query(
+    "insert into campuses(id,slug,name,boundary,bounds) select $1,'patch-test','Patch test',boundary,bounds from campuses where id='lasu'",
+    [campus],
+  );
+  const lasuBefore = (
+    await database.query(
+      "select * from source_features where campus_id='lasu' order by id",
+    )
+  ).rows;
+  try {
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    await database.exec(
+      "insert into source_features(id,source,entity,payload,hash) values('meta:campus','combined','meta','{\"version\":\"old\"}','old'),('feature:keep','original','feature','{\"geometry\":{\"type\":\"Point\",\"coordinates\":[3.2,6.4]},\"properties\":{\"name\":\"Old\",\"appearance\":{\"wallColour\":\"#112233\"}}}','keep'),('feature:untouched','original','feature','{}','untouched')",
+    );
+    const expected = (
+      await database.query(
+        'select id,hash,updated_at,source,entity from source_features where campus_id=$1 order by id',
+        [campus],
+      )
+    ).rows;
+    const patches = [
+      {
+        id: 'meta:campus',
+        source: 'combined',
+        entity: 'meta',
+        hash: 'new',
+        payload_patch: { version: 'new' },
+      },
+      {
+        id: 'feature:keep',
+        source: 'original',
+        entity: 'feature',
+        hash: 'changed',
+        properties_patch: { name: 'Reviewed' },
+      },
+      {
+        id: 'feature:added',
+        source: 'new-source',
+        entity: 'feature',
+        hash: 'added',
+        payload: { properties: { kind: 'land' } },
+      },
+    ];
+    const args = [
+      owner,
+      'new',
+      JSON.stringify(expected),
+      JSON.stringify(patches),
+    ];
+    const result = await database.query<{ receipt: string }>(
+      'select apply_additive_source_patch($1::uuid,$2,$3::jsonb,$4::jsonb) as receipt',
+      args,
+    );
+    const after = (
+      await database.query<{ id: string; payload: any }>(
+        'select id,payload from source_features where campus_id=$1 order by id',
+        [campus],
+      )
+    ).rows;
+    expect(after).toHaveLength(4);
+    expect(after.find((r) => r.id === 'feature:keep')?.payload).toMatchObject({
+      geometry: { type: 'Point' },
+      properties: { name: 'Reviewed', appearance: { wallColour: '#112233' } },
+    });
+    expect(
+      (
+        await database.query<{
+          before_sources: unknown[];
+          after_sources: unknown[];
+        }>(
+          'select before_sources,after_sources from baseline_reconciliations where id=$1',
+          [result.rows[0].receipt],
+        )
+      ).rows[0],
+    ).toMatchObject({
+      before_sources: expect.any(Array),
+      after_sources: expect.any(Array),
+    });
+    await expect(
+      database.query(
+        'select apply_additive_source_patch($1::uuid,$2,$3::jsonb,$4::jsonb)',
+        args,
+      ),
+    ).rejects.toThrow('baseline changed');
+    const next = (
+      await database.query(
+        'select id,hash,updated_at,source,entity from source_features where campus_id=$1 order by id',
+        [campus],
+      )
+    ).rows;
+    await expect(
+      database.query(
+        'select apply_additive_source_patch($1::uuid,$2,$3::jsonb,$4::jsonb)',
+        [owner, 'wrong', JSON.stringify(next), JSON.stringify([patches[1]])],
+      ),
+    ).rejects.toThrow('version mismatch');
+    expect(
+      (
+        await database.query(
+          "select * from source_features where campus_id='lasu' order by id",
+        )
+      ).rows,
+    ).toEqual(lasuBefore);
+    expect(
+      (
+        await database.query(
+          'select id,hash,updated_at,source,entity from source_features where campus_id=$1 order by id',
+          [campus],
+        )
+      ).rows,
+    ).toEqual(next);
+  } finally {
+    await database.query(
+      'delete from baseline_reconciliations where campus_id=$1',
+      [campus],
+    );
+    await database.query('delete from source_features where campus_id=$1', [
+      campus,
+    ]);
+    await database.query('delete from campuses where id=$1', [campus]);
+    await database.exec("select set_config('request.headers','{}',false)");
+  }
 });
 describe('private media migration', () => {
   it('guards authored drafts against older writers and verifies private asset ownership', async () => {

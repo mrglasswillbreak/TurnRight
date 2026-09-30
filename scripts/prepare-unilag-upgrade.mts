@@ -67,7 +67,20 @@ if(process.env.APPLY_UNILAG==='true'){
   if(!owner)throw Error('Campus owner missing');
   // Transaction compares every source row and saves a rollback receipt. Existing
   // private drafts are not written, deleted, consumed or renumbered.
-  report.reconciliationId=await db('rpc/reconcile_published_baseline','POST',{actor:owner.id,published_version:published.version,expected_sources:previous,records:records.map(({id,entity,source,payload,hash})=>({id,entity,source,payload,hash}))},'return=representation',75000);
+  const oldIndex=new Map(previous.map(r=>[r.id,r]));
+  const patches=records.flatMap(record=>{
+    const old=oldIndex.get(record.id),base={id:record.id,source:record.source,entity:record.entity,hash:record.hash};
+    if(!old)return [{...base,payload:record.payload}];
+    if(old.hash===record.hash && hash(old.payload)===hash(record.payload))return [];
+    const payload_patch=Object.fromEntries(Object.entries(record.payload).filter(([key,value])=>key!=='properties'&&JSON.stringify(old.payload[key])!==JSON.stringify(value)));
+    const properties_patch=record.entity==='feature'?Object.fromEntries(Object.entries(record.payload.properties||{}).filter(([key,value])=>JSON.stringify(old.payload.properties?.[key])!==JSON.stringify(value))):undefined;
+    return [{...base,payload_patch,...(properties_patch?{properties_patch}:{})}];
+  });
+  const request={actor:owner.id,published_version:published.version,expected_sources:previous.map(({id,source,entity,hash,updated_at})=>({id,source,entity,hash,updated_at})),patches};
+  console.log(JSON.stringify({patchRecords:patches.length,requestBytes:Buffer.byteLength(JSON.stringify(request))}));
+  report.reconciliationId=await db('rpc/apply_additive_source_patch','POST',request,'return=representation',75000);
+  const accepted=await allRows('source_features');
+  if(accepted.length!==records.length || accepted.some(r=>r.hash!==index.get(r.id)?.hash))throw Error('Additive reconciliation read-back mismatch');
   if(hash(await allRows('map_edits'))!==hash(edits))throw Error('Drafts changed during preparation; pause publication and review.');
   process.env.CAMPUS_ID='lasu';const lasuAfter={features:hash(await allRows('source_features')),edits:hash(await allRows('map_edits'))};process.env.CAMPUS_ID=oldCampus;
   if(hash(lasuAfter)!==hash(lasuBefore))throw Error('LASU state changed during preparation; investigate before publication');

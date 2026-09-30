@@ -1038,8 +1038,18 @@ export default function CampusWorkspace({
                   {!!job.summary.repairs?.length && (
                     <details open>
                       <summary>
-                        {job.summary.repairs.length} automatic geometry repairs
+                        {job.summary.reportCounts?.repairs ??
+                          job.summary.repairs.length}{' '}
+                        automatic geometry repairs
                       </summary>
+                      {(job.summary.reportCounts?.repairs || 0) >
+                        job.summary.repairs.length && (
+                        <p className="hint">
+                          Showing the first {job.summary.repairs.length}{' '}
+                          receipts. The complete report is retained with the
+                          private import candidate.
+                        </p>
+                      )}
                       {job.summary.repairs.map((r, i) => (
                         <p key={i}>
                           {r.layer} · {r.sourceId}: {r.actions.join(', ')}
