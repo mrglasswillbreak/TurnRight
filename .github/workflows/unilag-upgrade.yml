@@ -1,0 +1,36 @@
+name: UNILAG detail release preparation
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/unilag-vector-detail]
+    paths: [.github/workflows/unilag-upgrade.yml]
+permissions:
+  contents: read
+concurrency:
+  group: unilag-detail-preparation
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CAMPUS_ID: campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a
+      PUBLISHED_MAP_URL: https://turnright.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: mkdir -p work && npx tsx ../scripts/audit-unilag.mts
+        working-directory: web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unilag-baseline-receipt
+          path: web/work/unilag-baseline-receipt.json
+          retention-days: 7
