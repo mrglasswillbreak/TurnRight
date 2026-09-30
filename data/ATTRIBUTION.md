@@ -1,8 +1,8 @@
 # Source attribution
 
-## LASU layer candidates — 30 September 2026
+## LASU road and landscape release — 30 September 2026
 
-The [LASU coverage review](../docs/LASU-LAYERS.md) refreshes the existing ArcGIS land-use classification and reviews a complete OSM extract, the complete Badagry Creek relation and previously downloaded Overture candidates. Checksums and dispositions are in the [candidate ledger](campus-layer-enrichment/lasu-candidate-ledger.json). No new ArcGIS geometry is added by this patch. Derived surface geometry retains the existing centreline attribution, including **© OpenStreetMap contributors, ODbL-1.0** where applicable. Widths are labelled illustrative estimates unless explicitly evidenced; road class supplies no pavement or access claim. Raw downloads and private drafts remain private. These candidate data have not yet been published.
+The [LASU coverage review](../docs/LASU-LAYERS.md) refreshes the existing ArcGIS land-use classification and reviews a complete OSM extract, the complete Badagry Creek relation and previously downloaded Overture candidates. Checksums and dispositions are in the [candidate ledger](campus-layer-enrichment/lasu-candidate-ledger.json). No new ArcGIS geometry is added by this patch. Derived surface geometry retains the existing centreline attribution, including **© OpenStreetMap contributors, ODbL-1.0** where applicable. Widths are labelled illustrative estimates unless explicitly evidenced; road class supplies no pavement or access claim. Raw downloads and private drafts remain private. Package `lasu-4895a363b403` publishes 82 illustrative surfaces and corrected classifications for the 30 existing land polygons. The remaining 12 fully excluded roads and one unresolved geometry conflict are accounted for in the coverage report. No new pavement, sidewalk, access or field-survey claim accompanies these estimates.
 
 ## Additional campuses and imported sources
 
