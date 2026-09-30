@@ -96,10 +96,14 @@ export default function PhotoOptimizer({
     [tool, setTool] = useState<PhotoTool>('navigate'),
     [panel, setPanel] = useState<'edit' | 'details' | 'files' | null>('edit'),
     [previewBusy, setPreviewBusy] = useState(false),
+    [previewPaused, setPreviewPaused] = useState(false),
     [past, setPast] = useState<PhotoRecipe[]>([]),
     [future, setFuture] = useState<PhotoRecipe[]>([]);
   const itemsRef = useRef(items);
   itemsRef.current = items;
+  const renderBatch = useRef<
+    (batch: LocalPhoto[], queue: boolean, automatic?: boolean) => Promise<void>
+  >(async () => {});
   const activity = useSyncExternalStore(
     processes.subscribe,
     processes.snapshot,
@@ -236,6 +240,9 @@ export default function PhotoOptimizer({
           });
         }
         if (abort.signal.aborted) return;
+        // New files are prepared together, not only when each one is selected.
+        // Keep originals in recovery before starting any automatic encoding.
+        if (request.files?.length) setBusy(true);
         existing = [...existing, ...added];
         setItems(
           request.replacesJob
@@ -250,9 +257,15 @@ export default function PhotoOptimizer({
           ));
           await write;
           if (pending.current === write) unsaved.current = false;
+          if (abort.signal.aborted) return;
         }
+        if (request.files?.length)
+          await renderBatch.current(added, false, true);
       } catch (e) {
-        if (!abort.signal.aborted) setError((e as Error).message);
+        if (!abort.signal.aborted) {
+          setBusy(false);
+          setError((e as Error).message);
+        }
       }
     })();
     return () => {
@@ -264,6 +277,7 @@ export default function PhotoOptimizer({
   }, [owner, target, request]);
   const change = (patch: Partial<PhotoRecipe>) => {
     if (!current) return;
+    setPreviewPaused(false);
     const geometryChanged =
       patch.crop ||
       patch.rotation !== undefined ||
@@ -297,20 +311,31 @@ export default function PhotoOptimizer({
     (undo ? setFuture : setPast)((v) => [...v, current.recipe]);
     save({ ...current, recipe: r, output: undefined });
   };
-  const render = async (batch: LocalPhoto[], queue: boolean) => {
+  const render = async (
+    batch: LocalPhoto[],
+    queue: boolean,
+    automatic = false,
+  ) => {
     previewController.current?.abort();
     const abort = new AbortController();
     controller.current = abort;
     setBusy(true);
     setError('');
+    setPreviewPaused(false);
     const process = processes.begin(
-      queue ? 'Prepare photos for upload' : 'Optimise photographs',
+      automatic
+        ? 'Compress added photos'
+        : queue
+          ? 'Prepare photos for upload'
+          : 'Optimise photographs',
       `0 of ${batch.length}`,
       () => abort.abort(),
     );
     try {
       await pending.current;
       const ready: LocalPhoto[] = [];
+      const failures: string[] = [];
+      const oversized: string[] = [];
       for (let i = 0; i < batch.length; i++) {
         while (pause.current) {
           process.update(
@@ -329,87 +354,108 @@ export default function PhotoOptimizer({
           batch.length,
           'images',
         );
-        const recipe = queue
-          ? {
-              ...p.recipe,
-              format: 'image/webp' as const,
-              width: Math.min(1600, p.recipe.width),
-              targetKiB: 250,
-            }
-          : p.recipe;
-        const reusable =
-          p.output &&
-          p.width &&
-          p.height &&
-          JSON.stringify(recipe) === JSON.stringify(p.recipe);
-        const out = reusable
-          ? {
-              blob: p.output!,
-              width: p.width!,
-              height: p.height!,
-              quality: p.outputQuality ?? recipe.quality,
-              targetMet:
-                !recipe.targetKiB || p.output!.size <= recipe.targetKiB * 1024,
-            }
-          : await editPhotoTask(p.source, recipe, abort.signal, p.filename);
-        abort.signal.throwIfAborted();
-        const next = {
-          ...p,
-          recipe,
-          output: out.blob,
-          width: out.width,
-          height: out.height,
-          outputQuality: out.quality,
-          metadata: {
-            ...p.metadata,
-            modifications: [
-              p.sourceModifications ?? p.original?.modifications,
-              photoModifications(recipe),
-            ]
-              .filter(Boolean)
-              .join('; '),
-          },
-        };
-        await updateLocalPhoto(
-          owner,
-          next.id,
-          {
+        try {
+          const recipe = queue
+            ? {
+                ...p.recipe,
+                format: 'image/webp' as const,
+                width: Math.min(1600, p.recipe.width),
+                targetKiB: 250,
+              }
+            : p.recipe;
+          const reusable =
+            p.output &&
+            p.width &&
+            p.height &&
+            JSON.stringify(recipe) === JSON.stringify(p.recipe);
+          const out = reusable
+            ? {
+                blob: p.output!,
+                width: p.width!,
+                height: p.height!,
+                quality: p.outputQuality ?? recipe.quality,
+                targetMet:
+                  !recipe.targetKiB ||
+                  p.output!.size <= recipe.targetKiB * 1024,
+              }
+            : await editPhotoTask(p.source, recipe, abort.signal, p.filename);
+          abort.signal.throwIfAborted();
+          const next = {
+            ...p,
             recipe,
-            metadata: next.metadata,
-            width: next.width,
-            height: next.height,
-            outputQuality: next.outputQuality,
-          },
-          false,
-          next.output,
-        );
-        abort.signal.throwIfAborted();
-        setItems((old) => old.map((v) => (v.id === next.id ? next : v)));
-        ready.push(next);
-        if (!out.targetMet) {
-          setNotice(
-            'The size target could not be met at these settings. Reduce dimensions or quality; the original is retained.',
+            output: out.blob,
+            width: out.width,
+            height: out.height,
+            outputQuality: out.quality,
+            metadata: {
+              ...p.metadata,
+              modifications: [
+                p.sourceModifications ?? p.original?.modifications,
+                photoModifications(recipe),
+              ]
+                .filter(Boolean)
+                .join('; '),
+            },
+          };
+          await updateLocalPhoto(
+            owner,
+            next.id,
+            {
+              recipe,
+              metadata: next.metadata,
+              width: next.width,
+              height: next.height,
+              outputQuality: next.outputQuality,
+            },
+            false,
+            next.output,
           );
-          if (queue)
-            throw Error(
-              `${p.filename} exceeds 250 KiB. Lower dimensions or quality, then try again.`,
+          abort.signal.throwIfAborted();
+          setItems((old) => old.map((v) => (v.id === next.id ? next : v)));
+          ready.push(next);
+          if (!out.targetMet) {
+            oversized.push(p.filename);
+            setNotice(
+              'The size target could not be met at these settings. Reduce dimensions or quality; the original is retained.',
             );
+            if (queue)
+              throw Error(
+                `${p.filename} exceeds 250 KiB. Lower dimensions or quality, then try again.`,
+              );
+          }
+          process.update(
+            `Saved ${i + 1} of ${batch.length} locally`,
+            i + 1,
+            batch.length,
+            'images',
+          );
+        } catch (error) {
+          if (!automatic || abort.signal.aborted) throw error;
+          failures.push(`${p.filename}: ${(error as Error).message}`);
         }
-        process.update(
-          `Saved ${i + 1} of ${batch.length} locally`,
-          i + 1,
-          batch.length,
-          'images',
-        );
       }
-      process.finish(queue ? 'Ready for private upload' : 'Saved locally');
+      if (failures.length) {
+        const message = `${ready.length} of ${batch.length} photos compressed. Originals retained. ${failures.join(' ')}`;
+        setPreviewPaused(true);
+        setError(message);
+        process.fail(Error(message));
+      } else {
+        process.finish(queue ? 'Ready for private upload' : 'Saved locally');
+        if (automatic)
+          setNotice(
+            `${ready.length} ${ready.length === 1 ? 'photo' : 'photos'} compressed locally. ${oversized.length ? `${oversized.length} exceed the size target at the quality floor; reduce dimensions before using for the map. ` : 'Review the result or adjust settings before using for the map. '}Originals retained.`,
+          );
+      }
       if (queue) {
         if (!onReady(ready, request.replacesJob)) onClose();
         else setPanel('details');
       }
     } catch (e) {
       process.fail(e);
-      if (alive.current) setError((e as Error).message);
+      if (alive.current) {
+        setPreviewPaused(true);
+        setError((e as Error).message);
+      }
     } finally {
       if (alive.current) setBusy(false);
       controller.current = null;
@@ -417,6 +463,7 @@ export default function PhotoOptimizer({
       setPaused(false);
     }
   };
+  renderBatch.current = render;
   const close = async () => {
     controller.current?.abort();
     previewController.current?.abort();
@@ -505,7 +552,14 @@ export default function PhotoOptimizer({
   );
   // Editing stays interactive; obsolete previews are cancelled before they can replace a newer draft.
   useEffect(() => {
-    if (!current || current.output || busy || tool !== 'navigate') return;
+    if (
+      !current ||
+      current.output ||
+      busy ||
+      previewPaused ||
+      tool !== 'navigate'
+    )
+      return;
     const photo = current,
       abort = new AbortController();
     previewController.current = abort;
@@ -572,7 +626,7 @@ export default function PhotoOptimizer({
       abort.abort();
       setPreviewBusy(false);
     };
-  }, [current, owner, busy, tool]);
+  }, [current, owner, busy, previewPaused, tool]);
   const saving = current?.output
     ? 100 * (1 - current.output.size / current.source.size)
     : 0;
@@ -735,6 +789,7 @@ export default function PhotoOptimizer({
                       setSelected(p.id);
                       setPast([]);
                       setFuture([]);
+                      setPreviewPaused(false);
                       setTool('navigate');
                     }}
                   >

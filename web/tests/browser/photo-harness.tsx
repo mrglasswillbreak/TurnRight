@@ -12,6 +12,7 @@ function Fixture() {
         <input
           aria-label="Add test photograph"
           type="file"
+          multiple
           accept="image/*"
           onChange={(e) => setRequest({ files: [...(e.target.files || [])] })}
         />

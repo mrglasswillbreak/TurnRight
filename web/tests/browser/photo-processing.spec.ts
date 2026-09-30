@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import sharp from 'sharp';
 import { readFileSync } from 'node:fs';
+import type { LocalPhoto } from '../../src/photo-local';
 test('image worker preserves orientation, formats and flattened redaction and cancels safely', async ({
   page,
 }) => {
@@ -138,6 +139,78 @@ test('Squoosh codecs reduce a photographic image with bounded distortion', async
   }
 });
 
+for (const broken of [false, true])
+  test(`photo comparison compresses all added files automatically${broken ? ' and retains failed originals' : ''}`, async ({
+    page,
+  }) => {
+    await page.goto('/tests/browser/photo-harness.html');
+    const input = await sharp({
+      create: { width: 1800, height: 1000, channels: 3, background: '#ee7755' },
+    })
+      .png()
+      .toBuffer();
+    const names = broken
+      ? ['First.png', 'Broken.png', 'Last.png']
+      : ['First.png', 'Last.png'];
+    await page.getByLabel('Add test photograph').setInputFiles(
+      names.map((name) => ({
+        name,
+        mimeType: 'image/png',
+        buffer: name === 'Broken.png' ? input.subarray(0, 33) : input,
+      })),
+    );
+    // Never select the last file or press Preview/Optimise: adding the batch starts encoding.
+    await expect
+      .poll(
+        () =>
+          page.evaluate(async () => {
+            const path = '/src/photo-local.ts';
+            const { localPhotos } = await import(path);
+            return (
+              await localPhotos('photo-test-owner', 'building:fixture')
+            ).filter((p: { output?: Blob }) => p.output).length;
+          }),
+        { timeout: 30000 },
+      )
+      .toBe(2);
+    const stored = await page.evaluate(async () => {
+      const path = '/src/photo-local.ts';
+      const { localPhotos } = await import(path);
+      return (await localPhotos('photo-test-owner', 'building:fixture')).map(
+        (p: LocalPhoto) => ({
+          name: p.filename,
+          original: p.source.size,
+          output: p.output?.size,
+          format: p.output?.type,
+          width: p.width,
+          quality: p.recipe.quality,
+        }),
+      );
+    });
+    expect(stored).toHaveLength(names.length);
+    for (const photo of stored) {
+      expect(photo.original).toBe(
+        photo.name === 'Broken.png' ? 33 : input.length,
+      );
+      if (photo.name === 'Broken.png') expect(photo.output).toBeUndefined();
+      else {
+        expect(photo.format).toBe('image/webp');
+        expect(photo.width).toBe(1600);
+        expect(photo.quality).toBe(0.84);
+        expect(photo.output).toBeLessThan(input.length);
+        expect(photo.output).toBeLessThanOrEqual(250 * 1024);
+      }
+    }
+    if (broken)
+      await expect(page.getByRole('dialog')).toContainText(
+        '2 of 3 photos compressed. Originals retained.',
+      );
+    else
+      await expect(page.getByRole('dialog')).toContainText(
+        '2 photos compressed locally.',
+      );
+  });
+
 for (const viewport of [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
@@ -154,18 +227,13 @@ for (const viewport of [
         'utf8',
       ),
     )[0];
-    await page
-      .getByLabel('Add test photograph')
-      .setInputFiles({
-        name: 'School of Communication.webp',
-        mimeType: 'image/webp',
-        buffer: readFileSync(
-          new URL(
-            `../../../data/photos/${sample.sha256}.webp`,
-            import.meta.url,
-          ),
-        ),
-      });
+    await page.getByLabel('Add test photograph').setInputFiles({
+      name: 'School of Communication.webp',
+      mimeType: 'image/webp',
+      buffer: readFileSync(
+        new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
+      ),
+    });
     const dialog = page.getByRole('dialog', { name: 'Edit & optimise photos' });
     const download = dialog.getByRole('button', {
       name: 'Download edited image',
@@ -210,6 +278,8 @@ for (const viewport of [
     expect(bounds!.y).toBeGreaterThanOrEqual(0);
     expect(bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
     expect(bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+    await dialog.getByLabel('Download format').scrollIntoViewIfNeeded();
+    await dialog.getByLabel('Download format').focus();
     await page.screenshot({
       path: info.outputPath(`photo-editor-${viewport.width}.png`),
     });
