@@ -108,6 +108,10 @@ The 26 filename prefixes listed in the earlier inventory below have all been ref
 | `editor-model-orbit-current` | Orbit restored after surface editing |
 | `editor-model-landscape` | Model beside one editing panel at 844 × 390 |
 | `editor-sources-current` | Source review and baseline status |
+## Published UNILAG layers · 1 October 2026
+
+`unilag-desktop-layer-controls-2026-10-01.jpg` is an unaltered 1280×720 browser capture of production deployment `dpl_D9tePNWBX3vBnRBoAAEQ2aJFTFDY`, package `unilag-faa044ebdd24`. It shows the expanded desktop panel with one control row 12 px above it, the 116 destinations, classified landscape and retained road surfaces. It replaces the earlier UNILAG overview in the README; older dark/mobile examples retain their dated provenance below. [Public-domain verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36788523640) passed package hashes, both browser engines and offline reopening.
+
 | `editor-releases-current` | Model review blockers before publication |
 | `editor-survey-current` | Survey workspace before recording |
 | `editor-model-window-instance` | One window edited independently, with unchanged neighbours |
