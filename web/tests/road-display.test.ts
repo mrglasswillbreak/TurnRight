@@ -56,3 +56,32 @@ it('terminates pending work on pagehide without starting a fallback import', asy
   await new Promise((resolve) => setTimeout(resolve, 20));
   expect(receive).not.toHaveBeenCalled();
 });
+
+it.each([true, false])('preserves cached-page work and handles its next lifecycle event (reply: %s)', (reply) => {
+  const lifecycle = new EventTarget();
+  vi.stubGlobal('window', lifecycle);
+  const terminate = vi.fn();
+  let worker: Worker;
+  vi.stubGlobal('Worker', class {
+    onerror: Worker['onerror'] = null;
+    onmessage: Worker['onmessage'] = null;
+    terminate = terminate;
+    postMessage() {}
+    constructor() { worker = this as unknown as Worker; }
+  });
+  const receive = vi.fn();
+  const geometry: FeatureCollection = { type: 'FeatureCollection', features: [] };
+  requestRoadDisplay(geometry, receive);
+  lifecycle.dispatchEvent(Object.assign(new Event('pagehide'), { persisted: true }));
+  expect(terminate).not.toHaveBeenCalled();
+  if (reply) {
+    worker!.onmessage!({ data: geometry } as MessageEvent<FeatureCollection>);
+    expect(receive).toHaveBeenCalledWith(geometry);
+  } else {
+    lifecycle.dispatchEvent(Object.assign(new Event('pagehide'), { persisted: false }));
+    expect(receive).not.toHaveBeenCalled();
+  }
+  expect(terminate).toHaveBeenCalledOnce();
+  lifecycle.dispatchEvent(new Event('pagehide'));
+  expect(terminate).toHaveBeenCalledOnce();
+});
