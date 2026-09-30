@@ -18,12 +18,16 @@ afterEach(() => {
 it('rejects foreign historical deployments before creating access and revokes access when copying fails', async () => {
   const changes: Record<string, unknown>[] = [];
   let projectId = 'prj_other';
+  let deploymentUrl = 'other.vercel.app';
+  const deploymentReads: string[] = [];
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: URL | string, init: RequestInit = {}) => {
       const url = new URL(input);
-      if (url.pathname.startsWith('/v13/deployments/'))
-        return Response.json({ projectId });
+      if (url.pathname.startsWith('/v13/deployments/')) {
+        deploymentReads.push(url.pathname);
+        return Response.json({ projectId, url: deploymentUrl });
+      }
       if (url.hostname === 'historical.vercel.app') return new Response('app');
       if (init.method === 'PATCH') {
         changes.push(JSON.parse(String(init.body)));
@@ -42,8 +46,14 @@ it('rejects foreign historical deployments before creating access and revokes ac
   expect(changes).toHaveLength(0);
   projectId = 'prj_test';
   await expect(
-    withDeploymentAccess('https://historical.vercel.app', read),
+    withDeploymentAccess('https://historical.vercel.app', read, 'dpl_history'),
+  ).rejects.toThrow('does not match');
+  expect(changes).toHaveLength(0);
+  deploymentUrl = 'historical.vercel.app';
+  await expect(
+    withDeploymentAccess('https://historical.vercel.app', read, 'dpl_history'),
   ).rejects.toThrow('checksum mismatch');
+  expect(deploymentReads.at(-1)).toBe('/v13/deployments/dpl_history');
   expect(changes).toHaveLength(2);
   expect(changes[1]).toEqual({
     revoke: {
