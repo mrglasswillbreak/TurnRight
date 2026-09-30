@@ -17,7 +17,10 @@ export function requestRoadDisplay(
   const stop = () => {
     stopped = true;
     worker?.terminate();
-    lifecycle?.removeEventListener('pagehide', stop);
+    lifecycle?.removeEventListener('pagehide', hide);
+  };
+  const hide = (event: PageTransitionEvent) => {
+    if (!event.persisted) stop();
   };
   const deliver = (value: FeatureCollection) => {
     if (stopped) return;
@@ -42,7 +45,7 @@ export function requestRoadDisplay(
       });
   };
   // Cancel pending module loading before WebKit unloads the owning document.
-  lifecycle?.addEventListener('pagehide', stop, { once: true });
+  lifecycle?.addEventListener('pagehide', hide);
   try {
     worker = new Worker(new URL('./road-surfaces.worker.ts', import.meta.url), {
       type: 'module',
