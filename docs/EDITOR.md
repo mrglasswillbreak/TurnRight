@@ -1,6 +1,6 @@
 # Editing the campus map
 
-The next layer-workspace upgrade is documented in [Campus layers and road surfaces](CAMPUS-LAYERS.md). Its deployment is pending; [production receipts](PRODUCTION.md) distinguish implemented changes from the live editor.
+The editor includes a persistent **Layers / Features** explorer, road-surface editing and campus-specific layer styling. [Campus layers and road surfaces](CAMPUS-LAYERS.md) describes the full workflow; [production receipts](PRODUCTION.md) identify deployed revisions and published data.
 
 ## Campuses and imports
 
@@ -28,6 +28,16 @@ On phones, ordinary inspector cards and survey sheets use at most 42% of the scr
 Selecting an object on the map or in the feature list animates the map into the space around the editor cards. On phones, long paths zoom out by at most 0.75 zoom levels, showing the stretch nearest the tap or current view instead of fitting the entire path. Short paths and buildings still fit their full geometry; multipart buildings include all wings. Desktop selection continues to fit the whole object. Closing properties returns to the view from before the selection. Editing fields or dragging vertices does not repeatedly refocus the camera.
 
 Public navigation uses mode- and leg-aware GPS matching and rerouting. Driving arrival requires an explicit parked-to-walking transition and retains the chosen parking point and entrance. Architectural model edits never grant routing permissions. See [driving](DRIVING.md) and [arrival guides](ARRIVAL-GUIDES.md).
+
+## Layers, roads and landscape
+
+Open **Layers** to search the tree, select a drawing target or open its attribute table. Layer visibility while editing, editing locks, release inclusion and published visibility are separate settings. Temporary isolation does not change publication. Hidden or locked layers cannot intercept map selection. The selected layer takes priority when features overlap; the chooser identifies each candidate by layer, class, name and source ID.
+
+**Road surface** polygons describe presentation; **Routing path** lines retain access, direction and connection controls. All 179 UNILAG surfaces are available through their layer, independently of **Needs mapping**. Search by name, application ID or original source ID. Edit name, class, material, width/unit and evidence in the inspector. Width changes mark linked estimates for **Preview → Apply** regeneration; surveyed polygons keep their geometry. Manually reshaped estimates require an explicit retain-or-replace decision.
+
+Land and overlay geometry supports up to **20,000 vertices** within the existing request-size limit; other feature kinds retain the 2,000-vertex limit. Progressive handles and a cancellable geometry worker support holes, multipart editing, split and merge without simplifying polygon 96. Review the proposed geometry before applying it. Split outputs keep stable child identities; merges retain the chosen primary identity, lineage and a complete undo command. Routing changes continue through the topology-aware path tools below.
+
+Layer and membership changes save atomically with revision checks and recovery. Bulk actions preview affected counts and form one undoable command. Layer settings are included in release review and offline packages; ordinary GeoJSON exports contain mapped properties and attribution, not private raw source attributes.
 
 ## Map an entrance and its approach
 
@@ -127,7 +137,7 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 
 ## Upgrade and verification
 
-Current installations require migrations **001–017** in order. Production has completed the reader → migration → writer rollout; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share the same owner authorization and explicit campus context. The notes below retain the history of earlier incremental upgrades.
+Current installations require migrations **001–021** in order. Production has completed the reader → migration → writer rollout; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share the same owner authorization and explicit campus context. The notes below retain the history of earlier incremental upgrades.
 
 Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo owner guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the draft and publish through Releases; author-provided photographs without external URLs require package schema 3 and compatible readers.
 
@@ -150,7 +160,7 @@ The original September 11 editor upgrade required migration `003_editor_batches.
 
 Migration 003 was applied to the TurnRight Supabase project on 11 September 2026. Live verification confirmed that receipt RLS is enabled, anonymous and authenticated roles cannot execute the function, and the service role can. The implementation passed 85 unit/database tests, seven real MapLibre/Terra Draw browser tests, seven Python tests, lint (existing warnings), and a production build on Node 22.23.2. Browser coverage includes undoing the first saved correction to a source building and retaining that building after reload.
 
-The editor/API revision `562fa4d8931f5355b53656bf233026d54d443343` was verified in [Vercel preview](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/AfnjaqHZRmqSXx2WZTrVvxkbSzVM), then deployed to [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/3ym4sa7Z4h3Novt781vUUYw5Tgay). Live owner login, source loading, 3D building selection, an authenticated metadata autosave and its saved undo passed in preview. The temporary verification note was reverted; only audit/undo receipts remain. Production `/admin` returned 200 and an unauthenticated admin request returned 401. The published campus package remains `lasu-4e4c8008b38b`, schema version 1. No source proposals or campus-data releases were published by this rollout.
+The editor/API revision `562fa4d8931f5355b53656bf233026d54d443343` was verified in [Vercel preview](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/AfnjaqHZRmqSXx2WZTrVvxkbSzVM), then deployed to [production](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/3ym4sa7Z4h3Novt781vUUYw5Tgay). Live owner login, source loading, 3D building selection, an authenticated metadata autosave and its saved undo passed in preview. The temporary verification note was reverted; only audit/undo receipts remain. Production `/admin` returned 200 and an unauthenticated admin request returned 401. At that September 11 checkpoint the published package was `lasu-4e4c8008b38b`, schema version 1; it has since been superseded. No source proposals or campus-data releases were published by this rollout.
 
 That historical rollout found a baseline predating published corrections. Later reconciliation and publication are recorded in [Production](PRODUCTION.md). Inspect the current workspace’s reconciliation state rather than repeating an old baseline repair.
 
