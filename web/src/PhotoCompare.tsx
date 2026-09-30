@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Minus, Plus, Scan } from 'lucide-react';
+import { ChevronsLeftRight, Minus, Plus, Scan } from 'lucide-react';
 import type { PhotoRecipe } from './photo-edit';
 /* Spatial pan/crop surface: arrow keys pan, Escape cancels; labelled numeric crop
    and zoom fields provide equivalent controls. ARIA application intentionally takes focus. */
@@ -232,6 +232,7 @@ export default function PhotoCompare({
             aria-valuenow={Math.round(split)}
             onChange={(e) => setSplit(Number(e.target.value))}
           />
+          <ChevronsLeftRight className="photo-wipe-arrows" aria-hidden="true" />
         </div>
       )}
       <div className="photo-view-tools">

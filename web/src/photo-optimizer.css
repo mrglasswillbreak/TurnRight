@@ -121,8 +121,8 @@
   box-shadow: 0 2px 10px #0002;
 }
 .photo-editor-status button {
-  min-width: 32px;
-  min-height: 32px;
+  min-width: 44px;
+  min-height: 44px;
   text-decoration: underline;
 }
 .photo-compare {
@@ -162,37 +162,25 @@
 }
 .photo-wipe {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #0007;
-  box-shadow: 0 0 0 1px #fff3;
+  inset: 0;
   pointer-events: none;
 }
 .photo-wipe-handle {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #000;
+  left: -29px;
+  transform: translateY(-50%);
+  background: none;
   color: var(--photo-blue);
-  width: 58px;
+  width: calc(100% + 58px);
   height: 58px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  pointer-events: auto;
+  border-radius: 0;
+  border: 0;
+  pointer-events: none;
   touch-action: none !important;
-  box-shadow: inset 6px 0 var(--photo-pink);
+  box-shadow: none;
   cursor: ew-resize !important;
-}
-.photo-wipe-handle svg {
-  width: 26px;
-  height: 26px;
-}
-.photo-wipe-handle {
   appearance: none;
-  width: 58px;
   padding: 0;
   overflow: visible;
 }
@@ -203,20 +191,27 @@
   border-radius: 50%;
   background: linear-gradient(90deg, #ff3385 0 15%, #000 15% 85%, #5fb4e4 85%);
   cursor: ew-resize;
+  pointer-events: auto;
 }
 .photo-wipe-handle::-moz-range-thumb {
   width: 58px;
   height: 58px;
   border: 0;
   border-radius: 50%;
-  background: #000;
+  background: linear-gradient(90deg, #ff3385 0 15%, #000 15% 85%, #5fb4e4 85%);
   cursor: ew-resize;
+  pointer-events: auto;
 }
-.photo-wipe {
-  inset: 0;
-  width: auto;
-  background: none;
-  box-shadow: none;
+.photo-optimizer .photo-wipe-handle:focus-visible {
+  outline: none;
+}
+.photo-wipe-handle:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid #ffdf59;
+  outline-offset: 2px;
+}
+.photo-wipe-handle:focus-visible::-moz-range-thumb {
+  outline: 3px solid #ffdf59;
+  outline-offset: 2px;
 }
 .photo-wipe::before {
   content: '';
@@ -228,21 +223,14 @@
   background: #0007;
   box-shadow: 0 0 0 1px #fff3;
 }
-.photo-wipe-handle {
-  left: -29px;
-  width: calc(100% + 58px);
-  transform: translateY(-50%);
-  background: none;
-  box-shadow: none;
-  border: 0;
-  border-radius: 0;
+.photo-optimizer .photo-wipe-arrows {
+  position: absolute;
+  top: 50%;
+  left: var(--photo-split);
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
   pointer-events: none;
-}
-.photo-wipe-handle::-webkit-slider-thumb {
-  pointer-events: auto;
-}
-.photo-wipe-handle::-moz-range-thumb {
-  pointer-events: auto;
 }
 .photo-view-tools {
   position: absolute;
