@@ -1,10 +1,13 @@
 import { validatePhotoRecipe, type PhotoRecipe } from './photo-edit';
 import { thumbnailSize } from './photo-thumbnail';
+import { encodePhotoPixels } from './photo-codecs';
+import { compressToTarget } from './photo-compression';
 export interface PhotoOutput {
   blob: Blob;
   width: number;
   height: number;
   targetMet: boolean;
+  quality: number;
 }
 const canvas = (w: number, h: number): OffscreenCanvas | HTMLCanvasElement => {
   if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
@@ -146,44 +149,22 @@ export async function processPhoto(
       ctx.fillRect(0, 0, cw, ch);
       ctx.globalCompositeOperation = 'source-over';
     }
+    const pixels = ctx.getImageData(0, 0, cw, ch);
     const encode = async (q: number) => {
       signal?.throwIfAborted();
-      const blob =
-        'convertToBlob' in c
-          ? await c.convertToBlob({ type: r.format, quality: q })
-          : await new Promise<Blob>((resolve, reject) =>
-              c.toBlob(
-                (b) => (b ? resolve(b) : reject(Error('Encoding failed'))),
-                r.format,
-                q,
-              ),
-            );
-      if (blob.type !== r.format)
-        throw Error(
-          `${r.format.split('/')[1]} encoding is not supported by this browser. Choose PNG or JPEG.`,
-        );
+      onStage(
+        `Compressing ${r.format.split('/')[1]} · quality ${Math.round(q * 100)}`,
+      );
+      const blob = await encodePhotoPixels(pixels, r, q);
+      signal?.throwIfAborted();
       return blob;
     };
-    let blob: Blob | undefined;
-    const qualities =
-      r.format === 'image/png'
-        ? [1]
-        : [
-            r.quality,
-            Math.max(0.5, r.quality - 0.1),
-            Math.max(0.4, r.quality - 0.2),
-          ].filter((v, i, a) => a.indexOf(v) === i && v <= r.quality);
-    for (let i = 0; i < qualities.length; i++) {
-      onStage(`Compressing · attempt ${i + 1} of ${qualities.length}`);
-      blob = await encode(qualities[i]);
-      if (!r.targetKiB || blob.size <= r.targetKiB * 1024) break;
-    }
+    const result = await compressToTarget(r, encode);
     signal?.throwIfAborted();
     return {
-      blob: blob!,
+      ...result,
       width: cw,
       height: ch,
-      targetMet: !r.targetKiB || blob!.size <= r.targetKiB * 1024,
     };
   } finally {
     image.close();

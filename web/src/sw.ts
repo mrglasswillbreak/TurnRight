@@ -31,7 +31,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
-    denylist: [/^\/api\//, /^\/auth\//, /^\/(packages|audio|glyphs)\//],
+    denylist: [/^\/api\//, /^\/auth\//, /^\/(packages|audio|glyphs|photo-codecs)\//],
   }),
 );
 self.addEventListener('message', (event) => {
@@ -46,6 +46,7 @@ self.addEventListener('fetch', (event) => {
     url.origin === self.location.origin &&
     (url.pathname.startsWith('/packages/') ||
       url.pathname.startsWith('/glyphs/') ||
+      url.pathname.startsWith('/photo-codecs/') ||
       url.pathname.startsWith('/audio/'))
   ) {
     event.respondWith(

@@ -1,4 +1,8 @@
-export type PhotoFormat = 'image/webp' | 'image/jpeg' | 'image/png';
+export type PhotoFormat =
+  | 'image/webp'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/avif';
 export interface PhotoRecipe {
   version: 1;
   crop: { x: number; y: number; width: number; height: number };
@@ -13,6 +17,11 @@ export interface PhotoRecipe {
   quality: number;
   format: PhotoFormat;
   targetKiB: number;
+  /** Optional for recovery compatibility with existing version-1 recipes. */
+  lossless?: boolean;
+  progressive?: boolean;
+  effort?: number;
+  minQuality?: number;
   masks: {
     x: number;
     y: number;
@@ -61,7 +70,14 @@ export function validatePhotoRecipe(r: PhotoRecipe) {
     !bounded(r.width, 64, 4096) ||
     !bounded(r.quality, 0.1, 1) ||
     !bounded(r.targetKiB, 0, 10240) ||
-    !['image/webp', 'image/jpeg', 'image/png'].includes(r.format) ||
+    (r.effort !== undefined &&
+      (!Number.isInteger(r.effort) || !bounded(r.effort, 0, 6))) ||
+    (r.minQuality !== undefined && !bounded(r.minQuality, 0.1, 1)) ||
+    (r.lossless !== undefined && typeof r.lossless !== 'boolean') ||
+    (r.progressive !== undefined && typeof r.progressive !== 'boolean') ||
+    !['image/webp', 'image/jpeg', 'image/png', 'image/avif'].includes(
+      r.format,
+    ) ||
     r.masks.length > 50 ||
     r.masks.some(
       (m) => !rect(m) || !['blur', 'pixelate', 'redact'].includes(m.mode),

@@ -18,7 +18,7 @@ export default defineConfig({
           'world/**/*.{geojson,json,webp}',
           'voice/**/*.{json,mp3}',
         ],
-        globIgnores: ['packages/**', 'glyphs/**'],
+        globIgnores: ['packages/**', 'glyphs/**', 'photo-codecs/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
