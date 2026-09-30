@@ -13,6 +13,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 from map_import.formats import inspect_file, check_expanded_batch
+from map_import.geometry import preview_features
 from map_import.network import MAX_BYTES, fetch_public
 
 
@@ -50,6 +51,8 @@ def convert(folder):
             fields = {f['name']:f for f in source_file.get('fields',[])}
             for field in layer['fields']:
                 meta = fields.get(field['name'],{})
+                if not field.get('values'):
+                    field['values'] = list(dict.fromkeys(str(f.get('properties',{}).get(field['name'],''))[:120] for f in layer['features'][:100]))[:8]
                 if meta.get('alias'): field['alias'] = meta['alias']
                 codes = meta.get('domain',{}).get('codedValues',[]) if meta.get('domain') else []
                 if codes:
@@ -61,10 +64,14 @@ def convert(folder):
             layers.append(layer)
     if len(layers)>100 or sum(len(l['features']) for l in layers)>100000:
         raise ValueError('Import exceeds the layer or feature limit.')
-    if len({l['name'] for l in layers}) != len(layers):
-        raise ValueError('Multiple datasets have the same layer name. Rename those layers before uploading.')
+    names = {}
+    for layer in layers:
+        original = layer['name']
+        names[original] = names.get(original,0)+1
+        if names[original]>1: layer['name'] = original + ' (' + str(names[original]) + ')'
     if request['phase']=='inspect':
-        summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers],'counts':{'added':0,'modified':0,'removed':0,'skipped':0},'warnings':warnings,'errors':[],'duplicates':[],'features':{'type':'FeatureCollection','features':[f for l in layers if l.get('crs')=='EPSG:4326' for f in l['features'] if f.get('geometry')][:2000]},'totalFeatures':sum(len(l['features']) for l in layers)}
+        preview, sampling = preview_features(layers)
+        summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers],'counts':{'added':0,'modified':0,'removed':0,'skipped':0},'warnings':warnings,'errors':[],'duplicates':[],'features':preview,'sampling':sampling,'totalFeatures':sum(len(l['features']) for l in layers)}
         output={'summary':summary}
     else:
         progress(f"Validating and comparing {sum(len(l['features']) for l in layers)} features")
@@ -142,7 +149,8 @@ def run_job():
                             raise ValueError(f"Uploaded file {asset['name']} is missing or unavailable. Select the same files to resume the upload, then inspect again.") from error
                         raise
                     if len(content)!=asset['bytes'] or hashlib.sha256(content).hexdigest()!=asset['sha256']: raise ValueError('Upload is incomplete or failed its integrity check. Start a new upload.')
-                    filename=f'input-{index}'+Path(asset['name']).suffix.lower()
+                    filename=Path(asset['name']).name
+                    if filename != asset['name'] or '\\' in filename or ':' in filename: raise ValueError('Invalid upload filename.')
                     (folder/filename).write_bytes(content)
                     files.append({'path':filename,'label':Path(asset['name']).stem})
             else:

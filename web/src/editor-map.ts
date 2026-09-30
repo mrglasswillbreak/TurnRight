@@ -388,12 +388,16 @@ export class EditorMap {
       'buildings-3d',
       'buildings',
       'roads',
+      'overlay-points',
+      'overlay-lines',
+      'overlay-fill',
+      'land',
     ];
-    const features = this.map.queryRenderedFeatures(event.point, { layers });
+    const features = this.map.queryRenderedFeatures(event.point, { layers: layers.filter(id => this.map.getLayer(id)) });
     for (const layer of layers) {
       const f = features.find((f) => f.layer.id === layer);
       if (!f?.properties?.id) continue;
-      const kind = layer.startsWith('editor-draft')
+      const kind = layer === 'land' ? 'land' : layer.startsWith('overlay-') ? 'overlay' : layer.startsWith('editor-draft')
         ? f.properties.kind
         : layer === 'editor-entrances'
           ? 'entrance'
@@ -442,8 +446,10 @@ export class EditorMap {
               type: 'Polygon' as const,
               coordinates,
             }))
+          : edit.geometry.type === 'MultiLineString' ? edit.geometry.coordinates.map(coordinates => ({type:'LineString' as const,coordinates}))
+          : edit.geometry.type === 'MultiPoint' ? edit.geometry.coordinates.map(coordinates => ({type:'Point' as const,coordinates}))
           : [edit.geometry];
-      if (edit.geometry.type === 'MultiPolygon')
+      if (edit.geometry.type.startsWith('Multi'))
         this.selectedParts = geometries.map(
           (_, index) => `${edit.id}:part:${index}`,
         );
@@ -485,6 +491,9 @@ export class EditorMap {
   }
   private partGeometry(): Geometry | undefined {
     if (!this.selectedParts.length) return;
+    const parts = this.selectedParts.map(id => this.draw.getSnapshotFeature(id)?.geometry).filter(g => !!g);
+    if (this.selected?.geometry.type === 'MultiLineString') return {type:'MultiLineString',coordinates:parts.filter(g => g.type==='LineString').map(g => g.coordinates)};
+    if (this.selected?.geometry.type === 'MultiPoint') return {type:'MultiPoint',coordinates:parts.filter(g => g.type==='Point').map(g => g.coordinates)};
     const polygons = this.selectedParts
       .map((id) => this.draw.getSnapshotFeature(id)?.geometry)
       .filter((g) => g?.type === 'Polygon');

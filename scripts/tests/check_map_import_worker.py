@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix='private-import-test-') as tmp:
     assert result['totalFeatures']==7, result
     assert len(result['layers'])==4
     assert all(l['crs']=='EPSG:4326' for l in result['layers'])
-    assert next(l for l in result['layers'] if l['name'].startswith('Road width'))['suggestedRole']=='landcover'
+    assert next(l for l in result['layers'] if l['name'].startswith('Road width'))['suggestedRole']=='road-surface'
     assert (folder/'result.json').stat().st_uid == os.getuid()
     fields=result['layers'][0]['fields']
     assert next(f for f in fields if f['name']=='OBJECTID')['unique'] is True

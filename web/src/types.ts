@@ -342,7 +342,7 @@ export interface MapChange {
 }
 export interface MapEdit {
   id: string;
-  kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure';
+  kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure' | 'land' | 'overlay';
   geometry: Geometry;
   properties: Record<string, unknown> & {
     modelDocument?: import('./model-document.js').ModelDocument;

@@ -12,6 +12,8 @@ export type ImportRole =
   | 'entrance'
   | 'barrier'
   | 'landcover'
+  | 'road-surface'
+  | 'overlay'
   | 'boundary'
   | 'skip';
 export interface ImportLayerMapping {
@@ -29,8 +31,24 @@ export interface ImportLayerMapping {
   heightUnit?: 'm' | 'ft';
   // Generic linework remains unroutable until explicitly reviewed.
   walkingAccess?: 'yes' | 'private' | 'no';
+  identity?: string;
+  roadClassField?: string;
+  roadClass?: string;
+  surfaceField?: string;
+  widthField?: string;
+  widthUnit?: 'm' | 'ft';
+  landUseField?: string;
+  vegetationField?: string;
+  geometryField?: string;
+  labelField?: string;
+  landClass?: string;
+  color?: string;
+  opacity?: number;
+  visible?: boolean;
+  order?: number;
 }
 export interface ImportConfiguration {
+  refreshMode?: 'merge' | 'replace-layer' | 'replace-source';
   layers: ImportLayerMapping[];
   attribution: string;
   license: string;
@@ -48,6 +66,7 @@ export interface CampusSource {
   updated_at: string;
 }
 export interface ImportLayer {
+  format?: string;
   name: string;
   count: number;
   geometryTypes: string[];
@@ -72,6 +91,9 @@ export function suggestedImportIdentifier(layer: ImportLayer) {
   )?.name;
 }
 export interface ImportPreview {
+  sampling?: { layer: string; shown: number; total: number }[];
+  repairs?: { layer: string; sourceId: string; actions: string[]; areaChangePercent?: number }[];
+  diagnostics?: { sourceId: string; message: string }[];
   layers: ImportLayer[];
   counts: { added: number; modified: number; removed: number; skipped: number };
   warnings: string[];
@@ -110,6 +132,7 @@ export function sameImportConfiguration(
 ): boolean {
   const snapshot = (configuration: ImportConfiguration) =>
     JSON.stringify([
+      configuration.refreshMode || 'merge',
       configuration.attribution,
       configuration.license,
       configuration.redistributionConfirmed,

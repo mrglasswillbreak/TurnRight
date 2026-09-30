@@ -6,6 +6,8 @@ import math
 from datetime import datetime, timezone
 
 from .formats import MAX_FEATURES
+from .geometry import components as geometry_components, prepare_geometry, preview_features
+from .semantics import mapped_properties
 
 
 def digest(value):
@@ -35,6 +37,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     region = boundary.buffer(0.0001)
     mappings = {m['layer']:m for m in configuration['layers']}
     records, warnings, errors, preview, duplicates = {}, [], [], [], []
+    repairs, diagnostics, mapped_layers = [], [], []
     previous_by_id = {r['id']:r for r in previous}
     skipped, feature_count = 0, 0
     categories = {'academic','library','food','services','worship','residence','sports','gate','other'}
@@ -52,15 +55,21 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         role = m['role']
         is_osm = 'osmNodes' in layer
         if not m.get('idField') and not is_osm:
-            warnings.append(layer['name'] + ': no stable identifier chosen; later uploads will be reviewed as replacements.')
+            warnings.append(layer['name'] + ': using feature IDs or content identities. Select a stable field to match records whose contents change.')
+        expanded = []
         for feature in layer['features']:
+            for component, geometry in geometry_components(feature.get('geometry')):
+                expanded.append({**feature, 'geometry':geometry, '_component':component})
+        mapped_layer = {**layer, 'features':[], 'suggestedRole':role, 'crs':'EPSG:4326'}
+        mapped_layers.append(mapped_layer)
+        for feature in expanded:
             feature_count += 1
             if feature_count > MAX_FEATURES: raise ValueError('Import exceeds the feature limit.')
             if feature.get('geometry') is None:
                 errors.append(layer['name'] + ': missing geometry or coordinate mapping.'); continue
-            geom = shape(feature['geometry'])
-            if not geom.is_valid or geom.is_empty:
-                errors.append(f"{layer['name']} {feature.get('id','')}: {explain_validity(geom)}"); continue
+            try: geom = shape(feature['geometry'])
+            except Exception as error:
+                errors.append(f"{layer['name']} {feature.get('id','')}: invalid geometry ({error})"); continue
             if layer['crs'] != 'EPSG:4326':
                 from osgeo import osr
                 from shapely.ops import transform
@@ -70,6 +79,11 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 geom = transform(lambda x,y,z=None:operation.TransformPoint(x,y)[:2],geom)
             if not all(math.isfinite(x) for x in geom.bounds) or geom.bounds[0] < -180 or geom.bounds[2] > 180 or geom.bounds[1] < -90 or geom.bounds[3] > 90:
                 errors.append(layer['name'] + ': coordinates fall outside WGS84; check the projection.'); continue
+            try: geom, repair = prepare_geometry(feature['geometry'] if layer['crs']=='EPSG:4326' else mapping(geom))
+            except Exception as error:
+                errors.append(f"{layer['name']} {feature.get('id','')}: {error}"); continue
+            if repair:
+                repairs.append({'layer':layer['name'],'sourceId':str(feature.get('id','')),**repair})
             if not region.intersects(geom): skipped += 1; continue
             attrs = feature.get('properties') or {}
             def mapped_value(field, fallback):
@@ -77,20 +91,28 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 value = attrs.get(key)
                 definition = next((f for f in layer.get('fields',[]) if f['name']==key),{})
                 return definition.get('codedValues',{}).get(str(value),value)
-            native = attrs.get(m.get('idField')) if m.get('idField') else feature.get('id') if is_osm else f'{import_id}:{feature_count}'
+            native = attrs.get(m.get('idField')) if m.get('idField') else feature.get('id')
+            if native is None and not m.get('idField'):
+                native = digest({'geometry':feature['geometry'],'properties':attrs})[:24]
             if native is None or str(native) == '':
                 errors.append(layer['name'] + ': a feature is missing its selected identifier.'); continue
-            ident = f"{owner_source}:{digest(layer['name'])[:8]}:{native}"
+            native = str(native) + feature.get('_component','')
+            layer_identity = m.get('identity') or layer['name']
+            ident = f"{owner_source}:{digest(layer_identity)[:8]}:{native}"
             if len(ident) > 180: ident = f"{owner_source}:{digest([layer['name'],native])}"
             name = str(mapped_value('nameField','name') or '').strip()[:200]
             category = str(mapped_value('categoryField','category') or 'other').lower()
             if category not in categories: category = 'other'
-            props = {'id':ident,'name':name,'source':owner_source,'sourceId':str(native),'kind': 'land' if role=='landcover' else role}
+            props = {'id':ident,'name':name,'source':owner_source,'sourceId':str(native),'importLayer':layer_identity,'kind': 'land' if role in ('landcover','road-surface') else role}
+            semantic_attrs = {key:next((f.get('codedValues',{}).get(str(value),value) for f in layer.get('fields',[]) if f['name']==key),value) for key,value in attrs.items()}
+            try: props.update(mapped_properties(semantic_attrs,m,role))
+            except ValueError as error:
+                errors.append(f'{name or ident}: {error}'); continue
             geometry = mapping(geom)
             if role == 'boundary':
                 warnings.append('Campus boundary layer is retained in the import preview; use it when creating a campus. Existing campus boundaries are not replaced by a source refresh.')
                 skipped += 1; continue
-            allowed = {'building':('Polygon','MultiPolygon'),'path':('LineString','MultiLineString'),'place':('Point','MultiPoint'),'entrance':('Point',),'barrier':('LineString','MultiLineString','Polygon','MultiPolygon'),'landcover':('Polygon','MultiPolygon')}
+            allowed = {'building':('Polygon','MultiPolygon'),'path':('LineString','MultiLineString'),'place':('Point','MultiPoint'),'entrance':('Point',),'barrier':('LineString','MultiLineString','Polygon','MultiPolygon'),'landcover':('Polygon','MultiPolygon'),'road-surface':('Polygon','MultiPolygon'),'overlay':('Point','MultiPoint','LineString','MultiLineString','Polygon','MultiPolygon')}
             if geom.geom_type not in allowed[role]:
                 errors.append(f"{layer['name']}: {geom.geom_type} cannot be imported as {role}."); continue
             for field,target in [('heightField','height'),('floorsField','floors')]:
@@ -139,7 +161,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                     if key in old_feature['payload'].get('properties',{}): props[key]=copy.deepcopy(old_feature['payload']['properties'][key])
             public_feature = {'type':'Feature','geometry':geometry,'properties':props}
             add('feature',ident,public_feature)
-            if len(preview) < 2000: preview.append(public_feature)
+            mapped_layer['features'].append(public_feature)
             if role in ('place','building','entrance') and (name or role=='entrance'):
                 point = geom.representative_point()
                 place_id = ident + ':place'
@@ -162,7 +184,19 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             candidate = shapes[index]
             if candidate.is_valid and geom.intersection(candidate).area / max(geom.area,candidate.area,1e-20) > 0.6:
                 duplicates.append({'incomingId':record['payload']['properties']['id'],'existingId':existing[index]['payload']['properties']['id'],'name':record['payload']['properties']['name']})
-    old = {r['id']:r for r in previous if r['source']==owner_source}
+    old = {r['id']:r for r in previous if r['source']==owner_source or r['id'].startswith('feature:'+owner_source+':') or r['id'].startswith('place:'+owner_source+':')}
+    # Owner reconciliations remain authoritative; source changes never erase them.
+    for ident, record in old.items():
+        if record['source'] == 'campus-review' and ident in records:
+            if record['hash'] != records[ident]['hash']:
+                diagnostics.append({'sourceId':ident,'message':'Retained owner-reviewed record; compare source changes in the editor.'})
+            records[ident] = copy.deepcopy(record)
+    mode = configuration.get('refreshMode', 'merge')
+    selected_prefixes = [f"{owner_source}:{digest(m.get('identity') or m['layer'])[:8]}:" for m in configuration['layers'] if m['role']!='skip']
+    for ident, record in old.items():
+        selected = any(ident.split(':',1)[-1].startswith(prefix) for prefix in selected_prefixes)
+        if ident not in records and (mode=='merge' or mode=='replace-layer' and not selected or record['source']=='campus-review'):
+            records[ident] = copy.deepcopy(record)
     parents={}
     def component(node):
         parents.setdefault(node,node)
@@ -190,7 +224,8 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     meta['hash']=digest(metadata)
     if meta['hash']!=meta_record['hash']:
         proposals.append({'id':digest({'id':meta['id'],'before':meta_record['hash'],'after':meta['hash']}),'source_id':meta['id'],'kind':'modify','before':meta_record,'after':meta,'base_hash':meta_record['hash'],'summary':'Update campus source attribution'})
-    summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers], 'counts':{**{k:sum(p['kind']==kind for p in proposals) for k,kind in [('added','add'),('modified','modify'),('removed','remove')]},'skipped':skipped},'warnings':list(dict.fromkeys(warnings)),'errors':list(dict.fromkeys(errors))[:500],'duplicates':duplicates[:500],'features':{'type':'FeatureCollection','features':preview},'totalFeatures':feature_count}
+    preview, sampling = preview_features(mapped_layers)
+    summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers], 'counts':{**{k:sum(p['kind']==kind for p in proposals) for k,kind in [('added','add'),('modified','modify'),('removed','remove')]},'skipped':skipped},'warnings':list(dict.fromkeys(warnings)),'errors':list(dict.fromkeys(errors))[:500],'duplicates':duplicates[:500],'features':preview,'sampling':sampling,'repairs':repairs[:500],'diagnostics':diagnostics[:500],'totalFeatures':feature_count}
     if old and summary['counts']['removed'] > len(old)*0.2: summary['errors'].append('Source removed more than 20% of records. Check the boundary, layer mapping and completeness before retrying.')
     if duplicates: summary['warnings'].append('Overlapping buildings need a keep/merge decision in the existing duplicate review workflow.')
     return {'summary':summary,'proposals':proposals,'expectedSources':previous}

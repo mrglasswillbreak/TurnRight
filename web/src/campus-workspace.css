@@ -400,3 +400,5 @@
     height: 240px;
   }
 }
+.import-layer-controls { display:flex; flex-wrap:wrap; gap:8px 16px; padding:12px 0; }
+.import-layer-controls label { display:flex; align-items:center; gap:6px; font-size:12px; }

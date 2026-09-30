@@ -107,6 +107,17 @@ export function MapView({
     () => displayGeometry(data.map, data.visuals),
     [data.map, data.visuals],
   );
+  const [roadGeometry, setRoadGeometry] = useState<FeatureCollection>();
+  useEffect(() => {
+    let cancelled = false;
+    setRoadGeometry(undefined);
+    if (campusGeometry.features.some(f => ['road','sidewalk','parking'].includes(f.properties?.landClass)))
+      void import('./road-surfaces').then(({exposedRoads}) => {
+        const geometry = exposedRoads(campusGeometry);
+        if (!cancelled) setRoadGeometry(geometry);
+      });
+    return () => { cancelled = true; };
+  }, [campusGeometry]);
   const placesGeometry = useMemo(
     () => placeFeatures(data.places),
     [data.places],
@@ -118,11 +129,12 @@ export function MapView({
   const sourceData = useMemo(
     () => ({
       campus: campusGeometry,
+      'road-display': roadGeometry || campusGeometry,
       boundary: data.boundary,
       places: placesGeometry,
       closures: closuresGeometry,
     }),
-    [campusGeometry, data.boundary, placesGeometry, closuresGeometry],
+    [campusGeometry, roadGeometry, data.boundary, placesGeometry, closuresGeometry],
   );
   const latestSources = useRef(sourceData);
   latestSources.current = sourceData;
@@ -136,6 +148,18 @@ export function MapView({
     [worldAttempt, setWorldAttempt] = useState(0),
     [worldView, setWorldView] = useState(false);
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
+  useEffect(() => {
+    if (!motionMap) return;
+    let cancelled = false;
+    const apply = () => {
+      void import('./map-extra-layers').then(({extraMapLayers}) => {
+        if (!cancelled && motionMap.getLayer('building-contact')) extraMapLayers(motionMap, dark);
+      });
+    };
+    if (motionMap.getLayer('building-contact')) apply();
+    else motionMap.once('load', apply);
+    return () => { cancelled = true; motionMap.off('load', apply); };
+  }, [motionMap, dark]);
   useEffect(() => {
     if (!editor) document.title = 'TurnRight · ' + String(data.boundary.properties?.name || 'Campus map');
   }, [editor, data.boundary]);
@@ -410,7 +434,8 @@ export function MapView({
         id: 'land',
         type: 'fill',
         source: 'campus',
-        filter: ['==', ['get', 'kind'], 'land'],
+        filter: ['all', ['==', ['get', 'kind'], 'land'], ['!=', ['get','visible'], false]],
+        layout: { 'fill-sort-key': ['match', ['get','landClass'], 'parcel', -10, ['road','sidewalk','parking'], 10, 0] },
         paint: {
           'fill-color': [
             'match',
@@ -438,7 +463,7 @@ export function MapView({
       map.addLayer({
         id: 'roads-case',
         type: 'line',
-        source: 'campus',
+        source: 'road-display',
         filter: ['==', ['get', 'kind'], 'path'],
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
@@ -449,7 +474,7 @@ export function MapView({
       map.addLayer({
         id: 'roads',
         type: 'line',
-        source: 'campus',
+        source: 'road-display',
         filter: ['==', ['get', 'kind'], 'path'],
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {

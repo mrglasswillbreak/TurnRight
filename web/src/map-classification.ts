@@ -5,11 +5,16 @@ const normalized = (value: unknown) =>
     : '';
 
 export function landClass(properties: Record<string, unknown>) {
-  const name = normalized(properties.name).replace(/\s/g, '');
-  if (['water', 'waterbody'].includes(name)) return 'water';
-  if (name.includes('wetland')) return 'wetland';
-  if (['greenarea', 'vegetation', 'forest'].includes(name)) return 'green';
-  if (name === 'baresurface') return 'bare';
+  if (['water','wetland','green','bare','developed','road','sidewalk','parking','sports','parcel'].includes(String(properties.landClass))) return String(properties.landClass);
+  const name = normalized(properties.landUse || properties.name).replace(/[^a-z0-9]/g, '');
+  if (/wetland|marsh|swamp/.test(name)) return 'wetland';
+  if (/water|lagoon|lake|river|pond/.test(name)) return 'water';
+  if (/green|vegetation|forest|treeline|hedgerow|shrubline|grass|garden/.test(name)) return 'green';
+  if (/sidewalk|footway|pedestrian/.test(name)) return 'sidewalk';
+  if (/carpark|parking/.test(name)) return 'parking';
+  if (/drivepaved|driveunpaved|tarredroad|untarredroad/.test(name)) return 'road';
+  if (/sport|pitch|court|stadium/.test(name)) return 'sports';
+  if (/baresurface|sand/.test(name)) return 'bare';
   return 'developed';
 }
 

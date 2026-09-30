@@ -44,7 +44,7 @@ class MapImportTests(unittest.TestCase):
             for value in ({'properties':{'exceededTransferLimit':True}}, {'exceededTransferLimit':True}, {'error':{'message':'Invalid query'}}):
                 file.write_text(json.dumps(value),encoding='utf-8')
                 with self.assertRaises(ValueError): check_json_export(file)
-        self.assertEqual(guess_role('Road width.geojson',['Polygon']),'landcover')
+        self.assertEqual(guess_role('Road width.geojson',['Polygon']),'road-surface')
         self.assertEqual(guess_role('Roads.geojson',['LineString']),'path')
 
     def test_query_export_url_resolves_to_layer_and_reports_ignored_filters(self):
@@ -176,7 +176,7 @@ class MapImportTests(unittest.TestCase):
         config=copy.deepcopy(CONFIG); del config['layers'][0]['idField']
         a=normalise([LAYER],SOURCE,CAMPUS,[META],config,'one')
         b=normalise([LAYER],SOURCE,CAMPUS,[META],config,'two')
-        self.assertNotEqual(a['proposals'][0]['source_id'],b['proposals'][0]['source_id'])
+        self.assertEqual(a['proposals'][0]['source_id'],b['proposals'][0]['source_id'])
 
     def test_generic_paths_keep_distinct_endpoints_and_restricted_access(self):
         line={'type':'Feature','properties':{'id':'path'},'geometry':{'type':'LineString','coordinates':[[3.2,6.46],[3.201,6.46]]}}

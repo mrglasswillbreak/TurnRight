@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { db, dispatch, HttpError } from './backend.js';
 import { currentCampusId } from './campus-scope.js';
+import { supportedMapFilename } from '../src/map-formats.js';
 import {
   MAP_IMPORT_LIMITS,
   type CampusImport,
@@ -31,6 +32,8 @@ export function importConfiguration(value: unknown): ImportConfiguration {
   )
     throw new HttpError(400, 'Invalid source mapping or attribution.');
   const seen = new Set<string>();
+  if (c.refreshMode && !['merge', 'replace-layer', 'replace-source'].includes(c.refreshMode))
+    throw new HttpError(400, 'Choose how existing layers should be updated.');
   for (const layer of c.layers) {
     if (
       typeof layer.layer !== 'string' ||
@@ -44,6 +47,8 @@ export function importConfiguration(value: unknown): ImportConfiguration {
         'entrance',
         'barrier',
         'landcover',
+        'road-surface',
+        'overlay',
         'boundary',
         'skip',
       ].includes(layer.role)
@@ -60,6 +65,8 @@ export function importConfiguration(value: unknown): ImportConfiguration {
       'longitudeField',
       'latitudeField',
       'crs',
+      'identity', 'roadClassField', 'roadClass', 'surfaceField', 'widthField',
+      'landUseField', 'vegetationField', 'geometryField', 'labelField', 'landClass',
     ] as const)
       if (
         layer[key] !== undefined &&
@@ -73,6 +80,13 @@ export function importConfiguration(value: unknown): ImportConfiguration {
       throw new HttpError(400, 'Choose valid walking access.');
     if (layer.heightUnit && !['m', 'ft'].includes(layer.heightUnit))
       throw new HttpError(400, 'Choose metres or feet.');
+    if (layer.widthUnit && !['m', 'ft'].includes(layer.widthUnit))
+      throw new HttpError(400, 'Choose metres or feet for widths.');
+    if (layer.color !== undefined && !/^#[0-9a-f]{6}$/i.test(layer.color) ||
+      layer.opacity !== undefined && (!Number.isFinite(layer.opacity) || layer.opacity < 0 || layer.opacity > 1) ||
+      layer.order !== undefined && (!Number.isInteger(layer.order) || Math.abs(layer.order) > 1000) ||
+      layer.visible !== undefined && typeof layer.visible !== 'boolean')
+      throw new HttpError(400, 'Choose a valid layer colour, opacity, order and visibility.');
   }
   return c;
 }
@@ -220,7 +234,7 @@ export async function mapImportAction(
     if (
       typeof p.name !== 'string' ||
       p.name.length > 180 ||
-      !/\.(geojson|json|zip|gpkg|kml|kmz|gpx|csv|osm|xml|pbf)$/i.test(p.name) ||
+      !supportedMapFilename(p.name) ||
       /[\\/]/.test(p.name) ||
       [...p.name].some((c) => c.charCodeAt(0) < 32) ||
       !Number.isSafeInteger(p.bytes) ||

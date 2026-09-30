@@ -18,6 +18,7 @@ import { api } from './supabase';
 import { campusUrl, lasuCampus, type CampusIdentity } from './campus-context';
 import { getPreference, setPreference, hashBytes } from './offline';
 import { ImportMapPreview } from './ImportMapPreview';
+import { mapFileAccept, mapFormats } from './map-formats';
 import type { CampusData, Position } from './types';
 import { finitePosition } from './validation';
 import type {
@@ -48,11 +49,14 @@ const roles: ImportLayerMapping['role'][] = [
   'entrance',
   'barrier',
   'landcover',
+  'road-surface',
+  'overlay',
   'boundary',
   'skip',
 ];
 export default function CampusWorkspace({
   current = lasuCampus,
+  currentData,
   owner,
   dark,
   onClose,
@@ -60,6 +64,7 @@ export default function CampusWorkspace({
   onReview,
 }: {
   current?: CampusIdentity;
+  currentData?: CampusData;
   owner: string;
   dark: boolean;
   onClose: () => void;
@@ -636,7 +641,7 @@ export default function CampusWorkspace({
                       <input
                         multiple
                         type="file"
-                        accept=".geojson,.json,.zip,.gpkg,.kml,.kmz,.gpx,.csv,.osm,.xml,.pbf"
+                        accept={mapFileAccept}
                         disabled={busy}
                         onChange={(e) => {
                           const files = Array.from(e.target.files || []);
@@ -666,6 +671,14 @@ export default function CampusWorkspace({
               )}
               {['mapping', 'preview', 'failed'].includes(job.status) && (
                 <>
+                  <label className="field-label">Update existing data
+                    <select value={configuration.refreshMode || 'merge'} onChange={e => setConfiguration(c => ({...c,refreshMode:e.target.value as ImportConfiguration['refreshMode']}))}>
+                      <option value="merge">Add and update selected layers; retain existing records</option>
+                      <option value="replace-layer">Replace selected layers, including missing records</option>
+                      <option value="replace-source">Replace the complete source, including missing layers</option>
+                    </select>
+                  </label>
+                  <p className="hint">Routine geometry fixes are automatic and listed in the preview. Uncertain repairs need review.</p>
                   {job.summary?.layers.map((layer) => {
                     const index = configuration.layers.findIndex(
                         (m) => m.layer === layer.name,
@@ -695,6 +708,7 @@ export default function CampusWorkspace({
                           <strong>{layer.name}</strong>
                           <span>
                             {layer.count.toLocaleString()} features ·{' '}
+                            {layer.format ? `${layer.format} · ` : ''}
                             {layer.sourceCrs ||
                               layer.crs ||
                               'Projection required'}
@@ -733,6 +747,10 @@ export default function CampusWorkspace({
                               </small>
                             )}
                           </label>
+                          <label>Existing layer identity
+                            <input value={m.identity || ''} placeholder={layer.name} onChange={e => update({identity:e.target.value || undefined})} list="accepted-layer-identities" />
+                            <small>Keep the accepted layer identity when a replacement file is renamed.</small>
+                          </label>
                           {(
                             [
                               'idField',
@@ -741,6 +759,7 @@ export default function CampusWorkspace({
                               'heightField',
                               'floorsField',
                               'accessField',
+                              'roadClassField', 'surfaceField', 'widthField', 'landUseField', 'vegetationField', 'labelField', 'geometryField',
                               ...(layer.requiresCoordinates || !layer.crs
                                 ? ['longitudeField', 'latitudeField']
                                 : []),
@@ -756,6 +775,7 @@ export default function CampusWorkspace({
                                     heightField: 'Height',
                                     floorsField: 'Floors',
                                     accessField: 'Access',
+                                    roadClassField: 'Road class', surfaceField: 'Surface', widthField: 'Width', landUseField: 'Land use / class', vegetationField: 'Vegetation', labelField: 'Overlay label', geometryField: 'WKT geometry (CSV)',
                                     longitudeField: 'Longitude / X',
                                     latitudeField: 'Latitude / Y',
                                   } as Record<string, string>
@@ -814,10 +834,18 @@ export default function CampusWorkspace({
                               </select>
                             </label>
                           )}
+                          {m.widthField && <label>Width units<select value={m.widthUnit || 'm'} onChange={e => update({widthUnit:e.target.value as 'm'|'ft'})}><option value="m">Metres</option><option value="ft">Feet</option></select></label>}
+                          {m.role === 'overlay' && <>
+                            <label>Colour<input type="color" value={m.color || '#2563eb'} onChange={e => update({color:e.target.value})} /></label>
+                            <label>Opacity<input type="number" min="0" max="1" step="0.1" value={m.opacity ?? 0.5} onChange={e => update({opacity:Number(e.target.value)})} /></label>
+                            <label>Layer order<input type="number" min="-1000" max="1000" value={m.order ?? 0} onChange={e => update({order:Number(e.target.value)})} /></label>
+                            <label><input type="checkbox" checked={m.visible !== false} onChange={e => update({visible:e.target.checked})} />Visible</label>
+                          </>}
                         </div>
                       </details>
                     );
                   })}
+                  <datalist id="accepted-layer-identities">{sources.find(s => s.id===job.source_id)?.configuration.layers.map(m => <option key={m.layer} value={m.identity || m.layer} />)}</datalist>
                   <div className="campus-fields">
                     <label>
                       Attribution
@@ -871,8 +899,13 @@ export default function CampusWorkspace({
               )}
               {job.summary && (
                 <>
+                  <details><summary>Supported vector formats</summary>{mapFormats.map(f => <p key={f.name}>{f.name}: {f.extensions.join(', ')}</p>)}</details>
+                  {job.summary.sampling?.some(s => s.shown<s.total) && <p className="notice">Preview is sampled across layers; validation includes every feature. {job.summary.sampling.map(s => `${s.layer}: ${s.shown}/${s.total}`).join(' · ')}</p>}
+                  {!!job.summary.repairs?.length && <details open><summary>{job.summary.repairs.length} automatic geometry repairs</summary>{job.summary.repairs.map((r,i) => <p key={i}>{r.layer} · {r.sourceId}: {r.actions.join(', ')}{r.areaChangePercent !== undefined ? ` (${r.areaChangePercent.toPrecision(3)}% area change)` : ''}</p>)}</details>}
+                  {!!job.summary.diagnostics?.length && <details><summary>Retained owner corrections</summary>{job.summary.diagnostics.map((d,i) => <p key={i}>{d.sourceId}: {d.message}</p>)}</details>}
                   <ImportMapPreview
                     campus={current}
+                    base={currentData}
                     features={job.summary.features}
                     dark={dark}
                   />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import type {
   GeoJSONSource,
@@ -11,6 +11,7 @@ import type { CampusData, Position } from './types';
 
 export function ImportMapPreview({
   campus,
+  base,
   features,
   boundary,
   drawing = false,
@@ -19,6 +20,7 @@ export function ImportMapPreview({
   dark = false,
 }: {
   campus: CampusIdentity;
+  base?: CampusData;
   features?: FeatureCollection;
   boundary?: CampusData['boundary'];
   drawing?: boolean;
@@ -29,10 +31,13 @@ export function ImportMapPreview({
   const map = useRef<MapInstance | null>(null),
     callback = useRef({ drawing, onVertex, vertices });
   callback.current = { drawing, onVertex, vertices };
+  const [hidden, setHidden] = useState<string[]>([]);
+  const layerNames = [...new Set((features?.features || []).map(f => String(f.properties?.importLayer || 'Imported layer')))];
+  const shown = useMemo(() => (features?.features || []).filter(f => !hidden.includes(String(f.properties?.importLayer || 'Imported layer'))), [features, hidden]);
   const data = useMemo(
     () => ({
-      ...emptyCampus(campus, boundary),
-      places: (features?.features || []).flatMap((feature, index) => {
+      ...(base || emptyCampus(campus, boundary)),
+      places: [...(base?.places || []), ...shown.flatMap((feature, index) => {
         const points =
           feature.geometry?.type === 'Point'
             ? [feature.geometry.coordinates]
@@ -53,10 +58,10 @@ export function ImportMapPreview({
           aliases: [],
           source: 'import-preview',
         }));
-      }),
+      })],
       map: {
         type: 'FeatureCollection' as const,
-        features: (features?.features || [])
+        features: [...(base?.map.features.filter(f => !shown.some(s => s.properties?.id === f.properties?.id)) || []), ...shown
           .filter((f) => f.geometry)
           .map((f, i) => ({
             ...f,
@@ -66,15 +71,15 @@ export function ImportMapPreview({
               kind:
                 f.properties?.kind ||
                 (/Polygon/.test(f.geometry.type)
-                  ? 'building'
+                  ? 'overlay'
                   : /Line/.test(f.geometry.type)
-                    ? 'path'
+                    ? 'overlay'
                     : 'place'),
             },
-          })),
+          }))],
       },
     }),
-    [campus, features, boundary],
+    [campus, shown, boundary, base],
   );
   const update = useCallback(() => {
     const m = map.current;
@@ -146,6 +151,8 @@ export function ImportMapPreview({
     [update],
   );
   return (
+    <>
+    {!!layerNames.length && <div className="import-layer-controls" aria-label="Preview layers">{layerNames.map(name => <label key={name}><input type="checkbox" checked={!hidden.includes(name)} onChange={e => setHidden(old => e.target.checked ? old.filter(n => n!==name) : [...old,name])} />{name}</label>)}</div>}
     <div
       className={`import-map ${drawing ? 'drawing' : ''}`}
       aria-label={
@@ -160,5 +167,6 @@ export function ImportMapPreview({
         onReady={ready}
       />
     </div>
+    </>
   );
 }

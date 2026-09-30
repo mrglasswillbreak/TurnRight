@@ -73,14 +73,14 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
   )
     return ['Invalid feature ID.'];
   if (
-    !['place', 'path', 'building', 'entrance', 'barrier', 'closure'].includes(
+    !['place', 'path', 'building', 'entrance', 'barrier', 'closure', 'land', 'overlay'].includes(
       edit.kind,
     )
   )
     return ['Choose a supported feature type.'];
   if (
     !edit.geometry ||
-    !['Point', 'LineString', 'Polygon', 'MultiPolygon'].includes(
+    !['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon'].includes(
       edit.geometry.type,
     )
   )
@@ -133,7 +133,7 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
   )
     errors.push('Places and entrances must be points.');
   if (
-    edit.kind === 'building' &&
+    ['building', 'land'].includes(edit.kind) &&
     !['Polygon', 'MultiPolygon'].includes(edit.geometry.type)
   )
     errors.push('Buildings must be polygons.');
@@ -159,6 +159,12 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
     );
   };
   const props = edit.properties;
+  if (['land','overlay'].includes(edit.kind)) {
+    if (props.color !== undefined && !/^#[0-9a-f]{6}$/i.test(String(props.color))) errors.push('Layer colour must be a six-digit hex colour.');
+    if (props.opacity !== undefined && (!Number.isFinite(Number(props.opacity)) || Number(props.opacity)<0 || Number(props.opacity)>1)) errors.push('Layer opacity must be between 0 and 1.');
+    if (props.order !== undefined && (!Number.isInteger(Number(props.order)) || Math.abs(Number(props.order))>1000)) errors.push('Layer order must be an integer between -1000 and 1000.');
+    if (props.visible !== undefined && typeof props.visible !== 'boolean') errors.push('Layer visibility must be true or false.');
+  }
   if (
     props.autoConnectCrossings !== undefined &&
     typeof props.autoConnectCrossings !== 'boolean'
@@ -457,6 +463,8 @@ export function applyEdits(
     entrance: 3,
     barrier: 4,
     closure: 4,
+    land: 2,
+    overlay: 2,
   };
   const ordered = [...edits].sort(
     (a, b) => rank[a.kind] - rank[b.kind] || a.id.localeCompare(b.id),
@@ -876,6 +884,10 @@ export function applyEdits(
             source: 'campus-review',
           },
         });
+    } else if (edit.kind === 'land' || edit.kind === 'overlay') {
+      const original = data.map.features.find(f => f.properties?.id === edit.id);
+      data.map.features = data.map.features.filter(f => f.properties?.id !== edit.id);
+      if (!edit.deleted) data.map.features.push({type:'Feature',geometry:structuredClone(edit.geometry),properties:{...original?.properties,...props,id:edit.id,kind:edit.kind,source:'campus-review'}});
     } else if (edit.kind === 'entrance' && edit.geometry.type === 'Point') {
       const previousEntrance = data.entrances.find((e) => e.id === edit.id);
       data.entrances = data.entrances.filter((e) => e.id !== edit.id);

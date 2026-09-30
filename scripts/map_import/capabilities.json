@@ -1,0 +1,17 @@
+[
+  {"name":"GeoJSON / ArcGIS JSON","extensions":["geojson","json"],"drivers":["GeoJSON","ESRIJSON"]},
+  {"name":"TopoJSON","extensions":["topojson"],"drivers":["TopoJSON"]},
+  {"name":"GeoJSON sequence","extensions":["geojsonl","geojsons","jsonl","ndjson"],"drivers":["GeoJSONSeq"]},
+  {"name":"Shapefile","extensions":["shp","shx","dbf","prj","cpg"],"drivers":["ESRI Shapefile"]},
+  {"name":"GeoPackage","extensions":["gpkg"],"drivers":["GPKG"]},
+  {"name":"KML / KMZ","extensions":["kml","kmz"],"drivers":["LIBKML","KML"]},
+  {"name":"GPX","extensions":["gpx"],"drivers":["GPX"]},
+  {"name":"Coordinate / WKT CSV","extensions":["csv"],"drivers":["CSV"]},
+  {"name":"OpenStreetMap","extensions":["osm","xml","pbf"],"drivers":[]},
+  {"name":"FlatGeobuf","extensions":["fgb"],"drivers":["FlatGeobuf"]},
+  {"name":"GML","extensions":["gml","xsd"],"drivers":["GML"]},
+  {"name":"MapInfo","extensions":["tab","dat","map","id","mif","mid"],"drivers":["MapInfo File"]},
+  {"name":"GeoParquet","extensions":["parquet","geoparquet"],"drivers":["Parquet"]},
+  {"name":"Georeferenced DXF","extensions":["dxf"],"drivers":["DXF"]},
+  {"name":"Vector ZIP / File Geodatabase ZIP","extensions":["zip"],"drivers":["OpenFileGDB"]}
+]

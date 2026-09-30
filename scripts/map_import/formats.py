@@ -10,7 +10,9 @@ import xml.etree.ElementTree as ET
 
 MAX_EXPANDED = 250 * 1024 * 1024
 MAX_FEATURES = 100000
-DRIVERS = ['GeoJSON', 'ESRI Shapefile', 'GPKG', 'LIBKML', 'KML', 'GPX', 'CSV', 'ESRIJSON']
+CAPABILITIES = json.loads((Path(__file__).with_name('capabilities.json')).read_text())
+DRIVERS = sorted({driver for capability in CAPABILITIES for driver in capability['drivers']})
+SIDECARS = {'.shx','.dbf','.prj','.cpg','.dat','.map','.id','.mid','.xsd'}
 
 
 def check_expanded_batch(paths, limit=MAX_EXPANDED):
@@ -63,17 +65,22 @@ def guess_role(name, types, properties=None):
     tags = properties or {}
     if tags.get('building') or 'building' in text or 'footprint' in text: return 'building'
     if tags.get('highway') or any(v in text for v in ['road','path','track','route']):
-        return 'landcover' if any('Polygon' in t for t in types) else 'path'
+        return 'road-surface' if any('Polygon' in t for t in types) else 'path'
     if tags.get('barrier') or 'barrier' in text: return 'barrier'
     if tags.get('entrance') or 'entrance' in text: return 'entrance'
     if 'boundary' in text: return 'boundary'
-    if 'Point' in types: return 'place'
-    if any('Polygon' in t for t in types): return 'landcover'
-    return 'skip'
+    if 'Point' in types or 'MultiPoint' in types: return 'place'
+    if any('Polygon' in t for t in types) and any(v in text for v in ('land','green','parcel','water','vegetation')): return 'landcover'
+    return 'overlay'
 
 
 def check_json_export(path):
-    value = json.loads(Path(path).read_text(encoding='utf-8-sig'))
+    content = Path(path).read_text(encoding='utf-8-sig')
+    try: value = json.loads(content)
+    except json.JSONDecodeError:
+        lines = [line.lstrip('\x1e') for line in content.splitlines() if line.strip('\x1e \t')]
+        if lines and all(json.loads(line).get('type') == 'Feature' for line in lines): return 'GeoJSONSeq'
+        raise ValueError('JSON is damaged or does not contain a GeoJSON sequence.')
     if not isinstance(value, dict):
         raise ValueError('Choose a GeoJSON Feature/FeatureCollection or an ArcGIS feature response.')
     properties = value.get('properties') or {}
@@ -81,6 +88,7 @@ def check_json_export(path):
         raise ValueError('This export is truncated (exceededTransferLimit). Download every object-ID batch or import the ArcGIS layer URL, then upload the complete file. Nothing was imported.')
     if value.get('error'):
         raise ValueError('This file contains an ArcGIS error response rather than map features. Download the layer again.')
+    if value.get('type') == 'Topology': return 'TopoJSON'
     # ArcGIS snapshots put records before their schema. GDAL's short header
     # probe can see "features" but miss geometryType and incorrectly choose
     # GeoJSON. Select the JSON dialect from the parsed document, not key order.
@@ -96,36 +104,71 @@ def inspect_file(path, configuration, work, label=None):
     path = Path(path)
     suffix = path.suffix.lower()
     json_driver = None
-    if suffix in ('.json', '.geojson'):
+    if suffix in ('.json', '.geojson', '.topojson'):
         json_driver = check_json_export(path)
     from osgeo import gdal, osr
+    if suffix == '.shp':
+        companions = {p.suffix.lower() for p in path.parent.iterdir() if p.stem.lower()==path.stem.lower()}
+        if not {'.shp','.shx','.dbf'}.issubset(companions): raise ValueError('Shapefile needs matching .shp, .shx and .dbf files.')
     if suffix in ('.osm','.xml'):
         safe_xml(path)
     if suffix == '.xml':
         import xml.etree.ElementTree as ET
         with path.open('rb') as stream:
             root = next(ET.iterparse(stream, events=('start',)))[1]
-            if root.tag != 'osm': raise ValueError('XML uploads must contain OpenStreetMap data.')
-        osm_path = Path(work) / (path.stem + '.osm')
-        osm_path.parent.mkdir(parents=True, exist_ok=True)
-        osm_path.write_bytes(path.read_bytes())
-        path, suffix = osm_path, '.osm'
+            is_osm = root.tag == 'osm'
+        if is_osm:
+            osm_path = Path(work) / (path.stem + '.osm')
+            osm_path.parent.mkdir(parents=True, exist_ok=True)
+            osm_path.write_bytes(path.read_bytes())
+            path, suffix = osm_path, '.osm'
+        else: json_driver = 'GML'
     if suffix in ('.osm','.pbf'):
         from .osm import inspect_osm
         return inspect_osm(path)
     if suffix in ('.zip','.kmz'):
         files = unpack(path,Path(work)/path.stem)
-        targets = [p for p in files if p.suffix.lower() == ('.kml' if suffix == '.kmz' else '.shp')]
+        geodatabases = sorted({parent for p in files for parent in p.parents if parent.suffix.lower()=='.gdb'})
+        known = {'.'+ext for capability in CAPABILITIES for ext in capability['extensions']}
+        targets = [p for p in files if p.suffix.lower() in ({'.kml'} if suffix == '.kmz' else known - SIDECARS - {'.zip','.kmz'}) and not any(g in p.parents for g in geodatabases)] + geodatabases
         if not targets: raise ValueError('Archive contains no supported vector dataset.')
         results = []
         for target in targets:
             if target.suffix.lower() == '.shp':
                 companions = {p.suffix.lower() for p in files if p.stem.lower() == target.stem.lower() and p.parent == target.parent}
                 if not {'.shp','.shx','.dbf'}.issubset(companions): raise ValueError('Shapefile needs matching .shp, .shx and .dbf files.')
-            results.extend(inspect_file(target,configuration,work))
+            dataset_label = target.relative_to(Path(work)/path.stem).as_posix()
+            results.extend(inspect_file(target,configuration,work,dataset_label))
         return results
-    if suffix in ('.kml','.gpx','.xml'): safe_xml(path)
+    if suffix in SIDECARS: return []
+    if suffix in ('.kml','.gpx','.xml','.gml'): safe_xml(path)
+    if suffix in ('.geojsonl','.geojsons','.jsonl','.ndjson'): json_driver = 'GeoJSONSeq'
     mappings = {m['layer']:m for m in configuration.get('layers',[])}
+    if suffix in ('.parquet','.geoparquet'):
+        import pyarrow.parquet as pq
+        from shapely import from_wkb
+        from shapely.geometry import mapping as geometry_mapping
+        from shapely.ops import transform as shape_transform
+        from pyproj import CRS, Transformer
+        parquet = pq.ParquetFile(path)
+        if parquet.metadata.num_rows > MAX_FEATURES: raise ValueError('GeoParquet exceeds the feature limit.')
+        metadata = parquet.schema_arrow.metadata or {}
+        if b'geo' not in metadata: raise ValueError('Parquet has no GeoParquet geometry metadata.')
+        geo = json.loads(metadata[b'geo']); column = geo['primary_column']; definition = geo['columns'][column]
+        if definition.get('encoding') != 'WKB': raise ValueError('Export GeoParquet geometry using WKB encoding.')
+        name = label or path.stem
+        crs = mappings.get(name,{}).get('crs') or definition.get('crs', 'OGC:CRS84')
+        projection = CRS.from_user_input(crs) if crs else None
+        operation = Transformer.from_crs(projection,'EPSG:4326',always_xy=True).transform if projection else None
+        features = []
+        for batch in parquet.iter_batches(batch_size=1000):
+            for row in batch.to_pylist():
+                raw = row.pop(column)
+                geometry = from_wkb(raw) if raw is not None else None
+                if geometry is not None and operation: geometry = shape_transform(operation,geometry)
+                features.append({'type':'Feature','id':None,'geometry':geometry_mapping(geometry) if geometry is not None else None,'properties':json.loads(json.dumps(row,default=str))})
+        types = sorted({f['geometry']['type'] for f in features if f['geometry']})
+        return [{'name':name,'features':features,'fields':[{'name':f} for f in parquet.schema_arrow.names if f!=column],'crs':'EPSG:4326' if projection else None,'sourceCrs':projection.to_string() if projection else None,'geometryTypes':types,'suggestedRole':guess_role(name,types),'format':'GeoParquet (WKB)'}]
     if suffix == '.csv':
         with path.open(encoding='utf-8-sig',newline='') as stream:
             reader = csv.DictReader(stream)
@@ -137,14 +180,25 @@ def inspect_file(path, configuration, work, label=None):
         name = label or path.stem
         mapping = mappings.get(name,{})
         x,y = mapping.get('longitudeField'),mapping.get('latitudeField')
+        aliases = {name.lower():name for name in reader.fieldnames}
+        x = x or next((aliases[n] for n in ('longitude','lon','lng') if n in aliases),None)
+        y = y or next((aliases[n] for n in ('latitude','lat') if n in aliases),None)
+        wkt = mapping.get('geometryField') or aliases.get('wkt')
         features = []
         for index,row in enumerate(rows):
             geom = None
-            if x and y:
+            if wkt:
+                from shapely import from_wkt
+                from shapely.geometry import mapping as geometry_mapping
+                try: geom = geometry_mapping(from_wkt(row[wkt]))
+                except Exception as error: raise ValueError(f'CSV row {index+2} has invalid WKT geometry.') from error
+            elif x and y:
                 try: geom = {'type':'Point','coordinates':[float(row[x]),float(row[y])]}
                 except (KeyError,TypeError,ValueError): raise ValueError(f'CSV row {index+2} has invalid coordinates.')
             features.append({'type':'Feature','id':index,'geometry':geom,'properties':row})
-        return [{'name':name,'features':features,'fields':[{'name':f} for f in reader.fieldnames],'crs':mapping.get('crs'),'geometryTypes':['Point'],'suggestedRole':'place','requiresCoordinates':True}]
+        types = sorted({f['geometry']['type'] for f in features if f.get('geometry')}) or ['Point']
+        crs = mapping.get('crs') or ('EPSG:4326' if x and y and not wkt else None)
+        return [{'name':name,'features':features,'fields':[{'name':f} for f in reader.fieldnames],'crs':crs,'geometryTypes':types,'suggestedRole':guess_role(name,types),'requiresCoordinates':not bool(x and y or wkt),'format':'CSV'}]
     gdal.UseExceptions()
     gdal.SetConfigOption('OGR_SQLITE_LOAD_EXTENSIONS','')
     gdal.SetConfigOption('OGR_SQLITE_LIST_VIRTUAL_OGR','NO')
@@ -156,7 +210,8 @@ def inspect_file(path, configuration, work, label=None):
     total = 0
     for index in range(dataset.GetLayerCount()):
         layer = dataset.GetLayerByIndex(index)
-        name = label if label and dataset.GetLayerCount() == 1 else layer.GetName()
+        name = label if label and dataset.GetLayerCount() == 1 else (label + ' / ' if label else '') + layer.GetName()
+        if name not in mappings and layer.GetName() in mappings: name = layer.GetName()
         mapping = mappings.get(name,{})
         spatial = layer.GetSpatialRef()
         if mapping.get('crs'):
@@ -171,7 +226,17 @@ def inspect_file(path, configuration, work, label=None):
             spatial.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             transform = osr.CoordinateTransformation(spatial,target)
         definition = layer.GetLayerDefn()
-        fields = [{'name':definition.GetFieldDefn(i).GetName()} for i in range(definition.GetFieldCount())]
+        fields = []
+        for i in range(definition.GetFieldCount()):
+            field = definition.GetFieldDefn(i)
+            item = {'name':field.GetName()}
+            if field.GetAlternativeNameRef(): item['alias'] = field.GetAlternativeNameRef()
+            if field.GetDomainName():
+                domain = dataset.GetFieldDomain(field.GetDomainName())
+                if domain and hasattr(domain,'GetEnumeration'):
+                    values = domain.GetEnumeration()
+                    if values: item['codedValues'] = values; item['values'] = list(values.values())
+            fields.append(item)
         features, types = [], set()
         for record in layer:
             total += 1
@@ -185,5 +250,12 @@ def inspect_file(path, configuration, work, label=None):
                 geometry = json.loads(geometry.ExportToJson())
                 types.add(geometry['type'])
             features.append({'type':'Feature','id':record.GetFID(),'geometry':geometry,'properties':props})
-        result.append({'name':name,'features':features,'fields':fields,'crs':'EPSG:4326' if spatial else None,'sourceCrs':source_crs,'geometryTypes':sorted(types),'suggestedRole':guess_role(name,types)})
+        # GeoJSON ids are identities, not row positions. GDAL may otherwise coerce strings.
+        if json_driver == 'GeoJSON':
+            document = json.loads(path.read_text(encoding='utf-8-sig'))
+            originals = document.get('features',[]) if document.get('type')=='FeatureCollection' else [document] if document.get('type')=='Feature' else []
+            if len(originals)==len(features):
+                for original,feature in zip(originals,features):
+                    feature['id'] = original.get('id')
+        result.append({'name':name,'features':features,'fields':fields,'crs':'EPSG:4326' if spatial else None,'sourceCrs':source_crs,'geometryTypes':sorted(types),'suggestedRole':guess_role(name,types),'format':dataset.GetDriver().ShortName})
     return result

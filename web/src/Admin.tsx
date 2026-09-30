@@ -1592,7 +1592,7 @@ function Editor({
             : 'Mapped place',
       });
     for (const f of validation.data.map.features)
-      if (['building', 'path'].includes(f.properties?.kind))
+      if (['building', 'path', 'land', 'overlay'].includes(f.properties?.kind))
         result.push({
           id: String(f.properties!.id),
           kind: f.properties!.kind,
@@ -2153,6 +2153,7 @@ function Editor({
             fallback={<p className="campus-workspace">Opening campuses…</p>}
           >
             <CampusWorkspace
+              currentData={validation.data}
               owner={owner}
               current={state.campus || lasuCampus}
               dark={dark}
