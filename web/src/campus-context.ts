@@ -35,8 +35,7 @@ export function campusKey(key: string, campus = requestedCampus()) {
 }
 export function campusUrl(path: string, campus = requestedCampus()) {
   const url = new URL(path, 'https://turnright.local');
-  if (campus !== DEFAULT_CAMPUS) url.searchParams.set('campus', campus);
-  else if (url.searchParams.has('campus')) url.searchParams.delete('campus');
+  url.searchParams.set('campus', campus);
   return url.pathname + url.search + url.hash;
 }
 export function validCatalogue(value: unknown): value is CampusCatalogue {
@@ -152,4 +151,23 @@ export function insideCampusMappingArea(point: unknown, area?: MappingArea) {
   const offset = ((point[0] - west) % 360 + 360) % 360;
   return east - west === 360 || width + 2 * longitudeBuffer >= 360 ||
     offset <= width + longitudeBuffer || offset >= 360 - longitudeBuffer;
+}
+
+/** Restore only a plain public entry; shared destinations and owner links stay explicit. */
+export function restorePublicCampus() {
+  try {
+    const url = new URL(location.href);
+    const slug = localStorage.getItem('turnright:last-campus');
+    if (url.pathname === '/' && !url.search && !url.hash &&
+        slug && /^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
+      url.searchParams.set('campus', slug);
+      history.replaceState(history.state, '', url);
+    }
+  } catch { /* Storage or history can be unavailable; use the ordinary link. */ }
+}
+
+/** Remember successful public loads only, including verified offline packages. */
+export function rememberPublicCampus(slug: string) {
+  try { localStorage.setItem('turnright:last-campus', slug); }
+  catch { /* The map remains usable when browser storage is blocked. */ }
 }
