@@ -15,7 +15,11 @@ const headers = bypass ? { 'x-vercel-protection-bypass': bypass } : {};
 const get = async (url) => {
   const target = new URL(url, origin);
   assert.equal(target.origin, new URL(origin).origin);
-  const response = await fetch(target, { headers, redirect: 'error' });
+  const response = await fetch(target, {
+    headers,
+    redirect: 'error',
+    signal: AbortSignal.timeout(45000),
+  });
   assert(response.ok, `${url}: ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 };
@@ -157,8 +161,12 @@ for (const [engine, launcher] of [
     for (const campus of process.env.VERIFY_SCOPE === 'offline-webkit'
       ? []
       : campuses)
-      for (const mobile of [false, true])
-        for (const theme of ['light', 'dark']) {
+      for (const mobile of process.env.VERIFY_SCOPE === 'production'
+        ? [false]
+        : [false, true])
+        for (const theme of process.env.VERIFY_SCOPE === 'production'
+          ? ['light']
+          : ['light', 'dark']) {
           const context = await browser.newContext({
             viewport: mobile
               ? { width: 390, height: 844 }

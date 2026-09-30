@@ -10,7 +10,7 @@ on:
         required: false
       scope:
         type: choice
-        options: [all, offline-webkit]
+        options: [all, offline-webkit, production]
         default: all
       cleanup_run:
         description: Optional preceding verification run whose temporary credential needs cleanup

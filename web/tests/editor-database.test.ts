@@ -138,7 +138,7 @@ it('applies an additive campus patch atomically with stale guards and rollback w
       args,
     );
     const after = (
-      await database.query<{ id: string; payload: any }>(
+      await database.query<{ id: string; payload: unknown }>(
         'select id,payload from source_features where campus_id=$1 order by id',
         [campus],
       )
