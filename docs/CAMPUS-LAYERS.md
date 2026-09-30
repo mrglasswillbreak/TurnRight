@@ -1,6 +1,6 @@
 # Campus layers and road surfaces
 
-**Release status:** implementation is on `codex/lasu-campus-layers`; production rollout and final browser verification are pending. See the [production record](PRODUCTION.md) for the exact checkpoint.
+The layer workspace is deployed. [Production receipts](PRODUCTION.md) record the released campus packages, browser checks and preserved drafts.
 
 The owner editor has a persistent **Layers** entry. The desktop explorer resizes horizontally; the same Layers / Features workflow appears in a sheet on phones. Layer changes join ordinary feature corrections in transactional autosave, undo/redo, backups, recovery and immutable release snapshots. There is no visitor layer switcher.
 
@@ -25,7 +25,7 @@ Layer styling resolves **feature override → first matching classification rule
 
 ## Geometry and linked widths
 
-Land and generic overlays support up to **20,000 vertices per feature**; other kinds retain the 2,000-vertex limit and requests retain their existing byte limits. Large polygons expose a selected part/ring in windows of 100 editing handles. All other vertices and holes stay intact. Imported coordinate precision is retained.
+Land and generic overlays support up to **20,000 vertices per feature**; other kinds retain the 2,000-vertex limit and requests retain their existing byte limits. Large polygons expose a selected part/ring in windows of 100 editing handles; multipart lines and points use bounded windows too. All other vertices and holes stay intact. Imported coordinate precision is retained.
 
 **Parts, holes and geometry tools** opens a lazy worker. Draw a cutting line or hole on the map, choose a part or interior ring, or merge a selected group. Generate a preview, inspect its before/after map, then apply. Cancellation terminates the worker; a changed workspace invalidates its preview. Splits retain the parent as a superseded identity and create stable children. Merges keep the first selected identity, retain lineage and supersede the others. Undo restores the complete operation; refreshed source records do not revive superseded corrections. Routing geometry uses the existing topology-aware tools.
 
