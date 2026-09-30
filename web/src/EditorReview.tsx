@@ -1,4 +1,4 @@
-import { requestedCampus } from './campus-context';
+import { campusUrl, requestedCampus } from './campus-context';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
 import {
@@ -175,52 +175,56 @@ export function EditorReview({
       {tab === 'changes' && (
         <>
           <h2>Source review</h2>
-          {requestedCampus() === 'lasu' && <>
-          <EnrichmentReview
-            onLocate={(center) => mapRef.current?.flyTo({ center, zoom: 19 })}
-          />
-          <BuildingRoofReview
-            data={validation.data}
-            duplicates={validation.duplicates}
-            edits={workspace.edits}
-            disabled={
-              busy ||
-              !!validation.pending ||
-              !!workspace.unfinished ||
-              !!workspace.roofDraft ||
-              workspace.status === 'Conflict'
-            }
-            onApply={onApplyAppearances}
-            onLocate={onLocateBuilding}
-          />
-          <BuildingReferenceReview
-            data={validation.data}
-            duplicates={validation.duplicates}
-            edits={workspace.edits}
-            disabled={
-              busy ||
-              !!validation.pending ||
-              !!workspace.unfinished ||
-              !!workspace.roofDraft ||
-              workspace.status === 'Conflict'
-            }
-            onApply={onApplyAppearances}
-            onLocate={onLocateBuilding}
-          />
-          <BuildingPhotoReview
-            data={validation.data}
-            edits={workspace.edits}
-            disabled={
-              busy ||
-              !!validation.pending ||
-              !!workspace.unfinished ||
-              !!workspace.roofDraft ||
-              workspace.status === 'Conflict'
-            }
-            onApply={onApplyAppearances}
-            onLocate={onLocateBuilding}
-          />
-          </>}
+          {requestedCampus() === 'lasu' && (
+            <>
+              <EnrichmentReview
+                onLocate={(center) =>
+                  mapRef.current?.flyTo({ center, zoom: 19 })
+                }
+              />
+              <BuildingRoofReview
+                data={validation.data}
+                duplicates={validation.duplicates}
+                edits={workspace.edits}
+                disabled={
+                  busy ||
+                  !!validation.pending ||
+                  !!workspace.unfinished ||
+                  !!workspace.roofDraft ||
+                  workspace.status === 'Conflict'
+                }
+                onApply={onApplyAppearances}
+                onLocate={onLocateBuilding}
+              />
+              <BuildingReferenceReview
+                data={validation.data}
+                duplicates={validation.duplicates}
+                edits={workspace.edits}
+                disabled={
+                  busy ||
+                  !!validation.pending ||
+                  !!workspace.unfinished ||
+                  !!workspace.roofDraft ||
+                  workspace.status === 'Conflict'
+                }
+                onApply={onApplyAppearances}
+                onLocate={onLocateBuilding}
+              />
+              <BuildingPhotoReview
+                data={validation.data}
+                edits={workspace.edits}
+                disabled={
+                  busy ||
+                  !!validation.pending ||
+                  !!workspace.unfinished ||
+                  !!workspace.roofDraft ||
+                  workspace.status === 'Conflict'
+                }
+                onApply={onApplyAppearances}
+                onLocate={onLocateBuilding}
+              />
+            </>
+          )}
           <p className="small-note">
             Daily checks propose changes. Your campus corrections always take
             precedence.
@@ -712,7 +716,8 @@ export function EditorReview({
                 </details>
                 <p>
                   {impact.result.newlyDisconnected.length} newly disconnected
-                  destinations (lost approach or reachability from Clinic).
+                  destinations (lost approach or reachability from the
+                  comparison origin).
                 </p>
                 {impact.result.newlyDisconnected.map((p) => (
                   <p className="notice" key={p.id}>
@@ -795,7 +800,10 @@ export function EditorReview({
               {release.preview_url && (
                 <a
                   className="source-link"
-                  href={release.preview_url}
+                  href={
+                    new URL(campusUrl(release.preview_url), release.preview_url)
+                      .href
+                  }
                   target="_blank"
                   rel="noreferrer"
                 >

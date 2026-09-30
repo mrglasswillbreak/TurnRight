@@ -1550,10 +1550,10 @@ export default function App() {
               ) : (
                 <span className="status-dot" />
               )}
-              <span>{!online ? 'Offline' : 'Lagos State University'}</span>
+              <span>{!online ? 'Offline' : campusName}</span>
               <span className="pill-divider" />
               <span>
-                {downloaded && swReady ? 'Map downloaded' : 'Ojo, Lagos'}
+                {downloaded && swReady ? 'Map downloaded' : 'Campus map'}
               </span>
             </button>
           </div>
