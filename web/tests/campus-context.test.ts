@@ -19,7 +19,10 @@ import {
   withCampusId,
   currentCampusId,
 } from '../server/campus-scope';
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 it('retains legacy LASU links and separates preferences and public editor links', () => {
   expect(requestedCampus('')).toBe('lasu');
   expect(campusKey('saved', 'lasu')).toBe('saved');
@@ -44,7 +47,8 @@ it('rejects duplicate campuses and remote manifest pointers', () => {
   ).toBe(false);
   expect(structuralIssues(emptyCampus(lasuCampus))).toEqual([]);
 });
-it('isolates simultaneous API requests including nested asset calls', async () => {
+it.each([undefined, 'campus-release-job'])('isolates simultaneous API requests from the job campus %s', async (jobCampus) => {
+  vi.stubEnv('CAMPUS_ID', jobCampus);
   const results = await Promise.all(
     ['lasu', 'campus-two'].map((id) =>
       withCampusId(id, async () => {
@@ -67,7 +71,7 @@ it('isolates simultaneous API requests including nested asset calls', async () =
     ),
   );
   expect(results).toEqual(['lasu', 'campus-two']);
-  expect(currentCampusId()).toBe('lasu');
+  expect(currentCampusId()).toBe(jobCampus || 'lasu');
   expect(scopeDatabaseRequest('admin_users', 'GET', undefined).path).toBe(
     'admin_users',
   );
