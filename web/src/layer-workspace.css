@@ -161,11 +161,41 @@
   border-radius: 8px;
 }
 .layer-feature-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 24px minmax(190px, 1fr) 100px 70px 110px;
   align-items: center;
   gap: 6px;
   padding: 2px 6px;
   border-bottom: 1px solid var(--border);
+}
+.layer-table table {
+  min-width: 540px;
+  border-collapse: collapse;
+}
+.layer-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: block;
+  background: var(--background);
+}
+.layer-table thead tr {
+  display: grid;
+  grid-template-columns: 24px minmax(190px, 1fr) 100px 70px 110px;
+  gap: 6px;
+  padding: 7px 6px;
+}
+.layer-table th {
+  text-align: left;
+  font-size: 11px;
+  color: var(--muted);
+}
+.layer-feature-row td {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
 }
 .layer-feature-row button {
   flex: 1;

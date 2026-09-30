@@ -279,6 +279,18 @@ export function extraMapLayers(map: Map, dark: boolean) {
         styled('opacity', base['line-opacity'] ?? 1),
       );
     }
+    if (type === 'circle') {
+      map.setPaintProperty(
+        id,
+        'circle-radius',
+        styled('pointSize', base['circle-radius'] ?? 4),
+      );
+      map.setPaintProperty(
+        id,
+        'circle-opacity',
+        styled('opacity', base['circle-opacity'] ?? 1),
+      );
+    }
     if (type === 'fill') {
       map.setPaintProperty(
         id,

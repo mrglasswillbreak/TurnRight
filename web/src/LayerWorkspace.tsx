@@ -25,6 +25,7 @@ import './layer-workspace.css';
 
 export default function LayerWorkspace({
   data,
+  issues,
   edits,
   view,
   onView,
@@ -37,6 +38,7 @@ export default function LayerWorkspace({
   onClose,
 }: {
   data: CampusData;
+  issues: import('./validation').ValidationIssue[];
   edits: MapEdit[];
   view: LayerViewState;
   onView: (value: LayerViewState) => void;
@@ -58,6 +60,14 @@ export default function LayerWorkspace({
     features = useMemo(() => layerFeatures(data), [data]),
     membership = useMemo(() => layerMembership(data, items), [data, items]);
   const active = items.find((l) => l.id === view.active);
+  const layerIssues = useMemo(() => {
+    const result = new Map<string, import('./validation').ValidationIssue[]>();
+    for (const issue of issues) {
+      const id = membership.get(`${issue.featureKind}:${issue.featureId}`);
+      if (id) result.set(id, [...(result.get(id) || []), issue]);
+    }
+    return result;
+  }, [issues, membership]);
   const [explorerTab, setExplorerTab] = useState<'layers' | 'features'>(
     'layers',
   );
@@ -70,6 +80,10 @@ export default function LayerWorkspace({
     [createRole, setCreateRole] = useState<LayerRole>('overlay'),
     [bulk, setBulk] = useState({ field: 'surface', value: '' }),
     [pending, setPending] = useState<MapEdit[] | null>(null),
+    [pendingBase, setPendingBase] = useState<{
+      data: CampusData;
+      edits: MapEdit[];
+    } | null>(null),
     [moveTarget, setMoveTarget] = useState('');
   const selected = view.selected || [];
   const setSelected = (value: string[] | ((current: string[]) => string[])) =>
@@ -146,6 +160,7 @@ export default function LayerWorkspace({
       );
       return;
     }
+    setPendingBase({ data, edits });
     setPending(batch);
   };
   const selectionEditable = () => {
@@ -230,6 +245,7 @@ export default function LayerWorkspace({
             ? [...new Set([...l.members, ...selected])]
             : l.members.filter((k) => !keys.has(k)),
       }));
+    setPendingBase({ data, edits });
     setPending(
       changed.map((l) =>
         layerEdit(
@@ -295,6 +311,18 @@ export default function LayerWorkspace({
               {edits.some((e) => e.kind === 'layer' && e.id === layer.id)
                 ? '· Edited'
                 : ''}
+              {(layerIssues.get(layer.id)?.length || 0) > 0
+                ? ` · ${layerIssues.get(layer.id)!.length} issues`
+                : ''}
+            </small>
+            <small>
+              {[
+                ...new Set(
+                  features
+                    .filter((f) => membership.get(f.key) === layer.id)
+                    .map((f) => f.geometry.type),
+                ),
+              ].join(' · ')}
             </small>
           </span>
         </button>
@@ -779,6 +807,25 @@ export default function LayerWorkspace({
                 Source: {active.sourceName || 'Owner-created'}{' '}
                 {active.importedLayer ? ` / ${active.importedLayer}` : ''}
               </small>
+              {!!layerIssues.get(active.id)?.length && (
+                <details>
+                  <summary>
+                    Layer issues ({layerIssues.get(active.id)!.length})
+                  </summary>
+                  {layerIssues.get(active.id)!.map((issue, i) => (
+                    <button
+                      key={i}
+                      onClick={() =>
+                        issue.featureKind &&
+                        issue.featureId &&
+                        onSelect(issue.featureKind, issue.featureId)
+                      }
+                    >
+                      {issue.message}
+                    </button>
+                  ))}
+                </details>
+              )}
               {['landcover', 'road-surface', 'overlay'].includes(
                 active.role,
               ) && (
@@ -846,6 +893,15 @@ export default function LayerWorkspace({
               aria-rowcount={rows.length}
               style={{ width: '100%' }}
             >
+              <thead>
+                <tr>
+                  <th aria-label="Selection" />
+                  <th>Name / identity</th>
+                  <th>Class</th>
+                  <th>Width</th>
+                  <th>Surface</th>
+                </tr>
+              </thead>
               <tbody
                 style={{
                   height: rows.length * 44,
@@ -905,6 +961,27 @@ export default function LayerWorkspace({
                           )}
                         </small>
                       </button>
+                    </td>
+                    <td
+                      title={String(
+                        f.properties.landClass ||
+                          f.properties.highway ||
+                          f.kind,
+                      )}
+                    >
+                      {String(
+                        f.properties.landClass ||
+                          f.properties.highway ||
+                          f.kind,
+                      )}
+                    </td>
+                    <td title={String(f.properties.widthEvidence || '')}>
+                      {f.properties.width == null
+                        ? '—'
+                        : `${Number(f.properties.width).toFixed(1)} m`}
+                    </td>
+                    <td title={String(f.properties.surface || '')}>
+                      {String(f.properties.surface || 'Unknown')}
                     </td>
                   </tr>
                 ))}
@@ -984,8 +1061,15 @@ export default function LayerWorkspace({
           </p>
           <button
             className="editor-primary"
+            disabled={
+              pendingBase?.data !== data || pendingBase?.edits !== edits
+            }
             onClick={() => {
-              if (selectionEditable()) {
+              if (
+                pendingBase?.data === data &&
+                pendingBase?.edits === edits &&
+                selectionEditable()
+              ) {
                 onCommit(pending);
                 setPending(null);
               }
@@ -993,6 +1077,9 @@ export default function LayerWorkspace({
           >
             Apply changes
           </button>
+          {(pendingBase?.data !== data || pendingBase?.edits !== edits) && (
+            <p>The workspace changed. Preview again before applying.</p>
+          )}
           <button onClick={() => setPending(null)}>Cancel</button>
         </div>
       )}

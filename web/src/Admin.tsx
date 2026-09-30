@@ -2188,6 +2188,7 @@ function Editor({
           >
             <LayerWorkspace
               data={validation.data}
+              issues={validation.issues}
               edits={workspace.edits}
               view={layerView}
               onView={setLayerView}
