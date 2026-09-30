@@ -10,7 +10,7 @@ on:
         required: false
       scope:
         type: choice
-        options: [all, offline-webkit, production]
+        options: [all, offline-webkit, production, rollback]
         default: all
       cleanup_run:
         description: Optional preceding verification run whose temporary credential needs cleanup
@@ -48,6 +48,7 @@ jobs:
         env:
           CLEANUP_RUN_ID: ${{ inputs.cleanup_run }}
       - run: npx playwright install --with-deps chromium webkit
+        if: inputs.scope != 'rollback'
         working-directory: web
       - if: inputs.release_id != ''
         run: node ../scripts/verify-release-preview.mjs

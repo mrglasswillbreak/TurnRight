@@ -87,12 +87,12 @@ it('explains an HTML deployment response without exposing its contents', async (
   expect(await readdir(publicDir)).toEqual([]);
 });
 
-it('scopes historical-deployment credentials to verified asset paths and refuses redirects', async () => {
+it('scopes historical-deployment credentials to verified asset paths and refuses external redirects', async () => {
   const headers = { 'x-vercel-protection-bypass': 'test-only-bypass' };
   const request = vi.fn(async (url: URL, init: RequestInit) => {
     expect(url.origin).toBe(origin);
     expect(init.headers).toEqual(headers);
-    expect(init.redirect).toBe('error');
+    expect(init.redirect).toBe('manual');
     return url.pathname.endsWith('manifest.json')
       ? Response.json(manifest)
       : new Response(bytes);
@@ -119,6 +119,24 @@ it('scopes historical-deployment credentials to verified asset paths and refuses
     ),
   ).rejects.toThrow('Invalid published asset path');
   expect(request).not.toHaveBeenCalled();
+  request.mockImplementationOnce(
+    async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: 'https://example.net/manifest.json' },
+      }),
+  );
+  await expect(
+    preservePublished(
+      publicDir,
+      origin,
+      false,
+      manifest.version,
+      '/packages/lasu-abc123/manifest.json',
+      { headers },
+    ),
+  ).rejects.toThrow('redirected outside its origin');
+  expect(request).toHaveBeenCalledTimes(1);
 });
 
 it('stops before copying assets when the verified public baseline changes', async () => {

@@ -41,7 +41,8 @@ try {
   if (!accessible) throw Error("Preview authorization did not become available");
   process.env.VERIFY_ORIGIN = url.origin;
   process.env.VERIFY_BYPASS = secret;
-  await import("../web/scripts/verify-campus-detail.mjs");
+  if (process.env.VERIFY_SCOPE !== "rollback")
+    await import("../web/scripts/verify-campus-detail.mjs");
   const [historical] = await db(
     "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url",
   );

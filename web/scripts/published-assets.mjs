@@ -29,12 +29,24 @@ export async function preservePublished(
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
   assetTarget(publicDir, manifestPath);
-  const response = await fetch(new URL(manifestPath, base), {
-    headers,
-    redirect: 'error',
-    cache: 'no-store',
-    signal: AbortSignal.timeout(20000),
-  });
+  const request = async (pathname, timeout) => {
+    let target = new URL(pathname, base);
+    for (let attempt = 0; attempt < 10; attempt++) {
+      assetTarget(publicDir, target.pathname);
+      const response = await fetch(target, {headers,redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(timeout)});
+      if (![301,302,303,307,308].includes(response.status)) return response;
+      const next = new URL(response.headers.get('location') || '', target);
+      if (next.origin === base.origin) { target = next; continue; }
+      // Protection configuration propagates independently to edge asset paths.
+      if (headers['x-vercel-protection-bypass'] && next.hostname === 'vercel.com' && /^\/(sso-api|login)/.test(next.pathname)) {
+        await new Promise(resolve=>setTimeout(resolve,2000));
+        continue;
+      }
+      throw Error(`Published asset ${target.pathname} redirected outside its origin (${next.origin}${next.pathname})`);
+    }
+    throw Error(`Published asset ${pathname} remained protected or redirected repeatedly`);
+  };
+  const response = await request(manifestPath, 20000);
   if (!response.ok)
     throw new Error(
       'Published map is unavailable. Build stopped to preserve the working release.',
@@ -72,11 +84,7 @@ export async function preservePublished(
       createHash('sha256').update(bytes).digest('hex') === asset.sha256;
     let bytes = await fs.readFile(target).catch(() => null);
     if (bytes && valid(bytes)) continue;
-    const result = await fetch(new URL(asset.url, base), {
-      headers,
-      redirect: 'error',
-      signal: AbortSignal.timeout(30000),
-    });
+    const result = await request(asset.url, 30000);
     if (!result.ok) throw new Error('A preceding release asset is unavailable');
     bytes = Buffer.from(await result.arrayBuffer());
     if (!valid(bytes)) throw new Error('Published asset checksum mismatch');
