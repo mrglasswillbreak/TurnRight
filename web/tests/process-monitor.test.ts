@@ -59,7 +59,9 @@ describe('process monitor', () => {
     task.finish();
     expect(m.snapshot()).toHaveLength(0);
   });
-  it('retains active jobs while bounding finished history and marking cancellation', () => {
+  it('retains active jobs and the newest finished jobs when timestamps tie', () => {
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(1000);
+    try {
     const m = new ProcessMonitor();
     const active = m.begin('Build', 'Rendering');
     for (let i = 0; i < 40; i++) m.begin('Old', 'Work').finish();
@@ -69,5 +71,6 @@ describe('process monitor', () => {
     expect(m.snapshot().find((r) => r.title === 'Build')?.state).toBe(
       'cancelled',
     );
+    } finally { clock.mockRestore(); }
   });
 });
