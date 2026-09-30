@@ -2806,6 +2806,9 @@ test('review separate building wings, edit their geometry, save and undo without
     }),
   );
   await clickMap(page, [3.1997, 6.47128]);
+  const chooser = page.getByRole('dialog', { name: 'Choose overlapping feature' });
+  if (await chooser.isVisible())
+    await chooser.getByRole('button', { name: /building .*120$/ }).click();
   await page.getByRole('button', { name: 'Review corrected wings' }).click();
   await expect(
     page.getByRole('complementary', { name: 'Review proposed repair' }),
