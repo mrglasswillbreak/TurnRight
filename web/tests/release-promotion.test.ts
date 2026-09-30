@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   publishDeployment,
   withDeploymentAccess,
+  withRetainedPackageAccess,
 } from '../../scripts/vercel-api.mjs';
 
 beforeEach(() => {
@@ -61,6 +62,40 @@ it('rejects foreign historical deployments before creating access and revokes ac
       regenerate: false,
     },
   });
+});
+
+it.each([404, 403])('retained package recovery only falls back after deployment expiry (%s)', async (status) => {
+  const requests: string[] = [];
+  const changes: Record<string, unknown>[] = [];
+  vi.stubGlobal('fetch', vi.fn(async (input: URL | string, init: RequestInit = {}) => {
+    const url = new URL(input);
+    requests.push(url.pathname);
+    if (url.pathname === '/v13/deployments/dpl_old')
+      return Response.json({ error: { message: 'Deployment unavailable' } }, { status });
+    if (url.pathname === '/v9/projects/prj_test')
+      return Response.json({ targets: { production: { id: 'dpl_current', url: 'retained.vercel.app' } } });
+    if (url.pathname === '/v13/deployments/dpl_current')
+      return Response.json({ projectId: 'prj_test', url: 'retained.vercel.app' });
+    if (url.hostname === 'retained.vercel.app') return new Response('app');
+    if (init.method === 'PATCH') {
+      changes.push(JSON.parse(String(init.body)));
+      return Response.json({});
+    }
+    throw Error('Unexpected retained package request');
+  }));
+  const read = vi.fn(async (_headers: Record<string, string>, origin: string) => origin);
+  const operation = withRetainedPackageAccess({ deployment_id: 'dpl_old', deployment_url: 'https://historical.vercel.app' }, read);
+  if (status === 404) {
+    await expect(operation).resolves.toBe('https://retained.vercel.app');
+    expect(read).toHaveBeenCalledTimes(1);
+    expect(changes).toHaveLength(2);
+    expect(changes[1]).toEqual({ revoke: { secret: (changes[0].generate as { secret: string }).secret, regenerate: false } });
+  } else {
+    await expect(operation).rejects.toThrow('Vercel 403');
+    expect(requests).toEqual(['/v13/deployments/dpl_old']);
+    expect(changes).toHaveLength(0);
+    expect(read).not.toHaveBeenCalled();
+  }
 });
 
 function vercel({
