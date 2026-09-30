@@ -16,7 +16,7 @@ Visitors do not need accounts. Other GitHub users cannot gain editor access by s
 
 ## Database and private storage
 
-Production has migrations **001–019**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, and 019 adds guarded, additive source patching with complete revision checks and rollback receipts. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+Production has migrations **001–021**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -31,6 +31,8 @@ Production has migrations **001–019**. Compatible readers preceded model-asset
 | 016–017 | Atomic bulk import-review application and bounded RPC execution time |
 | 018 | Land and generic-overlay edit kinds |
 | 019 | Service-only additive source updates, revision inventory and before/after receipts |
+| 020 | Campus layer/group records and atomic feature membership, revision and compatibility guards |
+| 021 | Service-only reviewed snapshot insertion, bounded deadline and idempotent release identity |
 
 | Private bucket | Purpose | Per-object limit |
 | --- | --- | ---: |
@@ -69,6 +71,8 @@ Set application variables in Vercel Preview and Production when previews can be 
 | `map-import.yml` | Inspection/preview for one campus/import/run token |
 | `map-source-check.yml` | Daily 03:47 UTC; opted-in sources and OSM endpoint permission gate |
 | `map-import-tests.yml` | Full pinned Linux GIS regressions |
+| `campus-layer-baselines.yml` | Preserve both campuses’ published, source and private draft baselines |
+| `campus-layer-release.yml` | Prepare a reviewed enrichment snapshot; apply only the matching complete workspace hash |
 | `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |
 | `release.yml` | Serialized `preview` or `publish`; explicit campus, legacy default LASU |
 | `bootstrap.yml`, `preview.yml` | Initial baseline and seed preview for new installations |
@@ -79,9 +83,9 @@ Publication replaces one campus and preserves every other campus. **Prepare rest
 
 ## Operational verification
 
-After deployment verify the source revision, owner login/Campuses list, public switcher, unauthenticated admin rejection, catalogue, LASU manifest and asset hashes. Install waiting PWA updates through **Install update** so recovery guards remain active.
+After deployment verify the source revision, owner login/Campuses list, public switcher and plain-home campus memory, unauthenticated admin rejection, catalogue, LASU manifest and asset hashes. Install waiting PWA updates through **Install update** so recovery guards remain active.
 
-The September 26 migration preserved fingerprints for 4,777 source features, 133 edits, 32 releases, two surveys, 25 media records and one model asset. LASU remained the only campus and all 84 published assets were unchanged. No second campus or test import was published. See [Production](PRODUCTION.md) for the exact receipt.
+The September 26 migration preserved fingerprints for 4,777 source features, 133 edits, 32 releases, two surveys, 25 media records and one model asset. At that checkpoint LASU was the only published campus and all 84 assets were unchanged. UNILAG was published later; those dated counts are not the current catalogue. See [Production](PRODUCTION.md) for the exact receipt.
 
 The initial September 9 preview was release `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`; its old counts and preview state are historical evidence in [Production](PRODUCTION.md). The original token record listed an expiry of 7 December 2026; check current secret-store expiry when maintaining credentials rather than assuming it has not changed.
 
