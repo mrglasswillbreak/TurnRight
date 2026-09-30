@@ -11,7 +11,8 @@ import {
 import { hydrateModelEdits } from "../web/server/model-assets";
 import { publicCampus } from "./public-campus.mjs";
 import { readPublishedCatalogue } from "../web/scripts/published-campus-catalogue.mjs";
-import type { SourceRecord } from "../web/src/editor-model";
+import { assembleSources, applyEdits, type SourceRecord } from "../web/src/editor-model";
+import { withPublishedVisuals } from "../web/src/editor-visuals";
 import type { MapEdit } from "../web/src/types";
 
 const campus = process.env.CAMPUS_ID;
@@ -42,12 +43,20 @@ const [hydratedCurrent, hydratedPublished] = await Promise.all([
   hydrateModelEdits(priorEdits),
 ]);
 
-function patch(input: SourceRecord[], edits: MapEdit[]) {
+function patch(input: SourceRecord[], edits: MapEdit[], forRelease: boolean) {
   const records = structuredClone(input),
     index = new Map(records.map((r) => [r.id, r]));
   const meta = records.find((r) => r.entity === "meta")!;
   meta.payload.version = published.version;
-  const before = validateReleaseSnapshot({ features: records, edits }, published);
+  const evaluate = () =>
+    forRelease
+      ? {
+          data: validateReleaseSnapshot({ features: records, edits }, published),
+          errors: [] as string[],
+        }
+      : applyEdits(withPublishedVisuals(assembleSources(records, published), published), edits);
+  const beforeResult = evaluate();
+  const before = beforeResult.data;
   for (const change of changes.featureUpdates) {
     const record = index.get("feature:" + change.id);
     if (!record) throw Error("Reviewed source identity is missing: " + change.id);
@@ -71,7 +80,11 @@ function patch(input: SourceRecord[], edits: MapEdit[]) {
     ...meta.payload.sources.filter((s: any) => !changes.sources.some((n: any) => n.id === s.id)),
     ...changes.sources,
   ];
-  const result = validateReleaseSnapshot({ features: records, edits }, published);
+  const afterResult = evaluate();
+  const introduced = afterResult.errors.filter((e) => !beforeResult.errors.includes(e));
+  if (introduced.length)
+    throw Error("The layer patch introduced workspace errors: " + introduced.join("\n"));
+  const result = afterResult.data;
   meta.payload.layers = result.layers;
   for (const record of records) record.hash = hash(record.payload);
   if (hash(result.graph) !== hash(before.graph))
@@ -90,8 +103,8 @@ function patch(input: SourceRecord[], edits: MapEdit[]) {
   }
   return { records, index, data: result, graphHash: hash(result.graph) };
 }
-const current = patch(previous, hydratedCurrent),
-  release = patch(last.snapshot.features, hydratedPublished);
+const current = patch(previous, hydratedCurrent, false),
+  release = patch(last.snapshot.features, hydratedPublished, true);
 const prior = new Map(priorEdits.map((e) => [`${e.kind}:${e.id}`, hash(e)]));
 const excluded = drafts.filter((e) => prior.get(`${e.kind}:${e.id}`) !== hash(e));
 const storagePath = `${campus}/${randomUUID()}/campus-layer-release.json`;
