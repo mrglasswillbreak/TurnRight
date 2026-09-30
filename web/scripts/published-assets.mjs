@@ -17,22 +17,15 @@ export function assetTarget(publicDir, url) {
     throw new Error('Asset escaped public directory');
   return target;
 }
-export async function preservePublished(
-  publicDir,
-  origin,
-  activate = false,
-  expectedVersion,
-  manifestPath = '/packages/latest.json',
-  {headers = {}} = {},
-) {
+export async function requestPublishedAsset(origin, pathname, timeout, { headers = {} } = {}) {
   const base = new URL(origin);
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
-  assetTarget(publicDir, manifestPath);
-  const request = async (pathname, timeout) => {
     let target = new URL(pathname, base);
     for (let attempt = 0; attempt < 10; attempt++) {
-      assetTarget(publicDir, target.pathname);
+      if (target.origin !== base.origin || target.username || target.password)
+        throw Error('Published asset origin changed');
+      assetTarget('.', target.pathname);
       const response = await fetch(target, {headers,redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(timeout)});
       if (![301,302,303,307,308].includes(response.status)) return response;
       const next = new URL(response.headers.get('location') || '', target);
@@ -45,7 +38,21 @@ export async function preservePublished(
       throw Error(`Published asset ${target.pathname} redirected outside its origin (${next.origin}${next.pathname})`);
     }
     throw Error(`Published asset ${pathname} remained protected or redirected repeatedly`);
-  };
+}
+
+export async function preservePublished(
+  publicDir,
+  origin,
+  activate = false,
+  expectedVersion,
+  manifestPath = '/packages/latest.json',
+  {headers = {}} = {},
+) {
+  const base = new URL(origin);
+  if (base.protocol !== 'https:' || base.username || base.password)
+    throw new Error('Published map URL must be HTTPS');
+  assetTarget(publicDir, manifestPath);
+  const request = (pathname, timeout) => requestPublishedAsset(origin, pathname, timeout, { headers });
   const response = await request(manifestPath, 20000);
   if (!response.ok)
     throw new Error(
