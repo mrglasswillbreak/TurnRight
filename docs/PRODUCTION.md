@@ -3,6 +3,24 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## UNILAG publication · 30 September 2026
+
+The owner-authorized UNILAG release was inspected in the in-app browser and
+[published successfully](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36663072375).
+Release `0a33726d-f417-4405-b459-97def6d52f46` serves
+`unilag-eedb8166a67f` at [the public UNILAG map](https://turnright.vercel.app/?campus=unilag).
+It contains 71 destinations and 4,252 directed path segments. Three road segments
+intersecting a mapped building remain excluded; the main library's approach is
+blocked. Routes and final entrances remain explicitly unverified in the field.
+
+Verification at **2026-09-30T03:16:19Z** checked all **23 UNILAG assets / 9,498,906 bytes**
+and all **133 LASU assets / 21,178,465 bytes** against their published hashes and
+lengths. LASU remains `lasu-2b70a39ca041`; its manifest is byte-identical to the
+pre-publication baseline (SHA-256 `4177f122756ec833c0915d4d195af3b3d709e5d913b1609977de942a59c70a53`).
+The catalogue now contains both campuses. The earlier release-test failure was
+an environment-scoping test assumption, fixed in `a3dd5e6`; neither campus's
+feature IDs nor model fingerprints were changed by that repair.
+
 ## Import review repair and LASU publication · 27 September 2026
 
 Application revision `dd671c7` is Ready in production. [PR #3](https://github.com/mrglasswillbreak/TurnRight/pull/3) fixes the disabled review button by comparing mapping values independently of database JSON key order, while retaining real-change and validation blockers. Migrations 016–017 replace row-by-row insertion with a bulk transaction and allow up to 60 seconds for this service-only RPC; its API transport waits up to 75 seconds. The source lock, campus identity, run token, validation and exact baseline checks remain enforced.

@@ -1,5 +1,16 @@
 # Application screenshots
 
+## Photo comparison workspace · 30 September 2026
+
+`photo-editor-desktop`, `photo-editor-portrait` and `photo-editor-landscape` are
+unaltered captures of the current PhotoOptimizer/PhotoCompare components at
+1440×900, 390×844 and 844×390. The isolated component fixture uses the licensed
+School of Communication photograph. These views show actual codec output at an
+800-pixel longest edge, without assigning the photograph to a different map
+building. They replace the September 27 layouts in current guides; older
+captures remain dated evidence. Reproduce with
+`npx playwright test photo-processing --output ../test-results/photos-refinement`.
+
 ## Image editing, activity and portrait globe · 27 September 2026
 
 The new `photo-optimise-*`, `photo-controls-portrait`, `photo-editing-offline` and `activity-monitor` captures are unaltered local application screenshots. The desktop/phone images use Chromium with an isolated owner API and a published, attributed School of Communication photograph; the fixture gallery is deliberately called Library and is not a claim about that building identity. The portrait image is scrolled to compression controls. The offline screenshot comes from the production-service-worker test after disconnecting and reloading. The activity import stage is an explicit test fixture, not a live production import.

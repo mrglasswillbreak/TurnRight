@@ -1,6 +1,6 @@
 # TurnRight documentation
 
-TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo is the default and currently the only published campus. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
+TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo remains the default; UNILAG is also published. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
 
 ## Use the application
 
@@ -13,6 +13,8 @@ TurnRight combines a public campus navigation PWA, a private GIS/map workspace a
 | Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL | [Model authoring](MODEL-AUTHORING.md) |
 | Edit standard and custom roof plans | [Building roofs](BUILDING-ROOFS.md) |
 | Upload, credit, recover and approve photographs; edit arrival guides | [Arrival guides and photos](ARRIVAL-GUIDES.md) |
+| Automatically compress added photos, compare and edit offline; drag gallery order | [Photo editing and compression](PHOTO-EDITING.md) |
+| Follow import inspection, builds, uploads and local processing | [Build and process progress](PROGRESS-MONITOR.md) |
 | Record and review private path/entrance evidence | [Walking surveys](SURVEY.md) |
 | Use vehicle routes, parking and the walking handoff | [Driving](DRIVING.md) |
 | Understand offline spoken guidance | [Voice](VOICE.md) |
@@ -26,7 +28,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–015, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
+| New installations, migrations 001–017, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |

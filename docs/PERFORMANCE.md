@@ -1,5 +1,18 @@
 # Responsiveness and recovery
 
+## 30 September image workspace
+
+New photos compress automatically in a sequential, cancellable worker batch.
+Settings changes debounce previews by 450 ms; obsolete work is cancelled, and
+identical prepared output is reused for upload. Target-size search runs at most
+five encodes and respects a quality floor. Preview persistence updates output
+bytes without cloning the retained original. Four pinned Squoosh encoders are
+loaded only when needed; explicit offline preparation caches about 3.6 MB outside
+the public startup budget. [Current UI, codec measurements and tests](PHOTO-EDITING.md).
+
+The historical interaction timings below predate this comparison UI. They should
+not be interpreted as new measurements of the full-screen editor or AVIF encoding.
+
 ## 27 September audit
 
 The [current reliability and performance audit](AUDIT-2026-09-27.md) records

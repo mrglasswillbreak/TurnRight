@@ -7,6 +7,14 @@ are live. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 
+**UNILAG is public (30 September):** `?campus=unilag` loads
+`unilag-eedb8166a67f`, with 71 destinations and 4,252 directed path segments.
+Owner permission to publish the ArcGIS layers is recorded. Reviewed public roads
+support routing; three segments crossing a mapped building remain excluded and
+the main library's approach remains blocked. Entrances still require field
+verification. Publication retained LASU's `lasu-2b70a39ca041` manifest and all
+133 assets unchanged. Additional edits still require a new reviewed release.
+
 ![Campuses workspace](assets/screenshots/campus-workspace-2026-09-26.png)
 
 ## Create a campus

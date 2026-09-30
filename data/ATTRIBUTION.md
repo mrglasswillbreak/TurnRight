@@ -4,6 +4,12 @@
 
 Each campus retains its own source URL, download timestamp/hash, attribution, licence and redistribution declaration. Original uploaded attributes and snapshots are private; approved geometry and applicable attribution enter its public/offline package. The source declaration is checked before publication. Public ArcGIS availability is not permission to redistribute: confirm the specific dataset's terms. Existing LASU source permissions do not authorize another campus's data.
 
+For the imported UNILAG layers, the owner separately confirmed permission to
+publish before the 30 September 2026 release. This records the owner's statement;
+the underlying agreement was not independently inspected and no public reuse
+licence is inferred. Retain the source attribution and permission correspondence.
+[Publication receipt](../docs/PRODUCTION.md).
+
 OpenStreetMap imports retain **© OpenStreetMap contributors**, **ODbL-1.0** and [the copyright/licence link](https://www.openstreetmap.org/copyright). Overpass is a download service, not a separate map-data licence. The public map renders the selected campus's attribution. Original world/globe and photograph credits below remain applicable. [Import and refresh guide](../docs/CAMPUS-IMPORTS.md).
 
 Authored/imported 3D geometry and textures need their own reuse rights. GLB/glTF/OBJ/STL support is a file capability, not a licence grant; retain source/material attribution and any required published notices. Decorative globe clouds are application-generated visuals, not live-weather or satellite observations.

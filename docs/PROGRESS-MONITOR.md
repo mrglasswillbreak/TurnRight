@@ -6,6 +6,12 @@ The owner's **Activity** button opens **Builds and processes**. It shows local t
 
 Covered work includes map import uploads and inspection, ArcGIS retrieval, release validation/build/publication, model file parsing/export, photo processing/uploads/approval and offline package preparation. Existing feature-specific status remains beside the initiating action. Percentages come from actual totals; phases without a measurable total show an indeterminate bar and a named stage. Elapsed times are shown only when known.
 
+Adding photos starts **Compress added photos** automatically. The batch reports
+completed image counts while individual workers report decoding, editing and
+encoding stages. Pause waits for the current image; cancellation retains completed
+outputs and originals. A failed image is reported without preventing the remaining
+new files from being compressed. Review and attachment remain separate actions.
+
 Owner status refreshes every five seconds during active work and every 30 seconds
 when idle, while the page is visible and online. Starting work, reconnecting or
 returning to the page wakes the monitor, with a five-second minimum between

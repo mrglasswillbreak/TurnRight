@@ -16,7 +16,7 @@ Visitors do not need accounts. Other GitHub users cannot gain editor access by s
 
 ## Database and private storage
 
-Production has migrations **001–015**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+Production has migrations **001–017**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions, as recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -28,6 +28,7 @@ Production has migrations **001–015**. Compatible readers preceded model-asset
 | 013 | Campus identity, LASU backfill, scoped keys/functions and media/survey/model isolation |
 | 014 | Source configurations, cancellable import jobs and private uploads |
 | 015 | Campus restore previews and catalogue revisions |
+| 016–017 | Atomic bulk import-review application and bounded RPC execution time |
 
 | Private bucket | Purpose | Per-object limit |
 | --- | --- | ---: |
@@ -85,4 +86,4 @@ Quotas, paused services and expired tokens can interrupt owner jobs while publis
 
 ## Source permissions
 
-The owner previously confirmed permission to redistribute LASU ArcGIS data offline. That is an owner confirmation, not a public licence or a grant for other campuses. Keep the correspondence with project records. New sources need their own attribution/licence/redistribution record; OSM retains ODbL attribution in public and offline packages. See [Attribution](../data/ATTRIBUTION.md) and [imports](CAMPUS-IMPORTS.md).
+The owner confirmed permission to redistribute LASU ArcGIS data offline and separately confirmed permission to publish the imported UNILAG layers before its 30 September release. These are owner confirmations, not public licences or grants for other campuses. Keep the correspondence with project records. New sources need their own attribution/licence/redistribution record; OSM retains ODbL attribution in public and offline packages. See [Attribution](../data/ATTRIBUTION.md) and [imports](CAMPUS-IMPORTS.md).

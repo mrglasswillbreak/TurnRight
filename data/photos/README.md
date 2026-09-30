@@ -2,15 +2,18 @@
 
 This is the historical **23 September collection audit**, against published map
 **lasu-a81135d18314**. Its counts describe that research corpus. The current
-27 September published gallery uses **lasu-49f832190110**, with 395 buildings and 39
-photographs covering 19 buildings. See [current photo/model coverage](../../docs/PHOTO-MODEL-COVERAGE.md)
+public LASU package is **lasu-2b70a39ca041** (29 September); later owner edits and
+the six reviewed photographs below are separate from the original corpus.
+See the [publication receipts](../../docs/PRODUCTION.md), [dated photo/model coverage](../../docs/PHOTO-MODEL-COVERAGE.md)
 and the [application screenshot inventory](../../docs/assets/screenshots/README.md).
 
 ## Owner review on 27 September
 
-Six retained, licensed Commons photographs were added to **private building drafts**
-after the owner approved the proposed matches. They are not part of the 39-photo
-published package or the historical 21-photo research catalogue yet.
+Six retained, licensed Commons photographs were added to building drafts after
+the owner approved the proposed matches, then included in the 27 September
+publication. They remain separate from the historical 21-photo research
+catalogue. The publication receipt in [Production](../../docs/PRODUCTION.md)
+records the resulting 45-photo gallery at that time.
 
 | Building | Approved historical views |
 | --- | --- |

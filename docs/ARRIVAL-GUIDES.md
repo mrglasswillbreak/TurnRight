@@ -42,15 +42,18 @@ strip. A linked place opens its building's gallery. The desktop dialog becomes a
 full-screen workspace on mobile, with the gallery name and draft save status
 kept visible.
 
-- **Gallery:** edit details, make a photo the cover, move it earlier/later, or
-  remove it from the draft. The first photograph is the cover. Removal offers
+- **Gallery:** drag a photograph by its grip to arrange it; the first is the
+  cover. Keyboard users pick up/drop with Space or Enter and reorder with arrows
+  or Home/End. The sliders icon opens one comparison editor for pixels,
+  compression and photo details; the trash icon removes an attachment. Removal offers
   **Undo removal**, and all gallery operations support the editor's undo/redo.
   Editing keeps the original position. Changing **Pictured building** or
   **Photograph of** moves the photo and updates affected galleries in one batch.
 - **Add photos:** select several JPEG, PNG or WebP files, or drop them onto the
   desktop upload area. The [offline image editor](PHOTO-EDITING.md) accepts up to
-  25 MiB per image and 20 images / 100 MiB per batch. Edit and preview locally,
-  then choose **Use selected for map** or **Use batch for map** to upload bounded
+  25 MiB per image and 20 images / 100 MiB per batch. Every added image compresses
+  automatically with map-ready defaults while retaining the original. Adjust and preview locally,
+  then choose **Use for map** or **Use batch for map** to upload bounded
   WebP copies. Files process sequentially; failures retain the other results.
 - **Review uploads:** use the large preview and Previous/Next controls. Give each
   photo a caption, useful image description and correct building/entrance match.

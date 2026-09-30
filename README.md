@@ -10,7 +10,7 @@ TurnRight is a campus walking and driving navigation PWA with a private owner wo
 
 > **Project status:** An independent, non-commercial personal project, not an official LASU service. Routes and modeled details combine recorded sources, reviewed corrections and explicitly illustrative estimates. Campus routes have **not been field-verified**. A mapped approach is not a confirmed building entrance, and missing steps information does not establish step-free access.
 
-The project has three connected parts: a public offline navigation app, a private campus/GIS workspace, and a building authoring editor. The same owner reviews and publishes each campus independently. LASU is currently the only published campus; other campus names in screenshots are test fixtures. Application releases and reviewed map releases have separate versions.
+The project has three connected parts: a public offline navigation app, a private campus/GIS workspace, and a building authoring editor. The same owner reviews and publishes each campus independently. LASU is the default public map and UNILAG is also published. Older second-campus screenshots remain labelled test fixtures. Application releases and reviewed map releases have separate versions.
 
 | Project area | Current scope |
 | --- | --- |
@@ -124,17 +124,17 @@ These new screenshots use isolated owner/API fixtures and illustrative second-ca
 
 <img src="docs/assets/screenshots/editor-model-actions-mobile-2026-09-26.png" width="300" alt="Selected detail action menu with edit, duplicate, copy, lock, hide and delete commands">
 
-**Photo management:** edit and compress images offline, then review, arrange and publish building photographs independently from model details.
+**Photo management:** drag gallery grips to arrange photographs; the first image is the cover. The sliders icon combines image editing, compression, caption, building assignment and credits. The trash icon removes a draft attachment with Undo.
 
-![Visual photo workspace with published building views and gallery controls](docs/assets/screenshots/editor-photos-current-2026-09-26.png)
+![Full-screen photo editor with the original, comparison wipe and measured compressed output](docs/assets/screenshots/photo-editor-desktop-2026-09-30.png)
 
-**Offline image editor:** retain originals, crop/rotate, adjust colour, flatten privacy areas, compare quality and compress batches. Map-ready copies enter the existing rights-review workflow. [Photo editing guide](docs/PHOTO-EDITING.md).
+**Offline image editor:** adding photos automatically compresses every image with map-ready defaults while retaining its original. A Squoosh-style comparison workspace uses its WebP, MozJPEG, OxiPNG and AVIF encoders locally. Preview updates automatically; pan, pinch, zoom, crop/rotate, colour and privacy tools retain the original. A bounded quality search respects the chosen floor and shows actual size changes. Map-ready copies enter rights review. [Photo editing guide and measurements](docs/PHOTO-EDITING.md).
 
-![Offline photo editor with original retention and compression controls](docs/assets/screenshots/photo-optimise-desktop-2026-09-27.png)
+<img src="docs/assets/screenshots/photo-editor-portrait-2026-09-30.png" width="300" alt="Phone comparison workspace with a collapsible settings panel and separate downloads">
 
 | Landscape image editing | Build and import activity |
 | --- | --- |
-| ![Landscape image editor with scrollable controls](docs/assets/screenshots/photo-optimise-landscape-2026-09-27.png) | ![Activity drawer with stages and measured progress](docs/assets/screenshots/activity-monitor-2026-09-27.png) |
+| ![Landscape image editor with scrollable controls](docs/assets/screenshots/photo-editor-landscape-2026-09-30.png) | ![Activity drawer with stages and measured progress](docs/assets/screenshots/activity-monitor-2026-09-27.png) |
 
 **Activity:** follow import inspection, release builds, model files, photos and offline downloads through named stages. Real counts drive percentages where available; failures retain recovery information. [Progress monitor](docs/PROGRESS-MONITOR.md).
 
@@ -171,7 +171,8 @@ The gallery covers the public app, desktop editor, mobile modes, surface text an
 
 ## Recent changes
 
-- **Import review and current publication (27 September):** value-based mapping comparison fixes disabled review buttons; migrations 016–017 keep large queues atomic with bounded timeouts. Five valid UNILAG layers are now in its private editor; Road width remains held for polygon repair. LASU’s requested draft is published as `lasu-0b8025eb23b8`, with 394 buildings, 220 places and 45 photographs. [Import outcome](docs/CAMPUS-IMPORTS.md#september-27-unilag-import-outcome) · [Verified release and tests](docs/PRODUCTION.md).
+- **UNILAG publication (30 September):** [UNILAG is public](https://turnright.vercel.app/?campus=unilag) with 71 destinations and 4,252 directed path segments. Owner permission to publish the ArcGIS layers is recorded. Three road/building conflicts remain excluded and the main library approach is blocked; final entrances and routes require field verification. LASU remains `lasu-2b70a39ca041`, with its manifest and 133 assets unchanged. [Verified release](docs/PRODUCTION.md).
+- **Import review repair (27 September):** value-based mapping comparison fixes disabled review buttons; migrations 016–017 keep large queues atomic with bounded timeouts. Five valid UNILAG layers are now in its private editor; Road width remains held for polygon repair. That dated LASU release was `lasu-0b8025eb23b8`, with 394 buildings, 220 places and 45 photographs. [Import outcome](docs/CAMPUS-IMPORTS.md#september-27-unilag-import-outcome) · [Verified release and tests](docs/PRODUCTION.md).
 
 - Multi-campus imports add a resumable Campuses workspace, isolated data and offline state, complete GIS/OSM/ArcGIS processing, and independent review, publication and restore previews. Migrations 013–015 follow compatible reader deployment. [Guide](docs/CAMPUS-IMPORTS.md) · [Rollout status](docs/PRODUCTION.md).
 
@@ -289,7 +290,7 @@ Open a destination's **Building photographs** and **Entrances & arrival** sectio
 
 The map distinguishes connected entrances, unconfirmed connections and mapped approaches. **Mapped approach …; final entrance not verified** means the route ends on a mapped path near the destination. It does not confirm a doorway connection. Recorded steps, ramps, surfaces and measured doorway widths remain observations, with unknown details left unknown; no accessible-route guarantee is implied.
 
-The building inspector shows its gallery preview and **Manage photos** button at the top. Owners edit arrival guides separately from this photo workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Local full-resolution originals stay on the device; prepared upload copies and reviewer records remain private. The offline editor accepts JPEG/PNG/WebP, retains editable recipes and provides crop, rotation, colour, privacy and batch compression controls. [Editing and compression](docs/PHOTO-EDITING.md). Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
+The building inspector shows its gallery preview and **Manage photos** button at the top. Owners edit arrival guides separately from this photo workspace. Add multiple files, review large previews, choose **I took this photo** or an external source, arrange the cover and gallery, and recover unfinished work in **Private uploads**. Reviewed photos attach to the map draft in an undoable batch; public-gallery preview and release publication remain separate. Local full-resolution originals stay on the device; prepared upload copies and reviewer records remain private. The offline editor accepts JPEG/PNG/WebP, exports WebP/MozJPEG/OxiPNG/AVIF through local Squoosh codecs, and retains editable crop, rotation, colour, privacy and batch compression recipes. [Editing and compression](docs/PHOTO-EDITING.md). Published derivatives are metadata-free WebP files, at most 1,600 pixels on the longest side and 250 KiB each. Moving an entrance flags its guide and photographs for review. Photos never grant access or create routing connections. [Guide, media review and offline behavior](docs/ARRIVAL-GUIDES.md) · [Collection coverage and candidate decisions](data/photos/README.md).
 
 ## Appearance and 3D
 
@@ -581,9 +582,9 @@ The [27 September reliability and responsiveness audit](docs/AUDIT-2026-09-27.md
 tracks reproduced failures, fixes and current verification. It includes campus-safe
 save retries, offline asset-pool recovery, ArcGIS snapshot completeness, efficient
 local image storage, image history/rotation, active-job reporting and resilient
-feature search. Six newly reviewed licensed photos are saved in private building
-galleries; [their assignments and source evidence](data/photos/README.md#owner-review-on-27-september)
-remain separate from the published photo count.
+feature search. Six reviewed licensed photos were added to building galleries
+and published on 27 September; [their assignments and source evidence](data/photos/README.md#owner-review-on-27-september)
+remain recorded separately from later owner photo edits.
 
 Acceptance records separate automated/browser checks from unfinished physical work: Android/iPhone touch repairs, installation, airplane-mode reopening, outdoor GPS, campus walks, battery behavior and modest-phone performance. Do not interpret a software WebGL timing or emulated phone screenshot as a completed physical-device test.
 
@@ -611,8 +612,12 @@ TurnRight/
 │   │   ├── building-*.ts             # Architectural generation and surface identity
 │   │   ├── surface-text.ts           # Wall/roof lettering and validation
 │   │   ├── campus-model-layer.ts     # Published/draft Three.js model rendering
-│   │   ├── PhotoManager.tsx          # Private photo uploads, recovery and approvals
-│   │   ├── PhotoOptimizer.tsx        # Offline crop, colour, privacy and compression UI
+│   │   ├── PhotoManager.tsx          # Drag ordering, unified details, private upload/review
+│   │   ├── PhotoOptimizer.tsx        # Squoosh-style local comparison/editing workspace
+│   │   ├── PhotoCompare.tsx          # Shared pan/pinch transform and accessible wipe
+│   │   ├── photo-codecs.ts           # Lazy, pinned WASM encoders and offline verification
+│   │   ├── photo-compression.ts      # Bounded target search with a quality floor
+│   │   ├── use-photo-order.ts        # Pointer/keyboard gallery reorder gestures
 │   │   ├── photo-edit*.ts            # Recipes, worker client and processing worker
 │   │   ├── photo-processing-local.ts # Native decode, pixel edits and bounded encoding
 │   │   ├── photo-local.ts            # Owner/campus original and recipe storage
@@ -638,6 +643,7 @@ TurnRight/
 │   │   └── published-campus-catalogue.mjs # Preserve/replace one campus atomically
 │   ├── tests/                       # Unit/database tests, fixtures, browser workflows
 │   ├── public/                      # Seed packages, world/voice/glyph/static assets
+│   │   └── photo-codecs/e8d35e0/     # Pinned local Squoosh WASM encoders and licences
 │   ├── playwright*.config.ts         # Chromium, WebKit, PWA, docs and performance runs
 │   ├── package.json                 # Node 22 scripts and pinned dependencies
 │   └── .env.example                 # Configuration names without credentials
