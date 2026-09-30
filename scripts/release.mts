@@ -15,7 +15,7 @@ import { prepareReleasePhotos } from './photo-release.mjs';
 import { arrivalIssues } from '../web/src/arrival';
 import {hydrateModelEdits} from '../web/server/model-assets';
 import {modelDocumentRevision} from '../web/src/model-document-revision';
-import { vercelApi, uploadSource, waitForDeployment, publishDeployment } from "./vercel-api.mjs";
+import { vercelApi, uploadSource, waitForDeployment, publishDeployment, withDeploymentAccess } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
 const id = process.env.RELEASE_ID,
@@ -48,7 +48,7 @@ try {
       const [historical] = await db(`releases?id=eq.${release.restored_from}&status=eq.published`);
       if (!historical?.deployment_url || !historical.version) throw Error('The historical campus package is unavailable.');
       // Reuse the immutable reviewed package, but build a fresh site with the current other campuses.
-      manifest = await preservePublished(path.join(web,'public'), historical.deployment_url, false, historical.version, `/packages/${historical.version}/manifest.json`);
+      manifest = await withDeploymentAccess(historical.deployment_url, headers => preservePublished(path.join(web,'public'), historical.deployment_url, false, historical.version, `/packages/${historical.version}/manifest.json`, {headers}));
       if (campus.id !== 'lasu' && manifest.campus?.id !== campus.id) throw Error('Historical package campus mismatch.');
       await fs.mkdir(path.dirname(path.join(web,'public',manifestPath)),{recursive:true});
       await fs.writeFile(path.join(web,'public',manifestPath),JSON.stringify(manifest,null,2));

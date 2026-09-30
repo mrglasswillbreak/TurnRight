@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 // Official API contracts: github.com/vercel/sdk/docs/sdks/{deployments,projects}.
 export async function vercelApi(endpoint, options = {}) {
@@ -20,6 +20,29 @@ export async function vercelApi(endpoint, options = {}) {
     );
   }
   return response.status === 204 ? null : response.json().catch(() => null);
+}
+/** Read an immutable deployment owned by this project without disabling protection. */
+export async function withDeploymentAccess(origin, read) {
+  const url = new URL(origin);
+  if (url.protocol !== 'https:' || url.username || url.password || !url.hostname.endsWith('.vercel.app')) throw Error('Unexpected historical deployment origin');
+  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(url.hostname)}`);
+  if (deployment.projectId !== process.env.VERCEL_PROJECT_ID) throw Error('Historical deployment belongs to another project');
+  const secret = randomBytes(16).toString('hex');
+  if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${secret}`);
+  const endpoint = `/v1/projects/${process.env.VERCEL_PROJECT_ID}/protection-bypass`;
+  const update = body => vercelApi(endpoint,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  await update({generate:{secret,note:`Temporary campus release check ${process.env.GITHUB_RUN_ID || 'local'}`}});
+  try {
+    const headers = {'x-vercel-protection-bypass':secret};
+    for (let attempt=0;attempt<15;attempt++) {
+      const probe=await fetch(url.origin,{headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+      if(probe.ok)return await read(headers);
+      await new Promise(resolve=>setTimeout(resolve,2000));
+    }
+    throw Error('Historical deployment authorization did not become available');
+  } finally {
+    await update({revoke:{secret,regenerate:false}});
+  }
 }
 export async function uploadSource(root) {
   const files = [];

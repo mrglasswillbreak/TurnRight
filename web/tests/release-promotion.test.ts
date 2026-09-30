@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // @ts-expect-error Node-only deployment module.
-import { publishDeployment } from '../../scripts/vercel-api.mjs';
+import {
+  publishDeployment,
+  withDeploymentAccess,
+} from '../../scripts/vercel-api.mjs';
 
 beforeEach(() => {
   vi.stubEnv('VERCEL_TOKEN', 'test-token');
@@ -10,6 +13,44 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   vi.useRealTimers();
+});
+
+it('rejects foreign historical deployments before creating access and revokes access when copying fails', async () => {
+  const changes: Record<string, unknown>[] = [];
+  let projectId = 'prj_other';
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (input: URL | string, init: RequestInit = {}) => {
+      const url = new URL(input);
+      if (url.pathname.startsWith('/v13/deployments/'))
+        return Response.json({ projectId });
+      if (url.hostname === 'historical.vercel.app') return new Response('app');
+      if (init.method === 'PATCH') {
+        changes.push(JSON.parse(String(init.body)));
+        return Response.json({});
+      }
+      throw Error('Unexpected request');
+    }),
+  );
+  const read = vi.fn(async (headers: Record<string, string>) => {
+    expect(headers['x-vercel-protection-bypass']).toMatch(/^[a-f0-9]{32}$/);
+    throw Error('checksum mismatch');
+  });
+  await expect(
+    withDeploymentAccess('https://historical.vercel.app', read),
+  ).rejects.toThrow('another project');
+  expect(changes).toHaveLength(0);
+  projectId = 'prj_test';
+  await expect(
+    withDeploymentAccess('https://historical.vercel.app', read),
+  ).rejects.toThrow('checksum mismatch');
+  expect(changes).toHaveLength(2);
+  expect(changes[1]).toEqual({
+    revoke: {
+      secret: (changes[0].generate as { secret: string }).secret,
+      regenerate: false,
+    },
+  });
 });
 
 function vercel({

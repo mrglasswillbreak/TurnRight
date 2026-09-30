@@ -49,3 +49,6 @@ jobs:
       - name: Record failed build
         if: failure()
         run: node scripts/record-failure.mjs
+      - name: Clean up temporary historical-deployment access
+        if: always()
+        run: node scripts/cleanup-preview-access.mjs

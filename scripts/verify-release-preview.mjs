@@ -1,7 +1,7 @@
 /** Authenticated preview acceptance. The temporary automation credential never leaves CI. */
 import { randomBytes } from "node:crypto";
 import { db } from "./cloud.mjs";
-import { vercelApi } from "./vercel-api.mjs";
+import { vercelApi, withDeploymentAccess } from "./vercel-api.mjs";
 const [release] = await db(`releases?id=eq.${process.env.RELEASE_ID}&select=preview_url,status`);
 if (!release?.preview_url || release.status !== "preview")
   throw Error("A ready preview is required");
@@ -48,12 +48,15 @@ try {
   if (!historical?.version || !historical.deployment_url)
     throw Error("Rollback package record missing");
   const { preservePublished } = await import("../web/scripts/published-assets.mjs");
-  await preservePublished(
-    "work/rollback-verification",
-    historical.deployment_url,
-    false,
-    historical.version,
-    `/packages/${historical.version}/manifest.json`,
+  await withDeploymentAccess(historical.deployment_url, (headers) =>
+    preservePublished(
+      "work/rollback-verification",
+      historical.deployment_url,
+      false,
+      historical.version,
+      `/packages/${historical.version}/manifest.json`,
+      { headers },
+    ),
   );
   console.log(
     `Rollback package ${historical.version}: immutable assets verified through the restore transport; no publication or drafts changed`,

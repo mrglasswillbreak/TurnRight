@@ -23,11 +23,15 @@ export async function preservePublished(
   activate = false,
   expectedVersion,
   manifestPath = '/packages/latest.json',
+  {headers = {}} = {},
 ) {
   const base = new URL(origin);
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
+  assetTarget(publicDir, manifestPath);
   const response = await fetch(new URL(manifestPath, base), {
+    headers,
+    redirect: 'error',
     cache: 'no-store',
     signal: AbortSignal.timeout(20000),
   });
@@ -69,6 +73,8 @@ export async function preservePublished(
     let bytes = await fs.readFile(target).catch(() => null);
     if (bytes && valid(bytes)) continue;
     const result = await fetch(new URL(asset.url, base), {
+      headers,
+      redirect: 'error',
       signal: AbortSignal.timeout(30000),
     });
     if (!result.ok) throw new Error('A preceding release asset is unavailable');
