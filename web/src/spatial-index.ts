@@ -24,10 +24,17 @@ export function overlaps(a: Bounds, b: Bounds) {
 export class BoundsIndex<T> {
   private cells = new Map<string, number[]>();
   private entries: { bounds: Bounds; value: T }[] = [];
+  private broad: number[] = [];
   constructor(private cellSize = 0.001) {}
   private keys(bounds: Bounds) {
     const result: string[] = [];
     if (!bounds.every(Number.isFinite)) return result;
+    if (
+      (Math.ceil((bounds[2] - bounds[0]) / this.cellSize) + 1) *
+        (Math.ceil((bounds[3] - bounds[1]) / this.cellSize) + 1) >
+      4096
+    )
+      return null;
     for (
       let x = Math.floor(bounds[0] / this.cellSize);
       x <= Math.floor(bounds[2] / this.cellSize);
@@ -43,15 +50,25 @@ export class BoundsIndex<T> {
   }
   add(bounds: Bounds, value: T) {
     const id = this.entries.push({ bounds, value }) - 1;
-    for (const key of this.keys(bounds)) {
+    const keys = this.keys(bounds);
+    if (!keys) {
+      this.broad.push(id);
+      return;
+    }
+    for (const key of keys) {
       const cell = this.cells.get(key) || [];
       cell.push(id);
       this.cells.set(key, cell);
     }
   }
   query(bounds: Bounds): T[] {
-    const ids = new Set<number>();
-    for (const key of this.keys(bounds))
+    const keys = this.keys(bounds);
+    if (!keys)
+      return this.entries
+        .filter((e) => overlaps(e.bounds, bounds))
+        .map((e) => e.value);
+    const ids = new Set<number>(this.broad);
+    for (const key of keys)
       for (const id of this.cells.get(key) || []) ids.add(id);
     return [...ids]
       .sort((a, b) => a - b)

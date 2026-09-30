@@ -71,6 +71,11 @@ if(process.env.APPLY_UNILAG==='true'){
   if(hash(await allRows('map_edits'))!==hash(edits))throw Error('Drafts changed during preparation; pause publication and review.');
   process.env.CAMPUS_ID='lasu';const lasuAfter={features:hash(await allRows('source_features')),edits:hash(await allRows('map_edits'))};process.env.CAMPUS_ID=oldCampus;
   if(hash(lasuAfter)!==hash(lasuBefore))throw Error('LASU state changed during preparation; investigate before publication');
+  const coverage=JSON.parse(await fs.readFile('../data/unilag-enrichment/coverage.json','utf8'));
+  const sourceId='bd74d5cc-2b8d-4d42-977a-00165dc70b7e',importId='d1c63965-7cdb-4e79-8b49-ef04a5716c9d';
+  const summary={layers:[{name:'Road width.geojson',format:'GeoJSON',count:179,geometryTypes:['Polygon'],crs:'EPSG:4326',suggestedRole:'road-surface',fields:[{name:'OBJECTID_1'},{name:'NAME'}]}],counts:{added:179,modified:0,removed:0,skipped:0},warnings:['Display surfaces only. Routing and access permissions unchanged.'],errors:[],duplicates:[],features:{type:'FeatureCollection',features:road},sampling:[{layer:'Road width.geojson',shown:179,total:179}],repairs:coverage.roads.repairs,totalFeatures:179};
+  await db(`campus_imports?id=eq.${importId}`,'PATCH',{status:'reviewed',phase:'preview',message:'179 road surfaces accepted by guarded UNILAG reconciliation; source original and geometry diagnostics retained.',summary,snapshot_path:storagePath,updated_at:new Date().toISOString()});
+  await db(`campus_sources?id=eq.${sourceId}`,'PATCH',{accepted_import_id:importId,updated_at:new Date().toISOString()});
   const catalogue=await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
   report.releaseId=await db('rpc/snapshot_release','POST',{catalogue_hash:catalogue.revision,release_summary:'UNILAG cartographic detail upgrade: 179 reviewed road surfaces, classified landscape, expanded destinations and attributed building photographs. Routing permissions and source conflicts remain explicitly recorded.'});
 }

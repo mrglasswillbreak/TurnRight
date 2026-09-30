@@ -42,6 +42,18 @@ class VectorLayerTests(unittest.TestCase):
         self.assertEqual(len(preview['features']),20)
         self.assertEqual(sampling[1]['shown'],len(small['features']))
 
+    def test_sampling_spreads_across_the_entire_layer(self):
+        large={**LAYER,'features':[{**LAYER['features'][0],'id':i} for i in range(10000)]}
+        preview,_=preview_features([large],10)
+        ids=[f['id'] for f in preview['features']]
+        self.assertEqual(ids[0],0)
+        self.assertEqual(ids[-1],9999)
+        self.assertEqual(len(set(ids)),10)
+
+    def test_osm_public_tags_exclude_unmapped_private_attributes(self):
+        from map_import.semantics import public_tags
+        self.assertEqual(public_tags({'name':'Lane','access':'private','foot:conditional':'no @ (night)','owner_phone':'123','survey_notes':'private'}),{'name':'Lane','access':'private','foot:conditional':'no @ (night)'})
+
     def test_road_surface_preserves_class_and_never_adds_routes(self):
         layer=copy.deepcopy(LAYER);layer['features'][0]['properties']['NAME']='Drive-Unpaved'
         config={**CONFIG,'layers':[{**CONFIG['layers'][0],'role':'road-surface','nameField':'NAME'}]}

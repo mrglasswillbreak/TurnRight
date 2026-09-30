@@ -41,8 +41,6 @@ jobs:
       - if: github.event_name == 'workflow_dispatch' && inputs.operation != 'audit'
         run: node ../scripts/preserve-unilag-road.mjs
         working-directory: web
-        env:
-          UNILAG_ROAD_SOURCE_KEY: ${{ secrets.UNILAG_ROAD_SOURCE_KEY }}
       - if: github.event_name == 'workflow_dispatch' && inputs.operation != 'audit'
         run: mkdir -p work && npx tsx ../scripts/prepare-unilag-upgrade.mts
         working-directory: web

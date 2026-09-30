@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from .formats import MAX_FEATURES
 from .geometry import components as geometry_components, prepare_geometry, preview_features
-from .semantics import mapped_properties
+from .semantics import mapped_properties, public_tags
 
 
 def digest(value):
@@ -144,7 +144,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                     if attrs.get('foot') in ('yes','designated','permissive'): access='yes'
                     if attrs.get('construction') or attrs.get('highway')=='construction' or attrs.get('access:conditional') or attrs.get('foot:conditional'): access='no'
                 if access not in ('yes','private','no'): access='private'
-                props.update({'walkingAccess':access,'autoConnectCrossings':False,'sourceTags':attrs if is_osm else {}})
+                props.update({'walkingAccess':access,'autoConnectCrossings':False,'sourceTags':public_tags(attrs) if is_osm else {}})
                 if not is_osm: warnings.append('Imported line endpoints are separate until connected in the editor. Review path access and junctions before routing.')
                 for li,line in enumerate(lines):
                     coordinates = list(line.coords)
@@ -154,7 +154,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                         node_id = f'{owner_source}:node:{node_ref}' if node_ref is not None else f'{ident}:line:{li}:vertex:{vi}'
                         node = {'id':node_id,'coordinates':list(point)}
                         node_data = layer.get('osmNodes',{}).get(str(node_ref),layer.get('osmNodes',{}).get(node_ref,{}))
-                        if node_data.get('tags'): node['sourceTags']=node_data['tags']
+                        if node_data.get('tags'): node['sourceTags']=public_tags(node_data['tags'])
                         add('node',node_id,node); ids.append(node_id)
                     for vi in range(len(ids)-1):
                         if distance(coordinates[vi],coordinates[vi+1]) < 0.01:

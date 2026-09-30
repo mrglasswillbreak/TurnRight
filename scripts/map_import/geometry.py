@@ -71,26 +71,28 @@ def prepare_geometry(value):
 
 
 def preview_features(layers, limit=2000):
-    """Round-robin layers: small layers and late datasets are never starved."""
+    """Fair per-layer quotas, evenly spread across each complete feature set."""
     from .semantics import mapped_properties
-    result, positions = [], [0]*len(layers)
-    counts = [0]*len(layers)
-    while len(result) < limit:
+    result, quotas = [], [0]*len(layers)
+    eligible = [[f for f in l['features'] if f.get('geometry') and l.get('crs')=='EPSG:4326'] for l in layers]
+    while sum(quotas) < limit:
         progressed = False
         for index, layer in enumerate(layers):
-            features = layer['features']
-            while positions[index] < len(features):
-                f = features[positions[index]]; positions[index] += 1
-                if not f.get('geometry') or layer.get('crs') != 'EPSG:4326': continue
+            if quotas[index] < len(eligible[index]):
+                quotas[index] += 1
+                progressed = True
+            if sum(quotas) == limit: break
+        if not progressed: break
+    for index, layer in enumerate(layers):
+        features, count = eligible[index], quotas[index]
+        for sample in range(count):
+                position = round(sample*(len(features)-1)/(count-1)) if count>1 else len(features)//2
+                f = features[position]
                 role = layer.get('suggestedRole', 'overlay')
                 props = {**(f.get('properties') or {}), 'importLayer': layer['name']}
                 if not props.get('kind'):
                     props['kind'] = 'land' if role in ('landcover','road-surface') else 'overlay' if role in ('skip','boundary') else role
                 if role in ('landcover', 'road-surface'):
                     props.update(mapped_properties(props, {}, role))
-                result.append({**f, 'properties':props}); counts[index] += 1
-                progressed = True
-                break
-            if len(result) == limit: break
-        if not progressed: break
-    return {'type':'FeatureCollection','features':result}, [{'layer':l['name'],'shown':counts[i],'total':len(l['features'])} for i,l in enumerate(layers)]
+                result.append({**f, 'properties':props})
+    return {'type':'FeatureCollection','features':result}, [{'layer':l['name'],'shown':quotas[i],'total':len(l['features'])} for i,l in enumerate(layers)]

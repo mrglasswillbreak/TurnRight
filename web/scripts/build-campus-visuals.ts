@@ -108,7 +108,7 @@ for (const sourceFeature of buildings) {
     ],
     inferred: [
       ...(p.appearance?.photoEvidence?.estimated || []),
-      ...(level === 'extrusion'
+      ...(!supported && !observedFloors
         ? ['Illustrative 6 m height; real height unknown.']
         : display.kind === 'recorded'
           ? []

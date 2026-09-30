@@ -68,7 +68,7 @@ const summary: ImportPreview = {
   totalFeatures: 44,
 };
 
-async function setup(page: Page, { photo = false, outsideLasu = false }: { photo?: boolean; outsideLasu?: boolean } = {}) {
+async function setup(page: Page, { photo = false, outsideLasu = false, overlay = false }: { photo?: boolean; outsideLasu?: boolean; overlay?: boolean } = {}) {
   const data: CampusData = photo
     ? JSON.parse(
         readFileSync(
@@ -93,6 +93,7 @@ async function setup(page: Page, { photo = false, outsideLasu = false }: { photo
     data.graph.nodes = [];
     data.graph.edges = [];
   }
+  if (overlay) data.map.features.push({type:'Feature', properties:{id:'survey-area',kind:'overlay',name:'Survey area',label:'Field survey',color:'#2563eb',opacity:0.5,order:2},geometry:{type:'Polygon',coordinates:[[[3.2,6.46],[3.201,6.46],[3.201,6.461],[3.2,6.46]]]}});
   let saved: MapEdit[] = [];
   const bytes = JSON.stringify(data);
   const manifest: CampusPackage = {
@@ -748,4 +749,38 @@ test('campus imports reconcile a lost queue response without submitting twice', 
   await expect(page.getByRole('button', { name: 'Open source review' })).toBeVisible();
   expect(submissions).toBe(1);
   await expect(queue).toHaveCount(0);
+});
+
+test('campus imports edit an overlay and reopen its saved style', async ({ page }) => {
+  const state=await setup(page,{overlay:true});
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto('/admin');
+  await page.getByRole('button',{name:'All',exact:true}).click();
+  await page.getByRole('searchbox',{name:'Search map features'}).fill('Survey area');
+  await page.getByRole('button',{name:/^Survey area/}).click();
+  await page.getByLabel('Label',{exact:true}).fill('Reviewed survey');
+  await page.getByLabel('Layer order',{exact:true}).fill('8');
+  await page.getByLabel('Visible on the map',{exact:true}).uncheck();
+  await expect.poll(()=>state.calls.filter(c=>c.action==='save-edits').length).toBeGreaterThan(0);
+  await expect(page.getByRole('status').filter({hasText:/^Saved$/})).toBeVisible();
+  await page.reload();
+  await page.getByRole('button',{name:'All',exact:true}).click();
+  await page.getByRole('searchbox',{name:'Search map features'}).fill('Survey area');
+  await page.getByRole('button',{name:/^Survey area/}).click();
+  await expect(page.getByLabel('Label',{exact:true})).toHaveValue('Reviewed survey');
+  await expect(page.getByLabel('Layer order',{exact:true})).toHaveValue('8');
+  await expect(page.getByLabel('Visible on the map',{exact:true})).not.toBeChecked();
+});
+
+test('campus imports expose vector roles, repair receipts and per-layer sampling', async ({page})=>{
+  const state=await setup(page);
+  state.summary.repairs=[{layer:'Buildings',sourceId:'96',actions:['Repaired polygon self-intersection'],areaChangePercent:0.00001}];
+  state.summary.sampling=[{layer:'Buildings',shown:20,total:24},{layer:'Footpaths',shown:18,total:18}];
+  await workspace(page); await fileImport(page);
+  await expect(page.locator('.import-layer').first().getByLabel('Import as')).toContainText('road-surface');
+  await expect(page.locator('.import-layer').first().getByLabel('Import as')).toContainText('overlay');
+  await expect(page.getByText('Preview is sampled across layers',{exact:false})).toBeVisible();
+  await expect(page.getByText('Buildings · 96:',{exact:false})).toBeVisible();
+  await page.getByText('Supported vector formats',{exact:true}).click();
+  await expect(page.getByText('GeoParquet: parquet, geoparquet',{exact:true})).toBeVisible();
 });

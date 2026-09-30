@@ -71,3 +71,9 @@ def mapped_properties(attrs, mapping, role):
         result.update({k: mapping[k] for k in ('color', 'opacity', 'visible', 'order', 'labelField') if k in mapping})
         if mapping.get('labelField'): result['label'] = str(attrs.get(mapping['labelField']) or '')[:200]
     return result
+
+
+def public_tags(attrs):
+    """Routing and presentation tags only; the private original retains all attributes."""
+    allowed = {'highway','name','service','surface','width','smoothness','incline','lit','covered','tunnel','bridge','layer','level','barrier','entrance','access','foot','wheelchair','vehicle','motor_vehicle','motorcar','bicycle','oneway','oneway:foot','oneway:bicycle','junction','maxspeed','lanes','steps','step_count','kerb','crossing','construction','access:conditional','foot:conditional','motor_vehicle:conditional','opening_hours','restriction','type','area'}
+    return {key:value for key,value in attrs.items() if key in allowed}

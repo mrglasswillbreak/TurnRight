@@ -186,6 +186,30 @@ def build(downloads, baseline, output):
                 ident='unilag:osm:way:'+w.get('id');accepted.append({'type':'Feature','geometry':mapping(g),'properties':{'id':ident,'kind':'land','landClass':kind,'source':OSM_SOURCE,'sourceId':w.get('id'),'name':nice(attrs.get('name',''))}});entry.update(status='included',record=ident)
         candidates.append(entry)
     features.extend(accepted)
+    # Nodes and relations are reviewed separately: relation member ways already
+    # have dispositions above, but that does not establish a complete multipolygon.
+    reviewed_ways={c['id']:c for c in candidates if c['source']=='osm-way'}
+    for node in root.findall('node'):
+        attrs={t.get('k'):t.get('v') for t in node.findall('tag')}
+        if not any(k in attrs for k in ('name','amenity','shop','tourism','leisure','natural','entrance','barrier')): continue
+        point=Point(nodes[node.get('id')]);entry={'source':'osm-node','id':node.get('id'),'name':attrs.get('name','')}
+        if not actual.covers(point) or not boundary.covers(point):entry['status']='outside-campus'
+        elif 'entrance' in attrs or 'barrier' in attrs:entry.update(status='reference-only',reason='Access feature requires field review; no permissions or routing connection inferred.')
+        else:
+            matched=next((p for p in data['places'] if attrs.get('name') and key(attrs['name']) in [key(p['name']),*[key(a) for a in p.get('aliases',[])]]),None)
+            if matched:entry.update(status='matched',record=matched['id'])
+            else:entry.update(status='needs-review',reason='Point-only candidate; no confirmed facility identity or current footprint association.')
+        candidates.append(entry)
+    for relation in root.findall('relation'):
+        attrs={t.get('k'):t.get('v') for t in relation.findall('tag')}
+        members=[m.get('ref') for m in relation.findall('member') if m.get('type')=='way']
+        local=[reviewed_ways[m] for m in members if m in reviewed_ways and reviewed_ways[m]['status']!='outside-campus']
+        entry={'source':'osm-relation','id':relation.get('id'),'name':attrs.get('name',''),'memberWays':len(members)}
+        if attrs.get('type') in ('restriction','route'):entry.update(status='reference-only',reason='Routing relation retained for comparison; existing graph preserved.')
+        elif attrs.get('amenity')=='university' or attrs.get('boundary'):entry.update(status='reference-only',reason='Boundary or institutional compound; existing campus extent retained.')
+        elif not local:entry.update(status='outside-reviewed-coverage',reason='No reviewed in-campus member polygon; relation not imported.')
+        else:entry.update(status='needs-review',reason='Member ways accounted separately; complete multipolygon holes and compound identity need reconciliation before addition.')
+        candidates.append(entry)
     old={f['properties']['id']:f for f in original['map']['features']}
     changes={'featureUpdates':[{'id':f['properties']['id'],'properties':{k:v for k,v in f['properties'].items() if old[f['properties']['id']]['properties'].get(k)!=v}} for f in features if f['properties']['id'] in old and old[f['properties']['id']]!=f], 'featureAdds':[f for f in features if f['properties']['id'] not in old], 'places':data['places']}
     changes['sources']=[{'id':ROAD_SOURCE,'name':'UNILAG Road width','url':original['sources'][0]['url'],'attribution':'Owner-provided UNILAG road surfaces; OBJECTID_1 retained; original upload and raw attributes preserved privately.','license':'Owner authorised public and offline publication in the UNILAG detail upgrade request, 30 September 2026. No broader reuse licence asserted.','redistributionConfirmed':True,'retrievedAt':DATE},{'id':OSM_SOURCE,'name':'OpenStreetMap UNILAG coverage review','url':'https://www.openstreetmap.org/copyright','attribution':'© OpenStreetMap contributors','license':'ODbL-1.0','retrievedAt':'2026-09-27'}]

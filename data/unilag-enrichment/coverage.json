@@ -1274,11 +1274,12 @@
   },
   "candidateCounts": {
     "included": 315,
-    "reference-only": 89,
-    "matched": 152,
-    "needs-review": 658,
-    "outside-campus": 13678,
-    "covered-by-existing-landscape": 12
+    "reference-only": 110,
+    "matched": 172,
+    "needs-review": 686,
+    "outside-campus": 13850,
+    "covered-by-existing-landscape": 12,
+    "outside-reviewed-coverage": 65
   },
   "candidates": [
     {
@@ -92528,6 +92529,2048 @@
       "id": "1469042304",
       "name": "",
       "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "177174208",
+      "name": "Oshodi Interchange",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "287175785",
+      "name": "Gué de Constantine;Bir Khadem;Alger Centre;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "333218069",
+      "name": "Baba Ali;CW114",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "347435994",
+      "name": "Gué de Constantine;Bir Khadem;Alger Centre;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "513720265",
+      "name": "Chiffa;A1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "513720667",
+      "name": "RN1 Sud",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "529614870",
+      "name": "A100",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "539323701",
+      "name": "Médéa Nord;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "708526086",
+      "name": "Rond Point Magama Oukou",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "932143954",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1035786352",
+      "name": "Lakwass",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1042361545",
+      "name": "Médéa Sud;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1118713147",
+      "name": "Tessala ElMerdja;Ouled Sidi Mohammed",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1209117432",
+      "name": "زوبيرية",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1209117438",
+      "name": "برواقية جنوب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1209117523",
+      "name": "زوبيرية",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1378092866",
+      "name": "Baba Ali;CW114",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1378094988",
+      "name": "Deuxième Rocade Sud التجنب الجنوبي الثاني",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1423114432",
+      "name": "Fadeyi Bus Stop",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1425265114",
+      "name": "Bouira;Boumerdes;Constantine",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1425266048",
+      "name": "A100",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1438890519",
+      "name": "Checkpoint",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1475431696",
+      "name": "Tincan Island Interchange",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1475431908",
+      "name": "Tincan Island Interchange",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1476480046",
+      "name": "Gbagada Interchange",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1476488810",
+      "name": "Oworonṣoki Interchange",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1513671682",
+      "name": "Casino Cinema",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1513671686",
+      "name": "GT Bank",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1734670855",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "1734727804",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2060573195",
+      "name": "Birtouta;Ouled Chebel",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2271071863",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2271072313",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2281160860",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2294948108",
+      "name": "Lakwass",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2408270469",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2408270495",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2411403016",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2429318784",
+      "name": "سغوان شمال",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2429318833",
+      "name": "سغوان شمال",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2451654576",
+      "name": "Wisdom Pronaos",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2507210438",
+      "name": "Aire du Sersou",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2549973490",
+      "name": "Ain El Hadjadj",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2599609519",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2694376013",
+      "name": "Checkpoint",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2793796911",
+      "name": "La mosqué",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "2793796912",
+      "name": "La mosqué",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3066092269",
+      "name": "Blida Ouest;CW108",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3066103973",
+      "name": "Beni Chougrane;CW108",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3221982758",
+      "name": "Tessala ElMerdja;Ouled Sidi Mohammed",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3476013267",
+      "name": "Médéa Nord;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3937600867",
+      "name": "Aire d'Esseguia",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "3983868466",
+      "name": "Rond Point Assamblé",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4232946922",
+      "name": "Hassi Bahbah Sud",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4304796449",
+      "name": "Arret de bus CROU",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4308250661",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4308307490",
+      "name": "Mfm HQ",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4308308189",
+      "name": "Ade Bread",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4313425389",
+      "name": "Makoko R/A Taxi Park",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4348744891",
+      "name": "RCCG",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4348744892",
+      "name": "CCC HQ",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4348789189",
+      "name": "Ayo Ni o",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4392488933",
+      "name": "Sidi Madani;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4392489062",
+      "name": "Chiffa;A1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4392519173",
+      "name": "Sidi Madani;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4394960000",
+      "name": "Onike R / A",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4421889343",
+      "name": "Arret de bus CROU - Terminus Laterite",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "4706592573",
+      "name": "منطقةالشبابة",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5120883802",
+      "name": "Ben chicao",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5120909286",
+      "name": "Ouzéra;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5127026907",
+      "name": "مجبر غرب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5128837034",
+      "name": "قصر البخاري غرب؛ ط ول1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5141949113",
+      "name": "مجبر",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5141949139",
+      "name": "مجبر غرب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5141966076",
+      "name": "سغوان جنوب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5141966449",
+      "name": "سغوان جنوب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5142040008",
+      "name": "برواقية جنوب",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5142040375",
+      "name": "برواقية شمال",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5142117802",
+      "name": "El Omaria",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5142117966",
+      "name": "El Omaria",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5142145644",
+      "name": "برواقية شمال",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5143249584",
+      "name": "El Hamdania;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5143249628",
+      "name": "El Hamdania;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5404393507",
+      "name": "Ben Chicao;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5455623024",
+      "name": "Asuquo bespoke",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5465588068",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5473712600",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5594620153",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5594978337",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5596481783",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5596499696",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5613519713",
+      "name": "Ouzéra;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "5613522961",
+      "name": "Médéa Sud;N1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6104938229",
+      "name": "Moremi Hall",
+      "status": "matched",
+      "record": "review:unilag:detail:6fc6e3fc608ac317"
+    },
+    {
+      "source": "osm-node",
+      "id": "6121114159",
+      "name": "Lagoon Front Resort",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6121119459",
+      "name": "Faculty of Engineering",
+      "status": "matched",
+      "record": "review:unilag:detail:880d07dc4369c62c"
+    },
+    {
+      "source": "osm-node",
+      "id": "6121178177",
+      "name": "King Jaja Hall",
+      "status": "matched",
+      "record": "review:unilag:detail:41bef0b150da7a76"
+    },
+    {
+      "source": "osm-node",
+      "id": "6121187825",
+      "name": "Mariere Hall",
+      "status": "matched",
+      "record": "review:unilag:detail:912759d3e492d01d"
+    },
+    {
+      "source": "osm-node",
+      "id": "6121748261",
+      "name": "Faculty of Science",
+      "status": "matched",
+      "record": "review:unilag:detail:e1eb0c9e5bba60a7"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122513909",
+      "name": "Civil Engineering Hydraulic Basin",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566932",
+      "name": "Distance Learning Institute",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566933",
+      "name": "Faculty of Social Sciences",
+      "status": "matched",
+      "record": "review:unilag:parcel:75"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566934",
+      "name": "Department of Creative Arts",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566936",
+      "name": "Faculty of Environmental Sciences",
+      "status": "matched",
+      "record": "review:unilag:detail:af5e89c5cf6820ff"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566937",
+      "name": "Faculty of Education",
+      "status": "matched",
+      "record": "review:unilag:detail:7047685317c3ba1c"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566938",
+      "name": "Saburi Biobaku Hall",
+      "status": "matched",
+      "record": "review:unilag:parcel:175"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566939",
+      "name": "Queen Amina Hall",
+      "status": "matched",
+      "record": "review:unilag:detail:cb07f63f4ced70a4"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566940",
+      "name": "Kofoworola Hall",
+      "status": "matched",
+      "record": "review:unilag:parcel:158"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566943",
+      "name": "Unilag Main Library",
+      "status": "matched",
+      "record": "review:unilag:parcel:329"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566944",
+      "name": "Department of Architecture",
+      "status": "matched",
+      "record": "review:unilag:parcel:342"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566945",
+      "name": "United Bank of Africa",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566946",
+      "name": "Faculty of Law",
+      "status": "matched",
+      "record": "review:unilag:detail:4a400b8f4338f388"
+    },
+    {
+      "source": "osm-node",
+      "id": "6122566947",
+      "name": "Faculty of Management Sciences",
+      "status": "matched",
+      "record": "review:unilag:detail:69e6339f121af49e"
+    },
+    {
+      "source": "osm-node",
+      "id": "6124747894",
+      "name": "Julius Berger Hall",
+      "status": "matched",
+      "record": "review:unilag:parcel:378"
+    },
+    {
+      "source": "osm-node",
+      "id": "6124752173",
+      "name": "Odukoya Reasearch Laboratory",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6264985908",
+      "name": "قصر البخاري غرب؛ ط ول1",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6264985913",
+      "name": "فضاء الراحة قصر البخاري",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6274484744",
+      "name": "Marina/CMS Ferry Terminal",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6274678046",
+      "name": "Ilaje Waterfront Jetty Terminal Bariga",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6288815547",
+      "name": "flour mills (apapa)",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6291446258",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6360590815",
+      "name": "Rond Point Magama Oukou",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6465060368",
+      "name": "Arret de bus CROU",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6465060379",
+      "name": "Arret de bus CROU - Terminus Laterite",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6646039122",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "6646182852",
+      "name": "block A",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6646182967",
+      "name": "Depatrment of architecture site",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "6646309251",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "6767686749",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "6911613872",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "6944692000",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "7919357763",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "7919369497",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "7919369502",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "7919397288",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "7919397289",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "7919397290",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "8509974036",
+      "name": "Hassi Bahbah Sud",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "8591574088",
+      "name": "Hai El Wiam",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "8839346182",
+      "name": "Noah Art Traditional Health Centre",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "9012839996",
+      "name": "Geo for All Site",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "9045632450",
+      "name": "OPGI/Baladia",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "9889685634",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "9936977143",
+      "name": "ROYAL DIADEM CHAPEL INT'L",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10052851838",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10175109289",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10175112733",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10181967344",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10569445275",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10604029905",
+      "name": "Ilaje-Bariga",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "10839499246",
+      "name": "Ecobank, UNILAG branch",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10853015708",
+      "name": "Street Lamp",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10853020470",
+      "name": "StreetLamp",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10862325172",
+      "name": "UBA ATM stand Unilag branch",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10918408241",
+      "name": "Wema bank, UNILAG",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10922129854",
+      "name": "Coca-Cola Moremi Hall Garden, Unilag.",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "10944351243",
+      "name": "Senate Building, University of Lagos",
+      "status": "matched",
+      "record": "review:unilag:parcel:328"
+    },
+    {
+      "source": "osm-node",
+      "id": "10944364898",
+      "name": "Love Garden, UNILAG",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "11103582231",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "11107845529",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "11925389636",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12205944698",
+      "name": "Cashx",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854854",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854855",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854856",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854857",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854858",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854859",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854860",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854866",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854867",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854868",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854869",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854870",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854871",
+      "name": "",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854872",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854873",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854874",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854875",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854876",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854877",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12276854878",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12642612904",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12642612911",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12642769509",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12642769518",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12648986677",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12814051343",
+      "name": "Ikorodu Terminal",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12814705879",
+      "name": "Ebute Ero",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "12814706438",
+      "name": "Liverpool (Apapa)",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13023896283",
+      "name": "Faculty of Art Unilag",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13024020870",
+      "name": "EcoBank, Unilag Branch.",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13092338354",
+      "name": "yamoriah",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316582",
+      "name": "GT Bank",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316584",
+      "name": "Mariere Hall",
+      "status": "matched",
+      "record": "review:unilag:detail:912759d3e492d01d"
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316585",
+      "name": "Moremi extension",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316586",
+      "name": "Moremi hall",
+      "status": "matched",
+      "record": "review:unilag:detail:6fc6e3fc608ac317"
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316587",
+      "name": "First Bank",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316588",
+      "name": "International School, Unilag",
+      "status": "matched",
+      "record": "review:unilag:detail:419847604296f706"
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316589",
+      "name": "Women Society Hall",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13111316590",
+      "name": "Honors Hall",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13164687550",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13164687554",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956865",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956869",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956870",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956882",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956883",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956884",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13166956885",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13167192917",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13183426631",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13183426632",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13183426633",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13388771440",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13399550958",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13399550959",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13415246993",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13415272406",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13415272407",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13415272409",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13415272410",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13625156577",
+      "name": "SITE",
+      "status": "needs-review",
+      "reason": "Point-only candidate; no confirmed facility identity or current footprint association."
+    },
+    {
+      "source": "osm-node",
+      "id": "13805484794",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "13868861197",
+      "name": "Aire de Hassi Bahbah",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "13954894599",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14148544595",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14148544596",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14178015854",
+      "name": "Onike",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14208108636",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14208146571",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "14208199739",
+      "name": "",
+      "status": "outside-campus"
+    },
+    {
+      "source": "osm-node",
+      "id": "14208200827",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-node",
+      "id": "14208204378",
+      "name": "",
+      "status": "reference-only",
+      "reason": "Access feature requires field review; no permissions or routing connection inferred."
+    },
+    {
+      "source": "osm-relation",
+      "id": "2116203",
+      "name": "Lagos Lagoon",
+      "memberWays": 46,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "2860969",
+      "name": "Federal Road F265",
+      "memberWays": 105,
+      "status": "reference-only",
+      "reason": "Routing relation retained for comparison; existing graph preserved."
+    },
+    {
+      "source": "osm-relation",
+      "id": "2862983",
+      "name": "Federal Road F266",
+      "memberWays": 11,
+      "status": "reference-only",
+      "reason": "Routing relation retained for comparison; existing graph preserved."
+    },
+    {
+      "source": "osm-relation",
+      "id": "3718195",
+      "name": "Kosofe",
+      "memberWays": 5,
+      "status": "reference-only",
+      "reason": "Boundary or institutional compound; existing campus extent retained."
+    },
+    {
+      "source": "osm-relation",
+      "id": "3718199",
+      "name": "Shomolu",
+      "memberWays": 5,
+      "status": "reference-only",
+      "reason": "Boundary or institutional compound; existing campus extent retained."
+    },
+    {
+      "source": "osm-relation",
+      "id": "5403871",
+      "name": "Lagos Mainland",
+      "memberWays": 5,
+      "status": "reference-only",
+      "reason": "Boundary or institutional compound; existing campus extent retained."
+    },
+    {
+      "source": "osm-relation",
+      "id": "5404351",
+      "name": "Lagos Island",
+      "memberWays": 7,
+      "status": "reference-only",
+      "reason": "Boundary or institutional compound; existing campus extent retained."
+    },
+    {
+      "source": "osm-relation",
+      "id": "5498666",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "5867251",
+      "name": "Route transsaharienne",
+      "memberWays": 1536,
+      "status": "reference-only",
+      "reason": "Routing relation retained for comparison; existing graph preserved."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837175",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837260",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837261",
+      "name": "Honours Hall",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837262",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837341",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "9837342",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "10302673",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "10997323",
+      "name": "Akoka",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618053",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618054",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618055",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618056",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618196",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618197",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618198",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618199",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618200",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618201",
+      "name": "",
+      "memberWays": 4,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618241",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618242",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618493",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618494",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618609",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618610",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618889",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618890",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618918",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618971",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618972",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618973",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618974",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618975",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618976",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17618977",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619144",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619145",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619146",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619148",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619149",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619355",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619381",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619382",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619383",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17619765",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17624369",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17624370",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625187",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625188",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625189",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625250",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625253",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625366",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625367",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625368",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17625970",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17627890",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17627911",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17627912",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17630111",
+      "name": "MADhouse",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17630153",
+      "name": "",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17630658",
+      "name": "",
+      "memberWays": 3,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17630689",
+      "name": "",
+      "memberWays": 4,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
+    },
+    {
+      "source": "osm-relation",
+      "id": "17630715",
+      "name": "Unilag Cafeteria",
+      "memberWays": 2,
+      "status": "outside-reviewed-coverage",
+      "reason": "No reviewed in-campus member polygon; relation not imported."
     }
   ],
   "landmarks": [
