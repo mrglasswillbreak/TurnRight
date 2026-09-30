@@ -1,0 +1,31 @@
+name: Preserve campus layer baselines
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/lasu-campus-layers]
+    paths: [.github/workflows/campus-layer-baselines.yml]
+permissions:
+  contents: read
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npx tsx ../scripts/audit-campus-layers.mts
+        working-directory: web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: campus-layer-baselines
+          path: web/work/campus-layer-baselines.json
+          retention-days: 14
