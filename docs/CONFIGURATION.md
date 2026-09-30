@@ -16,7 +16,7 @@ Visitors do not need accounts. Other GitHub users cannot gain editor access by s
 
 ## Database and private storage
 
-Production has migrations **001–017**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions, as recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+Production has migrations **001–019**. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, and 019 adds guarded, additive source patching with complete revision checks and rollback receipts. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -29,6 +29,8 @@ Production has migrations **001–017**. Compatible readers preceded model-asset
 | 014 | Source configurations, cancellable import jobs and private uploads |
 | 015 | Campus restore previews and catalogue revisions |
 | 016–017 | Atomic bulk import-review application and bounded RPC execution time |
+| 018 | Land and generic-overlay edit kinds |
+| 019 | Service-only additive source updates, revision inventory and before/after receipts |
 
 | Private bucket | Purpose | Per-object limit |
 | --- | --- | ---: |
@@ -67,6 +69,7 @@ Set application variables in Vercel Preview and Production when previews can be 
 | `map-import.yml` | Inspection/preview for one campus/import/run token |
 | `map-source-check.yml` | Daily 03:47 UTC; opted-in sources and OSM endpoint permission gate |
 | `map-import-tests.yml` | Full pinned Linux GIS regressions |
+| `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |
 | `release.yml` | Serialized `preview` or `publish`; explicit campus, legacy default LASU |
 | `bootstrap.yml`, `preview.yml` | Initial baseline and seed preview for new installations |
 
@@ -82,7 +85,7 @@ The September 26 migration preserved fingerprints for 4,777 source features, 133
 
 The initial September 9 preview was release `4c193c03-25da-4237-88c4-f4c41ca52217`, package `lasu-240581101c35`; its old counts and preview state are historical evidence in [Production](PRODUCTION.md). The original token record listed an expiry of 7 December 2026; check current secret-store expiry when maintaining credentials rather than assuming it has not changed.
 
-Quotas, paused services and expired tokens can interrupt owner jobs while published/offline navigation keeps working. Inspect the exact failure before retrying; do not duplicate an uncertain job. Preserve required assets explicitly instead of assuming hosting retention settings. Physical Android/iPhone checks, campus walks, live non-owner login and a second-campus publish/restore rehearsal remain separate [acceptance work](ACCEPTANCE.md).
+Quotas, paused services and expired tokens can interrupt owner jobs while published/offline navigation keeps working. Inspect the exact failure before retrying; do not duplicate an uncertain job. Preserve required assets explicitly instead of assuming hosting retention settings. Both campus publications and historical restore-asset retrieval are verified in [Production](PRODUCTION.md). Physical Android/iPhone checks, campus walks, live non-owner login and an actual public rollback rehearsal remain separate [acceptance work](ACCEPTANCE.md).
 
 ## Source permissions
 

@@ -2,18 +2,12 @@
 
 TurnRight keeps separate campus maps under the existing owner account. LASU is the default; links without a campus parameter retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
 
-**Rollout status:** migrations 013–017, the Campuses controls and the writing API
+**Rollout status:** migrations 013–019, the Campuses controls and the writing API
 are live. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 
-**UNILAG is public (30 September):** `?campus=unilag` loads
-`unilag-eedb8166a67f`, with 71 destinations and 4,252 directed path segments.
-Owner permission to publish the ArcGIS layers is recorded. Reviewed public roads
-support routing; three segments crossing a mapped building remain excluded and
-the main library's approach remains blocked. Entrances still require field
-verification. Publication retained LASU's `lasu-2b70a39ca041` manifest and all
-133 assets unchanged. Additional edits still require a new reviewed release.
+**UNILAG detail upgrade (30 September):** 723 buildings, 116 destinations, 16 credited photographs and 179 road surfaces. The existing graph and access decisions are retained. The main library approach and other recorded field-verification gaps remain unresolved. [Coverage and source conflicts](UNILAG-DETAIL.md) · [Actual release receipts](PRODUCTION.md).
 
 ![Campuses workspace](assets/screenshots/campus-workspace-2026-09-26.png)
 
@@ -31,19 +25,28 @@ For UNILAG Akoka, the [download and source-comparison guide](UNILAG-DOWNLOADS.md
 
 Choose **Import data** inside the target campus. Several sources can contribute layers to one campus. Existing sources retain their configuration for replacement files and manual checks.
 
-| Input | Supported content and requirements |
+| Input | Requirements and supported content |
 | --- | --- |
-| GeoJSON | Features and feature collections; polygon holes and multipart geometry retained |
-| Shapefile ZIP | Matching `.shp`, `.shx`, `.dbf`; include `.prj` or select an EPSG projection |
-| GeoPackage | Select individual vector layers; raster contents are excluded |
-| KML / KMZ | Vector placemarks, lines and polygons; network links and external XML entities rejected |
-| GPX | Waypoints, tracks and routes; tracks do not establish walking permission |
-| CSV | Header row, explicitly mapped coordinate columns and projection |
-| OSM XML / PBF | Complete campus-sized extracts, including referenced nodes and relation members |
-| OpenStreetMap | Boundary-based Overpass query; complete extract required |
-| ArcGIS | Public Web Maps, embedded feature collections, FeatureServer and queryable MapServer layers |
+| GeoJSON / ArcGIS JSON | `.geojson`, `.json`, including `.geojson.json`; features, collections, bare geometry, multipart and GeometryCollections |
+| TopoJSON | `.topojson` or detected JSON topology |
+| GeoJSON sequences / NDJSON | `.geojsonl`, `.geojsons`, `.jsonl`, `.ndjson`; one feature per record |
+| Shapefile | ZIP or matching `.shp`, `.shx`, `.dbf`; include `.prj` or select the source CRS |
+| GeoPackage | `.gpkg`; select vector layers |
+| KML / KMZ | Local vector content; external network links are rejected |
+| GPX | Waypoints, tracks and routes; tracks confer no access permission |
+| CSV | Coordinate columns or WKT geometry; map fields and CRS |
+| OSM | Complete XML/PBF extracts, or boundary-based Overpass source |
+| FlatGeobuf | `.fgb` |
+| File Geodatabase | ZIP containing a complete `.gdb` directory |
+| GML | `.gml`, with local schema companions where needed |
+| MapInfo | Grouped TAB companions or MIF/MID, directly or in a ZIP |
+| GeoParquet | `.parquet` / `.geoparquet` with GeoParquet metadata and WKB geometry |
+| Georeferenced DXF | `.dxf` coordinates already tied to a known CRS; select that CRS |
+| Mixed vector ZIP | Multiple supported datasets, with companion files kept together |
+| Public ArcGIS | Web Maps, embedded collections and queryable FeatureServer/MapServer layers |
 
-Imagery, scanned maps, PDF alignment, File Geodatabases, private ArcGIS authentication and routes between campuses are outside this release. Model GLB/glTF/OBJ/STL imports remain in the separate [model workspace](MODEL-AUTHORING.md).
+Raster imagery, scanned-map alignment, tile archives, proprietary DWG conversion and private ArcGIS authentication are deferred. Importing a CAD drawing does not automatically georeference a local engineering coordinate system. [GDAL driver documentation](https://gdal.org/en/stable/drivers/vector/index.html).
+
 
 ![Public ArcGIS source entry](assets/screenshots/campus-sources-2026-09-26.png)
 
@@ -51,7 +54,7 @@ Upload files directly to private storage; the application server issues a short-
 
 Failed jobs also expose **Choose map files**. Re-select the original files to resume their reserved uploads, then inspect again; a retry creates a new run token and clears an unusable candidate. An ArcGIS layer's `/query?...` export link is accepted: inspection resolves the underlying layer and reports that it is using the campus bounds rather than the link's query filters or export settings.
 
-GeoJSON exports containing `exceededTransferLimit` (including inside collection `properties`) are incomplete and are rejected with a download-all-records explanation. Use the source layer URL for complete ID batching, or download all batches yourself. `.geojson.json` filenames are supported. Road-width polygons are suggested as land cover; routing paths require line geometry. Identifier suggestions prefer fields verified unique across the inspected layer, so a repeated legacy `Id` does not take precedence over a unique `OBJECTID` or `OBJECTID_1`.
+GeoJSON exports containing `exceededTransferLimit` (including inside collection `properties`) are incomplete and are rejected with a download-all-records explanation. Use the source layer URL for complete ID batching, or download all batches yourself. `.geojson.json` filenames are supported. Road-width polygons use the road-surface role; routing paths require line geometry. Identifier suggestions prefer fields verified unique across the inspected layer, so a repeated legacy `Id` does not take precedence over a unique `OBJECTID` or `OBJECTID_1`.
 
 ![Resuming a failed file import](assets/screenshots/import-resume-2026-09-27.png)
 
@@ -67,9 +70,9 @@ The six supplied UNILAG examples were also checked locally without changing thei
 
 ## Map fields and check placement
 
-Choose an import role for each layer: building, path, place, entrance, barrier, land cover, boundary or skip. Suggested mappings are editable. Names, categories, heights, floors and access fields map to the existing editor model. ArcGIS aliases and coded-value labels appear in the selectors. Height units can be metres or feet; floor counts remain properties.
+Choose an import role for each layer: building, path, place, entrance, barrier, land cover, road-surface, overlay, boundary or skip. Suggested mappings are editable. Names, categories, heights, floors, road class, surface, width, land use, vegetation and access fields map to the existing editor model. Unknown point, line and polygon datasets can remain generic overlays with editable labels, colour, opacity, visibility and order. ArcGIS aliases and coded-value labels appear in the selectors. Height and width units can be metres or feet; floor counts remain properties.
 
-Choose a stable identifier for file reimports. OSM node/way/relation IDs are retained automatically. Without a stable identifier, subsequent files create replacement proposals; names and nearby coordinates are not treated as identity. Original files, attributes, source URLs, snapshots and hashes stay in private import storage.
+Choose a stable identifier for file reimports. OSM node/way/relation IDs are retained automatically. Without a stable identifier, content-derived identities can change when content changes; names and nearby coordinates are not treated as identity. Select an accepted layer identity after a filename/layer rename to reuse its mappings. Duplicate layer names are disambiguated by dataset context. Original files, attributes, source URLs, snapshots and hashes stay in private import storage.
 
 Supported coordinate systems are converted to WGS84 through GDAL/PROJ. The layer
 summary shows the detected source projection; leave the override empty to retain
@@ -81,7 +84,9 @@ the mapping step cannot reinterpret projected metres as degrees.
 
 ![Field aliases, identifiers and height mapping](assets/screenshots/campus-mapping-2026-09-26.png)
 
-**Build preview** reports additions, changes, removals, skipped features, invalid geometry, overlap candidates and disconnected walking networks. Long forms scroll inside the workspace. Mapping choices survive tab changes, resizing and rotation. The preview is bounded for responsiveness; counts cover the full processed dataset.
+**Build preview** reports additions, changes, removals, skipped features, invalid geometry, overlap candidates and disconnected walking networks. Long forms scroll inside the workspace. Mapping choices survive tab changes, resizing and rotation. The preview allocates coverage to each layer and spreads samples across its complete feature list. An explicit per-layer shown/total indicator identifies sampling; validation covers every feature. GeometryCollections split into stable editable component identities. Null geometries, duplicate identifiers and coordinate problems are reported.
+
+Routine winding, closable rings and consecutive duplicate vertices are normalized automatically. A polygon repair is accepted only if it is valid, nonempty, retains all components, and changes area by no more than 1% in a local equal-area projection. Dimension-changing/collapsed geometry or larger changes require review. Original uploads and geometry hashes stay private. The preview shows repair actions and area diagnostics; complete receipts remain in the private candidate even when its visible report is capped. [Why repair output types need checking](https://shapely.readthedocs.io/en/stable/reference/shapely.make_valid.html).
 
 ![Landscape import review](assets/screenshots/campus-landscape-2026-09-26.png)
 
@@ -98,6 +103,8 @@ Reopening a completed import retains recoverable mapping edits and the same
 checks. A successful background job alone does not bypass validation.
 
 Large validated batches use a bulk transaction (migration 016) with a bounded 60-second database allowance (migration 017). The server waits up to 75 seconds for this queue RPC; other database requests retain their usual limit. If a queue attempt fails, its transaction rolls back and the validated preview remains recoverable. Reopen the import before retrying to distinguish a completed queue from a failed request.
+
+Repeat imports default to adding/updating selected layers. Choose **Replace selected layers** or **Replace the complete source** explicitly before missing records can be proposed for removal; verify source completeness first.
 
 Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace owner corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
 
@@ -133,7 +140,7 @@ Record the source attribution, licence and redistribution permission before publ
 
 The default limits are 50 MiB per upload batch, 250 MiB expanded archives, 100,000 normalized features, 100 layers and 20 minutes of job processing. Public package, model, photo and startup budgets remain independent. Split overly complex datasets into sources when they exceed a processing or public-package limit.
 
-`scripts/import_map.py` runs conversion in a network-disabled, read-only Docker container. The GDAL 3.11.4 image is pinned by digest and supplies PROJ; Pyosmium 4.1.1 and Shapely 2.1.2 are pinned. Supported drivers are explicitly allowed. ZIP traversal/symlinks, external KML entities and arbitrary native-parser network access are blocked. Online adapters use HTTPS, reject private DNS answers, pin the resolved address and recheck redirects. ArcGIS object-ID batches must match both the requested IDs and feature counts before comparison.
+`scripts/import_map.py` runs conversion in a network-disabled, read-only Docker container. The GDAL 3.11.4 image is pinned by digest and supplies PROJ; Pyosmium 4.1.1, Shapely 2.1.2, Pyproj 3.7.2 and PyArrow 19.0.1 are pinned. GeoParquet WKB/metadata conversion runs inside this worker; it adds no browser parser. Supported drivers are explicitly allowed. ZIP traversal/symlinks, external KML entities and arbitrary native-parser network access are blocked. Online adapters use HTTPS, reject private DNS answers, pin the resolved address and recheck redirects. ArcGIS object-ID batches must match both the requested IDs and feature counts before comparison.
 
 `campuses`, `campus_sources`, `campus_imports` and `campus_import_assets` hold private identity, configuration and jobs. Migrations 013–015 add campus scoping to source records, edits, reviews, reports, surveys, media, model assets and releases. Legacy requests and backfilled records remain LASU-only. The server resolves public slugs and passes an explicit campus context to REST and transactional RPCs; private storage grants are not exposed to anonymous or authenticated browser clients.
 
@@ -170,6 +177,8 @@ The app's dark/light/system preference also applies to the import header, forms 
 
 Screenshots are unaltered local application captures with isolated owner/source responses, illustrative campus names and a checked-in LASU geographic fixture. They demonstrate controls, not a second published production campus. Physical-device keyboards and native browser zoom remain separate manual checks. See [screenshot provenance](assets/screenshots/README.md) and [production evidence](PRODUCTION.md).
 ## September 27 UNILAG import outcome
+
+This dated initial-import record is superseded by the [September 30 detail upgrade](UNILAG-DETAIL.md); its exclusions describe that earlier stage.
 
 The requested building footprints, Roads, Parcel, Greenspace and complete Greenland layers were applied to the private UNILAG workspace from its existing ArcGIS source. The queue contained 10,175 additions and one attribution-metadata change; acceptance used the existing campus-scoped review operation. The private baseline now contains 3,646 geographic features, 2,281 routing nodes, 4,248 directed edges and one campus metadata record. Generic road access remains restricted pending connectivity/access review. UNILAG was not published, and redistribution permission remains unconfirmed.
 

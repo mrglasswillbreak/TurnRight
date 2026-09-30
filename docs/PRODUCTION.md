@@ -3,6 +3,98 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## UNILAG detail and vector compatibility · 30 September 2026
+
+Release `9f775622-a2aa-419c-a154-e9b584c7f465`, package
+`unilag-a3779f9c3603`, [published successfully](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36687163769)
+at **08:03:55 UTC** and serves the [public UNILAG map](https://turnright.vercel.app/?campus=unilag).
+Its [frozen preview build](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36685569828)
+contains 3,928 map features, 723 buildings, 116 destinations, 16 credited
+photographs and all 179 road surfaces. The model build contains 4 detailed,
+7 simplified and 712 illustrative extrusion records in nine sectors
+(276,746 bytes; revision `1adc07ebe2ae5d83`).
+
+Migrations **018–019** were applied and read back before dependent writers.
+The [additive preparation](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36682149808)
+retained all 188 UNILAG corrections and the Engineering model. It added 282
+features and 45 destinations and changed mapped metadata without deleting
+source rows. Receipt `6cd211e3-f025-47b2-9d24-2a69282db93a` retains complete
+before/after source snapshots. The original road upload was verified in private
+storage against its 748,261-byte original and SHA-256 checksum.
+
+The prepared workspace graph is unchanged: 4,252 directed edges and canonical SHA-256
+`12551b2a9daa618d4f6d9eb6db1713a70542e69c9879d09c0c409139e653fb26`.
+Packaging retains the existing removal of unused nodes. The public graph has
+2,114 nodes and 4,252 edges; its before/after SHA-256 is
+`326fa8e18e683283ef53ba0673b434e318f94f24ec645e338f4a11dd065dd5a3`.
+Direct comparison found zero changed nodes or edges.
+The final snapshot has 188 edits and hash
+`41d217b3b9b314cbefee1a25d4e633a5852307e26f12954a91a9f7273ed66b67`.
+LASU's private source and draft hashes were unchanged across the additive
+transaction. Unrelated owner activity changed LASU drafts earlier in the
+session; that state was preserved rather than overwritten by the older capture.
+
+[Regression audit](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36683508502)
+passed all eight jobs: 641 unit tests, lint/typechecks, configured build,
+Chromium/WebKit campus/import/photo checks and offline recovery. The final
+restore transport adds two regression cases; **643 tests across 94 files pass**.
+The [pinned GIS run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36681596847)
+passes all 29 GIS tests, covering every advertised vector format, plus the
+private 0700 worker smoke test. The ordinary Python run contains 56 cases:
+52 pass and four have driver-dependent skips; the pinned run covers those skips.
+
+Configured gzip budgets remain unchanged: public startup **434,560 / 435,200
+bytes**, additional owner code **186,593 / 189,440**, photo workspace
+**10,430 / 12,288** and lazy 3D renderer/editor **235.8 / 300 KiB**.
+Full-UNILAG road clipping measured approximately 0.87–2.74 seconds in the local
+software benchmark; it now runs in a cancellable worker with cached results.
+These timings are not phone frame-rate measurements. Browser verification uses
+the full vegetation and building dataset, not a reduced fixture.
+
+The restore check found that Vercel protects historical deployment URLs.
+Restoration now verifies project ownership, obtains temporary authenticated
+access, validates every historical asset and revokes that access. Redirects
+cannot forward credentials to another origin. The restore operation still
+builds a new campus-specific preview while preserving other campuses and drafts.
+
+At **08:07:24 UTC**, direct production checks confirmed all 179 distinct road
+identities are valid and nonempty: 80 paved roads, 24 unpaved roads and 75
+sidewalks. UNILAG's manifest contains **47 assets / 14,209,103 bytes**, SHA-256
+`6de05eddd311fa1d5a9d9069ad03f644d35f6e301b54d22a36347fbd23653cf4`.
+LASU remains `lasu-2b70a39ca041`, **133 assets / 21,178,465 bytes**; its manifest
+is byte-identical to the captured baseline, SHA-256
+`4177f122756ec833c0915d4d195af3b3d709e5d913b1609977de942a59c70a53`.
+Both campuses' public routing graphs match their preceding releases. An
+unauthenticated request for private UNILAG state returns HTTP 401.
+
+The [real-package matrix](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36686022563)
+passed all 32 desktop/mobile, light/dark, 2D/3D views in Chromium and WebKit,
+all 180 asset hashes, and all four campus/browser offline checks. The later
+historical-asset check in that run failed on protected redirects. The
+[focused restore follow-up](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36686978255)
+then passed with every previous UNILAG asset verified and temporary credentials
+removed. No public rollback was performed.
+
+The [production follow-up](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36687623034)
+completed successfully at **08:11 UTC** against `turnright.vercel.app`. It
+rechecked all 180 published asset hashes, eight desktop 2D/3D campus/browser
+views, and all four offline reopen cases. Every rendered view retained its
+full feature coverage and had no horizontal overflow or JavaScript errors.
+
+A live Chromium navigation check at **08:15 UTC** also passed LASU
+Clinic–Senate route planning (three options), switching through the public
+campus chooser, UNILAG Senate search, and Central Mosque–Senate route planning
+(two options). It did not start GPS navigation or change owner drafts.
+
+Chromium's disconnected-browser checks and WebKit's stopped-origin checks both
+reopen actual campus maps, photographs and verified model packages. The latter
+avoids a [Playwright 1.63 offline-navigation emulation defect](https://github.com/microsoft/playwright/issues/42775);
+it is not a native Safari or physical-phone result. Campus access, real GPS,
+precise dimensions and unresolved source associations remain field/evidence work.
+
+[Coverage, repaired geometry and evidence gaps](UNILAG-DETAIL.md) ·
+[Import formats and operation](CAMPUS-IMPORTS.md).
+
 ## Image editor release checks · 30 September 2026
 
 Implementation `8ce0fd9` passed [the final regression audit](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36669158593):

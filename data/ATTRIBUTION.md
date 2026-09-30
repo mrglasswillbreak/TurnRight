@@ -32,3 +32,11 @@ Authored/imported 3D geometry and textures need their own reuse rights. GLB/glTF
 - Legacy navigation recordings: generated locally using Windows speech synthesis (Microsoft Hazel), retained unchanged in campus packages as fallback. No online speech service or system speech synthesis is used during navigation.
 
 This map has not been field surveyed by TurnRight. A mapped approach ends on a source path near a building and does not imply an entrance, access permission, or a walkable final connection. Approximate 3D heights use documented floor descriptions at 3 metres per floor.
+
+## UNILAG detail release · 30 September 2026
+
+The owner supplied `Road width.geojson.json` and explicitly requested public/offline UNILAG publication. Its exact original remains private (SHA-256 `82659e26dcbeb4a8829b18fb14c2aa264bec6c877710147aac3ded1125d087b4`). All 179 `OBJECTID_1` identities are retained. No broader source reuse licence or new route permission is inferred.
+
+Additional accepted footprint/landscape geometry comes from the downloaded September 27 OpenStreetMap extract, © OpenStreetMap contributors, ODbL-1.0. Existing ArcGIS credits remain in the campus package. Official university and architect references are factual research; their photographs are not redistributed merely because a page is public.
+
+Sixteen Wikimedia Commons photographs, covering 11 buildings, retain their individual author, original URL, CC BY-SA 4.0 licence, historical/capture-date notes and WebP derivative notices. The [accepted inventory](unilag-enrichment/photos.json), [115-candidate review](unilag-enrichment/photo-review.json), existing photo metadata audit and [architecture coverage](../docs/UNILAG-DETAIL.md) record their provenance and limits. The Engineering owner's authored model remains authoritative.

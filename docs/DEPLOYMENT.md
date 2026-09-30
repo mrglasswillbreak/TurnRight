@@ -64,7 +64,7 @@ Vercel builds intentionally require `SOURCE_REDISTRIBUTION_APPROVED=true`. Set i
 
 ## 2. Create Supabase Free and configure GitHub login
 
-Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. For a new database, apply every checked-in SQL migration in numeric order from `001_campus.sql` through `017_import_queue_deadline.sql`. The initial 001–003 migrations establish the base schema and editor batches; 004–011 add surveys, source review, media and reconciliation; 012 adds model assets; 013–015 add campus isolation, imports and scoped restores; 016–017 bulk-insert review proposals and bound large queue transactions. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, transactional editor saves, and server-only publication/import functions. Do not rerun the first migration on an initialized database. For existing installations, first check which migrations are present and apply only the missing migrations before enabling their dependent writers; see [the editor upgrade guide](EDITOR.md).
+Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. For a new database, apply every checked-in SQL migration in numeric order from `001_campus.sql` through `019_additive_source_patch.sql`. The initial 001–003 migrations establish the base schema and editor batches; 004–011 add surveys, source review, media and reconciliation; 012 adds model assets; 013–015 add campus isolation, imports and scoped restores; 016–017 bulk-insert review proposals and bound large queue transactions; 018 adds land/overlay edit kinds; 019 adds an atomic, additive campus patch with scoped row-revision guards and rollback receipts. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, transactional editor saves, and server-only publication/import functions. Do not rerun the first migration on an initialized database. For existing installations, first check which migrations are present and apply only the missing migrations before enabling their dependent writers; see [the editor upgrade guide](EDITOR.md).
 
 Enable GitHub under Authentication → Sign In / Providers. Create a GitHub OAuth App with the callback URL shown by Supabase (`https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`), then store its client ID and client secret in the Supabase GitHub provider settings. The OAuth client secret belongs there, not in the PWA. Use the real Supabase callback URL, not the PWA `/admin` URL. [Supabase GitHub login instructions](https://supabase.com/docs/guides/auth/social-login/auth-github).
 
@@ -157,3 +157,25 @@ Use GitHub's included Actions allowance with a zero spending budget for paid Act
 Export backups from the editor after substantial changes. Exports contain accepted source records, corrections and edit history; release snapshots also remain in Supabase. Keep an encrypted copy outside the project. To recover a fresh database, apply the migration and restore these tables using a trusted server-side process, preserving feature IDs. No browser restore endpoint is exposed. Never import untrusted backup files into a privileged database.
 
 Record live verification in `docs/CONFIGURATION.md`; do not infer rollback or campus accuracy from a successful build alone.
+
+## September 30 vector/detail release
+
+Apply migration 018 before land/overlay writers. Migration 019 supports large additive source preparation without sending two complete maps through the HTTP gateway; it is service-only, compares the complete scoped row-revision inventory, never deletes absent records, and stores immutable before/after receipts. The UNILAG preparation keeps all private corrections and validates routing before and after.
+
+Release the shared capability registry, API and pinned GIS worker together. Server-dispatched GitHub workflows use `main`; a preview branch alone does not upgrade the production worker. The deployment source allowlist includes `scripts/map_import/capabilities.json`. Run the GIS integration fixtures inside the pinned image before enabling the additional advertised formats.
+
+The UNILAG workflow first captures private baselines, verifies the original road upload hash, builds a public preview and accepts only an exact reviewed baseline hash. Reconcile the additive patch, create an immutable release snapshot, build its deployment preview, inspect desktop/mobile and offline behavior, then publish that exact release. Verify all served asset bytes/hashes and LASU's unchanged manifest. A failed or timed-out write must be audited before retrying. Roll back one campus through a new restore preview, retaining the other campus's current package. See [coverage](UNILAG-DETAIL.md) and [production receipts](PRODUCTION.md).
+
+Historical Vercel deployment URLs can require authentication even when the
+production domain is public. The restore worker checks that the deployment
+belongs to the configured project and uses temporary automation access for
+verified asset retrieval. It revokes that credential on completion; the workflow
+also cleans up after failures or interruption. Deployment protection stays enabled.
+
+The **Verify released campus detail** workflow accepts a ready preview release
+ID, or checks production when that field is empty. It verifies all package
+hashes, captures both browsers and tests downloaded photos/models. Chromium
+uses browser offline mode. WebKit uses unchanged deployed bytes through a local
+origin, then stops that origin and verifies cached navigation: Playwright 1.63
+has an [upstream offline-navigation emulation issue](https://github.com/microsoft/playwright/issues/42775).
+This does not replace native Safari/physical-device acceptance.

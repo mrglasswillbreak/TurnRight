@@ -1,5 +1,26 @@
 # TurnRight verification and release checklist
 
+## UNILAG detail and vector compatibility — 30 September 2026
+
+UNILAG's published upgrade includes all 179 valid road surfaces, 723 buildings,
+116 destinations and 16 credited photos. The existing public routing graph,
+LASU package and owner corrections are preserved. Polygon 96's original,
+repair diagnostics and complete candidate dispositions are retained.
+
+The release passes 643 unit tests, every advertised format's pinned GIS fixture,
+the Chromium/WebKit regression suites and unchanged build budgets. The real
+package matrix passes 32 desktop/mobile, light/dark and 2D/3D views. The final
+production follow-up verifies all 180 campus assets and four offline reopen
+cases. Historical rollback assets pass authenticated retrieval and checksum
+verification without changing either publication.
+
+[Production receipts](PRODUCTION.md) distinguish the preview matrix, the later
+restore fix and final production results. [UNILAG evidence](UNILAG-DETAIL.md)
+records remaining height, footprint, photo and access conflicts. Native Safari,
+physical phones, real GPS, field entrances and access permissions remain
+separate checks; WebKit's offline check stops the origin to avoid the documented
+Playwright offline-emulation defect.
+
 ## Globe navigation and import repair — 27 September 2026
 
 - Six focused globe journeys pass in Chromium and Windows WebKit, covering

@@ -7,6 +7,7 @@ TurnRight combines a public campus navigation PWA, a private GIS/map workspace a
 | Task | Guide |
 | --- | --- |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
+| Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
 | Edit places, paths, entrances, access and source changes | [Owner editor](EDITOR.md) |
 | Edit windows, walls, roofs, footprints, text and model review | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
@@ -28,7 +29,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–017, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
+| New installations, migrations 001–019, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |

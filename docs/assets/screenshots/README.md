@@ -1,5 +1,27 @@
 # Application screenshots
 
+## UNILAG detail and campus comparison · 30 September 2026
+
+`unilag-desktop-light-3d`, `unilag-desktop-dark-2d`,
+`unilag-mobile-light-3d` and `lasu-desktop-light-3d`, all dated `2026-09-30`,
+are unaltered Chromium captures from the reviewed release preview. They show
+real packages `unilag-a3779f9c3603` and `lasu-2b70a39ca041`, including actual
+geometry, road surfaces, model assets and credited historical photographs.
+Desktop is 1440×1000; mobile is a 390×844 browser simulation.
+
+`web/scripts/verify-campus-detail.mjs` captured 32 combinations across both
+campuses, Chromium/WebKit, desktop/mobile, light/dark and 2D/3D. The
+[real-package run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36686022563)
+passed every view, verified all 180 package assets and completed four offline
+campus/browser checks. That run subsequently failed in the separate historical
+restore transport check; [Production](../../PRODUCTION.md) records its repair
+and final publication verification. Screenshot review checked the road/landscape
+alignment, readable labels, galleries and contained mobile controls.
+
+The polygon-96 illustration in the coverage guide is a data-derived geometry
+inspection plot, not an app screenshot. Earlier editor captures below remain
+dated fixture examples. Physical Safari and GPS checks are separate acceptance.
+
 ## Photo comparison workspace · 30 September 2026
 
 `photo-editor-desktop`, `photo-editor-portrait`, `photo-editor-portrait-controls`,

@@ -1,4 +1,23 @@
-# LASU Ojo building photograph collection
+# Campus building photographs
+
+The shared `catalogue.json` includes campus-scoped source metadata. Publication
+selects only the target campus's accepted photographs and preserves the other
+campus's immutable package. The current LASU gallery contains 44 photographs;
+the UNILAG detail release adds 16 credited photographs covering 11 buildings.
+
+## UNILAG review · 30 September 2026
+
+The review assessed 115 Commons candidates and selected 16 CC BY-SA 4.0 images,
+totalling 3,494,520 bytes after WebP conversion. Author, source URL, licence,
+capture-date context and derivative notice remain attached to every image.
+The existing metadata audit, compression, package-hash and offline-photo
+workflows apply to both campuses.
+
+[Accepted UNILAG inventory](../unilag-enrichment/photos.json) ·
+[All candidate dispositions](../unilag-enrichment/photo-review.json) ·
+[Architecture associations and evidence gaps](../../docs/UNILAG-DETAIL.md).
+
+## LASU collection history
 
 This is the historical **23 September collection audit**, against published map
 **lasu-a81135d18314**. Its counts describe that research corpus. The current
