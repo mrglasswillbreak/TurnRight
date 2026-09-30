@@ -92,5 +92,9 @@ export default defineConfig({
       },
     },
   },
-  server: { host: '127.0.0.1' },
+  // Building the offline-test preview must not reload an active editing session.
+  server: {
+    host: '127.0.0.1',
+    watch: { ignored: ['**/work/**', '**/test-results/**'] },
+  },
 });
