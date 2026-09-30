@@ -61,7 +61,7 @@ def build(downloads, baseline, output):
 
     for raw in load(downloads/'Road width.geojson.json')['features']:
         attrs=raw['properties'];ident=str(attrs['OBJECTID_1']);geom,repair=prepare_geometry(raw['geometry'])
-        props={'id':f'{ROAD_SOURCE}:road-width:{ident}','source':ROAD_SOURCE,'sourceId':ident,'importLayer':'UNILAG Road width','kind':'land','name':attrs['NAME'],**mapped_properties(attrs,{'nameField':'NAME'},'road-surface')}
+        props={'id':f'{ROAD_SOURCE}:8e590a7a:{ident}','source':ROAD_SOURCE,'sourceId':ident,'importLayer':'UNILAG Road width','kind':'land','name':attrs['NAME'],**mapped_properties(attrs,{'nameField':'NAME'},'road-surface')}
         features.append({'type':'Feature','properties':props,'geometry':mapping(geom)})
         candidates.append({'source':'road-width','id':ident,'status':'included','record':props['id'],'class':props['landClass'],'surface':props['surface']})
         if repair:repairs.append({'sourceId':ident,**repair})
