@@ -3,6 +3,30 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Image editor release checks · 30 September 2026
+
+Implementation `8ce0fd9` passed [the final regression audit](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36669158593):
+634 unit tests across 92 files, lint/typechecks, configured production build and
+budgets, focused Chromium/WebKit campus and photo workflows, the dedicated
+15-case WebKit image suite, and both production offline suites. Python discovery
+passed 40 tests with three GIS-driver-dependent skips. Eight existing lint
+warnings remain. The preceding portrait run exposed test assumptions about an
+always-open settings panel; the final tests wait for image recovery and use the
+panel's expanded state before continuing.
+
+The update adds retained-original automatic batch compression, local Squoosh
+codecs, combined image/details editing and drag ordering. Portrait has a horizontal
+comparison and expandable bottom bars; TurnRight's shared light/dark tokens style
+the workspace. Actual desktop, landscape and both portrait themes are captured
+in [the photo guide](PHOTO-EDITING.md). Four local comparison workflows also
+passed, including divider dragging, rotation and recipe recovery. These are
+browser checks, not physical-phone measurements.
+
+Configured gzip budgets remain unchanged: public startup **434,890 / 435,200
+bytes**, additional owner code **188,861 / 189,440**, lazy photo manager
+**10,236 / 12,288**. Code deployment must preserve the current LASU and UNILAG
+manifests and catalogue; it does not publish additional photo or map drafts.
+
 ## UNILAG publication · 30 September 2026
 
 The owner-authorized UNILAG release was inspected in the in-app browser and
