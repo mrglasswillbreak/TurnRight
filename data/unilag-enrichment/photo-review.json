@@ -1,0 +1,998 @@
+{
+  "checkedAt": "2026-09-30",
+  "queries": [
+    "University of Lagos building",
+    "Unilag library",
+    "Unilag mosque",
+    "Unilag hall",
+    "Unilag medical",
+    "University of Lagos faculty",
+    "Unilag auditorium"
+  ],
+  "candidates": [
+    {
+      "id": "commons:102926557",
+      "title": "File:ASC Leiden - NSAG - Crebolder 1 - 078 - Lagos. A street with pedestrians - Lagos, Nigeria - February 13-14, 1962.tif",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:ASC_Leiden_-_NSAG_-_Crebolder_1_-_078_-_Lagos._A_street_with_pedestrians_-_Lagos,_Nigeria_-_February_13-14,_1962.tif",
+      "originalSha1": "1326ee49b54658e77f1a5646fc6bce117c9514cc",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:98664553",
+      "title": "File:ASC Leiden - NSAG - van Dis 5 - 024 - A city roundabout with a modernistic fountain and a huge pool - Lagos, Nigeria - February 14, 1962.tiff",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:ASC_Leiden_-_NSAG_-_van_Dis_5_-_024_-_A_city_roundabout_with_a_modernistic_fountain_and_a_huge_pool_-_Lagos,_Nigeria_-_February_14,_1962.tiff",
+      "originalSha1": "4a48c56bb2f9dbd5f8e71ddc20a4a2eff486cc23",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113564414",
+      "title": "File:Abisogun Leigh Science Building,Lasu.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,Lasu.jpg",
+      "originalSha1": "12f8ed43de71db92e93edb99a5d55013dc80f96a",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112838120",
+      "title": "File:Abisogun Leigh Science Building, Faculty of Science, Lagos State University.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "originalSha1": "2b737b258ba23704d1e7033fc9f8d2a750d6983f",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113535613",
+      "title": "File:Akintunde Ojo memorial hall, Unilag.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Akintunde_Ojo_memorial_hall,_Unilag.jpg",
+      "originalSha1": "1ea4c73d70ed751a0d21cebceceecca0bad407c1",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:94",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg/1280px-Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "f897e70740c703f5ca9bc563234c484976ef20afd550a50cc3eb86aefe57336c",
+      "derivativeSha256": "48e802f3e9bc6181849d7cda7101924378deed93d45694cd2df5f5c18fb22b8b"
+    },
+    {
+      "id": "commons:80012137",
+      "title": "File:Architectural view of the senate building University of lagos, Nigeria.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Architectural_view_of_the_senate_building_University_of_lagos,_Nigeria.jpg",
+      "originalSha1": "6d59336c024fa35748342a55da7ee43117d67718",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:89",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg/1280px-Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "ca08e33ac75627756713e44464565092454c41736ee1103339c4dff7ddfeda66",
+      "derivativeSha256": "3533e1f9d28a05a0e9128b692b7efab213ce155e2b984cc4c429da37900f3683"
+    },
+    {
+      "id": "commons:168855873",
+      "title": "File:Aveiro - View on University and Lago do Paraíso.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aveiro_-_View_on_University_and_Lago_do_Para%C3%ADso.jpg",
+      "originalSha1": "0d9f07ea975ca33317d8dd47abaabb1387076eb8",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113525024",
+      "title": "File:CITS, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:CITS,_University_of_Lagos.jpg",
+      "originalSha1": "85e0ed3ca334000bd8bd9543aef867d3d9bb97c5",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:491",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/CITS%2C_University_of_Lagos.jpg/1280px-CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "ba6cd91c68f6a987217971de7fb2c6c613509d7c760dbc4343a769b93e49a427",
+      "derivativeSha256": "d0b6ec39087934022d59c2dac9eaa4e9c4ffe3f18f257b231020d103152571f7"
+    },
+    {
+      "id": "commons:61249165",
+      "title": "File:Collapsed Kitchen, Makama Bida Hall, University of Lagos, Akoka.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Collapsed_Kitchen,_Makama_Bida_Hall,_University_of_Lagos,_Akoka.jpg",
+      "originalSha1": "1bd5a03fe88b5fe5741360f75321449de41deac8",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:61249164",
+      "title": "File:Collapsed Kitchen 1, Makama Bida Hall, University of Lagos, Akoka.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Collapsed_Kitchen_1,_Makama_Bida_Hall,_University_of_Lagos,_Akoka.jpg",
+      "originalSha1": "a8c68010b249f853f87a56fa99a097379a6c270a",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:113564152",
+      "title": "File:Department of Computer engineering, Laspotech.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Department_of_Computer_engineering,_Laspotech.jpg",
+      "originalSha1": "b3bb3ba1616cee400410b61f7da3c3b8b1b2656c",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:156712873",
+      "title": "File:Department of Radiology, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Department_of_Radiology,_University_of_Lagos.jpg",
+      "originalSha1": "dbc5564a73fed3455ab3533bc2089bdc00d96e40",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:113564413",
+      "title": "File:Enitan Bababumi science laboratory building, Lasu.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Enitan_Bababumi_science_laboratory_building,_Lasu.jpg",
+      "originalSha1": "25c0c05005497328f1f688ef528eac48b117a9f5",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:163071730",
+      "title": "File:FACULTY BUILDINGS, AUGUSTINE UNIVERSITY, ILARA EPE, LAGOS STATE.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:FACULTY_BUILDINGS,_AUGUSTINE_UNIVERSITY,_ILARA_EPE,_LAGOS_STATE.jpg",
+      "originalSha1": "8d40a872894034eff94d2c36cc8bc7ea011b465f",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:59106656",
+      "title": "File:Faculty of Arts building, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Arts_building,_University_of_Lagos.jpg",
+      "originalSha1": "9e2f682de61199a902b3069d599d7966195a8ec7",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:87",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg/1280px-Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "ce20508d1a0ddcfa25e4550cdf1bdbe8b303cf00de99a9a8404a6c6510288036",
+      "derivativeSha256": "a4b50c58cd304d5c9a4b7bc9809abd30d9eb537ae290169b8818df25c1f0305e"
+    },
+    {
+      "id": "commons:79542881",
+      "title": "File:Highrise Blocks C, B and A in University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Highrise_Blocks_C,_B_and_A_in_University_of_Lagos.jpg",
+      "originalSha1": "9013fcc4b43133ce2012808d56653bc48ca41875",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:184794988",
+      "title": "File:Image of the Shotgun and Gas Cannister from the 2026 Mar-a-Lago Shooting (Palm Beach County Sheriff).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Image_of_the_Shotgun_and_Gas_Cannister_from_the_2026_Mar-a-Lago_Shooting_(Palm_Beach_County_Sheriff).jpg",
+      "originalSha1": "02c799db4f418e8fec412593ebb6f5ea020bd61e",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:117706001",
+      "title": "File:Innovation for Sustainable Railway Usage and Maintenance In A Smart City. Study of Mobolaji Johnson Train Station Lagos, Nigeria. journal.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Innovation_for_Sustainable_Railway_Usage_and_Maintenance_In_A_Smart_City._Study_of_Mobolaji_Johnson_Train_Station_Lagos,_Nigeria._journal.pdf",
+      "originalSha1": "7950e8c7df8a634a273910b8bf648fecc399c8f8",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:178879318",
+      "title": "File:Joseph Street, Lagos, with the Royal Cinema.png",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Joseph_Street,_Lagos,_with_the_Royal_Cinema.png",
+      "originalSha1": "c653f9b3494fd07ac9b9fe14f8fb4147783dbea5",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113536418",
+      "title": "File:LASPOTECH LIBRARY COMPLEX.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASPOTECH_LIBRARY_COMPLEX.jpg",
+      "originalSha1": "3f10c0aec7faf4576ebc36fc9730e2e17d5a3291",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:116180606",
+      "title": "File:LASU Main Printing Press Building, Ojo.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building,_Ojo.jpg",
+      "originalSha1": "4270f2e1a9a92748bba6067ef86a544c5ffae3b2",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:116180210",
+      "title": "File:LASU Main Printing Press Building.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building.jpg",
+      "originalSha1": "82d4f268898cc60dbe9cc6584a7cbb826297c998",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:116073984",
+      "title": "File:LASU Senate Building Right Section 1.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+      "originalSha1": "5a4c17fdd9a346f2d0aae41fd2454f6255076519",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:138069484",
+      "title": "File:Lagos State University Senate Building.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg",
+      "originalSha1": "ff6cfbc9f0e560872330a14cd6bc70751cee28c3",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:198256507",
+      "title": "File:Lagos State University Senate building aug 2026 IMG 5989b.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+      "originalSha1": "c0986aff055f36faa38b273971ad04ed3ee1a63a",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149186663",
+      "title": "File:Lagos University Gate House And Enquiry Office Nigeria 1977 Designed by Michael Olutusen Onafowokan Elevation Drwg005 004.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_University_Gate_House_And_Enquiry_Office_Nigeria_1977_Designed_by_Michael_Olutusen_Onafowokan_Elevation_Drwg005_004.jpg",
+      "originalSha1": "176807604b1505e727dd1e72ac424ffe0e9eb356",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149186666",
+      "title": "File:Lagos University Gate House And Enquiry Office Nigeria 1977 Designed by Michael Olutusen Onafowokan Elevation Drwg04 002.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_University_Gate_House_And_Enquiry_Office_Nigeria_1977_Designed_by_Michael_Olutusen_Onafowokan_Elevation_Drwg04_002.jpg",
+      "originalSha1": "43fac99bc68d96b881d003ac48a0dc72f5f4a42a",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149186660",
+      "title": "File:Lagos University Gate House And Enquiry Office Nigeria 1977 Designed by Michael Olutusen Onafowokan Elevation Section Drwg004 003.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_University_Gate_House_And_Enquiry_Office_Nigeria_1977_Designed_by_Michael_Olutusen_Onafowokan_Elevation_Section_Drwg004_003.jpg",
+      "originalSha1": "ffd530a9166c56b1bc1e7238e4a0b173bea858b1",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149186670",
+      "title": "File:Lagos University Gate House And Enquiry Office Nigeria 1977 Designed by Michael Olutusen Onafowokan First Floor Plan Roof Plan Drwg03 001.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_University_Gate_House_And_Enquiry_Office_Nigeria_1977_Designed_by_Michael_Olutusen_Onafowokan_First_Floor_Plan_Roof_Plan_Drwg03_001.jpg",
+      "originalSha1": "2917d275f87602664d601cf500cb4bc63c15b04f",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149186678",
+      "title": "File:Lagos University Gate House And Enquiry Office Nigeria 1977 Designed by Michael Olutusen Onafowokan Stanchions Rain Water Pipes Handrail Balustrade Staircase Details Drwg006 005.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_University_Gate_House_And_Enquiry_Office_Nigeria_1977_Designed_by_Michael_Olutusen_Onafowokan_Stanchions_Rain_Water_Pipes_Handrail_Balustrade_Staircase_Details_Drwg006_005.jpg",
+      "originalSha1": "f33260e3c143b103a0bcaf6aa55fd4801e83f7ad",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:115996430",
+      "title": "File:Lagos state university radio.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg",
+      "originalSha1": "2ad9d3075883900538cb4b9f48c4fe84f6e61dd0",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112540966",
+      "title": "File:Lagos state university school of communication.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+      "originalSha1": "b4370fcb62667b09a07dca5ed93cbf92b2153394",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112540904",
+      "title": "File:Lasu School of transport.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+      "originalSha1": "3bdb813014f74aa43599baf0c6a5df9a967d871d",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:76850270",
+      "title": "File:Münster, Aasee, Restaurants -- 2019 -- 3464-8.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:M%C3%BCnster,_Aasee,_Restaurants_--_2019_--_3464-8.jpg",
+      "originalSha1": "91a289215edadf2857187a0c5f2769d9eec38c45",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:184761565",
+      "title": "File:Photo of suspect's gun in 2026 Mar-a-Lago shooting (Palm Beach County Sheriff).webp",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Photo_of_suspect%27s_gun_in_2026_Mar-a-Lago_shooting_(Palm_Beach_County_Sheriff).webp",
+      "originalSha1": "c8b8725709e818ed8a0f29279ce9edf82f88f634",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:59107305",
+      "title": "File:Senate Building, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_Building,_University_of_Lagos.jpg",
+      "originalSha1": "a305ea7c254bdebaffe7bb0cf2e6647651ee6f6b",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:59107531",
+      "title": "File:Senate Building , University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_Building_,_University_of_Lagos.jpg",
+      "originalSha1": "98d9d94f86dab8acaefce424fd26af5df566bf49",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:80068438",
+      "title": "File:Senate Building in Unilag.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_Building_in_Unilag.jpg",
+      "originalSha1": "a48f48ea85c4bc62853672442caa26cad560742a",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:59107718",
+      "title": "File:Senate House, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_House,_University_of_Lagos.jpg",
+      "originalSha1": "6da363a9799d4182fc56adafc505043ed3394ecd",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:89",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Senate_House%2C_University_of_Lagos.jpg/1280px-Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "b97994a935e5f87f0d3ffe9752ef655addb53507784062dc60b469fc7a12fe2d",
+      "derivativeSha256": "833e4e2f840348fabca0719c3e451b45f5d6f7f4cb643cc1d4cb7aa907b86dee"
+    },
+    {
+      "id": "commons:115987634",
+      "title": "File:Senate building.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg",
+      "originalSha1": "f59d53bdfcf40318e43fe314e196f24776c2aa42",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:160132436",
+      "title": "File:The MadHouse.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_MadHouse.jpg",
+      "originalSha1": "13b0ef1a69b2a1ea3a8d6cd7a3e5cab4104840d2",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:158002419",
+      "title": "File:The Ultramodern Chapel of Mary Mother of the Church in Augustine University, ilara-Epe, Lagos State.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Ultramodern_Chapel_of_Mary_Mother_of_the_Church_in_Augustine_University,_ilara-Epe,_Lagos_State.jpg",
+      "originalSha1": "e9d58ae700a0a617ae2fab7641078776972731b0",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:80069195",
+      "title": "File:Unilag High Rise.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Unilag_High_Rise.jpg",
+      "originalSha1": "3834f6595bf690abfc28837ce0a850b3bd6bc09f",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:113525303",
+      "title": "File:Unilag Senate house.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Unilag_Senate_house.jpg",
+      "originalSha1": "b272d2867c5dc7ecda16bdefc7e452586befdcf4",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:82527991",
+      "title": "File:University-of-lagos-faculty-building.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University-of-lagos-faculty-building.jpg",
+      "originalSha1": "9a02484f171351d61121a90ef3e5748a75a962db",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:3944629",
+      "title": "File:University of Lagos2.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Lagos2.jpg",
+      "originalSha1": "70d2cfb9747a51339acb95d33230d4285b8b968e",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:94717066",
+      "title": "File:University of Michigan (IA 2911296.0001.001.umich.edu).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Michigan_(IA_2911296.0001.001.umich.edu).pdf",
+      "originalSha1": "9b77c76998b7801401ff4291bc56063d61d0dee0",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:94719954",
+      "title": "File:University of Michigan (IA 3927871.0001.001.umich.edu).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Michigan_(IA_3927871.0001.001.umich.edu).pdf",
+      "originalSha1": "0011cafe31d3434b99857d2a3230a62e62e85e72",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:94758226",
+      "title": "File:University of Michigan (IA adh2498.0001.001.umich.edu).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Michigan_(IA_adh2498.0001.001.umich.edu).pdf",
+      "originalSha1": "ea3ca4bc5efddb4782595a236399c8c30c1542a9",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:94758320",
+      "title": "File:University of Michigan (IA adh2515.0001.001.umich.edu).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Michigan_(IA_adh2515.0001.001.umich.edu).pdf",
+      "originalSha1": "74d31265457a0c09da55096547bd42bda27e4d58",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:104875807",
+      "title": "File:(Photo-walk Nigeria), UNILAG library ,.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:(Photo-walk_Nigeria),_UNILAG_library_,.jpg",
+      "originalSha1": "39d37463e1ae040c96faf0fb319f5fe8c9b398e0",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:96",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "b7a09dd829af2f04bc1fce1c753c9a34f604f0ccf7d02095599ee0bbadf625a6",
+      "derivativeSha256": "1f5d20f87a47397638af97375e2c1b187b18e9f926f17f6a641a1788052751f4"
+    },
+    {
+      "id": "commons:122061521",
+      "title": "File:Day 2 Training for Librarians 06.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Day_2_Training_for_Librarians_06.jpg",
+      "originalSha1": "defeb67997813d996fa2b679f82669b1cd3d72b1",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:109500851",
+      "title": "File:Leeuwarder courant 31-08-1805 (IA ddd 010578636 mpeg21).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Leeuwarder_courant_31-08-1805_(IA_ddd_010578636_mpeg21).pdf",
+      "originalSha1": "b65a47ed45377a123afab4da6cc2feb9eee4bb5f",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:104610615",
+      "title": "File:Library of the Lagos Business School (LBS)-pan Atlantic University.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Library_of_the_Lagos_Business_School_(LBS)-pan_Atlantic_University.jpg",
+      "originalSha1": "59a0612004ebf634181134d3d4bbc89e5938e935",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:59107716",
+      "title": "File:Main Library, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Main_Library,_University_of_Lagos.jpg",
+      "originalSha1": "951cc06ef065841a41a0dd26d525fbbd97504b38",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:96",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Main_Library%2C_University_of_Lagos.jpg/1280px-Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "f70ee9e6bceab70fdf62303b72ebf16031a65c0d23c3f80c198a35891a7c323e",
+      "derivativeSha256": "5f648e86c999ff56190800f5a90c3faca83c80ba0491d3ba3f34326f51f5c0af"
+    },
+    {
+      "id": "commons:98513654",
+      "title": "File:Mariposa Chronicle 1854-09-15 (IA cmarm 000137).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mariposa_Chronicle_1854-09-15_(IA_cmarm_000137).pdf",
+      "originalSha1": "55045fcf8742e511aeed227f49e65a15aad96d91",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:146361729",
+      "title": "File:NUC 2019 NIGERIAN UNIVERSITY SYSTEM STATISTICAL DIGEST.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:NUC_2019_NIGERIAN_UNIVERSITY_SYSTEM_STATISTICAL_DIGEST.pdf",
+      "originalSha1": "1198fad7004e237c88ac9139e83db9455babed58",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:155840161",
+      "title": "File:Olubukola Olatise 1.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Olubukola_Olatise_1.jpg",
+      "originalSha1": "5523202262691f40d51f34b6252f68ad50c99ad3",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:123220796",
+      "title": "File:Research Fund Request - Overcoming challenges of introducing Wikipedia in Nigeria classroom.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Research_Fund_Request_-_Overcoming_challenges_of_introducing_Wikipedia_in_Nigeria_classroom.pdf",
+      "originalSha1": "f37008359b414269966bc61eedaf0e92ebb55fc8",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113535657",
+      "title": "File:Unilag Library.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Unilag_Library.jpg",
+      "originalSha1": "31ebd08e6b0e409388abb61dc4a1a610b5f26c7c",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:96",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Unilag_Library.jpg/1280px-Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "0df563f79f3d20e0eb72f7535fd1041bd163e64560556dcb8ce6bd05e406654a",
+      "derivativeSha256": "cdbe9287133e8e3f39f3c69d7d57473f16db16f44b1ac458021883224a1ca3ab"
+    },
+    {
+      "id": "commons:156086619",
+      "title": "File:Yetunde Zaid.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Yetunde_Zaid.jpg",
+      "originalSha1": "98f3042b3f99222b88f93fef1306e19c658fa876",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:104875812",
+      "title": "File:(Photo-walk Nigeria), King Jaja hall UNILAG,.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:(Photo-walk_Nigeria),_King_Jaja_hall_UNILAG,.jpg",
+      "originalSha1": "c281c08bbe865f60af825890405be2c277f06ff9",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:270",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "7890f4a4fce2f75b71e652984006e1dedcfff4ff3e500e8b0f308a0224991c90",
+      "derivativeSha256": "b26cf8cb29f4abd29df9e3389f5c99da50b6289f9d492e80a72a04ee73c00dd8"
+    },
+    {
+      "id": "commons:59194709",
+      "title": "File:My Monkey Story in Unilag 1.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:My_Monkey_Story_in_Unilag_1.jpg",
+      "originalSha1": "553cc8dd457110a5f97a5d67fccbd76924d645ed",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:59107096",
+      "title": "File:Sky view of multipurpose hall,UNIVERSITY OF LAGOS.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sky_view_of_multipurpose_hall,UNIVERSITY_OF_LAGOS.jpg",
+      "originalSha1": "e73b3a209ca4d2def022c4779899675923429f27",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:185502608",
+      "title": "File:Unilag students in the hall.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Unilag_students_in_the_hall.jpg",
+      "originalSha1": "21580a30f0667f67cd70ee381ad287f73c2071c3",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:128815390",
+      "title": "File:230201-N-DK722-1004 - NAVEUR-NAVAF Band visits Nigerian National Museum and University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:230201-N-DK722-1004_-_NAVEUR-NAVAF_Band_visits_Nigerian_National_Museum_and_University_of_Lagos.jpg",
+      "originalSha1": "3c98e0e796b3b182ce8a458323ae583527e530cc",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:162421572",
+      "title": "File:Folasade Ogunsola.ogg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Folasade_Ogunsola.ogg",
+      "originalSha1": "8d714d2eaecde1c6eb0ccae13c088457f66fb9f2",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:95198016",
+      "title": "File:A faith that enquires - the Glifford lectures delivered in the University of Glasgow in the years 1920 and 1921 (IA faiththatenquir00jone).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_faith_that_enquires_-_the_Glifford_lectures_delivered_in_the_University_of_Glasgow_in_the_years_1920_and_1921_(IA_faiththatenquir00jone).pdf",
+      "originalSha1": "94766dfe62b4059c06ac0cd52e27b304cd7a0b22",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:92131840",
+      "title": "File:An address, delivered at the laying of the cornerstone of the Catholic university .. (IA addressdelivered00spal).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:An_address,_delivered_at_the_laying_of_the_cornerstone_of_the_Catholic_university_.._(IA_addressdelivered00spal).pdf",
+      "originalSha1": "73827881f9e8018e33771077a7abeaa359e9dfbd",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:94854451",
+      "title": "File:Black Vall's Vale; or, The farewell address of a theatrical shoe black and cobler (!) on his leaving a certain college in a certain English university (IA blackvallsvaleor00londrich).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Black_Vall%27s_Vale;_or,_The_farewell_address_of_a_theatrical_shoe_black_and_cobler_(!)_on_his_leaving_a_certain_college_in_a_certain_English_university_(IA_blackvallsvaleor00londrich).pdf",
+      "originalSha1": "f1a5a4a4ef9fb8c623f5aaea12d1ed38098bfd18",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112838121",
+      "title": "File:Bola Ahmed Tinubu Science Complex, Faculty of Science, Lagos State University.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bola_Ahmed_Tinubu_Science_Complex,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "originalSha1": "eb70745df9fc8aa545c2e0e3d301f1e22a806b9c",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:98134410",
+      "title": "File:Cornell University Library digitization (IA cu31924064955382).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cornell_University_Library_digitization_(IA_cu31924064955382).pdf",
+      "originalSha1": "fae6079803537ae1891fe4c25d7219ca6b7b2a7a",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:98163445",
+      "title": "File:Cornell University Library digitization (IA cu31924077189433).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cornell_University_Library_digitization_(IA_cu31924077189433).pdf",
+      "originalSha1": "49940bdf256eb423d82451682b86dc53d26634d0",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:93073341",
+      "title": "File:Cretins and cretinism (electronic resource) - a prize thesis of the University of Edinburgh (IA b21478132).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cretins_and_cretinism_(electronic_resource)_-_a_prize_thesis_of_the_University_of_Edinburgh_(IA_b21478132).pdf",
+      "originalSha1": "b2bbd5bdee2cb9edf01e8e66575cc08cc9228656",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:97888712",
+      "title": "File:Dictionary and grammar of the Chamorro language of the island of Guam (IA cu31924026914501).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dictionary_and_grammar_of_the_Chamorro_language_of_the_island_of_Guam_(IA_cu31924026914501).pdf",
+      "originalSha1": "f0306bc4797b37909703d50c27155029e4f39d19",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:92221943",
+      "title": "File:English in American universities (IA englishinamerica00payn).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:English_in_American_universities_(IA_englishinamerica00payn).pdf",
+      "originalSha1": "60a0b5a3a75d0c531c6e7d289e0e0ca66b2737e3",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:95149123",
+      "title": "File:English in American universities (IA englishinamerica00paynrich).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:English_in_American_universities_(IA_englishinamerica00paynrich).pdf",
+      "originalSha1": "f4077fc3a9b8d94eb50bd2dcb876feb91257ca0b",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112838122",
+      "title": "File:Enitan Bababunmi Science Laboratory, Faculty of Science, Lagos State University.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Enitan_Bababunmi_Science_Laboratory,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "originalSha1": "5400c16a13999f68befa12a883832a71b377df5d",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112834108",
+      "title": "File:Faculty of Art, University of Lago.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Art,_University_of_Lago.jpg",
+      "originalSha1": "af0a235c9b3586a57e513bb762b645fc082bcb62",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:59107337",
+      "title": "File:Faculty of Art, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Art,_University_of_Lagos.jpg",
+      "originalSha1": "3c8c99d4b09db02ac388ef88b115cf1cad3e163d",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:112834607",
+      "title": "File:Faculty of Education, Lagos State University(LASU).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+      "originalSha1": "ea29c81bb32fa1814f008cd7ac93018ad926fad2",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:115992650",
+      "title": "File:Faculty of Education, Lagos State University (LASU) Ojo.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg",
+      "originalSha1": "8171228504b17562552947fb04c09da569141ed2",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:112833699",
+      "title": "File:Faculty of Education, UNILAG.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_UNILAG.jpg",
+      "originalSha1": "3dddbf9c7d6def51cd570832ed95fd23d40527aa",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:26",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Faculty_of_Education%2C_UNILAG.jpg/1280px-Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "d1a9bfa9bc85a4c886747d190679a0afb263b50f036c9e58803bf6ebc3e54f3a",
+      "derivativeSha256": "e43e2b09d32aeab51c7a036c7f39a504d683e37d19d4e97bce98b00f7c907c2e"
+    },
+    {
+      "id": "commons:112833731",
+      "title": "File:Faculty of Education, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_University_of_Lagos.jpg",
+      "originalSha1": "b7eccbb9ea8ab9f6307769ab60342235d8810036",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:26",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg/1280px-Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "893d3219813e86c65e4e54c52fd1e2766aefcafeb428536c1fd142a2e0681b31",
+      "derivativeSha256": "2bf4ba92ee741791a0b11d195935222d650504fa5c04a12f65a471a1ed505485"
+    },
+    {
+      "id": "commons:113464990",
+      "title": "File:Faculty of Engineering, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Engineering,_University_of_Lagos.jpg",
+      "originalSha1": "2a9447b36855b9a4346761751863f1326420d612",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:99",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg/1280px-Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "e4e82d2875cdcba062d886d21fc90f19e4e04de0f60fb1bb77ba675b6ba8a6d6",
+      "derivativeSha256": "47ee81dea69264241a0c80f7b8be0a6a28d399d210c86638946d5b2c9504349b"
+    },
+    {
+      "id": "commons:112834242",
+      "title": "File:Faculty of Science, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Science,_University_of_Lagos.jpg",
+      "originalSha1": "bc48eedebec436f001474e1e985c87be88986599",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:261",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg/1280px-Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "36918a19f9bf19ada52502301faeb9b31fb6f861131110f2cc4a64da7514bc6f",
+      "derivativeSha256": "92de0376dd0a7a9a06701a2ee8beeb16e84563fcd441aa6a1aaa1b21fe86a27e"
+    },
+    {
+      "id": "commons:112834241",
+      "title": "File:Faculty of Science, University of Lagos 2.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Science,_University_of_Lagos_2.jpg",
+      "originalSha1": "dad914d31186839f324fbdfd9368b3170a61d3a7",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:113535786",
+      "title": "File:Faculty of management sciences, university of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_management_sciences,_university_of_Lagos.jpg",
+      "originalSha1": "7605f691a5030ae14929c40f2b3ec265e36a9962",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:524",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg/1280px-Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "f732a3eb39676d639fbd512c6390b8ca49867d0bd29974665e1d1771b7860cd2",
+      "derivativeSha256": "b4988fc08a5dfd126d08f66324af60d7e051f039dda6518ee3dba1a6876a2762"
+    },
+    {
+      "id": "commons:112835955",
+      "title": "File:Law library, LASU.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+      "originalSha1": "a21e65f6b6aa7c3442d928dc918fc3aa40ba1951",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:36899249",
+      "title": "File:Lenier, Roberto y Carmelo.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lenier,_Roberto_y_Carmelo.jpg",
+      "originalSha1": "2e37981416b098389b37fd00697b5f6d460581ce",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:97789366",
+      "title": "File:Letters of William Wheeler of the class of 1855, Y.C (IA cu31924022210565).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Letters_of_William_Wheeler_of_the_class_of_1855,_Y.C_(IA_cu31924022210565).pdf",
+      "originalSha1": "fd5a15ec0b9ccc2960248d745ea59bf4e9dff4ac",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:146361741",
+      "title": "File:NUC 2021 Directory of Full Professors in the Nigerian University System.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:NUC_2021_Directory_of_Full_Professors_in_the_Nigerian_University_System.pdf",
+      "originalSha1": "3f5e3de1eaf54aacb79ed4bbabbbc34bb35a0613",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:120783011",
+      "title": "File:Patrick Bolton at National Bank of Belgium panel.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Patrick_Bolton_at_National_Bank_of_Belgium_panel.jpg",
+      "originalSha1": "7ea5ec2ac387fcdabcbe7ed27e1424558405bb1c",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:98185470",
+      "title": "File:Principles of Quakerism; a collection of essays (IA cu31924084552532).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Principles_of_Quakerism;_a_collection_of_essays_(IA_cu31924084552532).pdf",
+      "originalSha1": "d763b81b5cbbf6d1473b23887c5188709c7e83d4",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:149775333",
+      "title": "File:Prof Ajiboye in his office in Faculty of Arts, University of Lagos, Akoko.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Prof_Ajiboye_in_his_office_in_Faculty_of_Arts,_University_of_Lagos,_Akoko.jpg",
+      "originalSha1": "34765b7bfe0487dd9f6af6ed58e2062544a514ca",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:82608360",
+      "title": "File:Professor Hakeem Ibikunle Tijani.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Professor_Hakeem_Ibikunle_Tijani.jpg",
+      "originalSha1": "3b3b04c5f8010dbae0cae0b5df72e725abdb2039",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113536199",
+      "title": "File:Quadrangle, Faculty of Arts, Unilag.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Quadrangle,_Faculty_of_Arts,_Unilag.jpg",
+      "originalSha1": "d744428a24e8bf524cb11589022fa94560118ebe",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:146374084",
+      "title": "File:REPORT OF VISITATION TO UNIVERSITY COLLEGE, IBADAN JANUARY, 1957.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:REPORT_OF_VISITATION_TO_UNIVERSITY_COLLEGE,_IBADAN_JANUARY,_1957.pdf",
+      "originalSha1": "5289d2ec60ae6201dacc7ddd6904fb829db3caff",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:61249361",
+      "title": "File:The Corridor, Faculty of Arts, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Corridor,_Faculty_of_Arts,_University_of_Lagos.jpg",
+      "originalSha1": "72284a3d81c78b71954a274960960f1e79a1f2c1",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:61249362",
+      "title": "File:The Corridor 1, Faculty of Arts, University of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Corridor_1,_Faculty_of_Arts,_University_of_Lagos.jpg",
+      "originalSha1": "0555b5a53cbc22beea68c9b60e6079cab1b05de4",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:98351112",
+      "title": "File:The complete concordance to Shakspere (IA cu31924080795119).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_complete_concordance_to_Shakspere_(IA_cu31924080795119).pdf",
+      "originalSha1": "5820152d0e3929e03a698ac1ab27100812178c6b",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:93390216",
+      "title": "File:The mystery of space; a study of the hyperspace movement in the light of the evolution of new psychic faculties and an inquiry into the genesis and essential nature of space (IA mysteryofspacest00brow).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_mystery_of_space;_a_study_of_the_hyperspace_movement_in_the_light_of_the_evolution_of_new_psychic_faculties_and_an_inquiry_into_the_genesis_and_essential_nature_of_space_(IA_mysteryofspacest00brow).pdf",
+      "originalSha1": "70d10e65a5f616f58e6f26da5dfab5918b1c1bcb",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:95840223",
+      "title": "File:The mystery of space; a study of the hyperspace movement in the light of the evolution of new psychic faculties and an inquiry into the genesis and essential nature of space (IA mysteryofspacest00browiala).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_mystery_of_space;_a_study_of_the_hyperspace_movement_in_the_light_of_the_evolution_of_new_psychic_faculties_and_an_inquiry_into_the_genesis_and_essential_nature_of_space_(IA_mysteryofspacest00browiala).pdf",
+      "originalSha1": "74ed68987f22febff12163e4cdad5eff802f9e5e",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:94716378",
+      "title": "File:The prevention of spinal deformities, especially of lateral curvatures, with notes on the causes, the artificial production &amp, the injurious modes of treatment of these complaints (IA 2188674.0001.001.umich.edu).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_prevention_of_spinal_deformities,_especially_of_lateral_curvatures,_with_notes_on_the_causes,_the_artificial_production_%26amp,_the_injurious_modes_of_treatment_of_these_complaints_(IA_2188674.0001.001.umich.edu).pdf",
+      "originalSha1": "215b77ef3828afc34eeb2ec2f1c68411d8a3b204",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:95948359",
+      "title": "File:The tragedy of Othello, the Moor of Venice. (IA tragedyofothello02shak).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_tragedy_of_Othello,_the_Moor_of_Venice._(IA_tragedyofothello02shak).pdf",
+      "originalSha1": "bba0f700ffcbb313c41f3b659319bd58ee69d117",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:183667636",
+      "title": "File:UCI-Yearbooks 1966.pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:UCI-Yearbooks_1966.pdf",
+      "originalSha1": "98984a9f591197a337c0666d99ee6eeba11a8768",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:63271135",
+      "title": "File:University Of Lagos.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_Of_Lagos.jpg",
+      "originalSha1": "3b44048b11509f46c613c7e26e3cc8512a422894",
+      "status": "not-selected",
+      "reason": "No confident individual footprint match, interior/event view, or a redundant angle; retain as research only."
+    },
+    {
+      "id": "commons:95593165",
+      "title": "File:University of North Carolina at Chapel Hill (IA musicformillionc00rede 0).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_North_Carolina_at_Chapel_Hill_(IA_musicformillionc00rede_0).pdf",
+      "originalSha1": "960dfde8c2fc176f90d28349458c08af8709bbd5",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:145611524",
+      "title": "File:VIEWS OF THE GOVERNMENT ON THE VISITATION PANEL REPORT INTO THE AFFAIRS OF THE FEDERAL UNIVERSITY, WUKARI, TARABA STATE (2011-2015).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:VIEWS_OF_THE_GOVERNMENT_ON_THE_VISITATION_PANEL_REPORT_INTO_THE_AFFAIRS_OF_THE_FEDERAL_UNIVERSITY,_WUKARI,_TARABA_STATE_(2011-2015).pdf",
+      "originalSha1": "196f05ca62e4d9c6928924f077e4e637c06f6ddb",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:145611527",
+      "title": "File:VISITATION PANEL'S REPORT INTO THE AFFAIRS OF THE FEDERAL UNIVERSITY OF UYO (2016-2020).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:VISITATION_PANEL%27S_REPORT_INTO_THE_AFFAIRS_OF_THE_FEDERAL_UNIVERSITY_OF_UYO_(2016-2020).pdf",
+      "originalSha1": "3f16ac750208d5c2649b002d75a238b876670401",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:145611526",
+      "title": "File:VISITATION PANEL'S REPORT INTO THE AFFAIRS OF THE UNIVERSITY CALABAR (2011-2015).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:VISITATION_PANEL%27S_REPORT_INTO_THE_AFFAIRS_OF_THE_UNIVERSITY_CALABAR_(2011-2015).pdf",
+      "originalSha1": "5ab0ee38ea6907e78c3ee6ba22e1ae9403998e9d",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:145611528",
+      "title": "File:VISITATION PANELS REPORT INTO THE AFFAIRS OF THE UNIVERSITY OF JOS (2016-2020).pdf",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:VISITATION_PANELS_REPORT_INTO_THE_AFFAIRS_OF_THE_UNIVERSITY_OF_JOS_(2016-2020).pdf",
+      "originalSha1": "eacb96938c14f941651bfcb748f14693f685da08",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:146365914",
+      "title": "File:Yoruba wikimedians user group training of lecturers and students at Lasu 2.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Yoruba_wikimedians_user_group_training_of_lecturers_and_students_at_Lasu_2.jpg",
+      "originalSha1": "611bc0758714495a7424a7c58d54e50603f42bfa",
+      "status": "not-selected",
+      "reason": "Different institution, portrait, event or unrelated search result."
+    },
+    {
+      "id": "commons:113525160",
+      "title": "File:Afe Babalola Auditorium, Unilag.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Afe_Babalola_Auditorium,_Unilag.jpg",
+      "originalSha1": "9d75ebea025454f34c1874ad2ad6b7c9671b4a91",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:292",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg/1280px-Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "1b76d2246e6eea125bd5da997d18f1a3c5965030d2aa94c35edab21734ecd1fa",
+      "derivativeSha256": "493d1ad20c87700fa9c2a141bbf11ccfbe6b4847bb4609fd3a6fd6cfae410e73"
+    },
+    {
+      "id": "commons:199169521",
+      "title": "File:Unilag-Lagos-Afe-Babalola-auditorium-IMG 7169.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg",
+      "originalSha1": "5c5aad63d2589cb2ccbe931494ac79e7257a7deb",
+      "status": "included",
+      "buildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:292",
+      "reason": "Exterior and identity visually reviewed; dated view, current appearance may differ.",
+      "inputUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg/1280px-Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "inputSha256": "a262d2a646a953796bb8b42f2e38678482e489ed10d100bedbc2520c9779ca42",
+      "derivativeSha256": "3028d4e366850e81b715fd6d31de35f2cc1fa180771b41c8d1f995f01046384a"
+    }
+  ]
+}

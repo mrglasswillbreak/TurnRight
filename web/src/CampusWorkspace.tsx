@@ -960,7 +960,7 @@ export default function CampusWorkspace({
                     {sources
                       .find((s) => s.id === job.source_id)
                       ?.configuration.layers.map((m) => (
-                        <option key={m.layer} value={m.identity || m.layer} />
+                        <option key={m.layer} value={m.identity || m.layer}>{m.identity || m.layer}</option>
                       ))}
                   </datalist>
                   <div className="campus-fields">

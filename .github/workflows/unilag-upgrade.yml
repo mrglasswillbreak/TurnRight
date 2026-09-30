@@ -1,6 +1,14 @@
 name: UNILAG detail release preparation
 on:
   workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [audit, prepare, apply]
+        default: prepare
+      expected_snapshot:
+        type: string
+        required: false
   push:
     branches: [codex/unilag-vector-detail]
     paths: [.github/workflows/unilag-upgrade.yml]
@@ -27,10 +35,17 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
-      - run: mkdir -p work && npx tsx ../scripts/audit-unilag.mts
+      - if: github.event_name == 'push' || inputs.operation == 'audit'
+        run: mkdir -p work && npx tsx ../scripts/audit-unilag.mts
         working-directory: web
+      - if: github.event_name == 'workflow_dispatch' && inputs.operation != 'audit'
+        run: mkdir -p work && npx tsx ../scripts/prepare-unilag-upgrade.mts
+        working-directory: web
+        env:
+          APPLY_UNILAG: ${{ inputs.operation == 'apply' && 'true' || 'false' }}
+          EXPECTED_UNILAG_SNAPSHOT: ${{ inputs.expected_snapshot }}
       - uses: actions/upload-artifact@v4
         with:
           name: unilag-baseline-receipt
-          path: web/work/unilag-baseline-receipt.json
+          path: web/work/unilag-*.json
           retention-days: 7

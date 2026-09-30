@@ -6677,6 +6677,3712 @@
           }
         }
       ]
+    },
+    {
+      "pageid": 113535613,
+      "ns": 6,
+      "title": "File:Akintunde Ojo memorial hall, Unilag.jpg",
+      "index": 4,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 2568019,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg/1280px-Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg/3840px-Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg/1280px-Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg/3840px-Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Akintunde_Ojo_memorial_hall%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Akintunde_Ojo_memorial_hall,_Unilag.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113535613",
+          "sha1": "1ea4c73d70ed751a0d21cebceceecca0bad407c1",
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-21 10:44:03",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Akintunde Ojo memorial hall, Unilag",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Universities in Nigeria|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Akintunde Ojo memorial hall, Natural history museum building, university of Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-21",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Abiolakintrunde\" title=\"User:Abiolakintrunde\">Abiolakintrunde</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 80012137,
+      "ns": 6,
+      "title": "File:Architectural view of the senate building University of lagos, Nigeria.jpg",
+      "index": 5,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 4868490,
+          "width": 5184,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg/1280px-Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1024,
+          "thumbheight": 683,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg/3840px-Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg/1280px-Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1024,
+            "height": 683,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg/3840px-Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Architectural_view_of_the_senate_building_University_of_lagos%2C_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Architectural_view_of_the_senate_building_University_of_lagos,_Nigeria.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=80012137",
+          "sha1": "6d59336c024fa35748342a55da7ee43117d67718",
+          "metadata": [
+            {
+              "name": "ImageWidth",
+              "value": 5184
+            },
+            {
+              "name": "ImageLength",
+              "value": 3456
+            },
+            {
+              "name": "BitsPerSample",
+              "value": "\n*8\n*8\n*8"
+            },
+            {
+              "name": "PhotometricInterpretation",
+              "value": 2
+            },
+            {
+              "name": "Make",
+              "value": "Canon"
+            },
+            {
+              "name": "Model",
+              "value": "Canon EOS 7D"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "SamplesPerPixel",
+              "value": 3
+            },
+            {
+              "name": "XResolution",
+              "value": "3000000/10000"
+            },
+            {
+              "name": "YResolution",
+              "value": "3000000/10000"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "Adobe Photoshop CC 2015 (Windows)"
+            },
+            {
+              "name": "DateTime",
+              "value": "2019:06:28 17:18:57"
+            },
+            {
+              "name": "Artist",
+              "value": "JohnBrainy Visuals"
+            },
+            {
+              "name": "Copyright",
+              "value": "JohnBrainy Visuals\n\n"
+            },
+            {
+              "name": "ExposureTime",
+              "value": "1/100"
+            },
+            {
+              "name": "FNumber",
+              "value": "14/1"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 1
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 100
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2018:06:02 14:50:15"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2018:06:02 14:50:15"
+            },
+            {
+              "name": "ShutterSpeedValue",
+              "value": "6643856/1000000"
+            },
+            {
+              "name": "ApertureValue",
+              "value": "761471/100000"
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/1"
+            },
+            {
+              "name": "MaxApertureValue",
+              "value": "3/1"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 16
+            },
+            {
+              "name": "FocalLength",
+              "value": "40/1"
+            },
+            {
+              "name": "SubSecTimeOriginal",
+              "value": "14"
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "14"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "FocalPlaneXResolution",
+              "value": "5184000/907"
+            },
+            {
+              "name": "FocalPlaneYResolution",
+              "value": "3456000/595"
+            },
+            {
+              "name": "FocalPlaneResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "CustomRendered",
+              "value": 0
+            },
+            {
+              "name": "ExposureMode",
+              "value": 1
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            },
+            {
+              "name": "SerialNumber",
+              "value": "2381208233"
+            },
+            {
+              "name": "Lens",
+              "value": "EF40mm f/2.8 STM"
+            },
+            {
+              "name": "DateTimeMetadata",
+              "value": "2019:06:28 10:18:57"
+            },
+            {
+              "name": "OriginalDocumentID",
+              "value": "781A78C5CEFF46AC6C32B2A25475BADC"
+            },
+            {
+              "name": "Copyrighted",
+              "value": "True"
+            },
+            {
+              "name": "Keywords",
+              "value": "\n*Artistic\n*Broken Thought\n*Concept Thought\n*Conceptualize\n*Creative art\n*Exhibition\n*Johnbrainy Visuals\n*Minimalist\n*Ogedengbe Tobi John\n*Streetography\n*Visual Art\n*Words unspoken\n*light\n*stunt\n*unspoken words"
+            },
+            {
+              "name": "iimVersion",
+              "value": 4
+            },
+            {
+              "name": "MEDIAWIKI_EXIF_VERSION",
+              "value": 1
+            }
+          ],
+          "commonmetadata": [
+            {
+              "name": "ImageWidth",
+              "value": 5184
+            },
+            {
+              "name": "ImageLength",
+              "value": 3456
+            },
+            {
+              "name": "BitsPerSample",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 8
+                },
+                {
+                  "name": 1,
+                  "value": 8
+                },
+                {
+                  "name": 2,
+                  "value": 8
+                }
+              ]
+            },
+            {
+              "name": "PhotometricInterpretation",
+              "value": 2
+            },
+            {
+              "name": "Make",
+              "value": "Canon"
+            },
+            {
+              "name": "Model",
+              "value": "Canon EOS 7D"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "SamplesPerPixel",
+              "value": 3
+            },
+            {
+              "name": "XResolution",
+              "value": "3000000/10000"
+            },
+            {
+              "name": "YResolution",
+              "value": "3000000/10000"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "Adobe Photoshop CC 2015 (Windows)"
+            },
+            {
+              "name": "DateTime",
+              "value": "2019:06:28 17:18:57"
+            },
+            {
+              "name": "Artist",
+              "value": "JohnBrainy Visuals"
+            },
+            {
+              "name": "Copyright",
+              "value": [
+                {
+                  "name": "x-default",
+                  "value": "JohnBrainy Visuals"
+                },
+                {
+                  "name": "_type",
+                  "value": "lang"
+                }
+              ]
+            },
+            {
+              "name": "ExposureTime",
+              "value": "1/100"
+            },
+            {
+              "name": "FNumber",
+              "value": "14/1"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 1
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 100
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2018:06:02 14:50:15"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2018:06:02 14:50:15"
+            },
+            {
+              "name": "ShutterSpeedValue",
+              "value": "6643856/1000000"
+            },
+            {
+              "name": "ApertureValue",
+              "value": "761471/100000"
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/1"
+            },
+            {
+              "name": "MaxApertureValue",
+              "value": "3/1"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 16
+            },
+            {
+              "name": "FocalLength",
+              "value": "40/1"
+            },
+            {
+              "name": "SubSecTimeOriginal",
+              "value": "14"
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "14"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "FocalPlaneXResolution",
+              "value": "5184000/907"
+            },
+            {
+              "name": "FocalPlaneYResolution",
+              "value": "3456000/595"
+            },
+            {
+              "name": "FocalPlaneResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "CustomRendered",
+              "value": 0
+            },
+            {
+              "name": "ExposureMode",
+              "value": 1
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            },
+            {
+              "name": "SerialNumber",
+              "value": "2381208233"
+            },
+            {
+              "name": "Lens",
+              "value": "EF40mm f/2.8 STM"
+            },
+            {
+              "name": "DateTimeMetadata",
+              "value": "2019:06:28 10:18:57"
+            },
+            {
+              "name": "OriginalDocumentID",
+              "value": "781A78C5CEFF46AC6C32B2A25475BADC"
+            },
+            {
+              "name": "Copyrighted",
+              "value": "True"
+            },
+            {
+              "name": "Keywords",
+              "value": [
+                {
+                  "name": 0,
+                  "value": "Artistic"
+                },
+                {
+                  "name": 1,
+                  "value": "Broken Thought"
+                },
+                {
+                  "name": 2,
+                  "value": "Concept Thought"
+                },
+                {
+                  "name": 3,
+                  "value": "Conceptualize"
+                },
+                {
+                  "name": 4,
+                  "value": "Creative art"
+                },
+                {
+                  "name": 5,
+                  "value": "Exhibition"
+                },
+                {
+                  "name": 6,
+                  "value": "Johnbrainy Visuals"
+                },
+                {
+                  "name": 7,
+                  "value": "Minimalist"
+                },
+                {
+                  "name": 8,
+                  "value": "Ogedengbe Tobi John"
+                },
+                {
+                  "name": 9,
+                  "value": "Streetography"
+                },
+                {
+                  "name": 10,
+                  "value": "Visual Art"
+                },
+                {
+                  "name": 11,
+                  "value": "Words unspoken"
+                },
+                {
+                  "name": 12,
+                  "value": "light"
+                },
+                {
+                  "name": 13,
+                  "value": "stunt"
+                },
+                {
+                  "name": 14,
+                  "value": "unspoken words"
+                },
+                {
+                  "name": "_type",
+                  "value": "ul"
+                }
+              ]
+            },
+            {
+              "name": "iimVersion",
+              "value": 4
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2019-06-28 16:29:39",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Architectural view of the senate building University of lagos, Nigeria",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work|Nigeria photographs taken on 2018-06-02|Images from Wiki Loves Earth 2019 in Nigeria|Images from Wiki Loves Earth 2019|Uploaded via Campaign:wle-ng|Images from Wiki Loves Earth missing SDC location of creation",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Architectural view of the Senate building University of lagos, Nigeria",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2018-06-02 14:50:15",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Johnbrainyvisuals\" title=\"User:Johnbrainyvisuals\">Johnbrainyvisuals</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 113525024,
+      "ns": 6,
+      "title": "File:CITS, University of Lagos.jpg",
+      "index": 14,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 2778009,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/CITS%2C_University_of_Lagos.jpg/1280px-CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1024,
+          "thumbheight": 768,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/CITS%2C_University_of_Lagos.jpg/3840px-CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/CITS%2C_University_of_Lagos.jpg/1280px-CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1024,
+            "height": 768,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/CITS%2C_University_of_Lagos.jpg/3840px-CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/CITS%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:CITS,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113525024",
+          "sha1": "85e0ed3ca334000bd8bd9543aef867d3d9bb97c5",
+          "metadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": "\n#1\n#2\n#3\n#0"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            },
+            {
+              "name": "MEDIAWIKI_EXIF_VERSION",
+              "value": 1
+            }
+          ],
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-20 22:54:46",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "CITS, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "CITS building, university of Lagos, Lagos state.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-20",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Abiolakintrunde\" title=\"User:Abiolakintrunde\">Abiolakintrunde</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 59106656,
+      "ns": 6,
+      "title": "File:Faculty of Arts building, University of Lagos.jpg",
+      "index": 19,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 988477,
+          "width": 2048,
+          "height": 1232,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg/1280px-Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 602,
+          "responsiveUrls": {
+            "2": "https://upload.wikimedia.org/wikipedia/commons/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg/1280px-Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 602,
+            "srcset": "https://upload.wikimedia.org/wikipedia/commons/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Faculty_of_Arts_building%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Arts_building,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=59106656",
+          "sha1": "9e2f682de61199a902b3069d599d7966195a8ec7",
+          "commonmetadata": [
+            {
+              "name": "Height",
+              "value": 1232
+            },
+            {
+              "name": "Width",
+              "value": 2048
+            },
+            {
+              "name": "ImageWidth",
+              "value": 2048
+            },
+            {
+              "name": "ImageLength",
+              "value": 1232
+            },
+            {
+              "name": "Make",
+              "value": "SAMSUNG"
+            },
+            {
+              "name": "Model",
+              "value": "GT-P1000"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "Software",
+              "value": "P1000JVJM5"
+            },
+            {
+              "name": "DateTime",
+              "value": "2017:05:20 13:32:46"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExposureTime",
+              "value": "1/104"
+            },
+            {
+              "name": "FNumber",
+              "value": "26/10"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 3
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 50
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0220"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2017:05:20 13:32:46"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2017:05:20 13:32:46"
+            },
+            {
+              "name": "ShutterSpeedValue",
+              "value": "70/10"
+            },
+            {
+              "name": "ApertureValue",
+              "value": "30/10"
+            },
+            {
+              "name": "BrightnessValue",
+              "value": "60/10"
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/10"
+            },
+            {
+              "name": "MaxApertureValue",
+              "value": "30/10"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 0
+            },
+            {
+              "name": "FocalLength",
+              "value": "278/100"
+            },
+            {
+              "name": "UserComment",
+              "value": "User comments"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ExposureMode",
+              "value": 0
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2017-05-20 13:09:55",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of Arts building, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Self-published work|Images from She Can With ICT",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Faculty of Arts building, University of Lagos",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2017-05-20 13:32:46",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Cupid04&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Cupid04 (page does not exist)\">Cupid04</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 59107718,
+      "ns": 6,
+      "title": "File:Senate House, University of Lagos.jpg",
+      "index": 35,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 1180053,
+          "width": 2560,
+          "height": 1920,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Senate_House%2C_University_of_Lagos.jpg/1280px-Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1024,
+          "thumbheight": 768,
+          "responsiveUrls": {
+            "2": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Senate_House%2C_University_of_Lagos.jpg/1280px-Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1024,
+            "height": 768,
+            "srcset": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Senate_House%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Senate_House,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=59107718",
+          "sha1": "6da363a9799d4182fc56adafc505043ed3394ecd",
+          "metadata": [
+            {
+              "name": "Height",
+              "value": 1920
+            },
+            {
+              "name": "Width",
+              "value": 2560
+            },
+            {
+              "name": "Make",
+              "value": "BlackBerry"
+            },
+            {
+              "name": "Model",
+              "value": "BlackBerry Q5"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "BlackBerry 10.2.1.1925"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExposureTime",
+              "value": "6115/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "2400/1000"
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 43
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2017:05:20 12:58:35"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2017:05:20 12:58:35"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": "\n#1\n#2\n#3\n#0"
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/6"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 24
+            },
+            {
+              "name": "FocalLength",
+              "value": "3000/1000"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "1000/1000"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 30
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            },
+            {
+              "name": "MEDIAWIKI_EXIF_VERSION",
+              "value": 1
+            }
+          ],
+          "commonmetadata": [
+            {
+              "name": "Height",
+              "value": 1920
+            },
+            {
+              "name": "Width",
+              "value": 2560
+            },
+            {
+              "name": "Make",
+              "value": "BlackBerry"
+            },
+            {
+              "name": "Model",
+              "value": "BlackBerry Q5"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "BlackBerry 10.2.1.1925"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExposureTime",
+              "value": "6115/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "2400/1000"
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 43
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2017:05:20 12:58:35"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2017:05:20 12:58:35"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/6"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 24
+            },
+            {
+              "name": "FocalLength",
+              "value": "3000/1000"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "1000/1000"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 30
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2017-05-20 13:57:44",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Senate House, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Self-published work|Images from She Can With ICT",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "The Senate building University of Lagos",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2017-05-20 12:58:35",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Onikepe32&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Onikepe32 (page does not exist)\">Onikepe32</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 104875807,
+      "ns": 6,
+      "title": "File:(Photo-walk Nigeria), UNILAG library ,.jpg",
+      "index": 1,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 930641,
+          "width": 5184,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 667,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg/3840px-%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 667,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg/3840px-%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/%28Photo-walk_Nigeria%29%2C_UNILAG_library_%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:(Photo-walk_Nigeria),_UNILAG_library_,.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=104875807",
+          "sha1": "39d37463e1ae040c96faf0fb319f5fe8c9b398e0",
+          "commonmetadata": [
+            {
+              "name": "Compression",
+              "value": 6
+            },
+            {
+              "name": "ImageWidth",
+              "value": 5184
+            },
+            {
+              "name": "Model",
+              "value": "Canon EOS REBEL T5"
+            },
+            {
+              "name": "ImageLength",
+              "value": 3456
+            },
+            {
+              "name": "Make",
+              "value": "Canon"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 2
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 200
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 1
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 63
+                },
+                {
+                  "name": 1,
+                  "value": 63
+                },
+                {
+                  "name": 2,
+                  "value": 63
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "21"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2021:03:14 12:22:12"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-05-03 18:12:13",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "(Photo-walk Nigeria), UNILAG library ,",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Self-published work|April 2021 Nigeria photographs",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "(Photo-walk Nigeria), UNILAG library , yaba Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-04-25 12:21:04",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Yemi_festus\" title=\"User:Yemi festus\">Yemi festus</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 59107716,
+      "ns": 6,
+      "title": "File:Main Library, University of Lagos.jpg",
+      "index": 3,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 1506278,
+          "width": 2560,
+          "height": 1920,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Main_Library%2C_University_of_Lagos.jpg/1280px-Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Main_Library%2C_University_of_Lagos.jpg/1280px-Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Main_Library%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Main_Library,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=59107716",
+          "sha1": "951cc06ef065841a41a0dd26d525fbbd97504b38",
+          "commonmetadata": [
+            {
+              "name": "Height",
+              "value": 1920
+            },
+            {
+              "name": "Width",
+              "value": 2560
+            },
+            {
+              "name": "Make",
+              "value": "BlackBerry"
+            },
+            {
+              "name": "Model",
+              "value": "BlackBerry Q5"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "BlackBerry 10.2.1.1925"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExposureTime",
+              "value": "19988/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "2400/1000"
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 48
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2017:05:20 12:50:34"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2017:05:20 12:50:34"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/6"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "Flash",
+              "value": 24
+            },
+            {
+              "name": "FocalLength",
+              "value": "3000/1000"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "1000/1000"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 30
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2017-05-20 13:57:43",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Main Library, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Self-published work|Images from She Can With ICT",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "University of Lagos Main Library",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2017-05-20 12:50:34",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Onikepe32&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Onikepe32 (page does not exist)\">Onikepe32</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 113535657,
+      "ns": 6,
+      "title": "File:Unilag Library.jpg",
+      "index": 2,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 5108796,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Unilag_Library.jpg/1280px-Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Unilag_Library.jpg/3840px-Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Unilag_Library.jpg/1280px-Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Unilag_Library.jpg/3840px-Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Unilag_Library.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Unilag_Library.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113535657",
+          "sha1": "31ebd08e6b0e409388abb61dc4a1a610b5f26c7c",
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-21 10:47:19",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Unilag Library",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Libraries in Nigeria|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Library of the university of Lagos",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-21",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Abiolakintrunde\" title=\"User:Abiolakintrunde\">Abiolakintrunde</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 104875812,
+      "ns": 6,
+      "title": "File:(Photo-walk Nigeria), King Jaja hall UNILAG,.jpg",
+      "index": 2,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 1057315,
+          "width": 5184,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 667,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg/3840px-%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg/1280px-%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 667,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg/3840px-%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/%28Photo-walk_Nigeria%29%2C_King_Jaja_hall_UNILAG%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:(Photo-walk_Nigeria),_King_Jaja_hall_UNILAG,.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=104875812",
+          "sha1": "c281c08bbe865f60af825890405be2c277f06ff9",
+          "commonmetadata": [
+            {
+              "name": "Compression",
+              "value": 6
+            },
+            {
+              "name": "ImageWidth",
+              "value": 5184
+            },
+            {
+              "name": "Model",
+              "value": "Canon EOS REBEL T5"
+            },
+            {
+              "name": "ImageLength",
+              "value": 3456
+            },
+            {
+              "name": "Make",
+              "value": "Canon"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 2
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0230"
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 200
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 1
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 63
+                },
+                {
+                  "name": 1,
+                  "value": 63
+                },
+                {
+                  "name": 2,
+                  "value": 63
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "00"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2021:03:14 12:46:35"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-05-03 18:12:16",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "(Photo-walk Nigeria), King Jaja hall UNILAG,",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Jaja of Opobo|Self-published work|April 2021 Nigeria photographs",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "(Photo-walk Nigeria), King Jaja hall UNILAG, yaba Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-04-25 12:21:04",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Yemi_festus\" title=\"User:Yemi festus\">Yemi festus</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 112833699,
+      "ns": 6,
+      "title": "File:Faculty of Education, UNILAG.jpg",
+      "index": 20,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 3886648,
+          "width": 4608,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Faculty_of_Education%2C_UNILAG.jpg/1280px-Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Faculty_of_Education%2C_UNILAG.jpg/3840px-Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Faculty_of_Education%2C_UNILAG.jpg/1280px-Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Faculty_of_Education%2C_UNILAG.jpg/3840px-Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Faculty_of_Education%2C_UNILAG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_UNILAG.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=112833699",
+          "sha1": "3dddbf9c7d6def51cd570832ed95fd23d40527aa",
+          "commonmetadata": [
+            {
+              "name": "Make",
+              "value": "TECNO MOBILE LIMITED"
+            },
+            {
+              "name": "Model",
+              "value": "TECNO KD7"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "MediaTek Camera Application"
+            },
+            {
+              "name": "DateTime",
+              "value": "2021:11:11 11:56:14"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 2
+            },
+            {
+              "name": "ExposureTime",
+              "value": "782/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "1850/1000"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 0
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 119
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0220"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2021:11:11 11:56:14"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2021:11:11 11:56:14"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/10"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "LightSource",
+              "value": 255
+            },
+            {
+              "name": "Flash",
+              "value": 0
+            },
+            {
+              "name": "FocalLength",
+              "value": "3630/1000"
+            },
+            {
+              "name": "SubSecTime",
+              "value": "25"
+            },
+            {
+              "name": "SubSecTimeOriginal",
+              "value": "25"
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "25"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ExposureMode",
+              "value": 0
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "255/100"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 0
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-11-26 08:46:26",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of Education, UNILAG",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Faculty of Education, Department of Educational Foundation, University of Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-11-26",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Official_alade\" title=\"User:Official alade\">Official alade</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 112833731,
+      "ns": 6,
+      "title": "File:Faculty of Education, University of Lagos.jpg",
+      "index": 8,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 5268212,
+          "width": 4608,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg/1280px-Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg/3840px-Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg/1280px-Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg/3840px-Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Faculty_of_Education%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=112833731",
+          "sha1": "b7eccbb9ea8ab9f6307769ab60342235d8810036",
+          "commonmetadata": [
+            {
+              "name": "Make",
+              "value": "TECNO MOBILE LIMITED"
+            },
+            {
+              "name": "Model",
+              "value": "TECNO KD7"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "MediaTek Camera Application"
+            },
+            {
+              "name": "DateTime",
+              "value": "2021:11:11 11:56:54"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 2
+            },
+            {
+              "name": "ExposureTime",
+              "value": "1191/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "1850/1000"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 0
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 118
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0220"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2021:11:11 11:56:54"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2021:11:11 11:56:54"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/10"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "LightSource",
+              "value": 255
+            },
+            {
+              "name": "Flash",
+              "value": 0
+            },
+            {
+              "name": "FocalLength",
+              "value": "3630/1000"
+            },
+            {
+              "name": "SubSecTime",
+              "value": "80"
+            },
+            {
+              "name": "SubSecTimeOriginal",
+              "value": "80"
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "80"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ExposureMode",
+              "value": 0
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "135/100"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 0
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-11-26 08:48:38",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of Education, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Department of Educational Administration, Faculty of Education, University of Lagos",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-11-26",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Official_alade\" title=\"User:Official alade\">Official alade</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 113464990,
+      "ns": 6,
+      "title": "File:Faculty of Engineering, University of Lagos.jpg",
+      "index": 7,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 6100593,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg/1280px-Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg/3840px-Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg/1280px-Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg/3840px-Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Faculty_of_Engineering%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Engineering,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113464990",
+          "sha1": "2a9447b36855b9a4346761751863f1326420d612",
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-18 17:37:05",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of Engineering, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Faculty of Engineering, University of Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-18",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Official_alade\" title=\"User:Official alade\">Official alade</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 112834242,
+      "ns": 6,
+      "title": "File:Faculty of Science, University of Lagos.jpg",
+      "index": 12,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 4359386,
+          "width": 4608,
+          "height": 3456,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg/1280px-Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg/3840px-Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg/1280px-Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg/3840px-Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Faculty_of_Science%2C_University_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Science,_University_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=112834242",
+          "sha1": "bc48eedebec436f001474e1e985c87be88986599",
+          "commonmetadata": [
+            {
+              "name": "Make",
+              "value": "TECNO MOBILE LIMITED"
+            },
+            {
+              "name": "Model",
+              "value": "TECNO KD7"
+            },
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "Software",
+              "value": "MediaTek Camera Application"
+            },
+            {
+              "name": "DateTime",
+              "value": "2021:11:11 13:54:05"
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 2
+            },
+            {
+              "name": "ExposureTime",
+              "value": "1691/1000000"
+            },
+            {
+              "name": "FNumber",
+              "value": "1850/1000"
+            },
+            {
+              "name": "ExposureProgram",
+              "value": 0
+            },
+            {
+              "name": "ISOSpeedRatings",
+              "value": 118
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0220"
+            },
+            {
+              "name": "DateTimeOriginal",
+              "value": "2021:11:11 13:54:05"
+            },
+            {
+              "name": "DateTimeDigitized",
+              "value": "2021:11:11 13:54:05"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "ExposureBiasValue",
+              "value": "0/10"
+            },
+            {
+              "name": "MeteringMode",
+              "value": 2
+            },
+            {
+              "name": "LightSource",
+              "value": 255
+            },
+            {
+              "name": "Flash",
+              "value": 0
+            },
+            {
+              "name": "FocalLength",
+              "value": "3630/1000"
+            },
+            {
+              "name": "SubSecTime",
+              "value": "71"
+            },
+            {
+              "name": "SubSecTimeOriginal",
+              "value": "71"
+            },
+            {
+              "name": "SubSecTimeDigitized",
+              "value": "71"
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "ExposureMode",
+              "value": 0
+            },
+            {
+              "name": "WhiteBalance",
+              "value": 0
+            },
+            {
+              "name": "DigitalZoomRatio",
+              "value": "135/100"
+            },
+            {
+              "name": "FocalLengthIn35mmFilm",
+              "value": 0
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-11-26 09:19:26",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of Science, University of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work|Nigeria photographs taken on 2021-11-11",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Faculty of Science, University of Lagos.\nHouses all departments of Pure science at the University.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-11-11 13:54:05",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Official_alade\" title=\"User:Official alade\">Official alade</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 113535786,
+      "ns": 6,
+      "title": "File:Faculty of management sciences, university of Lagos.jpg",
+      "index": 9,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 2894202,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg/1280px-Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg/3840px-Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg/1280px-Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg/3840px-Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Faculty_of_management_sciences%2C_university_of_Lagos.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Faculty_of_management_sciences,_university_of_Lagos.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113535786",
+          "sha1": "7605f691a5030ae14929c40f2b3ec265e36a9962",
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-21 10:55:10",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Faculty of management sciences, university of Lagos",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Faculty of management sciences, university of Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-21",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Abiolakintrunde\" title=\"User:Abiolakintrunde\">Abiolakintrunde</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 113525160,
+      "ns": 6,
+      "title": "File:Afe Babalola Auditorium, Unilag.jpg",
+      "index": 2,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 4079108,
+          "width": 4032,
+          "height": 3024,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg/1280px-Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg/3840px-Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg/1280px-Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg/3840px-Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Afe_Babalola_Auditorium%2C_Unilag.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Afe_Babalola_Auditorium,_Unilag.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=113525160",
+          "sha1": "9d75ebea025454f34c1874ad2ad6b7c9671b4a91",
+          "commonmetadata": [
+            {
+              "name": "Orientation",
+              "value": 1
+            },
+            {
+              "name": "XResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "YResolution",
+              "value": "72/1"
+            },
+            {
+              "name": "ResolutionUnit",
+              "value": 2
+            },
+            {
+              "name": "YCbCrPositioning",
+              "value": 1
+            },
+            {
+              "name": "ExifVersion",
+              "value": "0221"
+            },
+            {
+              "name": "ComponentsConfiguration",
+              "value": [
+                {
+                  "name": 0,
+                  "value": 1
+                },
+                {
+                  "name": 1,
+                  "value": 2
+                },
+                {
+                  "name": 2,
+                  "value": 3
+                },
+                {
+                  "name": 3,
+                  "value": 0
+                },
+                {
+                  "name": "_type",
+                  "value": "ol"
+                }
+              ]
+            },
+            {
+              "name": "FlashPixVersion",
+              "value": "0100"
+            },
+            {
+              "name": "ColorSpace",
+              "value": 1
+            },
+            {
+              "name": "SceneCaptureType",
+              "value": 0
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2021-12-20 22:59:04",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Afe Babalola Auditorium, Unilag",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "University of Lagos|Self-published work",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Afe Babalola Auditorium, university of Lagos.",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2021-12-20",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:Abiolakintrunde\" title=\"User:Abiolakintrunde\">Abiolakintrunde</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "pageid": 199169521,
+      "ns": 6,
+      "title": "File:Unilag-Lagos-Afe-Babalola-auditorium-IMG 7169.jpg",
+      "index": 1,
+      "imagerepository": "local",
+      "imageinfo": [
+        {
+          "size": 2649751,
+          "width": 2000,
+          "height": 1500,
+          "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg/1280px-Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "thumbwidth": 1000,
+          "thumbheight": 750,
+          "responsiveUrls": {
+            "2": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+          },
+          "thumbattribs": {
+            "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg/1280px-Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "decoding": "async",
+            "loading": "lazy",
+            "width": 1000,
+            "height": 750,
+            "srcset": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled 2x"
+          },
+          "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Unilag-Lagos-Afe-Babalola-auditorium-IMG_7169.jpg",
+          "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=199169521",
+          "sha1": "5c5aad63d2589cb2ccbe931494ac79e7257a7deb",
+          "commonmetadata": [
+            {
+              "name": "Software",
+              "value": "Adobe Photoshop 27.10 (Windows)"
+            }
+          ],
+          "extmetadata": {
+            "DateTime": {
+              "value": "2026-09-09 07:00:04",
+              "source": "mediawiki-metadata",
+              "hidden": ""
+            },
+            "ObjectName": {
+              "value": "Unilag-Lagos-Afe-Babalola-auditorium-IMG 7169",
+              "source": "mediawiki-metadata"
+            },
+            "CommonsMetadataExtension": {
+              "value": 1.2,
+              "source": "extension",
+              "hidden": ""
+            },
+            "Categories": {
+              "value": "Self-published work|All media needing categories as of 2026|Media needing categories as of 9 September 2026",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "Assessments": {
+              "value": "",
+              "source": "commons-categories",
+              "hidden": ""
+            },
+            "ImageDescription": {
+              "value": "Unilag, Lagos, Afe Babalola Auditorium",
+              "source": "commons-desc-page"
+            },
+            "DateTimeOriginal": {
+              "value": "2026-09-09",
+              "source": "commons-desc-page"
+            },
+            "Credit": {
+              "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+              "source": "commons-desc-page"
+            },
+            "Artist": {
+              "value": "<a href=\"//commons.wikimedia.org/wiki/User:FrankvEck\" title=\"User:FrankvEck\">FrankvEck</a>",
+              "source": "commons-desc-page"
+            },
+            "LicenseShortName": {
+              "value": "CC BY-SA 4.0",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "UsageTerms": {
+              "value": "Creative Commons Attribution-Share Alike 4.0",
+              "source": "commons-desc-page"
+            },
+            "AttributionRequired": {
+              "value": "true",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "LicenseUrl": {
+              "value": "https://creativecommons.org/licenses/by-sa/4.0",
+              "source": "commons-desc-page"
+            },
+            "Copyrighted": {
+              "value": "True",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "Restrictions": {
+              "value": "",
+              "source": "commons-desc-page",
+              "hidden": ""
+            },
+            "License": {
+              "value": "cc-by-sa-4.0",
+              "source": "commons-templates",
+              "hidden": ""
+            }
+          }
+        }
+      ]
     }
   ],
   "receipts": [
