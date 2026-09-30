@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { chromium, webkit, expect } from '@playwright/test';
+import { createServer } from 'node:http';
 const origin = process.env.VERIFY_ORIGIN || 'https://turnright.vercel.app';
 const output = path.resolve(
   process.env.VERIFY_OUTPUT || 'work/campus-detail-verification',
@@ -18,6 +19,42 @@ const get = async (url) => {
   assert(response.ok, `${url}: ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 };
+async function offlineOrigin() {
+  // WebKit 1.63's offline-emulation bug rejects navigation before SW handling
+  // (microsoft/playwright#42775). Stop this local origin instead; all bytes are
+  // fetched unchanged from the deployed app, and no response is synthesized.
+  const server = createServer(async (request, response) => {
+    try {
+      const target = new URL(request.url, origin);
+      assert.equal(target.origin, new URL(origin).origin);
+      const upstream = await fetch(target, {
+        headers,
+        redirect: 'error',
+        signal: AbortSignal.timeout(45000),
+      });
+      const bytes = Buffer.from(await upstream.arrayBuffer());
+      response.writeHead(upstream.status, {
+        'content-type':
+          upstream.headers.get('content-type') || 'application/octet-stream',
+        'cache-control': upstream.headers.get('cache-control') || 'no-store',
+      });
+      response.end(bytes);
+    } catch {
+      response.writeHead(502);
+      response.end();
+    }
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  return {
+    origin: `http://127.0.0.1:${server.address().port}`,
+    stop: () =>
+      new Promise((resolve, reject) => {
+        if (!server.listening) return resolve();
+        server.close((error) => (error ? reject(error) : resolve()));
+        server.closeAllConnections();
+      }),
+  };
+}
 async function authorize(context) {
   if (!bypass) return;
   // Use the context's cookie jar so credentials stay confined to this origin,
@@ -115,7 +152,7 @@ for (const [engine, launcher] of [
         }
       : {}),
   });
-  let activePage, activeCase;
+  let activePage, activeCase, outageOrigin;
   try {
     for (const campus of process.env.VERIFY_SCOPE === 'offline-webkit'
       ? []
@@ -241,8 +278,10 @@ for (const [engine, launcher] of [
       activePage = page;
       activeCase = { engine, campus: campus.slug, offline: true };
       console.log(`${engine} ${campus.slug}: starting offline download`);
+      outageOrigin = engine === 'webkit' ? await offlineOrigin() : undefined;
+      const offlineBase = outageOrigin?.origin || origin;
       const senate = campus.data.places.find((p) => /senate/i.test(p.name));
-      await page.goto(`${origin}/?campus=${campus.slug}`);
+      await page.goto(`${offlineBase}/?campus=${campus.slug}`);
       await attach(page);
       await page.waitForFunction(
         () => !!navigator.serviceWorker.controller,
@@ -261,9 +300,15 @@ for (const [engine, launcher] of [
       await expect(
         page.getByText('Enhanced 3D ready offline · all model files verified'),
       ).toBeVisible({ timeout: 120000 });
-      await context.setOffline(true);
+      if (outageOrigin) {
+        await outageOrigin.stop();
+        await assert.rejects(
+          fetch(offlineBase, { signal: AbortSignal.timeout(5000) }),
+          'Origin must be unavailable',
+        );
+      } else await context.setOffline(true);
       await page.goto(
-        `${origin}/?campus=${campus.slug}&place=${encodeURIComponent(senate.id)}`,
+        `${offlineBase}/?campus=${campus.slug}&place=${encodeURIComponent(senate.id)}`,
       );
       await expect(
         page.getByRole('heading', { name: senate.name, exact: true }),
@@ -286,6 +331,7 @@ for (const [engine, launcher] of [
         campus: campus.slug,
         version: campus.manifest.version,
         passed: true,
+        disruption: outageOrigin ? 'origin-stopped' : 'browser-offline',
       });
       console.log(
         `${engine} ${campus.slug}: offline destination, photo and model package passed`,
@@ -300,6 +346,7 @@ for (const [engine, launcher] of [
       .catch(() => {});
     throw error;
   } finally {
+    await outageOrigin?.stop();
     await browser.close();
     await fs.writeFile(
       path.join(output, 'report.json'),

@@ -24,6 +24,21 @@ await update({
   },
 });
 try {
+  // Edge protection configuration can take a few seconds to propagate.
+  let accessible = false;
+  for (let attempt = 0; attempt < 15; attempt++) {
+    const probe = await fetch(new URL("/packages/campuses.json", url), {
+      headers: { "x-vercel-protection-bypass": secret },
+      redirect: "manual",
+      signal: AbortSignal.timeout(15000),
+    });
+    if (probe.ok && probe.headers.get("content-type")?.includes("application/json")) {
+      accessible = true;
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+  if (!accessible) throw Error("Preview authorization did not become available");
   process.env.VERIFY_ORIGIN = url.origin;
   process.env.VERIFY_BYPASS = secret;
   await import("../web/scripts/verify-campus-detail.mjs");
