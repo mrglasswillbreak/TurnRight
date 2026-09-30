@@ -44,7 +44,7 @@ try {
   if (process.env.VERIFY_SCOPE !== "rollback")
     await import("../web/scripts/verify-campus-detail.mjs");
   const [historical] = await db(
-    "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url",
+    "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url,deployment_id",
   );
   if (!historical?.version || !historical.deployment_url)
     throw Error("Rollback package record missing");
@@ -58,6 +58,7 @@ try {
       `/packages/${historical.version}/manifest.json`,
       { headers },
     ),
+    historical.deployment_id,
   );
   console.log(
     `Rollback package ${historical.version}: immutable assets verified through the restore transport; no publication or drafts changed`,
