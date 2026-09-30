@@ -115,7 +115,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             if category not in categories: category = 'other'
             props = {'id':ident,'name':name,'source':owner_source,'sourceId':str(native),'importLayer':layer_identity,'kind': 'land' if role in ('landcover','road-surface') else role}
             semantic_attrs = {key:next((f.get('codedValues',{}).get(str(value),value) for f in layer.get('fields',[]) if f['name']==key),value) for key,value in attrs.items()}
-            try: props.update(mapped_properties(semantic_attrs,m,role))
+            try: props.update(mapped_properties(semantic_attrs,{**m,'sourceLayerName':layer['name']},role))
             except ValueError as error:
                 errors.append(f'{name or ident}: {error}'); continue
             geometry = mapping(geom)

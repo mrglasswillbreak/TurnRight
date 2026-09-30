@@ -1,5 +1,9 @@
 # Source attribution
 
+## LASU layer candidates — 30 September 2026
+
+The [LASU coverage review](../docs/LASU-LAYERS.md) refreshes the existing ArcGIS land-use classification and reviews a complete OSM extract, the complete Badagry Creek relation and previously downloaded Overture candidates. Checksums and dispositions are in the [candidate ledger](campus-layer-enrichment/lasu-candidate-ledger.json). No new ArcGIS geometry is added by this patch. Derived surface geometry retains the existing centreline attribution, including **© OpenStreetMap contributors, ODbL-1.0** where applicable. Widths are labelled illustrative estimates unless explicitly evidenced; road class supplies no pavement or access claim. Raw downloads and private drafts remain private. These candidate data have not yet been published.
+
 ## Additional campuses and imported sources
 
 Each campus retains its own source URL, download timestamp/hash, attribution, licence and redistribution declaration. Original uploaded attributes and snapshots are private; approved geometry and applicable attribution enter its public/offline package. The source declaration is checked before publication. Public ArcGIS availability is not permission to redistribute: confirm the specific dataset's terms. Existing LASU source permissions do not authorize another campus's data.

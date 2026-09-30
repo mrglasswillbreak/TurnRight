@@ -1,0 +1,50 @@
+name: Prepare reviewed campus layer release
+on:
+  push:
+    branches: [codex/lasu-campus-layers]
+    paths: [.github/workflows/campus-layer-release.yml]
+  workflow_dispatch:
+    inputs:
+      campus_id:
+        type: choice
+        options: [lasu, campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a]
+        required: true
+      operation:
+        type: choice
+        options: [prepare, apply]
+        default: prepare
+      expected_hash:
+        description: Reviewed complete workspace hash; required for apply
+        required: false
+permissions:
+  contents: read
+jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PUBLISHED_MAP_URL: https://turnright.vercel.app
+      CAMPUS_ID: ${{ inputs.campus_id }}
+      APPLY_LAYER_UPGRADE: ${{ inputs.operation == 'apply' }}
+      EXPECTED_SNAPSHOT: ${{ inputs.expected_hash }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npx tsx ../scripts/prepare-campus-layer-release.mts
+        working-directory: web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: campus-layer-release
+          path: |
+            web/work/*-layer-receipt.json
+            web/work/*-layer-preview.json
+          retention-days: 14

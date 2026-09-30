@@ -1,5 +1,7 @@
 # Campuses and editable map imports
 
+The pending [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stable campus layer identities. Accepted layer hashes survive filename changes; membership uses `mapLayerId`, distinct from the numeric road grade field. Pending import jobs stay in source review. Parcel-layer labels such as street addresses no longer classify a parcel as a road surface. Migration 020 has been applied; the corresponding editor deployment is still pending.
+
 TurnRight keeps separate campus maps under the existing owner account. LASU is the default; links without a campus parameter retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
 
 **Rollout status:** migrations 013–019, the Campuses controls and the writing API

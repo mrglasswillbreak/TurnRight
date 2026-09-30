@@ -1,5 +1,7 @@
 # Editing the campus map
 
+The next layer-workspace upgrade is documented in [Campus layers and road surfaces](CAMPUS-LAYERS.md). Its deployment is pending; [production receipts](PRODUCTION.md) distinguish implemented changes from the live editor.
+
 ## Campuses and imports
 
 **Campuses** opens the owner directory and import workspace. Create a boundary, upload supported vector files or connect public OSM/ArcGIS sources, map fields and projections, then inspect a candidate before queuing it for source review. Each campus retains separate drafts, models, reports, survey sessions, source history and releases. Switching protects unfinished edits and pending saves. Public Editor links preserve the campus and selected building through sign-in.

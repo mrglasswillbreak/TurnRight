@@ -22,6 +22,16 @@ import { distance } from './geo';
 import { drawingProgress } from './drawing-state';
 import { visualEdges } from './map-display';
 import { hasModelSelection } from './model-selection';
+import {
+  campusLayers,
+  layerFeatures,
+  layerMembership,
+  layerKey,
+  editableLayer,
+  layerPresentation,
+} from './campus-layers';
+import type { LayerViewState } from './campus-layer-types';
+import { vertexCount, geometryWindow, replaceWindow } from './geometry-window';
 
 type Interaction =
   | 'select'
@@ -31,6 +41,10 @@ type Interaction =
   | 'entrance-link'
   | 'block';
 interface Callbacks {
+  choose?: (
+    features: { kind: MapEdit['kind']; id: string }[],
+    anchor: Position,
+  ) => void;
   select: (kind: MapEdit['kind'], id: string, anchor?: Position) => void;
   create: (edit: MapEdit) => void;
   geometry: (geometry: Geometry) => void;
@@ -66,6 +80,8 @@ export class EditorMap {
   private draftTimer: ReturnType<typeof setTimeout> | undefined;
   private finishTimer: ReturnType<typeof setTimeout> | undefined;
   private source: CampusData;
+  private layerView: LayerViewState = {};
+  private window: ReturnType<typeof geometryWindow> | null = null;
   private hint = '';
   private disposed = false;
   private previousSources = new Map<string, string>();
@@ -101,7 +117,7 @@ export class EditorMap {
       },
     };
     this.draw = new TerraDraw({
-      adapter: new TerraDrawMapLibreGLAdapter({ map }),
+      adapter: new TerraDrawMapLibreGLAdapter({ map, coordinatePrecision: 18 }),
       idStrategy: {
         getId: () => crypto.randomUUID(),
         isValidId: (id) => typeof id === 'string',
@@ -130,8 +146,45 @@ export class EditorMap {
       'editor-network',
       'editor-target',
       'editor-review',
+      'editor-path-hits',
+      'editor-multi-selection',
     ])
       map.addSource(id, { type: 'geojson', data: collection() });
+    map.addLayer({
+      id: 'editor-multi-selection-fill',
+      source: 'editor-multi-selection',
+      type: 'fill',
+      filter: ['==', ['geometry-type'], 'Polygon'],
+      paint: { 'fill-color': '#1764ed', 'fill-opacity': 0.15 },
+    });
+    map.addLayer({
+      id: 'editor-multi-selection-line',
+      source: 'editor-multi-selection',
+      type: 'line',
+      filter: ['!=', ['geometry-type'], 'Point'],
+      paint: { 'line-color': '#1764ed', 'line-width': 3 },
+    });
+    map.addLayer({
+      id: 'editor-multi-selection-point',
+      source: 'editor-multi-selection',
+      type: 'circle',
+      filter: ['==', ['geometry-type'], 'Point'],
+      paint: {
+        'circle-color': '#1764ed',
+        'circle-radius': 9,
+        'circle-opacity': 0.5,
+      },
+    });
+    map.addLayer({
+      id: 'editor-path-hits',
+      type: 'line',
+      source: 'editor-path-hits',
+      paint: {
+        'line-width': 14,
+        'line-opacity': 0.001,
+        'line-color': '#1764ed',
+      },
+    });
     map.addLayer({
       id: 'editor-network',
       type: 'line',
@@ -229,7 +282,21 @@ export class EditorMap {
       const feature = this.draw.getSnapshotFeature(id);
       if (!feature) return;
       if (context.action !== 'draw') {
-        if (this.selected)
+        if (
+          this.selected &&
+          this.window &&
+          (feature.geometry.type === 'LineString' || this.window.points)
+        ) {
+          this.callbacks.geometry(
+            replaceWindow(
+              this.selected.geometry,
+              this.window,
+              this.window.points
+                ? this.windowPoints()
+                : (feature.geometry as GeoJSON.LineString).coordinates,
+            ),
+          );
+        } else if (this.selected)
           this.callbacks.geometry(this.partGeometry() || feature.geometry);
         return;
       }
@@ -287,15 +354,35 @@ export class EditorMap {
         this.kind = null;
         this.callbacks.draft(null);
         this.callbacks.create(edit);
-        this.select(edit);
+        if (!edit.properties.temporaryGeometry) this.select(edit);
       }, 0);
     });
     this.draw.on('change', (_ids, type) => {
       if (this.setting || this.compare) return;
       if (!this.kind) {
+        if (type === 'delete' && this.window && this.selected) {
+          const remaining = this.draw.getSnapshotFeature(
+            `${this.selected.id}:window`,
+          );
+          if (remaining?.geometry.type === 'LineString' || this.window.points)
+            this.callbacks.geometry(
+              replaceWindow(
+                this.selected.geometry,
+                this.window,
+                this.window.points
+                  ? this.windowPoints()
+                  : (remaining!.geometry as GeoJSON.LineString).coordinates,
+              ),
+            );
+          return;
+        }
         if (type === 'delete' && this.selectedParts.length) {
           const geometry = this.partGeometry();
-          if (geometry?.type === 'MultiPolygon' && geometry.coordinates.length)
+          if (
+            geometry &&
+            'coordinates' in geometry &&
+            geometry.coordinates.length
+          )
             this.callbacks.geometry(geometry);
           else {
             this.selected = null;
@@ -388,36 +475,70 @@ export class EditorMap {
       'buildings-3d',
       'buildings',
       'roads',
+      'editor-path-hits',
       'overlay-points',
       'overlay-lines',
       'overlay-fill',
       'land',
+      ...this.map
+        .getStyle()
+        .layers.filter((l) => l.id.startsWith('overlay-'))
+        .map((l) => l.id),
     ];
-    const features = this.map.queryRenderedFeatures(event.point, { layers: layers.filter(id => this.map.getLayer(id)) });
-    for (const layer of layers) {
-      const f = features.find((f) => f.layer.id === layer);
-      if (!f?.properties?.id) continue;
-      const kind = layer === 'land' ? 'land' : layer.startsWith('overlay-') ? 'overlay' : layer.startsWith('editor-draft')
-        ? f.properties.kind
-        : layer === 'editor-entrances'
-          ? 'entrance'
-          : layer.startsWith('places')
-            ? 'place'
-            : layer === 'roads'
-              ? 'path'
-              : 'building';
-      if (
-        this.selected &&
-        this.selected.id === f.properties.id &&
-        this.selected.kind === kind
-      )
-        return;
-      this.callbacks.select(kind, String(f.properties.id), [
-        event.lngLat.lng,
-        event.lngLat.lat,
-      ]);
-      break;
-    }
+    const features = this.map.queryRenderedFeatures(event.point, {
+      layers: layers.filter((id) => this.map.getLayer(id)),
+    });
+    const candidates: { kind: MapEdit['kind']; id: string }[] = [];
+    const definitions = campusLayers(this.source).items,
+      membership = layerMembership(this.source, definitions);
+    const shown = layerPresentation(this.source, true, this.layerView);
+    const hidden = new Set(
+      layerFeatures(shown)
+        .filter((f) => f.properties.visible === false)
+        .map((f) => f.key),
+    );
+    for (const layer of layers)
+      for (const f of features.filter((f) => f.layer.id === layer)) {
+        if (!f?.properties?.id) continue;
+        const kind =
+          layer === 'land'
+            ? 'land'
+            : layer.startsWith('overlay-')
+              ? 'overlay'
+              : layer.startsWith('editor-draft')
+                ? f.properties.kind
+                : layer === 'editor-entrances'
+                  ? 'entrance'
+                  : layer.startsWith('places')
+                    ? 'place'
+                    : layer === 'roads' || layer === 'editor-path-hits'
+                      ? 'path'
+                      : 'building';
+        const id = String(f.properties.id),
+          key = layerKey(kind, id),
+          definition = definitions.find((l) => l.id === membership.get(key));
+        if (
+          hidden.has(key) ||
+          (definition && !editableLayer(definition, definitions)) ||
+          candidates.some((c) => c.id === id && c.kind === kind)
+        )
+          continue;
+        candidates.push({ kind, id });
+      }
+    candidates.sort(
+      (a, b) =>
+        Number(
+          membership.get(layerKey(b.kind, b.id)) === this.layerView.active,
+        ) -
+        Number(
+          membership.get(layerKey(a.kind, a.id)) === this.layerView.active,
+        ),
+    );
+    const anchor: Position = [event.lngLat.lng, event.lngLat.lat];
+    if (candidates.length > 1 && this.callbacks.choose)
+      this.callbacks.choose(candidates, anchor);
+    else if (candidates[0])
+      this.callbacks.select(candidates[0].kind, candidates[0].id, anchor);
   };
   private doubleclick = (event: MapMouseEvent) => {
     if (this.kind) {
@@ -432,6 +553,7 @@ export class EditorMap {
     (this.map.getSource(id) as GeoJSONSource)?.setData(data);
   }
   select(edit: MapEdit | null, outline = this.outline) {
+    const previousWindow = this.selected?.id === edit?.id ? this.window : null;
     this.outline = outline;
     this.setting = true;
     this.kind = null;
@@ -439,6 +561,28 @@ export class EditorMap {
     this.interaction = 'select';
     this.draw.clear();
     this.selectedParts = [];
+    this.window = null;
+    if (
+      edit &&
+      !edit.deleted &&
+      ['land', 'overlay'].includes(edit.kind) &&
+      vertexCount(edit.geometry) > 2000 &&
+      [
+        'Polygon',
+        'MultiPolygon',
+        'LineString',
+        'MultiLineString',
+        'MultiPoint',
+      ].includes(edit.geometry.type)
+    ) {
+      this.setting = false;
+      this.selectWindow(
+        previousWindow?.part || 0,
+        previousWindow?.ring || 0,
+        previousWindow?.start || 0,
+      );
+      return;
+    }
     if (edit && !edit.deleted) {
       const geometries =
         edit.geometry.type === 'MultiPolygon'
@@ -446,9 +590,17 @@ export class EditorMap {
               type: 'Polygon' as const,
               coordinates,
             }))
-          : edit.geometry.type === 'MultiLineString' ? edit.geometry.coordinates.map(coordinates => ({type:'LineString' as const,coordinates}))
-          : edit.geometry.type === 'MultiPoint' ? edit.geometry.coordinates.map(coordinates => ({type:'Point' as const,coordinates}))
-          : [edit.geometry];
+          : edit.geometry.type === 'MultiLineString'
+            ? edit.geometry.coordinates.map((coordinates) => ({
+                type: 'LineString' as const,
+                coordinates,
+              }))
+            : edit.geometry.type === 'MultiPoint'
+              ? edit.geometry.coordinates.map((coordinates) => ({
+                  type: 'Point' as const,
+                  coordinates,
+                }))
+              : [edit.geometry];
       if (edit.geometry.type.startsWith('Multi'))
         this.selectedParts = geometries.map(
           (_, index) => `${edit.id}:part:${index}`,
@@ -491,9 +643,23 @@ export class EditorMap {
   }
   private partGeometry(): Geometry | undefined {
     if (!this.selectedParts.length) return;
-    const parts = this.selectedParts.map(id => this.draw.getSnapshotFeature(id)?.geometry).filter(g => !!g);
-    if (this.selected?.geometry.type === 'MultiLineString') return {type:'MultiLineString',coordinates:parts.filter(g => g.type==='LineString').map(g => g.coordinates)};
-    if (this.selected?.geometry.type === 'MultiPoint') return {type:'MultiPoint',coordinates:parts.filter(g => g.type==='Point').map(g => g.coordinates)};
+    const parts = this.selectedParts
+      .map((id) => this.draw.getSnapshotFeature(id)?.geometry)
+      .filter((g) => !!g);
+    if (this.selected?.geometry.type === 'MultiLineString')
+      return {
+        type: 'MultiLineString',
+        coordinates: parts
+          .filter((g) => g.type === 'LineString')
+          .map((g) => g.coordinates),
+      };
+    if (this.selected?.geometry.type === 'MultiPoint')
+      return {
+        type: 'MultiPoint',
+        coordinates: parts
+          .filter((g) => g.type === 'Point')
+          .map((g) => g.coordinates),
+      };
     const polygons = this.selectedParts
       .map((id) => this.draw.getSnapshotFeature(id)?.geometry)
       .filter((g) => g?.type === 'Polygon');
@@ -501,6 +667,52 @@ export class EditorMap {
       type: 'MultiPolygon',
       coordinates: polygons.map((g) => g.coordinates),
     };
+  }
+  selectWindow(part: number, ring: number, start: number) {
+    if (!this.selected || !['land', 'overlay'].includes(this.selected.kind))
+      return;
+    this.setting = true;
+    this.draw.clear();
+    this.selectedParts = [];
+    this.window = geometryWindow(this.selected.geometry, part, ring, start);
+    const handles = this.window.points
+      ? this.window.geometry.coordinates.map((coordinates, i) => ({
+          type: 'Feature' as const,
+          id: `${this.selected!.id}:window:${i}`,
+          geometry: { type: 'Point' as const, coordinates },
+          properties: { mode: 'point' },
+        }))
+      : [
+          {
+            type: 'Feature' as const,
+            id: `${this.selected.id}:window`,
+            geometry: this.window.geometry,
+            properties: { mode: 'linestring' },
+          },
+        ];
+    if (this.window.points) this.selectedParts = handles.map((f) => f.id);
+    const result = this.draw.addFeatures([
+      {
+        type: 'Feature',
+        id: `${this.selected.id}:outline`,
+        geometry: structuredClone(this.selected.geometry),
+        properties: { mode: 'render' },
+      } as GeoJSONStoreFeatures,
+      ...handles,
+    ]);
+    this.draw.setMode(this.compare ? 'render' : 'select');
+    if (!this.compare && result[1]?.valid)
+      this.draw.selectFeature(handles[0].id);
+    this.setting = false;
+    this.callbacks.hint(
+      `Editing vertices ${this.window.start + 1}–${this.window.start + this.window.length} of part ${part + 1}${this.window.closed ? ', ' + (ring ? 'hole ' + ring : 'exterior') : ''}. Other vertices and holes are preserved.`,
+    );
+  }
+  private windowPoints() {
+    return this.selectedParts.flatMap((id) => {
+      const g = this.draw.getSnapshotFeature(id)?.geometry;
+      return g?.type === 'Point' ? [g.coordinates] : [];
+    });
   }
   begin(
     kind: MapEdit['kind'],
@@ -518,9 +730,13 @@ export class EditorMap {
     this.properties = properties;
     this.interaction = 'select';
     this.draw.setMode(
-      kind === 'path' || kind === 'barrier'
+      kind === 'path' ||
+        kind === 'barrier' ||
+        properties.drawingGeometry === 'LineString'
         ? 'linestring'
-        : kind === 'building'
+        : kind === 'building' ||
+            kind === 'land' ||
+            properties.drawingGeometry === 'Polygon'
           ? 'polygon'
           : 'point',
     );
@@ -537,7 +753,8 @@ export class EditorMap {
           heldKeys: [],
           isContextMenu: false,
         };
-        const mode = kind === 'building' ? this.polygon : this.line;
+        const mode =
+          this.draw.getMode() === 'polygon' ? this.polygon : this.line;
         mode.onMouseMove(event);
         mode.onClick(event);
       }
@@ -548,9 +765,9 @@ export class EditorMap {
       kind,
       properties,
       geometry:
-        kind === 'building'
+        this.draw.getMode() === 'polygon'
           ? { type: 'Polygon', coordinates: [[]] }
-          : kind === 'path' || kind === 'barrier'
+          : this.draw.getMode() === 'linestring'
             ? { type: 'LineString', coordinates: [] }
             : { type: 'Point', coordinates: [] },
     };
@@ -587,7 +804,7 @@ export class EditorMap {
       return;
     }
     const event = { key: 'Enter', heldKeys: [], preventDefault: () => {} };
-    if (this.kind === 'building') this.polygon.onKeyUp(event);
+    if (this.draw.getMode() === 'polygon') this.polygon.onKeyUp(event);
     else if (this.kind) this.line.onKeyUp(event);
   }
   cancel() {
@@ -615,8 +832,68 @@ export class EditorMap {
     base: CampusData,
     invalid: Set<string>,
     compare: boolean,
+    layerView: LayerViewState = {},
   ) {
     this.source = data;
+    this.layerView = layerView;
+    const presentation = layerPresentation(data, true, layerView);
+    const definitions = campusLayers(data).items,
+      membership = layerMembership(data, definitions);
+    const hidden = new Set([
+      ...presentation.map.features
+        .filter((f) => f.properties?.visible === false)
+        .map((f) =>
+          layerKey(String(f.properties?.kind), String(f.properties?.id)),
+        ),
+      ...presentation.places
+        .filter(
+          (p) => (p as unknown as Record<string, unknown>).visible === false,
+        )
+        .map((p) => layerKey('place', p.id)),
+      ...(presentation.entrances || [])
+        .filter(
+          (p) => (p as unknown as Record<string, unknown>).visible === false,
+        )
+        .map((p) => layerKey('entrance', p.id)),
+    ]);
+    const allowed = (kind: string, id: string) => {
+      const l = definitions.find(
+        (l) => l.id === membership.get(layerKey(kind, id)),
+      );
+      return (
+        !hidden.has(layerKey(kind, id)) && (!l || editableLayer(l, definitions))
+      );
+    };
+    if (this.selected && !allowed(this.selected.kind, this.selected.id))
+      this.select(null);
+    const selectedKeys = new Set(layerView.selected || []);
+    this.setSource(
+      'editor-multi-selection',
+      collection(
+        compare
+          ? []
+          : layerFeatures(presentation)
+              .filter((f) => selectedKeys.has(f.key) && allowed(f.kind, f.id))
+              .map((f) => ({
+                type: 'Feature',
+                properties: f.properties,
+                geometry: f.geometry,
+              })),
+      ),
+    );
+    this.setSource(
+      'editor-path-hits',
+      collection(
+        compare
+          ? []
+          : presentation.map.features.filter(
+              (f) =>
+                f.properties?.kind === 'path' &&
+                f.properties.visible !== false &&
+                allowed('path', String(f.properties.id)),
+            ),
+      ),
+    );
     if (compare !== this.compare) {
       this.compare = compare;
       this.draw.setMode(
@@ -654,11 +931,17 @@ export class EditorMap {
       collection(
         compare
           ? []
-          : (data.entrances || []).map((e) => ({
-              type: 'Feature',
-              properties: { id: e.id, name: e.name, connected: !!e.graphNode },
-              geometry: { type: 'Point', coordinates: e.coordinates },
-            })),
+          : (data.entrances || [])
+              .filter((e) => allowed('entrance', e.id))
+              .map((e) => ({
+                type: 'Feature',
+                properties: {
+                  id: e.id,
+                  name: e.name,
+                  connected: !!e.graphNode,
+                },
+                geometry: { type: 'Point', coordinates: e.coordinates },
+              })),
       ),
     );
     this.setSource(
@@ -667,7 +950,12 @@ export class EditorMap {
         compare
           ? []
           : edits
-              .filter((e) => !(e.deleted && e.properties.revertToSource))
+              .filter(
+                (e) =>
+                  e.kind !== 'layer' &&
+                  allowed(e.kind, e.id) &&
+                  !(e.deleted && e.properties.revertToSource),
+              )
               .map((e) => ({
                 type: 'Feature',
                 properties: {

@@ -59,6 +59,18 @@ export function displayGeometry(
   return {
     ...map,
     features: map.features.flatMap((feature): Feature[] => {
+      if (feature.properties?.visible === false) return [];
+      feature = {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          ...Object.fromEntries(
+            Object.entries(feature.properties?.renderStyle || {}).map(
+              ([key, value]) => [`mapStyle_${key}`, value],
+            ),
+          ),
+        },
+      };
       if (feature.properties?.kind === 'land')
         return [
           {
@@ -81,6 +93,11 @@ export function displayGeometry(
             properties: {
               ...feature.properties,
               ...pathDisplay(feature.properties),
+              ...(feature.properties.mapStyle_labels === false
+                ? { streetLabel: '' }
+                : feature.properties.mapStyle_labelField
+                  ? { streetLabel: String(feature.properties.label || '') }
+                  : {}),
             },
           },
         ];

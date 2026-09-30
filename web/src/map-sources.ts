@@ -16,22 +16,36 @@ export const placeColours: Record<Category, { light: string; dark: string }> = {
 export function placeFeatures(places: Place[]): FeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: places.map((p) => ({
-      type: 'Feature',
-      id: p.id,
-      geometry: { type: 'Point', coordinates: p.coordinates },
-      properties: {
+    features: places
+      .filter(
+        (p) => (p as unknown as Record<string, unknown>).visible !== false,
+      )
+      .map((p) => ({
+        type: 'Feature',
         id: p.id,
-        name: p.name.replace(/[^\x20-\x7E]/g, ' '),
-        category: p.category,
-        color: (placeColours[p.category] || placeColours.other).light,
-        nightColor: (placeColours[p.category] || placeColours.other).dark,
-        badge: `place-${Object.hasOwn(placeColours, p.category) ? p.category : 'other'}`,
-        priority: /library|senate|health|clinic|faculty|gate/i.test(p.name)
-          ? 1
-          : 2,
-      },
-    })),
+        geometry: { type: 'Point', coordinates: p.coordinates },
+        properties: {
+          id: p.id,
+          ...Object.fromEntries(
+            Object.entries(
+              (p as unknown as { renderStyle?: Record<string, unknown> })
+                .renderStyle || {},
+            ).map(([key, value]) => [`mapStyle_${key}`, value]),
+          ),
+          name: ((p as unknown as { renderStyle?: { labels?: boolean } })
+            .renderStyle?.labels === false
+            ? ''
+            : String((p as unknown as { label?: string }).label || p.name)
+          ).replace(/[^\x20-\x7E]/g, ' '),
+          category: p.category,
+          color: (placeColours[p.category] || placeColours.other).light,
+          nightColor: (placeColours[p.category] || placeColours.other).dark,
+          badge: `place-${Object.hasOwn(placeColours, p.category) ? p.category : 'other'}`,
+          priority: /library|senate|health|clinic|faculty|gate/i.test(p.name)
+            ? 1
+            : 2,
+        },
+      })),
   };
 }
 export function closureFeatures(

@@ -185,19 +185,30 @@
   height: 20px;
 }
 .app-shell .map-controls {
-  position: static;
+  position: absolute;
   inset: auto;
+  z-index: 8;
+  left: 24px;
+  width: min(440px, calc(100% - 48px));
+  bottom: calc(
+    var(--sheet-height, 96px) + var(--sheet-bottom-offset, 0px) +
+      max(16px, env(safe-area-inset-bottom)) + 12px
+  );
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0 16px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 0;
+  pointer-events: none;
+}
+.app-shell .map-controls > * {
+  pointer-events: auto;
+  box-shadow: 0 3px 16px #142b3b26;
 }
 .app-shell .map-controls button {
   width: 42px;
-  height: 40px;
+  height: 44px;
   border-radius: 20px;
   box-shadow: none;
   background: var(--soft);
@@ -205,7 +216,7 @@
 .app-shell .map-controls button:has(span:not(.minus)) {
   flex-direction: row;
   gap: 6px;
-  height: 40px;
+  height: 44px;
   width: 70px;
 }
 .app-shell .map-controls .control-group {
@@ -510,6 +521,7 @@
     z-index: 8;
     left: max(12px, env(safe-area-inset-left));
     right: max(12px, env(safe-area-inset-right));
+    width: auto;
     bottom: calc(
       var(--sheet-height) + var(--sheet-bottom-offset, 0px) +
         max(12px, env(safe-area-inset-bottom)) + 12px

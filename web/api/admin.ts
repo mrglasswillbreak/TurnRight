@@ -19,6 +19,8 @@ import {
   type ResponseLike,
 } from '../server/backend.js';
 import { validateEdit } from '../src/editor-model.js';
+import { catalogueErrors } from '../src/campus-layers.js';
+import type { CampusLayer } from '../src/campus-layer-types.js';
 import { surveyAction } from '../server/surveys.js';
 import { mediaAction, validateMediaEdits } from '../server/building-media.js';
 import {
@@ -242,6 +244,32 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               'Upload the editable model as a verified private asset before saving.',
             );
           const currentModels = (await allRows('map_edits')) as MapEdit[];
+          if (clean.some((i) => i.edit.kind === 'layer')) {
+            if (payload.layerManagementVersion !== 1)
+              throw new HttpError(
+                409,
+                'Update the editor before saving layers.',
+              );
+            const layers = new Map(
+              currentModels
+                .filter((e) => e.kind === 'layer' && !e.deleted)
+                .map((e) => [
+                  e.id,
+                  e.properties.layerDefinition as CampusLayer,
+                ]),
+            );
+            for (const item of clean)
+              if (item.edit.kind === 'layer') {
+                if (item.edit.deleted) layers.delete(item.edit.id);
+                else
+                  layers.set(
+                    item.edit.id,
+                    item.edit.properties.layerDefinition as CampusLayer,
+                  );
+              }
+            const errors = catalogueErrors([...layers.values()]);
+            if (errors.length) throw new HttpError(400, errors.join(' '));
+          }
           const authored = clean.some(
             (i) =>
               i.edit.properties.modelDocumentAsset ||
@@ -290,7 +318,11 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               );
           }
           const result = await db(
-            authored ? 'rpc/save_editor_model_batch' : 'rpc/save_editor_batch',
+            payload.layerManagementVersion === 1
+              ? 'rpc/save_editor_layer_batch'
+              : authored
+                ? 'rpc/save_editor_model_batch'
+                : 'rpc/save_editor_batch',
             'POST',
             {
               operation_id: operationId,

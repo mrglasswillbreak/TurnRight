@@ -23,6 +23,7 @@ export function EditorInspector({
   onEndField,
   focusField,
   onGeometry,
+  onLayerGeometry,
   onEntrance,
   onApproach,
   onPick,
@@ -44,6 +45,7 @@ export function EditorInspector({
   onEndField: () => void;
   focusField?: string;
   onGeometry: (geometry: Geometry) => void;
+  onLayerGeometry?: (operation: 'hole' | 'regenerate') => void;
   onEntrance: () => void;
   onApproach: () => void;
   onPick: (mode: 'start' | 'end' | 'join' | 'entrance-link' | 'block') => void;
@@ -110,7 +112,14 @@ export function EditorInspector({
     >
       <div className="editor-panel-heading">
         <div>
-          <span className="editor-eyebrow">{edit.kind}</span>
+          <span className="editor-eyebrow">
+            {edit.kind === 'path'
+              ? 'Routing path'
+              : edit.kind === 'land' &&
+                  ['road', 'sidewalk'].includes(String(p.landClass))
+                ? 'Road surface'
+                : edit.kind}
+          </span>
           <h2>{String(p.name || 'New feature')}</h2>
         </div>
         <button
@@ -127,17 +136,160 @@ export function EditorInspector({
         )}
         {edit.kind === 'building' && photoTools}
         {field('Name', 'name', 'Give this feature a useful name')}
-        {(edit.kind === 'land' || edit.kind === 'overlay') && <>
-          {edit.kind === 'land' && <label className="field-label">Land class<select value={String(p.landClass || 'developed')} onChange={e => onProperty('landClass',e.target.value)}>{['developed','green','water','wetland','bare','road','sidewalk','parking','sports','parcel'].map(c => <option key={c}>{c}</option>)}</select></label>}
-          {field('Surface', 'surface', 'paved, unpaved, concrete…')}
-          {edit.kind === 'overlay' && <>
-            {field('Label', 'label')}
-            <label className="field-label">Colour<input type="color" value={String(p.color || '#2563eb')} onChange={e => onProperty('color',e.target.value,true)} /></label>
-            <label className="field-label">Opacity<input type="number" min="0" max="1" step="0.1" value={Number(p.opacity ?? 0.5)} onChange={e => onProperty('opacity',Number(e.target.value),true)} /></label>
-            <label className="field-label">Layer order<input type="number" min="-1000" max="1000" value={Number(p.order || 0)} onChange={e => onProperty('order',Number(e.target.value),true)} /></label>
-          </>}
-          <label className="field-label"><input type="checkbox" checked={p.visible !== false} onChange={e => onProperty('visible',e.target.checked)} />Visible on the map</label>
-        </>}
+        {['land', 'overlay', 'path'].includes(edit.kind) && (
+          <p className="small-note">
+            Application ID: {edit.id}
+            <br />
+            Source ID: {String(p.sourceId || 'Owner-created')} ·{' '}
+            {String(p.importLayer || p.mapLayerSource || p.source || 'Campus')}
+          </p>
+        )}
+        {['land', 'overlay'].includes(edit.kind) && (
+          <button onClick={() => onLayerGeometry?.('hole')}>
+            Parts, holes and geometry tools
+          </button>
+        )}
+        {(edit.kind === 'path' || !!p.derivedSurface) && (
+          <button onClick={() => onLayerGeometry?.('regenerate')}>
+            Preview linked road surfaces
+          </button>
+        )}
+        {(edit.kind === 'path' ||
+          (edit.kind === 'land' &&
+            ['road', 'sidewalk'].includes(String(p.landClass)))) && (
+          <fieldset className="road-properties">
+            <legend>Road detail</legend>
+            {field('Road class', 'highway', 'residential, service, footway…')}
+            {edit.kind === 'path' &&
+              field('Surface', 'surface', 'Unknown unless documented')}
+            <label className="field-label">
+              Width
+              <input
+                type="number"
+                min="0.01"
+                max={p.widthUnit === 'ft' ? 656.16 : 200}
+                step="0.1"
+                value={
+                  p.width == null
+                    ? ''
+                    : Number(p.width) / (p.widthUnit === 'ft' ? 0.3048 : 1)
+                }
+                onChange={(e) =>
+                  onProperty(
+                    'width',
+                    e.target.value
+                      ? Number(e.target.value) *
+                          (p.widthUnit === 'ft' ? 0.3048 : 1)
+                      : null,
+                    true,
+                  )
+                }
+              />
+            </label>
+            <label className="field-label">
+              Width unit
+              <select
+                value={String(p.widthUnit || 'm')}
+                onChange={(e) => onProperty('widthUnit', e.target.value)}
+              >
+                <option value="m">Metres</option>
+                <option value="ft">Feet</option>
+              </select>
+            </label>
+            <label className="field-label">
+              Width evidence
+              <select
+                value={String(p.widthEvidence || 'source')}
+                onChange={(e) => onProperty('widthEvidence', e.target.value)}
+              >
+                <option value="source">Documented source</option>
+                <option value="owner">Owner observation</option>
+                <option value="illustrative">Illustrative estimate</option>
+              </select>
+            </label>
+            {field('Width source / notes', 'widthSource')}
+            <p className="small-note">
+              Surface geometry and width describe appearance. Access and
+              connections belong to routing paths. Changing a recorded width
+              does not reshape a surveyed polygon.
+            </p>
+          </fieldset>
+        )}
+        {(edit.kind === 'land' || edit.kind === 'overlay') && (
+          <>
+            {edit.kind === 'land' && (
+              <label className="field-label">
+                Land class
+                <select
+                  value={String(p.landClass || 'developed')}
+                  onChange={(e) => onProperty('landClass', e.target.value)}
+                >
+                  {[
+                    'developed',
+                    'green',
+                    'water',
+                    'wetland',
+                    'bare',
+                    'road',
+                    'sidewalk',
+                    'parking',
+                    'sports',
+                    'parcel',
+                  ].map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {field('Surface', 'surface', 'paved, unpaved, concrete…')}
+            {edit.kind === 'overlay' && (
+              <>
+                {field('Label', 'label')}
+                <label className="field-label">
+                  Colour
+                  <input
+                    type="color"
+                    value={String(p.color || '#2563eb')}
+                    onChange={(e) => onProperty('color', e.target.value, true)}
+                  />
+                </label>
+                <label className="field-label">
+                  Opacity
+                  <input
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={Number(p.opacity ?? 0.5)}
+                    onChange={(e) =>
+                      onProperty('opacity', Number(e.target.value), true)
+                    }
+                  />
+                </label>
+                <label className="field-label">
+                  Layer order
+                  <input
+                    type="number"
+                    min="-1000"
+                    max="1000"
+                    value={Number(p.order || 0)}
+                    onChange={(e) =>
+                      onProperty('order', Number(e.target.value), true)
+                    }
+                  />
+                </label>
+              </>
+            )}
+            <label className="field-label">
+              <input
+                type="checkbox"
+                checked={p.visible !== false}
+                onChange={(e) => onProperty('visible', e.target.checked)}
+              />
+              Visible on the map
+            </label>
+          </>
+        )}
         {(edit.kind === 'place' || edit.kind === 'building') && (
           <button className="editor-primary" onClick={onEntrance}>
             <DoorOpen size={16} /> Add entrance
@@ -295,14 +447,16 @@ export function EditorInspector({
             )}
           </>
         )}
-        <DrivingEditor edit={edit} data={data} onProperty={onProperty} />
+        {['path', 'place', 'entrance', 'barrier', 'closure'].includes(
+          edit.kind,
+        ) && <DrivingEditor edit={edit} data={data} onProperty={onProperty} />}
         <ArrivalEditor
           key={edit.id}
           edit={edit}
           data={data}
           onProperty={onProperty}
         />
-        {edit.kind !== 'building' && photoTools}
+        {['entrance', 'place'].includes(edit.kind) && photoTools}
         {(edit.kind === 'path' || edit.kind === 'entrance') && (
           <label className="field-label">
             Walking access

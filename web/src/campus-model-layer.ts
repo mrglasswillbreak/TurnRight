@@ -157,22 +157,26 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
     authored?: ModelRenderMaterial,
   ) {
-    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':'+JSON.stringify(authored) : ''}`;
+    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':' + JSON.stringify(authored) : ''}`;
     let entry = materials.get(key);
     if (!entry) {
-      const custom=authored?createModelRenderMaterial(authored,()=>map.triggerRepaint()):undefined;
+      const custom = authored
+        ? createModelRenderMaterial(authored, () => map.triggerRepaint())
+        : undefined;
       entry = {
-        value: custom?.material || new MeshLambertMaterial({
-          color: colour,
-          side: DoubleSide,
-          flatShading: true,
-        }),
+        value:
+          custom?.material ||
+          new MeshLambertMaterial({
+            color: colour,
+            side: DoubleSide,
+            flatShading: true,
+          }),
         users: 0,
         colour,
         role,
         recipe,
-        releaseTexture:custom?.release,
-        authoredOpacity:authored?.opacity,
+        releaseTexture: custom?.release,
+        authoredOpacity: authored?.opacity,
       };
       materials.set(key, entry);
     }
@@ -201,19 +205,23 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       geometry.setIndex(part.indices);
       if (part.uvs)
         geometry.setAttribute('uv', new Float32BufferAttribute(part.uvs, 2));
-      if(part.normals)geometry.setAttribute('normal',new Float32BufferAttribute(part.normals,3));
+      if (part.normals)
+        geometry.setAttribute(
+          'normal',
+          new Float32BufferAttribute(part.normals, 3),
+        );
       else geometry.computeVertexNormals();
       geometry.computeBoundingSphere();
       const role = meshMaterialRole(part.surfaces, part);
       const mesh = new Mesh(
         geometry,
-        material(part.colour, role, part.texture || part.text,part.material),
+        material(part.colour, role, part.texture || part.text, part.material),
       );
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
         minZoom: part.minZoom,
-        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}${part.material ? ':'+JSON.stringify(part.material) : ''}`,
+        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}${part.material ? ':' + JSON.stringify(part.material) : ''}`,
         surfaces: part.surfaces,
       };
       group.add(mesh);
@@ -320,7 +328,9 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         drafts.set(override.model.id, group);
         scene.add(group);
       }
-      group.visible = active;
+      group.visible =
+        active &&
+        features.get(override.model.id)?.properties?.visible !== false;
     }
     for (const sector of loaded.values()) {
       sector.visible = active && mode !== 'extrusion';
@@ -331,6 +341,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         child.visible =
           !draftIds.has(id) &&
           !!feature &&
+          feature.properties?.visible !== false &&
           compatibleVisual(feature, visual) &&
           child.userData.revision ===
             `${visual?.geometryRevision}:${visual?.detailRevision || ''}`;
@@ -346,8 +357,13 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     for (const entry of materials.values()) {
       if (entry.themeKey === themeKey) continue;
       entry.themeKey = themeKey;
-      entry.value.color.set(entry.value.map && entry.authoredOpacity===undefined ? '#ffffff' : entry.colour);
-      entry.value.opacity = (options.opacity ?? 1)*(entry.authoredOpacity ?? 1);
+      entry.value.color.set(
+        entry.value.map && entry.authoredOpacity === undefined
+          ? '#ffffff'
+          : entry.colour,
+      );
+      entry.value.opacity =
+        (options.opacity ?? 1) * (entry.authoredOpacity ?? 1);
       entry.value.transparent = entry.value.opacity < 1;
       entry.value.depthWrite = entry.value.opacity >= 0.7;
     }

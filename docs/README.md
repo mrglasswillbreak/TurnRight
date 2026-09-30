@@ -6,6 +6,8 @@ TurnRight combines a public campus navigation PWA, a private GIS/map workspace a
 
 | Task | Guide |
 | --- | --- |
+| Organize campus layers and edit road surfaces (pending rollout) | [Layer workflow](CAMPUS-LAYERS.md) |
+| Inspect LASU road-width candidates and refreshed landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
 | Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |

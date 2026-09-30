@@ -6,6 +6,11 @@ const normalized = (value: unknown) =>
 
 export function landClass(properties: Record<string, unknown>) {
   if (
+    /parcel/i.test(String(properties.importLayer || '')) &&
+    !properties.landUse
+  )
+    return 'parcel';
+  if (
     [
       'water',
       'wetland',

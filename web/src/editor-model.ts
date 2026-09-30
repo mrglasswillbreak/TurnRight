@@ -1,5 +1,12 @@
 import { insideCampusMappingArea, type MappingArea } from './campus-context.js';
 import {
+  campusLayers,
+  catalogueErrors,
+  layerErrors,
+  bindCampusLayers,
+} from './campus-layers.js';
+import type { CampusLayer } from './campus-layer-types.js';
+import {
   validVehicleRules,
   validParking,
   validTurnRestriction,
@@ -73,16 +80,41 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
   )
     return ['Invalid feature ID.'];
   if (
-    !['place', 'path', 'building', 'entrance', 'barrier', 'closure', 'land', 'overlay'].includes(
-      edit.kind,
-    )
+    ![
+      'place',
+      'path',
+      'building',
+      'entrance',
+      'barrier',
+      'closure',
+      'land',
+      'overlay',
+      'layer',
+    ].includes(edit.kind)
   )
     return ['Choose a supported feature type.'];
+  if (edit.kind === 'layer') {
+    const definition = edit.properties?.layerDefinition as CampusLayer;
+    if (edit.deleted && edit.properties.revertToSource !== true)
+      return ['Archive layers instead of deleting their history.'];
+    if (
+      edit.geometry?.type !== 'GeometryCollection' ||
+      edit.geometry.geometries.length ||
+      definition?.id !== edit.id
+    )
+      return ['Invalid layer record.'];
+    return layerErrors(definition);
+  }
   if (
     !edit.geometry ||
-    !['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon'].includes(
-      edit.geometry.type,
-    )
+    ![
+      'Point',
+      'MultiPoint',
+      'LineString',
+      'MultiLineString',
+      'Polygon',
+      'MultiPolygon',
+    ].includes(edit.geometry.type)
   )
     return ['Draw a point, path, or building outline.'];
   if (!edit.properties || typeof edit.properties !== 'object')
@@ -159,11 +191,44 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
     );
   };
   const props = edit.properties;
-  if (['land','overlay'].includes(edit.kind)) {
-    if (props.color !== undefined && !/^#[0-9a-f]{6}$/i.test(String(props.color))) errors.push('Layer colour must be a six-digit hex colour.');
-    if (props.opacity !== undefined && (!Number.isFinite(Number(props.opacity)) || Number(props.opacity)<0 || Number(props.opacity)>1)) errors.push('Layer opacity must be between 0 and 1.');
-    if (props.order !== undefined && (!Number.isInteger(Number(props.order)) || Math.abs(Number(props.order))>1000)) errors.push('Layer order must be an integer between -1000 and 1000.');
-    if (props.visible !== undefined && typeof props.visible !== 'boolean') errors.push('Layer visibility must be true or false.');
+  if (
+    props.width != null &&
+    (!Number.isFinite(Number(props.width)) ||
+      Number(props.width) <= 0 ||
+      Number(props.width) > 200)
+  )
+    errors.push('Road width must be greater than zero and at most 200 metres.');
+  if (
+    props.widthEvidence !== undefined &&
+    !['source', 'owner', 'illustrative'].includes(String(props.widthEvidence))
+  )
+    errors.push('Choose the width evidence.');
+  if (
+    props.mapLayerId !== undefined &&
+    !/^map-layer:[\w.-]{1,100}$/.test(String(props.mapLayerId))
+  )
+    errors.push('Invalid map layer identity.');
+  if (['land', 'overlay'].includes(edit.kind)) {
+    if (
+      props.color !== undefined &&
+      !/^#[0-9a-f]{6}$/i.test(String(props.color))
+    )
+      errors.push('Layer colour must be a six-digit hex colour.');
+    if (
+      props.opacity !== undefined &&
+      (!Number.isFinite(Number(props.opacity)) ||
+        Number(props.opacity) < 0 ||
+        Number(props.opacity) > 1)
+    )
+      errors.push('Layer opacity must be between 0 and 1.');
+    if (
+      props.order !== undefined &&
+      (!Number.isInteger(Number(props.order)) ||
+        Math.abs(Number(props.order)) > 1000)
+    )
+      errors.push('Layer order must be an integer between -1000 and 1000.');
+    if (props.visible !== undefined && typeof props.visible !== 'boolean')
+      errors.push('Layer visibility must be true or false.');
   }
   if (
     props.autoConnectCrossings !== undefined &&
@@ -271,12 +336,17 @@ export function validateEdit(edit: MapEdit, area?: MappingArea): string[] {
     else value.forEach(walk);
   }
   walk(geometry.coordinates);
-  if (positions.length > 2000)
-    errors.push('A single edit is limited to 2,000 vertices.');
+  const vertexLimit = ['land', 'overlay'].includes(edit.kind) ? 20000 : 2000;
+  if (positions.length > vertexLimit)
+    errors.push(
+      `A single ${edit.kind} edit is limited to ${vertexLimit.toLocaleString('en-US')} vertices.`,
+    );
   if (positions.some((p) => !insideCampusMappingArea(p, area)))
-    errors.push(area
-      ? 'All coordinates must be within the selected campus mapping area (including its 500 m approach buffer).'
-      : 'Use finite WGS84 longitude/latitude coordinates.');
+    errors.push(
+      area
+        ? 'All coordinates must be within the selected campus mapping area (including its 500 m approach buffer).'
+        : 'Use finite WGS84 longitude/latitude coordinates.',
+    );
   if (geometry.type === 'LineString' && positions.length < 2)
     errors.push('A path needs at least two points.');
   if (
@@ -457,6 +527,7 @@ export function applyEdits(
     phase?.('edits');
   };
   const rank = {
+    layer: -1,
     path: 0,
     place: 1,
     building: 2,
@@ -479,6 +550,15 @@ export function applyEdits(
       continue;
     }
     const props = edit.properties;
+    if (edit.kind === 'layer') {
+      const definition = props.layerDefinition as CampusLayer;
+      const items = campusLayers(data).items.filter((l) => l.id !== edit.id);
+      data.layers = {
+        version: 1,
+        items: [...items, structuredClone(definition)],
+      };
+      continue;
+    }
     // A keep-separate decision must not freeze source geometry or metadata.
     if (props.duplicateReviewOnly && !edit.deleted) continue;
     if (
@@ -570,6 +650,23 @@ export function applyEdits(
         access !== pathWalkingAccess(data, edit.id);
       const pathProperties = {
         ...originalFeature?.properties,
+        highway: props.highway ?? originalFeature?.properties?.highway,
+        surface: props.surface ?? originalFeature?.properties?.surface,
+        width:
+          props.width !== undefined
+            ? props.width
+            : originalFeature?.properties?.width,
+        widthEvidence:
+          props.widthEvidence ?? originalFeature?.properties?.widthEvidence,
+        widthSource:
+          props.widthSource ?? originalFeature?.properties?.widthSource,
+        widthUnit: props.widthUnit ?? originalFeature?.properties?.widthUnit,
+        mapLayerId: props.mapLayerId ?? originalFeature?.properties?.mapLayerId,
+        mapLayerSource:
+          props.mapLayerSource ??
+          originalFeature?.properties?.mapLayerSource ??
+          originalFeature?.properties?.source,
+        layerStyle: props.layerStyle ?? originalFeature?.properties?.layerStyle,
         vehicle: props.vehicle ?? originalFeature?.properties?.vehicle,
         id: edit.id,
         kind: 'path',
@@ -885,9 +982,24 @@ export function applyEdits(
           },
         });
     } else if (edit.kind === 'land' || edit.kind === 'overlay') {
-      const original = data.map.features.find(f => f.properties?.id === edit.id);
-      data.map.features = data.map.features.filter(f => f.properties?.id !== edit.id);
-      if (!edit.deleted) data.map.features.push({type:'Feature',geometry:structuredClone(edit.geometry),properties:{...original?.properties,...props,id:edit.id,kind:edit.kind,source:'campus-review'}});
+      const original = data.map.features.find(
+        (f) => f.properties?.id === edit.id,
+      );
+      data.map.features = data.map.features.filter(
+        (f) => f.properties?.id !== edit.id,
+      );
+      if (!edit.deleted)
+        data.map.features.push({
+          type: 'Feature',
+          geometry: structuredClone(edit.geometry),
+          properties: {
+            ...original?.properties,
+            ...props,
+            id: edit.id,
+            kind: edit.kind,
+            source: 'campus-review',
+          },
+        });
     } else if (edit.kind === 'entrance' && edit.geometry.type === 'Point') {
       const previousEntrance = data.entrances.find((e) => e.id === edit.id);
       data.entrances = data.entrances.filter((e) => e.id !== edit.id);
@@ -1185,6 +1297,10 @@ export function applyEdits(
   };
   for (const message of arrivalIssues(data))
     issue(message, 'campus', 'building', { code: 'arrival-media' });
+  bindCampusLayers(data, base);
+  if (data.layers)
+    for (const message of catalogueErrors(data.layers.items))
+      issue(message, 'campus', 'layer', { code: 'layer-catalogue' });
   return {
     data,
     errors: [...new Set(errors)],

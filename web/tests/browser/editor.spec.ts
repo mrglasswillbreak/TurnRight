@@ -9369,3 +9369,255 @@ test('editor reliability: imported names with extra spaces remain searchable wit
   ).toHaveValue('LASU  Clinic');
   expect(server.edits()).toHaveLength(0);
 });
+
+test('campus layer explorer saves folders and release visibility', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const state = await setup(page);
+  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  const workspace = page.getByRole('region', { name: 'Campus layers' });
+  await expect(workspace).toBeVisible();
+  await workspace.getByText('Create layer or folder', { exact: true }).click();
+  await workspace.getByLabel('New layer name').fill('Survey reference');
+  await workspace.getByLabel('New layer role').selectOption('overlay');
+  await workspace.getByRole('button', { name: 'Create', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        state.edits().filter((e) => e.kind === 'layer' && !e.deleted).length,
+    )
+    .toBe(1);
+  await workspace.getByLabel('Published visibility', { exact: true }).uncheck();
+  await workspace.getByRole('button', { name: 'Apply layer settings' }).click();
+  await expect
+    .poll(
+      () =>
+        state.edits().find((e) => e.kind === 'layer')?.properties
+          .layerDefinition.publishedVisible,
+    )
+    .toBe(false);
+  await page.reload();
+  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  await workspace
+    .getByRole('button', { name: /Survey reference.*Overlays/ })
+    .click();
+  await expect(
+    workspace.getByLabel('Published visibility', { exact: true }),
+  ).not.toBeChecked();
+  await page.screenshot({ path: 'test-results/campus-layer-explorer.png' });
+});
+
+test('covered paths remain selectable through the overlap chooser', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await setup(page, false, false, {
+    mutateCampus: (data) => {
+      const path = data.map.features.find(
+        (f) => f.properties?.kind === 'path',
+      )!;
+      if (path.geometry.type !== 'LineString')
+        throw Error('Expected test path');
+      const [x, y] = path.geometry.coordinates[1];
+      data.map.features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [x - 0.0002, y - 0.0002],
+              [x + 0.0002, y - 0.0002],
+              [x + 0.0002, y + 0.0002],
+              [x - 0.0002, y + 0.0002],
+              [x - 0.0002, y - 0.0002],
+            ],
+          ],
+        },
+        properties: {
+          id: 'surface:96',
+          sourceId: '96',
+          kind: 'land',
+          name: 'Tarred road',
+          landClass: 'road',
+          source: 'survey',
+        },
+      });
+    },
+  });
+  await page.evaluate(() => {
+    const source = window.editorTestMap.getSource(
+      'editor-path-hits',
+    ) as unknown as {
+      getData: () => Promise<{
+        features: { geometry: { coordinates: number[][] } }[];
+      }>;
+    };
+    return source.getData().then((data) =>
+      window.editorTestMap.jumpTo({
+        center: data.features[0].geometry.coordinates[1] as [number, number],
+        zoom: 19,
+      }),
+    );
+  });
+  const position = await page.evaluate(() =>
+    window.editorTestMap.project(window.editorTestMap.getCenter()),
+  );
+  const map = await page.locator('.maplibregl-canvas').boundingBox();
+  await page.mouse.click(map!.x + position.x, map!.y + position.y);
+  const chooser = page.getByRole('dialog', {
+    name: 'Choose overlapping feature',
+  });
+  await expect(chooser).toBeVisible();
+  await chooser
+    .getByRole('button', { name: /Routing path/ })
+    .first()
+    .click();
+  await expect(
+    page.getByText('Routing path', { exact: true }).first(),
+  ).toBeVisible();
+});
+
+test('desktop map controls stay twelve pixels above the panel through expansion', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await setup(page);
+  await page.goto('/');
+  await attachMap(page);
+  await expect(page.locator('.app-shell > .map-controls')).toHaveCount(1);
+  for (const expand of [false, true]) {
+    if (expand)
+      await page
+        .getByRole('button', { name: 'Expand card', exact: true })
+        .click();
+    const control = await page
+        .locator('.app-shell > .map-controls')
+        .boundingBox(),
+      panel = await page.locator('.explore-panel').boundingBox();
+    expect(control).not.toBeNull();
+    expect(panel).not.toBeNull();
+    expect(
+      Math.abs(panel!.y - (control!.y + control!.height) - 12),
+    ).toBeLessThanOrEqual(1);
+    expect(control!.y).toBeGreaterThanOrEqual(0);
+  }
+  await page.screenshot({ path: 'test-results/desktop-map-control-row.png' });
+});
+
+test('campus layers polygon 96 preserves vertices and holes through property and geometry saves', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(180000);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const changes = JSON.parse(
+    readFileSync(
+      new URL('../../../data/unilag-enrichment/changes.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const roads = changes.featureAdds.filter(
+    (f: { properties: Record<string, unknown> }) =>
+      f.properties.source === 'import:bd74d5cc-2b8d-4d42-977a-00165dc70b7e',
+  );
+  const road = roads.find(
+    (f: { properties: Record<string, unknown> }) =>
+      f.properties.sourceId === '96',
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const server = await setup(page, false, false, {
+    mutateCampus(data) {
+      data.map.features.push(...roads);
+      data.bounds = [
+        [3.19, 6.45],
+        [3.41, 6.53],
+      ];
+    },
+  });
+  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  const workspace = page.getByRole('region', { name: 'Campus layers' });
+  await workspace.getByRole('button', { name: /Road surfaces/ }).click();
+  await workspace.getByRole('tab', { name: /^Features/ }).click();
+  await expect(
+    workspace.getByRole('heading', { name: 'Features · 179', exact: true }),
+  ).toBeVisible();
+  await workspace.getByLabel('Search layer features').fill('96');
+  await workspace.getByRole('button', { name: /Edit .* · 96$/ }).click();
+  await page
+    .getByRole('textbox', { name: 'Name', exact: true })
+    .fill('Reviewed road 96');
+  await page.getByRole('spinbutton', { name: 'Width', exact: true }).fill('7');
+  await expect
+    .poll(
+      () =>
+        server.edits().find((e) => e.id === road.properties.id)?.properties
+          .width,
+    )
+    .toBe(7);
+  expect(
+    server.edits().find((e) => e.id === road.properties.id)!.geometry,
+  ).toEqual(road.geometry);
+  await page
+    .getByRole('button', {
+      name: 'Parts, holes and geometry tools',
+      exact: true,
+    })
+    .click();
+  const dialog = page.getByRole('dialog', { name: 'Geometry operation' });
+  await dialog
+    .getByRole('combobox', { name: 'Ring', exact: true })
+    .selectOption('45');
+  await dialog
+    .getByRole('button', { name: 'Edit next 100 vertices on map' })
+    .click();
+  await expect(page.getByText(/Editing vertices .*hole 45/)).toBeVisible();
+  await workspace.getByRole('button', { name: 'Close layers' }).click();
+  const point = road.geometry.coordinates[45][1];
+  await page.evaluate(
+    (point) =>
+      window.editorTestMap.jumpTo({
+        center: point,
+        zoom: 22,
+        pitch: 0,
+        bearing: 0,
+      }),
+    point,
+  );
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
+    .toBe(true);
+  const pixel = await position(page, point);
+  await page.mouse.move(pixel.x, pixel.y);
+  await page.mouse.down();
+  await page.mouse.move(pixel.x + 4, pixel.y + 3, { steps: 5 });
+  await page.mouse.up();
+  await expect
+    .poll(() =>
+      JSON.stringify(
+        server.edits().find((e) => e.id === road.properties.id)?.geometry,
+      ),
+    )
+    .not.toBe(JSON.stringify(road.geometry));
+  const saved = server.edits().find((e) => e.id === road.properties.id)!;
+  expect(saved.geometry.type).toBe('Polygon');
+  if (saved.geometry.type !== 'Polygon') throw Error('Expected polygon');
+  expect(saved.geometry.coordinates).toHaveLength(57);
+  expect(saved.geometry.coordinates.flat().length).toBe(6094);
+  expect(saved.geometry.coordinates[44]).toEqual(road.geometry.coordinates[44]);
+  await page.reload();
+  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  await workspace.getByRole('button', { name: /Road surfaces/ }).click();
+  await workspace.getByRole('tab', { name: /^Features/ }).click();
+  await workspace.getByLabel('Search layer features').fill('96');
+  await workspace
+    .getByRole('button', { name: /Edit Reviewed road 96 · 96$/ })
+    .click();
+  await expect(
+    page.getByRole('spinbutton', { name: 'Width', exact: true }),
+  ).toHaveValue('7');
+  await page.screenshot({
+    path: testInfo.outputPath('polygon-96-reloaded.png'),
+  });
+  expect(errors).toEqual([]);
+});

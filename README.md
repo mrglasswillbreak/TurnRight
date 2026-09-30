@@ -10,6 +10,8 @@ TurnRight combines a public navigation PWA, a private GIS workspace and a buildi
 
 ## Campus status
 
+The follow-on **LASU layers and editable roads** implementation is in progress on `codex/lasu-campus-layers`. It prepares 82 labelled illustrative LASU surfaces, corrects UNILAG parcel classifications and adds the campus layer explorer. Final browser/build checks and deployment are pending; the published counts below remain unchanged. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU candidate coverage](docs/LASU-LAYERS.md) · [Exact verification checkpoint](docs/PRODUCTION.md).
+
 The September 30 detail upgrade retains LASU's published package and private drafts. UNILAG receives distinct landscape classes, road surfaces, additional footprints and destinations, credited photographs and evidence-backed architectural treatments. [Coverage and unresolved evidence](docs/UNILAG-DETAIL.md) · [Release versions, checks and rollback](docs/PRODUCTION.md).
 
 | Published map content | LASU Ojo | UNILAG Akoka |

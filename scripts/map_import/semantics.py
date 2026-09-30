@@ -10,7 +10,8 @@ def surface_class(value):
     text = key(value)
     if any(x in text for x in ('sidewalk', 'footway', 'pedestrian', 'pavement')): return 'sidewalk'
     if any(x in text for x in ('carpark', 'parking')): return 'parking'
-    if any(x in text for x in ('road', 'drive', 'street')): return 'road'
+    # A street address is a label, not evidence of a road-surface polygon.
+    if text in ('road','roads','street','streets','drive','drivepaved','driveunpaved','pavedroad','unpavedroad','tarredroad','untarredroad','roadpaved','roadunpaved'): return 'road'
     return None
 
 
@@ -52,13 +53,18 @@ def mapped_properties(attrs, mapping, role):
     if role in ('landcover', 'road-surface'):
         name = str(value('nameField', 'name') or '')
         result.setdefault('landClass', land_class(result.get('landUse') or name))
+        if role == 'landcover' and 'parcel' in str(mapping.get('sourceLayerName','')).lower() and not mapping.get('landClass'):
+            # Parcel labels may describe an address, building or proposed use.
+            # Only unambiguous land-use labels override the parcel presentation.
+            text=key(result.get('landUse') or name)
+            result['landClass']='parking' if text in ('carpark','parking') else 'green' if re.search(r'\bgarden\b',name,re.I) else 'parcel'
         if role == 'road-surface':
             result['landClass'] = surface_class(result.get('landUse') or name) or 'road'
         result.setdefault('surface', surface(result.get('landUse') or name))
         if not result.get('vegetation'):
-            text = key(name)
+            text = str(name).lower()
             for part, kind in [('tree', 'trees'), ('hedge', 'hedges'), ('shrub', 'shrubs')]:
-                if part in text: result['vegetation'] = kind; break
+                if re.search(r'\b' + part + r'(?:s|line|row)?\b', text): result['vegetation'] = kind; break
     width = value('widthField', 'width', 'road_width')
     if width not in (None, ''):
         import math

@@ -1,0 +1,273 @@
+.layer-workspace {
+  position: absolute;
+  z-index: 9;
+  top: 20px;
+  left: 76px;
+  width: 360px;
+  max-width: calc(100% - 110px);
+  height: calc(100% - 110px);
+  min-width: 290px;
+  resize: horizontal;
+  overflow: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--foreground);
+  background: var(--background);
+}
+.layer-workspace header,
+.layer-actions,
+.layer-row,
+.layer-feature-heading {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.layer-workspace header {
+  justify-content: space-between;
+}
+.layer-workspace h2,
+.layer-workspace h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.layer-workspace input,
+.layer-workspace select {
+  max-width: 100%;
+  min-width: 0;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px;
+}
+.layer-workspace button {
+  min-height: 36px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--foreground);
+}
+.layer-workspace button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+.layer-workspace button:disabled {
+  opacity: 0.5;
+}
+.layer-workspace input[type='checkbox'] {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.layer-actions {
+  flex-wrap: wrap;
+}
+.layer-tree {
+  min-height: 100px;
+  max-height: 250px;
+  overflow: auto;
+  flex: none;
+}
+.layer-row {
+  padding-block: 5px;
+  border-bottom: 1px solid var(--border);
+}
+.layer-row.active {
+  background: var(--info-background);
+}
+.layer-title {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+  border: 0 !important;
+  background: transparent !important;
+}
+.layer-title i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: none;
+  margin-top: 4px;
+}
+.layer-title span,
+.layer-feature-row button {
+  min-width: 0;
+  overflow: hidden;
+}
+.layer-workspace strong,
+.layer-workspace small {
+  display: block;
+}
+.layer-workspace small {
+  font-size: 11px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.layer-workspace details {
+  flex: none;
+}
+.layer-workspace summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 600;
+}
+.layer-settings label {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0;
+  font-size: 12px;
+}
+.layer-settings .layer-check,
+.layer-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.layer-settings fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+.layer-style-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.layer-rule {
+  display: flex;
+  gap: 4px;
+}
+.layer-rule input {
+  width: 65px;
+}
+.layer-rule select {
+  width: 90px;
+}
+.layer-feature-heading {
+  flex-wrap: wrap;
+}
+.layer-table {
+  height: 260px;
+  min-height: 160px;
+  flex: none;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.layer-feature-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.layer-feature-row button {
+  flex: 1;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+}
+.layer-feature-row strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.layer-preview {
+  padding: 10px;
+  border: 1px solid var(--link);
+  border-radius: 8px;
+}
+.layer-workspace output {
+  white-space: pre-wrap;
+  font-size: 12px;
+}
+.layer-explorer-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+}
+.layer-explorer-tabs button {
+  flex: 1;
+}
+.editor-overlap {
+  position: absolute;
+  z-index: 15;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  max-height: 45vh;
+  overflow: auto;
+  padding: 12px;
+}
+.editor-overlap button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.editor-overlap small {
+  display: block;
+  color: var(--muted);
+}
+@media (max-width: 767px) {
+  .layer-workspace {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    height: 60dvh;
+    resize: none;
+  }
+  .layer-tree {
+    max-height: 180px;
+  }
+  .editor-overlap {
+    top: 60px;
+    max-width: calc(100% - 24px);
+  }
+}
+.layer-geometry {
+  margin: 0;
+  position: absolute;
+  z-index: 40;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 24px));
+  max-height: calc(100% - 32px);
+  overflow: auto;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+}
+.layer-geometry::backdrop {
+  background: #0006;
+}
+.layer-geometry header {
+  display: flex;
+  justify-content: space-between;
+}
+.layer-geometry label {
+  display: grid;
+  gap: 4px;
+}
+.layer-geometry textarea {
+  width: 100%;
+}
+.layer-geometry ul {
+  max-height: 220px;
+  overflow: auto;
+  padding-left: 22px;
+}

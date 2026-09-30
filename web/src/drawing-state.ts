@@ -8,14 +8,14 @@ export function drawingProgress(drawing: UnfinishedDrawing | null) {
         ? geometry.coordinates[0] || []
         : [];
   const count = points.length;
-  const minimum = drawing?.kind === 'building' ? 3 : 2;
+  const minimum = geometry?.type === 'Polygon' ? 3 : 2;
   const remaining = Math.max(
     0,
     minimum - new Set(points.map((p) => p.join(','))).size,
   );
   const canFinish =
     !!drawing &&
-    ['path', 'barrier', 'building'].includes(drawing.kind) &&
+    ['LineString', 'Polygon'].includes(geometry?.type || '') &&
     remaining === 0;
   return {
     count,

@@ -6,6 +6,12 @@ from map_import.geometry import prepare_geometry, preview_features
 
 
 class VectorLayerTests(unittest.TestCase):
+    def test_parcel_street_address_cannot_create_road_surface_or_trees(self):
+        from map_import.semantics import mapped_properties, surface_class
+        self.assertNotEqual(surface_class('13 PROFESSOR STREET'), 'road')
+        result=mapped_properties({'NAME':'13 PROFESSOR STREET'},{'nameField':'NAME','sourceLayerName':'UNILAG Parcels'},'landcover')
+        self.assertEqual(result['landClass'],'parcel')
+        self.assertNotEqual(result.get('vegetation'),'trees')
     def test_merge_retains_absent_layers_and_explicit_replacement_removes(self):
         initial=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'one')
         previous=[p['after'] for p in initial['proposals'] if p['after']]

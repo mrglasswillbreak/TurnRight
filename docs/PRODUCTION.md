@@ -3,6 +3,20 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Campus layers implementation checkpoint · 30 September 2026 · not deployed
+
+Branch `codex/lasu-campus-layers` contains the layer explorer, original-path hit testing, road-property persistence, bounded polygon editing, reviewed geometry operations, desktop control row and candidate data. The app and campus packages have **not** been released. Production remains `lasu-2b70a39ca041` and `unilag-a3779f9c3603`.
+
+Private campus backups were captured and read-back verified before migration. [Audit run 36760377686](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36760377686) retained LASU's 4,776 source rows / 137 corrections and UNILAG's 10,574 source rows / 189 corrections. Comparison with immutable published snapshots found two unpublished LASU building drafts and one unpublished UNILAG land draft. The new preparation workflow preserves these privately and guards publication with a complete live workspace hash.
+
+Migration **020_campus_layer_records.sql** was applied in a transaction through the Supabase SQL editor. Readback confirmed `save_editor_layer_batch(uuid,uuid,jsonb)` and unchanged correction counts (137 / 189). No new layer records or source enrichment were written to the live campus workspaces.
+
+The LASU candidate patch contains 82 illustrative surfaces with all 95 source paths accounted for, 30 reclassified landscape records and three bounded coordinate-conversion repairs. Independent Shapely checks pass validity, non-overlap, identity and area accounting. UNILAG's patch corrects 426 parcel classifications while retaining all 179 surveyed road identities.
+
+Verification checkpoint: 13 focused layer/geometry tests pass, including all UNILAG identities, progressive windows, multipart deletion, split/merge lineage, linked width edits and manual-regeneration safeguards. The database suite passes 23 tests. The GIS suite passed 57 tests with four pinned-runtime skips, and all three new LASU/parcel acceptance tests passed. Chromium verifies layer save/reload, covered-centreline selection and the desktop row's 12 px gap. Polygon 96 now passes the actual property edit, vertex drag in hole 45, geometry save and reload with all 6,094 vertices and 56 holes retained. Full CI and released-package verification remain pending.
+
+The configured build passes all unchanged limits: public startup **434,836 / 435,200** gzip bytes, additional owner startup **188,589 / 189,440**, lazy photo workspace **10,492 / 12,288**, and 3D **238.3 / 300 KiB**. World and voice assets pass their existing 8 MiB limits. The earlier Windows command-runner interruption has cleared; no security protections were disabled.
+
 ## UNILAG detail and vector compatibility · 30 September 2026
 
 Release `9f775622-a2aa-419c-a154-e9b584c7f465`, package

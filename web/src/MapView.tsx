@@ -138,7 +138,10 @@ export function MapView({
     () => ({
       campus: campusGeometry,
       'road-display': roadGeometry || campusGeometry,
-      boundary: data.boundary,
+      boundary: displayGeometry({
+        type: 'FeatureCollection',
+        features: [data.boundary],
+      }),
       places: placesGeometry,
       closures: closuresGeometry,
     }),
@@ -177,7 +180,7 @@ export function MapView({
       cancelled = true;
       motionMap.off('load', apply);
     };
-  }, [motionMap, dark]);
+  }, [motionMap, dark, selected?.id]);
   useEffect(() => {
     if (!editor)
       document.title =

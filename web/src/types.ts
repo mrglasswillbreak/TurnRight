@@ -193,6 +193,7 @@ export interface Closure {
   reopenedAt?: string;
 }
 export interface CampusData {
+  layers?: import('./campus-layer-types.js').CampusLayers;
   sourceSnapshots?: {
     file: string;
     url: string;
@@ -342,7 +343,16 @@ export interface MapChange {
 }
 export interface MapEdit {
   id: string;
-  kind: 'place' | 'path' | 'building' | 'entrance' | 'barrier' | 'closure' | 'land' | 'overlay';
+  kind:
+    | 'place'
+    | 'path'
+    | 'building'
+    | 'entrance'
+    | 'barrier'
+    | 'closure'
+    | 'land'
+    | 'overlay'
+    | 'layer';
   geometry: Geometry;
   properties: Record<string, unknown> & {
     modelDocument?: import('./model-document.js').ModelDocument;

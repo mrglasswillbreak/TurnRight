@@ -33,6 +33,7 @@ export interface WorkspaceSnapshot {
   roofDraft?: RoofDraft | null;
 }
 export interface SaveBatch {
+  layerManagementVersion?: 1;
   modelAuthoringVersion?: 1;
   modelDocumentVersion?: 1;
   operationId: string;
@@ -476,6 +477,7 @@ export class EditorWorkspace {
           }
           const saved = new Map(this.saved.map((e) => [editKey(e), e]));
           this.pending = {
+            layerManagementVersion: 1,
             modelAuthoringVersion: 1,
             modelDocumentVersion: 1,
             operationId: crypto.randomUUID(),

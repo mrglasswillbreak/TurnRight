@@ -60,6 +60,7 @@ beforeAll(async () => {
     '017_import_queue_deadline.sql',
     '018_vector_layer_edits.sql',
     '019_additive_source_patch.sql',
+    '020_campus_layer_records.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -79,6 +80,91 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await database?.close();
+});
+it('saves layer membership atomically, rejects stale moves and protects metadata from old clients', async () => {
+  const layer = {
+    id: 'map-layer:database',
+    name: 'Road surfaces',
+    role: 'road-surface',
+    band: 'surfaces',
+    order: 0,
+    editorVisible: true,
+    locked: false,
+    included: true,
+    publishedVisible: true,
+    archived: false,
+    style: {},
+    rules: [],
+    members: ['land:surface:db'],
+  };
+  const layerItem = {
+    edit: {
+      id: layer.id,
+      kind: 'layer',
+      geometry: { type: 'GeometryCollection', geometries: [] },
+      properties: { layerDefinition: layer },
+      deleted: false,
+    },
+    expectedUpdatedAt: null,
+  };
+  const feature = {
+    edit: {
+      id: 'surface:db',
+      kind: 'land',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [3.2, 6.46],
+            [3.201, 6.46],
+            [3.201, 6.461],
+            [3.2, 6.46],
+          ],
+        ],
+      },
+      properties: { name: 'Surveyed road', mapLayerId: layer.id, width: 6 },
+      deleted: false,
+    },
+    expectedUpdatedAt: null,
+  };
+  await expect(
+    database.query('select save_editor_batch($1,$2,$3)', [
+      randomUUID(),
+      owner,
+      JSON.stringify([layerItem]),
+    ]),
+  ).rejects.toThrow('Update the editor');
+  const saved = await database.query<{
+    result: { id: string; updated_at: string }[];
+  }>('select save_editor_layer_batch($1,$2,$3) result', [
+    randomUUID(),
+    owner,
+    JSON.stringify([layerItem, feature]),
+  ]);
+  await expect(
+    database.query('select save_editor_layer_batch($1,$2,$3)', [
+      randomUUID(),
+      owner,
+      JSON.stringify([layerItem]),
+    ]),
+  ).rejects.toThrow();
+  const record = saved.rows[0].result.find((e) => e.id === feature.edit.id)!;
+  await database.query('select save_editor_batch($1,$2,$3)', [
+    randomUUID(),
+    owner,
+    JSON.stringify([
+      {
+        ...feature,
+        expectedUpdatedAt: record.updated_at,
+        edit: { ...feature.edit, properties: { name: 'Older editor name' } },
+      },
+    ]),
+  ]);
+  const kept = await database.query<{ properties: { mapLayerId: string } }>(
+    'select properties from map_edits where id=$1',
+    [feature.edit.id],
+  );
+  expect(kept.rows[0].properties.mapLayerId).toBe(layer.id);
 });
 it('applies an additive campus patch atomically with stale guards and rollback while retaining drafts', async () => {
   const campus = 'campus-patch-test';

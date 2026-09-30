@@ -8,14 +8,23 @@ import {
   snapshotHash,
   validateReleaseSnapshot,
 } from "../web/server/release-validation";
-import {preservePublished} from "../web/scripts/published-assets.mjs";
-import {preserveCampusCatalogue,readPublishedCatalogue} from "../web/scripts/published-campus-catalogue.mjs";
-import {activeCampus} from "../web/server/campuses";
-import { prepareReleasePhotos } from './photo-release.mjs';
-import { arrivalIssues } from '../web/src/arrival';
-import {hydrateModelEdits} from '../web/server/model-assets';
-import {modelDocumentRevision} from '../web/src/model-document-revision';
-import { vercelApi, uploadSource, waitForDeployment, publishDeployment, withDeploymentAccess } from "./vercel-api.mjs";
+import { preservePublished } from "../web/scripts/published-assets.mjs";
+import {
+  preserveCampusCatalogue,
+  readPublishedCatalogue,
+} from "../web/scripts/published-campus-catalogue.mjs";
+import { activeCampus } from "../web/server/campuses";
+import { prepareReleasePhotos } from "./photo-release.mjs";
+import { arrivalIssues } from "../web/src/arrival";
+import { hydrateModelEdits } from "../web/server/model-assets";
+import { modelDocumentRevision } from "../web/src/model-document-revision";
+import {
+  vercelApi,
+  uploadSource,
+  waitForDeployment,
+  publishDeployment,
+  withDeploymentAccess,
+} from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   web = path.join(root, "web");
 const id = process.env.RELEASE_ID,
@@ -28,87 +37,132 @@ if (
 )
   throw new Error("Release/Vercel workflow secrets are missing");
 let progressJob: string | undefined;
-const progress = async (message: string) => { if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {message}).catch(()=>console.warn('Progress status update unavailable')); };
+const progress = async (message: string) => {
+  if (progressJob)
+    await db(`jobs?id=eq.${progressJob}`, "PATCH", { message }).catch(() =>
+      console.warn("Progress status update unavailable"),
+    );
+};
 try {
   const [release] = await db(`releases?id=eq.${encodeURIComponent(id)}`);
   if (!release) throw new Error("Release not found");
-  const [job] = await db('jobs','POST',{kind:`release:${id}:${operation}`,status:'running',message:'Validating release snapshot'}).catch(()=>[]);
-  progressJob=job?.id;
+  const [job] = await db("jobs", "POST", {
+    kind: `release:${id}:${operation}`,
+    status: "running",
+    message: "Validating release snapshot",
+  }).catch(() => []);
+  progressJob = job?.id;
   const campus = await activeCampus();
   const catalog = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
-  if (!release.catalogue_revision || catalog.revision !== release.catalogue_revision) throw Error('The campus directory changed. Create a fresh reviewed preview.');
+  if (!release.catalogue_revision || catalog.revision !== release.catalogue_revision)
+    throw Error("The campus directory changed. Create a fresh reviewed preview.");
   if (operation === "preview") {
     if (release.status !== "queued") throw new Error("Only queued releases can be built");
     await db(`releases?id=eq.${id}`, "PATCH", { status: "building", error: null });
     if (!release.snapshot.features.length)
       throw new Error("No approved source baseline. Run bootstrap first.");
-    const manifestPath = campus.id === 'lasu' ? 'packages/latest.json' : `packages/${campus.slug}/latest.json`;
+    const manifestPath =
+      campus.id === "lasu" ? "packages/latest.json" : `packages/${campus.slug}/latest.json`;
     let manifest;
     if (release.restored_from) {
       const [historical] = await db(`releases?id=eq.${release.restored_from}&status=eq.published`);
-      if (!historical?.deployment_url || !historical.version) throw Error('The historical campus package is unavailable.');
+      if (!historical?.deployment_url || !historical.version)
+        throw Error("The historical campus package is unavailable.");
       // Reuse the immutable reviewed package, but build a fresh site with the current other campuses.
-      manifest = await withDeploymentAccess(historical.deployment_url, headers => preservePublished(path.join(web,'public'), historical.deployment_url, false, historical.version, `/packages/${historical.version}/manifest.json`, {headers}));
-      if (campus.id !== 'lasu' && manifest.campus?.id !== campus.id) throw Error('Historical package campus mismatch.');
-      await fs.mkdir(path.dirname(path.join(web,'public',manifestPath)),{recursive:true});
-      await fs.writeFile(path.join(web,'public',manifestPath),JSON.stringify(manifest,null,2));
+      manifest = await withDeploymentAccess(historical.deployment_url, (headers) =>
+        preservePublished(
+          path.join(web, "public"),
+          historical.deployment_url,
+          false,
+          historical.version,
+          `/packages/${historical.version}/manifest.json`,
+          { headers },
+        ),
+      );
+      if (campus.id !== "lasu" && manifest.campus?.id !== campus.id)
+        throw Error("Historical package campus mismatch.");
+      await fs.mkdir(path.dirname(path.join(web, "public", manifestPath)), { recursive: true });
+      await fs.writeFile(path.join(web, "public", manifestPath), JSON.stringify(manifest, null, 2));
     } else {
-    const published = await publishedCampus();
-    const data = validateReleaseSnapshot({...release.snapshot,edits:await hydrateModelEdits(release.snapshot.edits)}, published, {restoring:!!release.restored_from});
-    for(const feature of data.map.features){const doc=feature.properties?.modelDocument;if(doc){feature.properties!.authoredModelRevision=modelDocumentRevision(doc);if(doc.curves.length)feature.properties!.surfaceCurves=doc.curves;}}
-    await progress('Preparing reviewed photographs and model textures');
-    await prepareReleasePhotos(data, root);
-    data.createdAt = new Date().toISOString();
-    await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
-    await progress('Building reviewed 3D models');
-    execFileSync(
-      process.execPath,
-      [
-        "--import",
-        "tsx",
-        "scripts/build-campus-visuals.ts",
-        "../data/release-input.json",
-        "../data/release-visuals",
-        "--reviewed",
-      ],
-      {
-        cwd: web,
-        env: process.env,
+      const published = await publishedCampus();
+      const data = validateReleaseSnapshot(
+        { ...release.snapshot, edits: await hydrateModelEdits(release.snapshot.edits) },
+        published,
+        { restoring: !!release.restored_from },
+      );
+      for (const feature of data.map.features) {
+        const doc = feature.properties?.modelDocument;
+        if (doc) {
+          feature.properties!.authoredModelRevision = modelDocumentRevision(doc);
+          if (doc.curves.length) feature.properties!.surfaceCurves = doc.curves;
+        }
+      }
+      await progress("Preparing reviewed photographs and model textures");
+      await prepareReleasePhotos(data, root);
+      data.createdAt = new Date().toISOString();
+      await fs.writeFile(path.join(root, "data/release-input.json"), JSON.stringify(data));
+      await progress("Building reviewed 3D models");
+      execFileSync(
+        process.execPath,
+        [
+          "--import",
+          "tsx",
+          "scripts/build-campus-visuals.ts",
+          "../data/release-input.json",
+          "../data/release-visuals",
+          "--reviewed",
+        ],
+        {
+          cwd: web,
+          env: process.env,
+          stdio: "inherit",
+          timeout: 120000,
+        },
+      );
+      await progress("Packaging map, routing graph and offline assets");
+      execFileSync(process.execPath, [path.join(root, "scripts/package.mjs")], {
+        cwd: root,
+        env: {
+          ...process.env,
+          CAMPUS_INPUT: "data/release-input.json",
+          CAMPUS_ID: campus.id,
+          CAMPUS_SLUG: campus.slug,
+          CAMPUS_NAME: campus.name,
+          VISUALS_INPUT: "data/release-visuals",
+          RELEASE_SUMMARY: release.summary,
+        },
         stdio: "inherit",
-        timeout: 120000,
+      });
+      manifest = JSON.parse(await fs.readFile(path.join(web, "public", manifestPath), "utf8"));
+    }
+    await progress("Verifying and retaining other published campuses");
+    const preserved = await preserveCampusCatalogue(
+      path.join(web, "public"),
+      process.env.PUBLISHED_MAP_URL!,
+      {
+        expectedRevision: release.catalogue_revision,
+        replacement: { campus, manifest },
       },
     );
-    await progress('Packaging map, routing graph and offline assets');
-    execFileSync(process.execPath, [path.join(root, "scripts/package.mjs")], {
-      cwd: root,
-      env: {
-        ...process.env,
-        CAMPUS_INPUT: "data/release-input.json",
-        CAMPUS_ID: campus.id,
-        CAMPUS_SLUG: campus.slug,
-        CAMPUS_NAME: campus.name,
-        VISUALS_INPUT: "data/release-visuals",
-        RELEASE_SUMMARY: release.summary,
-      },
-      stdio: "inherit",
-    });
-    manifest = JSON.parse(await fs.readFile(path.join(web,'public',manifestPath),'utf8'));
-    }
-    await progress('Verifying and retaining other published campuses');
-    const preserved = await preserveCampusCatalogue(path.join(web,'public'),process.env.PUBLISHED_MAP_URL!,{
-      expectedRevision:release.catalogue_revision,replacement:{campus,manifest}
-    });
-    const packagedData = JSON.parse(await fs.readFile(path.join(web, 'public', manifest.dataUrl), 'utf8'));
+    const packagedData = JSON.parse(
+      await fs.readFile(path.join(web, "public", manifest.dataUrl), "utf8"),
+    );
     const photoIssues = arrivalIssues(packagedData);
-    if (photoIssues.length) throw new Error(photoIssues.join('\n'));
+    if (photoIssues.length) throw new Error(photoIssues.join("\n"));
     await fs.writeFile(
       path.join(web, "release-build.json"),
-      JSON.stringify({ version: manifest.version, releaseId: id, campusId: campus.id, manifestPath, catalogueRevision:preserved.revision }),
+      JSON.stringify({
+        version: manifest.version,
+        releaseId: id,
+        campusId: campus.id,
+        manifestPath,
+        catalogueRevision: preserved.revision,
+      }),
     );
     const project = await vercelApi(
       `/v9/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID!)}`,
     );
-    await progress('Uploading release source for deployment');
+    await progress("Uploading release source for deployment");
     const files = await uploadSource(root);
     const created = await vercelApi("/v13/deployments", {
       method: "POST",
@@ -135,7 +189,7 @@ try {
       version: manifest.version,
       published_catalogue_revision: preserved.revision,
     });
-    await progress('Building deployment and checking asset budgets');
+    await progress("Building deployment and checking asset budgets");
     const deployment = await waitForDeployment(created.id);
     const url = `https://${deployment.url}`;
     await db(`releases?id=eq.${id}`, "PATCH", { status: "preview", preview_url: url });
@@ -146,19 +200,29 @@ try {
     if (!release.deployment_id) throw new Error("Deployment is missing");
     await db(`releases?id=eq.${id}`, "PATCH", { error: null });
     if (operation === "publish") {
-      validateReleaseSnapshot({...release.snapshot,edits:await hydrateModelEdits(release.snapshot.edits)}, await publishedCampus(), {restoring:!!release.restored_from});
+      validateReleaseSnapshot(
+        { ...release.snapshot, edits: await hydrateModelEdits(release.snapshot.edits) },
+        await publishedCampus(),
+        { restoring: !!release.restored_from },
+      );
       const [features, edits] = await Promise.all([
         allRows("source_features"),
         allRows("map_edits"),
       ]);
       if (
-        !release.restored_from && snapshotHash(release.snapshot.features, release.snapshot.edits) !==
-        snapshotHash(features, edits)
+        !release.restored_from &&
+        (release.snapshot.workspaceHash ||
+          snapshotHash(release.snapshot.features, release.snapshot.edits)) !==
+          snapshotHash(features, edits)
       )
         throw new Error("Preview is stale. Create a fresh reviewed preview.");
     }
-    if((await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !== release.catalogue_revision) throw Error('Another campus changed before publication. Build a fresh preview.');
-    await progress('Publishing reviewed preview and verifying production');
+    if (
+      (await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !==
+      release.catalogue_revision
+    )
+      throw Error("Another campus changed before publication. Build a fresh preview.");
+    await progress("Publishing reviewed preview and verifying production");
     const deployment = await publishDeployment(release.deployment_id, {
       releaseId: id,
       operation,
@@ -168,7 +232,13 @@ try {
           error: null,
         }),
     });
-    if((await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !== release.published_catalogue_revision) throw Error('Published campus directory verification failed. Inspect the production deployment before retrying.');
+    if (
+      (await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !==
+      release.published_catalogue_revision
+    )
+      throw Error(
+        "Published campus directory verification failed. Inspect the production deployment before retrying.",
+      );
     await db(`releases?id=eq.${id}`, "PATCH", {
       status: "published",
       deployment_url: `https://${deployment.url}`,
@@ -177,10 +247,20 @@ try {
     });
     console.log("Production release and domain assignment verified.");
   } else throw new Error("Unknown release operation");
-  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'succeeded',message:operation==='preview'?'Preview ready for review':'Publication verified',completed_at:new Date().toISOString()}).catch(()=>{});
+  if (progressJob)
+    await db(`jobs?id=eq.${progressJob}`, "PATCH", {
+      status: "succeeded",
+      message: operation === "preview" ? "Preview ready for review" : "Publication verified",
+      completed_at: new Date().toISOString(),
+    }).catch(() => {});
 } catch (error) {
   const message = (error as Error).message;
-  if(progressJob) await db(`jobs?id=eq.${progressJob}`, 'PATCH', {status:'failed',message,completed_at:new Date().toISOString()}).catch(()=>{});
+  if (progressJob)
+    await db(`jobs?id=eq.${progressJob}`, "PATCH", {
+      status: "failed",
+      message,
+      completed_at: new Date().toISOString(),
+    }).catch(() => {});
   await db(
     `releases?id=eq.${id}`,
     "PATCH",

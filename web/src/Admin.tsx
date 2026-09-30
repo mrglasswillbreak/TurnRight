@@ -1,3 +1,4 @@
+import { propertyEdits } from './road-properties';
 import { campusUrl, lasuCampus } from './campus-context';
 import { PhotoSession } from './PhotoSession';
 import { canonicalBuildingId } from './arrival';
@@ -92,7 +93,6 @@ import {
 import { useEditorWorkspace } from './useEditorWorkspace';
 import { withPublishedVisuals } from './editor-visuals';
 import { remapBuildingSurfaces } from './building-surfaces';
-import { EditorInspector } from './EditorInspector';
 import { photoEdits } from './photo-workspace';
 import { EditorReview, type ReviewState } from './EditorReview';
 import { campusFacadeReviewIssues } from './building-facades';
@@ -108,11 +108,28 @@ import { useRoutes } from './useRoutes';
 import { placeHasConnection } from './routing';
 import type { CampusData, MapChange, MapEdit, Position, Route } from './types';
 import './editor.css';
+import './layer-workspace.css';
+import {
+  campusLayers,
+  layerFeatures,
+  layerMembership,
+  layerPresentation,
+  editableLayer,
+  layerKey,
+  catalogueErrors,
+} from './campus-layers';
+import { validateEdit } from './editor-model';
+import type { LayerViewState } from './campus-layer-types';
 
 const SurveyPanel = lazy(() =>
   import('./SurveyPanel').then((m) => ({ default: m.SurveyPanel })),
 );
 const CampusWorkspace = lazy(() => import('./CampusWorkspace'));
+const LayerWorkspace = lazy(() => import('./LayerWorkspace'));
+const LayerGeometry = lazy(() => import('./LayerGeometry'));
+const EditorInspector = lazy(() =>
+  import('./EditorInspector').then((m) => ({ default: m.EditorInspector })),
+);
 const BuildingAppearanceEditor = lazy(() =>
   import('./BuildingAppearanceEditor').then((module) => ({
     default: module.BuildingAppearanceEditor,
@@ -516,6 +533,18 @@ function Editor({
     [search, setSearch] = useState(''),
     [filter, setFilter] = useState('needs'),
     [explorer, setExplorer] = useState(true);
+  const [layersOpen, setLayersOpen] = useState(false),
+    [layerView, setLayerView] = useState<LayerViewState>({});
+  const [overlap, setOverlap] = useState<{
+    features: { kind: MapEdit['kind']; id: string }[];
+    anchor: Position;
+  } | null>(null);
+  const [layerOperation, setLayerOperation] = useState<
+    import('./layer-geometry-engine').GeometryRequest | null
+  >(null);
+  const cutterRequest = useRef<
+    import('./layer-geometry-engine').GeometryRequest | null
+  >(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
     try {
       return (
@@ -766,8 +795,9 @@ function Editor({
     };
   }, [visible.map, mapSelection, preview, workspace.roofDraft]);
   const rendered = useMemo(
-    () => ({ ...visible, map: renderedMap }),
-    [visible, renderedMap],
+    () =>
+      layerPresentation({ ...visible, map: renderedMap }, !preview, layerView),
+    [visible, renderedMap, preview, layerView],
   );
   const invalid = useMemo(
     () =>
@@ -779,6 +809,16 @@ function Editor({
     [validation.issues],
   );
   const select = (edit: MapEdit, refocus = false, anchor?: Position) => {
+    const definitions = campusLayers(validation.data).items,
+      member = layerMembership(validation.data, definitions).get(
+        layerKey(edit.kind, edit.id),
+      ),
+      layer = definitions.find((l) => l.id === member);
+    if (layer && !editableLayer(layer, definitions)) {
+      setMessage('Show and unlock this layer before editing its features.');
+      return;
+    }
+    setOverlap(null);
     workspace.endHistoryGroup();
     if (workspace.roofDraft && workspace.roofDraft.buildingId !== edit.id) {
       setMessage(
@@ -822,7 +862,12 @@ function Editor({
     const edit = featureEdit(validation.data, kind, id, workspace.edits);
     if (edit) select(edit, refocus, anchor);
   };
-  const commit = (batch: MapEdit[], current = batch[0]) => {
+  const commit = (
+    batch: MapEdit[],
+    current: MapEdit | null = batch.find(
+      (e) => !e.deleted && e.kind !== 'layer',
+    ) || null,
+  ) => {
     workspace.commit(batch, null);
     setSelected(current);
     selectedRef.current = current;
@@ -830,6 +875,55 @@ function Editor({
     restoreDrawingPanels();
     setRoutes([]);
     controller.current?.select(current);
+  };
+  const commitLayers = (batch: MapEdit[]) => {
+    const errors = batch.flatMap((e) => validateEdit(e));
+    const definitions = new Map(
+      campusLayers(validation.data).items.map((l) => [l.id, l]),
+    );
+    for (const e of batch)
+      if (e.kind === 'layer')
+        definitions.set(
+          e.id,
+          e.properties
+            .layerDefinition as import('./campus-layer-types').CampusLayer,
+        );
+    errors.push(...catalogueErrors([...definitions.values()]));
+    if (errors.length) {
+      setError(errors.join(' '));
+      return;
+    }
+    workspace.commit(batch, null);
+    setMessage(
+      `${batch.length} layer or feature changes added to the draft. Undo restores the whole operation.`,
+    );
+  };
+  const zoomLayers = (keys: string[]) => {
+    const points: Position[] = [];
+    const collect = (v: unknown) => {
+      if (!Array.isArray(v)) return;
+      if (typeof v[0] === 'number') points.push(v as Position);
+      else v.forEach(collect);
+    };
+    layerFeatures(validation.data)
+      .filter((f) => keys.includes(f.key))
+      .forEach((f) => {
+        if ('coordinates' in f.geometry) collect(f.geometry.coordinates);
+      });
+    if (points.length)
+      mapRef.current?.fitBounds(
+        [
+          [
+            Math.min(...points.map((p) => p[0])),
+            Math.min(...points.map((p) => p[1])),
+          ],
+          [
+            Math.max(...points.map((p) => p[0])),
+            Math.max(...points.map((p) => p[1])),
+          ],
+        ],
+        { padding: 100, maxZoom: 19 },
+      );
   };
   const stageRepair = (
     batch: MapEdit[],
@@ -1038,7 +1132,13 @@ function Editor({
                 : 'Campus place';
     controller.current?.begin(
       kind,
-      { name, access: 'yes', category: 'other', ...props },
+      {
+        name,
+        ...(['land', 'overlay'].includes(kind)
+          ? {}
+          : { access: 'yes', category: 'other' }),
+        ...props,
+      },
       seed,
     );
     setMessage(
@@ -1085,6 +1185,22 @@ function Editor({
     );
   };
   const create = (edit: MapEdit) => {
+    if (
+      edit.properties.temporaryGeometry &&
+      (cutterRequest.current || edit.properties.geometryRequest)
+    ) {
+      setLayerOperation({
+        ...((cutterRequest.current ||
+          edit.properties
+            .geometryRequest) as import('./layer-geometry-engine').GeometryRequest),
+        cutter: edit.geometry,
+      });
+      cutterRequest.current = null;
+      controller.current?.cancel();
+      setTool(null);
+      restoreDrawingPanels();
+      return;
+    }
     const batch = [edit];
     if (
       edit.kind === 'path' &&
@@ -1129,6 +1245,12 @@ function Editor({
       validation.data,
       workspace.edits,
     );
+    for (const edit of batch)
+      if (edit.properties.derivedSurface)
+        edit.properties.derivedSurface = {
+          ...(edit.properties.derivedSurface as Record<string, unknown>),
+          manual: true,
+        };
     if (repairFocus) stageRepair(batch);
     else
       commit(
@@ -1294,6 +1416,7 @@ function Editor({
       draft: (drawing) => workspace.draft(drawing),
       connect: (target, mode) => live.current.connect(target, mode),
       hint: setHint,
+      choose: (features, anchor) => setOverlap({ features, anchor }),
     });
     controller.current = instance;
     setReady((r) => r + 1);
@@ -1345,14 +1468,28 @@ function Editor({
     workspace.roofDraft,
   ]);
   useEffect(() => {
+    const definitions = campusLayers(validation.data).items;
+    const current = selectedRef.current;
+    if (current) {
+      const member = layerMembership(validation.data, definitions).get(
+        layerKey(current.kind, current.id),
+      );
+      const layer = definitions.find((l) => l.id === member);
+      if (layer && !editableLayer(layer, definitions)) {
+        setSelected(null);
+        selectedRef.current = null;
+        controller.current?.select(null);
+      }
+    }
     controller.current?.update(
       validation.data,
       drafts,
       data,
       invalid,
       preview || survey,
+      layerView,
     );
-  }, [validation, drafts, data, invalid, preview, ready, survey]);
+  }, [validation, drafts, data, invalid, preview, ready, survey, layerView]);
   useEffect(() => {
     const features: Feature[] = [];
     for (const [side, color] of [
@@ -1743,6 +1880,7 @@ function Editor({
         <nav className="editor-navigation" aria-label="Editor sections">
           {[
             ['map', 'Workspace'],
+            ['layers', 'Layers'],
             ['campuses', 'Campuses'],
             ['changes', 'Sources'],
             ['duplicates', 'Duplicates'],
@@ -1761,6 +1899,13 @@ function Editor({
               }
               onClick={() => {
                 workspace.endHistoryGroup();
+                if (id === 'layers') {
+                  setLayersOpen(true);
+                  setExplorer(false);
+                  setTab('map');
+                  return;
+                }
+                setLayersOpen(false);
                 if (id === 'settings') {
                   setTab(id);
                   return;
@@ -1985,7 +2130,133 @@ function Editor({
             <span>Redo</span>
           </button>
         </div>
-        <div className={`editor-explorer ${explorer ? '' : 'collapsed'}`}>
+        {overlap && (
+          <dialog
+            open
+            className="editor-overlap editor-card"
+            aria-label="Choose overlapping feature"
+          >
+            <strong>Choose a feature</strong>
+            <button
+              aria-label="Close feature chooser"
+              onClick={() => setOverlap(null)}
+            >
+              ×
+            </button>
+            {overlap.features.map((f) => {
+              const edit = featureEdit(
+                validation.data,
+                f.kind,
+                f.id,
+                workspace.edits,
+              );
+              const l = campusLayers(validation.data).items.find(
+                (l) =>
+                  l.id ===
+                  layerMembership(validation.data).get(layerKey(f.kind, f.id)),
+              );
+              return (
+                <button
+                  key={`${f.kind}:${f.id}`}
+                  onClick={() => selectId(f.kind, f.id, false, overlap.anchor)}
+                >
+                  <strong>
+                    {f.kind === 'path'
+                      ? 'Routing path'
+                      : f.kind === 'land' && l?.role === 'road-surface'
+                        ? 'Road surface'
+                        : f.kind}{' '}
+                    · {String(edit?.properties.name || 'Unnamed')}
+                  </strong>
+                  <small>
+                    {l?.name} ·{' '}
+                    {String(
+                      edit?.properties.surface ||
+                        edit?.properties.landClass ||
+                        '',
+                    )}{' '}
+                    · {String(edit?.properties.sourceId || f.id)}
+                  </small>
+                </button>
+              );
+            })}
+          </dialog>
+        )}
+        {layersOpen && tab === 'map' && !tool && (
+          <Suspense
+            fallback={<div className="editor-card">Loading layers…</div>}
+          >
+            <LayerWorkspace
+              data={validation.data}
+              edits={workspace.edits}
+              view={layerView}
+              onView={setLayerView}
+              onCommit={commitLayers}
+              onSelect={(kind, id) => selectId(kind, id, true)}
+              onZoom={zoomLayers}
+              onImport={() => {
+                setLayersOpen(false);
+                setTab('campuses');
+              }}
+              onClose={() => {
+                setLayersOpen(false);
+                setExplorer(true);
+              }}
+              onDraw={(layer, type) =>
+                begin(layer.role === 'overlay' ? 'overlay' : 'land', {
+                  mapLayerId: layer.id,
+                  mapLayerSource: 'owner',
+                  drawingGeometry: type,
+                  name: layer.name,
+                  ...(layer.role === 'road-surface'
+                    ? { landClass: 'road' }
+                    : {}),
+                })
+              }
+              onGeometry={(operation, keys) =>
+                setLayerOperation({ operation, keys })
+              }
+            />
+          </Suspense>
+        )}
+        {layerOperation && (
+          <Suspense
+            fallback={
+              <div className="editor-card">Loading geometry tools…</div>
+            }
+          >
+            <LayerGeometry
+              data={validation.data}
+              edits={workspace.edits}
+              request={layerOperation}
+              onClose={() => setLayerOperation(null)}
+              onPreview={stageRepair}
+              onDrawCutter={(request) => {
+                cutterRequest.current = request;
+                setLayerOperation(null);
+                begin('overlay', {
+                  name: 'Geometry preview',
+                  temporaryGeometry: true,
+                  geometryRequest: request,
+                  drawingGeometry:
+                    request.operation === 'split' ? 'LineString' : 'Polygon',
+                });
+              }}
+              onWindow={(part, ring, start) => {
+                const key = layerOperation.keys[0],
+                  index = key.indexOf(':');
+                selectId(
+                  key.slice(0, index) as MapEdit['kind'],
+                  key.slice(index + 1),
+                );
+                controller.current?.selectWindow(part, ring, start);
+              }}
+            />
+          </Suspense>
+        )}
+        <div
+          className={`editor-explorer ${explorer && !layersOpen ? '' : 'collapsed'}`}
+        >
           {explorer ? (
             <section className="editor-card">
               <div className="editor-explorer-top">
@@ -2311,161 +2582,179 @@ function Editor({
             )}
           </aside>
         ) : selected && !preview ? (
-          <EditorInspector
-            photoOwner={owner}
-            photoSaveStatus={workspace.status}
-            publishedPhotos={data.photos}
-            onPhotoUndo={() => undo()}
-            onPhotos={(change) => {
-              if (
-                workspace.roofDraft ||
-                workspace.unfinished ||
-                validation.pending
-              )
-                throw Error(
-                  'Finish the current edit and wait for map validation before changing photos.',
+          <Suspense
+            fallback={
+              <aside className="editor-inspector editor-card">
+                Loading properties…
+              </aside>
+            }
+          >
+            <EditorInspector
+              photoOwner={owner}
+              photoSaveStatus={workspace.status}
+              publishedPhotos={data.photos}
+              onPhotoUndo={() => undo()}
+              onPhotos={(change) => {
+                if (
+                  workspace.roofDraft ||
+                  workspace.unfinished ||
+                  validation.pending
+                )
+                  throw Error(
+                    'Finish the current edit and wait for map validation before changing photos.',
+                  );
+                const batch = photoEdits(
+                  validation.data,
+                  workspace.edits,
+                  change,
                 );
-              const batch = photoEdits(
-                validation.data,
-                workspace.edits,
-                change,
-              );
-              workspace.commit(batch, null);
-              const next = batch.find(
-                (e) => e.id === selected.id && e.kind === selected.kind,
-              );
-              if (next) {
-                setSelected(next);
-                selectedRef.current = next;
+                workspace.commit(batch, null);
+                const next = batch.find(
+                  (e) => e.id === selected.id && e.kind === selected.kind,
+                );
+                if (next) {
+                  setSelected(next);
+                  selectedRef.current = next;
+                }
+              }}
+              onGeometry={(geometry) => {
+                if (selected)
+                  stageRepair(
+                    [remapBuildingSurfaces(selected, geometry)],
+                    'Review corrected building geometry',
+                  );
+              }}
+              key={editKey(selected)}
+              edit={selected}
+              data={validation.data}
+              issues={validation.issues
+                .filter(
+                  (i) =>
+                    i.featureId === selected.id &&
+                    (!i.featureKind || i.featureKind === selected.kind),
+                )
+                .map((i) => i.message)}
+              focusField={repairFocus?.field}
+              onEndField={workspace.endHistoryGroup}
+              buildingEditor={
+                selected.kind === 'building' && (
+                  <Suspense fallback={<output>Loading building tools…</output>}>
+                    <BuildingAppearanceEditor
+                      reviewRequest={
+                        repairFocus?.repair === 'review-model' ||
+                        /^(height|floors|appearance|roof|wall)/i.test(
+                          repairFocus?.field || '',
+                        )
+                          ? repairFocus || undefined
+                          : undefined
+                      }
+                      onReviewOpened={() => setRepairFocus(null)}
+                      workspace={workspace}
+                      onHistory={undo}
+                      edit={selected}
+                      data={validation.data}
+                      mode={buildingMode}
+                      selection={buildingSelection}
+                      onMode={(mode) => {
+                        workspace.endHistoryGroup();
+                        setBuildingMode(mode);
+                        if (mode === 'roof')
+                          setBuildingSelection((s) => ({
+                            buildingId: selected.id,
+                            partId: s?.partId,
+                          }));
+                      }}
+                      onSelection={(value) => {
+                        workspace.endHistoryGroup();
+                        setBuildingSelection(value);
+                      }}
+                      onEdit={(edit, field) => {
+                        workspace.commit(
+                          [edit],
+                          workspace.unfinished,
+                          field ? `${editKey(edit)}:${field}` : undefined,
+                        );
+                        setSelected(edit);
+                        selectedRef.current = edit;
+                      }}
+                      roofDraft={workspace.roofDraft}
+                      onRoofDraft={(value) => workspace.draftRoof(value)}
+                      onApplyRoof={(edit) => {
+                        workspace.applyRoof(edit);
+                        setSelected(edit);
+                        selectedRef.current = edit;
+                        setMessage(
+                          'Roof applied. Undo restores the previous roof.',
+                        );
+                      }}
+                    />
+                  </Suspense>
+                )
               }
-            }}
-            onGeometry={(geometry) => {
-              if (selected)
-                stageRepair(
-                  [remapBuildingSurfaces(selected, geometry)],
-                  'Review corrected building geometry',
+              onProperty={(key, value, continuous) => {
+                if (workspace.roofDraft) {
+                  setMessage(
+                    'Apply or cancel the roof plan before changing other building properties.',
+                  );
+                  return;
+                }
+                const batch = propertyEdits(
+                  validation.data,
+                  workspace.edits,
+                  [selected],
+                  key,
+                  value,
                 );
-            }}
-            key={editKey(selected)}
-            edit={selected}
-            data={validation.data}
-            issues={validation.issues
-              .filter(
-                (i) =>
-                  i.featureId === selected.id &&
-                  (!i.featureKind || i.featureKind === selected.kind),
-              )
-              .map((i) => i.message)}
-            focusField={repairFocus?.field}
-            onEndField={workspace.endHistoryGroup}
-            buildingEditor={
-              selected.kind === 'building' && (
-                <Suspense fallback={<output>Loading building tools…</output>}>
-                  <BuildingAppearanceEditor
-                    reviewRequest={
-                      repairFocus?.repair === 'review-model' ||
-                      /^(height|floors|appearance|roof|wall)/i.test(
-                        repairFocus?.field || '',
+                const edit = batch[0];
+                if (repairFocus) {
+                  stageRepair(batch, 'Review feature repair');
+                  return;
+                }
+                workspace.commit(
+                  batch,
+                  workspace.unfinished,
+                  continuous ? `${editKey(edit)}:${key}` : undefined,
+                );
+                setSelected(edit);
+                selectedRef.current = edit;
+              }}
+              onLayerGeometry={(operation) =>
+                setLayerOperation({
+                  operation,
+                  keys: [`${selected.kind}:${selected.id}`],
+                })
+              }
+              onEntrance={addEntrance}
+              onApproach={approach}
+              onPick={pick}
+              onDisconnect={disconnect}
+              onDelete={remove}
+              onRestorePublished={
+                publishedBuilding
+                  ? () =>
+                      stageRepair(
+                        [publishedBuilding],
+                        'Restore published building · review before applying',
                       )
-                        ? repairFocus || undefined
-                        : undefined
-                    }
-                    onReviewOpened={() => setRepairFocus(null)}
-                    workspace={workspace}
-                    onHistory={undo}
-                    edit={selected}
-                    data={validation.data}
-                    mode={buildingMode}
-                    selection={buildingSelection}
-                    onMode={(mode) => {
-                      workspace.endHistoryGroup();
-                      setBuildingMode(mode);
-                      if (mode === 'roof')
-                        setBuildingSelection((s) => ({
-                          buildingId: selected.id,
-                          partId: s?.partId,
-                        }));
-                    }}
-                    onSelection={(value) => {
-                      workspace.endHistoryGroup();
-                      setBuildingSelection(value);
-                    }}
-                    onEdit={(edit, field) => {
-                      workspace.commit(
-                        [edit],
-                        workspace.unfinished,
-                        field ? `${editKey(edit)}:${field}` : undefined,
-                      );
-                      setSelected(edit);
-                      selectedRef.current = edit;
-                    }}
-                    roofDraft={workspace.roofDraft}
-                    onRoofDraft={(value) => workspace.draftRoof(value)}
-                    onApplyRoof={(edit) => {
-                      workspace.applyRoof(edit);
-                      setSelected(edit);
-                      selectedRef.current = edit;
-                      setMessage(
-                        'Roof applied. Undo restores the previous roof.',
-                      );
-                    }}
-                  />
-                </Suspense>
-              )
-            }
-            onProperty={(key, value, continuous) => {
-              if (workspace.roofDraft) {
-                setMessage(
-                  'Apply or cancel the roof plan before changing other building properties.',
-                );
-                return;
+                  : undefined
               }
-              const edit = {
-                ...selected,
-                properties: { ...selected.properties, [key]: value },
-              };
-              if (repairFocus) {
-                stageRepair([edit], 'Review feature repair');
-                return;
-              }
-              workspace.commit(
-                [edit],
-                workspace.unfinished,
-                continuous ? `${editKey(edit)}:${key}` : undefined,
-              );
-              setSelected(edit);
-              selectedRef.current = edit;
-            }}
-            onEntrance={addEntrance}
-            onApproach={approach}
-            onPick={pick}
-            onDisconnect={disconnect}
-            onDelete={remove}
-            onRestorePublished={
-              publishedBuilding
-                ? () =>
-                    stageRepair(
-                      [publishedBuilding],
-                      'Restore published building · review before applying',
-                    )
-                : undefined
-            }
-            onClose={() => {
-              workspace.endHistoryGroup();
-              setFocusRequest(null);
-              if (selectionOverview.current)
-                mapRef.current?.easeTo({
-                  ...selectionOverview.current,
-                  pitch: mapRef.current.getPitch(),
-                  duration: 450,
-                });
-              selectionOverview.current = null;
-              setSelected(null);
-              setBuildingSelection(undefined);
-              selectedRef.current = null;
-              controller.current?.select(null);
-            }}
-          />
+              onClose={() => {
+                workspace.endHistoryGroup();
+                setFocusRequest(null);
+                if (selectionOverview.current)
+                  mapRef.current?.easeTo({
+                    ...selectionOverview.current,
+                    pitch: mapRef.current.getPitch(),
+                    duration: 450,
+                  });
+                selectionOverview.current = null;
+                setSelected(null);
+                setBuildingSelection(undefined);
+                selectedRef.current = null;
+                controller.current?.select(null);
+              }}
+            />
+          </Suspense>
         ) : (
           !tool &&
           !preview &&

@@ -34,7 +34,7 @@ function records(data: CampusData) {
   ) => records.set(`${kind}:${id}`, { kind, id, name, value });
   data.map.features.forEach((f) => {
     const kind = f.properties?.kind;
-    if (['path', 'building', 'barrier'].includes(kind))
+    if (['path', 'building', 'barrier', 'land', 'overlay'].includes(kind))
       add(
         kind,
         String(f.properties!.id),
@@ -59,6 +59,7 @@ function records(data: CampusData) {
     .forEach((n) => add('barrier', n.id, 'Reviewed vehicle gate', n));
   data.entrances?.forEach((e) => add('entrance', e.id, e.name, e));
   data.closures.forEach((c) => add('closure', c.id, c.reason, c));
+  data.layers?.items.forEach((l) => add('layer', l.id, l.name, l));
   return records;
 }
 function reachableFrom(data: CampusData, originId?: string): Set<string> {
@@ -169,21 +170,31 @@ export function releaseImpact(published: CampusData, draft: CampusData) {
     (p) => p.id === releaseWalks[0].origin,
   );
   const candidates = [...published.places, ...draft.places]
-    .filter((p, index, all) => all.findIndex((other) => other.id === p.id) === index)
+    .filter(
+      (p, index, all) => all.findIndex((other) => other.id === p.id) === index,
+    )
     .sort((a, b) => a.id.localeCompare(b.id));
   const origin = hasClinic
     ? releaseWalks[0].origin
-    : candidates.find((p) =>
-        placeHasConnection(published, p) || placeHasConnection(draft, p),
+    : candidates.find(
+        (p) => placeHasConnection(published, p) || placeHasConnection(draft, p),
       )?.id;
-  const walks = hasClinic ? releaseWalks : candidates
-    .filter((p) => p.id !== origin)
-    .slice(0, 3)
-    .flatMap((p) => origin ? [{
-      name: `${candidates.find((item) => item.id === origin)?.name}–${p.name}`,
-      origin,
-      destination: p.id,
-    }] : []);
+  const walks = hasClinic
+    ? releaseWalks
+    : candidates
+        .filter((p) => p.id !== origin)
+        .slice(0, 3)
+        .flatMap((p) =>
+          origin
+            ? [
+                {
+                  name: `${candidates.find((item) => item.id === origin)?.name}–${p.name}`,
+                  origin,
+                  destination: p.id,
+                },
+              ]
+            : [],
+        );
   const oldReachable = reachableFrom(published, origin),
     newReachable = reachableFrom(draft, origin);
   const newlyDisconnected = published.places

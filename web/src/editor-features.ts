@@ -1,4 +1,5 @@
 import { remapBuildingSurfaces } from './building-surfaces';
+import { campusLayers, layerMembership, layerEdit } from './campus-layers';
 import { detailFields } from './place-details';
 import type { Geometry } from 'geojson';
 import { distance, projectSegment } from './geo';
@@ -125,6 +126,10 @@ export function featureEdit(
       !(e.deleted && e.properties.revertToSource),
   );
   const saved = stored?.properties.duplicateReviewOnly ? undefined : stored;
+  if (kind === 'layer') {
+    const layer = campusLayers(data).items.find((l) => l.id === id);
+    return layer ? layerEdit(layer, saved) : undefined;
+  }
   if (kind === 'entrance') {
     if (saved) return structuredClone(saved);
     const e = data.entrances?.find((e) => e.id === id);
@@ -179,9 +184,24 @@ export function featureEdit(
     properties: {
       ...f.properties,
       ...saved?.properties,
+      mapLayerId:
+        saved?.properties.mapLayerId ||
+        f.properties?.mapLayerId ||
+        layerMembership(data).get(`${kind}:${id}`),
+      mapLayerSource:
+        saved?.properties.mapLayerSource ||
+        f.properties?.mapLayerSource ||
+        f.properties?.source,
       duplicateKeepSeparate: stored?.properties.duplicateKeepSeparate,
       name:
-        f.properties?.name || (kind === 'path' ? 'Campus path' : 'Building'),
+        f.properties?.name ||
+        (kind === 'path'
+          ? 'Campus path'
+          : kind === 'land'
+            ? 'Landscape feature'
+            : kind === 'overlay'
+              ? 'Overlay feature'
+              : 'Building'),
     },
   };
   if (kind === 'barrier') {
