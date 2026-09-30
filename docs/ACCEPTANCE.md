@@ -1,5 +1,13 @@
 # TurnRight verification and release checklist
 
+## Current layers, road editing and campus reopening
+
+Acceptance covers all 179 UNILAG surface identities, polygon 96 property and geometry editing without simplification, original-path selection under clipped roads, overlap priority, property persistence, multipart deletion and reviewed split/merge lineage. Layer creation, grouping, locking, styles, bulk edits, archives, imports, recovery, concurrent saves and old-package reads share the same campus-isolation checks. Generated surfaces and visual layer changes must retain graph fingerprints.
+
+Plain-home startup must reopen the last successful public campus while explicit campus and legacy destination/editor links retain their meaning. Check both browser engines, blocked storage, failed-campus recovery and verified offline reopening. Public controls must stay 12 px above the desktop panel through resize/collapse/detail/route views and retain the mobile arrangement.
+
+[Production receipts](PRODUCTION.md) record actual completed runs and measured bundles. The dated sections below are historical results, not current totals. Physical-device, GPS, assistive-technology and field checks remain separate.
+
 ## UNILAG detail and vector compatibility — 30 September 2026
 
 UNILAG's published upgrade includes all 179 valid road surfaces, 723 buildings,
@@ -87,8 +95,8 @@ Playwright offline-emulation defect.
   The production writer deployment and migrations 013–015 are verified. All six
   private-record fingerprints match before/after migration, all 84 published LASU
   assets are unchanged, and authenticated Campuses/public-switcher reads pass.
-  Real imported-source jobs and a second-campus publication still require owner
-  data and review; fixture tests do not claim those operations happened.
+  At that September 26 checkpoint, real imported-source jobs and a second-campus
+  publication still awaited owner data and review; later production receipts record their completion.
 
 Use [CAMPUS-IMPORTS.md](CAMPUS-IMPORTS.md) for reproducible commands and screenshot
 provenance, and [PRODUCTION.md](PRODUCTION.md) for exact deployed state.
