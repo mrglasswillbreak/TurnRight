@@ -11,7 +11,7 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 // @ts-expect-error Node-only deployment module.
-import { preservePublished } from '../scripts/published-assets.mjs';
+import { preservePublished, requestPublishedAsset } from '../scripts/published-assets.mjs';
 
 const origin = 'https://turnright.vercel.app';
 const bytes = Buffer.from('verified published campus');
@@ -179,4 +179,29 @@ it('still supports activating the public package for ordinary application builds
       await readFile(path.join(publicDir, 'packages/latest.json'), 'utf8'),
     ),
   ).toEqual(manifest);
+});
+it('retries protected edge propagation without sending credentials to the login origin', async () => {
+  vi.useFakeTimers();
+  try {
+    const headers = { 'x-vercel-protection-bypass': 'test-only' };
+    const request = vi.fn()
+      .mockResolvedValueOnce(new Response(null, { status: 307, headers: { location: 'https://vercel.com/sso-api' } }))
+      .mockResolvedValueOnce(new Response(null, { status: 308, headers: { location: '/packages/canonical.json' } }))
+      .mockResolvedValueOnce(new Response(bytes));
+    vi.stubGlobal('fetch', request);
+    const result = requestPublishedAsset(origin, '/packages/source.json', 45000, { headers });
+    await vi.runAllTimersAsync();
+    expect(Buffer.from(await (await result).arrayBuffer())).toEqual(bytes);
+    expect(request.mock.calls.map(([url]) => url.origin)).toEqual([origin, origin, origin]);
+    expect(request.mock.calls.map(([url]) => url.pathname)).toEqual(['/packages/source.json', '/packages/source.json', '/packages/canonical.json']);
+    expect(request.mock.calls.every(([, init]) => init.headers === headers && init.redirect === 'manual')).toBe(true);
+  } finally { vi.useRealTimers(); }
+});
+it('rejects absolute foreign targets and credential-bearing redirects before forwarding headers', async () => {
+  const request = vi.fn(async () => new Response(null, { status: 302, headers: { location: 'https://user:password@turnright.vercel.app/packages/secret.json' } }));
+  vi.stubGlobal('fetch', request);
+  await expect(requestPublishedAsset(origin, 'https://example.net/packages/asset.json', 1000)).rejects.toThrow('origin changed');
+  expect(request).not.toHaveBeenCalled();
+  await expect(requestPublishedAsset(origin, '/packages/asset.json', 1000)).rejects.toThrow('origin changed');
+  expect(request).toHaveBeenCalledTimes(1);
 });
