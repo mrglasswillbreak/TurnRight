@@ -1,0 +1,2 @@
+# Vendored encoders are immutable, hash-checked assets. Keep bytes identical on all platforms.
+web/public/photo-codecs/** -text
