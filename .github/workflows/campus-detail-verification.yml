@@ -8,6 +8,13 @@ on:
       campus_id:
         default: campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a
         required: false
+      scope:
+        type: choice
+        options: [all, offline-webkit]
+        default: all
+      cleanup_run:
+        description: Optional preceding verification run whose temporary credential needs cleanup
+        required: false
   push:
     branches: [codex/unilag-vector-detail]
     paths: [.github/workflows/campus-detail-verification.yml]
@@ -26,6 +33,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       RELEASE_ID: ${{ inputs.release_id }}
       CAMPUS_ID: ${{ inputs.campus_id }}
+      VERIFY_SCOPE: ${{ inputs.scope }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,6 +43,10 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
+      - if: inputs.cleanup_run != ''
+        run: node scripts/cleanup-preview-access.mjs
+        env:
+          CLEANUP_RUN_ID: ${{ inputs.cleanup_run }}
       - run: npx playwright install --with-deps chromium webkit
         working-directory: web
       - if: inputs.release_id != ''
@@ -43,6 +55,8 @@ jobs:
       - if: inputs.release_id == ''
         run: node scripts/verify-campus-detail.mjs
         working-directory: web
+      - if: always() && inputs.release_id != ''
+        run: node scripts/cleanup-preview-access.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

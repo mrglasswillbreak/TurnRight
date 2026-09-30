@@ -110,9 +110,9 @@ export function mapTheme(dark: boolean) {
         'sidewalk',
         p.path,
         'parking',
-        p.bare,
+        dark ? '#4a5156' : '#d8d4c8',
         'sports',
-        p.green,
+        dark ? '#285d5b' : '#9cbfb8',
         p.land,
       ],
       'fill-opacity': [

@@ -101,6 +101,8 @@ for (const [engine, launcher] of [
   ['chromium', chromium],
   ['webkit', webkit],
 ]) {
+  if (process.env.VERIFY_SCOPE === 'offline-webkit' && engine !== 'webkit')
+    continue;
   const browser = await launcher.launch({
     headless: true,
     ...(engine === 'chromium'
@@ -113,8 +115,11 @@ for (const [engine, launcher] of [
         }
       : {}),
   });
+  let activePage, activeCase;
   try {
-    for (const campus of campuses)
+    for (const campus of process.env.VERIFY_SCOPE === 'offline-webkit'
+      ? []
+      : campuses)
       for (const mobile of [false, true])
         for (const theme of ['light', 'dark']) {
           const context = await browser.newContext({
@@ -128,6 +133,8 @@ for (const [engine, launcher] of [
           await authorize(context);
           const page = await context.newPage(),
             errors = [];
+          activePage = page;
+          activeCase = { engine, campus: campus.slug, mobile, theme };
           page.on('pageerror', (e) => errors.push(e.message));
           await page.addInitScript(
             ({ theme }) => {
@@ -231,6 +238,9 @@ for (const [engine, launcher] of [
       });
       await authorize(context);
       const page = await context.newPage();
+      activePage = page;
+      activeCase = { engine, campus: campus.slug, offline: true };
+      console.log(`${engine} ${campus.slug}: starting offline download`);
       const senate = campus.data.places.find((p) => /senate/i.test(p.name));
       await page.goto(`${origin}/?campus=${campus.slug}`);
       await attach(page);
@@ -282,6 +292,13 @@ for (const [engine, launcher] of [
       );
       await context.close();
     }
+  } catch (error) {
+    report.failure = { ...activeCase, message: error.message };
+    console.error(JSON.stringify(report.failure));
+    await activePage
+      ?.screenshot({ path: path.join(output, 'failure.png'), timeout: 10000 })
+      .catch(() => {});
+    throw error;
   } finally {
     await browser.close();
     await fs.writeFile(

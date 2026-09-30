@@ -45,6 +45,6 @@ try {
   );
 } finally {
   delete process.env.VERIFY_BYPASS;
-  await update({ revoke: { secret } });
+  await update({ revoke: { secret, regenerate: false } });
   console.log("Temporary preview verification credential revoked");
 }
