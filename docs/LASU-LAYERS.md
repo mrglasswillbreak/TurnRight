@@ -1,6 +1,6 @@
 # LASU roads and landscape review — 30 September 2026
 
-**Release status:** these are validated candidate data, not yet published campus content. Production versions remain recorded in [the release log](PRODUCTION.md).
+**Release status:** LASU package `lasu-4895a363b403` was published on 30 September 2026 from reviewed release `aee5cdc6-51dd-42a0-b2ae-1b5d1ad03b4a`. Its 82 illustrative road surfaces and corrected landscape classes are live. The [release log](PRODUCTION.md) records asset, offline and rollback checks and the separate UNILAG release status.
 
 Baseline: `lasu-2b70a39ca041`, with 393 building footprints, 220 destinations, 44 photographs, 95 routing paths and 30 landscape polygons. The enrichment retains the routing graph, permissions, destinations, photographs and authored models.
 
@@ -23,7 +23,7 @@ The candidate ledger contains every reviewed disposition, source checksums, ArcG
 
 ## UNILAG corrections in the same upgrade
 
-All 426 accepted parcel identities are reclassified using the parcel source layer and explicit land use. Street addresses no longer become road surfaces or trees. Unambiguous car-park and garden labels retain their appropriate classes. The 179 surveyed road-width records remain separate and retain their source identities and geometry, including polygon 96's 6,094 vertices and 56 holes.
+The reviewed UNILAG patch reclassifies all 426 accepted parcel identities using the parcel source layer and explicit land use. Street addresses no longer become road surfaces or trees. Unambiguous car-park and garden labels retain their appropriate classes. The 179 surveyed road-width records remain separate and retain their source identities and geometry, including polygon 96's 6,094 vertices and 56 holes.
 
 ## Reproduce and inspect
 
