@@ -240,6 +240,15 @@ for (const viewport of [
       exact: true,
     });
     await expect(download).toBeEnabled({ timeout: 30000 });
+    const portrait = viewport.width < 600 && viewport.height > viewport.width;
+    const settingsToggle = dialog.getByRole('button', {
+      name: 'Show compression settings',
+      exact: true,
+    });
+    if (portrait) {
+      await expect(settingsToggle).toHaveAttribute('aria-expanded', 'false');
+      await settingsToggle.click();
+    }
     await dialog.getByText('Resize', { exact: true }).click();
     await dialog.getByLabel('Longest edge (px)').fill('800');
     await expect(dialog.locator('.photo-result-output')).toContainText(
@@ -280,6 +289,72 @@ for (const viewport of [
     expect(bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
     await dialog.getByLabel('Download format').scrollIntoViewIfNeeded();
     await dialog.getByLabel('Download format').focus();
+    if (portrait) {
+      const quality = dialog.getByRole('slider', {
+        name: 'Quality',
+        exact: true,
+      });
+      await quality.scrollIntoViewIfNeeded();
+      await quality.focus();
+      await expect
+        .poll(() =>
+          quality.evaluate((el) => {
+            const b = el.getBoundingClientRect();
+            return (
+              document.elementFromPoint(
+                b.x + b.width / 2,
+                b.y + b.height / 2,
+              ) === el
+            );
+          }),
+        )
+        .toBe(true);
+      await page.screenshot({
+        path: info.outputPath('photo-editor-390-controls.png'),
+      });
+      await settingsToggle.click();
+      const dismiss = dialog.getByRole('button', {
+        name: 'Dismiss image notice',
+      });
+      if (await dismiss.isVisible()) await dismiss.click();
+      await expect(wipe).toHaveAttribute('aria-orientation', 'vertical');
+      await wipe.press('ArrowDown');
+      await expect(wipe).toHaveAttribute('aria-valuenow', '52');
+      const dividerY = await dialog
+        .locator('.photo-wipe')
+        .evaluate((el) => parseFloat(getComputedStyle(el, '::before').top));
+      expect(dividerY).toBeCloseTo(viewport.height * 0.52, 0);
+      await page.setViewportSize({ width: 844, height: 390 });
+      await expect(wipe).toHaveAttribute('aria-orientation', 'horizontal');
+      await expect(wipe).toHaveAttribute('aria-valuenow', '52');
+      await page.setViewportSize(viewport);
+      await expect(wipe).toHaveAttribute('aria-orientation', 'vertical');
+      // Dragging the horizontal divider must move vertically, independently of canvas pan.
+      await page.mouse.move(viewport.width / 2, viewport.height * 0.52);
+      await page.mouse.down();
+      await page.mouse.move(viewport.width / 2, viewport.height * 0.65, {
+        steps: 8,
+      });
+      await page.mouse.up();
+      await expect
+        .poll(async () => Number(await wipe.getAttribute('aria-valuenow')))
+        .toBeGreaterThan(60);
+      await wipe.press('Home');
+      for (let i = 0; i < 25; i++) await wipe.press('ArrowDown');
+      await expect(wipe).toHaveAttribute('aria-valuenow', '50');
+      const originalBar = (await dialog
+        .locator('.photo-result-original')
+        .boundingBox())!;
+      const editedBar = (await dialog
+        .locator('.photo-result-output')
+        .boundingBox())!;
+      expect(originalBar.y + originalBar.height).toBeLessThanOrEqual(
+        editedBar.y,
+      );
+      expect(editedBar.y + editedBar.height).toBeLessThanOrEqual(
+        viewport.height,
+      );
+    }
     await page.screenshot({
       path: info.outputPath(`photo-editor-${viewport.width}.png`),
     });

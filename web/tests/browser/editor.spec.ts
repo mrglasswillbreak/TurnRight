@@ -9113,6 +9113,10 @@ for (const viewport of [
     await expect(
       editor.getByRole('button', { name: 'Preview changes', exact: true }),
     ).toBeEnabled();
+    if (!(await editor.getByText('Resize', { exact: true }).isVisible()))
+      await editor
+        .getByRole('button', { name: 'Image settings', exact: true })
+        .click();
     await editor.getByText('Resize', { exact: true }).click();
     await editor.getByLabel('Longest edge (px)', { exact: true }).fill('800');
     await editor
@@ -9183,6 +9187,10 @@ for (const viewport of [
     await gallery
       .getByRole('button', { name: 'Local image drafts · edit offline' })
       .click();
+    if (!(await editor.getByText('Resize', { exact: true }).isVisible()))
+      await editor
+        .getByRole('button', { name: 'Image settings', exact: true })
+        .click();
     await editor.getByText('Resize', { exact: true }).click();
     await editor.getByText('Crop & orientation', { exact: true }).click();
     await expect(

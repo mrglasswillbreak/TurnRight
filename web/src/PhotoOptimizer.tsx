@@ -94,7 +94,11 @@ export default function PhotoOptimizer({
     [busy, setBusy] = useState(false),
     [prepared, setPrepared] = useState(false),
     [tool, setTool] = useState<PhotoTool>('navigate'),
-    [panel, setPanel] = useState<'edit' | 'details' | 'files' | null>('edit'),
+    [panel, setPanel] = useState<'edit' | 'details' | 'files' | null>(() =>
+      matchMedia('(max-width: 599px) and (orientation: portrait)').matches
+        ? null
+        : 'edit',
+    ),
     [previewBusy, setPreviewBusy] = useState(false),
     [previewPaused, setPreviewPaused] = useState(false),
     [past, setPast] = useState<PhotoRecipe[]>([]),
@@ -1347,32 +1351,65 @@ export default function PhotoOptimizer({
           <>
             <div className="photo-result photo-result-original">
               <button
+                className="photo-result-toggle"
+                aria-label="Show original image and local files"
+                aria-expanded={panel === 'files'}
+                onClick={() =>
+                  setPanel((p) => (p === 'files' ? null : 'files'))
+                }
+              >
+                {panel === 'files' ? <ChevronDown /> : <ChevronUp />}
+              </button>
+              <span className="photo-result-meta">
+                {bytes(current.source.size)}
+                <small className="photo-result-label">Original</small>
+                <small className="photo-result-name">{current.filename}</small>
+              </span>
+              <span className="photo-original-saving" aria-hidden="true">
+                0%
+              </span>
+              <button
+                className="photo-original-download"
                 aria-label="Download original"
                 title="Download original"
                 onClick={() => download(current.source, current.filename)}
               >
                 <Download />
               </button>
-              <span>
-                {bytes(current.source.size)}
-                <small>Original</small>
-              </span>
             </div>
             <div className="photo-result photo-result-output">
+              <button
+                className="photo-result-toggle"
+                aria-label="Show compression settings"
+                aria-expanded={panel === 'edit'}
+                onClick={() => setPanel((p) => (p === 'edit' ? null : 'edit'))}
+              >
+                {panel === 'edit' ? <ChevronDown /> : <ChevronUp />}
+              </button>
+              <span className="photo-result-meta" aria-live="polite">
+                {current.output ? bytes(current.output.size) : 'Encoding…'}
+                <small className="photo-result-format">
+                  {
+                    {
+                      'image/webp': 'WebP',
+                      'image/jpeg': 'MozJPEG',
+                      'image/png': 'OxiPNG',
+                      'image/avif': 'AVIF',
+                    }[current.recipe.format]
+                  }
+                </small>
+                <small className="photo-result-dimensions">
+                  {current.output
+                    ? current.width + ' × ' + current.height
+                    : 'Edited'}
+                </small>
+              </span>
               <span className="photo-saving">
                 {current.output
                   ? (saving >= 0 ? '↓ ' : '↑ ') +
                     Math.abs(saving).toFixed(1) +
                     '%'
                   : '…'}
-              </span>
-              <span aria-live="polite">
-                {current.output ? bytes(current.output.size) : 'Encoding…'}
-                <small>
-                  {current.output
-                    ? current.width + ' × ' + current.height
-                    : 'Edited'}
-                </small>
               </span>
               <button
                 aria-label="Download edited image"

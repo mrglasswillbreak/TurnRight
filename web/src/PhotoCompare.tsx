@@ -26,6 +26,7 @@ export default function PhotoCompare({
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [split, setSplit] = useState(50);
   const [box, setBox] = useState<PhotoRecipe['crop']>();
+  const horizontal = size.w <= 599 && size.h > size.w;
   const points = useRef(new Map<number, { x: number; y: number }>());
   const start = useRef<{ x: number; y: number } | null>(null);
   const fit = Math.min(size.w / natural.w, size.h / natural.h);
@@ -89,7 +90,12 @@ export default function PhotoCompare({
   };
   const imageStyle = { width: w, height: h, left, top };
   return (
-    <section className="photo-compare" aria-label="Image comparison">
+    <section
+      className="photo-compare"
+      aria-label="Image comparison"
+      data-horizontal={horizontal}
+      style={{ '--photo-split': `${split}%` } as React.CSSProperties}
+    >
       <div
         className="photo-compare-canvas"
         role="application"
@@ -194,7 +200,11 @@ export default function PhotoCompare({
         {tool === 'navigate' && output && (
           <div
             className="photo-compare-before"
-            style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
+            style={{
+              clipPath: horizontal
+                ? `inset(0 0 ${100 - split}% 0)`
+                : `inset(0 ${100 - split}% 0 0)`,
+            }}
           >
             <img
               src={source}
@@ -225,14 +235,27 @@ export default function PhotoCompare({
             type="range"
             className="photo-wipe-handle"
             aria-label="Before and after comparison"
+            aria-orientation={horizontal ? 'vertical' : 'horizontal'}
             min={0}
             max={100}
             step={2}
             value={split}
             aria-valuenow={Math.round(split)}
             onChange={(e) => setSplit(Number(e.target.value))}
+            onKeyDown={(e) => {
+              if (horizontal && ['ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault();
+                setSplit((v) =>
+                  Math.max(
+                    0,
+                    Math.min(100, v + (e.key === 'ArrowUp' ? -2 : 2)),
+                  ),
+                );
+              }
+            }}
           />
           <ChevronsLeftRight className="photo-wipe-arrows" aria-hidden="true" />
+          <span className="photo-wipe-vertical" aria-hidden="true" />
         </div>
       )}
       <div className="photo-view-tools">
