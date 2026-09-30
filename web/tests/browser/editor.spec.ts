@@ -7244,8 +7244,10 @@ test('selected detail menu supports context actions, keyboard focus and undo', a
     .getByRole('menuitem', { name: 'Edit details', exact: true })
     .click();
   await expect(dialog.getByLabel('Detail name', { exact: true })).toBeFocused();
+  await expect(page.getByRole('menu')).toBeHidden();
   await canvas.focus();
   await page.keyboard.press('Shift+F10');
+  await expect(page.getByRole('menu')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(dialog).toBeVisible();
   await expect(canvas).toBeFocused();
