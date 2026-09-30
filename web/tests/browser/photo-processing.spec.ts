@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import sharp from 'sharp';
+import { readFileSync } from 'node:fs';
 test('image worker preserves orientation, formats and flattened redaction and cancels safely', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/tests/browser/photo-harness.html');
   const input = await sharp({
     create: { width: 400, height: 200, channels: 3, background: '#ee5522' },
   })
@@ -28,7 +29,12 @@ test('image worker preserves orientation, formats and flattened redaction and ca
       new AbortController().signal,
     );
     const formats = [];
-    for (const format of ['image/jpeg', 'image/webp', 'image/png'] as const) {
+    for (const format of [
+      'image/jpeg',
+      'image/webp',
+      'image/png',
+      'image/avif',
+    ] as const) {
       const next = await editPhotoTask(
         file,
         { ...recipe, format },
@@ -53,7 +59,12 @@ test('image worker preserves orientation, formats and flattened redaction and ca
       cancelled,
     };
   }, Array.from(input));
-  expect(result.formats).toEqual(['image/jpeg', 'image/webp', 'image/png']);
+  expect(result.formats).toEqual([
+    'image/jpeg',
+    'image/webp',
+    'image/png',
+    'image/avif',
+  ]);
   expect(result.cancelled).toBe('AbortError');
   expect([result.width, result.height]).toEqual([400, 200]);
   const output = Buffer.from(result.data);
@@ -71,3 +82,145 @@ test('image worker preserves orientation, formats and flattened redaction and ca
     .toBuffer();
   expect(retained[0]).toBeGreaterThan(220);
 });
+
+test('Squoosh codecs reduce a photographic image with bounded distortion', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.goto('/tests/browser/photo-harness.html');
+  const sample = JSON.parse(
+    readFileSync(
+      new URL('../../../data/photos/catalogue.json', import.meta.url),
+      'utf8',
+    ),
+  )[0];
+  const input = await sharp(
+    readFileSync(
+      new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
+    ),
+  )
+    .resize(800)
+    .png()
+    .toBuffer();
+  const outputs = await page.evaluate(async (data) => {
+    const path = '/src/photo-edit-client.ts',
+      recipes = '/src/photo-edit.ts';
+    const { editPhotoTask } = await import(path),
+      { defaultPhotoRecipe } = await import(recipes);
+    const result = [];
+    for (const format of ['image/webp', 'image/jpeg', 'image/avif']) {
+      const out = await editPhotoTask(
+        new Blob([new Uint8Array(data)], { type: 'image/png' }),
+        { ...defaultPhotoRecipe(), format, targetKiB: 0, quality: 0.85 },
+        new AbortController().signal,
+      );
+      result.push({
+        format,
+        data: Array.from(new Uint8Array(await out.blob.arrayBuffer())),
+      });
+    }
+    return result;
+  }, Array.from(input));
+  const raw = await sharp(input).removeAlpha().raw().toBuffer();
+  for (const out of outputs) {
+    expect(out.data.length, out.format).toBeLessThan(input.length * 0.65);
+    const decoded = await sharp(Buffer.from(out.data))
+      .removeAlpha()
+      .raw()
+      .toBuffer();
+    expect(decoded.length).toBe(raw.length);
+    const mae =
+      decoded.reduce((n, v, i) => n + Math.abs(v - raw[i]), 0) / raw.length;
+    expect(mae, out.format).toBeLessThan(12);
+    console.log(
+      `${out.format}: ${input.length} → ${out.data.length} bytes, mean pixel error ${mae.toFixed(2)}/255`,
+    );
+  }
+});
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+])
+  test(`photo comparison edits and restores local recipes at ${viewport.width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/tests/browser/photo-harness.html');
+    const sample = JSON.parse(
+      readFileSync(
+        new URL('../../../data/photos/catalogue.json', import.meta.url),
+        'utf8',
+      ),
+    )[0];
+    await page
+      .getByLabel('Add test photograph')
+      .setInputFiles({
+        name: 'School of Communication.webp',
+        mimeType: 'image/webp',
+        buffer: readFileSync(
+          new URL(
+            `../../../data/photos/${sample.sha256}.webp`,
+            import.meta.url,
+          ),
+        ),
+      });
+    const dialog = page.getByRole('dialog', { name: 'Edit & optimise photos' });
+    const download = dialog.getByRole('button', {
+      name: 'Download edited image',
+      exact: true,
+    });
+    await expect(download).toBeEnabled({ timeout: 30000 });
+    await dialog.getByText('Resize', { exact: true }).click();
+    await dialog.getByLabel('Longest edge (px)').fill('800');
+    await expect(dialog.locator('.photo-result-output')).toContainText(
+      '800 × 600',
+      { timeout: 30000 },
+    );
+    await dialog.getByText('Crop & orientation', { exact: true }).click();
+    await dialog
+      .getByRole('button', { name: 'Rotate right', exact: true })
+      .click();
+    await expect(dialog.getByLabel('Straighten')).toHaveValue('90');
+    await expect(dialog.locator('.photo-result-output')).toContainText(
+      '600 × 800',
+      { timeout: 30000 },
+    );
+    await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect(dialog.locator('.photo-result-output')).toContainText(
+      '800 × 600',
+      { timeout: 30000 },
+    );
+    await dialog.getByText('Crop & orientation', { exact: true }).click();
+    await dialog.getByText('Resize', { exact: true }).click();
+    const wipe = dialog.getByRole('slider', {
+      name: 'Before and after comparison',
+    });
+    await wipe.press('Home');
+    await expect(wipe).toHaveAttribute('aria-valuenow', '0');
+    await wipe.press('End');
+    await expect(wipe).toHaveAttribute('aria-valuenow', '100');
+    await wipe.press('ArrowLeft');
+    await expect(wipe).toHaveAttribute('aria-valuenow', '98');
+    // Centre it for visual review, then verify two-finger/pointer cancellation doesn't edit a recipe.
+    for (let i = 0; i < 24; i++) await wipe.press('ArrowLeft');
+    const bounds = await dialog.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
+    expect(bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+    await page.screenshot({
+      path: info.outputPath(`photo-editor-${viewport.width}.png`),
+    });
+    await dialog.getByRole('button', { name: 'Close image editor' }).click();
+    await expect(dialog).toBeHidden();
+    const recipe = await page.evaluate(async () => {
+      const path = '/src/photo-local.ts';
+      const { localPhotos } = await import(path);
+      return (await localPhotos('photo-test-owner', 'building:fixture'))[0]
+        .recipe;
+    });
+    expect(recipe.width).toBe(800);
+    expect(recipe.rotation).toBe(0);
+  });

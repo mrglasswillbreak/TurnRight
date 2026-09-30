@@ -9,6 +9,11 @@ import {
   Upload,
   X,
   HardDrive,
+  ChevronUp,
+  ChevronDown,
+  SlidersHorizontal,
+  FolderOpen,
+  Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +40,9 @@ import type { CampusPhoto } from './types';
 import { processes } from './process-monitor';
 import { registerPhotoRecovery } from './update-safety';
 import { thumbnailSize } from './photo-thumbnail';
+import PhotoCompare, { type PhotoTool } from './PhotoCompare';
+import { preparePhotoCodecs } from './photo-codecs';
+import type { ReactNode } from 'react';
 import './photo-optimizer.css';
 
 export interface PhotoOptimizerRequest {
@@ -69,13 +77,15 @@ export default function PhotoOptimizer({
   onClose,
   onReady,
   protectedIds = [],
+  details,
 }: {
   owner: string;
   target: string;
   request: PhotoOptimizerRequest;
   onClose: () => void;
-  onReady: (photos: LocalPhoto[], replacesJob?: string) => void;
+  onReady: (photos: LocalPhoto[], replacesJob?: string) => boolean | void;
   protectedIds?: string[];
+  details?: ReactNode;
 }) {
   const [items, setItems] = useState<LocalPhoto[]>([]),
     [selected, setSelected] = useState(''),
@@ -83,12 +93,9 @@ export default function PhotoOptimizer({
     [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false),
     [prepared, setPrepared] = useState(false),
-    [tool, setTool] = useState<
-      'navigate' | 'crop' | 'blur' | 'pixelate' | 'redact'
-    >('navigate'),
-    [compare, setCompare] = useState(50),
-    [showOriginal, setShowOriginal] = useState(false),
-    [zoom, setZoom] = useState(1),
+    [tool, setTool] = useState<PhotoTool>('navigate'),
+    [panel, setPanel] = useState<'edit' | 'details' | 'files' | null>('edit'),
+    [previewBusy, setPreviewBusy] = useState(false),
     [past, setPast] = useState<PhotoRecipe[]>([]),
     [future, setFuture] = useState<PhotoRecipe[]>([]);
   const itemsRef = useRef(items);
@@ -105,27 +112,7 @@ export default function PhotoOptimizer({
   const pending = useRef<Promise<unknown>>(Promise.resolve()),
     controller = useRef<AbortController | null>(null),
     alive = useRef(true),
-    drag = useRef<{ x: number; y: number } | null>(null);
-  const [box, setBox] = useState<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null>(null);
-  const [lastPreview, setLastPreview] = useState<Blob>();
-  const previewHost = useRef<HTMLDivElement>(null);
-  const [frame, setFrame] = useState({ width: 0, height: 0 });
-  const [imageAspect, setImageAspect] = useState(4 / 3);
-  useEffect(() => {
-    const host = previewHost.current;
-    if (!host) return;
-    const measure = () =>
-      setFrame({ width: host.clientWidth, height: host.clientHeight });
-    const observer = new ResizeObserver(measure);
-    observer.observe(host);
-    measure();
-    return () => observer.disconnect();
-  }, [selected]);
+    previewController = useRef<AbortController | null>(null);
   const unsaved = useRef(false);
   useEffect(() => {
     const unregister = registerPhotoRecovery(pending, () =>
@@ -143,26 +130,9 @@ export default function PhotoOptimizer({
       window.removeEventListener('beforeunload', warn);
     };
   }, []);
-  useEffect(() => {
-    setLastPreview(undefined);
-    setShowOriginal(false);
-  }, [selected]);
-  useEffect(() => {
-    const output = items.find((p) => p.id === selected)?.output;
-    if (output) setLastPreview(output);
-  }, [items, selected]);
   const current = items.find((p) => p.id === selected),
     sourceUrl = useBlob(current?.source),
-    outputUrl = useBlob(current?.output || lastPreview);
-  const geometryChanged =
-    !!current &&
-    (current.recipe.rotation !== 0 ||
-      current.recipe.flipX ||
-      current.recipe.flipY ||
-      current.recipe.crop.x !== 0 ||
-      current.recipe.crop.y !== 0 ||
-      current.recipe.crop.width !== 1 ||
-      current.recipe.crop.height !== 1);
+    outputUrl = useBlob(current?.output);
   const save = (value: LocalPhoto) => {
     unsaved.current = true;
     setItems((old) => old.map((p) => (p.id === value.id ? value : p)));
@@ -203,7 +173,11 @@ export default function PhotoOptimizer({
                 ? { ...p, original: request.photo, metadata: request.photo! }
                 : p,
             );
-            setItems(existing);
+            setItems(
+              request.replacesJob
+                ? existing.filter((p) => p.id === original.id)
+                : existing,
+            );
             setSelected(original.id);
             return;
           }
@@ -263,7 +237,11 @@ export default function PhotoOptimizer({
         }
         if (abort.signal.aborted) return;
         existing = [...existing, ...added];
-        setItems(existing);
+        setItems(
+          request.replacesJob
+            ? existing.filter((p) => p.id === (request.localId || added[0]?.id))
+            : existing,
+        );
         setSelected(request.localId || added[0]?.id || existing[0]?.id || '');
         for (const p of added) {
           unsaved.current = true;
@@ -281,6 +259,7 @@ export default function PhotoOptimizer({
       alive.current = false;
       abort.abort();
       controller.current?.abort();
+      previewController.current?.abort();
     };
   }, [owner, target, request]);
   const change = (patch: Partial<PhotoRecipe>) => {
@@ -291,7 +270,6 @@ export default function PhotoOptimizer({
       patch.flipX !== undefined ||
       patch.flipY !== undefined;
     if (geometryChanged) {
-      setLastPreview(undefined);
       patch = { ...patch, masks: [] };
       if (current.recipe.masks.length)
         setNotice(
@@ -312,15 +290,15 @@ export default function PhotoOptimizer({
     const list = undo ? past : future,
       r = list.at(-1);
     if (!r) return;
-    setLastPreview(undefined);
+
     setTool('navigate');
-    setBox(null);
-    drag.current = null;
+
     (undo ? setPast : setFuture)(list.slice(0, -1));
     (undo ? setFuture : setPast)((v) => [...v, current.recipe]);
     save({ ...current, recipe: r, output: undefined });
   };
   const render = async (batch: LocalPhoto[], queue: boolean) => {
+    previewController.current?.abort();
     const abort = new AbortController();
     controller.current = abort;
     setBusy(true);
@@ -359,12 +337,21 @@ export default function PhotoOptimizer({
               targetKiB: 250,
             }
           : p.recipe;
-        const out = await editPhotoTask(
-          p.source,
-          recipe,
-          abort.signal,
-          p.filename,
-        );
+        const reusable =
+          p.output &&
+          p.width &&
+          p.height &&
+          JSON.stringify(recipe) === JSON.stringify(p.recipe);
+        const out = reusable
+          ? {
+              blob: p.output!,
+              width: p.width!,
+              height: p.height!,
+              quality: p.outputQuality ?? recipe.quality,
+              targetMet:
+                !recipe.targetKiB || p.output!.size <= recipe.targetKiB * 1024,
+            }
+          : await editPhotoTask(p.source, recipe, abort.signal, p.filename);
         abort.signal.throwIfAborted();
         const next = {
           ...p,
@@ -372,6 +359,7 @@ export default function PhotoOptimizer({
           output: out.blob,
           width: out.width,
           height: out.height,
+          outputQuality: out.quality,
           metadata: {
             ...p.metadata,
             modifications: [
@@ -382,7 +370,19 @@ export default function PhotoOptimizer({
               .join('; '),
           },
         };
-        await saveLocalPhoto(owner, next);
+        await updateLocalPhoto(
+          owner,
+          next.id,
+          {
+            recipe,
+            metadata: next.metadata,
+            width: next.width,
+            height: next.height,
+            outputQuality: next.outputQuality,
+          },
+          false,
+          next.output,
+        );
         abort.signal.throwIfAborted();
         setItems((old) => old.map((v) => (v.id === next.id ? next : v)));
         ready.push(next);
@@ -404,8 +404,8 @@ export default function PhotoOptimizer({
       }
       process.finish(queue ? 'Ready for private upload' : 'Saved locally');
       if (queue) {
-        onReady(ready, request.replacesJob);
-        onClose();
+        if (!onReady(ready, request.replacesJob)) onClose();
+        else setPanel('details');
       }
     } catch (e) {
       process.fail(e);
@@ -419,6 +419,7 @@ export default function PhotoOptimizer({
   };
   const close = async () => {
     controller.current?.abort();
+    previewController.current?.abort();
     try {
       await pending.current;
       onClose();
@@ -439,6 +440,7 @@ export default function PhotoOptimizer({
           'Finish installing the app cache while online, then reopen this tool.',
         );
       await navigator.serviceWorker.ready;
+      await preparePhotoCodecs();
       // The worker and editor are precached with this app version; exercise the actual codec too.
       const c = document.createElement('canvas');
       c.width = c.height = 1;
@@ -494,16 +496,91 @@ export default function PhotoOptimizer({
         value={current!.recipe[key]}
         onChange={(e) => change({ [key]: Number(e.target.value) })}
       />
-      <output>{current!.recipe[key].toFixed(2)}</output>
+      <output>
+        {key === 'quality'
+          ? Math.round(current!.recipe[key] * 100)
+          : current!.recipe[key].toFixed(2)}
+      </output>
     </label>
   );
-  const point = (e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    return {
-      x: Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)),
-      y: Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height)),
+  // Editing stays interactive; obsolete previews are cancelled before they can replace a newer draft.
+  useEffect(() => {
+    if (!current || current.output || busy || tool !== 'navigate') return;
+    const photo = current,
+      abort = new AbortController();
+    previewController.current = abort;
+    const timer = setTimeout(() => {
+      setPreviewBusy(true);
+      void editPhotoTask(
+        photo.source,
+        photo.recipe,
+        abort.signal,
+        photo.filename,
+      )
+        .then(async (out) => {
+          abort.signal.throwIfAborted();
+          const next = {
+            ...photo,
+            output: out.blob,
+            width: out.width,
+            height: out.height,
+            outputQuality: out.quality,
+          };
+          pending.current = pending.current
+            .catch(() => {})
+            .then(async () => {
+              if (
+                !abort.signal.aborted &&
+                itemsRef.current.find((v) => v.id === photo.id)?.recipe ===
+                  photo.recipe
+              )
+                await updateLocalPhoto(
+                  owner,
+                  next.id,
+                  {
+                    recipe: next.recipe,
+                    width: next.width,
+                    height: next.height,
+                    outputQuality: next.outputQuality,
+                  },
+                  false,
+                  next.output,
+                );
+            });
+          await pending.current;
+          if (!abort.signal.aborted) {
+            setItems((old) =>
+              old.map((v) =>
+                v.id === photo.id && v.recipe === photo.recipe ? next : v,
+              ),
+            );
+            if (!out.targetMet)
+              setNotice(
+                'Size target not reached at the quality floor. Reduce dimensions or change the target. Your original is retained.',
+              );
+          }
+        })
+        .catch((e) => {
+          if (!abort.signal.aborted) setError((e as Error).message);
+        })
+        .finally(() => {
+          if (!abort.signal.aborted) setPreviewBusy(false);
+        });
+    }, 450);
+    return () => {
+      clearTimeout(timer);
+      abort.abort();
+      setPreviewBusy(false);
     };
-  };
+  }, [current, owner, busy, tool]);
+  const saving = current?.output
+    ? 100 * (1 - current.output.size / current.source.size)
+    : 0;
+  const outputName = current
+    ? current.filename.replace(/\.[^.]+$/, '') +
+      '-edited.' +
+      current.recipe.format.split('/')[1]
+    : '';
   return (
     <Dialog
       open
@@ -516,406 +593,448 @@ export default function PhotoOptimizer({
         showCloseButton={false}
         className="photo-optimizer"
       >
-        <header>
-          <div>
-            <DialogTitle>Edit & optimise photos</DialogTitle>
-            <DialogDescription>
-              Private editing on this device. Upload and publication stay
-              separate.
-            </DialogDescription>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
+        <DialogTitle className="sr-only">Edit & optimise photos</DialogTitle>
+        <DialogDescription className="sr-only">
+          Compare the original with your edited image. Compression stays on this
+          device. Upload and publication are separate.
+        </DialogDescription>
+        {current && (
+          <PhotoCompare
+            source={sourceUrl}
+            output={outputUrl}
+            tool={tool}
+            onCancel={() => setTool('navigate')}
+            onRegion={(rect) => {
+              if (tool === 'crop') change({ crop: rect, masks: [] });
+              else if (tool !== 'navigate')
+                change({
+                  masks: [...current.recipe.masks, { ...rect, mode: tool }],
+                });
+              setTool('navigate');
+            }}
+          />
+        )}
+        <header className="photo-editor-header">
+          <button
+            className="photo-editor-back"
             aria-label="Close image editor"
+            title="Close image editor"
             onClick={() => void close()}
           >
             <X />
-          </Button>
-        </header>
-        <div className="photo-opt-toolbar">
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() => void prepare()}
-          >
-            <HardDrive />
-            {prepared ? 'Ready offline' : 'Prepare for offline use'}
-          </Button>
-          <span>
-            {items.length} images ·{' '}
-            {bytes(
-              items.reduce(
-                (n, p) => n + p.source.size + (p.output?.size || 0),
-                0,
-              ),
-            )}{' '}
-            stored for this gallery
+          </button>
+          <span className="photo-editor-filename">
+            {current?.filename || 'Photo editor'}
           </span>
-          {busy && (
-            <>
-              <output>{activeStage || 'Processing images…'}</output>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  pause.current = !pause.current;
-                  setPaused(pause.current);
-                }}
-              >
-                {paused ? 'Resume batch' : 'Pause after this image'}
-              </Button>
-            </>
-          )}
-          {busy && (
-            <Button
-              variant="destructive"
-              onClick={() => controller.current?.abort()}
+          <div className="photo-editor-actions">
+            <button
+              aria-label="Local image drafts"
+              title="Local images & offline tools"
+              aria-pressed={panel === 'files'}
+              onClick={() => setPanel((p) => (p === 'files' ? null : 'files'))}
             >
-              Cancel processing
-            </Button>
-          )}
-        </div>
-        {error && (
-          <p role="alert" className="photo-error">
-            {error}
-          </p>
-        )}
-        {notice && <output>{notice}</output>}
-        <div className="photo-opt-layout">
-          <nav aria-label="Local image drafts">
-            {items.map((p) => (
+              <FolderOpen />
+            </button>
+            {details && (
               <button
-                disabled={busy}
-                aria-pressed={selected === p.id}
-                key={p.id}
-                onClick={() => {
-                  setSelected(p.id);
-                  setPast([]);
-                  setFuture([]);
-                  setZoom(1);
-                  setTool('navigate');
-                }}
+                aria-label="Photo details"
+                title="Caption, building & credits"
+                aria-pressed={panel === 'details'}
+                onClick={() =>
+                  setPanel((p) => (p === 'details' ? null : 'details'))
+                }
               >
-                {p.filename}
-                <small>
-                  {bytes(p.source.size)}
-                  {p.output
-                    ? ` → ${bytes(p.output.size)}`
-                    : ' · Original retained'}
-                </small>
+                <Info />
               </button>
-            ))}
-            {!items.length && (
-              <p>No local photos. Add photos from the gallery.</p>
             )}
-          </nav>
-          {current && (
-            <>
-              <section
-                className="photo-opt-preview"
-                aria-label="Image comparison"
+            <button
+              aria-label="Image settings"
+              title="Image settings"
+              aria-pressed={panel === 'edit'}
+              onClick={() => setPanel((p) => (p === 'edit' ? null : 'edit'))}
+            >
+              <SlidersHorizontal />
+            </button>
+            <Button
+              aria-label="Use for map"
+              title="Prepare the edited photo for the map"
+              disabled={busy || !current}
+              onClick={() => current && void render([current], true)}
+            >
+              <Upload />
+              <span>Use for map</span>
+            </Button>
+          </div>
+        </header>
+        {(error || notice || busy || previewBusy || tool !== 'navigate') && (
+          <div className="photo-editor-status" aria-live="polite">
+            {error ? (
+              <span role="alert">{error}</span>
+            ) : busy || previewBusy ? (
+              <span>{activeStage || 'Compressing preview…'}</span>
+            ) : (
+              <span>
+                {tool !== 'navigate'
+                  ? 'Drag a rectangle on the image. Escape cancels.'
+                  : notice}
+              </span>
+            )}
+            {busy && (
+              <>
+                <button
+                  onClick={() => {
+                    pause.current = !pause.current;
+                    setPaused(pause.current);
+                  }}
+                >
+                  {paused ? 'Resume batch' : 'Pause after this image'}
+                </button>
+                <button onClick={() => controller.current?.abort()}>
+                  Cancel processing
+                </button>
+              </>
+            )}
+            {notice && !busy && !previewBusy && (
+              <button
+                aria-label="Dismiss image notice"
+                onClick={() => setNotice('')}
               >
-                <div className="photo-opt-toolbar">
-                  <Button
-                    variant="outline"
-                    disabled={busy || !past.length}
-                    onClick={() => history(true)}
-                  >
-                    <Undo2 />
-                    Undo
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={busy || !future.length}
-                    onClick={() => history(false)}
-                  >
-                    <Redo2 />
-                    Redo
-                  </Button>
-                  <label>
-                    Zoom
-                    <input
-                      aria-label="Image zoom"
-                      type="range"
-                      min="1"
-                      max="3"
-                      step=".25"
-                      value={zoom}
-                      onChange={(e) => setZoom(Number(e.target.value))}
-                    />
-                  </label>
-                </div>
-                <div className="photo-opt-scroll" ref={previewHost}>
-                  <div
-                    className="photo-opt-image"
-                    style={{
-                      width: frame.width
-                        ? `${Math.min(frame.width, frame.height * imageAspect) * zoom}px`
-                        : '100%',
-                      touchAction: tool === 'navigate' ? 'pan-x pan-y' : 'none',
-                    }}
-                    onPointerDown={(e) => {
-                      if (busy || tool === 'navigate') return;
-                      drag.current = point(e);
-                      e.currentTarget.setPointerCapture(e.pointerId);
-                    }}
-                    onPointerMove={(e) => {
-                      if (!drag.current) return;
-                      const p = point(e),
-                        a = drag.current;
-                      setBox({
-                        x: Math.min(p.x, a.x),
-                        y: Math.min(p.y, a.y),
-                        width: Math.abs(p.x - a.x),
-                        height: Math.abs(p.y - a.y),
-                      });
-                    }}
-                    onPointerUp={(e) => {
-                      if (!drag.current) return;
-                      const p = point(e),
-                        a = drag.current,
-                        rect = {
-                          x: Math.min(p.x, a.x),
-                          y: Math.min(p.y, a.y),
-                          width: Math.abs(p.x - a.x),
-                          height: Math.abs(p.y - a.y),
-                        };
-                      drag.current = null;
-                      setBox(null);
-                      if (rect.width < 0.005 || rect.height < 0.005) return;
-                      if (tool === 'crop') change({ crop: rect, masks: [] });
-                      else if (tool !== 'navigate')
-                        change({
-                          masks: [
-                            ...current.recipe.masks,
-                            { ...rect, mode: tool },
-                          ],
-                        });
+                <X />
+              </button>
+            )}
+          </div>
+        )}
+        <aside className="photo-source-panel">
+          <h3>Original</h3>
+          <div className="photo-source-name">
+            {current?.filename || 'Choose an image'}
+          </div>
+        </aside>
+        {panel === 'files' && (
+          <section
+            className="photo-floating-panel photo-files-panel"
+            aria-label="Local images and offline tools"
+          >
+            <h3>
+              Local images{' '}
+              <button
+                aria-label="Collapse local images"
+                onClick={() => setPanel(null)}
+              >
+                <ChevronDown />
+              </button>
+            </h3>
+            <div className="photo-panel-scroll">
+              <nav aria-label="Local image drafts">
+                {items.map((p) => (
+                  <button
+                    disabled={busy}
+                    aria-pressed={selected === p.id}
+                    key={p.id}
+                    onClick={() => {
+                      setSelected(p.id);
+                      setPast([]);
+                      setFuture([]);
                       setTool('navigate');
                     }}
-                    onPointerCancel={() => {
-                      drag.current = null;
-                      setBox(null);
-                    }}
                   >
-                    <img
-                      onLoad={(e) =>
-                        setImageAspect(
-                          e.currentTarget.naturalWidth /
-                            e.currentTarget.naturalHeight,
-                        )
-                      }
-                      src={
-                        (tool === 'crop' ||
-                        (showOriginal && geometryChanged && tool === 'navigate')
-                          ? sourceUrl
-                          : outputUrl || sourceUrl) || undefined
-                      }
-                      alt="Edited photograph preview"
-                      draggable={false}
-                    />
-                    {outputUrl && !geometryChanged && tool === 'navigate' && (
-                      <img
-                        className="photo-opt-before"
-                        src={sourceUrl}
-                        alt="Original comparison"
-                        style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
-                      />
-                    )}
-                    {outputUrl && !geometryChanged && tool === 'navigate' && (
-                      <span
-                        className="photo-opt-divider"
-                        style={{ left: `${compare}%` }}
-                        aria-hidden="true"
-                      />
-                    )}
-                    {box && (
-                      <div
-                        className="photo-opt-box"
-                        style={{
-                          left: `${box.x * 100}%`,
-                          top: `${box.y * 100}%`,
-                          width: `${box.width * 100}%`,
-                          height: `${box.height * 100}%`,
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-                {current.output && (
-                  <>
-                    {geometryChanged ? (
-                      <fieldset
-                        className="photo-opt-toolbar"
-                        aria-label="Compare image versions"
-                      >
-                        <Button
-                          variant={showOriginal ? 'default' : 'outline'}
-                          aria-pressed={showOriginal}
-                          onClick={() => setShowOriginal(true)}
-                        >
-                          Original
-                        </Button>
-                        <Button
-                          variant={!showOriginal ? 'default' : 'outline'}
-                          aria-pressed={!showOriginal}
-                          onClick={() => setShowOriginal(false)}
-                        >
-                          Edited
-                        </Button>
-                      </fieldset>
-                    ) : (
-                      <label>
-                        Original / edited comparison
-                        <input
-                          aria-label="Before and after comparison"
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={compare}
-                          onChange={(e) => setCompare(Number(e.target.value))}
-                        />
-                      </label>
-                    )}
-                    <p>
-                      {bytes(current.source.size)} →{' '}
-                      <strong>{bytes(current.output!.size)}</strong> ·{' '}
-                      {(
-                        100 -
-                        (current.output!.size / current.source.size) * 100
-                      ).toFixed(1)}
-                      % smaller · {current.width} × {current.height}px
-                    </p>
-                  </>
-                )}
-                <p>
-                  {tool === 'navigate'
-                    ? 'Preview changes to inspect the output at full size.'
-                    : `Drag a rectangle to ${tool}. Numeric crop controls are also available.`}
-                </p>
-              </section>
-              <section
-                className="photo-opt-controls"
-                aria-label="Image settings"
+                    {p.filename}
+                    <small>
+                      {bytes(p.source.size)}
+                      {p.output
+                        ? ' → ' + bytes(p.output.size)
+                        : ' · Original retained'}
+                    </small>
+                  </button>
+                ))}
+              </nav>
+              {!items.length && (
+                <p>No local photos. Add photos from the gallery.</p>
+              )}
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => void prepare()}
               >
-                <fieldset disabled={busy}>
-                  <legend>Crop & orientation</legend>
-                  <select
-                    aria-label="Crop aspect ratio"
-                    defaultValue="free"
-                    onChange={(e) => {
-                      const aspect = Number(e.target.value);
-                      if (!aspect) {
-                        setTool('crop');
-                        return;
-                      }
-                      const image = new Image();
-                      image.onload = () => {
-                        const actual = image.width / image.height;
-                        change({
-                          crop:
-                            actual > aspect
-                              ? {
-                                  x: (1 - aspect / actual) / 2,
-                                  y: 0,
-                                  width: aspect / actual,
-                                  height: 1,
-                                }
-                              : {
-                                  x: 0,
-                                  y: (1 - actual / aspect) / 2,
-                                  width: 1,
-                                  height: actual / aspect,
-                                },
-                          masks: [],
-                        });
-                      };
-                      image.src = sourceUrl;
-                    }}
-                  >
-                    <option value="free">Free crop</option>
-                    <option value="1">Square · 1:1</option>
-                    <option value="1.333333">Landscape · 4:3</option>
-                    <option value="1.777778">Wide · 16:9</option>
-                    <option value="0.75">Portrait · 3:4</option>
-                  </select>
+                <HardDrive />
+                {prepared ? 'Ready offline' : 'Prepare for offline use'}
+              </Button>
+              <p>
+                {items.length} images ·{' '}
+                {bytes(
+                  items.reduce(
+                    (n, p) => n + p.source.size + (p.output?.size || 0),
+                    0,
+                  ),
+                )}{' '}
+                stored for this gallery.
+              </p>
+              <details>
+                <summary>Batch tools</summary>
+                <div className="photo-batch-tools">
+                  {' '}
                   <Button
                     variant="outline"
+                    disabled={busy || !current || items.length < 2}
                     onClick={() => {
-                      setTool('crop');
-                      setCompare(0);
+                      for (const p of items)
+                        save({
+                          ...p,
+                          recipe: {
+                            ...p.recipe,
+                            width: current!.recipe.width,
+                            quality: current!.recipe.quality,
+                            targetKiB: current!.recipe.targetKiB,
+                            format: current!.recipe.format,
+                          },
+                          output: undefined,
+                        });
                     }}
                   >
-                    Draw crop
+                    Apply compression settings to batch
                   </Button>
-                  <div className="photo-opt-fields">
-                    {(['x', 'y', 'width', 'height'] as const).map((key) => (
-                      <label key={key}>
-                        Crop {key} (%)
-                        <input
-                          type="number"
-                          min={key === 'width' || key === 'height' ? 1 : 0}
-                          max="100"
-                          value={Math.round(current.recipe.crop[key] * 100)}
-                          onChange={(e) => {
-                            const next = {
-                              ...current.recipe.crop,
-                              [key]: Math.max(
-                                key === 'width' || key === 'height' ? 0.01 : 0,
-                                Math.min(1, Number(e.target.value) / 100),
-                              ),
-                            };
-                            next.width = Math.min(next.width, 1 - next.x);
-                            next.height = Math.min(next.height, 1 - next.y);
-                            change({ crop: next, masks: [] });
-                          }}
-                        />
-                      </label>
-                    ))}
+                  <Button
+                    variant="outline"
+                    disabled={busy || !items.length}
+                    onClick={() => void render(items, false)}
+                  >
+                    Optimise batch
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={busy || !items.length}
+                    onClick={() => void render(items, true)}
+                  >
+                    Use batch for map
+                  </Button>
+                </div>
+              </details>
+              {current && (
+                <Button
+                  variant="destructive"
+                  disabled={busy || protectedIds.includes(current.id)}
+                  title={
+                    protectedIds.includes(current.id)
+                      ? 'Remove this image from the upload queue first'
+                      : undefined
+                  }
+                  onClick={() => {
+                    previewController.current?.abort();
+                    void pending.current
+                      .then(() => removeLocalPhoto(owner, current.id))
+                      .then(() => {
+                        setItems((v) => v.filter((p) => p.id !== current.id));
+                        setSelected(
+                          items.find((p) => p.id !== current.id)?.id || '',
+                        );
+                      })
+                      .catch((e) => setError(e.message));
+                  }}
+                >
+                  Remove local files
+                </Button>
+              )}
+              <p>
+                Powered by{' '}
+                <a
+                  href="https://github.com/GoogleChromeLabs/squoosh"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Squoosh codecs
+                </a>
+                .{' '}
+                <a
+                  href="/photo-codecs/e8d35e0/README.md"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Licences
+                </a>
+              </p>
+            </div>
+          </section>
+        )}
+        {details && panel === 'details' && (
+          <section
+            className="photo-floating-panel photo-details-panel"
+            aria-label="Photo metadata"
+          >
+            <h3>
+              Photo details{' '}
+              <button
+                aria-label="Collapse photo details"
+                onClick={() => setPanel(null)}
+              >
+                <ChevronDown />
+              </button>
+            </h3>
+            <div className="photo-panel-scroll">{details}</div>
+          </section>
+        )}
+        {current && (
+          <section
+            className="photo-floating-panel photo-edit-panel"
+            data-expanded={panel === 'edit'}
+            aria-label="Image settings"
+          >
+            <h3>
+              <button
+                className="photo-panel-toggle"
+                aria-expanded={panel === 'edit'}
+                onClick={() => setPanel((p) => (p === 'edit' ? null : 'edit'))}
+              >
+                Edit & compress{' '}
+                {panel === 'edit' ? <ChevronDown /> : <ChevronUp />}
+              </button>
+            </h3>
+            {panel === 'edit' && (
+              <div className="photo-panel-scroll photo-opt-controls">
+                <fieldset disabled={busy}>
+                  <div className="photo-edit-history">
+                    <Button
+                      variant="ghost"
+                      disabled={!past.length}
+                      onClick={() => history(true)}
+                    >
+                      <Undo2 />
+                      Undo
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      disabled={!future.length}
+                      onClick={() => history(false)}
+                    >
+                      <Redo2 />
+                      Redo
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => change(defaultPhotoRecipe())}
+                    >
+                      Reset
+                    </Button>
                   </div>
-                  <div className="photo-opt-toolbar">
+                  <details>
+                    <summary>Crop & orientation</summary>{' '}
+                    <select
+                      aria-label="Crop aspect ratio"
+                      defaultValue="free"
+                      onChange={(e) => {
+                        const aspect = Number(e.target.value);
+                        if (!aspect) {
+                          setTool('crop');
+                          return;
+                        }
+                        const image = new Image();
+                        image.onload = () => {
+                          const actual = image.width / image.height;
+                          change({
+                            crop:
+                              actual > aspect
+                                ? {
+                                    x: (1 - aspect / actual) / 2,
+                                    y: 0,
+                                    width: aspect / actual,
+                                    height: 1,
+                                  }
+                                : {
+                                    x: 0,
+                                    y: (1 - actual / aspect) / 2,
+                                    width: 1,
+                                    height: actual / aspect,
+                                  },
+                            masks: [],
+                          });
+                        };
+                        image.src = sourceUrl;
+                      }}
+                    >
+                      <option value="free">Free crop</option>
+                      <option value="1">Square · 1:1</option>
+                      <option value="1.333333">Landscape · 4:3</option>
+                      <option value="1.777778">Wide · 16:9</option>
+                      <option value="0.75">Portrait · 3:4</option>
+                    </select>
                     <Button
                       variant="outline"
-                      aria-label="Rotate left"
-                      onClick={() =>
-                        change({
-                          rotation: rotatePhoto(current.recipe.rotation, -90),
-                          masks: [],
-                        })
-                      }
+                      onClick={() => {
+                        setTool('crop');
+                      }}
                     >
-                      <RotateCcw />
+                      Draw crop
                     </Button>
-                    <Button
-                      variant="outline"
-                      aria-label="Rotate right"
-                      onClick={() =>
-                        change({
-                          rotation: rotatePhoto(current.recipe.rotation, 90),
-                          masks: [],
-                        })
-                      }
-                    >
-                      <RotateCw />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        change({ flipX: !current.recipe.flipX, masks: [] })
-                      }
-                    >
-                      Flip horizontal
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        change({ flipY: !current.recipe.flipY, masks: [] })
-                      }
-                    >
-                      Flip vertical
-                    </Button>
-                  </div>
-                  {range('Straighten', 'rotation', -180, 180, 1)}
+                    <div className="photo-opt-fields">
+                      {(['x', 'y', 'width', 'height'] as const).map((key) => (
+                        <label key={key}>
+                          Crop {key} (%)
+                          <input
+                            type="number"
+                            min={key === 'width' || key === 'height' ? 1 : 0}
+                            max="100"
+                            value={Math.round(current.recipe.crop[key] * 100)}
+                            onChange={(e) => {
+                              const next = {
+                                ...current.recipe.crop,
+                                [key]: Math.max(
+                                  key === 'width' || key === 'height'
+                                    ? 0.01
+                                    : 0,
+                                  Math.min(1, Number(e.target.value) / 100),
+                                ),
+                              };
+                              next.width = Math.min(next.width, 1 - next.x);
+                              next.height = Math.min(next.height, 1 - next.y);
+                              change({ crop: next, masks: [] });
+                            }}
+                          />
+                        </label>
+                      ))}
+                    </div>
+                    <div className="photo-opt-toolbar">
+                      <Button
+                        variant="outline"
+                        aria-label="Rotate left"
+                        onClick={() =>
+                          change({
+                            rotation: rotatePhoto(current.recipe.rotation, -90),
+                            masks: [],
+                          })
+                        }
+                      >
+                        <RotateCcw />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        aria-label="Rotate right"
+                        onClick={() =>
+                          change({
+                            rotation: rotatePhoto(current.recipe.rotation, 90),
+                            masks: [],
+                          })
+                        }
+                      >
+                        <RotateCw />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          change({ flipX: !current.recipe.flipX, masks: [] })
+                        }
+                      >
+                        Flip horizontal
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          change({ flipY: !current.recipe.flipY, masks: [] })
+                        }
+                      >
+                        Flip vertical
+                      </Button>
+                    </div>
+                    {range('Straighten', 'rotation', -180, 180, 1)}
+                  </details>
                   <details>
                     <summary>Light & colour</summary>
                     {range('Exposure', 'exposure', -2, 2, 0.05)}
@@ -945,8 +1064,6 @@ export default function PhotoOptimizer({
                           variant={tool === t ? 'default' : 'outline'}
                           onClick={() => {
                             setTool(t);
-                            setShowOriginal(false);
-                            setCompare(0);
                           }}
                         >
                           {t}
@@ -1032,21 +1149,28 @@ export default function PhotoOptimizer({
                       </fieldset>
                     ))}
                   </details>
+
+                  <details>
+                    <summary>Resize</summary>
+                    <label>
+                      Longest edge (px)
+                      <input
+                        type="number"
+                        min="64"
+                        max="4096"
+                        value={current.recipe.width}
+                        onChange={(e) =>
+                          change({ width: Number(e.target.value) })
+                        }
+                      />
+                    </label>
+                    <p>Preserves proportions. Images are never enlarged.</p>
+                  </details>
+                  <h4>Compress</h4>
                   <label>
-                    Longest edge (px)
-                    <input
-                      type="number"
-                      min="64"
-                      max="4096"
-                      value={current.recipe.width}
-                      onChange={(e) =>
-                        change({ width: Number(e.target.value) })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Download format
+                    <span className="sr-only">Download format</span>
                     <select
+                      aria-label="Download format"
                       value={current.recipe.format}
                       onChange={(e) =>
                         change({
@@ -1055,135 +1179,159 @@ export default function PhotoOptimizer({
                       }
                     >
                       <option value="image/webp">WebP</option>
-                      <option value="image/jpeg">
-                        JPEG · white background
-                      </option>
-                      <option value="image/png">
-                        PNG · lossless compression
-                      </option>
+                      <option value="image/jpeg">MozJPEG</option>
+                      <option value="image/png">OxiPNG · lossless</option>
+                      <option value="image/avif">AVIF</option>
                     </select>
                   </label>
                   {current.recipe.format !== 'image/png' &&
+                    !(
+                      current.recipe.format === 'image/webp' &&
+                      current.recipe.lossless
+                    ) &&
                     range('Quality', 'quality', 0.1, 1, 0.01)}
-                  <label>
-                    Target size (KiB; 0 = no target)
-                    <input
-                      type="number"
-                      min="0"
-                      max="10240"
-                      value={current.recipe.targetKiB}
-                      onChange={(e) =>
-                        change({ targetKiB: Number(e.target.value) })
-                      }
-                    />
-                  </label>
-                  <Button onClick={() => void render([current], false)}>
+                  <details>
+                    <summary>Advanced settings</summary>
+                    {current.recipe.format === 'image/webp' && (
+                      <label className="photo-check">
+                        <input
+                          type="checkbox"
+                          checked={!!current.recipe.lossless}
+                          onChange={(e) =>
+                            change({ lossless: e.target.checked })
+                          }
+                        />
+                        Lossless
+                      </label>
+                    )}
+                    {current.recipe.format === 'image/jpeg' && (
+                      <label className="photo-check">
+                        <input
+                          type="checkbox"
+                          checked={current.recipe.progressive !== false}
+                          onChange={(e) =>
+                            change({ progressive: e.target.checked })
+                          }
+                        />
+                        Progressive JPEG
+                      </label>
+                    )}
+                    {current.recipe.format !== 'image/jpeg' && (
+                      <label>
+                        Compression effort
+                        <input
+                          type="range"
+                          min="0"
+                          max="6"
+                          step="1"
+                          value={
+                            current.recipe.effort ??
+                            (current.recipe.format === 'image/webp' ? 4 : 2)
+                          }
+                          onChange={(e) =>
+                            change({ effort: Number(e.target.value) })
+                          }
+                        />
+                        <small>Higher effort takes longer.</small>
+                      </label>
+                    )}
+                    <label>
+                      Target size (KiB; 0 = no target)
+                      <input
+                        type="number"
+                        min="0"
+                        max="10240"
+                        value={current.recipe.targetKiB}
+                        onChange={(e) =>
+                          change({ targetKiB: Number(e.target.value) })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Minimum quality
+                      <input
+                        type="range"
+                        min=".1"
+                        max="1"
+                        step=".01"
+                        value={current.recipe.minQuality ?? 0.65}
+                        onChange={(e) =>
+                          change({ minQuality: Number(e.target.value) })
+                        }
+                      />
+                      <output>
+                        {Math.round((current.recipe.minQuality ?? 0.65) * 100)}
+                      </output>
+                    </label>
+                    <p>
+                      A size target may lower quality to this floor. Actual
+                      output quality:{' '}
+                      {Math.round(
+                        (current.outputQuality ?? current.recipe.quality) * 100,
+                      )}
+                      .
+                    </p>
+                  </details>
+                  <Button
+                    variant="ghost"
+                    onClick={() => void render([current], false)}
+                  >
                     <ImageDown />
                     Preview changes
                   </Button>
-                  <Button
-                    variant="outline"
-                    disabled={!current.output}
-                    onClick={() =>
-                      download(
-                        current.output!,
-                        current.filename.replace(/\.[^.]+$/, '') +
-                          '-edited.' +
-                          current.recipe.format.split('/')[1],
-                      )
-                    }
-                  >
-                    <Download />
-                    Download edited image
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => download(current.source, current.filename)}
-                  >
-                    Download original
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => change(defaultPhotoRecipe())}
-                  >
-                    Reset to original
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    disabled={protectedIds.includes(current.id)}
-                    title={
-                      protectedIds.includes(current.id)
-                        ? 'Remove this image from the upload queue first'
-                        : undefined
-                    }
-                    onClick={() => {
-                      void pending.current
-                        .then(() => removeLocalPhoto(owner, current.id))
-                        .then(() => {
-                          setItems((v) => v.filter((p) => p.id !== current.id));
-                          setSelected(
-                            items.find((p) => p.id !== current.id)?.id || '',
-                          );
-                        })
-                        .catch((e) => setError(e.message));
-                    }}
-                  >
-                    Remove local files
-                  </Button>
+                  <p className="photo-map-note">
+                    Map uploads use WebP, up to 1600px and 250 KiB. Originals
+                    stay on this device.
+                  </p>
                 </fieldset>
-              </section>
-            </>
-          )}
-        </div>
-        <footer>
-          <p>
-            Map uploads use WebP, up to 1600px and 250 KiB. Originals remain on
-            this device.
-          </p>
-          <div className="photo-opt-toolbar">
-            <Button
-              variant="outline"
-              disabled={busy || !current || items.length < 2}
-              onClick={() => {
-                for (const p of items)
-                  save({
-                    ...p,
-                    recipe: {
-                      ...p.recipe,
-                      width: current!.recipe.width,
-                      quality: current!.recipe.quality,
-                      targetKiB: current!.recipe.targetKiB,
-                      format: current!.recipe.format,
-                    },
-                    output: undefined,
-                  });
-              }}
-            >
-              Apply compression settings to batch
-            </Button>
-            <Button
-              variant="outline"
-              disabled={busy || !items.length}
-              onClick={() => void render(items, false)}
-            >
-              Optimise batch
-            </Button>
-            <Button
-              disabled={busy || !current}
-              onClick={() => void render([current!], true)}
-            >
-              <Upload />
-              Use selected for map
-            </Button>
-            <Button
-              variant="outline"
-              disabled={busy || !items.length}
-              onClick={() => void render(items, true)}
-            >
-              Use batch for map
-            </Button>
-          </div>
-        </footer>
+              </div>
+            )}
+          </section>
+        )}
+        {current && (
+          <>
+            <div className="photo-result photo-result-original">
+              <button
+                aria-label="Download original"
+                title="Download original"
+                onClick={() => download(current.source, current.filename)}
+              >
+                <Download />
+              </button>
+              <span>
+                {bytes(current.source.size)}
+                <small>Original</small>
+              </span>
+            </div>
+            <div className="photo-result photo-result-output">
+              <span className="photo-saving">
+                {current.output
+                  ? (saving >= 0 ? '↓ ' : '↑ ') +
+                    Math.abs(saving).toFixed(1) +
+                    '%'
+                  : '…'}
+              </span>
+              <span aria-live="polite">
+                {current.output ? bytes(current.output.size) : 'Encoding…'}
+                <small>
+                  {current.output
+                    ? current.width + ' × ' + current.height
+                    : 'Edited'}
+                </small>
+              </span>
+              <button
+                aria-label="Download edited image"
+                title="Download edited image"
+                disabled={!current.output || busy}
+                onClick={() =>
+                  current.output && download(current.output, outputName)
+                }
+              >
+                <Download />
+              </button>
+            </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

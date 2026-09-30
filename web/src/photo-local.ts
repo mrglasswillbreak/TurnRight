@@ -12,6 +12,7 @@ export interface LocalPhoto {
   output?: Blob;
   width?: number;
   height?: number;
+  outputQuality?: number;
   original?: CampusPhoto;
   metadata: Partial<CampusPhoto>;
   photoId?: string;
@@ -176,7 +177,9 @@ export async function updateLocalPhoto(
   id: string,
   patch: Partial<Omit<LocalPhoto, 'id' | 'owner' | 'source' | 'output'>>,
   clearOutput = false,
+  output?: Blob,
 ) {
+  const outputBytes = output ? await output.arrayBuffer() : undefined;
   const scopedOwner = campusKey(owner);
   const db = await connection();
   try {
@@ -196,7 +199,17 @@ export async function updateLocalPhoto(
       id,
       updated: Date.now(),
     });
-    if (clearOutput)
+    if (outputBytes)
+      await tx
+        .objectStore('content')
+        .put({
+          owner: scopedOwner,
+          id,
+          kind: 'output',
+          bytes: outputBytes,
+          type: output!.type,
+        });
+    else if (clearOutput)
       await tx.objectStore('content').delete([scopedOwner, id, 'output']);
     await tx.done;
   } finally {

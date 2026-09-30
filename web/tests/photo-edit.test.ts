@@ -15,6 +15,37 @@ import {
   associateLocalPhoto,
 } from '../src/photo-local';
 describe('local image drafts', () => {
+  it('stores previews without rewriting the original or a concurrent gallery association', async () => {
+    const owner = crypto.randomUUID(),
+      id = crypto.randomUUID();
+    const source = new Blob(['retained original'], { type: 'image/png' });
+    await saveLocalPhoto(owner, {
+      id,
+      owner,
+      target: 'building:preview',
+      filename: 'source.png',
+      source,
+      recipe: defaultPhotoRecipe(),
+      metadata: {},
+      updated: 0,
+    });
+    const read = vi.spyOn(source, 'arrayBuffer');
+    await associateLocalPhoto(owner, id, 'published:photo');
+    const output = new Blob(['new preview'], { type: 'image/webp' });
+    await updateLocalPhoto(
+      owner,
+      id,
+      { width: 800, height: 600, outputQuality: 0.8 },
+      false,
+      output,
+    );
+    const result = await localPhoto(owner, id);
+    expect(read).not.toHaveBeenCalled();
+    expect(result?.photoId).toBe('published:photo');
+    expect(await result?.source.text()).toBe('retained original');
+    expect(await result?.output?.text()).toBe('new preview');
+    expect(result?.outputQuality).toBe(0.8);
+  });
   it('rotates through all four orientations and retains a straighten adjustment', () => {
     for (const step of [90, -90]) {
       let angle = 0;
