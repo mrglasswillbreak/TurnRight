@@ -1,4 +1,4 @@
-import { requestedCampus, DEFAULT_CAMPUS } from './campus-context';
+import { requestedCampus, DEFAULT_CAMPUS, rememberPublicCampus } from './campus-context';
 import type { TravelMode } from './types';
 import { placeMatches, streetResults } from './place-details';
 import { PlaceInformation } from './PlaceInformation';
@@ -300,6 +300,8 @@ export default function App() {
     )
       .then((result) => {
         if (generation !== downloadGeneration.current) return;
+        if (!location.pathname.startsWith('/admin'))
+          rememberPublicCampus(result.manifest.campus?.slug || DEFAULT_CAMPUS);
         setData(result.data);
         setManifest(result.manifest);
         setDownloaded(result.downloaded);
@@ -893,7 +895,8 @@ export default function App() {
           TurnRight<span>.</span>
         </h1>
         <p>{loadError || 'Opening campus map…'}</p>
-        {loadError && <Button onClick={reloadData}>Retry</Button>}
+        {loadError && <><Button onClick={reloadData}>Retry</Button>
+          <a href="/?campus=lasu">Open LASU</a></>}
       </main>
     );
   if (location.pathname.startsWith('/admin'))
