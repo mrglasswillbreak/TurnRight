@@ -35,7 +35,9 @@ export function campusKey(key: string, campus = requestedCampus()) {
 }
 export function campusUrl(path: string, campus = requestedCampus()) {
   const url = new URL(path, 'https://turnright.local');
-  url.searchParams.set('campus', campus);
+  if (campus !== DEFAULT_CAMPUS || url.pathname === '/')
+    url.searchParams.set('campus', campus);
+  else if (url.searchParams.has('campus')) url.searchParams.delete('campus');
   return url.pathname + url.search + url.hash;
 }
 export function validCatalogue(value: unknown): value is CampusCatalogue {
