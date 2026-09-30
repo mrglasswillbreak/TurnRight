@@ -12,25 +12,47 @@ export function requestRoadDisplay(
     return () => {};
   }
   let stopped = false;
-  const worker = new Worker(
-    new URL('./road-surfaces.worker.ts', import.meta.url),
-    { type: 'module' },
-  );
+  let worker: Worker | undefined;
   const deliver = (value: FeatureCollection) => {
     if (stopped) return;
     cache.set(map, value);
     receive(value);
-    worker.terminate();
+    worker?.terminate();
   };
+  const fallback = () =>
+    void import('./road-surfaces')
+      .then(({ exposedRoads }) => {
+        if (!stopped) deliver(exposedRoads(map));
+      })
+      .catch(() => {
+        // An unloading page can reject both the worker and its dynamic import.
+        // Retain original display lines if the optional renderer is unavailable.
+        if (!stopped)
+          receive({
+            type: 'FeatureCollection',
+            features: map.features.filter((f) => f.properties?.kind === 'path'),
+          });
+      });
+  const stop = () => {
+    stopped = true;
+    worker?.terminate();
+  };
+  try {
+    worker = new Worker(new URL('./road-surfaces.worker.ts', import.meta.url), {
+      type: 'module',
+    });
+  } catch {
+    // WebKit can synchronously refuse a worker while its document unloads.
+    fallback();
+    return stop;
+  }
   worker.onmessage = (event: MessageEvent<FeatureCollection>) =>
     deliver(event.data);
   worker.onerror = (event) => {
     event.preventDefault();
-    worker.terminate();
+    worker?.terminate();
     // Retain correct geometry on browsers where a worker cannot start.
-    void import('./road-surfaces').then(({ exposedRoads }) => {
-      if (!stopped) deliver(exposedRoads(map));
-    });
+    fallback();
   };
   worker.postMessage({
     type: 'FeatureCollection',
@@ -41,8 +63,5 @@ export function requestRoadDisplay(
           ['road', 'sidewalk', 'parking'].includes(f.properties.landClass)),
     ),
   });
-  return () => {
-    stopped = true;
-    worker.terminate();
-  };
+  return stop;
 }
