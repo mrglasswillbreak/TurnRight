@@ -9463,6 +9463,19 @@ test('covered paths remain selectable through the overlap chooser', async ({
   const position = await page.evaluate(() =>
     window.editorTestMap.project(window.editorTestMap.getCenter()),
   );
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const map = window.editorTestMap;
+        const layers = map
+          .queryRenderedFeatures(map.project(map.getCenter()), {
+            layers: ['editor-path-hits', 'land'],
+          })
+          .map((f) => f.layer.id);
+        return layers.includes('editor-path-hits') && layers.includes('land');
+      }),
+    )
+    .toBe(true);
   const map = await page.locator('.maplibregl-canvas').boundingBox();
   await page.mouse.click(map!.x + position.x, map!.y + position.y);
   const chooser = page.getByRole('dialog', {

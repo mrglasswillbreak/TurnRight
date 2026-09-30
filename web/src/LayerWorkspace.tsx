@@ -91,11 +91,14 @@ export default function LayerWorkspace({
       ...view,
       selected: typeof value === 'function' ? value(selected) : value,
     });
+  // Validation/autosave can replace CampusData without changing this layer.
+  // Do not reset an in-progress settings form for those unrelated rerenders.
+  const activeSignature = active ? JSON.stringify(active) : '';
   useEffect(() => {
-    setDraft(active ? structuredClone(active) : null);
+    setDraft(activeSignature ? JSON.parse(activeSignature) : null);
     setScroll(0);
     setMessage('');
-  }, [active]);
+  }, [activeSignature]);
   const descendants = (id: string): string[] => [
     id,
     ...items.filter((l) => l.parentId === id).flatMap((l) => descendants(l.id)),
