@@ -174,7 +174,12 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
         : undefined;
     return [{ ...base, payload_patch, ...(properties_patch ? { properties_patch } : {}) }];
   });
-  report.reconciliationId = await db(
+  const [activeRelease] = await db("releases?status=in.(queued,building)&select=id,status&limit=1");
+  if (activeRelease)
+    throw Error("A release is already being built. Complete it before applying campus layers.");
+  report.patchCount = patches.length;
+  await fs.writeFile(`work/${slug}-layer-receipt.json`, JSON.stringify(report, null, 2));
+  if (patches.length) report.reconciliationId = await db(
     "rpc/apply_additive_source_patch",
     "POST",
     {
@@ -205,10 +210,15 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
     throw Error("Drafts changed during preparation. Review before publication.");
   const catalogue = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
   report.workspaceHash = snapshotHash(accepted, savedDrafts);
-  const [created] = await db("releases", "POST", {
-    summary: `${slug.toUpperCase()} reviewed campus layers: ${slug === "lasu" ? "82 labelled road-width surfaces and refreshed landscape classification" : "parcel classification corrections and 179 editable road surfaces"}. Routing unchanged. ${excluded.length} unrelated draft changes retained privately.`,
-    catalogue_revision: catalogue.revision,
-    snapshot: {
+  report.releaseId = randomUUID();
+  await fs.writeFile(`work/${slug}-layer-receipt.json`, JSON.stringify(report, null, 2));
+  // The service-only RPC bounds large snapshot insertion to sixty seconds.
+  await db("rpc/create_reviewed_release_snapshot", "POST", {
+    actor: owner.id,
+    release_identity: report.releaseId,
+    release_summary: `${slug.toUpperCase()} reviewed campus layers: ${slug === "lasu" ? "82 labelled road-width surfaces and refreshed landscape classification" : "parcel classification corrections and 179 editable road surfaces"}. Routing unchanged. ${excluded.length} unrelated draft changes retained privately.`,
+    catalogue_hash: catalogue.revision,
+    release_snapshot: {
       features: release.records,
       edits: priorEdits,
       workspaceHash: report.workspaceHash,
@@ -218,8 +228,9 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
         excludedDrafts: excluded.length,
       },
     },
-  });
-  report.releaseId = created.id;
+  }, "return=representation", 75000);
+  const [created] = await db(`releases?id=eq.${report.releaseId}&select=id,status`);
+  if (created?.id !== report.releaseId) throw Error("Release creation readback failed");
 }
 await fs.writeFile(`work/${slug}-layer-receipt.json`, JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));

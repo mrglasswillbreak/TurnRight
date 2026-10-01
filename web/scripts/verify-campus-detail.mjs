@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { chromium, webkit, expect } from '@playwright/test';
 import { createServer } from 'node:http';
+import { requestPublishedAsset } from './published-assets.mjs';
 const origin = process.env.VERIFY_ORIGIN || 'https://turnright.vercel.app';
 const output = path.resolve(
   process.env.VERIFY_OUTPUT || 'work/campus-detail-verification',
@@ -15,11 +16,7 @@ const headers = bypass ? { 'x-vercel-protection-bypass': bypass } : {};
 const get = async (url) => {
   const target = new URL(url, origin);
   assert.equal(target.origin, new URL(origin).origin);
-  const response = await fetch(target, {
-    headers,
-    redirect: 'error',
-    signal: AbortSignal.timeout(45000),
-  });
+  const response = await requestPublishedAsset(origin, target.href, 45000, { headers });
   assert(response.ok, `${url}: ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 };

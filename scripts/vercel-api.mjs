@@ -22,11 +22,12 @@ export async function vercelApi(endpoint, options = {}) {
   return response.status === 204 ? null : response.json().catch(() => null);
 }
 /** Read an immutable deployment owned by this project without disabling protection. */
-export async function withDeploymentAccess(origin, read) {
+export async function withDeploymentAccess(origin, read, deploymentId) {
   const url = new URL(origin);
   if (url.protocol !== 'https:' || url.username || url.password || !url.hostname.endsWith('.vercel.app')) throw Error('Unexpected historical deployment origin');
-  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(url.hostname)}`);
+  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(deploymentId || url.hostname)}`);
   if (deployment.projectId !== process.env.VERCEL_PROJECT_ID) throw Error('Historical deployment belongs to another project');
+  if (deploymentId && deployment.url !== url.hostname) throw Error('Historical deployment URL does not match its stored ID');
   const secret = randomBytes(16).toString('hex');
   if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${secret}`);
   const endpoint = `/v1/projects/${process.env.VERCEL_PROJECT_ID}/protection-bypass`;
@@ -42,6 +43,32 @@ export async function withDeploymentAccess(origin, read) {
     throw Error('Historical deployment authorization did not become available');
   } finally {
     await update({revoke:{secret,regenerate:false}});
+  }
+}
+/** Recover immutable package assets retained by the current site after deployment expiry. */
+export async function withRetainedPackageAccess(historical, read) {
+  try {
+    return await withDeploymentAccess(
+      historical.deployment_url,
+      (headers) => read(headers, historical.deployment_url),
+      historical.deployment_id,
+    );
+  } catch (error) {
+    if (!/^Vercel 404:/.test(error.message)) throw error;
+    const project = await vercelApi(
+      '/v9/projects/' + encodeURIComponent(process.env.VERCEL_PROJECT_ID),
+    );
+    const current = project.targets?.production;
+    if (!current?.id || !current.url)
+      throw Error('Historical deployment expired and no current package host is available');
+    const retainedOrigin = 'https://' + current.url;
+    console.log('Historical deployment expired; checking its immutable package on the current production host');
+    // The caller still verifies the exact historical version and every asset hash.
+    return withDeploymentAccess(
+      retainedOrigin,
+      (headers) => read(headers, retainedOrigin),
+      current.id,
+    );
   }
 }
 export async function uploadSource(root) {

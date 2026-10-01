@@ -2,38 +2,40 @@
 
 Explore **LASU Ojo and UNILAG Akoka**, search campus places, and navigate with independently downloadable offline maps.
 
-[Open LASU](https://turnright.vercel.app/) · [Open UNILAG](https://turnright.vercel.app/?campus=unilag) · [Owner workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md)
+[Open map](https://turnright.vercel.app/) · [Open LASU](https://turnright.vercel.app/?campus=lasu) · [Open UNILAG](https://turnright.vercel.app/?campus=unilag) · [Owner workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md)
 
-TurnRight combines a public navigation PWA, a private GIS workspace and a building model editor. Search, route calculation, GPS processing and spoken guidance run on the device. Each campus has its own sources, corrections, photographs, models and reviewed releases. LASU remains the default for older links.
+TurnRight combines a public navigation PWA, a private GIS workspace and a building model editor. Search, route calculation, GPS processing and spoken guidance run on the device. Each campus has its own sources, corrections, photographs, models and reviewed releases. A plain visit reopens the last successfully used campus on this device. Explicit campus links take priority; first visits and older destination links default to LASU.
 
 > An independent personal project, not an official university service. Campus routes have not been field-verified. A mapped approach is not a confirmed entrance. Unknown heights remain labelled illustrative estimates; visual detail does not establish walking, driving or accessibility permission.
 
 ## Campus status
 
-The follow-on **LASU layers and editable roads** implementation is in progress on `codex/lasu-campus-layers`. It prepares 82 labelled illustrative LASU surfaces, corrects UNILAG parcel classifications and adds the campus layer explorer. Final browser/build checks and deployment are pending; the published counts below remain unchanged. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU candidate coverage](docs/LASU-LAYERS.md) · [Exact verification checkpoint](docs/PRODUCTION.md).
-
-The September 30 detail upgrade retains LASU's published package and private drafts. UNILAG receives distinct landscape classes, road surfaces, additional footprints and destinations, credited photographs and evidence-backed architectural treatments. [Coverage and unresolved evidence](docs/UNILAG-DETAIL.md) · [Release versions, checks and rollback](docs/PRODUCTION.md).
+LASU has 82 labelled illustrative road surfaces and distinct landscape classes. UNILAG has 179 surveyed road-width records, detailed vegetation, credited photographs and evidence-backed architectural treatments. The editor provides a campus layer explorer, independently selectable routing paths and road surfaces, and reviewed geometry operations. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md) · [Released versions and verification](docs/PRODUCTION.md).
 
 | Published map content | LASU Ojo | UNILAG Akoka |
 | --- | ---: | ---: |
 | Building footprints | 393 | 723 |
 | Destinations | 220 | 116 |
 | Photographs | 44 | 16 |
-| New UNILAG road surfaces | — | 179 |
+| Road surfaces | 82 illustrative | 179 surveyed |
 
-UNILAG's upgrade starts from 629 buildings, 71 destinations and no photographs. It retains every existing destination identity and the existing routing graph. The 179 road polygons comprise 80 paved roads, 24 unpaved roads and 75 sidewalks. The documented self-intersection in source feature 96 is repaired with a retained diagnostic receipt. Senate floor totals and several residence-hall assignments remain explicitly disputed.
+Both upgrades preserve existing destination identities, routing graphs, permissions, photographs, authored models and unrelated private drafts. LASU accounts for all 95 source roads: 82 generated surfaces, 12 with no usable area after exclusions and one held geometry conflict. The 179 road polygons comprise 80 paved roads, 24 unpaved roads and 75 sidewalks. The documented self-intersection in source feature 96 is repaired with a retained diagnostic receipt. Senate floor totals and several residence-hall assignments remain explicitly disputed.
 
 ## Screenshots
 
-The September 30 campus captures show the real upgraded map. Historical editor examples below use isolated owner/API fixtures; phone images are browser simulations. [Capture provenance](docs/assets/screenshots/README.md).
+The dated campus captures show real packages. Editor examples use isolated owner/API fixtures; phone images are browser simulations. Capture provenance identifies each release and distinguishes historical examples. [Capture provenance](docs/assets/screenshots/README.md).
 
 | UNILAG · light, 3D | UNILAG · dark, 2D |
 | --- | --- |
-| ![UNILAG campus and Senate in 3D](docs/assets/screenshots/unilag-desktop-light-3d-2026-09-30.png) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |
+| ![Published UNILAG roads, landscape and controls above the desktop panel](docs/assets/screenshots/unilag-desktop-layer-controls-2026-10-01.jpg) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |
 
-| UNILAG · mobile | LASU · unchanged campus data |
+| UNILAG · mobile | LASU · campus detail |
 | --- | --- |
-| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU map using the shared visual language](docs/assets/screenshots/lasu-desktop-light-3d-2026-09-30.png) |
+| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU published road surfaces and controls above the desktop panel](docs/assets/screenshots/chromium-lasu-desktop-light-3d-2026-09-30.png) |
+
+| LASU · mobile dark 2D | Road and landscape workflow |
+| --- | --- |
+| <img src="docs/assets/screenshots/webkit-lasu-mobile-dark-2d-2026-09-30.png" width="280" alt="LASU road surfaces in mobile dark 2D"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
 
 | Private GIS workspace | Building authoring |
 | --- | --- |
@@ -43,9 +45,11 @@ The September 30 campus captures show the real upgraded map. Historical editor e
 
 - **Campus navigation:** searchable names, aliases, categories and streets; walking and driving routes; destination/entrance guides; mapped restrictions, closures, parking and walking handoffs; foreground GPS and offline spoken instructions.
 - **Consistent maps:** light, dark and system themes; 2D and 3D; shared building colours, place icons and labels; separate trees, hedges, shrubs, greenspaces, water, sports areas, parking and subtle parcels. Polygon road surfaces cover matching centreline display segments while leaving uncovered segments visible.
-- **Independent campuses:** searchable globe chooser, campus-specific links, recents, saved places, report drafts and offline packages. Changing campuses during navigation requires confirmation. A map can publish before its routes are ready.
+- **Independent campuses:** remembered last-used public campus, searchable globe chooser, explicit campus links, campus-scoped recents, saved places, report drafts and offline packages. Changing campuses during navigation requires confirmation. A map can publish before its routes are ready.
 - **Vector imports:** file batches, public ArcGIS and complete OSM extracts; format/projection detection, editable field mappings, aliases/coded values, repair receipts, per-layer sampling and styled previews over the current campus.
-- **Owner editing:** select and edit places, paths, buildings, barriers, land and generic overlays; undo/redo, transactional autosave, recovery and review. Overlays have editable labels, colours, opacity, visibility and order.
+- **Layer management:** Layers / Features explorer, folders, search by source identity, virtualized attribute table, map-linked multi-selection, bulk edits, styling rules, locking, isolation, archive/restore, duplication and mapped-property exports. Editing visibility, release inclusion and published visibility are separate.
+- **Road and geometry editing:** original routing paths remain selectable beneath road surfaces. Road class, material, width and evidence persist through saves and release. Land/overlays support 20,000 vertices with progressive handles, holes, multipart edits, reviewed split/merge and linked-surface regeneration; undo restores whole operations.
+- **Owner editing:** places, paths, buildings, barriers, land and overlays share transactional autosave, revision guards, undo/redo, interruption recovery and release review.
 - **Building detail:** footprint-bound architectural evidence, roof plans, wall materials, windows, surface text, curves, components, meshes and reference-photo split views. GLB/glTF/OBJ/STL exchange uses the separate model workspace.
 - **Photographs:** credited galleries, automatic compression, offline image editing, crop/rotate/exposure controls, ordered galleries, recovery and model references. Photo dates and historical views remain visible.
 - **Reviewed publication:** immutable campus snapshots, validated models and hashed assets, preview before publication, preserved other-campus packages, and a campus-specific restore workflow.
@@ -76,10 +80,10 @@ The configured build exercises the real authentication/dependency boundary using
 1. Open a campus directly or use **Choose a campus** beside search.
 2. Search a destination or street. Open its details to inspect photographs, model evidence and arrival information.
 3. Choose directions and an origin. Select walking or driving where the campus supports it, then review restrictions and the final approach before starting.
-4. Use settings for theme, 2D/3D and navigation preferences. GPS guidance runs while the app is foregrounded.
+4. Use the controls above the main panel for 2D/3D, zoom, north-up and location/follow. Desktop has one floating row; mobile retains two rows. Theme and navigation preferences remain in settings. GPS guidance runs while the app is foregrounded.
 5. Open **Offline** and download that campus. Wait for completion before disconnecting. Removing one campus download retains other campuses and shared assets.
 
-Links use `?campus=unilag` and can include existing place/building identifiers. Legacy links without a campus parameter continue to resolve to LASU. Search and route calculation work with the downloaded package; online source imports and owner publication require a connection.
+Links use `?campus=unilag` and can include existing place/building identifiers. Opening `/` restores the last successfully loaded public campus from device storage. First visits use LASU. Existing destination/building links without a campus parameter retain their LASU interpretation. Explicit links always win; unsuccessful loads and editor visits do not change the remembered choice. Browser storage restrictions can prevent remembering it. Search and route calculation work with the downloaded package; online source imports and owner publication require a connection.
 
 ## Supported map imports
 
@@ -119,6 +123,14 @@ Repeat imports default to **add/update selected layers**. Removing missing recor
 
 Queue a valid preview, review the proposed changes, then build a campus release preview. Existing drafts and public packages remain separate. A changed baseline or public catalogue invalidates a stale release. [Editor guide](docs/EDITOR.md) · [Import guide](docs/CAMPUS-IMPORTS.md) · [Publication](docs/DEPLOYMENT.md).
 
+## Manage campus layers
+
+Open **Editor → Layers**. Choose a layer to set the drawing target, then use **Features** to find records by name, application ID or source ID. UNILAG’s 179 road surfaces are available here independently of **Needs mapping**. Overlapping map selections show a chooser; hidden or locked layers do not intercept clicks.
+
+Layer settings control folders, order within cartographic bands, labels, classification styles and release settings. Bulk edits and geometry operations preview their affected records before one undoable application. Source width changes mark generated surfaces stale; **Preview linked road surfaces → Apply** regenerates them after review. Manually reshaped surfaces require an explicit replacement choice. Surveyed polygons never reshape just because their width property changes.
+
+[Full layer guide](docs/CAMPUS-LAYERS.md) · [Editor](docs/EDITOR.md) · [LASU coverage and estimates](docs/LASU-LAYERS.md).
+
 ## Building models and photographs
 
 Open a building in the owner editor to manage references, appearance and its model. Native authoring covers roofs, wall surfaces, openings, surface text, curves and object/component meshes. Undo history and authored models remain private until reviewed publication. Imported standard model files retain supported static geometry and appearance; native editing history is not a standard model-file feature.
@@ -143,7 +155,7 @@ Resource limits remain 50 MiB uploaded per batch, 250 MiB expanded archives, 100
 
 ## Configuration and hosting
 
-Apply migrations in order through **019_additive_source_patch.sql** before enabling land/overlay writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
+Apply migrations in order through **021_reviewed_release_snapshot.sql** before enabling their dependent writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
 
 Set up the owner allowlist, GitHub OAuth, private storage and repository/Vercel secrets using [Deployment](docs/DEPLOYMENT.md) and [Configuration](docs/CONFIGURATION.md). `PUBLISHED_MAP_URL` makes application builds preserve current campus packages. Worker workflows run from `main`, so release the shared registry/API/worker changes together. Restore one campus through a fresh release preview, preserving other campuses' current packages.
 
@@ -169,6 +181,7 @@ The [verification record](docs/PRODUCTION.md) distinguishes full regression runs
 | `scripts/map_import` | Shared format registry and pinned GIS conversion |
 | `scripts/tests` | Import, source-completeness and UNILAG geometry acceptance |
 | `supabase/migrations` | Additive schema/RPC upgrades |
+| `data/campus-layer-enrichment` | LASU generated surfaces, candidate ledger, repair receipts and UNILAG parcel corrections |
 | `data/unilag-enrichment` | Mapped release patch, candidate dispositions and credited photo inventory |
 | `data/building-evidence.json`, `data/photos` | Architecture references and licensed photo derivatives |
 | `docs` | Current guides, evidence, screenshots and dated verification |

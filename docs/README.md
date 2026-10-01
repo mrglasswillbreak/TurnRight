@@ -1,13 +1,13 @@
 # TurnRight documentation
 
-TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo remains the default; UNILAG is also published. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
+TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo is the first-visit default; the plain public home page remembers the last successfully opened campus. UNILAG is also published. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
 
 ## Use the application
 
 | Task | Guide |
 | --- | --- |
-| Organize campus layers and edit road surfaces (pending rollout) | [Layer workflow](CAMPUS-LAYERS.md) |
-| Inspect LASU road-width candidates and refreshed landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
+| Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |
+| Inspect published LASU road estimates, reviewed sources and landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
 | Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
@@ -31,13 +31,13 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–019, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
+| New installations, migrations 001–021, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
 | Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
-| Current bug reproductions, fixes and broad workflow checks | [27 September audit](AUDIT-2026-09-27.md) |
+| Dated bug reproductions, fixes and broad workflow checks | [27 September audit](AUDIT-2026-09-27.md) |
 | Theme tokens and text contrast | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md) |
 | Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
 | Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |

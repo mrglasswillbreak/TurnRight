@@ -80,6 +80,7 @@ export class ProcessMonitor {
     this.records = [...this.records.filter((r) => r.id !== record.id), next];
     const finished = this.records
       .filter((r) => r.finished)
+      .reverse() // Newest update wins when several jobs finish in one millisecond.
       .sort((a, b) => b.updated - a.updated);
     this.records = this.records.filter(
       (r) => !r.finished || finished.indexOf(r) < 30,

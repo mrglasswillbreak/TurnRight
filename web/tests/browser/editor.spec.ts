@@ -2806,6 +2806,9 @@ test('review separate building wings, edit their geometry, save and undo without
     }),
   );
   await clickMap(page, [3.1997, 6.47128]);
+  const chooser = page.getByRole('dialog', { name: 'Choose overlapping feature' });
+  if (await chooser.isVisible())
+    await chooser.getByRole('button', { name: /building .*120$/ }).click();
   await page.getByRole('button', { name: 'Review corrected wings' }).click();
   await expect(
     page.getByRole('complementary', { name: 'Review proposed repair' }),
@@ -5436,10 +5439,12 @@ test('slate map badges select places and street labels omit generic names', asyn
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.editorTestMap.getFilter('places-label-selected'),
+        window.editorTestMap
+          .queryRenderedFeatures({ layers: ['places-label-selected'] })
+          .map((feature) => feature.properties?.id),
       ),
     )
-    .toEqual(['==', ['get', 'id'], state.campus.places[0].id]);
+    .toEqual([state.campus.places[0].id]);
   await page.screenshot({
     path: testInfo.outputPath('selected-badge-and-street.png'),
   });
@@ -6206,6 +6211,8 @@ test('driving road approval persists separately from walking access', async ({
   );
 });
 async function modelAction(page: Page, name: string) {
+  // Wait for the previous popup and its focus restoration to finish before reopening.
+  await expect(page.locator('.model-action-menu')).toHaveCount(0);
   const dialog = page.getByRole('dialog');
   const attached = dialog.getByRole('button', {
     name: 'Selected detail actions',
@@ -6227,6 +6234,7 @@ async function modelAction(page: Page, name: string) {
       .click();
   }
   await page.getByRole('menuitem', { name, exact: true }).click();
+  await expect(page.locator('.model-action-menu')).toHaveCount(0);
 }
 for (const width of [390, 1440]) {
   test(`release preflight opens the exact wall and retains targeted review through undo at ${width}px`, async ({
@@ -7239,8 +7247,10 @@ test('selected detail menu supports context actions, keyboard focus and undo', a
     .getByRole('menuitem', { name: 'Edit details', exact: true })
     .click();
   await expect(dialog.getByLabel('Detail name', { exact: true })).toBeFocused();
+  await expect(page.getByRole('menu')).toBeHidden();
   await canvas.focus();
   await page.keyboard.press('Shift+F10');
+  await expect(page.getByRole('menu')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(dialog).toBeVisible();
   await expect(canvas).toBeFocused();

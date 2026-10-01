@@ -1,5 +1,15 @@
 # Application screenshots
 
+## Published UNILAG layers · 1 October 2026
+
+`unilag-desktop-layer-controls-2026-10-01.jpg` is an unaltered 1280×720 browser capture of production deployment `dpl_D9tePNWBX3vBnRBoAAEQ2aJFTFDY`, package `unilag-faa044ebdd24`. It shows the expanded desktop panel with one control row 12 px above it, the 116 destinations, classified landscape and retained road surfaces. It replaces the earlier UNILAG overview in the README; older dark/mobile examples retain their dated provenance below. [Public-domain verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36788523640) passed package hashes, both browser engines and offline reopening.
+
+## LASU road and layer release · 30 September 2026
+
+`chromium-lasu-desktop-light-3d-2026-09-30.png` and `webkit-lasu-mobile-dark-2d-2026-09-30.png` are unaltered captures of reviewed package `lasu-4895a363b403`, release `aee5cdc6-51dd-42a0-b2ae-1b5d1ad03b4a`. They show the 82 illustrative surfaces, corrected landscape classes and public controls outside the panel. Desktop is 1440×1000 and mobile is 390×844. The [release verification run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36769797340) passed all 32 campus/browser/viewport/theme/view combinations, 180 asset hashes, four offline reopen cases and historical rollback transport. Its artifact `11124270250` is the source of these two PNGs.
+
+These replace the older LASU map in the README. Earlier UNILAG and model examples below retain their actual date/package and fixture scope. No image content was composited or retouched; browser phone views do not establish physical-device acceptance.
+
 ## UNILAG detail and campus comparison · 30 September 2026
 
 `unilag-desktop-light-3d`, `unilag-desktop-dark-2d`,

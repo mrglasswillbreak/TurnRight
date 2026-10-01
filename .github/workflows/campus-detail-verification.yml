@@ -43,6 +43,8 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
+      - run: npx vitest run tests/release-promotion.test.ts tests/published-assets.test.ts
+        working-directory: web
       - if: inputs.cleanup_run != ''
         run: node scripts/cleanup-preview-access.mjs
         env:
@@ -62,5 +64,7 @@ jobs:
         if: always()
         with:
           name: campus-detail-verification
-          path: web/work/campus-detail-verification
+          path: |
+            web/work/campus-detail-verification
+            web/work/rollback-verification
           retention-days: 14

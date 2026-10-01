@@ -2,6 +2,12 @@
 
 The detail upgrade uses LASU's shared map palette, labels, place icons and 2D/3D presentation while retaining UNILAG's geography and existing route permissions. [Production receipt](PRODUCTION.md) records the actual published version and asset checks.
 
+## Road editing and parcel classification follow-up
+
+The layer upgrade keeps all 179 surveyed records accessible through **Layers / Features**, independently of **Needs mapping**, with search by application and original source identity. Road name, class, material, width/unit and evidence use the ordinary save/review workflow. Original routing paths remain selectable beneath clipped public lines. Polygon 96 supports property edits and geometry edits with all 6,094 vertices and 56 holes, within the land/overlay 20,000-vertex bound.
+
+The reviewed parcel patch uses source-layer identity and explicit land use for all 426 parcels; a street address no longer makes a parcel a road surface or tree. It retains specific supported parking/garden classes and leaves the routing graph unchanged. [Layer workflow](CAMPUS-LAYERS.md), [patch](../data/campus-layer-enrichment/unilag-changes.json) and [release receipts](PRODUCTION.md) record the implementation and publication status. Later private corrections remain separate from the initial 188-correction detail snapshot below.
+
 ## Coverage
 
 | Measure | Before | Reviewed release |

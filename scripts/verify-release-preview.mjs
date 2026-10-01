@@ -1,7 +1,7 @@
 /** Authenticated preview acceptance. The temporary automation credential never leaves CI. */
 import { randomBytes } from "node:crypto";
 import { db } from "./cloud.mjs";
-import { vercelApi, withDeploymentAccess } from "./vercel-api.mjs";
+import { vercelApi, withRetainedPackageAccess } from "./vercel-api.mjs";
 const [release] = await db(`releases?id=eq.${process.env.RELEASE_ID}&select=preview_url,status`);
 if (!release?.preview_url || release.status !== "preview")
   throw Error("A ready preview is required");
@@ -44,15 +44,15 @@ try {
   if (process.env.VERIFY_SCOPE !== "rollback")
     await import("../web/scripts/verify-campus-detail.mjs");
   const [historical] = await db(
-    "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url",
+    "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url,deployment_id",
   );
   if (!historical?.version || !historical.deployment_url)
     throw Error("Rollback package record missing");
   const { preservePublished } = await import("../web/scripts/published-assets.mjs");
-  await withDeploymentAccess(historical.deployment_url, (headers) =>
+  await withRetainedPackageAccess(historical, (headers, retainedOrigin) =>
     preservePublished(
       "work/rollback-verification",
-      historical.deployment_url,
+      retainedOrigin,
       false,
       historical.version,
       `/packages/${historical.version}/manifest.json`,

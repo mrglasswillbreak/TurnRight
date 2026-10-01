@@ -14,6 +14,7 @@ import {
   lazy,
   Suspense,
   type RefObject,
+  type KeyboardEvent,
 } from 'react';
 import { Menu } from '@base-ui/react/menu';
 import {
@@ -1130,6 +1131,13 @@ function ModelWorkspace({
     setContextPoint({ x, y });
     setActionMenuOpen(true);
   };
+  const dismissActions = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || !actionMenuOpen) return;
+    // Context menus may open while the SVG canvas still owns keyboard focus.
+    event.preventDefault();
+    event.stopPropagation();
+    setActionMenuOpen(false);
+  };
   const grouped = authoring.groups.some(
     (g) =>
       g.wallId === activeWall &&
@@ -1343,6 +1351,7 @@ function ModelWorkspace({
                   );
                 }
               }}
+              onKeyDownCapture={dismissActions}
               onKeyDown={(e) => {
                 if (e.defaultPrevented) return;
                 const input = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
@@ -3490,6 +3499,7 @@ function ModelWorkspace({
                 <Menu.Popup
                   className="model-action-menu"
                   aria-label="Detail actions"
+                  onKeyDownCapture={dismissActions}
                   finalFocus={() => {
                     const target = actionFocus.current;
                     actionFocus.current = null;
