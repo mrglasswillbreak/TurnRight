@@ -1,0 +1,9 @@
+# Default owner
+* @mrglasswillbreak
+
+# Area ownership
+/web/ @mrglasswillbreak
+/scripts/ @mrglasswillbreak
+/supabase/ @mrglasswillbreak
+/.github/workflows/ @mrglasswillbreak
+/docs/ @mrglasswillbreak

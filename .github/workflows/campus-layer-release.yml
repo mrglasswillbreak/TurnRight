@@ -1,8 +1,5 @@
 name: Prepare reviewed campus layer release
 on:
-  push:
-    branches: [codex/lasu-campus-layers]
-    paths: [.github/workflows/campus-layer-release.yml]
   workflow_dispatch:
     inputs:
       campus_id:

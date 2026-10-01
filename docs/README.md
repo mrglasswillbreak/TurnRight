@@ -2,6 +2,14 @@
 
 TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo is the first-visit default; the plain public home page remembers the last successfully opened campus. UNILAG is also published. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
 
+## Start by role
+
+| Role | Entry guides |
+| --- | --- |
+| Public map user | [Driving](DRIVING.md), [Voice](VOICE.md), [Motion](MOTION.md) |
+| Owner/editor operator | [Editor](EDITOR.md), [Campuses and imports](CAMPUS-IMPORTS.md), [Layer workflow](CAMPUS-LAYERS.md), [Unified model editor](UNIFIED-MODEL-EDITOR.md) |
+| Maintainer/contributor | [Architecture](ARCHITECTURE.md), [Deployment](DEPLOYMENT.md), [Configuration](CONFIGURATION.md), [Operations checklist](OPERATIONS-CHECKLIST.md), [Security hygiene](SECURITY-HYGIENE.md) |
+
 ## Use the application
 
 | Task | Guide |
@@ -33,6 +41,8 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
 | New installations, migrations 001–021, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
+| Canonical release/import/source-sync runbook and failure handling | [Operations checklist](OPERATIONS-CHECKLIST.md) |
+| Dependency cadence and CI scanning policy | [Security hygiene](SECURITY-HYGIENE.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
@@ -54,4 +64,4 @@ These records retain the package, date and measurements they assessed. Their cou
 - [Photographic models](PHOTO-MODELS.md), [all-building/photo coverage](PHOTO-MODEL-COVERAGE.md) and [September 24 verification](PHOTO-MODEL-VERIFICATION.md).
 - [Earlier map/editor improvements](MAP-IMPROVEMENTS.md), dated sections of [Production](PRODUCTION.md), and the archived captures in the [screenshot inventory](assets/screenshots/README.md).
 
-When changing a workflow, update its guide and the README entry, recapture affected screens from the actual application, validate relative links and heading anchors, and record measured results with their date/package. Keep example campuses and illustrative model changes labelled. Software-rendered phone screenshots and automated GPS fixtures do not establish physical-device behavior or campus safety.
+When changing a workflow or policy, update its guide, this README entry, and the matching verification note in the same change. Recapture affected screens from the actual application, validate relative links and heading anchors, and record measured results with their date/package. Keep example campuses and illustrative model changes labelled. Software-rendered phone screenshots and automated GPS fixtures do not establish physical-device behavior or campus safety.

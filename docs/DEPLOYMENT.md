@@ -1,5 +1,7 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+Use [Operations checklist](OPERATIONS-CHECKLIST.md) as the canonical release/import/source-sync runbook and failure-mode policy. Use [Security hygiene](SECURITY-HYGIENE.md) for dependency/secret scanning policy and update cadence.
+
 ## Campus layer rollout
 
 Capture and verify private source/draft backups and the immutable published snapshots for both campuses. Apply additive migrations `020_campus_layer_records.sql` and `021_reviewed_release_snapshot.sql` after 019 before enabling their writers. Migration 020 preserves revision checks, campus isolation, atomic feature/layer saves and metadata when older clients save existing features. Migration 021 gives only the service-role reviewed-snapshot RPC a bounded 60-second allowance; ordinary API timeouts and browser grants remain unchanged. Keep this guard when rolling back application code.

@@ -1,9 +1,6 @@
 name: Preserve campus layer baselines
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/lasu-campus-layers]
-    paths: [.github/workflows/campus-layer-baselines.yml]
 permissions:
   contents: read
 jobs:

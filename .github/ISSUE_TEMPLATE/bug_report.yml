@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible defect
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please provide a reproducible case.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: 1. ... 2. ... 3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - web
+        - scripts/import-release
+        - supabase/migrations
+        - workflows/ci
+        - docs
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Node/browser/OS plus commit SHA or branch.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification notes
+      description: What checks were run and what failed/passed?

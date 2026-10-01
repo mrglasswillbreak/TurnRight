@@ -2,6 +2,8 @@
 
 This is the current configuration guide. [Deployment](DEPLOYMENT.md) contains the setup sequence; [Production](PRODUCTION.md) records dated changes and live verification. Credentials belong in service secret stores, never in this repository or browser screenshots.
 
+Operational workflow sequencing, retry/rollback expectations and audit traceability are defined in [Operations checklist](OPERATIONS-CHECKLIST.md). Dependency/secrets scanning policy and update cadence are defined in [Security hygiene](SECURITY-HYGIENE.md).
+
 ## Projects and owner access
 
 | Service | Existing project and responsibility |
@@ -67,10 +69,12 @@ Set application variables in both Vercel Preview and Production. Publication bui
 
 | Workflow | Trigger and behavior |
 | --- | --- |
+| `core-quality-gate.yml` | Default merge barrier: `main` pushes and PRs to `main`; unit/lint/configured build/complexity/PWA critical browser checks |
+| `security-hygiene.yml` | Default security barrier: dependency review on PRs and secret scanning on `main` pushes/PRs |
 | `source-update.yml` | LASU daily 02:17 UTC and manual checks |
 | `map-import.yml` | Inspection/preview for one campus/import/run token |
 | `map-source-check.yml` | Daily 03:47 UTC; opted-in sources and OSM endpoint permission gate |
-| `map-import-tests.yml` | Full pinned Linux GIS regressions |
+| `map-import-tests.yml` | Tiered full pinned Linux GIS regressions (manual + path-focused push trigger) |
 | `campus-layer-baselines.yml` | Preserve both campuses’ published, source and private draft baselines |
 | `campus-layer-release.yml` | Prepare a reviewed enrichment snapshot; apply only the matching complete workspace hash |
 | `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |

@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose an improvement
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      placeholder: What user problem are you solving?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      placeholder: What should change?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - public-map
+        - owner-editor
+        - import/release
+        - model/photo workflows
+        - workflow/security policy
+        - docs
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks and alternatives
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I checked existing docs/issues before filing.
+          required: true
+        - label: I included impact, constraints, and success criteria.
+          required: true

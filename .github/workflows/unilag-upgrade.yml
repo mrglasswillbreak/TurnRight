@@ -13,9 +13,6 @@ on:
         description: Optional older preview to retire after creating the replacement snapshot
         type: string
         required: false
-  push:
-    branches: [codex/unilag-vector-detail]
-    paths: [.github/workflows/unilag-upgrade.yml]
 permissions:
   contents: read
 concurrency:
