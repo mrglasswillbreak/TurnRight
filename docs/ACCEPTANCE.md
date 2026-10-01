@@ -6,7 +6,7 @@ Acceptance covers all 179 UNILAG surface identities, polygon 96 property and geo
 
 Plain-home startup must reopen the last successful public campus while explicit campus and legacy destination/editor links retain their meaning. Check both browser engines, blocked storage, failed-campus recovery and verified offline reopening. Public controls must stay 12 px above the desktop panel through resize/collapse/detail/route views and retain the mobile arrangement.
 
-[Production receipts](PRODUCTION.md) record actual completed runs and measured bundles. The dated sections below are historical results, not current totals. Physical-device, GPS, assistive-technology and field checks remain separate.
+The 1 October production check passed 180 asset hashes, eight Chromium/WebKit desktop views and four offline reopen cases for `lasu-4895a363b403` and `unilag-faa044ebdd24`. The complete preview matrix covers 32 campus/browser/viewport/theme/view combinations. Current unit coverage is 680 tests across 96 files; [Production receipts](PRODUCTION.md) distinguish full-suite results, focused repairs and measured bundles. The dated sections below are historical results, not current totals. Physical-device, GPS, assistive-technology and field checks remain separate.
 
 ## UNILAG detail and vector compatibility — 30 September 2026
 
