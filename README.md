@@ -8,6 +8,14 @@ TurnRight combines a public navigation PWA, a private GIS workspace and a buildi
 
 > An independent personal project, not an official university service. Campus routes have not been field-verified. A mapped approach is not a confirmed entrance. Unknown heights remain labelled illustrative estimates; visual detail does not establish walking, driving or accessibility permission.
 
+## Start here by role
+
+| Role | Start here |
+| --- | --- |
+| Public map user | [Using the public map](#using-the-public-map) and [documentation index](docs/README.md) |
+| Owner/editor operator | [Import and edit a campus](#import-and-edit-a-campus), [manage campus layers](#manage-campus-layers), [deployment](docs/DEPLOYMENT.md) |
+| Maintainer/contributor | [Quick start](#quick-start), [repository structure](#repository-structure), [CONTRIBUTING.md](CONTRIBUTING.md), [SUPPORT.md](SUPPORT.md), [SECURITY.md](SECURITY.md) |
+
 ## Campus status
 
 LASU has 82 labelled illustrative road surfaces and distinct landscape classes. UNILAG has 179 surveyed road-width records, detailed vegetation, credited photographs and evidence-backed architectural treatments. The editor provides a campus layer explorer, independently selectable routing paths and road surfaces, and reviewed geometry operations. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md) · [Released versions and verification](docs/PRODUCTION.md).
@@ -204,4 +212,4 @@ No cross-campus routing, indoor room navigation or verified step-free campus gua
 
 [Documentation index](docs/README.md) links current usage, deployment and engineering guides. [UNILAG coverage](docs/UNILAG-DETAIL.md) records included candidates, source conflicts and remaining evidence gaps. Historical research reports retain their original dates and counts.
 
-Map data and photographs have separate terms: [source attribution](data/ATTRIBUTION.md), [photo catalogue](data/photos/README.md), and the per-asset author/licence records. OpenStreetMap-derived data retains ODbL attribution. Owner-authorised ArcGIS publication does not imply a broader public reuse licence. Contributions should preserve campus identities, source provenance, private draft isolation and existing resource budgets.
+Repository code is licensed under [MIT](LICENSE). Map data and photographs have separate terms: [source attribution](data/ATTRIBUTION.md), [photo catalogue](data/photos/README.md), and the per-asset author/licence records. OpenStreetMap-derived data retains ODbL attribution. Owner-authorised ArcGIS publication does not imply a broader public reuse licence. Contributions should preserve campus identities, source provenance, private draft isolation and existing resource budgets.

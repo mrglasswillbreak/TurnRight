@@ -1,5 +1,7 @@
 # TurnRight architecture
 
+Operational sequencing and failure handling live in [Operations checklist](OPERATIONS-CHECKLIST.md). Frontend ownership boundaries and complexity budgets live in [Frontend boundaries](FRONTEND-BOUNDARIES.md).
+
 ## Campus isolation and import processing
 
 `campus-context.ts` preserves LASU legacy links and scopes URL/device state. Before React mounts, a plain public home entry restores the browser’s last successfully loaded campus from `turnright:last-campus`; explicit queries, destination links, editor/auth paths and hashes keep their own meaning. Successful public/offline loads update the preference, while failed or owner-only loads do not. Storage errors preserve usable defaults. `CampusWorkspace` and `CampusSwitcher` are lazy entries. The public catalogue references immutable campus manifests; legacy `/packages/latest.json` remains LASU. Public links carry campus plus place/building identities, and session storage restores both through the existing exact OAuth callback.

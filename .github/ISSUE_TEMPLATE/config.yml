@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support
+    url: https://github.com/mrglasswillbreak/TurnRight/blob/main/SUPPORT.md
+    about: Usage and setup support process
+  - name: Security policy
+    url: https://github.com/mrglasswillbreak/TurnRight/blob/main/SECURITY.md
+    about: Private vulnerability disclosure instructions

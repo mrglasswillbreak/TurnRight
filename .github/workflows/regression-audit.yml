@@ -7,9 +7,6 @@ on:
         required: false
         default: ''
         type: string
-  push:
-    branches: [codex/unilag-globe]
-    paths: [.github/workflows/regression-audit.yml]
 permissions:
   contents: read
 concurrency:

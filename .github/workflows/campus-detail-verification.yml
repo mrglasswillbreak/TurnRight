@@ -15,9 +15,6 @@ on:
       cleanup_run:
         description: Optional preceding verification run whose temporary credential needs cleanup
         required: false
-  push:
-    branches: [codex/unilag-vector-detail]
-    paths: [.github/workflows/campus-detail-verification.yml]
 permissions:
   contents: read
 jobs:
