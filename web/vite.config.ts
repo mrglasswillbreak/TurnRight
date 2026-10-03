@@ -22,10 +22,10 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
-        name: 'TurnRight · LASU Campus',
+        name: 'TurnRight · Campus Maps',
         short_name: 'TurnRight',
         description:
-          'Find your way around LASU Ojo. Walking directions, even offline.',
+          'Explore campus places and get walking and driving directions, online or offline.',
         theme_color: '#1764ed',
         background_color: '#f6f8fc',
         display: 'standalone',
