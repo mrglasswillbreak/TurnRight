@@ -2,6 +2,22 @@ import { afterEach, expect, it, vi } from 'vitest';
 import type { FeatureCollection } from 'geojson';
 import { requestRoadDisplay } from '../src/road-display';
 afterEach(() => vi.unstubAllGlobals());
+it('recovers a worker module failure and releases the worker', async () => {
+  const terminate = vi.fn();
+  let worker: Worker;
+  vi.stubGlobal('Worker', class {
+    onerror: Worker['onerror'] = null;
+    onmessage: Worker['onmessage'] = null;
+    terminate = terminate;
+    postMessage() {}
+    constructor() { worker = this as unknown as Worker; }
+  });
+  const source: FeatureCollection = { type: 'FeatureCollection', features: [] };
+  const result = new Promise<FeatureCollection>((resolve) => requestRoadDisplay(source, resolve));
+  worker!.onmessage!({ data: { error: true } } as MessageEvent);
+  expect(await result).toEqual(source);
+  expect(terminate).toHaveBeenCalled();
+});
 it('retains road display when a browser synchronously refuses a worker during reload', async () => {
   vi.stubGlobal(
     'Worker',

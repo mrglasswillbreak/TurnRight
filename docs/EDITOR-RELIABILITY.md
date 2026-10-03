@@ -21,13 +21,13 @@ revision, so later edits restore the usual leave protection.
 
 ## Interfaces and compatibility
 
-- `save-edits` retains its transactional, idempotent operation receipts and optimistic revisions. Network retries reuse the original payload. Publication/job submissions are not automatically replayed.
+- `save-edits` retains its transactional, idempotent operation receipts and optimistic revisions. Migration 022 guarantees a strictly increasing revision on every row update, including repeated/backwards clock readings. Keep returned revision strings intact, including microseconds. Network retries reuse the original payload. Publication/job submissions are not automatically replayed.
 - The authenticated read-only `review-status` action returns jobs, releases and pending source changes. It does not return or replace the current editor workspace.
 - Recovery JSON has `format: turnright-editor-recovery`, `schemaVersion: 1`, export time, baseline version and a complete owner-local workspace snapshot. Optional `conflictBase` and `featureBases` retain the original comparison across reloads, including first corrections to published features. Older recovery snapshots remain readable; when no original field values are available, conflict review conservatively requires a whole-feature choice.
 - Validation issues carry feature identity/kind, severity, affected field and a supported repair action. Existing error/warning strings remain available to server release validation and older callers.
 - Place sharing uses `/?place=<encoded stable ID>` and existing public place aliases. No account or device location is included.
 - Public package readers support schemas 1–3; these reliability repairs do not change the schema. Steps remain optional booleans in routing edges; missing information remains unknown. A private edit can explicitly reset steps knowledge to unknown, which omits the public edge flag.
-- The original reliability patch required no database migration. Current installations must follow migrations 001–017 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
+- The original reliability patch required no database migration. Current installations must follow migrations 001–022 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
 
 ## Validation
 

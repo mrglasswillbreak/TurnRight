@@ -1,5 +1,7 @@
 # TurnRight verification and release checklist
 
+The [3 October application audit](AUDIT-2026-10-03.md) adds regressions for scrolled layer searches, keyboard tabs, layer zoom limits, path-only renderer input and strictly increasing draft revisions. Current release results belong in [Production](PRODUCTION.md); the campus-discovery acceptance below retains its original scope.
+
 ## Campus silhouettes and in-place switching
 
 Verify exact published Polygon/MultiPolygon outlines, holes, legacy pin-only directories, malformed outline rejection and longitude wraparound. Direct silhouette/pin/label clicks and the keyboard list share selection; overlapping targets offer a non-modal chooser. At detail zoom the selected overview must not intercept destinations. Check both themes and 2D/3D, panel resizing, interrupted flights and reduced motion.

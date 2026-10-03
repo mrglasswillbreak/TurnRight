@@ -137,7 +137,7 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 
 ## Upgrade and verification
 
-Current installations require migrations **001–021** in order. Production has completed the reader → migration → writer rollout; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share the same owner authorization and explicit campus context. The notes below retain the history of earlier incremental upgrades.
+Current installations require migrations **001–022** in order. Production has completed the reader → migration → writer rollout; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share the same owner authorization and explicit campus context. Migration 022 makes timestamp revision tokens strictly increasing per draft record; clients must retain the returned token unchanged, including sub-millisecond precision. The notes below retain the history of earlier incremental upgrades.
 
 Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo owner guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the draft and publish through Releases; author-provided photographs without external URLs require package schema 3 and compatible readers.
 

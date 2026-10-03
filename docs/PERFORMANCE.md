@@ -1,10 +1,18 @@
 # Responsiveness and recovery
 
+## 3 October application audit
+
+The [whole-application audit](AUDIT-2026-10-03.md) uses the current LASU and UNILAG packages. Initial road-source payload is reduced by 89.8% / 97.1%, building associations are indexed per campus snapshot, and layer scrolling reuses its search/count/regeneration data. Only changed filters regain zoom limits after selection or model updates; those updates no longer repaint every optional GIS layer. Routing data and public package contents are unchanged.
+
+The configured build measures 434,420 public, 188,621 additional owner and 10,497 lazy photo gzip bytes against unchanged 435,200 / 189,440 / 12,288 budgets. Bundle size passing is not a claim about frame rate. The audit distinguishes processing microbenchmarks from whole-map startup and records remaining device and rendering gaps.
+
+Current [model-workspace measurements](MODEL-EDITOR-VERIFICATION.md#current-audit--3-october-2026) preserve twenty trials, no generation while typing and consistent per-trial worker/GPU retention. At 4× CPU, published input/click p95 is 84.4/199.9 ms; the synthetic 100-detail wall reaches 244.7/228.2 ms and remains over the 200 ms target. This is a separate current measurement, not an improvement claim against older fixtures.
+
 ## 3 October campus discovery
 
 Discovery loads only bounded directory outlines. Campus packages load on selection, preferring verified downloaded data; the MapLibre instance survives switches. Aborted requests and generation guards prevent stale work from committing. The transition controller and world-geography installer are lazy modules. One shared overview replaces duplicate active/catalogue markers, and the selected silhouette fades out before detailed place selection.
 
-The configured build measures 434,246 public, 188,608 additional owner and 10,499 lazy photo gzip bytes, within the unchanged 435,200 / 189,440 / 12,288 limits. Lazy 3D remains 238.4 / 300 KiB. World and voice assets retain their independent 8 MiB limits. Flights last 1.1–2.2 seconds, are interruptible, and use an immediate transition with reduced motion. [Globe behavior](CAMPUS-GLOBE.md) · [Verification receipts](PRODUCTION.md).
+That release’s configured build measured 434,246 public, 188,608 additional owner and 10,499 lazy photo gzip bytes, within the unchanged 435,200 / 189,440 / 12,288 limits. Lazy 3D remains 238.4 / 300 KiB. World and voice assets retain their independent 8 MiB limits. Flights last 1.1–2.2 seconds, are interruptible, and use an immediate transition with reduced motion. [Globe behavior](CAMPUS-GLOBE.md) · [Verification receipts](PRODUCTION.md).
 
 ## 30 September layers and public startup
 

@@ -62,6 +62,7 @@ beforeAll(async () => {
     '019_additive_source_patch.sql',
     '020_campus_layer_records.sql',
     '021_reviewed_release_snapshot.sql',
+    '022_monotonic_editor_revisions.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -871,9 +872,30 @@ describe('transactional editor migration', () => {
       item('revision', 'New name', first[0].updated_at),
     ]);
     expect(second[0].properties.name).toBe('New name');
+    expect(second[0].updated_at).not.toBe(first[0].updated_at);
     await expect(
       save(randomUUID(), [item('revision', 'Stale', first[0].updated_at)]),
     ).rejects.toThrow(/another session/);
+  });
+  it('advances revisions even when the previous timestamp is ahead of the clock', async () => {
+    const initial = await database.query<{ updated_at: string }>(
+      `insert into map_edits(id,kind,geometry,properties,edited_by,updated_at)
+       values('future-revision','entrance','{"type":"Point","coordinates":[3.201,6.46]}','{}',$1,'2099-01-01')
+       returning updated_at::text`,
+      [owner],
+    );
+    const first = initial.rows[0].updated_at;
+    const next = await save(randomUUID(), [
+      item('future-revision', 'Current', first),
+    ]);
+    expect(next[0].updated_at).not.toBe(first);
+    await expect(
+      save(randomUUID(), [item('future-revision', 'Stale', first)]),
+    ).rejects.toThrow(/another session/);
+    const third = await save(randomUUID(), [
+      item('future-revision', 'Latest', next[0].updated_at),
+    ]);
+    expect(third[0].updated_at).not.toBe(next[0].updated_at);
   });
   it('rejects unauthorized actors and direct authenticated execution', async () => {
     await expect(
@@ -1231,33 +1253,82 @@ it('persists land and overlay edits through the transactional history workflow',
   }
 });
 it('creates bounded reviewed snapshots with campus isolation and idempotent retries', async () => {
-  const campus = 'reviewed-snapshot-test', identity = randomUUID();
-  await database.exec("insert into campuses(id,slug,name,boundary,bounds) select 'reviewed-snapshot-test','reviewed-snapshot-test','Reviewed snapshot',boundary,bounds from campuses where id='lasu'");
+  const campus = 'reviewed-snapshot-test',
+    identity = randomUUID();
+  await database.exec(
+    "insert into campuses(id,slug,name,boundary,bounds) select 'reviewed-snapshot-test','reviewed-snapshot-test','Reviewed snapshot',boundary,bounds from campuses where id='lasu'",
+  );
   const snapshot = {
-    features: Array.from({ length: 1500 }, (_, i) => ({ id: 'source-' + i, payload: { name: 'Building ' + i } })),
-    edits: [], workspaceHash: 'a'.repeat(64),
+    features: Array.from({ length: 1500 }, (_, i) => ({
+      id: 'source-' + i,
+      payload: { name: 'Building ' + i },
+    })),
+    edits: [],
+    workspaceHash: 'a'.repeat(64),
     selection: { mode: 'reviewed-layer-upgrade', excludedDrafts: 1 },
   };
-  const create = (actor = owner, id = identity, value = snapshot) => database.query<{ id: string }>(
-    'select create_reviewed_release_snapshot($1,$2,$3,$4,$5) as id',
-    [actor, id, 'Reviewed campus release', JSON.stringify(value), 'catalogue-v1'],
-  );
+  const create = (actor = owner, id = identity, value = snapshot) =>
+    database.query<{ id: string }>(
+      'select create_reviewed_release_snapshot($1,$2,$3,$4,$5) as id',
+      [
+        actor,
+        id,
+        'Reviewed campus release',
+        JSON.stringify(value),
+        'catalogue-v1',
+      ],
+    );
   try {
-    await database.query("select set_config('request.headers',$1,false)", [JSON.stringify({ 'x-turnright-campus': campus })]);
-    await expect(create(randomUUID())).rejects.toThrow('Administrator required');
-    await expect(create(owner, identity, { ...snapshot, workspaceHash: 'invalid' })).rejects.toThrow('Invalid reviewed release snapshot');
-    await expect(create(owner, identity, { ...snapshot, features: [] })).rejects.toThrow('Invalid reviewed feature count');
-    expect((await database.query('select id from releases where id=$1', [identity])).rows).toHaveLength(0);
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    await expect(create(randomUUID())).rejects.toThrow(
+      'Administrator required',
+    );
+    await expect(
+      create(owner, identity, { ...snapshot, workspaceHash: 'invalid' }),
+    ).rejects.toThrow('Invalid reviewed release snapshot');
+    await expect(
+      create(owner, identity, { ...snapshot, features: [] }),
+    ).rejects.toThrow('Invalid reviewed feature count');
+    expect(
+      (await database.query('select id from releases where id=$1', [identity]))
+        .rows,
+    ).toHaveLength(0);
     expect((await create()).rows[0].id).toBe(identity);
-    const saved = await database.query<{ campus_id: string; status: string; snapshot: unknown }>('select campus_id,status,snapshot from releases where id=$1', [identity]);
-    expect(saved.rows[0]).toEqual({ campus_id: campus, status: 'queued', snapshot });
+    const saved = await database.query<{
+      campus_id: string;
+      status: string;
+      snapshot: unknown;
+    }>('select campus_id,status,snapshot from releases where id=$1', [
+      identity,
+    ]);
+    expect(saved.rows[0]).toEqual({
+      campus_id: campus,
+      status: 'queued',
+      snapshot,
+    });
     expect((await create()).rows[0].id).toBe(identity);
-    await expect(create(owner, identity, { ...snapshot, workspaceHash: 'b'.repeat(64) })).rejects.toThrow('different snapshot');
-    await expect(create(owner, randomUUID())).rejects.toThrow('already being built');
+    await expect(
+      create(owner, identity, { ...snapshot, workspaceHash: 'b'.repeat(64) }),
+    ).rejects.toThrow('different snapshot');
+    await expect(create(owner, randomUUID())).rejects.toThrow(
+      'already being built',
+    );
     await database.exec("select set_config('request.headers','{}',false)");
     await expect(create()).rejects.toThrow('different snapshot');
-    const grants = await database.query<{ service: boolean; browser: boolean; anonymous: boolean }>("select has_function_privilege('service_role','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') service, has_function_privilege('authenticated','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') browser, has_function_privilege('anon','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') anonymous");
-    expect(grants.rows[0]).toEqual({ service: true, browser: false, anonymous: false });
+    const grants = await database.query<{
+      service: boolean;
+      browser: boolean;
+      anonymous: boolean;
+    }>(
+      "select has_function_privilege('service_role','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') service, has_function_privilege('authenticated','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') browser, has_function_privilege('anon','create_reviewed_release_snapshot(uuid,uuid,text,jsonb,text)','EXECUTE') anonymous",
+    );
+    expect(grants.rows[0]).toEqual({
+      service: true,
+      browser: false,
+      anonymous: false,
+    });
   } finally {
     await database.exec("select set_config('request.headers','{}',false)");
   }

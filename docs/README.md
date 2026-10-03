@@ -32,13 +32,13 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–021, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
+| New installations, migrations 001–022, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
 | Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
-| Dated bug reproductions, fixes and broad workflow checks | [27 September audit](AUDIT-2026-09-27.md) |
+| Current bug reproductions, fixes, measurements and verification limits | [3 October audit](AUDIT-2026-10-03.md) |
 | Theme tokens and text contrast | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md) |
 | Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
 | Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
@@ -53,6 +53,7 @@ These records retain the package, date and measurements they assessed. Their cou
 - [Campus access](CAMPUS-ACCESS.md), [Law/Library connection review](CONNECTION-REVIEW.md) and [Overture comparison](OVERTURE-COMPARISON.md). Their access exceptions apply only to LASU and the recorded source identities.
 - [Building reference research](BUILDING-REFERENCE-RESEARCH.md), [appearance coverage](BUILDING-APPEARANCE-COVERAGE.md), [roof coverage](BUILDING-ROOF-COVERAGE.md), [miniature-campus assessment](MINIATURE-CAMPUS.md) and [visual reference sheets](../data/visuals/reference-sheets.md).
 - [Photographic models](PHOTO-MODELS.md), [all-building/photo coverage](PHOTO-MODEL-COVERAGE.md) and [September 24 verification](PHOTO-MODEL-VERIFICATION.md).
+- [27 September audit](AUDIT-2026-09-27.md).
 - [Earlier map/editor improvements](MAP-IMPROVEMENTS.md), dated sections of [Production](PRODUCTION.md), and the archived captures in the [screenshot inventory](assets/screenshots/README.md).
 
 When changing a workflow, update its guide and the README entry, recapture affected screens from the actual application, validate relative links and heading anchors, and record measured results with their date/package. Keep example campuses and illustrative model changes labelled. Software-rendered phone screenshots and automated GPS fixtures do not establish physical-device behavior or campus safety.

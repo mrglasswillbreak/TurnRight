@@ -2,15 +2,42 @@ import type { Map } from 'maplibre-gl';
 import { campusPalette } from './map-palette';
 import { mapTheme } from './map-theme';
 
+const styled = (key: string, fallback: unknown) =>
+  [
+    'coalesce',
+    ['get', `mapStyle_${key}`],
+    fallback,
+  ] as import('maplibre-gl').ExpressionSpecification;
+
+/** Reapply only filters replaced by selection/model changes, without repainting
+ * every GIS layer or rebuilding symbol images on each model-sector response. */
+export function layerZoomLimits(map: Map, ids?: string[]) {
+  for (const id of ids ||
+    map
+      .getStyle()
+      .layers.filter(
+        (layer) =>
+          'source' in layer &&
+          ['campus', 'road-display', 'places', 'boundary'].includes(
+            String(layer.source),
+          ),
+      )
+      .map((layer) => layer.id)) {
+    if (!map.getLayer(id)) continue;
+    const filter = map.getFilter(id);
+    if ((JSON.stringify(filter) || '').includes('mapStyle_minZoom')) continue;
+    map.setFilter(id, [
+      'all',
+      filter || true,
+      ['>=', ['zoom'], styled('minZoom', 0)],
+      ['<=', ['zoom'], styled('maxZoom', 24)],
+    ] as import('maplibre-gl').FilterSpecification);
+  }
+}
+
 /** Extra GIS presentation is lazy: conversion and authoring never enter startup. */
 export function extraMapLayers(map: Map, dark: boolean) {
   const p = campusPalette[dark ? 'dark' : 'light'];
-  const styled = (key: string, fallback: unknown) =>
-    [
-      'coalesce',
-      ['get', `mapStyle_${key}`],
-      fallback,
-    ] as import('maplibre-gl').ExpressionSpecification;
   const lineWidth = (fallback: unknown) =>
     Array.isArray(fallback) && fallback[0] === 'interpolate'
       ? (fallback.map((value, i) =>
@@ -208,23 +235,7 @@ export function extraMapLayers(map: Map, dark: boolean) {
           value,
         );
   }
-  for (const layer of map.getStyle().layers) {
-    if (
-      !('source' in layer) ||
-      !['campus', 'road-display', 'places', 'boundary'].includes(
-        String(layer.source),
-      )
-    )
-      continue;
-    const filter = 'filter' in layer ? layer.filter : undefined;
-    if ((JSON.stringify(filter) || '').includes('mapStyle_minZoom')) continue;
-    map.setFilter(layer.id, [
-      'all',
-      filter || true,
-      ['>=', ['zoom'], styled('minZoom', 0)],
-      ['<=', ['zoom'], styled('maxZoom', 24)],
-    ] as import('maplibre-gl').FilterSpecification);
-  }
+  layerZoomLimits(map);
   // Keep these per-feature expressions in the optional renderer, away from startup.
   const theme = mapTheme(dark) as unknown as Record<
     string,

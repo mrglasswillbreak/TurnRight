@@ -47,6 +47,36 @@ describe('shared map presentation', () => {
     expect(displayGeometry(map).features[0].properties!.displayHeight).toBe(6);
     expect(map.features[0].properties).toEqual({ kind: 'building', height: 0 });
   });
+  it('indexes associations without changing precedence or leaking between campus snapshots', () => {
+    const data = campusFixture();
+    const place = data.places[0];
+    data.places = [
+      { ...place, id: 'first', buildingId: 'old-building' },
+      { ...place, id: 'second', buildingId: 'building' },
+      { ...place, id: 'direct' },
+    ];
+    data.buildingIdAliases = { 'old-building': 'building' };
+    data.placeIdAliases = { 'old-direct': 'direct', historic: 'direct' };
+    const building = {
+      type: 'Feature' as const,
+      properties: { id: 'building' },
+      geometry: { type: 'Polygon' as const, coordinates: [] },
+    };
+    expect(buildingPlace(data, building)?.id).toBe('first');
+    expect(
+      buildingPlace(data, {
+        ...building,
+        properties: { id: 'building', placeId: 'old-direct' },
+      })?.id,
+    ).toBe('direct');
+    expect(
+      buildingPlace(data, { ...building, properties: { id: 'historic' } })?.id,
+    ).toBe('direct');
+    const next = { ...data, places: data.places.slice(1) };
+    expect(buildingPlace(next, building)?.id).toBe('second');
+    expect(buildingPlace({ ...data, places: [] }, building)).toBeUndefined();
+    expect(buildingPlace(data, building)?.id).toBe('first');
+  });
   it('resolves historical place links and preserves bookmarks absent from an older package', () => {
     const data = campusFixture();
     data.placeIdAliases = { old: 'intermediate', intermediate: 'library' };

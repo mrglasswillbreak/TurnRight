@@ -1,0 +1,2118 @@
+{
+  "environment": {
+    "os": "Windows",
+    "cpu": "Intel Core i5-1155G7",
+    "ramGiB": 8,
+    "runtime": "Node 22.23.3",
+    "gpu": "Chromium SwiftShader software WebGL",
+    "execution": "Sequential local runs; no concurrent graphics benchmark or build"
+  },
+  "before": {
+    "checkedAt": "2026-10-03T05:54:21.260Z",
+    "runtime": "v22.23.3",
+    "build": "14aed84 configured production build; placeholder authentication",
+    "packages": "Exact published LASU/UNILAG packages; versions and SHA-256 recorded per sample",
+    "softwareWebGL": true,
+    "network": "localhost, no artificial network throttle, fresh context per trial",
+    "samples": [
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 1,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 3091.89999999851,
+        "longTasks": [
+          {
+            "start": 263,
+            "duration": 50
+          },
+          {
+            "start": 330.79999999701977,
+            "duration": 157
+          },
+          {
+            "start": 513,
+            "duration": 604
+          },
+          {
+            "start": 1300.7000000029802,
+            "duration": 67
+          },
+          {
+            "start": 1531.8999999985099,
+            "duration": 53
+          },
+          {
+            "start": 1598.1000000014901,
+            "duration": 89
+          },
+          {
+            "start": 1687.8999999985099,
+            "duration": 61
+          },
+          {
+            "start": 1780.6000000014901,
+            "duration": 149
+          },
+          {
+            "start": 1996.3999999985099,
+            "duration": 58
+          },
+          {
+            "start": 2190.2000000029802,
+            "duration": 63
+          },
+          {
+            "start": 2304.2000000029802,
+            "duration": 223
+          },
+          {
+            "start": 2553.5,
+            "duration": 66
+          },
+          {
+            "start": 2965.7000000029802,
+            "duration": 126
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8652623,
+        "jsHeapBytes": 28263088,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 2,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 2247.10000000149,
+        "longTasks": [
+          {
+            "start": 286.80000000447035,
+            "duration": 168
+          },
+          {
+            "start": 489.20000000298023,
+            "duration": 51
+          },
+          {
+            "start": 667.4000000059605,
+            "duration": 65
+          },
+          {
+            "start": 747.3000000044703,
+            "duration": 156
+          },
+          {
+            "start": 912.8000000044703,
+            "duration": 66
+          },
+          {
+            "start": 1163.4000000059605,
+            "duration": 243
+          },
+          {
+            "start": 1491.8000000044703,
+            "duration": 132
+          },
+          {
+            "start": 1762,
+            "duration": 72
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8652623,
+        "jsHeapBytes": 32574648,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 3,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 1845.2999999970198,
+        "longTasks": [
+          {
+            "start": 262.29999999701977,
+            "duration": 135
+          },
+          {
+            "start": 627.5,
+            "duration": 72
+          },
+          {
+            "start": 764.3999999985099,
+            "duration": 134
+          },
+          {
+            "start": 910.8999999985099,
+            "duration": 59
+          },
+          {
+            "start": 989.2000000029802,
+            "duration": 53
+          },
+          {
+            "start": 1079.5,
+            "duration": 157
+          },
+          {
+            "start": 1237.1000000014901,
+            "duration": 88
+          },
+          {
+            "start": 1353.2999999970198,
+            "duration": 79
+          },
+          {
+            "start": 1521,
+            "duration": 86
+          },
+          {
+            "start": 1676.2999999970198,
+            "duration": 58
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8652623,
+        "jsHeapBytes": 29771892,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 1,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4201.69999999553,
+        "longTasks": [
+          {
+            "start": 171.69999999552965,
+            "duration": 60
+          },
+          {
+            "start": 340.09999999403954,
+            "duration": 292
+          },
+          {
+            "start": 868.5,
+            "duration": 50
+          },
+          {
+            "start": 929.8999999985099,
+            "duration": 135
+          },
+          {
+            "start": 1076.0999999940395,
+            "duration": 117
+          },
+          {
+            "start": 1313.6999999955297,
+            "duration": 50
+          },
+          {
+            "start": 1373.2999999970198,
+            "duration": 66
+          },
+          {
+            "start": 1589.6999999955297,
+            "duration": 344
+          },
+          {
+            "start": 1959.2999999970198,
+            "duration": 52
+          },
+          {
+            "start": 2090.5999999940395,
+            "duration": 68
+          },
+          {
+            "start": 2225.39999999851,
+            "duration": 55
+          },
+          {
+            "start": 2908.39999999851,
+            "duration": 164
+          },
+          {
+            "start": 3876,
+            "duration": 326
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14594564,
+        "jsHeapBytes": 46455800,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 2,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4073.7000000029802,
+        "longTasks": [
+          {
+            "start": 181.5,
+            "duration": 53
+          },
+          {
+            "start": 344,
+            "duration": 251
+          },
+          {
+            "start": 701.4000000059605,
+            "duration": 52
+          },
+          {
+            "start": 819.9000000059605,
+            "duration": 167
+          },
+          {
+            "start": 1035.8000000044703,
+            "duration": 140
+          },
+          {
+            "start": 1295.1000000014901,
+            "duration": 82
+          },
+          {
+            "start": 1522.3000000044703,
+            "duration": 191
+          },
+          {
+            "start": 1736.1000000014901,
+            "duration": 64
+          },
+          {
+            "start": 1934.3000000044703,
+            "duration": 57
+          },
+          {
+            "start": 3009.9000000059605,
+            "duration": 79
+          },
+          {
+            "start": 3447.8000000044703,
+            "duration": 103
+          },
+          {
+            "start": 3696.9000000059605,
+            "duration": 382
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14594564,
+        "jsHeapBytes": 59862096,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 3,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4301.70000000298,
+        "longTasks": [
+          {
+            "start": 189.79999999701977,
+            "duration": 58
+          },
+          {
+            "start": 347,
+            "duration": 272
+          },
+          {
+            "start": 934.7000000029802,
+            "duration": 105
+          },
+          {
+            "start": 1205,
+            "duration": 51
+          },
+          {
+            "start": 1263.7000000029802,
+            "duration": 76
+          },
+          {
+            "start": 1424.5,
+            "duration": 228
+          },
+          {
+            "start": 1680.6000000014901,
+            "duration": 55
+          },
+          {
+            "start": 1746.8999999985099,
+            "duration": 81
+          },
+          {
+            "start": 2863.89999999851,
+            "duration": 61
+          },
+          {
+            "start": 3412.5,
+            "duration": 100
+          },
+          {
+            "start": 3920.2000000029802,
+            "duration": 85
+          },
+          {
+            "start": 4014.7999999970198,
+            "duration": 288
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14594564,
+        "jsHeapBytes": 53498244,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 1,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 5291.70000000298,
+        "longTasks": [
+          {
+            "start": 119.20000000298023,
+            "duration": 126
+          },
+          {
+            "start": 248.79999999701977,
+            "duration": 53
+          },
+          {
+            "start": 547.2999999970198,
+            "duration": 110
+          },
+          {
+            "start": 658.2000000029802,
+            "duration": 196
+          },
+          {
+            "start": 854.8999999985099,
+            "duration": 59
+          },
+          {
+            "start": 920.7999999970198,
+            "duration": 157
+          },
+          {
+            "start": 1078.2999999970198,
+            "duration": 57
+          },
+          {
+            "start": 1187.2999999970198,
+            "duration": 378
+          },
+          {
+            "start": 1713.7999999970198,
+            "duration": 69
+          },
+          {
+            "start": 1920.7999999970198,
+            "duration": 108
+          },
+          {
+            "start": 2129.60000000149,
+            "duration": 85
+          },
+          {
+            "start": 2301.2000000029802,
+            "duration": 207
+          },
+          {
+            "start": 2533,
+            "duration": 60
+          },
+          {
+            "start": 2611.7000000029802,
+            "duration": 125
+          },
+          {
+            "start": 2737.7999999970198,
+            "duration": 95
+          },
+          {
+            "start": 2909,
+            "duration": 108
+          },
+          {
+            "start": 3017.2000000029802,
+            "duration": 303
+          },
+          {
+            "start": 3339.7000000029802,
+            "duration": 57
+          },
+          {
+            "start": 3433.2000000029802,
+            "duration": 66
+          },
+          {
+            "start": 3539.7999999970198,
+            "duration": 481
+          },
+          {
+            "start": 4099.29999999702,
+            "duration": 111
+          },
+          {
+            "start": 4212.70000000298,
+            "duration": 92
+          },
+          {
+            "start": 4345.89999999851,
+            "duration": 90
+          },
+          {
+            "start": 4453.70000000298,
+            "duration": 95
+          },
+          {
+            "start": 4555,
+            "duration": 53
+          },
+          {
+            "start": 4617.89999999851,
+            "duration": 69
+          },
+          {
+            "start": 4836.10000000149,
+            "duration": 63
+          },
+          {
+            "start": 4899.60000000149,
+            "duration": 417
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2273,
+        "resources": 8652623,
+        "jsHeapBytes": 47157356,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 2,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 4302.5,
+        "longTasks": [
+          {
+            "start": 99.40000000596046,
+            "duration": 105
+          },
+          {
+            "start": 208.30000000447035,
+            "duration": 52
+          },
+          {
+            "start": 468,
+            "duration": 104
+          },
+          {
+            "start": 572.9000000059605,
+            "duration": 168
+          },
+          {
+            "start": 795.3000000044703,
+            "duration": 112
+          },
+          {
+            "start": 966.7000000029802,
+            "duration": 298
+          },
+          {
+            "start": 1392.6000000014901,
+            "duration": 74
+          },
+          {
+            "start": 1558.3000000044703,
+            "duration": 126
+          },
+          {
+            "start": 1785.3000000044703,
+            "duration": 79
+          },
+          {
+            "start": 1968.4000000059605,
+            "duration": 76
+          },
+          {
+            "start": 2046.7000000029802,
+            "duration": 226
+          },
+          {
+            "start": 2273.60000000149,
+            "duration": 54
+          },
+          {
+            "start": 2327.8000000044703,
+            "duration": 98
+          },
+          {
+            "start": 2427,
+            "duration": 87
+          },
+          {
+            "start": 2515.4000000059605,
+            "duration": 52
+          },
+          {
+            "start": 2615.10000000149,
+            "duration": 79
+          },
+          {
+            "start": 2694.7000000029802,
+            "duration": 333
+          },
+          {
+            "start": 3137.5,
+            "duration": 50
+          },
+          {
+            "start": 3236,
+            "duration": 352
+          },
+          {
+            "start": 3588.8000000044703,
+            "duration": 58
+          },
+          {
+            "start": 3833.4000000059605,
+            "duration": 58
+          },
+          {
+            "start": 3925.9000000059605,
+            "duration": 50
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2273,
+        "resources": 8652623,
+        "jsHeapBytes": 44816444,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 3,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 4302,
+        "longTasks": [
+          {
+            "start": 108.89999999850988,
+            "duration": 102
+          },
+          {
+            "start": 213.89999999850988,
+            "duration": 64
+          },
+          {
+            "start": 494.79999999701977,
+            "duration": 106
+          },
+          {
+            "start": 601.8999999985099,
+            "duration": 170
+          },
+          {
+            "start": 772.5,
+            "duration": 53
+          },
+          {
+            "start": 832.2999999970198,
+            "duration": 57
+          },
+          {
+            "start": 891,
+            "duration": 64
+          },
+          {
+            "start": 968.6000000014901,
+            "duration": 378
+          },
+          {
+            "start": 1748.3999999985099,
+            "duration": 158
+          },
+          {
+            "start": 1906.8999999985099,
+            "duration": 245
+          },
+          {
+            "start": 2183.7999999970198,
+            "duration": 97
+          },
+          {
+            "start": 2350.5,
+            "duration": 89
+          },
+          {
+            "start": 2571.89999999851,
+            "duration": 91
+          },
+          {
+            "start": 2693.7000000029802,
+            "duration": 485
+          },
+          {
+            "start": 3179.60000000149,
+            "duration": 92
+          },
+          {
+            "start": 3273.60000000149,
+            "duration": 301
+          },
+          {
+            "start": 3697.2000000029802,
+            "duration": 75
+          },
+          {
+            "start": 3854.2000000029802,
+            "duration": 448
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2269,
+        "resources": 8652623,
+        "jsHeapBytes": 41110800,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 1,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 5683.29999999702,
+        "longTasks": [
+          {
+            "start": 99.5,
+            "duration": 116
+          },
+          {
+            "start": 219.19999999552965,
+            "duration": 50
+          },
+          {
+            "start": 535,
+            "duration": 50
+          },
+          {
+            "start": 588.2999999970198,
+            "duration": 267
+          },
+          {
+            "start": 857,
+            "duration": 214
+          },
+          {
+            "start": 1072.0999999940395,
+            "duration": 53
+          },
+          {
+            "start": 1131.8999999985099,
+            "duration": 63
+          },
+          {
+            "start": 1197.7999999970198,
+            "duration": 68
+          },
+          {
+            "start": 1276.5999999940395,
+            "duration": 910
+          },
+          {
+            "start": 2314.2999999970198,
+            "duration": 67
+          },
+          {
+            "start": 2524.1999999955297,
+            "duration": 60
+          },
+          {
+            "start": 2686.2999999970198,
+            "duration": 262
+          },
+          {
+            "start": 2975.39999999851,
+            "duration": 99
+          },
+          {
+            "start": 3145.6999999955297,
+            "duration": 94
+          },
+          {
+            "start": 3242.1999999955297,
+            "duration": 57
+          },
+          {
+            "start": 3378.2999999970198,
+            "duration": 161
+          },
+          {
+            "start": 3608,
+            "duration": 101
+          },
+          {
+            "start": 3742.7999999970198,
+            "duration": 572
+          },
+          {
+            "start": 4315.69999999553,
+            "duration": 68
+          },
+          {
+            "start": 4425.0999999940395,
+            "duration": 54
+          },
+          {
+            "start": 4524.0999999940395,
+            "duration": 93
+          },
+          {
+            "start": 4657.5,
+            "duration": 89
+          },
+          {
+            "start": 4747.29999999702,
+            "duration": 66
+          },
+          {
+            "start": 4950.5999999940395,
+            "duration": 68
+          },
+          {
+            "start": 5035.69999999553,
+            "duration": 649
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7436,
+        "resources": 14594564,
+        "jsHeapBytes": 67773628,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 2,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 5940.70000000298,
+        "longTasks": [
+          {
+            "start": 105.70000000298023,
+            "duration": 112
+          },
+          {
+            "start": 221.60000000149012,
+            "duration": 52
+          },
+          {
+            "start": 570.6000000014901,
+            "duration": 284
+          },
+          {
+            "start": 855.8000000044703,
+            "duration": 218
+          },
+          {
+            "start": 1074.8000000044703,
+            "duration": 56
+          },
+          {
+            "start": 1135.6000000014901,
+            "duration": 113
+          },
+          {
+            "start": 1248.6000000014901,
+            "duration": 66
+          },
+          {
+            "start": 1331.2000000029802,
+            "duration": 984
+          },
+          {
+            "start": 2362.2000000029802,
+            "duration": 81
+          },
+          {
+            "start": 2528,
+            "duration": 83
+          },
+          {
+            "start": 2772.7000000029802,
+            "duration": 90
+          },
+          {
+            "start": 2970.4000000059605,
+            "duration": 197
+          },
+          {
+            "start": 3168,
+            "duration": 56
+          },
+          {
+            "start": 3224.60000000149,
+            "duration": 70
+          },
+          {
+            "start": 3295.3000000044703,
+            "duration": 74
+          },
+          {
+            "start": 3369.60000000149,
+            "duration": 50
+          },
+          {
+            "start": 3502.4000000059605,
+            "duration": 237
+          },
+          {
+            "start": 3774.60000000149,
+            "duration": 76
+          },
+          {
+            "start": 3912.10000000149,
+            "duration": 560
+          },
+          {
+            "start": 4472.4000000059605,
+            "duration": 83
+          },
+          {
+            "start": 4561.4000000059605,
+            "duration": 63
+          },
+          {
+            "start": 4673.60000000149,
+            "duration": 59
+          },
+          {
+            "start": 4736,
+            "duration": 66
+          },
+          {
+            "start": 4915.80000000447,
+            "duration": 61
+          },
+          {
+            "start": 4977,
+            "duration": 109
+          },
+          {
+            "start": 5154.4000000059605,
+            "duration": 189
+          },
+          {
+            "start": 5344.10000000149,
+            "duration": 624
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7436,
+        "resources": 14594564,
+        "jsHeapBytes": 86508076,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 3,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 5576.60000000149,
+        "longTasks": [
+          {
+            "start": 122.39999999850988,
+            "duration": 120
+          },
+          {
+            "start": 246.60000000149012,
+            "duration": 58
+          },
+          {
+            "start": 609.6000000014901,
+            "duration": 238
+          },
+          {
+            "start": 849.2999999970198,
+            "duration": 214
+          },
+          {
+            "start": 1064.6000000014901,
+            "duration": 51
+          },
+          {
+            "start": 1122.2000000029802,
+            "duration": 56
+          },
+          {
+            "start": 1180.7000000029802,
+            "duration": 60
+          },
+          {
+            "start": 1255.3999999985099,
+            "duration": 879
+          },
+          {
+            "start": 2287.10000000149,
+            "duration": 62
+          },
+          {
+            "start": 2562.39999999851,
+            "duration": 296
+          },
+          {
+            "start": 2916.5,
+            "duration": 113
+          },
+          {
+            "start": 3033.2000000029802,
+            "duration": 51
+          },
+          {
+            "start": 3186,
+            "duration": 163
+          },
+          {
+            "start": 3427.60000000149,
+            "duration": 134
+          },
+          {
+            "start": 3650.2999999970198,
+            "duration": 600
+          },
+          {
+            "start": 4321.89999999851,
+            "duration": 106
+          },
+          {
+            "start": 4441.29999999702,
+            "duration": 70
+          },
+          {
+            "start": 4511.60000000149,
+            "duration": 61
+          },
+          {
+            "start": 4938,
+            "duration": 78
+          },
+          {
+            "start": 5017.5,
+            "duration": 560
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7436,
+        "resources": 14594564,
+        "jsHeapBytes": 68696840,
+        "errors": []
+      }
+    ]
+  },
+  "after": {
+    "checkedAt": "2026-10-03T13:06:42.127Z",
+    "runtime": "v22.23.3",
+    "build": "5bce6ec0 configured production build; placeholder authentication",
+    "packages": "Exact published LASU/UNILAG packages; versions and SHA-256 recorded per sample",
+    "softwareWebGL": true,
+    "network": "localhost, no artificial network throttle, fresh context per trial",
+    "samples": [
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 1,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 2926.60000000149,
+        "longTasks": [
+          {
+            "start": 290.30000000447035,
+            "duration": 148
+          },
+          {
+            "start": 464.70000000298023,
+            "duration": 566
+          },
+          {
+            "start": 1360.3000000044703,
+            "duration": 136
+          },
+          {
+            "start": 1592.8000000044703,
+            "duration": 51
+          },
+          {
+            "start": 1653.2000000029802,
+            "duration": 72
+          },
+          {
+            "start": 1725.5,
+            "duration": 134
+          },
+          {
+            "start": 1927.7000000029802,
+            "duration": 53
+          },
+          {
+            "start": 2044.9000000059605,
+            "duration": 120
+          },
+          {
+            "start": 2202.8000000044703,
+            "duration": 67
+          },
+          {
+            "start": 2270.10000000149,
+            "duration": 153
+          },
+          {
+            "start": 2789.10000000149,
+            "duration": 137
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8649971,
+        "jsHeapBytes": 33282340,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 2,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 2281.2999999970198,
+        "longTasks": [
+          {
+            "start": 229.5,
+            "duration": 55
+          },
+          {
+            "start": 370.5,
+            "duration": 173
+          },
+          {
+            "start": 592.7999999970198,
+            "duration": 58
+          },
+          {
+            "start": 787.8999999985099,
+            "duration": 65
+          },
+          {
+            "start": 918.7999999970198,
+            "duration": 89
+          },
+          {
+            "start": 1046.7999999970198,
+            "duration": 55
+          },
+          {
+            "start": 1132.3999999985099,
+            "duration": 57
+          },
+          {
+            "start": 1197.2999999970198,
+            "duration": 77
+          },
+          {
+            "start": 1317.1999999955297,
+            "duration": 64
+          },
+          {
+            "start": 1428.0999999940395,
+            "duration": 120
+          },
+          {
+            "start": 1588.3999999985099,
+            "duration": 67
+          },
+          {
+            "start": 1656,
+            "duration": 147
+          },
+          {
+            "start": 2158.5,
+            "duration": 123
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8649971,
+        "jsHeapBytes": 30405296,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "lasu",
+        "trial": 3,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 2060.7000000029802,
+        "longTasks": [
+          {
+            "start": 294.3999999985099,
+            "duration": 160
+          },
+          {
+            "start": 693.2000000029802,
+            "duration": 57
+          },
+          {
+            "start": 833,
+            "duration": 88
+          },
+          {
+            "start": 995.5,
+            "duration": 65
+          },
+          {
+            "start": 1142.6000000014901,
+            "duration": 143
+          },
+          {
+            "start": 1351.8999999985099,
+            "duration": 53
+          },
+          {
+            "start": 1410.1000000014901,
+            "duration": 128
+          },
+          {
+            "start": 1578.1000000014901,
+            "duration": 77
+          },
+          {
+            "start": 1662.7000000029802,
+            "duration": 78
+          },
+          {
+            "start": 1743.6000000014901,
+            "duration": 76
+          },
+          {
+            "start": 1985.2000000029802,
+            "duration": 75
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2277,
+        "resources": 8649971,
+        "jsHeapBytes": 48740316,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 1,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4263,
+        "longTasks": [
+          {
+            "start": 208.79999999701977,
+            "duration": 59
+          },
+          {
+            "start": 372,
+            "duration": 261
+          },
+          {
+            "start": 674.5,
+            "duration": 51
+          },
+          {
+            "start": 763.1999999955297,
+            "duration": 51
+          },
+          {
+            "start": 844.3999999985099,
+            "duration": 54
+          },
+          {
+            "start": 955.1999999955297,
+            "duration": 143
+          },
+          {
+            "start": 1106.0999999940395,
+            "duration": 85
+          },
+          {
+            "start": 1296.0999999940395,
+            "duration": 122
+          },
+          {
+            "start": 1489.2999999970198,
+            "duration": 257
+          },
+          {
+            "start": 3241.7999999970198,
+            "duration": 116
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14591912,
+        "jsHeapBytes": 62086984,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 2,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4316,
+        "longTasks": [
+          {
+            "start": 178.79999999701977,
+            "duration": 66
+          },
+          {
+            "start": 357.5,
+            "duration": 196
+          },
+          {
+            "start": 592.8999999985099,
+            "duration": 50
+          },
+          {
+            "start": 742.1999999955297,
+            "duration": 60
+          },
+          {
+            "start": 852.8999999985099,
+            "duration": 131
+          },
+          {
+            "start": 1003.1999999955297,
+            "duration": 65
+          },
+          {
+            "start": 1090.6000000014901,
+            "duration": 66
+          },
+          {
+            "start": 1167.2999999970198,
+            "duration": 65
+          },
+          {
+            "start": 1249.6999999955297,
+            "duration": 213
+          },
+          {
+            "start": 1677.8999999985099,
+            "duration": 54
+          },
+          {
+            "start": 3312.39999999851,
+            "duration": 128
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14591912,
+        "jsHeapBytes": 63436480,
+        "errors": []
+      },
+      {
+        "profile": "desktop",
+        "slug": "unilag",
+        "trial": 3,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 4055.3000000044703,
+        "longTasks": [
+          {
+            "start": 185.10000000149012,
+            "duration": 66
+          },
+          {
+            "start": 350.80000000447035,
+            "duration": 226
+          },
+          {
+            "start": 623.2000000029802,
+            "duration": 53
+          },
+          {
+            "start": 849.1000000014901,
+            "duration": 205
+          },
+          {
+            "start": 1068.4000000059605,
+            "duration": 75
+          },
+          {
+            "start": 1164.4000000059605,
+            "duration": 74
+          },
+          {
+            "start": 1271.8000000044703,
+            "duration": 238
+          },
+          {
+            "start": 1529.9000000059605,
+            "duration": 68
+          },
+          {
+            "start": 1688.2000000029802,
+            "duration": 71
+          },
+          {
+            "start": 1762.2000000029802,
+            "duration": 63
+          },
+          {
+            "start": 2455.4000000059605,
+            "duration": 51
+          },
+          {
+            "start": 3221,
+            "duration": 105
+          },
+          {
+            "start": 3705.7000000029802,
+            "duration": 355
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 8751,
+        "resources": 14591912,
+        "jsHeapBytes": 55961948,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 1,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 5684,
+        "longTasks": [
+          {
+            "start": 112.89999999850988,
+            "duration": 129
+          },
+          {
+            "start": 246.80000000447035,
+            "duration": 56
+          },
+          {
+            "start": 543.5,
+            "duration": 114
+          },
+          {
+            "start": 658.8999999985099,
+            "duration": 184
+          },
+          {
+            "start": 844.3999999985099,
+            "duration": 60
+          },
+          {
+            "start": 914.5,
+            "duration": 124
+          },
+          {
+            "start": 1038.6000000014901,
+            "duration": 62
+          },
+          {
+            "start": 1155,
+            "duration": 351
+          },
+          {
+            "start": 1661.3000000044703,
+            "duration": 98
+          },
+          {
+            "start": 1931.2000000029802,
+            "duration": 161
+          },
+          {
+            "start": 2129,
+            "duration": 88
+          },
+          {
+            "start": 2219.2000000029802,
+            "duration": 51
+          },
+          {
+            "start": 2307.8000000044703,
+            "duration": 52
+          },
+          {
+            "start": 2360.3000000044703,
+            "duration": 266
+          },
+          {
+            "start": 2639.2000000029802,
+            "duration": 190
+          },
+          {
+            "start": 2893.3000000044703,
+            "duration": 126
+          },
+          {
+            "start": 3142.3000000044703,
+            "duration": 229
+          },
+          {
+            "start": 3372.3000000044703,
+            "duration": 80
+          },
+          {
+            "start": 3467.10000000149,
+            "duration": 62
+          },
+          {
+            "start": 3556.2000000029802,
+            "duration": 74
+          },
+          {
+            "start": 3655.7000000029802,
+            "duration": 670
+          },
+          {
+            "start": 4591.39999999851,
+            "duration": 66
+          },
+          {
+            "start": 4841.60000000149,
+            "duration": 84
+          },
+          {
+            "start": 4926.5,
+            "duration": 80
+          },
+          {
+            "start": 5021.30000000447,
+            "duration": 663
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2273,
+        "resources": 8649971,
+        "jsHeapBytes": 47368952,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 2,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 5314.60000000149,
+        "longTasks": [
+          {
+            "start": 123.30000000447035,
+            "duration": 132
+          },
+          {
+            "start": 258.40000000596046,
+            "duration": 54
+          },
+          {
+            "start": 588.3000000044703,
+            "duration": 134
+          },
+          {
+            "start": 723.1000000014901,
+            "duration": 185
+          },
+          {
+            "start": 908.9000000059605,
+            "duration": 63
+          },
+          {
+            "start": 982.2000000029802,
+            "duration": 73
+          },
+          {
+            "start": 1055.4000000059605,
+            "duration": 58
+          },
+          {
+            "start": 1137.3000000044703,
+            "duration": 331
+          },
+          {
+            "start": 1635.9000000059605,
+            "duration": 95
+          },
+          {
+            "start": 1893.1000000014901,
+            "duration": 149
+          },
+          {
+            "start": 2142.5,
+            "duration": 83
+          },
+          {
+            "start": 2290.60000000149,
+            "duration": 291
+          },
+          {
+            "start": 2583.10000000149,
+            "duration": 55
+          },
+          {
+            "start": 2638.9000000059605,
+            "duration": 122
+          },
+          {
+            "start": 2761.60000000149,
+            "duration": 60
+          },
+          {
+            "start": 2822.8000000044703,
+            "duration": 95
+          },
+          {
+            "start": 2922.9000000059605,
+            "duration": 74
+          },
+          {
+            "start": 2997.10000000149,
+            "duration": 54
+          },
+          {
+            "start": 3097.7000000029802,
+            "duration": 84
+          },
+          {
+            "start": 3225.9000000059605,
+            "duration": 351
+          },
+          {
+            "start": 3741.4000000059605,
+            "duration": 476
+          },
+          {
+            "start": 4219.20000000298,
+            "duration": 69
+          },
+          {
+            "start": 4607.70000000298,
+            "duration": 93
+          },
+          {
+            "start": 4702.20000000298,
+            "duration": 644
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2273,
+        "resources": 8649971,
+        "jsHeapBytes": 42369260,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "lasu",
+        "trial": 3,
+        "version": "lasu-4895a363b403",
+        "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+        "readyMs": 5163.20000000298,
+        "longTasks": [
+          {
+            "start": 120.29999999701977,
+            "duration": 120
+          },
+          {
+            "start": 246,
+            "duration": 55
+          },
+          {
+            "start": 555.5,
+            "duration": 129
+          },
+          {
+            "start": 686.6000000014901,
+            "duration": 214
+          },
+          {
+            "start": 901.3999999985099,
+            "duration": 61
+          },
+          {
+            "start": 971.2000000029802,
+            "duration": 79
+          },
+          {
+            "start": 1051.3999999985099,
+            "duration": 67
+          },
+          {
+            "start": 1141.1000000014901,
+            "duration": 471
+          },
+          {
+            "start": 1653.2000000029802,
+            "duration": 53
+          },
+          {
+            "start": 1782.1000000014901,
+            "duration": 98
+          },
+          {
+            "start": 2025.2000000029802,
+            "duration": 171
+          },
+          {
+            "start": 2297.2000000029802,
+            "duration": 81
+          },
+          {
+            "start": 2450.89999999851,
+            "duration": 51
+          },
+          {
+            "start": 2503.7000000029802,
+            "duration": 195
+          },
+          {
+            "start": 2748,
+            "duration": 101
+          },
+          {
+            "start": 2875.89999999851,
+            "duration": 134
+          },
+          {
+            "start": 3036.7000000029802,
+            "duration": 65
+          },
+          {
+            "start": 3121.2000000029802,
+            "duration": 177
+          },
+          {
+            "start": 3327.60000000149,
+            "duration": 60
+          },
+          {
+            "start": 3428.5,
+            "duration": 88
+          },
+          {
+            "start": 3559.7000000029802,
+            "duration": 73
+          },
+          {
+            "start": 3652.60000000149,
+            "duration": 565
+          },
+          {
+            "start": 4274.10000000149,
+            "duration": 82
+          },
+          {
+            "start": 4389.79999999702,
+            "duration": 77
+          },
+          {
+            "start": 4537.5,
+            "duration": 50
+          },
+          {
+            "start": 4615.79999999702,
+            "duration": 66
+          }
+        ],
+        "roadFeatures": 59,
+        "campusFeatures": 611,
+        "renderedFeatures": 2273,
+        "resources": 8649971,
+        "jsHeapBytes": 42284176,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 1,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 5900.80000000447,
+        "longTasks": [
+          {
+            "start": 125.10000000149012,
+            "duration": 132
+          },
+          {
+            "start": 261.90000000596046,
+            "duration": 58
+          },
+          {
+            "start": 602.2000000029802,
+            "duration": 54
+          },
+          {
+            "start": 661,
+            "duration": 272
+          },
+          {
+            "start": 934.7000000029802,
+            "duration": 204
+          },
+          {
+            "start": 1140.7000000029802,
+            "duration": 91
+          },
+          {
+            "start": 1238.8000000044703,
+            "duration": 95
+          },
+          {
+            "start": 1334.2000000029802,
+            "duration": 63
+          },
+          {
+            "start": 1414.7000000029802,
+            "duration": 657
+          },
+          {
+            "start": 2127.8000000044703,
+            "duration": 59
+          },
+          {
+            "start": 2194.7000000029802,
+            "duration": 57
+          },
+          {
+            "start": 2256.3000000044703,
+            "duration": 58
+          },
+          {
+            "start": 2350.60000000149,
+            "duration": 57
+          },
+          {
+            "start": 2612.10000000149,
+            "duration": 233
+          },
+          {
+            "start": 2884.60000000149,
+            "duration": 107
+          },
+          {
+            "start": 3057.7000000029802,
+            "duration": 123
+          },
+          {
+            "start": 3328.8000000044703,
+            "duration": 317
+          },
+          {
+            "start": 3746.2000000029802,
+            "duration": 151
+          },
+          {
+            "start": 4014.4000000059605,
+            "duration": 657
+          },
+          {
+            "start": 4723.10000000149,
+            "duration": 79
+          },
+          {
+            "start": 4817.80000000447,
+            "duration": 54
+          },
+          {
+            "start": 4995.70000000298,
+            "duration": 65
+          },
+          {
+            "start": 5072.20000000298,
+            "duration": 83
+          },
+          {
+            "start": 5257.60000000149,
+            "duration": 674
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7436,
+        "resources": 14591912,
+        "jsHeapBytes": 68771160,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 2,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 6416.39999999851,
+        "longTasks": [
+          {
+            "start": 137,
+            "duration": 140
+          },
+          {
+            "start": 282.8999999985099,
+            "duration": 66
+          },
+          {
+            "start": 634.3999999985099,
+            "duration": 52
+          },
+          {
+            "start": 690.3999999985099,
+            "duration": 252
+          },
+          {
+            "start": 944.6000000014901,
+            "duration": 225
+          },
+          {
+            "start": 1170.8999999985099,
+            "duration": 66
+          },
+          {
+            "start": 1244.7000000029802,
+            "duration": 97
+          },
+          {
+            "start": 1342.2999999970198,
+            "duration": 68
+          },
+          {
+            "start": 1423.1000000014901,
+            "duration": 625
+          },
+          {
+            "start": 2108.2000000029802,
+            "duration": 51
+          },
+          {
+            "start": 2243.89999999851,
+            "duration": 71
+          },
+          {
+            "start": 2612.2000000029802,
+            "duration": 190
+          },
+          {
+            "start": 2841,
+            "duration": 63
+          },
+          {
+            "start": 2904.2000000029802,
+            "duration": 67
+          },
+          {
+            "start": 3114.10000000149,
+            "duration": 322
+          },
+          {
+            "start": 3481.2999999970198,
+            "duration": 62
+          },
+          {
+            "start": 3545.10000000149,
+            "duration": 138
+          },
+          {
+            "start": 3785.10000000149,
+            "duration": 149
+          },
+          {
+            "start": 3945.2999999970198,
+            "duration": 60
+          },
+          {
+            "start": 4005.89999999851,
+            "duration": 591
+          },
+          {
+            "start": 4713.89999999851,
+            "duration": 64
+          },
+          {
+            "start": 5017.10000000149,
+            "duration": 59
+          },
+          {
+            "start": 5164.39999999851,
+            "duration": 70
+          },
+          {
+            "start": 5273.10000000149,
+            "duration": 58
+          },
+          {
+            "start": 5331.70000000298,
+            "duration": 92
+          },
+          {
+            "start": 5427.5,
+            "duration": 989
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7436,
+        "resources": 14591912,
+        "jsHeapBytes": 52107392,
+        "errors": []
+      },
+      {
+        "profile": "phone-4x-cpu",
+        "slug": "unilag",
+        "trial": 3,
+        "version": "unilag-faa044ebdd24",
+        "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+        "readyMs": 5732.70000000298,
+        "longTasks": [
+          {
+            "start": 131.5,
+            "duration": 137
+          },
+          {
+            "start": 273.6000000014901,
+            "duration": 62
+          },
+          {
+            "start": 598.2000000029802,
+            "duration": 53
+          },
+          {
+            "start": 653.8999999985099,
+            "duration": 264
+          },
+          {
+            "start": 919,
+            "duration": 217
+          },
+          {
+            "start": 1137.3000000044703,
+            "duration": 67
+          },
+          {
+            "start": 1211.5,
+            "duration": 90
+          },
+          {
+            "start": 1304.1000000014901,
+            "duration": 68
+          },
+          {
+            "start": 1385,
+            "duration": 645
+          },
+          {
+            "start": 2075.8000000044703,
+            "duration": 84
+          },
+          {
+            "start": 2254.2000000029802,
+            "duration": 57
+          },
+          {
+            "start": 2346.10000000149,
+            "duration": 55
+          },
+          {
+            "start": 2545,
+            "duration": 217
+          },
+          {
+            "start": 2807.5,
+            "duration": 75
+          },
+          {
+            "start": 2889.5,
+            "duration": 139
+          },
+          {
+            "start": 3029.60000000149,
+            "duration": 61
+          },
+          {
+            "start": 3095,
+            "duration": 55
+          },
+          {
+            "start": 3194.89999999851,
+            "duration": 233
+          },
+          {
+            "start": 3535.89999999851,
+            "duration": 148
+          },
+          {
+            "start": 3775.39999999851,
+            "duration": 111
+          },
+          {
+            "start": 3901,
+            "duration": 50
+          },
+          {
+            "start": 3993,
+            "duration": 706
+          },
+          {
+            "start": 4699.89999999851,
+            "duration": 84
+          },
+          {
+            "start": 5046.20000000298,
+            "duration": 141
+          }
+        ],
+        "roadFeatures": 18,
+        "campusFeatures": 3928,
+        "renderedFeatures": 7432,
+        "resources": 14591912,
+        "jsHeapBytes": 70869832,
+        "errors": []
+      }
+    ]
+  }
+}

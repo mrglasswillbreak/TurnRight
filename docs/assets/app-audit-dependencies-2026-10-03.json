@@ -1,0 +1,50 @@
+{
+  "checkedAt": "2026-10-03",
+  "before": {
+    "command": "npm audit --omit=dev --json",
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 2,
+        "high": 7,
+        "critical": 0,
+        "total": 9
+      },
+      "dependencies": {
+        "prod": 453,
+        "dev": 443,
+        "optional": 177,
+        "peer": 1,
+        "peerOptional": 0,
+        "total": 923
+      }
+    }
+  },
+  "after": {
+    "command": "npm audit --json",
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 142,
+        "dev": 534,
+        "optional": 177,
+        "peer": 1,
+        "peerOptional": 0,
+        "total": 703
+      }
+    }
+  },
+  "changes": [
+    "Remove unused shadcn scaffolding CLI",
+    "Update build transitive fast-uri, brace-expansion and serialize-javascript within supported ranges"
+  ],
+  "interpretation": "Registry advisory snapshot, not proof of absence of vulnerabilities or runtime exploitability. Before was production-dependency-only; after includes development dependencies."
+}

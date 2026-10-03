@@ -435,9 +435,9 @@ try {
       }
   if (!process.argv.includes('--capture'))
     await fs.writeFile(
-      audit
-        ? '../docs/model-editor-audit-2026-09-27.json'
-        : '../docs/model-editor-performance.json',
+      process.env.BENCHMARK_OUTPUT || (audit
+        ? `../docs/model-editor-audit-${new Date().toISOString().slice(0, 10)}.json`
+        : '../docs/model-editor-performance.json'),
       JSON.stringify(
         {
           date: new Date().toISOString(),

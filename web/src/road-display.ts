@@ -42,6 +42,7 @@ export function requestRoadDisplay(
             type: 'FeatureCollection',
             features: map.features.filter((f) => f.properties?.kind === 'path'),
           });
+        stop();
       });
   };
   // Cancel pending module loading before WebKit unloads the owning document.
@@ -55,8 +56,12 @@ export function requestRoadDisplay(
     fallback();
     return stop;
   }
-  worker.onmessage = (event: MessageEvent<FeatureCollection>) =>
-    deliver(event.data);
+  worker.onmessage = (event: MessageEvent<FeatureCollection | { error: true }>) => {
+    if ('error' in event.data) {
+      worker?.terminate();
+      fallback();
+    } else deliver(event.data);
+  };
   worker.onerror = (event) => {
     event.preventDefault();
     worker?.terminate();

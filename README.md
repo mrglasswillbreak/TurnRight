@@ -8,6 +8,10 @@ TurnRight combines a public navigation PWA, a private GIS workspace and a buildi
 
 > An independent personal project, not an official university service. Campus routes have not been field-verified. A mapped approach is not a confirmed entrance. Unknown heights remain labelled illustrative estimates; visual detail does not establish walking, driving or accessibility permission.
 
+## Quality and performance
+
+The [3 October application audit](docs/AUDIT-2026-10-03.md) covers public navigation, the editor, models/photos, GIS, database saves and offline packages. It fixes duplicate road-renderer input, repeated building lookups, off-screen layer search results, keyboard tab navigation, lost layer zoom limits and colliding save revisions. UNILAG’s initial road-source input falls from 6.35 MB to 185 KB; whole-map startup remains a separate measured target. [Performance and limits](docs/PERFORMANCE.md) · [Verification and deployment](docs/PRODUCTION.md).
+
 ## Campus status
 
 LASU has 82 labelled illustrative road surfaces and distinct landscape classes. UNILAG has 179 surveyed road-width records, detailed vegetation, credited photographs and evidence-backed architectural treatments. The editor provides a campus layer explorer, independently selectable routing paths and road surfaces, and reviewed geometry operations. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md) · [Released versions and verification](docs/PRODUCTION.md).
@@ -39,9 +43,9 @@ The dated campus captures show real packages. Editor examples use isolated owner
 | --- | --- |
 | <img src="docs/assets/screenshots/webkit-lasu-mobile-dark-2d-2026-09-30.png" width="280" alt="LASU road surfaces in mobile dark 2D"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
 
-| Private GIS workspace | Building authoring |
+| Campus layer and road editor | Building authoring |
 | --- | --- |
-| ![Campus field mapping and projection controls](docs/assets/screenshots/campus-mapping-2026-09-26.png) | ![Building authoring and model controls](docs/assets/screenshots/unified-model-desktop-2026-09-26.png) |
+| ![Source-ID search and the polygon 96 road inspector in an isolated editor fixture](docs/assets/screenshots/layer-road-editor-2026-10-03.png) | ![Building authoring and model controls](docs/assets/screenshots/unified-model-desktop-2026-09-26.png) |
 
 ## Features
 
@@ -129,7 +133,7 @@ Queue a valid preview, review the proposed changes, then build a campus release 
 
 ## Manage campus layers
 
-Open **Editor → Layers**. Choose a layer to set the drawing target, then use **Features** to find records by name, application ID or source ID. UNILAG’s 179 road surfaces are available here independently of **Needs mapping**. Overlapping map selections show a chooser; hidden or locked layers do not intercept clicks.
+Open **Editor → Layers**. Choose a layer to set the drawing target, then use **Features** to find records by name, application ID or source ID. Left/Right or Home/End switches the explorer tabs from the keyboard. Filtering returns the table to the first matching row. UNILAG’s 179 road surfaces are available here independently of **Needs mapping**. Overlapping map selections show a chooser; hidden or locked layers do not intercept clicks.
 
 Layer settings control folders, order within cartographic bands, labels, classification styles and release settings. Bulk edits and geometry operations preview their affected records before one undoable application. Source width changes mark generated surfaces stale; **Preview linked road surfaces → Apply** regenerates them after review. Manually reshaped surfaces require an explicit replacement choice. Surveyed polygons never reshape just because their width property changes.
 
@@ -159,7 +163,7 @@ Resource limits remain 50 MiB uploaded per batch, 250 MiB expanded archives, 100
 
 ## Configuration and hosting
 
-Apply migrations in order through **021_reviewed_release_snapshot.sql** before enabling their dependent writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
+Apply migrations in order through **022_monotonic_editor_revisions.sql** before enabling their dependent writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
 
 Set up the owner allowlist, GitHub OAuth, private storage and repository/Vercel secrets using [Deployment](docs/DEPLOYMENT.md) and [Configuration](docs/CONFIGURATION.md). `PUBLISHED_MAP_URL` makes application builds preserve current campus packages. Worker workflows run from `main`, so release the shared registry/API/worker changes together. Restore one campus through a fresh release preview, preserving other campuses' current packages.
 

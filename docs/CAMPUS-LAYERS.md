@@ -12,6 +12,8 @@ The map distinguishes **Road surface** from **Routing path**. Original routing g
 
 Road inspectors retain name, class, surface, width, unit and evidence. Metres are stored internally; feet are a display/input option. Clearing a width restores the illustrative fallback when generating a surface. Access, direction and connections remain separate routing controls. Land and overlay inspectors do not offer unrelated driving or photo controls.
 
+Search or layer changes reset the virtual table to its first result. Left/Right and Home/End navigate the Layers / Features tabs. Counts, search text and regeneration checks are cached between scroll events. Layer zoom limits remain effective when changing building opacity, model coverage or selection. [Audit evidence](AUDIT-2026-10-03.md).
+
 ## Organize the workspace
 
 - Create layers or folders, rename them, choose a parent, drag between folders and reorder within a cartographic band. Landscape, surfaces, buildings and annotations have separate bands; routes and essential labels remain above map content.

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   campusLayers,
   layerFeatures,
@@ -60,6 +60,22 @@ export default function LayerWorkspace({
     features = useMemo(() => layerFeatures(data), [data]),
     membership = useMemo(() => layerMembership(data, items), [data, items]);
   const active = items.find((l) => l.id === view.active);
+  const table = useRef<HTMLDivElement>(null);
+  const featureIndex = useMemo(
+    () => new Map(features.map((f) => [f.key, f])),
+    [features],
+  );
+  const layerStats = useMemo(() => {
+    const stats = new Map<string, { count: number; geometry: Set<string> }>();
+    for (const f of features) {
+      const id = membership.get(f.key) || '';
+      const entry = stats.get(id) || { count: 0, geometry: new Set<string>() };
+      entry.count++;
+      entry.geometry.add(f.geometry.type);
+      stats.set(id, entry);
+    }
+    return stats;
+  }, [features, membership]);
   const layerIssues = useMemo(() => {
     const result = new Map<string, import('./validation').ValidationIssue[]>();
     for (const issue of issues) {
@@ -86,6 +102,10 @@ export default function LayerWorkspace({
     } | null>(null),
     [moveTarget, setMoveTarget] = useState('');
   const selected = view.selected || [];
+  const selectedKeys = useMemo(
+    () => new Set(view.selected || []),
+    [view.selected],
+  );
   const setSelected = (value: string[] | ((current: string[]) => string[])) =>
     onView({
       ...view,
@@ -96,20 +116,56 @@ export default function LayerWorkspace({
   const activeSignature = active ? JSON.stringify(active) : '';
   useEffect(() => {
     setDraft(activeSignature ? JSON.parse(activeSignature) : null);
-    setScroll(0);
     setMessage('');
   }, [activeSignature]);
-  const descendants = (id: string): string[] => [
-    id,
-    ...items.filter((l) => l.parentId === id).flatMap((l) => descendants(l.id)),
-  ];
-  const activeIds = new Set(active ? descendants(active.id) : []);
-  const rows = features.filter(
-    (f) =>
-      (!active || activeIds.has(membership.get(f.key) || '')) &&
-      `${f.properties.name || ''} ${f.id} ${f.properties.sourceId || ''} ${f.properties.surface || ''} ${f.properties.landClass || ''}`
-        .toLowerCase()
-        .includes(featureQuery.toLowerCase()),
+  // Reset the DOM scroller as well as the virtual window; changing just React
+  // state leaves filtered results thousands of pixels above the visible rows.
+  useLayoutEffect(() => {
+    if (table.current) table.current.scrollTop = 0;
+    setScroll(0);
+  }, [view.active, featureQuery, explorerTab]);
+  const descendants = useMemo(() => {
+    const children = new Map<string, string[]>();
+    for (const item of items) {
+      if (item.parentId)
+        children.set(item.parentId, [
+          ...(children.get(item.parentId) || []),
+          item.id,
+        ]);
+    }
+    const visit = (id: string): string[] => [
+      id,
+      ...(children.get(id) || []).flatMap(visit),
+    ];
+    return visit;
+  }, [items]);
+  const activeIds = useMemo(
+    () => new Set(view.active ? descendants(view.active) : []),
+    [view.active, descendants],
+  );
+  const searchIndex = useMemo(
+    () =>
+      new Map(
+        features.map((f) => [
+          f.key,
+          `${f.properties.name || ''} ${f.id} ${f.properties.sourceId || ''} ${f.properties.surface || ''} ${f.properties.landClass || ''}`.toLowerCase(),
+        ]),
+      ),
+    [features],
+  );
+  const rows = useMemo(
+    () =>
+      features.filter(
+        (f) =>
+          (!active || activeIds.has(membership.get(f.key) || '')) &&
+          searchIndex.get(f.key)!.includes(featureQuery.toLowerCase()),
+      ),
+    [features, active, activeIds, membership, searchIndex, featureQuery],
+  );
+  const staleCount = useMemo(
+    () =>
+      rows.filter((f) => surfaceStale(f.properties, data.map.features)).length,
+    [rows, data.map.features],
   );
   const save = (layers: CampusLayer[]) =>
     onCommit(
@@ -127,7 +183,7 @@ export default function LayerWorkspace({
   const previewBulk = () => {
     if (!selectionEditable()) return;
     const changes = selected
-      .map((key) => features.find((f) => f.key === key))
+      .map((key) => featureIndex.get(key))
       .filter(
         (f): f is import('./campus-layers').LayerFeature =>
           !!f && f.kind !== 'boundary',
@@ -309,7 +365,7 @@ export default function LayerWorkspace({
             <small>
               {layer.role === 'group'
                 ? 'Folder'
-                : `${roleName(layer.role)} · ${features.filter((f) => membership.get(f.key) === layer.id).length}`}{' '}
+                : `${roleName(layer.role)} · ${layerStats.get(layer.id)?.count || 0}`}{' '}
               {layer.archived ? '· Archived' : ''}{' '}
               {edits.some((e) => e.kind === 'layer' && e.id === layer.id)
                 ? '· Edited'
@@ -319,13 +375,7 @@ export default function LayerWorkspace({
                 : ''}
             </small>
             <small>
-              {[
-                ...new Set(
-                  features
-                    .filter((f) => membership.get(f.key) === layer.id)
-                    .map((f) => f.geometry.type),
-                ),
-              ].join(' · ')}
+              {[...(layerStats.get(layer.id)?.geometry || [])].join(' · ')}
             </small>
           </span>
         </button>
@@ -342,7 +392,10 @@ export default function LayerWorkspace({
         .map((l) => row(l, depth + 1))}
     </div>
   );
-  const first = Math.max(0, Math.floor(scroll / 44) - 4),
+  const first = Math.max(
+      0,
+      Math.min(rows.length - 1, Math.floor(scroll / 44) - 4),
+    ),
     last = Math.min(rows.length, first + 22);
   return (
     <section className="layer-workspace editor-card" aria-label="Campus layers">
@@ -355,11 +408,30 @@ export default function LayerWorkspace({
       <div
         className="layer-explorer-tabs"
         role="tablist"
+        tabIndex={-1}
         aria-label="Layer explorer"
+        onKeyDown={(e) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key))
+            return;
+          e.preventDefault();
+          const next =
+            e.key === 'Home'
+              ? 'layers'
+              : e.key === 'End'
+                ? 'features'
+                : explorerTab === 'layers'
+                  ? 'features'
+                  : 'layers';
+          setExplorerTab(next);
+          e.currentTarget
+            .querySelectorAll<HTMLButtonElement>('[role="tab"]')
+            [next === 'layers' ? 0 : 1]?.focus();
+        }}
       >
         <button
           role="tab"
           aria-selected={explorerTab === 'layers'}
+          tabIndex={explorerTab === 'layers' ? 0 : -1}
           onClick={() => setExplorerTab('layers')}
         >
           Layers
@@ -367,6 +439,7 @@ export default function LayerWorkspace({
         <button
           role="tab"
           aria-selected={explorerTab === 'features'}
+          tabIndex={explorerTab === 'features' ? 0 : -1}
           onClick={() => setExplorerTab('features')}
         >
           Features ({rows.length})
@@ -854,12 +927,8 @@ export default function LayerWorkspace({
       {explorerTab === 'features' && (
         <>
           <p>
-            {active?.name || 'All campus layers'} ·{' '}
-            {
-              rows.filter((f) => surfaceStale(f.properties, data.map.features))
-                .length
-            }{' '}
-            surfaces need regeneration
+            {active?.name || 'All campus layers'} · {staleCount} surfaces need
+            regeneration
           </p>
           <div className="layer-feature-heading">
             <h3>Features · {rows.length}</h3>
@@ -869,7 +938,6 @@ export default function LayerWorkspace({
               value={featureQuery}
               onChange={(e) => {
                 setFeatureQuery(e.target.value);
-                setScroll(0);
               }}
             />
           </div>
@@ -877,7 +945,7 @@ export default function LayerWorkspace({
             <input
               type="checkbox"
               checked={
-                !!rows.length && rows.every((f) => selected.includes(f.key))
+                !!rows.length && rows.every((f) => selectedKeys.has(f.key))
               }
               onChange={(e) =>
                 setSelected(
@@ -889,11 +957,12 @@ export default function LayerWorkspace({
           </label>
           <div
             className="layer-table"
+            ref={table}
             onScroll={(e) => setScroll(e.currentTarget.scrollTop)}
           >
             <table
               aria-label="Layer attributes"
-              aria-rowcount={rows.length}
+              aria-rowcount={rows.length + 1}
               style={{ width: '100%' }}
             >
               <thead>
@@ -914,7 +983,7 @@ export default function LayerWorkspace({
               >
                 {rows.slice(first, last).map((f, i) => (
                   <tr
-                    aria-rowindex={first + i + 1}
+                    aria-rowindex={first + i + 2}
                     key={f.key}
                     className="layer-feature-row"
                     style={{
@@ -929,7 +998,7 @@ export default function LayerWorkspace({
                       <input
                         type="checkbox"
                         aria-label={`Select ${String(f.properties.name || f.kind)} ${String(f.properties.sourceId || f.id)}`}
-                        checked={selected.includes(f.key)}
+                        checked={selectedKeys.has(f.key)}
                         onChange={(e) =>
                           setSelected((s) =>
                             e.target.checked

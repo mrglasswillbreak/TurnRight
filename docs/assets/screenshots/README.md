@@ -1,5 +1,9 @@
 # Application screenshots
 
+## Audit: layer and road editor · 3 October 2026
+
+`layer-road-editor-2026-10-03.png` is an unaltered 1440×1000 Windows WebKit capture from the polygon-96 persistence regression at application commit `5bce6ec0`. The isolated owner/API fixture contains all 179 original UNILAG road surfaces on the test campus. It shows source-ID search, the width inspector and progressive handles after save/reload, with all 6,094 vertices and 56 holes preserved. The name “Reviewed road 96” and width 7 m are test edits, not published campus facts. Buildings outside the test fixture are intentionally absent. It replaces the older field-mapping screenshot in the README; the older image remains available in the import guide. [Audit scope and results](../../AUDIT-2026-10-03.md).
+
 ## Clickable campus silhouettes · 3 October 2026
 
 `campus-silhouettes-desktop-2026-10-03.png` is an unaltered Chromium capture at 1440×1000 of the live production release using the exact published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages. It shows both directory boundaries, one pin/label per campus and the stronger selected-campus outline. `web/scripts/verify-campus-globe.mjs` reproduces the capture and checks real-boundary clicks, map-instance retention, both themes and view modes, scoped offline switching and reopening. This capture comes from the [successful public-origin verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/37099018264), which covers all 32 campus/browser/viewport/theme/view combinations; [Production](../../PRODUCTION.md) records the deployment and unchanged package hashes. Phone views are browser simulations; no images are composited or retouched.
