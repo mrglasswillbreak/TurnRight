@@ -120,38 +120,42 @@ for (const [engine, launcher] of [['chromium', chromium], ['webkit', webkit]]) {
     await page.evaluate(() => { window.originalGlobeMap = window.globeMap; });
     for (const mobile of [false, true]) {
       await page.setViewportSize(mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 });
-      const theme = mobile ? 'dark' : 'light';
-      await page.emulateMedia({ colorScheme: theme });
-      if (mobile) await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
-      for (const campus of [...campuses].reverse()) {
-        await choose(page, campus, origin);
-        const state = await page.evaluate(async () => ({ pitch: window.globeMap.getPitch(), bearing: window.globeMap.getBearing(),
-          zoom: window.globeMap.getZoom(), boundary: await window.globeMap.getSource('boundary').getData(),
-          overflow: document.documentElement.scrollWidth > innerWidth + 1 }));
-        assert(!state.overflow);
-        assert.equal(state.bearing, 0);
-        assert.equal(state.pitch, mobile ? 0 : 45);
-        assert.deepEqual(state.boundary.features[0].geometry, campus.data.boundary.geometry);
-        const filename = `${engine}-${campus.entry.slug}-${mobile ? 'mobile' : 'desktop'}-${theme}-${mobile ? '2d' : '3d'}.png`;
-        await page.screenshot({ path: path.join(output, filename) });
-        report.views.push({ engine, campus: campus.entry.slug, mobile, theme, pitch: state.pitch, filename });
-        // Both real silhouettes visible together; click and retain the same canvas.
-        await page.evaluate((phone) => window.globeMap.jumpTo({ center: [3.297, 6.493], zoom: phone ? 10.25 : 10.8, pitch: 0 }), mobile);
-        await page.waitForFunction(() => window.globeMap.loaded());
-        await page.screenshot({ path: path.join(output, `${engine}-silhouettes-${theme}.png`) });
-        const other = campuses.find((c) => c.entry.slug !== campus.entry.slug);
-        const geometry = other.entry.outline;
-        const point = (geometry.type === 'Polygon' ? geometry.coordinates[0][0] : geometry.coordinates[0][0][0]).slice(0, 2);
-        await page.evaluate((center) => window.globeMap.jumpTo({ center, zoom: 11.3, pitch: 0 }), point);
-        await page.waitForFunction(() => window.globeMap.loaded());
-        const pixel = await page.evaluate((coordinate) => {
-          const p = window.globeMap.project(coordinate), r = window.globeMap.getCanvas().getBoundingClientRect();
-          return { x: p.x + r.left, y: p.y + r.top };
-        }, point);
-        await page.mouse.click(pixel.x, pixel.y);
-        await expect(page).toHaveURL(`${origin}/?campus=${other.entry.slug}`, { timeout: 60000 });
-        await page.waitForFunction(() => window.globeMap.getZoom() > 12 && !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
-        assert(await page.evaluate(() => window.originalGlobeMap === window.globeMap));
+      for (const theme of ['light', 'dark']) {
+        await page.emulateMedia({ colorScheme: theme });
+        for (const threeD of [true, false]) {
+          const toggle = page.getByRole('button', { name: `Switch to ${threeD ? '3D' : '2D'}`, exact: true });
+          if (await toggle.isVisible()) await toggle.click();
+          for (const campus of [...campuses].reverse()) {
+            await choose(page, campus, origin);
+            const state = await page.evaluate(async () => ({ pitch: window.globeMap.getPitch(), bearing: window.globeMap.getBearing(),
+              zoom: window.globeMap.getZoom(), boundary: await window.globeMap.getSource('boundary').getData(),
+              overflow: document.documentElement.scrollWidth > innerWidth + 1 }));
+            assert(!state.overflow);
+            assert.equal(state.bearing, 0);
+            assert.equal(state.pitch, threeD ? (mobile ? 40 : 45) : 0);
+            assert.deepEqual(state.boundary.features[0].geometry, campus.data.boundary.geometry);
+            const filename = `${engine}-${campus.entry.slug}-${mobile ? 'mobile' : 'desktop'}-${theme}-${threeD ? '3d' : '2d'}.png`;
+            await page.screenshot({ path: path.join(output, filename) });
+            report.views.push({ engine, campus: campus.entry.slug, mobile, theme, pitch: state.pitch, filename });
+            // Both real silhouettes visible together; click and retain the same canvas.
+            await page.evaluate((phone) => window.globeMap.jumpTo({ center: [3.297, 6.493], zoom: phone ? 10.25 : 10.8, pitch: 0 }), mobile);
+            await page.waitForFunction(() => window.globeMap.loaded());
+            await page.screenshot({ path: path.join(output, `${engine}-silhouettes-${mobile ? 'mobile' : 'desktop'}-${theme}.png`) });
+            const other = campuses.find((c) => c.entry.slug !== campus.entry.slug);
+            const geometry = other.entry.outline;
+            const point = (geometry.type === 'Polygon' ? geometry.coordinates[0][0] : geometry.coordinates[0][0][0]).slice(0, 2);
+            await page.evaluate((center) => window.globeMap.jumpTo({ center, zoom: 11.3, pitch: 0 }), point);
+            await page.waitForFunction(() => window.globeMap.loaded());
+            const pixel = await page.evaluate((coordinate) => {
+              const p = window.globeMap.project(coordinate), r = window.globeMap.getCanvas().getBoundingClientRect();
+              return { x: p.x + r.left, y: p.y + r.top };
+            }, point);
+            await page.mouse.click(pixel.x, pixel.y);
+            await expect(page).toHaveURL(`${origin}/?campus=${other.entry.slug}`, { timeout: 60000 });
+            await page.waitForFunction(() => window.globeMap.getZoom() > 12 && !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
+            assert(await page.evaluate(() => window.originalGlobeMap === window.globeMap));
+          }
+        }
       }
     }
     assert.deepEqual(errors, []);
