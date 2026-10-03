@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, Globe2, MapPin, Search } from 'lucide-react';
-import type { Map as MapInstance, MapLayerMouseEvent } from 'maplibre-gl';
+import type { Map as MapInstance } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,39 +12,79 @@ import {
 } from '@/components/ui/dialog';
 import { loadCampusCatalogue } from './campus-catalogue';
 import { frameGlobe } from './world-camera';
-import { returnToCampus } from './world-map';
 import { publicMapPadding } from './public-map-layout';
-import {
-  campusUrl,
-  lasuCampus,
-  requestedCampus,
-  type CampusIdentity,
-} from './campus-context';
+import { type CampusIdentity } from './campus-context';
+import { campusCenter, installCampusOverview } from './campus-overview';
+import { useCampusSwitch, type CampusSession } from './useCampusSwitch';
 
 export default function CampusSwitcher({
   map,
   navigating = false,
   onStop,
-  bounds,
+  campus,
+  dark,
+  threeD,
   onOpenChange,
   onBrowse,
+  onCommit,
 }: {
   map: MapInstance | null;
   navigating?: boolean;
   onStop: () => Promise<void>;
-  bounds: CampusIdentity['bounds'];
-  onOpenChange: (open: boolean) => void;
+  campus: CampusIdentity;
+  dark: boolean;
+  threeD: boolean;
+  onOpenChange: (active: boolean) => void;
   onBrowse: () => void;
+  onCommit: (session: CampusSession) => void;
 }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
-  const callbacks = useRef({ onOpenChange, onBrowse, bounds });
-  callbacks.current = { onOpenChange, onBrowse, bounds };
-  const [campuses, setCampuses] = useState<CampusIdentity[]>([lasuCampus]),
-    [open, setOpen] = useState(false),
-    [query, setQuery] = useState(''),
-    [error, setError] = useState(''),
-    [choice, setChoice] = useState<CampusIdentity | null>(null);
+  const [campuses, setCampuses] = useState<CampusIdentity[]>([campus]);
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [directoryError, setDirectoryError] = useState('');
+  const [overlaps, setOverlaps] = useState<CampusIdentity[]>([]);
+  const browse = useRef(false);
+  const transition = useCampusSwitch({
+    campuses,
+    active: campus.slug,
+    map,
+    threeD,
+    navigating,
+    onStop,
+    onCommit,
+    onBrowse,
+    onClose: () => {
+      setOpen(false);
+      setOverlaps([]);
+    },
+    onConfirm: () => {
+      browse.current = false;
+      setOpen(true);
+    },
+  });
+  const callbacks = useRef({ transition, onBrowse, campus });
+  callbacks.current = { transition, onBrowse, campus };
+  useEffect(() => {
+    onOpenChange(open || !!transition.pending || transition.flying);
+  }, [open, transition.pending, transition.flying, onOpenChange]);
+  useEffect(() => {
+    let cancelled = false;
+    void loadCampusCatalogue()
+      .then((directory) => {
+        if (!cancelled) {
+          setCampuses(directory.campuses);
+          setDirectoryError('');
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) setDirectoryError(error.message);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   useEffect(() => {
     if (!open) return;
     const viewport = window.visualViewport;
@@ -71,10 +112,9 @@ export default function CampusSwitcher({
     };
   }, [open]);
   useEffect(() => {
-    callbacks.current.onOpenChange(open);
-    if (navigating || !map) return;
+    if (!map || navigating) return;
+    let frame = 0;
     if (!open) {
-      let frame = 0;
       const refresh = () => {
         frame = requestAnimationFrame(() => {
           if (map.getZoom() < 12 && !map.isMoving())
@@ -88,8 +128,8 @@ export default function CampusSwitcher({
         map.off('moveend', refresh);
       };
     }
-    let framed = false,
-      frame = 0;
+    if (!browse.current) return;
+    let framed = false;
     const attempt = () => {
       if (
         framed ||
@@ -99,10 +139,8 @@ export default function CampusSwitcher({
         return;
       framed = true;
       callbacks.current.onBrowse();
-      const b = callbacks.current.bounds;
-      frameGlobe(map, [(b[0][0] + b[1][0]) / 2, (b[0][1] + b[1][1]) / 2]);
+      frameGlobe(map, campusCenter(callbacks.current.campus.bounds));
     };
-    // Wait for the dialog layout and for a pending world install to complete.
     const schedule = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(attempt);
@@ -117,99 +155,45 @@ export default function CampusSwitcher({
     };
   }, [open, map, navigating]);
   useEffect(() => {
-    void loadCampusCatalogue()
-      .then((c) => setCampuses(c.campuses))
-      .catch((e) => setError(e.message));
-  }, []);
-  const choose = (campus: CampusIdentity) => {
-    if (campus.slug === requestedCampus()) {
-      setOpen(false);
-      setChoice(null);
-      if (map && !navigating) returnToCampus(map, callbacks.current.bounds);
-      return;
-    }
-    if (navigating) {
-      setChoice(campus);
-      setOpen(true);
-      return;
-    }
-    location.assign(campusUrl('/', campus.slug));
-  };
-  useEffect(() => {
     if (!map) return;
+    let dispose: (() => void) | undefined;
     const install = () => {
-      if (map.getSource('published-campuses')) return;
-      map.addSource('published-campuses', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: campuses.map((c) => ({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [
-                (c.bounds[0][0] + c.bounds[1][0]) / 2,
-                (c.bounds[0][1] + c.bounds[1][1]) / 2,
-              ],
-            },
-            properties: { id: c.id, name: c.name },
-          })),
+      if (
+        dispose ||
+        map.getSource('published-campuses') ||
+        !map.getLayer('campus-fill')
+      )
+        return;
+      const activeCampus = callbacks.current.campus;
+      // Old directories still show the active campus's already loaded boundary.
+      dispose = installCampusOverview(
+        map,
+        campuses.map((c) =>
+          c.slug === activeCampus.slug && !c.outline
+            ? { ...c, outline: activeCampus.outline }
+            : c,
+        ),
+        activeCampus.slug,
+        dark,
+        (choices) => {
+          if (choices.length === 1)
+            void callbacks.current.transition.choose(choices[0]);
+          else {
+            browse.current = false;
+            setQuery('');
+            setOverlaps(choices);
+            setOpen(true);
+          }
         },
-      });
-      map.addLayer({
-        id: 'published-campus-pins',
-        type: 'circle',
-        source: 'published-campuses',
-        maxzoom: 12,
-        paint: {
-          'circle-radius': 7,
-          'circle-color': '#0d9488',
-          'circle-stroke-color': '#fff',
-          'circle-stroke-width': 2,
-        },
-      });
-      map.addLayer({
-        id: 'published-campus-labels',
-        type: 'symbol',
-        source: 'published-campuses',
-        minzoom: 3,
-        maxzoom: 12,
-        layout: {
-          'text-field': ['get', 'name'],
-          'text-size': 12,
-          'text-offset': [0, 1.6],
-          'text-font': ['Open Sans Semibold'],
-        },
-        paint: {
-          'text-color': '#0f766e',
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.5,
-        },
-      });
-    };
-    const click = (e: MapLayerMouseEvent) => {
-      const campus = campuses.find(
-        (c) => c.id === e.features?.[0].properties?.id,
       );
-      if (campus) {
-        setChoice(campus);
-        setOpen(true);
-      }
     };
-    if (map.isStyleLoaded()) install();
-    else map.once('load', install);
-    map.on('click', 'published-campus-pins', click);
+    install();
+    map.on('styledata', install);
     return () => {
-      map.off('load', install);
-      map.off('click', 'published-campus-pins', click);
-      if (map.getLayer('published-campus-labels'))
-        map.removeLayer('published-campus-labels');
-      if (map.getLayer('published-campus-pins'))
-        map.removeLayer('published-campus-pins');
-      if (map.getSource('published-campuses'))
-        map.removeSource('published-campuses');
+      map.off('styledata', install);
+      dispose?.();
     };
-  }, [map, campuses]);
+  }, [map, campuses, campus.slug, campus.outline, dark]);
   return (
     <>
       <Button
@@ -220,16 +204,48 @@ export default function CampusSwitcher({
         title="Choose a campus"
         aria-expanded={open}
         aria-haspopup="dialog"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          browse.current = true;
+          setOverlaps([]);
+          setQuery('');
+          setOpen(true);
+        }}
       >
         <Globe2 size={20} />
         <span className="sr-only">Campuses</span>
       </Button>
+      {(transition.pending || transition.error) &&
+        createPortal(
+          <output className="campus-switch-status" aria-live="polite">
+            <span>
+              {transition.pending
+                ? `Opening ${transition.pending}…`
+                : transition.error}
+            </span>
+            {transition.error && (
+              <>
+                <Button size="sm" onClick={transition.retry}>
+                  Retry
+                </Button>
+                <Button size="sm" variant="ghost" onClick={transition.dismiss}>
+                  Dismiss
+                </Button>
+              </>
+            )}
+          </output>,
+          document.body,
+        )}
       <Dialog
+        modal={false}
         open={open}
-        onOpenChange={(value) => {
+        onOpenChange={(value, details) => {
+          // The globe remains interactive while this discovery panel is open.
+          if (!value && details.reason === 'outside-press') return;
           setOpen(value);
-          if (!value) setChoice(null);
+          if (!value) {
+            setOverlaps([]);
+            transition.dismiss();
+          }
         }}
       >
         <DialogContent
@@ -244,11 +260,11 @@ export default function CampusSwitcher({
         >
           <DialogHeader>
             <DialogTitle ref={title} tabIndex={-1}>
-              Choose a campus
+              {overlaps.length ? 'Choose a campus here' : 'Choose a campus'}
             </DialogTitle>
             <DialogDescription>
-              Explore published maps. Each campus has its own places, routes and
-              offline download.
+              Choose a campus below or select its silhouette on the globe. Each
+              campus has its own places, routes and offline download.
             </DialogDescription>
           </DialogHeader>
           <label className="campus-public-search">
@@ -258,45 +274,43 @@ export default function CampusSwitcher({
               aria-label="Search published campuses"
               placeholder="Search campus names"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(event) => setQuery(event.target.value)}
             />
           </label>
-          {error && <output>{error}</output>}
+          {directoryError && <output>{directoryError}</output>}
           <div className="campus-public-list">
-            {campuses
+            {(overlaps.length ? overlaps : campuses)
               .filter((c) => c.name.toLowerCase().includes(query.toLowerCase()))
               .map((c) => (
                 <Button
                   key={c.id}
                   variant="ghost"
                   className="campus-public-option"
-                  onClick={() => choose(c)}
+                  aria-current={c.slug === campus.slug ? 'true' : undefined}
+                  onClick={() => void transition.choose(c)}
                 >
                   <MapPin size={18} />
                   <span>{c.name}</span>
-                  {c.slug === requestedCampus() && <Check size={17} />}
+                  {c.slug === campus.slug && <Check size={17} />}
                 </Button>
               ))}
           </div>
-          {choice && (
+          {overlaps.length > 0 && (
+            <Button variant="ghost" onClick={() => setOverlaps([])}>
+              Show all campuses
+            </Button>
+          )}
+          {transition.confirmation && (
             <div className="campus-public-confirm">
               <p>
-                {navigating ? 'Stop directions and open' : 'Open'}{' '}
-                <strong>{choice.name}</strong>?
+                Stop directions and open{' '}
+                <strong>{transition.confirmation.campus.name}</strong>?
               </p>
-              <Button
-                onClick={() =>
-                  void (async () => {
-                    if (choice.slug === requestedCampus()) {
-                      choose(choice);
-                      return;
-                    }
-                    if (navigating) await onStop();
-                    location.assign(campusUrl('/', choice.slug));
-                  })()
-                }
-              >
-                {navigating ? 'Stop and switch campus' : 'Open campus'}
+              <Button onClick={transition.confirm}>
+                Stop and switch campus
+              </Button>
+              <Button variant="ghost" onClick={transition.dismiss}>
+                Keep directions
               </Button>
             </div>
           )}

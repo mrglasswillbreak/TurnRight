@@ -81,7 +81,6 @@ export function mapTheme(dark: boolean) {
     'world-country-labels': label,
     'world-cities': label,
     'world-lakes': { 'fill-color': p.water },
-    'world-campus-label': { ...label, 'text-color': p.route },
     'campus-fill': { 'fill-color': p.campus },
     land: {
       'fill-color': [

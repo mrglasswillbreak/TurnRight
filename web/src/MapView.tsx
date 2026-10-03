@@ -6,9 +6,6 @@ import { publicMapPadding } from './public-map-layout';
 import {
   CAMPUS_MIN_ZOOM,
   WORLD_PROJECTION,
-  installWorldLayers,
-  loadWorld,
-  returnToCampus,
 } from './world-map';
 import * as maplibregl from 'maplibre-gl';
 import type {
@@ -33,7 +30,8 @@ import { placeFeatures, closureFeatures } from './map-sources';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
 const noRoutes: Route[] = [];
-const WorldAnimation = lazy(() => import('./WorldAnimation'));
+// Decorative controls can be unavailable on an unprepared offline visit.
+const WorldAnimation = lazy(() => import('./WorldAnimation').catch(() => ({ default: () => <></> })));
 export interface MapViewProps {
   animationPaused?: boolean;
   selectedStreet?: string | null;
@@ -181,6 +179,34 @@ export function MapView({
       motionMap.off('load', apply);
     };
   }, [motionMap, dark, selected?.id]);
+  useEffect(() => {
+    if (!motionMap) return;
+    const control = new maplibregl.AttributionControl({
+        compact: true,
+        customAttribution: [
+          ...new Set(
+            data.sources
+              .map((s) => s.attribution)
+              .filter(Boolean),
+          ),
+        ].map((value) =>
+          value.replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+              })[c]!,
+          ),
+        ),
+    });
+    motionMap.addControl(control, 'bottom-right');
+    return () => { if (motionMap.hasControl(control)) motionMap.removeControl(control); };
+
+  }, [motionMap, data.sources]);
   useEffect(() => {
     if (!editor)
       document.title =
@@ -411,31 +437,6 @@ export function MapView({
       ),
     );
     map.on('webglcontextrestored', () => setMapError(''));
-    map.addControl(
-      new maplibregl.AttributionControl({
-        compact: true,
-        customAttribution: [
-          ...new Set(
-            latestData.current.sources
-              .map((s) => s.attribution)
-              .filter(Boolean),
-          ),
-        ].map((value) =>
-          value.replace(
-            /[&<>"']/g,
-            (c) =>
-              ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;',
-              })[c]!,
-          ),
-        ),
-      }),
-      'bottom-right',
-    );
     map.addControl(
       new maplibregl.ScaleControl({ maxWidth: 90 }),
       'bottom-left',
@@ -837,18 +838,10 @@ export function MapView({
         });
       } else {
         map.on('click', (event) => {
-          if (map.getZoom() < CAMPUS_MIN_ZOOM) {
-            if (
-              map.getLayer('world-campus-dot') &&
-              map.queryRenderedFeatures(event.point, {
-                layers: ['world-campus-dot', 'world-campus-label'],
-              }).length
-            ) {
-              callbacks.current.onManualPan?.();
-              returnToCampus(map, latestData.current.bounds);
-            }
-            return;
-          }
+          if (map.getZoom() < CAMPUS_MIN_ZOOM) return;
+          if (map.getLayer('published-campus-outline-fill') &&
+              map.queryRenderedFeatures(event.point, { layers: ['published-campus-outline-fill', 'published-campus-labels'] })
+                .some((feature) => !feature.properties?.active)) return;
           const placeHit = map.queryRenderedFeatures(event.point, {
             layers: [
               'places-dot',
@@ -966,14 +959,14 @@ export function MapView({
     if (!motionMap || editor) return;
     const controller = new AbortController();
     setWorldError(false);
-    void loadWorld(controller.signal)
-      .then((world) => {
+    void import('./world-overview')
+      .then(async ({ loadWorld, installWorldLayers }) => {
+        controller.signal.throwIfAborted();
+        const world = await loadWorld(controller.signal);
         if (controller.signal.aborted || mapRef.current !== motionMap) return;
         installWorldLayers(
           motionMap,
           world,
-          latestData.current.bounds,
-          String(latestData.current.boundary.properties?.name || 'Campus'),
         );
         applyMapTheme(motionMap, camera.current.dark);
       })

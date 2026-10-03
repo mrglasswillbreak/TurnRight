@@ -8,6 +8,8 @@ import {
   hashBytes,
   installPackage,
   loadCampus,
+  getPreference,
+  setPreference,
 } from '../src/offline';
 import type { CampusPackage } from '../src/types';
 const saved = new Map<string, Response>();
@@ -33,6 +35,26 @@ beforeEach(async () => {
     },
   });
   await deletePackages();
+});
+
+it('captures explicit preference scopes before asynchronous storage and URL changes', async () => {
+  vi.stubGlobal('location', { search: '?campus=lasu' });
+  const first = setPreference('saved', ['lasu-library'], 'lasu');
+  vi.stubGlobal('location', { search: '?campus=north' });
+  const second = setPreference('saved', ['north-library'], 'north');
+  await Promise.all([first, second]);
+  expect(await getPreference('saved', [], 'lasu')).toEqual(['lasu-library']);
+  expect(await getPreference('saved', [], 'north')).toEqual(['north-library']);
+  vi.unstubAllGlobals();
+});
+
+it('fails an undownloaded offline target without altering the active campus', async () => {
+  const p = await pkg('retained-offline');
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(p.bytes)));
+  await installPackage(p.manifest, () => {});
+  vi.stubGlobal('navigator', { onLine: false });
+  await expect(loadCampus('missing')).rejects.toThrow('not downloaded');
+  expect((await loadCampus('lasu')).manifest.version).toBe(p.manifest.version);
 });
 async function pkg(version: string) {
   const bytes = new TextEncoder().encode(

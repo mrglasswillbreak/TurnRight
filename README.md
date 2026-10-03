@@ -45,7 +45,7 @@ The dated campus captures show real packages. Editor examples use isolated owner
 
 - **Campus navigation:** searchable names, aliases, categories and streets; walking and driving routes; destination/entrance guides; mapped restrictions, closures, parking and walking handoffs; foreground GPS and offline spoken instructions.
 - **Consistent maps:** light, dark and system themes; 2D and 3D; shared building colours, place icons and labels; separate trees, hedges, shrubs, greenspaces, water, sports areas, parking and subtle parcels. Polygon road surfaces cover matching centreline display segments while leaving uncovered segments visible.
-- **Independent campuses:** remembered last-used public campus, searchable globe chooser, explicit campus links, campus-scoped recents, saved places, report drafts and offline packages. Changing campuses during navigation requires confirmation. A map can publish before its routes are ready.
+- **Independent campuses:** clickable published boundary silhouettes, distant pins and a searchable non-modal globe chooser. Switching flies directly to the target on the same map, remembers the last successful campus and supports browser Back/Forward. Saved places, recents, report drafts and verified offline packages stay campus-scoped. Active directions require confirmation before switching. [Globe and offline guide](docs/CAMPUS-GLOBE.md).
 - **Vector imports:** file batches, public ArcGIS and complete OSM extracts; format/projection detection, editable field mappings, aliases/coded values, repair receipts, per-layer sampling and styled previews over the current campus.
 - **Layer management:** Layers / Features explorer, folders, search by source identity, virtualized attribute table, map-linked multi-selection, bulk edits, styling rules, locking, isolation, archive/restore, duplication and mapped-property exports. Editing visibility, release inclusion and published visibility are separate.
 - **Road and geometry editing:** original routing paths remain selectable beneath road surfaces. Road class, material, width and evidence persist through saves and release. Land/overlays support 20,000 vertices with progressive handles, holes, multipart edits, reviewed split/merge and linked-surface regeneration; undo restores whole operations.
@@ -77,13 +77,15 @@ The configured build exercises the real authentication/dependency boundary using
 
 ## Using the public map
 
-1. Open a campus directly or use **Choose a campus** beside search.
+1. Open a campus directly or use **Choose a campus** beside search. Select a published silhouette, pin, label or list entry; overlapping campuses offer a chooser. The globe remains interactive while search is open.
 2. Search a destination or street. Open its details to inspect photographs, model evidence and arrival information.
 3. Choose directions and an origin. Select walking or driving where the campus supports it, then review restrictions and the final approach before starting.
 4. Use the controls above the main panel for 2D/3D, zoom, north-up and location/follow. Desktop has one floating row; mobile retains two rows. Theme and navigation preferences remain in settings. GPS guidance runs while the app is foregrounded.
 5. Open **Offline** and download that campus. Wait for completion before disconnecting. Removing one campus download retains other campuses and shared assets.
 
 Links use `?campus=unilag` and can include existing place/building identifiers. Opening `/` restores the last successfully loaded public campus from device storage. First visits use LASU. Existing destination/building links without a campus parameter retain their LASU interpretation. Explicit links always win; unsuccessful loads and editor visits do not change the remembered choice. Browser storage restrictions can prevent remembering it. Search and route calculation work with the downloaded package; online source imports and owner publication require a connection.
+
+Switching keeps the current campus usable while **Opening [campus]…** loads and validates the target. Success updates the URL and campus together, clears the old search/route preview and flies to the new boundary in the chosen 2D/3D view. Gestures interrupt the flight; reduced motion skips animation. Failure offers Retry without changing the current map. Download each campus needed offline: silhouettes remain discoverable, but an undownloaded offline target cannot open. [Complete switching and offline behavior](docs/CAMPUS-GLOBE.md).
 
 ## Supported map imports
 

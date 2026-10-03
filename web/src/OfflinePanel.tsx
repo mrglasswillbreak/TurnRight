@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Check, Download, HardDrive, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deletePackages, installPackage } from './offline';
+import { packageCampus } from './campus-context';
 import { PHOTO_WARNING_BYTES } from './arrival';
 import type { CampusData, CampusPackage } from './types';
 export function OfflinePanel({
@@ -206,7 +207,7 @@ export function OfflinePanel({
               variant="destructive"
               onClick={async () => {
                 try {
-                  await deletePackages();
+                  await deletePackages(packageCampus(manifest));
                   onDelete();
                   setConfirmDelete(false);
                 } catch {
