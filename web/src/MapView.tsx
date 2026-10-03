@@ -180,6 +180,9 @@ export function MapView({
     [worldAttempt, setWorldAttempt] = useState(0),
     [worldView, setWorldView] = useState(false);
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
+  const restoreLayerZoom = useRef<
+    typeof import('./map-extra-layers').layerZoomLimits | undefined
+  >(undefined);
   useEffect(() => {
     if (!motionMap) return;
     const control = new maplibregl.AttributionControl({
@@ -259,10 +262,14 @@ export function MapView({
     if (!motionMap) return;
     let cancelled = false;
     const apply = () => {
-      void import('./map-extra-layers').then(({ extraMapLayers }) => {
-        if (!cancelled && motionMap.getLayer('building-contact'))
-          extraMapLayers(motionMap, dark);
-      });
+      void import('./map-extra-layers').then(
+        ({ extraMapLayers, layerZoomLimits }) => {
+          if (!cancelled && motionMap.getLayer('building-contact')) {
+            extraMapLayers(motionMap, dark);
+            restoreLayerZoom.current = layerZoomLimits;
+          }
+        },
+      );
     };
     if (motionMap.getLayer('building-contact')) apply();
     else motionMap.once('load', apply);
@@ -270,14 +277,7 @@ export function MapView({
       cancelled = true;
       motionMap.off('load', apply);
     };
-  }, [
-    motionMap,
-    dark,
-    selectedId,
-    selectedBuildingId,
-    buildingOpacity,
-    modelIds,
-  ]);
+  }, [motionMap, dark]);
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
     glyphs: '/glyphs/{fontstack}/{range}.pbf',
@@ -1097,6 +1097,13 @@ export function MapView({
         ]);
       }
       applyMapTheme(map, dark);
+      restoreLayerZoom.current?.(map, [
+        'buildings-3d',
+        'building-roofs',
+        'places-label',
+        'places-label-detail',
+        'places-label-selected',
+      ]);
     };
     if (ready.current) apply();
     else map.once('load', apply);

@@ -9676,6 +9676,11 @@ test('campus layers polygon 96 preserves vertices and holes through property and
   expect(saved.geometry.coordinates).toHaveLength(57);
   expect(saved.geometry.coordinates.flat().length).toBe(6094);
   expect(saved.geometry.coordinates[44]).toEqual(road.geometry.coordinates[44]);
+  // This case verifies persisted geometry, so wait for acknowledgement and map
+  // processing. Reloading during Vite's injected worker env-module startup emits
+  // a WebKit development-server import error unrelated to the saved polygon.
+  await expect(page.locator('.editor-save-state')).toHaveText('Saved');
+  await page.waitForFunction(() => window.editorTestMap.loaded());
   await page.reload();
   await page.getByRole('button', { name: 'Layers', exact: true }).click();
   await workspace.getByRole('button', { name: /Road surfaces/ }).click();

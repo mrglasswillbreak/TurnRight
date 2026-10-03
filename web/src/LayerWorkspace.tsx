@@ -102,7 +102,10 @@ export default function LayerWorkspace({
     } | null>(null),
     [moveTarget, setMoveTarget] = useState('');
   const selected = view.selected || [];
-  const selectedKeys = useMemo(() => new Set(view.selected || []), [view.selected]);
+  const selectedKeys = useMemo(
+    () => new Set(view.selected || []),
+    [view.selected],
+  );
   const setSelected = (value: string[] | ((current: string[]) => string[])) =>
     onView({
       ...view,
