@@ -151,10 +151,31 @@ export function displayGeometry(
     }),
   };
 }
+// Campus snapshots are immutable; collect associations once, preserving first-match
+// ordering and explicit place links before building and historical-ID fallbacks.
+const associations = new WeakMap<
+  CampusData,
+  { places: Map<string, Place>; buildings: Map<string, Place> }
+>();
 export function buildingPlace(
   data: CampusData,
   building: Feature,
 ): Place | undefined {
+  let index = associations.get(data);
+  if (!index) {
+    index = { places: new Map(), buildings: new Map() };
+    for (const place of data.places) {
+      if (!index.places.has(place.id)) index.places.set(place.id, place);
+      if (place.buildingId) {
+        const key = resolvePlaceId(
+          { placeIdAliases: data.buildingIdAliases },
+          place.buildingId,
+        );
+        if (!index.buildings.has(key)) index.buildings.set(key, place);
+      }
+    }
+    associations.set(data, index);
+  }
   const id = String(building.properties?.id ?? building.id ?? '');
   const placeId = resolvePlaceId(
     data,
@@ -165,22 +186,16 @@ export function buildingPlace(
     id,
   );
   return (
-    data.places.find((p) => p.id === placeId) ||
-    data.places.find(
-      (p) =>
-        p.buildingId &&
-        resolvePlaceId(
-          { placeIdAliases: data.buildingIdAliases },
-          p.buildingId,
-        ) === canonicalBuilding,
-    ) ||
-    data.places.find((p) => p.id === resolvePlaceId(data, id))
+    index.places.get(placeId) ||
+    index.buildings.get(canonicalBuilding) ||
+    index.places.get(resolvePlaceId(data, id))
   );
 }
 export function resolvePlaceId(
   data: Pick<CampusData, 'placeIdAliases'>,
   id: string,
 ): string {
+  if (!data.placeIdAliases) return id;
   const seen = new Set<string>();
   while (Object.hasOwn(data.placeIdAliases || {}, id) && !seen.has(id)) {
     seen.add(id);

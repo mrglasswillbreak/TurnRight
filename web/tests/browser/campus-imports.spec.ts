@@ -486,7 +486,7 @@ test('campus imports restore campus creation and public handoff keeps the campus
     page.getByRole('button', { name: 'LASU · Ojo', exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: north.name, exact: true }),
+    page.getByRole('dialog', { name: 'Choose a campus' }).getByRole('button', { name: north.name, exact: true }),
   ).toHaveCount(0);
 });
 
@@ -633,6 +633,7 @@ test('campus imports public chooser stays in the search row without covering nav
         page.getByRole('dialog', { name: 'Choose a campus' }),
       ).toBeVisible();
       await page
+        .getByRole('dialog', { name: 'Choose a campus' })
         .getByRole('button', { name: 'LASU · Ojo', exact: true })
         .click();
       await expect(page.getByRole('dialog')).toHaveCount(0);

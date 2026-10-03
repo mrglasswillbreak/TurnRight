@@ -3,10 +3,7 @@ import type { BuildingSelection } from './visual-types';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { MotionMap } from './MotionAssistance';
 import { publicMapPadding } from './public-map-layout';
-import {
-  CAMPUS_MIN_ZOOM,
-  WORLD_PROJECTION,
-} from './world-map';
+import { CAMPUS_MIN_ZOOM, WORLD_PROJECTION } from './world-map';
 import * as maplibregl from 'maplibre-gl';
 import type {
   Map as MapInstance,
@@ -31,7 +28,9 @@ const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
 const noRoutes: Route[] = [];
 // Decorative controls can be unavailable on an unprepared offline visit.
-const WorldAnimation = lazy(() => import('./WorldAnimation').catch(() => ({ default: () => <></> })));
+const WorldAnimation = lazy(() =>
+  import('./WorldAnimation').catch(() => ({ default: () => <></> })),
+);
 export interface MapViewProps {
   animationPaused?: boolean;
   selectedStreet?: string | null;
@@ -105,11 +104,22 @@ export function MapView({
     () => displayGeometry(data.map, data.visuals),
     [data.map, data.visuals],
   );
-  const [roadGeometry, setRoadGeometry] = useState<FeatureCollection>();
+  const roadPaths = useMemo<FeatureCollection>(
+    () => ({
+      type: 'FeatureCollection',
+      features: campusGeometry.features.filter(
+        (f) => f.properties?.kind === 'path',
+      ),
+    }),
+    [campusGeometry],
+  );
+  const [roadGeometry, setRoadGeometry] = useState<{
+    source: FeatureCollection;
+    geometry: FeatureCollection;
+  }>();
   useEffect(() => {
     let cancelled = false;
     let dispose: (() => void) | undefined;
-    setRoadGeometry(undefined);
     if (
       campusGeometry.features.some((f) =>
         ['road', 'sidewalk', 'parking'].includes(f.properties?.landClass),
@@ -117,7 +127,10 @@ export function MapView({
     )
       void import('./road-display').then(({ requestRoadDisplay }) => {
         if (!cancelled)
-          dispose = requestRoadDisplay(campusGeometry, setRoadGeometry);
+          dispose = requestRoadDisplay(campusGeometry, (geometry) => {
+            if (!cancelled)
+              setRoadGeometry({ source: campusGeometry, geometry });
+          });
       });
     return () => {
       cancelled = true;
@@ -135,7 +148,10 @@ export function MapView({
   const sourceData = useMemo(
     () => ({
       campus: campusGeometry,
-      'road-display': roadGeometry || campusGeometry,
+      'road-display':
+        roadGeometry?.source === campusGeometry
+          ? roadGeometry.geometry
+          : roadPaths,
       boundary: displayGeometry({
         type: 'FeatureCollection',
         features: [data.boundary],
@@ -146,6 +162,7 @@ export function MapView({
     [
       campusGeometry,
       roadGeometry,
+      roadPaths,
       data.boundary,
       placesGeometry,
       closuresGeometry,
@@ -165,47 +182,28 @@ export function MapView({
   const [motionMap, setMotionMap] = useState<MapInstance | null>(null);
   useEffect(() => {
     if (!motionMap) return;
-    let cancelled = false;
-    const apply = () => {
-      void import('./map-extra-layers').then(({ extraMapLayers }) => {
-        if (!cancelled && motionMap.getLayer('building-contact'))
-          extraMapLayers(motionMap, dark);
-      });
-    };
-    if (motionMap.getLayer('building-contact')) apply();
-    else motionMap.once('load', apply);
-    return () => {
-      cancelled = true;
-      motionMap.off('load', apply);
-    };
-  }, [motionMap, dark, selected?.id]);
-  useEffect(() => {
-    if (!motionMap) return;
     const control = new maplibregl.AttributionControl({
-        compact: true,
-        customAttribution: [
-          ...new Set(
-            data.sources
-              .map((s) => s.attribution)
-              .filter(Boolean),
-          ),
-        ].map((value) =>
-          value.replace(
-            /[&<>"']/g,
-            (c) =>
-              ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;',
-              })[c]!,
-          ),
+      compact: true,
+      customAttribution: [
+        ...new Set(data.sources.map((s) => s.attribution).filter(Boolean)),
+      ].map((value) =>
+        value.replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            })[c]!,
         ),
+      ),
     });
     motionMap.addControl(control, 'bottom-right');
-    return () => { if (motionMap.hasControl(control)) motionMap.removeControl(control); };
-
+    return () => {
+      if (motionMap.hasControl(control)) motionMap.removeControl(control);
+    };
   }, [motionMap, data.sources]);
   useEffect(() => {
     if (!editor)
@@ -246,15 +244,40 @@ export function MapView({
   const selectedBuildingId = useMemo(
     () =>
       buildingSelection?.buildingId ||
-      String(
-        data.map.features.find(
-          (f) =>
-            f.properties?.kind === 'building' &&
-            buildingPlace(data, f)?.id === selectedId,
-        )?.properties?.id || '',
-      ),
+      (selectedId
+        ? String(
+            data.map.features.find(
+              (f) =>
+                f.properties?.kind === 'building' &&
+                buildingPlace(data, f)?.id === selectedId,
+            )?.properties?.id || '',
+          )
+        : ''),
     [data, selectedId, buildingSelection?.buildingId],
   );
+  useEffect(() => {
+    if (!motionMap) return;
+    let cancelled = false;
+    const apply = () => {
+      void import('./map-extra-layers').then(({ extraMapLayers }) => {
+        if (!cancelled && motionMap.getLayer('building-contact'))
+          extraMapLayers(motionMap, dark);
+      });
+    };
+    if (motionMap.getLayer('building-contact')) apply();
+    else motionMap.once('load', apply);
+    return () => {
+      cancelled = true;
+      motionMap.off('load', apply);
+    };
+  }, [
+    motionMap,
+    dark,
+    selectedId,
+    selectedBuildingId,
+    buildingOpacity,
+    modelIds,
+  ]);
   const style = (theme: boolean): StyleSpecification => ({
     version: 8,
     glyphs: '/glyphs/{fontstack}/{range}.pbf',
@@ -839,9 +862,18 @@ export function MapView({
       } else {
         map.on('click', (event) => {
           if (map.getZoom() < CAMPUS_MIN_ZOOM) return;
-          if (map.getLayer('published-campus-outline-fill') &&
-              map.queryRenderedFeatures(event.point, { layers: ['published-campus-outline-fill', 'published-campus-labels'] })
-                .some((feature) => !feature.properties?.active)) return;
+          if (
+            map.getLayer('published-campus-outline-fill') &&
+            map
+              .queryRenderedFeatures(event.point, {
+                layers: [
+                  'published-campus-outline-fill',
+                  'published-campus-labels',
+                ],
+              })
+              .some((feature) => !feature.properties?.active)
+          )
+            return;
           const placeHit = map.queryRenderedFeatures(event.point, {
             layers: [
               'places-dot',
@@ -964,10 +996,7 @@ export function MapView({
         controller.signal.throwIfAborted();
         const world = await loadWorld(controller.signal);
         if (controller.signal.aborted || mapRef.current !== motionMap) return;
-        installWorldLayers(
-          motionMap,
-          world,
-        );
+        installWorldLayers(motionMap, world);
         applyMapTheme(motionMap, camera.current.dark);
       })
       .catch(() => {

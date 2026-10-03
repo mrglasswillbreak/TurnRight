@@ -9380,6 +9380,54 @@ test('editor reliability: imported names with extra spaces remain searchable wit
   expect(server.edits()).toHaveLength(0);
 });
 
+test('campus layer feature search resets the real scroll position and keeps results reachable', async ({ page }) => {
+  await setup(page, false, false, {
+    mutateCampus(data) {
+      const building = data.map.features.find((f) => f.properties?.kind === 'building')!;
+      data.map.features.push(...Array.from({ length: 300 }, (_, i) => ({
+        ...building,
+        properties: { ...building.properties, id: `audit-${i}`, name: `Audit building ${i}`, sourceId: `source-${i}` },
+      })));
+    },
+  });
+  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  const workspace = page.getByRole('region', { name: 'Campus layers' });
+  await workspace.getByRole('tab', { name: 'Layers', exact: true }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(workspace.getByRole('tab', { name: /^Features/ })).toBeFocused();
+  const scroller = workspace.locator('.layer-table');
+  await scroller.evaluate((el) => { el.scrollTop = 9000; });
+  await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(8000);
+  await workspace.getByLabel('Search layer features').fill('Audit building 1');
+  await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBe(0);
+  await expect(workspace.getByRole('button', { name: 'Edit Audit building 1 · source-1', exact: true })).toBeInViewport();
+  await workspace.getByLabel('Search layer features').fill('source-299');
+  await expect(workspace.getByRole('button', { name: 'Edit Audit building 299 · source-299', exact: true })).toBeInViewport();
+  await expect(workspace.getByRole('row')).toHaveCount(2);
+});
+
+test('campus layer zoom limits survive building presentation changes', async ({ page }) => {
+  await setup(page);
+  const filter = () => page.evaluate(() => JSON.stringify(window.editorTestMap.getFilter('buildings-3d')));
+  await expect.poll(filter).toContain('mapStyle_minZoom');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByLabel('Building opacity', { exact: true }).fill('0.35');
+  await expect.poll(filter).toContain('mapStyle_minZoom');
+});
+
+test('road display source excludes unrelated campus geometry without hiding editor paths', async ({ page }) => {
+  await setup(page);
+  const sources = await page.evaluate(async () => {
+    const map = window.editorTestMap;
+    const roads = await (map.getSource('road-display') as import('maplibre-gl').GeoJSONSource).getData() as import('geojson').FeatureCollection;
+    const campus = await (map.getSource('campus') as import('maplibre-gl').GeoJSONSource).getData() as import('geojson').FeatureCollection;
+    return { kinds: roads.features.map((f) => f.properties?.kind), paths: campus.features.filter((f) => f.properties?.kind === 'path').length };
+  });
+  expect(sources.kinds.length).toBeGreaterThan(0);
+  expect(sources.kinds.every((kind) => kind === 'path')).toBe(true);
+  expect(sources.paths).toBeGreaterThan(0);
+});
+
 test('campus layer explorer saves folders and release visibility', async ({
   page,
 }) => {
