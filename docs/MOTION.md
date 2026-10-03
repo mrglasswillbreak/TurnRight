@@ -10,7 +10,7 @@ Stars form a deterministic decorative sky: rotating the globe changes the visibl
 
 ![Dark globe facing the Pacific, without horizon glow](assets/screenshots/globe-dark-pacific-2026-09-27.png)
 
-**Choose a campus** frames the whole globe and opens search, pausing rotation. During active directions it leaves the camera, following and route unchanged. Closing search leaves the globe visible; choosing the current campus returns to the campus map. The canvas observes its actual container size so the globe stays centred above the mobile landscape dock when browser chrome or orientation changes.
+**Choose a campus** frames the whole globe and opens non-modal search, pausing rotation while keeping the map interactive. Published campus silhouettes, pins, labels and list entries share one selection action; overlaps offer a chooser. During active directions opening search leaves the camera, following and route unchanged; switching away requires confirmation. Closing search leaves the globe visible. Choosing the current campus returns to it, and switching campuses uses a direct 1.1–2.2 second flight while retaining the same map and chosen 2D/3D mode. Rotation and following pause during the flight; gestures interrupt it, and reduced motion skips animation. The canvas observes its actual container size so the globe stays centred above the mobile landscape dock when browser chrome or orientation changes. [Campus switching and offline discovery](CAMPUS-GLOBE.md).
 
 Status: **Awaiting device verification**. Browser simulations are software checks; they do not establish physical sensor accuracy or battery performance.
 

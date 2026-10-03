@@ -1,5 +1,11 @@
 # Responsiveness and recovery
 
+## 3 October campus discovery
+
+Discovery loads only bounded directory outlines. Campus packages load on selection, preferring verified downloaded data; the MapLibre instance survives switches. Aborted requests and generation guards prevent stale work from committing. The transition controller and world-geography installer are lazy modules. One shared overview replaces duplicate active/catalogue markers, and the selected silhouette fades out before detailed place selection.
+
+The configured build measures 434,246 public, 188,608 additional owner and 10,499 lazy photo gzip bytes, within the unchanged 435,200 / 189,440 / 12,288 limits. Lazy 3D remains 238.4 / 300 KiB. World and voice assets retain their independent 8 MiB limits. Flights last 1.1–2.2 seconds, are interruptible, and use an immediate transition with reduced motion. [Globe behavior](CAMPUS-GLOBE.md) · [Verification receipts](PRODUCTION.md).
+
 ## 30 September layers and public startup
 
 The layer explorer uses a virtualized attribute table and bounded selection. Land/overlay editing supports 20,000 vertices, while rendering vertex handles progressively in windows of 100. Projected split/merge and derived-surface generation run in a cancellable worker loaded on demand; page exit terminates pending work. Full GIS format conversion remains server-side. Polygon 96 is edited without simplifying its 6,094 vertices or 56 holes.

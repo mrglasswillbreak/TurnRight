@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { preservePublished, assetTarget } from './published-assets.mjs';
+import { validCampusOutline } from '../src/campus-outline.mjs';
 
 export function catalogueRevision(catalogue) {
   return createHash('sha256')
@@ -16,6 +17,7 @@ export function catalogueRevision(catalogue) {
             name: c.name,
             bounds: c.bounds,
             manifestUrl: c.manifestUrl,
+            ...(c.outline ? { outline: c.outline } : {}),
           })),
       }),
     )
@@ -77,6 +79,7 @@ export async function readPublishedCatalogue(origin) {
       !/^[a-z0-9][a-z0-9-]{0,79}$/.test(campus.slug) ||
       typeof campus.name !== 'string' ||
       !campus.name ||
+      (campus.outline !== undefined && !validCampusOutline(campus.outline)) ||
       !/^\/packages\/[a-z0-9-]+\/manifest\.json$/.test(campus.manifestUrl) ||
       !Array.isArray(campus.bounds) ||
       campus.bounds.length !== 2 ||
@@ -144,6 +147,19 @@ export async function preserveCampusCatalogue(
     manifests.set(campus.id, manifest);
   }
   const directory = path.join(publicDir, 'packages');
+  // Only the integrity-checked public package supplies discovery geometry.
+  // Regenerate on code builds, publication and restore, never from owner drafts.
+  for (const campus of catalogue.campuses) {
+    const manifest = manifests.get(campus.id);
+    const core = manifest.assets.find((asset) => asset.url === manifest.dataUrl);
+    if (!core) throw Error('Campus outline has no verified source asset.');
+    const bytes = await fs.readFile(assetTarget(publicDir, manifest.dataUrl));
+    if (bytes.length !== core.bytes || createHash('sha256').update(bytes).digest('hex') !== core.sha256)
+      throw Error('Campus outline source checksum mismatch.');
+    const outline = JSON.parse(bytes.toString()).boundary?.geometry;
+    if (!validCampusOutline(outline)) throw Error(`Invalid published boundary for ${campus.slug}.`);
+    campus.outline = { type: outline.type, coordinates: outline.coordinates };
+  }
   await fs.mkdir(directory, { recursive: true });
   await fs.writeFile(
     path.join(directory, 'campuses.json'),

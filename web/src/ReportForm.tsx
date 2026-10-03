@@ -14,6 +14,7 @@ export function ReportForm({
   onDone: () => void;
   onDraftSaved: () => void;
 }) {
+  const [campus] = useState(requestedCampus);
   const [category, setCategory] = useState('incorrect-place'),
     [description, setDescription] = useState(''),
     [error, setError] = useState(''),
@@ -25,11 +26,11 @@ export function ReportForm({
     getPreference(draftKey, {
       description: '',
       category: 'incorrect-place',
-    }).then((d) => {
+    }, campus).then((d) => {
       setDescription(d.description);
       setCategory(d.category);
     });
-  }, [draftKey]);
+  }, [draftKey, campus]);
   const submit = async () => {
     const point = place?.coordinates || coordinates;
     if (!point) {
@@ -43,7 +44,7 @@ export function ReportForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          campus: requestedCampus(),
+          campus,
           coordinates: point,
           placeId: place?.id,
           category,
@@ -57,7 +58,7 @@ export function ReportForm({
       }));
       if (!response.ok || result.error)
         throw new Error(result.error || 'Could not submit report');
-      await discardReportDraft(draftKey).catch(() => {});
+      await discardReportDraft(draftKey, campus).catch(() => {});
       onDraftSaved();
       onDone();
     } catch (e) {
@@ -116,10 +117,11 @@ export function ReportForm({
           variant="outline"
           onClick={async () => {
             try {
-              await setPreference(draftKey, { description, category });
+              await setPreference(draftKey, { description, category }, campus);
               const drafts = await getPreference<ReportDraft[]>(
                 'report-drafts',
                 [],
+                campus,
               );
               await setPreference(
                 'report-drafts',
@@ -132,6 +134,7 @@ export function ReportForm({
                   },
                   ...drafts.filter((d) => d.key !== draftKey),
                 ].slice(0, 30),
+                campus,
               );
               setSaved(true);
               onDraftSaved();
@@ -156,7 +159,7 @@ export function ReportForm({
         disabled={busy}
         onClick={async () => {
           try {
-            await discardReportDraft(draftKey);
+            await discardReportDraft(draftKey, campus);
             onDraftSaved();
             onDone();
           } catch {

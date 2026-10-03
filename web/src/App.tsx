@@ -1,5 +1,6 @@
 import { requestedCampus, DEFAULT_CAMPUS, rememberPublicCampus } from './campus-context';
 import type { TravelMode } from './types';
+import type { CampusSession } from './useCampusSwitch';
 import { placeMatches, streetResults } from './place-details';
 import { PlaceInformation } from './PlaceInformation';
 import { placeHasConnection } from './routing';
@@ -128,6 +129,7 @@ const categories: {
   { id: 'sports', label: 'Sports', Icon: Flag },
 ];
 export default function App() {
+  const campusScope = useRef(requestedCampus());
   const { preference: appearance, dark, setAppearance } = useAppearance();
   const [data, setData] = useState<CampusData | null>(null),
     [manifest, setManifest] = useState<CampusPackage | null>(null),
@@ -184,9 +186,10 @@ export default function App() {
     { key: string; name: string; placeId?: string; coordinates: Position }[]
   >([]);
   const refreshDrafts = () => {
-    void getPreference<typeof reportDrafts>('report-drafts', []).then(
-      setReportDrafts,
-    );
+    const campus = campusScope.current;
+    void getPreference<typeof reportDrafts>('report-drafts', [], campus).then((drafts) => {
+      if (campusScope.current === campus) setReportDrafts(drafts);
+    });
   };
   const startRequested = useRef(false);
   const [dialog, setDialog] = useState<
@@ -296,7 +299,7 @@ export default function App() {
     return loadCampus(
       location.pathname.startsWith('/admin')
         ? DEFAULT_CAMPUS
-        : requestedCampus(),
+        : campusScope.current,
     )
       .then((result) => {
         if (generation !== downloadGeneration.current) return;
@@ -322,8 +325,10 @@ export default function App() {
       });
   };
   const checkUpdates = async (announce = false) => {
+    const campus = campusScope.current;
     try {
-      const next = await latestPackage();
+      const next = await latestPackage(campus);
+      if (campusScope.current !== campus) return;
       setLatest(next);
       if (announce)
         setToast(
@@ -332,17 +337,18 @@ export default function App() {
             : 'A new campus map is available in Offline Maps.',
         );
     } catch (e) {
-      if (announce) setToast((e as Error).message);
+      if (announce && campusScope.current === campus) setToast((e as Error).message);
     }
   };
   const checkUpdatesEvent = useEffectEvent(checkUpdates);
   useEffect(() => {
-    void activatePending()
+    const campus = campusScope.current;
+    void activatePending(campus)
       .catch(() => false)
-      .then(reloadData);
+      .then(() => { if (campusScope.current === campus) return reloadData(); });
     void checkUpdatesEvent();
-    getPreference('saved', [] as string[]).then(setSaved);
-    getPreference('recent', [] as string[]).then(setRecent);
+    getPreference('saved', [] as string[], campus).then((ids) => { if (campusScope.current === campus) setSaved(ids); });
+    getPreference('recent', [] as string[], campus).then((ids) => { if (campusScope.current === campus) setRecent(ids); });
     getPreference('muted', false).then(setMuted);
     refreshDrafts();
     if ('serviceWorker' in navigator) {
@@ -417,7 +423,7 @@ export default function App() {
       const next = resolvePlaceIds(data, ids);
       if (JSON.stringify(next) !== JSON.stringify(ids)) {
         set(next);
-        void setPreference(key, next).catch(() =>
+        void setPreference(key, next, campusScope.current).catch(() =>
           setToast(
             'Place links updated for this session. Storage could not save the change.',
           ),
@@ -426,11 +432,13 @@ export default function App() {
     }
   }, [data, saved, recent]);
   useEffect(() => {
+    let cancelled = false;
     if (packageVersion)
       void voice.current
         .load(packageVersion)
-        .then(setVoiceMode)
-        .catch(() => setVoiceMode('unavailable'));
+        .then((mode) => { if (!cancelled) setVoiceMode(mode); })
+        .catch(() => { if (!cancelled) setVoiceMode('unavailable'); });
+    return () => { cancelled = true; };
   }, [packageVersion]);
   useEffect(() => {
     if (!toast) return;
@@ -584,7 +592,7 @@ export default function App() {
         12,
       );
       setRecent(next);
-      void setPreference('recent', next);
+      void setPreference('recent', next, campusScope.current);
     },
     [navigating, recent, setPanelExpanded],
   );
@@ -656,6 +664,7 @@ export default function App() {
   );
   const openDestinationLink = useEffectEvent(() => {
     if (!data || location.pathname.startsWith('/admin')) return;
+    if (requestedCampus() !== campusScope.current) return;
     const stamp = `${location.search}:${data.version}`;
     if (sharedLinkOpened.current === stamp) return;
     const shared = sharedDestination(data, location.href);
@@ -711,7 +720,7 @@ export default function App() {
       ? saved.filter((id) => id !== selected.id)
       : [...saved, selected.id];
     setSaved(next);
-    void setPreference('saved', next);
+    void setPreference('saved', next, campusScope.current);
   };
   const previewRoute = async (
     from = origin,
@@ -850,9 +859,9 @@ export default function App() {
       setRerouting(false);
       setRouteError('');
     } catch (e) {
-      setRouteError((e as Error).message);
+      if (request === routeRequest.current) setRouteError((e as Error).message);
     } finally {
-      setBusy(false);
+      if (request === routeRequest.current) setBusy(false);
     }
   };
   const finishStart = useEffectEvent(() => {
@@ -869,6 +878,7 @@ export default function App() {
   });
   useEffect(() => finishStart(), [gps.fix?.timestamp]);
   const stopNavigation = async () => {
+    const campus = campusScope.current;
     startRequested.current = false;
     routeRequest.current++;
     setNavigating(false);
@@ -877,13 +887,33 @@ export default function App() {
     gps.stop();
     voice.current.stop();
     setNav(initialNavigation);
-    if (await activatePending()) {
+    if (await activatePending(campus) && campus === campusScope.current) {
       await reloadData();
       setSelected(null);
       setRouteView(false);
       setRoutes([]);
       setToast('Your downloaded map update is now active.');
     }
+  };
+  const commitCampus = ({ result, saved, recent, reportDrafts }: CampusSession) => {
+    campusScope.current = result.manifest.campus?.slug || DEFAULT_CAMPUS;
+    const generation = ++downloadGeneration.current;
+    routeRequest.current++; startRequested.current = false;
+    gps.stop(); voice.current.stop();
+    sharedLinkOpened.current = '';
+    setData(result.data); setManifest(result.manifest); setLatest(null);
+    setDownloaded(result.downloaded); setCheckingDownload(!!result.verification);
+    void result.verification?.then((complete) => {
+      if (downloadGeneration.current === generation) { setDownloaded(complete); setCheckingDownload(false); }
+    });
+    setSaved(saved); setRecent(recent); setReportDrafts(reportDrafts);
+    setSelected(null); setSelectedStreet(null); setUnlinkedBuilding(null);
+    setQuery(''); setCategory('all'); setSavedOnly(false); setSearching(false);
+    setEntranceId(''); setParkingId(''); setOrigin('gps'); setChosen(0); setActiveLeg(0);
+    setRoutes([]); setRouteView(false); setNavigating(false); setNav(initialNavigation);
+    setBusy(false); setRerouting(false); setFollow(false);
+    setDialog(null); setReportPin(undefined); setShareFallback(''); setSharedLinkMissing(false);
+    setLoadError(''); setToast(''); setRouteError(''); setVoicePreviewFeedback(''); setPreviewingVoice(false);
   };
   if (!data || !manifest)
     return (
@@ -1073,7 +1103,13 @@ export default function App() {
               map={campusMap}
               navigating={navigating}
               onStop={stopNavigation}
-              bounds={data.bounds}
+              campus={{ id: manifest.campus?.id || DEFAULT_CAMPUS, slug: campusScope.current,
+                name: campusName, bounds: data.bounds,
+                outline: data.boundary.geometry.type === 'Polygon' || data.boundary.geometry.type === 'MultiPolygon'
+                  ? data.boundary.geometry : undefined }}
+              dark={dark}
+              threeD={threeD}
+              onCommit={commitCampus}
               onOpenChange={setCampusSearch}
               onBrowse={() => setFollow(false)}
             />
@@ -1668,6 +1704,7 @@ export default function App() {
             )}
             {dialog === 'offline' && (
               <OfflinePanel
+                key={campusScope.current}
                 manifest={manifest}
                 latest={latest}
                 downloaded={downloaded}
@@ -1676,11 +1713,13 @@ export default function App() {
                 swReady={swReady}
                 onCheck={() => void checkUpdates(true)}
                 onDelete={() => {
+                  if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
                   downloadGeneration.current++;
                   setDownloaded(false);
                   setCheckingDownload(false);
                 }}
                 onInstall={(nextData, nextManifest, pending) => {
+                  if ((nextManifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
                   downloadGeneration.current++;
                   setCheckingDownload(false);
                   setDownloaded(true);
@@ -1702,10 +1741,12 @@ export default function App() {
             {dialog === 'report' && (
               <Suspense fallback={<p>Loading report form...</p>}>
                 <ReportForm
+                  key={campusScope.current}
                   onDraftSaved={refreshDrafts}
                   place={selected}
                   coordinates={reportPin}
                   onDone={() => {
+                    if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
                     setDialog(null);
                     setToast(
                       'Report submitted. Thank you for helping improve the map.',
@@ -1770,21 +1811,27 @@ export default function App() {
                   variant="outline"
                   disabled={muted || navigating || previewingVoice}
                   onClick={async () => {
+                    const scope = campusScope.current;
                     setPreviewingVoice(true);
                     setVoicePreviewFeedback('');
                     try {
                       await voice.current.unlock();
-                      setVoiceMode(await voice.current.load(manifest.version));
+                      if (scope !== campusScope.current) return;
+                      const mode = await voice.current.load(manifest.version);
+                      if (scope !== campusScope.current) return;
+                      setVoiceMode(mode);
                       await voice.current.preview();
+                      if (scope !== campusScope.current) return;
                       setVoicePreviewFeedback('Voice preview played.');
                     } catch (error) {
+                      if (scope !== campusScope.current) return;
                       setVoicePreviewFeedback(
                         error instanceof Error
                           ? error.message
                           : 'Audio is unavailable. Check device volume and download the campus map.',
                       );
                     } finally {
-                      setPreviewingVoice(false);
+                      if (scope === campusScope.current) setPreviewingVoice(false);
                     }
                   }}
                 >

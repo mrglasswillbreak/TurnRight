@@ -11,8 +11,26 @@
   overflow: auto;
 }
 .campus-chooser-backdrop[data-slot='dialog-overlay'] {
+  display: none;
   background: transparent;
   backdrop-filter: none;
+}
+.campus-switch-status {
+  position: fixed;
+  z-index: 45;
+  top: max(88px, env(safe-area-inset-top));
+  right: 16px;
+  max-width: min(340px, calc(100% - 32px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 8px 32px #142b3b26;
 }
 @media (max-width: 599px) {
   .campus-chooser[data-slot='dialog-content'] {

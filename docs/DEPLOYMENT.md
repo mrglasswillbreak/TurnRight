@@ -1,5 +1,11 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Campus silhouettes and in-place switching
+
+This application-only rollout needs no migration or owner data publication. Keep `PUBLISHED_MAP_URL` enabled: the preservation step verifies all retained package assets and derives directory outlines from their exact published boundaries, backfilling existing campuses. Package manifests and core hashes must remain unchanged. The optional directory field is compatible with older clients; outline changes participate in release revision checks while legacy directories keep their previous hashes.
+
+Run the [globe checks](CAMPUS-GLOBE.md#verification), configured bundle budgets and real-package/offline verification before promotion. Verify both served outlines against the released core boundaries, campus switching/history, downloaded and unavailable offline targets, and retained immutable assets after deployment. Roll back application code through the normal deployment process; do not restore or republish owner drafts for this change. [Dated release evidence](PRODUCTION.md).
+
 ## Campus layer rollout
 
 Capture and verify private source/draft backups and the immutable published snapshots for both campuses. Apply additive migrations `020_campus_layer_records.sql` and `021_reviewed_release_snapshot.sql` after 019 before enabling their writers. Migration 020 preserves revision checks, campus isolation, atomic feature/layer saves and metadata when older clients save existing features. Migration 021 gives only the service-role reviewed-snapshot RPC a bounded 60-second allowance; ordinary API timeouts and browser grants remain unchanged. Keep this guard when rolling back application code.

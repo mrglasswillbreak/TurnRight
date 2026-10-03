@@ -6,6 +6,7 @@ TurnRight combines a public campus navigation PWA, a private GIS/map workspace a
 
 | Task | Guide |
 | --- | --- |
+| Select campus silhouettes, switch smoothly and use downloaded campuses offline | [Campus globe](CAMPUS-GLOBE.md) |
 | Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |
 | Inspect published LASU road estimates, reviewed sources and landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |

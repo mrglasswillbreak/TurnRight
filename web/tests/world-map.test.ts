@@ -5,17 +5,12 @@ import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import type { Map as MapInstance, StyleSpecification } from 'maplibre-gl';
 import {
   CAMPUS_MIN_ZOOM,
-  WORLD_MAX_BYTES,
   WORLD_MIN_ZOOM,
   WORLD_PROJECTION,
-  WORLD_URL,
   followZoom,
-  installWorldLayers,
-  loadWorld,
   returnToCampus,
-  validWorldData,
-  type WorldData,
 } from '../src/world-map';
+import { WORLD_MAX_BYTES, WORLD_URL, installWorldLayers, loadWorld, validWorldData, type WorldData } from '../src/world-overview';
 import { mapTheme } from '../src/map-theme';
 
 const bytes = readFileSync(
@@ -154,6 +149,7 @@ describe('offline world overview', () => {
       const map = {
         on: vi.fn(),
         getSource: (id: string) => style.sources[id],
+        getLayer: (id: string) => style.layers.find((layer) => layer.id === id),
         addSource: (
           id: string,
           source: StyleSpecification['sources'][string],
@@ -166,10 +162,7 @@ describe('offline world overview', () => {
           minimum = zoom;
         },
       } as unknown as MapInstance;
-      installWorldLayers(map, data, [
-        [3.19, 6.45],
-        [3.21, 6.47],
-      ]);
+      installWorldLayers(map, data);
       const theme = mapTheme(dark);
       for (const layer of style.layers) {
         Object.assign(layer, {
@@ -192,10 +185,7 @@ describe('offline world overview', () => {
         0,
       ]);
       const count = style.layers.length;
-      installWorldLayers(map, data, [
-        [3.19, 6.45],
-        [3.21, 6.47],
-      ]);
+      installWorldLayers(map, data);
       expect(style.layers).toHaveLength(count);
     }
   });

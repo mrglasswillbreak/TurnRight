@@ -54,38 +54,39 @@ export const hashBytes = async (bytes: ArrayBuffer) =>
   Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
-const preferenceKey = (key: string) =>
+const preferenceKey = (key: string, campus = requestedCampus()) =>
   /^(saved$|recent$|report|editor-workspace:|photo-)/.test(key)
-    ? campusKey(key)
+    ? campusKey(key, campus)
     : key;
-export async function getPreference<T>(key: string, fallback: T): Promise<T> {
-  key = preferenceKey(key);
+export async function getPreference<T>(key: string, fallback: T, campus = requestedCampus()): Promise<T> {
+  key = preferenceKey(key, campus);
   try {
     return (await (await database()).get('preferences', key)) ?? fallback;
   } catch {
     return fallback;
   }
 }
-export async function setPreference(key: string, value: unknown) {
-  key = preferenceKey(key);
+export async function setPreference(key: string, value: unknown, campus = requestedCampus()) {
+  key = preferenceKey(key, campus);
   await (await database()).put('preferences', value, key);
 }
-export async function discardReportDraft(key: string) {
+export async function discardReportDraft(key: string, campus = requestedCampus()) {
   const transaction = (await database()).transaction(
     'preferences',
     'readwrite',
   );
   const drafts: ReportDraft[] =
-    (await transaction.store.get(campusKey('report-drafts'))) || [];
-  await transaction.store.delete(preferenceKey(key));
+    (await transaction.store.get(campusKey('report-drafts', campus))) || [];
+  await transaction.store.delete(preferenceKey(key, campus));
   await transaction.store.put(
     drafts.filter((draft) => draft.key !== key),
-    campusKey('report-drafts'),
+    campusKey('report-drafts', campus),
   );
   await transaction.done;
 }
 export async function latestPackage(
   campus = requestedCampus(),
+  signal?: AbortSignal,
 ): Promise<CampusPackage> {
   let url = '/packages/latest.json';
   if (campus !== DEFAULT_CAMPUS) {
@@ -99,7 +100,7 @@ export async function latestPackage(
   }
   const response = await fetch(url, {
     cache: 'no-store',
-    signal: AbortSignal.timeout(15000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
   });
   if (!response.ok)
     throw new Error(
@@ -112,14 +113,14 @@ export async function latestPackage(
     throw new Error('Campus package identity does not match this link.');
   return manifest;
 }
-export async function getActivePackage(): Promise<{
+export async function getActivePackage(campus = requestedCampus()): Promise<{
   manifest: CampusPackage;
   data: CampusData;
   complete: boolean;
   visualsComplete: boolean;
 } | null> {
   const db = await database();
-  const version = await db.get('meta', campusKey('active'));
+  const version = await db.get('meta', campusKey('active', campus));
   const record = version && (await db.get('packages', version));
   if (!record) return null;
   const visualUrls = new Set<string>([
@@ -240,7 +241,7 @@ async function verifiedAsset(response: Response, asset: PackageAsset) {
     (await hashBytes(bytes)) === asset.sha256
   );
 }
-export async function loadCampus(campus = requestedCampus()): Promise<{
+export async function loadCampus(campus = requestedCampus(), signal?: AbortSignal): Promise<{
   data: CampusData;
   manifest: CampusPackage;
   downloaded: boolean;
@@ -278,9 +279,11 @@ export async function loadCampus(campus = requestedCampus()): Promise<{
         };
     }
   }
-  const manifest = await latestPackage(campus);
+  signal?.throwIfAborted();
+  if (navigator.onLine === false) throw new Error('This campus is not downloaded. Connect to the internet to open it.');
+  const manifest = await latestPackage(campus, signal);
   const response = await fetch(manifest.dataUrl, {
-    signal: AbortSignal.timeout(20000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000),
   }).catch((error) => {
     if (error instanceof DOMException && error.name === 'TimeoutError')
       throw new Error(
@@ -294,13 +297,13 @@ export async function loadCampus(campus = requestedCampus()): Promise<{
     );
   const bytes = await response.arrayBuffer();
   const asset = manifest.assets.find((a) => a.url === manifest.dataUrl);
-  if (!asset || (await hashBytes(bytes)) !== asset.sha256)
+  if (!asset || bytes.byteLength !== asset.bytes || (await hashBytes(bytes)) !== asset.sha256)
     throw new Error(
       'Campus data did not pass its integrity check. Please retry.',
     );
   const data = JSON.parse(new TextDecoder().decode(bytes)) as CampusData;
   if (
-    data.schemaVersion !== manifest.schemaVersion ||
+    data.version !== manifest.version || data.schemaVersion !== manifest.schemaVersion ||
     structuralIssues(data).length
   )
     throw new Error('This campus package is invalid or needs a newer app.');
@@ -420,20 +423,21 @@ export async function installPackage(
   await navigator.storage?.persist?.().catch(() => false);
   return data;
 }
-export async function activatePending() {
+export async function activatePending(campus = requestedCampus()) {
   const db = await database(),
-    pending = await db.get('meta', campusKey('pending'));
+    pending = await db.get('meta', campusKey('pending', campus));
   if (!pending) return false;
   const record = await db.get('packages', pending);
   if (
     !record ||
+    packageCampus(record.manifest) !== campus ||
     !visualManifestMatches(record.data, record.manifest) ||
     (await auditAssets(record.manifest)).some((present) => !present)
   )
     return false;
   const tx = db.transaction('meta', 'readwrite');
-  await tx.store.put(pending, campusKey('active'));
-  await tx.store.delete(campusKey('pending'));
+  await tx.store.put(pending, campusKey('active', campus));
+  await tx.store.delete(campusKey('pending', campus));
   await tx.done;
   return true;
 }

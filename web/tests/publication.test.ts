@@ -15,6 +15,8 @@ describe("deployment success gates", () => {
     if (!path.resolve(deployment).startsWith(prefix)) throw new Error("Unexpected temporary build directory");
     try {
       cpSync(new URL("../scripts", import.meta.url), path.join(deployment, "scripts"), { recursive: true });
+      mkdirSync(path.join(deployment, "src"));
+      cpSync(new URL("../src/campus-outline.mjs", import.meta.url), path.join(deployment, "src/campus-outline.mjs"));
       mkdirSync(path.join(deployment, "public/packages"), { recursive: true });
       writeFileSync(path.join(deployment, "release-build.json"), JSON.stringify({ version: "lasu-test" }));
       writeFileSync(path.join(deployment, "public/packages/latest.json"), JSON.stringify({ version: "lasu-test" }));

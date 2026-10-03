@@ -1,4 +1,6 @@
 import type { CampusData, CampusPackage, Position } from './types.js';
+import type { Polygon, MultiPolygon } from 'geojson';
+import { validCampusOutline } from './campus-outline.mjs';
 
 export const DEFAULT_CAMPUS = 'lasu';
 export interface CampusIdentity {
@@ -7,6 +9,7 @@ export interface CampusIdentity {
   name: string;
   bounds: [Position, Position];
   manifestUrl?: string;
+  outline?: Polygon | MultiPolygon;
 }
 export interface CampusCatalogue {
   schemaVersion: 1;
@@ -45,7 +48,7 @@ export function validCatalogue(value: unknown): value is CampusCatalogue {
   if (
     c?.schemaVersion !== 1 ||
     !Array.isArray(c.campuses) ||
-    !c.campuses.length
+    !c.campuses.length || c.campuses.length > 1000
   )
     return false;
   const ids = new Set<string>(),
@@ -59,6 +62,7 @@ export function validCatalogue(value: unknown): value is CampusCatalogue {
       !/^[a-z0-9][a-z0-9-]{0,79}$/.test(p.slug) ||
       typeof p.name !== 'string' ||
       !p.name.trim() ||
+      (p.outline !== undefined && !validCampusOutline(p.outline)) ||
       !Array.isArray(p.bounds) ||
       p.bounds.length !== 2 ||
       !p.bounds.every(
