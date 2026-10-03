@@ -9406,6 +9406,50 @@ test('campus layer feature search resets the real scroll position and keeps resu
   await expect(workspace.getByRole('row')).toHaveCount(2);
 });
 
+test('public phone map credits stay readable and clear of the panel', async ({ page }, info) => {
+  await setup(page, false, false, {
+    mutateCampus(data) {
+      data.sources.push({ id: 'credit-test', name: 'Campus survey', url: 'https://example.test', license: 'Test fixture', retrievedAt: '2026-10-03', attribution: 'Campus source attribution. '.repeat(50) });
+    },
+  });
+  await page.goto('/');
+  await attachMap(page);
+  const credits = page.locator('.maplibregl-ctrl-attrib');
+  const toggle = credits.locator('summary');
+  const content = credits.locator('.maplibregl-ctrl-attrib-inner');
+  await expect(content).toBeHidden();
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const dark of [false, true]) {
+      await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), dark);
+      await toggle.focus();
+      await page.keyboard.press('Enter');
+      await expect(content).toBeVisible();
+      const panel = await page.locator('.explore-panel').boundingBox();
+      const box = await credits.boundingBox();
+      const button = await toggle.boundingBox();
+      expect(box!.y + box!.height).toBeLessThan(panel!.y);
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      expect(button!.width).toBeGreaterThanOrEqual(44);
+      expect(button!.height).toBeGreaterThanOrEqual(44);
+      await expect(content).toHaveCSS('font-size', '12px');
+      await page.screenshot({ path: info.outputPath(`credits-${width}-${dark ? 'dark' : 'light'}.png`) });
+      await page.keyboard.press('Enter');
+      await expect(content).toBeHidden();
+    }
+  }
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
+  await toggle.click();
+  await expect(content).toBeVisible();
+  expect(await content.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return el.contains(document.elementFromPoint(r.x + 20, r.bottom - 15));
+  })).toBe(true);
+  await toggle.click();
+  await expect(content).toBeHidden();
+});
+
 test('campus layer zoom limits survive building presentation changes', async ({ page }) => {
   await setup(page);
   const filter = () => page.evaluate(() => JSON.stringify(window.editorTestMap.getFilter('buildings-3d')));

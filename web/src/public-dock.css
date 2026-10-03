@@ -381,7 +381,47 @@
   bottom: 30px;
 }
 .app-shell .maplibregl-ctrl-bottom-right {
-  bottom: 0;
+  top: 84px;
+  right: 12px;
+  bottom: auto;
+  z-index: 20;
+}
+.app-shell .maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 0;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px #142b3b1a;
+}
+.app-shell .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button {
+  width: 44px;
+  height: 44px;
+  left: auto;
+  right: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.dark .app-shell .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+.app-shell .maplibregl-ctrl-attrib-inner {
+  box-sizing: border-box;
+  max-width: min(360px, calc(100vw - 24px));
+  max-height: min(35dvh, 250px);
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 12px 52px 12px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.app-shell .maplibregl-ctrl-attrib a {
+  color: inherit;
+  text-decoration: underline;
 }
 .app-shell .toast {
   top: 16px;

@@ -204,10 +204,15 @@ export function MapView({
       ),
     });
     motionMap.addControl(control, 'bottom-right');
+    if (!editor) {
+      const credits = motionMap.getContainer().querySelector('details.maplibregl-ctrl-attrib');
+      credits?.removeAttribute('open');
+      credits?.classList.remove('maplibregl-compact-show');
+    }
     return () => {
       if (motionMap.hasControl(control)) motionMap.removeControl(control);
     };
-  }, [motionMap, data.sources]);
+  }, [motionMap, data.sources, editor]);
   useEffect(() => {
     if (!editor)
       document.title =
