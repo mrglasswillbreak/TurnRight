@@ -42,7 +42,10 @@ npm run lint
 npm run check:configured-build
 npx playwright test tests/browser/campus-globe-switching.spec.ts tests/browser/globe-search.spec.ts
 npx playwright test --config playwright.webkit.config.ts tests/browser/campus-globe-switching.spec.ts tests/browser/globe-search.spec.ts
+node scripts/verify-campus-globe.mjs
 ```
+
+The final command checks the public origin by default, verifies all package assets and runs the 32-view campus/browser/viewport/theme/view matrix plus downloaded-campus switching and reopening offline. Set `VERIFY_ORIGIN` for a preview and `VERIFY_BASELINE` to a captured receipt when comparing unchanged packages. GitHub's **Verify published campus globe** workflow runs the same check and retains its report and unaltered screenshots. It uses public assets only.
 
 Unit tests cover boundary validation, multipart shapes/holes, legacy revisions, wraparound, flight duration, overview styles/overlaps, explicit storage scopes and missing offline targets. Browser tests exercise the real MapLibre instance, selection, history, failure/retry, superseded loads, active-direction confirmation and downloaded/undownloaded offline targets. Production receipts record the executed suites, served package hashes and screenshots. Physical Android/iPhone checks and campus field verification remain separate and pending.
 
