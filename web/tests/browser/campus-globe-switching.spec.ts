@@ -253,7 +253,7 @@ test('campus globe silhouette and pin clicks share selection and leave detailed 
   let hit = await point(page, [3.405, 6.48]);
   await page.mouse.click(hit.x, hit.y);
   await selected(page, 'north');
-  await page.waitForFunction(() => !window.editorTestMap.isMoving());
+  await page.waitForFunction(() => window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving());
   await page.evaluate(() => window.editorTestMap.jumpTo({ center: [3.401, 6.46], zoom: 17 }));
   await page.waitForFunction(() => window.editorTestMap.loaded());
   const library = await point(page, [3.401, 6.46]);
@@ -359,6 +359,7 @@ test('campus globe uses verified offline targets, refuses missing downloads and 
   await context.setOffline(true);
   await choose(page, 'north campus');
   await selected(page, 'north');
+  await page.waitForFunction(() => window.editorTestMap.getZoom() > 12);
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
