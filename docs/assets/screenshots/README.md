@@ -2,7 +2,7 @@
 
 ## Clickable campus silhouettes · 3 October 2026
 
-`campus-silhouettes-desktop-2026-10-03.png` is an unaltered Chromium capture at 1440×1000 of the release build using the exact published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages. It shows both directory boundaries, one pin/label per campus and the stronger selected-campus outline. `web/scripts/verify-campus-globe.mjs` reproduces the capture and checks real-boundary clicks, map-instance retention, both themes and view modes, scoped offline switching and reopening. This capture comes from the local release verification; [Production](../../PRODUCTION.md) records deployment and served verification separately. Phone views are browser simulations; no images are composited or retouched.
+`campus-silhouettes-desktop-2026-10-03.png` is an unaltered Chromium capture at 1440×1000 of the live production release using the exact published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages. It shows both directory boundaries, one pin/label per campus and the stronger selected-campus outline. `web/scripts/verify-campus-globe.mjs` reproduces the capture and checks real-boundary clicks, map-instance retention, both themes and view modes, scoped offline switching and reopening. This capture comes from the [successful public-origin verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/37099018264), which covers all 32 campus/browser/viewport/theme/view combinations; [Production](../../PRODUCTION.md) records the deployment and unchanged package hashes. Phone views are browser simulations; no images are composited or retouched.
 
 ## Published UNILAG layers · 1 October 2026
 

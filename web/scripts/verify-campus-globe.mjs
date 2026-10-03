@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { chromium, webkit, expect } from '@playwright/test';
 import { validCampusOutline } from '../src/campus-outline.mjs';
+import { assertCampusCapture } from './assert-campus-capture.mjs';
 
 const origin = process.env.VERIFY_ORIGIN || 'https://turnright.vercel.app';
 const output = path.resolve(process.env.VERIFY_OUTPUT || 'work/campus-globe-verification');
@@ -135,7 +136,8 @@ for (const [engine, launcher] of [['chromium', chromium], ['webkit', webkit]]) {
             assert.equal(state.pitch, threeD ? (mobile ? 40 : 45) : 0);
             assert.deepEqual(state.boundary.features[0].geometry, campus.data.boundary.geometry);
             const filename = `${engine}-${campus.entry.slug}-${mobile ? 'mobile' : 'desktop'}-${theme}-${threeD ? '3d' : '2d'}.png`;
-            await page.screenshot({ path: path.join(output, filename) });
+            const capture = await page.screenshot({ path: path.join(output, filename) });
+            await assertCampusCapture(capture, filename);
             report.views.push({ engine, campus: campus.entry.slug, mobile, theme, pitch: state.pitch, filename });
             // Both real silhouettes visible together; click and retain the same canvas.
             await page.evaluate((phone) => window.globeMap.jumpTo({ center: [3.297, 6.493], zoom: phone ? 10.25 : 10.8, pitch: 0 }), mobile);

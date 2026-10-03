@@ -6,7 +6,7 @@ Verify exact published Polygon/MultiPolygon outlines, holes, legacy pin-only dir
 
 Verify target loading, failure/Retry, rapid selections, Back/Forward with shared destinations, last-campus memory and explicit campus links. Saved places, recents, report drafts, attribution and offline state must follow the selected campus. Active directions require confirmation before switching away. Test both a verified downloaded target and an unavailable target offline; then reopen plain `/` with the origin unavailable. Retain the same MapLibre instance throughout in-place switches and compare package/core/graph hashes with the pre-deployment baseline.
 
-The 3 October local release check passes all 180 asset hashes, eight real-package views, both browser engines' offline switching/reopening, and 696 unit tests across 97 files. [Globe guide](CAMPUS-GLOBE.md), [machine-readable receipt](assets/campus-globe-local-2026-10-03.json) and [production record](PRODUCTION.md) separate local, CI and deployed results. Physical-device and field checks remain pending.
+The 3 October production check passes all 180 served asset hashes, all 32 real-package campus/browser/viewport/theme/view combinations, and both browser engines' offline switching/reopening. The final eight-job audit passes 696 unit tests across 97 files and the relevant browser/offline suites. [Globe guide](CAMPUS-GLOBE.md), [machine-readable served receipt](assets/campus-globe-production-2026-10-03.json) and [production record](PRODUCTION.md) separate local, CI and deployed results. Physical-device and field checks remain pending.
 
 ## Current layers, road editing and campus reopening
 

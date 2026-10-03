@@ -1,0 +1,134 @@
+{
+  "checkedAt": "2026-10-03T05:27:38.439Z",
+  "views": [
+    {
+      "file": "chromium-unilag-desktop-light-3d.png",
+      "colours": 6705
+    },
+    {
+      "file": "chromium-lasu-desktop-light-3d.png",
+      "colours": 4045
+    },
+    {
+      "file": "chromium-unilag-desktop-light-2d.png",
+      "colours": 6882
+    },
+    {
+      "file": "chromium-lasu-desktop-light-2d.png",
+      "colours": 3584
+    },
+    {
+      "file": "chromium-unilag-desktop-dark-3d.png",
+      "colours": 5980
+    },
+    {
+      "file": "chromium-lasu-desktop-dark-3d.png",
+      "colours": 3606
+    },
+    {
+      "file": "chromium-unilag-desktop-dark-2d.png",
+      "colours": 5214
+    },
+    {
+      "file": "chromium-lasu-desktop-dark-2d.png",
+      "colours": 3228
+    },
+    {
+      "file": "chromium-unilag-mobile-light-3d.png",
+      "colours": 5789
+    },
+    {
+      "file": "chromium-lasu-mobile-light-3d.png",
+      "colours": 3758
+    },
+    {
+      "file": "chromium-unilag-mobile-light-2d.png",
+      "colours": 6113
+    },
+    {
+      "file": "chromium-lasu-mobile-light-2d.png",
+      "colours": 3876
+    },
+    {
+      "file": "chromium-unilag-mobile-dark-3d.png",
+      "colours": 4130
+    },
+    {
+      "file": "chromium-lasu-mobile-dark-3d.png",
+      "colours": 3480
+    },
+    {
+      "file": "chromium-unilag-mobile-dark-2d.png",
+      "colours": 4062
+    },
+    {
+      "file": "chromium-lasu-mobile-dark-2d.png",
+      "colours": 2647
+    },
+    {
+      "file": "webkit-unilag-desktop-light-3d.png",
+      "colours": 6654
+    },
+    {
+      "file": "webkit-lasu-desktop-light-3d.png",
+      "colours": 4026
+    },
+    {
+      "file": "webkit-unilag-desktop-light-2d.png",
+      "colours": 7102
+    },
+    {
+      "file": "webkit-lasu-desktop-light-2d.png",
+      "colours": 3884
+    },
+    {
+      "file": "webkit-unilag-desktop-dark-3d.png",
+      "colours": 5891
+    },
+    {
+      "file": "webkit-lasu-desktop-dark-3d.png",
+      "colours": 3621
+    },
+    {
+      "file": "webkit-unilag-desktop-dark-2d.png",
+      "colours": 5162
+    },
+    {
+      "file": "webkit-lasu-desktop-dark-2d.png",
+      "colours": 3088
+    },
+    {
+      "file": "webkit-unilag-mobile-light-3d.png",
+      "colours": 5586
+    },
+    {
+      "file": "webkit-lasu-mobile-light-3d.png",
+      "colours": 4251
+    },
+    {
+      "file": "webkit-unilag-mobile-light-2d.png",
+      "colours": 6560
+    },
+    {
+      "file": "webkit-lasu-mobile-light-2d.png",
+      "colours": 4344
+    },
+    {
+      "file": "webkit-unilag-mobile-dark-3d.png",
+      "colours": 4519
+    },
+    {
+      "file": "webkit-lasu-mobile-dark-3d.png",
+      "colours": 4199
+    },
+    {
+      "file": "webkit-unilag-mobile-dark-2d.png",
+      "colours": 3940
+    },
+    {
+      "file": "webkit-lasu-mobile-dark-2d.png",
+      "colours": 3175
+    }
+  ],
+  "blankCaptureRejected": true
+}
