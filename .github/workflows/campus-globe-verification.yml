@@ -20,6 +20,8 @@ jobs:
         working-directory: web
       - run: node scripts/verify-campus-globe.mjs
         working-directory: web
+        env:
+          VERIFY_BASELINE: ../docs/assets/campus-globe-baseline-2026-10-03.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

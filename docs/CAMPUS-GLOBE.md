@@ -8,6 +8,8 @@ Every directory entry represents a published campus. Distant campuses have a pin
 
 Select a silhouette, pin, label or list entry to open that campus. Nearby hits use a larger touch target. Overlapping campus hits open **Choose a campus here**; the list is also the keyboard-accessible alternative. Older directories without outlines retain pins. Private campuses and owner draft boundaries do not appear.
 
+![Published LASU and UNILAG boundary silhouettes](assets/screenshots/campus-silhouettes-desktop-2026-10-03.png)
+
 The existing map stays mounted. **Opening [campus]…** appears while the target package is loaded and validated; the current campus remains usable. On success the campus, explicit URL and last-campus preference change together. A direct flight takes 1.1–2.2 seconds according to distance, zooms out only as needed and fits the destination around the visible panel. It preserves the selected 2D/3D mode and finishes north-up. An already-centred target uses a straight zoom. Reduced motion uses an immediate transition.
 
 Map gestures interrupt the flight without reverting the successful switch. Rotation and location following pause during the transition. Selecting the current campus returns the camera to it. Switching away from active directions first requires **Stop and switch campus**; closing the confirmation retains the walk.

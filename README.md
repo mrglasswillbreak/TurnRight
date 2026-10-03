@@ -25,6 +25,8 @@ Both upgrades preserve existing destination identities, routing graphs, permissi
 
 The dated campus captures show real packages. Editor examples use isolated owner/API fixtures; phone images are browser simulations. Capture provenance identifies each release and distinguishes historical examples. [Capture provenance](docs/assets/screenshots/README.md).
 
+![Clickable LASU and UNILAG silhouettes, with the selected LASU outline highlighted](docs/assets/screenshots/campus-silhouettes-desktop-2026-10-03.png)
+
 | UNILAG · light, 3D | UNILAG · dark, 2D |
 | --- | --- |
 | ![Published UNILAG roads, landscape and controls above the desktop panel](docs/assets/screenshots/unilag-desktop-layer-controls-2026-10-01.jpg) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |

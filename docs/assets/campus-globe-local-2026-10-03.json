@@ -1,0 +1,112 @@
+{
+  "origin": "http://127.0.0.1:5175",
+  "checkedAt": "2026-10-03T04:38:55.837Z",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "version": "lasu-4895a363b403",
+      "manifestHash": "41dd0eeac2692098da53ac667718231814cca63f594e7ec07b27401b027ccf17",
+      "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+      "graphHash": "fe73ceb24da1fd83f53361e99316ca786e1580bbea8bf64c8b17d65a3c3056c1",
+      "outlineHash": "4c774be9588e6f5fee3883ac307980ebf0e8d52866d721c9dd0e44176ab6a0a2",
+      "assets": 133
+    },
+    {
+      "slug": "unilag",
+      "version": "unilag-faa044ebdd24",
+      "manifestHash": "c7257093787d20f58579d842e483ec82ad37c3b90ae7231c29d5d5d1bef2f8e0",
+      "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+      "graphHash": "cda51f16381232fa17b918462740613c48a543aca7427a1c652ca238658f607c",
+      "outlineHash": "5b1637d96836720002565709a5b99c37fe3e3bd13377ec0357246074213a2cc5",
+      "assets": 47
+    }
+  ],
+  "views": [
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "pitch": 45,
+      "filename": "chromium-unilag-desktop-light-3d.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "pitch": 45,
+      "filename": "chromium-lasu-desktop-light-3d.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "pitch": 0,
+      "filename": "chromium-unilag-mobile-dark-2d.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "pitch": 0,
+      "filename": "chromium-lasu-mobile-dark-2d.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "pitch": 45,
+      "filename": "webkit-unilag-desktop-light-3d.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "pitch": 45,
+      "filename": "webkit-lasu-desktop-light-3d.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "pitch": 0,
+      "filename": "webkit-unilag-mobile-dark-2d.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "pitch": 0,
+      "filename": "webkit-lasu-mobile-dark-2d.png"
+    }
+  ],
+  "offline": [
+    {
+      "engine": "chromium",
+      "campuses": [
+        "lasu",
+        "unilag"
+      ],
+      "reopen": "unilag",
+      "disruption": "browser-offline",
+      "passed": true
+    },
+    {
+      "engine": "webkit",
+      "campuses": [
+        "lasu",
+        "unilag"
+      ],
+      "reopen": "unilag",
+      "disruption": "origin-stopped",
+      "passed": true
+    }
+  ]
+}

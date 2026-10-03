@@ -136,7 +136,7 @@ for (const [engine, launcher] of [['chromium', chromium], ['webkit', webkit]]) {
         await page.screenshot({ path: path.join(output, filename) });
         report.views.push({ engine, campus: campus.entry.slug, mobile, theme, pitch: state.pitch, filename });
         // Both real silhouettes visible together; click and retain the same canvas.
-        await page.evaluate(() => window.globeMap.jumpTo({ center: [3.3, 6.51], zoom: 10.8, pitch: 0 }));
+        await page.evaluate((phone) => window.globeMap.jumpTo({ center: [3.297, 6.493], zoom: phone ? 10.25 : 10.8, pitch: 0 }), mobile);
         await page.waitForFunction(() => window.globeMap.loaded());
         await page.screenshot({ path: path.join(output, `${engine}-silhouettes-${theme}.png`) });
         const other = campuses.find((c) => c.entry.slug !== campus.entry.slug);

@@ -1,5 +1,9 @@
 # Application screenshots
 
+## Clickable campus silhouettes · 3 October 2026
+
+`campus-silhouettes-desktop-2026-10-03.png` is an unaltered Chromium capture at 1440×1000 of the release build using the exact published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages. It shows both directory boundaries, one pin/label per campus and the stronger selected-campus outline. `web/scripts/verify-campus-globe.mjs` reproduces the capture and checks real-boundary clicks, map-instance retention, both themes and view modes, scoped offline switching and reopening. This capture comes from the local release verification; [Production](../../PRODUCTION.md) records deployment and served verification separately. Phone views are browser simulations; no images are composited or retouched.
+
 ## Published UNILAG layers · 1 October 2026
 
 `unilag-desktop-layer-controls-2026-10-01.jpg` is an unaltered 1280×720 capture of the public app after the `98325aa8c4e3a17bb25601353321fb5bef900016` production deployment. The browser installed the app update, then used **Offline → Download update** and visibly confirmed package `unilag-faa044ebdd24` with **Ready offline** and all model files verified before this replacement capture. It shows the expanded desktop panel with one control row 12 px above it, the 116 destinations, classified landscape and retained road surfaces. It replaces the earlier UNILAG overview in the README; older dark/mobile examples retain their dated provenance below. [Post-merge public verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36795379351/job/110159507156) passed 180 package hashes, eight views across both browser engines and all four offline reopen cases.
