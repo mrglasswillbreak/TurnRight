@@ -6,6 +6,8 @@ Apply additive migration `022_monotonic_editor_revisions.sql` after 021. It guar
 
 Run the full regression audit, pinned GIS driver fixtures and configured budgets. Compare the exact published package hashes before/after application deployment. `scripts/benchmark-public-map.mjs` and `scripts/benchmark-campus-processing.mjs` accept explicit package fixtures and output paths; record raw trials and avoid simultaneous local graphics jobs.
 
+For attribution layout changes, `node scripts/verify-map-credits.mjs` checks the public production site in Chromium and WebKit with fresh desktop/mobile contexts, both themes, keyboard/touch targets, screenshot pixels and main-panel expansion. It makes no owner requests. This focused check complements the full campus/offline/hash matrix rather than replacing it.
+
 ## Campus silhouettes and in-place switching
 
 This application-only rollout needs no migration or owner data publication. Keep `PUBLISHED_MAP_URL` enabled: the preservation step verifies all retained package assets and derives directory outlines from their exact published boundaries, backfilling existing campuses. Package manifests and core hashes must remain unchanged. The optional directory field is compatible with older clients; outline changes participate in release revision checks while legacy directories keep their previous hashes.

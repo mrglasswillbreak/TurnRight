@@ -12,7 +12,7 @@ const report = { origin, checkedAt: new Date().toISOString(), views: [] };
 for (const [engine, type] of Object.entries({ chromium, webkit })) {
   const browser = await type.launch(engine === 'chromium' ? { args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] } : {});
   try {
-    for (const mobile of [false, true]) for (const dark of [false, true]) {
+    for (const campus of ['lasu', 'unilag']) for (const mobile of [false, true]) for (const dark of [false, true]) {
       // Fresh contexts avoid the separately documented Windows WebKit resize issue.
       const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
       try {
@@ -22,7 +22,6 @@ for (const [engine, type] of Object.entries({ chromium, webkit })) {
           localStorage.setItem('turnright:appearance', dark ? 'dark' : 'light');
           localStorage.setItem('turnright:world-animation', JSON.stringify({ rotation: false, clouds: false }));
         }, dark);
-        const campus = mobile ? 'unilag' : 'lasu';
         await page.goto(`${origin}/?campus=${campus}`);
         await page.waitForFunction(() => {
           const el = document.querySelector('.map-canvas');

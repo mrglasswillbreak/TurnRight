@@ -1,5 +1,9 @@
 # Application screenshots
 
+## Production audit and map credits · 3 October 2026
+
+`lasu-desktop-audit-2026-10-03.png`, `lasu-mobile-audit-2026-10-03.png` and `map-credits-mobile-2026-10-03.png` are unaltered production captures at application commit `7bb7e75`, using the unchanged published LASU `lasu-4895a363b403` package. Chromium uses 1440×1000 desktop and 390×844 phone viewports, in light/dark 3D. The first two replace the older LASU overview images in the README. Credits open above the panel, remain readable in dark mode and use a keyboard-accessible 44 px target; all original attributions remain available. Reproduce with `web/scripts/verify-map-credits.mjs`. Fresh contexts avoid the separately documented Windows WebKit resize issue; these are not physical-device captures. [Production evidence](../../PRODUCTION.md).
+
 ## Audit: layer and road editor · 3 October 2026
 
 `layer-road-editor-2026-10-03.png` is an unaltered 1440×1000 Windows WebKit capture from the polygon-96 persistence regression at application commit `5bce6ec0`. The isolated owner/API fixture contains all 179 original UNILAG road surfaces on the test campus. It shows source-ID search, the width inspector and progressive handles after save/reload, with all 6,094 vertices and 56 holes preserved. The name “Reviewed road 96” and width 7 m are test edits, not published campus facts. Buildings outside the test fixture are intentionally absent. It replaces the older field-mapping screenshot in the README; the older image remains available in the import guide. [Audit scope and results](../../AUDIT-2026-10-03.md).

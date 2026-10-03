@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-03T14:14:22.346Z",
+  "applicationCommit": "7bb7e75afa8ba3911b4a895d1db5cd2e83a51a41",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "version": "lasu-4895a363b403",
+      "assets": 133,
+      "manifestHash": "41dd0eeac2692098da53ac667718231814cca63f594e7ec07b27401b027ccf17",
+      "coreHash": "680bfd5e6e79c8870329fd514e5f4bc11ea260378072201a0152212327ab2438",
+      "graphHash": "fe73ceb24da1fd83f53361e99316ca786e1580bbea8bf64c8b17d65a3c3056c1"
+    },
+    {
+      "slug": "unilag",
+      "version": "unilag-faa044ebdd24",
+      "assets": 47,
+      "manifestHash": "c7257093787d20f58579d842e483ec82ad37c3b90ae7231c29d5d5d1bef2f8e0",
+      "coreHash": "a3e436a9b39260b764e7c7308a295f8a0a04a85001da24fd3d4447323dca5c17",
+      "graphHash": "cda51f16381232fa17b918462740613c48a543aca7427a1c652ca238658f607c"
+    }
+  ]
+}

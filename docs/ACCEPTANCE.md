@@ -1,6 +1,6 @@
 # TurnRight verification and release checklist
 
-The [3 October application audit](AUDIT-2026-10-03.md) adds regressions for scrolled layer searches, keyboard tabs, layer zoom limits, path-only renderer input and strictly increasing draft revisions. Current release results belong in [Production](PRODUCTION.md); the campus-discovery acceptance below retains its original scope.
+The [3 October application audit](AUDIT-2026-10-03.md) adds regressions for scrolled layer searches, keyboard tabs, layer zoom limits, path-only renderer input and strictly increasing draft revisions. Final visual review also fixes map-credit overlap: check its keyboard/touch toggle, light/dark contrast, scroll bounds and visibility above an expanded main panel. The audit passes 699 unit tests, the full browser/offline suites, 32 production campus views and a final 16-view credits check with unchanged packages. Exact revisions and results belong in [Production](PRODUCTION.md); the campus-discovery acceptance below retains its original scope.
 
 ## Campus silhouettes and in-place switching
 

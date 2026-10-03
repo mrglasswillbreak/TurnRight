@@ -1,0 +1,107 @@
+{
+  "origin": "https://turnright.vercel.app",
+  "checkedAt": "2026-10-03T14:11:14.654Z",
+  "metadata": {
+    "title": "TurnRight · Campus Maps",
+    "description": "Explore campus places and get walking and driving directions, online or offline."
+  },
+  "assets": [
+    {
+      "url": "/assets/index-FbnAk1UY.js",
+      "bytes": 180067,
+      "sha256": "90d7ba839ff36336508c8474b739f0cb036f8bdb941c87c4a1be27852241ec50"
+    },
+    {
+      "url": "/assets/rolldown-runtime-hePW80VL.js",
+      "bytes": 716,
+      "sha256": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021"
+    },
+    {
+      "url": "/assets/icons~index~AppearanceSettings~MapRenderingSettings~ReportForm~CampusSwitcher~Admin~Buildin~l7e1ffkf-JxHnMX69.js",
+      "bytes": 7532,
+      "sha256": "371bf2f1aa0bdb7c9c86dfa6e747f96f20788abca48658714d86f0584f1cd631"
+    },
+    {
+      "url": "/assets/react-D662KPHt.js",
+      "bytes": 182211,
+      "sha256": "b7c32a89a005bc2d88bdf2a955f56a8bf4cc4a3842b246b44836984c761503f8"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~nzyc4xb0-DtM6a0QX.js",
+      "bytes": 3371,
+      "sha256": "2fbd583a8ec19b95c20792e477e54f8703d8625108935185ba18646369c86b91"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~c40z1eaz-BeMxvn1k.js",
+      "bytes": 1330,
+      "sha256": "02d006840dae8d8e7308056178d362879ec5371a821176bf22fb16a11945779b"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~lby9oi6c-ZpSjR6Ie.js",
+      "bytes": 1911,
+      "sha256": "351073bbe49c6ac518ef7a39104dde68d53bf95a6f6f940b0c3967aa6a49439f"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~jbuxejyv-CbdCqKMK.js",
+      "bytes": 9548,
+      "sha256": "afa16e2966cb782df09bf077e8efd6c22f3f53fa539d40ec4bd1620205260d15"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~nrn9onta-D0NC7ni2.js",
+      "bytes": 34836,
+      "sha256": "bee540ca6b301306d0db2f9786e2d3b4d93a6887eb59c2b3be29cfc38fda7c57"
+    },
+    {
+      "url": "/assets/building-editor-core~index-C8KBYlna.js",
+      "bytes": 1220,
+      "sha256": "a57619ca03a0e6380317b7555dbe96264c50d8cf6f005298967fa46872dae415"
+    },
+    {
+      "url": "/assets/icons~index~AppearanceSettings~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoModelWork~jalko68i-DsBNsekP.js",
+      "bytes": 1513,
+      "sha256": "3a30b106909c481fe818398f4e6d17289f39f150a00fb1e8aa78ba8a84dc3e37"
+    },
+    {
+      "url": "/assets/icons~index-BegX499I.js",
+      "bytes": 8079,
+      "sha256": "5de34994535298d03fc3e153aefbabe5c0c546414aa3ea3bf13e2f94aec5848c"
+    },
+    {
+      "url": "/assets/icons~index~CampusSwitcher~Admin~PhotoModelWorkspace~ModelMeshPanel~EditorInspector~PhotoMa~erx3qw7c-BWBYoy_H.js",
+      "bytes": 238,
+      "sha256": "0dd93de7bc9f9ebaeb25c801bfc37199ba5971b23a7a268c59a3a1c81007921c"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~mpd7m3wi-Czpn1I53.js",
+      "bytes": 1196,
+      "sha256": "aba87f2a53e45ecdc9113fc30387d16e449d1676428cf5f82dd624c1df97d152"
+    },
+    {
+      "url": "/assets/building-editor-core~index~ReportForm~CampusSwitcher~Admin~BuildingAppearanceEditor~PhotoMo~gdmkvcl3-BA-87UG9.js",
+      "bytes": 40320,
+      "sha256": "8ef98563f5a7846dfdafe0d3954bca45145e015eb5207a04e360272c57e05187"
+    },
+    {
+      "url": "/assets/building-editor-core~index~CampusSwitcher~BuildingAppearanceEditor~PhotoModelWorkspace~Mode~46f684dq-um6j39Y-.js",
+      "bytes": 34074,
+      "sha256": "9d509f708a2464e173e8afe087efdb94fd8a703932706159eb562298df5c5fb6"
+    },
+    {
+      "url": "/assets/map-BkGjoaPO.js",
+      "bytes": 1010909,
+      "sha256": "4ae38277036f63f322db7f15428233b059b670317b21deb375df8d37c3c5e2c6"
+    },
+    {
+      "url": "/assets/map-CKRTiAqP.css",
+      "bytes": 82869,
+      "sha256": "a44e9c8519685a73587bcb465401eade1c3491d382c22243373c1c42b766f186"
+    },
+    {
+      "url": "/assets/index-CLTFxFT0.css",
+      "bytes": 76889,
+      "sha256": "41d4ae293af351d6ecfa58eaa6687a635a38c58d3e06718d60aea522ee674107"
+    }
+  ],
+  "serviceWorkerHash": "519965eda92153c6d720c0d3ab8ad432cc082e87169b035d46e43b5d6402c659",
+  "applicationCommit": "7bb7e75afa8ba3911b4a895d1db5cd2e83a51a41"
+}

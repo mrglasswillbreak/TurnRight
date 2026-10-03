@@ -1,0 +1,134 @@
+{
+  "origin": "https://turnright.vercel.app",
+  "checkedAt": "2026-10-03T14:10:57.430Z",
+  "views": [
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "dark": false,
+      "passed": true,
+      "filename": "chromium-lasu-desktop-light.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "dark": true,
+      "passed": true,
+      "filename": "chromium-lasu-desktop-dark.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "dark": false,
+      "passed": true,
+      "filename": "chromium-lasu-mobile-light.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "dark": true,
+      "passed": true,
+      "filename": "chromium-lasu-mobile-dark.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "dark": false,
+      "passed": true,
+      "filename": "chromium-unilag-desktop-light.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "dark": true,
+      "passed": true,
+      "filename": "chromium-unilag-desktop-dark.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "dark": false,
+      "passed": true,
+      "filename": "chromium-unilag-mobile-light.png"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "dark": true,
+      "passed": true,
+      "filename": "chromium-unilag-mobile-dark.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "dark": false,
+      "passed": true,
+      "filename": "webkit-lasu-desktop-light.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "dark": true,
+      "passed": true,
+      "filename": "webkit-lasu-desktop-dark.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "dark": false,
+      "passed": true,
+      "filename": "webkit-lasu-mobile-light.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "dark": true,
+      "passed": true,
+      "filename": "webkit-lasu-mobile-dark.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "dark": false,
+      "passed": true,
+      "filename": "webkit-unilag-desktop-light.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "dark": true,
+      "passed": true,
+      "filename": "webkit-unilag-desktop-dark.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "dark": false,
+      "passed": true,
+      "filename": "webkit-unilag-mobile-light.png"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "dark": true,
+      "passed": true,
+      "filename": "webkit-unilag-mobile-dark.png"
+    }
+  ]
+}

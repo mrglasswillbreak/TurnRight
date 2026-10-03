@@ -10,7 +10,7 @@ TurnRight combines a public navigation PWA, a private GIS workspace and a buildi
 
 ## Quality and performance
 
-The [3 October application audit](docs/AUDIT-2026-10-03.md) covers public navigation, the editor, models/photos, GIS, database saves and offline packages. It fixes duplicate road-renderer input, repeated building lookups, off-screen layer search results, keyboard tab navigation, lost layer zoom limits and colliding save revisions. UNILAG’s initial road-source input falls from 6.35 MB to 185 KB; whole-map startup remains a separate measured target. [Performance and limits](docs/PERFORMANCE.md) · [Verification and deployment](docs/PRODUCTION.md).
+The [3 October application audit](docs/AUDIT-2026-10-03.md) covers public navigation, the editor, models/photos, GIS, database saves and offline packages. It fixes duplicate road-renderer input, repeated building lookups, off-screen layer search results, keyboard tab navigation, lost layer zoom limits and colliding save revisions. Browser/install metadata now names the multi-campus app correctly, and unused scaffolding dependencies are removed. UNILAG’s initial road-source input falls from 6.35 MB to 185 KB; whole-map startup remains a separate measured target. [Performance and limits](docs/PERFORMANCE.md) · [Verification and deployment](docs/PRODUCTION.md).
 
 ## Campus status
 
@@ -37,11 +37,11 @@ The dated campus captures show real packages. Editor examples use isolated owner
 
 | UNILAG · mobile | LASU · campus detail |
 | --- | --- |
-| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU published road surfaces and controls above the desktop panel](docs/assets/screenshots/chromium-lasu-desktop-light-3d-2026-09-30.png) |
+| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU published road surfaces, controls above the desktop panel and compact map credits](docs/assets/screenshots/lasu-desktop-audit-2026-10-03.png) |
 
-| LASU · mobile dark 2D | Road and landscape workflow |
+| LASU · mobile dark 3D | Road and landscape workflow |
 | --- | --- |
-| <img src="docs/assets/screenshots/webkit-lasu-mobile-dark-2d-2026-09-30.png" width="280" alt="LASU road surfaces in mobile dark 2D"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
+| <img src="docs/assets/screenshots/lasu-mobile-audit-2026-10-03.png" width="280" alt="LASU road surfaces in mobile dark 3D, with accessible map credits above the panel"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
 
 | Campus layer and road editor | Building authoring |
 | --- | --- |
@@ -86,7 +86,7 @@ The configured build exercises the real authentication/dependency boundary using
 1. Open a campus directly or use **Choose a campus** beside search. Select a published silhouette, pin, label or list entry; overlapping campuses offer a chooser. The globe remains interactive while search is open.
 2. Search a destination or street. Open its details to inspect photographs, model evidence and arrival information.
 3. Choose directions and an origin. Select walking or driving where the campus supports it, then review restrictions and the final approach before starting.
-4. Use the controls above the main panel for 2D/3D, zoom, north-up and location/follow. Desktop has one floating row; mobile retains two rows. Theme and navigation preferences remain in settings. GPS guidance runs while the app is foregrounded.
+4. Use the controls above the main panel for 2D/3D, zoom, north-up and location/follow. Desktop has one floating row; mobile retains two rows. Open the information button near the upper-right corner for full map-source credits. Theme and navigation preferences remain in settings. GPS guidance runs while the app is foregrounded.
 5. Open **Offline** and download that campus. Wait for completion before disconnecting. Removing one campus download retains other campuses and shared assets.
 
 Links use `?campus=unilag` and can include existing place/building identifiers. Opening `/` restores the last successfully loaded public campus from device storage. First visits use LASU. Existing destination/building links without a campus parameter retain their LASU interpretation. Explicit links always win; unsuccessful loads and editor visits do not change the remembered choice. Browser storage restrictions can prevent remembering it. Search and route calculation work with the downloaded package; online source imports and owner publication require a connection.
