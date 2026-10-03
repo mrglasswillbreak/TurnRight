@@ -3,6 +3,14 @@
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 
+## Application performance and quality audit · 3 October 2026
+
+The [application audit](AUDIT-2026-10-03.md) repairs road-source duplication, repeated building associations, layer-search scrolling and keyboard navigation, lost layer zoom limits, worker failure cleanup and colliding draft revisions. The unused scaffolding CLI and its dependency subtree are removed; compatible build-tool patches leave the full dependency scan at zero known advisories. The README, editor/import/deployment guides, architecture and dated performance reports are refreshed. Campus content is not republished.
+
+Migration `022_monotonic_editor_revisions.sql` was applied in production and verified at 13:05 UTC. The `advance_editor_revision` trigger is present, with unchanged draft counts: LASU 147 and UNILAG 201. It writes no existing rows and must remain installed during application rollback. The frozen public package baseline remains LASU `lasu-4895a363b403`, UNILAG `unilag-faa044ebdd24` and 180 asset declarations.
+
+The [full application regression run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/37125078717) tests application commit `5bce6ec0`; the [pinned GIS run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/37101541059) passes all 30 integration tests and the actual private-workspace worker mount. The final dependency cleanup also passes 699 local unit tests, lint/API typechecks and the configured build. Gzip sizes remain 434,420 / 435,200 public, 188,621 / 189,440 additional owner and 10,497 / 12,288 lazy photo bytes. Application deployment and production verification are pending completion of the remaining release checks.
+
 ## Campus silhouettes and switching · 3 October 2026
 
 [PR #6](https://github.com/mrglasswillbreak/TurnRight/pull/6) is merged into `main` at `9a6417599249fbc145055b4468bcd4b300bc07c2`, with a [successful Vercel production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/FQuYNfgoZbrM4CDfpj83ySZ84AqR). Published boundary silhouettes, pins, labels and the non-modal campus list share in-place switching and direct flights. The map instance is retained; history, cancellation, failure/retry, campus preferences and downloaded-campus switching use the same transition path. No migration, owner-data edit or campus republication occurred.

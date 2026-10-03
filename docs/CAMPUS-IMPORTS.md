@@ -4,7 +4,7 @@ The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stabl
 
 TurnRight keeps separate campus maps under the existing owner account. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
 
-**Required schema:** migrations 001–021. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–022. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, and 022 preserves conflict detection for rapid successive saves. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 

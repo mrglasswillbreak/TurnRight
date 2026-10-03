@@ -1,8 +1,16 @@
-# Unified model editor verification · updated 26 September 2026
+# Unified model editor verification
+
+## Current audit · 3 October 2026
+
+The [application audit](AUDIT-2026-10-03.md) reruns the production workspace harness with current published LASU `lasu-4895a363b403` (393 buildings and 220 places), plus a synthetic 100-detail wall. Twenty sequential Chromium runs use software WebGL at 1×/4× CPU. Published-fixture input/click p95 is 22.7/93.3 ms at 1× and 84.4/199.9 ms at 4×; the dense fixture records 32.5/130.2 ms and 244.7/228.2 ms. These aggregate lab interaction samples exclude network work and are not field INP or new before/after model timings.
+
+All twenty trials generate zero model jobs while typing. After closing the workspace, every independent trial records one remaining worker/canvas and consistent GPU resource counts within its fixture. This does not establish a long-session leak bound. Dense throttled editing exceeds the existing 200 ms interaction target and remains open. [Raw trials, hashes and environment](model-editor-audit-2026-10-03.json) preserve the result. Set `BENCHMARK_OUTPUT` to choose an output path; otherwise `node scripts/benchmark-model-editor.mjs --audit` creates a dated audit without replacing the September report. Current full-suite and production checks are in [Production](PRODUCTION.md).
+
+## Historical rollout · 26 September 2026
 
 The unified workspace retains the owner draft and publication pipeline. This rollout
-changes the application/editor, not published architectural content. The current
-verified reference is **`lasu-7343cb96c9a5`**, schema 2: **395 buildings, 220 places,
+changes the application/editor, not published architectural content. That rollout’s
+verified reference was **`lasu-7343cb96c9a5`**, schema 2: **395 buildings, 220 places,
 39 photographs covering 19 buildings**, and **84 assets / 20,228,832 bytes**.
 
 ## Reference editing, globe and authored models · 26 September 2026
