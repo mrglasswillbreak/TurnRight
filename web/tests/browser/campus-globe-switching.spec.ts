@@ -168,7 +168,7 @@ test('campus globe switches in place, restores scoped preferences and follows br
   await selected(page, 'north');
   await expect(page.locator('.maplibregl-ctrl-attrib-inner')).toContainText('north campus source');
   await expect(page.locator('.maplibregl-ctrl-attrib-inner')).not.toContainText('lasu campus source');
-  await page.waitForFunction(() => !window.editorTestMap.isMoving());
+  await page.waitForFunction(() => window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving());
   expect(await page.evaluate(() => window.editorTestMap.getBearing())).toBe(0);
   expect(
     await page.evaluate(() => window.editorTestMap.getZoom()),

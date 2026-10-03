@@ -119,6 +119,14 @@ test('prepared offline enrichment retains business details on reload', async ({
     await navigator.serviceWorker.ready;
   });
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.getByRole('button', { name: 'Offline', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Download campus map', exact: true })
+    .click();
+  await expect(page.getByText('Ready offline', { exact: true })).toBeVisible();
+  // Remove fixture transport: the reopened details must come from the verified download.
+  await context.unroute('**/packages/latest.json');
+  await context.unroute('**/packages/fixture/campus.json');
   await context.setOffline(true);
   await page.reload();
   await expect(

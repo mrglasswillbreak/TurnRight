@@ -73,7 +73,7 @@ async function choose(page, campus, base) {
   await page.getByRole('button', { name: 'Choose a campus', exact: true }).click();
   await page.getByRole('button', { name: campus.entry.name, exact: true }).click();
   await expect(page).toHaveURL(`${base}/?campus=${campus.entry.slug}`, { timeout: 60000 });
-  await page.waitForFunction(() => !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
+  await page.waitForFunction(() => window.globeMap.getZoom() > 12 && !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
   assert(await page.evaluate(() => window.originalGlobeMap === window.globeMap), 'Map instance retained');
   assert.equal(await page.evaluate(() => localStorage.getItem('turnright:last-campus')), campus.entry.slug);
 }
@@ -150,7 +150,7 @@ for (const [engine, launcher] of [['chromium', chromium], ['webkit', webkit]]) {
         }, point);
         await page.mouse.click(pixel.x, pixel.y);
         await expect(page).toHaveURL(`${origin}/?campus=${other.entry.slug}`, { timeout: 60000 });
-        await page.waitForFunction(() => !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
+        await page.waitForFunction(() => window.globeMap.getZoom() > 12 && !window.globeMap.isMoving() && window.globeMap.loaded(), null, { timeout: 90000 });
         assert(await page.evaluate(() => window.originalGlobeMap === window.globeMap));
       }
     }
