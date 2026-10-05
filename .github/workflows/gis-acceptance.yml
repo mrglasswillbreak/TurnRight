@@ -42,6 +42,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
       - run: docker build -t turnright-gis scripts/gis
       - name: Verify vector operations and real GeoPackage round trip
         run: docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,size=512m -v "${{ github.workspace }}/scripts:/app:ro" --entrypoint python3 turnright-gis -m unittest discover -s /app/tests -p 'test_gis_processing.py' -v
+      - name: Verify actual private export worker and host cleanup
+        run: node scripts/gis/check_worker.mjs

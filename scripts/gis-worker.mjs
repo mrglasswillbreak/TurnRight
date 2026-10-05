@@ -24,6 +24,10 @@ try {
   containerName = `turnright-gis-${job.run_token}`;
   directory = await fs.mkdtemp(path.join(os.tmpdir(), "turnright-gis-"));
   await fs.chmod(directory, 0o777);
+  // Keep the output directory owned by the host so cleanup can unlink files
+  // written by the unprivileged container UID on Linux bind mounts.
+  await fs.mkdir(path.join(directory, "output"));
+  await fs.chmod(path.join(directory, "output"), 0o777);
   await fs.writeFile(path.join(directory, "job.json"), JSON.stringify(job), { mode: 0o644 });
   let cancelled = false;
   const stillActive = async () => {
