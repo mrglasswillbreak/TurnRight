@@ -68,6 +68,10 @@ export default defineConfig({
     target: 'es2022',
     rollupOptions: {
       output: {
+        // Entry-aware shared chunks retain their full manifest names. Short URLs
+        // avoid repeating every workspace name in the public preload manifest.
+        chunkFileNames: (chunk) =>
+          `assets/${chunk.name.split('~')[0]}-[hash].js`,
         codeSplitting: {
           groups: [
             {

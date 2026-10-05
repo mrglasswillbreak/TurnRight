@@ -945,8 +945,15 @@ export default function LayerWorkspace({
             <input
               type="checkbox"
               checked={
-                !!rows.length && rows.every((f) => selectedKeys.has(f.key))
+                !!rows.length &&
+                rows.slice(0, 500).every((f) => selectedKeys.has(f.key))
               }
+              ref={(input) => {
+                if (input)
+                  input.indeterminate =
+                    rows.slice(0, 500).some((f) => selectedKeys.has(f.key)) &&
+                    !rows.slice(0, 500).every((f) => selectedKeys.has(f.key));
+              }}
               onChange={(e) =>
                 setSelected(
                   e.target.checked ? rows.slice(0, 500).map((f) => f.key) : [],

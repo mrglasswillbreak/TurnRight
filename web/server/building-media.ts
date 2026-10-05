@@ -71,12 +71,11 @@ export async function mediaAction(
       .trim()
       .slice(0, 100)
       .replace(/[^\p{L}\p{N} _-]/gu, '');
-    const filter = query
-      ? `&or=(original_filename.ilike.*${encodeURIComponent(query)}*,public_metadata->>caption.ilike.*${encodeURIComponent(query)}*,draft_metadata->>caption.ilike.*${encodeURIComponent(query)}*)`
-      : '';
-    const rows = await db<MediaRow[]>(
-      `building_media?owner=eq.${owner}&order=created_at.desc,id.desc&limit=21&offset=${offset}${filter}`,
-    );
+    const rows = await db<MediaRow[]>('rpc/gis_media_library', 'POST', {
+      actor: owner,
+      search: query,
+      page_offset: offset,
+    });
     return {
       items: await Promise.all(
         rows.slice(0, 20).map(async (row) => ({
@@ -185,10 +184,22 @@ export async function mediaAction(
   }
   if (typeof payload.id !== 'string' || !/^[a-f0-9-]{36}$/.test(payload.id))
     throw new HttpError(400, 'Choose a photograph upload.');
-  const [row] = await db<MediaRow[]>(
-    `building_media?id=eq.${payload.id}&owner=eq.${owner}`,
-  );
+  const [row] = await db<MediaRow[]>(`building_media?id=eq.${payload.id}`);
   if (!row) throw new HttpError(404, 'Photograph not found.');
+  if (row.owner !== owner) {
+    const shared =
+      ['media-preview', 'media-status', 'media-revise'].includes(action) &&
+      row.status === 'approved' &&
+      (await db<boolean>('rpc/gis_asset_attached', 'POST', {
+        asset: row.id,
+        kind: 'photo',
+      }));
+    if (!shared)
+      throw new HttpError(
+        404,
+        'This photograph is not attached to shared campus work.',
+      );
+  }
   if (action === 'media-preview')
     return {
       previewUrl: await preview(row),
@@ -199,8 +210,8 @@ export async function mediaAction(
       id: row.id,
       status: row.status,
       metadata: row.public_metadata,
-      draft: row.draft_metadata,
-      revision: row.draft_revision || 0,
+      draft: row.owner === owner ? row.draft_metadata : undefined,
+      revision: row.owner === owner ? row.draft_revision || 0 : 0,
     };
   if (action === 'media-draft') {
     if (row.status === 'approved')

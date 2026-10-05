@@ -12,6 +12,10 @@ TurnRight combines a public navigation PWA, a private GIS workspace and a buildi
 
 The [3 October application audit](docs/AUDIT-2026-10-03.md) covers public navigation, the editor, models/photos, GIS, database saves and offline packages. It fixes duplicate road-renderer input, repeated building lookups, off-screen layer search results, keyboard tab navigation, lost layer zoom limits and colliding save revisions. Browser/install metadata now names the multi-campus app correctly, and unused scaffolding dependencies are removed. UNILAG’s initial road-source input falls from 6.35 MB to 185 KB; whole-map startup remains a separate measured target. [Performance and limits](docs/PERFORMANCE.md) · [Verification and deployment](docs/PRODUCTION.md).
 
+## Campus GIS platform
+
+The implementation branch adds campus roles, typed/private attributes, indexed and paged feature access, a processing toolbox, independent snapshot approval, controlled publication fields, thematic styling and GIS/map exports. Read the [workflow, limits, verification and migration rollout](docs/GIS-PLATFORM.md). This code has not been deployed; native service and release acceptance remain required before production use.
+
 ## Campus status
 
 LASU has 82 labelled illustrative road surfaces and distinct landscape classes. UNILAG has 179 surveyed road-width records, detailed vegetation, credited photographs and evidence-backed architectural treatments. The editor provides a campus layer explorer, independently selectable routing paths and road surfaces, and reviewed geometry operations. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md) · [Released versions and verification](docs/PRODUCTION.md).
@@ -62,7 +66,7 @@ The dated campus captures show real packages. Editor examples use isolated owner
 
 ## Quick start
 
-Use **Node 22.13+ in the 22.x line**.
+Use **Node 22.23.3**, pinned in `.node-version` and `.nvmrc`.
 
 ```sh
 cd web

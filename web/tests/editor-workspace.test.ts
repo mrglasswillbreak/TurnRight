@@ -322,3 +322,36 @@ describe('editor autosave and recovery', () => {
     expect(workspace.edits[0].properties.name).toBe('Local');
   });
 });
+
+it('hydrates paged GIS corrections without turning them into new writes and releases only saved sessions', async () => {
+  const original = edit('Original');
+  const send = vi.fn(async (batch: SaveBatch) => ack(batch));
+  const workspace = new EditorWorkspace([original], send, async () => {});
+  workspace.commit([{ ...original, properties: { name: 'Changed' } }]);
+  const remote = {
+    ...edit('Dataset point'),
+    id: 'remote',
+    properties: { name: 'Dataset point', gisManaged: true },
+    updated_at: '2026-10-05T10:00:00Z',
+  };
+  workspace.includeServerFeature(remote);
+  expect(() => workspace.releaseDatasetFeatures()).toThrow(/Save/);
+  workspace.undo();
+  expect(workspace.edits.find((e) => e.id === 'remote')).toEqual(remote);
+  expect(workspace.dirty).toBe(false);
+  expect(await workspace.flush()).toBe(true);
+  expect(send).not.toHaveBeenCalled();
+  expect(() =>
+    workspace.includeServerFeature({
+      ...remote,
+      updated_at: '2026-10-05T11:00:00Z',
+    }),
+  ).toThrow(/changed/);
+  workspace.releaseDatasetFeatures();
+  expect(workspace.edits).toEqual([original]);
+  workspace.redo();
+  expect(workspace.edits.find((e) => e.id === 'library')?.properties.name).toBe(
+    'Changed',
+  );
+  expect(workspace.edits.some((e) => e.id === 'remote')).toBe(false);
+});

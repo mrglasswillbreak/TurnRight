@@ -1,5 +1,9 @@
 # TurnRight setup: Vercel Hobby + Supabase Free
 
+## Campus GIS team workflow (not yet deployed)
+
+The team/data/analysis/review release requires additive migrations **023–037** and the matching API, UI and worker workflows. Use **Node 22.23.3** from `.node-version`. Follow the [GIS platform rollout and acceptance guide](GIS-PLATFORM.md) before enabling writes: back up and restore a staging clone, backfill memberships/indexes, compare effective geometry, configure the required checks, then complete the independent-review publication pilot. The new publication guard requires an approved immutable submission; legacy owner-only publication is no longer sufficient. Current production status below is historical until a new deployment receipt is recorded.
+
 ## Application audit and draft revisions
 
 Apply additive migration `022_monotonic_editor_revisions.sql` after 021. It guarantees increasing per-record draft revision tokens even for rapid writes or backwards clock changes. No draft rewrite, public package republication or client-schema change is required. Retain the guard during an application rollback. Production application and verification are recorded in [Production](PRODUCTION.md); inspect existing triggers before applying a migration again.

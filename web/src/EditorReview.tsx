@@ -859,17 +859,17 @@ export function EditorReview({
                   onClick={() => {
                     if (
                       window.confirm(
-                        'Prepare a preview restoring this campus release? Other campuses will stay unchanged.',
+                        'Submit this campus release for independent restoration review?',
                       )
                     )
                       void action(
                         'rollback',
                         { id: release.id },
-                        'Restore preview requested. Review the new preview before publishing.',
+                        'Restoration submitted. Open Review for independent approval, then Publish to build its preview.',
                       );
                   }}
                 >
-                  Prepare restore preview
+                  Submit restoration for review
                 </Button>
               )}
             </div>

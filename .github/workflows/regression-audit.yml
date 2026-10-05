@@ -1,19 +1,25 @@
 name: Application regression audit
 on:
+  workflow_call:
+    inputs:
+      browser_grep:
+        required: false
+        default: ""
+        type: string
   workflow_dispatch:
     inputs:
       browser_grep:
-        description: 'Optional Playwright title filter for focused repair verification (empty runs the full suite)'
+        description: "Optional Playwright title filter for focused repair verification (empty runs the full suite)"
         required: false
-        default: ''
+        default: ""
         type: string
+  pull_request:
   push:
-    branches: [codex/unilag-globe]
-    paths: [.github/workflows/regression-audit.yml]
+    branches: [main]
 permissions:
   contents: read
 concurrency:
-  group: regression-audit-${{ github.ref }}-${{ inputs.browser_grep || 'all' }}
+  group: regression-audit-${{ github.workflow }}-${{ github.ref }}-${{ inputs.browser_grep || 'all' }}
   cancel-in-progress: true
 jobs:
   quality:
@@ -26,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
@@ -35,7 +41,7 @@ jobs:
       - run: npm run check:configured-build
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       # Includes the projection dependency needed by the UNILAG download tests.
       - run: python -m pip install -r scripts/requirements-data.txt
         working-directory: .
@@ -61,7 +67,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
@@ -101,7 +107,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci

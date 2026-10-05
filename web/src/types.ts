@@ -193,6 +193,8 @@ export interface Closure {
   reopenedAt?: string;
 }
 export interface CampusData {
+  /** Reviewed public cartography only; private schemas and processing actors are excluded. */
+  gisPresentation?: Pick<import('./gis-types.js').Dataset, 'id' | 'name' | 'revision' | 'style'>[];
   layers?: import('./campus-layer-types.js').CampusLayers;
   sourceSnapshots?: {
     file: string;

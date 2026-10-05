@@ -164,7 +164,7 @@ The editor/API revision `562fa4d8931f5355b53656bf233026d54d443343` was verified 
 
 That historical rollout found a baseline predating published corrections. Later reconciliation and publication are recorded in [Production](PRODUCTION.md). Inspect the current workspace’s reconciliation state rather than repeating an old baseline repair.
 
-Use Node 22.13 or later in the 22.x line:
+Use Node 22.23.3 from `.node-version`:
 
 ```sh
 cd web

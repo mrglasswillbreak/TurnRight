@@ -57,10 +57,14 @@ describe('server authorization', () => {
     expect(res.code).toBe(401);
     expect(fetcher).not.toHaveBeenCalled();
   });
-  it('rejects an authenticated non-admin', async () => {
-    const fetcher = vi.fn(
-      async () => new Response(JSON.stringify({ id: 'stranger' })),
-    );
+  it('rejects an authenticated account without campus membership', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'stranger' })))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([{ id: 'lasu', slug: 'lasu' }])),
+      )
+      .mockResolvedValueOnce(new Response('[]'));
     vi.stubGlobal('fetch', fetcher);
     const res = response();
     await admin(
@@ -72,12 +76,15 @@ describe('server authorization', () => {
       res,
     );
     expect(res.code).toBe(403);
-    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher).toHaveBeenCalledTimes(3);
   });
-  it('does not trust an administrator UUID without a database allowlist entry', async () => {
+  it('does not trust an administrator UUID without a current campus membership', async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'owner' })))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([{ id: 'lasu', slug: 'lasu' }])),
+      )
       .mockResolvedValueOnce(new Response('[]'));
     vi.stubGlobal('fetch', fetcher);
     const res = response();

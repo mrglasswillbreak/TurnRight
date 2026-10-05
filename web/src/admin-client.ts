@@ -153,7 +153,7 @@ async function wireAdminRequest<T>(
           action,
           response.status === 401
             ? 'Your session has expired. Sign in again; your local work is retained.'
-            : 'This account cannot access the owner workspace.',
+            : 'Your campus role does not allow this action.',
           response.status,
           'auth',
         );

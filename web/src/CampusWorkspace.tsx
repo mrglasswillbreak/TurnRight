@@ -1352,7 +1352,15 @@ export default function CampusWorkspace({
                 <button
                   className="campus-import-row"
                   key={item.id}
-                  onClick={() => openJob(item)}
+                  onClick={() =>
+                    void run(async () => {
+                      const result = await api<{ job: CampusImport }>(
+                        'import-get',
+                        { importId: item.id },
+                      );
+                      openJob(result.job);
+                    })
+                  }
                 >
                   <span>
                     <strong>

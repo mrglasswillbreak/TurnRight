@@ -94,7 +94,11 @@ import { useEditorWorkspace } from './useEditorWorkspace';
 import { withPublishedVisuals } from './editor-visuals';
 import { remapBuildingSurfaces } from './building-surfaces';
 import { photoEdits } from './photo-workspace';
-import { EditorReview, type ReviewState } from './EditorReview';
+import type { ReviewState } from './EditorReview';
+const EditorReview = lazy(() =>
+  import('./EditorReview').then((m) => ({ default: m.EditorReview })),
+);
+const GisTeamWorkspace = lazy(() => import('./GisTeamWorkspace'));
 import { campusFacadeReviewIssues } from './building-facades';
 import {
   getPreference,
@@ -118,12 +122,13 @@ import {
   layerKey,
   catalogueErrors,
 } from './campus-layers';
-import { validateEdit } from './editor-model';
+import { validateEdit, applyEdits } from './editor-model';
 import type { LayerViewState } from './campus-layer-types';
 
 const SurveyPanel = lazy(() =>
   import('./SurveyPanel').then((m) => ({ default: m.SurveyPanel })),
 );
+const GisWorkspace = lazy(() => import('./GisWorkspace'));
 const CampusWorkspace = lazy(() => import('./CampusWorkspace'));
 const LayerWorkspace = lazy(() => import('./LayerWorkspace'));
 const LayerGeometry = lazy(() => import('./LayerGeometry'));
@@ -137,6 +142,7 @@ const BuildingAppearanceEditor = lazy(() =>
 );
 
 interface EditorState extends ReviewState {
+  capabilities?: import('./gis-types').WorkspaceCapabilities;
   base?: CampusData;
   campus?: import('./campus-context').CampusIdentity;
   edits: MapEdit[];
@@ -218,11 +224,16 @@ export default function Admin({
     if (!owner) return;
     const key = `editor-workspace:${owner}`;
     const load = async () => {
+      const recovery = await getPreference<WorkspaceRecovery | null>(key, null);
+      const gisKeys = (recovery?.edits || [])
+        .filter((e) => e.properties.gisManaged)
+        .map(editKey)
+        .slice(0, 500);
       const loaded = await loadPreparedWorkspace<OfflineEditor>(
         async () => {
           const [state, source] = await Promise.all([
-            api<EditorState>('state'),
-            api<{ features: SourceRecord[] }>('sources'),
+            api<EditorState>('state', { gisKeys }),
+            api<{ features: SourceRecord[] }>('sources', { gisKeys }),
           ]);
           if (state.base) initialCampus.current = state.base;
           rememberOfflineOwner(owner);
@@ -289,9 +300,13 @@ export default function Admin({
   }, [state?.campus?.name]);
 
   const refresh = async () => {
+    const gisKeys = (workspace?.edits || [])
+      .filter((e) => e.properties.gisManaged)
+      .map(editKey)
+      .slice(0, 500);
     const [result, source] = await Promise.all([
-      api<EditorState>('state'),
-      api<{ features: SourceRecord[] }>('sources'),
+      api<EditorState>('state', { gisKeys }),
+      api<{ features: SourceRecord[] }>('sources', { gisKeys }),
     ]);
     setState(result);
     setSources(source.features);
@@ -326,7 +341,7 @@ export default function Admin({
             ? 'Connect your Supabase project to enable the protected editor. The public campus map works without it.'
             : owner
               ? 'Opening your private workspace…'
-              : 'Sign in with the GitHub account allowlisted for TurnRight.'}
+              : 'Sign in with a GitHub account that belongs to your campus team.'}
         </p>
         {supabase && !owner && (
           <button
@@ -387,6 +402,22 @@ export default function Admin({
         <a href={campusUrl('/')}>Back to campus map</a>
       </main>
     );
+  if (state.capabilities && !state.capabilities.capabilities.includes('edit')) {
+    const view = applyEdits(
+      assembleEditorSources(sources, state.base || data).data,
+      state.edits,
+    );
+    return (
+      <Suspense fallback={<p>Opening team workspace…</p>}>
+        <GisTeamWorkspace
+          data={view.data}
+          issues={view.issues}
+          capabilities={state.capabilities}
+          dark={dark}
+        />
+      </Suspense>
+    );
+  }
   return (
     <PhotoSession key={owner} owner={owner!}>
       <Editor
@@ -404,9 +435,13 @@ export default function Admin({
         updateReady={updateReady}
         installUpdate={installUpdate}
         prepareOffline={async () => {
+          const gisKeys = workspace.edits
+            .filter((e) => e.properties.gisManaged)
+            .map(editKey)
+            .slice(0, 500);
           const [verified, source] = await Promise.all([
-            api<EditorState>('state'),
-            api<{ features: SourceRecord[] }>('sources'),
+            api<EditorState>('state', { gisKeys }),
+            api<{ features: SourceRecord[] }>('sources', { gisKeys }),
           ]);
           const manifest = await latestPackage();
           await installPackage(manifest, () => {});
@@ -519,7 +554,16 @@ function Editor({
   const [reviewOverlay, setReviewOverlay] = useState<Feature[]>([]);
   const reviewConflicts = async () => {
     try {
-      setConflictServer((await api<EditorState>('state')).edits);
+      setConflictServer(
+        (
+          await api<EditorState>('state', {
+            gisKeys: workspace.edits
+              .filter((e) => e.properties.gisManaged)
+              .map(editKey)
+              .slice(0, 500),
+          })
+        ).edits,
+      );
       setTaskError(null);
     } catch (e) {
       failTask(e, 'Retry conflict review', reviewConflicts);
@@ -645,9 +689,17 @@ function Editor({
   } | null>(null);
   const [repairErrors, setRepairErrors] = useState<string[]>([]);
   const calculate = useRoutes();
+  const [gisSources, setGisSources] = useState<SourceRecord[]>([]);
   const assembly = useMemo(
-    () => assembleEditorSources(sources, data),
-    [sources, data],
+    () =>
+      assembleEditorSources(
+        [
+          ...sources,
+          ...gisSources.filter((s) => !sources.some((r) => r.id === s.id)),
+        ],
+        data,
+      ),
+    [sources, gisSources, data],
   );
   const base = useMemo(
     () => withPublishedVisuals(assembly.data, data),
@@ -1879,7 +1931,11 @@ function Editor({
         </a>
         <nav className="editor-navigation" aria-label="Editor sections">
           {[
-            ['map', 'Workspace'],
+            ['gis-data', 'Data'],
+            ['map', 'Edit'],
+            ['gis-analyze', 'Analyze'],
+            ['gis-review', 'Review'],
+            ['gis-publish', 'Publish'],
             ['layers', 'Layers'],
             ['campuses', 'Campuses'],
             ['changes', 'Sources'],
@@ -2426,6 +2482,99 @@ function Editor({
             {preview ? 'Back to draft' : 'Compare base'}
           </button>
         </div>
+        {tab.startsWith('gis-') && (
+          <Suspense
+            fallback={
+              <p className="campus-workspace">Opening GIS workspace…</p>
+            }
+          >
+            <GisWorkspace
+              section={tab}
+              capabilities={state.capabilities}
+              map={mapRef.current}
+              beforeChange={async () => {
+                if (
+                  workspace.unfinished ||
+                  workspace.roofDraft ||
+                  !(await workspace.flush())
+                )
+                  throw new Error(
+                    'Finish the current edit and resolve pending saves first.',
+                  );
+              }}
+              onClose={() => setTab('map')}
+              issues={validation.issues}
+              onIssue={(issue) => {
+                setRepairFocus(issue);
+                setTab('map');
+              }}
+              onEndEditingSession={async () => {
+                if (!(await workspace.flush()))
+                  throw Error('Resolve pending saves first.');
+                workspace.releaseDatasetFeatures();
+                setGisSources([]);
+                setSelected(null);
+                await refresh();
+              }}
+              onEdit={(source, edit) => {
+                if (
+                  new Set([
+                    ...gisSources.map((s) =>
+                      s.entity === 'feature'
+                        ? s.payload.properties.kind +
+                          ':' +
+                          s.payload.properties.id
+                        : 'place:' + s.payload.id,
+                    ),
+                    ...workspace.edits
+                      .filter((e) => e.properties.gisManaged)
+                      .map((e) => editKey(e)),
+                  ]).size >= 500 &&
+                  !gisSources.some((s) => s.id === source?.id) &&
+                  !workspace.edits.some(
+                    (e) => e.id === edit?.id && e.kind === edit?.kind,
+                  )
+                )
+                  throw new Error(
+                    'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
+                  );
+                if (source)
+                  setGisSources((rows) => [
+                    ...rows.filter((r) => r.id !== source.id),
+                    source,
+                  ]);
+                if (edit) workspace.includeServerFeature(edit);
+                const target =
+                  edit ||
+                  (source?.entity === 'feature'
+                    ? {
+                        id: source.payload.properties.id,
+                        kind: source.payload.properties.kind,
+                        geometry: source.payload.geometry,
+                        properties: source.payload.properties,
+                        deleted: false,
+                      }
+                    : source?.entity === 'place'
+                      ? {
+                          id: source.payload.id,
+                          kind: 'place' as const,
+                          geometry: {
+                            type: 'Point' as const,
+                            coordinates: source.payload.coordinates,
+                          },
+                          properties: {
+                            ...source.payload,
+                            kind: 'place',
+                            gisManaged: true,
+                          },
+                          deleted: false,
+                        }
+                      : null);
+                if (target) select(target, true);
+              }}
+            />
+          </Suspense>
+        )}
         {tab === 'campuses' && (
           <Suspense
             fallback={<p className="campus-workspace">Opening campuses…</p>}
@@ -2475,7 +2624,10 @@ function Editor({
             }}
           />
         )}
-        {tab !== 'map' && tab !== 'settings' && tab !== 'campuses' ? (
+        {!tab.startsWith('gis-') &&
+        tab !== 'map' &&
+        tab !== 'settings' &&
+        tab !== 'campuses' ? (
           <aside className="editor-review-panel editor-card">
             <div className="editor-panel-heading">
               <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
@@ -2505,84 +2657,86 @@ function Editor({
                 }
               />
             ) : (
-              <EditorReview
-                tab={tab}
-                state={state}
-                onPublishedWorkspace={setPublishedWorkspace}
-                draftCount={drafts.length}
-                workspace={workspace}
-                validation={validation}
-                baselineVersion={base.version}
-                publishedVersion={data.version}
-                published={data}
-                onIssue={openIssue}
-                onSignIn={signIn}
-                busy={busy}
-                action={action}
-                mapRef={mapRef}
-                preview={preview}
-                setPreview={setPreview}
-                review={review}
-                setReview={setReview}
-                onLocateBuilding={(id) => selectId('building', id, true)}
-                onApplyAppearances={async (batch) => {
-                  if (
-                    tool ||
-                    workspace.unfinished ||
-                    workspace.roofDraft ||
-                    workspace.status === 'Conflict'
-                  )
-                    return;
-                  const original = workspace.edits;
-                  const originalBase = currentBase.current;
-                  setBusy(true);
-                  try {
-                    const checked = await validation.check([
-                      ...original.filter(
-                        (e) => !batch.some((b) => editKey(b) === editKey(e)),
-                      ),
-                      ...batch,
-                    ]);
+              <Suspense fallback={<p>Opening source and release review…</p>}>
+                <EditorReview
+                  tab={tab}
+                  state={state}
+                  onPublishedWorkspace={setPublishedWorkspace}
+                  draftCount={drafts.length}
+                  workspace={workspace}
+                  validation={validation}
+                  baselineVersion={base.version}
+                  publishedVersion={data.version}
+                  published={data}
+                  onIssue={openIssue}
+                  onSignIn={signIn}
+                  busy={busy}
+                  action={action}
+                  mapRef={mapRef}
+                  preview={preview}
+                  setPreview={setPreview}
+                  review={review}
+                  setReview={setReview}
+                  onLocateBuilding={(id) => selectId('building', id, true)}
+                  onApplyAppearances={async (batch) => {
                     if (
-                      workspace.edits !== original ||
-                      currentBase.current !== originalBase ||
+                      tool ||
                       workspace.unfinished ||
-                      workspace.roofDraft
+                      workspace.roofDraft ||
+                      workspace.status === 'Conflict'
                     )
-                      throw new Error(
-                        'The draft changed. Review the appearance batch again.',
+                      return;
+                    const original = workspace.edits;
+                    const originalBase = currentBase.current;
+                    setBusy(true);
+                    try {
+                      const checked = await validation.check([
+                        ...original.filter(
+                          (e) => !batch.some((b) => editKey(b) === editKey(e)),
+                        ),
+                        ...batch,
+                      ]);
+                      if (
+                        workspace.edits !== original ||
+                        currentBase.current !== originalBase ||
+                        workspace.unfinished ||
+                        workspace.roofDraft
+                      )
+                        throw new Error(
+                          'The draft changed. Review the appearance batch again.',
+                        );
+                      const errors = checked.errors.filter(
+                        (e) => !validation.errors.includes(e),
                       );
-                    const errors = checked.errors.filter(
-                      (e) => !validation.errors.includes(e),
-                    );
-                    if (!checked.usable || errors.length)
-                      throw new Error(
-                        errors.join(' ') ||
-                          'The proposed appearances could not be validated.',
+                      if (!checked.usable || errors.length)
+                        throw new Error(
+                          errors.join(' ') ||
+                            'The proposed appearances could not be validated.',
+                        );
+                      workspace.commit(batch);
+                      const current = batch.find(
+                        (e) =>
+                          e.kind === selectedRef.current?.kind &&
+                          e.id === selectedRef.current?.id,
                       );
-                    workspace.commit(batch);
-                    const current = batch.find(
-                      (e) =>
-                        e.kind === selectedRef.current?.kind &&
-                        e.id === selectedRef.current?.id,
-                    );
-                    if (current) {
-                      setSelected(current);
-                      selectedRef.current = current;
+                      if (current) {
+                        setSelected(current);
+                        selectedRef.current = current;
+                      }
+                      setMessage(
+                        `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
+                      );
+                    } catch (error) {
+                      setError((error as Error).message);
+                    } finally {
+                      setBusy(false);
                     }
-                    setMessage(
-                      `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
-                    );
-                  } catch (error) {
-                    setError((error as Error).message);
-                  } finally {
-                    setBusy(false);
-                  }
-                }}
-              />
+                  }}
+                />
+              </Suspense>
             )}
           </aside>
-        ) : selected && !preview ? (
+        ) : selected && !preview && tab === 'map' ? (
           <Suspense
             fallback={
               <aside className="editor-inspector editor-card">

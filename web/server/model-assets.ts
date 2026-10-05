@@ -55,11 +55,11 @@ const reference = (row: AssetRow): ModelAssetReference => ({
   sha256: row.sha256,
   bytes: row.bytes,
 });
-async function rowFor(ref: ModelAssetReference, owner?: string) {
+async function rowFor(ref: ModelAssetReference, owner?: string, shared = true) {
   if (!validModelReference(ref))
     throw new HttpError(400, 'Invalid editable model asset reference.');
   const [row] = await db<AssetRow[]>(
-    `model_assets?id=eq.${ref.id}${owner ? `&owner=eq.${owner}` : ''}`,
+    `model_assets?id=eq.${ref.id}${owner && !shared ? `&owner=eq.${owner}` : ''}`,
   );
   if (
     !row ||
@@ -71,6 +71,19 @@ async function rowFor(ref: ModelAssetReference, owner?: string) {
       404,
       'This model asset is not available to this account.',
     );
+  if (owner && row.owner !== owner) {
+    const allowed =
+      row.status === 'ready' &&
+      (await db<boolean>('rpc/gis_asset_attached', 'POST', {
+        asset: ref.id,
+        kind: 'model',
+      }));
+    if (!allowed)
+      throw new HttpError(
+        404,
+        'This model is not attached to shared campus work.',
+      );
+  }
   return row;
 }
 async function readRow(row: AssetRow): Promise<ModelDocument> {
@@ -183,7 +196,7 @@ export async function modelAssetAction(
     return { reference: reference(row), url: url.toString(), ready: false };
   }
   const ref = payload.reference as ModelAssetReference,
-    row = await rowFor(ref, owner);
+    row = await rowFor(ref, owner, action === 'model-asset-read');
   if (action === 'model-asset-confirm') {
     if (row.status === 'ready') return { reference: reference(row) };
     const document = await readRow(row);

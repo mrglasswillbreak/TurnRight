@@ -16,15 +16,25 @@ export async function surveyAction(
   if (action === 'survey-get') {
     if (!uuid(input.revisionId))
       throw new HttpError(400, 'Invalid survey revision.');
-    const [revision] = await db(
+    let [revision] = await db(
       `survey_revisions?id=eq.${input.revisionId}&owner=eq.${actor}`,
     );
+    if (
+      !revision &&
+      (await db<boolean>('rpc/gis_survey_attached', 'POST', {
+        revision_identity: input.revisionId,
+      }))
+    ) {
+      [revision] = await db(
+        `survey_revisions?id=eq.${input.revisionId}&status=eq.complete`,
+      );
+    }
     if (!revision) throw new HttpError(404, 'Survey not found.');
     const offset = Number(input.offset || 0);
     if (!Number.isInteger(offset) || offset < 0 || offset > 2000)
       throw new HttpError(400, 'Invalid chunk offset.');
     const chunks = await db(
-      `survey_chunks?revision_id=eq.${input.revisionId}&owner=eq.${actor}&order=chunk_index&limit=4&offset=${offset}`,
+      `survey_chunks?revision_id=eq.${input.revisionId}&owner=eq.${encodeURIComponent(revision.owner)}&order=chunk_index&limit=4&offset=${offset}`,
     );
     return {
       revision,
@@ -77,16 +87,20 @@ export async function surveyAction(
     )
       throw new HttpError(400, 'Invalid recording chunk.');
     for (const sample of payload.samples) {
-      const rejected = !['accepted','duplicate'].includes(sample.status);
+      const rejected = !['accepted', 'duplicate'].includes(sample.status);
       if (
         !uuid(sample.id) ||
         !Array.isArray(sample.coordinates) ||
         sample.coordinates.length !== 2 ||
         !sample.coordinates.every(
-          (v: unknown) => (typeof v === 'number' && Number.isFinite(v)) || (rejected && v === null),
+          (v: unknown) =>
+            (typeof v === 'number' && Number.isFinite(v)) ||
+            (rejected && v === null),
         ) ||
-        (!Number.isFinite(sample.timestamp) && !(rejected && sample.timestamp === null)) ||
-        (!Number.isFinite(sample.accuracy) && !(rejected && sample.accuracy === null)) ||
+        (!Number.isFinite(sample.timestamp) &&
+          !(rejected && sample.timestamp === null)) ||
+        (!Number.isFinite(sample.accuracy) &&
+          !(rejected && sample.accuracy === null)) ||
         ![
           'accepted',
           'duplicate',
