@@ -34,7 +34,7 @@ Unaltered captures of the production-built application use a verified published 
 
 | Repeatable analysis | Independent review |
 | --- | --- |
-| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/gis-analyze-2026-10-05.png) | ![Immutable submission inspection and exact-snapshot approval controls](docs/assets/screenshots/gis-review-2026-10-05.png) |
+| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/gis-analyze-2026-10-05.png) | ![Immutable submission inspection and quality-check summary](docs/assets/screenshots/gis-review-2026-10-05.png) |
 
 ![Publication workspace with approved snapshots and map export templates](docs/assets/screenshots/gis-publish-2026-10-05.png)
 

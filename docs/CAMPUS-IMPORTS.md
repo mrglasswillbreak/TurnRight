@@ -10,9 +10,9 @@ Large spatial datasets use indexed, paged reads instead of complete editor downl
 
 The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stable campus layer identities. Accepted layer hashes survive filename changes; membership uses `mapLayerId`, distinct from the numeric road grade field. Pending import jobs stay in source review. Parcel-layer labels such as street addresses no longer classify a parcel as a road surface. Migration 020 persists layer records and membership atomically. See the release log for the deployed application and current campus packages.
 
-TurnRight keeps separate campus maps under the existing owner account. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
+TurnRight keeps separate campus maps with campus-scoped team memberships. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography stays private until the team submits an immutable snapshot, obtains independent approval and publishes a campus release.
 
-**Required schema:** migrations 001–022. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, and 022 preserves conflict detection for rapid successive saves. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–037. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 

@@ -21,7 +21,10 @@ export default function GisData({
   onEndEditingSession,
 }: GisPanelProps) {
   const [id, setId] = useState(''),
-    [page, setPage] = useState<FeaturePage>(),
+    [pageResult, setPageResult] = useState<{
+      key: string;
+      page: FeaturePage;
+    }>(),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(false),
     [query, setQuery] = useState<Partial<FeatureQuery>>({}),
@@ -40,6 +43,16 @@ export default function GisData({
     editable = capabilities.capabilities.includes('edit');
   const revision = dataset?.revision;
   const datasetId = dataset?.id;
+  const requestKey = JSON.stringify([
+    datasetId,
+    revision,
+    query,
+    cursor,
+    epoch,
+  ]);
+  // Hide the previous page synchronously when a query changes. It must not
+  // remain editable until the loading effect or response arrives.
+  const page = pageResult?.key === requestKey ? pageResult.page : undefined;
   const schemaKey = JSON.stringify(dataset?.schema.fields || []);
   useEffect(() => {
     const fields = JSON.parse(schemaKey) as DatasetField[];
@@ -61,7 +74,7 @@ export default function GisData({
     if (!datasetId || revision === undefined) return;
     let cancelled = false;
     setLoading(true);
-    setPage(undefined);
+    setPageResult(undefined);
     setError('');
     void gisApi('gis-query', {
       limit: 100,
@@ -72,11 +85,11 @@ export default function GisData({
       geometry: true,
     })
       .then((result) => {
-        if (!cancelled) setPage(result);
+        if (!cancelled) setPageResult({ key: requestKey, page: result });
       })
       .catch((e) => {
         if (!cancelled) {
-          setPage(undefined);
+          setPageResult(undefined);
           setError(e.message);
         }
       })
@@ -86,7 +99,7 @@ export default function GisData({
     return () => {
       cancelled = true;
     };
-  }, [datasetId, revision, query, cursor, epoch]);
+  }, [datasetId, revision, query, cursor, epoch, requestKey]);
   useEffect(() => {
     if (!map || !dataset || !page) return;
     return showGisPage(map, dataset, page.features, selected, (key) =>
@@ -519,7 +532,7 @@ export default function GisData({
               selected · showing at most 100 geometries
             </span>
             <button
-              disabled={!history.length || loading}
+              disabled={!history.length || loading || !page}
               onClick={() => {
                 setCursor(history.at(-1));
                 setHistory((h) => h.slice(0, -1));

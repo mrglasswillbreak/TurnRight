@@ -207,23 +207,22 @@ export default function CampusWorkspace({
     );
     return () => clearTimeout(timer);
   }, [name, slug, vertices, boundaryText, creating, recoveryKey]);
-  const openJob = (next: CampusImport) => {
+  const openJob = async (next: CampusImport) => {
+    const saved = await getPreference<ImportConfiguration | null>(
+      `${recoveryKey}:${next.id}`,
+      null,
+    );
     setJob(next);
     setAdding(false);
     setCreating(false);
     setConfiguration(
-      next.status === 'mapping' ? suggestMappings(next) : next.configuration,
-    );
-    void getPreference<ImportConfiguration | null>(
-      `${recoveryKey}:${next.id}`,
-      null,
-    ).then((saved) => {
-      if (
-        saved &&
+      saved &&
         !['running', 'queued', 'reviewed', 'cancelled'].includes(next.status)
-      )
-        setConfiguration(saved);
-    });
+        ? saved
+        : next.status === 'mapping'
+          ? suggestMappings(next)
+          : next.configuration,
+    );
   };
   useEffect(() => {
     if (!job || !['mapping', 'preview', 'failed', 'draft'].includes(job.status))
@@ -232,7 +231,11 @@ export default function CampusWorkspace({
       () => void setPreference(`${recoveryKey}:${job.id}`, configuration),
       300,
     );
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // Leaving the wizard must retain the final edit even before debounce fires.
+      void setPreference(`${recoveryKey}:${job.id}`, configuration);
+    };
   }, [job, configuration, recoveryKey]);
   const selectedSource = sources.find((s) => s.id === job?.source_id);
   const counts = job?.summary?.counts;
@@ -1274,7 +1277,7 @@ export default function CampusWorkspace({
                           },
                         );
                         await refresh();
-                        openJob(result.job);
+                        await openJob(result.job);
                       })
                     }
                   >
@@ -1337,7 +1340,7 @@ export default function CampusWorkspace({
                             { sourceId: source.id },
                           );
                           await refresh();
-                          openJob(result.job);
+                          await openJob(result.job);
                         })
                       }
                     >
@@ -1352,13 +1355,14 @@ export default function CampusWorkspace({
                 <button
                   className="campus-import-row"
                   key={item.id}
+                  disabled={busy}
                   onClick={() =>
                     void run(async () => {
                       const result = await api<{ job: CampusImport }>(
                         'import-get',
                         { importId: item.id },
                       );
-                      openJob(result.job);
+                      await openJob(result.job);
                     })
                   }
                 >

@@ -193,7 +193,7 @@ Record model, OS, browser version, package version and date. Test on at least on
 
 ## Connected administration
 
-- Complete `DEPLOYMENT.md`. Sign in as the allowlisted GitHub owner and as a separate non-owner test account. Only the owner may open drafts/reports/source data or call admin mutations. Use the anonymous key to query private tables directly: no private rows should be returned.
+- Complete `DEPLOYMENT.md`. Sign in as the original administrator, each campus role, and a non-member account. Verify the capability matrix for drafts, reports, sources and mutations; reject non-members and cross-campus access. Revoke a role and confirm the next server request is denied. Use the anonymous key to query private tables directly: no private rows should be returned.
 - Submit a test report through the public endpoint. Verify it is private, rate limited, bounded to campus, and cannot change routes. Mark it resolved in the editor.
 - Edit a name; import a conflicting source name. The correction must remain. Review additions, geometry changes and removals. Force an incomplete import; no baseline records may be deleted.
 - Import generic lines or draw a path with **Connect crossings automatically** disabled: a crossing alone must not create a junction. Enable it on a suitable editor-authored path and verify same-level connections while bridges, tunnels, barriers and restrictions remain respected. Add an explicit endpoint connection within five metres and verify routing, undo/redo, saved junctions and building conflicts.
