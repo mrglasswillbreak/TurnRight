@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-10-05T10:10:56.720Z",
+  "commit": "a96332906cc019f80b98b38b34d360a424cef9ff",
+  "checks": [
+    {
+      "name": "Application regression audit",
+      "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316",
+      "head": "a96332906cc019f80b98b38b34d360a424cef9ff",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "quality",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670112"
+        },
+        {
+          "name": "offline",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670442"
+        },
+        {
+          "name": "browsers (webkit, 2, 2)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670529"
+        },
+        {
+          "name": "browsers (chromium, 2, 4)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670548"
+        },
+        {
+          "name": "browsers (chromium, 4, 4)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670617"
+        },
+        {
+          "name": "browsers (chromium, 3, 4)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670629"
+        },
+        {
+          "name": "browsers (chromium, 1, 4)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670632"
+        },
+        {
+          "name": "browsers (webkit, 1, 2)",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107316/job/111704670633"
+        }
+      ]
+    },
+    {
+      "name": "GIS database and engine acceptance",
+      "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107394",
+      "head": "a96332906cc019f80b98b38b34d360a424cef9ff",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "native-postgis",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107394/job/111704669845"
+        },
+        {
+          "name": "isolated-engine",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107394/job/111704670205"
+        }
+      ]
+    },
+    {
+      "name": "GIS import regression tests",
+      "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107228",
+      "head": "a96332906cc019f80b98b38b34d360a424cef9ff",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "gis",
+          "conclusion": "success",
+          "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37292107228/job/111704669819"
+        }
+      ]
+    }
+  ],
+  "unitTests": 714,
+  "unitFiles": 99,
+  "chromium": {
+    "passed": 187,
+    "intentionalSkips": 13
+  },
+  "webkit": {
+    "passed": 87,
+    "intentionalSkips": 1,
+    "additionalPhotoPassed": 15
+  },
+  "offlinePassed": 10,
+  "python": {
+    "passed": 66,
+    "nativeDependentLocalSkips": 5
+  },
+  "nativeChecks": [
+    "PostgreSQL 17/PostGIS 3.5 migrations",
+    "100000-feature query and job consistency",
+    "Independent approval and publication locks",
+    "pg_dump/pg_restore",
+    "Isolated GDAL/GEOS/PROJ processing and GeoPackage",
+    "Native import formats and private worker mount"
+  ],
+  "bundleGzipBytes": {
+    "public": 433681,
+    "editorAdditional": 167384,
+    "photo": 10253,
+    "GisData": 8877,
+    "GisAnalyze": 6713,
+    "GisReview": 6032,
+    "GisPublish": 7681,
+    "PublicMapLayout": 3448
+  },
+  "limitsUnchanged": true
+}

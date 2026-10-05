@@ -69,7 +69,7 @@ Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN
 | release.yml | Gated preview or publication of an approved immutable submission |
 | campus-detail-verification.yml | Served package hashes, real-campus browser views, offline reopening and retained restore assets |
 
-Configure protected-branch requirements for the actual quality, browser, offline and native job names once they appear in GitHub. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
+Protect main with an up-to-date branch requirement and these GitHub Actions checks: `quality`, `offline`, `browsers (chromium, 1, 4)` through `browsers (chromium, 4, 4)`, `browsers (webkit, 1, 2)`, `browsers (webkit, 2, 2)`, `native-postgis`, `isolated-engine` and `gis`. Bind them to the GitHub Actions app and enforce them for administrators too. All three workflows run on every pull request, including documentation changes, so a required check cannot remain pending because of a path filter. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
 
 ## Team publication
 
@@ -86,6 +86,10 @@ Restoring one campus creates a new review submission from historical content. It
 Retain additive database tables/guards when rolling application code back. Do not discard dataset attributes, approvals or operation receipts. Recover one campus's public content through a reviewed restore, not a whole-site rollback. Restoring a private database backup requires an explicit controlled restoration procedure; there is no public browser restore endpoint.
 
 For the dated 5 October upgrade, the encrypted application backup contains public application tables and private storage objects; Supabase Auth and platform configuration are outside its scope. Keep the RSA private key separately from the Actions artifact. After extracting the artifact into a private directory containing `backup-private.pem`, run `node scripts/gis/verify-deployment-backup.mjs <private-backup-directory>`. It checks authentication, row identities/counts and object hashes without writing plaintext records. Rehearse record/object restoration in an isolated project before any production restore; integrity verification alone is not a full platform restoration test.
+
+A gateway timeout does not prove a database transaction rolled back. Inspect database activity and the committed migration receipt before retrying an uncertain upgrade. The dated 5 October helper is single-use and has been removed after verified completion; its SQL file is historical transport evidence, not a routine installation command. Apply future migrations through the normal reviewed migration process.
+
+The GIS host worker creates and owns its writable output directory before starting the unprivileged container. Keep that ownership boundary when changing runner UIDs or mount paths: container-created directories can prevent ordinary host cleanup after an otherwise successful export. The native actual-worker acceptance exercises upload, completion and removal of all scratch output.
 
 Supabase/project pauses, quota exhaustion, expired credentials and unavailable Actions can interrupt team work while published/offline navigation remains usable. Diagnose the exact job/transport failure and preserve an uncertain operation's identity before retrying. The shared draft uses conflicts rather than editing branches.
 

@@ -25,7 +25,7 @@ See [Campuses and map imports](CAMPUS-IMPORTS.md) for the full workflow. Review 
 
 ## Reference, mesh and model files
 
-The unified workspace includes a remembered model/photo split, exterior wall and curve tools, and Mesh mode with Object/Vertex/Edge/Face selection. Import GLB/glTF, OBJ/MTL/textures or STL; export whole buildings or selected objects. Commands share undo, optimistic saves and owner-scoped recovery. Immutable private assets require migration 012, and authored revisions need review before publication. See [the complete guide](MODEL-AUTHORING.md).
+The unified workspace includes a remembered model/photo split, exterior wall and curve tools, and Mesh mode with Object/Vertex/Edge/Face selection. Import GLB/glTF, OBJ/MTL/textures or STL; export whole buildings or selected objects. Commands share undo, optimistic saves and user-scoped recovery. Immutable private assets require migration 012, and authored revisions need review before publication. See [the complete guide](MODEL-AUTHORING.md).
 
 On the public map, **Editor** opens and centres the selected building’s general card. The `/admin?building=<id>` handoff survives sign-in, resolves building aliases, and waits for recovered drawings or roof drafts to be resolved. Missing buildings show a notice; an ordinary `/admin` visit has no forced selection.
 
@@ -121,7 +121,7 @@ Completed edits autosave after 750 ms of inactivity. Related changes, such as an
 
 Typing in a text field is one undo step, including when autosave runs during the field session. Leaving the field, pressing Enter, selecting another feature or running another edit ends the group. Recovery snapshots continue to retain the latest input.
 
-The status distinguishes **Saving**, **Saved**, and **Saved locally**. Interrupted requests retry with the same operation ID. The browser keeps an owner- and campus-scoped IndexedDB recovery copy, including unfinished drawings and undo history. Reopening the editor offers **Resume drawing**. A failed storage write is reported rather than represented as a successful recovery save.
+The status distinguishes **Saving**, **Saved**, and **Saved locally**. Interrupted requests retry with the same operation ID. The browser keeps a user- and campus-scoped IndexedDB recovery copy, including unfinished drawings and undo history. Reopening the editor offers **Resume drawing**. A failed storage write is reported rather than represented as a successful recovery save.
 
 If another session changes a draft, local work is preserved. **Review conflicts** compares original, local and server values. Independent property changes are combined; conflicting fields require an explicit choice. Geometry and its connection references are reviewed together. **Apply reviewed choices** checks the server again before saving; a newer revision requires another review. History preceding a changed remote snapshot is cleared after reconciliation so Undo cannot overwrite the reviewed remote changes.
 
@@ -129,7 +129,7 @@ If another session changes a draft, local work is preserved. **Review conflicts*
 
 Action errors have their own controls, such as **Retry export**, **Retry route** or **Sign in again**, separate from draft-save errors. Network requests have bounded waits. Reads and transactional save batches can retry safely with the same operation ID; publication and job submissions are not automatically repeated after an uncertain response. **Check action status** refreshes state first.
 
-An already-prepared owner workspace can open from its cache after a network failure even when the browser reports an online connection. The editor identifies offline work and the cached synchronization date. Authorization rejection does not open a cache as a fallback. Preparation is still required before the first offline session.
+An already-prepared personal workspace can open from its cache after a network failure even when the browser reports an online connection. The editor identifies offline work and the cached synchronization date. Authorization rejection does not open a cache as a fallback. Preparation is still required before the first offline session.
 
 **Sources**, **Reports**, and **Releases** retain their separate review workflows. Building a release first flushes pending saves and validates the saved draft. The release worker independently validates the immutable snapshot before packaging it. Independent snapshot approval is required in **Review** before **Publish** can prepare a release. Restoration creates a new review submission.
 
@@ -151,7 +151,7 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 
 Current installations require migrations **001–037** in order. Check the current production receipt before applying missing migrations; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share campus capabilities and explicit campus context. Migration 022 makes timestamp revision tokens strictly increasing per draft record; clients must retain the returned token unchanged, including sub-millisecond precision. The notes below retain the history of earlier incremental upgrades.
 
-Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo owner guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the draft and publish through Releases; author-provided photographs without external URLs require package schema 3 and compatible readers.
+Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo management guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the shared draft and publish through **Publish** after independent approval in **Review**; author-provided photographs without external URLs require package schema 3 and compatible readers.
 
 Photo uploads continue across inspector changes and dialog closure during the
 owner session. Use the persistent **Pause uploads / Resume uploads** control;

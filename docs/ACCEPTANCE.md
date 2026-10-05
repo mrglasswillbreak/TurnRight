@@ -2,7 +2,7 @@
 
 ## Campus GIS team release
 
-Use the current [workflow and rollout guide](GIS-PLATFORM.md), with dated results in [Production](PRODUCTION.md). Checkmarks below indicate requirements, not unperformed success claims.
+Use the current [workflow and rollout guide](GIS-PLATFORM.md), with dated results in [Production](PRODUCTION.md). The items below are requirements; dated receipts identify completed checks.
 
 - Run every migration on native PostgreSQL/PostGIS, then exercise pg_dump/pg_restore. Compare authoritative source/correction fingerprints before and after the production migration and index rebuild.
 - Verify cross-campus denial, role revocation, composable roles, shared attached media/models, personal recovery and unfinished-upload privacy. Use separate editor/reviewer accounts for independent approval; verify self-approval denial and the original-owner override reason/audit.

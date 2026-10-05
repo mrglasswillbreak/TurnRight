@@ -1,0 +1,50 @@
+{
+  "datasets": 21,
+  "appliedAt": "2026-10-05T02:33:42.706893+00:00",
+  "migrations": [
+    "023_campus_teams.sql",
+    "024_gis_datasets.sql",
+    "025_gis_queries.sql",
+    "026_gis_review.sql",
+    "027_gis_processing.sql",
+    "028_gis_catalogue_and_issues.sql",
+    "029_gis_workflow_integration.sql",
+    "030_gis_consistency.sql",
+    "031_gis_publication_and_review.sql",
+    "032_gis_saved_views.sql",
+    "033_gis_quality.sql",
+    "034_gis_bounded_editor.sql",
+    "035_gis_review_integrity.sql",
+    "036_gis_source_metadata.sql",
+    "037_gis_typed_reviews.sql"
+  ],
+  "memberships": 2,
+  "backupSchema": "turnright_gis_20261005",
+  "bundleSha256": "2e6bd6b35c0b2631f74c4be80ff692b139e06e929521d78dfcd9f21e3b2a69d7",
+  "indexedFeatures": 4873,
+  "helperServiceExecute": false,
+  "preservedOriginalRows": {
+    "campuses": 2,
+    "releases": 46,
+    "map_edits": 350,
+    "admin_users": 1,
+    "campus_sources": 21,
+    "source_features": 15432
+  },
+  "helpersAnonymousExecute": false,
+  "originalContentDifferences": 0,
+  "verification": "Authenticated SQL readback after HTTP 504; transaction committed successfully. Do not rerun.",
+  "workflow": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37255858645",
+  "indexReadback": {
+    "lasu": 829,
+    "unilag": 4044,
+    "missingSourceIdentities": 0,
+    "existingInvalidGeometries": 5
+  },
+  "originalOwnerRoles": [
+    "administrator"
+  ],
+  "note": "Five pre-existing effective geometries are invalid and remain unchanged for the QA workflow; no campus content was republished.",
+  "migrationHelperRemoved": true,
+  "privateBackupRetained": true
+}

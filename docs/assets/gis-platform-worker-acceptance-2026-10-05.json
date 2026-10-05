@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-10-05T10:28:39.474Z",
+  "sourceCommit": "938d4e262855e271324cfd00cfe12446ad504335",
+  "workflowUrl": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37296147347",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "native-postgis",
+      "conclusion": "success",
+      "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37296147347/job/111717720752"
+    },
+    {
+      "name": "isolated-engine",
+      "conclusion": "success",
+      "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37296147347/job/111717721305"
+    }
+  ],
+  "regression": "Actual host worker executes an isolated native GeoPackage export, verifies its stored artifact and finish receipt, and removes all host-owned scratch output. A non-root runner exercises the ownership boundary.",
+  "productionFix": "The host creates the writable output directory before the unprivileged container runs."
+}

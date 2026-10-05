@@ -15,6 +15,14 @@ TURNRIGHT_GIS_SCREENSHOTS=1 npx playwright test --config playwright.gis-docs.con
 
 In PowerShell set the TURNRIGHT_GIS_SCREENSHOTS environment variable before invoking the command. The opt-in capture test uses the real production-built React/MapLibre UI and writes these dated files. Review the resulting images before updating documentation. [Current scope](../../GIS-PLATFORM.md) · [Deployment receipts](../../PRODUCTION.md).
 
+## Published campuses after GIS deployment · 5 October 2026
+
+The unaltered **lasu-desktop-gis-2026-10-05.png** (1440×1000) and **unilag-mobile-gis-2026-10-05.png** (390×844) show the actual public origin in Chromium, light appearance and 3D. They replace the older public overview images in the README. Both retain the unchanged published packages: LASU **lasu-4895a363b403** and UNILAG **unilag-faa044ebdd24**. No private workspace data, account or device location is shown.
+
+The [successful production run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/37295236782) verified all 180 assets, 32 campus/browser/viewport/theme/view combinations, exact boundaries, in-place map retention and both-campus offline switching/reopening in Chromium and WebKit. [The saved report](../gis-platform-production-2026-10-05.json) records package hashes, filenames and workflow provenance. The app was deployed from PR #8; the later 938d4e2 worker cleanup deployment leaves application code unchanged.
+
+Reproduce with the **Verify published campus globe** Actions workflow, or run `node scripts/verify-campus-globe.mjs` from `web/` with the documented baseline and installed Chromium/WebKit browsers. Download the workflow artifact, copy these two named Chromium views, inspect them and preserve the report. Phone captures use a browser viewport; they do not establish physical-device or field acceptance. Earlier captures below retain their historical context.
+
 ## Production audit and map credits · 3 October 2026
 
 `lasu-desktop-audit-2026-10-03.png`, `lasu-mobile-audit-2026-10-03.png` and `map-credits-mobile-2026-10-03.png` are unaltered production captures at application commit `7bb7e75`, using the unchanged published LASU `lasu-4895a363b403` package. Chromium uses 1440×1000 desktop and 390×844 phone viewports, in light/dark 3D. The first two replace the older LASU overview images in the README. Credits open above the panel, remain readable in dark mode and use a keyboard-accessible 44 px target; all original attributions remain available. Reproduce with `web/scripts/verify-map-credits.mjs`. Fresh contexts avoid the separately documented Windows WebKit resize issue; these are not physical-device captures. [Production evidence](../../PRODUCTION.md).

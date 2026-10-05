@@ -1,0 +1,54 @@
+{
+  "verifiedAt": "2026-10-05T10:31:10.745Z",
+  "origin": "https://turnright.vercel.app/admin",
+  "workerCommit": "938d4e262855e271324cfd00cfe12446ad504335",
+  "workflowUrl": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37296683112",
+  "conclusion": "success",
+  "campus": "lasu",
+  "dataset": "barrier",
+  "jobId": "e6bc6577-14a5-4bd0-b991-aa5a49cda384",
+  "artifact": {
+    "format": "GeoPackage in ZIP",
+    "bytes": 5571,
+    "sha256": "2c0b44f6053169cfc0d7a2b42bccb48548904a550accfd8f623c8f95af963789",
+    "files": [
+      "data.gpkg",
+      "metadata.json"
+    ]
+  },
+  "download": "Authenticated production UI download verified locally; private content retained outside Git.",
+  "validation": {
+    "features": 9,
+    "uniqueStableIdentities": 9,
+    "srid": 4326,
+    "integrity": "ok",
+    "inputRevision": 10,
+    "metadataKeys": [
+      "request",
+      "engine",
+      "inputRevision",
+      "provenance",
+      "identityField",
+      "outputCRS",
+      "nulls"
+    ],
+    "engine": {
+      "shapely": "2.1.2",
+      "geos": "3.13.1",
+      "pyproj": "3.7.2",
+      "proj": "9.5.1",
+      "analysisCRS": "EPSG:32631",
+      "units": "metres",
+      "transformation": "axis order change (2D) + UTM zone 31N"
+    }
+  },
+  "contentChanges": {
+    "source": false,
+    "corrections": false,
+    "publication": false
+  },
+  "initialCleanupDefect": {
+    "workflowUrl": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37295469259",
+    "result": "Artifact was stored; host cleanup failed on container-owned output. Fixed host output ownership and added actual-worker native regression; fresh job completed successfully."
+  }
+}

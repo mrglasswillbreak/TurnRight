@@ -119,7 +119,7 @@ Pull requests run the quality, browser, offline, importer and native GIS workflo
 
 ## Verification status
 
-The final local verification used Node 22.23.3:
+Implementation and Linux release verification use Node 22.23.3. The [release gate receipt](assets/gis-platform-release-gates-2026-10-05.json) binds the completed checks to application revision a963329:
 
 | Check | Result |
 | --- | --- |
@@ -127,14 +127,14 @@ The final local verification used Node 22.23.3:
 | TypeScript | Both application and server projects passed |
 | Lint | Passed with eight pre-existing warnings and no errors |
 | Configured production build | Passed all existing asset, offline precache and bundle budgets |
-| Public startup JavaScript | 433,679 / 435,200 gzip bytes |
-| Additional editor JavaScript | 167,389 / 189,440 gzip bytes |
+| Public startup JavaScript | 433,681 / 435,200 gzip bytes |
+| Additional editor JavaScript | 167,384 / 189,440 gzip bytes |
 | Lazy GIS workspaces and released layout | Each below its separate 20,480-byte gzip budget |
 | New GIS browser journeys | All four passed in Chromium and WebKit, including paged editing/review, role restrictions, CSV joins/styling, PNG receipts and exact released-package identity |
-| Prepared offline journeys | All nine passed, covering navigation, surveys, models, photos, enrichment and recovery |
+| Prepared offline journeys | All ten passed, including the separate image-editor offline suite |
 | Python suites | 66 passed; five native GDAL-dependent tests skipped |
 | Repository whitespace | `git diff --check` passed |
 
-Database coverage includes migration application, role revocation, cross-campus denial, independent and stale approval, audited overrides, typed values, private CSV round trips, index rebuilds, 100,000-feature paging, cancelled jobs, effective historical geometry, shared approved photographs and source contributor attribution. Browser GIS journeys use isolated API/auth fixtures with the real React/MapLibre UI; they do not claim a live Supabase/Vercel end-to-end release or a complete 100,000-feature device benchmark. Existing campus-import and bounded-selection browser regressions also passed. The full browser matrix remains a release CI requirement.
+Database coverage includes migration application, role revocation, cross-campus denial, independent and stale approval, audited overrides, typed values, private CSV round trips, index rebuilds, 100,000-feature paging, cancelled jobs, effective historical geometry, shared approved photographs and source contributor attribution. Browser GIS journeys use isolated API/auth fixtures with the real React/MapLibre UI; they do not claim a live Supabase/Vercel end-to-end release or a complete 100,000-feature device benchmark. Existing campus-import and bounded-selection browser regressions also passed. The full release matrix passed 187 Chromium cases (13 intentional skips), 87 WebKit cases (one opt-in documentation skip), 15 additional WebKit photo cases and 10 offline cases.
 
-Native PostgreSQL/PostGIS, isolated processing/GeoPackage and importer CI have passed; the native gate also restores a pg_dump backup. Full release CI and live verification are recorded in Production. The Windows development environment has no Docker/GDAL, so five native GIS tests remain skipped locally even though the separate Linux gates exercise native drivers. Physical devices, the live multi-user pilot and field verification remain distinct acceptance work. Existing production receipts in [Production](PRODUCTION.md) are unchanged by this work.
+Native PostgreSQL/PostGIS, isolated processing/GeoPackage and importer CI have passed; the native gate also restores a pg_dump backup. The [actual-worker regression](assets/gis-platform-worker-acceptance-2026-10-05.json) additionally verifies unprivileged container output, upload and host cleanup. A [live private GeoPackage export](assets/gis-platform-live-export-2026-10-05.json) completed and its authenticated download passed local integrity, identity, CRS and revision checks. [Production](PRODUCTION.md) records full release CI and actual live rollout checks. The Windows development environment has no Docker/GDAL, so five native GIS tests remain skipped locally even though the separate Linux gates exercise native drivers. Physical devices, the live multi-user pilot and field verification remain distinct acceptance work. [Production](PRODUCTION.md) records the actual additive migration, preserved content, live verification and deployment status; historical entries retain their original scope.

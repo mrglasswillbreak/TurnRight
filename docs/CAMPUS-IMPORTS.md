@@ -24,7 +24,7 @@ explicitly reviewed release remains a separate operation.
 
 Open **Editor → Campuses → New campus**. Enter a name and a unique public URL name. Move to the location using longitude, latitude, then draw a closed boundary. Alternatively upload or paste a WGS84 GeoJSON polygon. A collection containing several polygons exposes a boundary selector and previews the selected geometry before creation.
 
-Campus identity is permanent; the public slug identifies links such as `/?campus=north-campus`. Creating a campus does not publish it. The new workspace begins with a boundary and no invented buildings, destinations or routes. Campus creation fields and import mappings are recovered on this device under the owner and campus identity.
+Campus identity is permanent; the public slug identifies links such as `/?campus=north-campus`. Creating a campus does not publish it. The new workspace begins with a boundary and no invented buildings, destinations or routes. Campus creation fields and import mappings are recovered on this device under the user and campus identity.
 
 ![Campus boundary preview](assets/screenshots/campus-creation-2026-09-26.png)
 
@@ -115,9 +115,9 @@ Large validated batches use a bulk transaction (migration 016) with a bounded 60
 
 Repeat imports default to adding/updating selected layers. Choose **Replace selected layers** or **Replace the complete source** explicitly before missing records can be proposed for removal; verify source completeness first.
 
-Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace owner corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
+Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace shared corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
 
-Authored model assignments on matching building identities survive refreshes. Owner corrections remain separate from the source layer. Geometry changes can still require wall, roof, connection or duplicate review before publication.
+Authored model assignments on matching building identities survive refreshes. Shared corrections remain separate from the source layer. Geometry changes can still require wall, roof, connection or duplicate review before publication.
 
 OSM paths retain their node topology and access restrictions. Generic line endpoints remain separate until connected explicitly. GPX tracks and lines default to restricted access. Crossing bridges and tunnels are not connected because their lines happen to intersect. Imported entrance pins need a building/place assignment and an explicit approach connection. LASU-specific access decisions do not carry into another campus.
 
@@ -125,13 +125,13 @@ OSM paths retain their node topology and access restrictions. Generic line endpo
 
 A campus with buildings and places can publish without routes. The public map then explains that directions are unavailable. Review permitted paths and their connections before promising navigation.
 
-In **Releases**, prepare and inspect a preview, then publish. The preview freezes the campus snapshot and the current public catalogue revision. A changed catalogue makes that preview stale. The serialized release workflow preserves every other campus and verifies all referenced immutable assets. **Prepare restore preview** reuses a campus's historical package in a new deployment alongside the other campuses' current packages; it never promotes an old whole-site deployment.
+In **Review**, validate the shared draft, submit an immutable snapshot and obtain independent approval. In **Publish**, choose that approved snapshot, use **Build approved preview**, inspect it and select **Publish this preview**. A changed snapshot or public catalogue makes the preview stale. The serialized release workflow preserves every other campus and verifies all referenced immutable assets. **Submit restoration for review** creates a new approval request from one campus's historical release; after approval, build and publish it alongside the other campuses' current packages. **Releases** retains detailed release history and diagnostics.
 
 ## Public switching and offline maps
 
 A successful public load remembers the campus, including a verified offline package. Opening the plain home URL restores it. Explicit `/?campus=lasu` or `/?campus=unilag` links take precedence; saved destination links, editor visits and failed loads do not silently select a different campus. If the remembered campus is unavailable, **Open LASU** provides recovery. Storage-blocked browsers retain the ordinary first-visit behavior.
 
-The public globe button beside search (**Choose a campus**) opens the globe and a non-modal searchable published-campus chooser. It stays reachable with the card collapsed or expanded. Published boundary silhouettes, pins, labels and list entries use the same in-place switch; overlaps offer a chooser. A successful load updates the URL and remembered campus, then flies to the target while retaining the map and chosen 2D/3D view. Failed loads offer Retry; offline targets require a verified download. Closing the chooser leaves the globe visible; choosing the current campus returns to its map. Active directions retain their camera and following when search opens, and switching away requires confirmation. Browser Back/Forward uses the same loading path. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. The owner workspace also protects unfinished drawings, roof drafts, recording and pending saves. [Complete globe/offline guide](CAMPUS-GLOBE.md).
+The public globe button beside search (**Choose a campus**) opens the globe and a non-modal searchable published-campus chooser. It stays reachable with the card collapsed or expanded. Published boundary silhouettes, pins, labels and list entries use the same in-place switch; overlaps offer a chooser. A successful load updates the URL and remembered campus, then flies to the target while retaining the map and chosen 2D/3D view. Failed loads offer Retry; offline targets require a verified download. Closing the chooser leaves the globe visible; choosing the current campus returns to its map. Active directions retain their camera and following when search opens, and switching away requires confirmation. Browser Back/Forward uses the same loading path. Campus links compose with place and building links; **Editor** keeps the selected campus and building through the existing OAuth callback. The team workspace also protects unfinished drawings, roof drafts, recording and pending saves. [Complete globe/offline guide](CAMPUS-GLOBE.md).
 
 ![Globe and published campus selector](assets/screenshots/globe-campus-chooser-2026-09-27.png)
 

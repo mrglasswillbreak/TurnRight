@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-05T02:32:07.396Z",
+  "sha256": "13336b8c09e036a18764ee6e1633db5598d1ddf77824977a821b284a74199978",
+  "counts": {
+    "admin_users": 1,
+    "baseline_reconciliations": 35,
+    "building_media": 52,
+    "campus_import_assets": 49,
+    "campus_imports": 31,
+    "campus_sources": 21,
+    "campuses": 2,
+    "edit_history": 1961,
+    "editor_operations": 1321,
+    "jobs": 45,
+    "map_changes": 28804,
+    "map_edits": 350,
+    "model_assets": 18,
+    "releases": 46,
+    "report_limits": 1,
+    "reports": 1,
+    "source_features": 15432,
+    "source_field_reviews": 1,
+    "survey_chunks": 1,
+    "survey_revisions": 2,
+    "surveys": 2
+  },
+  "storageObjects": 193,
+  "storageBytes": 842790364,
+  "checks": [
+    "ciphertext SHA-256",
+    "RSA key unwrap",
+    "AES-GCM authentication",
+    "gzip records",
+    "row counts and identities",
+    "storage content hashes"
+  ],
+  "scope": "Public application tables and private storage; Supabase Auth and platform configuration are not included",
+  "backupRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/37253952724",
+  "artifactId": 11322148558,
+  "encryptedArchiveBytes": 327837564
+}

@@ -6,7 +6,7 @@ GIS feature reads use a GiST-indexed, rebuildable effective representation and r
 
 The target is 100,000 features per campus workspace dataset. Native PostGIS acceptance inserts 100,000 features, checks bounded spatial queries and immutable job inputs, and tests cancellation, review/publication locks and restoration. This is not a complete 100,000-feature live mobile benchmark. Public navigation remains bounded to 20,000 map features/25 MB; draft layouts cap five layers at 500 visible features each.
 
-New workspaces load on demand under separate 20 KiB incremental gzip budgets. The final implementation build measured 433,679/435,200 public startup bytes and 167,389/189,440 additional editor bytes; existing budgets were not increased. These are compressed dependency bytes, not startup latency measurements. [GIS verification](GIS-PLATFORM.md#verification-status) and [production receipts](PRODUCTION.md) identify subsequent checks.
+New workspaces load on demand under separate 20 KiB incremental gzip budgets. The final implementation build measured 433,681/435,200 public startup bytes and 167,384/189,440 additional editor bytes; existing budgets were not increased. These are compressed dependency bytes, not startup latency measurements. [GIS verification](GIS-PLATFORM.md#verification-status) and [production receipts](PRODUCTION.md) identify subsequent checks.
 
 The analysis container limits inputs/outputs to 100,000 features/50 MiB each, permits three active jobs per campus and applies an 18-minute processing deadline, 2 GB RAM and two CPUs. Cancellation/run tokens reject late results. Public map, personal offline recovery and server-dependent GIS capabilities have distinct availability boundaries.
 

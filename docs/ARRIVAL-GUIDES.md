@@ -78,11 +78,11 @@ kept visible.
   use Private uploads to create another revision if those details need changing.
 - **Preview public gallery** uses visitors' ordering, captions and credits. It
   does not publish. **Saved privately**, **In map draft**, and **Published** are
-  distinct states; publication still happens through Releases.
+  distinct states; campus publication still requires Review → Publish.
 
 ### Recovery and privacy
 
-Unfinished metadata is saved locally per owner and original gallery, and uploaded
+Unfinished metadata is saved locally per user and original gallery, and uploaded
 metadata synchronizes privately when online. Switching inspectors never attaches
 an upload to the new selection. After reopening, uploaded derivatives can resume
 review; files that never finished uploading explicitly request reselection.
@@ -92,14 +92,14 @@ while the editor session stays available. **Pause uploads** in the persistent
 indicator finishes the current upload/processing operation, then stops before
 the next file. **Resume uploads** continues the queue. Keep the browser open until
 original files finish uploading; browser closure and operating-system suspension
-do not provide background-upload guarantees. Signing out stops further owner
+do not provide background-upload guarantees. Signing out stops further authenticated
 requests and clears private previews from memory.
 
 Recovery uses per-photo IndexedDB records. Existing localStorage drafts migrate
 only after their replacement is stored successfully. The indicator distinguishes
 pending local recovery from saved recovery; **Saved privately** on a photo means
 the server acknowledged its details. A storage error remains visible and app
-updates wait for recovery and original uploads. Only one tab owns an owner's
+updates wait for recovery and original uploads. Only one tab owns a user's
 queue at a time; another tab can take over after the current editor closes.
 Browsers without Web Locks show an explanation instead of risking duplicate
 uploads. Galleries and upload queues also use pages of 20 photographs.
@@ -112,12 +112,12 @@ upload before continuing. Removing an item from the local queue does not delete
 its private upload. Approved records are immutable; edits create a new revision.
 
 Prepared upload copies (and originals from the earlier direct-upload flow) and reviewer records remain in the private `building-media`
-bucket and owner-authorized `building_media` table. The server rejects malformed,
+bucket and campus-authorized `building_media` table. The server rejects malformed,
 animated, oversized or unsupported images and creates a metadata-free WebP at
 most 1,600 pixels on its longest side and 250 KiB. Valid metadata-free WebP copies
 within those limits pass through without another lossy encode. Local full-resolution
 originals and editing recipes remain on this device; [crop, rotation, privacy areas
-and compression](PHOTO-EDITING.md) happen before upload review. Explicit owner galleries, including
+and compression](PHOTO-EDITING.md) happen before upload review. Explicitly authored galleries, including
 empty galleries, override the research catalogue through aliases and merges.
 
 New installations apply migrations in order through
@@ -135,7 +135,7 @@ the existing media records. [Measurements and test coverage](PERFORMANCE.md).
 ## Release and offline integrity
 
 `data/photos/catalogue.json` contains reviewed reusable research derivatives.
-The release worker combines these with owner-approved media, verifies every
+The release worker combines these with approved attached media, verifies every
 required hash and size, validates associations and publishes immutable assets.
 Public serialization excludes original paths, raw survey details and reviewer
 identities. Required author credits and license notices remain public.

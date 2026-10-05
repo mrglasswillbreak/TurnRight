@@ -1,0 +1,21 @@
+{
+  "verifiedAt": "2026-10-05T10:13:55.636Z",
+  "commit": "6c1685673833ed4724befb06b83b87c3f3589da5",
+  "validatedApplicationCommit": "a96332906cc019f80b98b38b34d360a424cef9ff",
+  "origin": "https://turnright.vercel.app",
+  "immutableOrigin": "https://turnright-jgu0v6snh-muhammed-abdulhadi-s-projects.vercel.app",
+  "deployment": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/BmgyFgNCk5bZmdxcrvGPa9wNUxjR",
+  "environment": "Production",
+  "status": "Ready",
+  "assignedDomain": "turnright.vercel.app",
+  "pullRequest": "https://github.com/mrglasswillbreak/TurnRight/pull/8",
+  "workerFixDeployment": {
+    "verifiedAt": "2026-10-05T10:33:42.849Z",
+    "commit": "938d4e262855e271324cfd00cfe12446ad504335",
+    "immutableOrigin": "https://turnright-iuy4yyqft-muhammed-abdulhadi-s-projects.vercel.app",
+    "deployment": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/G6UYLSpqZFUjEb7rxgxKL3pVxSca",
+    "status": "Ready",
+    "environment": "Production",
+    "assignedDomain": "turnright.vercel.app"
+  }
+}

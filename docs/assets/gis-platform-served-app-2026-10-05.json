@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-10-05T10:14:47.486Z",
+  "origin": "https://turnright.vercel.app",
+  "commit": "6c1685673833ed4724befb06b83b87c3f3589da5",
+  "http": [
+    {
+      "path": "/",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "sha256": "b358099633e84512458d1157afe5d1eb946aee29968bc33b2edeca21b73093a9"
+    },
+    {
+      "path": "/admin",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "sha256": "b358099633e84512458d1157afe5d1eb946aee29968bc33b2edeca21b73093a9"
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "sha256": "82c423409142366a1aec623f2c0d047276168cc53da11b346e7d11d37eac6f6d"
+    }
+  ],
+  "campuses": [
+    {
+      "slug": "lasu",
+      "version": "lasu-4895a363b403",
+      "manifestSha256": "5e251be7dcaef7c91b72d55f568e20012aed9eeae746edaba7710210a5684bdc",
+      "assets": 133
+    },
+    {
+      "slug": "unilag",
+      "version": "unilag-faa044ebdd24",
+      "manifestSha256": "3a3c31bf367a880ea44b72d7bd91ba40a4da200b3c072130f1ae92ce7614fa01",
+      "assets": 47
+    }
+  ],
+  "entry": "/assets/index-DkTEitQC.js",
+  "anonymousAdmin": {
+    "status": 401,
+    "cacheControl": "no-store"
+  },
+  "catalogueSha256": "de523a39e7c0112cce1bc908cc4cfeb63f3fade8d6756de8141a3803674d0f61"
+}

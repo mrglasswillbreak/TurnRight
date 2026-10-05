@@ -66,9 +66,9 @@ LASU Ojo and UNILAG Akoka are independently published. Application deployments p
 
 | Public desktop map | Public phone view |
 | --- | --- |
-| ![LASU campus roads and landscape with public navigation controls](docs/assets/screenshots/lasu-desktop-audit-2026-10-03.png) | <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG destination and credited photograph in a browser phone viewport"> |
+| ![LASU campus roads and landscape with public navigation controls](docs/assets/screenshots/lasu-desktop-gis-2026-10-05.png) | <img src="docs/assets/screenshots/unilag-mobile-gis-2026-10-05.png" width="280" alt="Published UNILAG campus overview in a browser phone viewport"> |
 
-These public captures retain their dates and package provenance. Phone images are browser simulations, not physical-device verification. New GIS workspace images above show the current scope; [historical galleries](docs/assets/screenshots/README.md) remain available.
+These unaltered public captures are from **5 October 2026**. [Live verification](docs/assets/gis-platform-production-2026-10-05.json) checked all 180 assets, 32 browser/campus/theme/view combinations and offline reopening in Chromium and WebKit. Phone images are browser simulations, not physical-device verification. [Capture provenance and historical galleries](docs/assets/screenshots/README.md) remain available.
 
 ## Get started
 
@@ -143,7 +143,7 @@ Apply additive migrations **001–037** in order for a fresh installation, or on
 
 Pull requests run unit/database, type, lint, configured-build, browser, offline and native GIS checks. Reviewed content releases also require the comprehensive gates. [Deployment procedure](docs/DEPLOYMENT.md) · [Configuration](docs/CONFIGURATION.md) · [Acceptance](docs/ACCEPTANCE.md) · [Actual deployment receipts](docs/PRODUCTION.md).
 
-Local implementation verification passed **714 tests across 99 files**, both TypeScript projects, the unchanged build budgets, four GIS journeys in both Chromium and WebKit and nine prepared-offline journeys. Native service results and live rollout checks are recorded separately; local fixture success is not a production acceptance claim.
+The [complete release gates](docs/assets/gis-platform-release-gates-2026-10-05.json) passed **714 tests across 99 files**, both TypeScript projects, lint and unchanged build budgets; 187 Chromium cases, 87 WebKit cases, 15 additional WebKit photo cases and 10 offline cases. Native PostGIS/isolated GIS/importer checks also passed, including 100,000-feature paging and database backup restoration. [Production](docs/PRODUCTION.md) separately records live service, migration and deployment evidence; fixture success does not establish the remaining multi-user/device/field acceptance.
 
 ## Repository structure
 

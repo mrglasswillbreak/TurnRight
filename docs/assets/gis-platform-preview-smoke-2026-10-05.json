@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-05T02:46:07.345Z",
+  "origin": "https://turnright-fq8uqly8n-muhammed-abdulhadi-s-projects.vercel.app",
+  "commit": "64454d029b4e3ebbbb9260c4de15a76c44c7247a",
+  "databaseMigrations": "001-037",
+  "authentication": "Existing GitHub owner successfully opened the team workspace",
+  "readOnlyChecks": [
+    "Data catalogue loaded from production PostGIS",
+    "220-building dataset paged 100, 100 and 20 rows",
+    "Analyze catalogue and input CRS loaded",
+    "Review workspace and map validation opened",
+    "Live PostGIS QA returned the five existing hole-outside-shell errors",
+    "Publish loaded approved-snapshot selector and map layout controls"
+  ],
+  "noContentPublication": true,
+  "alerts": []
+}
