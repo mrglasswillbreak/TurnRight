@@ -295,7 +295,7 @@ test('paged GIS data, typed edit, buffer inspection and immutable review stay co
 }) => {
   const { calls } = await setup(page);
   const nav = page.getByRole('navigation', { name: 'Editor sections' });
-  await nav.getByRole('button', { name: 'Data', exact: true }).click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
   await expect(page.getByText(/100,000 matching/)).toBeVisible();
   await expect(
     page.locator('.gis-table-scroll').first().locator('tbody tr'),
@@ -377,10 +377,7 @@ test('review-only members have no geometry or attribute editing controls', async
   page,
 }) => {
   await setup(page, ['reviewer']);
-  await page
-    .getByRole('navigation', { name: 'Editor sections' })
-    .getByRole('button', { name: 'Data', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
   await expect(page.getByText(/100,000 matching/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Edit geometry' })).toHaveCount(
     0,
@@ -395,9 +392,9 @@ test('GIS styling, asset CSV join and map PNG export are reachable', async ({
 }) => {
   const { calls } = await setup(page);
   const nav = page.getByRole('navigation', { name: 'Editor sections' });
-  await nav.getByRole('button', { name: 'Data', exact: true }).click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
   await page
-    .getByText('Schema, styling and publication fields', { exact: true })
+    .getByRole('button', { name: 'Fields and styling', exact: true })
     .click();
   const domain = page.getByLabel('height coded domain', { exact: true });
   await domain.fill('not a number');
@@ -422,6 +419,9 @@ test('GIS styling, asset CSV join and map PNG export are reachable', async ({
           .style.classes?.[0].maximum,
     )
     .toBe(10);
+  await page
+    .getByRole('button', { name: 'Close GIS workspace', exact: true })
+    .click();
   await page.getByText('Import an attribute CSV', { exact: true }).click();
   await page.getByLabel('Import CSV', { exact: true }).setInputFiles({
     name: 'assets.csv',
@@ -541,7 +541,7 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     await page.evaluate(
       (bounds) =>
         window.editorTestMap.fitBounds(bounds, {
-          padding: { left: 820, right: 32, top: 105, bottom: 80 },
+          padding: { left: 80, right: 40, top: 90, bottom: 50 },
           pitch: 0,
           bearing: 0,
           duration: 0,
@@ -551,19 +551,23 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
       .toBe(true);
-    await page.locator('.gis-workspace').evaluate((e) => {
-      e.scrollTop = 0;
-    });
+    await page.locator('.gis-workspace:visible').evaluateAll((elements) =>
+      elements.forEach((e) => {
+        e.scrollTop = 0;
+      }),
+    );
     await page.screenshot({
       path: fileURLToPath(
         new URL(
-          '../../../docs/assets/screenshots/gis-' + name + '-2026-10-05.png',
+          '../../../docs/assets/screenshots/unified-editor-' +
+            name +
+            '-2026-10-05.png',
           import.meta.url,
         ),
       ),
     });
   };
-  await nav.getByRole('button', { name: 'Data', exact: true }).click();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
   await expect(page.getByText(/100,000 matching/)).toBeVisible();
   await page
     .getByRole('textbox', { name: 'height', exact: true })
@@ -599,7 +603,120 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
   await page
     .getByText('Map layout: A4 / A3 PNG and PDF', { exact: true })
     .click();
-  await page.getByRole('combobox',{name:'Approved snapshot',exact:true}).selectOption('22222222-2222-4222-8222-222222222222');
-  await page.getByLabel('Release summary',{exact:true}).fill('Demonstration campus review');
+  await page
+    .getByRole('combobox', { name: 'Approved snapshot', exact: true })
+    .selectOption('22222222-2222-4222-8222-222222222222');
+  await page
+    .getByLabel('Release summary', { exact: true })
+    .fill('Demonstration campus review');
   await shot('publish');
+});
+
+test('unified shell preserves inputs, filters, pages and map instance across tasks', async ({
+  page,
+}) => {
+  const { calls } = await setup(page);
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await expect(page.getByText(/100,000 matching/)).toBeVisible();
+  const canvas = await page
+    .locator('.map-canvas canvas')
+    .first()
+    .elementHandle();
+  await page.getByText('Filters and columns', { exact: true }).click();
+  await page.getByRole('textbox', { name: 'Value', exact: true }).fill('001');
+  await page.getByRole('button', { name: 'Filter', exact: true }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect
+    .poll(
+      () =>
+        calls.filter((c) => c.action === 'gis-query').at(-1)?.payload.cursor,
+    )
+    .toBe('page-two');
+  await page
+    .getByRole('checkbox', { name: 'Select overlay:tree-100', exact: true })
+    .check();
+  await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+  await page
+    .getByLabel('Result name', { exact: true })
+    .fill('Retained analysis form');
+  await page.getByRole('button', { name: 'Review', exact: true }).click();
+  await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+  await expect(page.getByLabel('Result name', { exact: true })).toHaveValue(
+    'Retained analysis form',
+  );
+  await page
+    .getByRole('button', { name: 'Close GIS workspace', exact: true })
+    .click();
+  await expect(
+    page.getByRole('checkbox', {
+      name: 'Select overlay:tree-100',
+      exact: true,
+    }),
+  ).toBeChecked();
+  expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+  const height = page
+    .getByRole('textbox', { name: 'height', exact: true })
+    .first();
+  await height.fill('invalid');
+  await page.getByRole('button', { name: 'Analyze', exact: true }).click();
+  await expect(page.locator('.editor-save-state')).toHaveText(
+    'Unsaved attributes',
+  );
+  await page
+    .getByRole('button', { name: 'Close GIS workspace', exact: true })
+    .click();
+  await expect(height).toHaveValue('invalid');
+  await page.reload();
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(height).toHaveValue('invalid');
+  expect(
+    calls
+      .filter((c) => c.action === 'gis-query')
+      .every((c) => (c.payload.limit ?? 100) <= 100),
+  ).toBe(true);
+});
+test('viewport overlays are bounded independently of table pages and docks resize by keyboard', async ({
+  page,
+}) => {
+  const { calls } = await setup(page);
+  await page
+    .getByRole('checkbox', { name: 'Show Campus trees', exact: true })
+    .check();
+  await expect
+    .poll(
+      () =>
+        calls.filter((c) => c.action === 'gis-query' && !!c.payload.bbox)
+          .length,
+    )
+    .toBeGreaterThan(0);
+  expect(
+    calls
+      .filter((c) => c.action === 'gis-query' && !!c.payload.bbox)
+      .every((c) => c.payload.limit === 100 && !c.payload.cursor),
+  ).toBe(true);
+  const splitter = page.getByRole('separator', { name: 'Resize catalogue' });
+  const before = Number(await splitter.getAttribute('aria-valuenow'));
+  await splitter.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(splitter).toHaveAttribute('aria-valuenow', String(before + 20));
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  expect(
+    calls
+      .filter((c) => c.action === 'gis-query' && !!c.payload.bbox)
+      .every((c) => !c.payload.cursor),
+  ).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Expand panel', exact: true }).click();
+  const box = await page
+    .getByRole('region', { name: 'Attribute table', exact: true })
+    .boundingBox();
+  expect(box!.width).toBeLessThanOrEqual(390);
+  expect(box!.height).toBeGreaterThan(500);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

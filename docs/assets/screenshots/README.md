@@ -312,3 +312,9 @@ The earlier files below remain as historical references and are no longer the ma
 | [appearance.jpg](appearance.jpg) | Public Device appearance setting | 390 × 844 |
 
 All phone screenshots use responsive browser viewports. Physical Android/iPhone installation, GPS, touch and offline checks are tracked separately in [the acceptance checklist](../../ACCEPTANCE.md).
+
+## Unified editor · 5 October 2026
+
+`unified-editor-{data,analyze,review,publish}-2026-10-05.png` show the consolidated editor built from this feature branch. Captured by the opt-in `GIS documentation gallery` Playwright journey using the published campus basemap and an isolated team/dataset fixture. The fixture demonstrates 100,000 matching records through bounded pages; it is not production campus content or evidence of a real approval. Captures include the persistent catalogue, bottom table and contextual task dock. Older images remain historical release evidence.
+
+Regenerate with `TURNRIGHT_GIS_SCREENSHOTS=1` and `playwright test --config playwright.gis-docs.config.ts` from `web`. Run this separately from other browser suites, or use a distinct Playwright output directory.

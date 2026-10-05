@@ -452,6 +452,19 @@ export class EditorMap {
     }
   }
   private click = (event: MapMouseEvent) => {
+    const gisLayers = this.map
+      .getStyle()
+      .layers.filter(
+        (l) =>
+          l.id.startsWith('workspace-dataset-') ||
+          l.id.startsWith('workspace-gis-page'),
+      )
+      .map((l) => l.id);
+    if (
+      gisLayers.length &&
+      this.map.queryRenderedFeatures(event.point, { layers: gisLayers }).length
+    )
+      return;
     if (this.compare || this.kind || hasModelSelection(event.originalEvent))
       return;
     if (this.interaction !== 'select') {

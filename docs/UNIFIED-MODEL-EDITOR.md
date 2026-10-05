@@ -1,5 +1,7 @@
 # Unified model editor
 
+Building, roof and mesh tools open as integrated focus views in the [shared campus editor](UNIFIED-EDITOR.md). Their engines, staged operations and history are retained; closing the focus view restores the map context.
+
 The building workspace brings architectural details, appearance, roofs, outlines and review into one draft. Open **Edit model** from a building inspector. Its read-only summary shows wings, recorded height/floors and review status; model forms live inside the workspace. Linked place photographs still belong to their building.
 
 ![Desktop model workspace in Orbit](assets/screenshots/editor-model-orbit-current-2026-09-26.png)
@@ -110,7 +112,7 @@ In **Review**, choose **Mark all as reviewed** to approve eligible recorded wall
 
 Use the current campus’s owner review, preview and publication workflow. Restoring a campus uses a new preview that preserves other campuses; see [campus releases](CAMPUS-IMPORTS.md#accept-proposals-then-independently-review-and-publish). Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
 
-The Releases panel checks façade reviews before enabling **Build review preview**. Each blocker names its building, wing and wall; **Review model** opens that exact wall in the workspace. A height or roof edit can invalidate placement review even when the footprint is unchanged. Inspect the retained metre positions and evidence, then **Mark this wall reviewed**. This clears only the selected wall's review flag and remains undoable. A moved or reassigned wall also requires an explicit wall match. Invalid placements still require repair; reviewing does not invent measurements or approve other walls.
+**Review → Draft changes** checks façade reviews before continuing to submission. Approved snapshots proceed through **Publish**. Each blocker names its building, wing and wall; **Review model** opens that exact wall in the workspace. A height or roof edit can invalidate placement review even when the footprint is unchanged. Inspect the retained metre positions and evidence, then **Mark this wall reviewed**. This clears only the selected wall's review flag and remains undoable. A moved or reassigned wall also requires an explicit wall match. Invalid placements still require repair; reviewing does not invent measurements or approve other walls.
 
 Older failed releases keep their original error records. After repairing the current draft, build a new immutable preview rather than trying to publish a failed or stale one.
 

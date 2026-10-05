@@ -1,5 +1,7 @@
 # Entrance guides and building photographs
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Campus GIS integration
 
 Campus team access now governs shared arrival evidence and approved photographs. Editors retain personal unfinished uploads; authorized teammates can reuse ready assets attached to shared campus work. Photograph/evidence approval remains separate from independent approval of the immutable campus publication snapshot. [Team workflow and roles](GIS-PLATFORM.md).

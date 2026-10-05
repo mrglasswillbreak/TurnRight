@@ -414,7 +414,8 @@ export function layerPresentation(
       if (
         l.archived ||
         (editor
-          ? !l.editorVisible || view.hidden?.includes(l.id)
+          ? (!l.editorVisible && !view.shown?.includes(l.id)) ||
+            view.hidden?.includes(l.id)
           : !l.included || !l.publishedVisible)
       )
         return false;

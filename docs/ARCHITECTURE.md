@@ -2,13 +2,13 @@
 
 ## Campus GIS workflow
 
-The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while lazy **Data, Analyze, Review and Publish** workspaces coordinate the existing **Edit** tools. Read-only team members receive the same map and review surfaces without geometry editing controls.
+The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while a shared catalogue, attribute table and lazy **Analyze, Review and Publish** task docks coordinate contextual editing. `EditorSession` holds presentation state, revision-bound table context and personal attribute inputs; `EditorWorkspace` remains authoritative for geometry and edit history. [Editor module boundaries](UNIFIED-EDITOR.md). Read-only team members receive the same map and review surfaces without geometry editing controls.
 
 ~~~mermaid
 flowchart LR
   Sources[Spatial sources and asset CSV] --> Draft[Authoritative sources and corrections]
   Draft --> Index[Rebuildable PostGIS index]
-  Index --> Data[Paged Data workspace]
+  Index --> Data[Paged attribute table]
   Index --> Jobs[Isolated analysis jobs]
   Jobs --> Staged[Inspected private result layers]
   Staged --> Draft
@@ -19,7 +19,7 @@ flowchart LR
 
 Migrations **023–037** add campus memberships, typed dataset schemas, private attribute overlays, indexed effective geometry, processing jobs, QA issues, saved views, immutable reviews and publication guards. Existing source_features/map_edits remain authoritative; gis_feature_index is rebuilt from those records. Source metadata includes CRS and declared field types. Configured team field definitions survive reimports.
 
-Dataset requests carry campus identity, input revision and operation identity. Feature queries use spatial indexes, validated filters, deterministic sorting and revision-bound cursors; responses are capped at 500 rows/2 MB. The Data table renders 100 rows and GIS geometry sessions retain at most 500 loaded features. This bounds normal editing without downloading a complete 100,000-feature dataset. Administrative baseline reconciliation remains a separate explicit maintenance operation.
+Dataset requests carry campus identity, input revision and operation identity. Feature queries use spatial indexes, validated filters, deterministic sorting and revision-bound cursors; responses are capped at 500 rows/2 MB. The attribute table renders 100 rows and GIS geometry sessions retain at most 500 loaded features. This bounds normal editing without downloading a complete 100,000-feature dataset. Administrative baseline reconciliation remains a separate explicit maintenance operation.
 
 Analysis jobs snapshot input revisions, capture parameters/CRS/engine/actor, and stage outputs. The pinned GDAL/GEOS/PROJ worker runs without network access and supports cancellation/run-token leases. Applying a result rechecks input revisions and creates an ordinary private dataset. Stored coordinates remain WGS84; metric tools currently require a validated WGS84 UTM zone in metres. Restricted expressions never execute arbitrary user code.
 

@@ -1,5 +1,7 @@
 # Editable campus roof plans
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Reference and boundary editing
 
 Roof editing can run beside a photograph using Reference split. New walls, curved outlines and courtyards can invalidate a prior roof plan: repair and review the retained draft before publishing. Imported objects attach to the building without silently changing native roof parameters. See [expanded authoring](MODEL-AUTHORING.md).

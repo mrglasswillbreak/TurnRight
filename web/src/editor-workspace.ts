@@ -291,8 +291,12 @@ export class EditorWorkspace {
       })
       .finally(() => {
         this.writingRecovery = false;
+        this.notify();
       });
     return this.persistence;
+  }
+  get recoveryPending() {
+    return this.writingRecovery;
   }
   get dirty() {
     return this.changes().length > 0 || !!this.pending;

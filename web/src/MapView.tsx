@@ -205,7 +205,9 @@ export function MapView({
     });
     motionMap.addControl(control, 'bottom-right');
     if (!editor) {
-      const credits = motionMap.getContainer().querySelector('details.maplibregl-ctrl-attrib');
+      const credits = motionMap
+        .getContainer()
+        .querySelector('details.maplibregl-ctrl-attrib');
       credits?.removeAttribute('open');
       credits?.classList.remove('maplibregl-compact-show');
     }
@@ -842,6 +844,19 @@ export function MapView({
       );
       if (editor) {
         map.on('click', (event) => {
+          const gisLayers = map
+            .getStyle()
+            .layers.filter(
+              (l) =>
+                l.id.startsWith('workspace-dataset-') ||
+                l.id.startsWith('workspace-gis-page'),
+            )
+            .map((l) => l.id);
+          if (
+            gisLayers.length &&
+            map.queryRenderedFeatures(event.point, { layers: gisLayers }).length
+          )
+            return;
           if (
             map.queryRenderedFeatures(event.point, {
               layers: [

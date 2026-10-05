@@ -2,7 +2,7 @@
 
 ## Campus GIS scope · 5 October 2026
 
-GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. Data renders 100 rows; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
+GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. The shared attribute table renders 100 rows per page; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
 
 The target is 100,000 features per campus workspace dataset. Native PostGIS acceptance inserts 100,000 features, checks bounded spatial queries and immutable job inputs, and tests cancellation, review/publication locks and restoration. This is not a complete 100,000-feature live mobile benchmark. Public navigation remains bounded to 20,000 map features/25 MB; draft layouts cap five layers at 500 visible features each.
 

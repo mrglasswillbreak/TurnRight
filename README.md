@@ -2,7 +2,7 @@
 
 **A campus GIS platform for small teams — from source data to reviewed, published maps.**
 
-Import spatial data and asset tables, edit geometry and attributes, run analysis, resolve quality issues, obtain independent approval, and publish a campus that visitors can reopen offline. TurnRight combines this private team workspace with public walking/driving navigation, photographs, field evidence and building authoring.
+Import spatial data and asset tables, edit geometry and attributes, run analysis, resolve quality issues, obtain independent approval, and publish a campus that visitors can reopen offline. TurnRight combines one map-centered private editor with public walking/driving navigation, photographs, field evidence and building authoring.
 
 [Open map](https://turnright.vercel.app/) · [LASU](https://turnright.vercel.app/?campus=lasu) · [UNILAG](https://turnright.vercel.app/?campus=unilag) · [Team workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md) · [Deployment status](docs/PRODUCTION.md)
 
@@ -12,31 +12,31 @@ Import spatial data and asset tables, edit geometry and attributes, run analysis
 
 **Import → edit → analyze → validate → submit → independently approve → preview → publish → offline**
 
-| Workspace | What teams can do |
+| Shared editor area | What teams can do |
 | --- | --- |
-| **Data** | Browse indexed, revision-consistent pages; configure typed fields, aliases, units and domains; filter/sort, inspect statistics, import CSV tables, select public fields and export data. |
-| **Edit** | Edit geometry with topology-aware tools, shared selection, undo/redo, optimistic concurrency and personal recovery. Preserve separate source records and corrections. |
+| **Catalogue and table** | Browse indexed, revision-consistent pages; configure typed fields, aliases, units and domains; filter/sort, inspect statistics, import CSV tables, select public fields and export data. |
+| **Map and properties** | Edit geometry with topology-aware tools, shared selection, undo/redo, optimistic concurrency and personal recovery. Preserve separate source records and corrections. |
 | **Analyze** | Run buffer, clip, intersect, difference, dissolve, spatial/attribute joins, nearest, summarize-within, measurement and restricted calculations. Inspect staged results before applying a new private layer. |
 | **Review** | Triage map-linked issues, assign work, retain comments/evidence, inspect immutable submissions and approve an exact content hash independently of its contributors. |
 | **Publish** | Preview and release approved snapshots, restore one campus through renewed review, retain other campuses, and export A4/A3 maps. |
 
-[Complete workflow, roles and operating limits](docs/GIS-PLATFORM.md) · [Editing](docs/EDITOR.md) · [Imports](docs/CAMPUS-IMPORTS.md)
+[Unified editor navigation](docs/UNIFIED-EDITOR.md) · [Complete workflow, roles and operating limits](docs/GIS-PLATFORM.md) · [Editing](docs/EDITOR.md) · [Imports](docs/CAMPUS-IMPORTS.md)
 
 Administrator, editor, reviewer and publisher roles compose per campus. The original owner becomes an administrator and can record a reasoned, audited review override. Personal recovery and unfinished uploads remain user-scoped. Ready assets attached to campus work can be reused by authorized teammates.
 
 The workspace targets **100,000 features** with bounded server queries and editing sessions. That is a dataset target, not a claim that every mobile device can render 100,000 features interactively. Public navigation and offline packages have their own smaller limits.
 
-## Current workspace screenshots
+## Current editor screenshots
 
-Unaltered captures of the production-built application use a verified published LASU basemap and isolated demonstration team/API responses. The 100,000-row catalogue count illustrates paging controls; it is not a live inventory or a performance measurement. [Capture provenance and reproduction](docs/assets/screenshots/README.md#campus-gis-workflow--5-october-2026).
+Unaltered captures of the production-built application use a verified published LASU basemap and isolated demonstration team/API responses. The 100,000-row catalogue count illustrates paging controls; it is not a live inventory or a performance measurement. [Capture provenance and reproduction](docs/assets/screenshots/README.md#unified-editor--5-october-2026).
 
-![Data workspace with typed private attributes, paged selection and a shared campus map](docs/assets/screenshots/gis-data-2026-10-05.png)
+![Data workspace with typed private attributes, paged selection and a shared campus map](docs/assets/screenshots/unified-editor-data-2026-10-05.png)
 
 | Repeatable analysis | Independent review |
 | --- | --- |
-| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/gis-analyze-2026-10-05.png) | ![Immutable submission inspection and quality-check summary](docs/assets/screenshots/gis-review-2026-10-05.png) |
+| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/unified-editor-analyze-2026-10-05.png) | ![Immutable submission inspection and quality-check summary](docs/assets/screenshots/unified-editor-review-2026-10-05.png) |
 
-![Publication workspace with approved snapshots and map export templates](docs/assets/screenshots/gis-publish-2026-10-05.png)
+![Publication workspace with approved snapshots and map export templates](docs/assets/screenshots/unified-editor-publish-2026-10-05.png)
 
 ## Capabilities
 
@@ -95,9 +95,9 @@ The configured build uses placeholder public authentication settings to test rea
 
 ## Work with campus data
 
-1. Sign in to **Team workspace**. An administrator assigns existing Supabase Auth users to campus roles in **Review → Campus memberships**.
-2. Open **Campuses** to import spatial files or public OSM/ArcGIS sources. Inspect CRS, stable identities, field mappings and repair diagnostics before accepting proposals into the shared draft.
-3. Use **Data** for typed attributes and non-spatial asset CSVs. Join tables in **Analyze**, then inspect and apply the result as a private dataset.
+1. Sign in to **Team workspace**. An administrator assigns existing Supabase Auth users to campus roles in **Campus menu → Campus memberships**.
+2. Use **Layers and data → Add data** to import spatial files or public OSM/ArcGIS sources. Inspect CRS, stable identities, field mappings and repair diagnostics before accepting proposals into the shared draft.
+3. Use the **attribute table** for typed attributes and non-spatial asset CSVs. Join tables in **Analyze**, then inspect and apply the result as a private dataset.
 4. Select a feature for **Edit geometry**. Finish the bounded editing session with **Save and end geometry session**; other team edits use explicit conflict handling.
 5. Style results and explicitly choose public fields. Resolve blocking issues in **Review**, submit a snapshot, and obtain approval from a non-contributor.
 6. A publisher previews and publishes that exact approved content. Export data or a map, then download the published campus in the public **Offline** panel.
@@ -121,12 +121,12 @@ Export selected/filtered datasets as **GeoJSON, CSV or GeoPackage**. Receipts re
 
 ## Architecture and boundaries
 
-React/TypeScript and MapLibre share one map. Supabase/PostGIS stores campus memberships, authoritative sources/corrections, typed datasets, a rebuildable spatial index, jobs and immutable reviews. Vercel serves the PWA and typed compatibility API; GitHub Actions runs isolated processing and release gates. Additional workspaces load on demand.
+React/TypeScript and MapLibre share one map. Supabase/PostGIS stores campus memberships, authoritative sources/corrections, typed datasets, a rebuildable spatial index, jobs and immutable reviews. Vercel serves the PWA and typed compatibility API; GitHub Actions runs isolated processing and release gates. Specialist tasks load on demand inside the shared shell.
 
 | Boundary | Current limit |
 | --- | --- |
 | Spatial workspace dataset target | 100,000 features |
-| Interactive query/edit batch | Up to 500 features; Data displays 100 rows per page |
+| Interactive query/edit batch | Up to 500 features; the attribute table displays 100 rows per page |
 | Query response | 2 MB |
 | Asset CSV | 2.5 MB, 100,000 rows, 100 fields |
 | Processing input/output | 100,000 features and 50 MiB each |
@@ -143,7 +143,7 @@ Apply additive migrations **001–037** in order for a fresh installation, or on
 
 Pull requests run unit/database, type, lint, configured-build, browser, offline and native GIS checks. Reviewed content releases also require the comprehensive gates. [Deployment procedure](docs/DEPLOYMENT.md) · [Configuration](docs/CONFIGURATION.md) · [Acceptance](docs/ACCEPTANCE.md) · [Actual deployment receipts](docs/PRODUCTION.md).
 
-The [complete release gates](docs/assets/gis-platform-release-gates-2026-10-05.json) passed **714 tests across 99 files**, both TypeScript projects, lint and unchanged build budgets; 187 Chromium cases, 87 WebKit cases, 15 additional WebKit photo cases and 10 offline cases. Native PostGIS/isolated GIS/importer checks also passed, including 100,000-feature paging and database backup restoration. [Production](docs/PRODUCTION.md) separately records live service, migration and deployment evidence; fixture success does not establish the remaining multi-user/device/field acceptance.
+The preceding GIS platform release's [complete release gates](docs/assets/gis-platform-release-gates-2026-10-05.json) passed **714 tests across 99 files**, both TypeScript projects, lint and unchanged build budgets; 187 Chromium cases, 87 WebKit cases, 15 additional WebKit photo cases and 10 offline cases. Native PostGIS/isolated GIS/importer checks also passed, including 100,000-feature paging and database backup restoration. [Production](docs/PRODUCTION.md) separately records live service, migration and deployment evidence; fixture success does not establish the remaining multi-user/device/field acceptance.
 
 ## Repository structure
 

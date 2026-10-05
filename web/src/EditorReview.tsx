@@ -1,4 +1,5 @@
-import { campusUrl, requestedCampus } from './campus-context';
+import { useEditorSession } from './EditorSession';
+import { requestedCampus } from './campus-context';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
 import {
@@ -8,7 +9,6 @@ import {
   Layers,
   MapPin,
   RefreshCw,
-  Upload,
   X,
 } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
@@ -48,6 +48,7 @@ export interface ReviewState {
 
 export function EditorReview({
   tab,
+  active = true,
   state,
   workspace,
   validation,
@@ -69,6 +70,7 @@ export function EditorReview({
   draftCount,
 }: {
   tab: string;
+  active?: boolean;
   state: ReviewState;
   workspace: EditorWorkspace;
   validation: EditorValidation & { pending?: boolean; retry: () => void };
@@ -89,7 +91,7 @@ export function EditorReview({
   onPublishedWorkspace: (published: PublishedWorkspace | null) => void;
   draftCount: number;
 }) {
-  const [summary, setSummary] = useState('');
+  const session = useEditorSession();
   const modelReviews = useMemo(
     () => campusFacadeReviewIssues(validation.data),
     [validation.data],
@@ -104,9 +106,10 @@ export function EditorReview({
   const impact = useReleaseImpact(
     published,
     validation.data,
-    tab === 'releases' && !validation.pending,
+    active && tab === 'releases' && !validation.pending,
   );
   useEffect(() => {
+    if (!active) return;
     if (!['changes', 'releases'].includes(tab)) {
       setLiveState(state);
       return;
@@ -145,6 +148,7 @@ export function EditorReview({
     };
   }, [
     state,
+    active,
     tab,
     statusAttempt,
     onPublishedWorkspace,
@@ -483,7 +487,7 @@ export function EditorReview({
       )}
       {tab === 'releases' && (
         <>
-          <h2>Review, then publish</h2>
+          <h2>Draft changes</h2>
           <p>
             {draftCount} unpublished corrections · {workspace.status}
           </p>
@@ -759,121 +763,27 @@ export function EditorReview({
               </>
             )}
           </section>
-          <label className="field-label">
-            What changed?
-            <textarea
-              value={summary}
-              maxLength={500}
-              placeholder="Describe the corrections in this release…"
-              onChange={(e) => setSummary(e.target.value)}
-            />
-          </label>
+          <p>
+            Submit this draft for independent approval in Review. Approved
+            snapshots, previews and restoration are managed in Publish.
+          </p>
           <Button
             disabled={
               busy ||
               validation.pending ||
-              workspace.unfinished !== null ||
+              !!workspace.unfinished ||
+              !!workspace.roofDraft ||
               validation.errors.length > 0 ||
               modelReviews.length > 0 ||
               baselineVersion !== publishedVersion ||
-              summary.trim().length < 5 ||
               impact.pending ||
               !!impact.error ||
               !impact.result
             }
-            onClick={() =>
-              action(
-                'prepare-release',
-                { summary },
-                'Immutable release queued. Review its deployment preview before publishing.',
-              )
-            }
+            onClick={() => session.navigate('gis-review')}
           >
-            <Upload /> Build review preview
+            Continue to submission
           </Button>
-          {liveState.releases.map((release) => (
-            <div className="change-card" key={release.id}>
-              <span className="change-kind">{release.status}</span>
-              <h3>{release.summary}</h3>
-              <small>{new Date(release.created_at).toLocaleString()}</small>
-              {release.error && <p className="form-error">{release.error}</p>}
-              {release.preview_url && (
-                <a
-                  className="source-link"
-                  href={
-                    new URL(campusUrl(release.preview_url), release.preview_url)
-                      .href
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open exact release preview ↗
-                </a>
-              )}
-              {release.status === 'preview' && (
-                <>
-                  <p className="small-note">
-                    {baselineVersion !== publishedVersion ||
-                    release.created_at <
-                      (workspace.edits
-                        .map((e) => e.updated_at || '')
-                        .sort()
-                        .at(-1) || '')
-                      ? 'Stale preview: reconcile the baseline and build a new preview from the current drafts.'
-                      : 'The server checks this snapshot again before publication.'}
-                  </p>
-                  <Button
-                    disabled={
-                      busy ||
-                      validation.pending ||
-                      validation.errors.length > 0 ||
-                      modelReviews.length > 0 ||
-                      baselineVersion !== publishedVersion ||
-                      release.created_at <
-                        (workspace.edits
-                          .map((e) => e.updated_at || '')
-                          .sort()
-                          .at(-1) || '')
-                    }
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          'Publish this reviewed preview to the public TurnRight site?',
-                        )
-                      )
-                        void action(
-                          'publish-release',
-                          { id: release.id },
-                          'Publication requested. Refresh to verify the result.',
-                        );
-                    }}
-                  >
-                    Publish this preview
-                  </Button>
-                </>
-              )}
-              {release.status === 'published' && (
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        'Submit this campus release for independent restoration review?',
-                      )
-                    )
-                      void action(
-                        'rollback',
-                        { id: release.id },
-                        'Restoration submitted. Open Review for independent approval, then Publish to build its preview.',
-                      );
-                  }}
-                >
-                  Submit restoration for review
-                </Button>
-              )}
-            </div>
-          ))}
         </>
       )}
     </>

@@ -48,5 +48,6 @@ export interface LayerViewState {
   active?: string;
   isolated?: string;
   hidden?: string[];
+  shown?: string[];
   selected?: string[];
 }

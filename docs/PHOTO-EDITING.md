@@ -1,5 +1,7 @@
 # Offline image editing and compression
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Campus GIS integration
 
 Local image recipes and unfinished uploads remain personal. Authorized campus teammates can read and reuse approved photographs attached to current or immutable work; private original paths and unrelated drafts are not exposed. Publishing a gallery change follows the shared independent-review workflow. [Team workflow and roles](GIS-PLATFORM.md).

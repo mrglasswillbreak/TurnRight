@@ -4,13 +4,18 @@ import type {
   DatasetField,
   DatasetFeature,
   FeaturePage,
-  FeatureQuery,
   FieldValue,
 } from './gis-types';
 import { gisApi } from './gis-api';
 import { valueErrors } from './gis-contracts';
-import { focusGisFeature, showGisPage } from './gis-map';
-import GisSchema from './GisSchema';
+import { focusGisFeature } from './gis-map';
+import { useEditorSession } from './EditorSession';
+import {
+  attributeInputKey,
+  featureReference,
+  selectionKey,
+  type TableContext,
+} from './editor-session';
 export default function GisData({
   datasets,
   capabilities,
@@ -19,19 +24,114 @@ export default function GisData({
   refresh,
   onEdit,
   onEndEditingSession,
+  active = true,
 }: GisPanelProps) {
-  const [id, setId] = useState(''),
-    [pageResult, setPageResult] = useState<{
-      key: string;
-      page: FeaturePage;
-    }>(),
-    [error, setError] = useState(''),
+  const session = useEditorSession();
+  const { setState: setSession } = session;
+  const id =
+    session.state.table.kind === 'dataset' ? session.state.table.id || '' : '';
+  const setId = (value: string) =>
+    session.setState((s) => ({
+      ...s,
+      activeEntry: 'dataset:' + value,
+      table: { ...s.table, kind: 'dataset', id: value },
+    }));
+  const dataset = datasets.find((d) => d.id === id) || datasets[0];
+  const datasetId = dataset?.id;
+  const revision = dataset?.revision;
+  const editable = capabilities.capabilities.includes('edit');
+  const defaults: TableContext = useMemo(
+    () => ({
+      query: {},
+      columns: dataset?.schema.fields.map((f) => f.name).slice(0, 8) || [],
+      revision,
+      history: [],
+    }),
+    [dataset, revision],
+  );
+  const table = session.state.datasetTables[datasetId || ''] || defaults;
+  const changeTable = <K extends keyof TableContext>(
+    key: K,
+    value: TableContext[K] | ((previous: TableContext[K]) => TableContext[K]),
+  ) =>
+    session.setState((s) => {
+      const previous = s.datasetTables[datasetId || ''] || defaults;
+      return {
+        ...s,
+        datasetTables: {
+          ...s.datasetTables,
+          [datasetId || '']: {
+            ...previous,
+            [key]: typeof value === 'function' ? value(previous[key]) : value,
+          },
+        },
+      };
+    });
+  const query = table.query,
+    cursor = table.revision === revision ? table.cursor : undefined,
+    history = table.revision === revision ? table.history : [],
+    columns = table.columns;
+  const setQuery = (
+    value:
+      | TableContext['query']
+      | ((q: TableContext['query']) => TableContext['query']),
+  ) => changeTable('query', value);
+  const setCursor = (value: string | undefined) => changeTable('cursor', value);
+  const setHistory = (
+    value:
+      | TableContext['history']
+      | ((h: TableContext['history']) => TableContext['history']),
+  ) => changeTable('history', value);
+  const setColumns = (value: string[] | ((c: string[]) => string[])) =>
+    changeTable('columns', value);
+  const selected = new Set(
+    session.state.selection
+      .filter((f) => f.datasetId === datasetId)
+      .map(selectionKey),
+  );
+  const setSelected = (
+    value: Set<string> | ((s: Set<string>) => Set<string>),
+  ) =>
+    session.setState((s) => {
+      const previous = new Set(
+        s.selection.filter((f) => f.datasetId === datasetId).map(selectionKey),
+      );
+      const next = typeof value === 'function' ? value(previous) : value;
+      return {
+        ...s,
+        editingFeature: undefined,
+        selection: [...next]
+          .slice(0, 500)
+          .map((key) =>
+            featureReference(capabilities.campusId, key, datasetId, revision),
+          ),
+      };
+    });
+  useEffect(() => {
+    if (!datasetId || revision === undefined) return;
+    setSession((s) => {
+      const previous = s.datasetTables[datasetId];
+      if (previous?.revision === revision) return s;
+      return {
+        ...s,
+        datasetTables: {
+          ...s.datasetTables,
+          [datasetId]: {
+            ...(previous || defaults),
+            revision,
+            cursor: undefined,
+            history: [],
+          },
+        },
+      };
+    });
+  }, [datasetId, revision, setSession, defaults]);
+  const [pageResult, setPageResult] = useState<{
+    key: string;
+    page: FeaturePage;
+  }>();
+  const [error, setError] = useState(''),
     [loading, setLoading] = useState(false),
-    [query, setQuery] = useState<Partial<FeatureQuery>>({}),
-    [cursor, setCursor] = useState<string>(),
-    [history, setHistory] = useState<(string | undefined)[]>([]),
-    [selected, setSelected] = useState(new Set<string>()),
-    [columns, setColumns] = useState<string[]>([]),
     [extent, setExtent] = useState(false),
     [epoch, setEpoch] = useState(0),
     [name, setName] = useState('Asset table');
@@ -39,10 +139,6 @@ export default function GisData({
     [operator, setOperator] = useState('contains'),
     [value, setValue] = useState(''),
     [stats, setStats] = useState('');
-  const dataset = datasets.find((d) => d.id === id) || datasets[0],
-    editable = capabilities.capabilities.includes('edit');
-  const revision = dataset?.revision;
-  const datasetId = dataset?.id;
   const requestKey = JSON.stringify([
     datasetId,
     revision,
@@ -53,25 +149,15 @@ export default function GisData({
   // Hide the previous page synchronously when a query changes. It must not
   // remain editable until the loading effect or response arrives.
   const page = pageResult?.key === requestKey ? pageResult.page : undefined;
-  const schemaKey = JSON.stringify(dataset?.schema.fields || []);
   useEffect(() => {
-    const fields = JSON.parse(schemaKey) as DatasetField[];
-    setId(datasetId || '');
-    setQuery({});
-    setCursor(undefined);
-    setHistory([]);
-    setSelected(new Set());
-    setColumns(fields.map((f) => f.name).slice(0, 8));
-    setField(fields[0]?.name || '');
-  }, [datasetId, schemaKey]);
+    setField((current) =>
+      dataset?.schema.fields.some((f) => f.name === current)
+        ? current
+        : dataset?.schema.fields[0]?.name || '',
+    );
+  }, [datasetId, dataset?.schema.fields]);
   useEffect(() => {
-    if (revision === undefined) return;
-    setCursor(undefined);
-    setHistory([]);
-    setSelected(new Set());
-  }, [revision]);
-  useEffect(() => {
-    if (!datasetId || revision === undefined) return;
+    if (!active || !datasetId || revision === undefined) return;
     let cancelled = false;
     setLoading(true);
     setPageResult(undefined);
@@ -99,40 +185,41 @@ export default function GisData({
     return () => {
       cancelled = true;
     };
-  }, [datasetId, revision, query, cursor, epoch, requestKey]);
+  }, [active, datasetId, revision, query, cursor, epoch, requestKey]);
   useEffect(() => {
-    if (!map || !dataset || !page) return;
-    return showGisPage(map, dataset, page.features, selected, (key) =>
-      setSelected((previous) => {
-        const next = new Set(previous);
-        if (next.has(key)) next.delete(key);
-        else if (next.size < 500) next.add(key);
-        return next;
-      }),
-    );
-  }, [map, dataset, page, selected]);
-  useEffect(() => {
-    if (!map || !extent) return;
+    if (!active || !map || !extent) return;
     const update = () => {
       const b = map.getBounds();
-      setQuery((q) => ({
-        ...q,
-        bbox: [
-          Math.max(-180, b.getWest()),
-          Math.max(-90, b.getSouth()),
-          Math.min(180, b.getEast()),
-          Math.min(90, b.getNorth()),
-        ],
-      }));
-      setCursor(undefined);
-      setHistory([]);
+      setSession((s) => {
+        const previous = s.datasetTables[datasetId || ''] || defaults;
+        return {
+          ...s,
+          datasetTables: {
+            ...s.datasetTables,
+            [datasetId || '']: {
+              ...previous,
+              cursor: undefined,
+              history: [],
+              query: {
+                ...previous.query,
+                bbox: [
+                  Math.max(-180, b.getWest()),
+                  Math.max(-90, b.getSouth()),
+                  Math.min(180, b.getEast()),
+                  Math.min(90, b.getNorth()),
+                ],
+              },
+            },
+          },
+        };
+      });
     };
     update();
     map.on('moveend', update);
     return () => {
       map.off('moveend', update);
     };
-  }, [map, extent]);
+  }, [map, extent, active, datasetId, defaults, setSession]);
   const fields = useMemo(
     () => dataset?.schema.fields.filter((f) => columns.includes(f.name)) || [],
     [dataset, columns],
@@ -260,154 +347,174 @@ export default function GisData({
         <p>Import campus features in Campuses, or add an asset CSV above.</p>
       ) : (
         <>
-          <p>
-            {dataset.source_crs} → {dataset.analysis_crs} · metric analysis in
-            metres · revision {dataset.revision} ·{' '}
-            {dataset.included ? 'Selected for publication' : 'Private dataset'}
-          </p>
-          <div className="gis-toolbar">
-            <label>
-              Field
-              <select value={field} onChange={(e) => setField(e.target.value)}>
-                {dataset.schema.fields.map((f) => (
-                  <option key={f.name}>{f.name}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Operator
-              <select
-                value={operator}
-                onChange={(e) => setOperator(e.target.value)}
-              >
-                {['contains', 'eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'null'].map(
-                  (o) => (
+          <details className="gis-table-options">
+            <summary>
+              Filters and columns{query.filters?.length ? ' · filtered' : ''}
+            </summary>
+            <p>
+              {dataset.source_crs} → {dataset.analysis_crs} · metric analysis in
+              metres · revision {dataset.revision} ·{' '}
+              {dataset.included
+                ? 'Selected for publication'
+                : 'Private dataset'}
+            </p>
+            <div className="gis-toolbar">
+              <label>
+                Field
+                <select
+                  value={field}
+                  onChange={(e) => setField(e.target.value)}
+                >
+                  {dataset.schema.fields.map((f) => (
+                    <option key={f.name}>{f.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Operator
+                <select
+                  value={operator}
+                  onChange={(e) => setOperator(e.target.value)}
+                >
+                  {[
+                    'contains',
+                    'eq',
+                    'ne',
+                    'gt',
+                    'gte',
+                    'lt',
+                    'lte',
+                    'null',
+                  ].map((o) => (
                     <option key={o}>{o}</option>
-                  ),
-                )}
-              </select>
-            </label>
-            <label>
-              Value
-              <input value={value} onChange={(e) => setValue(e.target.value)} />
-            </label>
-            <button
-              onClick={() => {
-                const type = dataset.schema.fields.find(
-                  (f) => f.name === field,
-                )?.type;
-                const parsed =
-                  value === ''
-                    ? null
-                    : type === 'number'
-                      ? Number(value)
-                      : type === 'boolean'
-                        ? value === 'true'
-                        : value;
-                setQuery((q) => ({
-                  ...q,
-                  filters: [
-                    { field, operator: operator as 'eq', value: parsed },
-                  ],
-                }));
-                setCursor(undefined);
-                setHistory([]);
-              }}
-            >
-              Filter
-            </button>
-            <button
-              onClick={() => {
-                setQuery({});
-                setCursor(undefined);
-                setHistory([]);
-                setExtent(false);
-              }}
-            >
-              Clear
-            </button>
-            <button
-              onClick={() =>
-                void attempt(async () => {
-                  const s = await gisApi('gis-statistics', {
-                    ...query,
-                    datasetId: dataset.id,
-                    revision: dataset.revision,
-                    field,
-                  });
-                  setStats(
-                    `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
-                  );
-                })
-              }
-            >
-              Statistics
-            </button>
-          </div>
-          {stats && <output>{stats}</output>}
-          <div className="gis-toolbar">
-            <label>
-              <input
-                type="checkbox"
-                checked={extent}
-                onChange={(e) => {
-                  setExtent(e.target.checked);
-                  if (!e.target.checked)
-                    setQuery((q) => {
-                      const { bbox: _bbox, ...rest } = q;
-                      return rest;
-                    });
-                }}
-              />
-              Limit to map extent
-            </label>
-            <details>
-              <summary>Columns</summary>
-              {dataset.schema.fields.map((f) => (
-                <label key={f.name}>
-                  <input
-                    type="checkbox"
-                    checked={columns.includes(f.name)}
-                    onChange={(e) =>
-                      setColumns((c) =>
-                        e.target.checked
-                          ? [...c, f.name]
-                          : c.filter((k) => k !== f.name),
-                      )
-                    }
-                  />
-                  {f.alias || f.name}
-                </label>
-              ))}
-            </details>
-            <label>
-              Saved filter
-              <select
-                value=""
-                onChange={(e) => {
-                  const saved = dataset.saved_filters[Number(e.target.value)];
-                  if (saved) {
-                    const {
-                      datasetId: _id,
-                      revision: _rev,
-                      cursor: _cursor,
-                      ...q
-                    } = saved.query;
-                    setQuery(q);
-                    setCursor(undefined);
-                    setHistory([]);
-                  }
+                  ))}
+                </select>
+              </label>
+              <label>
+                Value
+                <input
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+              </label>
+              <button
+                onClick={() => {
+                  const type = dataset.schema.fields.find(
+                    (f) => f.name === field,
+                  )?.type;
+                  const parsed =
+                    value === ''
+                      ? null
+                      : type === 'number'
+                        ? Number(value)
+                        : type === 'boolean'
+                          ? value === 'true'
+                          : value;
+                  setQuery((q) => ({
+                    ...q,
+                    filters: [
+                      { field, operator: operator as 'eq', value: parsed },
+                    ],
+                  }));
+                  setCursor(undefined);
+                  setHistory([]);
                 }}
               >
-                <option value="">Choose…</option>
-                {dataset.saved_filters.map((s, i) => (
-                  <option key={i} value={i}>
-                    {s.name}
-                  </option>
+                Filter
+              </button>
+              <button
+                onClick={() => {
+                  setQuery({});
+                  setCursor(undefined);
+                  setHistory([]);
+                  setExtent(false);
+                }}
+              >
+                Clear
+              </button>
+              <button
+                onClick={() =>
+                  void attempt(async () => {
+                    const s = await gisApi('gis-statistics', {
+                      ...query,
+                      datasetId: dataset.id,
+                      revision: dataset.revision,
+                      field,
+                    });
+                    setStats(
+                      `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
+                    );
+                  })
+                }
+              >
+                Statistics
+              </button>
+            </div>
+            {stats && <output>{stats}</output>}
+            <div className="gis-toolbar">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={extent}
+                  onChange={(e) => {
+                    setExtent(e.target.checked);
+                    if (!e.target.checked)
+                      setQuery((q) => {
+                        const { bbox: _bbox, ...rest } = q;
+                        return rest;
+                      });
+                  }}
+                />
+                Limit to map extent
+              </label>
+              <details>
+                <summary>Columns</summary>
+                {dataset.schema.fields.map((f) => (
+                  <label key={f.name}>
+                    <input
+                      type="checkbox"
+                      checked={columns.includes(f.name)}
+                      onChange={(e) =>
+                        setColumns((c) =>
+                          e.target.checked
+                            ? [...c, f.name]
+                            : c.filter((k) => k !== f.name),
+                        )
+                      }
+                    />
+                    {f.alias || f.name}
+                  </label>
                 ))}
-              </select>
-            </label>
-          </div>
+              </details>
+              <label>
+                Saved filter
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const saved = dataset.saved_filters[Number(e.target.value)];
+                    if (saved) {
+                      const {
+                        datasetId: _id,
+                        revision: _rev,
+                        cursor: _cursor,
+                        ...q
+                      } = saved.query;
+                      setQuery(q);
+                      setCursor(undefined);
+                      setHistory([]);
+                    }
+                  }}
+                >
+                  <option value="">Choose…</option>
+                  {dataset.saved_filters.map((s, i) => (
+                    <option key={i} value={i}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </details>
           <div className="gis-table-scroll" aria-busy={loading}>
             <table>
               <thead>
@@ -488,7 +595,10 @@ export default function GisData({
                     <td>
                       <button
                         title={f.id}
-                        onClick={() => focusGisFeature(map, f)}
+                        onClick={() => {
+                          setSelected(new Set([f.id]));
+                          focusGisFeature(map, f);
+                        }}
                       >
                         {String(f.properties.name || f.id).slice(0, 50)}
                       </button>
@@ -513,6 +623,12 @@ export default function GisData({
                     {fields.map((field) => (
                       <td key={field.name}>
                         <AttributeCell
+                          draftKey={attributeInputKey(
+                            dataset.id,
+                            f.id,
+                            field.name,
+                          )}
+                          revision={page!.revision}
                           key={field.name + ':' + page.revision}
                           field={field}
                           value={f.properties[field.name] ?? null}
@@ -550,24 +666,6 @@ export default function GisData({
               Next
             </button>
           </div>
-          {editable && (
-            <GisSchema
-              key={dataset.id + ':' + dataset.revision}
-              dataset={dataset}
-              query={{ ...query, datasetId: dataset.id }}
-              save={(next) =>
-                attempt(() =>
-                  mutate(() =>
-                    gisApi('gis-dataset-save', {
-                      dataset: next,
-                      expectedRevision: dataset.revision,
-                      operationId: crypto.randomUUID(),
-                    }),
-                  ),
-                )
-              }
-            />
-          )}
           <details>
             <summary>Export filtered or selected data</summary>
             <p>
@@ -614,16 +712,53 @@ function AttributeCell({
   value,
   disabled,
   save,
+  draftKey,
+  revision,
 }: {
+  draftKey: string;
+  revision: number;
   field: DatasetField;
   value: FieldValue;
   disabled: boolean;
   save: (value: string) => Promise<void>;
 }) {
-  const [text, setText] = useState(value === null ? '' : String(value)),
-    [error, setError] = useState(''),
+  const session = useEditorSession();
+  const draft = session.state.attributeDrafts[draftKey];
+  const text = draft?.text ?? (value === null ? '' : String(value));
+  const setText = (text: string) => {
+    if (!draft && Object.keys(session.state.attributeDrafts).length >= 500) {
+      setError(
+        'Finish or discard an unfinished attribute input before adding another.',
+      );
+      return;
+    }
+    session.setState((s) => ({
+      ...s,
+      attributeDrafts: {
+        ...s.attributeDrafts,
+        [draftKey]: {
+          text,
+          revision: s.attributeDrafts[draftKey]?.revision ?? revision,
+        },
+      },
+    }));
+  };
+  const clear = () =>
+    session.setState((s) => {
+      const next = { ...s.attributeDrafts };
+      delete next[draftKey];
+      return { ...s, attributeDrafts: next };
+    });
+  const [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
   const commit = async () => {
+    if (!draft || busy || disabled) return;
+    if (draft.revision !== revision) {
+      setError(
+        'The dataset changed. Review the current value before applying this input.',
+      );
+      return;
+    }
     const errors = valueErrors(
       field,
       text === ''
@@ -642,6 +777,7 @@ function AttributeCell({
     setBusy(true);
     try {
       await save(text);
+      clear();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -687,6 +823,34 @@ function AttributeCell({
         />
       )}
       {error && <small role="alert">{error}</small>}
+      {draft && (
+        <span>
+          <button type="button" onClick={clear}>
+            Discard input
+          </button>
+          {draft.revision !== revision && (
+            <button
+              type="button"
+              onClick={() => {
+                session.setState((s) => ({
+                  ...s,
+                  attributeDrafts: {
+                    ...s.attributeDrafts,
+                    [draftKey]: { text, revision },
+                  },
+                }));
+                setError(
+                  'Current value: ' +
+                    String(value ?? 'NULL') +
+                    '. Check your input, then leave the field to save.',
+                );
+              }}
+            >
+              Review current value
+            </button>
+          )}
+        </span>
+      )}
     </>
   );
 }

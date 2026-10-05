@@ -1,3 +1,4 @@
+import { editorTask, layerProperties, layerTable } from './editor-navigation';
 import { fileURLToPath } from 'node:url';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Color } from 'three';
@@ -2094,7 +2095,7 @@ test('published corrections leave Drafts and map highlights without losing saved
     .toBe('Next library');
   await expect.poll(draftIds).toEqual(['library']);
   server.publish();
-  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  await editorTask(page, 'Releases');
   await expect(
     page.getByText('0 unpublished corrections · Saved'),
   ).toBeVisible();
@@ -2240,7 +2241,7 @@ test('editor reliability: export retries export and local recovery downloads off
     if (action === 'save-edits') saves++;
     return route.fallback();
   });
-  await page.getByLabel('Backup options').click();
+  await page.getByLabel('Save and recovery status').click();
   await page
     .getByRole('button', { name: 'Export backup', exact: true })
     .click();
@@ -2282,7 +2283,7 @@ test('editor reliability: opening duplicates is read-only until the reviewed bat
       campus.places.push({ ...gate, id: 'gate-copy' });
     },
   });
-  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await editorTask(page, 'Duplicates');
   await expect(
     page.getByRole('button', { name: 'Review exact duplicate cleanup' }),
   ).toBeVisible();
@@ -2549,7 +2550,7 @@ test('editor reliability: source comparisons and release status refresh without 
     }
     return route.fallback();
   });
-  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await editorTask(page, 'Sources');
   await expect(
     page.getByText('Source check complete', { exact: true }),
   ).toBeVisible();
@@ -2559,7 +2560,7 @@ test('editor reliability: source comparisons and release status refresh without 
   );
   expect(polls).toBeGreaterThan(0);
   expect(saves).toBe(0);
-  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  await editorTask(page, 'Releases');
   const impact = page.getByRole('region', { name: 'Release impact' });
   await expect(impact).toContainText('Clinic–Law');
   await expect(impact.locator('tbody')).toContainText('Connected');
@@ -2588,7 +2589,7 @@ test('editor reliability: uncertain jobs check status before resubmission and re
       return route.fulfill({ status: 401, json: { error: 'Expired' } });
     return route.fallback();
   });
-  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await editorTask(page, 'Sources');
   await page.getByRole('button', { name: 'Check now', exact: true }).click();
   await expect(
     page.getByRole('button', { name: 'Check action status', exact: true }),
@@ -2655,7 +2656,7 @@ test.describe('phone editor reliability', () => {
       updated_at: '2026-09-11T10:00:00Z',
     };
     const server = await setup(page, false, false, { initialEdits: [initial] });
-    await page.getByRole('button', { name: 'Releases', exact: true }).tap();
+    await editorTask(page, 'Releases');
     await page
       .getByRole('button', { name: 'Choose entrance’s place' })
       .first()
@@ -2765,7 +2766,7 @@ test('release diagnostics preserve the usable campus and identify the captured m
   page.on('pageerror', (e) => errors.push(e.message));
   await page.reload();
   await attachMap(page);
-  await page.getByRole('button', { name: 'Releases', exact: true }).click();
+  await editorTask(page, 'Releases');
   await expect(
     page.getByText('Validation needs attention', { exact: true }),
   ).toBeVisible();
@@ -2774,7 +2775,7 @@ test('release diagnostics preserve the usable campus and identify the captured m
     page.getByText(/osm:way:1534765716:2297333149:2297333129:1/).first(),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: 'Build review preview' }),
+    page.getByRole('button', { name: 'Continue to submission' }),
   ).toBeDisabled();
   await page.getByRole('button', { name: 'Retry validation' }).click();
   await expect(
@@ -2808,7 +2809,9 @@ test('review separate building wings, edit their geometry, save and undo without
     }),
   );
   await clickMap(page, [3.1997, 6.47128]);
-  const chooser = page.getByRole('dialog', { name: 'Choose overlapping feature' });
+  const chooser = page.getByRole('dialog', {
+    name: 'Choose overlapping feature',
+  });
   if (await chooser.isVisible())
     await chooser.getByRole('button', { name: /building .*120$/ }).click();
   await page.getByRole('button', { name: 'Review corrected wings' }).click();
@@ -2971,7 +2974,7 @@ for (const phone of [false, true])
     await page.screenshot({
       path: `test-results/miniature-${phone ? 'phone' : 'desktop'}-dark.png`,
     });
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await editorTask(page, 'Settings');
     await page.getByRole('radio', { name: 'Simple', exact: true }).check();
     await expect
       .poll(() =>
@@ -2983,7 +2986,7 @@ for (const phone of [false, true])
     await page
       .getByRole('button', { name: 'Expand card', exact: true })
       .click();
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await editorTask(page, 'Settings');
     await expect(
       page.getByRole('radio', { name: 'Simple', exact: true }),
     ).toBeChecked();
@@ -3582,7 +3585,7 @@ test('duplicate queue keeps same-name campus records separate and supports undo 
   page,
 }) => {
   const server = await setup(page, true);
-  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await editorTask(page, 'Duplicates');
   await expect(
     page.getByRole('heading', { name: 'Duplicate review', exact: true }),
   ).toBeVisible();
@@ -3633,7 +3636,7 @@ test('duplicate queue keeps same-name campus records separate and supports undo 
   const count = await page.locator('.duplicate-review output').textContent();
   await page.reload();
   await attachMap(page);
-  await page.getByRole('button', { name: 'Duplicates', exact: true }).click();
+  await editorTask(page, 'Duplicates');
   await expect(page.locator('.duplicate-review output')).toHaveText(count!);
 });
 
@@ -3883,7 +3886,7 @@ test('supports dark appearance and small-screen review', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Switch to 3D', exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await editorTask(page, 'Sources');
   await expect(
     page.getByRole('heading', { name: 'Source review' }),
   ).toBeVisible();
@@ -3911,7 +3914,7 @@ for (const phone of [false, true]) {
       window.editorTestMap.getZoom(),
       window.editorTestMap.getPitch(),
     ]);
-    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await editorTask(page, 'Sources');
     await page
       .locator('summary')
       .filter({ hasText: /^Building appearances$/ })
@@ -3982,7 +3985,7 @@ for (const phone of [false, true]) {
       .toBe(true);
     await page.reload();
     await attachMap(page);
-    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await editorTask(page, 'Sources');
     await page
       .locator('summary')
       .filter({ hasText: /^Building appearances$/ })
@@ -4009,7 +4012,7 @@ test('building references campus batch: all eligible facades regenerate without 
       pitch: 48,
     }),
   );
-  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await editorTask(page, 'Sources');
   await page
     .locator('summary')
     .filter({ hasText: /^Building appearances$/ })
@@ -4028,7 +4031,7 @@ test('building references campus batch: all eligible facades regenerate without 
       ?.properties.appearance?.parts?.['arcgis:University_Property:120:wing:1']
       ?.windows,
   ).toBe(false);
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await editorTask(page, 'Edit');
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
     timeout: 45000,
   });
@@ -4488,7 +4491,7 @@ test.describe('building roof touch editing', () => {
         ),
       )
       .toContain('library');
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await editorTask(page, 'Settings');
     await page.getByLabel('Building opacity', { exact: true }).fill('0.25');
     await page
       .getByRole('button', { name: 'Close settings', exact: true })
@@ -4734,7 +4737,7 @@ test('public cards: compact start, drag sizing, remembered heights and keyboard 
   await expect(handle).toHaveAttribute('aria-valuenow', '96');
   await page.getByRole('button', { name: 'Expand card' }).click();
   await expect(handle).toHaveAttribute('aria-valuenow', '396');
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   const dialogHandle = page.getByRole('slider', { name: 'Resize dialog' });
   await dialogHandle.press('Home');
   await expect(dialogHandle).toHaveAttribute('aria-valuenow', '220');
@@ -4754,7 +4757,7 @@ test('public cards: compact start, drag sizing, remembered heights and keyboard 
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Expand card' }).click();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(dialogHandle).toHaveAttribute('aria-valuenow', '252');
 });
 
@@ -4776,7 +4779,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await expect(toggle).toHaveText('3D');
   await toggle.press('Space');
   await expect(toggle).toHaveAccessibleName('Switch to 2D');
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByRole('radio', { name: 'Enhanced', exact: true }),
   ).toBeChecked();
@@ -4788,14 +4791,14 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await page.reload();
   await attachMap(page);
   await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByRole('radio', { name: 'Simple', exact: true }),
   ).toBeChecked();
   await page.goto('/admin');
   await attachMap(page);
   await expect(toggle).toHaveAccessibleName('Switch to 3D');
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByRole('radio', { name: 'Simple', exact: true }),
   ).toBeChecked();
@@ -4810,7 +4813,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await page.goto('/');
   await attachMap(page);
   await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByRole('radio', { name: 'Enhanced', exact: true }),
   ).toBeChecked();
@@ -4855,7 +4858,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
     zoom: window.editorTestMap.getZoom(),
   }));
   await closeBuildingModel(page);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByLabel('Point elevation (m)', { exact: true }),
   ).toBeHidden();
@@ -4913,7 +4916,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
     ),
   ).toBe(true);
   await closeBuildingModel(page);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByLabel('Building opacity', { exact: true }),
   ).toHaveValue('0.35');
@@ -4940,7 +4943,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
     '2 points placed',
   );
   const progress = await page.locator('.drawing-progress').innerText();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await page.getByRole('radio', { name: 'Device', exact: true }).check();
   await page.emulateMedia({ colorScheme: 'light' });
   await expect
@@ -4960,7 +4963,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
     page.getByRole('button', { name: 'Finish', exact: true }),
   ).toBeEnabled();
   expect(state.edits()).toEqual(savedBeforeDrawing);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect
     .poll(async () => (await browserRecovery(page))?.unfinished?.kind)
     .toBe('path');
@@ -4992,7 +4995,7 @@ test.describe('view settings touch', () => {
     await expect(toggle).toHaveCount(1);
     await toggle.tap();
     await expect(toggle).toHaveAccessibleName('Switch to 2D');
-    await page.getByRole('button', { name: 'Settings', exact: true }).tap();
+    await editorTask(page, 'Settings');
     await expect(
       page.getByRole('complementary', { name: 'Editor settings' }),
     ).toBeVisible();
@@ -5041,7 +5044,7 @@ test.describe('view settings touch', () => {
     await expect(toggle).toHaveAccessibleName('Switch to 2D');
     await toggle.tap();
     await expect(toggle).toHaveAccessibleName('Switch to 3D');
-    await page.getByRole('button', { name: 'Settings', exact: true }).tap();
+    await editorTask(page, 'Settings');
     await expect(
       page.getByRole('radio', { name: 'Dark', exact: true }),
     ).toBeChecked();
@@ -5124,7 +5127,7 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
       await page.getByRole('button', { name: section, exact: true }).click();
       await audit(`editor ${section}`);
     }
-    await page.getByRole('button', { name: 'Edit', exact: true }).click();
+    await editorTask(page, 'Edit');
     await focusCampus(page);
     if (
       await page.getByRole('button', { name: 'Collapse explorer' }).isVisible()
@@ -5202,7 +5205,7 @@ for (const phone of [false, true]) {
       window.editorTestMap.getZoom(),
       window.editorTestMap.getPitch(),
     ]);
-    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await editorTask(page, 'Sources');
     await page
       .locator('summary')
       .filter({ hasText: /^Building roofs$/ })
@@ -5241,7 +5244,7 @@ for (const phone of [false, true]) {
         window.editorTestMap.getPitch(),
       ]),
     ).toEqual(camera);
-    await page.getByRole('button', { name: 'Edit', exact: true }).click();
+    await editorTask(page, 'Edit');
     await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
     await expect(
       page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
@@ -5289,7 +5292,7 @@ test('roof proposal retains its saved geometry and unfinished input through sett
   await page.getByLabel('Eaves elevation (m)').fill('');
   await closeBuildingModel(page);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await page.getByRole('radio', { name: 'Light', exact: true }).check();
   await page
     .getByRole('button', { name: 'Close settings', exact: true })
@@ -5350,7 +5353,7 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
     window.editorTestMap.getZoom(),
     window.editorTestMap.getPitch(),
   ]);
-  await page.getByRole('button', { name: 'Sources', exact: true }).click();
+  await editorTask(page, 'Sources');
   await page
     .locator('summary')
     .filter({ hasText: /^Building roofs$/ })
@@ -5364,7 +5367,7 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   expect(state.edits()).toHaveLength(0);
   await apply.click();
   await expect.poll(() => state.edits().length, { timeout: 45000 }).toBe(count);
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await editorTask(page, 'Edit');
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
     timeout: 45000,
   });
@@ -5708,7 +5711,7 @@ test('documentation current gallery: published campus and isolated owner workflo
     await shot('editor-building-current');
     await page.setViewportSize({ width: 390, height: 844 });
     await shot('editor-building-mobile-current');
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await editorTask(page, 'Settings');
     await shot('editor-settings-mobile-current');
     await page
       .getByRole('button', { name: 'Close settings', exact: true })
@@ -5903,11 +5906,11 @@ test('documentation current gallery: published campus and isolated owner workflo
     await dialog
       .getByRole('button', { name: 'Back to Survey', exact: true })
       .click();
-    await page.getByRole('button', { name: 'Sources', exact: true }).click();
+    await editorTask(page, 'Sources');
     await shot('editor-sources-current');
-    await page.getByRole('button', { name: 'Releases', exact: true }).click();
+    await editorTask(page, 'Releases');
     await shot('editor-releases-current');
-    await page.getByRole('button', { name: 'Edit', exact: true }).click();
+    await editorTask(page, 'Edit');
     await page.getByRole('button', { name: 'Survey', exact: true }).click();
     await shot('editor-survey-current');
     if (process.env.TURNRIGHT_DOCS_EDITOR_ONLY) return;
@@ -5949,7 +5952,7 @@ test('documentation current gallery: published campus and isolated owner workflo
     await page.setViewportSize({ width: 390, height: 844 });
     await handle.press('End');
     await shot('public-place-mobile-current');
-    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await editorTask(page, 'Settings');
     await shot('public-settings-mobile-current');
     await page.keyboard.press('Escape');
     await page
@@ -6109,7 +6112,7 @@ test('documentation capture: editor appearance, roof and settings', async ({
     element.scrollTop = 300;
   });
   await page.screenshot({ path: testInfo.outputPath('editor-roof.png') });
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await page.getByRole('radio', { name: 'Dark', exact: true }).check();
   await page.screenshot({ path: testInfo.outputPath('editor-settings.png') });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -6288,10 +6291,7 @@ for (const width of [390, 1440]) {
         },
       ],
     });
-    await page.getByRole('button', { name: 'Releases', exact: true }).click();
-    await page
-      .getByLabel('What changed?')
-      .fill('Review the changed model height');
+    await editorTask(page, 'Releases');
     const blockers = page.getByRole('region', {
       name: 'Model release blockers',
     });
@@ -6303,7 +6303,7 @@ for (const width of [390, 1440]) {
       });
     }
     await expect(
-      page.getByRole('button', { name: 'Build review preview' }),
+      page.getByRole('button', { name: 'Continue to submission' }),
     ).toBeDisabled();
     await blockers.getByRole('button', { name: /Wing 1 · wall 2/ }).click();
     const dialog = page.getByRole('dialog');
@@ -6343,7 +6343,7 @@ for (const width of [390, 1440]) {
         exact: true,
       })
       .click();
-    await page.getByRole('button', { name: 'Releases', exact: true }).click();
+    await editorTask(page, 'Releases');
     await expect(blockers.getByRole('button')).toHaveCount(1);
     await expect(blockers).toContainText('Wing 1 · wall 1');
   });
@@ -8537,7 +8537,7 @@ test('public Editor opens the selected building card and consumes the handoff on
   ).toBeVisible();
   await expect(page).toHaveURL(/\/admin$/);
   expect(server.edits()).toHaveLength(0);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await expect(
     page.getByLabel('Building opacity', { exact: true }),
   ).toHaveValue('1');
@@ -9402,11 +9402,13 @@ test('campus layer feature search resets the real scroll position and keeps resu
       );
     },
   });
-  await page.getByRole('button', { name: 'Layers', exact: true }).click();
-  const workspace = page.getByRole('region', { name: 'Campus layers' });
-  await workspace.getByRole('tab', { name: 'Layers', exact: true }).focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(workspace.getByRole('tab', { name: /^Features/ })).toBeFocused();
+  await layerTable(page);
+  const workspace = page.getByRole('region', { name: 'Attribute table' });
+  await workspace.getByRole('separator', { name: 'Resize table' }).focus();
+  await page.keyboard.press('ArrowUp');
+  await expect(
+    workspace.getByRole('separator', { name: 'Resize table' }),
+  ).toHaveAttribute('aria-valuenow', '320');
   await workspace.getByLabel('Search layer features').fill('Audit building');
   const selectShown = workspace.getByRole('checkbox', {
     name: /Select shown results/,
@@ -9446,10 +9448,19 @@ test('campus layer feature search resets the real scroll position and keeps resu
   await expect(workspace.getByRole('row')).toHaveCount(2);
 });
 
-test('public phone map credits stay readable and clear of the panel', async ({ page }, info) => {
+test('public phone map credits stay readable and clear of the panel', async ({
+  page,
+}, info) => {
   await setup(page, false, false, {
     mutateCampus(data) {
-      data.sources.push({ id: 'credit-test', name: 'Campus survey', url: 'https://example.test', license: 'Test fixture', retrievedAt: '2026-10-03', attribution: 'Campus source attribution. '.repeat(50) });
+      data.sources.push({
+        id: 'credit-test',
+        name: 'Campus survey',
+        url: 'https://example.test',
+        license: 'Test fixture',
+        retrievedAt: '2026-10-03',
+        attribution: 'Campus source attribution. '.repeat(50),
+      });
     },
   });
   await page.goto('/');
@@ -9461,7 +9472,10 @@ test('public phone map credits stay readable and clear of the panel', async ({ p
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 844 });
     for (const dark of [false, true]) {
-      await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), dark);
+      await page.evaluate(
+        (dark) => document.documentElement.classList.toggle('dark', dark),
+        dark,
+      );
       await toggle.focus();
       await page.keyboard.press('Enter');
       await expect(content).toBeVisible();
@@ -9474,7 +9488,11 @@ test('public phone map credits stay readable and clear of the panel', async ({ p
       expect(button!.width).toBeGreaterThanOrEqual(44);
       expect(button!.height).toBeGreaterThanOrEqual(44);
       await expect(content).toHaveCSS('font-size', '12px');
-      await page.screenshot({ path: info.outputPath(`credits-${width}-${dark ? 'dark' : 'light'}.png`) });
+      await page.screenshot({
+        path: info.outputPath(
+          `credits-${width}-${dark ? 'dark' : 'light'}.png`,
+        ),
+      });
       await page.keyboard.press('Enter');
       await expect(content).toBeHidden();
     }
@@ -9482,30 +9500,47 @@ test('public phone map credits stay readable and clear of the panel', async ({ p
   await page.getByRole('button', { name: 'Expand card', exact: true }).click();
   await toggle.click();
   await expect(content).toBeVisible();
-  expect(await content.evaluate((el) => {
-    const r = el.getBoundingClientRect();
-    return el.contains(document.elementFromPoint(r.x + 20, r.bottom - 15));
-  })).toBe(true);
+  expect(
+    await content.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return el.contains(document.elementFromPoint(r.x + 20, r.bottom - 15));
+    }),
+  ).toBe(true);
   await toggle.click();
   await expect(content).toBeHidden();
 });
 
-test('campus layer zoom limits survive building presentation changes', async ({ page }) => {
+test('campus layer zoom limits survive building presentation changes', async ({
+  page,
+}) => {
   await setup(page);
-  const filter = () => page.evaluate(() => JSON.stringify(window.editorTestMap.getFilter('buildings-3d')));
+  const filter = () =>
+    page.evaluate(() =>
+      JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+    );
   await expect.poll(filter).toContain('mapStyle_minZoom');
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await editorTask(page, 'Settings');
   await page.getByLabel('Building opacity', { exact: true }).fill('0.35');
   await expect.poll(filter).toContain('mapStyle_minZoom');
 });
 
-test('road display source excludes unrelated campus geometry without hiding editor paths', async ({ page }) => {
+test('road display source excludes unrelated campus geometry without hiding editor paths', async ({
+  page,
+}) => {
   await setup(page);
   const sources = await page.evaluate(async () => {
     const map = window.editorTestMap;
-    const roads = await (map.getSource('road-display') as import('maplibre-gl').GeoJSONSource).getData() as import('geojson').FeatureCollection;
-    const campus = await (map.getSource('campus') as import('maplibre-gl').GeoJSONSource).getData() as import('geojson').FeatureCollection;
-    return { kinds: roads.features.map((f) => f.properties?.kind), paths: campus.features.filter((f) => f.properties?.kind === 'path').length };
+    const roads = (await (
+      map.getSource('road-display') as import('maplibre-gl').GeoJSONSource
+    ).getData()) as import('geojson').FeatureCollection;
+    const campus = (await (
+      map.getSource('campus') as import('maplibre-gl').GeoJSONSource
+    ).getData()) as import('geojson').FeatureCollection;
+    return {
+      kinds: roads.features.map((f) => f.properties?.kind),
+      paths: campus.features.filter((f) => f.properties?.kind === 'path')
+        .length,
+    };
   });
   expect(sources.kinds.length).toBeGreaterThan(0);
   expect(sources.kinds.every((kind) => kind === 'path')).toBe(true);
@@ -9517,7 +9552,7 @@ test('campus layer explorer saves folders and release visibility', async ({
 }) => {
   test.setTimeout(120000);
   const state = await setup(page);
-  await page.getByRole('button', { name: 'Layers', exact: true }).click();
+  await layerProperties(page);
   const workspace = page.getByRole('region', { name: 'Campus layers' });
   await expect(workspace).toBeVisible();
   await workspace.getByText('Create layer or folder', { exact: true }).click();
@@ -9540,10 +9575,7 @@ test('campus layer explorer saves folders and release visibility', async ({
     )
     .toBe(false);
   await page.reload();
-  await page.getByRole('button', { name: 'Layers', exact: true }).click();
-  await workspace
-    .getByRole('button', { name: /Survey reference.*Overlays/ })
-    .click();
+  await layerProperties(page, 'Survey reference');
   await expect(
     workspace.getByLabel('Published visibility', { exact: true }),
   ).not.toBeChecked();
@@ -9690,10 +9722,8 @@ test('campus layers polygon 96 preserves vertices and holes through property and
       ];
     },
   });
-  await page.getByRole('button', { name: 'Layers', exact: true }).click();
-  const workspace = page.getByRole('region', { name: 'Campus layers' });
-  await workspace.getByRole('button', { name: /Road surfaces/ }).click();
-  await workspace.getByRole('tab', { name: /^Features/ }).click();
+  await layerTable(page, 'Road surfaces');
+  const workspace = page.getByRole('region', { name: 'Attribute table' });
   await expect(
     workspace.getByRole('heading', { name: 'Features · 179', exact: true }),
   ).toBeVisible();
@@ -9766,9 +9796,7 @@ test('campus layers polygon 96 preserves vertices and holes through property and
   await expect(page.locator('.editor-save-state')).toHaveText('Saved');
   await page.waitForFunction(() => window.editorTestMap.loaded());
   await page.reload();
-  await page.getByRole('button', { name: 'Layers', exact: true }).click();
-  await workspace.getByRole('button', { name: /Road surfaces/ }).click();
-  await workspace.getByRole('tab', { name: /^Features/ }).click();
+  await layerTable(page, 'Road surfaces');
   await workspace.getByLabel('Search layer features').fill('96');
   await workspace
     .getByRole('button', { name: /Edit Reviewed road 96 · 96$/ })

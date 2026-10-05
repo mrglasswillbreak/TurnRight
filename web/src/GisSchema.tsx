@@ -59,8 +59,21 @@ export default function GisSchema({
       },
     }));
   return (
-    <details>
+    <details open>
       <summary>Schema, styling and publication fields</summary>
+      {draft.revision !== dataset.revision && (
+        <p role="alert">
+          This dataset changed. Your form is retained.{' '}
+          <button
+            onClick={() => {
+              setDraft(structuredClone(dataset));
+              setDomains({});
+            }}
+          >
+            Load current fields and styling
+          </button>
+        </p>
+      )}
       <label>
         Dataset name
         <input
@@ -376,6 +389,16 @@ export default function GisSchema({
       {error && <p role="alert">{error}</p>}
       <button
         disabled={busy}
+        onClick={() => {
+          setDraft(structuredClone(dataset));
+          setDomains({});
+          setError('');
+        }}
+      >
+        Discard staged field/style changes
+      </button>
+      <button
+        disabled={busy || draft.revision !== dataset.revision}
         onClick={async () => {
           setBusy(true);
           try {
@@ -404,11 +427,12 @@ export default function GisSchema({
                     value: typed(String(c.value ?? ''), definition?.type),
                   }))
                 : draft.style.classes;
-            await save({
+            const saved = (await save({
               ...draft,
               schema,
               style: { ...draft.style, classes },
-            });
+            })) as Dataset;
+            if (saved?.revision !== undefined) setDraft(structuredClone(saved));
             setError('');
           } catch (e) {
             setError((e as Error).message);

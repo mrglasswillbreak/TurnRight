@@ -1,5 +1,7 @@
 # Building appearance and model editing
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Expanded modelling
 
 **Reference split** keeps a photograph beside Orbit/Edit surface. **Outline → Add wall** draws exterior replacements, wings and courtyards; edge controls support arcs, Bézier curves and rounded corners. **Mesh** adds primitives, profiles, component selection and model files. Native architecture requires an explicit editable mesh copy; replacing its visual is a separate undoable choice. See [workflows and limits](MODEL-AUTHORING.md).

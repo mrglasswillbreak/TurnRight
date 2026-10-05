@@ -1,5 +1,7 @@
 # Build and process progress
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Campus GIS integration
 
 The new **Analyze** workspace records GIS processing progress, diagnostics, cancellation, retries and input/output revisions. Its persisted job history complements the existing **Activity** view for import, release and local processing stages. Applying a result checks its input revisions again and creates a private layer for the team review workflow. [Team workflow and roles](GIS-PLATFORM.md).

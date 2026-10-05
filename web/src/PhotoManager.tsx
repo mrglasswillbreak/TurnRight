@@ -1,3 +1,4 @@
+import { useEditorFocus } from './useEditorFocus';
 import {
   memo,
   lazy,
@@ -212,6 +213,7 @@ export function PhotoManager({
     [tab, setTab] = useState<'gallery' | 'review' | 'private' | 'preview'>(
       'gallery',
     );
+  useEditorFocus(open);
   const [optimizing, setOptimizing] = useState<PhotoOptimizerRequest | null>(
     null,
   );
