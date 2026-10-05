@@ -1,209 +1,94 @@
-# TurnRight setup: Vercel Hobby + Supabase Free
+# Deploying TurnRight
 
-## Campus GIS team workflow (not yet deployed)
+TurnRight deploys a public campus PWA, a private team GIS API and isolated processing/release workers. Application deployment preserves the already published campus packages. Publishing changed campus data is a separate, independently approved operation. [Current account settings](CONFIGURATION.md) · [Actual production receipts](PRODUCTION.md) · [Team workflow](GIS-PLATFORM.md).
 
-The team/data/analysis/review release requires additive migrations **023–037** and the matching API, UI and worker workflows. Use **Node 22.23.3** from `.node-version`. Follow the [GIS platform rollout and acceptance guide](GIS-PLATFORM.md) before enabling writes: back up and restore a staging clone, backfill memberships/indexes, compare effective geometry, configure the required checks, then complete the independent-review publication pilot. The new publication guard requires an approved immutable submission; legacy owner-only publication is no longer sufficient. Current production status below is historical until a new deployment receipt is recorded.
+## Existing-installation upgrade
 
-## Application audit and draft revisions
+1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. This GIS milestone appends **023–037** after 022.
+2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
+3. Pass unit/database tests, both TypeScript projects, lint, configured build/budgets, Chromium/WebKit, offline, native PostGIS and isolated GIS/importer checks. Resolve failures before production migration.
+4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
+5. Deploy matching API/UI and workers together. Production dispatch uses main, so a preview branch alone does not update workers. Keep PUBLISHED_MAP_URL enabled and verify public manifests/assets retain the pre-deployment hashes.
+6. Check authenticated team capabilities, bounded dataset reads, denied anonymous requests, both campus maps and offline reopening. Pilot import/CSV join/edit/analysis/independent review/preview/publication with separate accounts before broad team adoption. Reload older editing clients after migration.
 
-Apply additive migration `022_monotonic_editor_revisions.sql` after 021. It guarantees increasing per-record draft revision tokens even for rapid writes or backwards clock changes. No draft rewrite, public package republication or client-schema change is required. Retain the guard during an application rollback. Production application and verification are recorded in [Production](PRODUCTION.md); inspect existing triggers before applying a migration again.
+The complete [GIS rollout checklist](GIS-PLATFORM.md#additive-rollout-and-recovery) includes the index comparison SQL and concurrency/asset cases. The production receipt records which checks actually ran. A successful application deployment alone is not a field/device or live multi-user acceptance result.
 
-Run the full regression audit, pinned GIS driver fixtures and configured budgets. Compare the exact published package hashes before/after application deployment. `scripts/benchmark-public-map.mjs` and `scripts/benchmark-campus-processing.mjs` accept explicit package fixtures and output paths; record raw trials and avoid simultaneous local graphics jobs.
+## Fresh installation
 
-For attribution layout changes, `node scripts/verify-map-credits.mjs` checks the public production site in Chromium and WebKit with fresh desktop/mobile contexts, both themes, keyboard/touch targets, screenshot pixels and main-panel expansion. It makes no owner requests. This focused check complements the full campus/offline/hash matrix rather than replacing it.
+### Sources and rights
 
-## Campus silhouettes and in-place switching
+Resolve redistribution permission for every source before packaging it for public/offline use. The existing LASU and UNILAG confirmations apply to their recorded sources, not arbitrary new campuses. Keep attribution and photo licences intact. SOURCE_REDISTRIBUTION_APPROVED=true is required for hosted builds after that check. [Attribution](../data/ATTRIBUTION.md).
 
-This application-only rollout needs no migration or owner data publication. Keep `PUBLISHED_MAP_URL` enabled: the preservation step verifies all retained package assets and derives directory outlines from their exact published boundaries, backfilling existing campuses. Package manifests and core hashes must remain unchanged. The optional directory field is compatible with older clients; outline changes participate in release revision checks while legacy directories keep their previous hashes.
+### Supabase and authentication
 
-Run the [globe checks](CAMPUS-GLOBE.md#verification), configured bundle budgets and real-package/offline verification before promotion. Verify both served outlines against the released core boundaries, campus switching/history, downloaded and unavailable offline targets, and retained immutable assets after deployment. Roll back application code through the normal deployment process; do not restore or republish owner drafts for this change. [Dated release evidence](PRODUCTION.md).
+Create the project, retain the database credentials privately, and apply **all migrations 001–037 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
-## Campus layer rollout
+Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Review → Campus memberships. Invitation email and SSO are not included.
 
-Capture and verify private source/draft backups and the immutable published snapshots for both campuses. Apply additive migrations `020_campus_layer_records.sql` and `021_reviewed_release_snapshot.sql` after 019 before enabling their writers. Migration 020 preserves revision checks, campus isolation, atomic feature/layer saves and metadata when older clients save existing features. Migration 021 gives only the service-role reviewed-snapshot RPC a bounded 60-second allowance; ordinary API timeouts and browser grants remain unchanged. Keep this guard when rolling back application code.
+Use the existing bootstrap workflow only on an empty source baseline; it refuses to overwrite existing records. Never reinitialize an established project.
 
-Deploy compatible readers and workers with `PUBLISHED_MAP_URL` enabled. Run the campus-layer preparation workflow in `prepare` mode and review its public preview and complete workspace hash. `apply` requires that hash, checks for a queued/building campus release before any source mutation, and preserves unrelated unpublished corrections; publication uses the last reviewed release plus the explicit enrichment patch. Build and verify the frozen preview through the normal release workflow before publishing. Complete one campus publication before preparing the second so the campus catalogue revision remains current. Verify served asset hashes, both offline packages and historical rollback assets. Application deployment alone never publishes owner drafts.
-
-The preparation workflow always retains its receipt artifact, including failed attempts. If additive source application succeeded but snapshot creation timed out, inspect the receipt and database release identity before retrying. A matching existing release identity returns the same snapshot; a different snapshot or another active build is rejected. Re-run a read-only preparation if the workspace hash changed. Empty patches skip source mutation; they do not skip release verification.
-
-See [layer workflow](CAMPUS-LAYERS.md), [LASU coverage](LASU-LAYERS.md) and [dated production receipts](PRODUCTION.md) for the actual rollout status.
-
-## Import review queue repair (27 September 2026)
-
-On an existing installation through migration 015, apply `016_bulk_import_review_queue.sql` followed by `017_import_queue_deadline.sql`. Both are applied and verified in production. They retain campus scoping, the advisory lock, exact source comparison, run-token validation and service-only execution. The queue RPC has a 60-second database allowance; its server transport waits up to 75 seconds. Ordinary API and lock deadlines remain unchanged. Deploy the matching backend before retrying large batches.
-
-The live UNILAG job queued 10,176 proposals successfully. The PostgreSQL regression covers a 1,500-record batch, duplicate counts, rejected candidates, atomic rollback and cross-campus isolation. See [import status](CAMPUS-IMPORTS.md#september-27-unilag-import-outcome) and [production evidence](PRODUCTION.md).
-
-## Multi-campus rollout
-
-1. Deploy compatible readers before enabling campus writes. Keep `PUBLISHED_MAP_URL` set so code builds preserve reviewed public assets.
-2. Back up/verify the current private record counts and apply migrations **013_campus_isolation.sql**, **014_map_import_jobs.sql**, then **015_campus_release_restores.sql** in order. Run the database isolation tests first. They are additive backfills and scoped-function replacements, not a reset of LASU drafts.
-3. Deploy the writing API and Campuses controls only after verifying the new tables, private storage bucket, scoped RPCs and LASU record counts. The existing owner remains the only administrator. No new secrets are required.
-4. Verify `.github/workflows/map-import-tests.yml` on Linux. The worker image pins GDAL/PROJ by digest and Pyosmium/Shapely by version. The host performs authorized downloads; the parser container has no network and no credentials.
-5. Optionally set `OVERPASS_URL`. Enable `OVERPASS_SCHEDULE_ALLOWED=true` in both Vercel and GitHub variables only for an endpoint permitting scheduled use. Manual is the default; LASU's original schedule is unchanged.
-6. Verify the served revision, `/packages/latest.json`, all LASU asset hashes and `/packages/campuses.json`. Publish a second campus only after its own source/geometry/access/attribution review.
-
-The release workflow takes `campus_id` (legacy default `lasu`). Its operations are `preview` and `publish`; restore requests create a new scoped preview. Never promote an old whole-site deployment to roll back one campus. Catalogue changes invalidate stale previews. `/packages/campuses.json` and mutable compatibility manifests use revalidation headers; versioned packages remain immutable.
-
-[Owner guide](CAMPUS-IMPORTS.md) · [Exact production status](PRODUCTION.md). Production completed this sequence on 26 September 2026: migrations 013–015 were applied in one transaction and verified before the writing release. Use the sequence above for another installation; do not rerun table-creation migrations on an initialized database.
-
-
-## Expanded model authoring rollout
-
-Deploy compatible public readers first, apply `supabase/migrations/012_editable_model_assets.sql`, then deploy the writing editor/API. Migration 012 creates private immutable model assets and a server-only versioned save wrapper; older clients cannot erase authored references. Keep `PUBLISHED_MAP_URL` enabled. Model uploads use owner-authorized signed URLs; no new environment secret is required. The publication workflow hydrates reviewed immutable documents and packages authored textures. Application deployment does not publish model drafts.
-
-Production migration 012 was applied and verified on 26 September 2026: the `building-models` bucket is private, authenticated clients have no direct metadata SELECT grant, and `save_editor_model_batch` is present. Retain the guard when rolling back application code. [Authoring limits and formats](MODEL-AUTHORING.md) and [deployment verification](PRODUCTION.md) describe the rollout. The migration-free statements below refer to the earlier surface-text release only.
-
-## Model workspace refinement and surface text
-
-Deploy this application through the existing Git/Vercel workflow with `PUBLISHED_MAP_URL` enabled. The refinement has no database migration or new API endpoint. Text records are optional appearance JSON and validated by the shared model pipeline. Application deployment preserves the published manifest and assets; labels and other architectural edits publish only through the owner's reviewed map release workflow.
-
-Use Node 22, run lint/unit and focused Chromium/WebKit workflows, the production build and `npm run check:configured-build`. Keep the shared-icon/authentication boundary and existing bundle limits intact. See [current verification](MODEL-EDITOR-VERIFICATION.md), [owner controls](UNIFIED-MODEL-EDITOR.md) and [screenshot provenance](assets/screenshots/README.md).
-
-## Unified model editor rollout
-
-The separate baseline reconciliation timeout repair uses
-`supabase/migrations/011_linear_baseline_reconciliation.sql` after the existing
-migrations. It materializes parsed JSON inputs through a small RPC wrapper before
-calling a private implementation, keeping
-the owner guard, exclusive source lock, exact stale-review checks, incremental
-writes and immutable rollback snapshots. Its 15-second statement budget applies only to this owner-only RPC; ordinary API and lock timeouts remain unchanged. It does not
-change map edits, package schemas or public content. Apply it before retrying
-**Use this reviewed baseline**; then review current draft errors before building.
-
-The unified model editor itself requires no migration or public package-schema change. Deploy additive model-authoring validation and the older-writer guard before dependent clients. The guard rejects edits to buildings whose newer private authoring metadata would be dropped, while unaffected older-editor changes remain supported. Private metadata stays in owner draft JSON and is excluded from public packages. Keep `PUBLISHED_MAP_URL` enabled for application builds; reviewed architectural changes publish only through the existing immutable release workflow.
-
-
-Campus enrichment adds migration `007_source_field_reviews.sql`. Apply it before
-using “Accept selected details” in the owner editor. Daily source checks now use
-the bounded enrichment pipeline and retain a review artifact; they still cannot
-publish a map. See [enrichment setup and source licenses](ENRICHMENT.md).
-Migration 007 was applied and verified on the existing TurnRight production
-database on 22 September 2026; do not rerun it there. See the
-[production record](PRODUCTION.md).
-
-See [the configuration record](CONFIGURATION.md) for the current projects and completed steps. The public map runs locally without Supabase; editor login, submitted reports, daily source checks, and release publication need the setup below. Never put service keys in `VITE_*` variables or commit `.env` files.
-
-## 1. Resolve the campus source rights
-
-The seed combines OpenStreetMap with the public LASU ArcGIS item `ffd68667b1464eeb999c0050897a82a0` owned by MangroveandpartnersLimited. The item supplies no explicit redistribution license. Public viewing alone does not establish permission to redistribute the layers. Obtain permission covering the packaged geometry, places, offline downloads, and OSM-derived combination, or replace the ArcGIS layers with independently surveyed or suitably licensed data. Record the decision in `data/ATTRIBUTION.md` and update each source's license description.
-
-Vercel builds intentionally require `SOURCE_REDISTRIBUTION_APPROVED=true`. Set it only after that check is complete. Local development and tests do not require this variable. Also resolve source conflicts and complete the campus/device checks in `docs/ACCEPTANCE.md` before calling routes verified.
-
-## 2. Create Supabase Free and configure GitHub login
-
-Create a Free organization/project, for example `turnright`, and keep its database password in your password manager. Disable automatic table exposure and enable automatic RLS. For a new database, apply every checked-in SQL migration in numeric order from `001_campus.sql` through `022_monotonic_editor_revisions.sql`. The initial 001–003 migrations establish the base schema and editor batches; 004–011 add surveys, source review, media and reconciliation; 012 adds model assets; 013–015 add campus isolation, imports and scoped restores; 016–017 bulk-insert review proposals and bound large queue transactions; 018 adds land/overlay edit kinds; 019 adds an atomic, additive campus patch with scoped row-revision guards and rollback receipts; 020 adds guarded layer metadata and atomic layer/feature batches; 021 adds bounded, campus-scoped, idempotent reviewed release snapshots; 022 ensures monotonic draft revisions. They create PostGIS, private source/draft/report tables, explicit role grants, auditing, the singleton administrator allowlist, transactional editor saves, and server-only publication/import functions. Do not rerun the first migration on an initialized database. For existing installations, first check which migrations are present and apply only the missing migrations before enabling their dependent writers; see [the editor upgrade guide](EDITOR.md).
-
-Enable GitHub under Authentication → Sign In / Providers. Create a GitHub OAuth App with the callback URL shown by Supabase (`https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`), then store its client ID and client secret in the Supabase GitHub provider settings. The OAuth client secret belongs there, not in the PWA. Use the real Supabase callback URL, not the PWA `/admin` URL. [Supabase GitHub login instructions](https://supabase.com/docs/guides/auth/social-login/auth-github).
-
-Keep other login providers and anonymous sign-ins disabled. The map has no visitor account flow. GitHub users outside the allowlist still receive no draft, report, or administration access.
-
-## 3. Create an empty Vercel Hobby project
-
-Use Node.js 22. From the repository root run `npx vercel link`, sign in to your personal Hobby account, and create/link a project named `turnright` (or another available name). Linking creates the project association without deploying the site. Do not run a production deploy yet. [Vercel link command](https://vercel.com/docs/cli/link).
-
-In the project settings set:
+### Vercel
 
 | Setting | Value |
-|---|---|
-| Framework | Vite |
-| Root directory | `web` |
-| Include source files outside root directory | Enabled for repository tooling; the frontend build is self-contained in `web/` |
-| Node.js | 22.x |
-| Install command | `npm ci` |
-| Build command | `npm run build` |
-| Output directory | `dist` |
+| --- | --- |
+| Framework / root | Vite / web |
+| Include source outside root | Enabled for repository tooling |
+| Node | 22.x; development and CI pin 22.23.3 |
+| Install / build / output | npm ci / npm run build / dist |
+| Production branch | main |
+| Ignored Build Step | Automatic |
 
-Keep the default standard build machine; do not enable paid upgrades, paid add-ons, or usage purchases. Retain the preceding production deployment when configuring deployment retention. Keep preview deployment protection enabled while reviewing the map.
+Keep preview protection and existing project cost limits. Review a compatible preview before switching production. Do not promote an old whole-site deployment to restore only one campus.
 
-For public launch, set **Build and Deployment → Ignored Build Step → Automatic**.
-The earlier **Only build pre-production** setting deliberately cancels `main`
-production builds, even when GitHub receives the push successfully. The current
-project uses Automatic; see [PRODUCTION.md](PRODUCTION.md). Changes limited to
-files outside `web` may still be skipped by Vercel's unaffected-project check.
+Set these in **both Preview and Production**:
 
-Set these environment variables in **both Preview and Production**. The same backend configuration is needed when promoting a preview without rebuilding it.
+| Variable | Purpose and exposure |
+| --- | --- |
+| VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY | Public client configuration; RLS still applies |
+| SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY | Server-only API configuration; use the supported service-role JWT |
+| ADMIN_USER_ID | Original-owner Auth UUID; bootstrap and explicit override identity |
+| GITHUB_REPOSITORY | Worker repository |
+| GITHUB_WORKFLOW_TOKEN | Repository-scoped Actions dispatch credential, server-only |
+| REPORT_RATE_SALT | Server-only unique random report-rate salt |
+| SOURCE_REDISTRIBUTION_APPROVED | Build confirmation for source rights |
+| PUBLISHED_MAP_URL | Stable production origin; enable after the first public release |
 
-| Variable | Value / source | Exposure |
-|---|---|---|
-| `VITE_SUPABASE_URL` | Supabase project URL | Public |
-| `VITE_SUPABASE_ANON_KEY` | Supabase publishable key or legacy anon key | Public; RLS applies |
-| `SUPABASE_URL` | Same project URL | Server |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase legacy service-role JWT | Secret, server only |
-| `ADMIN_USER_ID` | Your Supabase Auth user UUID; filled after first login | Server |
-| `GITHUB_REPOSITORY` | `mrglasswillbreak/TurnRight` | Server |
-| `GITHUB_WORKFLOW_TOKEN` | Fine-grained GitHub token scoped to this repository, Actions read/write | Secret, server only |
-| `REPORT_RATE_SALT` | Random, unique value of at least 32 characters | Secret, server only |
-| `SOURCE_REDISTRIBUTION_APPROVED` | `true`, after step 1 | Build |
+Never store service credentials in browser variables, Git, screenshots or public artifacts. PUBLISHED_MAP_URL makes ordinary code builds fetch and verify the current catalogue, campus packages and retained assets. If verification fails, the build stops. Initially omit it only when no public release exists.
 
-Use the legacy service-role JWT here: the REST helpers currently place this value in both `apikey` and Bearer headers. Do not substitute the project database password or a browser key. Generate the report salt in a password manager. Restrict GitHub token access to this repository and set an expiry/reminder you can maintain. GitHub OAuth and the workflow token are separate credentials.
+### GitHub Actions
 
-After the first public release, also set `PUBLISHED_MAP_URL` in both environments to the stable production origin, such as `https://YOUR_PROJECT.vercel.app`. Code-only Git deployments then copy and verify the published map instead of accidentally reverting to the seed. If that origin cannot be fetched, the build stops; the existing production deployment remains intact. Controlled map releases use a frozen manifest and retain the preceding package. Initially omit this variable because no public map exists yet.
+Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID. Service credentials remain on the runner; isolated parsing containers receive files and no network. Keep an included-usage spending limit and do not enable paid upgrades as part of ordinary deployment.
 
-## 4. Configure GitHub Actions secrets
+| Workflow | Responsibility |
+| --- | --- |
+| regression-audit.yml | Unit/types/lint/configured build, Chromium/WebKit and prepared offline checks |
+| gis-acceptance.yml | Native PostGIS migrations, 100,000-feature queries/jobs, approval locks, pg_dump/pg_restore and isolated engine/GeoPackage tests |
+| map-import-tests.yml | Native import-format and private worker-mount regressions |
+| gis-processing.yml | One campus-scoped analysis/export job with cancellation, leases and staged output |
+| map-import.yml / map-source-check.yml | Private source inspection/preview and opted-in refresh candidates |
+| release.yml | Gated preview or publication of an approved immutable submission |
+| campus-detail-verification.yml | Served package hashes, real-campus browser views, offline reopening and retained restore assets |
 
-Commit the implementation and push it to the repository's `main` branch yourself. The server currently dispatches workflows on `main`. Add these under repository Settings → Secrets and variables → Actions:
+Configure protected-branch requirements for the actual quality, browser, offline and native job names once they appear in GitHub. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
 
-| Secret | Value |
-|---|---|
-| `SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Same server-only service-role JWT |
-| `VERCEL_TOKEN` | Vercel access token authorized for the Hobby project |
-| `VERCEL_ORG_ID` | `orgId` from the local `.vercel/project.json` created by linking |
-| `VERCEL_PROJECT_ID` | `projectId` from that file |
+## Team publication
 
-Tokens remain in the services' secret stores. Deployment uploads use an explicit file allowlist and exclude `.env`, raw imports, Git history, and dependencies.
+Editors accept source proposals into the shared draft, edit attributes/geometry and apply inspected analysis results. New arbitrary attributes and result layers stay private. Model/photograph approval and source acceptance do not replace independent campus snapshot approval.
 
-Run **Initialize reviewed source baseline once** from Actions. This imports the checked-in seed as the initial accepted baseline in one database transaction. It refuses to overwrite an existing baseline. Then run **Deploy initial Vercel preview**. Its run summary supplies the preview URL; it does not promote production traffic.
+In **Review**, resolve blocking issues and submit a validated immutable snapshot. A reviewer who did not contribute approves the exact hash, or the original owner records an explicit override reason. New content invalidates approval. Publishers use **Publish** to build the approved preview, inspect it, then publish the same source. Both API and SQL recheck current roles; a short publication lease prevents concurrent draft changes during promotion.
 
-Add the exact preview `/admin` URL to Supabase Authentication → URL Configuration → Redirect URLs. Add the future production `/admin` URL too. Add further preview URLs individually as needed. Keep broad cross-project wildcards out of the allowlist.
+The worker validates schemas, selected public fields, styles, lineage and assets, creates immutable packages, waits for Vercel READY and verifies production assignment. A failed job leaves the preceding public release active. **Activity** reports stages; an uncertain request should be inspected before retrying.
 
-Visit the preview `/admin` and sign in with your GitHub account once. Until allowlisting, the app denies editor access. Find that account in Supabase Authentication → Users, copy its UUID, and run:
+Restoring one campus creates a new review submission from historical content. It leaves the shared current draft intact and preserves every other campus's current package. Retain immutable hashes, snapshots and referenced assets. Older clients remain on their downloaded version until a verified replacement is selected.
 
-```sql
-insert into public.admin_users(id) values ('YOUR_AUTH_USER_UUID');
-```
+## Recovery and operational limits
 
-Set `ADMIN_USER_ID` to that same UUID in Vercel Preview and Production. Run **Deploy initial Vercel preview** again so the server receives the updated environment. Sign in on the new preview. The database permits only one allowlisted administrator, and the API checks both the authenticated UUID and the allowlist row.
+Retain additive database tables/guards when rolling application code back. Do not discard dataset attributes, approvals or operation receipts. Recover one campus's public content through a reviewed restore, not a whole-site rollback. Restoring a private database backup requires an explicit controlled restoration procedure; there is no public browser restore endpoint.
 
-## 5. Review → validate → preview → publish
+Supabase/project pauses, quota exhaustion, expired credentials and unavailable Actions can interrupt team work while published/offline navigation remains usable. Diagnose the exact job/transport failure and preserve an uncertain operation's identity before retrying. The shared draft uses conflicts rather than editing branches.
 
-Use the editor on desktop. Select places, paths or building outlines, or draw new features. Drag vertices/midpoints, use undo/redo, set walking access, and explicitly connect path endpoints and entrances. Crossing paths on the same level connect automatically while retaining access restrictions and mapped obstacles. Turn off **Connect crossings automatically** for a path that should stay separate, or choose its **Crossing level** for a bridge or tunnel. Deliberate manual joins remain connected. Completed commands autosave; wait for Saved before building a release preview.
+The GIS target is 100,000 features per workspace dataset, with bounded interactive reads; public navigation is limited independently. Metric analysis currently supports validated WGS84 UTM zones. PNG templates include provenance receipts; PDF uses browser printing. No SSO, arbitrary code, raster alignment or OGC service conformance is implied.
 
-The **Sources** tab compares imported records before/after and retains corrections separately. LASU’s original **Check now** uses the 02:17 UTC workflow. **Campuses** configures additional file, OSM and ArcGIS sources per campus; `map-import.yml` runs private inspection/preview jobs and `map-source-check.yml` checks opted-in sources at 03:47 UTC. Review source removals and conflicts carefully. Incomplete downloads and unusually large removal sets fail without deleting the accepted baseline. Source modification dates are not survey dates.
+## Historical rollout records
 
-In Releases, review validation errors/warnings and use draft route previews. Write a summary and create a preview. The workflow freezes approved records and corrections, validates them, builds hashed packages, uploads an immutable Vercel preview, and records success only when Vercel reports READY. Open and accept that preview before choosing Publish. Publication builds production from that frozen preview source, persists its deployment identity before waiting, and verifies readiness and production domain assignment. Failed jobs retain the old public release. Open **Activity** to follow named build/publication stages; visible online sessions refresh automatically every five seconds. [Progress monitor](PROGRESS-MONITOR.md). Ordinary Git code deployments retain their GitHub Actions/Vercel logs.
-
-To restore one campus, use **Prepare restore preview** on its historical release. The worker copies that campus’s immutable package into a fresh preview alongside every other campus’s current package. Review and publish that new preview; never promote an old whole-site deployment for a campus rollback. Retain historical immutable packages and snapshots. Clients still choose whether to download a different version, and an active navigation session remains on its current package. A date on a closure never reopens a path: explicitly confirm reopening, save, preview and publish it.
-
-## 6. Cost controls, pauses and recovery
-
-Stay on Vercel **Hobby** and Supabase **Free**, and do not upgrade or enable paid extras. Vercel Hobby is for personal, non-commercial use; quota exhaustion can interrupt service. Supabase Free can pause inactive projects. These are operational constraints rather than an uptime guarantee. [Vercel Hobby](https://vercel.com/docs/plans/hobby), [Supabase Free billing](https://supabase.com/docs/guides/platform/billing-on-supabase).
-
-Use GitHub's included Actions allowance with a zero spending budget for paid Actions usage, and inspect the account's current billing settings. Daily source checks do not rebuild/deploy the website. The editor shows dispatch/database errors and recent job failures; a paused Supabase project may prevent the editor itself opening. Resume it from Supabase. Already published files and downloaded navigation remain independent of Supabase. If Actions are disabled or exhausted, check the Actions run log and resume them; no failed job auto-publishes data.
-
-Export backups from the editor after substantial changes. Exports contain accepted source records, corrections and edit history; release snapshots also remain in Supabase. Keep an encrypted copy outside the project. To recover a fresh database, apply the migration and restore these tables using a trusted server-side process, preserving feature IDs. No browser restore endpoint is exposed. Never import untrusted backup files into a privileged database.
-
-Record live verification in `docs/CONFIGURATION.md`; do not infer rollback or campus accuracy from a successful build alone.
-
-## September 30 vector/detail release
-
-Apply migration 018 before land/overlay writers. Migration 019 supports large additive source preparation without sending two complete maps through the HTTP gateway; it is service-only, compares the complete scoped row-revision inventory, never deletes absent records, and stores immutable before/after receipts. The UNILAG preparation keeps all private corrections and validates routing before and after.
-
-Release the shared capability registry, API and pinned GIS worker together. Server-dispatched GitHub workflows use `main`; a preview branch alone does not upgrade the production worker. The deployment source allowlist includes `scripts/map_import/capabilities.json`. Run the GIS integration fixtures inside the pinned image before enabling the additional advertised formats.
-
-The UNILAG workflow first captures private baselines, verifies the original road upload hash, builds a public preview and accepts only an exact reviewed baseline hash. Reconcile the additive patch, create an immutable release snapshot, build its deployment preview, inspect desktop/mobile and offline behavior, then publish that exact release. Verify all served asset bytes/hashes and LASU's unchanged manifest. A failed or timed-out write must be audited before retrying. Roll back one campus through a new restore preview, retaining the other campus's current package. See [coverage](UNILAG-DETAIL.md) and [production receipts](PRODUCTION.md).
-
-Historical Vercel deployment URLs can require authentication even when the
-production domain is public. If retention has removed the historical deployment, the worker retrieves the same versioned package from the current production deployment and validates every asset hash; missing retained assets still stop the restore. The verification artifact includes the recovered rollback package. The restore worker checks that either deployment
-belongs to the configured project and uses temporary automation access for
-verified asset retrieval. It revokes that credential on completion; the workflow
-also cleans up after failures or interruption. Deployment protection stays enabled.
-
-The **Verify released campus detail** workflow accepts a ready preview release
-ID, or checks production when that field is empty. It verifies all package
-hashes, captures both browsers and tests downloaded photos/models. Chromium
-uses browser offline mode. WebKit uses unchanged deployed bytes through a local
-origin, then stops that origin and verifies cached navigation: Playwright 1.63
-has an [upstream offline-navigation emulation issue](https://github.com/microsoft/playwright/issues/42775).
-This does not replace native Safari/physical-device acceptance.
+Earlier reader → migration → writer upgrades, migration timestamps, Vercel deployments and package identities remain in [Production](PRODUCTION.md). Feature-specific history remains in [imports](CAMPUS-IMPORTS.md), [model authoring](MODEL-AUTHORING.md), [editor reliability](EDITOR-RELIABILITY.md) and the dated audit reports. Those older single-owner and migration-free statements describe their original release, not the current installation requirements.

@@ -1,5 +1,9 @@
 # Walking surveys
 
+## Campus GIS integration
+
+Survey capture and unfinished recovery remain user-scoped. Completed survey evidence attached to shared campus work is readable by authorized teammates. Collected changes enter the shared draft and the same quality/independent-review/publication workflow; configurable survey assignments/forms remain follow-on work. [Team workflow and roles](GIS-PLATFORM.md).
+
 Status: implemented; **awaiting physical field verification**. The feature remains owner-only. Survey evidence is private and applying it never publishes a campus release.
 
 Choose the target campus in **Campuses** before recording. Survey sessions, recovery, revision chunks and applied map drafts are isolated by owner and campus; switching requires pausing recording and resolving pending edits. LASU access exceptions do not transfer to a new campus.

@@ -1,5 +1,9 @@
 # Editor reliability and review update
 
+## Campus GIS integration
+
+The team GIS release retains the existing command history, personal recovery, optimistic revisions and idempotent receipts. One campus has one shared draft with explicit conflicts; editing branches are not introduced. Indexed GIS pages and geometry sessions are bounded, and processing results are staged until inspected. Role revocation is checked on reads, saves, job application and publication. [Team workflow and roles](GIS-PLATFORM.md).
+
 The editor provides operation-specific recovery, private local recovery downloads, grouped field undo, three-way conflict review, prepared-workspace fallback, guided repairs, explicit duplicate cleanup, release impact review, source comparisons, destination sharing and recorded steps information.
 
 ## Campus isolation

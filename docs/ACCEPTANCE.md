@@ -1,5 +1,20 @@
 # TurnRight verification and release checklist
 
+## Campus GIS team release
+
+Use the current [workflow and rollout guide](GIS-PLATFORM.md), with dated results in [Production](PRODUCTION.md). Checkmarks below indicate requirements, not unperformed success claims.
+
+- Run every migration on native PostgreSQL/PostGIS, then exercise pg_dump/pg_restore. Compare authoritative source/correction fingerprints before and after the production migration and index rebuild.
+- Verify cross-campus denial, role revocation, composable roles, shared attached media/models, personal recovery and unfinished-upload privacy. Use separate editor/reviewer accounts for independent approval; verify self-approval denial and the original-owner override reason/audit.
+- Import spatial features and an asset CSV; retain stable IDs on reimport; round-trip typed fields, nulls and coded domains; join attributes and exclude unselected fields from public packages.
+- Edit geometry, run buffer/spatial join and inspect/apply private outputs. Verify holes, multipart/invalid geometry, projected units, reference results, cancellation, retry and source refresh during a job.
+- Style layers, resolve map-linked issues, submit an immutable snapshot, approve its exact hash, preview and publish. A subsequent content change must invalidate approval; publication must reject revoked roles and stale submissions.
+- Export GeoPackage/CSV/GeoJSON and A4/A3 PNG/PDF; verify identifiers, CRS/provenance and exact released-map version. Reopen each verified published campus offline with its own assets and retained legacy packages.
+- Exercise 100,000-feature queries with bounded responses and geometry sessions; separately measure real dataset/device interaction. A fixture catalogue count is not scale evidence.
+- Require unit/types/lint/budgets, native GIS/importer, Chromium/WebKit and prepared-offline suites before rollout. Record real service checks, full CI results, physical-device gaps and backup restore evidence separately.
+
+The connected live multi-user pilot, physical devices and field measurements must be recorded when actually performed. Native SQL/container and mocked browser tests do not establish those outcomes.
+
 The [3 October application audit](AUDIT-2026-10-03.md) adds regressions for scrolled layer searches, keyboard tabs, layer zoom limits, path-only renderer input and strictly increasing draft revisions. Final visual review also fixes map-credit overlap: check its keyboard/touch toggle, light/dark contrast, scroll bounds and visibility above an expanded main panel. The audit passes 699 unit tests, the full browser/offline suites, 32 production campus views and a final 16-view credits check with unchanged packages. Exact revisions and results belong in [Production](PRODUCTION.md); the campus-discovery acceptance below retains its original scope.
 
 ## Campus silhouettes and in-place switching

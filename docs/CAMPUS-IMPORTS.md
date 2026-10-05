@@ -1,5 +1,13 @@
 # Campuses and editable map imports
 
+## Import into the team GIS workflow
+
+Spatial import is the first step of **Data → Edit → Analyze → Review → Publish**. Campus editors can import and accept source proposals into the shared draft; source acceptance records a contributor and does not approve a release. Administrators manage campus settings and memberships. All source/import reads and writes are scoped to campus capabilities.
+
+Original primitive attributes are retained separately from correction overlays. Source CRS, declared field types/aliases and stable identities populate the dataset catalogue. Use **Data** to configure typed fields, coded domains, validation, private/public selection and styling. Use **Data → Import an attribute CSV** for non-spatial asset tables, then **Analyze → attribute join** to connect unique matching keys. Reimports retain configured schemas and corrections; source revision changes make older analysis results stale.
+
+Large spatial datasets use indexed, paged reads instead of complete editor downloads. The workspace target is 100,000 features, with 500-feature interactive limits. Public packages remain separately bounded; imported/derived layers and arbitrary attributes stay private until selected and independently approved. [Complete workflow and limits](GIS-PLATFORM.md).
+
 The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stable campus layer identities. Accepted layer hashes survive filename changes; membership uses `mapLayerId`, distinct from the numeric road grade field. Pending import jobs stay in source review. Parcel-layer labels such as street addresses no longer classify a parcel as a road surface. Migration 020 persists layer records and membership atomically. See the release log for the deployed application and current campus packages.
 
 TurnRight keeps separate campus maps under the existing owner account. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography is private until the owner reviews the proposed changes and publishes a campus release.
@@ -91,7 +99,7 @@ Routine winding, closable rings and consecutive duplicate vertices are normalize
 
 ![Landscape import review](assets/screenshots/campus-landscape-2026-09-26.png)
 
-## Review, then publish
+## Accept proposals, then independently review and publish
 
 A completed preview enables **Queue for review** when its validation has no
 blocking errors and its field mappings still match the preview. Database JSON

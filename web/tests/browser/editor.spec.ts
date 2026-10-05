@@ -4026,7 +4026,7 @@ test('building references campus batch: all eligible facades regenerate without 
       ?.properties.appearance?.parts?.['arcgis:University_Property:120:wing:1']
       ?.windows,
   ).toBe(false);
-  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit', exact: true }).click();
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
     timeout: 45000,
   });
@@ -5122,7 +5122,7 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
       await page.getByRole('button', { name: section, exact: true }).click();
       await audit(`editor ${section}`);
     }
-    await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
     await focusCampus(page);
     if (
       await page.getByRole('button', { name: 'Collapse explorer' }).isVisible()
@@ -5239,7 +5239,7 @@ for (const phone of [false, true]) {
         window.editorTestMap.getPitch(),
       ]),
     ).toEqual(camera);
-    await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
     await expect(page.getByText('Updating 3D preview…')).toHaveCount(0);
     await expect(
       page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
@@ -5362,7 +5362,7 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   expect(state.edits()).toHaveLength(0);
   await apply.click();
   await expect.poll(() => state.edits().length, { timeout: 45000 }).toBe(count);
-  await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit', exact: true }).click();
   await expect(page.getByText('Updating 3D preview…')).toHaveCount(0, {
     timeout: 45000,
   });
@@ -5906,7 +5906,7 @@ test('documentation current gallery: published campus and isolated owner workflo
     await shot('editor-sources-current');
     await page.getByRole('button', { name: 'Releases', exact: true }).click();
     await shot('editor-releases-current');
-    await page.getByRole('button', { name: 'Workspace', exact: true }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
     await page.getByRole('button', { name: 'Survey', exact: true }).click();
     await shot('editor-survey-current');
     if (process.env.TURNRIGHT_DOCS_EDITOR_ONLY) return;

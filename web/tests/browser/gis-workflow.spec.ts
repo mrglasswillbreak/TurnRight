@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import type { CampusData, CampusPackage } from '../../src/types';
+import type { Map as MapInstance } from 'maplibre-gl';
+import { campusLayers } from '../../src/campus-layers';
 import { campusFixture } from '../fixture';
 import { lasuCampus } from '../../src/campus-context';
 import type {
@@ -20,8 +25,48 @@ async function setup(
   page: Page,
   roles: WorkspaceCapabilities['roles'] = ['administrator'],
 ) {
-  const data = campusFixture(),
-    bytes = JSON.stringify(data),
+  const capture = process.env.TURNRIGHT_GIS_SCREENSHOTS === '1';
+  const manifest: CampusPackage | undefined = capture
+    ? JSON.parse(
+        readFileSync(
+          new URL(
+            '../../work/model-benchmark/public/packages/latest.json',
+            import.meta.url,
+          ),
+          'utf8',
+        ),
+      )
+    : undefined;
+  const data: CampusData = manifest
+    ? JSON.parse(
+        readFileSync(
+          new URL(
+            '../../work/model-benchmark/public' + manifest.dataUrl,
+            import.meta.url,
+          ),
+          'utf8',
+        ),
+      )
+    : campusFixture();
+  if (manifest)
+    for (const asset of manifest.assets)
+      await page.route('**' + asset.url, (r) =>
+        r.fulfill({
+          body: readFileSync(
+            new URL(
+              '../../work/model-benchmark/public' + asset.url,
+              import.meta.url,
+            ),
+          ),
+          contentType: asset.url.endsWith('.json')
+            ? 'application/json'
+            : asset.url.endsWith('.webp')
+              ? 'image/webp'
+              : 'application/octet-stream',
+        }),
+      );
+  if (capture) data.layers = campusLayers(data);
+  const bytes = JSON.stringify(data),
     user = {
       id: '11111111-1111-4111-8111-111111111111',
       aud: 'authenticated',
@@ -94,7 +139,7 @@ async function setup(
   );
   await page.route('**/packages/latest.json', (r) =>
     r.fulfill({
-      json: {
+      json: manifest ?? {
         schemaVersion: 1,
         version: data.version,
         createdAt: data.createdAt,
@@ -243,7 +288,7 @@ async function setup(
   await expect(
     page.getByRole('navigation', { name: 'Editor sections' }),
   ).toBeVisible();
-  return { calls, data };
+  return { calls, data, datasets, jobs, reviews };
 }
 test('paged GIS data, typed edit, buffer inspection and immutable review stay connected', async ({
   page,
@@ -459,4 +504,102 @@ test('GIS released layouts retain immutable package identity and reject a differ
   await expect(
     panel.getByRole('button', { name: 'Export released PNG' }),
   ).toBeDisabled();
+});
+
+test('GIS documentation gallery uses the current workspace and an isolated team fixture', async ({
+  page,
+}) => {
+  test.skip(
+    process.env.TURNRIGHT_GIS_SCREENSHOTS !== '1',
+    'Opt-in documentation capture only',
+  );
+  const { reviews, data } = await setup(page);
+  await page.waitForFunction(() => {
+    type Hook = { memoizedState?: { current?: MapInstance }; next?: Hook };
+    type Fiber = { memoizedState?: Hook; return?: Fiber };
+    const el = document.querySelector('.map-canvas');
+    const key = Object.keys(el || {}).find((k) => k.startsWith('__reactFiber'));
+    let fiber =
+      el && key ? (el as unknown as Record<string, Fiber>)[key] : undefined;
+    while (fiber) {
+      let hook = fiber.memoizedState;
+      while (hook) {
+        const map = hook.memoizedState?.current;
+        if (map?.getCanvas && map?.project) {
+          window.editorTestMap = map;
+          return map.loaded();
+        }
+        hook = hook.next;
+      }
+      fiber = fiber.return;
+    }
+    return false;
+  });
+  const nav = page.getByRole('navigation', { name: 'Editor sections' });
+  const shot = async (name: string) => {
+    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(
+      (bounds) =>
+        window.editorTestMap.fitBounds(bounds, {
+          padding: { left: 820, right: 32, top: 105, bottom: 80 },
+          pitch: 0,
+          bearing: 0,
+          duration: 0,
+        }),
+      data.bounds,
+    );
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
+      .toBe(true);
+    await page.locator('.gis-workspace').evaluate((e) => {
+      e.scrollTop = 0;
+    });
+    await page.screenshot({
+      path: fileURLToPath(
+        new URL(
+          '../../../docs/assets/screenshots/gis-' + name + '-2026-10-05.png',
+          import.meta.url,
+        ),
+      ),
+    });
+  };
+  await nav.getByRole('button', { name: 'Data', exact: true }).click();
+  await expect(page.getByText(/100,000 matching/)).toBeVisible();
+  await page
+    .getByRole('textbox', { name: 'height', exact: true })
+    .first()
+    .fill('12');
+  await page
+    .getByRole('textbox', { name: 'height', exact: true })
+    .first()
+    .press('Tab');
+  await shot('data');
+  await nav.getByRole('button', { name: 'Analyze', exact: true }).click();
+  await page
+    .getByLabel('Result name', { exact: true })
+    .fill('Demonstration tree buffers');
+  await shot('analyze');
+  reviews.push({
+    id: '22222222-2222-4222-8222-222222222222',
+    summary: 'Demonstration tree survey and buffer review',
+    status: 'submitted',
+    content_hash: 'a'.repeat(64),
+    contributors: ['33333333-3333-4333-8333-333333333333'],
+    submitted_by: '33333333-3333-4333-8333-333333333333',
+    created_at: '2026-10-05T00:00:00Z',
+  });
+  await nav.getByRole('button', { name: 'Review', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Inspect immutable submission' })
+    .click();
+  await page.getByText(/^Map validation \(/).click();
+  await shot('review');
+  reviews[0].status = 'approved';
+  await nav.getByRole('button', { name: 'Publish', exact: true }).click();
+  await page
+    .getByText('Map layout: A4 / A3 PNG and PDF', { exact: true })
+    .click();
+  await page.getByRole('combobox',{name:'Approved snapshot',exact:true}).selectOption('22222222-2222-4222-8222-222222222222');
+  await page.getByLabel('Release summary',{exact:true}).fill('Demonstration campus review');
+  await shot('publish');
 });

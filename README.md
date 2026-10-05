@@ -1,219 +1,173 @@
 # TurnRight
 
-Explore **LASU Ojo and UNILAG Akoka**, search campus places, and navigate with independently downloadable offline maps.
+**A campus GIS platform for small teams — from source data to reviewed, published maps.**
 
-[Open map](https://turnright.vercel.app/) · [Open LASU](https://turnright.vercel.app/?campus=lasu) · [Open UNILAG](https://turnright.vercel.app/?campus=unilag) · [Owner workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md)
+Import spatial data and asset tables, edit geometry and attributes, run analysis, resolve quality issues, obtain independent approval, and publish a campus that visitors can reopen offline. TurnRight combines this private team workspace with public walking/driving navigation, photographs, field evidence and building authoring.
 
-TurnRight combines a public navigation PWA, a private GIS workspace and a building model editor. Search, route calculation, GPS processing and spoken guidance run on the device. Each campus has its own sources, corrections, photographs, models and reviewed releases. A plain visit reopens the last successfully used campus on this device. Explicit campus links take priority; first visits and older destination links default to LASU.
+[Open map](https://turnright.vercel.app/) · [LASU](https://turnright.vercel.app/?campus=lasu) · [UNILAG](https://turnright.vercel.app/?campus=unilag) · [Team workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md) · [Deployment status](docs/PRODUCTION.md)
 
-> An independent personal project, not an official university service. Campus routes have not been field-verified. A mapped approach is not a confirmed entrance. Unknown heights remain labelled illustrative estimates; visual detail does not establish walking, driving or accessibility permission.
+> An independent project, not an official university service. Campus routes have not been field-verified. A mapped approach is not a confirmed entrance; visual detail does not establish access permission. Unknown measurements and accessibility conditions remain explicit.
 
-## Quality and performance
+## One connected workflow
 
-The [3 October application audit](docs/AUDIT-2026-10-03.md) covers public navigation, the editor, models/photos, GIS, database saves and offline packages. It fixes duplicate road-renderer input, repeated building lookups, off-screen layer search results, keyboard tab navigation, lost layer zoom limits and colliding save revisions. Browser/install metadata now names the multi-campus app correctly, and unused scaffolding dependencies are removed. UNILAG’s initial road-source input falls from 6.35 MB to 185 KB; whole-map startup remains a separate measured target. [Performance and limits](docs/PERFORMANCE.md) · [Verification and deployment](docs/PRODUCTION.md).
+**Import → edit → analyze → validate → submit → independently approve → preview → publish → offline**
 
-## Campus GIS platform
+| Workspace | What teams can do |
+| --- | --- |
+| **Data** | Browse indexed, revision-consistent pages; configure typed fields, aliases, units and domains; filter/sort, inspect statistics, import CSV tables, select public fields and export data. |
+| **Edit** | Edit geometry with topology-aware tools, shared selection, undo/redo, optimistic concurrency and personal recovery. Preserve separate source records and corrections. |
+| **Analyze** | Run buffer, clip, intersect, difference, dissolve, spatial/attribute joins, nearest, summarize-within, measurement and restricted calculations. Inspect staged results before applying a new private layer. |
+| **Review** | Triage map-linked issues, assign work, retain comments/evidence, inspect immutable submissions and approve an exact content hash independently of its contributors. |
+| **Publish** | Preview and release approved snapshots, restore one campus through renewed review, retain other campuses, and export A4/A3 maps. |
 
-The implementation branch adds campus roles, typed/private attributes, indexed and paged feature access, a processing toolbox, independent snapshot approval, controlled publication fields, thematic styling and GIS/map exports. Read the [workflow, limits, verification and migration rollout](docs/GIS-PLATFORM.md). This code has not been deployed; native service and release acceptance remain required before production use.
+[Complete workflow, roles and operating limits](docs/GIS-PLATFORM.md) · [Editing](docs/EDITOR.md) · [Imports](docs/CAMPUS-IMPORTS.md)
 
-## Campus status
+Administrator, editor, reviewer and publisher roles compose per campus. The original owner becomes an administrator and can record a reasoned, audited review override. Personal recovery and unfinished uploads remain user-scoped. Ready assets attached to campus work can be reused by authorized teammates.
 
-LASU has 82 labelled illustrative road surfaces and distinct landscape classes. UNILAG has 179 surveyed road-width records, detailed vegetation, credited photographs and evidence-backed architectural treatments. The editor provides a campus layer explorer, independently selectable routing paths and road surfaces, and reviewed geometry operations. [Layer workflow](docs/CAMPUS-LAYERS.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md) · [Released versions and verification](docs/PRODUCTION.md).
+The workspace targets **100,000 features** with bounded server queries and editing sessions. That is a dataset target, not a claim that every mobile device can render 100,000 features interactively. Public navigation and offline packages have their own smaller limits.
 
-| Published map content | LASU Ojo | UNILAG Akoka |
+## Current workspace screenshots
+
+Unaltered captures of the production-built application use a verified published LASU basemap and isolated demonstration team/API responses. The 100,000-row catalogue count illustrates paging controls; it is not a live inventory or a performance measurement. [Capture provenance and reproduction](docs/assets/screenshots/README.md#campus-gis-workflow--5-october-2026).
+
+![Data workspace with typed private attributes, paged selection and a shared campus map](docs/assets/screenshots/gis-data-2026-10-05.png)
+
+| Repeatable analysis | Independent review |
+| --- | --- |
+| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/gis-analyze-2026-10-05.png) | ![Immutable submission inspection and exact-snapshot approval controls](docs/assets/screenshots/gis-review-2026-10-05.png) |
+
+![Publication workspace with approved snapshots and map export templates](docs/assets/screenshots/gis-publish-2026-10-05.png)
+
+## Capabilities
+
+- **Structured datasets:** stable campus/layer/feature identities; text, number, boolean and date fields; required values and coded domains; immutable source attributes plus correction overlays; saved filters and map views.
+- **Spatial analysis:** indexed PostGIS queries and isolated GDAL/GEOS/PROJ jobs. Runs retain inputs, revisions, parameters, CRS, engine, actor, progress and diagnostics. Cancel, retry or rerun settings; stale inputs prevent application.
+- **Cartography and exchange:** categorical/graduated styles, proportional point symbols, labels and legends; selected/filtered GeoJSON, CSV and GeoPackage with provenance receipts; A4/A3 PNG and browser-print PDF. Released maps retain exact package identity and date.
+- **Quality and governance:** geometry, connectivity, duplicate, attribute, evidence and source-conflict checks; assignments, comments and dispositions; independent approval bound to content; append-only audit and guarded publication.
+- **Geometry and roads:** holes, multipart editing, split/merge and linked-width regeneration. Routing paths remain selectable beneath road polygons. Visual-only geometry never grants walking or driving access.
+- **Models and photographs:** footprint-bound building evidence, roofs, façades, windows, surface text, curves and meshes; GLB/glTF/OBJ/STL exchange; credited galleries, local image editing, compression and interruption recovery.
+- **Public navigation:** searchable places/streets, walking and driving routes, entrances, restrictions, closures, parking handoffs, foreground GPS and offline spoken guidance. Search, routing and GPS processing run on the device.
+- **Independent campuses:** one persistent map, clickable campus silhouettes, remembered campus selection, scoped saved places/reports and separately verified offline downloads.
+
+Arbitrary attributes remain private until explicitly selected for publication. Analysis outputs begin as private layers and never silently replace source geometry or change routing permissions.
+
+## Public campuses
+
+LASU Ojo and UNILAG Akoka are independently published. Application deployments preserve their existing packages; team edits become public only through the reviewed release workflow.
+
+| Published content | LASU Ojo | UNILAG Akoka |
 | --- | ---: | ---: |
 | Building footprints | 393 | 723 |
 | Destinations | 220 | 116 |
 | Photographs | 44 | 16 |
 | Road surfaces | 82 illustrative | 179 surveyed |
 
-Both upgrades preserve existing destination identities, routing graphs, permissions, photographs, authored models and unrelated private drafts. LASU accounts for all 95 source roads: 82 generated surfaces, 12 with no usable area after exclusions and one held geometry conflict. The 179 road polygons comprise 80 paved roads, 24 unpaved roads and 75 sidewalks. The documented self-intersection in source feature 96 is repaired with a retained diagnostic receipt. Senate floor totals and several residence-hall assignments remain explicitly disputed.
+[Current release receipts](docs/PRODUCTION.md) · [LASU coverage](docs/LASU-LAYERS.md) · [UNILAG evidence and unresolved conflicts](docs/UNILAG-DETAIL.md)
 
-## Screenshots
-
-The dated campus captures show real packages. Editor examples use isolated owner/API fixtures; phone images are browser simulations. Capture provenance identifies each release and distinguishes historical examples. [Capture provenance](docs/assets/screenshots/README.md).
-
-![Clickable LASU and UNILAG silhouettes, with the selected LASU outline highlighted](docs/assets/screenshots/campus-silhouettes-desktop-2026-10-03.png)
-
-| UNILAG · light, 3D | UNILAG · dark, 2D |
+| Public desktop map | Public phone view |
 | --- | --- |
-| ![Published UNILAG roads, landscape and controls above the desktop panel](docs/assets/screenshots/unilag-desktop-layer-controls-2026-10-01.jpg) | ![UNILAG classified roads and landscape in dark 2D](docs/assets/screenshots/unilag-desktop-dark-2d-2026-09-30.png) |
+| ![LASU campus roads and landscape with public navigation controls](docs/assets/screenshots/lasu-desktop-audit-2026-10-03.png) | <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG destination and credited photograph in a browser phone viewport"> |
 
-| UNILAG · mobile | LASU · campus detail |
-| --- | --- |
-| <img src="docs/assets/screenshots/unilag-mobile-light-3d-2026-09-30.png" width="280" alt="UNILAG Senate destination and photograph on mobile"> | ![LASU published road surfaces, controls above the desktop panel and compact map credits](docs/assets/screenshots/lasu-desktop-audit-2026-10-03.png) |
+These public captures retain their dates and package provenance. Phone images are browser simulations, not physical-device verification. New GIS workspace images above show the current scope; [historical galleries](docs/assets/screenshots/README.md) remain available.
 
-| LASU · mobile dark 3D | Road and landscape workflow |
-| --- | --- |
-| <img src="docs/assets/screenshots/lasu-mobile-audit-2026-10-03.png" width="280" alt="LASU road surfaces in mobile dark 3D, with accessible map credits above the panel"> | [82 labelled road estimates, 30 classified landscape polygons, source decisions and remaining gaps](docs/LASU-LAYERS.md). [Layer editing and reviewed regeneration](docs/CAMPUS-LAYERS.md). |
+## Get started
 
-| Campus layer and road editor | Building authoring |
-| --- | --- |
-| ![Source-ID search and the polygon 96 road inspector in an isolated editor fixture](docs/assets/screenshots/layer-road-editor-2026-10-03.png) | ![Building authoring and model controls](docs/assets/screenshots/unified-model-desktop-2026-09-26.png) |
+Use **Node 22.23.3**, pinned in .node-version and .nvmrc.
 
-## Features
-
-- **Campus navigation:** searchable names, aliases, categories and streets; walking and driving routes; destination/entrance guides; mapped restrictions, closures, parking and walking handoffs; foreground GPS and offline spoken instructions.
-- **Consistent maps:** light, dark and system themes; 2D and 3D; shared building colours, place icons and labels; separate trees, hedges, shrubs, greenspaces, water, sports areas, parking and subtle parcels. Polygon road surfaces cover matching centreline display segments while leaving uncovered segments visible.
-- **Independent campuses:** clickable published boundary silhouettes, distant pins and a searchable non-modal globe chooser. Switching flies directly to the target on the same map, remembers the last successful campus and supports browser Back/Forward. Saved places, recents, report drafts and verified offline packages stay campus-scoped. Active directions require confirmation before switching. [Globe and offline guide](docs/CAMPUS-GLOBE.md).
-- **Vector imports:** file batches, public ArcGIS and complete OSM extracts; format/projection detection, editable field mappings, aliases/coded values, repair receipts, per-layer sampling and styled previews over the current campus.
-- **Layer management:** Layers / Features explorer, folders, search by source identity, virtualized attribute table, map-linked multi-selection, bulk edits, styling rules, locking, isolation, archive/restore, duplication and mapped-property exports. Editing visibility, release inclusion and published visibility are separate.
-- **Road and geometry editing:** original routing paths remain selectable beneath road surfaces. Road class, material, width and evidence persist through saves and release. Land/overlays support 20,000 vertices with progressive handles, holes, multipart edits, reviewed split/merge and linked-surface regeneration; undo restores whole operations.
-- **Owner editing:** places, paths, buildings, barriers, land and overlays share transactional autosave, revision guards, undo/redo, interruption recovery and release review.
-- **Building detail:** footprint-bound architectural evidence, roof plans, wall materials, windows, surface text, curves, components, meshes and reference-photo split views. GLB/glTF/OBJ/STL exchange uses the separate model workspace.
-- **Photographs:** credited galleries, automatic compression, offline image editing, crop/rotate/exposure controls, ordered galleries, recovery and model references. Photo dates and historical views remain visible.
-- **Reviewed publication:** immutable campus snapshots, validated models and hashed assets, preview before publication, preserved other-campus packages, and a campus-specific restore workflow.
-
-## Quick start
-
-Use **Node 22.23.3**, pinned in `.node-version` and `.nvmrc`.
-
-```sh
+~~~sh
 cd web
 npm ci
 npm run dev
-```
+~~~
 
-The local public map needs no credentials. Vite does not emulate Vercel's private APIs. Owner login, import jobs, submitted reports and publication require [the deployment setup](docs/DEPLOYMENT.md). Keep service credentials out of `VITE_*` variables and Git.
+The local public map needs no credentials. Vite does not emulate the private Vercel APIs. Team login, source imports, database queries, analysis and publication need the [deployment configuration](docs/DEPLOYMENT.md). Never put service credentials in VITE_* variables or Git.
 
-```sh
-npm test
+~~~sh
+npm test -- --maxWorkers=2
 npm run lint
-npm run build
 npm run check:configured-build
-```
+npx playwright test tests/browser/gis-workflow.spec.ts
+npx playwright test --config playwright.webkit.config.ts tests/browser/gis-workflow.spec.ts
+npx playwright test --config playwright.pwa.config.ts
+~~~
 
-The configured build exercises the real authentication/dependency boundary using placeholder public configuration; it is a verification build, not a deployable account configuration.
+The configured build uses placeholder public authentication settings to test real dependency boundaries; it is not an account configuration. Native database/engine checks run in [GIS acceptance CI](.github/workflows/gis-acceptance.yml); importer drivers use a separate pinned Linux image. [Reproduction and evidence](docs/GIS-PLATFORM.md#reproducible-development-and-acceptance).
 
-## Using the public map
+## Work with campus data
 
-1. Open a campus directly or use **Choose a campus** beside search. Select a published silhouette, pin, label or list entry; overlapping campuses offer a chooser. The globe remains interactive while search is open.
-2. Search a destination or street. Open its details to inspect photographs, model evidence and arrival information.
-3. Choose directions and an origin. Select walking or driving where the campus supports it, then review restrictions and the final approach before starting.
-4. Use the controls above the main panel for 2D/3D, zoom, north-up and location/follow. Desktop has one floating row; mobile retains two rows. Open the information button near the upper-right corner for full map-source credits. Theme and navigation preferences remain in settings. GPS guidance runs while the app is foregrounded.
-5. Open **Offline** and download that campus. Wait for completion before disconnecting. Removing one campus download retains other campuses and shared assets.
+1. Sign in to **Team workspace**. An administrator assigns existing Supabase Auth users to campus roles in **Review → Campus memberships**.
+2. Open **Campuses** to import spatial files or public OSM/ArcGIS sources. Inspect CRS, stable identities, field mappings and repair diagnostics before accepting proposals into the shared draft.
+3. Use **Data** for typed attributes and non-spatial asset CSVs. Join tables in **Analyze**, then inspect and apply the result as a private dataset.
+4. Select a feature for **Edit geometry**. Finish the bounded editing session with **Save and end geometry session**; other team edits use explicit conflict handling.
+5. Style results and explicitly choose public fields. Resolve blocking issues in **Review**, submit a snapshot, and obtain approval from a non-contributor.
+6. A publisher previews and publishes that exact approved content. Export data or a map, then download the published campus in the public **Offline** panel.
 
-Links use `?campus=unilag` and can include existing place/building identifiers. Opening `/` restores the last successfully loaded public campus from device storage. First visits use LASU. Existing destination/building links without a campus parameter retain their LASU interpretation. Explicit links always win; unsuccessful loads and editor visits do not change the remembered choice. Browser storage restrictions can prevent remembering it. Search and route calculation work with the downloaded package; online source imports and owner publication require a connection.
+Original source attributes remain separate from corrections. Reimports preserve stable identities, accepted mapping choices and authored references. A source refresh invalidates processing results based on older revisions. Subsequent content changes invalidate approval.
 
-Switching keeps the current campus usable while **Opening [campus]…** loads and validates the target. Success updates the URL and campus together, clears the old search/route preview and flies to the new boundary in the chosen 2D/3D view. Gestures interrupt the flight; reduced motion skips animation. Failure offers Retry without changing the current map. Download each campus needed offline: silhouettes remain discoverable, but an undownloaded offline target cannot open. [Complete switching and offline behavior](docs/CAMPUS-GLOBE.md).
+## Supported imports and exports
 
-## Supported map imports
-
-The [shared capability registry](scripts/map_import/capabilities.json) drives upload controls, API checks and worker dispatch. Conversion stays in the pinned server-side GIS worker.
-
-| Input | Requirements and supported content |
+| Input | Support |
 | --- | --- |
-| GeoJSON / ArcGIS JSON | `.geojson`, `.json`, including `.geojson.json`; features, collections, bare geometry, multipart and GeometryCollections |
-| TopoJSON | `.topojson` or detected JSON topology |
-| GeoJSON sequences / NDJSON | `.geojsonl`, `.geojsons`, `.jsonl`, `.ndjson`; one feature per record |
-| Shapefile | ZIP or matching `.shp`, `.shx`, `.dbf`; include `.prj` or select the source CRS |
-| GeoPackage | `.gpkg`; select vector layers |
-| KML / KMZ | Local vector content; external network links are rejected |
-| GPX | Waypoints, tracks and routes; tracks confer no access permission |
-| CSV | Coordinate columns or WKT geometry; map fields and CRS |
-| OSM | Complete XML/PBF extracts, or boundary-based Overpass source |
-| FlatGeobuf | `.fgb` |
-| File Geodatabase | ZIP containing a complete `.gdb` directory |
-| GML | `.gml`, with local schema companions where needed |
-| MapInfo | Grouped TAB companions or MIF/MID, directly or in a ZIP |
-| GeoParquet | `.parquet` / `.geoparquet` with GeoParquet metadata and WKB geometry |
-| Georeferenced DXF | `.dxf` coordinates already tied to a known CRS; select that CRS |
-| Mixed vector ZIP | Multiple supported datasets, with companion files kept together |
-| Public ArcGIS | Web Maps, embedded collections and queryable FeatureServer/MapServer layers |
+| GeoJSON, ArcGIS JSON, TopoJSON, GeoJSON sequences/NDJSON | Feature collections, multipart geometry and GeometryCollections |
+| Shapefile, GeoPackage, FlatGeobuf, File Geodatabase | Complete companion files/layer directories; select vector layers |
+| KML/KMZ, GPX, GML, MapInfo TAB/MIF | Local vector content and required companions; external KML links rejected |
+| GeoParquet, georeferenced DXF | Geographic metadata/known CRS required; local CAD coordinates are not automatically georeferenced |
+| Spatial CSV | Coordinate columns or WKT and explicit CRS |
+| Asset CSV | Non-spatial typed tables for attribute joins |
+| OSM XML/PBF and public ArcGIS services/Web Maps | Complete dependencies/records; no private ArcGIS authentication |
+| Mixed vector ZIP | Supported datasets with companions retained together |
 
-Raster imagery, scanned-map alignment, tile archives, proprietary DWG conversion and private ArcGIS authentication are deferred. Importing a CAD drawing does not automatically georeference a local engineering coordinate system. [Full guide, limits and fixtures](docs/CAMPUS-IMPORTS.md).
+Export selected/filtered datasets as **GeoJSON, CSV or GeoPackage**. Receipts retain CRS, source provenance and input revisions. Metric operations use the campus's validated WGS84 UTM analysis CRS and metres; stored coordinates remain WGS84. [Detailed format and repair rules](docs/CAMPUS-IMPORTS.md).
 
-## Import and edit a campus
+## Architecture and boundaries
 
-Open **Editor → Campuses**, select the target campus and choose **Import data**. Original uploads stay private. Inspect the layers, confirm the source projection, choose a role and stable identifier, then build the preview. Unknown points, lines and polygons can use the **overlay** role. Use **road-surface** for roads represented by polygons; it adds no routing connections.
+React/TypeScript and MapLibre share one map. Supabase/PostGIS stores campus memberships, authoritative sources/corrections, typed datasets, a rebuildable spatial index, jobs and immutable reviews. Vercel serves the PWA and typed compatibility API; GitHub Actions runs isolated processing and release gates. Additional workspaces load on demand.
 
-The importer retains meaningful names, categories, road/surface/width fields, land use, vegetation, heights and floors. Width/height units can be metres or feet. GeometryCollections receive stable component suffixes. Null geometry, invalid coordinates, duplicate identities, incomplete exports and ambiguous repairs are explicit errors or review diagnostics.
+| Boundary | Current limit |
+| --- | --- |
+| Spatial workspace dataset target | 100,000 features |
+| Interactive query/edit batch | Up to 500 features; Data displays 100 rows per page |
+| Query response | 2 MB |
+| Asset CSV | 2.5 MB, 100,000 rows, 100 fields |
+| Processing input/output | 100,000 features and 50 MiB each |
+| Public navigation package | 20,000 map features and 25 MB |
+| Draft map layout | Five layers, up to 500 visible features each; incomplete extents are rejected |
+| Public/editor startup budgets | 425 KiB public; 185 KiB additional editor, gzip |
+| Lazy GIS workspace budget | 20 KiB incremental gzip each |
 
-Routine winding, repairable ring closure and consecutive duplicate fixes are automatic. Polygon repair is accepted only when valid, nonempty, component-preserving and within 1% projected area change. Original geometry hashes and before/after diagnostics remain in the private review record.
+The importer separately limits uploaded batches to 50 MiB, expanded archives to 250 MiB and jobs to 100 layers/20 minutes. Worker containers disable network access, drop capabilities and bound scratch space, CPU, memory and execution time. [Architecture](docs/ARCHITECTURE.md) · [Performance](docs/PERFORMANCE.md).
 
-Repeat imports default to **add/update selected layers**. Removing missing records requires explicit complete-layer or complete-source replacement. Select the accepted layer identity when a filename/layer name changes to reuse its mappings. Owner corrections and authored models survive source refreshes. Preview sampling spreads across each layer; validation covers the full dataset.
+## Deployment and verification
 
-Queue a valid preview, review the proposed changes, then build a campus release preview. Existing drafts and public packages remain separate. A changed baseline or public catalogue invalidates a stale release. [Editor guide](docs/EDITOR.md) · [Import guide](docs/CAMPUS-IMPORTS.md) · [Publication](docs/DEPLOYMENT.md).
+Apply additive migrations **001–037** in order for a fresh installation, or only missing migrations for an existing database. Release the matching application, API and worker workflows together. The owner bootstrap remains in admin_users; ongoing access is campus membership based. PUBLISHED_MAP_URL preserves current public packages during code deployments.
 
-## Manage campus layers
+Pull requests run unit/database, type, lint, configured-build, browser, offline and native GIS checks. Reviewed content releases also require the comprehensive gates. [Deployment procedure](docs/DEPLOYMENT.md) · [Configuration](docs/CONFIGURATION.md) · [Acceptance](docs/ACCEPTANCE.md) · [Actual deployment receipts](docs/PRODUCTION.md).
 
-Open **Editor → Layers**. Choose a layer to set the drawing target, then use **Features** to find records by name, application ID or source ID. Left/Right or Home/End switches the explorer tabs from the keyboard. Filtering returns the table to the first matching row. UNILAG’s 179 road surfaces are available here independently of **Needs mapping**. Overlapping map selections show a chooser; hidden or locked layers do not intercept clicks.
-
-Layer settings control folders, order within cartographic bands, labels, classification styles and release settings. Bulk edits and geometry operations preview their affected records before one undoable application. Source width changes mark generated surfaces stale; **Preview linked road surfaces → Apply** regenerates them after review. Manually reshaped surfaces require an explicit replacement choice. Surveyed polygons never reshape just because their width property changes.
-
-[Full layer guide](docs/CAMPUS-LAYERS.md) · [Editor](docs/EDITOR.md) · [LASU coverage and estimates](docs/LASU-LAYERS.md).
-
-## Building models and photographs
-
-Open a building in the owner editor to manage references, appearance and its model. Native authoring covers roofs, wall surfaces, openings, surface text, curves and object/component meshes. Undo history and authored models remain private until reviewed publication. Imported standard model files retain supported static geometry and appearance; native editing history is not a standard model-file feature.
-
-Photographs retain author, licence, source URL, capture date where known and derivative notices. The UNILAG review assessed 115 candidates and accepted 16 images for 11 buildings. Ten footprint-bound architecture references feed the existing model pipeline; the pre-existing Engineering model remains authoritative. Four buildings gain source/photo-supported floor estimates. Unknown metre heights, rear elevations and materials remain labelled gaps.
-
-[Model authoring](docs/MODEL-AUTHORING.md) · [Unified editor](docs/UNIFIED-MODEL-EDITOR.md) · [Photo editing](docs/PHOTO-EDITING.md) · [Arrival photos](docs/ARRIVAL-GUIDES.md) · [UNILAG evidence](docs/UNILAG-DETAIL.md).
-
-## Offline operation and recovery
-
-Campus packages include map/routing data, models, credited photos, glyphs and audio with verified hashes. Offline downloads are scoped by campus. Application updates preserve the active navigation package. Editor recovery is scoped to owner and campus; pending saves, drawings, roof edits and survey recordings require resolution before switching.
-
-Interrupted file uploads can resume by selecting the same files. Import jobs expose progress, cancellation and retry; cancellation invalidates their run token. Daily source checks prepare review proposals and cannot publish automatically. [Offline and field verification](docs/ACCEPTANCE.md) · [Survey guide](docs/SURVEY.md).
-
-## Architecture
-
-React/TypeScript and MapLibre render the application. Web workers handle routing, road-display clipping, image work, model files and validation; optional authoring surfaces load on demand. Vercel serves the PWA and owner APIs, Supabase stores private campus records/assets, and GitHub Actions runs isolated GIS conversion and reviewed releases.
-
-The GIS worker pins GDAL 3.11.4 by image digest, Shapely 2.1.2, Pyproj 3.7.2, PyArrow 19.0.1 and Pyosmium 4.1.1. It runs with no network, a read-only root, bounded scratch space and explicit driver selection. Public packages contain mapped application properties rather than arbitrary source attributes.
-
-Resource limits remain 50 MiB uploaded per batch, 250 MiB expanded archives, 100,000 normalized features, 100 layers and 20 minutes per import job. Gzip budgets remain 425 KiB for public startup, 185 KiB additional owner startup, 12 KiB for the photo workspace and 300 KiB for the lazy 3D renderer/editor. [Architecture](docs/ARCHITECTURE.md) · [Performance](docs/PERFORMANCE.md).
-
-## Configuration and hosting
-
-Apply migrations in order through **022_monotonic_editor_revisions.sql** before enabling their dependent writers. Existing production migrations are recorded in [Production](docs/PRODUCTION.md); do not rerun initialized schema migrations.
-
-Set up the owner allowlist, GitHub OAuth, private storage and repository/Vercel secrets using [Deployment](docs/DEPLOYMENT.md) and [Configuration](docs/CONFIGURATION.md). `PUBLISHED_MAP_URL` makes application builds preserve current campus packages. Worker workflows run from `main`, so release the shared registry/API/worker changes together. Restore one campus through a fresh release preview, preserving other campuses' current packages.
-
-## Development and verification
-
-Unit tests cover source identities, geometry/classification, overlays, routing, private drafts, packages, photos and model publication. PostgreSQL-compatible migration tests exercise transactional land/overlay saves and history. GIS integration fixtures cover every advertised format inside the pinned Linux runtime, including projections, grouped files, incomplete sources and recovery.
-
-```sh
-cd web
-npx playwright test campus-imports.spec.ts
-npx playwright test --config playwright.webkit.config.ts campus-imports.spec.ts
-npm run test:survey-pwa
-```
-
-The [verification record](docs/PRODUCTION.md) distinguishes full regression runs, focused follow-ups, real-campus checks and remaining physical-device/field checks. Windows runs without GDAL skip the Linux integration fixtures; those skips do not establish format support.
+Local implementation verification passed **714 tests across 99 files**, both TypeScript projects, the unchanged build budgets, four GIS journeys in both Chromium and WebKit and nine prepared-offline journeys. Native service results and live rollout checks are recorded separately; local fixture success is not a production acceptance claim.
 
 ## Repository structure
 
-| Path | Purpose |
+| Path | Responsibility |
 | --- | --- |
-| `web/src`, `web/api`, `web/server` | Public app, owner editor, APIs and validation |
-| `web/tests` | Unit, database, browser and offline workflows |
-| `scripts/map_import` | Shared format registry and pinned GIS conversion |
-| `scripts/tests` | Import, source-completeness and UNILAG geometry acceptance |
-| `supabase/migrations` | Additive schema/RPC upgrades |
-| `data/campus-layer-enrichment` | LASU generated surfaces, candidate ledger, repair receipts and UNILAG parcel corrections |
-| `data/unilag-enrichment` | Mapped release patch, candidate dispositions and credited photo inventory |
-| `data/building-evidence.json`, `data/photos` | Architecture references and licensed photo derivatives |
-| `docs` | Current guides, evidence, screenshots and dated verification |
+| web/src | Public app, geometry/model editors and lazy GIS workspaces |
+| web/api, web/server | Authentication/capabilities, dataset queries, jobs, reviews and publication |
+| web/tests | Unit, PostGIS migration, browser and offline coverage |
+| scripts/map_import | Shared import registry, inspection and isolated conversion |
+| scripts/gis, scripts/gis-worker.mjs | Analysis/export engine, worker lifecycle and native database acceptance |
+| supabase/migrations | Additive schema, RLS and transactional RPC upgrades |
+| data | Attributed source preparation, surveyed/reviewed evidence and public assets |
+| docs | Workflow guides, deployment receipts, limits and screenshot provenance |
 
-Raw downloads and private source/draft snapshots are excluded from Git and public deployments.
+Raw uploads, private snapshots, credentials and local recovery are excluded from Git and public deployments.
 
-## Limitations and troubleshooting
+## Scope and next releases
 
-- **Unknown projection:** select the actual source CRS. Changing a label to WGS84 does not convert local drawing coordinates.
-- **Incomplete export:** retrieve all source records; the importer rejects truncated ArcGIS responses and incomplete OSM dependencies.
-- **Preview disabled:** resolve its stated errors or rebuild after changing mappings. Inspect automatic repair receipts before queueing.
-- **Changed source filename:** select the existing accepted layer identity. Do not infer identity from a repeated label or nearby location.
-- **Missing route:** no new access is inferred from a road polygon, photograph or model. Check reviewed paths, entrance connections and restrictions.
-- **3D unavailable:** use the 2D map. Mesh editing requires WebGL; full physical-device coverage remains a separate acceptance task.
-- **Stale release:** create a fresh preview after source/draft/catalogue changes. Do not promote an old whole-site deployment to roll back one campus.
+This release focuses on the complete small-team campus workflow. It does not claim desktop ArcGIS/QGIS parity or OGC conformance. Enterprise SSO, editing branches, arbitrary user code, raster/georeferencing, external WMS/WMTS, OGC API Features, workflow scheduling, advanced atlases and indoor/terrain analysis are follow-on work. Broader projected CRS support, vector PDF and an invitation-mail service are also outside the current implementation.
 
-No cross-campus routing, indoor room navigation or verified step-free campus guarantee is provided. Research does not fill unknown values merely to equal another campus's counts.
+Offline public navigation and prepared personal editing/recovery remain supported; server queries, shared-team synchronization, analysis and publication require a connection. Physical Android/iPhone, GPS and campus field checks remain separate acceptance work. There is no cross-campus routing or verified step-free guarantee.
 
-## Documentation and licensing
+## Documentation and data rights
 
-[Documentation index](docs/README.md) links current usage, deployment and engineering guides. [UNILAG coverage](docs/UNILAG-DETAIL.md) records included candidates, source conflicts and remaining evidence gaps. Historical research reports retain their original dates and counts.
+[Documentation index](docs/README.md) links the current guides. Historical research and deployment records retain their original dates, counts and limits. [Attribution](data/ATTRIBUTION.md), [photo records](data/photos/README.md) and in-app credits document separate data/asset terms. OpenStreetMap-derived data retains ODbL attribution. Owner-authorized ArcGIS publication does not imply a broader public reuse licence.
 
-Map data and photographs have separate terms: [source attribution](data/ATTRIBUTION.md), [photo catalogue](data/photos/README.md), and the per-asset author/licence records. OpenStreetMap-derived data retains ODbL attribution. Owner-authorised ArcGIS publication does not imply a broader public reuse licence. Contributions should preserve campus identities, source provenance, private draft isolation and existing resource budgets.
+Contributions should preserve campus identities, provenance, private attributes, independent review, recovery and existing resource budgets.
