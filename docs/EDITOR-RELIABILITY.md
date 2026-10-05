@@ -1,5 +1,7 @@
 # Editor reliability and review update
 
+Current navigation uses the [unified campus editor](UNIFIED-EDITOR.md): layer/data actions live in the catalogue and table, feature tools in Properties, and publication in Publish. Earlier dated captures below retain their original interface labels.
+
 ## Campus GIS integration
 
 The team GIS release retains the existing command history, personal recovery, optimistic revisions and idempotent receipts. One campus has one shared draft with explicit conflicts; editing branches are not introduced. Indexed GIS pages and geometry sessions are bounded, and processing results are staged until inspected. Role revocation is checked on reads, saves, job application and publication. [Team workflow and roles](GIS-PLATFORM.md).

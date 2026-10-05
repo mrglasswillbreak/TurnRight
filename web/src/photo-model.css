@@ -1791,3 +1791,23 @@
   font-weight: 600;
   padding-block: 8px;
 }
+
+body[data-editor-focus] .photo-model-workspace {
+  --editor-focus-header: 60px;
+  translate: none;
+  transform: none;
+  top: calc(var(--model-viewport-top, 0px) + var(--editor-focus-header));
+  left: var(--model-viewport-left, 0px);
+  width: var(--model-viewport-width, 100vw);
+  height: calc(
+    var(--model-viewport-height, 100dvh) - var(--editor-focus-header)
+  );
+  max-height: calc(
+    var(--model-viewport-height, 100dvh) - var(--editor-focus-header)
+  );
+}
+@media (max-width: 767px) {
+  body[data-editor-focus] .photo-model-workspace {
+    --editor-focus-header: 106px;
+  }
+}

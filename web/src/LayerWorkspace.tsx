@@ -1,3 +1,4 @@
+import { DockResize } from './EditorChrome';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   campusLayers,
@@ -36,7 +37,9 @@ export default function LayerWorkspace({
   onDraw,
   onGeometry,
   onClose,
+  mode,
 }: {
+  mode?: 'table' | 'properties';
   data: CampusData;
   issues: import('./validation').ValidationIssue[];
   edits: MapEdit[];
@@ -85,8 +88,11 @@ export default function LayerWorkspace({
     return result;
   }, [issues, membership]);
   const [explorerTab, setExplorerTab] = useState<'layers' | 'features'>(
-    'layers',
+    mode === 'table' ? 'features' : 'layers',
   );
+  useEffect(() => {
+    if (mode) setExplorerTab(mode === 'table' ? 'features' : 'layers');
+  }, [mode]);
   const [draft, setDraft] = useState<CampusLayer | null>(null),
     [query, setQuery] = useState(''),
     [featureQuery, setFeatureQuery] = useState(''),
@@ -398,9 +404,31 @@ export default function LayerWorkspace({
     ),
     last = Math.min(rows.length, first + 22);
   return (
-    <section className="layer-workspace editor-card" aria-label="Campus layers">
+    <section
+      className={
+        'layer-workspace editor-card ' +
+        (mode === 'table'
+          ? 'editor-table-dock layer-table'
+          : mode === 'properties'
+            ? 'editor-task-dock layer-properties'
+            : '')
+      }
+      aria-label={mode === 'table' ? 'Attribute table' : 'Campus layers'}
+    >
+      {mode && (
+        <DockResize
+          axis={mode === 'table' ? 'vertical' : 'horizontal'}
+          dimension={mode === 'table' ? 'table' : 'inspector'}
+        />
+      )}
       <header>
-        <h2>Layers</h2>
+        <h2>
+          {mode === 'table'
+            ? 'Attribute table'
+            : mode === 'properties'
+              ? 'Layer properties'
+              : 'Layers'}
+        </h2>
         <button onClick={onClose} aria-label="Close layers">
           ×
         </button>
@@ -455,30 +483,36 @@ export default function LayerWorkspace({
       </div>
       {explorerTab === 'layers' && (
         <>
-          <input
-            aria-label="Search layers"
-            placeholder="Search layers or sources"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <div
-            className="layer-tree"
-            role="tree"
-            aria-label="Campus layer tree"
+          <details
+            className="layer-organization"
+            open={mode ? undefined : true}
           >
-            {items
-              .filter(
-                (l) =>
-                  !l.parentId &&
-                  descendants(l.id).some((id) => {
-                    const child = items.find((c) => c.id === id)!;
-                    return `${child.name} ${child.sourceName || ''}`
-                      .toLowerCase()
-                      .includes(query.toLowerCase());
-                  }),
-              )
-              .map((l) => row(l))}
-          </div>
+            <summary>Organize layers</summary>
+            <input
+              aria-label="Search layers"
+              placeholder="Search layers or sources"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <div
+              className="layer-tree"
+              role="tree"
+              aria-label="Campus layer tree"
+            >
+              {items
+                .filter(
+                  (l) =>
+                    !l.parentId &&
+                    descendants(l.id).some((id) => {
+                      const child = items.find((c) => c.id === id)!;
+                      return `${child.name} ${child.sourceName || ''}`
+                        .toLowerCase()
+                        .includes(query.toLowerCase());
+                    }),
+                )
+                .map((l) => row(l))}
+            </div>
+          </details>
           <details>
             <summary>Create layer or folder</summary>
             <input

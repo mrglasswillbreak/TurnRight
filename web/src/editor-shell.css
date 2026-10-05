@@ -1,0 +1,881 @@
+.unified-editor {
+  --catalogue-space: 0px;
+  --inspector-space: 0px;
+  --table-space: 0px;
+}
+.unified-editor [hidden] {
+  display: none !important;
+}
+.unified-editor.catalogue-open {
+  --catalogue-space: var(--catalogue-width);
+}
+.unified-editor.table-open {
+  --table-space: min(var(--table-height), 48vh);
+}
+.unified-editor:has(
+  .editor-task-dock:not([hidden]):not([hidden] *),
+  .editor-review-panel:not([hidden]):not([hidden] *),
+  .editor-preserved-inspector:not([hidden]),
+  .layer-properties:not([hidden] *)
+) {
+  --inspector-space: var(--inspector-width);
+}
+.unified-editor .unified-header {
+  height: 60px;
+  min-height: 60px;
+  gap: 18px;
+  padding: 0 16px;
+  z-index: 35;
+}
+.unified-header details {
+  position: relative;
+}
+.unified-header summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 8px;
+  border-radius: 6px;
+}
+.unified-header summary:hover {
+  background: var(--ed-soft);
+}
+.unified-header details > .editor-card {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 260px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+.unified-header .editor-campus-menu > .editor-card {
+  left: 0;
+  right: auto;
+}
+.editor-campus-menu summary {
+  display: grid;
+  gap: 2px;
+}
+.editor-campus-menu strong {
+  font-size: 17px;
+}
+.editor-campus-menu span {
+  color: var(--ed-muted);
+  font-size: 11px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-command-trigger {
+  border: 1px solid var(--ed-line);
+  background: var(--ed-soft);
+  color: var(--ed-muted);
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-right: auto;
+}
+.editor-command-trigger kbd {
+  margin-left: 20px;
+  font-size: 10px;
+}
+.unified-header .editor-navigation {
+  gap: 18px;
+  overflow: visible;
+}
+.unified-header .editor-navigation button[aria-pressed='true'] {
+  color: var(--ed-accent);
+  box-shadow: inset 0 -3px var(--ed-accent);
+}
+.editor-save-menu {
+  margin-left: auto;
+}
+.editor-task-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  flex-wrap: wrap;
+  background: var(--ed-bg);
+  border-bottom: 1px solid var(--ed-line);
+  z-index: 20;
+}
+.editor-task-tabs button {
+  padding: 7px 10px;
+  border: 0;
+  background: var(--ed-soft);
+  color: var(--ed-text);
+  border-radius: 6px;
+}
+.editor-task-tabs button[aria-pressed='true'] {
+  background: var(--ed-accent);
+  color: var(--ed-accent-foreground);
+}
+.unified-editor .editor-map-workspace .map-canvas {
+  left: var(--catalogue-space);
+  right: var(--inspector-space);
+  bottom: var(--table-space);
+  width: auto;
+  height: auto;
+}
+.unified-editor .editor-catalogue {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--catalogue-width);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+}
+.editor-catalogue > header,
+.unified-editor .editor-task-dock > header,
+.unified-editor .editor-table-dock > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  flex: none;
+  margin: 0;
+  border-bottom: 1px solid var(--ed-line);
+}
+.editor-catalogue h2,
+.unified-editor .editor-table-dock h2 {
+  font-size: 14px;
+  margin: 0;
+}
+.editor-catalogue header button {
+  border: 0;
+  background: none;
+  color: var(--ed-muted);
+  font-size: 20px;
+}
+.editor-catalogue-content {
+  padding: 12px;
+  overflow: auto;
+  flex: 1;
+}
+.editor-catalogue input[type='search'] {
+  width: 100%;
+  padding: 9px;
+  background: var(--ed-soft);
+  border: 1px solid var(--ed-line);
+  border-radius: 7px;
+  color: inherit;
+}
+.editor-catalogue-actions {
+  display: flex;
+  gap: 5px;
+  padding: 10px 0;
+}
+.editor-catalogue-actions button,
+.editor-catalogue details button {
+  padding: 7px;
+  border: 1px solid var(--ed-line);
+  border-radius: 6px;
+  background: var(--ed-bg);
+  color: inherit;
+}
+.editor-catalogue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+.editor-catalogue-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 7px;
+  padding: 7px 4px;
+}
+.editor-catalogue-list li.active {
+  background: var(--ed-soft);
+  box-shadow: inset 3px 0 var(--ed-accent);
+}
+.catalogue-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 2px;
+  color: inherit;
+}
+.catalogue-name strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.catalogue-name small {
+  display: block;
+  color: var(--ed-muted);
+  font-size: 10px;
+  margin-top: 4px;
+}
+.editor-catalogue-list details {
+  position: relative;
+}
+.editor-catalogue-list summary {
+  padding: 6px;
+  cursor: pointer;
+}
+.editor-catalogue-list details > div {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 190px;
+  z-index: 12;
+  display: grid;
+  padding: 5px;
+  background: var(--ed-bg);
+  border: 1px solid var(--ed-line);
+  box-shadow: 0 5px 12px #0002;
+}
+.editor-feature-finder > .editor-card {
+  box-shadow: none;
+  border: 0;
+}
+.editor-feature-finder .editor-feature-list {
+  max-height: 40vh;
+}
+.editor-catalogue-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 12;
+  padding: 9px;
+  color: var(--ed-text);
+}
+.unified-editor .editor-tools {
+  left: calc(var(--catalogue-space) + 12px);
+  top: 12px;
+}
+.unified-editor .editor-view-controls {
+  left: calc(
+    var(--catalogue-space) +
+      (100% - var(--catalogue-space) - var(--inspector-space)) / 2
+  );
+  top: 12px;
+}
+.unified-editor .editor-task-dock,
+.unified-editor .editor-review-panel,
+.unified-editor .layer-properties,
+.unified-editor .editor-inspector {
+  inset: 0 0 var(--table-space) auto;
+  width: var(--inspector-width);
+  height: auto;
+  max-height: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 14px;
+  overflow: auto;
+  z-index: 14;
+}
+.unified-editor .editor-task-dock h2 {
+  font-size: 19px;
+}
+.unified-editor .editor-preserved-inspector {
+  position: absolute;
+  inset: 0 0 var(--table-space) auto;
+  width: var(--inspector-width);
+  z-index: 14;
+}
+.unified-editor .editor-preserved-inspector .editor-inspector {
+  inset: 0;
+  width: 100%;
+}
+.unified-editor .editor-table-dock {
+  position: absolute;
+  top: auto;
+  left: var(--catalogue-space);
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: var(--table-space);
+  max-height: 48vh;
+  padding: 0 14px 12px;
+  border-radius: 0;
+  z-index: 18;
+  overflow: auto;
+}
+.unified-editor .gis-table-scroll {
+  max-height: none;
+}
+.unified-editor .editor-table-dock > header {
+  position: sticky;
+  top: 0;
+  background: var(--ed-bg);
+  z-index: 5;
+}
+.unified-editor .layer-properties .layer-explorer-tabs,
+.unified-editor .layer-table .layer-explorer-tabs {
+  display: none;
+}
+.editor-dock-resize {
+  position: absolute;
+  z-index: 24;
+  touch-action: none;
+}
+.editor-dock-resize.horizontal {
+  width: 7px;
+  right: -4px;
+  top: 0;
+  bottom: 0;
+  cursor: ew-resize;
+}
+.editor-task-dock > .editor-dock-resize.horizontal,
+.editor-preserved-inspector > .editor-dock-resize.horizontal {
+  left: -4px;
+  right: auto;
+}
+.editor-dock-resize.vertical {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+}
+.editor-dock-resize:hover,
+.editor-dock-resize:focus-visible {
+  background: var(--ed-accent);
+}
+.editor-map-limit {
+  position: absolute;
+  left: calc(var(--catalogue-space) + 12px);
+  bottom: calc(var(--table-space) + 32px);
+  z-index: 11;
+  max-width: 320px;
+  padding: 8px;
+  background: var(--ed-bg);
+  border: 1px solid var(--ed-line);
+  border-radius: 6px;
+  color: var(--ed-text);
+  font-size: 11px;
+}
+.unified-editor .gis-workspace button:hover {
+  background: var(--ed-accent);
+  color: var(--ed-accent-foreground);
+}
+.unified-editor .gis-workspace input:not([type='checkbox']):not([type='color']),
+.unified-editor .gis-workspace select,
+.unified-editor .gis-workspace textarea {
+  border-color: var(--ed-line);
+}
+.unified-editor .editor-task-dock dl > div {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ed-line);
+}
+.unified-editor .editor-task-dock dt {
+  color: var(--ed-muted);
+  font-size: 11px;
+}
+.unified-editor .editor-task-dock dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1199px) {
+  .unified-editor:has(
+    .editor-task-dock:not([hidden]):not([hidden] *),
+    .editor-review-panel:not([hidden]):not([hidden] *),
+    .editor-preserved-inspector:not([hidden]),
+    .layer-properties:not([hidden] *)
+  ) {
+    --catalogue-space: 0px;
+  }
+  .unified-editor:has(
+      .editor-task-dock:not([hidden]):not([hidden] *),
+      .editor-review-panel:not([hidden]):not([hidden] *),
+      .editor-preserved-inspector:not([hidden]),
+      .layer-properties:not([hidden] *)
+    )
+    .editor-catalogue {
+    display: none;
+  }
+  .unified-header .editor-command-trigger kbd {
+    display: none;
+  }
+  .unified-editor .unified-header {
+    gap: 8px;
+  }
+}
+@media (max-width: 767px) {
+  .unified-editor {
+    --catalogue-space: 0px !important;
+    --inspector-space: 0px !important;
+  }
+  .unified-editor .unified-header {
+    min-height: 106px;
+    height: 106px;
+    flex-wrap: wrap;
+    padding: 5px 10px;
+    gap: 4px 9px;
+  }
+  .unified-header .editor-campus-menu {
+    flex: 1;
+  }
+  .unified-header .editor-command-trigger {
+    font-size: 11px;
+    padding: 8px;
+    margin-right: 0;
+  }
+  .unified-header .editor-navigation {
+    height: 40px;
+    order: 6;
+    width: 100%;
+    justify-content: space-around;
+  }
+  .unified-header .editor-save-menu {
+    margin: 0;
+  }
+  .unified-header .editor-account-menu {
+    font-size: 11px;
+  }
+  .unified-editor .editor-catalogue,
+  .unified-editor .editor-task-dock,
+  .unified-editor .editor-review-panel,
+  .unified-editor .editor-preserved-inspector,
+  .unified-editor .layer-properties {
+    inset: auto 0 0;
+    width: 100%;
+    height: 42%;
+    max-height: 85%;
+    border-radius: 14px 14px 0 0;
+  }
+  .unified-editor .editor-table-dock {
+    left: 0;
+    height: 48%;
+    max-height: 85%;
+  }
+  .unified-editor .editor-preserved-inspector .editor-inspector {
+    inset: 0;
+    height: 100%;
+  }
+  .unified-editor .editor-tools {
+    left: 10px;
+    top: 12px;
+  }
+  .unified-editor .editor-view-controls {
+    top: 12px;
+    right: 10px;
+    left: auto;
+    transform: none;
+  }
+  .unified-editor .editor-catalogue-toggle {
+    top: auto;
+    bottom: 10px;
+  }
+  .unified-editor .editor-task-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    font-size: 11px;
+  }
+  .unified-editor .editor-task-tabs button {
+    white-space: nowrap;
+  }
+  .unified-editor button,
+  .unified-editor summary {
+    min-height: 36px;
+  }
+  .unified-editor .editor-map-limit {
+    max-width: calc(100vw - 24px);
+    bottom: 44%;
+  }
+  .unified-editor.table-open .editor-catalogue {
+    display: none;
+  }
+  .editor-dock-resize.horizontal {
+    display: none;
+  }
+}
+
+.editor-dock-controls {
+  display: flex;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--ed-bg);
+  border-bottom: 1px solid var(--ed-line);
+}
+.editor-dock-controls button {
+  padding: 5px 10px;
+  border: 1px solid var(--ed-line);
+  background: var(--ed-soft);
+  color: var(--ed-text);
+  border-radius: 5px;
+  font-size: 11px;
+}
+.unified-editor .editor-task-dock {
+  position: absolute;
+}
+.unified-editor .editor-campus-task .campus-workspace {
+  position: absolute;
+  inset: 0 0 var(--table-space) auto;
+  width: min(720px, calc(100% - var(--catalogue-space)));
+  max-height: none;
+  height: auto;
+  z-index: 16;
+}
+.unified-editor:has(.editor-campus-task:not([hidden])) {
+  --inspector-space: min(720px, calc(100% - var(--catalogue-space)));
+}
+@media (max-width: 767px) {
+  .unified-editor .editor-campus-task .campus-workspace {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .unified-editor.table-open .editor-task-dock,
+  .unified-editor.table-open .editor-preserved-inspector,
+  .unified-editor.table-open .editor-review-panel {
+    visibility: hidden;
+  }
+  .unified-editor.table-open.task-open
+    .editor-task-dock:not([hidden]):not([hidden] *),
+  .unified-editor.table-open.task-open .editor-review-panel {
+    visibility: visible;
+    z-index: 20;
+    height: 48%;
+  }
+  .unified-editor.table-open.task-open .editor-table-dock {
+    visibility: hidden;
+  }
+  .editor-dock-controls button {
+    min-height: 40px;
+    flex: 1;
+  }
+}
+
+body[data-editor-focus] .photo-model-workspace,
+body[data-editor-focus] .photo-workspace {
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: none;
+  width: 100%;
+  height: calc(100dvh - 60px);
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+}
+body[data-editor-focus] .photo-model-overlay {
+  top: 60px;
+}
+@media (max-width: 767px) {
+  body[data-editor-focus] .photo-model-workspace,
+  body[data-editor-focus] .photo-workspace {
+    top: 106px;
+    height: calc(100dvh - 106px);
+  }
+  body[data-editor-focus] .photo-model-overlay {
+    top: 106px;
+  }
+}
+
+.editor-dock-resize {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .unified-editor[data-panel='catalogue'].catalogue-open {
+    --catalogue-space: var(--catalogue-width);
+    --inspector-space: 0px;
+  }
+  .unified-editor[data-panel='catalogue'] .editor-catalogue {
+    display: flex;
+  }
+  .unified-editor[data-panel='catalogue'] .editor-task-dock,
+  .unified-editor[data-panel='catalogue'] .editor-review-panel,
+  .unified-editor[data-panel='catalogue'] .editor-preserved-inspector {
+    visibility: hidden;
+  }
+}
+@media (max-width: 767px) {
+  .unified-editor .editor-catalogue,
+  .unified-editor .editor-table-dock,
+  .unified-editor .editor-task-dock,
+  .unified-editor .editor-review-panel,
+  .unified-editor .editor-preserved-inspector {
+    visibility: hidden;
+  }
+  .unified-editor[data-panel='catalogue'] .editor-catalogue {
+    display: flex;
+    visibility: visible;
+  }
+  .unified-editor[data-panel='table'] .editor-table-dock {
+    visibility: visible;
+    z-index: 22;
+  }
+  .unified-editor[data-panel='inspector']
+    .editor-task-dock:not([hidden]):not([hidden] *),
+  .unified-editor[data-panel='inspector'] .editor-review-panel,
+  .unified-editor[data-panel='inspector']
+    .editor-preserved-inspector:not([hidden]) {
+    visibility: visible;
+    z-index: 22;
+  }
+  .unified-editor[data-panel='table'] .editor-task-dock,
+  .unified-editor[data-panel='catalogue'] .editor-task-dock,
+  .unified-editor[data-panel='table'] .editor-review-panel,
+  .unified-editor[data-panel='catalogue'] .editor-review-panel {
+    visibility: hidden;
+  }
+  .unified-editor .editor-dock-controls {
+    gap: 3px;
+    padding: 3px;
+  }
+}
+.editor-table-dock .gis-toolbar {
+  margin: 6px 0;
+  gap: 6px;
+}
+.editor-table-dock .gis-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.editor-table-dock > p {
+  font-size: 11px;
+}
+.editor-table-dock > details > summary {
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.unified-editor.dock-expanded[data-panel='table']
+  .editor-table-dock:not([hidden]),
+.unified-editor.dock-expanded[data-panel='inspector']
+  .editor-task-dock:not([hidden]):not([hidden] *),
+.unified-editor.dock-expanded[data-panel='inspector']
+  .editor-preserved-inspector:not([hidden]),
+.unified-editor.dock-expanded[data-panel='inspector'] .editor-review-panel,
+.unified-editor.dock-expanded[data-panel='inspector']
+  .editor-campus-task:not([hidden])
+  .campus-workspace,
+.unified-editor.dock-expanded[data-panel='catalogue'] .editor-catalogue {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  z-index: 25;
+}
+
+.unified-editor .editor-feature-finder.editor-explorer {
+  position: static;
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+.unified-editor.drawing-active {
+  --catalogue-space: 0px;
+}
+.unified-editor.drawing-active .editor-catalogue {
+  display: none;
+}
+
+.attribute-recovery-list ul {
+  max-height: 260px;
+  overflow: auto;
+  padding-left: 16px;
+}
+
+/* Keep records visible at the default dock height; options expand in place. */
+.unified-editor .gis-workspace.editor-table-dock {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.unified-editor .gis-workspace.editor-table-dock > header {
+  padding: 6px 0;
+}
+.gis-data-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.gis-data-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  flex: none;
+  max-height: 55%;
+  overflow: auto;
+  padding: 4px 0;
+}
+.unified-editor .gis-data-controls > details {
+  border: 0;
+  padding: 3px 0;
+  margin: 0;
+  font-size: 11px;
+}
+.unified-editor .gis-data-controls > details[open] {
+  flex-basis: 100%;
+  order: 2;
+}
+.unified-editor .gis-data-controls .gis-dataset-picker,
+.unified-editor .gis-data-controls .gis-dataset-picker label {
+  margin: 0;
+}
+.unified-editor .gis-data-layout .gis-table-scroll {
+  flex: 1;
+  min-height: 70px;
+  margin: 4px 0;
+}
+.unified-editor .gis-data-layout .gis-table-pagination {
+  margin: 0;
+  flex: none;
+  font-size: 11px;
+}
+.unified-editor .gis-data-layout td,
+.unified-editor .gis-data-layout th {
+  padding: 3px 7px;
+}
+.unified-editor .gis-data-layout td button,
+.unified-editor .gis-data-layout td input {
+  padding: 4px 6px;
+}
+.unified-editor .gis-data-layout .gis-table-pagination span {
+  margin-right: auto;
+}
+@media (max-width: 767px) {
+  .unified-editor .gis-data-controls {
+    max-height: 45%;
+    gap: 2px 10px;
+  }
+  .unified-editor .gis-data-layout .gis-table-pagination span {
+    width: 100%;
+  }
+}
+
+/* Activity belongs to the editor toolbar, clear of table paging. */
+body:has(.unified-editor) .process-monitor {
+  top: 65px;
+  bottom: auto;
+}
+body:has(.unified-editor) .process-monitor section {
+  top: 44px;
+  bottom: auto;
+}
+.unified-editor .editor-dock-controls {
+  padding-right: 125px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.unified-editor .editor-dock-controls button {
+  flex: none;
+  white-space: nowrap;
+}
+.unified-editor:has(.editor-task-tabs) ~ .process-monitor,
+body:has(.unified-editor .editor-task-tabs) .process-monitor {
+  top: 105px;
+}
+.unified-editor .gis-workspace.editor-task-dock > header {
+  position: sticky;
+  top: -14px;
+  background: var(--ed-bg);
+  z-index: 3;
+}
+@media (max-width: 767px) {
+  body:has(.unified-editor) .process-monitor {
+    top: 110px;
+  }
+  body:has(.unified-editor .editor-task-tabs) .process-monitor {
+    top: 150px;
+  }
+}
+
+.editor-command-compact {
+  display: none;
+}
+.unified-editor .unified-header {
+  flex-shrink: 0;
+}
+.unified-editor .editor-task-tabs {
+  flex-shrink: 0;
+}
+.unified-editor .editor-error-stack {
+  z-index: 31;
+}
+.unified-editor .editor-conflicts,
+.unified-editor .editor-repair-preview {
+  z-index: 32;
+  left: auto;
+  right: 0;
+  top: 0;
+  bottom: var(--table-space);
+  width: var(--inspector-width);
+  max-height: none;
+  border-radius: 0;
+}
+.unified-editor:has(.editor-conflicts, .editor-repair-preview)
+  .editor-preserved-inspector {
+  visibility: hidden;
+}
+@media (max-width: 767px) {
+  .unified-editor .unified-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-rows: 50px 40px;
+    gap: 5px;
+    padding: 5px 8px;
+  }
+  .unified-header .editor-campus-menu {
+    min-width: 0;
+  }
+  .unified-header .editor-campus-menu span {
+    max-width: 100%;
+  }
+  .unified-header .editor-command-label {
+    display: none;
+  }
+  .unified-header .editor-command-compact {
+    display: inline;
+  }
+  .unified-header .editor-navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    justify-content: space-around;
+  }
+  .unified-header .editor-save-state {
+    margin: 0;
+    max-width: 90px;
+    white-space: normal;
+  }
+  .unified-header .editor-account-menu summary {
+    padding: 6px;
+  }
+  .unified-editor .editor-conflicts,
+  .unified-editor .editor-repair-preview {
+    inset: auto 0 0;
+    width: 100%;
+    max-height: 65%;
+  }
+  .unified-editor .editor-error-stack {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    bottom: 8px;
+  }
+}
+
+.unified-editor .editor-dock-controls {
+  margin-right: 132px;
+  padding-right: 4px;
+}
+.editor-control-compact {
+  display: none;
+}
+@media (max-width: 767px) {
+  .editor-control-label {
+    display: none;
+  }
+  .editor-control-compact {
+    display: inline;
+  }
+}

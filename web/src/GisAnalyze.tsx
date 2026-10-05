@@ -1,3 +1,5 @@
+import { useEditorSession } from './EditorSession';
+import { selectionKey } from './editor-session';
 import { useEffect, useState } from 'react';
 import type { GisPanelProps } from './GisWorkspace';
 import type {
@@ -25,9 +27,14 @@ export default function GisAnalyze({
   map,
   mutate,
 }: GisPanelProps) {
+  const session = useEditorSession();
   const [search, setSearch] = useState(''),
     [tool, setTool] = useState<ProcessingTool>('buffer'),
-    [input, setInput] = useState(''),
+    [input, setInput] = useState(
+      session.state.table.kind === 'dataset'
+        ? session.state.table.id || ''
+        : '',
+    ),
     [overlay, setOverlay] = useState(''),
     [inputQuery, setInputQuery] = useState<Partial<FeatureQuery>>({}),
     [overlayQuery, setOverlayQuery] = useState<Partial<FeatureQuery>>({}),
@@ -112,6 +119,28 @@ export default function GisAnalyze({
   };
   return (
     <>
+      <button
+        onClick={() => {
+          const id =
+            session.state.table.kind === 'dataset'
+              ? session.state.table.id
+              : undefined;
+          if (!id) {
+            setError('Choose a dataset in the catalogue first.');
+            return;
+          }
+          setInput(id);
+          const selected = session.state.selection
+            .filter((f) => f.datasetId === id)
+            .map(selectionKey);
+          setInputQuery({
+            ...session.state.datasetTables[id]?.query,
+            ...(selected.length ? { keys: selected } : {}),
+          });
+        }}
+      >
+        Use current table filter and selection
+      </button>
       <p>
         Metric tools use the input dataset’s validated projected CRS. WGS84
         source coordinates and navigation permissions are preserved. Results
@@ -496,7 +525,27 @@ export default function GisAnalyze({
                 disabled={!canEdit || !reviewed || busy}
                 onClick={() =>
                   void attempt(() =>
-                    mutate(() => gisApi('gis-job-apply', { id: job.id })),
+                    mutate(async () => {
+                      const result = await gisApi('gis-job-apply', {
+                        id: job.id,
+                      });
+                      session.setState((s) => ({
+                        ...s,
+                        activeEntry: 'dataset:' + result.datasetId,
+                        table: {
+                          open: true,
+                          kind: 'dataset',
+                          id: result.datasetId,
+                        },
+                        datasetVisibility: [
+                          ...new Set([
+                            ...s.datasetVisibility,
+                            result.datasetId,
+                          ]),
+                        ].slice(-5),
+                      }));
+                      return result;
+                    }),
                   )
                 }
               >

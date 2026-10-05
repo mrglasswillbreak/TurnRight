@@ -6,6 +6,7 @@ TurnRight is a campus GIS platform for small teams: import, typed data, geometry
 
 | Task | Guide |
 | --- | --- |
+| Navigate the persistent map, catalogue, table, task docks and specialist focus views | [Unified editor](UNIFIED-EDITOR.md) |
 | Work as a campus team: typed datasets, analysis, independent review, publication and exports | [Campus GIS platform and rollout](GIS-PLATFORM.md) |
 | Select campus silhouettes, switch smoothly and use downloaded campuses offline | [Campus globe](CAMPUS-GLOBE.md) |
 | Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |

@@ -28,14 +28,12 @@ import {
   Check,
   ChevronLeft,
   DoorOpen,
-  Download,
   LockKeyhole,
   MapPin,
   MousePointer2,
   Plus,
   Minus,
   Redo2,
-  RefreshCw,
   Route as RouteIcon,
   Search,
   Shield,
@@ -98,6 +96,11 @@ import type { ReviewState } from './EditorReview';
 const EditorReview = lazy(() =>
   import('./EditorReview').then((m) => ({ default: m.EditorReview })),
 );
+import { EditorSessionProvider, useEditorSession } from './EditorSession';
+import { EditorChrome, DockResize } from './EditorChrome';
+import type { EditorTask } from './editor-session';
+const EditorCatalogue = lazy(() => import('./EditorCatalogue'));
+const DatasetInspector = lazy(() => import('./DatasetInspector'));
 const GisTeamWorkspace = lazy(() => import('./GisTeamWorkspace'));
 import { campusFacadeReviewIssues } from './building-facades';
 import {
@@ -408,62 +411,82 @@ export default function Admin({
       state.edits,
     );
     return (
-      <Suspense fallback={<p>Opening team workspace…</p>}>
-        <GisTeamWorkspace
-          data={view.data}
-          issues={view.issues}
-          capabilities={state.capabilities}
-          dark={dark}
-        />
-      </Suspense>
+      <EditorSessionProvider
+        key={owner + ':' + (state.campus?.id || 'lasu')}
+        capabilities={state.capabilities}
+      >
+        <Suspense fallback={<p>Opening team workspace…</p>}>
+          <GisTeamWorkspace
+            data={view.data}
+            issues={view.issues}
+            capabilities={state.capabilities}
+            campus={state.campus || lasuCampus}
+            appearance={appearance}
+            onAppearance={onAppearance}
+            dark={dark}
+          />
+        </Suspense>
+      </EditorSessionProvider>
     );
   }
   return (
-    <PhotoSession key={owner} owner={owner!}>
-      <Editor
-        data={state.base || data}
-        dark={dark}
-        appearance={appearance}
-        onAppearance={onAppearance}
-        state={state}
-        sources={sources}
-        workspace={workspace}
-        refresh={refresh}
-        owner={owner!}
-        offlineContext={offlineContext}
-        syncedAt={syncedAt}
-        updateReady={updateReady}
-        installUpdate={installUpdate}
-        prepareOffline={async () => {
-          const gisKeys = workspace.edits
-            .filter((e) => e.properties.gisManaged)
-            .map(editKey)
-            .slice(0, 500);
-          const [verified, source] = await Promise.all([
-            api<EditorState>('state', { gisKeys }),
-            api<{ features: SourceRecord[] }>('sources', { gisKeys }),
-          ]);
-          const manifest = await latestPackage();
-          await installPackage(manifest, () => {});
-          if (!(await getActivePackage())?.complete)
-            throw new Error(
-              'Offline map verification failed. Retry preparation.',
-            );
-          if (!navigator.serviceWorker?.controller)
-            throw new Error(
-              'The offline app is not ready. Reload once online, then retry preparation.',
-            );
-          await writeSurveyContext(owner!, {
-            state: verified,
-            sources: source.features,
-            data,
-            prepared: true,
-            syncedAt: new Date().toISOString(),
-          } satisfies OfflineEditor);
-          rememberOfflineOwner(owner!);
-        }}
-      />
-    </PhotoSession>
+    <EditorSessionProvider
+      key={owner + ':' + (state.campus?.id || 'lasu')}
+      capabilities={
+        state.capabilities || {
+          campusId: state.campus?.id || 'lasu',
+          userId: owner!,
+          roles: ['administrator'],
+          capabilities: ['read', 'edit', 'review', 'publish', 'manage'],
+        }
+      }
+    >
+      <PhotoSession key={owner} owner={owner!}>
+        <Editor
+          data={state.base || data}
+          dark={dark}
+          appearance={appearance}
+          onAppearance={onAppearance}
+          state={state}
+          sources={sources}
+          workspace={workspace}
+          refresh={refresh}
+          owner={owner!}
+          offlineContext={offlineContext}
+          syncedAt={syncedAt}
+          updateReady={updateReady}
+          installUpdate={installUpdate}
+          prepareOffline={async () => {
+            const gisKeys = workspace.edits
+              .filter((e) => e.properties.gisManaged)
+              .map(editKey)
+              .slice(0, 500);
+            const [verified, source] = await Promise.all([
+              api<EditorState>('state', { gisKeys }),
+              api<{ features: SourceRecord[] }>('sources', { gisKeys }),
+            ]);
+            const manifest = await latestPackage();
+            await installPackage(manifest, () => {});
+            if (!(await getActivePackage())?.complete)
+              throw new Error(
+                'Offline map verification failed. Retry preparation.',
+              );
+            if (!navigator.serviceWorker?.controller)
+              throw new Error(
+                'The offline app is not ready. Reload once online, then retry preparation.',
+              );
+            await writeSurveyContext(owner!, {
+              state: verified,
+              sources: source.features,
+              data,
+              prepared: true,
+              syncedAt: new Date().toISOString(),
+            } satisfies OfflineEditor);
+            rememberOfflineOwner(owner!);
+          }}
+        />
+      </PhotoSession>
+    </EditorSessionProvider>
   );
 }
 
@@ -499,6 +522,8 @@ function Editor({
   installUpdate?: () => Promise<void>;
 }) {
   const workspace = useEditorWorkspace(store);
+  const session = useEditorSession();
+  const { setState: setSession, setNavigationGuard } = session;
   const [publishedWorkspace, setPublishedWorkspace] = useState(state.published);
   useEffect(() => setPublishedWorkspace(state.published), [state.published]);
   const drafts = useMemo(
@@ -573,12 +598,25 @@ function Editor({
     [surveyRecording, setSurveyRecording] = useState(false);
   const surveying = useRef(false);
   surveying.current = survey;
-  const [tab, setTab] = useState('map'),
-    [search, setSearch] = useState(''),
+  const tab = session.state.task;
+  const setTab = (value: string) => {
+    if (value === 'gis-data') {
+      session.setState((s) => ({
+        ...s,
+        task: 'map',
+        table: { ...s.table, open: true, kind: 'dataset' },
+      }));
+      return;
+    }
+    session.navigate(
+      (value === 'releases' ? 'draft-changes' : value) as EditorTask,
+    );
+  };
+  const [search, setSearch] = useState(''),
     [filter, setFilter] = useState('needs'),
     [explorer, setExplorer] = useState(true);
-  const [layersOpen, setLayersOpen] = useState(false),
-    [layerView, setLayerView] = useState<LayerViewState>({});
+
+  const [layerView, setLayerView] = useState<LayerViewState>({});
   const [overlap, setOverlap] = useState<{
     features: { kind: MapEdit['kind']; id: string }[];
     anchor: Position;
@@ -613,7 +651,7 @@ function Editor({
     }
   });
   const [simple3D, setSimple3D] = useSimple3D();
-  const settingsTrigger = useRef<HTMLButtonElement>(null);
+
   const [opacity, setOpacity] = useState(1),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
@@ -634,8 +672,77 @@ function Editor({
   const [review, setReview] = useState<MapChange | null>(null);
   const mapRef = useRef<MapInstance | null>(null),
     controller = useRef<EditorMap | null>(null);
+  const [layerVisited, setLayerVisited] = useState(false);
+  useEffect(() => {
+    if (
+      tab === 'layer' ||
+      (session.state.table.open && session.state.table.kind === 'layer')
+    )
+      setLayerVisited(true);
+  }, [tab, session.state.table.open, session.state.table.kind]);
+  const legacyReviewTasks = [
+    'changes',
+    'duplicates',
+    'reports',
+    'draft-changes',
+  ] as const;
+  const [reviewVisited, setReviewVisited] = useState<string[]>([]);
+  useEffect(() => {
+    if (['changes', 'duplicates', 'reports', 'draft-changes'].includes(tab))
+      setReviewVisited((previous) =>
+        previous.includes(tab) ? previous : [...previous, tab],
+      );
+  }, [tab]);
+  const [campusVisited, setCampusVisited] = useState(false);
+  useEffect(() => {
+    if (tab === 'campuses') setCampusVisited(true);
+  }, [tab]);
+  useEffect(() => {
+    setNavigationGuard((next) => {
+      if (
+        (tool ||
+          workspace.unfinished ||
+          workspace.roofDraft ||
+          surveyRecording) &&
+        next !== 'map' &&
+        next !== 'settings'
+      ) {
+        setError(
+          'Finish the current edit or pause recording before changing tasks.',
+        );
+        return false;
+      }
+      workspace.endHistoryGroup();
+      setReviewOverlay([]);
+      return true;
+    });
+    return () => setNavigationGuard(null);
+  }, [
+    tool,
+    workspace,
+    workspace.unfinished,
+    workspace.roofDraft,
+    surveyRecording,
+    setNavigationGuard,
+  ]);
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
+  const selectedKind = selected?.kind,
+    selectedId = selected?.id,
+    campusId = state.campus?.id || 'lasu';
+  useEffect(() => {
+    if (selectedKind && selectedId)
+      setSession((s) => ({
+        ...s,
+        editingFeature: selectedKind + ':' + selectedId,
+        panel: 'inspector',
+        selection: s.selection.some(
+          (f) => f.kind === selectedKind && f.id === selectedId,
+        )
+          ? s.selection
+          : [{ campusId, kind: selectedKind, id: selectedId }],
+      }));
+  }, [selectedKind, selectedId, campusId, setSession]);
   const [focusRequest, setFocusRequest] = useState<{
     edit: MapEdit;
     anchor?: Position;
@@ -1538,10 +1645,24 @@ function Editor({
       drafts,
       data,
       invalid,
-      preview || survey,
+      preview ||
+        survey ||
+        tab === 'gis-review' ||
+        !session.capabilities.capabilities.includes('edit'),
       layerView,
     );
-  }, [validation, drafts, data, invalid, preview, ready, survey, layerView]);
+  }, [
+    validation,
+    drafts,
+    data,
+    invalid,
+    preview,
+    ready,
+    survey,
+    layerView,
+    tab,
+    session.capabilities,
+  ]);
   useEffect(() => {
     const features: Feature[] = [];
     for (const [side, color] of [
@@ -1589,11 +1710,25 @@ function Editor({
     setHint('');
     setMessage('Drawing cancelled. Select a feature or choose a tool.');
   };
+  const keyboardEnabled =
+    tab === 'map' &&
+    session.capabilities.capabilities.includes('edit') &&
+    (!session.state.selection[0]?.datasetId || !!session.state.editingFeature);
+  const keyboardContext = useRef(keyboardEnabled);
+  keyboardContext.current = keyboardEnabled;
+  useEffect(() => {
+    if (!keyboardEnabled) controller.current?.select(null);
+    else if (selectedRef.current)
+      controller.current?.select(
+        selectedRef.current,
+        buildingMode === 'outline' || selectedRef.current.kind !== 'building',
+      );
+  }, [keyboardEnabled, buildingMode]);
   const keyboard = useRef({ begin, undo, cancel, remove });
   keyboard.current = { begin, undo, cancel, remove };
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
-      if (surveying.current) return;
+      if (surveying.current || !keyboardContext.current) return;
       // Modal workspaces own Escape, history and tool shortcuts while open.
       // The window capture listener must not cancel the selected map feature.
       if (document.querySelector('[role="dialog"], [role="alertdialog"]'))
@@ -1692,6 +1827,7 @@ function Editor({
         `turnright-backup-${new Date().toISOString().slice(0, 10)}.json`,
         {
           ...workspace.localBackup(base.version),
+          attributeInputs: session.state.attributeDrafts,
           server,
           local: workspace.edits,
           unfinished: workspace.unfinished,
@@ -1704,10 +1840,10 @@ function Editor({
   };
   const localRecovery = () => {
     try {
-      downloadJson(
-        'turnright-local-recovery.json',
-        workspace.localBackup(base.version),
-      );
+      downloadJson('turnright-local-recovery.json', {
+        ...workspace.localBackup(base.version),
+        attributeInputs: session.state.attributeDrafts,
+      });
     } catch (e) {
       failTask(e, 'Retry local recovery download', localRecovery);
     }
@@ -1716,6 +1852,7 @@ function Editor({
     try {
       if (!(await workspace.flush())) return;
       workspace.reconcile(await refresh(), true);
+      await session.refresh();
       setTaskError(null);
     } catch (e) {
       failTask(e, 'Retry refresh', refreshWorkspace);
@@ -1874,6 +2011,64 @@ function Editor({
       /* View still works this session. */
     }
   };
+  const openDatasetFeature = (
+    source: SourceRecord | null,
+    edit: MapEdit | null,
+  ) => {
+    if (
+      new Set([
+        ...gisSources.map((s) =>
+          s.entity === 'feature'
+            ? s.payload.properties.kind + ':' + s.payload.properties.id
+            : 'place:' + s.payload.id,
+        ),
+        ...workspace.edits
+          .filter((e) => e.properties.gisManaged)
+          .map((e) => editKey(e)),
+      ]).size >= 500 &&
+      !gisSources.some((s) => s.id === source?.id) &&
+      !workspace.edits.some((e) => e.id === edit?.id && e.kind === edit?.kind)
+    )
+      throw new Error(
+        'This editing session contains 500 GIS features. Use Table → Geometry editing session to save and end it, or use a processing job.',
+      );
+    if (source)
+      setGisSources((rows) => [
+        ...rows.filter((r) => r.id !== source.id),
+        source,
+      ]);
+    if (edit) workspace.includeServerFeature(edit);
+    const target =
+      edit ||
+      (source?.entity === 'feature'
+        ? {
+            id: source.payload.properties.id,
+            kind: source.payload.properties.kind,
+            geometry: source.payload.geometry,
+            properties: source.payload.properties,
+            deleted: false,
+          }
+        : source?.entity === 'place'
+          ? {
+              id: source.payload.id,
+              kind: 'place' as const,
+              geometry: {
+                type: 'Point' as const,
+                coordinates: source.payload.coordinates,
+              },
+              properties: {
+                ...source.payload,
+                kind: 'place',
+                gisManaged: true,
+              },
+              deleted: false,
+            }
+          : null);
+    if (target) {
+      session.setState((s) => ({ ...s, editingFeature: editKey(target) }));
+      select(target, true);
+    }
+  };
   const resume = () => {
     const drawing = workspace.unfinished;
     if (!drawing) return;
@@ -1895,7 +2090,38 @@ function Editor({
     );
   };
   return (
-    <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
+    <EditorChrome
+      campus={state.campus?.name || 'LASU · Ojo'}
+      saveStatus={
+        workspace.recoveryPending && workspace.status === 'Saved'
+          ? 'Saving recovery'
+          : workspace.status
+      }
+      online={networkOnline && !offlineContext}
+      blocked={!!tool || !!workspace.unfinished || surveyRecording}
+      surveyActive={survey}
+      onTask={session.navigate}
+      onBackup={localRecovery}
+      onExportBackup={exportBackup}
+      onRefresh={refreshWorkspace}
+      onSignOut={() =>
+        void session
+          .settle()
+          .then((ok) => (ok ? workspace.flush() : false))
+          .then((saved) => {
+            if (saved) void supabase?.auth.signOut();
+          })
+      }
+      onSurvey={() => {
+        if (workspace.unfinished) {
+          setError('Finish or cancel the drawing before surveying.');
+          return;
+        }
+        setSurvey(true);
+        setTab('map');
+        setPreview(false);
+      }}
+    >
       {(offlineContext || !networkOnline) && (
         <output className="editor-offline">
           Working offline · Last synchronized:{' '}
@@ -1913,132 +2139,15 @@ function Editor({
           <button
             disabled={surveyRecording}
             onClick={async () => {
-              if (await workspace.prepareUpdate()) await installUpdate?.();
+              if ((await session.settle()) && (await workspace.prepareUpdate()))
+                await installUpdate?.();
             }}
           >
             Install update
           </button>
         </output>
       )}
-      <header className="editor-header">
-        <a className="editor-brand" href={campusUrl('/')}>
-          <span className="brandmark">
-            <ArrowUpRight size={23} />
-          </span>
-          <strong>
-            TurnRight<span>Map editor</span>
-          </strong>
-        </a>
-        <nav className="editor-navigation" aria-label="Editor sections">
-          {[
-            ['gis-data', 'Data'],
-            ['map', 'Edit'],
-            ['gis-analyze', 'Analyze'],
-            ['gis-review', 'Review'],
-            ['gis-publish', 'Publish'],
-            ['layers', 'Layers'],
-            ['campuses', 'Campuses'],
-            ['changes', 'Sources'],
-            ['duplicates', 'Duplicates'],
-            ['reports', 'Reports'],
-            ['releases', 'Releases'],
-            ['settings', 'Settings'],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              ref={id === 'settings' ? settingsTrigger : undefined}
-              className={tab === id ? 'active' : ''}
-              disabled={
-                id !== 'settings' &&
-                !(id === 'map' && tab === 'settings') &&
-                (!!tool || !!workspace.unfinished)
-              }
-              onClick={() => {
-                workspace.endHistoryGroup();
-                if (id === 'layers') {
-                  setLayersOpen(true);
-                  setExplorer(false);
-                  setTab('map');
-                  return;
-                }
-                setLayersOpen(false);
-                if (id === 'settings') {
-                  setTab(id);
-                  return;
-                }
-                setReviewOverlay([]);
-                setTab(id);
-                if (id !== 'map') setExplorer(false);
-              }}
-            >
-              {label}
-              {id === 'reports' && state.reports.length > 0 && (
-                <small>{state.reports.length}</small>
-              )}
-            </button>
-          ))}
-        </nav>
-        {!survey && (
-          <button
-            className="editor-survey-entry"
-            onClick={() => {
-              if (workspace.unfinished) {
-                setError('Finish or cancel the drawing before surveying.');
-                return;
-              }
-              setSurvey(true);
-              setTab('map');
-              setPreview(false);
-            }}
-          >
-            Survey
-          </button>
-        )}
-        <div className="editor-header-right">
-          <output
-            className={`editor-save-state ${workspace.status === 'Saved' ? 'saved' : ''}`}
-          >
-            <span />
-            {workspace.status}
-          </output>
-          <details className="editor-backup-menu">
-            <summary aria-label="Backup options">
-              <Download size={17} /> <span>Backup</span>
-            </summary>
-            <div className="editor-card">
-              <button className="editor-secondary" onClick={localRecovery}>
-                Download local recovery
-              </button>
-              <button className="editor-secondary" onClick={exportBackup}>
-                Export backup
-              </button>
-            </div>
-          </details>
-          <button
-            className="editor-icon"
-            aria-label="Refresh workspace"
-            title="Refresh workspace"
-            onClick={refreshWorkspace}
-          >
-            <RefreshCw size={17} />
-          </button>
-          <button
-            className="editor-publish"
-            disabled={!!tool || !!workspace.unfinished}
-            onClick={() => setTab('releases')}
-          >
-            Review changes <ArrowUpRight size={15} />
-          </button>
-          <button
-            className="editor-text editor-signout"
-            onClick={async () => {
-              if (await workspace.flush()) await supabase?.auth.signOut();
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+
       <section
         className={`editor-map-workspace ${tab === 'settings' ? 'settings-open' : ''}`}
         aria-label="Mapping workspace"
@@ -2070,6 +2179,11 @@ function Editor({
           onSelect={() => {}}
           buildingSelection={buildingSelection}
           onBuildingSelect={(feature, hit) => {
+            if (
+              tab === 'gis-review' ||
+              !session.capabilities.capabilities.includes('edit')
+            )
+              return;
             if (workspace.roofDraft) {
               if (
                 hit?.buildingId === workspace.roofDraft.buildingId &&
@@ -2145,6 +2259,7 @@ function Editor({
           className="editor-tools editor-card"
           role="toolbar"
           aria-label="Map drawing tools"
+          hidden={!session.capabilities.capabilities.includes('edit')}
         >
           {toolButtons.map(({ kind, name, icon: Icon, shortcut }) => (
             <button
@@ -2238,44 +2353,79 @@ function Editor({
             })}
           </dialog>
         )}
-        {layersOpen && tab === 'map' && !tool && (
-          <Suspense
-            fallback={<div className="editor-card">Loading layers…</div>}
-          >
-            <LayerWorkspace
-              data={validation.data}
-              issues={validation.issues}
-              edits={workspace.edits}
-              view={layerView}
-              onView={setLayerView}
-              onCommit={commitLayers}
-              onSelect={(kind, id) => selectId(kind, id, true)}
-              onZoom={zoomLayers}
-              onImport={() => {
-                setLayersOpen(false);
-                setTab('campuses');
-              }}
-              onClose={() => {
-                setLayersOpen(false);
-                setExplorer(true);
-              }}
-              onDraw={(layer, type) =>
-                begin(layer.role === 'overlay' ? 'overlay' : 'land', {
-                  mapLayerId: layer.id,
-                  mapLayerSource: 'owner',
-                  drawingGeometry: type,
-                  name: layer.name,
-                  ...(layer.role === 'road-surface'
-                    ? { landClass: 'road' }
-                    : {}),
-                })
+        {layerVisited &&
+          (['properties', 'table'] as const).map((mode) => (
+            <div
+              key={mode}
+              hidden={
+                !!tool ||
+                (mode === 'properties'
+                  ? tab !== 'layer'
+                  : !session.state.table.open ||
+                    session.state.table.kind !== 'layer')
               }
-              onGeometry={(operation, keys) =>
-                setLayerOperation({ operation, keys })
-              }
-            />
-          </Suspense>
-        )}
+            >
+              <Suspense
+                fallback={<div className="editor-card">Loading layers…</div>}
+              >
+                <LayerWorkspace
+                  mode={mode}
+                  data={validation.data}
+                  issues={validation.issues}
+                  edits={workspace.edits}
+                  view={{
+                    ...layerView,
+                    selected: session.state.selection
+                      .filter((f) => !f.datasetId)
+                      .map((f) => f.kind + ':' + f.id),
+                  }}
+                  onView={(view) => {
+                    setLayerView(view);
+                    if (view.selected)
+                      session.setState((s) => ({
+                        ...s,
+                        selection: view.selected!.slice(0, 500).map((key) => {
+                          const i = key.indexOf(':');
+                          return {
+                            campusId: state.campus?.id || 'lasu',
+                            kind: key.slice(0, i) as MapEdit['kind'],
+                            id: key.slice(i + 1),
+                          };
+                        }),
+                      }));
+                  }}
+                  onCommit={commitLayers}
+                  onSelect={(kind, id) => selectId(kind, id, true)}
+                  onZoom={zoomLayers}
+                  onImport={() => {
+                    setTab('campuses');
+                  }}
+                  onClose={() => {
+                    if (mode === 'properties') setTab('map');
+                    else
+                      session.setState((s) => ({
+                        ...s,
+                        table: { ...s.table, open: false },
+                      }));
+                  }}
+                  onDraw={(layer, type) =>
+                    begin(layer.role === 'overlay' ? 'overlay' : 'land', {
+                      mapLayerId: layer.id,
+                      mapLayerSource: 'owner',
+                      drawingGeometry: type,
+                      name: layer.name,
+                      ...(layer.role === 'road-surface'
+                        ? { landClass: 'road' }
+                        : {}),
+                    })
+                  }
+                  onGeometry={(operation, keys) =>
+                    setLayerOperation({ operation, keys })
+                  }
+                />
+              </Suspense>
+            </div>
+          ))}
         {layerOperation && (
           <Suspense
             fallback={
@@ -2311,130 +2461,159 @@ function Editor({
             />
           </Suspense>
         )}
-        <div
-          className={`editor-explorer ${explorer && !layersOpen ? '' : 'collapsed'}`}
+        <Suspense
+          fallback={
+            <p className="editor-catalogue editor-card">Opening catalogue…</p>
+          }
         >
-          {explorer ? (
-            <section className="editor-card">
-              <div className="editor-explorer-top">
-                <span className="editor-eyebrow">
-                  {state.campus?.name || 'LASU · OJO CAMPUS'}
-                </span>
-                <button
-                  className="editor-icon"
-                  aria-label="Collapse explorer"
-                  onClick={() => setExplorer(false)}
-                >
-                  <PanelLeftClose size={16} />
-                </button>
-              </div>
-              <label className="editor-search">
-                <Search size={17} />
-                <input
-                  type="search"
-                  aria-label="Search map features"
-                  placeholder="Find a place or building"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </label>
-              <button
-                className="editor-create-model"
-                disabled={
-                  preview ||
-                  !ready ||
-                  !!tool ||
-                  !!workspace.unfinished ||
-                  !!repairPreview
+          <EditorCatalogue
+            layers={campusLayers(validation.data).items}
+            view={layerView}
+            onView={setLayerView}
+            map={mapRef.current}
+            blocked={!!tool || !!workspace.unfinished}
+            onImport={() => setTab('campuses')}
+            onProperties={(entry) => {
+              if (entry.layer)
+                setLayerView((v) => ({ ...v, active: entry.layer!.id }));
+              setTab(entry.dataset ? 'dataset-settings' : 'layer');
+            }}
+          >
+            <details open>
+              <summary>Find map features</summary>{' '}
+              <div
+                className={
+                  'editor-feature-finder editor-explorer ' +
+                  (explorer ? '' : 'collapsed')
                 }
-                title="Draw a building footprint, then open Edit model"
-                onClick={() => begin('building')}
               >
-                <Building2 size={20} />
-                <span>Create model</span>
-              </button>
-              <div className="editor-filters">
-                {[
-                  ['needs', 'Needs mapping'],
-                  ['all', 'All'],
-                  ['drafts', 'Drafts'],
-                ].map(([id, label]) => (
-                  <button
-                    key={id}
-                    className={filter === id ? 'active' : ''}
-                    onClick={() => setFilter(id)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <div className="editor-result-count">
-                {visibleTasks.length} features <span>Click to locate</span>
-              </div>
-              <div className="editor-feature-list">
-                {visibleTasks.slice(0, 100).map((t, i) => (
-                  <button
-                    key={`${t.kind}:${t.id}:${i}`}
-                    onClick={() => selectId(t.kind, t.id, true)}
-                    className={
-                      selected?.kind === t.kind && selected.id === t.id
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    <span className={`editor-feature-icon ${t.kind}`}>
-                      {t.kind === 'building' ? (
-                        <Building2 size={17} />
-                      ) : t.kind === 'path' ? (
-                        <RouteIcon size={17} />
-                      ) : t.kind === 'entrance' ? (
-                        <DoorOpen size={17} />
-                      ) : (
-                        <MapPin size={17} />
+                {explorer ? (
+                  <section className="editor-card">
+                    <div className="editor-explorer-top">
+                      <span className="editor-eyebrow">
+                        {state.campus?.name || 'LASU · OJO CAMPUS'}
+                      </span>
+                      <button
+                        className="editor-icon"
+                        aria-label="Collapse explorer"
+                        onClick={() => setExplorer(false)}
+                      >
+                        <PanelLeftClose size={16} />
+                      </button>
+                    </div>
+                    <label className="editor-search">
+                      <Search size={17} />
+                      <input
+                        type="search"
+                        aria-label="Search map features"
+                        placeholder="Find a place or building"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      className="editor-create-model"
+                      disabled={
+                        preview ||
+                        !ready ||
+                        !!tool ||
+                        !!workspace.unfinished ||
+                        !!repairPreview
+                      }
+                      title="Draw a building footprint, then open Edit model"
+                      onClick={() => begin('building')}
+                    >
+                      <Building2 size={20} />
+                      <span>Create model</span>
+                    </button>
+                    <div className="editor-filters">
+                      {[
+                        ['needs', 'Needs mapping'],
+                        ['all', 'All'],
+                        ['drafts', 'Drafts'],
+                      ].map(([id, label]) => (
+                        <button
+                          key={id}
+                          className={filter === id ? 'active' : ''}
+                          onClick={() => setFilter(id)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="editor-result-count">
+                      {visibleTasks.length} features{' '}
+                      <span>Click to locate</span>
+                    </div>
+                    <div className="editor-feature-list">
+                      {visibleTasks.slice(0, 100).map((t, i) => (
+                        <button
+                          key={`${t.kind}:${t.id}:${i}`}
+                          onClick={() => selectId(t.kind, t.id, true)}
+                          className={
+                            selected?.kind === t.kind && selected.id === t.id
+                              ? 'selected'
+                              : ''
+                          }
+                        >
+                          <span className={`editor-feature-icon ${t.kind}`}>
+                            {t.kind === 'building' ? (
+                              <Building2 size={17} />
+                            ) : t.kind === 'path' ? (
+                              <RouteIcon size={17} />
+                            ) : t.kind === 'entrance' ? (
+                              <DoorOpen size={17} />
+                            ) : (
+                              <MapPin size={17} />
+                            )}
+                          </span>
+                          <span>
+                            <strong>{t.name}</strong>
+                            <small>{t.reason}</small>
+                          </span>
+                          <ArrowUpRight size={13} />
+                        </button>
+                      ))}
+                      {!visibleTasks.length && (
+                        <p className="editor-empty">
+                          {filter === 'drafts' && !search
+                            ? 'No unpublished changes. Published work stays on the map.'
+                            : 'No matching features.'}
+                        </p>
                       )}
-                    </span>
-                    <span>
-                      <strong>{t.name}</strong>
-                      <small>{t.reason}</small>
-                    </span>
-                    <ArrowUpRight size={13} />
+                      {visibleTasks.length > 100 && (
+                        <p className="small-note">
+                          Search to narrow these results.
+                        </p>
+                      )}
+                    </div>
+                    <div className="editor-explorer-bottom">
+                      <span>
+                        <DoorOpen size={15} />
+                        {validation.data.entrances?.length || 0} entrances
+                      </span>
+                      <button
+                        className="editor-text"
+                        onClick={() => setShowRoutes(!showRoutes)}
+                      >
+                        <RouteIcon size={15} /> Test route
+                      </button>
+                    </div>
+                  </section>
+                ) : (
+                  <button
+                    className="editor-card editor-icon"
+                    aria-label="Open explorer"
+                    disabled={!!tool}
+                    onClick={() => setExplorer(true)}
+                  >
+                    <PanelLeftOpen size={20} />
                   </button>
-                ))}
-                {!visibleTasks.length && (
-                  <p className="editor-empty">
-                    {filter === 'drafts' && !search
-                      ? 'No unpublished changes. Published work stays on the map.'
-                      : 'No matching features.'}
-                  </p>
-                )}
-                {visibleTasks.length > 100 && (
-                  <p className="small-note">Search to narrow these results.</p>
                 )}
               </div>
-              <div className="editor-explorer-bottom">
-                <span>
-                  <DoorOpen size={15} />
-                  {validation.data.entrances?.length || 0} entrances
-                </span>
-                <button
-                  className="editor-text"
-                  onClick={() => setShowRoutes(!showRoutes)}
-                >
-                  <RouteIcon size={15} /> Test route
-                </button>
-              </div>
-            </section>
-          ) : (
-            <button
-              className="editor-card editor-icon"
-              aria-label="Open explorer"
-              disabled={!!tool}
-              onClick={() => setExplorer(true)}
-            >
-              <PanelLeftOpen size={20} />
-            </button>
-          )}
-        </div>
+            </details>
+          </EditorCatalogue>
+        </Suspense>
         <div className="editor-view-controls editor-card">
           <MapViewControl threeD={threeD} onView={toggleView} />
           <button
@@ -2482,7 +2661,7 @@ function Editor({
             {preview ? 'Back to draft' : 'Compare base'}
           </button>
         </div>
-        {tab.startsWith('gis-') && (
+        {
           <Suspense
             fallback={
               <p className="campus-workspace">Opening GIS workspace…</p>
@@ -2516,96 +2695,46 @@ function Editor({
                 setSelected(null);
                 await refresh();
               }}
-              onEdit={(source, edit) => {
-                if (
-                  new Set([
-                    ...gisSources.map((s) =>
-                      s.entity === 'feature'
-                        ? s.payload.properties.kind +
-                          ':' +
-                          s.payload.properties.id
-                        : 'place:' + s.payload.id,
-                    ),
-                    ...workspace.edits
-                      .filter((e) => e.properties.gisManaged)
-                      .map((e) => editKey(e)),
-                  ]).size >= 500 &&
-                  !gisSources.some((s) => s.id === source?.id) &&
-                  !workspace.edits.some(
-                    (e) => e.id === edit?.id && e.kind === edit?.kind,
+              onEdit={openDatasetFeature}
+            />
+          </Suspense>
+        }
+        <Suspense fallback={null}>
+          <DatasetInspector map={mapRef.current} onEdit={openDatasetFeature} />
+        </Suspense>
+        {campusVisited && (
+          <div hidden={tab !== 'campuses'} className="editor-campus-task">
+            <Suspense
+              fallback={<p className="campus-workspace">Opening campuses…</p>}
+            >
+              <CampusWorkspace
+                currentData={validation.data}
+                owner={owner}
+                current={state.campus || lasuCampus}
+                dark={dark}
+                onClose={() => setTab('map')}
+                onSwitch={async (campus) => {
+                  if (
+                    workspace.unfinished ||
+                    workspace.roofDraft ||
+                    surveyRecording
                   )
-                )
-                  throw new Error(
-                    'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
-                  );
-                if (source)
-                  setGisSources((rows) => [
-                    ...rows.filter((r) => r.id !== source.id),
-                    source,
-                  ]);
-                if (edit) workspace.includeServerFeature(edit);
-                const target =
-                  edit ||
-                  (source?.entity === 'feature'
-                    ? {
-                        id: source.payload.properties.id,
-                        kind: source.payload.properties.kind,
-                        geometry: source.payload.geometry,
-                        properties: source.payload.properties,
-                        deleted: false,
-                      }
-                    : source?.entity === 'place'
-                      ? {
-                          id: source.payload.id,
-                          kind: 'place' as const,
-                          geometry: {
-                            type: 'Point' as const,
-                            coordinates: source.payload.coordinates,
-                          },
-                          properties: {
-                            ...source.payload,
-                            kind: 'place',
-                            gisManaged: true,
-                          },
-                          deleted: false,
-                        }
-                      : null);
-                if (target) select(target, true);
-              }}
-            />
-          </Suspense>
-        )}
-        {tab === 'campuses' && (
-          <Suspense
-            fallback={<p className="campus-workspace">Opening campuses…</p>}
-          >
-            <CampusWorkspace
-              currentData={validation.data}
-              owner={owner}
-              current={state.campus || lasuCampus}
-              dark={dark}
-              onClose={() => setTab('map')}
-              onSwitch={async (campus) => {
-                if (
-                  workspace.unfinished ||
-                  workspace.roofDraft ||
-                  surveyRecording
-                )
-                  throw new Error(
-                    'Finish the current edit or pause recording before switching campuses.',
-                  );
-                if (!(await workspace.flush()))
-                  throw new Error(
-                    'Resolve pending saves before switching campuses. Your local edits are retained.',
-                  );
-                location.assign(campusUrl('/admin', campus.slug));
-              }}
-              onReview={async () => {
-                await refresh();
-                setTab('changes');
-              }}
-            />
-          </Suspense>
+                    throw new Error(
+                      'Finish the current edit or pause recording before switching campuses.',
+                    );
+                  if (!(await session.settle()) || !(await workspace.flush()))
+                    throw new Error(
+                      'Resolve pending saves before switching campuses. Your local edits are retained.',
+                    );
+                  location.assign(campusUrl('/admin', campus.slug));
+                }}
+                onReview={async () => {
+                  await refresh();
+                  setTab('changes');
+                }}
+              />
+            </Suspense>
+          </div>
         )}
         {tab === 'settings' && (
           <EditorSettings
@@ -2620,123 +2749,131 @@ function Editor({
             onOpacity={setOpacity}
             onClose={() => {
               setTab('map');
-              settingsTrigger.current?.focus();
             }}
           />
         )}
-        {!tab.startsWith('gis-') &&
-        tab !== 'map' &&
-        tab !== 'settings' &&
-        tab !== 'campuses' ? (
-          <aside className="editor-review-panel editor-card">
-            <div className="editor-panel-heading">
-              <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
-              <button
-                className="editor-icon"
-                aria-label="Close review panel"
-                onClick={() => setTab('map')}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {tab === 'duplicates' ? (
-              <DuplicateReview
-                data={validation.data}
-                candidates={validation.duplicates}
-                pending={validation.pending || busy}
-                decide={decideDuplicate}
-                inspect={(kind, id) => selectId(kind, id, true)}
-                undo={() => undo()}
-                canUndo={!!workspace.past.length}
-                exactBatch={exactBatch}
-                applyExact={(batch) =>
-                  mergeBatch(
-                    batch,
-                    'Reviewed duplicate cleanup applied. Undo restores the batch.',
-                  )
-                }
-              />
-            ) : (
-              <Suspense fallback={<p>Opening source and release review…</p>}>
-                <EditorReview
-                  tab={tab}
-                  state={state}
-                  onPublishedWorkspace={setPublishedWorkspace}
-                  draftCount={drafts.length}
-                  workspace={workspace}
-                  validation={validation}
-                  baselineVersion={base.version}
-                  publishedVersion={data.version}
-                  published={data}
-                  onIssue={openIssue}
-                  onSignIn={signIn}
-                  busy={busy}
-                  action={action}
-                  mapRef={mapRef}
-                  preview={preview}
-                  setPreview={setPreview}
-                  review={review}
-                  setReview={setReview}
-                  onLocateBuilding={(id) => selectId('building', id, true)}
-                  onApplyAppearances={async (batch) => {
-                    if (
-                      tool ||
-                      workspace.unfinished ||
-                      workspace.roofDraft ||
-                      workspace.status === 'Conflict'
+        {legacyReviewTasks
+          .filter((task) => reviewVisited.includes(task))
+          .map((reviewTask) => (
+            <aside
+              key={reviewTask}
+              hidden={tab !== reviewTask}
+              className="editor-review-panel editor-card"
+            >
+              <DockResize axis="horizontal" dimension="inspector" />
+              <div className="editor-panel-heading">
+                <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
+                <button
+                  className="editor-icon"
+                  aria-label="Close review panel"
+                  onClick={() => setTab('map')}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              {reviewTask === 'duplicates' ? (
+                <DuplicateReview
+                  data={validation.data}
+                  candidates={validation.duplicates}
+                  pending={validation.pending || busy}
+                  decide={decideDuplicate}
+                  inspect={(kind, id) => selectId(kind, id, true)}
+                  undo={() => undo()}
+                  canUndo={!!workspace.past.length}
+                  exactBatch={exactBatch}
+                  applyExact={(batch) =>
+                    mergeBatch(
+                      batch,
+                      'Reviewed duplicate cleanup applied. Undo restores the batch.',
                     )
-                      return;
-                    const original = workspace.edits;
-                    const originalBase = currentBase.current;
-                    setBusy(true);
-                    try {
-                      const checked = await validation.check([
-                        ...original.filter(
-                          (e) => !batch.some((b) => editKey(b) === editKey(e)),
-                        ),
-                        ...batch,
-                      ]);
-                      if (
-                        workspace.edits !== original ||
-                        currentBase.current !== originalBase ||
-                        workspace.unfinished ||
-                        workspace.roofDraft
-                      )
-                        throw new Error(
-                          'The draft changed. Review the appearance batch again.',
-                        );
-                      const errors = checked.errors.filter(
-                        (e) => !validation.errors.includes(e),
-                      );
-                      if (!checked.usable || errors.length)
-                        throw new Error(
-                          errors.join(' ') ||
-                            'The proposed appearances could not be validated.',
-                        );
-                      workspace.commit(batch);
-                      const current = batch.find(
-                        (e) =>
-                          e.kind === selectedRef.current?.kind &&
-                          e.id === selectedRef.current?.id,
-                      );
-                      if (current) {
-                        setSelected(current);
-                        selectedRef.current = current;
-                      }
-                      setMessage(
-                        `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
-                      );
-                    } catch (error) {
-                      setError((error as Error).message);
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
+                  }
                 />
-              </Suspense>
-            )}
-          </aside>
-        ) : selected && !preview && tab === 'map' ? (
+              ) : (
+                <Suspense fallback={<p>Opening source and release review…</p>}>
+                  <EditorReview
+                    tab={
+                      reviewTask === 'draft-changes' ? 'releases' : reviewTask
+                    }
+                    active={tab === reviewTask}
+                    state={state}
+                    onPublishedWorkspace={setPublishedWorkspace}
+                    draftCount={drafts.length}
+                    workspace={workspace}
+                    validation={validation}
+                    baselineVersion={base.version}
+                    publishedVersion={data.version}
+                    published={data}
+                    onIssue={openIssue}
+                    onSignIn={signIn}
+                    busy={busy}
+                    action={action}
+                    mapRef={mapRef}
+                    preview={preview}
+                    setPreview={setPreview}
+                    review={review}
+                    setReview={setReview}
+                    onLocateBuilding={(id) => selectId('building', id, true)}
+                    onApplyAppearances={async (batch) => {
+                      if (
+                        tool ||
+                        workspace.unfinished ||
+                        workspace.roofDraft ||
+                        workspace.status === 'Conflict'
+                      )
+                        return;
+                      const original = workspace.edits;
+                      const originalBase = currentBase.current;
+                      setBusy(true);
+                      try {
+                        const checked = await validation.check([
+                          ...original.filter(
+                            (e) =>
+                              !batch.some((b) => editKey(b) === editKey(e)),
+                          ),
+                          ...batch,
+                        ]);
+                        if (
+                          workspace.edits !== original ||
+                          currentBase.current !== originalBase ||
+                          workspace.unfinished ||
+                          workspace.roofDraft
+                        )
+                          throw new Error(
+                            'The draft changed. Review the appearance batch again.',
+                          );
+                        const errors = checked.errors.filter(
+                          (e) => !validation.errors.includes(e),
+                        );
+                        if (!checked.usable || errors.length)
+                          throw new Error(
+                            errors.join(' ') ||
+                              'The proposed appearances could not be validated.',
+                          );
+                        workspace.commit(batch);
+                        const current = batch.find(
+                          (e) =>
+                            e.kind === selectedRef.current?.kind &&
+                            e.id === selectedRef.current?.id,
+                        );
+                        if (current) {
+                          setSelected(current);
+                          selectedRef.current = current;
+                        }
+                        setMessage(
+                          `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
+                        );
+                      } catch (error) {
+                        setError((error as Error).message);
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  />
+                </Suspense>
+              )}
+            </aside>
+          ))}
+        {selected && !preview ? (
           <Suspense
             fallback={
               <aside className="editor-inspector editor-card">
@@ -2744,171 +2881,189 @@ function Editor({
               </aside>
             }
           >
-            <EditorInspector
-              photoOwner={owner}
-              photoSaveStatus={workspace.status}
-              publishedPhotos={data.photos}
-              onPhotoUndo={() => undo()}
-              onPhotos={(change) => {
-                if (
-                  workspace.roofDraft ||
-                  workspace.unfinished ||
-                  validation.pending
-                )
-                  throw Error(
-                    'Finish the current edit and wait for map validation before changing photos.',
+            <div
+              hidden={
+                !session.capabilities.capabilities.includes('edit') ||
+                tab !== 'map' ||
+                (!!session.state.selection[0]?.datasetId &&
+                  !session.state.editingFeature)
+              }
+              className="editor-preserved-inspector"
+            >
+              <DockResize axis="horizontal" dimension="inspector" />
+              <EditorInspector
+                photoOwner={owner}
+                photoSaveStatus={workspace.status}
+                publishedPhotos={data.photos}
+                onPhotoUndo={() => undo()}
+                onPhotos={(change) => {
+                  if (
+                    workspace.roofDraft ||
+                    workspace.unfinished ||
+                    validation.pending
+                  )
+                    throw Error(
+                      'Finish the current edit and wait for map validation before changing photos.',
+                    );
+                  const batch = photoEdits(
+                    validation.data,
+                    workspace.edits,
+                    change,
                   );
-                const batch = photoEdits(
-                  validation.data,
-                  workspace.edits,
-                  change,
-                );
-                workspace.commit(batch, null);
-                const next = batch.find(
-                  (e) => e.id === selected.id && e.kind === selected.kind,
-                );
-                if (next) {
-                  setSelected(next);
-                  selectedRef.current = next;
+                  workspace.commit(batch, null);
+                  const next = batch.find(
+                    (e) => e.id === selected.id && e.kind === selected.kind,
+                  );
+                  if (next) {
+                    setSelected(next);
+                    selectedRef.current = next;
+                  }
+                }}
+                onGeometry={(geometry) => {
+                  if (selected)
+                    stageRepair(
+                      [remapBuildingSurfaces(selected, geometry)],
+                      'Review corrected building geometry',
+                    );
+                }}
+                key={editKey(selected)}
+                edit={selected}
+                data={validation.data}
+                issues={validation.issues
+                  .filter(
+                    (i) =>
+                      i.featureId === selected.id &&
+                      (!i.featureKind || i.featureKind === selected.kind),
+                  )
+                  .map((i) => i.message)}
+                focusField={repairFocus?.field}
+                onEndField={workspace.endHistoryGroup}
+                buildingEditor={
+                  selected.kind === 'building' && (
+                    <Suspense
+                      fallback={<output>Loading building tools…</output>}
+                    >
+                      <BuildingAppearanceEditor
+                        reviewRequest={
+                          repairFocus?.repair === 'review-model' ||
+                          /^(height|floors|appearance|roof|wall)/i.test(
+                            repairFocus?.field || '',
+                          )
+                            ? repairFocus || undefined
+                            : undefined
+                        }
+                        onReviewOpened={() => setRepairFocus(null)}
+                        workspace={workspace}
+                        onHistory={undo}
+                        edit={selected}
+                        data={validation.data}
+                        mode={buildingMode}
+                        selection={buildingSelection}
+                        onMode={(mode) => {
+                          workspace.endHistoryGroup();
+                          setBuildingMode(mode);
+                          if (mode === 'roof')
+                            setBuildingSelection((s) => ({
+                              buildingId: selected.id,
+                              partId: s?.partId,
+                            }));
+                        }}
+                        onSelection={(value) => {
+                          workspace.endHistoryGroup();
+                          setBuildingSelection(value);
+                        }}
+                        onEdit={(edit, field) => {
+                          workspace.commit(
+                            [edit],
+                            workspace.unfinished,
+                            field ? `${editKey(edit)}:${field}` : undefined,
+                          );
+                          setSelected(edit);
+                          selectedRef.current = edit;
+                        }}
+                        roofDraft={workspace.roofDraft}
+                        onRoofDraft={(value) => workspace.draftRoof(value)}
+                        onApplyRoof={(edit) => {
+                          workspace.applyRoof(edit);
+                          setSelected(edit);
+                          selectedRef.current = edit;
+                          setMessage(
+                            'Roof applied. Undo restores the previous roof.',
+                          );
+                        }}
+                      />
+                    </Suspense>
+                  )
                 }
-              }}
-              onGeometry={(geometry) => {
-                if (selected)
-                  stageRepair(
-                    [remapBuildingSurfaces(selected, geometry)],
-                    'Review corrected building geometry',
+                onProperty={(key, value, continuous) => {
+                  if (workspace.roofDraft) {
+                    setMessage(
+                      'Apply or cancel the roof plan before changing other building properties.',
+                    );
+                    return;
+                  }
+                  const batch = propertyEdits(
+                    validation.data,
+                    workspace.edits,
+                    [selected],
+                    key,
+                    value,
                   );
-              }}
-              key={editKey(selected)}
-              edit={selected}
-              data={validation.data}
-              issues={validation.issues
-                .filter(
-                  (i) =>
-                    i.featureId === selected.id &&
-                    (!i.featureKind || i.featureKind === selected.kind),
-                )
-                .map((i) => i.message)}
-              focusField={repairFocus?.field}
-              onEndField={workspace.endHistoryGroup}
-              buildingEditor={
-                selected.kind === 'building' && (
-                  <Suspense fallback={<output>Loading building tools…</output>}>
-                    <BuildingAppearanceEditor
-                      reviewRequest={
-                        repairFocus?.repair === 'review-model' ||
-                        /^(height|floors|appearance|roof|wall)/i.test(
-                          repairFocus?.field || '',
+                  const edit = batch[0];
+                  if (repairFocus) {
+                    stageRepair(batch, 'Review feature repair');
+                    return;
+                  }
+                  workspace.commit(
+                    batch,
+                    workspace.unfinished,
+                    continuous ? `${editKey(edit)}:${key}` : undefined,
+                  );
+                  setSelected(edit);
+                  selectedRef.current = edit;
+                }}
+                onLayerGeometry={(operation) =>
+                  setLayerOperation({
+                    operation,
+                    keys: [`${selected.kind}:${selected.id}`],
+                  })
+                }
+                onEntrance={addEntrance}
+                onApproach={approach}
+                onPick={pick}
+                onDisconnect={disconnect}
+                onDelete={remove}
+                onRestorePublished={
+                  publishedBuilding
+                    ? () =>
+                        stageRepair(
+                          [publishedBuilding],
+                          'Restore published building · review before applying',
                         )
-                          ? repairFocus || undefined
-                          : undefined
-                      }
-                      onReviewOpened={() => setRepairFocus(null)}
-                      workspace={workspace}
-                      onHistory={undo}
-                      edit={selected}
-                      data={validation.data}
-                      mode={buildingMode}
-                      selection={buildingSelection}
-                      onMode={(mode) => {
-                        workspace.endHistoryGroup();
-                        setBuildingMode(mode);
-                        if (mode === 'roof')
-                          setBuildingSelection((s) => ({
-                            buildingId: selected.id,
-                            partId: s?.partId,
-                          }));
-                      }}
-                      onSelection={(value) => {
-                        workspace.endHistoryGroup();
-                        setBuildingSelection(value);
-                      }}
-                      onEdit={(edit, field) => {
-                        workspace.commit(
-                          [edit],
-                          workspace.unfinished,
-                          field ? `${editKey(edit)}:${field}` : undefined,
-                        );
-                        setSelected(edit);
-                        selectedRef.current = edit;
-                      }}
-                      roofDraft={workspace.roofDraft}
-                      onRoofDraft={(value) => workspace.draftRoof(value)}
-                      onApplyRoof={(edit) => {
-                        workspace.applyRoof(edit);
-                        setSelected(edit);
-                        selectedRef.current = edit;
-                        setMessage(
-                          'Roof applied. Undo restores the previous roof.',
-                        );
-                      }}
-                    />
-                  </Suspense>
-                )
-              }
-              onProperty={(key, value, continuous) => {
-                if (workspace.roofDraft) {
-                  setMessage(
-                    'Apply or cancel the roof plan before changing other building properties.',
-                  );
-                  return;
+                    : undefined
                 }
-                const batch = propertyEdits(
-                  validation.data,
-                  workspace.edits,
-                  [selected],
-                  key,
-                  value,
-                );
-                const edit = batch[0];
-                if (repairFocus) {
-                  stageRepair(batch, 'Review feature repair');
-                  return;
-                }
-                workspace.commit(
-                  batch,
-                  workspace.unfinished,
-                  continuous ? `${editKey(edit)}:${key}` : undefined,
-                );
-                setSelected(edit);
-                selectedRef.current = edit;
-              }}
-              onLayerGeometry={(operation) =>
-                setLayerOperation({
-                  operation,
-                  keys: [`${selected.kind}:${selected.id}`],
-                })
-              }
-              onEntrance={addEntrance}
-              onApproach={approach}
-              onPick={pick}
-              onDisconnect={disconnect}
-              onDelete={remove}
-              onRestorePublished={
-                publishedBuilding
-                  ? () =>
-                      stageRepair(
-                        [publishedBuilding],
-                        'Restore published building · review before applying',
-                      )
-                  : undefined
-              }
-              onClose={() => {
-                workspace.endHistoryGroup();
-                setFocusRequest(null);
-                if (selectionOverview.current)
-                  mapRef.current?.easeTo({
-                    ...selectionOverview.current,
-                    pitch: mapRef.current.getPitch(),
-                    duration: 450,
-                  });
-                selectionOverview.current = null;
-                setSelected(null);
-                setBuildingSelection(undefined);
-                selectedRef.current = null;
-                controller.current?.select(null);
-              }}
-            />
+                onClose={() => {
+                  workspace.endHistoryGroup();
+                  setFocusRequest(null);
+                  if (selectionOverview.current)
+                    mapRef.current?.easeTo({
+                      ...selectionOverview.current,
+                      pitch: mapRef.current.getPitch(),
+                      duration: 450,
+                    });
+                  selectionOverview.current = null;
+                  setSelected(null);
+                  session.setState((s) => ({
+                    ...s,
+                    selection: [],
+                    editingFeature: undefined,
+                  }));
+                  setBuildingSelection(undefined);
+                  selectedRef.current = null;
+                  controller.current?.select(null);
+                }}
+              />
+            </div>
           </Suspense>
         ) : (
           !tool &&
@@ -3269,6 +3424,6 @@ function Editor({
           </div>
         )}
       </section>
-    </main>
+    </EditorChrome>
   );
 }

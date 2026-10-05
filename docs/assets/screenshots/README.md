@@ -1,8 +1,14 @@
 # Application screenshots
 
+## Unified editor · 5 October 2026
+
+`unified-editor-{data,analyze,review,publish,phone-table}-2026-10-05.png` show the consolidated editor built from this feature branch. Captured by the opt-in `GIS documentation gallery` Playwright journey using the published campus basemap and an isolated team/dataset fixture. The fixture demonstrates 100,000 matching records through bounded pages; it is not production campus content or evidence of a real approval. Desktop captures use 1440 × 1000; the expanded phone table uses 390 × 844. Captures include the persistent catalogue, bottom table and contextual task dock. Older images remain historical release evidence.
+
+Regenerate with `TURNRIGHT_GIS_SCREENSHOTS=1` and `playwright test --config playwright.gis-docs.config.ts` from `web`. Run this separately from other browser suites, or use a distinct Playwright output directory.
+
 ## Campus GIS workflow · 5 October 2026
 
-The four **gis-data**, **gis-analyze**, **gis-review** and **gis-publish** PNGs dated 2026-10-05 are unaltered 1440×1000 Chromium captures of the configured production build. They show the current Data/Edit/Analyze/Review/Publish navigation, typed table, processing catalogue, immutable submission and map templates. The map is the verified published LASU **lasu-4895a363b403** package with its attributed assets. Camera framing leaves room for the panel; no UI or map content is composited or retouched.
+The four **gis-data**, **gis-analyze**, **gis-review** and **gis-publish** PNGs dated 2026-10-05 are unaltered 1440×1000 Chromium captures of the configured production build. They show the preceding Data/Edit/Analyze/Review/Publish navigation, typed table, processing catalogue, immutable submission and map templates. The map is the verified published LASU **lasu-4895a363b403** package with its attributed assets. Camera framing leaves room for the panel; no UI or map content is composited or retouched.
 
 Authentication, tree attributes, catalogue totals and review decisions are isolated demonstration fixtures. The 100,000-row label illustrates bounded paging, not an actual campus tree inventory or a load benchmark. Demonstration reviews and buffers are not public campus records. No production private account, draft, upload or survey is exposed or changed.
 

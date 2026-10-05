@@ -2,9 +2,9 @@
 
 ## Import into the team GIS workflow
 
-Spatial import is the first step of **Data → Edit → Analyze → Review → Publish**. Campus editors can import and accept source proposals into the shared draft; source acceptance records a contributor and does not approve a release. Administrators manage campus settings and memberships. All source/import reads and writes are scoped to campus capabilities.
+Spatial import is the first step of **Catalogue → map/table → Analyze → Review → Publish**. Campus editors can import and accept source proposals into the shared draft; source acceptance records a contributor and does not approve a release. Administrators manage campus settings and memberships. All source/import reads and writes are scoped to campus capabilities.
 
-Original primitive attributes are retained separately from correction overlays. Source CRS, declared field types/aliases and stable identities populate the dataset catalogue. Use **Data** to configure typed fields, coded domains, validation, private/public selection and styling. Use **Data → Import an attribute CSV** for non-spatial asset tables, then **Analyze → attribute join** to connect unique matching keys. Reimports retain configured schemas and corrections; source revision changes make older analysis results stale.
+Original primitive attributes are retained separately from correction overlays. Source CRS, declared field types/aliases and stable identities populate the dataset catalogue. Use **Table → Fields and styling** to configure typed fields, coded domains, validation, private/public selection and styling. Use **Add data → Import attribute CSV** for non-spatial asset tables, then **Analyze → attribute join** to connect unique matching keys. Reimports retain configured schemas and corrections; source revision changes make older analysis results stale.
 
 Large spatial datasets use indexed, paged reads instead of complete editor downloads. The workspace target is 100,000 features, with 500-feature interactive limits. Public packages remain separately bounded; imported/derived layers and arbitrary attributes stay private until selected and independently approved. [Complete workflow and limits](GIS-PLATFORM.md).
 
@@ -22,7 +22,7 @@ explicitly reviewed release remains a separate operation.
 
 ## Create a campus
 
-Open **Editor → Campuses → New campus**. Enter a name and a unique public URL name. Move to the location using longitude, latitude, then draw a closed boundary. Alternatively upload or paste a WGS84 GeoJSON polygon. A collection containing several polygons exposes a boundary selector and previews the selected geometry before creation.
+Open **Campus menu → Switch campus / manage sources → New campus**. Enter a name and a unique public URL name. Move to the location using longitude, latitude, then draw a closed boundary. Alternatively upload or paste a WGS84 GeoJSON polygon. A collection containing several polygons exposes a boundary selector and previews the selected geometry before creation.
 
 Campus identity is permanent; the public slug identifies links such as `/?campus=north-campus`. Creating a campus does not publish it. The new workspace begins with a boundary and no invented buildings, destinations or routes. Campus creation fields and import mappings are recovered on this device under the user and campus identity.
 

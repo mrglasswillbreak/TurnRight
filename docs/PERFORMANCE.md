@@ -1,8 +1,16 @@
 # Responsiveness and recovery
 
+## Unified editor integration · 5 October 2026
+
+The shared shell retains one map and loads the catalogue, attribute table, command search and specialist tasks on demand. Dataset overlays query the viewport separately from the 100-row table, with at most five overlays and 100 features per query. A partial-results notice identifies bounded map results.
+
+The configured integration build measures **433,765 / 435,200** public startup bytes, **173,684 / 189,440** additional editor bytes and **10,287 / 12,288** lazy photo bytes (gzip). GIS data/analysis/review/publication increments measure **6,699 / 5,467 / 4,715 / 6,306 bytes**, each within its existing 20 KiB budget. Lazy 3D remains **246.6 / 300 KiB**. No budget was increased.
+
+These measure compressed code, not latency or frame rate. Browser regression tests cover map continuity, bounded requests, table paging and dock interaction; the native 100,000-feature database gate remains separate from a physical-device interaction benchmark.
+
 ## Campus GIS scope · 5 October 2026
 
-GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. Data renders 100 rows; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
+GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. The shared attribute table renders 100 rows per page; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
 
 The target is 100,000 features per campus workspace dataset. Native PostGIS acceptance inserts 100,000 features, checks bounded spatial queries and immutable job inputs, and tests cancellation, review/publication locks and restoration. This is not a complete 100,000-feature live mobile benchmark. Public navigation remains bounded to 20,000 map features/25 MB; draft layouts cap five layers at 500 visible features each.
 

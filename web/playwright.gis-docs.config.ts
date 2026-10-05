@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
+  outputDir: 'work/gis-docs-results',
   grep: /GIS documentation gallery/,
   timeout: 180000,
   use: {

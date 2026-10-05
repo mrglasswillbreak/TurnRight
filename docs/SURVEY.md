@@ -6,7 +6,7 @@ Survey capture and unfinished recovery remain user-scoped. Completed survey evid
 
 Status: implemented; **awaiting physical field verification**. Campus editors can capture surveys; unfinished sessions and recovery remain personal. Survey evidence is private and applying it never publishes a campus release.
 
-Choose the target campus in **Campuses** before recording. Survey sessions, recovery and revision chunks are isolated by user and campus; applied corrections join that campus’s shared draft, and switching requires pausing recording and resolving pending edits. LASU access exceptions do not transfer to a new campus.
+Choose the target campus in the **campus menu** before recording. Survey sessions, recovery and revision chunks are isolated by user and campus; applied corrections join that campus’s shared draft, and switching requires pausing recording and resolving pending edits. LASU access exceptions do not transfer to a new campus.
 
 ## Phone workflow
 

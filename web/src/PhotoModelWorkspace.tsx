@@ -1,3 +1,4 @@
+import { useEditorFocus } from './useEditorFocus';
 import {
   Trash2 as ActionTrash2,
   X as ActionX,
@@ -243,6 +244,7 @@ function ModelWorkspace({
   initialMode = 'details',
   initialField,
 }: WorkspaceProps) {
+  useEditorFocus(true);
   const compact = useCompactModel();
   const landscape = useLandscapeModel() && compact;
   const wide = useModelMedia('(min-width: 1200px)');

@@ -1,3 +1,4 @@
+import { editorTask } from './editor-navigation';
 import { expect, test, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -68,7 +69,14 @@ const summary: ImportPreview = {
   totalFeatures: 44,
 };
 
-async function setup(page: Page, { photo = false, outsideLasu = false, overlay = false }: { photo?: boolean; outsideLasu?: boolean; overlay?: boolean } = {}) {
+async function setup(
+  page: Page,
+  {
+    photo = false,
+    outsideLasu = false,
+    overlay = false,
+  }: { photo?: boolean; outsideLasu?: boolean; overlay?: boolean } = {},
+) {
   const data: CampusData = photo
     ? JSON.parse(
         readFileSync(
@@ -81,19 +89,78 @@ async function setup(page: Page, { photo = false, outsideLasu = false, overlay =
       )
     : campusFixture();
   const activeNorth = outsideLasu
-    ? { ...north, bounds: [[3.383488, 6.499619], [3.404971, 6.524281]] as CampusIdentity['bounds'] }
+    ? {
+        ...north,
+        bounds: [
+          [3.383488, 6.499619],
+          [3.404971, 6.524281],
+        ] as CampusIdentity['bounds'],
+      }
     : north;
   if (outsideLasu) {
     data.bounds = activeNorth.bounds;
-    data.boundary = { type: 'Feature', properties: { name: north.name }, geometry: {
-      type: 'Polygon', coordinates: [[[3.383488, 6.499619], [3.404971, 6.499619], [3.404971, 6.524281], [3.383488, 6.524281], [3.383488, 6.499619]]],
-    } };
-    data.map.features = [{ type: 'Feature', properties: { id: 'unilag-road', kind: 'path', name: 'OZOLUA RD.', walkingAccess: 'private' }, geometry: { type: 'LineString', coordinates: [[3.391, 6.51], [3.392, 6.511]] } }];
+    data.boundary = {
+      type: 'Feature',
+      properties: { name: north.name },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [3.383488, 6.499619],
+            [3.404971, 6.499619],
+            [3.404971, 6.524281],
+            [3.383488, 6.524281],
+            [3.383488, 6.499619],
+          ],
+        ],
+      },
+    };
+    data.map.features = [
+      {
+        type: 'Feature',
+        properties: {
+          id: 'unilag-road',
+          kind: 'path',
+          name: 'OZOLUA RD.',
+          walkingAccess: 'private',
+        },
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [3.391, 6.51],
+            [3.392, 6.511],
+          ],
+        },
+      },
+    ];
     data.places = [];
     data.graph.nodes = [];
     data.graph.edges = [];
   }
-  if (overlay) data.map.features.push({type:'Feature', properties:{id:'survey-area',kind:'overlay',name:'Survey area',label:'Field survey',color:'#2563eb',opacity:0.5,order:2},geometry:{type:'Polygon',coordinates:[[[3.2,6.46],[3.201,6.46],[3.201,6.461],[3.2,6.46]]]}});
+  if (overlay)
+    data.map.features.push({
+      type: 'Feature',
+      properties: {
+        id: 'survey-area',
+        kind: 'overlay',
+        name: 'Survey area',
+        label: 'Field survey',
+        color: '#2563eb',
+        opacity: 0.5,
+        order: 2,
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [3.2, 6.46],
+            [3.201, 6.46],
+            [3.201, 6.461],
+            [3.2, 6.46],
+          ],
+        ],
+      },
+    });
   let saved: MapEdit[] = [];
   const bytes = JSON.stringify(data);
   const manifest: CampusPackage = {
@@ -206,7 +273,10 @@ async function setup(page: Page, { photo = false, outsideLasu = false, overlay =
         published: null,
       };
     if (action === 'save-edits') {
-      saved = (payload as SaveBatch).edits.map(({ edit }) => ({ ...edit, updated_at: new Date().toISOString() }));
+      saved = (payload as SaveBatch).edits.map(({ edit }) => ({
+        ...edit,
+        updated_at: new Date().toISOString(),
+      }));
       result = saved;
     }
     if (action === 'sources') result = { features: [] };
@@ -254,7 +324,8 @@ async function setup(page: Page, { photo = false, outsideLasu = false, overlay =
         phase: payload.phase,
         // PostgreSQL JSONB does not preserve object-key insertion order.
         configuration: {
-          redistributionConfirmed: payload.configuration.redistributionConfirmed,
+          redistributionConfirmed:
+            payload.configuration.redistributionConfirmed,
           license: payload.configuration.license,
           attribution: payload.configuration.attribution,
           layers: payload.configuration.layers.map(
@@ -287,7 +358,7 @@ async function setup(page: Page, { photo = false, outsideLasu = false, overlay =
 }
 async function workspace(page: Page) {
   await page.goto('/admin');
-  await page.getByRole('button', { name: 'Campuses', exact: true }).click();
+  await editorTask(page, 'Campuses');
   await expect(
     page.getByRole('region', { name: 'Campuses workspace' }),
   ).toBeVisible();
@@ -299,13 +370,15 @@ async function fileImport(page: Page) {
     .fill('Campus buildings and paths');
   await page.getByRole('button', { name: 'Upload files', exact: true }).click();
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
-  await page.locator('input[type=file]').setInputFiles({
-    name: 'campus.geojson',
-    mimeType: 'application/geo+json',
-    buffer: Buffer.from(
-      JSON.stringify({ type: 'FeatureCollection', features: [] }),
-    ),
-  });
+  await page
+    .getByRole('button', { name: 'Choose map files', exact: true })
+    .setInputFiles({
+      name: 'campus.geojson',
+      mimeType: 'application/geo+json',
+      buffer: Buffer.from(
+        JSON.stringify({ type: 'FeatureCollection', features: [] }),
+      ),
+    });
   await page
     .getByRole('button', { name: 'Inspect layers', exact: true })
     .click();
@@ -350,26 +423,42 @@ test('campus imports preserve mappings through rotation and queue only a reviewe
   );
   await page.getByLabel('Attribution', { exact: true }).fill('Changed credit');
   await expect(queue).toBeDisabled();
-  await expect(page.getByText('Settings changed since this preview was built.', {
-    exact: false,
-  })).toBeVisible();
-  await expect(queue).toHaveAttribute('aria-describedby', 'import-review-blocker');
-  await page.getByLabel('Attribution', { exact: true }).fill(config.attribution);
+  await expect(
+    page.getByText('Settings changed since this preview was built.', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(queue).toHaveAttribute(
+    'aria-describedby',
+    'import-review-blocker',
+  );
+  await page
+    .getByLabel('Attribution', { exact: true })
+    .fill(config.attribution);
   await expect(queue).toBeEnabled();
   state.summary.errors.push('A building boundary needs repair.');
   await page.getByRole('button', { name: 'Back to sources' }).click();
-  await page.getByRole('button', {
-    name: /Campus buildings and paths.*preview/,
-  }).click();
+  await page
+    .getByRole('button', {
+      name: /Campus buildings and paths.*preview/,
+    })
+    .click();
   await expect(queue).toBeDisabled();
-  await expect(page.getByText('Resolve the preview errors shown above, then rebuild the preview.', {
-    exact: true,
-  })).toBeVisible();
+  await expect(
+    page.getByText(
+      'Resolve the preview errors shown above, then rebuild the preview.',
+      {
+        exact: true,
+      },
+    ),
+  ).toBeVisible();
   state.summary.errors.length = 0;
   await page.getByRole('button', { name: 'Back to sources' }).click();
-  await page.getByRole('button', {
-    name: /Campus buildings and paths.*preview/,
-  }).click();
+  await page
+    .getByRole('button', {
+      name: /Campus buildings and paths.*preview/,
+    })
+    .click();
   await expect(queue).toBeEnabled();
   expect(state.calls.some((c) => c.action === 'import-queue')).toBe(false);
   await page
@@ -422,7 +511,9 @@ test('campus imports resume failed uploads and allow selecting the same file aga
   await page.route('**/__campus-upload', (r) =>
     r.fulfill({ status: 503, json: { error: 'temporary failure' } }),
   );
-  await page.locator('input[type=file]').setInputFiles(file);
+  await page
+    .getByRole('button', { name: 'Choose map files', exact: true })
+    .setInputFiles(file);
   await expect(
     page.getByText('Upload was interrupted.', { exact: false }),
   ).toBeVisible();
@@ -430,7 +521,9 @@ test('campus imports resume failed uploads and allow selecting the same file aga
   await page.route('**/__campus-upload', (r) =>
     r.fulfill({ json: { ok: true } }),
   );
-  await page.locator('input[type=file]').setInputFiles(file);
+  await page
+    .getByRole('button', { name: 'Choose map files', exact: true })
+    .setInputFiles(file);
   await expect(
     page.getByText('1 file(s) uploaded. Inspect the layers next.', {
       exact: true,
@@ -486,7 +579,9 @@ test('campus imports restore campus creation and public handoff keeps the campus
     page.getByRole('button', { name: 'LASU · Ojo', exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole('dialog', { name: 'Choose a campus' }).getByRole('button', { name: north.name, exact: true }),
+    page
+      .getByRole('dialog', { name: 'Choose a campus' })
+      .getByRole('button', { name: north.name, exact: true }),
   ).toHaveCount(0);
 });
 
@@ -709,99 +804,189 @@ test('campus imports retain readable headers and fields in light and dark themes
   }
 });
 
-test('campus imports save and reopen paths outside LASU after rotation', async ({ page }, info) => {
+test('campus imports save and reopen paths outside LASU after rotation', async ({
+  page,
+}, info) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const state = await setup(page, { outsideLasu: true });
   await page.goto('/admin?campus=north-campus');
   await page.getByRole('button', { name: 'All', exact: true }).click();
-  await page.getByRole('searchbox', { name: 'Search map features' }).fill('OZOLUA');
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('OZOLUA');
   await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
-  await page.getByRole('combobox', { name: 'Walking access', exact: true }).selectOption('yes');
-  await expect.poll(() => state.calls.filter((c) => c.action === 'save-edits').length).toBeGreaterThan(0);
-  await expect(page.getByRole('status').filter({ hasText: /^Saved$/ })).toBeVisible();
+  await page
+    .getByRole('combobox', { name: 'Walking access', exact: true })
+    .selectOption('yes');
+  await expect
+    .poll(() => state.calls.filter((c) => c.action === 'save-edits').length)
+    .toBeGreaterThan(0);
+  await expect(
+    page.getByRole('status').filter({ hasText: /^Saved$/ }),
+  ).toBeVisible();
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
+  await expect(
+    page.getByRole('combobox', { name: 'Walking access', exact: true }),
+  ).toHaveValue('yes');
   await page.screenshot({ path: info.outputPath('unilag-path-saved.png') });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.reload();
   await page.getByRole('button', { name: 'All', exact: true }).click();
-  await page.getByRole('searchbox', { name: 'Search map features' }).fill('OZOLUA');
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('OZOLUA');
   await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
-  await expect(page.getByRole('combobox', { name: 'Walking access', exact: true })).toHaveValue('yes');
-  await expect(page.getByText('All coordinates must be within the LASU Ojo mapping area.', { exact: true })).toHaveCount(0);
-  expect(state.calls.filter((c) => c.action === 'save-edits').every((c) => c.campus === 'north-campus')).toBe(true);
+  await expect(
+    page.getByRole('combobox', { name: 'Walking access', exact: true }),
+  ).toHaveValue('yes');
+  await expect(
+    page.getByText(
+      'All coordinates must be within the LASU Ojo mapping area.',
+      { exact: true },
+    ),
+  ).toHaveCount(0);
+  expect(
+    state.calls
+      .filter((c) => c.action === 'save-edits')
+      .every((c) => c.campus === 'north-campus'),
+  ).toBe(true);
 });
 
-test('campus imports reconcile a lost queue response without submitting twice', async ({ page }) => {
+test('campus imports reconcile a lost queue response without submitting twice', async ({
+  page,
+}) => {
   const state = await setup(page);
   await workspace(page);
   await fileImport(page);
-  await page.getByRole('button', { name: 'Build preview', exact: true }).click();
-  const queue = page.getByRole('button', { name: 'Queue for review', exact: true });
+  await page
+    .getByRole('button', { name: 'Build preview', exact: true })
+    .click();
+  const queue = page.getByRole('button', {
+    name: 'Queue for review',
+    exact: true,
+  });
   await expect(queue).toBeEnabled({ timeout: 15000 });
   let submissions = 0;
   await page.route('**/api/admin', async (route) => {
-    if (route.request().postDataJSON().action !== 'import-queue') return route.fallback();
+    if (route.request().postDataJSON().action !== 'import-queue')
+      return route.fallback();
     submissions++;
     state.jobs[0].status = 'reviewed';
-    return route.fulfill({ status: 504, json: { error: 'The request timed out.' } });
+    return route.fulfill({
+      status: 504,
+      json: { error: 'The request timed out.' },
+    });
   });
   await queue.click();
-  await expect(page.getByRole('button', { name: 'Open source review' })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Open source review' }),
+  ).toBeVisible();
   expect(submissions).toBe(1);
   await expect(queue).toHaveCount(0);
 });
 
-test('campus imports edit an overlay and reopen its saved style', async ({ page }) => {
-  const state=await setup(page,{overlay:true});
-  await page.setViewportSize({width:1440,height:900});
+test('campus imports edit an overlay and reopen its saved style', async ({
+  page,
+}) => {
+  const state = await setup(page, { overlay: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/admin');
-  await page.getByRole('button',{name:'All',exact:true}).click();
-  await page.getByRole('searchbox',{name:'Search map features'}).fill('Survey area');
-  await page.getByRole('button',{name:/^Survey area/}).click();
-  await page.getByLabel('Label',{exact:true}).fill('Reviewed survey');
-  await page.getByLabel('Layer order',{exact:true}).fill('8');
-  await page.getByLabel('Visible on the map',{exact:true}).uncheck();
-  await expect.poll(()=>state.calls.filter(c=>c.action==='save-edits').length).toBeGreaterThan(0);
-  await expect(page.getByRole('status').filter({hasText:/^Saved$/})).toBeVisible();
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('Survey area');
+  await page.getByRole('button', { name: /^Survey area/ }).click();
+  await page.getByLabel('Label', { exact: true }).fill('Reviewed survey');
+  await page.getByLabel('Layer order', { exact: true }).fill('8');
+  await page.getByLabel('Visible on the map', { exact: true }).uncheck();
+  await expect
+    .poll(() => state.calls.filter((c) => c.action === 'save-edits').length)
+    .toBeGreaterThan(0);
+  await expect(
+    page.getByRole('status').filter({ hasText: /^Saved$/ }),
+  ).toBeVisible();
   await page.reload();
-  await page.getByRole('button',{name:'All',exact:true}).click();
-  await page.getByRole('searchbox',{name:'Search map features'}).fill('Survey area');
-  await page.getByRole('button',{name:/^Survey area/}).click();
-  await expect(page.getByLabel('Label',{exact:true})).toHaveValue('Reviewed survey');
-  await expect(page.getByLabel('Layer order',{exact:true})).toHaveValue('8');
-  await expect(page.getByLabel('Visible on the map',{exact:true})).not.toBeChecked();
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await page
+    .getByRole('searchbox', { name: 'Search map features' })
+    .fill('Survey area');
+  await page.getByRole('button', { name: /^Survey area/ }).click();
+  await expect(page.getByLabel('Label', { exact: true })).toHaveValue(
+    'Reviewed survey',
+  );
+  await expect(page.getByLabel('Layer order', { exact: true })).toHaveValue(
+    '8',
+  );
+  await expect(
+    page.getByLabel('Visible on the map', { exact: true }),
+  ).not.toBeChecked();
 });
 
-test('campus imports expose vector roles, repair receipts and per-layer sampling', async ({page})=>{
-  const state=await setup(page);
-  state.summary.repairs=[{layer:'Buildings',sourceId:'96',actions:['Repaired polygon self-intersection'],areaChangePercent:0.00001}];
-  state.summary.sampling=[{layer:'Buildings',shown:20,total:24},{layer:'Footpaths',shown:18,total:18}];
-  await workspace(page); await fileImport(page);
-  await expect(page.locator('.import-layer').first().getByLabel('Import as')).toContainText('road-surface');
-  await expect(page.locator('.import-layer').first().getByLabel('Import as')).toContainText('overlay');
-  await expect(page.getByText('Preview is sampled across layers',{exact:false})).toBeVisible();
-  await expect(page.getByText('Buildings · 96:',{exact:false})).toBeVisible();
-  await page.getByText('Supported vector formats',{exact:true}).click();
-  await expect(page.getByText('GeoParquet: parquet, geoparquet',{exact:true})).toBeVisible();
+test('campus imports expose vector roles, repair receipts and per-layer sampling', async ({
+  page,
+}) => {
+  const state = await setup(page);
+  state.summary.repairs = [
+    {
+      layer: 'Buildings',
+      sourceId: '96',
+      actions: ['Repaired polygon self-intersection'],
+      areaChangePercent: 0.00001,
+    },
+  ];
+  state.summary.sampling = [
+    { layer: 'Buildings', shown: 20, total: 24 },
+    { layer: 'Footpaths', shown: 18, total: 18 },
+  ];
+  await workspace(page);
+  await fileImport(page);
+  await expect(
+    page.locator('.import-layer').first().getByLabel('Import as'),
+  ).toContainText('road-surface');
+  await expect(
+    page.locator('.import-layer').first().getByLabel('Import as'),
+  ).toContainText('overlay');
+  await expect(
+    page.getByText('Preview is sampled across layers', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Buildings · 96:', { exact: false }),
+  ).toBeVisible();
+  await page.getByText('Supported vector formats', { exact: true }).click();
+  await expect(
+    page.getByText('GeoParquet: parquet, geoparquet', { exact: true }),
+  ).toBeVisible();
 });
 
-test('campus imports remember the last successful public campus and respect explicit links', async ({ page }) => {
+test('campus imports remember the last successful public campus and respect explicit links', async ({
+  page,
+}) => {
   await setup(page);
-  const remembered = () => page.evaluate(() => localStorage.getItem('turnright:last-campus'));
+  const remembered = () =>
+    page.evaluate(() => localStorage.getItem('turnright:last-campus'));
   await page.goto('/?campus=north-campus');
   await expect.poll(remembered).toBe('north-campus');
   await page.goto('/');
   await expect(page).toHaveURL(/\/\?campus=north-campus$/);
-  await expect(page.getByRole('button', { name: 'Choose a campus', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Choose a campus', exact: true }),
+  ).toBeVisible();
   await page.goto('/?campus=lasu');
   await expect.poll(remembered).toBe('lasu');
   await page.goto('/');
   await expect(page).toHaveURL(/\/\?campus=lasu$/);
-  await expect(page.getByRole('button', { name: 'Choose a campus', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Choose a campus', exact: true }),
+  ).toBeVisible();
   await page.goto('/?campus=not-published');
-  await expect(page.getByText('This campus is not published or is unavailable.', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('This campus is not published or is unavailable.', {
+      exact: true,
+    }),
+  ).toBeVisible();
   expect(await remembered()).toBe('lasu');
   await page.getByRole('link', { name: 'Open LASU', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Choose a campus', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Choose a campus', exact: true }),
+  ).toBeVisible();
 });
