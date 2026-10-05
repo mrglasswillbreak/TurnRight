@@ -1213,6 +1213,7 @@ async function setup(
     publishedEdits?: MapEdit[];
     mutateCampus?: (data: CampusData) => void;
     snapshot?: { data: CampusData; manifest: CampusPackage };
+    publicEntry?: boolean;
   } = {},
 ) {
   let edits: MapEdit[] = structuredClone(options.initialEdits || []);
@@ -1441,10 +1442,11 @@ async function setup(
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('/admin');
-  await expect(
-    page.getByRole('button', { name: 'Draw path', exact: true }),
-  ).toBeEnabled();
+  await page.goto(options.publicEntry ? '/' : '/admin');
+  if (!options.publicEntry)
+    await expect(
+      page.getByRole('button', { name: 'Draw path', exact: true }),
+    ).toBeEnabled();
   await attachMap(page);
   return {
     edits: () =>
@@ -5468,11 +5470,10 @@ for (const editor of [false, true])
         )
           errors.push(m.text());
       });
-      const state = await setup(page, true, true);
-      if (!editor) {
-        await page.goto('/');
-        await attachMap(page);
-      } else {
+      // Enter the surface being tested directly: unloading an unrelated editor
+      // mid-worker startup can emit WebKit transport errors before this journey.
+      const state = await setup(page, true, true, { publicEntry: !editor });
+      if (editor) {
         await page.getByRole('button', { name: 'Collapse explorer' }).click();
         await page
           .getByRole('button', { name: 'Switch to 3D', exact: true })
