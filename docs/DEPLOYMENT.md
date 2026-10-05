@@ -2,6 +2,12 @@
 
 TurnRight deploys a public campus PWA, a private team GIS API and isolated processing/release workers. Application deployment preserves the already published campus packages. Publishing changed campus data is a separate, independently approved operation. [Current account settings](CONFIGURATION.md) · [Actual production receipts](PRODUCTION.md) · [Team workflow](GIS-PLATFORM.md).
 
+## Unified editor application update
+
+The [unified editor](UNIFIED-EDITOR.md) uses the existing schema and API. It requires **no migration, index rebuild or campus-content publication**. Work on a feature branch, inspect its preview, and pass the existing unit/type/lint/build, browser, offline and native GIS checks before merging. The Git integration builds the branch preview and deploys main after merge.
+
+Retain the previous immutable Vercel deployment for rollback. Keep PUBLISHED_MAP_URL enabled, compare both campus manifests with the pre-update baseline, and verify the authenticated editor, anonymous API denial and service worker after deployment. Do not use the content-release workflow to deploy a UI change. Record actual deployment IDs, source revisions and verification results in [Production](PRODUCTION.md).
+
 ## Existing-installation upgrade
 
 1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. This GIS milestone appends **023–037** after 022.
@@ -23,7 +29,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 Create the project, retain the database credentials privately, and apply **all migrations 001–037 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
-Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Review → Campus memberships. Invitation email and SSO are not included.
+Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Campus menu → Campus memberships. Invitation email and SSO are not included.
 
 Use the existing bootstrap workflow only on an empty source baseline; it refuses to overwrite existing records. Never reinitialize an established project.
 

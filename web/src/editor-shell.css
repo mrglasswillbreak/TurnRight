@@ -110,14 +110,14 @@
   background: var(--ed-accent);
   color: var(--ed-accent-foreground);
 }
-.unified-editor .map-canvas {
+.unified-editor .editor-map-workspace .map-canvas {
   left: var(--catalogue-space);
   right: var(--inspector-space);
   bottom: var(--table-space);
   width: auto;
   height: auto;
 }
-.editor-catalogue {
+.unified-editor .editor-catalogue {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--catalogue-width);
@@ -678,4 +678,204 @@ body[data-editor-focus] .photo-model-overlay {
   max-height: 260px;
   overflow: auto;
   padding-left: 16px;
+}
+
+/* Keep records visible at the default dock height; options expand in place. */
+.unified-editor .gis-workspace.editor-table-dock {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.unified-editor .gis-workspace.editor-table-dock > header {
+  padding: 6px 0;
+}
+.gis-data-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.gis-data-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  flex: none;
+  max-height: 55%;
+  overflow: auto;
+  padding: 4px 0;
+}
+.unified-editor .gis-data-controls > details {
+  border: 0;
+  padding: 3px 0;
+  margin: 0;
+  font-size: 11px;
+}
+.unified-editor .gis-data-controls > details[open] {
+  flex-basis: 100%;
+  order: 2;
+}
+.unified-editor .gis-data-controls .gis-dataset-picker,
+.unified-editor .gis-data-controls .gis-dataset-picker label {
+  margin: 0;
+}
+.unified-editor .gis-data-layout .gis-table-scroll {
+  flex: 1;
+  min-height: 70px;
+  margin: 4px 0;
+}
+.unified-editor .gis-data-layout .gis-table-pagination {
+  margin: 0;
+  flex: none;
+  font-size: 11px;
+}
+.unified-editor .gis-data-layout td,
+.unified-editor .gis-data-layout th {
+  padding: 3px 7px;
+}
+.unified-editor .gis-data-layout td button,
+.unified-editor .gis-data-layout td input {
+  padding: 4px 6px;
+}
+.unified-editor .gis-data-layout .gis-table-pagination span {
+  margin-right: auto;
+}
+@media (max-width: 767px) {
+  .unified-editor .gis-data-controls {
+    max-height: 45%;
+    gap: 2px 10px;
+  }
+  .unified-editor .gis-data-layout .gis-table-pagination span {
+    width: 100%;
+  }
+}
+
+/* Activity belongs to the editor toolbar, clear of table paging. */
+body:has(.unified-editor) .process-monitor {
+  top: 65px;
+  bottom: auto;
+}
+body:has(.unified-editor) .process-monitor section {
+  top: 44px;
+  bottom: auto;
+}
+.unified-editor .editor-dock-controls {
+  padding-right: 125px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.unified-editor .editor-dock-controls button {
+  flex: none;
+  white-space: nowrap;
+}
+.unified-editor:has(.editor-task-tabs) ~ .process-monitor,
+body:has(.unified-editor .editor-task-tabs) .process-monitor {
+  top: 105px;
+}
+.unified-editor .gis-workspace.editor-task-dock > header {
+  position: sticky;
+  top: -14px;
+  background: var(--ed-bg);
+  z-index: 3;
+}
+@media (max-width: 767px) {
+  body:has(.unified-editor) .process-monitor {
+    top: 110px;
+  }
+  body:has(.unified-editor .editor-task-tabs) .process-monitor {
+    top: 150px;
+  }
+}
+
+.editor-command-compact {
+  display: none;
+}
+.unified-editor .unified-header {
+  flex-shrink: 0;
+}
+.unified-editor .editor-task-tabs {
+  flex-shrink: 0;
+}
+.unified-editor .editor-error-stack {
+  z-index: 31;
+}
+.unified-editor .editor-conflicts,
+.unified-editor .editor-repair-preview {
+  z-index: 32;
+  left: auto;
+  right: 0;
+  top: 0;
+  bottom: var(--table-space);
+  width: var(--inspector-width);
+  max-height: none;
+  border-radius: 0;
+}
+.unified-editor:has(.editor-conflicts, .editor-repair-preview)
+  .editor-preserved-inspector {
+  visibility: hidden;
+}
+@media (max-width: 767px) {
+  .unified-editor .unified-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-rows: 50px 40px;
+    gap: 5px;
+    padding: 5px 8px;
+  }
+  .unified-header .editor-campus-menu {
+    min-width: 0;
+  }
+  .unified-header .editor-campus-menu span {
+    max-width: 100%;
+  }
+  .unified-header .editor-command-label {
+    display: none;
+  }
+  .unified-header .editor-command-compact {
+    display: inline;
+  }
+  .unified-header .editor-navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    justify-content: space-around;
+  }
+  .unified-header .editor-save-state {
+    margin: 0;
+    max-width: 90px;
+    white-space: normal;
+  }
+  .unified-header .editor-account-menu summary {
+    padding: 6px;
+  }
+  .unified-editor .editor-conflicts,
+  .unified-editor .editor-repair-preview {
+    inset: auto 0 0;
+    width: 100%;
+    max-height: 65%;
+  }
+  .unified-editor .editor-error-stack {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    bottom: 8px;
+  }
+}
+
+.unified-editor .editor-dock-controls {
+  margin-right: 132px;
+  padding-right: 4px;
+}
+.editor-control-compact {
+  display: none;
+}
+@media (max-width: 767px) {
+  .editor-control-label {
+    display: none;
+  }
+  .editor-control-compact {
+    display: inline;
+  }
 }

@@ -195,9 +195,12 @@ export function EditorChrome({
         </details>
         <button
           className="editor-command-trigger"
+          aria-label="Search commands"
           onClick={() => setCommandsOpen(true)}
         >
-          Search commands <kbd>Ctrl K</kbd>
+          <span className="editor-command-label">Search commands</span>
+          <span className="editor-command-compact">Search</span>{' '}
+          <kbd>Ctrl K</kbd>
         </button>
         <nav aria-label="Editor sections" className="editor-navigation">
           {(
@@ -325,6 +328,7 @@ export function EditorChrome({
       )}
       <div className="editor-dock-controls" aria-label="Workspace panels">
         <button
+          aria-pressed={state.catalogueOpen && state.panel === 'catalogue'}
           onClick={() =>
             session.setState((s) => ({
               ...s,
@@ -366,11 +370,17 @@ export function EditorChrome({
         )}
         <button
           aria-pressed={state.expanded}
+          aria-label={state.expanded ? 'Restore panel' : 'Expand panel'}
           onClick={() =>
             session.setState((s) => ({ ...s, expanded: !s.expanded }))
           }
         >
-          {state.expanded ? 'Restore panel' : 'Expand panel'}
+          <span className="editor-control-label">
+            {state.expanded ? 'Restore panel' : 'Expand panel'}
+          </span>
+          <span className="editor-control-compact">
+            {state.expanded ? 'Restore' : 'Expand'}
+          </span>
         </button>
       </div>
       {children}

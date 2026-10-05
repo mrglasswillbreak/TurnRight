@@ -99,7 +99,7 @@ export function EditorSessionProvider({
     const focus = document.activeElement as HTMLElement | null;
     focus?.blur();
     if (guard.current && !guard.current(task)) return;
-    if (task !== 'map') opener.current = focus;
+    if (task !== 'map' && !opener.current) opener.current = focus;
     setState((s) => ({
       ...s,
       task,
@@ -114,6 +114,7 @@ export function EditorSessionProvider({
     if (task === 'map')
       requestAnimationFrame(() => {
         if (opener.current?.isConnected) opener.current.focus();
+        opener.current = null;
       });
   }, []);
   useEffect(
@@ -159,7 +160,16 @@ export function EditorSessionProvider({
       ]);
       if (generation !== request.current) return;
       if (Array.isArray(rows)) setDatasets(rows);
-      if (Array.isArray(roles?.capabilities)) setAccess(roles);
+      if (Array.isArray(roles?.capabilities)) {
+        setAccess(roles);
+        if (roles.capabilities.includes('read'))
+          setFailure((message) =>
+            message ===
+            'Campus access changed. Reconnect or sign in again. Local work is retained.'
+              ? ''
+              : message,
+          );
+      }
     } catch (error) {
       if (
         generation === request.current &&

@@ -33,7 +33,7 @@ Search or layer changes reset the virtual table to its first result. Arrow keys 
 
 Layer styling resolves **feature override → first matching classification rule → layer default → campus theme**. Controls cover colour, dark colour, outlines, opacity, line width, point symbols, labels and zoom ranges. Reference overlays may remain editor-only. The public and offline packages carry the same reviewed configuration.
 
-**Add data → Spatial files / sources** opens the campus import task for uploads, refresh, field remapping, source history and diagnostics. Pending imports stay in source review; accepted content appears in the catalogue. Accepted import identities, not display filenames, establish membership. Raw source attributes stay private; exports contain mapped application fields and attribution.
+**Add data → Import spatial data / sources** opens the campus import task for uploads, refresh, field remapping, source history and diagnostics. Pending imports stay in source review; accepted content appears in the catalogue. Accepted import identities, not display filenames, establish membership. Raw source attributes stay private; exports contain mapped application fields and attribution.
 
 ## Geometry and linked widths
 

@@ -43,7 +43,7 @@ Public navigation uses mode- and leg-aware GPS matching and rerouting. Driving a
 
 ## Layers, roads and landscape
 
-Open **Layers** to search the tree, select a drawing target or open its attribute table. Layer visibility while editing, editing locks, release inclusion and published visibility are separate settings. Temporary isolation does not change publication. Hidden or locked layers cannot intercept map selection. The selected layer takes priority when features overlap; the chooser identifies each candidate by layer, class, name and source ID.
+Use the left **Layers and data** catalogue to select a drawing target or open its attribute table. Entry actions open properties; **Organize layers** inside Layer properties exposes folder moves and reordering. Layer visibility while editing, editing locks, release inclusion and published visibility are separate settings. Temporary isolation does not change publication. Hidden or locked layers cannot intercept map selection. The selected layer takes priority when features overlap; the chooser identifies each candidate by layer, class, name and source ID.
 
 **Road surface** polygons describe presentation; **Routing path** lines retain access, direction and connection controls. All 179 UNILAG surfaces are available through their layer, independently of **Needs mapping**. Search by name, application ID or original source ID. Edit name, class, material, width/unit and evidence in the inspector. Width changes mark linked estimates for **Preview → Apply** regeneration; surveyed polygons keep their geometry. Manually reshaped estimates require an explicit retain-or-replace decision.
 

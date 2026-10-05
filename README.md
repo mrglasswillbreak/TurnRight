@@ -30,13 +30,15 @@ The workspace targets **100,000 features** with bounded server queries and editi
 
 Unaltered captures of the production-built application use a verified published LASU basemap and isolated demonstration team/API responses. The 100,000-row catalogue count illustrates paging controls; it is not a live inventory or a performance measurement. [Capture provenance and reproduction](docs/assets/screenshots/README.md#unified-editor--5-october-2026).
 
-![Data workspace with typed private attributes, paged selection and a shared campus map](docs/assets/screenshots/unified-editor-data-2026-10-05.png)
+![Unified editor with typed private attributes, paged selection and a shared campus map](docs/assets/screenshots/unified-editor-data-2026-10-05.png)
 
 | Repeatable analysis | Independent review |
 | --- | --- |
-| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/unified-editor-analyze-2026-10-05.png) | ![Immutable submission inspection and quality-check summary](docs/assets/screenshots/unified-editor-review-2026-10-05.png) |
+| ![Processing catalogue, input revisions, metric CRS and buffer parameters](docs/assets/screenshots/unified-editor-analyze-2026-10-05.png) | ![Map-linked quality checks and independent review entry points](docs/assets/screenshots/unified-editor-review-2026-10-05.png) |
 
 ![Publication workspace with approved snapshots and map export templates](docs/assets/screenshots/unified-editor-publish-2026-10-05.png)
+
+<img src="docs/assets/screenshots/unified-editor-phone-table-2026-10-05.png" width="320" alt="Expanded attribute table in the shared editor on a phone viewport">
 
 ## Capabilities
 

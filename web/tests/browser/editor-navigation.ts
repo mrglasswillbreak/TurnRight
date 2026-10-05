@@ -50,6 +50,9 @@ export async function layerProperties(page: Page, name?: string) {
   const catalogue = page.getByRole('complementary', {
     name: 'Layers and datasets',
   });
+  await expect(
+    page.locator('aside.editor-catalogue, .editor-catalogue-toggle'),
+  ).toHaveCount(1);
   if (!(await catalogue.isVisible()))
     await page.getByRole('button', { name: 'Layers', exact: true }).click();
   if (name) {
@@ -71,6 +74,9 @@ export async function layerTable(page: Page, name?: string) {
   const catalogue = page.getByRole('complementary', {
     name: 'Layers and datasets',
   });
+  await expect(
+    page.locator('aside.editor-catalogue, .editor-catalogue-toggle'),
+  ).toHaveCount(1);
   if (!(await catalogue.isVisible()))
     await page.getByRole('button', { name: 'Layers', exact: true }).click();
   await catalogue

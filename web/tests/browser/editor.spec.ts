@@ -1412,6 +1412,17 @@ async function setup(
         json: { changes: [], jobs: [], releases: [], published },
       });
     if (action === 'sources') return route.fulfill({ json: { features: [] } });
+    if (
+      [
+        'gis-datasets',
+        'gis-reviews',
+        'gis-issues',
+        'gis-members',
+        'gis-quality',
+        'gis-jobs',
+      ].includes(action)
+    )
+      return route.fulfill({ json: [] });
     if (action === 'survey-list') return route.fulfill({ json: [] });
     if (action === 'save-edits') {
       if (receipts.has(payload.operationId))
@@ -1605,7 +1616,7 @@ for (const width of [1440, 390])
         }),
       );
     await focusCampus(page);
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     await page.getByRole('button', { name: /Manage photos/ }).click();
     const dialog = page.getByRole('dialog');
@@ -1865,7 +1876,7 @@ test('an upload keeps its original building when the inspector changes mid-uploa
   );
   try {
     await focusCampus(page);
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     await page.getByRole('button', { name: /Manage photos/ }).click();
     const dialog = page.getByRole('dialog');
@@ -1962,7 +1973,7 @@ for (const width of [1440, 390])
       ],
     });
     await focusCampus(page);
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     const panel = page.getByRole('complementary', {
       name: 'Feature properties',
@@ -2205,7 +2216,7 @@ test('editor reliability: field typing is one undo step across an autosave', asy
 }) => {
   await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   const name = page
     .getByRole('complementary', { name: 'Feature properties' })
@@ -2257,7 +2268,7 @@ test('editor reliability: export retries export and local recovery downloads off
   await page.context().setOffline(true);
   const download = page.waitForEvent('download');
   await page
-    .locator('.editor-backup-menu')
+    .locator('.editor-save-menu')
     .getByRole('button', { name: 'Download local recovery' })
     .click();
   const path = await (await download).path();
@@ -2344,7 +2355,7 @@ for (const firstCorrection of [false, true])
       },
     });
     await focusCampus(page);
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     server.setEdits([
       {
@@ -2484,7 +2495,7 @@ test('editor reliability: expired authentication offers sign-in and retains the 
       return route.fulfill({ status: 401, json: { error: 'Expired' } });
     return route.fallback();
   });
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page
     .getByRole('complementary', { name: 'Feature properties' })
@@ -2772,7 +2783,10 @@ test('release diagnostics preserve the usable campus and identify the captured m
   ).toBeVisible();
   await expect(page.getByText(/Showing the last usable map/)).toBeVisible();
   await expect(
-    page.getByText(/osm:way:1534765716:2297333149:2297333129:1/).first(),
+    page
+      .locator('.editor-review-panel:visible')
+      .getByText(/osm:way:1534765716:2297333149:2297333129:1/)
+      .first(),
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Continue to submission' }),
@@ -2799,7 +2813,7 @@ test('review separate building wings, edit their geometry, save and undo without
   const server = await setup(page, true);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await page.evaluate(() =>
     window.editorTestMap.jumpTo({
       center: [3.19978, 6.47109],
@@ -3656,7 +3670,7 @@ for (const threeD of [false, true])
         .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
         .toBeGreaterThan(45);
     }
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     for (const [i, x] of [3.20018, 3.20033].entries()) {
       // Select the existing building surface, then use its entrance action.
       await clickMap(page, [3.20012, 6.46022]);
@@ -3746,7 +3760,7 @@ test('undoes the first saved source correction and keeps its building after relo
 }) => {
   await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   const name = page
     .getByRole('complementary', { name: 'Feature properties' })
@@ -3772,7 +3786,7 @@ test('undoes the first saved source correction and keeps its building after relo
   await page.reload();
   await attachMap(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await expect(name).toHaveValue(original);
 });
@@ -3784,7 +3798,7 @@ test('edits a path vertex in 3D with undo and redo across autosave', async ({
   page.on('pageerror', (e) => errors.push(e.message));
   const server = await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
@@ -4059,7 +4073,7 @@ test('building appearance: integrated view, surface inheritance, live preview, r
   page.on('pageerror', (e) => errors.push(e.message));
   const state = await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await expect(
     page.getByRole('button', { name: 'Edit model', exact: true }),
@@ -4190,7 +4204,7 @@ test('building previews survive revisiting unedited buildings without rebuilding
   });
   const state = await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   const rendered = () =>
@@ -4243,7 +4257,7 @@ test('building preview survives worker timeout, crash and obsolete replies', asy
   test.setTimeout(100000);
   await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   const rendered = () =>
@@ -4339,7 +4353,7 @@ test('enhanced editing keeps models through slow frames, map editing and rendere
   test.setTimeout(100000);
   await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   const rendered = () =>
@@ -4478,7 +4492,7 @@ test.describe('building roof touch editing', () => {
     test.setTimeout(150000);
     const state = await setup(page);
     await focusCampus(page);
-    const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+    const collapse = page.getByRole('button', { name: 'Collapse catalogue' });
     if (await collapse.isVisible()) await collapse.click();
     await clickMap(page, [3.20012, 6.46022]);
     await page
@@ -4589,7 +4603,7 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
   await page.evaluate(() => Reflect.deleteProperty(navigator, 'onLine'));
   await page.getByRole('button', { name: 'Close survey', exact: true }).click();
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await page.getByRole('button', { name: 'Edit model', exact: true }).click();
@@ -4654,7 +4668,7 @@ test('prepared building editor reopens saved appearance and unfinished roofs off
     recovery.edits.find((e: MapEdit) => e.id === 'library').properties
       .appearance.walls['library:wall:0:0:0'].wallColour,
   ).toBe('#884422');
-  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  const collapse = page.getByRole('button', { name: 'Collapse catalogue' });
   if (await collapse.isVisible()) await collapse.click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Edit model', exact: true }).click();
@@ -4807,9 +4821,7 @@ test('view settings: single button, keyboard switching and shared preferences', 
   await page
     .getByRole('button', { name: 'Close settings', exact: true })
     .click();
-  await expect(
-    page.getByRole('button', { name: 'Settings', exact: true }),
-  ).toBeFocused();
+  await expect(page.getByLabel('Campus menu', { exact: true })).toBeFocused();
   await page.goto('/');
   await attachMap(page);
   await page.getByRole('button', { name: 'Expand card', exact: true }).click();
@@ -4835,7 +4847,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
   test.setTimeout(120000);
   const state = await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
   await expect
@@ -5004,15 +5016,13 @@ test.describe('view settings touch', () => {
       .boundingBox();
     expect(settingsCard!.height).toBeLessThanOrEqual(844 * 0.43);
     expect(settingsCard!.y).toBeGreaterThan(844 * 0.4);
-    const header = await page.evaluate(() => ({
-      brandRight: document
-        .querySelector('.editor-brand strong')!
-        .getBoundingClientRect().right,
-      navigationLeft: document
-        .querySelector('.editor-navigation')!
-        .getBoundingClientRect().left,
-    }));
-    expect(header.brandRight).toBeLessThanOrEqual(header.navigationLeft);
+    await expect(
+      page.getByLabel('Campus menu', { exact: true }),
+    ).toBeInViewport();
+    for (const name of ['Analyze', 'Review', 'Publish'])
+      await expect(
+        page.getByRole('button', { name, exact: true }),
+      ).toBeInViewport();
     // Tap the visible label: the semantic radio is visually hidden.
     const appearance = page
       .locator('.appearance-options label')
@@ -5124,15 +5134,23 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
       'Reports',
       'Releases',
     ]) {
-      await page.getByRole('button', { name: section, exact: true }).click();
+      await editorTask(
+        page,
+        section as
+          | 'Settings'
+          | 'Sources'
+          | 'Duplicates'
+          | 'Reports'
+          | 'Releases',
+      );
       await audit(`editor ${section}`);
     }
     await editorTask(page, 'Edit');
     await focusCampus(page);
     if (
-      await page.getByRole('button', { name: 'Collapse explorer' }).isVisible()
+      await page.getByRole('button', { name: 'Collapse catalogue' }).isVisible()
     )
-      await page.getByRole('button', { name: 'Collapse explorer' }).click();
+      await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await clickMap(page, [3.20012, 6.46022]);
     await expect(
       page.getByRole('button', { name: 'Edit model', exact: true }),
@@ -5277,7 +5295,7 @@ test('roof proposal retains its saved geometry and unfinished input through sett
   await page.emulateMedia({ colorScheme: 'dark' });
   const state = await setup(page);
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await openBuildingModel(page, 'roof');
   await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
@@ -5308,7 +5326,7 @@ test('roof proposal retains its saved geometry and unfinished input through sett
   await page.reload();
   await attachMap(page);
   await focusCampus(page);
-  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  const collapse = page.getByRole('button', { name: 'Collapse catalogue' });
   if (await collapse.isVisible()) await collapse.click();
   await clickMap(page, [3.20012, 6.46022]);
   await openBuildingModel(page, 'roof');
@@ -5477,7 +5495,7 @@ for (const editor of [false, true])
       // mid-worker startup can emit WebKit transport errors before this journey.
       const state = await setup(page, true, true, { publicEntry: !editor });
       if (editor) {
-        await page.getByRole('button', { name: 'Collapse explorer' }).click();
+        await page.getByRole('button', { name: 'Collapse catalogue' }).click();
         await page
           .getByRole('button', { name: 'Switch to 3D', exact: true })
           .click();
@@ -5524,9 +5542,7 @@ for (const editor of [false, true])
             await page
               .getByRole('button', { name: 'Expand card', exact: true })
               .click();
-          await page
-            .getByRole('button', { name: 'Settings', exact: true })
-            .click();
+          await editorTask(page, 'Settings');
           await page
             .getByRole('radio', { name: 'Simple', exact: true })
             .check();
@@ -5707,7 +5723,7 @@ test('documentation current gallery: published campus and isolated owner workflo
       })
       .first()
       .click();
-    await page.getByRole('button', { name: 'Collapse explorer' }).click();
+    await page.getByRole('button', { name: 'Collapse catalogue' }).click();
     await shot('editor-building-current');
     await page.setViewportSize({ width: 390, height: 844 });
     await shot('editor-building-mobile-current');
@@ -6081,7 +6097,7 @@ test('documentation capture: editor appearance, roof and settings', async ({
     .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
     .toBe(true);
   await page.screenshot({ path: testInfo.outputPath('editor-workspace.png') });
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await focusModels(page);
   const roof = await position(page, [3.19978, 6.47109]);
   await page.mouse.click(roof.x, roof.y - 80);
@@ -6380,8 +6396,6 @@ async function unifiedModelFixture(
     })
     .first()
     .click();
-  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
-  if (await collapse.isVisible()) await collapse.click();
   if (options.noWebGL)
     await page.evaluate(() => {
       const original = HTMLCanvasElement.prototype.getContext;
@@ -6527,7 +6541,7 @@ test('model workspace desktop docks stay bounded through resize and zoom-sized v
           ];
         }),
       )
-      .toEqual([0, 0, viewport.width, viewport.height]);
+      .toEqual([0, 60, viewport.width, viewport.height - 60]);
     const stage = (await dialog.locator('.model-stage').boundingBox())!;
     const inspector = (await dialog.locator('.model-inspector').boundingBox())!;
     expect(stage.width).toBeGreaterThan(360);
@@ -7580,7 +7594,7 @@ for (const width of [320, 390, 768, 1440])
       );
       const server = await setup(page, false, false, { initialEdits: [edit] });
       await focusCampus(page);
-      await page.getByRole('button', { name: 'Collapse explorer' }).click();
+      await page.getByRole('button', { name: 'Collapse catalogue' }).click();
       await clickMap(page, [3.20012, 6.46022]);
       const trigger = page.getByRole('button', {
         name: /^Edit model$/,
@@ -9102,7 +9116,7 @@ for (const viewport of [
       return route.fallback();
     });
     await focusCampus(page);
-    const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+    const collapse = page.getByRole('button', { name: 'Collapse catalogue' });
     if (await collapse.isVisible()) await collapse.click();
     await clickMap(page, [3.20012, 6.46022]);
     await page.getByRole('button', { name: /Manage photos/ }).click();
@@ -9265,7 +9279,7 @@ test('prepared offline image tools reload originals and recipes and queue withou
   await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
   await page.getByRole('button', { name: 'Close survey', exact: true }).click();
   await focusCampus(page);
-  await page.getByRole('button', { name: 'Collapse explorer' }).click();
+  await page.getByRole('button', { name: 'Collapse catalogue' }).click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: /Manage photos/ }).click();
   const gallery = page.getByRole('dialog', { name: 'Photos · Library' });
@@ -9322,7 +9336,7 @@ test('prepared offline image tools reload originals and recipes and queue withou
   await page.reload();
   await attachMap(page);
   await focusCampus(page);
-  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+  const collapse = page.getByRole('button', { name: 'Collapse catalogue' });
   if (await collapse.isVisible()) await collapse.click();
   await clickMap(page, [3.20012, 6.46022]);
   await page.getByRole('button', { name: /Manage photos/ }).click();

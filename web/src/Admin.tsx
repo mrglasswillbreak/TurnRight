@@ -2030,7 +2030,7 @@ function Editor({
       !workspace.edits.some((e) => e.id === edit?.id && e.kind === edit?.kind)
     )
       throw new Error(
-        'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
+        'This editing session contains 500 GIS features. Use Table → Geometry editing session to save and end it, or use a processing job.',
       );
     if (source)
       setGisSources((rows) => [

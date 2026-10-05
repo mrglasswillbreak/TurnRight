@@ -43,7 +43,12 @@ export interface EditorSessionState {
   returnPanel?: 'catalogue' | 'inspector' | 'table';
   catalogueOpen: boolean;
   activeEntry?: string;
-  table: { open: boolean; kind: 'dataset' | 'layer'; id?: string };
+  table: {
+    open: boolean;
+    kind: 'dataset' | 'layer';
+    id?: string;
+    importCsv?: boolean;
+  };
   selection: FeatureRef[];
   editingFeature?: string;
   attributeDrafts: Record<string, { text: string; revision: number }>;

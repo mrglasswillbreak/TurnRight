@@ -39,7 +39,9 @@ export default function EditorCatalogue({
   const [query, setQuery] = useState(''),
     [error, setError] = useState('');
   useEffect(() => {
-    void refresh().catch((e) => setError(e.message));
+    void refresh()
+      .then(() => setError(''))
+      .catch((e) => setError(e.message));
   }, [refresh]);
   const entries = useMemo(
     () => catalogueEntries(layers, datasets),
@@ -117,7 +119,12 @@ export default function EditorCatalogue({
                         session.setState((s) => ({
                           ...s,
                           panel: 'table',
-                          table: { ...s.table, kind: 'dataset', open: true },
+                          table: {
+                            ...s.table,
+                            kind: 'dataset',
+                            open: true,
+                            importCsv: true,
+                          },
                         }))
                       }
                     >
@@ -220,6 +227,14 @@ export default function EditorCatalogue({
                         onClick={() => activate(entry)}
                       >
                         <strong>{entry.name}</strong>
+                        {(entry.layer?.sourceName ||
+                          typeof entry.dataset?.provenance.source ===
+                            'string') && (
+                          <small>
+                            {entry.layer?.sourceName ||
+                              String(entry.dataset?.provenance.source)}
+                          </small>
+                        )}
                         <small>
                           {entry.dataset
                             ? (entry.dataset.count || 0).toLocaleString() +

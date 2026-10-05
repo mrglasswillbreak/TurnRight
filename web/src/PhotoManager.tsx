@@ -1058,7 +1058,7 @@ export function PhotoManager({
             <DialogDescription>
               {gallery.length} in this gallery ·{' '}
               {saveStatus === 'Saved' ? 'Map draft saved' : saveStatus}.
-              Publication happens through Releases.
+              Publication happens through Publish.
             </DialogDescription>
           </header>
           <nav aria-label="Photo workspace">

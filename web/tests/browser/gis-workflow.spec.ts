@@ -422,7 +422,13 @@ test('GIS styling, asset CSV join and map PNG export are reachable', async ({
   await page
     .getByRole('button', { name: 'Close GIS workspace', exact: true })
     .click();
-  await page.getByText('Import an attribute CSV', { exact: true }).click();
+  const catalogue = page.getByRole('complementary', {
+    name: 'Layers and datasets',
+  });
+  await catalogue.getByText('Add data', { exact: true }).click();
+  await catalogue
+    .getByRole('button', { name: 'Import attribute CSV', exact: true })
+    .click();
   await page.getByLabel('Import CSV', { exact: true }).setInputFiles({
     name: 'assets.csv',
     mimeType: 'text/csv',
@@ -610,6 +616,18 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     .getByLabel('Release summary', { exact: true })
     .fill('Demonstration campus review');
   await shot('publish');
+  await page
+    .getByRole('button', { name: 'Close GIS workspace', exact: true })
+    .click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const tableToggle = page.getByRole('button', { name: 'Table', exact: true });
+  if ((await tableToggle.getAttribute('aria-pressed')) !== 'true')
+    await tableToggle.click();
+  await page.getByRole('button', { name: 'Expand panel', exact: true }).click();
+  await expect(
+    page.getByRole('region', { name: 'Attribute table', exact: true }),
+  ).toBeVisible();
+  await shot('phone-table');
 });
 
 test('unified shell preserves inputs, filters, pages and map instance across tasks', async ({
@@ -701,6 +719,24 @@ test('viewport overlays are bounded independently of table pages and docks resiz
   await page.keyboard.press('ArrowRight');
   await expect(splitter).toHaveAttribute('aria-valuenow', String(before + 20));
   await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await expect
+    .poll(async () => {
+      const map = await page.locator('.map-canvas').boundingBox();
+      const table = await page
+        .getByRole('region', { name: 'Attribute table', exact: true })
+        .boundingBox();
+      const catalogue = await page
+        .getByRole('complementary', { name: 'Layers and datasets' })
+        .boundingBox();
+      return (
+        !!map &&
+        !!table &&
+        !!catalogue &&
+        map.y + map.height <= table.y + 1 &&
+        map.x >= catalogue.x + catalogue.width - 1
+      );
+    })
+    .toBe(true);
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   expect(
     calls
@@ -719,4 +755,129 @@ test('viewport overlays are bounded independently of table pages and docks resiz
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test('unified table rejects late revision pages and revocation disables editing', async ({
+  page,
+}) => {
+  const { datasets, calls } = await setup(page);
+  let releaseOld: (() => Promise<void>) | undefined;
+  await page.route('**/api/admin', async (route) => {
+    const { action, payload = {} } = route.request().postDataJSON();
+    if (
+      action === 'gis-query' &&
+      !payload.bbox &&
+      payload.revision === 1 &&
+      !releaseOld
+    ) {
+      releaseOld = async () => {
+        await route.fulfill({
+          json: {
+            revision: 1,
+            total: 1,
+            nextCursor: null,
+            features: [
+              {
+                type: 'Feature',
+                id: 'overlay:stale',
+                geometry: null,
+                properties: { asset: 'stale', height: 999 },
+              },
+            ],
+          },
+        });
+      };
+      return;
+    }
+    return route.fallback();
+  });
+  await page.getByRole('button', { name: 'Table', exact: true }).click();
+  await expect.poll(() => !!releaseOld).toBe(true);
+  datasets[0].revision = 2;
+  await page
+    .getByRole('complementary', { name: 'Layers and datasets' })
+    .getByRole('button', { name: 'Refresh', exact: true })
+    .click();
+  const height = page
+    .getByRole('textbox', { name: 'height', exact: true })
+    .first();
+  await expect(height).toHaveValue('5');
+  await expect(height).toBeInViewport();
+  await releaseOld!();
+  await expect(
+    page.getByRole('button', { name: 'overlay:stale', exact: true }),
+  ).toHaveCount(0);
+  await expect(height).toHaveValue('5');
+  await page.route('**/api/admin', (route) => {
+    const { action } = route.request().postDataJSON();
+    return action === 'workspace-capabilities'
+      ? route.fulfill({ status: 403, json: { error: 'Membership revoked' } })
+      : route.fallback();
+  });
+  await page
+    .getByRole('complementary', { name: 'Layers and datasets' })
+    .getByRole('button', { name: 'Refresh', exact: true })
+    .click();
+  await expect(height).toBeDisabled();
+  await expect(page.locator('.editor-save-state')).toHaveText(
+    'Needs attention',
+  );
+  expect(calls.filter((c) => c.action === 'gis-attributes-save')).toHaveLength(
+    0,
+  );
+});
+
+test('Publish requires an approved snapshot even for an existing preview', async ({
+  page,
+}) => {
+  const { reviews } = await setup(page);
+  reviews.push({
+    id: 'approved-snapshot',
+    summary: 'Independently approved campus',
+    status: 'approved',
+    content_hash: 'b'.repeat(64),
+    contributors: ['another-editor'],
+    submitted_by: 'another-editor',
+    created_at: '2026-10-05T00:00:00Z',
+  });
+  await page.route('**/api/admin', async (route) => {
+    if (route.request().postDataJSON().action !== 'review-status')
+      return route.fallback();
+    await route.fulfill({
+      json: {
+        changes: [],
+        jobs: [],
+        published: null,
+        releases: [
+          {
+            id: 'legacy-preview',
+            summary: 'Preview without review',
+            status: 'preview',
+          },
+          {
+            id: 'approved-preview',
+            summary: 'Approved preview',
+            status: 'preview',
+            review_id: 'approved-snapshot',
+          },
+        ],
+      },
+    });
+  });
+  await page.getByRole('button', { name: 'Publish', exact: true }).click();
+  await expect(
+    page
+      .locator('.gis-job')
+      .filter({ hasText: 'Preview without review' })
+      .getByRole('button', { name: 'Publish this preview' }),
+  ).toBeDisabled();
+  await expect(
+    page
+      .locator('.gis-job')
+      .filter({ hasText: 'Approved preview' })
+      .getByRole('button', { name: 'Publish this preview' }),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole('button', { name: 'Prepare preview', exact: true }),
+  ).toHaveCount(0);
 });

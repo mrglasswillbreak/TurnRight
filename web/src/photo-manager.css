@@ -340,3 +340,23 @@
     max-height: 90px;
   }
 }
+
+/* The integrated editor positions the gallery below its header. Reset both
+   transform systems used by the dialog primitive and keep visual-viewport
+   measurements when a phone keyboard opens. */
+body[data-editor-focus] .photo-workspace[data-slot='dialog-content'] {
+  --tw-translate-x: 0px;
+  --tw-translate-y: 0px;
+  translate: none;
+  transform: none;
+  top: calc(var(--photo-viewport-top, 0px) + 60px);
+  height: calc(var(--photo-viewport-height, 100dvh) - 60px);
+  max-height: calc(var(--photo-viewport-height, 100dvh) - 60px);
+}
+@media (max-width: 767px) {
+  body[data-editor-focus] .photo-workspace[data-slot='dialog-content'] {
+    top: calc(var(--photo-viewport-top, 0px) + 106px);
+    height: calc(var(--photo-viewport-height, 100dvh) - 106px);
+    max-height: calc(var(--photo-viewport-height, 100dvh) - 106px);
+  }
+}

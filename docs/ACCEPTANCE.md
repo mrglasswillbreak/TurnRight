@@ -1,5 +1,17 @@
 # TurnRight verification and release checklist
 
+## Unified editor integration
+
+Use the [editor guide](UNIFIED-EDITOR.md) for the destination of each existing capability. This release changes presentation and task navigation without adding a migration or public API.
+
+- Keep the same map instance, camera, selection, table filters/columns and task forms while moving between catalogue, properties, Analyze, Review and Publish.
+- Reject late query responses and invalidate cached editable pages when revisions change. Keep dataset table requests at 100 rows and geometry/selection bounds at 500. Test real 100,000-feature storage separately from browser fixture counts.
+- Enter and leave building, roof, mesh and photo views with unfinished inputs retained; exercise existing undo, recovery and staged Apply/Cancel. Survey recording must remain explicit.
+- Reload during attribute and geometry edits, disconnect, retry uncertain saves, handle conflicts, revoke roles, and change campus or install updates with unfinished work. Save status must include pending requests and recovery writes.
+- Exercise Chromium/WebKit at desktop, tablet and phone sizes, both themes, keyboard dock resizing, focus restoration and virtual-keyboard viewport changes. Activity must not cover table controls.
+- Verify read-only issue/feature inspection and approved-snapshot publication; retain all existing source comparison, duplicate/report, restoration, export and offline destinations.
+- Run the complete existing release gates, inspect unaltered fresh screenshots, deploy a feature-branch preview, and retain the previous production deployment and campus package hashes.
+
 ## Campus GIS team release
 
 Use the current [workflow and rollout guide](GIS-PLATFORM.md), with dated results in [Production](PRODUCTION.md). The items below are requirements; dated receipts identify completed checks.

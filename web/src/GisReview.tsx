@@ -62,6 +62,8 @@ export default function GisReview({
       gisApi('gis-members', {}),
       gisApi('gis-quality', {}),
     ]);
+    if (![r, q, m, a].every(Array.isArray))
+      throw Error('Review data could not be read. Refresh the task to retry.');
     setReviews(r);
     setQa(q);
     setMembers(m);
@@ -90,17 +92,31 @@ export default function GisReview({
     );
   return (
     <>
+      {error && (
+        <p role="alert" className="form-error">
+          {error}
+        </p>
+      )}
+      <button disabled={busy} onClick={() => void attempt(async () => {})}>
+        Refresh {membersOnly ? 'memberships' : 'review'}
+      </button>
+      {!membersOnly && (
+        <button
+          onClick={() =>
+            document
+              .getElementById('editor-review-submissions')
+              ?.scrollIntoView({ block: 'start' })
+          }
+        >
+          Submissions
+        </button>
+      )}
       <div hidden={membersOnly}>
         <p>
           Approval applies to an immutable snapshot. A contributor cannot
           approve their own changes. Any later data change requires a new
           submission.
         </p>
-        {error && (
-          <p role="alert" className="form-error">
-            {error}
-          </p>
-        )}
         <details open>
           <summary>Map validation ({issues.length})</summary>
           {issues.slice(0, 100).map((issue, i) => (
@@ -297,7 +313,9 @@ export default function GisReview({
         >
           Validate and submit snapshot
         </button>
-        <h3>Submissions</h3>
+        <h3 id={membersOnly ? undefined : 'editor-review-submissions'}>
+          Submissions
+        </h3>
         {reviews.map((review) => (
           <article key={review.id} className="gis-job">
             <strong>{review.summary}</strong> · {review.status}

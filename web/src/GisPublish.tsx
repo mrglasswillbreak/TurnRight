@@ -45,6 +45,8 @@ export default function GisPublish({
       api<{ releases: Release[] }>('review-status'),
       gisApi('gis-views', {}),
     ]);
+    if (!Array.isArray(r) || !Array.isArray(s.releases) || !Array.isArray(v))
+      throw Error('Publication data could not be read. Refresh to retry.');
     setReviews(r.filter((r) => r.status === 'approved'));
     setReleases(s.releases);
     setViews(v);
@@ -198,7 +200,16 @@ export default function GisPublish({
               )}
             {r.status === 'preview' && (
               <button
-                disabled={!canPublish || busy}
+                disabled={
+                  !canPublish ||
+                  busy ||
+                  !reviews.some((review) => review.id === r.review_id)
+                }
+                title={
+                  !reviews.some((review) => review.id === r.review_id)
+                    ? 'Prepare a preview from an approved snapshot before publishing.'
+                    : undefined
+                }
                 onClick={() =>
                   void attempt(() =>
                     mutate(() => api('publish-release', { id: r.id })),

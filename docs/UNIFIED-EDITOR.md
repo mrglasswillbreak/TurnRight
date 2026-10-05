@@ -18,6 +18,8 @@ TurnRight's private editor uses one map-centered shell for campus data, geometry
 | Activity | Import, upload, local processing, GIS job and release progress |
 | Search commands | Keyboard-searchable destinations and actions; open with Ctrl/Cmd K |
 
+The compact table keeps rows in view by default; open its filter, import, geometry-session and export controls as needed. Entry actions expose **Layer settings and locks**, including **Organize layers** for folder moves and drawing order.
+
 The old Data, Edit, Layers, Campuses, Sources and Releases tabs are consolidated into these destinations. **Review → Draft changes** retains baseline reconciliation, model blockers and route impact. It leads to independent submission; publication actions live in **Publish**.
 
 ## Work without losing context

@@ -11,7 +11,8 @@ import { MapView } from './MapView';
 import GisWorkspace from './GisWorkspace';
 import EditorCatalogue from './EditorCatalogue';
 import DatasetInspector from './DatasetInspector';
-import { EditorChrome } from './EditorChrome';
+import { EditorChrome, DockResize } from './EditorChrome';
+import type { FeatureRef } from './editor-session';
 import { useEditorSession } from './EditorSession';
 import { campusLayers, layerPresentation } from './campus-layers';
 import { api, supabase } from './supabase';
@@ -54,10 +55,18 @@ export default function GisTeamWorkspace({
     () => layerPresentation(data, true, view),
     [data, view],
   );
-  const inspect = (title: string, properties: Record<string, unknown>) => {
+  const inspect = (
+    title: string,
+    properties: Record<string, unknown>,
+    feature?: FeatureRef,
+  ) => {
     setInspection({ title, properties });
     session.navigate('map');
-    session.setState((s) => ({ ...s, selection: [], panel: 'inspector' }));
+    session.setState((s) => ({
+      ...s,
+      selection: feature ? [feature] : [],
+      panel: 'inspector',
+    }));
   };
   const issue = (value: ValidationIssue) => {
     if (value.coordinates)
@@ -86,12 +95,21 @@ export default function GisTeamWorkspace({
           simple={simple}
           buildingOpacity={opacity}
           onSelect={(place) =>
-            inspect(place.name, place as unknown as Record<string, unknown>)
+            inspect(place.name, place as unknown as Record<string, unknown>, {
+              campusId: campus.id,
+              kind: 'place',
+              id: place.id,
+            })
           }
           onBuildingSelect={(feature) =>
             inspect(
               String(feature.properties?.name || 'Building'),
               feature.properties || {},
+              {
+                campusId: campus.id,
+                kind: 'building',
+                id: String(feature.properties?.id || feature.id),
+              },
             )
           }
           onReady={setMap}
@@ -127,6 +145,7 @@ export default function GisTeamWorkspace({
           inspection &&
           !session.state.selection[0]?.datasetId && (
             <aside className="editor-task-dock editor-card">
+              <DockResize axis="horizontal" dimension="inspector" />
               <header>
                 <h2>{inspection.title}</h2>
                 <button

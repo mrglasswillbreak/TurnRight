@@ -260,261 +260,318 @@ export default function GisData({
     setEpoch((e) => e + 1);
   };
   return (
-    <>
-      {editable && onEndEditingSession && (
-        <details>
-          <summary>Geometry editing session</summary>
-          <p>
-            Up to 500 dataset features can join Edit at once. End this session
-            to unload saved GIS geometry and clear its undo history. Saved
-            changes remain in the shared draft.
-          </p>
-          <button onClick={() => void attempt(onEndEditingSession)}>
-            Save and end geometry session
-          </button>
-        </details>
-      )}
-      <div className="gis-toolbar">
-        <label>
-          Dataset
-          <select
-            value={dataset?.id || ''}
-            onChange={(e) => setId(e.target.value)}
-          >
-            {datasets.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({(d.count || 0).toLocaleString()})
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          onClick={() =>
-            void attempt(async () => {
-              await refresh();
-              setEpoch((e) => e + 1);
-            })
-          }
-        >
-          Refresh
-        </button>
-      </div>
-      {editable && (
-        <details>
-          <summary>Import an attribute CSV</summary>
-          <p>
-            Quoted values and leading-zero identifiers are preserved. Join this
-            private table to a spatial dataset in Analyze.
-          </p>
+    <div className="gis-data-layout">
+      <div className="gis-data-controls">
+        <div className="gis-toolbar gis-dataset-picker">
           <label>
-            Table name
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={160}
-            />
+            Dataset
+            <select
+              value={dataset?.id || ''}
+              onChange={(e) => setId(e.target.value)}
+            >
+              {datasets.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({(d.count || 0).toLocaleString()})
+                </option>
+              ))}
+            </select>
           </label>
-          <input
-            aria-label="Import CSV"
-            type="file"
-            accept=".csv,text/csv"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file)
-                void attempt(async () => {
-                  if (file.size > 2500000) throw Error('CSV exceeds 2.5 MB.');
-                  const csv = await file.text();
-                  const created = await mutate(() =>
-                    gisApi('gis-csv-import', {
-                      name,
-                      csv,
-                      operationId: crypto.randomUUID(),
-                    }),
-                  );
-                  setId(created.id);
-                });
-              e.target.value = '';
+          <button
+            onClick={() =>
+              void attempt(async () => {
+                await refresh();
+                setEpoch((e) => e + 1);
+              })
+            }
+          >
+            Refresh
+          </button>
+        </div>
+        {editable && onEndEditingSession && (
+          <details>
+            <summary>Geometry editing session</summary>
+            <p>
+              Up to 500 dataset features can join Edit at once. End this session
+              to unload saved GIS geometry and clear its undo history. Saved
+              changes remain in the shared draft.
+            </p>
+            <button onClick={() => void attempt(onEndEditingSession)}>
+              Save and end geometry session
+            </button>
+          </details>
+        )}
+
+        {editable && (
+          <details
+            open={!!session.state.table.importCsv}
+            onToggle={(e) => {
+              const open = e.currentTarget.open;
+              session.setState((s) =>
+                s.table.importCsv === open
+                  ? s
+                  : { ...s, table: { ...s.table, importCsv: open } },
+              );
             }}
-          />
-        </details>
-      )}
+          >
+            <summary>Import an attribute CSV</summary>
+            <p>
+              Quoted values and leading-zero identifiers are preserved. Join
+              this private table to a spatial dataset in Analyze.
+            </p>
+            <label>
+              Table name
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={160}
+              />
+            </label>
+            <input
+              aria-label="Import CSV"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file)
+                  void attempt(async () => {
+                    if (file.size > 2500000) throw Error('CSV exceeds 2.5 MB.');
+                    const csv = await file.text();
+                    const created = await mutate(() =>
+                      gisApi('gis-csv-import', {
+                        name,
+                        csv,
+                        operationId: crypto.randomUUID(),
+                      }),
+                    );
+                    setId(created.id);
+                  });
+                e.target.value = '';
+              }}
+            />
+          </details>
+        )}
+        {dataset && (
+          <>
+            <details className="gis-table-options">
+              <summary>
+                Filters and columns{query.filters?.length ? ' · filtered' : ''}
+              </summary>
+              <p>
+                {dataset.source_crs} → {dataset.analysis_crs} · metric analysis
+                in metres · revision {dataset.revision} ·{' '}
+                {dataset.included
+                  ? 'Selected for publication'
+                  : 'Private dataset'}
+              </p>
+              <div className="gis-toolbar">
+                <label>
+                  Field
+                  <select
+                    value={field}
+                    onChange={(e) => setField(e.target.value)}
+                  >
+                    {dataset.schema.fields.map((f) => (
+                      <option key={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Operator
+                  <select
+                    value={operator}
+                    onChange={(e) => setOperator(e.target.value)}
+                  >
+                    {[
+                      'contains',
+                      'eq',
+                      'ne',
+                      'gt',
+                      'gte',
+                      'lt',
+                      'lte',
+                      'null',
+                    ].map((o) => (
+                      <option key={o}>{o}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Value
+                  <input
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                  />
+                </label>
+                <button
+                  onClick={() => {
+                    const type = dataset.schema.fields.find(
+                      (f) => f.name === field,
+                    )?.type;
+                    const parsed =
+                      value === ''
+                        ? null
+                        : type === 'number'
+                          ? Number(value)
+                          : type === 'boolean'
+                            ? value === 'true'
+                            : value;
+                    setQuery((q) => ({
+                      ...q,
+                      filters: [
+                        { field, operator: operator as 'eq', value: parsed },
+                      ],
+                    }));
+                    setCursor(undefined);
+                    setHistory([]);
+                  }}
+                >
+                  Filter
+                </button>
+                <button
+                  onClick={() => {
+                    setQuery({});
+                    setCursor(undefined);
+                    setHistory([]);
+                    setExtent(false);
+                  }}
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() =>
+                    void attempt(async () => {
+                      const s = await gisApi('gis-statistics', {
+                        ...query,
+                        datasetId: dataset.id,
+                        revision: dataset.revision,
+                        field,
+                      });
+                      setStats(
+                        `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
+                      );
+                    })
+                  }
+                >
+                  Statistics
+                </button>
+              </div>
+              {stats && <output>{stats}</output>}
+              <div className="gis-toolbar">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={extent}
+                    onChange={(e) => {
+                      setExtent(e.target.checked);
+                      if (!e.target.checked)
+                        setQuery((q) => {
+                          const { bbox: _bbox, ...rest } = q;
+                          return rest;
+                        });
+                    }}
+                  />
+                  Limit to map extent
+                </label>
+                <details>
+                  <summary>Columns</summary>
+                  {dataset.schema.fields.map((f) => (
+                    <label key={f.name}>
+                      <input
+                        type="checkbox"
+                        checked={columns.includes(f.name)}
+                        onChange={(e) =>
+                          setColumns((c) =>
+                            e.target.checked
+                              ? [...c, f.name]
+                              : c.filter((k) => k !== f.name),
+                          )
+                        }
+                      />
+                      {f.alias || f.name}
+                    </label>
+                  ))}
+                </details>
+                <label>
+                  Saved filter
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      const saved =
+                        dataset.saved_filters[Number(e.target.value)];
+                      if (saved) {
+                        const {
+                          datasetId: _id,
+                          revision: _rev,
+                          cursor: _cursor,
+                          ...q
+                        } = saved.query;
+                        setQuery(q);
+                        setCursor(undefined);
+                        setHistory([]);
+                      }
+                    }}
+                  >
+                    <option value="">Choose…</option>
+                    {dataset.saved_filters.map((s, i) => (
+                      <option key={i} value={i}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </details>
+            <details>
+              <summary>Export filtered or selected data</summary>
+              <p>
+                Exports run against this exact revision. A download includes CRS
+                and provenance metadata.
+              </p>
+              <div className="gis-toolbar">
+                {['geojson', 'csv', 'gpkg'].map((format) => (
+                  <button
+                    key={format}
+                    disabled={!editable || loading}
+                    onClick={() =>
+                      void attempt(() =>
+                        mutate(() =>
+                          gisApi('gis-job-start', {
+                            operationId: crypto.randomUUID(),
+                            tool: 'export',
+                            name: dataset.name + ' export',
+                            input: {
+                              ...query,
+                              datasetId: dataset.id,
+                              revision: dataset.revision,
+                              ...(selected.size ? { keys: [...selected] } : {}),
+                            },
+                            parameters: { format, crs: 'EPSG:4326' },
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    {format === 'gpkg' ? 'GeoPackage' : format.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              <p>Open Analyze to follow the job and download the result.</p>
+            </details>
+          </>
+        )}
+      </div>
       {error && (
         <p role="alert" className="form-error">
           {error}
         </p>
       )}
       {!dataset ? (
-        <p>Import campus features in Campuses, or add an asset CSV above.</p>
+        <p>
+          Use Add data in the catalogue to import spatial features or an asset
+          CSV.
+        </p>
       ) : (
         <>
-          <details className="gis-table-options">
-            <summary>
-              Filters and columns{query.filters?.length ? ' · filtered' : ''}
-            </summary>
-            <p>
-              {dataset.source_crs} → {dataset.analysis_crs} · metric analysis in
-              metres · revision {dataset.revision} ·{' '}
-              {dataset.included
-                ? 'Selected for publication'
-                : 'Private dataset'}
-            </p>
-            <div className="gis-toolbar">
-              <label>
-                Field
-                <select
-                  value={field}
-                  onChange={(e) => setField(e.target.value)}
-                >
-                  {dataset.schema.fields.map((f) => (
-                    <option key={f.name}>{f.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Operator
-                <select
-                  value={operator}
-                  onChange={(e) => setOperator(e.target.value)}
-                >
-                  {[
-                    'contains',
-                    'eq',
-                    'ne',
-                    'gt',
-                    'gte',
-                    'lt',
-                    'lte',
-                    'null',
-                  ].map((o) => (
-                    <option key={o}>{o}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Value
-                <input
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                />
-              </label>
-              <button
-                onClick={() => {
-                  const type = dataset.schema.fields.find(
-                    (f) => f.name === field,
-                  )?.type;
-                  const parsed =
-                    value === ''
-                      ? null
-                      : type === 'number'
-                        ? Number(value)
-                        : type === 'boolean'
-                          ? value === 'true'
-                          : value;
-                  setQuery((q) => ({
-                    ...q,
-                    filters: [
-                      { field, operator: operator as 'eq', value: parsed },
-                    ],
-                  }));
-                  setCursor(undefined);
-                  setHistory([]);
-                }}
-              >
-                Filter
-              </button>
-              <button
-                onClick={() => {
-                  setQuery({});
-                  setCursor(undefined);
-                  setHistory([]);
-                  setExtent(false);
-                }}
-              >
-                Clear
-              </button>
-              <button
-                onClick={() =>
-                  void attempt(async () => {
-                    const s = await gisApi('gis-statistics', {
-                      ...query,
-                      datasetId: dataset.id,
-                      revision: dataset.revision,
-                      field,
-                    });
-                    setStats(
-                      `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
-                    );
-                  })
-                }
-              >
-                Statistics
-              </button>
-            </div>
-            {stats && <output>{stats}</output>}
-            <div className="gis-toolbar">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={extent}
-                  onChange={(e) => {
-                    setExtent(e.target.checked);
-                    if (!e.target.checked)
-                      setQuery((q) => {
-                        const { bbox: _bbox, ...rest } = q;
-                        return rest;
-                      });
-                  }}
-                />
-                Limit to map extent
-              </label>
-              <details>
-                <summary>Columns</summary>
-                {dataset.schema.fields.map((f) => (
-                  <label key={f.name}>
-                    <input
-                      type="checkbox"
-                      checked={columns.includes(f.name)}
-                      onChange={(e) =>
-                        setColumns((c) =>
-                          e.target.checked
-                            ? [...c, f.name]
-                            : c.filter((k) => k !== f.name),
-                        )
-                      }
-                    />
-                    {f.alias || f.name}
-                  </label>
-                ))}
-              </details>
-              <label>
-                Saved filter
-                <select
-                  value=""
-                  onChange={(e) => {
-                    const saved = dataset.saved_filters[Number(e.target.value)];
-                    if (saved) {
-                      const {
-                        datasetId: _id,
-                        revision: _rev,
-                        cursor: _cursor,
-                        ...q
-                      } = saved.query;
-                      setQuery(q);
-                      setCursor(undefined);
-                      setHistory([]);
-                    }
-                  }}
-                >
-                  <option value="">Choose…</option>
-                  {dataset.saved_filters.map((s, i) => (
-                    <option key={i} value={i}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </details>
           <div className="gis-table-scroll" aria-busy={loading}>
             <table>
               <thead>
@@ -642,10 +699,10 @@ export default function GisData({
               </tbody>
             </table>
           </div>
-          <div className="gis-toolbar">
+          <div className="gis-toolbar gis-table-pagination">
             <span>
               {page?.total.toLocaleString() || 0} matching · {selected.size}{' '}
-              selected · showing at most 100 geometries
+              selected · 100 rows per page
             </span>
             <button
               disabled={!history.length || loading || !page}
@@ -666,45 +723,9 @@ export default function GisData({
               Next
             </button>
           </div>
-          <details>
-            <summary>Export filtered or selected data</summary>
-            <p>
-              Exports run against this exact revision. A download includes CRS
-              and provenance metadata.
-            </p>
-            <div className="gis-toolbar">
-              {['geojson', 'csv', 'gpkg'].map((format) => (
-                <button
-                  key={format}
-                  disabled={!editable || loading}
-                  onClick={() =>
-                    void attempt(() =>
-                      mutate(() =>
-                        gisApi('gis-job-start', {
-                          operationId: crypto.randomUUID(),
-                          tool: 'export',
-                          name: dataset.name + ' export',
-                          input: {
-                            ...query,
-                            datasetId: dataset.id,
-                            revision: dataset.revision,
-                            ...(selected.size ? { keys: [...selected] } : {}),
-                          },
-                          parameters: { format, crs: 'EPSG:4326' },
-                        }),
-                      ),
-                    )
-                  }
-                >
-                  {format === 'gpkg' ? 'GeoPackage' : format.toUpperCase()}
-                </button>
-              ))}
-            </div>
-            <p>Open Analyze to follow the job and download the result.</p>
-          </details>
         </>
       )}
-    </>
+    </div>
   );
 }
 function AttributeCell({
