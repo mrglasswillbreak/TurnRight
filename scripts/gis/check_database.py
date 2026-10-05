@@ -13,7 +13,7 @@ with psycopg.connect(url,autocommit=True) as db:
     if db.execute("select to_regclass('public.source_features')").fetchone()[0]:
         raise RuntimeError('The test database must be empty; create a fresh container')
     # The PostGIS image initially installs its extensions in public. Supabase uses extensions.
-    for extension in ['postgis_topology','postgis_raster','postgis']:
+    for extension in ['postgis_tiger_geocoder','postgis_topology','postgis_raster','postgis']:
         db.execute('drop extension if exists '+extension)
     for role in ['anon','authenticated','service_role']:
         if not db.execute('select 1 from pg_roles where rolname=%s',(role,)).fetchone():db.execute('create role '+role)
