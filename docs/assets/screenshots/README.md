@@ -1,5 +1,20 @@
 # Application screenshots
 
+## Campus GIS workflow · 5 October 2026
+
+The four **gis-data**, **gis-analyze**, **gis-review** and **gis-publish** PNGs dated 2026-10-05 are unaltered 1440×1000 Chromium captures of the configured production build. They show the current Data/Edit/Analyze/Review/Publish navigation, typed table, processing catalogue, immutable submission and map templates. The map is the verified published LASU **lasu-4895a363b403** package with its attributed assets. Camera framing leaves room for the panel; no UI or map content is composited or retouched.
+
+Authentication, tree attributes, catalogue totals and review decisions are isolated demonstration fixtures. The 100,000-row label illustrates bounded paging, not an actual campus tree inventory or a load benchmark. Demonstration reviews and buffers are not public campus records. No production private account, draft, upload or survey is exposed or changed.
+
+Reproduce after preparing the verified public assets described below:
+
+~~~sh
+cd web
+TURNRIGHT_GIS_SCREENSHOTS=1 npx playwright test --config playwright.gis-docs.config.ts
+~~~
+
+In PowerShell set the TURNRIGHT_GIS_SCREENSHOTS environment variable before invoking the command. The opt-in capture test uses the real production-built React/MapLibre UI and writes these dated files. Review the resulting images before updating documentation. [Current scope](../../GIS-PLATFORM.md) · [Deployment receipts](../../PRODUCTION.md).
+
 ## Production audit and map credits · 3 October 2026
 
 `lasu-desktop-audit-2026-10-03.png`, `lasu-mobile-audit-2026-10-03.png` and `map-credits-mobile-2026-10-03.png` are unaltered production captures at application commit `7bb7e75`, using the unchanged published LASU `lasu-4895a363b403` package. Chromium uses 1440×1000 desktop and 390×844 phone viewports, in light/dark 3D. The first two replace the older LASU overview images in the README. Credits open above the panel, remain readable in dark mode and use a keyboard-accessible 44 px target; all original attributions remain available. Reproduce with `web/scripts/verify-map-credits.mjs`. Fresh contexts avoid the separately documented Windows WebKit resize issue; these are not physical-device captures. [Production evidence](../../PRODUCTION.md).

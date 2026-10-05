@@ -108,7 +108,7 @@ In **Review**, choose **Mark all as reviewed** to approve eligible recorded wall
 
 ## Publication
 
-Use the current campus’s owner review, preview and publication workflow. Restoring a campus uses a new preview that preserves other campuses; see [campus releases](CAMPUS-IMPORTS.md#review-then-publish). Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
+Use the current campus’s owner review, preview and publication workflow. Restoring a campus uses a new preview that preserves other campuses; see [campus releases](CAMPUS-IMPORTS.md#accept-proposals-then-independently-review-and-publish). Draft autosave and application deployment do not publish architectural changes. Full publication validation remains authoritative, including geometry, evidence, asset integrity and existing walking/driving restrictions.
 
 The Releases panel checks façade reviews before enabling **Build review preview**. Each blocker names its building, wing and wall; **Review model** opens that exact wall in the workspace. A height or roof edit can invalidate placement review even when the footprint is unchanged. Inspect the retained metre positions and evidence, then **Mark this wall reviewed**. This clears only the selected wall's review flag and remains undoable. A moved or reassigned wall also requires an explicit wall match. Invalid placements still require repair; reviewing does not invent measurements or approve other walls.
 

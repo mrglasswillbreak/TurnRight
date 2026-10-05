@@ -1,5 +1,7 @@
+import { publicationAction } from '../server/publication.js';
 import { processStatus } from '../server/process-status.js';
-import { readPublishedCatalogue } from '../scripts/published-campus-catalogue.mjs';
+import { workspaceAccess } from '../server/workspace-access.js';
+import { gisAction } from '../server/gis.js';
 import { mapImportAction } from '../server/map-imports.js';
 import { withCampusId } from '../server/campus-scope.js';
 import { resolveCampus, campusAction } from '../server/campuses.js';
@@ -14,7 +16,7 @@ import {
   fail,
   HttpError,
   privateHeaders,
-  requireAdmin,
+  requireIdentity,
   type RequestLike,
   type ResponseLike,
 } from '../server/backend.js';
@@ -27,7 +29,6 @@ import {
   publishedCampus,
   publishedRecords,
   snapshotHash,
-  validateReleaseSnapshot,
 } from '../server/release-validation.js';
 import { validateWorkspace } from '../src/editor-validation.js';
 import { publishedWorkspace } from '../server/published-workspace.js';
@@ -39,14 +40,27 @@ import {
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   try {
-    const user = await requireAdmin(req);
+    const user = await requireIdentity(req);
     const {
       action,
       payload = {},
       campus: reference = 'lasu',
     } = bodyOf(req, 3_000_000);
+    if (action === 'campus-list') {
+      res.status(200).json(await campusAction(action, payload, user.id));
+      return;
+    }
     const campus = await resolveCampus(reference);
     await withCampusId(campus.id, async () => {
+      const capabilities = await workspaceAccess(user.id, action);
+      if (action === 'workspace-capabilities') {
+        res.status(200).json(capabilities);
+        return;
+      }
+      if (typeof action === 'string' && action.startsWith('gis-')) {
+        res.status(200).json(await gisAction(user.id, action, payload));
+        return;
+      }
       switch (action) {
         case 'import-list':
         case 'import-start':
@@ -60,7 +74,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         case 'campus-list':
         case 'campus-create':
-          res.status(200).json(await campusAction(action, payload));
+          res.status(200).json(await campusAction(action, payload, user.id));
           break;
         case 'model-asset-begin':
         case 'model-asset-confirm':
@@ -89,19 +103,29 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         case 'state': {
           const [edits, changes, reports, jobs, releases, published] =
             await Promise.all([
-              allRows('map_edits'),
+              allRows('map_edits', '&gis_managed=eq.false'),
               db<unknown[]>(sourceReviewQuery()),
               db('reports?status=eq.pending&order=created_at.desc&limit=200'),
               db('jobs?order=created_at.desc&limit=20'),
               db(
-                'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
+                'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
               ),
               publishedWorkspace(),
             ]);
+          const selected = await editorSelection(user.id, payload.gisKeys);
           res.status(200).json({
             campus,
+            capabilities,
             base: campus.id === 'lasu' ? undefined : await publishedCampus(),
-            edits,
+            edits: [
+              ...edits,
+              ...selected.edits.filter(
+                (e: MapEdit) =>
+                  !edits.some(
+                    (old: MapEdit) => old.kind === e.kind && old.id === e.id,
+                  ),
+              ),
+            ],
             changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
             hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
             reports,
@@ -125,7 +149,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           const [jobs, releases, changes, published] = await Promise.all([
             db('jobs?order=created_at.desc&limit=20'),
             db(
-              'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version&order=created_at.desc&limit=20',
+              'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
             ),
             db<unknown[]>(changesQuery),
             publishedWorkspace(),
@@ -139,9 +163,22 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           });
           break;
         }
-        case 'sources':
-          res.status(200).json({ features: await allRows('source_features') });
+        case 'sources': {
+          const selected = await editorSelection(user.id, payload.gisKeys);
+          const features = await allRows(
+            'source_features',
+            '&gis_managed=eq.false',
+          );
+          res.status(200).json({
+            features: [
+              ...features,
+              ...selected.features.filter(
+                (f: { id: string }) => !features.some((old) => old.id === f.id),
+              ),
+            ],
+          });
           break;
+        }
         case 'review-baseline':
         case 'reconcile-baseline': {
           const [published, features, edits] = await Promise.all([
@@ -243,7 +280,8 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               400,
               'Upload the editable model as a verified private asset before saving.',
             );
-          const currentModels = (await allRows('map_edits')) as MapEdit[];
+          const currentModels = (await editorSelection(user.id, [...keys]))
+            .edits as MapEdit[];
           if (clean.some((i) => i.edit.kind === 'layer')) {
             if (payload.layerManagementVersion !== 1)
               throw new HttpError(
@@ -251,7 +289,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
                 'Update the editor before saving layers.',
               );
             const layers = new Map(
-              currentModels
+              ((await allRows('map_edits', '&kind=eq.layer')) as MapEdit[])
                 .filter((e) => e.kind === 'layer' && !e.deleted)
                 .map((e) => [
                   e.id,
@@ -299,7 +337,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             payload.modelAuthoringVersion !== 1 &&
             clean.some((item) => item.edit.kind === 'building')
           ) {
-            const current = (await allRows('map_edits')) as MapEdit[];
+            const current = currentModels;
             if (
               clean.some(
                 (item) =>
@@ -387,9 +425,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             res.status(200).json({ ok: true });
             break;
           }
-          await db('rpc/review_map_change', 'POST', {
-            change_id: payload.id,
-            accept_change: payload.accept,
+          await db('rpc/team_review_source', 'POST', {
+            actor: user.id,
+            change_identity: payload.id,
+            accept: payload.accept,
           });
           res.status(200).json({ ok: true });
           break;
@@ -455,128 +494,13 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           res.status(202).json({ id: job.id });
           break;
         }
-        case 'prepare-release': {
-          if (
-            typeof payload.summary !== 'string' ||
-            payload.summary.trim().length < 5 ||
-            payload.summary.length > 500
-          )
-            throw new HttpError(
-              400,
-              'Provide a release summary between 5 and 500 characters.',
-            );
-          const { revision: catalogueHash } = await readPublishedCatalogue(
-            process.env.PUBLISHED_MAP_URL!,
-          );
-          const id = await db<string>('rpc/snapshot_release', 'POST', {
-            catalogue_hash: catalogueHash,
-            release_summary: payload.summary.trim(),
-          });
-          try {
-            const [release] = await db(
-              `releases?id=eq.${encodeURIComponent(id)}&select=snapshot`,
-            );
-            validateReleaseSnapshot(
-              {
-                ...release.snapshot,
-                edits: await hydrateModelEdits(release.snapshot.edits, user.id),
-              },
-              await publishedCampus(),
-            );
-            await dispatch('release.yml', {
-              release_id: id,
-              operation: 'preview',
-              campus_id: campus.id,
-            });
-          } catch (e) {
-            await db(`releases?id=eq.${id}`, 'PATCH', {
-              status: 'failed',
-              error: (e as Error).message,
-            });
-            throw e;
-          }
-          res.status(202).json({ id });
-          break;
-        }
+        case 'prepare-release':
         case 'publish-release':
-        case 'rollback': {
-          if (typeof payload.id !== 'string')
-            throw new HttpError(400, 'Choose a release');
-          const [release] = await db(
-            `releases?id=eq.${encodeURIComponent(payload.id)}&select=id,status,deployment_id,snapshot,catalogue_revision,restored_from`,
-          );
-          if (
-            !release?.deployment_id ||
-            (action === 'publish-release' && release.status !== 'preview') ||
-            (action === 'rollback' && release.status !== 'published')
-          )
-            throw new HttpError(
-              400,
-              'This release is not ready for that action.',
-            );
-          const { revision: catalogueHash } = await readPublishedCatalogue(
-            process.env.PUBLISHED_MAP_URL!,
-          );
-          if (action === 'rollback') {
-            const id = await db<string>('rpc/restore_campus_release', 'POST', {
-              previous_id: release.id,
-              catalogue_hash: catalogueHash,
-            });
-            try {
-              await dispatch('release.yml', {
-                release_id: id,
-                operation: 'preview',
-                campus_id: campus.id,
-              });
-            } catch (error) {
-              await db(`releases?id=eq.${id}`, 'PATCH', {
-                status: 'failed',
-                error: (error as Error).message,
-              });
-              throw error;
-            }
-            res.status(202).json({ id, previewRequired: true });
-            break;
-          }
-          if (release.catalogue_revision !== catalogueHash)
-            throw new HttpError(
-              409,
-              'Another campus was published after this preview. Build a fresh preview.',
-            );
-          if (action === 'publish-release') {
-            const [published, features, edits] = await Promise.all([
-              publishedCampus(),
-              allRows('source_features'),
-              allRows('map_edits'),
-            ]);
-            validateReleaseSnapshot(
-              {
-                ...release.snapshot,
-                edits: await hydrateModelEdits(release.snapshot.edits, user.id),
-              },
-              published,
-              { restoring: !!release.restored_from },
-            );
-            if (
-              !release.restored_from &&
-              snapshotHash(
-                release.snapshot.features,
-                release.snapshot.edits,
-              ) !== snapshotHash(features, edits)
-            )
-              throw new HttpError(
-                409,
-                'This preview is stale. Build a new preview from the current sources and drafts.',
-              );
-          }
-          await dispatch('release.yml', {
-            release_id: release.id,
-            operation: 'publish',
-            campus_id: campus.id,
-          });
-          res.status(202).json({ id: release.id });
+        case 'rollback':
+          res
+            .status(202)
+            .json(await publicationAction(user.id, action, payload));
           break;
-        }
         case 'export':
           res.status(200).json({
             sources: await allRows('source_features'),
@@ -591,4 +515,15 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   } catch (error) {
     fail(res, error);
   }
+}
+
+async function editorSelection(actor: string, keys: unknown) {
+  if (keys === undefined) return { features: [], edits: [] };
+  if (
+    !Array.isArray(keys) ||
+    keys.length > 500 ||
+    keys.some((key) => typeof key !== 'string' || key.length > 500)
+  )
+    throw new HttpError(400, 'Load at most 500 selected GIS features.');
+  return db('rpc/gis_hydrate_editor', 'POST', { actor, keys });
 }

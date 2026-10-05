@@ -1,5 +1,15 @@
 # Responsiveness and recovery
 
+## Campus GIS scope · 5 October 2026
+
+GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. Data renders 100 rows; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
+
+The target is 100,000 features per campus workspace dataset. Native PostGIS acceptance inserts 100,000 features, checks bounded spatial queries and immutable job inputs, and tests cancellation, review/publication locks and restoration. This is not a complete 100,000-feature live mobile benchmark. Public navigation remains bounded to 20,000 map features/25 MB; draft layouts cap five layers at 500 visible features each.
+
+New workspaces load on demand under separate 20 KiB incremental gzip budgets. The final implementation build measured 433,679/435,200 public startup bytes and 167,389/189,440 additional editor bytes; existing budgets were not increased. These are compressed dependency bytes, not startup latency measurements. [GIS verification](GIS-PLATFORM.md#verification-status) and [production receipts](PRODUCTION.md) identify subsequent checks.
+
+The analysis container limits inputs/outputs to 100,000 features/50 MiB each, permits three active jobs per campus and applies an 18-minute processing deadline, 2 GB RAM and two CPUs. Cancellation/run tokens reject late results. Public map, personal offline recovery and server-dependent GIS capabilities have distinct availability boundaries.
+
 ## 3 October application audit
 
 The [whole-application audit](AUDIT-2026-10-03.md) uses the current LASU and UNILAG packages. Initial road-source payload is reduced by 89.8% / 97.1%, building associations are indexed per campus snapshot, and layer scrolling reuses its search/count/regeneration data. Only changed filters regain zoom limits after selection or model updates; those updates no longer repaint every optional GIS layer. Routing data and public package contents are unchanged.

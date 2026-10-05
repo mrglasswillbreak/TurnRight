@@ -1,5 +1,13 @@
 # Campus layers and road surfaces
 
+## Dataset and geometry workspaces
+
+**Data** is the typed, indexed dataset catalogue for large GIS collections; **Layers / Features** retains the map editor's drawing targets, topology-aware features and established road/landscape tools. They share campus identities, map selection, corrections, review and publication. Open **Edit geometry** from Data to work on a bounded feature session in the existing editor.
+
+Data provides 100-row pages, private field overlays, aliases/units, required values/domains, filtering, sorting, statistics and saved filters. Configure categorical/graduated styles, proportional point symbols and labels; select public fields explicitly. GeoJSON/CSV/GeoPackage exports use selected/filtered data and provenance receipts. The legacy layer GeoJSON exporter continues to use mapped application properties.
+
+The original layer table selects at most 500 matching features. Its header checkbox now measures the same bounded set and displays an indeterminate state for partial selection. Larger changes use staged analysis jobs and independent review. [Team workflow](GIS-PLATFORM.md).
+
 The layer workspace is deployed. [Production receipts](PRODUCTION.md) record the released campus packages, browser checks and preserved drafts.
 
 The owner editor has a persistent **Layers** entry. The desktop explorer resizes horizontally; the same Layers / Features workflow appears in a sheet on phones. Layer changes join ordinary feature corrections in transactional autosave, undo/redo, backups, recovery and immutable release snapshots. There is no visitor layer switcher.

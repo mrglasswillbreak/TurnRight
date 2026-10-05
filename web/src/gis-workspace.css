@@ -1,0 +1,178 @@
+.gis-workspace {
+  position: absolute;
+  z-index: 12;
+  top: 14px;
+  bottom: 18px;
+  left: 16px;
+  width: min(780px, calc(100% - 32px));
+  overflow: auto;
+  padding: 22px;
+  background: var(--ed-bg, #fff);
+  color: var(--ed-text, #172033);
+  box-shadow: 0 8px 35px #0002;
+  border-radius: 16px;
+  font-size: 13px;
+}
+.gis-workspace > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.gis-workspace h2 {
+  font-size: 24px;
+  margin: 4px 0;
+}
+.gis-workspace h3 {
+  margin: 24px 0 10px;
+}
+.gis-workspace small {
+  overflow-wrap: anywhere;
+}
+.gis-workspace p {
+  line-height: 1.5;
+  margin: 10px 0;
+}
+.gis-workspace label {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin: 7px 0;
+  flex-wrap: wrap;
+}
+.gis-workspace input:not([type='checkbox']):not([type='color']),
+.gis-workspace select,
+.gis-workspace textarea {
+  max-width: 100%;
+  border: 1px solid #a3afbe;
+  border-radius: 6px;
+  padding: 7px;
+  background: var(--ed-bg, #fff);
+  color: inherit;
+}
+.gis-workspace textarea {
+  width: 100%;
+}
+.gis-workspace button {
+  padding: 7px 10px;
+  border: 1px solid #b6c1ce;
+  border-radius: 7px;
+  background: var(--ed-bg, #fff);
+  color: inherit;
+  cursor: pointer;
+}
+.gis-workspace button:hover,
+.gis-tools .active {
+  background: #1764ed;
+  color: white;
+}
+.gis-workspace button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.gis-workspace details {
+  border-top: 1px solid #b6c1ce66;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+.gis-workspace summary {
+  font-weight: 650;
+  cursor: pointer;
+}
+.gis-toolbar,
+.gis-tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.gis-table-scroll {
+  overflow: auto;
+  max-height: 400px;
+  margin: 12px 0;
+  border: 1px solid #b6c1ce;
+  border-radius: 8px;
+}
+.gis-workspace table {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+.gis-workspace th {
+  position: sticky;
+  top: 0;
+  background: var(--ed-bg, #fff);
+  z-index: 1;
+  text-align: left;
+  white-space: nowrap;
+}
+.gis-workspace td,
+.gis-workspace th {
+  padding: 7px;
+  border-bottom: 1px solid #b6c1ce66;
+}
+.gis-workspace td input:not([type='checkbox']),
+.gis-workspace td select {
+  min-width: 100px;
+  width: 130px;
+}
+.gis-workspace td small {
+  color: #b42318;
+  display: block;
+}
+.gis-workspace tr.selected {
+  background: #f59e0b22;
+}
+.gis-job,
+.gis-issue {
+  padding: 12px 0;
+  border-bottom: 1px solid #b6c1ce66;
+}
+.gis-job progress {
+  width: 100%;
+  height: 5px;
+  display: block;
+  margin: 8px 0;
+}
+.gis-workspace pre {
+  font-size: 11px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 400px;
+  overflow: auto;
+}
+.gis-workspace fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid #b6c1ce;
+  border-radius: 8px;
+}
+.gis-workspace input:focus-visible,
+.gis-workspace select:focus-visible,
+.gis-workspace button:focus-visible {
+  outline: 2px solid #1764ed;
+  outline-offset: 2px;
+}
+@media (max-width: 720px) {
+  .gis-workspace {
+    top: auto;
+    height: 58%;
+    bottom: 8px;
+    left: 8px;
+    width: calc(100% - 16px);
+    padding: 14px;
+  }
+  .gis-table-scroll {
+    max-height: 35vh;
+  }
+  .gis-workspace .gis-toolbar label {
+    width: 100%;
+  }
+}
+.gis-workspace.gis-public-layout {
+  top: 90px;
+  bottom: auto;
+  max-height: calc(100dvh - 120px);
+  width: min(480px, calc(100vw - 32px));
+}

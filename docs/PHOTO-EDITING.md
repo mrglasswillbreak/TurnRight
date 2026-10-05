@@ -1,5 +1,9 @@
 # Offline image editing and compression
 
+## Campus GIS integration
+
+Local image recipes and unfinished uploads remain personal. Authorized campus teammates can read and reuse approved photographs attached to current or immutable work; private original paths and unrelated drafts are not exposed. Publishing a gallery change follows the shared independent-review workflow. [Team workflow and roles](GIS-PLATFORM.md).
+
 Open **Manage photos** on a building and use its sliders icon to open one editor for pixels, caption, building assignment and credits. **Add photos** and **Local image drafts · edit offline** open the same workspace. Editing stays on this device; private upload and release publication remain separate.
 
 ## Compare and compress

@@ -10,6 +10,7 @@ import { HttpError } from './backend.js';
 import { facadeErrors } from '../src/building-facades.js';
 import { modelDocumentRevision } from '../src/model-document-revision.js';
 import { modelDocumentErrors } from '../src/model-document.js';
+import { publicationInputs, type GisSnapshot } from './gis-publication.js';
 
 function stable(value: unknown, source = false): unknown {
   if (Array.isArray(value)) return value.map((v) => stable(v, source));
@@ -135,7 +136,7 @@ export function publishedRecords(data: CampusData): SourceRecord[] {
   return records;
 }
 export function validateReleaseSnapshot(
-  snapshot: { features: SourceRecord[]; edits: MapEdit[] },
+  snapshot: GisSnapshot,
   published: CampusData,
   options: { restoring?: boolean } = {},
 ) {
@@ -162,7 +163,8 @@ export function validateReleaseSnapshot(
         );
     }
   }
-  const assembled = assembleSources(snapshot.features, published);
+  const gis = publicationInputs(snapshot);
+  const assembled = assembleSources(gis.features, published);
   const base = options.restoring
     ? assembled
     : withPublishedVisuals(assembled, published);
@@ -184,12 +186,12 @@ export function validateReleaseSnapshot(
         `${source.name}: record attribution and redistribution permission before publication.`,
       );
   }
-  const result = validateWorkspace(base, snapshot.edits);
+  const result = validateWorkspace(base, gis.edits);
   if (result.errors.length) throw new HttpError(400, result.errors.join('\n'));
   const facadeIssues = result.data.map.features
     .filter((f) => f.properties?.kind === 'building')
     .flatMap((f) => facadeErrors(f, result.data.photos, true));
   if (facadeIssues.length)
     throw new HttpError(400, [...new Set(facadeIssues)].join('\n'));
-  return result.data;
+  return gis.decorate(result.data);
 }

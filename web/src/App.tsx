@@ -2,7 +2,9 @@ import { requestedCampus, DEFAULT_CAMPUS, rememberPublicCampus } from './campus-
 import type { TravelMode } from './types';
 import type { CampusSession } from './useCampusSwitch';
 import { placeMatches, streetResults } from './place-details';
-import { PlaceInformation } from './PlaceInformation';
+const PlaceInformation = lazy(() =>
+  import('./PlaceInformation').then((m) => ({ default: m.PlaceInformation })),
+);
 import { placeHasConnection } from './routing';
 import { destinationLink, sharedDestination } from './destination-sharing';
 import { flushSurveyRecovery, surveyRecordingActive } from './update-safety';
@@ -79,7 +81,10 @@ import {
   loadCampus,
   setPreference,
 } from './offline';
-import { OfflinePanel } from './OfflinePanel';
+const OfflinePanel = lazy(() =>
+  import('./OfflinePanel').then((m) => ({ default: m.OfflinePanel })),
+);
+const PublicMapLayout = lazy(() => import('./PublicMapLayout'));
 
 import { RoutePanel } from './RoutePanel';
 import { OfflineVoice } from './audio';
@@ -1059,6 +1064,11 @@ export default function App() {
       />
 
       {mapControls}
+      {campusMap && new URLSearchParams(location.search).has('mapLayout') && (
+        <Suspense fallback={null}>
+          <PublicMapLayout key={manifest.version} map={campusMap} data={data} manifest={manifest} />
+        </Suspense>
+      )}
       {updateReady && (
         <AppUpdateNotice
           navigating={navigating}
@@ -1543,7 +1553,9 @@ export default function App() {
                 entranceId={entranceId}
                 onEntrance={setEntranceId}
               />
-              <PlaceInformation place={selected} sources={data.sources} />
+              <Suspense fallback={<p>Loading place details…</p>}>
+                <PlaceInformation place={selected} sources={data.sources} />
+              </Suspense>
               {(() => {
                 const building = data.map.features.find(
                   (f) =>
@@ -1703,40 +1715,42 @@ export default function App() {
               </div>
             )}
             {dialog === 'offline' && (
-              <OfflinePanel
-                key={campusScope.current}
-                manifest={manifest}
-                latest={latest}
-                downloaded={downloaded}
-                checking={checkingDownload}
-                navigating={navigating}
-                swReady={swReady}
-                onCheck={() => void checkUpdates(true)}
-                onDelete={() => {
-                  if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
-                  downloadGeneration.current++;
-                  setDownloaded(false);
-                  setCheckingDownload(false);
-                }}
-                onInstall={(nextData, nextManifest, pending) => {
-                  if ((nextManifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
-                  downloadGeneration.current++;
-                  setCheckingDownload(false);
-                  setDownloaded(true);
-                  if (!pending) {
-                    setData(nextData);
-                    setManifest(nextManifest);
-                    setRoutes([]);
-                    setRouteView(false);
-                    setSelected(null);
-                  }
-                  setToast(
-                    pending
-                      ? 'Download complete. It will activate after your walk.'
-                      : 'Campus map downloaded and verified.',
-                  );
-                }}
-              />
+              <Suspense fallback={<p>Opening offline downloads…</p>}>
+                <OfflinePanel
+                  key={campusScope.current}
+                  manifest={manifest}
+                  latest={latest}
+                  downloaded={downloaded}
+                  checking={checkingDownload}
+                  navigating={navigating}
+                  swReady={swReady}
+                  onCheck={() => void checkUpdates(true)}
+                  onDelete={() => {
+                    if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
+                    downloadGeneration.current++;
+                    setDownloaded(false);
+                    setCheckingDownload(false);
+                  }}
+                  onInstall={(nextData, nextManifest, pending) => {
+                    if ((nextManifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
+                    downloadGeneration.current++;
+                    setCheckingDownload(false);
+                    setDownloaded(true);
+                    if (!pending) {
+                      setData(nextData);
+                      setManifest(nextManifest);
+                      setRoutes([]);
+                      setRouteView(false);
+                      setSelected(null);
+                    }
+                    setToast(
+                      pending
+                        ? 'Download complete. It will activate after your walk.'
+                        : 'Campus map downloaded and verified.',
+                    );
+                  }}
+                />
+              </Suspense>
             )}{' '}
             {dialog === 'report' && (
               <Suspense fallback={<p>Loading report form...</p>}>

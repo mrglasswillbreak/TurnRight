@@ -365,7 +365,7 @@ Served workspace `PhotoModelWorkspace-Cr6rd58w.js` has SHA-256
 `98852ee27fadc2032f73172aea0b7a0d406ab4d113afe5faaac1298df5ad3892`.
 
 The reader deployment preceded database changes and the writing release above.
-Follow [the staged rollout](DEPLOYMENT.md#multi-campus-rollout) for future
+Follow [the staged rollout](DEPLOYMENT.md#historical-rollout-records) for future
 installations and retain the server-side protection when reverting clients.
 
 Implementation verification passes **591 unit tests**, the focused Chromium and

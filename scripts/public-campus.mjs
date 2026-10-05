@@ -1,5 +1,10 @@
 // Public downloads contain attribution and evidence references, not survey history.
 const privateKeys = new Set([
+  "gisManaged",
+  "private_attributes",
+  "gis_feature_key",
+  "gis_managed",
+  "gis_metadata",
   "surveyEvidence",
   "surveyProvenance",
   "reviewerId",

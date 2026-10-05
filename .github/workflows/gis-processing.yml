@@ -1,0 +1,31 @@
+name: Campus GIS processing
+on:
+  workflow_dispatch:
+    inputs:
+      campus_id:
+        required: true
+        type: string
+      job_id:
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: gis-${{ inputs.campus_id }}-${{ inputs.job_id }}
+  cancel-in-progress: false
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: docker build -t turnright-gis scripts/gis
+      - run: node scripts/gis-worker.mjs
+        env:
+          CAMPUS_ID: ${{ inputs.campus_id }}
+          GIS_JOB_ID: ${{ inputs.job_id }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

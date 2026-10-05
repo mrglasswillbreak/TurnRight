@@ -1,3 +1,4 @@
+let publicationLease: string | undefined;
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -195,6 +196,7 @@ try {
     await db(`releases?id=eq.${id}`, "PATCH", { status: "preview", preview_url: url });
     console.log(`Preview ready: ${url}`);
   } else if (operation === "publish") {
+    publicationLease = await db("rpc/gis_begin_publication", "POST", { release_identity: id });
     if (operation === "publish" && release.status !== "preview")
       throw new Error("Review a ready preview first");
     if (!release.deployment_id) throw new Error("Deployment is missing");
@@ -205,17 +207,18 @@ try {
         await publishedCampus(),
         { restoring: !!release.restored_from },
       );
-      const [features, edits] = await Promise.all([
-        allRows("source_features"),
-        allRows("map_edits"),
-      ]);
-      if (
-        !release.restored_from &&
-        (release.snapshot.workspaceHash ||
-          snapshotHash(release.snapshot.features, release.snapshot.edits)) !==
+      if (!release.review_id && !release.restored_from) {
+        const [features, edits] = await Promise.all([
+          allRows("source_features"),
+          allRows("map_edits"),
+        ]);
+        if (
+          (release.snapshot.workspaceHash ||
+            snapshotHash(release.snapshot.features, release.snapshot.edits)) !==
           snapshotHash(features, edits)
-      )
-        throw new Error("Preview is stale. Create a fresh reviewed preview.");
+        )
+          throw new Error("Preview is stale. Create a fresh reviewed preview.");
+      }
     }
     if (
       (await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !==
@@ -268,4 +271,10 @@ try {
   ).catch(() => {});
   console.error(message);
   process.exitCode = 1;
+} finally {
+  if (publicationLease)
+    await db("rpc/gis_end_publication", "POST", {
+      release_identity: id,
+      lease_token: publicationLease,
+    }).catch(() => {});
 }

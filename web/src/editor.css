@@ -1420,3 +1420,15 @@
     display: none;
   }
 }
+
+/* Workflow tabs remain reachable at intermediate desktop widths. */
+.editor-navigation {
+  min-width: 0;
+  overflow-x: auto;
+  gap: 16px;
+  flex: 1;
+}
+.editor-navigation > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

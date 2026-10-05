@@ -1,5 +1,9 @@
 # Build and process progress
 
+## Campus GIS integration
+
+The new **Analyze** workspace records GIS processing progress, diagnostics, cancellation, retries and input/output revisions. Its persisted job history complements the existing **Activity** view for import, release and local processing stages. Applying a result checks its input revisions again and creates a private layer for the team review workflow. [Team workflow and roles](GIS-PLATFORM.md).
+
 The owner's **Activity** button opens **Builds and processes**. It shows local tasks alongside campus-scoped server jobs, with stage text, measured counts when available, errors and supported cancellation/retry actions. It remains available outside modal editing panels; photo editing also displays its active processing stage inside the dialog.
 
 ![Activity drawer showing import inspection and completed image processing](assets/screenshots/activity-monitor-2026-09-27.png)

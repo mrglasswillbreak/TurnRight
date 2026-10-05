@@ -64,3 +64,32 @@ if (!sw.includes(photos.file))
 for (const key of collect(buildingToolsKey))
   if (!sw.includes(manifest[key].file))
     throw Error(`Offline building tools dependency missing: ${key}`);
+
+// GIS workspaces stay out of public/editor startup and have separate incremental budgets.
+for (const workspace of [
+  'GisData',
+  'GisAnalyze',
+  'GisReview',
+  'GisPublish',
+  'PublicMapLayout',
+]) {
+  const key = `src/${workspace}.tsx`;
+  if (
+    !manifest[key]?.isDynamicEntry ||
+    publicKeys.has(key) ||
+    editorKeys.has(key)
+  )
+    throw Error(`${workspace} must remain lazy`);
+  let bytes = 0;
+  for (const dependency of collect(key))
+    if (!publicKeys.has(dependency) && !editorKeys.has(dependency)) {
+      bytes += gzipSync(
+        await fs.readFile(`dist/${manifest[dependency].file}`),
+      ).length;
+      if (!sw.includes(manifest[dependency].file))
+        throw Error(`Offline GIS dependency missing: ${dependency}`);
+    }
+  console.log(`${workspace} incremental JS: ${bytes} / 20480 gzip bytes`);
+  if (bytes > 20 * 1024)
+    throw Error(`${workspace} exceeds its lazy workspace budget`);
+}

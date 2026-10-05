@@ -1,5 +1,9 @@
 # Editor reliability and review update
 
+## Campus GIS integration
+
+The team GIS release retains the existing command history, personal recovery, optimistic revisions and idempotent receipts. One campus has one shared draft with explicit conflicts; editing branches are not introduced. Indexed GIS pages and geometry sessions are bounded, and processing results are staged until inspected. Role revocation is checked on reads, saves, job application and publication. [Team workflow and roles](GIS-PLATFORM.md).
+
 The editor provides operation-specific recovery, private local recovery downloads, grouped field undo, three-way conflict review, prepared-workspace fallback, guided repairs, explicit duplicate cleanup, release impact review, source comparisons, destination sharing and recorded steps information.
 
 ## Campus isolation
@@ -27,7 +31,7 @@ revision, so later edits restore the usual leave protection.
 - Validation issues carry feature identity/kind, severity, affected field and a supported repair action. Existing error/warning strings remain available to server release validation and older callers.
 - Place sharing uses `/?place=<encoded stable ID>` and existing public place aliases. No account or device location is included.
 - Public package readers support schemas 1–3; these reliability repairs do not change the schema. Steps remain optional booleans in routing edges; missing information remains unknown. A private edit can explicitly reset steps knowledge to unknown, which omits the public edge flag.
-- The original reliability patch required no database migration. Current installations must follow migrations 001–022 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
+- The original reliability patch required no database migration. Current installations must follow migrations 001–037 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
 
 ## Validation
 

@@ -206,8 +206,12 @@ describe('photo management', () => {
       caption: 'View 0',
     });
     expect(JSON.stringify(result)).not.toContain('private-original');
-    expect(String(fetcher.mock.calls[0][0])).toContain('owner=eq.owner');
-    expect(String(fetcher.mock.calls[0][0])).toContain('limit=21&offset=20');
+    expect(String(fetcher.mock.calls[0][0])).toContain('rpc/gis_media_library');
+    expect(JSON.parse(String(fetcher.mock.calls[0][1]?.body))).toEqual({
+      actor: 'owner',
+      search: 'View',
+      page_offset: 20,
+    });
   });
   it('guards private draft revisions and rejects stale saves', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
@@ -217,7 +221,9 @@ describe('photo management', () => {
       .fn()
       .mockResolvedValueOnce(
         new Response(
-          JSON.stringify([{ id, status: 'processed', draft_revision: 4 }]),
+          JSON.stringify([
+            { id, owner: 'owner', status: 'processed', draft_revision: 4 },
+          ]),
         ),
       )
       .mockResolvedValueOnce(new Response('[]'));
@@ -244,6 +250,7 @@ describe('photo management', () => {
           JSON.stringify([
             {
               id,
+              owner: 'owner',
               status: 'processed',
               draft_revision: 1,
               draft_metadata: { replacesPhotoId: 'owner:original' },
@@ -272,15 +279,18 @@ describe('photo management', () => {
       sourceKind: 'author-upload',
       sourceUrl: undefined,
     };
-    const fetcher = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify([
-            { id, status: 'processed', public_metadata: metadata },
-          ]),
-        ),
-      );
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id,
+            owner: 'owner',
+            status: 'processed',
+            public_metadata: metadata,
+          },
+        ]),
+      ),
+    );
     vi.stubGlobal('fetch', fetcher);
     await expect(
       mediaAction('owner', 'media-approve', { id, metadata, reviewed: true }),
@@ -298,6 +308,7 @@ describe('photo management', () => {
           JSON.stringify([
             {
               id,
+              owner: 'owner',
               status: 'processed',
               derivative_path: 'owner/derivative.webp',
             },
@@ -345,6 +356,7 @@ describe('photo management', () => {
           JSON.stringify([
             {
               id,
+              owner: 'owner',
               status: 'processed',
               original_filename: 'front.jpg',
               original_bytes: 100,

@@ -35,9 +35,14 @@ export async function activeCampus() {
 export async function campusAction(
   action: string,
   input: Record<string, unknown>,
+  actor: string,
 ) {
   if (action === 'campus-list')
-    return { campuses: await db<CampusRow[]>('campuses?order=name') };
+    return {
+      campuses: await db<CampusRow[]>('rpc/workspace_campuses', 'POST', {
+        actor,
+      }),
+    };
   if (action !== 'campus-create')
     throw new HttpError(400, 'Unknown campus action.');
   const name = typeof input.name === 'string' ? input.name.trim() : '';
@@ -99,7 +104,8 @@ export async function campusAction(
       400,
       'Repair the boundary before creating this campus.',
     );
-  await db('rpc/create_campus', 'POST', {
+  await db('rpc/create_team_campus', 'POST', {
+    actor,
     identity: campus,
     records: publishedRecords(data),
   });

@@ -1,18 +1,19 @@
 # TurnRight documentation
 
-TurnRight combines a public campus navigation PWA, a private GIS/map workspace and a building authoring editor. LASU Ojo is the first-visit default; the plain public home page remembers the last successfully opened campus. UNILAG is also published. Separate campuses can be created and imported privately, then reviewed and published independently. See the [project overview and screenshots](../README.md), [repository map](../README.md#repository-structure) and [verified production state](PRODUCTION.md).
+TurnRight is a campus GIS platform for small teams: import, typed data, geometry editing, spatial analysis, quality review, independent approval, cartography and controlled publication. The same product provides public navigation, offline campus packages, field surveys, photographs and building authoring. Start with the [team workflow](GIS-PLATFORM.md), [project overview and screenshots](../README.md), and [verified production state](PRODUCTION.md).
 
 ## Use the application
 
 | Task | Guide |
 | --- | --- |
+| Work as a campus team: typed datasets, analysis, independent review, publication and exports | [Campus GIS platform and rollout](GIS-PLATFORM.md) |
 | Select campus silhouettes, switch smoothly and use downloaded campuses offline | [Campus globe](CAMPUS-GLOBE.md) |
 | Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |
 | Inspect published LASU road estimates, reviewed sources and landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
 | Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
-| Edit places, paths, entrances, access and source changes | [Owner editor](EDITOR.md) |
+| Edit places, paths, entrances, access and source changes | [Team editor](EDITOR.md) |
 | Edit windows, walls, roofs, footprints, text and model review | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
 | Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL | [Model authoring](MODEL-AUTHORING.md) |
 | Edit standard and custom roof plans | [Building roofs](BUILDING-ROOFS.md) |
@@ -32,7 +33,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–022, credentials and release jobs | [Deployment](DEPLOYMENT.md) |
+| New installations, migrations 001–037, credentials and release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery) |
 | Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
 | Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
@@ -43,7 +44,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 | Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
 | Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
 
-Start with Node 22.13+ in the 22.x line and `npm ci` inside `web/`. `npm run dev` serves the public seed with no credentials; it does not serve the Vercel APIs. Browser workflows isolate authentication and private data. `npm test`, `npm run lint`, `npm run build` and `npm run check:configured-build` cover the app and budgets. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate owner action.
+Start with Node 22.23.3 from `.node-version` and `npm ci` inside `web/`. `npm run dev` serves the public seed with no credentials; it does not serve the Vercel APIs. Browser workflows isolate authentication and private data. `npm test`, `npm run lint`, `npm run build` and `npm run check:configured-build` cover the app and budgets. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
 
 ## Research and historical evidence
 

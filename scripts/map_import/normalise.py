@@ -3,6 +3,7 @@ import copy
 import hashlib
 import json
 import math
+import re
 from datetime import datetime, timezone
 
 from .formats import MAX_FEATURES
@@ -40,10 +41,17 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     repairs, diagnostics, mapped_layers = [], [], []
     previous_by_id = {r['id']:r for r in previous}
     skipped, feature_count = 0, 0
+    large_import = sum(len(layer['features']) for layer in layers if mappings.get(layer['name'],{}).get('role','skip') != 'skip') > 10000
     categories = {'academic','library','food','services','worship','residence','sports','gate','other'}
-    def add(entity, ident, payload):
+    def add(entity, ident, payload, private_attributes=None):
         key = entity + ':' + ident
-        record = {'id':key,'entity':entity,'source':owner_source,'payload':payload,'hash':digest(payload)}
+        if large_import:
+            if entity == 'feature': payload.setdefault('properties',{})['gisManaged'] = True
+            elif entity in ('place','node','edge'): payload['gisManaged'] = True
+        metadata = {'sourceCRS':layer['crs'],'fields':layer.get('fields',[]),'layer':layer['name']} if private_attributes is not None else None
+        record = {'id':key,'entity':entity,'source':owner_source,'payload':payload,'hash':digest({'payload':payload,'private_attributes':private_attributes,'gis_metadata':metadata}) if private_attributes is not None else digest(payload)}
+        if private_attributes is not None: record['private_attributes']=private_attributes
+        if metadata is not None: record['gis_metadata']=metadata
         if key in records and records[key]['hash'] != record['hash']: raise ValueError('Duplicate source identity: ' + ident)
         records[key] = record
     for layer in layers:
@@ -170,7 +178,9 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 for key in ('appearance','buildingTopology','modelDocumentAsset','modelAuthoring','reviewedModelRevision','authoredModelRevision','surfaceCurves'):
                     if key in old_feature['payload'].get('properties',{}): props[key]=copy.deepcopy(old_feature['payload']['properties'][key])
             public_feature = {'type':'Feature','geometry':geometry,'properties':props}
-            add('feature',ident,public_feature)
+            if role == 'overlay': props['gisManaged'] = True
+            private_values = {key:value for key,value in attrs.items() if isinstance(key,str) and re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,62}',key) and key not in ('__proto__','prototype','constructor') and (value is None or isinstance(value,(str,int,float,bool))) and not (isinstance(value,float) and not math.isfinite(value))}
+            add('feature',ident,public_feature,private_values)
             mapped_layer['features'].append(public_feature)
             if role in ('place','building','entrance') and (name or role=='entrance'):
                 point = geom.representative_point()

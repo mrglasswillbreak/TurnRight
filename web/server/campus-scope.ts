@@ -5,6 +5,19 @@ export const currentCampusId = () =>
 export const withCampusId = <T>(id: string, run: () => T): T =>
   context.run(id, run);
 export const scopedTables = new Set([
+  'campus_memberships',
+  'workspace_audit',
+  'gis_datasets',
+  'gis_attributes',
+  'gis_feature_index',
+  'gis_jobs',
+  'gis_views',
+  'gis_review_features',
+  'gis_job_features',
+  'gis_operations',
+  'gis_table_rows',
+  'gis_reviews',
+  'gis_issues',
   'source_features',
   'map_edits',
   'map_changes',

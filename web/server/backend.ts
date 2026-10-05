@@ -46,29 +46,37 @@ export async function db<T = any>(
       ? { body: JSON.stringify(body) }
       : {}),
     // The import RPC has a 60-second database budget (migration 017).
-    signal: AbortSignal.timeout(path === 'rpc/queue_campus_import' ? 75000 : 20000),
+    signal: AbortSignal.timeout(
+      path === 'rpc/queue_campus_import' || path.startsWith('rpc/gis_')
+        ? 75000
+        : 20000,
+    ),
   });
   const result = await response.json().catch(() => null);
   if (!response.ok)
     throw new HttpError(
-      response.status === 409 ? 409 : response.status >= 500 ? 503 : 400,
+      [401, 403, 404, 409, 413].includes(response.status)
+        ? response.status
+        : response.status >= 500
+          ? 503
+          : 400,
       result?.message ||
         'Database request failed. Check service availability and quotas.',
     );
   return result;
 }
-export async function allRows(table: string) {
+export async function allRows(table: string, filter = '') {
   const rows: any[] = [];
   for (let offset = 0; offset < 300000; offset += 1000) {
     const page = await db(
-      `${table}?select=*&order=id&limit=1000&offset=${offset}`,
+      `${table}?select=*&order=${table === 'map_edits' ? 'id,kind' : 'id'}&limit=1000&offset=${offset}${filter}`,
     );
     rows.push(...page);
     if (page.length < 1000) return rows;
   }
   throw new HttpError(413, 'Dataset exceeds the supported campus size.');
 }
-export async function requireAdmin(req: RequestLike) {
+export async function requireIdentity(req: RequestLike) {
   requireConfig();
   const header = req.headers.authorization;
   if (typeof header !== 'string' || !header.startsWith('Bearer '))
@@ -83,19 +91,18 @@ export async function requireAdmin(req: RequestLike) {
   if (!response.ok)
     throw new HttpError(401, 'Your session expired. Sign in again.');
   const user = await response.json();
-  const expected = process.env.ADMIN_USER_ID;
-  if (!expected || user.id !== expected)
-    throw new HttpError(403, 'This account does not have editor access.');
-  const allowed = await db(
-    `admin_users?id=eq.${encodeURIComponent(user.id)}&select=id`,
-  );
-  if (!allowed.length)
-    throw new HttpError(403, 'Administrator allowlist is not configured.');
+  if (typeof user.id !== 'string')
+    throw new HttpError(401, 'Invalid identity.');
   return user;
 }
 export function bodyOf(req: RequestLike, limit = 100000) {
   if (req.method !== 'POST') throw new HttpError(405, 'Use POST');
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  let body;
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch {
+    throw new HttpError(400, 'Invalid JSON request.');
+  }
   if (!body || JSON.stringify(body).length > limit)
     throw new HttpError(413, 'Request is too large.');
   return body;

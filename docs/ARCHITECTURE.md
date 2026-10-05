@@ -1,5 +1,34 @@
 # TurnRight architecture
 
+## Campus GIS workflow
+
+The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while lazy **Data, Analyze, Review and Publish** workspaces coordinate the existing **Edit** tools. Read-only team members receive the same map and review surfaces without geometry editing controls.
+
+~~~mermaid
+flowchart LR
+  Sources[Spatial sources and asset CSV] --> Draft[Authoritative sources and corrections]
+  Draft --> Index[Rebuildable PostGIS index]
+  Index --> Data[Paged Data workspace]
+  Index --> Jobs[Isolated analysis jobs]
+  Jobs --> Staged[Inspected private result layers]
+  Staged --> Draft
+  Draft --> Review[Immutable submission and independent approval]
+  Review --> Release[Validated preview and publication]
+  Release --> Public[Hashed public package and offline navigation]
+~~~
+
+Migrations **023–037** add campus memberships, typed dataset schemas, private attribute overlays, indexed effective geometry, processing jobs, QA issues, saved views, immutable reviews and publication guards. Existing source_features/map_edits remain authoritative; gis_feature_index is rebuilt from those records. Source metadata includes CRS and declared field types. Configured team field definitions survive reimports.
+
+Dataset requests carry campus identity, input revision and operation identity. Feature queries use spatial indexes, validated filters, deterministic sorting and revision-bound cursors; responses are capped at 500 rows/2 MB. The Data table renders 100 rows and GIS geometry sessions retain at most 500 loaded features. This bounds normal editing without downloading a complete 100,000-feature dataset. Administrative baseline reconciliation remains a separate explicit maintenance operation.
+
+Analysis jobs snapshot input revisions, capture parameters/CRS/engine/actor, and stage outputs. The pinned GDAL/GEOS/PROJ worker runs without network access and supports cancellation/run-token leases. Applying a result rechecks input revisions and creates an ordinary private dataset. Stored coordinates remain WGS84; metric tools currently require a validated WGS84 UTM zone in metres. Restricted expressions never execute arbitrary user code.
+
+Review hashes cover source/correction content, schemas, attribute overlays, tables, issues and saved views. Contributor identities prevent self-approval; only the original owner can explicitly override with a recorded reason. Membership changes and decisions enter an append-only audit. Publication checks current roles and approval, then takes a short lease preventing draft changes during promotion. Historical restoration creates a fresh review submission and preserves the current shared draft.
+
+Private attributes are excluded unless explicitly selected for publication. Public dataset style/label fields must also be selected public fields. Public packages remain independently bounded to 20,000 features/25 MB and legacy readers are retained. GeoPackage/CSV/GeoJSON jobs export selected or filtered data with receipts. Draft and exact-version public map layouts produce PNG receipts or browser-print PDF.
+
+Server modules workspace-access, gis-datasets, gis-processing, gis-review, gis-publication and publication sit behind the compatible /api/admin dispatcher. Shared contracts live in gis-types and validators in gis-contracts. RLS, SQL functions and server handlers enforce the same campus capabilities. See [workflow semantics and limits](GIS-PLATFORM.md).
+
 ## Campus isolation and import processing
 
 `campus-context.ts` preserves LASU legacy links and scopes URL/device state. Before React mounts, a plain public home entry restores the browser’s last successfully loaded campus from `turnright:last-campus`; explicit queries, destination links, editor/auth paths and hashes keep their own meaning. Successful public/offline loads update the preference, while failed or owner-only loads do not. Storage errors preserve usable defaults. `CampusWorkspace` and `CampusSwitcher` are lazy entries. The public catalogue references immutable campus manifests; legacy `/packages/latest.json` remains LASU. Public links carry campus plus place/building identities, and session storage restores both through the existing exact OAuth callback.
@@ -10,7 +39,7 @@ The directory's optional `outline` holds the verified published Polygon/MultiPol
 
 Migrations 013–015 backfill campus IDs without rewriting feature identities or model fingerprints. Server `AsyncLocalStorage` propagates a resolved campus ID through scoped REST requests and the transactional RPC header. Composite source/edit keys allow identical feature IDs in different campuses; model/media/survey access, reports and recovery remain isolated. Pending edits guard switching.
 
-GIS processing stays outside browser bundles. Owner-signed uploads feed resumable jobs, a restricted GDAL/PROJ container and Pyosmium topology ingestion. HTTPS adapters validate public DNS/redirects and complete ArcGIS ID batches. Candidates compare against an exact accepted source snapshot and are queued atomically with run-token checks; source corrections and publication remain separate steps. Manual refresh is default. Optional daily checks never publish automatically.
+GIS processing stays outside browser bundles. Authorized editor uploads feed resumable jobs, a restricted GDAL/PROJ container and Pyosmium topology ingestion. HTTPS adapters validate public DNS/redirects and complete ArcGIS ID batches. Candidates compare against an exact accepted source snapshot and are queued atomically with run-token checks; source corrections and publication remain separate steps. Manual refresh is default. Optional daily checks never publish automatically.
 
 The container uses the host runner's UID/GID to access its private 0700 temporary directory while retaining disabled network access, dropped capabilities and a read-only root filesystem. The Linux regression workflow exercises that actual mount/command as well as individual drivers. Inspection selects the GeoJSON/ESRIJSON driver from the parsed JSON dialect rather than a short header probe, rejects truncated exports before GDAL conversion, reports unique candidate ID fields, and accepts a layer's `/query` URL with an explicit notice that query filters are replaced by campus-bound inspection. Failed uploads can resume their reserved storage objects; resetting the job invalidates its old run token and candidate.
 
@@ -21,7 +50,7 @@ Code builds preserve all published campus assets. Release snapshots record the c
 
 Optional campus layer/group metadata and feature `mapLayerId` memberships are independent of source filenames, accepted import identities and numeric road grade `layer`. Older packages infer defaults by source and role without changing feature IDs. Migration 020 adds versioned transactional layer/feature saves and preserves newer metadata against older writers. Commands, revision checks, undo, recovery, release snapshots and offline loading carry the same configuration.
 
-Editor visibility, locks, release inclusion and published visibility are separate. Styling resolves feature override → matching classification rule → layer default → campus theme within landscape, surfaces, buildings and annotation bands. Routes and essential guidance stay above content. Export/publication strips private source attributes. Pending imports stay in review until accepted.
+Editor visibility, locks, release inclusion and published visibility are separate. Styling resolves feature override → matching classification rule → layer default → campus theme within landscape, surfaces, buildings and annotation bands. Routes and essential guidance stay above content. Legacy layer exports retain mapped properties; GIS exports can include authorized private fields. Public packages include only explicitly selected dataset attributes. Pending imports stay in review until accepted.
 
 The layer explorer caches identity/search indexes and layer statistics per snapshot; changing its query or active layer resets both the real scroller and the virtual window. Keyboard tabs use roving focus. Draft revisions are strictly monotonic per record through migration 022, without rewriting existing rows.
 
@@ -35,7 +64,7 @@ Original routing geometry supplies editor hit-testing even where genuine road-su
 
 ## Authored model extension
 
-`model-document` defines version-1 source and stable component IDs; `model-architecture` handles boundaries/curves; `model-mesh-commands` and `use-mesh-viewport` share operations, picking and transient previews in one scene. Imported hierarchies are organisational, with transforms applied to descendants. Lazy file workers resolve only supplied dependencies. Private immutable documents embed topology, materials and textures; migration 012 and `model-asset-client` enforce owner access, integrity and newer-writer protection. Release compilation hydrates reviewed assets, extracts hashed textures and adds optional normals/PBR materials. Authored revisions affect compatibility only when present; legacy fingerprints remain frozen. Geographic footprints remain routing authority. See [model authoring](MODEL-AUTHORING.md).
+`model-document` defines version-1 source and stable component IDs; `model-architecture` handles boundaries/curves; `model-mesh-commands` and `use-mesh-viewport` share operations, picking and transient previews in one scene. Imported hierarchies are organisational, with transforms applied to descendants. Lazy file workers resolve only supplied dependencies. Private immutable documents embed topology, materials and textures; migration 012 and `model-asset-client` enforce campus access, attached-asset sharing, integrity and newer-writer protection. Release compilation hydrates reviewed assets, extracts hashed textures and adds optional normals/PBR materials. Authored revisions affect compatibility only when present; legacy fingerprints remain frozen. Geographic footprints remain routing authority. See [model authoring](MODEL-AUTHORING.md).
 
 ## Unified model authoring
 
@@ -110,9 +139,9 @@ Each editor command is immediately visible and recoverable in owner- and campus-
 
 ## Server and release boundaries
 
-`web/api/admin.ts` validates the Supabase session via the Auth service and checks both `ADMIN_USER_ID` and the database singleton allowlist. RLS and explicit grants protect private tables. Existing owner-readable tables retain their owner policies; campus/import/model-asset metadata is server-only. Browser writes are denied. The admin API authorizes the owner before resolving and scoping each campus request. Mutations run in small server endpoints using a service-role JWT. `web/api/reports.ts` validates anonymous submissions and consumes an atomic, daily salted IP-derived rate bucket (five reports/hour). No raw IP is stored in application tables; platform HTTP logs remain subject to hosting-provider behavior. Reports remain private and never edit routes.
+`web/api/admin.ts` validates the Supabase session, resolves the campus and checks its membership capabilities before dispatch. The singleton original-owner record bootstraps administrators and identifies the audited override authority; it is no longer the sole workspace access rule. RLS and explicit grants protect private tables; mutations use server-validated transactional functions. Personal uploads/recovery remain user-scoped, while verified assets attached to shared work are readable by authorized teammates. Mutations run in small server endpoints using a service-role JWT. `web/api/reports.ts` validates anonymous submissions and consumes an atomic, daily salted IP-derived rate bucket (five reports/hour). No raw IP is stored in application tables; platform HTTP logs remain subject to hosting-provider behavior. Reports remain private and never edit routes.
 
-The release RPC snapshots approved sources plus corrections; a trigger prevents mutation of snapshot content. Migration 021 adds a service-only reviewed snapshot RPC with a local 60-second bound, administrator/campus validation, a supplied immutable release identity and idempotent retry checks. GitHub Actions validates and packages the snapshot, uploads only allowed application files through Vercel's API, and waits for READY. A publish action promotes the reviewed deployment and verifies both the production alias and catalogue revision before recording success. A campus restore first prepares a new preview containing that historical campus and the other current campuses. Source imports do not deploy code or maps. Failures and quota interruptions are stored as job/release errors when the backend is available.
+The release RPC snapshots approved sources plus corrections; a trigger prevents mutation of snapshot content. Migration 021 adds a service-only reviewed snapshot RPC with a local 60-second bound, administrator/campus validation, a supplied immutable release identity and idempotent retry checks. GitHub Actions validates and packages the snapshot, uploads only allowed application files through Vercel's API, and waits for READY. A publish action builds production from the exact reviewed source and verifies both the production alias and catalogue revision before recording success. A campus restore first prepares a new preview containing that historical campus and the other current campuses. Source imports do not deploy code or maps. Failures and quota interruptions are stored as job/release errors when the backend is available.
 
 `PUBLISHED_MAP_URL` protects ordinary code builds from reverting published data to the seed. The build fetches and verifies current map files, failing safely if they are unavailable. Controlled releases freeze their own version and preserve the preceding immutable assets. A campus rollback reuses its historical package in a fresh preview; a device already holding a newer map keeps it until it consents to the version change.
 

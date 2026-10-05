@@ -86,6 +86,48 @@ export class EditorWorkspace {
   setSourceBaseline(lookup?: (edit: MapEdit) => MapEdit | undefined) {
     this.sourceBaseline = lookup;
   }
+  /** Explicitly end a saved GIS geometry session while retaining ordinary editor history. */
+  releaseDatasetFeatures() {
+    if (
+      this.dirty ||
+      this.pending ||
+      this.unfinished ||
+      this.roofDraft ||
+      this.status === 'Conflict'
+    )
+      throw new Error(
+        'Save and finish the current edit before ending the GIS editing session.',
+      );
+    const keep = (edit: MapEdit) => !edit.properties.gisManaged;
+    this.saved = this.saved.filter(keep);
+    this.edits = this.edits.filter(keep);
+    this.featureBases = this.featureBases.filter(keep);
+    this.past = this.past.map((s) => ({ ...s, edits: s.edits.filter(keep) }));
+    this.future = this.future.map((s) => ({
+      ...s,
+      edits: s.edits.filter(keep),
+    }));
+    this.changed();
+  }
+  /** A paged dataset feature can join the shared editor without becoming an edit command. */
+  includeServerFeature(edit: MapEdit) {
+    const key = editKey(edit),
+      existing = this.saved.find((e) => editKey(e) === key);
+    if (existing) {
+      if (existing.updated_at !== edit.updated_at)
+        throw new Error(
+          'This feature changed. Refresh and resolve the shared draft before editing.',
+        );
+      return;
+    }
+    if (this.edits.some((e) => editKey(e) === key))
+      throw new Error('Resolve the local version of this feature first.');
+    this.saved = [...this.saved, structuredClone(edit)];
+    this.edits = [...this.edits, structuredClone(edit)];
+    for (const snapshot of [...this.past, ...this.future])
+      snapshot.edits.push(structuredClone(edit));
+    this.changed();
+  }
   constructor(
     server: MapEdit[],
     private send: (batch: SaveBatch) => Promise<MapEdit[]>,

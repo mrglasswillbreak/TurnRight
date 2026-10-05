@@ -1,5 +1,9 @@
 # Reference editing and authored models
 
+## Campus GIS integration
+
+Model authoring now participates in the campus team workflow. Ready immutable assets attached to current or historical campus work are readable by authorized teammates, while unfinished/unattached assets and recovery remain personal. Model review does not replace independent campus snapshot approval. [Team workflow and roles](GIS-PLATFORM.md).
+
 The model workspace combines native building surfaces with editable objects. Open a building's **Edit model** button. Architectural height, floors, roofs, windows and text remain available; **Mesh** adds object and component editing. Authored objects attach to the building. Its geographic footprint remains authoritative for routing.
 
 Choose the campus first. Buildings, authored model assets, photos, recovery and release snapshots belong to that campus; identically named or identified buildings in another campus do not share their drafts. [Campus workflow](CAMPUS-IMPORTS.md).
