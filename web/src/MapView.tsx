@@ -204,8 +204,10 @@ export function MapView({
       ),
     });
     motionMap.addControl(control, 'bottom-right');
-    if (!editor) {
-      const credits = motionMap.getContainer().querySelector('details.maplibregl-ctrl-attrib');
+    {
+      const credits = motionMap
+        .getContainer()
+        .querySelector('details.maplibregl-ctrl-attrib');
       credits?.removeAttribute('open');
       credits?.classList.remove('maplibregl-compact-show');
     }

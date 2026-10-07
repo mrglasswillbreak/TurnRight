@@ -1,4 +1,9 @@
-import { requestedCampus, DEFAULT_CAMPUS, rememberPublicCampus } from './campus-context';
+import { BrandMark } from './BrandMark';
+import {
+  requestedCampus,
+  DEFAULT_CAMPUS,
+  rememberPublicCampus,
+} from './campus-context';
 import type { TravelMode } from './types';
 import type { CampusSession } from './useCampusSwitch';
 import { placeMatches, streetResults } from './place-details';
@@ -21,7 +26,6 @@ import {
   useState,
 } from 'react';
 import {
-  ArrowUpRight,
   ArrowLeft,
   BookOpen,
   Building2,
@@ -192,9 +196,11 @@ export default function App() {
   >([]);
   const refreshDrafts = () => {
     const campus = campusScope.current;
-    void getPreference<typeof reportDrafts>('report-drafts', [], campus).then((drafts) => {
-      if (campusScope.current === campus) setReportDrafts(drafts);
-    });
+    void getPreference<typeof reportDrafts>('report-drafts', [], campus).then(
+      (drafts) => {
+        if (campusScope.current === campus) setReportDrafts(drafts);
+      },
+    );
   };
   const startRequested = useRef(false);
   const [dialog, setDialog] = useState<
@@ -342,7 +348,8 @@ export default function App() {
             : 'A new campus map is available in Offline Maps.',
         );
     } catch (e) {
-      if (announce && campusScope.current === campus) setToast((e as Error).message);
+      if (announce && campusScope.current === campus)
+        setToast((e as Error).message);
     }
   };
   const checkUpdatesEvent = useEffectEvent(checkUpdates);
@@ -350,10 +357,16 @@ export default function App() {
     const campus = campusScope.current;
     void activatePending(campus)
       .catch(() => false)
-      .then(() => { if (campusScope.current === campus) return reloadData(); });
+      .then(() => {
+        if (campusScope.current === campus) return reloadData();
+      });
     void checkUpdatesEvent();
-    getPreference('saved', [] as string[], campus).then((ids) => { if (campusScope.current === campus) setSaved(ids); });
-    getPreference('recent', [] as string[], campus).then((ids) => { if (campusScope.current === campus) setRecent(ids); });
+    getPreference('saved', [] as string[], campus).then((ids) => {
+      if (campusScope.current === campus) setSaved(ids);
+    });
+    getPreference('recent', [] as string[], campus).then((ids) => {
+      if (campusScope.current === campus) setRecent(ids);
+    });
     getPreference('muted', false).then(setMuted);
     refreshDrafts();
     if ('serviceWorker' in navigator) {
@@ -441,9 +454,15 @@ export default function App() {
     if (packageVersion)
       void voice.current
         .load(packageVersion)
-        .then((mode) => { if (!cancelled) setVoiceMode(mode); })
-        .catch(() => { if (!cancelled) setVoiceMode('unavailable'); });
-    return () => { cancelled = true; };
+        .then((mode) => {
+          if (!cancelled) setVoiceMode(mode);
+        })
+        .catch(() => {
+          if (!cancelled) setVoiceMode('unavailable');
+        });
+    return () => {
+      cancelled = true;
+    };
   }, [packageVersion]);
   useEffect(() => {
     if (!toast) return;
@@ -892,7 +911,7 @@ export default function App() {
     gps.stop();
     voice.current.stop();
     setNav(initialNavigation);
-    if (await activatePending(campus) && campus === campusScope.current) {
+    if ((await activatePending(campus)) && campus === campusScope.current) {
       await reloadData();
       setSelected(null);
       setRouteView(false);
@@ -900,38 +919,78 @@ export default function App() {
       setToast('Your downloaded map update is now active.');
     }
   };
-  const commitCampus = ({ result, saved, recent, reportDrafts }: CampusSession) => {
+  const commitCampus = ({
+    result,
+    saved,
+    recent,
+    reportDrafts,
+  }: CampusSession) => {
     campusScope.current = result.manifest.campus?.slug || DEFAULT_CAMPUS;
     const generation = ++downloadGeneration.current;
-    routeRequest.current++; startRequested.current = false;
-    gps.stop(); voice.current.stop();
+    routeRequest.current++;
+    startRequested.current = false;
+    gps.stop();
+    voice.current.stop();
     sharedLinkOpened.current = '';
-    setData(result.data); setManifest(result.manifest); setLatest(null);
-    setDownloaded(result.downloaded); setCheckingDownload(!!result.verification);
+    setData(result.data);
+    setManifest(result.manifest);
+    setLatest(null);
+    setDownloaded(result.downloaded);
+    setCheckingDownload(!!result.verification);
     void result.verification?.then((complete) => {
-      if (downloadGeneration.current === generation) { setDownloaded(complete); setCheckingDownload(false); }
+      if (downloadGeneration.current === generation) {
+        setDownloaded(complete);
+        setCheckingDownload(false);
+      }
     });
-    setSaved(saved); setRecent(recent); setReportDrafts(reportDrafts);
-    setSelected(null); setSelectedStreet(null); setUnlinkedBuilding(null);
-    setQuery(''); setCategory('all'); setSavedOnly(false); setSearching(false);
-    setEntranceId(''); setParkingId(''); setOrigin('gps'); setChosen(0); setActiveLeg(0);
-    setRoutes([]); setRouteView(false); setNavigating(false); setNav(initialNavigation);
-    setBusy(false); setRerouting(false); setFollow(false);
-    setDialog(null); setReportPin(undefined); setShareFallback(''); setSharedLinkMissing(false);
-    setLoadError(''); setToast(''); setRouteError(''); setVoicePreviewFeedback(''); setPreviewingVoice(false);
+    setSaved(saved);
+    setRecent(recent);
+    setReportDrafts(reportDrafts);
+    setSelected(null);
+    setSelectedStreet(null);
+    setUnlinkedBuilding(null);
+    setQuery('');
+    setCategory('all');
+    setSavedOnly(false);
+    setSearching(false);
+    setEntranceId('');
+    setParkingId('');
+    setOrigin('gps');
+    setChosen(0);
+    setActiveLeg(0);
+    setRoutes([]);
+    setRouteView(false);
+    setNavigating(false);
+    setNav(initialNavigation);
+    setBusy(false);
+    setRerouting(false);
+    setFollow(false);
+    setDialog(null);
+    setReportPin(undefined);
+    setShareFallback('');
+    setSharedLinkMissing(false);
+    setLoadError('');
+    setToast('');
+    setRouteError('');
+    setVoicePreviewFeedback('');
+    setPreviewingVoice(false);
   };
   if (!data || !manifest)
     return (
       <main className="loading-screen">
         <div className="brandmark">
-          <ArrowUpRight />
+          <BrandMark />
         </div>
         <h1>
           TurnRight<span>.</span>
         </h1>
         <p>{loadError || 'Opening campus map…'}</p>
-        {loadError && <><Button onClick={reloadData}>Retry</Button>
-          <a href="/?campus=lasu">Open LASU</a></>}
+        {loadError && (
+          <>
+            <Button onClick={reloadData}>Retry</Button>
+            <a href="/?campus=lasu">Open LASU</a>
+          </>
+        )}
       </main>
     );
   if (location.pathname.startsWith('/admin'))
@@ -1066,7 +1125,12 @@ export default function App() {
       {mapControls}
       {campusMap && new URLSearchParams(location.search).has('mapLayout') && (
         <Suspense fallback={null}>
-          <PublicMapLayout key={manifest.version} map={campusMap} data={data} manifest={manifest} />
+          <PublicMapLayout
+            key={manifest.version}
+            map={campusMap}
+            data={data}
+            manifest={manifest}
+          />
         </Suspense>
       )}
       {updateReady && (
@@ -1089,7 +1153,7 @@ export default function App() {
         }
       >
         <span className="brandmark">
-          <ArrowUpRight />
+          <BrandMark />
         </span>
         <span>
           <strong>{worldView ? 'Back to campus' : 'TurnRight'}</strong>
@@ -1113,10 +1177,17 @@ export default function App() {
               map={campusMap}
               navigating={navigating}
               onStop={stopNavigation}
-              campus={{ id: manifest.campus?.id || DEFAULT_CAMPUS, slug: campusScope.current,
-                name: campusName, bounds: data.bounds,
-                outline: data.boundary.geometry.type === 'Polygon' || data.boundary.geometry.type === 'MultiPolygon'
-                  ? data.boundary.geometry : undefined }}
+              campus={{
+                id: manifest.campus?.id || DEFAULT_CAMPUS,
+                slug: campusScope.current,
+                name: campusName,
+                bounds: data.bounds,
+                outline:
+                  data.boundary.geometry.type === 'Polygon' ||
+                  data.boundary.geometry.type === 'MultiPolygon'
+                    ? data.boundary.geometry
+                    : undefined,
+              }}
               dark={dark}
               threeD={threeD}
               onCommit={commitCampus}
@@ -1201,7 +1272,7 @@ export default function App() {
           <div className="panel-toolbar">
             <nav className="app-rail" aria-label="Main navigation">
               <a href="/" className="brandmark" aria-label="TurnRight home">
-                <ArrowUpRight />
+                <BrandMark />
               </a>
               <button
                 className={`rail-item ${!savedOnly ? 'active' : ''}`}
@@ -1726,13 +1797,21 @@ export default function App() {
                   swReady={swReady}
                   onCheck={() => void checkUpdates(true)}
                   onDelete={() => {
-                    if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
+                    if (
+                      (manifest.campus?.slug || DEFAULT_CAMPUS) !==
+                      campusScope.current
+                    )
+                      return;
                     downloadGeneration.current++;
                     setDownloaded(false);
                     setCheckingDownload(false);
                   }}
                   onInstall={(nextData, nextManifest, pending) => {
-                    if ((nextManifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
+                    if (
+                      (nextManifest.campus?.slug || DEFAULT_CAMPUS) !==
+                      campusScope.current
+                    )
+                      return;
                     downloadGeneration.current++;
                     setCheckingDownload(false);
                     setDownloaded(true);
@@ -1760,7 +1839,11 @@ export default function App() {
                   place={selected}
                   coordinates={reportPin}
                   onDone={() => {
-                    if ((manifest.campus?.slug || DEFAULT_CAMPUS) !== campusScope.current) return;
+                    if (
+                      (manifest.campus?.slug || DEFAULT_CAMPUS) !==
+                      campusScope.current
+                    )
+                      return;
                     setDialog(null);
                     setToast(
                       'Report submitted. Thank you for helping improve the map.',
@@ -1845,7 +1928,8 @@ export default function App() {
                           : 'Audio is unavailable. Check device volume and download the campus map.',
                       );
                     } finally {
-                      if (scope === campusScope.current) setPreviewingVoice(false);
+                      if (scope === campusScope.current)
+                        setPreviewingVoice(false);
                     }
                   }}
                 >

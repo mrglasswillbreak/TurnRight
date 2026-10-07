@@ -34,25 +34,33 @@ export function selectionPadding(
   container: HTMLElement,
 ): Required<PaddingOptions> {
   const map = container.getBoundingClientRect();
-  const workspace = container.closest('.editor-map-workspace');
+  const workspace =
+    container.closest('.workspace-frame') ||
+    container.closest('.editor-map-workspace');
   const rect = (selector: string) => {
     const box = workspace?.querySelector(selector)?.getBoundingClientRect();
     return box && box.width && box.height ? box : undefined;
   };
   const tools = rect('.editor-tools');
-  const explorer = rect('.editor-explorer');
-  const inspector = rect('.editor-inspector');
+  const explorer =
+    rect('.workspace-pane[data-pane=left][data-open=true]') ||
+    rect('.editor-explorer');
+  const inspector =
+    rect('.workspace-pane[data-pane=right][data-open=true]') ||
+    rect('.editor-inspector');
   const controls = rect('.editor-view-controls');
   const mobile = window.matchMedia('(max-width: 767px)').matches;
   const padding = {
     top: controls ? controls.bottom - map.top + 20 : 40,
-    bottom: mobile && inspector ? map.bottom - inspector.top + 24 : 90,
+    bottom:
+      mobile && inspector ? Math.max(24, map.bottom - inspector.top + 24) : 90,
     left: Math.max(
       24,
       (tools?.right ?? map.left) - map.left + 16,
       !mobile && explorer ? explorer.right - map.left + 20 : 0,
     ),
-    right: !mobile && inspector ? map.right - inspector.left + 24 : 24,
+    right:
+      !mobile && inspector ? Math.max(24, map.right - inspector.left + 24) : 24,
   };
   // Very small viewports must still leave a usable camera rectangle.
   for (const [start, end, size] of [
