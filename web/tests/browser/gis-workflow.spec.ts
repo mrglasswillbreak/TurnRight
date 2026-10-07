@@ -25,6 +25,7 @@ async function setup(
   page: Page,
   roles: WorkspaceCapabilities['roles'] = ['administrator'],
 ) {
+  await page.setViewportSize({ width: 1440, height: 1000 });
   const capture = process.env.TURNRIGHT_GIS_SCREENSHOTS === '1';
   const manifest: CampusPackage | undefined = capture
     ? JSON.parse(
@@ -541,7 +542,7 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     await page.evaluate(
       (bounds) =>
         window.editorTestMap.fitBounds(bounds, {
-          padding: { left: 820, right: 32, top: 105, bottom: 80 },
+          padding: { left: 36, right: 36, top: 100, bottom: 100 },
           pitch: 0,
           bearing: 0,
           duration: 0,
@@ -551,13 +552,18 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
       .toBe(true);
-    await page.locator('.gis-workspace').evaluate((e) => {
-      e.scrollTop = 0;
-    });
+    await page
+      .locator('.gis-workspace')
+      .first()
+      .evaluate((e) => {
+        e.scrollTop = 0;
+      });
     await page.screenshot({
       path: fileURLToPath(
         new URL(
-          '../../../docs/assets/screenshots/gis-' + name + '-2026-10-05.png',
+          '../../../docs/assets/screenshots/redesign-gis-' +
+            name +
+            '-2026-10-07.png',
           import.meta.url,
         ),
       ),
@@ -599,7 +605,126 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
   await page
     .getByText('Map layout: A4 / A3 PNG and PDF', { exact: true })
     .click();
-  await page.getByRole('combobox',{name:'Approved snapshot',exact:true}).selectOption('22222222-2222-4222-8222-222222222222');
-  await page.getByLabel('Release summary',{exact:true}).fill('Demonstration campus review');
+  await page
+    .getByRole('combobox', { name: 'Approved snapshot', exact: true })
+    .selectOption('22222222-2222-4222-8222-222222222222');
+  await page
+    .getByLabel('Release summary', { exact: true })
+    .fill('Demonstration campus review');
   await shot('publish');
+});
+
+test('workspace panes preserve the canvas, restore preferences and dismiss the legend', async ({
+  page,
+}, info) => {
+  const failures: string[] = [];
+  page.on('pageerror', (e) => failures.push(e.message));
+  await setup(page);
+  const canvas = await page.locator('.map-canvas').elementHandle();
+  await page
+    .getByRole('button', { name: 'Close map legend', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Map legend', exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole('button', { name: 'Map legend', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Map legend', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Close map legend', exact: true }),
+  ).toBeVisible();
+  const retainedCanvas = await page.locator('.map-canvas').elementHandle();
+  await page.getByRole('button', { name: /^Activity/ }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: /^Activity/ })).toBeFocused();
+  await page.getByRole('button', { name: 'Focus canvas', exact: true }).click();
+  await expect(page.locator('.workspace-frame')).toHaveAttribute(
+    'data-focus',
+    'true',
+  );
+  const workspaceMenu = page.locator('.editor-header-right .workspace-menu');
+  await workspaceMenu.locator('summary').click();
+  await workspaceMenu
+    .getByRole('button', { name: 'Reset layout', exact: true })
+    .click();
+  await expect(page.locator('.workspace-frame')).toHaveAttribute(
+    'data-focus',
+    'false',
+  );
+  await workspaceMenu.locator('summary').click();
+
+  await page
+    .getByRole('navigation', { name: 'Editor sections' })
+    .getByRole('button', { name: 'Data', exact: true })
+    .click();
+  await expect(
+    page.getByRole('checkbox', { name: 'Select this page' }),
+  ).toBeVisible();
+  expect(await retainedCanvas!.evaluate((node) => node.isConnected)).toBe(true);
+  await page
+    .getByRole('separator', { name: 'Resize explorer', exact: true })
+    .focus();
+  await page.keyboard.press('ArrowRight');
+  await page
+    .getByRole('button', { name: 'Maximize table', exact: true })
+    .click();
+  await expect(page.locator('.workspace-frame')).toHaveAttribute(
+    'data-maximized',
+    'true',
+  );
+  await page
+    .getByRole('button', { name: 'Restore table', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Maximize table', exact: true })
+    .click();
+  await expect(page.locator('.workspace-canvas')).toHaveAttribute('inert', '');
+  await page
+    .getByRole('button', { name: 'Collapse table and activity', exact: true })
+    .click();
+  await expect(page.locator('.workspace-canvas')).not.toHaveAttribute(
+    'inert',
+    '',
+  );
+  await page
+    .getByRole('button', { name: 'Toggle table and activity', exact: true })
+    .click();
+  await page.screenshot({ path: info.outputPath('data-desktop.png') });
+  await page.reload();
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Editor sections' })
+      .getByRole('button', { name: 'Data', exact: true }),
+  ).toHaveAttribute('aria-current', 'page');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: /^Activity/ }).click();
+  const activityBounds = (await page.locator('#process-list').boundingBox())!;
+  expect(activityBounds.x).toBeGreaterThanOrEqual(0);
+  expect(activityBounds.x + activityBounds.width).toBeLessThanOrEqual(390);
+  expect(activityBounds.y + activityBounds.height).toBeLessThanOrEqual(844);
+  await page.keyboard.press('Escape');
+  const tableToggle = page.getByRole('button', {
+    name: 'Toggle table and activity',
+    exact: true,
+  });
+  if ((await tableToggle.getAttribute('aria-pressed')) !== 'true')
+    await tableToggle.click();
+  await expect(
+    page.getByRole('checkbox', { name: 'Select this page' }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('data-phone.png') });
+  await page.getByLabel('Workspace', { exact: true }).selectOption('map');
+  await page
+    .getByRole('button', { name: 'Reset layout', exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Close map legend', exact: true }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('edit-phone.png') });
+  expect(failures).toEqual([]);
+  await canvas?.dispose();
+  await retainedCanvas?.dispose();
 });
