@@ -1791,3 +1791,38 @@
   font-weight: 600;
   padding-block: 8px;
 }
+/* Persistent panel wrappers let desktop panes resize without replacing the renderer. */
+.model-desktop .model-layout {
+  display: flex !important;
+  gap: 0 !important;
+}
+.model-desktop .model-layout-panel > div {
+  height: 100%;
+}
+.model-desktop
+  .model-layout-panel
+  :is(.model-stage, .model-hierarchy, .model-inspector) {
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+}
+.model-desktop .model-layout-panel .model-stage {
+  display: flex;
+  flex-direction: column;
+}
+.model-desktop .model-pane-divider {
+  flex: none;
+}
+.model-compact .model-layout > [data-panel],
+.model-compact .model-layout-panel,
+.model-compact .model-layout-panel > div {
+  display: contents !important;
+}
+.model-compact .model-pane-divider {
+  display: none;
+}
+
+/* The resize group must yield its explicit width to the compact sheet margins. */
+.model-compact .model-layout {
+  width: auto !important;
+}
