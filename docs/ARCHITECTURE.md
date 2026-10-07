@@ -1,5 +1,9 @@
 # TurnRight architecture
 
+## Shared editor shell
+
+[Editor layout contract](EDITOR-LAYOUT.md) documents typed workspace/pane identities, stable canvas hosts, responsive sheets and versioned preferences. The new shell and combined Activity presentation use existing state stores and APIs. Model and photo editors retain their existing workers, queues, undo and recovery ownership. No database migration accompanies the layout or identity changes.
+
 ## Campus GIS workflow
 
 The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while lazy **Data, Analyze, Review and Publish** workspaces coordinate the existing **Edit** tools. Read-only team members receive the same map and review surfaces without geometry editing controls.

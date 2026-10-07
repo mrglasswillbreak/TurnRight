@@ -1,0 +1,174 @@
+{
+  "capturedDate": "2026-10-07",
+  "recordedAt": "2026-10-07T19:03:32.982Z",
+  "baseCommit": "6dba2991e40e25f80f1da34a38b169c95b0e071c",
+  "sourceTreeSha256": "7f507579debc881accf4948949eb17fd19cc74c02b32aba48beb80903caa25a8",
+  "revision": "Capture source is identified by baseCommit and sourceTreeSha256; not a deployment receipt",
+  "browser": "Chromium 153.0.8010.12",
+  "deviceScaleFactor": 1,
+  "unalteredBrowserCaptures": true,
+  "captures": [
+    {
+      "file": "redesign-public-desktop-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "d35cd17c5c9c059610d093f7afa8e83fc94d8dc457eda103d5d9bc9c34b1fb31",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-public-mobile-2026-10-07.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "e4ae7401dc8aa2a1bdf6c45168c88e84425ac5fc4e1380178cab581fc6bd183c",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-editor-desktop-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "8f2141c68e725fed42ec17ee367819e10996a53473e672cb5d89ad5eaaea2e4a",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-gis-data-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "b6d148de339f80fbee2624bdcc8186478c84df774fc346cbc5650f25ad4bc333",
+      "fixture": "gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-model-desktop-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "abc8030ab6d71f28afcc1f0ba34a6c09514214422eccaf62c50eabae6b2ced09",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-photo-desktop-2026-10-07.png",
+      "width": 1440,
+      "height": 900,
+      "theme": "light",
+      "sha256": "edc374c23099da13b9158a40e5cbb21757498a6a0ed2e2faf70027370f2e4bc8",
+      "fixture": "photo-harness: commons:112540966 (Abiolakintrunde, CC BY-SA 4.0)",
+      "build": "Vite development harness"
+    },
+    {
+      "file": "redesign-gis-review-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "64c8b28cfd32b8ac5a8295bb00415ef134098787af80a14b59dea5d1a8337284",
+      "fixture": "gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-gis-publish-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "b982f881029868d9bafd23a581710fc432c42c934f6af86cafcf5f597bfe003d",
+      "fixture": "gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-globe-2026-10-07.png",
+      "width": 1440,
+      "height": 900,
+      "theme": "dark",
+      "sha256": "77733b90c291a233951b3b0759cda63f8a572303cf3d2c06ef0e5e377a5b3724",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-editor-mobile-2026-10-07.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "55d6a4a6478e04f5cbffb91fb0cbb057eb59cf10030c3147ae3fc4995e145e92",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-gis-analyze-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "2fab742131bd3d004da4c2248bf142033563576e73329030845e5adefa57b4e0",
+      "fixture": "gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-imports-2026-10-07.png",
+      "width": 1440,
+      "height": 900,
+      "theme": "light",
+      "sha256": "489465759a8f62f396f6dba066dbdebc8ccb49fc2b8fc82fbb06caa80120456a",
+      "fixture": "campus-imports.spec.ts: synthetic campus and inspected layers",
+      "build": "Vite development harness"
+    },
+    {
+      "file": "redesign-model-portrait-2026-10-07.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "264eca68628b11d995b15e190e6826c3a8510c4e471edbb56ef030c400b1194d",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-model-landscape-2026-10-07.png",
+      "width": 844,
+      "height": 390,
+      "theme": "light",
+      "sha256": "58b0d033c37d82de4e269d301536f9bfa763417f22deab88c937c9ceecdf0b82",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-photo-mobile-2026-10-07.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "a1b93bb29f63591389f92e75badc45e49be8c6e809f51e1b421e2c7d4d34f1e3",
+      "fixture": "photo-harness: commons:112540966 (Abiolakintrunde, CC BY-SA 4.0)",
+      "build": "Vite development harness"
+    },
+    {
+      "file": "redesign-offline-2026-10-07.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "1a143200fe0b454bc0bb04132d04fce1e9d084bf8f88907facfd6ec1c9caaeee",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-legend-collapsed-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "87b47fe1dc75aaba4b3d3e91909a3f650b185e44b6ee13e19557caeb961c53ed",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    },
+    {
+      "file": "redesign-activity-expanded-2026-10-07.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "f3d2b67a0b68a2fbd709f4d1faab56dd2158b5538079173794b96c016f0784a3",
+      "fixture": "editor.spec.ts: lasu-4895a363b403 + isolated owner responses",
+      "build": "Configured production preview"
+    }
+  ]
+}

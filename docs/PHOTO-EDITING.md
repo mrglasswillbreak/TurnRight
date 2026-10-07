@@ -1,5 +1,15 @@
 # Offline image editing and compression
 
+## Workspace organization
+
+Desktop separates the file list, comparison canvas and inspector. **Edit** contains crop, orientation, adjustment, privacy and resize controls; **Compress** contains output format and quality; **Details** contains image metadata. Pane controls collapse, resize or maximize the surrounding tools without interrupting processing. Phones retain a full-screen comparison with one focused controls sheet.
+
+![Desktop photo comparison with file list and inspector](assets/screenshots/redesign-photo-desktop-2026-10-07.png)
+
+![Phone photo comparison](assets/screenshots/redesign-photo-mobile-2026-10-07.png)
+
+These captures use the local editor harness and an attributed repository photograph; see [capture records](SCREENSHOTS.md).
+
 ## Campus GIS integration
 
 Local image recipes and unfinished uploads remain personal. Authorized campus teammates can read and reuse approved photographs attached to current or immutable work; private original paths and unrelated drafts are not exposed. Publishing a gallery change follows the shared independent-review workflow. [Team workflow and roles](GIS-PLATFORM.md).

@@ -1,5 +1,39 @@
 # Editing the campus map
 
+## Arrange your workspace
+
+The primary navigation follows **Data → Edit → Analyze → Review → Publish**. Each workspace keeps the map in the centre, an explorer on the left, contextual properties on the right, and an optional table or activity pane below. Desktop panes start near 260 px and 320 px. Drag a divider or focus it and use the arrow keys to resize it. Pane headings stay visible while their contents scroll.
+
+Use the pane icons to collapse or reopen panes, **Focus canvas** to temporarily clear them, and **Reset layout** to restore default sizes and the legend. Each pane also has a maximize/restore control. Data opens its attributes below the map at about 45% of the available height; Edit opens layer attributes below the map. Analyze separates the tool catalogue, parameters, and processing history.
+
+At widths below 1200 px, one auxiliary pane is shown at a time. Phones use a workspace chooser and focused sheets; maximize a table or form for full-screen work. Short landscape screens keep sheets to the side. Model and photo workspaces retain their own canvas controls and return to the selected map context.
+
+The last workspace, pane sizes and collapsed panes are remembered for this account and campus, separately for desktop and compact viewports. New editors start in Edit; restricted roles start in a permitted workspace. A building link or recovered drawing takes priority. If preference storage is unavailable, editing still works with session preferences.
+
+The campus menu contains **Campuses** and import management; **Data → Imports** also opens imports. Settings holds appearance, layout reset and authorized membership management. The Workspace menu groups backup, local recovery, refresh and sign-out. Save status remains in the header.
+
+![Desktop editor with a feature explorer, selected building and properties](assets/screenshots/redesign-editor-desktop-2026-10-07.png)
+
+*The published LASU campus package is shown with an isolated owner account; this is a local application capture.*
+
+![Phone editor with a selected building and focused properties sheet](assets/screenshots/redesign-editor-mobile-2026-10-07.png)
+
+Survey mode temporarily hides auxiliary panes while retaining their preferences. Close the survey to restore them and switch workspaces; recording and recovery continue in the survey workspace.
+
+## Legend and activity
+
+Close **Map legend** with its labelled close button to remove the New / Modified / Needs attention card. A small **Map legend** icon reopens it. Dismissal is remembered per account and campus; Reset layout restores visibility. The unknown-height explanation appears only in 3D. Hiding the legend does not change highlights, selections or drawing instructions.
+
+On phones, the legend temporarily hides while placing geometry to give drawing instructions and Finish/Cancel controls enough room. Your visibility preference returns when drawing ends.
+
+![Editor with the legend collapsed to its reopening control](assets/screenshots/redesign-legend-collapsed-2026-10-07.png)
+
+The compact **Activity** icon opens upload and process history. It starts collapsed: saved private drafts and successful recovery do not add persistent text or zero counts. A badge counts active processes once, including photo jobs; an attention mark identifies failures or recovery/status errors. Screen readers receive meaningful status changes even while the control is collapsed.
+
+![Expanded activity panel showing private photo status and process history](assets/screenshots/redesign-activity-expanded-2026-10-07.png)
+
+Open Activity to inspect upload status, private drafts, recovery, process stages and available retry/cancel actions. Pause/Resume appears only while photo work is queued or running; the control is unavailable when another browser tab owns uploads. Closing the popover never stops uploads, recovery or server polling. Escape closes it and returns focus to the icon; clicking outside also closes it. Blocking recovery warnings still require resolution.
+
 ## Team workspaces
 
 Use **Data → Edit → Analyze → Review → Publish** for the complete campus workflow. Permissions compose per campus: editors author and submit, reviewers independently approve, publishers release approved snapshots, and administrators manage memberships/settings. Ready attached models/photos are shared with authorized teammates; unfinished uploads, recovery and unsent work stay personal. [Full workflow and roles](GIS-PLATFORM.md).
@@ -8,7 +42,7 @@ Use **Data → Edit → Analyze → Review → Publish** for the complete campus
 
 **Analyze** runs the processing catalogue against immutable input revisions. Inspect diagnostics and staged output before applying a private result layer. **Review** combines map-linked quality issues with assignments, comments and evidence; submit an immutable snapshot after validation. A non-contributor approves its exact hash. New data/schema/style/view changes require renewed approval. **Publish** creates and promotes only approved previews; restoration submits historical content for new review without replacing current drafts.
 
-![Typed dataset workspace](assets/screenshots/gis-data-2026-10-05.png)
+![Typed dataset workspace](assets/screenshots/redesign-gis-data-2026-10-07.png)
 
 The geometry, sources, models, surveys and recovery tools below remain part of that workflow. Model/evidence review does not replace independent publication approval. Older dated receipts and screenshot labels describe their original version.
 
@@ -16,9 +50,9 @@ The editor includes a persistent **Layers / Features** explorer, road-surface ed
 
 ## Campuses and imports
 
-**Campuses** opens the authorized campus directory and import workspace. Create a boundary, upload supported vector files or connect public OSM/ArcGIS sources, map fields and projections, then inspect a candidate before queuing it for source review. Each campus retains separate drafts, models, reports, survey sessions, source history and releases. Switching protects unfinished edits and pending saves. Public Editor links preserve the campus and selected building through sign-in.
+**Campus menu → Campuses** opens the authorized campus directory and import workspace. Create a boundary, upload supported vector files or connect public OSM/ArcGIS sources, map fields and projections, then inspect a candidate before queuing it for source review. Each campus retains separate drafts, models, reports, survey sessions, source history and releases. Switching protects unfinished edits and pending saves. Public Editor links preserve the campus and selected building through sign-in.
 
-![Campus source and field mapping](assets/screenshots/campus-mapping-2026-09-26.png)
+![Campus source and field mapping](assets/screenshots/redesign-imports-2026-10-07.png)
 
 See [Campuses and map imports](CAMPUS-IMPORTS.md) for the full workflow. Review and publication remain separate; a historical campus is restored through a new preview that preserves every other campus.
 
@@ -93,7 +127,7 @@ Settings remains available during unfinished drawings and roof work. Opening and
 
 The photo strip and **Manage photos** controls appear directly below the building title. Photo management covers uploads, captions, rights, cover ordering and private recovery; it remains separate from architectural modelling.
 
-**Edit model** opens the dedicated building workspace. Appearance, Roof and Outline are workspace modes; duplicate model forms have been removed from the general building card. **Details** uses a measured wall canvas linked to selectable 3D and a collapsible photograph reference. It supports precise placement, duplicate/copy previews, groups, row/column patterns and independent presets. Mobile uses a full-screen canvas, a labelled mode selector and one focused tool sheet. Orbit, Edit surface and Photo share the selected target. Tap selects; Move and Resize explicitly edit. Pinching cancels an unfinished edit before navigation. Expand/Collapse/Done keep the sheet manageable, and focused inputs scroll into view.
+**Edit model** opens the dedicated building workspace. Modes are ordered **Outline → Appearance → Roof → Details → Mesh → Review**; duplicate model forms have been removed from the general building card. **Details** uses a measured wall canvas linked to selectable 3D and a collapsible photograph reference. It supports precise placement, duplicate/copy previews, groups, row/column patterns and independent presets. Mobile uses a full-screen canvas, a labelled mode selector and one focused tool sheet. Orbit, Edit surface and Photo share the selected target. Tap selects; Move and Resize explicitly edit. Pinching cancels an unfinished edit before navigation. Expand/Collapse/Done keep the sheet manageable, and focused inputs scroll into view.
 
 The selected detail's **⋯** button, right-click menu or Shift+F10 opens Duplicate, Copy, Paste/copy-to, Delete, Lock and Hide. Mobile **More → Selection actions** retains access from a sheet. The keyboard shortcuts also work outside text inputs. **Appearance → Building height** edits building metres or recorded floor count inside Appearance; custom roof elevations follow proportionally by default, with explicit options to retain them or use building height for an overridden wing. **Review** identifies changed details, evidence gaps and wall assignments that need attention and opens the affected controls.
 
