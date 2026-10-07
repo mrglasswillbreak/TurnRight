@@ -62,6 +62,7 @@ export default function LayerWorkspace({
     membership = useMemo(() => layerMembership(data, items), [data, items]);
   const active = items.find((l) => l.id === view.active);
   const table = useRef<HTMLDivElement>(null);
+  const featureSearch = useRef<HTMLInputElement>(null);
   const featureIndex = useMemo(
     () => new Map(features.map((f) => [f.key, f])),
     [features],
@@ -88,6 +89,17 @@ export default function LayerWorkspace({
   const [explorerTab, setExplorerTab] = useState<'layers' | 'features'>(
     'layers',
   );
+  // On compact screens the attribute sheet replaces the explorer. Move focus
+  // into that sheet instead of leaving it on a tab that is now hidden.
+  useEffect(() => {
+    if (
+      explorerTab !== 'features' ||
+      !matchMedia('(max-width: 1199px)').matches
+    )
+      return;
+    const frame = requestAnimationFrame(() => featureSearch.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [explorerTab]);
   const [draft, setDraft] = useState<CampusLayer | null>(null),
     [query, setQuery] = useState(''),
     [featureQuery, setFeatureQuery] = useState(''),
@@ -949,6 +961,7 @@ export default function LayerWorkspace({
             <div className="layer-feature-heading">
               <h3>Features · {rows.length}</h3>
               <input
+                ref={featureSearch}
                 aria-label="Search layer features"
                 placeholder="Name, original ID or class"
                 value={featureQuery}
