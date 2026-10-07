@@ -2229,8 +2229,14 @@ async function clickMap(page: Page, coordinates: Position) {
         const map = window.editorTestMap;
         return (
           !map.isMoving() &&
-          Math.abs(map.transform.width - map.getContainer().clientWidth) < 1 &&
-          Math.abs(map.transform.height - map.getContainer().clientHeight) < 1
+          Math.abs(
+            map.getCanvas().width / map.getPixelRatio() -
+              map.getContainer().clientWidth,
+          ) < 1 &&
+          Math.abs(
+            map.getCanvas().height / map.getPixelRatio() -
+              map.getContainer().clientHeight,
+          ) < 1
         );
       }),
     )

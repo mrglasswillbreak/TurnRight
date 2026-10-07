@@ -21,7 +21,10 @@ export async function collapseExplorer(page: Page) {
     .poll(() =>
       page.evaluate(() => {
         const map = window.editorTestMap;
-        return Math.abs(map.transform.width - map.getContainer().clientWidth);
+        return Math.abs(
+          map.getCanvas().width / map.getPixelRatio() -
+            map.getContainer().clientWidth,
+        );
       }),
     )
     .toBeLessThan(1);
