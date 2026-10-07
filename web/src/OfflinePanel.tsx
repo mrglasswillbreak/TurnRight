@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark';
 import { useRef, useState } from 'react';
 import { Check, Download, HardDrive, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -82,7 +83,7 @@ export function OfflinePanel({
       <div className="download-card">
         <div className="download-title">
           <span className="mini-map">
-            <MapGrid />
+            <BrandMark size={42} />
           </span>
           <div>
             <strong>{target.campus?.name || 'LASU · Ojo campus'}</strong>
@@ -237,26 +238,5 @@ export function OfflinePanel({
         Offline maps only include closures known at the last download.
       </p>
     </div>
-  );
-}
-function MapGrid() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
-      <rect width="42" height="42" rx="9" fill="#e4eedb" />
-      <path
-        d="M0 14h42M0 29h42M13 0v42M30 0v42"
-        stroke="white"
-        strokeWidth="5"
-      />
-      <path d="M13 37V17q0-3 3-3h15" stroke="#1764ed" strokeWidth="3" />
-      <circle
-        cx="30"
-        cy="14"
-        r="4"
-        fill="#1764ed"
-        stroke="white"
-        strokeWidth="2"
-      />
-    </svg>
   );
 }

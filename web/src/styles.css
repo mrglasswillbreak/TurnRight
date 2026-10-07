@@ -514,14 +514,13 @@ svg {
   border-radius: 14px;
   display: grid;
   place-items: center;
-  background: #1764ed;
+  background: #202a36;
   color: white;
-  box-shadow: 0 5px 14px #1764ed26;
+  overflow: hidden;
 }
 .brandmark svg {
-  width: 29px;
-  height: 29px;
-  stroke-width: 2.7;
+  width: 100%;
+  height: 100%;
 }
 .app-rail .brandmark {
   margin-bottom: 27px;
