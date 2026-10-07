@@ -542,7 +542,7 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
     await page.evaluate(
       (bounds) =>
         window.editorTestMap.fitBounds(bounds, {
-          padding: { left: 36, right: 36, top: 100, bottom: 100 },
+          padding: { left: 36, right: 36, top: 45, bottom: 45 },
           pitch: 0,
           bearing: 0,
           duration: 0,

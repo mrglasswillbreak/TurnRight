@@ -816,7 +816,15 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
     .getByRole('searchbox', { name: 'Search map features' })
     .fill('OZOLUA');
   await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
-  await page.getByLabel('Walking access', { exact: true }).selectOption('yes');
+  await expect(
+    page.getByRole('region', { name: 'Properties', exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole('combobox', { name: 'Walking access', exact: true })
+    .scrollIntoViewIfNeeded();
+  await page
+    .getByRole('combobox', { name: 'Walking access', exact: true })
+    .selectOption('yes');
   await expect
     .poll(() => state.calls.filter((c) => c.action === 'save-edits').length)
     .toBeGreaterThan(0);
@@ -824,9 +832,9 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
     page.getByRole('status').filter({ hasText: /^Saved$/ }),
   ).toBeVisible();
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(page.getByLabel('Walking access', { exact: true })).toHaveValue(
-    'yes',
-  );
+  await expect(
+    page.getByRole('combobox', { name: 'Walking access', exact: true }),
+  ).toHaveValue('yes');
   await page.screenshot({ path: info.outputPath('unilag-path-saved.png') });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.reload();
@@ -835,9 +843,9 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
     .getByRole('searchbox', { name: 'Search map features' })
     .fill('OZOLUA');
   await page.getByRole('button', { name: /^OZOLUA RD./ }).click();
-  await expect(page.getByLabel('Walking access', { exact: true })).toHaveValue(
-    'yes',
-  );
+  await expect(
+    page.getByRole('combobox', { name: 'Walking access', exact: true }),
+  ).toHaveValue('yes');
   await expect(
     page.getByText(
       'All coordinates must be within the LASU Ojo mapping area.',

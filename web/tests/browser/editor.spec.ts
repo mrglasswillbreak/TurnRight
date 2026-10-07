@@ -828,6 +828,9 @@ test('phone survey marks two entrances, connects both approaches and tests their
     .toHaveLength(2);
   await page.getByRole('button', { name: 'Close survey', exact: true }).click();
   await page.getByRole('button', { name: 'Test route', exact: true }).click();
+  await expect(
+    page.getByRole('region', { name: 'Route test', exact: true }),
+  ).toBeVisible();
   await page.getByLabel('Test route From').selectOption('gate');
   await page.getByLabel('Test route To').selectOption('library');
   await page
@@ -2507,6 +2510,9 @@ test('editor reliability: retry route replaces a failed worker and calculates th
   });
   const server = await setup(page);
   await page.getByRole('button', { name: 'Test route', exact: true }).click();
+  await expect(
+    page.getByRole('region', { name: 'Route test', exact: true }),
+  ).toBeVisible();
   await page.getByLabel('Test route From').selectOption('gate');
   await page
     .getByLabel('Test route To')
@@ -3787,6 +3793,9 @@ for (const threeD of [false, true])
     if ((await explorer.getAttribute('aria-pressed')) !== 'true')
       await explorer.click();
     await page.getByRole('button', { name: 'Test route', exact: true }).click();
+    await expect(
+      page.getByRole('region', { name: 'Route test', exact: true }),
+    ).toBeVisible();
     await page.getByLabel('Test route From').selectOption('gate');
     await page.getByLabel('Test route To').selectOption('library');
     await page
@@ -10033,8 +10042,14 @@ test('redesign documentation gallery: public, editor and model layouts', async (
     .getByRole('button', { name: 'Reference split', exact: true })
     .click();
   await page.setViewportSize({ width: 390, height: 844 });
+  await dialog
+    .getByRole('button', { name: 'Fit selection', exact: true })
+    .click();
   await shot('model-portrait');
   await page.setViewportSize({ width: 844, height: 390 });
+  await dialog
+    .getByRole('button', { name: 'Fit selection', exact: true })
+    .click();
   await shot('model-landscape');
   await page.goto('/');
   await attachMap(page);

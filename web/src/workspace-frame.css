@@ -49,6 +49,9 @@
   border-radius: 7px;
   white-space: nowrap;
 }
+.workspace-menu:not([open]) > div {
+  display: none;
+}
 .workspace-menu > div {
   position: absolute;
   right: 0;
@@ -189,7 +192,11 @@
   min-width: 0;
 }
 .workspace-pane[data-open='false'] {
-  visibility: hidden;
+  display: none;
+}
+/* Compact sheets and maximized panes leave their collapsed panel's bounds. */
+.workspace-frame:is([data-compact='true'], [data-maximized='true']) [data-panel] {
+  overflow: visible !important;
 }
 .workspace-pane-heading {
   min-height: 38px;
