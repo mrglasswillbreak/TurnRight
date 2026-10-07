@@ -112,8 +112,13 @@ export default function GisWorkspace(props: GisWorkspaceProps) {
             <Data {...panel} />
           ) : props.section === 'gis-analyze' ? (
             <Analyze {...panel} />
-          ) : props.section === 'gis-review' ? (
-            <Review {...panel} issues={props.issues} onIssue={props.onIssue} />
+          ) : props.section === 'gis-review' || props.section === 'members' ? (
+            <Review
+              {...panel}
+              membershipsOnly={props.section === 'members'}
+              issues={props.issues}
+              onIssue={props.onIssue}
+            />
           ) : (
             <Publish {...panel} />
           ))}

@@ -26,12 +26,24 @@ export default defineConfig({
         short_name: 'TurnRight',
         description:
           'Explore campus places and get walking and driving directions, online or offline.',
-        theme_color: '#1764ed',
+        theme_color: '#20634c',
         background_color: '#f6f8fc',
         display: 'standalone',
         start_url: '/',
         scope: '/',
         icons: [
+          {
+            src: '/icon-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: '/icon-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
           {
             src: '/icon-192.png',
             sizes: '192x192',
@@ -42,7 +54,7 @@ export default defineConfig({
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
           },
         ],
       },

@@ -290,6 +290,10 @@ for (const viewport of [
     expect(bounds!.y).toBeGreaterThanOrEqual(0);
     expect(bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
     expect(bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+    await dialog
+      .getByRole('navigation', { name: 'Photo tools' })
+      .getByRole('button', { name: 'Compress', exact: true })
+      .click();
     await dialog.getByLabel('Download format').scrollIntoViewIfNeeded();
     await dialog.getByLabel('Download format').focus();
     if (portrait) {
@@ -361,6 +365,15 @@ for (const viewport of [
     await page.screenshot({
       path: info.outputPath(`photo-editor-${viewport.width}.png`),
     });
+    if (
+      process.env.TURNRIGHT_REDESIGN_SCREENSHOTS === '1' &&
+      !viewport.theme &&
+      [1440, 390].includes(viewport.width)
+    ) {
+      await page.screenshot({
+        path: `../docs/assets/screenshots/redesign-photo-${viewport.width === 1440 ? 'desktop' : 'mobile'}-2026-10-07.png`,
+      });
+    }
     await dialog.getByRole('button', { name: 'Close image editor' }).click();
     await expect(dialog).toBeHidden();
     const recipe = await page.evaluate(async () => {

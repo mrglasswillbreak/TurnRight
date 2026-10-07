@@ -1,9 +1,9 @@
 import {
   useEffect,
+  useContext,
   lazy,
   Suspense,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from 'react';
 import { PhotoQueueStore } from './photo-queue-store';
@@ -11,26 +11,6 @@ import { PhotoQueueContext } from './use-photo-queue';
 import './photo-manager.css';
 import { registerPhotoRecovery } from './update-safety';
 const ProcessMonitor = lazy(() => import('./ProcessMonitor'));
-function UploadStatus({ store }: { store: PhotoQueueStore }) {
-  const status = useSyncExternalStore(store.subscribe, store.getStatus);
-  if (!store.jobs.length && !store.storageError) return null;
-  return (
-    <aside className="owner-upload-status" aria-label="Private photo uploads">
-      <output aria-live="off">{status}</output>
-      <span className="sr-only" aria-live="polite">
-        {
-          store.jobs.filter((j) =>
-            ['queued', 'uploading', 'processing'].includes(j.state),
-          ).length
-        }{' '}
-        photographs left to upload{store.paused ? ', paused' : ''}
-      </span>
-      <button disabled={!store.leader} onClick={store.togglePause}>
-        {store.paused ? 'Resume uploads' : 'Pause uploads'}
-      </button>
-    </aside>
-  );
-}
 export function PhotoSession({
   owner,
   children,
@@ -59,13 +39,14 @@ export function PhotoSession({
       current.stop();
     };
   }, [owner]);
+  return <PhotoQueueContext value={store}>{children}</PhotoQueueContext>;
+}
+
+export function PhotoActivity() {
+  const store = useContext(PhotoQueueContext);
   return (
-    <PhotoQueueContext value={store}>
-      {children}
-      <UploadStatus store={store} />
-      <Suspense fallback={null}>
-        <ProcessMonitor />
-      </Suspense>
-    </PhotoQueueContext>
+    <Suspense fallback={null}>
+      <ProcessMonitor photoStore={store || undefined} />
+    </Suspense>
   );
 }

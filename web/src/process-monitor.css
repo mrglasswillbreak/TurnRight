@@ -2,7 +2,7 @@
   position: fixed;
   z-index: 49;
   right: max(12px, env(safe-area-inset-right));
-  bottom: max(12px, env(safe-area-inset-bottom));
+  top: calc(100px + env(safe-area-inset-top));
   font-size: 13px;
   color: var(--foreground, #182536);
 }
@@ -19,13 +19,60 @@
 }
 .process-launch {
   box-shadow: 0 2px 12px #0002;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  padding: 0 !important;
+  border-radius: 12px !important;
+}
+.activity-count,
+.activity-attention {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 10px;
+  background: #24785a;
+  color: white;
+  font-size: 10px;
+  display: grid;
+  place-items: center;
+  padding: 0 3px;
+}
+.activity-attention {
+  background: #a94424;
+  top: auto;
+  bottom: -4px;
+}
+.activity-announcement {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.activity-uploads {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border, #d4dbe5);
+}
+.activity-uploads h3 {
+  margin: 0;
+  font-size: 13px;
 }
 .process-monitor section {
   position: absolute;
-  bottom: 48px;
+  top: 52px;
   right: 0;
   width: min(380px, calc(100vw - 24px));
-  max-height: min(65dvh, 600px);
+  max-height: min(calc(100dvh - 180px), 600px);
   overflow: auto;
   background: var(--background, #fff);
   padding: 12px;
@@ -71,4 +118,6 @@
   }
 }
 
-[data-base-ui-inert] .process-monitor { visibility: hidden; }
+[data-base-ui-inert] .process-monitor {
+  visibility: hidden;
+}

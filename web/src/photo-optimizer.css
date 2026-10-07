@@ -757,3 +757,74 @@
     max-height: min(52dvh, calc(100% - 270px));
   }
 }
+/* Photo files and controls share the same docked pane system as mapping. */
+.photo-optimizer > .workspace-frame {
+  height: 100%;
+  --pane-bg: var(--background);
+}
+.photo-optimizer[data-wide='true']
+  .workspace-pane-content
+  > .photo-floating-panel {
+  position: static;
+  inset: auto;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+.photo-optimizer[data-wide='true']
+  .workspace-pane-content
+  > .photo-floating-panel
+  .photo-panel-scroll {
+  overflow: visible;
+}
+.photo-optimizer .workspace-pane-content {
+  min-width: 0;
+}
+.photo-inspector-tabs {
+  position: sticky;
+  top: 0;
+  display: flex;
+  gap: 4px;
+  padding: 5px 0 10px;
+  background: var(--background);
+  z-index: 2;
+}
+.photo-inspector-tabs button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: inherit;
+  background: transparent;
+}
+.photo-inspector-tabs button[aria-pressed='true'] {
+  background: var(--soft);
+  color: var(--link);
+}
+.photo-opt-controls [hidden] {
+  display: none !important;
+}
+.photo-optimizer[data-wide='false'] .workspace-commandbar {
+  display: none;
+}
+.photo-optimizer[data-wide='true'] .photo-result-original {
+  left: 12px;
+}
+.photo-optimizer[data-wide='true'] .photo-result-optimized {
+  right: 12px;
+}
+.photo-optimizer[data-wide='true'] .photo-editor-filename {
+  max-width: 25vw;
+}
+
+.photo-preview-action {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  min-height: 44px;
+  background: var(--background);
+  z-index: 2;
+}

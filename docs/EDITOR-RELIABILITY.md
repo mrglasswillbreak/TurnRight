@@ -1,5 +1,13 @@
 # Editor reliability and review update
 
+## Layout and recovery
+
+Layout preferences are optional local presentation state, separate from durable map/photo/model recovery. Reset layout changes pane sizes, collapsed state and legend visibility; it does not discard edits. Recovery and explicit building links take priority over remembered workspace navigation. Activity is collapsed by default but continues subscribing to recovery and jobs; recovery failures still show attention and retain existing blocking protections.
+
+![Offline package controls in a phone viewport](assets/screenshots/redesign-offline-2026-10-07.png)
+
+*This view demonstrates the download interface. Offline correctness is verified separately by the prepared-package browser gates.*
+
 ## Campus GIS integration
 
 The team GIS release retains the existing command history, personal recovery, optimistic revisions and idempotent receipts. One campus has one shared draft with explicit conflicts; editing branches are not introduced. Indexed GIS pages and geometry sessions are bounded, and processing results are staged until inspected. Role revocation is checked on reads, saves, job application and publication. [Team workflow and roles](GIS-PLATFORM.md).

@@ -1,3 +1,4 @@
+import { WorkspacePane } from './WorkspaceFrame';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
@@ -16,6 +17,8 @@ export function EditorSettings({
   opacity,
   onOpacity,
   onClose,
+  onMemberships,
+  onResetLayout,
 }: {
   appearance: Appearance;
   dark: boolean;
@@ -27,6 +30,8 @@ export function EditorSettings({
   opacity: number;
   onOpacity: (value: number) => void;
   onClose: () => void;
+  onMemberships?: () => void;
+  onResetLayout?: () => void;
 }) {
   const [pitch, setPitch] = useState(() => map?.getPitch() || 0);
   useEffect(() => {
@@ -39,57 +44,74 @@ export function EditorSettings({
     };
   }, [map]);
   return (
-    <aside
-      className="editor-review-panel editor-card editor-settings"
-      aria-label="Editor settings"
-    >
-      <div className="editor-panel-heading">
-        <h2>Settings</h2>
-        <button
-          className="editor-icon"
-          aria-label="Close settings"
-          onClick={onClose}
-        >
-          <X size={18} />
-        </button>
-      </div>
-      <AppearanceSettings
-        preference={appearance}
-        dark={dark}
-        onChange={onAppearance}
-      />
-      <MapRenderingSettings simple={simple} onSimple={onSimple} />
-      <label className="field-label">
-        <span>
-          Tilt{' '}
-          <output>
-            {threeD ? `${Math.round(pitch)}°` : '· Available in 3D'}
-          </output>
-        </span>
-        <input
-          type="range"
-          aria-label="Map tilt"
-          min={15}
-          max={60}
-          disabled={!threeD || !map}
-          value={Math.max(15, pitch)}
-          onChange={(event) => map?.setPitch(Number(event.target.value))}
+    <WorkspacePane id="right" title="Settings">
+      <aside
+        className="editor-review-panel editor-card editor-settings"
+        aria-label="Editor settings"
+      >
+        <div className="editor-panel-heading">
+          <h2>Settings</h2>
+          <button
+            className="editor-icon"
+            aria-label="Close settings"
+            onClick={onClose}
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <AppearanceSettings
+          preference={appearance}
+          dark={dark}
+          onChange={onAppearance}
         />
-      </label>
-      <label className="field-label">
-        <span>
-          Building opacity <output>{Math.round(opacity * 100)}%</output>
-        </span>
-        <input
-          type="range"
-          aria-label="Building opacity"
-          min={0.1}
-          max={1}
-          step={0.05}
-          value={opacity}
-          onChange={(event) => onOpacity(Number(event.target.value))}
-        />
-      </label>
-    </aside>
+        {(onMemberships || onResetLayout) && (
+          <section className="editor-settings-workspace">
+            <h3>Workspace</h3>
+            {onResetLayout && (
+              <button className="editor-secondary" onClick={onResetLayout}>
+                Reset workspace layout
+              </button>
+            )}
+            {onMemberships && (
+              <button className="editor-secondary" onClick={onMemberships}>
+                Campus memberships
+              </button>
+            )}
+          </section>
+        )}
+        <MapRenderingSettings simple={simple} onSimple={onSimple} />
+        <label className="field-label">
+          <span>
+            Tilt{' '}
+            <output>
+              {threeD ? `${Math.round(pitch)}°` : '· Available in 3D'}
+            </output>
+          </span>
+          <input
+            type="range"
+            aria-label="Map tilt"
+            min={15}
+            max={60}
+            disabled={!threeD || !map}
+            value={Math.max(15, pitch)}
+            onChange={(event) => map?.setPitch(Number(event.target.value))}
+          />
+        </label>
+        <label className="field-label">
+          <span>
+            Building opacity <output>{Math.round(opacity * 100)}%</output>
+          </span>
+          <input
+            type="range"
+            aria-label="Building opacity"
+            min={0.1}
+            max={1}
+            step={0.05}
+            value={opacity}
+            onChange={(event) => onOpacity(Number(event.target.value))}
+          />
+        </label>
+      </aside>
+    </WorkspacePane>
   );
 }

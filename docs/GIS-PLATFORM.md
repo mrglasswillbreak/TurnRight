@@ -1,5 +1,11 @@
 # Campus GIS team workflow
 
+## Workspace layout
+
+The five workspaces share a persistent map canvas with a left explorer, right inspector and optional bottom table/history. Data starts with attributes below the map; Analyze has tools left, parameters right and jobs below. Review holds quality and submission lists, while Publish groups approved snapshots, release history and export actions. Source changes, duplicates and reports are under Review; releases are under Publish. See [pane controls and saved layouts](EDITOR.md#arrange-your-workspace).
+
+![Analysis tools, map, parameters and processing history](assets/screenshots/redesign-gis-analyze-2026-10-07.png)
+
 This implementation connects the existing campus importer, geometry editor, model/photo assets and immutable release pipeline to team permissions, typed datasets, indexed feature queries and repeatable analysis. It retains React, MapLibre, Supabase/PostGIS, Vercel and GitHub Actions. The changes are additive after migration 022. [Production](PRODUCTION.md) records the actual migration/deployment state and [Deployment](DEPLOYMENT.md) is the operational runbook.
 
 The milestone is a small-team campus workflow, with a 100,000-feature dataset target and separately bounded public navigation packages. Enterprise tenancy/SSO, editing branches, a visual workflow designer, raster georeferencing, OGC service endpoints, atlases and desktop GIS parity remain outside this release. No OGC conformance is claimed.

@@ -1,5 +1,6 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Activity, Check, X } from 'lucide-react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { Activity, X } from 'lucide-react';
+import type { PhotoQueueStore } from './photo-queue-store';
 import {
   processes,
   processFraction,
@@ -57,10 +58,64 @@ export function ProcessProgress({ record }: { record: ProcessRecord }) {
     </article>
   );
 }
-export default function ProcessMonitor() {
+const noSubscribe = () => () => {};
+const emptyStatus = () => '';
+export default function ProcessMonitor({
+  photoStore,
+}: {
+  photoStore?: Pick<
+    PhotoQueueStore,
+    | 'subscribe'
+    | 'getStatus'
+    | 'jobs'
+    | 'storageError'
+    | 'leader'
+    | 'paused'
+    | 'togglePause'
+  >;
+}) {
   const records = useSyncExternalStore(processes.subscribe, processes.snapshot);
+  const photoStatus = useSyncExternalStore(
+    photoStore?.subscribe || noSubscribe,
+    photoStore?.getStatus || emptyStatus,
+  );
+  const [online, setOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    return () => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    };
+  }, []);
+  const root = useRef<HTMLElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false),
     [error, setError] = useState('');
+  const close = () => {
+    setOpen(false);
+    trigger.current?.focus();
+  };
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        close();
+      }
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape, true);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', escape, true);
+    };
+  }, [open]);
   useEffect(() => {
     let stopped = false,
       polling = false,
@@ -215,27 +270,79 @@ export default function ProcessMonitor() {
     };
   }, []);
   const active = records.filter((r) => !r.finished).length;
+  const uploads =
+    photoStore?.jobs.filter((j) =>
+      ['queued', 'uploading', 'processing'].includes(j.state),
+    ).length || 0;
+  const attention =
+    !!photoStore?.storageError ||
+    !!error ||
+    records.some((r) => r.state === 'failed');
   return (
-    <aside className="process-monitor" aria-label="Activity monitor">
+    <aside ref={root} className="process-monitor" aria-label="Activity monitor">
+      <span
+        className="activity-announcement"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {photoStore?.storageError ||
+          error ||
+          (records.some((r) => r.state === 'failed')
+            ? 'A process needs attention. Open Activity for details.'
+            : active
+              ? `${active} active processes${uploads ? `, ${uploads} photographs left to upload` : ''}${photoStore?.paused ? ', uploads paused' : ''}`
+              : records.length
+                ? 'All processes finished'
+                : '')}
+      </span>
       <button
+        ref={trigger}
         className="process-launch"
+        aria-label={`Activity${active ? `, ${active} active` : ''}${attention ? ', needs attention' : ''}`}
+        title="Activity and uploads"
         aria-expanded={open}
         aria-controls="process-list"
         onClick={() => setOpen(!open)}
       >
         <Activity size={18} />
-        Activity{active ? ` · ${active}` : <Check size={15} />}
+        {active > 0 && (
+          <span className="activity-count" aria-hidden="true">
+            {active}
+          </span>
+        )}
+        {attention && (
+          <span className="activity-attention" aria-hidden="true">
+            !
+          </span>
+        )}
       </button>
       {open && (
         <section id="process-list" aria-label="Builds and processes">
           <header>
-            <strong>Builds and processes</strong>
-            <button aria-label="Close activity" onClick={() => setOpen(false)}>
+            <strong>Activity and uploads</strong>
+            <button aria-label="Close activity" onClick={close}>
               <X size={18} />
             </button>
           </header>
+          {photoStore && (
+            <div
+              className="activity-uploads"
+              aria-label="Private photo uploads"
+            >
+              <h3>Photographs</h3>
+              <output>{photoStatus}</output>
+              {uploads > 0 && (
+                <button
+                  disabled={!photoStore.leader}
+                  onClick={photoStore.togglePause}
+                >
+                  {photoStore.paused ? 'Resume uploads' : 'Pause uploads'}
+                </button>
+              )}
+            </div>
+          )}
           {error && <output>{error}</output>}
-          {!navigator.onLine && (
+          {!online && (
             <p>Offline — server stages resume updating when connected.</p>
           )}
           {!records.length && <p>No processes yet.</p>}

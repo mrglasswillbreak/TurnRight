@@ -4,9 +4,9 @@
 
 The new **Analyze** workspace records GIS processing progress, diagnostics, cancellation, retries and input/output revisions. Its persisted job history complements the existing **Activity** view for import, release and local processing stages. Applying a result checks its input revisions again and creates a private layer for the team review workflow. [Team workflow and roles](GIS-PLATFORM.md).
 
-The owner's **Activity** button opens **Builds and processes**. It shows local tasks alongside campus-scoped server jobs, with stage text, measured counts when available, errors and supported cancellation/retry actions. It remains available outside modal editing panels; photo editing also displays its active processing stage inside the dialog.
+The compact **Activity** icon in the workspace toolbar opens **Activity and uploads**. It is collapsed by default; idle private drafts and saved recovery add no persistent text. Active jobs have a count badge, and failures or recovery problems have an attention indicator. Photo jobs are counted once. The popover includes private-draft and recovery status, and Pause/Resume only when photo uploads can be paused. Another tab's upload ownership keeps that control disabled. Escape returns focus to the icon; outside clicks dismiss the popover. Uploads, polling and recovery continue while it is closed. It shows local tasks alongside campus-scoped server jobs, with stage text, measured counts when available, errors and supported cancellation/retry actions. It remains available outside modal editing panels; photo editing also displays its active processing stage inside the dialog.
 
-![Activity drawer showing import inspection and completed image processing](assets/screenshots/activity-monitor-2026-09-27.png)
+![Expanded Activity popover showing photo upload and recovery status with an empty process history](assets/screenshots/redesign-activity-expanded-2026-10-07.png)
 
 Covered work includes map import uploads and inspection, ArcGIS retrieval, release validation/build/publication, model file parsing/export, photo processing/uploads/approval and offline package preparation. Existing feature-specific status remains beside the initiating action. Percentages come from actual totals; phases without a measurable total show an indeterminate bar and a named stage. Elapsed times are shown only when known.
 

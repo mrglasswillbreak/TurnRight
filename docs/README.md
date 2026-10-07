@@ -2,7 +2,7 @@
 
 TurnRight is a campus GIS platform for small teams: import, typed data, geometry editing, spatial analysis, quality review, independent approval, cartography and controlled publication. The same product provides public navigation, offline campus packages, field surveys, photographs and building authoring. Start with the [team workflow](GIS-PLATFORM.md), [project overview and screenshots](../README.md), and [verified production state](PRODUCTION.md).
 
-## Use the application
+## Use TurnRight
 
 | Task | Guide |
 | --- | --- |
@@ -28,14 +28,14 @@ TurnRight is a campus GIS platform for small teams: import, typed data, geometry
 
 Native surface editing can fall back to 2D when WebGL is unavailable; mesh editing requires WebGL. Standard model files preserve supported static geometry and appearance, while native parameters, review state and history remain in TurnRight. GIS imports do not include imagery/PDF alignment or private ArcGIS authentication. No cross-campus routing or interior room workflow is provided.
 
-## Develop, configure and deploy
+## Develop
+
+Start with [contributing](../CONTRIBUTING.md), [brand usage](BRAND.md), and [maintaining screenshots](SCREENSHOTS.md). The [workspace shell contract](EDITOR-LAYOUT.md) explains pane identity and preferences.
 
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| New installations, migrations 001–037, credentials and release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery) |
-| Existing project configuration and operational settings | [Configuration](CONFIGURATION.md) |
-| Current production revision and dated deployment receipts | [Production](PRODUCTION.md) |
+| Workspace redesign, compact controls, branding and current automated results | [Redesign verification](REDESIGN-VERIFICATION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
 | Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
@@ -46,7 +46,17 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 
 Start with Node 22.23.3 from `.node-version` and `npm ci` inside `web/`. `npm run dev` serves the public seed with no credentials; it does not serve the Vercel APIs. Browser workflows isolate authentication and private data. `npm test`, `npm run lint`, `npm run build` and `npm run check:configured-build` cover the app and budgets. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
 
-## Research and historical evidence
+## Operate
+
+| Task | Guide |
+| --- | --- |
+| Install, migrate, configure credentials and run release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery) |
+| Maintain operational settings | [Configuration](CONFIGURATION.md) |
+| Check deployed revisions and dated release receipts | [Production](PRODUCTION.md) |
+| Recover private work and handle conflicts | [Editor reliability](EDITOR-RELIABILITY.md) |
+| Verify offline and release readiness | [Acceptance](ACCEPTANCE.md) |
+
+## Reference and history
 
 These records retain the package, date and measurements they assessed. Their counts and older interface labels are not the current application specification. Do not rewrite source observations to match a newer UI; consult the current guides above for operating instructions.
 

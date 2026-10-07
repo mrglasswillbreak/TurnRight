@@ -1,5 +1,11 @@
 # Application screenshots
 
+## Workspace redesign · 7 October 2026
+
+The current README and workflow guides use the eighteen `redesign-*-2026-10-07.png` captures: sixteen product layouts and two compact-control states. See the [visual tour, provenance and reproduction instructions](../../SCREENSHOTS.md) and [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below. Earlier screenshots remain historical records.
+
+Historical reproduction commands refer to the code revision recorded with that capture. Current gallery drivers write the October 7 files; use the current instructions above when updating today's documentation.
+
 ## Campus GIS workflow · 5 October 2026
 
 The four **gis-data**, **gis-analyze**, **gis-review** and **gis-publish** PNGs dated 2026-10-05 are unaltered 1440×1000 Chromium captures of the configured production build. They show the current Data/Edit/Analyze/Review/Publish navigation, typed table, processing catalogue, immutable submission and map templates. The map is the verified published LASU **lasu-4895a363b403** package with its attributed assets. Camera framing leaves room for the panel; no UI or map content is composited or retouched.

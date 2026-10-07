@@ -1,6 +1,15 @@
+import { BrandMark } from './BrandMark';
+import {
+  WorkspaceFrame,
+  WorkspacePane,
+  useWorkspaceLayout,
+} from './WorkspaceFrame';
+import { WorkspaceNavigation, WorkspaceSections } from './WorkspaceNavigation';
+import { workspaceForSection, type EditorSection } from './editor-layout';
+import { EditorLegend } from './EditorLegend';
 import { propertyEdits } from './road-properties';
 import { campusUrl, lasuCampus } from './campus-context';
-import { PhotoSession } from './PhotoSession';
+import { PhotoSession, PhotoActivity } from './PhotoSession';
 import { canonicalBuildingId } from './arrival';
 import { searchKey } from './place-details';
 import {
@@ -28,14 +37,12 @@ import {
   Check,
   ChevronLeft,
   DoorOpen,
-  Download,
   LockKeyhole,
   MapPin,
   MousePointer2,
   Plus,
   Minus,
   Redo2,
-  RefreshCw,
   Route as RouteIcon,
   Search,
   Shield,
@@ -331,8 +338,12 @@ export default function Admin({
   if (!workspace || !state)
     return (
       <main className="loading-screen">
-        <a className="brandmark" href={campusUrl('/')}>
-          <ArrowUpRight />
+        <a
+          className="brandmark"
+          href={campusUrl('/')}
+          aria-label="TurnRight public map"
+        >
+          <BrandMark />
         </a>
         <LockKeyhole size={28} />
         <h1>Campus map editor</h1>
@@ -413,6 +424,8 @@ export default function Admin({
           data={view.data}
           issues={view.issues}
           capabilities={state.capabilities}
+          appearance={appearance}
+          onAppearance={onAppearance}
           dark={dark}
         />
       </Suspense>
@@ -573,10 +586,26 @@ function Editor({
     [surveyRecording, setSurveyRecording] = useState(false);
   const surveying = useRef(false);
   surveying.current = survey;
-  const [tab, setTab] = useState('map'),
+  const layout = useWorkspaceLayout(
+    owner,
+    state.campus?.id || 'lasu',
+    state.capabilities,
+  );
+  const [tab, setTab] = useState<string>(() =>
+      workspace.unfinished ||
+      workspace.roofDraft ||
+      requestedEditorBuilding(location.href, editorHandoffStorage())
+        ? 'map'
+        : layout.value.workspace,
+    ),
     [search, setSearch] = useState(''),
     [filter, setFilter] = useState('needs'),
     [explorer, setExplorer] = useState(true);
+  const updateLayout = layout.update;
+  useEffect(() => {
+    if (!['settings', 'members'].includes(tab))
+      updateLayout({ workspace: workspaceForSection(tab) });
+  }, [tab, updateLayout]);
   const [layersOpen, setLayersOpen] = useState(false),
     [layerView, setLayerView] = useState<LayerViewState>({});
   const [overlap, setOverlap] = useState<{
@@ -1596,7 +1625,11 @@ function Editor({
       if (surveying.current) return;
       // Modal workspaces own Escape, history and tool shortcuts while open.
       // The window capture listener must not cancel the selected map feature.
-      if (document.querySelector('[role="dialog"], [role="alertdialog"]'))
+      if (
+        document.querySelector(
+          '[role="dialog"], [role="alertdialog"], .process-monitor [aria-expanded="true"]',
+        )
+      )
         return;
       if (
         (event.target as HTMLElement)?.closest(
@@ -1894,6 +1927,34 @@ function Editor({
       drawing.id,
     );
   };
+  const selectSection = (id: EditorSection) => {
+    document
+      .querySelectorAll<HTMLDetailsElement>('details.workspace-menu[open]')
+      .forEach((menu) => {
+        menu.open = false;
+      });
+    workspace.endHistoryGroup();
+    if (survey) {
+      setError('Close the survey before changing workspace.');
+      return;
+    }
+    if (
+      id !== 'settings' &&
+      (!!tool || !!workspace.unfinished || !!workspace.roofDraft)
+    ) {
+      setError('Finish or cancel the current edit before changing workspace.');
+      return;
+    }
+    setLayersOpen(id === 'layers');
+    if (id === 'layers') {
+      setExplorer(false);
+      setTab('map');
+      return;
+    }
+    setReviewOverlay([]);
+    setTab(id);
+    setExplorer(id === 'map');
+  };
   return (
     <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
       {(offlineContext || !networkOnline) && (
@@ -1921,79 +1982,41 @@ function Editor({
         </output>
       )}
       <header className="editor-header">
-        <a className="editor-brand" href={campusUrl('/')}>
+        <a
+          className="editor-brand"
+          href={campusUrl('/')}
+          aria-label="TurnRight public map"
+        >
           <span className="brandmark">
-            <ArrowUpRight size={23} />
+            <BrandMark size={23} />
           </span>
           <strong>
             TurnRight<span>Map editor</span>
           </strong>
         </a>
-        <nav className="editor-navigation" aria-label="Editor sections">
-          {[
-            ['gis-data', 'Data'],
-            ['map', 'Edit'],
-            ['gis-analyze', 'Analyze'],
-            ['gis-review', 'Review'],
-            ['gis-publish', 'Publish'],
-            ['layers', 'Layers'],
-            ['campuses', 'Campuses'],
-            ['changes', 'Sources'],
-            ['duplicates', 'Duplicates'],
-            ['reports', 'Reports'],
-            ['releases', 'Releases'],
-            ['settings', 'Settings'],
-          ].map(([id, label]) => (
+        <details className="workspace-menu campus-menu">
+          <summary>{state.campus?.name || 'LASU Ojo'}</summary>
+          <div>
             <button
-              key={id}
-              ref={id === 'settings' ? settingsTrigger : undefined}
-              className={tab === id ? 'active' : ''}
               disabled={
-                id !== 'settings' &&
-                !(id === 'map' && tab === 'settings') &&
-                (!!tool || !!workspace.unfinished)
+                !!tool ||
+                !!workspace.unfinished ||
+                !!workspace.roofDraft ||
+                surveyRecording
               }
-              onClick={() => {
-                workspace.endHistoryGroup();
-                if (id === 'layers') {
-                  setLayersOpen(true);
-                  setExplorer(false);
-                  setTab('map');
-                  return;
-                }
-                setLayersOpen(false);
-                if (id === 'settings') {
-                  setTab(id);
-                  return;
-                }
-                setReviewOverlay([]);
-                setTab(id);
-                if (id !== 'map') setExplorer(false);
-              }}
+              onClick={() => selectSection('campuses')}
             >
-              {label}
-              {id === 'reports' && state.reports.length > 0 && (
-                <small>{state.reports.length}</small>
-              )}
+              Campuses
             </button>
-          ))}
-        </nav>
-        {!survey && (
-          <button
-            className="editor-survey-entry"
-            onClick={() => {
-              if (workspace.unfinished) {
-                setError('Finish or cancel the drawing before surveying.');
-                return;
-              }
-              setSurvey(true);
-              setTab('map');
-              setPreview(false);
-            }}
-          >
-            Survey
-          </button>
-        )}
+          </div>
+        </details>
+        <WorkspaceNavigation
+          section={tab}
+          onSelect={selectSection}
+          disabled={
+            survey || !!tool || !!workspace.unfinished || !!workspace.roofDraft
+          }
+        />
         <div className="editor-header-right">
           <output
             className={`editor-save-state ${workspace.status === 'Saved' ? 'saved' : ''}`}
@@ -2001,1274 +2024,1349 @@ function Editor({
             <span />
             {workspace.status}
           </output>
-          <details className="editor-backup-menu">
-            <summary aria-label="Backup options">
-              <Download size={17} /> <span>Backup</span>
-            </summary>
-            <div className="editor-card">
-              <button className="editor-secondary" onClick={localRecovery}>
-                Download local recovery
+          <button
+            className="editor-icon"
+            aria-label="Settings"
+            title="Settings"
+            ref={settingsTrigger}
+            onClick={() => selectSection('settings')}
+          >
+            ⚙
+          </button>
+          <details className="workspace-menu">
+            <summary>Workspace</summary>
+            <div>
+              <button onClick={localRecovery}>Download local recovery</button>
+              <button onClick={exportBackup}>Export backup</button>
+              <button onClick={refreshWorkspace}>Refresh workspace</button>
+              <button
+                onClick={() => {
+                  layout.reset();
+                  setTab('map');
+                }}
+              >
+                Reset layout
               </button>
-              <button className="editor-secondary" onClick={exportBackup}>
-                Export backup
+              {state.capabilities?.capabilities.includes('manage') && (
+                <button onClick={() => selectSection('members')}>
+                  Campus memberships
+                </button>
+              )}
+              <button
+                onClick={async () => {
+                  if (await workspace.flush()) await supabase?.auth.signOut();
+                }}
+              >
+                Sign out
               </button>
             </div>
           </details>
-          <button
-            className="editor-icon"
-            aria-label="Refresh workspace"
-            title="Refresh workspace"
-            onClick={refreshWorkspace}
-          >
-            <RefreshCw size={17} />
-          </button>
-          <button
-            className="editor-publish"
-            disabled={!!tool || !!workspace.unfinished}
-            onClick={() => setTab('releases')}
-          >
-            Review changes <ArrowUpRight size={15} />
-          </button>
-          <button
-            className="editor-text editor-signout"
-            onClick={async () => {
-              if (await workspace.flush()) await supabase?.auth.signOut();
-            }}
-          >
-            Sign out
-          </button>
         </div>
       </header>
-      <section
-        className={`editor-map-workspace ${tab === 'settings' ? 'settings-open' : ''}`}
-        aria-label="Mapping workspace"
-      >
-        <MapView
-          data={rendered}
-          dark={dark}
-          threeD={threeD}
-          simple={simple3D}
-          editor
-          editing={
-            !!tool ||
-            !!workspace.unfinished ||
-            survey ||
-            (selected?.kind === 'building' && buildingMode === 'outline')
-          }
-          buildingOpacity={
-            survey ||
-            tool === 'entrance' ||
-            tool === 'path' ||
-            tool === 'barrier' ||
-            tool === 'building' ||
-            (selected?.kind === 'building' && buildingMode === 'outline')
-              ? 0.2
-              : opacity
-          }
-          routes={routes}
-          panelBesideMap
-          onSelect={() => {}}
-          buildingSelection={buildingSelection}
-          onBuildingSelect={(feature, hit) => {
-            if (workspace.roofDraft) {
-              if (
-                hit?.buildingId === workspace.roofDraft.buildingId &&
-                hit.partId === workspace.roofDraft.partId &&
-                hit.role === 'roof'
-              )
-                setBuildingSelection(hit);
-              return;
-            }
-            if (selected?.id === hit?.buildingId && buildingMode === 'roof') {
-              setBuildingSelection(hit);
-              return;
-            }
-            selectId('building', String(feature.properties?.id));
-            if (hit) setBuildingSelection(hit);
-          }}
-          onReady={mapReady}
-        />
-        {survey && ready > 0 && mapRef.current && (
-          <Suspense fallback={<output>Loading survey tools...</output>}>
-            <SurveyPanel
-              owner={owner}
-              map={mapRef.current}
-              data={validation.data}
-              edits={workspace.edits}
-              selected={selected}
-              close={() => setSurvey(false)}
-              prepareOffline={prepareOffline}
-              recordingChanged={setSurveyRecording}
-              view2D={() => setThreeD(false)}
-              apply={async (edits, previousIds) => {
-                const removed = workspace.edits
-                  .filter(
-                    (e) =>
-                      previousIds.includes(e.id) &&
-                      !edits.some((n) => n.id === e.id),
-                  )
-                  .map((e) => ({ ...e, deleted: true }));
-                edits = [...edits, ...removed];
-                const next = [
-                  ...workspace.edits.filter(
-                    (e) =>
-                      !edits.some((n) => n.kind === e.kind && n.id === e.id),
-                  ),
-                  ...edits,
-                ];
-                const checked = await validation.check(next);
-                const addedErrors = checked.errors.filter(
-                  (e) => !validation.errors.includes(e),
-                );
-                if (addedErrors.length) throw new Error(addedErrors.join(' '));
-                if (
-                  disconnectedSurveyPaths(validation.data, checked.data, edits)
-                    .length
-                )
-                  throw new Error(
-                    'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
-                  );
-                workspace.commit(next, null);
-                if (navigator.onLine && !(await workspace.flush()))
-                  throw new Error(
-                    'Map changes are saved locally. Resolve the draft save issue before retrying.',
-                  );
-                return edits.map(
-                  (e) =>
-                    featureEdit(checked.data, e.kind, e.id, store.edits) || e,
-                );
-              }}
-            />
-          </Suspense>
-        )}
-        <div
-          className="editor-tools editor-card"
-          role="toolbar"
-          aria-label="Map drawing tools"
-        >
-          {toolButtons.map(({ kind, name, icon: Icon, shortcut }) => (
-            <button
-              key={name}
-              className={tool === kind ? 'active' : ''}
-              aria-label={name}
-              aria-pressed={tool === kind}
-              title={`${name}${shortcut ? ` (${shortcut})` : ''}`}
+      <WorkspaceFrame
+        layout={layout}
+        suspendPanes={survey}
+        activity={<PhotoActivity />}
+        workspace={workspaceForSection(tab)}
+        tools={
+          <>
+            <WorkspaceSections
+              section={layersOpen ? 'layers' : tab}
+              onSelect={selectSection}
               disabled={
-                preview ||
-                !ready ||
-                (!!kind &&
-                  (!!tool || !!workspace.unfinished || !!repairPreview))
+                survey ||
+                !!tool ||
+                !!workspace.unfinished ||
+                !!workspace.roofDraft
               }
-              onClick={() => (kind ? begin(kind) : cancel())}
-            >
-              <Icon size={20} />
-              <span>{name}</span>
-            </button>
-          ))}
-
-          <hr />
-          <button
-            aria-label="Undo"
-            title="Undo (Ctrl+Z)"
-            disabled={!workspace.past.length}
-            onClick={() => undo()}
-          >
-            <Undo2 size={19} />
-            <span>Undo</span>
-          </button>
-          <button
-            aria-label="Redo"
-            title="Redo (Ctrl+Shift+Z)"
-            disabled={!workspace.future.length}
-            onClick={() => undo(true)}
-          >
-            <Redo2 size={19} />
-            <span>Redo</span>
-          </button>
-        </div>
-        {overlap && (
-          <dialog
-            open
-            className="editor-overlap editor-card"
-            aria-label="Choose overlapping feature"
-          >
-            <strong>Choose a feature</strong>
-            <button
-              aria-label="Close feature chooser"
-              onClick={() => setOverlap(null)}
-            >
-              ×
-            </button>
-            {overlap.features.map((f) => {
-              const edit = featureEdit(
-                validation.data,
-                f.kind,
-                f.id,
-                workspace.edits,
-              );
-              const l = campusLayers(validation.data).items.find(
-                (l) =>
-                  l.id ===
-                  layerMembership(validation.data).get(layerKey(f.kind, f.id)),
-              );
-              return (
-                <button
-                  key={`${f.kind}:${f.id}`}
-                  onClick={() => selectId(f.kind, f.id, false, overlap.anchor)}
-                >
-                  <strong>
-                    {f.kind === 'path'
-                      ? 'Routing path'
-                      : f.kind === 'land' && l?.role === 'road-surface'
-                        ? 'Road surface'
-                        : f.kind}{' '}
-                    · {String(edit?.properties.name || 'Unnamed')}
-                  </strong>
-                  <small>
-                    {l?.name} ·{' '}
-                    {String(
-                      edit?.properties.surface ||
-                        edit?.properties.landClass ||
-                        '',
-                    )}{' '}
-                    · {String(edit?.properties.sourceId || f.id)}
-                  </small>
-                </button>
-              );
-            })}
-          </dialog>
-        )}
-        {layersOpen && tab === 'map' && !tool && (
-          <Suspense
-            fallback={<div className="editor-card">Loading layers…</div>}
-          >
-            <LayerWorkspace
-              data={validation.data}
-              issues={validation.issues}
-              edits={workspace.edits}
-              view={layerView}
-              onView={setLayerView}
-              onCommit={commitLayers}
-              onSelect={(kind, id) => selectId(kind, id, true)}
-              onZoom={zoomLayers}
-              onImport={() => {
-                setLayersOpen(false);
-                setTab('campuses');
-              }}
-              onClose={() => {
-                setLayersOpen(false);
-                setExplorer(true);
-              }}
-              onDraw={(layer, type) =>
-                begin(layer.role === 'overlay' ? 'overlay' : 'land', {
-                  mapLayerId: layer.id,
-                  mapLayerSource: 'owner',
-                  drawingGeometry: type,
-                  name: layer.name,
-                  ...(layer.role === 'road-surface'
-                    ? { landClass: 'road' }
-                    : {}),
-                })
-              }
-              onGeometry={(operation, keys) =>
-                setLayerOperation({ operation, keys })
-              }
-            />
-          </Suspense>
-        )}
-        {layerOperation && (
-          <Suspense
-            fallback={
-              <div className="editor-card">Loading geometry tools…</div>
-            }
-          >
-            <LayerGeometry
-              data={validation.data}
-              edits={workspace.edits}
-              request={layerOperation}
-              onClose={() => setLayerOperation(null)}
-              onPreview={stageRepair}
-              onDrawCutter={(request) => {
-                cutterRequest.current = request;
-                setLayerOperation(null);
-                begin('overlay', {
-                  name: 'Geometry preview',
-                  temporaryGeometry: true,
-                  geometryRequest: request,
-                  drawingGeometry:
-                    request.operation === 'split' ? 'LineString' : 'Polygon',
-                });
-              }}
-              onWindow={(part, ring, start) => {
-                const key = layerOperation.keys[0],
-                  index = key.indexOf(':');
-                selectId(
-                  key.slice(0, index) as MapEdit['kind'],
-                  key.slice(index + 1),
-                );
-                controller.current?.selectWindow(part, ring, start);
-              }}
-            />
-          </Suspense>
-        )}
-        <div
-          className={`editor-explorer ${explorer && !layersOpen ? '' : 'collapsed'}`}
-        >
-          {explorer ? (
-            <section className="editor-card">
-              <div className="editor-explorer-top">
-                <span className="editor-eyebrow">
-                  {state.campus?.name || 'LASU · OJO CAMPUS'}
-                </span>
-                <button
-                  className="editor-icon"
-                  aria-label="Collapse explorer"
-                  onClick={() => setExplorer(false)}
-                >
-                  <PanelLeftClose size={16} />
-                </button>
-              </div>
-              <label className="editor-search">
-                <Search size={17} />
-                <input
-                  type="search"
-                  aria-label="Search map features"
-                  placeholder="Find a place or building"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </label>
+            />{' '}
+            {!survey && tab === 'map' && (
               <button
-                className="editor-create-model"
+                className="editor-survey-entry"
+                onClick={() => {
+                  if (workspace.unfinished) {
+                    setError('Finish or cancel the drawing before surveying.');
+                    return;
+                  }
+                  setSurvey(true);
+                  setTab('map');
+                  setPreview(false);
+                }}
+              >
+                Survey
+              </button>
+            )}
+          </>
+        }
+      >
+        <section
+          className={`editor-map-workspace ${tab === 'settings' ? 'settings-open' : ''}`}
+          aria-label="Mapping workspace"
+        >
+          <MapView
+            data={rendered}
+            dark={dark}
+            threeD={threeD}
+            simple={simple3D}
+            editor
+            editing={
+              !!tool ||
+              !!workspace.unfinished ||
+              survey ||
+              (selected?.kind === 'building' && buildingMode === 'outline')
+            }
+            buildingOpacity={
+              survey ||
+              tool === 'entrance' ||
+              tool === 'path' ||
+              tool === 'barrier' ||
+              tool === 'building' ||
+              (selected?.kind === 'building' && buildingMode === 'outline')
+                ? 0.2
+                : opacity
+            }
+            routes={routes}
+            panelBesideMap
+            onSelect={() => {}}
+            buildingSelection={buildingSelection}
+            onBuildingSelect={(feature, hit) => {
+              if (workspace.roofDraft) {
+                if (
+                  hit?.buildingId === workspace.roofDraft.buildingId &&
+                  hit.partId === workspace.roofDraft.partId &&
+                  hit.role === 'roof'
+                )
+                  setBuildingSelection(hit);
+                return;
+              }
+              if (selected?.id === hit?.buildingId && buildingMode === 'roof') {
+                setBuildingSelection(hit);
+                return;
+              }
+              selectId('building', String(feature.properties?.id));
+              if (hit) setBuildingSelection(hit);
+            }}
+            onReady={mapReady}
+          />
+          {survey && ready > 0 && mapRef.current && (
+            <Suspense fallback={<output>Loading survey tools...</output>}>
+              <SurveyPanel
+                owner={owner}
+                map={mapRef.current}
+                data={validation.data}
+                edits={workspace.edits}
+                selected={selected}
+                close={() => setSurvey(false)}
+                prepareOffline={prepareOffline}
+                recordingChanged={setSurveyRecording}
+                view2D={() => setThreeD(false)}
+                apply={async (edits, previousIds) => {
+                  const removed = workspace.edits
+                    .filter(
+                      (e) =>
+                        previousIds.includes(e.id) &&
+                        !edits.some((n) => n.id === e.id),
+                    )
+                    .map((e) => ({ ...e, deleted: true }));
+                  edits = [...edits, ...removed];
+                  const next = [
+                    ...workspace.edits.filter(
+                      (e) =>
+                        !edits.some((n) => n.kind === e.kind && n.id === e.id),
+                    ),
+                    ...edits,
+                  ];
+                  const checked = await validation.check(next);
+                  const addedErrors = checked.errors.filter(
+                    (e) => !validation.errors.includes(e),
+                  );
+                  if (addedErrors.length)
+                    throw new Error(addedErrors.join(' '));
+                  if (
+                    disconnectedSurveyPaths(
+                      validation.data,
+                      checked.data,
+                      edits,
+                    ).length
+                  )
+                    throw new Error(
+                      'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                    );
+                  workspace.commit(next, null);
+                  if (navigator.onLine && !(await workspace.flush()))
+                    throw new Error(
+                      'Map changes are saved locally. Resolve the draft save issue before retrying.',
+                    );
+                  return edits.map(
+                    (e) =>
+                      featureEdit(checked.data, e.kind, e.id, store.edits) || e,
+                  );
+                }}
+              />
+            </Suspense>
+          )}
+          <div
+            className="editor-tools editor-card"
+            role="toolbar"
+            aria-label="Map drawing tools"
+          >
+            {toolButtons.map(({ kind, name, icon: Icon, shortcut }) => (
+              <button
+                key={name}
+                className={tool === kind ? 'active' : ''}
+                aria-label={name}
+                aria-pressed={tool === kind}
+                title={`${name}${shortcut ? ` (${shortcut})` : ''}`}
                 disabled={
                   preview ||
                   !ready ||
-                  !!tool ||
-                  !!workspace.unfinished ||
-                  !!repairPreview
+                  (!!kind &&
+                    (!!tool || !!workspace.unfinished || !!repairPreview))
                 }
-                title="Draw a building footprint, then open Edit model"
-                onClick={() => begin('building')}
+                onClick={() => (kind ? begin(kind) : cancel())}
               >
-                <Building2 size={20} />
-                <span>Create model</span>
+                <Icon size={20} />
+                <span>{name}</span>
               </button>
-              <div className="editor-filters">
-                {[
-                  ['needs', 'Needs mapping'],
-                  ['all', 'All'],
-                  ['drafts', 'Drafts'],
-                ].map(([id, label]) => (
+            ))}
+
+            <hr />
+            <button
+              aria-label="Undo"
+              title="Undo (Ctrl+Z)"
+              disabled={!workspace.past.length}
+              onClick={() => undo()}
+            >
+              <Undo2 size={19} />
+              <span>Undo</span>
+            </button>
+            <button
+              aria-label="Redo"
+              title="Redo (Ctrl+Shift+Z)"
+              disabled={!workspace.future.length}
+              onClick={() => undo(true)}
+            >
+              <Redo2 size={19} />
+              <span>Redo</span>
+            </button>
+          </div>
+          {overlap && (
+            <dialog
+              open
+              className="editor-overlap editor-card"
+              aria-label="Choose overlapping feature"
+            >
+              <strong>Choose a feature</strong>
+              <button
+                aria-label="Close feature chooser"
+                onClick={() => setOverlap(null)}
+              >
+                ×
+              </button>
+              {overlap.features.map((f) => {
+                const edit = featureEdit(
+                  validation.data,
+                  f.kind,
+                  f.id,
+                  workspace.edits,
+                );
+                const l = campusLayers(validation.data).items.find(
+                  (l) =>
+                    l.id ===
+                    layerMembership(validation.data).get(
+                      layerKey(f.kind, f.id),
+                    ),
+                );
+                return (
                   <button
-                    key={id}
-                    className={filter === id ? 'active' : ''}
-                    onClick={() => setFilter(id)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <div className="editor-result-count">
-                {visibleTasks.length} features <span>Click to locate</span>
-              </div>
-              <div className="editor-feature-list">
-                {visibleTasks.slice(0, 100).map((t, i) => (
-                  <button
-                    key={`${t.kind}:${t.id}:${i}`}
-                    onClick={() => selectId(t.kind, t.id, true)}
-                    className={
-                      selected?.kind === t.kind && selected.id === t.id
-                        ? 'selected'
-                        : ''
+                    key={`${f.kind}:${f.id}`}
+                    onClick={() =>
+                      selectId(f.kind, f.id, false, overlap.anchor)
                     }
                   >
-                    <span className={`editor-feature-icon ${t.kind}`}>
-                      {t.kind === 'building' ? (
-                        <Building2 size={17} />
-                      ) : t.kind === 'path' ? (
-                        <RouteIcon size={17} />
-                      ) : t.kind === 'entrance' ? (
-                        <DoorOpen size={17} />
-                      ) : (
-                        <MapPin size={17} />
-                      )}
-                    </span>
-                    <span>
-                      <strong>{t.name}</strong>
-                      <small>{t.reason}</small>
-                    </span>
-                    <ArrowUpRight size={13} />
+                    <strong>
+                      {f.kind === 'path'
+                        ? 'Routing path'
+                        : f.kind === 'land' && l?.role === 'road-surface'
+                          ? 'Road surface'
+                          : f.kind}{' '}
+                      · {String(edit?.properties.name || 'Unnamed')}
+                    </strong>
+                    <small>
+                      {l?.name} ·{' '}
+                      {String(
+                        edit?.properties.surface ||
+                          edit?.properties.landClass ||
+                          '',
+                      )}{' '}
+                      · {String(edit?.properties.sourceId || f.id)}
+                    </small>
                   </button>
-                ))}
-                {!visibleTasks.length && (
-                  <p className="editor-empty">
-                    {filter === 'drafts' && !search
-                      ? 'No unpublished changes. Published work stays on the map.'
-                      : 'No matching features.'}
-                  </p>
-                )}
-                {visibleTasks.length > 100 && (
-                  <p className="small-note">Search to narrow these results.</p>
-                )}
-              </div>
-              <div className="editor-explorer-bottom">
-                <span>
-                  <DoorOpen size={15} />
-                  {validation.data.entrances?.length || 0} entrances
-                </span>
-                <button
-                  className="editor-text"
-                  onClick={() => setShowRoutes(!showRoutes)}
-                >
-                  <RouteIcon size={15} /> Test route
-                </button>
-              </div>
-            </section>
-          ) : (
-            <button
-              className="editor-card editor-icon"
-              aria-label="Open explorer"
-              disabled={!!tool}
-              onClick={() => setExplorer(true)}
-            >
-              <PanelLeftOpen size={20} />
-            </button>
+                );
+              })}
+            </dialog>
           )}
-        </div>
-        <div className="editor-view-controls editor-card">
-          <MapViewControl threeD={threeD} onView={toggleView} />
-          <button
-            className="editor-icon"
-            aria-label="Zoom in"
-            onClick={() => mapRef.current?.zoomIn()}
-          >
-            <Plus size={18} />
-          </button>
-          <button
-            className="editor-icon"
-            aria-label="Zoom out"
-            onClick={() => mapRef.current?.zoomOut()}
-          >
-            <Minus size={18} />
-          </button>
-          <button
-            className="editor-icon"
-            aria-label="Reset north"
-            title="Reset north"
-            onClick={() => mapRef.current?.easeTo({ bearing: 0 })}
-          >
-            <ArrowUp size={18} />
-          </button>
-          {threeD && (
-            <>
-              <button
-                className="editor-icon"
-                aria-label="Rotate left"
-                onClick={() =>
-                  mapRef.current?.easeTo({
-                    bearing: mapRef.current.getBearing() - 30,
+          {layersOpen && tab === 'map' && !tool && (
+            <Suspense
+              fallback={<div className="editor-card">Loading layers…</div>}
+            >
+              <LayerWorkspace
+                data={validation.data}
+                issues={validation.issues}
+                edits={workspace.edits}
+                view={layerView}
+                onView={setLayerView}
+                onCommit={commitLayers}
+                onSelect={(kind, id) => selectId(kind, id, true)}
+                onZoom={zoomLayers}
+                onImport={() => {
+                  setLayersOpen(false);
+                  setTab('campuses');
+                }}
+                onClose={() => {
+                  setLayersOpen(false);
+                  setExplorer(true);
+                }}
+                onDraw={(layer, type) =>
+                  begin(layer.role === 'overlay' ? 'overlay' : 'land', {
+                    mapLayerId: layer.id,
+                    mapLayerSource: 'owner',
+                    drawingGeometry: type,
+                    name: layer.name,
+                    ...(layer.role === 'road-surface'
+                      ? { landClass: 'road' }
+                      : {}),
                   })
                 }
-              >
-                <ChevronLeft size={18} />
-              </button>
-            </>
-          )}
-          <button
-            className={`editor-compare ${preview ? 'active' : ''}`}
-            disabled={!!tool || !!workspace.unfinished}
-            onClick={() => setPreview(!preview)}
-          >
-            {preview ? 'Back to draft' : 'Compare base'}
-          </button>
-        </div>
-        {tab.startsWith('gis-') && (
-          <Suspense
-            fallback={
-              <p className="campus-workspace">Opening GIS workspace…</p>
-            }
-          >
-            <GisWorkspace
-              section={tab}
-              capabilities={state.capabilities}
-              map={mapRef.current}
-              beforeChange={async () => {
-                if (
-                  workspace.unfinished ||
-                  workspace.roofDraft ||
-                  !(await workspace.flush())
-                )
-                  throw new Error(
-                    'Finish the current edit and resolve pending saves first.',
-                  );
-              }}
-              onClose={() => setTab('map')}
-              issues={validation.issues}
-              onIssue={(issue) => {
-                setRepairFocus(issue);
-                setTab('map');
-              }}
-              onEndEditingSession={async () => {
-                if (!(await workspace.flush()))
-                  throw Error('Resolve pending saves first.');
-                workspace.releaseDatasetFeatures();
-                setGisSources([]);
-                setSelected(null);
-                await refresh();
-              }}
-              onEdit={(source, edit) => {
-                if (
-                  new Set([
-                    ...gisSources.map((s) =>
-                      s.entity === 'feature'
-                        ? s.payload.properties.kind +
-                          ':' +
-                          s.payload.properties.id
-                        : 'place:' + s.payload.id,
-                    ),
-                    ...workspace.edits
-                      .filter((e) => e.properties.gisManaged)
-                      .map((e) => editKey(e)),
-                  ]).size >= 500 &&
-                  !gisSources.some((s) => s.id === source?.id) &&
-                  !workspace.edits.some(
-                    (e) => e.id === edit?.id && e.kind === edit?.kind,
-                  )
-                )
-                  throw new Error(
-                    'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
-                  );
-                if (source)
-                  setGisSources((rows) => [
-                    ...rows.filter((r) => r.id !== source.id),
-                    source,
-                  ]);
-                if (edit) workspace.includeServerFeature(edit);
-                const target =
-                  edit ||
-                  (source?.entity === 'feature'
-                    ? {
-                        id: source.payload.properties.id,
-                        kind: source.payload.properties.kind,
-                        geometry: source.payload.geometry,
-                        properties: source.payload.properties,
-                        deleted: false,
-                      }
-                    : source?.entity === 'place'
-                      ? {
-                          id: source.payload.id,
-                          kind: 'place' as const,
-                          geometry: {
-                            type: 'Point' as const,
-                            coordinates: source.payload.coordinates,
-                          },
-                          properties: {
-                            ...source.payload,
-                            kind: 'place',
-                            gisManaged: true,
-                          },
-                          deleted: false,
-                        }
-                      : null);
-                if (target) select(target, true);
-              }}
-            />
-          </Suspense>
-        )}
-        {tab === 'campuses' && (
-          <Suspense
-            fallback={<p className="campus-workspace">Opening campuses…</p>}
-          >
-            <CampusWorkspace
-              currentData={validation.data}
-              owner={owner}
-              current={state.campus || lasuCampus}
-              dark={dark}
-              onClose={() => setTab('map')}
-              onSwitch={async (campus) => {
-                if (
-                  workspace.unfinished ||
-                  workspace.roofDraft ||
-                  surveyRecording
-                )
-                  throw new Error(
-                    'Finish the current edit or pause recording before switching campuses.',
-                  );
-                if (!(await workspace.flush()))
-                  throw new Error(
-                    'Resolve pending saves before switching campuses. Your local edits are retained.',
-                  );
-                location.assign(campusUrl('/admin', campus.slug));
-              }}
-              onReview={async () => {
-                await refresh();
-                setTab('changes');
-              }}
-            />
-          </Suspense>
-        )}
-        {tab === 'settings' && (
-          <EditorSettings
-            appearance={appearance}
-            dark={dark}
-            onAppearance={onAppearance}
-            map={mapRef.current}
-            threeD={threeD}
-            simple={simple3D}
-            onSimple={setSimple3D}
-            opacity={opacity}
-            onOpacity={setOpacity}
-            onClose={() => {
-              setTab('map');
-              settingsTrigger.current?.focus();
-            }}
-          />
-        )}
-        {!tab.startsWith('gis-') &&
-        tab !== 'map' &&
-        tab !== 'settings' &&
-        tab !== 'campuses' ? (
-          <aside className="editor-review-panel editor-card">
-            <div className="editor-panel-heading">
-              <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
-              <button
-                className="editor-icon"
-                aria-label="Close review panel"
-                onClick={() => setTab('map')}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            {tab === 'duplicates' ? (
-              <DuplicateReview
-                data={validation.data}
-                candidates={validation.duplicates}
-                pending={validation.pending || busy}
-                decide={decideDuplicate}
-                inspect={(kind, id) => selectId(kind, id, true)}
-                undo={() => undo()}
-                canUndo={!!workspace.past.length}
-                exactBatch={exactBatch}
-                applyExact={(batch) =>
-                  mergeBatch(
-                    batch,
-                    'Reviewed duplicate cleanup applied. Undo restores the batch.',
-                  )
+                onGeometry={(operation, keys) =>
+                  setLayerOperation({ operation, keys })
                 }
               />
-            ) : (
-              <Suspense fallback={<p>Opening source and release review…</p>}>
-                <EditorReview
-                  tab={tab}
-                  state={state}
-                  onPublishedWorkspace={setPublishedWorkspace}
-                  draftCount={drafts.length}
-                  workspace={workspace}
-                  validation={validation}
-                  baselineVersion={base.version}
-                  publishedVersion={data.version}
-                  published={data}
-                  onIssue={openIssue}
-                  onSignIn={signIn}
-                  busy={busy}
-                  action={action}
-                  mapRef={mapRef}
-                  preview={preview}
-                  setPreview={setPreview}
-                  review={review}
-                  setReview={setReview}
-                  onLocateBuilding={(id) => selectId('building', id, true)}
-                  onApplyAppearances={async (batch) => {
-                    if (
-                      tool ||
-                      workspace.unfinished ||
-                      workspace.roofDraft ||
-                      workspace.status === 'Conflict'
-                    )
-                      return;
-                    const original = workspace.edits;
-                    const originalBase = currentBase.current;
-                    setBusy(true);
-                    try {
-                      const checked = await validation.check([
-                        ...original.filter(
-                          (e) => !batch.some((b) => editKey(b) === editKey(e)),
-                        ),
-                        ...batch,
-                      ]);
-                      if (
-                        workspace.edits !== original ||
-                        currentBase.current !== originalBase ||
-                        workspace.unfinished ||
-                        workspace.roofDraft
-                      )
-                        throw new Error(
-                          'The draft changed. Review the appearance batch again.',
-                        );
-                      const errors = checked.errors.filter(
-                        (e) => !validation.errors.includes(e),
-                      );
-                      if (!checked.usable || errors.length)
-                        throw new Error(
-                          errors.join(' ') ||
-                            'The proposed appearances could not be validated.',
-                        );
-                      workspace.commit(batch);
-                      const current = batch.find(
-                        (e) =>
-                          e.kind === selectedRef.current?.kind &&
-                          e.id === selectedRef.current?.id,
-                      );
-                      if (current) {
-                        setSelected(current);
-                        selectedRef.current = current;
+            </Suspense>
+          )}
+          {layerOperation && (
+            <Suspense
+              fallback={
+                <div className="editor-card">Loading geometry tools…</div>
+              }
+            >
+              <LayerGeometry
+                data={validation.data}
+                edits={workspace.edits}
+                request={layerOperation}
+                onClose={() => setLayerOperation(null)}
+                onPreview={stageRepair}
+                onDrawCutter={(request) => {
+                  cutterRequest.current = request;
+                  setLayerOperation(null);
+                  begin('overlay', {
+                    name: 'Geometry preview',
+                    temporaryGeometry: true,
+                    geometryRequest: request,
+                    drawingGeometry:
+                      request.operation === 'split' ? 'LineString' : 'Polygon',
+                  });
+                }}
+                onWindow={(part, ring, start) => {
+                  const key = layerOperation.keys[0],
+                    index = key.indexOf(':');
+                  selectId(
+                    key.slice(0, index) as MapEdit['kind'],
+                    key.slice(index + 1),
+                  );
+                  controller.current?.selectWindow(part, ring, start);
+                }}
+              />
+            </Suspense>
+          )}
+          {tab === 'map' && !layersOpen && (
+            <WorkspacePane id="left" title="Features" enabled={explorer}>
+              <div
+                className={`editor-explorer ${explorer && !layersOpen ? '' : 'collapsed'}`}
+              >
+                {explorer ? (
+                  <section className="editor-card">
+                    <div className="editor-explorer-top">
+                      <span className="editor-eyebrow">
+                        {state.campus?.name || 'LASU · OJO CAMPUS'}
+                      </span>
+                      <button
+                        className="editor-icon"
+                        aria-label="Close feature list"
+                        onClick={() => setExplorer(false)}
+                      >
+                        <PanelLeftClose size={16} />
+                      </button>
+                    </div>
+                    <label className="editor-search">
+                      <Search size={17} />
+                      <input
+                        type="search"
+                        aria-label="Search map features"
+                        placeholder="Find a place or building"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      className="editor-create-model"
+                      disabled={
+                        preview ||
+                        !ready ||
+                        !!tool ||
+                        !!workspace.unfinished ||
+                        !!repairPreview
                       }
-                      setMessage(
-                        `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
-                      );
-                    } catch (error) {
-                      setError((error as Error).message);
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
-                />
-              </Suspense>
+                      title="Draw a building footprint, then open Edit model"
+                      onClick={() => begin('building')}
+                    >
+                      <Building2 size={20} />
+                      <span>Create model</span>
+                    </button>
+                    <div className="editor-filters">
+                      {[
+                        ['needs', 'Needs mapping'],
+                        ['all', 'All'],
+                        ['drafts', 'Drafts'],
+                      ].map(([id, label]) => (
+                        <button
+                          key={id}
+                          className={filter === id ? 'active' : ''}
+                          onClick={() => setFilter(id)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="editor-result-count">
+                      {visibleTasks.length} features{' '}
+                      <span>Click to locate</span>
+                    </div>
+                    <div className="editor-feature-list">
+                      {visibleTasks.slice(0, 100).map((t, i) => (
+                        <button
+                          key={`${t.kind}:${t.id}:${i}`}
+                          onClick={() => selectId(t.kind, t.id, true)}
+                          className={
+                            selected?.kind === t.kind && selected.id === t.id
+                              ? 'selected'
+                              : ''
+                          }
+                        >
+                          <span className={`editor-feature-icon ${t.kind}`}>
+                            {t.kind === 'building' ? (
+                              <Building2 size={17} />
+                            ) : t.kind === 'path' ? (
+                              <RouteIcon size={17} />
+                            ) : t.kind === 'entrance' ? (
+                              <DoorOpen size={17} />
+                            ) : (
+                              <MapPin size={17} />
+                            )}
+                          </span>
+                          <span>
+                            <strong>{t.name}</strong>
+                            <small>{t.reason}</small>
+                          </span>
+                          <ArrowUpRight size={13} />
+                        </button>
+                      ))}
+                      {!visibleTasks.length && (
+                        <p className="editor-empty">
+                          {filter === 'drafts' && !search
+                            ? 'No unpublished changes. Published work stays on the map.'
+                            : 'No matching features.'}
+                        </p>
+                      )}
+                      {visibleTasks.length > 100 && (
+                        <p className="small-note">
+                          Search to narrow these results.
+                        </p>
+                      )}
+                    </div>
+                    <div className="editor-explorer-bottom">
+                      <span>
+                        <DoorOpen size={15} />
+                        {validation.data.entrances?.length || 0} entrances
+                      </span>
+                      <button
+                        className="editor-text"
+                        onClick={() => setShowRoutes(!showRoutes)}
+                      >
+                        <RouteIcon size={15} /> Test route
+                      </button>
+                    </div>
+                  </section>
+                ) : (
+                  <button
+                    className="editor-card editor-icon"
+                    aria-label="Open explorer"
+                    disabled={!!tool}
+                    onClick={() => setExplorer(true)}
+                  >
+                    <PanelLeftOpen size={20} />
+                  </button>
+                )}
+              </div>
+            </WorkspacePane>
+          )}
+
+          <div className="editor-view-controls editor-card">
+            <MapViewControl threeD={threeD} onView={toggleView} />
+            <button
+              className="editor-icon"
+              aria-label="Zoom in"
+              onClick={() => mapRef.current?.zoomIn()}
+            >
+              <Plus size={18} />
+            </button>
+            <button
+              className="editor-icon"
+              aria-label="Zoom out"
+              onClick={() => mapRef.current?.zoomOut()}
+            >
+              <Minus size={18} />
+            </button>
+            <button
+              className="editor-icon"
+              aria-label="Reset north"
+              title="Reset north"
+              onClick={() => mapRef.current?.easeTo({ bearing: 0 })}
+            >
+              <ArrowUp size={18} />
+            </button>
+            {threeD && (
+              <>
+                <button
+                  className="editor-icon"
+                  aria-label="Rotate left"
+                  onClick={() =>
+                    mapRef.current?.easeTo({
+                      bearing: mapRef.current.getBearing() - 30,
+                    })
+                  }
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              </>
             )}
-          </aside>
-        ) : selected && !preview && tab === 'map' ? (
-          <Suspense
-            fallback={
-              <aside className="editor-inspector editor-card">
-                Loading properties…
-              </aside>
-            }
-          >
-            <EditorInspector
-              photoOwner={owner}
-              photoSaveStatus={workspace.status}
-              publishedPhotos={data.photos}
-              onPhotoUndo={() => undo()}
-              onPhotos={(change) => {
-                if (
-                  workspace.roofDraft ||
-                  workspace.unfinished ||
-                  validation.pending
-                )
-                  throw Error(
-                    'Finish the current edit and wait for map validation before changing photos.',
-                  );
-                const batch = photoEdits(
-                  validation.data,
-                  workspace.edits,
-                  change,
-                );
-                workspace.commit(batch, null);
-                const next = batch.find(
-                  (e) => e.id === selected.id && e.kind === selected.kind,
-                );
-                if (next) {
-                  setSelected(next);
-                  selectedRef.current = next;
-                }
+            <button
+              className={`editor-compare ${preview ? 'active' : ''}`}
+              disabled={!!tool || !!workspace.unfinished}
+              onClick={() => setPreview(!preview)}
+            >
+              {preview ? 'Back to draft' : 'Compare base'}
+            </button>
+          </div>
+          {(tab.startsWith('gis-') || tab === 'members') && (
+            <Suspense
+              fallback={
+                <p className="campus-workspace">Opening GIS workspace…</p>
+              }
+            >
+              <GisWorkspace
+                section={tab}
+                capabilities={state.capabilities}
+                map={mapRef.current}
+                beforeChange={async () => {
+                  if (
+                    workspace.unfinished ||
+                    workspace.roofDraft ||
+                    !(await workspace.flush())
+                  )
+                    throw new Error(
+                      'Finish the current edit and resolve pending saves first.',
+                    );
+                }}
+                onClose={() => setTab('map')}
+                issues={validation.issues}
+                onIssue={(issue) => {
+                  setRepairFocus(issue);
+                  setTab('map');
+                }}
+                onEndEditingSession={async () => {
+                  if (!(await workspace.flush()))
+                    throw Error('Resolve pending saves first.');
+                  workspace.releaseDatasetFeatures();
+                  setGisSources([]);
+                  setSelected(null);
+                  await refresh();
+                }}
+                onEdit={(source, edit) => {
+                  if (
+                    new Set([
+                      ...gisSources.map((s) =>
+                        s.entity === 'feature'
+                          ? s.payload.properties.kind +
+                            ':' +
+                            s.payload.properties.id
+                          : 'place:' + s.payload.id,
+                      ),
+                      ...workspace.edits
+                        .filter((e) => e.properties.gisManaged)
+                        .map((e) => editKey(e)),
+                    ]).size >= 500 &&
+                    !gisSources.some((s) => s.id === source?.id) &&
+                    !workspace.edits.some(
+                      (e) => e.id === edit?.id && e.kind === edit?.kind,
+                    )
+                  )
+                    throw new Error(
+                      'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
+                    );
+                  if (source)
+                    setGisSources((rows) => [
+                      ...rows.filter((r) => r.id !== source.id),
+                      source,
+                    ]);
+                  if (edit) workspace.includeServerFeature(edit);
+                  const target =
+                    edit ||
+                    (source?.entity === 'feature'
+                      ? {
+                          id: source.payload.properties.id,
+                          kind: source.payload.properties.kind,
+                          geometry: source.payload.geometry,
+                          properties: source.payload.properties,
+                          deleted: false,
+                        }
+                      : source?.entity === 'place'
+                        ? {
+                            id: source.payload.id,
+                            kind: 'place' as const,
+                            geometry: {
+                              type: 'Point' as const,
+                              coordinates: source.payload.coordinates,
+                            },
+                            properties: {
+                              ...source.payload,
+                              kind: 'place',
+                              gisManaged: true,
+                            },
+                            deleted: false,
+                          }
+                        : null);
+                  if (target) select(target, true);
+                }}
+              />
+            </Suspense>
+          )}
+          {tab === 'campuses' && (
+            <Suspense
+              fallback={<p className="campus-workspace">Opening campuses…</p>}
+            >
+              <CampusWorkspace
+                currentData={validation.data}
+                owner={owner}
+                current={state.campus || lasuCampus}
+                dark={dark}
+                onClose={() => setTab('map')}
+                onSwitch={async (campus) => {
+                  if (
+                    workspace.unfinished ||
+                    workspace.roofDraft ||
+                    surveyRecording
+                  )
+                    throw new Error(
+                      'Finish the current edit or pause recording before switching campuses.',
+                    );
+                  if (!(await workspace.flush()))
+                    throw new Error(
+                      'Resolve pending saves before switching campuses. Your local edits are retained.',
+                    );
+                  location.assign(campusUrl('/admin', campus.slug));
+                }}
+                onReview={async () => {
+                  await refresh();
+                  setTab('changes');
+                }}
+              />
+            </Suspense>
+          )}
+          {tab === 'settings' && (
+            <EditorSettings
+              onResetLayout={layout.reset}
+              onMemberships={
+                state.capabilities?.capabilities.includes('manage')
+                  ? () => selectSection('members')
+                  : undefined
+              }
+              appearance={appearance}
+              dark={dark}
+              onAppearance={onAppearance}
+              map={mapRef.current}
+              threeD={threeD}
+              simple={simple3D}
+              onSimple={setSimple3D}
+              opacity={opacity}
+              onOpacity={setOpacity}
+              onClose={() => {
+                setTab('map');
+                settingsTrigger.current?.focus();
               }}
-              onGeometry={(geometry) => {
-                if (selected)
-                  stageRepair(
-                    [remapBuildingSurfaces(selected, geometry)],
-                    'Review corrected building geometry',
-                  );
-              }}
-              key={editKey(selected)}
-              edit={selected}
-              data={validation.data}
-              issues={validation.issues
-                .filter(
-                  (i) =>
-                    i.featureId === selected.id &&
-                    (!i.featureKind || i.featureKind === selected.kind),
-                )
-                .map((i) => i.message)}
-              focusField={repairFocus?.field}
-              onEndField={workspace.endHistoryGroup}
-              buildingEditor={
-                selected.kind === 'building' && (
-                  <Suspense fallback={<output>Loading building tools…</output>}>
-                    <BuildingAppearanceEditor
-                      reviewRequest={
-                        repairFocus?.repair === 'review-model' ||
-                        /^(height|floors|appearance|roof|wall)/i.test(
-                          repairFocus?.field || '',
-                        )
-                          ? repairFocus || undefined
-                          : undefined
-                      }
-                      onReviewOpened={() => setRepairFocus(null)}
+            />
+          )}
+          {!tab.startsWith('gis-') &&
+          tab !== 'members' &&
+          tab !== 'map' &&
+          tab !== 'settings' &&
+          tab !== 'campuses' ? (
+            <WorkspacePane id="right" title="Review details">
+              <aside className="editor-review-panel editor-card">
+                <div className="editor-panel-heading">
+                  <span className="editor-eyebrow">PRIVATE WORKSPACE</span>
+                  <button
+                    className="editor-icon"
+                    aria-label="Close review panel"
+                    onClick={() => setTab('map')}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                {tab === 'duplicates' ? (
+                  <DuplicateReview
+                    data={validation.data}
+                    candidates={validation.duplicates}
+                    pending={validation.pending || busy}
+                    decide={decideDuplicate}
+                    inspect={(kind, id) => selectId(kind, id, true)}
+                    undo={() => undo()}
+                    canUndo={!!workspace.past.length}
+                    exactBatch={exactBatch}
+                    applyExact={(batch) =>
+                      mergeBatch(
+                        batch,
+                        'Reviewed duplicate cleanup applied. Undo restores the batch.',
+                      )
+                    }
+                  />
+                ) : (
+                  <Suspense
+                    fallback={<p>Opening source and release review…</p>}
+                  >
+                    <EditorReview
+                      tab={tab}
+                      state={state}
+                      onPublishedWorkspace={setPublishedWorkspace}
+                      draftCount={drafts.length}
                       workspace={workspace}
-                      onHistory={undo}
-                      edit={selected}
-                      data={validation.data}
-                      mode={buildingMode}
-                      selection={buildingSelection}
-                      onMode={(mode) => {
-                        workspace.endHistoryGroup();
-                        setBuildingMode(mode);
-                        if (mode === 'roof')
-                          setBuildingSelection((s) => ({
-                            buildingId: selected.id,
-                            partId: s?.partId,
-                          }));
-                      }}
-                      onSelection={(value) => {
-                        workspace.endHistoryGroup();
-                        setBuildingSelection(value);
-                      }}
-                      onEdit={(edit, field) => {
-                        workspace.commit(
-                          [edit],
-                          workspace.unfinished,
-                          field ? `${editKey(edit)}:${field}` : undefined,
-                        );
-                        setSelected(edit);
-                        selectedRef.current = edit;
-                      }}
-                      roofDraft={workspace.roofDraft}
-                      onRoofDraft={(value) => workspace.draftRoof(value)}
-                      onApplyRoof={(edit) => {
-                        workspace.applyRoof(edit);
-                        setSelected(edit);
-                        selectedRef.current = edit;
-                        setMessage(
-                          'Roof applied. Undo restores the previous roof.',
-                        );
+                      validation={validation}
+                      baselineVersion={base.version}
+                      publishedVersion={data.version}
+                      published={data}
+                      onIssue={openIssue}
+                      onSignIn={signIn}
+                      busy={busy}
+                      action={action}
+                      mapRef={mapRef}
+                      preview={preview}
+                      setPreview={setPreview}
+                      review={review}
+                      setReview={setReview}
+                      onLocateBuilding={(id) => selectId('building', id, true)}
+                      onApplyAppearances={async (batch) => {
+                        if (
+                          tool ||
+                          workspace.unfinished ||
+                          workspace.roofDraft ||
+                          workspace.status === 'Conflict'
+                        )
+                          return;
+                        const original = workspace.edits;
+                        const originalBase = currentBase.current;
+                        setBusy(true);
+                        try {
+                          const checked = await validation.check([
+                            ...original.filter(
+                              (e) =>
+                                !batch.some((b) => editKey(b) === editKey(e)),
+                            ),
+                            ...batch,
+                          ]);
+                          if (
+                            workspace.edits !== original ||
+                            currentBase.current !== originalBase ||
+                            workspace.unfinished ||
+                            workspace.roofDraft
+                          )
+                            throw new Error(
+                              'The draft changed. Review the appearance batch again.',
+                            );
+                          const errors = checked.errors.filter(
+                            (e) => !validation.errors.includes(e),
+                          );
+                          if (!checked.usable || errors.length)
+                            throw new Error(
+                              errors.join(' ') ||
+                                'The proposed appearances could not be validated.',
+                            );
+                          workspace.commit(batch);
+                          const current = batch.find(
+                            (e) =>
+                              e.kind === selectedRef.current?.kind &&
+                              e.id === selectedRef.current?.id,
+                          );
+                          if (current) {
+                            setSelected(current);
+                            selectedRef.current = current;
+                          }
+                          setMessage(
+                            `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
+                          );
+                        } catch (error) {
+                          setError((error as Error).message);
+                        } finally {
+                          setBusy(false);
+                        }
                       }}
                     />
                   </Suspense>
-                )
-              }
-              onProperty={(key, value, continuous) => {
-                if (workspace.roofDraft) {
-                  setMessage(
-                    'Apply or cancel the roof plan before changing other building properties.',
-                  );
-                  return;
-                }
-                const batch = propertyEdits(
-                  validation.data,
-                  workspace.edits,
-                  [selected],
-                  key,
-                  value,
-                );
-                const edit = batch[0];
-                if (repairFocus) {
-                  stageRepair(batch, 'Review feature repair');
-                  return;
-                }
-                workspace.commit(
-                  batch,
-                  workspace.unfinished,
-                  continuous ? `${editKey(edit)}:${key}` : undefined,
-                );
-                setSelected(edit);
-                selectedRef.current = edit;
-              }}
-              onLayerGeometry={(operation) =>
-                setLayerOperation({
-                  operation,
-                  keys: [`${selected.kind}:${selected.id}`],
-                })
-              }
-              onEntrance={addEntrance}
-              onApproach={approach}
-              onPick={pick}
-              onDisconnect={disconnect}
-              onDelete={remove}
-              onRestorePublished={
-                publishedBuilding
-                  ? () =>
-                      stageRepair(
-                        [publishedBuilding],
-                        'Restore published building · review before applying',
-                      )
-                  : undefined
-              }
-              onClose={() => {
-                workspace.endHistoryGroup();
-                setFocusRequest(null);
-                if (selectionOverview.current)
-                  mapRef.current?.easeTo({
-                    ...selectionOverview.current,
-                    pitch: mapRef.current.getPitch(),
-                    duration: 450,
-                  });
-                selectionOverview.current = null;
-                setSelected(null);
-                setBuildingSelection(undefined);
-                selectedRef.current = null;
-                controller.current?.select(null);
-              }}
-            />
-          </Suspense>
-        ) : (
-          !tool &&
-          !preview &&
-          !welcomeDismissed && (
-            <aside className="editor-welcome editor-card">
-              <button
-                type="button"
-                className="editor-icon editor-welcome-dismiss"
-                aria-label="Dismiss welcome card"
-                title="Dismiss welcome card"
-                onClick={() => {
-                  setWelcomeDismissed(true);
-                  try {
-                    localStorage.setItem(
-                      'turnright:editor-welcome-dismissed',
-                      'true',
-                    );
-                  } catch {
-                    // Dismiss for this visit when browser storage is unavailable.
-                  }
-                  mapRef.current?.getCanvas().focus();
-                }}
-              >
-                <X size={18} aria-hidden="true" />
-              </button>
-              <span className="editor-welcome-icon">
-                <DoorOpen size={23} />
-              </span>
-              <span className="editor-eyebrow">FILL IN THE MISSING PIECES</span>
-              <h2>
-                A better way
-                <br />
-                into every place.
-              </h2>
-              <p>
-                Select a building, mark its entrance, and connect it to the
-                paths people walk.
-              </p>
-              <div>
-                <span>1</span> Choose a place on the map
-              </div>
-              <div>
-                <span>2</span> Add entrances and paths
-              </div>
-              <div>
-                <span>3</span> Test, review, and publish
-              </div>
-              <button
-                className="editor-primary"
-                onClick={() => {
-                  setFilter('needs');
-                  setExplorer(true);
-                }}
-              >
-                Find places to map <ArrowUpRight size={16} />
-              </button>
-            </aside>
-          )
-        )}
-        {showRoutes && (
-          <section className="editor-route-test editor-card">
-            <div className="editor-panel-heading">
-              <h2>Test a walking route</h2>
-              <button
-                className="editor-icon"
-                aria-label="Close route test"
-                onClick={() => {
-                  setShowRoutes(false);
-                  setRoutes([]);
-                }}
-              >
-                <X size={16} />
-              </button>
-            </div>
-            {[
-              [testOrigin, setTestOrigin, 'From'],
-              [testDest, setTestDest, 'To'],
-            ].map(([value, set, label]) => (
-              <label className="field-label" key={String(label)}>
-                {String(label)}
-                <select
-                  aria-label={`Test route ${label}`}
-                  value={value as string}
-                  onChange={(e) => (set as (s: string) => void)(e.target.value)}
-                >
-                  <option value="">Choose a place</option>
-                  {validation.data.places
-                    .filter((p) => placeHasConnection(validation.data, p))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-            ))}
-            <button
-              className="editor-primary"
-              disabled={!testOrigin || !testDest || busy || validation.pending}
-              onClick={previewTestRoute}
-            >
-              <RouteIcon size={16} /> Preview route
-            </button>
-            {routes.map((route, i) => (
-              <p key={route.id}>
-                {i ? 'Alternative' : 'Shortest walk'} · {meters(route.distance)}
-                {route.destinationEntranceId && (
-                  <small>
-                    {' '}
-                    Arrive at{' '}
-                    {
-                      validation.data.entrances?.find(
-                        (e) => e.id === route.destinationEntranceId,
-                      )?.name
-                    }
-                  </small>
                 )}
-              </p>
-            ))}
-          </section>
-        )}
-        <div className="editor-bottom">
-          <div className="editor-legend editor-card">
-            <span>
-              <i className="new" />
-              New
-            </span>
-            <span>
-              <i className="modified" />
-              Modified
-            </span>
-            <span>
-              <i className="incomplete" />
-              Needs attention
-            </span>
-            {threeD && <small>Muted 3D blocks = height unknown</small>}
-          </div>
-          <output className="editor-guidance editor-card">
-            {preview
-              ? 'Approved source geometry · read-only comparison'
-              : hint || message}
-            {tool && (
-              <span className="editor-finish-controls">
-                <span aria-live="polite" className="drawing-progress">
-                  {progress.message}
+              </aside>
+            </WorkspacePane>
+          ) : selected && !preview && !showRoutes && tab === 'map' ? (
+            <Suspense
+              fallback={
+                <aside className="editor-inspector editor-card">
+                  Loading properties…
+                </aside>
+              }
+            >
+              <EditorInspector
+                photoOwner={owner}
+                photoSaveStatus={workspace.status}
+                publishedPhotos={data.photos}
+                onPhotoUndo={() => undo()}
+                onPhotos={(change) => {
+                  if (
+                    workspace.roofDraft ||
+                    workspace.unfinished ||
+                    validation.pending
+                  )
+                    throw Error(
+                      'Finish the current edit and wait for map validation before changing photos.',
+                    );
+                  const batch = photoEdits(
+                    validation.data,
+                    workspace.edits,
+                    change,
+                  );
+                  workspace.commit(batch, null);
+                  const next = batch.find(
+                    (e) => e.id === selected.id && e.kind === selected.kind,
+                  );
+                  if (next) {
+                    setSelected(next);
+                    selectedRef.current = next;
+                  }
+                }}
+                onGeometry={(geometry) => {
+                  if (selected)
+                    stageRepair(
+                      [remapBuildingSurfaces(selected, geometry)],
+                      'Review corrected building geometry',
+                    );
+                }}
+                key={editKey(selected)}
+                edit={selected}
+                data={validation.data}
+                issues={validation.issues
+                  .filter(
+                    (i) =>
+                      i.featureId === selected.id &&
+                      (!i.featureKind || i.featureKind === selected.kind),
+                  )
+                  .map((i) => i.message)}
+                focusField={repairFocus?.field}
+                onEndField={workspace.endHistoryGroup}
+                buildingEditor={
+                  selected.kind === 'building' && (
+                    <Suspense
+                      fallback={<output>Loading building tools…</output>}
+                    >
+                      <BuildingAppearanceEditor
+                        reviewRequest={
+                          repairFocus?.repair === 'review-model' ||
+                          /^(height|floors|appearance|roof|wall)/i.test(
+                            repairFocus?.field || '',
+                          )
+                            ? repairFocus || undefined
+                            : undefined
+                        }
+                        onReviewOpened={() => setRepairFocus(null)}
+                        workspace={workspace}
+                        onHistory={undo}
+                        edit={selected}
+                        data={validation.data}
+                        mode={buildingMode}
+                        selection={buildingSelection}
+                        onMode={(mode) => {
+                          workspace.endHistoryGroup();
+                          setBuildingMode(mode);
+                          if (mode === 'roof')
+                            setBuildingSelection((s) => ({
+                              buildingId: selected.id,
+                              partId: s?.partId,
+                            }));
+                        }}
+                        onSelection={(value) => {
+                          workspace.endHistoryGroup();
+                          setBuildingSelection(value);
+                        }}
+                        onEdit={(edit, field) => {
+                          workspace.commit(
+                            [edit],
+                            workspace.unfinished,
+                            field ? `${editKey(edit)}:${field}` : undefined,
+                          );
+                          setSelected(edit);
+                          selectedRef.current = edit;
+                        }}
+                        roofDraft={workspace.roofDraft}
+                        onRoofDraft={(value) => workspace.draftRoof(value)}
+                        onApplyRoof={(edit) => {
+                          workspace.applyRoof(edit);
+                          setSelected(edit);
+                          selectedRef.current = edit;
+                          setMessage(
+                            'Roof applied. Undo restores the previous roof.',
+                          );
+                        }}
+                      />
+                    </Suspense>
+                  )
+                }
+                onProperty={(key, value, continuous) => {
+                  if (workspace.roofDraft) {
+                    setMessage(
+                      'Apply or cancel the roof plan before changing other building properties.',
+                    );
+                    return;
+                  }
+                  const batch = propertyEdits(
+                    validation.data,
+                    workspace.edits,
+                    [selected],
+                    key,
+                    value,
+                  );
+                  const edit = batch[0];
+                  if (repairFocus) {
+                    stageRepair(batch, 'Review feature repair');
+                    return;
+                  }
+                  workspace.commit(
+                    batch,
+                    workspace.unfinished,
+                    continuous ? `${editKey(edit)}:${key}` : undefined,
+                  );
+                  setSelected(edit);
+                  selectedRef.current = edit;
+                }}
+                onLayerGeometry={(operation) =>
+                  setLayerOperation({
+                    operation,
+                    keys: [`${selected.kind}:${selected.id}`],
+                  })
+                }
+                onEntrance={addEntrance}
+                onApproach={approach}
+                onPick={pick}
+                onDisconnect={disconnect}
+                onDelete={remove}
+                onRestorePublished={
+                  publishedBuilding
+                    ? () =>
+                        stageRepair(
+                          [publishedBuilding],
+                          'Restore published building · review before applying',
+                        )
+                    : undefined
+                }
+                onClose={() => {
+                  workspace.endHistoryGroup();
+                  setFocusRequest(null);
+                  if (selectionOverview.current)
+                    mapRef.current?.easeTo({
+                      ...selectionOverview.current,
+                      pitch: mapRef.current.getPitch(),
+                      duration: 450,
+                    });
+                  selectionOverview.current = null;
+                  setSelected(null);
+                  setBuildingSelection(undefined);
+                  selectedRef.current = null;
+                  controller.current?.select(null);
+                }}
+              />
+            </Suspense>
+          ) : (
+            !tool &&
+            !preview &&
+            !showRoutes &&
+            tab === 'map' &&
+            !welcomeDismissed && (
+              <aside className="editor-welcome editor-card">
+                <button
+                  type="button"
+                  className="editor-icon editor-welcome-dismiss"
+                  aria-label="Dismiss welcome card"
+                  title="Dismiss welcome card"
+                  onClick={() => {
+                    setWelcomeDismissed(true);
+                    try {
+                      localStorage.setItem(
+                        'turnright:editor-welcome-dismissed',
+                        'true',
+                      );
+                    } catch {
+                      // Dismiss for this visit when browser storage is unavailable.
+                    }
+                    mapRef.current?.getCanvas().focus();
+                  }}
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+                <span className="editor-welcome-icon">
+                  <DoorOpen size={23} />
                 </span>
+                <span className="editor-eyebrow">
+                  FILL IN THE MISSING PIECES
+                </span>
+                <h2>
+                  A better way
+                  <br />
+                  into every place.
+                </h2>
+                <p>
+                  Select a building, mark its entrance, and connect it to the
+                  paths people walk.
+                </p>
+                <div>
+                  <span>1</span> Choose a place on the map
+                </div>
+                <div>
+                  <span>2</span> Add entrances and paths
+                </div>
+                <div>
+                  <span>3</span> Test, review, and publish
+                </div>
                 <button
                   className="editor-primary"
-                  disabled={!progress.canFinish}
-                  title={
-                    progress.canFinish ? 'Finish drawing' : progress.message
-                  }
-                  onClick={() => controller.current?.finish()}
+                  onClick={() => {
+                    setFilter('needs');
+                    setExplorer(true);
+                  }}
                 >
-                  <Check size={15} /> Finish
+                  Find places to map <ArrowUpRight size={16} />
                 </button>
-                <button className="editor-secondary" onClick={cancel}>
-                  Cancel
+              </aside>
+            )
+          )}
+          {showRoutes && tab === 'map' && !layersOpen && (
+            <WorkspacePane id="right" title="Route test">
+              <section className="editor-route-test editor-card">
+                <div className="editor-panel-heading">
+                  <h2>Test a walking route</h2>
+                  <button
+                    className="editor-icon"
+                    aria-label="Close route test"
+                    onClick={() => {
+                      setShowRoutes(false);
+                      setRoutes([]);
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                {[
+                  [testOrigin, setTestOrigin, 'From'],
+                  [testDest, setTestDest, 'To'],
+                ].map(([value, set, label]) => (
+                  <label className="field-label" key={String(label)}>
+                    {String(label)}
+                    <select
+                      aria-label={`Test route ${label}`}
+                      value={value as string}
+                      onChange={(e) =>
+                        (set as (s: string) => void)(e.target.value)
+                      }
+                    >
+                      <option value="">Choose a place</option>
+                      {validation.data.places
+                        .filter((p) => placeHasConnection(validation.data, p))
+                        .map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                ))}
+                <button
+                  className="editor-primary"
+                  disabled={
+                    !testOrigin || !testDest || busy || validation.pending
+                  }
+                  onClick={previewTestRoute}
+                >
+                  <RouteIcon size={16} /> Preview route
                 </button>
-              </span>
+                {routes.map((route, i) => (
+                  <p key={route.id}>
+                    {i ? 'Alternative' : 'Shortest walk'} ·{' '}
+                    {meters(route.distance)}
+                    {route.destinationEntranceId && (
+                      <small>
+                        {' '}
+                        Arrive at{' '}
+                        {
+                          validation.data.entrances?.find(
+                            (e) => e.id === route.destinationEntranceId,
+                          )?.name
+                        }
+                      </small>
+                    )}
+                  </p>
+                ))}
+              </section>
+            </WorkspacePane>
+          )}
+          <div className="editor-bottom">
+            <EditorLegend
+              open={layout.value.legend}
+              onChange={(legend) => layout.update({ legend })}
+              threeD={threeD}
+            />
+            <output className="editor-guidance editor-card">
+              {preview
+                ? 'Approved source geometry · read-only comparison'
+                : hint || message}
+              {tool && (
+                <span className="editor-finish-controls">
+                  <span aria-live="polite" className="drawing-progress">
+                    {progress.message}
+                  </span>
+                  <button
+                    className="editor-primary"
+                    disabled={!progress.canFinish}
+                    title={
+                      progress.canFinish ? 'Finish drawing' : progress.message
+                    }
+                    onClick={() => controller.current?.finish()}
+                  >
+                    <Check size={15} /> Finish
+                  </button>
+                  <button className="editor-secondary" onClick={cancel}>
+                    Cancel
+                  </button>
+                </span>
+              )}
+            </output>
+          </div>
+          {workspace.roofDraft &&
+            (selected?.id !== workspace.roofDraft.buildingId ||
+              buildingMode !== 'roof') && (
+              <div className="editor-recovery editor-card">
+                <strong>Unfinished roof recovered</strong>
+                <button
+                  className="editor-primary"
+                  onClick={() => {
+                    const draft = workspace.roofDraft!;
+                    selectId('building', draft.buildingId, true);
+                    setBuildingMode('roof');
+                    setBuildingSelection({
+                      buildingId: draft.buildingId,
+                      partId: draft.partId,
+                    });
+                  }}
+                >
+                  Resume roof
+                </button>
+                <button onClick={() => workspace.draftRoof(null)}>
+                  Discard roof
+                </button>
+              </div>
             )}
-          </output>
-        </div>
-        {workspace.roofDraft &&
-          (selected?.id !== workspace.roofDraft.buildingId ||
-            buildingMode !== 'roof') && (
+          {handoffNotice && (
             <div className="editor-recovery editor-card">
-              <strong>Unfinished roof recovered</strong>
+              <output>{handoffNotice}</output>
               <button
-                className="editor-primary"
                 onClick={() => {
-                  const draft = workspace.roofDraft!;
-                  selectId('building', draft.buildingId, true);
-                  setBuildingMode('roof');
-                  setBuildingSelection({
-                    buildingId: draft.buildingId,
-                    partId: draft.partId,
-                  });
+                  requestedBuilding.current = undefined;
+                  history.replaceState(
+                    history.state,
+                    '',
+                    consumeEditorBuilding(
+                      location.href,
+                      editorHandoffStorage(),
+                    ),
+                  );
+                  setHandoffNotice('');
                 }}
               >
-                Resume roof
-              </button>
-              <button onClick={() => workspace.draftRoof(null)}>
-                Discard roof
+                Dismiss building request
               </button>
             </div>
           )}
-        {handoffNotice && (
-          <div className="editor-recovery editor-card">
-            <output>{handoffNotice}</output>
-            <button
-              onClick={() => {
-                requestedBuilding.current = undefined;
-                history.replaceState(
-                  history.state,
-                  '',
-                  consumeEditorBuilding(location.href, editorHandoffStorage()),
-                );
-                setHandoffNotice('');
-              }}
-            >
-              Dismiss building request
-            </button>
-          </div>
-        )}
-        {workspace.unfinished && !tool && (
-          <div className="editor-recovery editor-card">
-            <strong>Unfinished drawing recovered</strong>
-            <button className="editor-primary" onClick={resume}>
-              Resume drawing
-            </button>
-            <button
-              className="editor-text"
-              onClick={() => workspace.draft(null)}
-            >
-              Discard drawing
-            </button>
-          </div>
-        )}
-        {repairPreview && (
-          <aside
-            className="editor-repair-preview editor-card"
-            aria-label="Review proposed repair"
-          >
-            <h2>{repairPreview.title}</h2>
-            <p>Red: current geometry · Green: proposed geometry</p>
-            {repairPreview.batch.map((e) => (
-              <p key={editKey(e)}>
-                {e.kind} · {String(e.properties.name || e.id)}
-                {e.kind === 'entrance' && e.properties.placeId
-                  ? ` · Serves ${validation.data.places.find((p) => p.id === e.properties.placeId)?.name || e.properties.placeId}`
-                  : ''}
-              </p>
-            ))}
-            {repairErrors.map((message) => (
-              <p className="form-error" role="alert" key={message}>
-                {message}
-              </p>
-            ))}
-            <div className="button-row">
-              <button
-                className="editor-primary"
-                disabled={
-                  busy || validation.pending || !!tool || !!workspace.unfinished
-                }
-                onClick={applyRepair}
-              >
-                Apply reviewed repair
+          {workspace.unfinished && !tool && (
+            <div className="editor-recovery editor-card">
+              <strong>Unfinished drawing recovered</strong>
+              <button className="editor-primary" onClick={resume}>
+                Resume drawing
               </button>
-              <button className="editor-secondary" onClick={dismissRepair}>
-                Cancel repair
+              <button
+                className="editor-text"
+                onClick={() => workspace.draft(null)}
+              >
+                Discard drawing
               </button>
             </div>
-          </aside>
-        )}
-        {conflictServer && (
-          <EditorConflictReview
-            workspace={workspace}
-            server={conflictServer}
-            onSignIn={signIn}
-            close={() => {
-              setConflictServer(null);
-              setReviewOverlay([]);
-            }}
-            resolved={() => {
-              setConflictServer(null);
-              setReviewOverlay([]);
-              setSelected(null);
-              selectedRef.current = null;
-              controller.current?.select(null);
-            }}
-            compare={(local, remote) => {
-              setReviewOverlay([
-                ...[local].filter(Boolean).map((e) => ({
-                  type: 'Feature' as const,
-                  geometry: e!.geometry,
-                  properties: { color: '#c26ce3' },
-                })),
-                ...[remote].filter(Boolean).map((e) => ({
-                  type: 'Feature' as const,
-                  geometry: e!.geometry,
-                  properties: { color: '#26a07c' },
-                })),
-              ]);
-              if (local || remote) select(local || remote!, true);
-            }}
-          />
-        )}
-        {(error || taskError || workspace.error) && (
-          <div className="editor-error-stack">
-            {error && (
-              <div className="editor-card editor-error-row" role="alert">
-                <span>{error}</span>
-                <button className="editor-text" onClick={() => setError('')}>
-                  Dismiss message
+          )}
+          {repairPreview && (
+            <aside
+              className="editor-repair-preview editor-card"
+              aria-label="Review proposed repair"
+            >
+              <h2>{repairPreview.title}</h2>
+              <p>Red: current geometry · Green: proposed geometry</p>
+              {repairPreview.batch.map((e) => (
+                <p key={editKey(e)}>
+                  {e.kind} · {String(e.properties.name || e.id)}
+                  {e.kind === 'entrance' && e.properties.placeId
+                    ? ` · Serves ${validation.data.places.find((p) => p.id === e.properties.placeId)?.name || e.properties.placeId}`
+                    : ''}
+                </p>
+              ))}
+              {repairErrors.map((message) => (
+                <p className="form-error" role="alert" key={message}>
+                  {message}
+                </p>
+              ))}
+              <div className="button-row">
+                <button
+                  className="editor-primary"
+                  disabled={
+                    busy ||
+                    validation.pending ||
+                    !!tool ||
+                    !!workspace.unfinished
+                  }
+                  onClick={applyRepair}
+                >
+                  Apply reviewed repair
+                </button>
+                <button className="editor-secondary" onClick={dismissRepair}>
+                  Cancel repair
                 </button>
               </div>
-            )}
-            {taskError && (
-              <div className="editor-card editor-error-row" role="alert">
-                <span>{taskError.message}</span>
-                <button
-                  className="editor-secondary"
-                  onClick={() => {
-                    if (taskError.auth) signIn();
-                    else taskError.retry();
-                  }}
-                >
-                  {taskError.auth ? 'Sign in again' : taskError.label}
-                </button>
-                <button
-                  className="editor-text"
-                  onClick={() => setTaskError(null)}
-                >
-                  Dismiss action error
-                </button>
-              </div>
-            )}
-            {workspace.error && (
-              <div className="editor-card editor-error-row" role="alert">
-                <span>{workspace.error}</span>
-                {workspace.status === 'Conflict' ? (
-                  <button
-                    className="editor-secondary"
-                    onClick={reviewConflicts}
-                  >
-                    Review conflicts
+            </aside>
+          )}
+          {conflictServer && (
+            <EditorConflictReview
+              workspace={workspace}
+              server={conflictServer}
+              onSignIn={signIn}
+              close={() => {
+                setConflictServer(null);
+                setReviewOverlay([]);
+              }}
+              resolved={() => {
+                setConflictServer(null);
+                setReviewOverlay([]);
+                setSelected(null);
+                selectedRef.current = null;
+                controller.current?.select(null);
+              }}
+              compare={(local, remote) => {
+                setReviewOverlay([
+                  ...[local].filter(Boolean).map((e) => ({
+                    type: 'Feature' as const,
+                    geometry: e!.geometry,
+                    properties: { color: '#c26ce3' },
+                  })),
+                  ...[remote].filter(Boolean).map((e) => ({
+                    type: 'Feature' as const,
+                    geometry: e!.geometry,
+                    properties: { color: '#26a07c' },
+                  })),
+                ]);
+                if (local || remote) select(local || remote!, true);
+              }}
+            />
+          )}
+          {(error || taskError || workspace.error) && (
+            <div className="editor-error-stack">
+              {error && (
+                <div className="editor-card editor-error-row" role="alert">
+                  <span>{error}</span>
+                  <button className="editor-text" onClick={() => setError('')}>
+                    Dismiss message
                   </button>
-                ) : (
+                </div>
+              )}
+              {taskError && (
+                <div className="editor-card editor-error-row" role="alert">
+                  <span>{taskError.message}</span>
                   <button
                     className="editor-secondary"
-                    onClick={async () => {
-                      if ([401, 403].includes(workspace.errorStatus))
-                        await signIn();
-                      else {
-                        if (
-                          workspace.status === 'Recovery unavailable' &&
-                          !(await workspace.preserveRecovery())
-                        )
-                          return;
-                        await workspace.flush();
-                      }
+                    onClick={() => {
+                      if (taskError.auth) signIn();
+                      else taskError.retry();
                     }}
                   >
-                    {[401, 403].includes(workspace.errorStatus)
-                      ? 'Sign in again'
-                      : workspace.status === 'Recovery unavailable'
-                        ? 'Retry local recovery'
-                        : 'Retry save'}
+                    {taskError.auth ? 'Sign in again' : taskError.label}
                   </button>
-                )}
-                <button className="editor-text" onClick={localRecovery}>
-                  Download local recovery
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
+                  <button
+                    className="editor-text"
+                    onClick={() => setTaskError(null)}
+                  >
+                    Dismiss action error
+                  </button>
+                </div>
+              )}
+              {workspace.error && (
+                <div className="editor-card editor-error-row" role="alert">
+                  <span>{workspace.error}</span>
+                  {workspace.status === 'Conflict' ? (
+                    <button
+                      className="editor-secondary"
+                      onClick={reviewConflicts}
+                    >
+                      Review conflicts
+                    </button>
+                  ) : (
+                    <button
+                      className="editor-secondary"
+                      onClick={async () => {
+                        if ([401, 403].includes(workspace.errorStatus))
+                          await signIn();
+                        else {
+                          if (
+                            workspace.status === 'Recovery unavailable' &&
+                            !(await workspace.preserveRecovery())
+                          )
+                            return;
+                          await workspace.flush();
+                        }
+                      }}
+                    >
+                      {[401, 403].includes(workspace.errorStatus)
+                        ? 'Sign in again'
+                        : workspace.status === 'Recovery unavailable'
+                          ? 'Retry local recovery'
+                          : 'Retry save'}
+                    </button>
+                  )}
+                  <button className="editor-text" onClick={localRecovery}>
+                    Download local recovery
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </WorkspaceFrame>
     </main>
   );
 }

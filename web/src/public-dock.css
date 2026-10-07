@@ -565,6 +565,10 @@
     left: 12px;
     top: max(12px, env(safe-area-inset-top));
   }
+  .app-shell .maplibregl-ctrl-bottom-right {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+  }
   .app-shell .maplibregl-ctrl-bottom-left {
     left: 50%;
     right: auto;
@@ -687,4 +691,11 @@
 .campus-public-confirm {
   border-top: 1px solid var(--border);
   padding-top: 16px;
+}
+
+/* In short world views the animation controls occupy the top-right corner. */
+@media (max-height: 500px) {
+  .app-shell .map-canvas[data-world-view='true'] .maplibregl-ctrl-bottom-right {
+    top: calc(76px + env(safe-area-inset-top));
+  }
 }

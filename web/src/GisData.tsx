@@ -1,3 +1,4 @@
+import { WorkspacePane } from './WorkspaceFrame';
 import { useEffect, useMemo, useState } from 'react';
 import type { GisPanelProps } from './GisWorkspace';
 import type {
@@ -174,436 +175,477 @@ export default function GisData({
   };
   return (
     <>
-      {editable && onEndEditingSession && (
-        <details>
-          <summary>Geometry editing session</summary>
-          <p>
-            Up to 500 dataset features can join Edit at once. End this session
-            to unload saved GIS geometry and clear its undo history. Saved
-            changes remain in the shared draft.
-          </p>
-          <button onClick={() => void attempt(onEndEditingSession)}>
-            Save and end geometry session
-          </button>
-        </details>
-      )}
-      <div className="gis-toolbar">
-        <label>
-          Dataset
-          <select
-            value={dataset?.id || ''}
-            onChange={(e) => setId(e.target.value)}
-          >
-            {datasets.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({(d.count || 0).toLocaleString()})
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          onClick={() =>
-            void attempt(async () => {
-              await refresh();
-              setEpoch((e) => e + 1);
-            })
-          }
-        >
-          Refresh
-        </button>
-      </div>
-      {editable && (
-        <details>
-          <summary>Import an attribute CSV</summary>
-          <p>
-            Quoted values and leading-zero identifiers are preserved. Join this
-            private table to a spatial dataset in Analyze.
-          </p>
+      <WorkspacePane
+        id="left"
+        title="Datasets"
+        className="gis-pane gis-workspace"
+      >
+        {editable && onEndEditingSession && (
+          <details>
+            <summary>Geometry editing session</summary>
+            <p>
+              Up to 500 dataset features can join Edit at once. End this session
+              to unload saved GIS geometry and clear its undo history. Saved
+              changes remain in the shared draft.
+            </p>
+            <button onClick={() => void attempt(onEndEditingSession)}>
+              Save and end geometry session
+            </button>
+          </details>
+        )}
+        <div className="gis-toolbar">
           <label>
-            Table name
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={160}
-            />
+            Dataset
+            <select
+              value={dataset?.id || ''}
+              onChange={(e) => setId(e.target.value)}
+            >
+              {datasets.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name} ({(d.count || 0).toLocaleString()})
+                </option>
+              ))}
+            </select>
           </label>
-          <input
-            aria-label="Import CSV"
-            type="file"
-            accept=".csv,text/csv"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file)
-                void attempt(async () => {
-                  if (file.size > 2500000) throw Error('CSV exceeds 2.5 MB.');
-                  const csv = await file.text();
-                  const created = await mutate(() =>
-                    gisApi('gis-csv-import', {
-                      name,
-                      csv,
-                      operationId: crypto.randomUUID(),
-                    }),
-                  );
-                  setId(created.id);
-                });
-              e.target.value = '';
-            }}
-          />
-        </details>
-      )}
-      {error && (
-        <p role="alert" className="form-error">
-          {error}
-        </p>
-      )}
+          <button
+            onClick={() =>
+              void attempt(async () => {
+                await refresh();
+                setEpoch((e) => e + 1);
+              })
+            }
+          >
+            Refresh
+          </button>
+        </div>
+        {editable && (
+          <details>
+            <summary>Import an attribute CSV</summary>
+            <p>
+              Quoted values and leading-zero identifiers are preserved. Join
+              this private table to a spatial dataset in Analyze.
+            </p>
+            <label>
+              Table name
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={160}
+              />
+            </label>
+            <input
+              aria-label="Import CSV"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file)
+                  void attempt(async () => {
+                    if (file.size > 2500000) throw Error('CSV exceeds 2.5 MB.');
+                    const csv = await file.text();
+                    const created = await mutate(() =>
+                      gisApi('gis-csv-import', {
+                        name,
+                        csv,
+                        operationId: crypto.randomUUID(),
+                      }),
+                    );
+                    setId(created.id);
+                  });
+                e.target.value = '';
+              }}
+            />
+          </details>
+        )}
+        {error && (
+          <p role="alert" className="form-error">
+            {error}
+          </p>
+        )}
+      </WorkspacePane>
       {!dataset ? (
-        <p>Import campus features in Campuses, or add an asset CSV above.</p>
+        <WorkspacePane
+          id="bottom"
+          title="Attributes"
+          className="gis-pane gis-workspace"
+        >
+          <p>Import campus features in Campuses, or add an asset CSV above.</p>
+        </WorkspacePane>
       ) : (
         <>
-          <p>
-            {dataset.source_crs} → {dataset.analysis_crs} · metric analysis in
-            metres · revision {dataset.revision} ·{' '}
-            {dataset.included ? 'Selected for publication' : 'Private dataset'}
-          </p>
-          <div className="gis-toolbar">
-            <label>
-              Field
-              <select value={field} onChange={(e) => setField(e.target.value)}>
-                {dataset.schema.fields.map((f) => (
-                  <option key={f.name}>{f.name}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Operator
-              <select
-                value={operator}
-                onChange={(e) => setOperator(e.target.value)}
-              >
-                {['contains', 'eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'null'].map(
-                  (o) => (
+          <WorkspacePane
+            id="bottom"
+            title="Attributes"
+            className="gis-pane gis-workspace"
+          >
+            <p>
+              {dataset.source_crs} → {dataset.analysis_crs} · metric analysis in
+              metres · revision {dataset.revision} ·{' '}
+              {dataset.included
+                ? 'Selected for publication'
+                : 'Private dataset'}
+            </p>
+            <div className="gis-toolbar">
+              <label>
+                Field
+                <select
+                  value={field}
+                  onChange={(e) => setField(e.target.value)}
+                >
+                  {dataset.schema.fields.map((f) => (
+                    <option key={f.name}>{f.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Operator
+                <select
+                  value={operator}
+                  onChange={(e) => setOperator(e.target.value)}
+                >
+                  {[
+                    'contains',
+                    'eq',
+                    'ne',
+                    'gt',
+                    'gte',
+                    'lt',
+                    'lte',
+                    'null',
+                  ].map((o) => (
                     <option key={o}>{o}</option>
-                  ),
-                )}
-              </select>
-            </label>
-            <label>
-              Value
-              <input value={value} onChange={(e) => setValue(e.target.value)} />
-            </label>
-            <button
-              onClick={() => {
-                const type = dataset.schema.fields.find(
-                  (f) => f.name === field,
-                )?.type;
-                const parsed =
-                  value === ''
-                    ? null
-                    : type === 'number'
-                      ? Number(value)
-                      : type === 'boolean'
-                        ? value === 'true'
-                        : value;
-                setQuery((q) => ({
-                  ...q,
-                  filters: [
-                    { field, operator: operator as 'eq', value: parsed },
-                  ],
-                }));
-                setCursor(undefined);
-                setHistory([]);
-              }}
-            >
-              Filter
-            </button>
-            <button
-              onClick={() => {
-                setQuery({});
-                setCursor(undefined);
-                setHistory([]);
-                setExtent(false);
-              }}
-            >
-              Clear
-            </button>
-            <button
-              onClick={() =>
-                void attempt(async () => {
-                  const s = await gisApi('gis-statistics', {
-                    ...query,
-                    datasetId: dataset.id,
-                    revision: dataset.revision,
-                    field,
-                  });
-                  setStats(
-                    `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
-                  );
-                })
-              }
-            >
-              Statistics
-            </button>
-          </div>
-          {stats && <output>{stats}</output>}
-          <div className="gis-toolbar">
-            <label>
-              <input
-                type="checkbox"
-                checked={extent}
-                onChange={(e) => {
-                  setExtent(e.target.checked);
-                  if (!e.target.checked)
-                    setQuery((q) => {
-                      const { bbox: _bbox, ...rest } = q;
-                      return rest;
-                    });
-                }}
-              />
-              Limit to map extent
-            </label>
-            <details>
-              <summary>Columns</summary>
-              {dataset.schema.fields.map((f) => (
-                <label key={f.name}>
-                  <input
-                    type="checkbox"
-                    checked={columns.includes(f.name)}
-                    onChange={(e) =>
-                      setColumns((c) =>
-                        e.target.checked
-                          ? [...c, f.name]
-                          : c.filter((k) => k !== f.name),
-                      )
-                    }
-                  />
-                  {f.alias || f.name}
-                </label>
-              ))}
-            </details>
-            <label>
-              Saved filter
-              <select
-                value=""
-                onChange={(e) => {
-                  const saved = dataset.saved_filters[Number(e.target.value)];
-                  if (saved) {
-                    const {
-                      datasetId: _id,
-                      revision: _rev,
-                      cursor: _cursor,
-                      ...q
-                    } = saved.query;
-                    setQuery(q);
-                    setCursor(undefined);
-                    setHistory([]);
-                  }
+                  ))}
+                </select>
+              </label>
+              <label>
+                Value
+                <input
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+              </label>
+              <button
+                onClick={() => {
+                  const type = dataset.schema.fields.find(
+                    (f) => f.name === field,
+                  )?.type;
+                  const parsed =
+                    value === ''
+                      ? null
+                      : type === 'number'
+                        ? Number(value)
+                        : type === 'boolean'
+                          ? value === 'true'
+                          : value;
+                  setQuery((q) => ({
+                    ...q,
+                    filters: [
+                      { field, operator: operator as 'eq', value: parsed },
+                    ],
+                  }));
+                  setCursor(undefined);
+                  setHistory([]);
                 }}
               >
-                <option value="">Choose…</option>
-                {dataset.saved_filters.map((s, i) => (
-                  <option key={i} value={i}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <div className="gis-table-scroll" aria-busy={loading}>
-            <table>
-              <thead>
-                <tr>
-                  <th>
+                Filter
+              </button>
+              <button
+                onClick={() => {
+                  setQuery({});
+                  setCursor(undefined);
+                  setHistory([]);
+                  setExtent(false);
+                }}
+              >
+                Clear
+              </button>
+              <button
+                onClick={() =>
+                  void attempt(async () => {
+                    const s = await gisApi('gis-statistics', {
+                      ...query,
+                      datasetId: dataset.id,
+                      revision: dataset.revision,
+                      field,
+                    });
+                    setStats(
+                      `${s.count} rows; ${s.nulls} null; min ${s.min ?? '—'}; max ${s.max ?? '—'}; mean ${s.average ?? '—'}; sum ${s.sum ?? '—'}`,
+                    );
+                  })
+                }
+              >
+                Statistics
+              </button>
+            </div>
+            {stats && <output>{stats}</output>}
+            <div className="gis-toolbar">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={extent}
+                  onChange={(e) => {
+                    setExtent(e.target.checked);
+                    if (!e.target.checked)
+                      setQuery((q) => {
+                        const { bbox: _bbox, ...rest } = q;
+                        return rest;
+                      });
+                  }}
+                />
+                Limit to map extent
+              </label>
+              <details>
+                <summary>Columns</summary>
+                {dataset.schema.fields.map((f) => (
+                  <label key={f.name}>
                     <input
                       type="checkbox"
-                      aria-label="Select this page"
-                      checked={
-                        !!page?.features.length &&
-                        page.features.every((f) => selected.has(f.id))
-                      }
-                      ref={(el) => {
-                        if (el)
-                          el.indeterminate =
-                            !!page?.features.some((f) => selected.has(f.id)) &&
-                            !page?.features.every((f) => selected.has(f.id));
-                      }}
+                      checked={columns.includes(f.name)}
                       onChange={(e) =>
-                        setSelected(
+                        setColumns((c) =>
                           e.target.checked
-                            ? new Set(page?.features.map((f) => f.id))
-                            : new Set(),
+                            ? [...c, f.name]
+                            : c.filter((k) => k !== f.name),
                         )
                       }
                     />
-                  </th>
-                  <th>Feature</th>
-                  {fields.map((f) => (
-                    <th key={f.name}>
-                      <button
-                        onClick={() => {
-                          setQuery((q) => ({
-                            ...q,
-                            sort: {
-                              field: f.name,
-                              direction:
-                                q.sort?.field === f.name &&
-                                q.sort.direction === 'asc'
-                                  ? 'desc'
-                                  : 'asc',
-                            },
-                          }));
-                          setCursor(undefined);
-                          setHistory([]);
-                        }}
-                      >
-                        {f.alias || f.name}
-                        {f.unit ? ` (${f.unit})` : ''}
-                        {f.required ? ' *' : ''}
-                      </button>
-                    </th>
+                    {f.alias || f.name}
+                  </label>
+                ))}
+              </details>
+              <label>
+                Saved filter
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const saved = dataset.saved_filters[Number(e.target.value)];
+                    if (saved) {
+                      const {
+                        datasetId: _id,
+                        revision: _rev,
+                        cursor: _cursor,
+                        ...q
+                      } = saved.query;
+                      setQuery(q);
+                      setCursor(undefined);
+                      setHistory([]);
+                    }
+                  }}
+                >
+                  <option value="">Choose…</option>
+                  {dataset.saved_filters.map((s, i) => (
+                    <option key={i} value={i}>
+                      {s.name}
+                    </option>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {page?.features.map((f) => (
-                  <tr
-                    key={f.id}
-                    className={selected.has(f.id) ? 'selected' : ''}
-                  >
-                    <td>
+                </select>
+              </label>
+            </div>
+            <div className="gis-table-scroll" aria-busy={loading}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>
                       <input
                         type="checkbox"
-                        aria-label={'Select ' + f.id}
-                        checked={selected.has(f.id)}
+                        aria-label="Select this page"
+                        checked={
+                          !!page?.features.length &&
+                          page.features.every((f) => selected.has(f.id))
+                        }
+                        ref={(el) => {
+                          if (el)
+                            el.indeterminate =
+                              !!page?.features.some((f) =>
+                                selected.has(f.id),
+                              ) &&
+                              !page?.features.every((f) => selected.has(f.id));
+                        }}
                         onChange={(e) =>
-                          setSelected((s) => {
-                            const next = new Set(s);
-                            if (e.target.checked && next.size < 500)
-                              next.add(f.id);
-                            else next.delete(f.id);
-                            return next;
-                          })
+                          setSelected(
+                            e.target.checked
+                              ? new Set(page?.features.map((f) => f.id))
+                              : new Set(),
+                          )
                         }
                       />
-                    </td>
-                    <td>
-                      <button
-                        title={f.id}
-                        onClick={() => focusGisFeature(map, f)}
-                      >
-                        {String(f.properties.name || f.id).slice(0, 50)}
-                      </button>
-                      {editable && f.geometry && (
+                    </th>
+                    <th>Feature</th>
+                    {fields.map((f) => (
+                      <th key={f.name}>
                         <button
-                          disabled={loading}
-                          onClick={() =>
-                            void attempt(async () => {
-                              const result = await gisApi('gis-feature', {
-                                datasetId: dataset.id,
-                                key: f.id,
-                                revision: page.revision,
-                              });
-                              onEdit(result.source, result.edit);
-                            })
-                          }
+                          onClick={() => {
+                            setQuery((q) => ({
+                              ...q,
+                              sort: {
+                                field: f.name,
+                                direction:
+                                  q.sort?.field === f.name &&
+                                  q.sort.direction === 'asc'
+                                    ? 'desc'
+                                    : 'asc',
+                              },
+                            }));
+                            setCursor(undefined);
+                            setHistory([]);
+                          }}
                         >
-                          Edit geometry
+                          {f.alias || f.name}
+                          {f.unit ? ` (${f.unit})` : ''}
+                          {f.required ? ' *' : ''}
                         </button>
-                      )}
-                    </td>
-                    {fields.map((field) => (
-                      <td key={field.name}>
-                        <AttributeCell
-                          key={field.name + ':' + page.revision}
-                          field={field}
-                          value={f.properties[field.name] ?? null}
-                          disabled={!editable || loading}
-                          save={(v) => save(f, field, v)}
-                        />
-                      </td>
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="gis-toolbar">
-            <span>
-              {page?.total.toLocaleString() || 0} matching · {selected.size}{' '}
-              selected · showing at most 100 geometries
-            </span>
-            <button
-              disabled={!history.length || loading || !page}
-              onClick={() => {
-                setCursor(history.at(-1));
-                setHistory((h) => h.slice(0, -1));
-              }}
-            >
-              Previous
-            </button>
-            <button
-              disabled={!page?.nextCursor || loading}
-              onClick={() => {
-                setHistory((h) => [...h, cursor]);
-                setCursor(page?.nextCursor || undefined);
-              }}
-            >
-              Next
-            </button>
-          </div>
-          {editable && (
-            <GisSchema
-              key={dataset.id + ':' + dataset.revision}
-              dataset={dataset}
-              query={{ ...query, datasetId: dataset.id }}
-              save={(next) =>
-                attempt(() =>
-                  mutate(() =>
-                    gisApi('gis-dataset-save', {
-                      dataset: next,
-                      expectedRevision: dataset.revision,
-                      operationId: crypto.randomUUID(),
-                    }),
-                  ),
-                )
-              }
-            />
-          )}
-          <details>
-            <summary>Export filtered or selected data</summary>
-            <p>
-              Exports run against this exact revision. A download includes CRS
-              and provenance metadata.
-            </p>
-            <div className="gis-toolbar">
-              {['geojson', 'csv', 'gpkg'].map((format) => (
-                <button
-                  key={format}
-                  disabled={!editable || loading}
-                  onClick={() =>
-                    void attempt(() =>
-                      mutate(() =>
-                        gisApi('gis-job-start', {
-                          operationId: crypto.randomUUID(),
-                          tool: 'export',
-                          name: dataset.name + ' export',
-                          input: {
-                            ...query,
-                            datasetId: dataset.id,
-                            revision: dataset.revision,
-                            ...(selected.size ? { keys: [...selected] } : {}),
-                          },
-                          parameters: { format, crs: 'EPSG:4326' },
-                        }),
-                      ),
-                    )
-                  }
-                >
-                  {format === 'gpkg' ? 'GeoPackage' : format.toUpperCase()}
-                </button>
-              ))}
+                </thead>
+                <tbody>
+                  {page?.features.map((f) => (
+                    <tr
+                      key={f.id}
+                      className={selected.has(f.id) ? 'selected' : ''}
+                    >
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={'Select ' + f.id}
+                          checked={selected.has(f.id)}
+                          onChange={(e) =>
+                            setSelected((s) => {
+                              const next = new Set(s);
+                              if (e.target.checked && next.size < 500)
+                                next.add(f.id);
+                              else next.delete(f.id);
+                              return next;
+                            })
+                          }
+                        />
+                      </td>
+                      <td>
+                        <button
+                          title={f.id}
+                          onClick={() => focusGisFeature(map, f)}
+                        >
+                          {String(f.properties.name || f.id).slice(0, 50)}
+                        </button>
+                        {editable && f.geometry && (
+                          <button
+                            disabled={loading}
+                            onClick={() =>
+                              void attempt(async () => {
+                                const result = await gisApi('gis-feature', {
+                                  datasetId: dataset.id,
+                                  key: f.id,
+                                  revision: page.revision,
+                                });
+                                onEdit(result.source, result.edit);
+                              })
+                            }
+                          >
+                            Edit geometry
+                          </button>
+                        )}
+                      </td>
+                      {fields.map((field) => (
+                        <td key={field.name}>
+                          <AttributeCell
+                            key={field.name + ':' + page.revision}
+                            field={field}
+                            value={f.properties[field.name] ?? null}
+                            disabled={!editable || loading}
+                            save={(v) => save(f, field, v)}
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <p>Open Analyze to follow the job and download the result.</p>
-          </details>
+            <div className="gis-toolbar">
+              <span>
+                {page?.total.toLocaleString() || 0} matching · {selected.size}{' '}
+                selected · showing at most 100 geometries
+              </span>
+              <button
+                disabled={!history.length || loading || !page}
+                onClick={() => {
+                  setCursor(history.at(-1));
+                  setHistory((h) => h.slice(0, -1));
+                }}
+              >
+                Previous
+              </button>
+              <button
+                disabled={!page?.nextCursor || loading}
+                onClick={() => {
+                  setHistory((h) => [...h, cursor]);
+                  setCursor(page?.nextCursor || undefined);
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </WorkspacePane>
+          <WorkspacePane
+            id="right"
+            title="Schema, style and exports"
+            className="gis-pane gis-workspace"
+          >
+            {editable && (
+              <GisSchema
+                key={dataset.id + ':' + dataset.revision}
+                dataset={dataset}
+                query={{ ...query, datasetId: dataset.id }}
+                save={(next) =>
+                  attempt(() =>
+                    mutate(() =>
+                      gisApi('gis-dataset-save', {
+                        dataset: next,
+                        expectedRevision: dataset.revision,
+                        operationId: crypto.randomUUID(),
+                      }),
+                    ),
+                  )
+                }
+              />
+            )}
+            <details>
+              <summary>Export filtered or selected data</summary>
+              <p>
+                Exports run against this exact revision. A download includes CRS
+                and provenance metadata.
+              </p>
+              <div className="gis-toolbar">
+                {['geojson', 'csv', 'gpkg'].map((format) => (
+                  <button
+                    key={format}
+                    disabled={!editable || loading}
+                    onClick={() =>
+                      void attempt(() =>
+                        mutate(() =>
+                          gisApi('gis-job-start', {
+                            operationId: crypto.randomUUID(),
+                            tool: 'export',
+                            name: dataset.name + ' export',
+                            input: {
+                              ...query,
+                              datasetId: dataset.id,
+                              revision: dataset.revision,
+                              ...(selected.size ? { keys: [...selected] } : {}),
+                            },
+                            parameters: { format, crs: 'EPSG:4326' },
+                          }),
+                        ),
+                      )
+                    }
+                  >
+                    {format === 'gpkg' ? 'GeoPackage' : format.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              <p>Open Analyze to follow the job and download the result.</p>
+            </details>
+          </WorkspacePane>
         </>
       )}
     </>

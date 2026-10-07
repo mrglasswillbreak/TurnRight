@@ -1,5 +1,11 @@
 # Campuses and editable map imports
 
+## Finding imports
+
+Use **Campus menu → Campuses**, or **Data → Imports**. Campus management is separate from the five primary workspaces. It opens a focused directory and import form, with a persistent heading and responsive scrolling. Close it to return to the map.
+
+![Isolated campus import fixture with inspected fields](assets/screenshots/redesign-imports-2026-10-07.png)
+
 ## Import into the team GIS workflow
 
 Spatial import is the first step of **Data → Edit → Analyze → Review → Publish**. Campus editors can import and accept source proposals into the shared draft; source acceptance records a contributor and does not approve a release. Administrators manage campus settings and memberships. All source/import reads and writes are scoped to campus capabilities.

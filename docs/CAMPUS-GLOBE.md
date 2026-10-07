@@ -1,5 +1,11 @@
 # Campus discovery and offline switching
 
+## Current view
+
+![Campus globe in a desktop dark theme](assets/screenshots/redesign-globe-2026-10-07.png)
+
+*Local application capture using published campus assets; phone/desktop screenshots do not establish physical-device performance.*
+
 Open **Choose a campus** beside public search to browse the globe and search published campus names. The chooser is non-modal: dragging, zooming and selecting on the map remain available while it is open. Escape or Close dismisses it and restores focus. Other application dialogs retain their modal behavior.
 
 ## Select a campus
