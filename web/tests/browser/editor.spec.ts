@@ -2216,28 +2216,57 @@ test('path crossing controls persist automatic connection and bridge choices', a
   ).toBe(true);
 });
 async function clickMap(page: Page, coordinates: Position) {
-  // Feature selection can animate the camera. Project only after it settles.
+  // React pane changes and MapLibre resizing both commit on animation frames.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
   await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
-    .toBe(false);
-  // Dock resizing can leave a fixture coordinate outside the visible canvas.
-  // Reframe it with the map's normal camera before sending the pointer event.
+    .poll(() =>
+      page.evaluate(() => {
+        const map = window.editorTestMap;
+        return (
+          !map.isMoving() &&
+          Math.abs(map.transform.width - map.getContainer().clientWidth) < 1 &&
+          Math.abs(map.transform.height - map.getContainer().clientHeight) < 1
+        );
+      }),
+    )
+    .toBe(true);
+  // Reframe fixture points that are outside the canvas or beneath a real
+  // control (including the drawing guidance), just as a user would pan.
   await page.evaluate((coordinates) => {
     const map = window.editorTestMap;
     const point = map.project(coordinates);
-    const canvas = map.getCanvas().getBoundingClientRect();
+    const canvas = map.getCanvas();
+    const rect = canvas.getBoundingClientRect();
     if (
       point.x < 70 ||
-      point.x > canvas.width - 70 ||
+      point.x > rect.width - 70 ||
       point.y < 70 ||
-      point.y > canvas.height - 150
+      point.y > rect.height - 150 ||
+      document.elementFromPoint(rect.left + point.x, rect.top + point.y) !==
+        canvas
     )
       map.panTo(coordinates, { duration: 0 });
   }, coordinates);
-  const p = await position(page, coordinates);
-  await page.mouse.click(p.x, p.y);
-  // Selection framing is scheduled by a React effect on the next frame.
-  // Observe that frame before testing isMoving, which can still be false here.
+  // Selection queries must observe the newly rendered viewport, not tiles
+  // left over from the previous pane dimensions or camera.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.editorTestMap;
+        map.once('render', () => resolve());
+        map.triggerRepaint();
+      }),
+  );
+  const p = await page.evaluate((coordinates) => {
+    const point = window.editorTestMap.project(coordinates);
+    return { x: point.x, y: point.y };
+  }, coordinates);
+  await page.locator('.maplibregl-canvas').click({ position: p });
   await page.evaluate(
     () =>
       new Promise<void>((resolve) =>
@@ -9498,7 +9527,12 @@ test('campus layer feature search resets the real scroll position and keeps resu
   const workspace = page.getByRole('region', { name: 'Campus layers' });
   await workspace.getByRole('tab', { name: 'Layers', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
-  await expect(workspace.getByRole('tab', { name: /^Features/ })).toBeFocused();
+  if ((page.viewportSize()?.width || 0) < 1200)
+    await expect(page.getByLabel('Search layer features')).toBeFocused();
+  else
+    await expect(
+      workspace.getByRole('tab', { name: /^Features/ }),
+    ).toBeFocused();
   const attributes = page.getByRole('region', {
     name: 'Layer attributes',
     exact: true,

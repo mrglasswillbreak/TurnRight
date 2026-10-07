@@ -488,6 +488,31 @@ test('GIS released layouts retain immutable package identity and reject a differ
   });
   await expect(panel).toContainText('Release ' + data.version);
   await panel.getByRole('button', { name: 'Set flat view' }).click();
+  // Flat-view framing can request a new set of tiles. Keep the export's
+  // readiness guard intact and wait for those real tiles before downloading.
+  await page.waitForFunction(() => {
+    type Hook = { memoizedState?: { current?: MapInstance }; next?: Hook };
+    type Fiber = { memoizedState?: Hook; return?: Fiber };
+    const element = document.querySelector('.map-canvas');
+    const key = Object.keys(element || {}).find((k) =>
+      k.startsWith('__reactFiber'),
+    );
+    let fiber =
+      element && key
+        ? (element as unknown as Record<string, Fiber>)[key]
+        : undefined;
+    while (fiber) {
+      let hook = fiber.memoizedState;
+      while (hook) {
+        const map = hook.memoizedState?.current;
+        if (map?.getCanvas && map?.project)
+          return !map.isMoving() && map.areTilesLoaded() && map.getPitch() < 1;
+        hook = hook.next;
+      }
+      fiber = fiber.return;
+    }
+    return false;
+  });
   const download = page.waitForEvent('download');
   await panel.getByRole('button', { name: 'Export released PNG' }).click();
   const file = await download;

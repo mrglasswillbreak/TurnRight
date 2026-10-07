@@ -8,6 +8,23 @@ export async function collapseExplorer(page: Page) {
   if ((await toggle.getAttribute('aria-pressed')) === 'true')
     await toggle.click();
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  // The pane group applies its layout on the next animation frame. Wait for
+  // both the pane and MapLibre viewport before projecting click coordinates.
+  await expect
+    .poll(() =>
+      page
+        .locator('.workspace-pane[data-pane="left"]')
+        .evaluate((pane) => pane.parentElement!.getBoundingClientRect().width),
+    )
+    .toBeLessThan(1);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const map = window.editorTestMap;
+        return Math.abs(map.transform.width - map.getContainer().clientWidth);
+      }),
+    )
+    .toBeLessThan(1);
 }
 export async function openEditorSection(
   page: Page,
