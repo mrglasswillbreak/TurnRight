@@ -338,7 +338,11 @@ export default function Admin({
   if (!workspace || !state)
     return (
       <main className="loading-screen">
-        <a className="brandmark" href={campusUrl('/')}>
+        <a
+          className="brandmark"
+          href={campusUrl('/')}
+          aria-label="TurnRight public map"
+        >
           <BrandMark />
         </a>
         <LockKeyhole size={28} />
