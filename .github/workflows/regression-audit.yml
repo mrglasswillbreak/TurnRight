@@ -38,6 +38,7 @@ jobs:
       - run: npm ci
       - run: npm test -- --maxWorkers=2
       - run: npm run lint
+      - run: node scripts/check-docs.mjs
       - run: npm run check:configured-build
       - uses: actions/setup-python@v5
         with:
