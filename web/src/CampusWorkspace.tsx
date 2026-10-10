@@ -643,6 +643,13 @@ export default function CampusWorkspace({
                       ? 'Inspect the proposed changes before adding them to source review.'
                       : 'Add your files, then inspect the available layers.')}
               </output>
+              {job.artifacts_expired_at && (
+                <p className="notice">
+                  Source files expired under the storage retention policy.
+                  This summary and all review changes are still available.
+                  Use Check source to download a fresh import.
+                </p>
+              )}
               {(job.status === 'draft' || job.status === 'failed') && (
                 <div className="import-upload">
                   {selectedSource?.kind === 'file' && (
@@ -1056,8 +1063,10 @@ export default function CampusWorkspace({
                         job.summary.repairs.length && (
                         <p className="hint">
                           Showing the first {job.summary.repairs.length}{' '}
-                          receipts. The complete report is retained with the
-                          private import candidate.
+                          receipts.{' '}
+                          {job.artifacts_expired_at
+                            ? 'The remaining receipts expired with the old source files.'
+                            : 'The complete report is retained with the private import candidate.'}
                         </p>
                       )}
                       {job.summary.repairs.map((r, i) => (
