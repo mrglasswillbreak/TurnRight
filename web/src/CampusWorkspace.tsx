@@ -160,9 +160,16 @@ export default function CampusWorkspace({
   useEffect(() => {
     if (!resumable) return;
     const timer = setInterval(() => {
-      void api<{ job: CampusImport }>('import-get', { importId: job!.id })
+      void api<{ job: CampusImport }>('import-get', {
+        importId: job!.id,
+        statusOnly: true,
+      })
         .then(({ job: next }) => {
           setJob(next);
+          if (next.status === 'reviewed')
+            setNotice(
+              'Changes are queued. Review source changes before publishing.',
+            );
           if (next.status === 'mapping')
             setConfiguration(suggestMappings(next));
         })
@@ -1128,22 +1135,31 @@ export default function CampusWorkspace({
                     onClick={() =>
                       void run(async () => {
                         try {
-                          await api('import-queue', { importId: job.id });
+                          const result = await api<{ job: CampusImport }>(
+                            'import-queue',
+                            { importId: job.id },
+                          );
+                          setJob(result.job);
                         } catch (error) {
                           // A lost response does not mean the transaction failed.
                           const result = await api<{ job: CampusImport }>(
                             'import-get',
                             { importId: job.id },
                           ).catch(() => null);
-                          if (result?.job.status !== 'reviewed') {
+                          if (
+                            !result ||
+                            !['queued', 'running', 'reviewed'].includes(
+                              result.job.status,
+                            )
+                          ) {
                             setUncertainReview(job.id);
                             throw error;
                           }
+                          setJob(result.job);
                         }
-                        setJob({ ...job, status: 'reviewed' });
                         setUncertainReview(null);
                         setNotice(
-                          'Changes are queued. Review source changes before publishing.',
+                          'Preparing changes for review. You can leave this screen while the worker finishes.',
                         );
                         void refresh().catch(() => {});
                       })
@@ -1184,7 +1200,11 @@ export default function CampusWorkspace({
                   <Button
                     variant="outline"
                     disabled={busy}
-                    onClick={() => void startPhase(job.phase)}
+                    onClick={() =>
+                      void startPhase(
+                        job.phase === 'queue' ? 'preview' : job.phase,
+                      )
+                    }
                   >
                     Retry import
                   </Button>

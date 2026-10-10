@@ -349,7 +349,7 @@ async function setup(
     }
     if (action === 'import-queue' && job) {
       job.status = 'reviewed';
-      result = { count: 42 };
+      result = { job };
     }
     return r.fulfill({ json: result });
   });

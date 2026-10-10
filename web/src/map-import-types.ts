@@ -126,7 +126,7 @@ export interface CampusImport {
     | 'reviewed'
     | 'cancelled'
     | 'failed';
-  phase: 'inspect' | 'preview';
+  phase: 'inspect' | 'preview' | 'queue';
   configuration: ImportConfiguration;
   run_token: string;
   message?: string;

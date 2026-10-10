@@ -13,6 +13,55 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
+it('dispatches manual review to the worker without downloading a large candidate', async () => {
+  vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');
+  vi.stubEnv('GITHUB_REPOSITORY', 'test/repository');
+  vi.stubEnv('GITHUB_WORKFLOW_TOKEN', 'test-only');
+  const preview = {
+    ...job,
+    status: 'preview',
+    candidate_path: `lasu/${id}/candidate.json`,
+    summary: { errors: [] },
+  };
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json([preview]))
+    .mockResolvedValueOnce(
+      Response.json([{ ...preview, status: 'queued', phase: 'queue' }]),
+    )
+    .mockResolvedValueOnce(new Response(null, { status: 204 }));
+  vi.stubGlobal('fetch', fetcher);
+  expect(await mapImportAction('import-queue', { importId: id })).toMatchObject(
+    { job: { status: 'queued', phase: 'queue' } },
+  );
+  expect(fetcher).toHaveBeenCalledTimes(3);
+  expect(String(fetcher.mock.calls[2][0])).toContain(
+    'map-import.yml/dispatches',
+  );
+  expect(
+    fetcher.mock.calls.some(
+      (c) =>
+        String(c[0]).includes('/storage/') || String(c[0]).includes('/rpc/'),
+    ),
+  ).toBe(false);
+});
+it('omits large preview summaries from the import history', async () => {
+  vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');
+  const fetcher = vi.fn().mockImplementation(async () => Response.json([]));
+  vi.stubGlobal('fetch', fetcher);
+  await mapImportAction('import-list', {});
+  const url = new URL(
+    String(
+      fetcher.mock.calls.find((c) =>
+        String(c[0]).includes('campus_imports'),
+      )![0],
+    ),
+  );
+  expect(url.searchParams.get('select')?.split(',')).not.toContain('summary');
+  expect(url.searchParams.get('select')).toContain('status');
+});
 it('reopens a failed upload with a new token and reuses its reserved asset', async () => {
   vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');

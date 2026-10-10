@@ -63,6 +63,7 @@ beforeAll(async () => {
     '020_campus_layer_records.sql',
     '021_reviewed_release_snapshot.sql',
     '022_monotonic_editor_revisions.sql',
+    '038_stream_import_source_comparison.sql',
   ]) {
     // PGlite runs PostgreSQL; geometry is JSONB in this schema. Only the unused
     // PostGIS extension declaration is omitted from the local test environment.
@@ -1230,6 +1231,84 @@ it('queues a large import atomically without losing campus, token, validation or
       "select has_function_privilege('service_role','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') service, has_function_privilege('authenticated','queue_campus_import(uuid,uuid,jsonb,jsonb)','EXECUTE') browser",
     );
     expect(grants.rows[0]).toEqual({ service: true, browser: false });
+  } finally {
+    await database.exec("select set_config('request.headers','{}',false)");
+  }
+}, 30000);
+
+it('compares every import source field without assembling a second campus snapshot', async () => {
+  const campus = 'stream-import-test',
+    source = randomUUID(),
+    job = randomUUID(),
+    token = randomUUID();
+  await database.exec(
+    "insert into campuses(id,slug,name,boundary,bounds) select 'stream-import-test','stream-import-test','Stream import',boundary,bounds from campuses where id='lasu'",
+  );
+  await database.query(
+    "insert into campus_sources(id,campus_id,name,kind) values($1,$2,'Vectors','file')",
+    [source, campus],
+  );
+  await database.query(
+    "insert into campus_imports(id,campus_id,source_id,configuration,run_token,status,summary) values($1,$2,$3,'{}',$4,'preview','{\"errors\":[]}')",
+    [job, campus, source, token],
+  );
+  await database.query(
+    `insert into source_features(campus_id,id,entity,source,hash,payload)
+     select $1,'feature:' || lpad(n::text,4,'0'),'feature','import:' || $2,'same-hash',
+       jsonb_build_object('name','Building ' || n,'metadata',jsonb_build_object('note',repeat('x',8192),'optional',null))
+     from generate_series(1,256) n`,
+    [campus, source],
+  );
+  const expected = (
+    await database.query<{ record: Record<string, unknown> }>(
+      'select to_jsonb(s) as record from source_features s where campus_id=$1 order by id',
+      [campus],
+    )
+  ).rows.map((r) => r.record);
+  const queue = (snapshot: unknown) =>
+    database.query<{ count: number }>(
+      "select queue_campus_import($1,$2,'[]',$3) as count",
+      [job, token, JSON.stringify(snapshot)],
+    );
+  try {
+    await database.query("select set_config('request.headers',$1,false)", [
+      JSON.stringify({ 'x-turnright-campus': campus }),
+    ]);
+    const changedPayload = structuredClone(expected);
+    (changedPayload[128].payload as { name: string }).name =
+      'Changed without a hash update';
+    const missingField = structuredClone(expected);
+    delete missingField[0].source;
+    for (const stale of [
+      null,
+      {},
+      expected.slice(1),
+      [...expected, expected[0]],
+      [expected[0], ...expected.slice(0, -1)],
+      [...expected].reverse(),
+      changedPayload,
+      missingField,
+      expected.map((r, i) => (i === 0 ? { ...r, campus_id: 'lasu' } : r)),
+    ]) {
+      await expect(queue(stale)).rejects.toThrow(/campus changed/);
+    }
+    expect(
+      (
+        await database.query<{ status: string }>(
+          'select status from campus_imports where id=$1',
+          [job],
+        )
+      ).rows[0].status,
+    ).toBe('preview');
+    expect((await queue(expected)).rows[0].count).toBe(0);
+    expect(
+      (
+        await database.query<{ record: Record<string, unknown> }>(
+          'select to_jsonb(s) as record from source_features s where campus_id=$1 order by id',
+          [campus],
+        )
+      ).rows.map((r) => r.record),
+    ).toEqual(expected);
   } finally {
     await database.exec("select set_config('request.headers','{}',false)");
   }
