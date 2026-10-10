@@ -1,22 +1,24 @@
 """Bound review-queue requests before PostgreSQL parses any candidate JSON."""
 import json
 
-MAX_BATCH_BYTES = 256 * 1024
+MAX_BATCH_BYTES = 384 * 1024
 MAX_BATCH_RECORDS = 100
 
 
 def batches(records):
     batch, size, offset = [], 2, 0
     for record in records:
-        length = len(json.dumps(record, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode('utf-8'))
+        # Count whitespace too, leaving headroom under the DB's 512 KiB JSONB
+        # text limit. UNILAG's largest before/after proposal is about 336 KiB.
+        length = len(json.dumps(record, ensure_ascii=False, allow_nan=False).encode('utf-8'))
         if length + 2 > MAX_BATCH_BYTES:
-            raise ValueError('An import record exceeds 256 KiB. Simplify this feature before retrying.')
-        if batch and (size + length + 1 > MAX_BATCH_BYTES or len(batch) == MAX_BATCH_RECORDS):
+            raise ValueError('An import record exceeds 384 KiB. Simplify this feature before retrying.')
+        if batch and (size + length + 2 > MAX_BATCH_BYTES or len(batch) == MAX_BATCH_RECORDS):
             yield offset, batch
             offset += len(batch)
             batch, size = [], 2
         batch.append(record)
-        size += length + (1 if len(batch) > 1 else 0)
+        size += length + (2 if len(batch) > 1 else 0)
     if batch:
         yield offset, batch
 

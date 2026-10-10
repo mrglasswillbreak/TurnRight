@@ -2,7 +2,7 @@
 
 ## Finding imports
 
-Migration 039 replaces the whole-candidate queue RPC with private staging: at most 100 records and 256 KiB of compact JSON per worker request, followed by one atomic baseline validation and review transaction. Cancellation, stale previews and incomplete batches leave the review queue unchanged. Manual **Queue for review** runs in the worker and shows progress. Import history and active-job polling omit preview geometry. The retired unbounded RPC must not be restored when rolling back application code.
+Migration 039 replaces the whole-candidate queue RPC with private staging: at most 100 records and 384 KiB of JSON per worker batch, within the database's 512 KiB limit, followed by one atomic baseline validation and review transaction. Cancellation, stale previews and incomplete batches leave the review queue unchanged. Manual **Queue for review** runs in the worker and shows progress. Import history and active-job polling omit preview geometry. The retired unbounded RPC must not be restored when rolling back application code.
 
 For a one-off check while a source's schedule is paused, run **Check opted-in campus sources** with its `source_id`. This bypasses the daily interval for that source without changing its schedule; it still creates review proposals rather than accepting or publishing them.
 

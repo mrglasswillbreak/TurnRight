@@ -26,11 +26,13 @@ with psycopg.connect(url, autocommit=True) as db:
     db.execute("insert into campus_imports(id,source_id,status,phase,run_token,summary,configuration) values(%s,%s,'preview','preview',%s,'{\"errors\":[]}','{}')", (job, source, token))
     # Incompressible private attributes represent real import geometry/metadata.
     db.execute("insert into source_features(id,source,entity,payload,hash) select 'feature:scale:'||lpad(i::text,6,'0'),%s,'feature',jsonb_build_object('data',(select string_agg(md5(i::text||':'||j::text),'') from generate_series(1,90) j)),md5(i::text) from generate_series(1,10574) i", ('import:' + source,))
+    db.execute("update source_features set payload=jsonb_build_object('data',%s) where id='feature:scale:000001'", (os.urandom(83500).hex(),))
     baseline = [r[0] for r in db.execute('select to_jsonb(s) from source_features s order by id')]
     proposals = [{'id': 'scale-change-' + str(i), 'source_id': r['id'], 'kind': 'modify', 'before': r, 'after': {**r, 'hash': 'new-' + r['hash']}, 'base_hash': r['hash'], 'summary': 'Scale review'} for i, r in enumerate(baseline[:3647])]
     candidate = {'summary': {'errors': []}, 'expectedSources': baseline, 'proposals': proposals}
     size = len(json.dumps(candidate).encode())
     assert size > 31454509
+    assert 256 * 1024 < len(json.dumps(proposals[0]).encode()) < 384 * 1024
     latencies, failures, requests = [], [], []
     stopped = threading.Event()
     def monitor():
@@ -60,7 +62,7 @@ with psycopg.connect(url, autocommit=True) as db:
     elapsed = time.monotonic() - start
     assert not failures, failures
     assert latencies and max(latencies) < 2
-    assert max(requests) < 263000
+    assert max(requests) < 394000
     assert elapsed < 120
     assert db.execute('select pg_postmaster_start_time()').fetchone()[0] == boot
     assert db.execute('select count(*) from source_features').fetchone()[0] == 10574

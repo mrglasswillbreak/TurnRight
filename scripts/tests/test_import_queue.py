@@ -19,9 +19,15 @@ class ImportQueueTests(unittest.TestCase):
 
     def test_oversized_record_rejected_before_any_database_request(self):
         calls = []
-        with self.assertRaisesRegex(ValueError, '256 KiB'):
+        with self.assertRaisesRegex(ValueError, '384 KiB'):
             queue_import(lambda *args: calls.append(args), 'job', 'token', {'summary': {'errors': []}, 'expectedSources': [], 'proposals': [{'id': 'a', 'payload': 'x' * MAX_BATCH_BYTES}]})
         self.assertEqual(calls, [])
+
+    def test_large_before_after_proposal_fits_without_raising_database_limit(self):
+        rows = [{'id': 'large', 'before': {'data': 'x' * 167000}, 'after': {'data': 'y' * 167000}}]
+        chunks = list(batches(rows))
+        self.assertEqual(chunks, [(0, rows)])
+        self.assertLess(len(json.dumps(chunks[0][1]).encode()), 512 * 1024)
 
     def test_incomplete_upload_never_finishes(self):
         calls = []
