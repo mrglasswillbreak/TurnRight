@@ -126,4 +126,46 @@ it('stages bounded requests and preserves atomic, scoped, stale-preview and retr
       ).rows[0].allowed,
     ).toBe(false);
   }
+  // A daily rerun must retain identical pending proposals while superseding
+  // obsolete ones; ON CONFLICT alone would otherwise silently discard them.
+  await db.query(
+    "insert into map_changes(id,source_id,kind,after,summary) values('obsolete','feature:queue','modify',$1,'Old proposal')",
+    [JSON.stringify(proposal.after)],
+  );
+  const rerun = randomUUID();
+  await db.query(
+    "insert into campus_imports(id,source_id,status,phase,run_token,summary,configuration) values($1,$2,'preview','preview',$3,'{\"errors\":[]}','{}')",
+    [rerun, source, token],
+  );
+  await db.query('select begin_campus_import_queue($1,$2,$3,1)', [
+    rerun,
+    token,
+    baseline.length,
+  ]);
+  await db.query("select stage_campus_import_queue($1,$2,'source',0,$3)", [
+    rerun,
+    token,
+    JSON.stringify(baseline),
+  ]);
+  await db.query("select stage_campus_import_queue($1,$2,'proposal',0,$3)", [
+    rerun,
+    token,
+    JSON.stringify([proposal]),
+  ]);
+  expect(
+    (
+      await db.query<{ count: number }>(
+        'select finish_campus_import_queue($1,$2) count',
+        [rerun, token],
+      )
+    ).rows[0].count,
+  ).toBe(0);
+  expect(
+    (await db.query("select status from map_changes where id='queue-proposal'"))
+      .rows[0].status,
+  ).toBe('pending');
+  expect(
+    (await db.query("select status from map_changes where id='obsolete'"))
+      .rows[0].status,
+  ).toBe('superseded');
 }, 60000);

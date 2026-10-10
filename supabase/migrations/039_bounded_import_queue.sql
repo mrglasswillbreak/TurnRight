@@ -107,7 +107,9 @@ begin
   raise exception 'The campus changed. Rebuild the import preview.';
  end if;
  if clock_timestamp()>deadline then raise exception 'Import source validation exceeded its time limit'; end if;
- update map_changes set status='superseded' where campus_id=campus and status='pending' and (after->>'source'='import:' || job.source_id::text or before->>'source'='import:' || job.source_id::text);
+ update map_changes m set status='superseded' where m.campus_id=campus and m.status='pending'
+  and (m.after->>'source'='import:' || job.source_id::text or m.before->>'source'='import:' || job.source_id::text)
+  and not exists(select 1 from campus_import_queue_records q where q.import_id=job.id and q.kind='proposal' and q.record->>'id'=m.id);
  insert into map_changes(id,source_id,kind,before,after,base_hash,summary)
  select record->>'id',record->>'source_id',record->>'kind',nullif(record->'before','null'),nullif(record->'after','null'),record->>'base_hash',record->>'summary'
  from campus_import_queue_records q where q.import_id=job.id and q.kind='proposal'
