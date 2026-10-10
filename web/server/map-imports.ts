@@ -153,7 +153,7 @@ async function storage(path: string, method = 'GET', body?: unknown) {
   return response;
 }
 const jobColumns =
-  'id,campus_id,source_id,status,phase,configuration,run_token,message,created_at,updated_at';
+  'id,campus_id,source_id,status,phase,configuration,run_token,message,created_at,updated_at,artifacts_expired_at';
 async function jobById(id: unknown, statusOnly = false) {
   if (!uuid(id)) throw new HttpError(400, 'Invalid import identity.');
   const [job] = await db<(CampusImport & { candidate_path?: string })[]>(
@@ -261,6 +261,11 @@ export async function mapImportAction(
         `campus_import_assets?import_id=eq.${job.id}&order=name`,
       ),
     };
+  if (job.artifacts_expired_at)
+    throw new HttpError(
+      409,
+      'These source files have expired. Start a new source check; the import summary and review data are retained.',
+    );
   if (action === 'import-upload') {
     if (!['draft', 'failed'].includes(job.status))
       throw new HttpError(409, 'Start a new import to add files.');

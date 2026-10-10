@@ -13,6 +13,41 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
+it('keeps expired import history readable but rejects retries before any write', async () => {
+  vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');
+  const expired = {
+    ...job,
+    status: 'cancelled',
+    artifacts_expired_at: '2026-10-10T00:00:00Z',
+    summary: { errors: [] },
+  };
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json([expired]))
+    .mockResolvedValueOnce(Response.json([]));
+  vi.stubGlobal('fetch', fetcher);
+  expect(await mapImportAction('import-get', { importId: id })).toMatchObject({
+    job: expired,
+  });
+  fetcher
+    .mockReset()
+    .mockImplementation(async () => Response.json([expired]));
+  for (const action of [
+    'import-run',
+    'import-queue',
+    'import-upload',
+    'import-cancel',
+  ]) {
+    await expect(mapImportAction(action, { importId: id })).rejects.toThrow(
+      'Start a new source check',
+    );
+  }
+  expect(fetcher).toHaveBeenCalledTimes(4);
+  expect(fetcher.mock.calls.every((call) => call[1].method === 'GET')).toBe(
+    true,
+  );
+});
 it('dispatches manual review to the worker without downloading a large candidate', async () => {
   vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');

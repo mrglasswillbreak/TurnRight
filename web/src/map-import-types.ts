@@ -130,6 +130,7 @@ export interface CampusImport {
   configuration: ImportConfiguration;
   run_token: string;
   message?: string;
+  artifacts_expired_at?: string;
   summary?: ImportPreview;
   created_at: string;
   updated_at: string;

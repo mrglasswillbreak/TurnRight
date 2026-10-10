@@ -22,7 +22,7 @@ The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stabl
 
 TurnRight keeps separate campus maps with campus-scoped team memberships. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography stays private until the team submits an immutable snapshot, obtains independent approval and publishes a campus release.
 
-**Required schema:** migrations 001–039. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–040. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 
@@ -91,7 +91,7 @@ The six supplied UNILAG examples were also checked locally without changing thei
 
 Choose an import role for each layer: building, path, place, entrance, barrier, land cover, road-surface, overlay, boundary or skip. Suggested mappings are editable. Names, categories, heights, floors, road class, surface, width, land use, vegetation and access fields map to the existing editor model. Unknown point, line and polygon datasets can remain generic overlays with editable labels, colour, opacity, visibility and order. ArcGIS aliases and coded-value labels appear in the selectors. Height and width units can be metres or feet; floor counts remain properties.
 
-Choose a stable identifier for file reimports. OSM node/way/relation IDs are retained automatically. Without a stable identifier, content-derived identities can change when content changes; names and nearby coordinates are not treated as identity. Select an accepted layer identity after a filename/layer rename to reuse its mappings. Duplicate layer names are disambiguated by dataset context. Original files, attributes, source URLs, snapshots and hashes stay in private import storage.
+Choose a stable identifier for file reimports. OSM node/way/relation IDs are retained automatically. Without a stable identifier, content-derived identities can change when content changes; names and nearby coordinates are not treated as identity. Select an accepted layer identity after a filename/layer rename to reuse its mappings. Duplicate layer names are disambiguated by dataset context. Original uploads stay private. Source attributes, URLs, hashes and import summaries remain available; generated remote-source snapshots follow the retention policy below.
 
 Supported coordinate systems are converted to WGS84 through GDAL/PROJ. The layer
 summary shows the detected source projection; leave the override empty to retain
@@ -105,7 +105,7 @@ the mapping step cannot reinterpret projected metres as degrees.
 
 **Build preview** reports additions, changes, removals, skipped features, invalid geometry, overlap candidates and disconnected walking networks. Long forms scroll inside the workspace. Mapping choices survive tab changes, resizing and rotation. The preview allocates coverage to each layer and spreads samples across its complete feature list. An explicit per-layer shown/total indicator identifies sampling; validation covers every feature. GeometryCollections split into stable editable component identities. Null geometries, duplicate identifiers and coordinate problems are reported.
 
-Routine winding, closable rings and consecutive duplicate vertices are normalized automatically. A polygon repair is accepted only if it is valid, nonempty, retains all components, and changes area by no more than 1% in a local equal-area projection. Dimension-changing/collapsed geometry or larger changes require review. Original uploads and geometry hashes stay private. The preview shows repair actions and area diagnostics; complete receipts remain in the private candidate even when its visible report is capped. [Why repair output types need checking](https://shapely.readthedocs.io/en/stable/reference/shapely.make_valid.html).
+Routine winding, closable rings and consecutive duplicate vertices are normalized automatically. A polygon repair is accepted only if it is valid, nonempty, retains all components, and changes area by no more than 1% in a local equal-area projection. Dimension-changing/collapsed geometry or larger changes require review. Original uploads and geometry hashes stay private. The preview shows repair actions and area diagnostics; complete receipts remain in the private candidate even when its visible report is capped, until that candidate expires under the retention policy. [Why repair output types need checking](https://shapely.readthedocs.io/en/stable/reference/shapely.make_valid.html).
 
 ![Landscape import review](assets/screenshots/campus-landscape-2026-09-26.png)
 
@@ -156,6 +156,16 @@ Sources default to **Manual**. File sources refresh through **Replace file**. On
 Overpass snapshots are reused for 15 minutes per source. Requests have bounded retries and backoff. Configure `OVERPASS_URL` for another endpoint. Daily OSM checks remain unavailable unless `OVERPASS_SCHEDULE_ALLOWED=true` is set both in the server environment and GitHub repository variables for an endpoint that permits scheduled use. Map visitors never download source data.
 
 Record the source attribution, licence and redistribution permission before publication. Public availability is not itself permission to redistribute ArcGIS content. OSM attribution and ODbL information remain in public data and offline packages. The map renders each campus's source attribution rather than hard-coded LASU credits. See [source attribution](../data/ATTRIBUTION.md), [OpenStreetMap copyright](https://www.openstreetmap.org/copyright), [Overpass usage](https://dev.overpass-api.de/overpass-doc/en/preface/commons.html) and [ArcGIS querying](https://developers.arcgis.com/rest/services-reference/enterprise/query-feature-service-layer/).
+
+## Storage retention
+
+Migration 040 and **Clean expired import artifacts** remove only generated `snapshot-UUID.json` and `candidate-UUID.json` files belonging to eligible ArcGIS/OSM imports. Original uploads, file-source imports, manual previews, publication baselines, releases, accepted features, pending review proposals and saved edits are preserved. Import history keeps its configuration, hashes and summary, and explains when source files have expired.
+
+The accepted import and two newest reviewed imports per source are always retained. Completed files also have a 24-hour minimum lifetime. Automatic mapping/preview jobs older than 24 hours expire only after a newer reviewed import exists. Cancelled jobs expire after seven days; failed jobs need both seven days and a newer reviewed import. A queued/running job pauses cleanup for its whole source. Recent or shared files and imports with registered uploads are protected.
+
+Cleanup runs after the main import workflow and at 05:17 UTC. It plans at most 500 files per run and claims at most 100 files per import, using row locks before retiring the job. Expired jobs cannot be retried or reattach deleted paths: use **Check source** to fetch a fresh copy. A durable cleanup queue retries incomplete deletions. Objects are removed through the [Supabase Storage API](https://supabase.com/docs/guides/storage/management/delete-objects), never by deleting storage metadata with SQL.
+
+Deploy migration 040 before the application. First run the cleanup workflow with **apply** unchecked and inspect its exact file/byte manifest. Deletion requires repository variable `IMPORT_RETENTION_ENABLED=true`; a manual run also requires **apply** checked. Without the variable every trigger is a dry run. Set the variable to `false` to stop future deletion. Do not enable it before the database retention/race tests and the manifest review pass.
 
 ## Implementation and limits
 
