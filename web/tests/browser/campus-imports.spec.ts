@@ -859,6 +859,58 @@ test('campus imports save and reopen paths outside LASU after rotation', async (
   ).toBe(true);
 });
 
+test('campus imports wait for background review queueing to finish', async ({
+  page,
+}) => {
+  const state = await setup(page);
+  await workspace(page);
+  await fileImport(page);
+  await page
+    .getByRole('button', { name: 'Build preview', exact: true })
+    .click();
+  const queue = page.getByRole('button', {
+    name: 'Queue for review',
+    exact: true,
+  });
+  await expect(queue).toBeEnabled({ timeout: 15000 });
+  let polls = 0;
+  await page.route('**/api/admin', async (route) => {
+    const payload = route.request().postDataJSON();
+    const job = state.jobs[0];
+    if (payload.action === 'import-queue') {
+      Object.assign(job, {
+        status: 'queued',
+        phase: 'queue',
+        message: 'Waiting for the review worker',
+      });
+      return route.fulfill({ json: { job } });
+    }
+    if (payload.action === 'import-get' && job.phase === 'queue') {
+      expect(payload.payload.statusOnly).toBe(true);
+      Object.assign(job, {
+        status: ++polls < 2 ? 'running' : 'reviewed',
+        message:
+          polls < 2 ? 'Preparing review batches' : 'Changes queued for review',
+      });
+      return route.fulfill({ json: { job } });
+    }
+    return route.fallback();
+  });
+  await queue.click();
+  await expect(
+    page.getByText(
+      'Preparing changes for review. You can leave this screen while the worker finishes.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Open source review' }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Open source review' }),
+  ).toBeVisible({ timeout: 15000 });
+  expect(polls).toBe(2);
+});
+
 test('campus imports reconcile a lost queue response without submitting twice', async ({
   page,
 }) => {

@@ -80,8 +80,8 @@ end $$;
 create function public.finish_campus_import_queue(import_id uuid, expected_token uuid)
 returns integer language plpgsql security definer
 set search_path=public set lock_timeout='5s' set statement_timeout='60s' set work_mem='4MB' as $$
-declare job campus_imports; session campus_import_queue_sessions; source_row source_features;
- campus text := current_campus_id(); count_added integer; expected jsonb;
+declare job campus_imports; session campus_import_queue_sessions;
+ campus text := current_campus_id(); count_added integer;
  deadline timestamptz := clock_timestamp()+interval '45 seconds';
 begin
  if not pg_try_advisory_xact_lock(hashtext('turnright-source-review:' || campus)) then raise exception 'Another source review is running. Wait for it to finish before retrying.'; end if;
@@ -98,12 +98,15 @@ begin
  -- (including Auth) remain unblocked; a busy editor causes a bounded lock failure.
  lock table source_features in share mode;
  if session.source_count<>(select count(*) from source_features where campus_id=campus) then raise exception 'The campus changed. Rebuild the import preview.'; end if;
- for source_row in select * from source_features where campus_id=campus order by id loop
-  if clock_timestamp()>deadline then raise exception 'Import source validation exceeded its time limit'; end if;
-  select q.record into expected from campus_import_queue_records q
-   where q.import_id=job.id and q.kind='source' and q.record->>'id'=source_row.id;
-  if to_jsonb(source_row) is distinct from expected then raise exception 'The campus changed. Rebuild the import preview.'; end if;
- end loop;
+ -- Newly staged tables need current statistics: otherwise repeated point
+ -- lookups can choose scans based on the previously empty table's estimates.
+ analyze campus_import_queue_records;
+ if exists(select 1 from source_features s left join campus_import_queue_records q
+  on q.import_id=job.id and q.kind='source' and q.record->>'id'=s.id
+  where s.campus_id=campus and to_jsonb(s) is distinct from q.record) then
+  raise exception 'The campus changed. Rebuild the import preview.';
+ end if;
+ if clock_timestamp()>deadline then raise exception 'Import source validation exceeded its time limit'; end if;
  update map_changes set status='superseded' where campus_id=campus and status='pending' and (after->>'source'='import:' || job.source_id::text or before->>'source'='import:' || job.source_id::text);
  insert into map_changes(id,source_id,kind,before,after,base_hash,summary)
  select record->>'id',record->>'source_id',record->>'kind',nullif(record->'before','null'),nullif(record->'after','null'),record->>'base_hash',record->>'summary'

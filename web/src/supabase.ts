@@ -60,7 +60,7 @@ export async function api<T = unknown>(
       campus,
     );
     tracked?.finish(
-      /release|import-run|rollback/.test(action)
+      /release|import-(run|queue)|rollback/.test(action)
         ? 'Request accepted; background job status appears in Activity'
         : 'Complete',
     );
