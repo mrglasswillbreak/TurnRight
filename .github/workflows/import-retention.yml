@@ -1,0 +1,40 @@
+name: Clean expired import artifacts
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_run:
+    workflows: ['Inspect and preview campus imports']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Delete the eligible files (requires IMPORT_RETENTION_ENABLED=true)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: campus-import-retention
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      APPLY_CLEANUP: ${{ vars.IMPORT_RETENTION_ENABLED == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
+    steps:
+      # workflow_run must never execute untrusted artifacts or a pull-request checkout.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Clean only expired remote import files
+        run: |
+          if [ "$APPLY_CLEANUP" = "true" ]; then
+            python3 scripts/cleanup_imports.py --apply
+          else
+            python3 scripts/cleanup_imports.py
+          fi
