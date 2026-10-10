@@ -2,6 +2,10 @@
 
 ## Finding imports
 
+Migration 039 replaces the whole-candidate queue RPC with private staging: at most 100 records and 384 KiB of JSON per worker batch, within the database's 512 KiB limit, followed by one atomic baseline validation and review transaction. Cancellation, stale previews and incomplete batches leave the review queue unchanged. Manual **Queue for review** runs in the worker and shows progress. Import history and active-job polling omit preview geometry. The retired unbounded RPC must not be restored when rolling back application code.
+
+For a one-off check while a source's schedule is paused, run **Check opted-in campus sources** with its `source_id`. This bypasses the daily interval for that source without changing its schedule; it still creates review proposals rather than accepting or publishing them.
+
 Use **Campus menu → Campuses**, or **Data → Imports**. Campus management is separate from the five primary workspaces. It opens a focused directory and import form, with a persistent heading and responsive scrolling. Close it to return to the map.
 
 ![Isolated campus import fixture with inspected fields](assets/screenshots/redesign-imports-2026-10-07.png)
@@ -18,7 +22,7 @@ The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stabl
 
 TurnRight keeps separate campus maps with campus-scoped team memberships. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography stays private until the team submits an immutable snapshot, obtains independent approval and publishes a campus release.
 
-**Required schema:** migrations 001–037. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–039. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 

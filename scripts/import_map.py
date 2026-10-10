@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from map_import.formats import inspect_file, check_expanded_batch
 from map_import.geometry import preview_features
 from map_import.network import MAX_BYTES, fetch_public
+from map_import.queue import queue_import
 
 
 def encoded(value):
@@ -118,12 +119,21 @@ def run_job():
     if not claimed: return
     job=claimed[0]
     def live():
-        if not db(selector+'&status=eq.running'): raise ValueError('Import cancelled or replaced by another run.')
+        if not db(selector+'&status=eq.running&select=id'): raise ValueError('Import cancelled or replaced by another run.')
     def progress(message):
-        if not db(selector+'&status=eq.running','PATCH',{'message':message[:500],'updated_at':datetime.now(timezone.utc).isoformat()}):
+        if not db(selector+'&status=eq.running&select=id','PATCH',{'message':message[:500],'updated_at':datetime.now(timezone.utc).isoformat()}):
             raise ValueError('Import cancelled or replaced by another run.')
     try:
         source=db('campus_sources?id=eq.'+job['source_id'])[0]
+        if job['phase']=='queue':
+            path=job.get('candidate_path')
+            if not path or not path.startswith(f'{campus_id}/{import_id}/'):
+                raise ValueError('Prepare a complete import preview first.')
+            progress('Reading the private import candidate')
+            candidate=json.loads(remote('storage/v1/object/campus-imports/'+path,raw=True))
+            queue_import(db,import_id,token,candidate,progress)
+            db('campus_sources?id=eq.'+source['id']+'&select=id','PATCH',{'last_checked_at':datetime.now(timezone.utc).isoformat()})
+            return
         campus=db('campuses?id=eq.'+campus_id)[0]
         previous=[]
         progress('Reading existing campus records')
@@ -228,17 +238,20 @@ def run_job():
                 if len(candidate_bytes)>MAX_BYTES: raise ValueError('The normalized candidate exceeds 50 MiB. Split this source into smaller layers before retrying.')
                 remote('storage/v1/object/campus-imports/'+path,'POST',candidate_bytes)
                 update['candidate_path']=path
-            changed=db(selector+'&status=eq.running','PATCH',update)
+            changed=db(selector+'&status=eq.running&select=id','PATCH',update)
             if changed and job.get('auto_queue') and job['phase']=='preview' and not result['summary']['errors']:
-                db('rpc/queue_campus_import','POST',{'import_id':import_id,'expected_token':token,'proposals':result['proposals'],'expected_sources':result['expectedSources']})
+                queue_import(db,import_id,token,result,progress)
             db('campus_sources?id=eq.'+source['id'],'PATCH',{'last_checked_at':datetime.now(timezone.utc).isoformat()})
     except Exception as error:
-        db(selector+'&status=eq.running','PATCH',{'status':'failed','message':str(error)[:1500],'updated_at':datetime.now(timezone.utc).isoformat()})
+        try:
+            db(selector+'&status=in.(running,preview)&select=id','PATCH',{'status':'failed','message':str(error)[:1500],'updated_at':datetime.now(timezone.utc).isoformat()})
+        except Exception as reporting_error:
+            error.add_note('Could not record the failure: '+str(reporting_error)[:500])
         raise
 
 
 if __name__=='__main__':
     if len(sys.argv)>1 and sys.argv[1]=='fail':
-        db(f"campus_imports?id=eq.{os.environ['IMPORT_ID']}&run_token=eq.{os.environ['RUN_TOKEN']}&status=in.(queued,running)",'PATCH',{'status':'failed','message':'The processing job was interrupted or its runtime could not start. Retry this import.','updated_at':datetime.now(timezone.utc).isoformat()})
+        db(f"campus_imports?id=eq.{os.environ['IMPORT_ID']}&run_token=eq.{os.environ['RUN_TOKEN']}&status=in.(queued,running,preview)&select=id",'PATCH',{'status':'failed','message':'The processing job was interrupted or its runtime could not start. Retry this import.','updated_at':datetime.now(timezone.utc).isoformat()})
     elif len(sys.argv)>1 and sys.argv[1]=='convert': convert(sys.argv[2])
     else: run_job()

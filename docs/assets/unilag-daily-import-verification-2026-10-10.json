@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-10",
+  "outcome": "failed",
+  "scheduler": {
+    "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38078814032",
+    "number": 15,
+    "result": "success",
+    "durationSeconds": 13
+  },
+  "worker": {
+    "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38078826483",
+    "number": 59,
+    "result": "failure",
+    "durationSeconds": 263,
+    "commit": "77ad8314a1166bc8f83c667c6a8a2020334f182d",
+    "error": "HTTP read timed out in queue_campus_import; subsequent failure-report requests returned 520/521",
+    "failedAtUtc": "2026-10-10T19:16:03Z"
+  },
+  "import": {
+    "id": "ed5f0e83-f815-4a04-b4c1-d3990fac49d1",
+    "campus": "UNILAG",
+    "autoQueue": true,
+    "candidateBytes": 31454509,
+    "previewCounts": { "added": 0, "modified": 3647, "removed": 0, "skipped": 6870 },
+    "previewValidationErrors": [],
+    "statusBeforeContainment": "preview",
+    "statusAfterContainment": "failed",
+    "artifactsRetained": true
+  },
+  "database": {
+    "migration038DefinitionMd5": "f6fe71c764b465e97e1cdb9f5dffc756",
+    "unhealthyDuringRun": true,
+    "healthFailure": "Database not usable / CONNECT_TIMEOUT",
+    "uncleanShutdownAndAutomaticRecoveryObserved": true,
+    "newPostmasterStartUtc": "2026-10-10T19:16:02.953985Z",
+    "concurrentImportListingTimeoutUtc": "2026-10-10T19:14:59.984Z",
+    "manualRestartPerformedDuringVerification": false,
+    "exactCrashMechanismProven": false,
+    "postRecoveryDashboard": "Healthy"
+  },
+  "sourceEditReleaseCountsUnchanged": { "sources": 15432, "edits": 351, "releases": 46 },
+  "freshPostRecoveryGitHubSignIn": "Standard /admin callback completed and authenticated editor loaded with Saved status",
+  "containment": {
+    "source": "UNILAG Arcgis",
+    "previousSchedule": "daily",
+    "currentSchedule": "manual",
+    "recordedAtUtc": "2026-10-10T19:20:37.076559Z",
+    "dailyRefreshPausedPendingRepair": true,
+    "sourceProposalsAccepted": false,
+    "campusContentRepublished": false
+  },
+  "oauthProbes": [
+    { "stage": "before", "atUtc": "2026-10-10T19:11:09Z", "status": 302, "seconds": 0.888539 },
+    { "stage": "during", "atUtc": "2026-10-10T19:12:58Z", "status": 302, "seconds": 0.805172 },
+    { "stage": "during", "atUtc": "2026-10-10T19:14:02Z", "status": 302, "seconds": 0.979079 },
+    { "stage": "during", "atUtc": "2026-10-10T19:15:04Z", "status": 302, "seconds": 4.082147 },
+    { "stage": "after", "atUtc": "2026-10-10T19:18:23Z", "status": 302, "seconds": 1.074109 },
+    { "stage": "after", "atUtc": "2026-10-10T19:21:29Z", "status": 302, "seconds": 0.745264 }
+  ],
+  "limitations": [
+    "Periodic authorization probes do not establish uninterrupted authentication availability",
+    "The successful row-read benchmark and unit tests from the initial patch did not predict full production request behavior"
+  ]
+}

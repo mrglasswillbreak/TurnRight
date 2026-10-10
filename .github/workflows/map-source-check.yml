@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '47 3 * * *'
   workflow_dispatch:
+    inputs:
+      source_id:
+        description: 'Optional source UUID: run it once now, even while its schedule is paused'
+        required: false
+        type: string
 permissions:
   contents: read
   actions: write
@@ -18,6 +23,7 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       GITHUB_TOKEN: ${{ github.token }}
       OVERPASS_SCHEDULE_ALLOWED: ${{ vars.OVERPASS_SCHEDULE_ALLOWED }}
+      SOURCE_ID: ${{ inputs.source_id }}
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/check_map_sources.py

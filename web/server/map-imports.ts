@@ -152,10 +152,12 @@ async function storage(path: string, method = 'GET', body?: unknown) {
     );
   return response;
 }
-async function jobById(id: unknown) {
+const jobColumns =
+  'id,campus_id,source_id,status,phase,configuration,run_token,message,created_at,updated_at';
+async function jobById(id: unknown, statusOnly = false) {
   if (!uuid(id)) throw new HttpError(400, 'Invalid import identity.');
   const [job] = await db<(CampusImport & { candidate_path?: string })[]>(
-    `campus_imports?id=eq.${id}`,
+    `campus_imports?id=eq.${id}${statusOnly ? `&select=${jobColumns}` : ''}`,
   );
   if (!job) throw new HttpError(404, 'Import not found in this campus.');
   return job;
@@ -167,7 +169,9 @@ export async function mapImportAction(
   if (action === 'import-list') {
     const [sources, imports] = await Promise.all([
       db<CampusSource[]>('campus_sources?order=name'),
-      db<CampusImport[]>('campus_imports?order=created_at.desc&limit=30'),
+      db<CampusImport[]>(
+        `campus_imports?select=${jobColumns}&order=created_at.desc&limit=30`,
+      ),
     ]);
     return {
       sources,
@@ -240,7 +244,16 @@ export async function mapImportAction(
       updated_at: new Date().toISOString(),
     });
   }
-  const job = await jobById(p.importId);
+  let job = await jobById(
+    p.importId,
+    action === 'import-get' && p.statusOnly === true,
+  );
+  if (
+    action === 'import-get' &&
+    p.statusOnly === true &&
+    !['queued', 'running'].includes(job.status)
+  )
+    job = await jobById(p.importId);
   if (action === 'import-get')
     return {
       job,
@@ -375,17 +388,37 @@ export async function mapImportAction(
       !job.candidate_path.startsWith(`${currentCampusId()}/${job.id}/`)
     )
       throw new HttpError(409, 'Prepare a complete import preview first.');
-    const response = await storage(
-      `object/campus-imports/${job.candidate_path}`,
+    if (job.summary?.errors.length)
+      throw new HttpError(409, 'Repair import errors before review.');
+    const token = randomUUID();
+    const rows = await db<CampusImport[]>(
+      `campus_imports?id=eq.${job.id}&run_token=eq.${job.run_token}&status=eq.preview`,
+      'PATCH',
+      {
+        status: 'queued',
+        phase: 'queue',
+        run_token: token,
+        message: 'Waiting for the review worker',
+        updated_at: new Date().toISOString(),
+      },
     );
-    const candidate = await response.json();
-    const count = await db('rpc/queue_campus_import', 'POST', {
-      import_id: job.id,
-      expected_token: job.run_token,
-      proposals: candidate.proposals,
-      expected_sources: candidate.expectedSources,
-    });
-    return { count };
+    if (!rows.length)
+      throw new HttpError(409, 'This import changed in another session.');
+    try {
+      await dispatch('map-import.yml', {
+        campus_id: currentCampusId(),
+        import_id: job.id,
+        run_token: token,
+      });
+    } catch (error) {
+      await db(
+        `campus_imports?id=eq.${job.id}&run_token=eq.${token}&status=eq.queued`,
+        'PATCH',
+        { status: 'failed', message: (error as Error).message },
+      );
+      throw error;
+    }
+    return { job: rows[0] };
   }
   throw new HttpError(400, 'Unknown import action.');
 }

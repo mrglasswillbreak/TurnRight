@@ -46,11 +46,7 @@ export async function db<T = any>(
       ? { body: JSON.stringify(body) }
       : {}),
     // The import RPC has a 60-second database budget (migration 017).
-    signal: AbortSignal.timeout(
-      path === 'rpc/queue_campus_import' || path.startsWith('rpc/gis_')
-        ? 75000
-        : 20000,
-    ),
+    signal: AbortSignal.timeout(path.startsWith('rpc/gis_') ? 75000 : 20000),
   });
   const result = await response.json().catch(() => null);
   if (!response.ok)
