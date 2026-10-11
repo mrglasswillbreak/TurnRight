@@ -2389,6 +2389,9 @@ test("release diagnostics preserve the usable campus and identify the captured m
   ];
   await page.route("**/api/admin", (route) => {
     const { action } = route.request().postDataJSON();
+    // Preserve the shared permission and workspace fixtures while replacing
+    // only the captured campus data used by this diagnostic regression.
+    if (action !== "sources" && action !== "state") return route.fallback();
     return route.fulfill({
       json:
         action === "sources"
