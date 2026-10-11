@@ -21,8 +21,9 @@ def check_sources():
                 if checked>datetime.now(timezone.utc)-timedelta(hours=23): continue
             pending=db(f"campus_imports?source_id=eq.{source['id']}&status=in.(queued,running)&select=id&limit=1")
             if pending: continue
-            identity,run_token=str(uuid.uuid4()),str(uuid.uuid4())
-            db('campus_imports?select=id','POST',{'id':identity,'campus_id':campus['id'],'source_id':source['id'],'configuration':source['configuration'],'phase':'preview' if source['configuration'].get('layers') else 'inspect','status':'queued','run_token':run_token,'auto_queue':True})
+            claim=db('rpc/queue_source_check','POST',{'actor':None,'source_identity':source['id']})
+            if not claim['created']: continue
+            identity,run_token=claim['job']['id'],claim['job']['run_token']
             request=urllib.request.Request(f'https://api.github.com/repos/{repository}/actions/workflows/map-import.yml/dispatches',method='POST',data=json.dumps({'ref':'main','inputs':{'campus_id':campus['id'],'import_id':identity,'run_token':run_token}}).encode(),headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'})
             try:
                 with urllib.request.urlopen(request,timeout=30) as response:
