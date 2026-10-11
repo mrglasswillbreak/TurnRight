@@ -7,7 +7,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await db?.close();
 });
-it('captures correction data when releases are created and snapshots change', async () => {
+it('captures correction data and preserves snapshot immutability', async () => {
   const snapshot = {
     features: [{ payload: { geometry: 'large source record' } }],
     edits: [{ id: 'retained correction' }],
@@ -19,13 +19,13 @@ it('captures correction data when releases are created and snapshots change', as
     )
   ).rows[0];
   expect(row.editor_edits).toEqual(snapshot.edits);
-  await db.query("update releases set snapshot=jsonb_set(snapshot,'{edits}','[]') where id=$1", [
+  await expect(db.query("update releases set snapshot=jsonb_set(snapshot,'{edits}','[]') where id=$1", [
     row.id,
-  ]);
+  ])).rejects.toThrow('Release snapshots are immutable');
   expect(
     (await db.query<any>('select editor_edits from releases where id=$1', [row.id])).rows[0]
       .editor_edits,
-  ).toEqual([]);
+  ).toEqual(snapshot.edits);
 });
 it('backfills one latest summary without rewriting historical snapshots', async () => {
   const ids = [];
