@@ -175,7 +175,7 @@ To undo a building correction made since publication, use **Restore published bu
 
 Validation issues identify their feature and offer **Choose entrance’s place**, **Connect to path**, or **Review blocked segment** where applicable. The control selects the feature and opens its relevant properties. Connection changes, guided geometry repairs and building-wing corrections show a red current / green proposed comparison before **Apply reviewed repair**. Cancel retains the current draft. Finish or cancel an active drawing before entering repair review.
 
-Source review shows changed property rows and before/after map geometry. Raw source records remain available under Details. Source and release jobs refresh while the review panel is visible; polling does not save edits or refresh geometry beneath an active drawing.
+Source review shows changed property rows and before/after map geometry. Raw source records remain available under **Technical source records**. Source and release jobs refresh while the review panel is visible; polling does not save edits or refresh geometry beneath an active drawing.
 
 Release impact compares the working map with the public package loaded by the app. It lists additions, changes, removals, entrance changes and destinations losing their mapped approach or directed reachability from Clinic. It also compares Clinic–Senate, Clinic–Law and Clinic–International Library routes using stable place IDs and published aliases. Unknown/missing endpoints are reported explicitly. These are software checks, not field verification.
 
@@ -229,3 +229,7 @@ Deploy to a configured Vercel preview after applying all required migrations. Ch
 ## Source updates workspace
 
 **Review → Source updates** combines connected-source status, manual checks, schedule controls, a searchable 50-row inbox, map comparisons, and bulk decisions. Select rows across pages or all matching results, inspect the frozen confirmation, and follow background progress in Activity. Phone layouts use List, Map, and Details. See [Source updates](SOURCE-UPDATES.md) for removal warnings, cancellation, retry, and retention.
+
+![Source inbox beside its map comparison and editor override explanation](assets/screenshots/source-updates-desktop-2026-10-11.png)
+
+*October 11 demonstration fixture; source decisions are isolated from production. [Capture provenance](assets/screenshots/source-updates-2026-10-11.json).*

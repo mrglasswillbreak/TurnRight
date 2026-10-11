@@ -2,6 +2,10 @@
 
 Open **Review → Source updates** to check connected sources, inspect proposed map changes, and accept or reject a selection. The workflow is **check → review → publish**. Accepting source data changes the private source baseline; it does not publish the public map. Saved editor corrections continue to take precedence.
 
+![Source inbox with readable rows, map comparison and retained editor corrections](assets/screenshots/source-updates-desktop-2026-10-11.png)
+
+*October 11 browser capture with 101 synthetic proposals and isolated API responses. Counts and names are examples, not a production inventory.*
+
 ## Check sources
 
 Expand **Connected sources** for each source's latest activity, last successful check, schedule, and pending count. **Check now** reuses the source's saved mapping and queues review proposals. An active check is reused instead of starting another download. **Finish setup** opens Imports when mapping is incomplete. Uploaded files use **Replace file** rather than automatic downloads.
@@ -27,13 +31,17 @@ On a phone, use **List**, **Map**, and **Details** to move between the inbox, ma
 
 The selection does not expand when a daily import adds proposals. Proposals whose revisions or source baselines change before processing are skipped for a fresh review. Rejection retains the existing baseline. Publication remains a separate, independently reviewed workflow.
 
+| Phone inbox | Review before confirming |
+| --- | --- |
+| ![Phone source list with accessible selection controls](assets/screenshots/source-updates-mobile-2026-10-11.png) | ![Frozen bulk selection with geometry and removal warnings](assets/screenshots/source-updates-confirm-mobile-2026-10-11.png) |
+
 ## Background progress and recovery
 
 Bulk decisions continue after closing the editor. **Activity** and **Recent decisions** show progress, completed/skipped/failed counts, and paged results. One bulk operation runs per campus at a time. GitHub Actions may briefly queue a worker before processing starts.
 
 **Stop remaining** stops before another batch; already completed decisions remain applied. **Retry unfinished** resumes pending items from a failed or cancelled operation. **Resume worker** re-dispatches an operation whose worker has not updated recently. Both use the existing receipt rather than creating another selection. Changed or invalid proposals require fresh inspection.
 
-Unconfirmed selections expire after 24 hours. Detailed per-item bookkeeping expires after 30 days once an operation is terminal. Operation summaries and the decision audit remain. This cleanup does not delete source features, editor corrections, published content, original uploads, or pending proposals. Pending proposals remain reviewable after disposable import artifacts expire.
+Unconfirmed selections expire after 24 hours. Detailed per-item bookkeeping and the retained ID/revision request list expire after 30 days once an operation is terminal. Operation summaries and the decision audit remain. This cleanup does not delete source features, editor corrections, published content, original uploads, or pending proposals. Pending proposals remain reviewable after disposable import artifacts expire.
 
 ## Deployment and maintenance
 
@@ -44,5 +52,7 @@ The **Apply source review decisions** workflow uses the existing repository disp
 The maintenance workflow runs daily at 05:22 UTC and is also manually dispatchable. Cleanup removes at most 1,000 expired bookkeeping rows per transaction. Import-file cleanup remains governed by migration 040 and its existing workflow.
 
 API actions use the `source-updates-` prefix: overview, list, detail, history, prepare, control, and check. Read actions require campus access; preparation, decisions, and checks require editing permission. Schedule changes continue to require management permission. Browser roles cannot execute worker RPCs directly.
+
+Browser capture commands and fixture scope are in [Screenshot maintenance](SCREENSHOTS.md#source-updates-capture-workflow). See [Production](PRODUCTION.md) for rollout status; this guide is not a deployment receipt.
 
 See [Campuses and imports](CAMPUS-IMPORTS.md), [Editor guide](EDITOR.md), [Activity](PROGRESS-MONITOR.md), and [Deployment](DEPLOYMENT.md).
