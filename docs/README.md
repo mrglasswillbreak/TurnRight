@@ -68,3 +68,7 @@ These records retain the package, date and measurements they assessed. Their cou
 - [Earlier map/editor improvements](MAP-IMPROVEMENTS.md), dated sections of [Production](PRODUCTION.md), and the archived captures in the [screenshot inventory](assets/screenshots/README.md).
 
 When changing a workflow, update its guide and the README entry, recapture affected screens from the actual application, validate relative links and heading anchors, and record measured results with their date/package. Keep example campuses and illustrative model changes labelled. Software-rendered phone screenshots and automated GPS fixtures do not establish physical-device behavior or campus safety.
+
+## Source updates and bulk decisions
+
+Use [Source updates](SOURCE-UPDATES.md) for connected-source status, schedules, comparisons, bulk selection, background decisions, and recovery. Acceptance and publication are separate.

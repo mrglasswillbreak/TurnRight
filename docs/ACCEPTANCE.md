@@ -224,3 +224,9 @@ Publish only after the user accepts the preview and the relevant checks pass. Ke
 - Verify owner/campus isolation and immutable queued copies. Exercise storage failure and removal protection; no failed save should be described as recovered.
 - Check Activity for import, release, model and photo stages; actual file counts, indeterminate phases, cancellation, errors, dismissals and a failed status refresh. Hidden/offline pages must not keep polling.
 - Run the focused commands in [photo editing](PHOTO-EDITING.md) and [progress monitoring](PROGRESS-MONITOR.md), plus lint, configured build and existing budgets. Browser simulations do not replace checking physical-device keyboards or storage pressure.
+
+## Source updates acceptance
+
+The source-review database suite uses 10,000 synthetic proposals, asserts no transaction processes more than 25 items, and checks frozen revisions, stale/superseded skips, audit counts, unchanged editor corrections, and zero releases. Additional cases cover removal acknowledgement, one active campus operation, cancellation/resume, role denial, cross-campus isolation, and selection expiry. Worker tests cover lost-response retries and exhausted attempts.
+
+Browser acceptance covers 50-row pagination, selection across pages, selection clearing on filter changes, readable comparisons, editor overrides, removal confirmation, progress/results, and desktop/phone screenshots in Chromium/WebKit. Production smoke checks must remain read-only for pending proposals. [Source updates](SOURCE-UPDATES.md).

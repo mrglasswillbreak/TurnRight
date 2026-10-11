@@ -1,5 +1,12 @@
 # Production deployments
 
+## Bounded import recovery and artifact retention — 11 October 2026
+
+[PR #11](https://github.com/mrglasswillbreak/TurnRight/pull/11) and [PR #12](https://github.com/mrglasswillbreak/TurnRight/pull/12) are merged. Migrations 039 and 040 are installed. The complete UNILAG daily import [run 38088544052](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38088544052) succeeded in 3m 36s after bounded queue staging, and daily ArcGIS checks were re-enabled. The earlier failed verification below is historical; migration 038 alone did not resolve the outage.
+
+The authorized [retention run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38111159593) removed 37 obsolete generated files totalling 516,513,589 bytes. All 176 protected files remained unchanged. Source features, saved edits, pending proposals, original uploads and releases remained 15,432 / 351 / 7,546 / 49 / 46. The editor and OAuth entry point remained available, with no database restart during cleanup. Automatic retention is enabled after imports and daily at 05:17 UTC.
+
+
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 

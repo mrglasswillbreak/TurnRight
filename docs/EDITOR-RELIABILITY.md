@@ -61,3 +61,7 @@ Verification on Windows with Node 22, 14 September 2026:
 Run browser projects sequentially on this workstation. Concurrent software-rendered browser runs produced map/worker readiness timeouts; the affected Chromium scenarios passed in isolation. Failure traces and screenshots are retained under `web/work/verification/webkit`, with successful focused runs under `chromium-final` and `pwa-final` in the same local verification directory.
 
 The owner subsequently requested application deployment, completed on 14 September 2026; see [the production record](PRODUCTION.md). Hosted public sharing, Clinic–Law routing, phone-sized search fallback and the configured editor sign-in screen passed. Physical Android/iPhone checks, actual outdoor GPS behavior and authenticated owner acceptance remain pending. Browser emulation and WebKit on Windows do not establish physical-device acceptance; campus-data publication remains a separate reviewed action.
+
+## Durable bulk source decisions
+
+Source selections freeze proposal IDs/revisions before confirmation. Processing continues outside the browser, at most 25 decisions per transaction. Receipts and audits commit with the decisions, so a lost response cannot repeat an applied item. Changed or superseded proposals are skipped. Stop remaining keeps completed decisions; retry resumes pending items from the original receipt. Saved corrections remain separate and publication never starts automatically. [Recovery controls](SOURCE-UPDATES.md#background-progress-and-recovery).

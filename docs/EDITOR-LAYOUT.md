@@ -23,3 +23,7 @@ Model desktop sizes use the `model:desktop` scope. Photo panes use `photo:deskto
 Run `npm test`, `npm run lint`, `npm run build`, and `npm run check:configured-build` in `web/`. The browser suite includes `workspace panes preserve the canvas, restore preferences and dismiss the legend`; `editor-layout.test.ts` covers storage isolation, validation, unavailable storage and permission defaults. Model/photo suites cover canvas identity, recovery, focused numeric input, undo and viewport changes. See [screenshot maintenance](SCREENSHOTS.md) for the reproducible visual fixtures and [acceptance](ACCEPTANCE.md) for offline and device gates.
 
 [Redesign verification](REDESIGN-VERIFICATION.md) records this working tree’s measured gates and remaining physical-device limits.
+
+## Source update panes
+
+The Source updates workspace registers the inbox in the left pane and the selected comparison in the right pane around the existing map. Connected-source configuration is collapsible, selection controls remain near the list, and compact layouts provide List, Map, and Details buttons. Changing filters clears review selection explicitly; paging does not. [Source updates](SOURCE-UPDATES.md).

@@ -16,7 +16,7 @@ Visitors do not need accounts. Signing in grants no campus access until an admin
 
 ## Database and private storage
 
-The current application requires migrations **001–039**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+The current application requires migrations **001–041**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -105,3 +105,9 @@ Quotas, paused services and expired tokens can interrupt owner jobs while publis
 ## Source permissions
 
 The owner confirmed permission to redistribute LASU ArcGIS data offline and separately confirmed permission to publish the imported UNILAG layers before its 30 September release. These are owner confirmations, not public licences or grants for other campuses. Keep the correspondence with project records. New sources need their own attribution/licence/redistribution record; OSM retains ODbL attribution in public and offline packages. See [Attribution](../data/ATTRIBUTION.md) and [imports](CAMPUS-IMPORTS.md).
+
+## Source review configuration
+
+Migration 041 adds indexed proposal summaries, revisions, frozen selections, and durable bulk operations. `source-review.yml` dispatches the dependency-free review worker using existing `GITHUB_WORKFLOW_TOKEN`, `GITHUB_REPOSITORY`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` configuration. Browser roles have no direct worker-RPC or receipt-table access.
+
+`source-review-maintenance.yml` runs daily at 05:22 UTC and on manual dispatch. Prepared selections expire after 24 hours; completed/cancelled/failed per-item bookkeeping expires after 30 days. Summaries and decision audits remain. Existing import-file retention and the OSM scheduling permission gates are unchanged. [Source updates setup](SOURCE-UPDATES.md#deployment-and-maintenance).

@@ -165,7 +165,7 @@ Action errors have their own controls, such as **Retry export**, **Retry route**
 
 An already-prepared personal workspace can open from its cache after a network failure even when the browser reports an online connection. The editor identifies offline work and the cached synchronization date. Authorization rejection does not open a cache as a fallback. Preparation is still required before the first offline session.
 
-**Sources**, **Reports**, and **Releases** retain their separate review workflows. Building a release first flushes pending saves and validates the saved draft. The release worker independently validates the immutable snapshot before packaging it. Independent snapshot approval is required in **Review** before **Publish** can prepare a release. Restoration creates a new review submission.
+**Source updates**, **Reports**, and **Releases** retain their separate review workflows. Building a release first flushes pending saves and validates the saved draft. The release worker independently validates the immutable snapshot before packaging it. Independent snapshot approval is required in **Review** before **Publish** can prepare a release. Restoration creates a new review submission.
 
 ## Repair and release review
 
@@ -183,7 +183,7 @@ Path properties distinguish unknown steps information, recorded steps, and recor
 
 ## Upgrade and verification
 
-Current installations require migrations **001–039** in order. Check the current production receipt before applying missing migrations; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share campus capabilities and explicit campus context. Migration 022 makes timestamp revision tokens strictly increasing per draft record; clients must retain the returned token unchanged, including sub-millisecond precision. The notes below retain the history of earlier incremental upgrades.
+Current installations require migrations **001–041** in order. Check the current production receipt before applying missing migrations; [Deployment](DEPLOYMENT.md) is the setup authority and [Production](PRODUCTION.md) records verified revisions. Campus imports, models, surveys and publication share campus capabilities and explicit campus context. Migration 022 makes timestamp revision tokens strictly increasing per draft record; clients must retain the returned token unchanged, including sub-millisecond precision. The notes below retain the history of earlier incremental upgrades.
 
 Entrance guides and building galleries require migration 008. The visual **Manage photos** workspace additionally requires migration 010 for private upload drafts and revision tracking. See the [photo management guide](ARRIVAL-GUIDES.md#manage-photos) for multiple uploads, rights review, cover/order changes, public preview and recovery. Arrival observations are edited separately. Photo changes save to the shared draft and publish through **Publish** after independent approval in **Review**; author-provided photographs without external URLs require package schema 3 and compatible readers.
 
@@ -225,3 +225,7 @@ npm run test:browser
 Unit tests exercise topology, entrances, route selection, recovery, and concurrency. GIS database tests apply every migration using PGlite with actual PostGIS. Native PostgreSQL/PostGIS and backup restoration run separately in the GIS acceptance workflow. Browser tests use the actual MapLibre renderer and Terra Draw interactions with test-only authentication and API responses, including both views, dragging, undo/redo, reload recovery, full campus rendering, and smaller screens.
 
 Deploy to a configured Vercel preview after applying all required migrations. Check a real owner login, a saved entrance/approach batch, source review, and release preparation against Supabase before promoting the application. Publishing new campus data remains a separate reviewed operation.
+
+## Source updates workspace
+
+**Review → Source updates** combines connected-source status, manual checks, schedule controls, a searchable 50-row inbox, map comparisons, and bulk decisions. Select rows across pages or all matching results, inspect the frozen confirmation, and follow background progress in Activity. Phone layouts use List, Map, and Details. See [Source updates](SOURCE-UPDATES.md) for removal warnings, cancellation, retry, and retention.
