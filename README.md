@@ -41,6 +41,13 @@ Work with footprints, roofs, façades, surface text, curves, and meshes. Compare
 
 Keep external map data current in **Review → Source updates**. Check connected sources, compare readable changes against the map, and accept or reject selected rows or all matching results. Bulk decisions continue in the background, preserve editor corrections, and remain separate from publication. [Source update guide](docs/SOURCE-UPDATES.md).
 
+| Source inbox and map comparison | Bulk confirmation on a phone |
+| --- | --- |
+| ![Source updates inbox beside a labelled source outline and retained editor correction](docs/assets/screenshots/source-updates-desktop-2026-10-11.png) | ![Phone confirmation with a fixed selection count, geometry warning and removal acknowledgement](docs/assets/screenshots/source-updates-confirm-mobile-2026-10-11.png) |
+
+These October 11 captures use 101 synthetic proposals and isolated decisions. [Capture record](docs/assets/screenshots/source-updates-2026-10-11.json).
+
+
 Resolve map-linked issues, submit immutable content, and obtain approval from someone who did not contribute to it. Publish an approved preview or submit historical content for renewed review.
 
 | Independent review | Publication |
