@@ -125,3 +125,5 @@ Public packages and private drafts are distinct. Application deployments preserv
 Start with [Contributing](CONTRIBUTING.md). Changes should preserve campus identities, provenance, private attributes, recovery, independent review, and existing resource budgets.
 
 Software licensing terms have not been declared in a root licence file. Data, photographs, codecs, and other assets have their own terms: consult [data attribution](data/ATTRIBUTION.md), [photo records](data/photos/README.md), and in-app credits. OpenStreetMap-derived data retains ODbL attribution; authorization to publish a source does not automatically grant broader reuse rights. [Brand assets and usage](docs/BRAND.md).
+
+For connection recovery and the accepted-updates → review → preview workflow, see [editor availability](docs/EDITOR-AVAILABILITY.md). Full-map baseline replacement is retired; accepted sources already form the working baseline.
