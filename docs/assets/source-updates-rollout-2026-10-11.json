@@ -1,6 +1,6 @@
 {
-  "recordedAt": "2026-10-11T07:36:30.283Z",
-  "status": "migration_and_backfill_complete_ci_running",
+  "recordedAt": "2026-10-11T08:52:47.575Z",
+  "status": "deployed_verified",
   "pullRequest": 13,
   "initialCommit": "6cd9cd0844ad64938346036c5d1ad3f599a2b74b",
   "migration": {
@@ -25,16 +25,45 @@
     "databaseStartedAt": "2026-10-10T19:16:02.953985Z"
   },
   "productionVerification": {
-    "oauthEntryPoint": "302 observed before and during backfill",
-    "finalBaselineComparison": "Source, correction and proposal fingerprints unchanged; releases and database start unchanged",
-    "authenticatedEditor": "pending",
+    "capturedAt": "2026-10-11T08:49:20.136493+00:00",
+    "authenticatedEditor": "UNILAG and LASU authenticated; source status, 50-row inboxes and on-demand comparisons loaded read-only",
     "proposalsDecidedByRollout": 0,
-    "latestOauthEntryPoint": {
-      "status": 302,
-      "elapsedMs": 1323,
-      "checkedAt": "2026-10-11T07:31:09.670Z"
-    },
-    "previewEditor": "UNILAG authenticated; source status, 50-row inbox and individual comparison loaded read-only"
+    "sourceFeatures": 15432,
+    "mapEdits": 351,
+    "pendingProposals": 7544,
+    "releases": 46,
+    "bulkOperations": 0,
+    "unindexed": 0,
+    "sourceAndCorrectionFingerprints": "unchanged from before migration and before deployment",
+    "databaseStartedAt": "2026-10-10T19:16:02.953985+00:00",
+    "publicCatalogueAndManifests": "SHA-256 unchanged",
+    "health": [
+      {
+        "name": "editor",
+        "status": 200,
+        "elapsedMs": 370,
+        "checkedAt": "2026-10-11T08:49:28.702Z"
+      },
+      {
+        "name": "adminUnauthenticated",
+        "status": 401,
+        "elapsedMs": 590,
+        "checkedAt": "2026-10-11T08:49:28.955Z"
+      },
+      {
+        "name": "oauth",
+        "status": 302,
+        "elapsedMs": 842,
+        "checkedAt": "2026-10-11T08:49:29.209Z"
+      }
+    ],
+    "concurrentScheduledCheck": {
+      "run": 38126008429,
+      "campus": "lasu",
+      "result": "success",
+      "startedAt": "2026-10-11T08:46:43Z",
+      "effect": "One pending campus metadata proposal superseded and replaced; pending total unchanged; source baseline and corrections unchanged"
+    }
   },
   "fixture": {
     "proposals": 10000,
@@ -45,18 +74,37 @@
     "releases": 0
   },
   "ci": {
-    "regressionRun": 38121519417,
-    "unit": "passed",
+    "regressionRun": 38124124909,
+    "result": "passed",
+    "quality": "passed",
+    "chromium": "all four shards passed",
+    "webkit": "both shards and image editor passed",
     "offline": "passed",
+    "databaseRun": 38124124849,
+    "importRun": 38124124874,
     "nativeDatabase": "passed",
     "import": "passed",
-    "quality": "follow-up running",
-    "webkit": "follow-up running",
-    "chromium": "follow-up running",
-    "initialSourceReviewJourneys": "passed on both engines; fresh contrast assertions and captures running",
-    "focusedRun": 38121589733,
-    "focusedSourceReview": "Chromium and WebKit desktop/phone passed"
+    "focusedCaptureRun": 38121589733
   },
   "screenshots": "Four fresh Chromium desktop/phone captures visually reviewed and promoted; Chromium and WebKit journeys passed",
-  "workerAndUiDeployed": false
+  "workerAndUiDeployed": true,
+  "testedCommit": "6a3c53d3ffdd3ab6c18262053995f55454c2f0eb",
+  "deployment": {
+    "commit": "f230fa60dfc13aa06dfbfb0ca7264f7326772fad",
+    "readyAt": "2026-10-11T08:46:22Z",
+    "url": "https://turnright.vercel.app",
+    "details": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/67KYgiCzSqNvcv2MmCLvB8vXPdCB"
+  },
+  "maintenance": {
+    "run": 38125975975,
+    "result": "passed",
+    "index": "ready",
+    "expiredRowsRemoved": 0,
+    "dailyUtc": "05:22"
+  },
+  "documentation": {
+    "guides": 53,
+    "relativeLinksAndAnchors": 640,
+    "errors": 0
+  }
 }
