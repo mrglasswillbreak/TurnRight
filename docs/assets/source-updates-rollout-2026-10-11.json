@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-11T07:36:30.283Z",
+  "status": "migration_and_backfill_complete_ci_running",
+  "pullRequest": 13,
+  "initialCommit": "6cd9cd0844ad64938346036c5d1ad3f599a2b74b",
+  "migration": {
+    "initialInstalled": true,
+    "installedSha256": "360a710827a53595d1f9c2d9c24f1a51684b2cfd1bc13642065c34e651d98065",
+    "finalRetentionFunctionInstalled": true
+  },
+  "backfill": {
+    "batchMax": 100,
+    "totalRecords": 32457,
+    "lastConfirmedRemaining": 0,
+    "laterBatchOutcome": "complete",
+    "completedAt": "2026-10-11T07:27:05.480365+00:00"
+  },
+  "baseline": {
+    "capturedAt": "2026-10-11T06:38:42.546198Z",
+    "sourceFeatures": 15432,
+    "mapEdits": 351,
+    "pendingProposals": 7544,
+    "releases": 46,
+    "activeImports": 0,
+    "databaseStartedAt": "2026-10-10T19:16:02.953985Z"
+  },
+  "productionVerification": {
+    "oauthEntryPoint": "302 observed before and during backfill",
+    "finalBaselineComparison": "Source, correction and proposal fingerprints unchanged; releases and database start unchanged",
+    "authenticatedEditor": "pending",
+    "proposalsDecidedByRollout": 0,
+    "latestOauthEntryPoint": {
+      "status": 302,
+      "elapsedMs": 1323,
+      "checkedAt": "2026-10-11T07:31:09.670Z"
+    },
+    "previewEditor": "UNILAG authenticated; source status, 50-row inbox and individual comparison loaded read-only"
+  },
+  "fixture": {
+    "proposals": 10000,
+    "batches": 400,
+    "maxDecisionsPerTransaction": 25,
+    "applied": 9998,
+    "skippedStale": 2,
+    "releases": 0
+  },
+  "ci": {
+    "regressionRun": 38121519417,
+    "unit": "passed",
+    "offline": "passed",
+    "nativeDatabase": "passed",
+    "import": "passed",
+    "quality": "follow-up running",
+    "webkit": "follow-up running",
+    "chromium": "follow-up running",
+    "initialSourceReviewJourneys": "passed on both engines; fresh contrast assertions and captures running",
+    "focusedRun": 38121589733,
+    "focusedSourceReview": "Chromium and WebKit desktop/phone passed"
+  },
+  "screenshots": "Four fresh Chromium desktop/phone captures visually reviewed and promoted; Chromium and WebKit journeys passed",
+  "workerAndUiDeployed": false
+}
