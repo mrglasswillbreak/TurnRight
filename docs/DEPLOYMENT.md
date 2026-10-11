@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–043 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–044 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -112,3 +112,5 @@ Apply the additive migration and complete the bounded published-correction backf
 ## Source map preview upgrade (043)
 
 Apply `043_source_map_preview.sql` before deploying the map preview reader. It adds read-only functions and requires no backfill. Verify the inbox and **Preview all matching changes on map** for each campus without making source decisions. The isolated 10,000-proposal fixture checks complete pagination, bounded responses, permissions and retained corrections; Chromium/WebKit journeys check actual map layers and the adjustable phone panel. Mobile panel height is a local layout preference and does not require database storage.
+
+Apply `044_source_preview_routing.sql` after 043 to include graph links stored as node references. It adds a partial pending-identity index and campus-scoped endpoint readers, while retaining the existing read-only API. Verify a routing-link preview and unchanged proposal/correction counts. No graph-wide backfill or materialized geometry is required.
