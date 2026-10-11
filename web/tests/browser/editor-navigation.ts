@@ -46,7 +46,10 @@ export async function openEditorSection(
   if (name !== 'Edit') {
     const button = page
       .getByRole('navigation', { name: 'Workspace tools' })
-      .getByRole('button', { name, exact: true });
+      .getByRole('button', {
+        name: name === 'Sources' ? 'Source updates' : name,
+        exact: true,
+      });
     await expect(button).toBeVisible();
     await button.click();
   }

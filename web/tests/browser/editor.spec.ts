@@ -1,4 +1,5 @@
 import { collapseExplorer, openEditorSection } from './editor-navigation';
+import type { SourceSummary, SourceOperation } from '../../src/source-updates';
 import { fileURLToPath } from 'node:url';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Color } from 'three';
@@ -1431,9 +1432,31 @@ async function setup(
           url: `http://127.0.0.1:5183/__model-assets/${payload.reference.id}`,
         },
       });
+    if (action === 'source-updates-overview')
+      return route.fulfill({
+        json: {
+          ready: true,
+          counts: {},
+          layers: [],
+          featureTypes: [],
+          sources: [],
+          scheduledOsmEnabled: false,
+          legacy: null,
+        },
+      });
+    if (action === 'source-updates-list')
+      return route.fulfill({ json: { rows: [], total: 0, nextCursor: null } });
+    if (action === 'source-updates-history')
+      return route.fulfill({ json: { operations: [], items: [] } });
     if (action === 'state')
       return route.fulfill({
         json: {
+          capabilities: {
+            campusId: 'lasu',
+            userId: user.id,
+            roles: ['administrator'],
+            capabilities: ['read', 'edit', 'review', 'publish', 'manage'],
+          },
           edits,
           reports: [],
           changes: [],
@@ -2604,45 +2627,57 @@ test('editor reliability: source comparisons and release status refresh without 
   )!;
   const after = structuredClone(before);
   after.properties!.name = 'Reviewed Senate name';
+  const change = {
+    id: 'change-test',
+    source_id: 'source-test',
+    kind: 'modify',
+    summary: 'Senate name update',
+    before: { payload: before },
+    after: { payload: after },
+    status: 'pending',
+    review_revision: 1,
+  };
   await page.route('**/api/admin', (route) => {
     const { action } = route.request().postDataJSON();
     if (action === 'save-edits') saves++;
-    if (action === 'review-status') {
+    if (action === 'source-updates-list') {
       polls++;
       return route.fulfill({
         json: {
-          jobs: [
+          rows: [
             {
-              id: 'job-test',
-              kind: 'source',
-              status: 'complete',
-              message: 'Source check complete',
-              created_at: '2026-09-14T00:00:00Z',
-            },
-          ],
-          releases: [],
-          changes: [
-            {
-              id: 'change-test',
-              source_id: 'source-test',
+              id: change.id,
+              sourceId: change.source_id,
+              sourceName: 'ArcGIS',
+              revision: 1,
+              createdAt: '2026-10-11T00:00:00Z',
               kind: 'modify',
-              summary: 'Senate name update',
-              before: { payload: before },
-              after: { payload: after },
-              status: 'pending',
+              meta: {
+                name: 'Senate name update',
+                source: 'arcgis',
+                layer: 'Buildings',
+                featureType: 'building',
+                fields: ['name'],
+                geometryChanged: false,
+              },
             },
           ],
+          total: 1,
+          nextCursor: null,
         },
       });
     }
+    if (action === 'source-updates-detail')
+      return route.fulfill({ json: { change, overrides: [] } });
     return route.fallback();
   });
   await openEditorSection(page, 'Sources');
-  await expect(
-    page.getByText('Source check complete', { exact: true }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'modify Senate name update' }).click();
-  await expect(page.locator('.source-comparison table')).toContainText(
+  await page.getByRole('button', { name: 'Review Senate name update' }).click();
+  const detailView = page
+    .getByRole('navigation', { name: 'Source review views' })
+    .getByRole('button', { name: 'Details', exact: true });
+  if (await detailView.isVisible()) await detailView.click();
+  await expect(page.locator('.source-update-details table')).toContainText(
     'Reviewed Senate name',
   );
   expect(polls).toBeGreaterThan(0);
@@ -2672,25 +2707,35 @@ test('editor reliability: uncertain jobs check status before resubmission and re
       return route.abort('failed');
     }
     if (action === 'state') reads++;
-    if (action === 'review-status' && expired)
+    if (action === 'source-updates-overview' && expired)
       return route.fulfill({ status: 401, json: { error: 'Expired' } });
     return route.fallback();
   });
   await openEditorSection(page, 'Sources');
-  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await page.getByText('Connected sources · 0', { exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Check LASU sources', exact: true })
+    .click();
   await expect(
     page.getByRole('button', { name: 'Check action status', exact: true }),
   ).toBeVisible();
   expect(submissions).toBe(1);
-  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Check LASU sources', exact: true })
+    .click();
   await expect.poll(() => reads).toBeGreaterThan(0);
   await expect(
     page.getByRole('button', { name: 'Check action status', exact: true }),
   ).not.toBeVisible();
   expect(submissions).toBe(1);
-  await page.getByRole('button', { name: 'Check now', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Check LASU sources', exact: true })
+    .click();
   await expect.poll(() => submissions).toBe(2);
   expired = true;
+  await page
+    .getByRole('button', { name: 'Refresh source updates', exact: true })
+    .click();
   await expect(
     page.getByRole('button', { name: 'Sign in again', exact: true }),
   ).toBeVisible();
@@ -3994,7 +4039,7 @@ test('supports dark appearance and small-screen review', async ({ page }) => {
   ).toBeVisible();
   await openEditorSection(page, 'Sources');
   await expect(
-    page.getByRole('heading', { name: 'Source review' }),
+    page.getByRole('heading', { name: 'Source updates' }),
   ).toBeVisible();
   await page.screenshot({ path: 'test-results/editor-mobile.png' });
 });
@@ -10135,3 +10180,295 @@ test('redesign documentation gallery: public, editor and model layouts', async (
     .toBe(true);
   await shot('globe');
 });
+
+for (const phone of [false, true]) {
+  test(
+    'source updates bulk review ' +
+      (phone ? 'phone' : 'desktop') +
+      ': selection, frozen confirmation, progress and results',
+    async ({ page }, testInfo) => {
+      await page.setViewportSize(
+        phone ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
+      );
+      const server = await setup(page, true);
+      const before = server.campus.map.features.find(
+        (f) => f.properties?.id === 'arcgis:University_Property:120',
+      )!;
+      const after = structuredClone(before);
+      after.properties!.name = 'Senate House';
+      const names = [
+        'Senate House',
+        'Main Library',
+        'Faculty of Arts',
+        'Medical Centre',
+        'Student Centre',
+        'Central Green',
+      ];
+      const rows: SourceSummary[] = Array.from({ length: 101 }, (_, n) => ({
+        id: 'proposal-' + String(n).padStart(3, '0'),
+        revision: 1,
+        sourceId: 'feature:' + n,
+        sourceName: 'Campus ArcGIS',
+        kind: n === 0 ? 'remove' : 'modify',
+        createdAt: '2026-10-11T00:00:00Z',
+        meta: {
+          source: 'import:11111111-1111-4111-8111-111111111111',
+          name: names[n] || 'Campus building ' + n,
+          layer: 'Buildings',
+          featureType: 'building',
+          fields: ['name', 'height'],
+          geometryChanged: n % 3 === 0,
+        },
+      }));
+      let operation: SourceOperation | undefined;
+      let preparedIds: string[] = [],
+        confirmed = 0;
+      await page.route('**/api/admin', (route) => {
+        const { action, payload } = route.request().postDataJSON();
+        if (action === 'source-updates-overview')
+          return route.fulfill({
+            json: {
+              ready: true,
+              counts: { [rows[0].meta.source]: 101 },
+              layers: ['Buildings'],
+              featureTypes: ['building'],
+              scheduledOsmEnabled: false,
+              sources: [
+                {
+                  id: '11111111-1111-4111-8111-111111111111',
+                  name: 'Campus ArcGIS',
+                  kind: 'arcgis',
+                  schedule: 'daily',
+                  configured: true,
+                  lastSuccess: '2026-10-11T03:48:00Z',
+                  latest: {
+                    id: 'import',
+                    status: 'reviewed',
+                    message: '101 updates ready for review',
+                    updatedAt: '2026-10-11T03:48:00Z',
+                  },
+                },
+              ],
+            },
+          });
+        if (action === 'source-updates-list') {
+          const matching = rows.filter(
+            (r) =>
+              (!payload.filters.kind || r.kind === payload.filters.kind) &&
+              (!payload.filters.query ||
+                r.meta.name
+                  .toLowerCase()
+                  .includes(payload.filters.query.toLowerCase())),
+          );
+          const offset = payload.cursor
+            ? matching.findIndex((r) => r.id === payload.cursor.id) + 1
+            : 0;
+          const selected = matching.slice(offset, offset + 50);
+          return route.fulfill({
+            json: {
+              rows: selected,
+              total: matching.length,
+              nextCursor:
+                offset + 50 < matching.length
+                  ? {
+                      id: selected.at(-1)!.id,
+                      createdAt: selected.at(-1)!.createdAt,
+                    }
+                  : null,
+            },
+          });
+        }
+        if (action === 'source-updates-detail')
+          return route.fulfill({
+            json: {
+              change: {
+                id: payload.id,
+                source_id: 'source',
+                kind: payload.id === rows[0].id ? 'remove' : 'modify',
+                before: { payload: before },
+                after: payload.id === rows[0].id ? null : { payload: after },
+                status: 'pending',
+                summary: 'Senate House',
+                review_revision: 1,
+              },
+              overrides: [
+                {
+                  id: 'building',
+                  kind: 'building',
+                  fields: ['name'],
+                  deleted: false,
+                },
+              ],
+            },
+          });
+        if (action === 'source-updates-prepare') {
+          preparedIds =
+            payload.selection.mode === 'filter'
+              ? rows.map((r) => r.id)
+              : payload.selection.items.map((i: { id: string }) => i.id);
+          operation = {
+            id: payload.operationId,
+            actor: 'owner',
+            accept: null,
+            total: preparedIds.length,
+            applied: 0,
+            skipped: 0,
+            failed: 0,
+            status: 'prepared',
+            breakdown: {
+              add: 0,
+              modify: preparedIds.length - 1,
+              remove: 1,
+              geometry: 34,
+            },
+            created_at: '2026-10-11T05:00:00Z',
+            updated_at: '2026-10-11T05:00:00Z',
+          };
+          return route.fulfill({ json: operation });
+        }
+        if (action === 'source-updates-control') {
+          confirmed++;
+          operation = {
+            ...operation!,
+            status: 'running',
+            accept: payload.accept,
+            applied: 25,
+            message: 'Applying reviewed changes',
+          };
+          return route.fulfill({ json: operation });
+        }
+        if (action === 'source-updates-history')
+          return route.fulfill({
+            json: {
+              operations:
+                operation && operation.status !== 'prepared' ? [operation] : [],
+              items:
+                operation?.status === 'completed'
+                  ? [
+                      {
+                        change_id: rows[0].id,
+                        name: 'Senate House',
+                        kind: 'remove',
+                        status: 'applied',
+                        message: 'Accepted into the source baseline',
+                      },
+                    ]
+                  : [],
+            },
+          });
+        return route.fallback();
+      });
+      await openEditorSection(page, 'Sources');
+      await expect(
+        page.getByText('101 pending', { exact: true }),
+      ).toBeVisible();
+      await page
+        .getByRole('checkbox', { name: 'Select Senate House', exact: true })
+        .check();
+      await page.getByRole('button', { name: 'Next', exact: true }).click();
+      await expect(
+        page.getByRole('checkbox', {
+          name: 'Select Campus building 50',
+          exact: true,
+        }),
+      ).toBeVisible();
+      await page
+        .getByRole('checkbox', {
+          name: 'Select Campus building 50',
+          exact: true,
+        })
+        .check();
+      await expect(page.getByText('2 selected', { exact: true })).toBeVisible();
+      await page.getByRole('button', { name: 'Previous', exact: true }).click();
+      await expect(
+        page.getByRole('checkbox', {
+          name: 'Select Senate House',
+          exact: true,
+        }),
+      ).toBeChecked();
+      await page.getByLabel('Find an update').fill('Library');
+      await expect(
+        page.getByText('Selection cleared because the filters changed.', {
+          exact: true,
+        }),
+      ).toBeVisible();
+      await page.getByLabel('Find an update').fill('');
+      await expect(
+        page.getByText('101 pending', { exact: true }),
+      ).toBeVisible();
+      await page
+        .getByRole('button', { name: 'Review Senate House', exact: true })
+        .click();
+      const views = page.getByRole('navigation', {
+        name: 'Source review views',
+      });
+      if (phone)
+        await views
+          .getByRole('button', { name: 'Details', exact: true })
+          .click();
+      await expect(
+        page.getByText('Your editor corrections take precedence', {
+          exact: true,
+        }),
+      ).toBeVisible();
+      if (phone)
+        await views.getByRole('button', { name: 'List', exact: true }).click();
+      await page.screenshot({
+        path: testInfo.outputPath(
+          'source-updates-' + (phone ? 'mobile' : 'desktop') + '.png',
+        ),
+      });
+      await page
+        .getByRole('button', {
+          name: 'Select all 101 matching results',
+          exact: true,
+        })
+        .click();
+      await page
+        .getByRole('button', { name: 'Accept selected', exact: true })
+        .click();
+      await expect(
+        page.getByRole('heading', { name: 'Accept 101 updates?', exact: true }),
+      ).toBeVisible();
+      expect(preparedIds).toHaveLength(101);
+      expect(confirmed).toBe(0);
+      const confirm = page.getByRole('button', {
+        name: 'Confirm acceptance',
+        exact: true,
+      });
+      await expect(confirm).toBeDisabled();
+      await page
+        .getByRole('checkbox', { name: /I reviewed the 1 removals/ })
+        .check();
+      await expect(confirm).toBeEnabled();
+      await confirm.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: testInfo.outputPath(
+          'source-updates-confirm-' + (phone ? 'mobile' : 'desktop') + '.png',
+        ),
+      });
+      await confirm.click();
+      await expect(
+        page.getByText(/Review queued. You can close the editor/),
+      ).toBeVisible();
+      expect(confirmed).toBe(1);
+      operation = {
+        ...operation!,
+        status: 'completed',
+        applied: 100,
+        skipped: 1,
+        message: 'Review finished. Publication is a separate step.',
+      };
+      await page
+        .getByRole('button', { name: 'Refresh source updates', exact: true })
+        .click();
+      await page.getByText('Recent decisions', { exact: true }).click();
+      await page
+        .getByRole('button', { name: 'View results', exact: true })
+        .click();
+      await expect(
+        page.getByRole('region', { name: 'Decision results' }),
+      ).toContainText('Accepted into the source baseline');
+    },
+  );
+}
