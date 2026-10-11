@@ -1,0 +1,23 @@
+name: Maintain source review index and receipts
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "22 5 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: source-review-maintenance
+  cancel-in-progress: false
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: node scripts/source-review-maintenance.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

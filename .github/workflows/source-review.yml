@@ -1,0 +1,34 @@
+name: Apply source review decisions
+on:
+  workflow_dispatch:
+    inputs:
+      campus_id:
+        required: true
+        type: string
+      operation_id:
+        required: true
+        type: string
+      run_token:
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: source-review-${{ inputs.campus_id }}-${{ inputs.operation_id }}
+  cancel-in-progress: false
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: node scripts/source-review-worker.mjs
+        env:
+          CAMPUS_ID: ${{ inputs.campus_id }}
+          SOURCE_REVIEW_OPERATION_ID: ${{ inputs.operation_id }}
+          SOURCE_REVIEW_RUN_TOKEN: ${{ inputs.run_token }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
