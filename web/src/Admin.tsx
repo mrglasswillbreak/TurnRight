@@ -102,6 +102,7 @@ import { withPublishedVisuals } from './editor-visuals';
 import { remapBuildingSurfaces } from './building-surfaces';
 import { photoEdits } from './photo-workspace';
 import type { ReviewState } from './EditorReview';
+const SourceUpdates = lazy(() => import('./SourceUpdates'));
 const EditorReview = lazy(() =>
   import('./EditorReview').then((m) => ({ default: m.EditorReview })),
 );
@@ -239,7 +240,7 @@ export default function Admin({
       const loaded = await loadPreparedWorkspace<OfflineEditor>(
         async () => {
           const [state, source] = await Promise.all([
-            api<EditorState>('state', { gisKeys }),
+            api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
             api<{ features: SourceRecord[] }>('sources', { gisKeys }),
           ]);
           if (state.base) initialCampus.current = state.base;
@@ -312,7 +313,7 @@ export default function Admin({
       .map(editKey)
       .slice(0, 500);
     const [result, source] = await Promise.all([
-      api<EditorState>('state', { gisKeys }),
+      api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
       api<{ features: SourceRecord[] }>('sources', { gisKeys }),
     ]);
     setState(result);
@@ -453,7 +454,7 @@ export default function Admin({
             .map(editKey)
             .slice(0, 500);
           const [verified, source] = await Promise.all([
-            api<EditorState>('state', { gisKeys }),
+            api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
             api<{ features: SourceRecord[] }>('sources', { gisKeys }),
           ]);
           const manifest = await latestPackage();
@@ -1955,6 +1956,85 @@ function Editor({
     setTab(id);
     setExplorer(id === 'map');
   };
+  const reviewPanel = (
+    <Suspense fallback={<p>Opening source and release review…</p>}>
+      <EditorReview
+        tab={tab}
+        state={state}
+        onPublishedWorkspace={setPublishedWorkspace}
+        draftCount={drafts.length}
+        workspace={workspace}
+        validation={validation}
+        baselineVersion={base.version}
+        publishedVersion={data.version}
+        published={data}
+        onIssue={openIssue}
+        onSignIn={signIn}
+        busy={busy}
+        action={action}
+        mapRef={mapRef}
+        preview={preview}
+        setPreview={setPreview}
+        review={review}
+        setReview={setReview}
+        onLocateBuilding={(id) => selectId('building', id, true)}
+        onApplyAppearances={async (batch) => {
+          if (
+            tool ||
+            workspace.unfinished ||
+            workspace.roofDraft ||
+            workspace.status === 'Conflict'
+          )
+            return;
+          const original = workspace.edits;
+          const originalBase = currentBase.current;
+          setBusy(true);
+          try {
+            const checked = await validation.check([
+              ...original.filter(
+                (e) => !batch.some((b) => editKey(b) === editKey(e)),
+              ),
+              ...batch,
+            ]);
+            if (
+              workspace.edits !== original ||
+              currentBase.current !== originalBase ||
+              workspace.unfinished ||
+              workspace.roofDraft
+            )
+              throw new Error(
+                'The draft changed. Review the appearance batch again.',
+              );
+            const errors = checked.errors.filter(
+              (e) => !validation.errors.includes(e),
+            );
+            if (!checked.usable || errors.length)
+              throw new Error(
+                errors.join(' ') ||
+                  'The proposed appearances could not be validated.',
+              );
+            workspace.commit(batch);
+            const current = batch.find(
+              (e) =>
+                e.kind === selectedRef.current?.kind &&
+                e.id === selectedRef.current?.id,
+            );
+            if (current) {
+              setSelected(current);
+              selectedRef.current = current;
+            }
+            setMessage(
+              `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
+            );
+          } catch (error) {
+            setError((error as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+    </Suspense>
+  );
   return (
     <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
       {(offlineContext || !networkOnline) && (
@@ -2064,6 +2144,7 @@ function Editor({
         </div>
       </header>
       <WorkspaceFrame
+        sourceReview={tab === 'changes'}
         layout={layout}
         suspendPanes={survey}
         activity={<PhotoActivity />}
@@ -2706,7 +2787,48 @@ function Editor({
               }}
             />
           )}
-          {!tab.startsWith('gis-') &&
+          {tab === 'changes' && (
+            <Suspense fallback={<p>Opening source updates…</p>}>
+              <SourceUpdates
+                data={validation.data}
+                capabilities={state.capabilities}
+                busy={busy}
+                extras={
+                  (state.campus?.slug || 'lasu') === 'lasu'
+                    ? reviewPanel
+                    : undefined
+                }
+                beforeDecision={async () => {
+                  if (
+                    workspace.unfinished ||
+                    workspace.roofDraft ||
+                    workspace.status === 'Conflict'
+                  )
+                    throw new Error(
+                      'Finish the current edit and resolve conflicts before applying source decisions.',
+                    );
+                  if (!(await workspace.flush()))
+                    throw new Error(
+                      workspace.error || 'Save or repair the draft first.',
+                    );
+                }}
+                onRefresh={async () => {
+                  if (!(await workspace.flush()))
+                    throw new Error(
+                      'Save or repair local edits, then refresh source updates.',
+                    );
+                  workspace.reconcile(await refresh(), true);
+                }}
+                onImports={() => setTab('campuses')}
+                onSignIn={signIn}
+                action={action}
+                onFocus={setReview}
+                mapRef={mapRef}
+              />
+            </Suspense>
+          )}
+          {tab !== 'changes' &&
+          !tab.startsWith('gis-') &&
           tab !== 'members' &&
           tab !== 'map' &&
           tab !== 'settings' &&
@@ -2741,86 +2863,7 @@ function Editor({
                     }
                   />
                 ) : (
-                  <Suspense
-                    fallback={<p>Opening source and release review…</p>}
-                  >
-                    <EditorReview
-                      tab={tab}
-                      state={state}
-                      onPublishedWorkspace={setPublishedWorkspace}
-                      draftCount={drafts.length}
-                      workspace={workspace}
-                      validation={validation}
-                      baselineVersion={base.version}
-                      publishedVersion={data.version}
-                      published={data}
-                      onIssue={openIssue}
-                      onSignIn={signIn}
-                      busy={busy}
-                      action={action}
-                      mapRef={mapRef}
-                      preview={preview}
-                      setPreview={setPreview}
-                      review={review}
-                      setReview={setReview}
-                      onLocateBuilding={(id) => selectId('building', id, true)}
-                      onApplyAppearances={async (batch) => {
-                        if (
-                          tool ||
-                          workspace.unfinished ||
-                          workspace.roofDraft ||
-                          workspace.status === 'Conflict'
-                        )
-                          return;
-                        const original = workspace.edits;
-                        const originalBase = currentBase.current;
-                        setBusy(true);
-                        try {
-                          const checked = await validation.check([
-                            ...original.filter(
-                              (e) =>
-                                !batch.some((b) => editKey(b) === editKey(e)),
-                            ),
-                            ...batch,
-                          ]);
-                          if (
-                            workspace.edits !== original ||
-                            currentBase.current !== originalBase ||
-                            workspace.unfinished ||
-                            workspace.roofDraft
-                          )
-                            throw new Error(
-                              'The draft changed. Review the appearance batch again.',
-                            );
-                          const errors = checked.errors.filter(
-                            (e) => !validation.errors.includes(e),
-                          );
-                          if (!checked.usable || errors.length)
-                            throw new Error(
-                              errors.join(' ') ||
-                                'The proposed appearances could not be validated.',
-                            );
-                          workspace.commit(batch);
-                          const current = batch.find(
-                            (e) =>
-                              e.kind === selectedRef.current?.kind &&
-                              e.id === selectedRef.current?.id,
-                          );
-                          if (current) {
-                            setSelected(current);
-                            selectedRef.current = current;
-                          }
-                          setMessage(
-                            `${batch.length} building appearances applied. Undo restores the batch. Review a release preview before publishing.`,
-                          );
-                        } catch (error) {
-                          setError((error as Error).message);
-                        } finally {
-                          setBusy(false);
-                        }
-                      }}
-                    />
-                  </Suspense>
+                  reviewPanel
                 )}
               </aside>
             </WorkspacePane>
