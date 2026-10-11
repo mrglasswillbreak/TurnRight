@@ -39,6 +39,8 @@ Work with footprints, roofs, façades, surface text, curves, and meshes. Compare
 
 ### Review and publish deliberately
 
+Keep external map data current in **Review → Source updates**. Check connected sources, compare readable changes against the map, and accept or reject selected rows or all matching results. Bulk decisions continue in the background, preserve editor corrections, and remain separate from publication. [Source update guide](docs/SOURCE-UPDATES.md).
+
 Resolve map-linked issues, submit immutable content, and obtain approval from someone who did not contribute to it. Publish an approved preview or submit historical content for renewed review.
 
 | Independent review | Publication |
@@ -89,6 +91,7 @@ See [Contributing](CONTRIBUTING.md) for focused browser checks, offline verifica
 | Understand the complete team workflow | [Campus GIS platform](docs/GIS-PLATFORM.md) |
 | Learn the editor, panes, and shortcuts | [Editor guide](docs/EDITOR.md) |
 | Import campus data | [Campuses and imports](docs/CAMPUS-IMPORTS.md) |
+| Check sources and review many updates | [Source updates and bulk review](docs/SOURCE-UPDATES.md) |
 | Build and review a model | [Unified model editor](docs/UNIFIED-MODEL-EDITOR.md) |
 | Edit and compress photographs | [Photo editing](docs/PHOTO-EDITING.md) |
 | Understand the code and data flow | [Architecture](docs/ARCHITECTURE.md) |
