@@ -15,7 +15,7 @@ TurnRight brings campus mapping, building authoring, and public navigation into 
 
 ### Explore a campus
 
-Search destinations, inspect buildings and photographs, and plan walking or driving routes. LASU Ojo and UNILAG Akoka have independent published packages and offline downloads.
+Search destinations, inspect 3D buildings and photographs, choose between walking or driving routes, and get GPS-enabled turn-by-turn directions. LASU Ojo and UNILAG Akoka have independent published packages and offline downloads.
 
 | Desktop map | Phone view |
 | --- | --- |
