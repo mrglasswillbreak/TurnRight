@@ -1,4 +1,5 @@
 import { publicationAction } from '../server/publication.js';
+import { sourceUpdatesAction } from '../server/source-updates.js';
 import { processStatus } from '../server/process-status.js';
 import { workspaceAccess } from '../server/workspace-access.js';
 import { gisAction } from '../server/gis.js';
@@ -53,6 +54,12 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     const campus = await resolveCampus(reference);
     await withCampusId(campus.id, async () => {
       const capabilities = await workspaceAccess(user.id, action);
+      if (typeof action === 'string' && action.startsWith('source-updates-')) {
+        res
+          .status(200)
+          .json(await sourceUpdatesAction(user.id, action, payload));
+        return;
+      }
       if (action === 'workspace-capabilities') {
         res.status(200).json(capabilities);
         return;
@@ -104,7 +111,9 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           const [edits, changes, reports, jobs, releases, published] =
             await Promise.all([
               allRows('map_edits', '&gis_managed=eq.false'),
-              db<unknown[]>(sourceReviewQuery()),
+              payload.sourceReviewVersion === 2
+                ? Promise.resolve([])
+                : db<unknown[]>(sourceReviewQuery()),
               db('reports?status=eq.pending&order=created_at.desc&limit=200'),
               db('jobs?order=created_at.desc&limit=20'),
               db(
@@ -136,7 +145,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'process-status': {
-          res.status(200).json(await processStatus(payload?.watch));
+          res.status(200).json(await processStatus(payload?.watch, user.id));
           break;
         }
         case 'review-status': {
@@ -151,7 +160,9 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             db(
               'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
             ),
-            db<unknown[]>(changesQuery),
+            payload.omitChanges === true
+              ? Promise.resolve([])
+              : db<unknown[]>(changesQuery),
             publishedWorkspace(),
           ]);
           res.status(200).json({

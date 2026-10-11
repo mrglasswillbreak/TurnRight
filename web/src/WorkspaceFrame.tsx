@@ -122,7 +122,9 @@ export function WorkspaceFrame({
   tools,
   activity,
   suspendPanes = false,
+  sourceReview = false,
 }: {
+  sourceReview?: boolean;
   suspendPanes?: boolean;
   activity?: ReactNode;
   children: ReactNode;
@@ -145,18 +147,25 @@ export function WorkspaceFrame({
   const sizes = layout.value.sizes[scope];
   const workspaceRef = useRef(workspace);
   workspaceRef.current = workspace;
-  const register = useCallback((id: PaneId, title: string) => {
-    setPresent((old) => ({ ...old, [id]: title }));
-    setActive((old) =>
-      workspaceRef.current === 'gis-data' && id !== 'bottom' ? old : id,
-    );
-    return () =>
-      setPresent((old) => {
-        const next = { ...old };
-        delete next[id];
-        return next;
-      });
-  }, []);
+  const register = useCallback(
+    (id: PaneId, title: string) => {
+      setPresent((old) => ({ ...old, [id]: title }));
+      setActive((old) =>
+        sourceReview
+          ? 'left'
+          : workspaceRef.current === 'gis-data' && id !== 'bottom'
+            ? old
+            : id,
+      );
+      return () =>
+        setPresent((old) => {
+          const next = { ...old };
+          delete next[id];
+          return next;
+        });
+    },
+    [sourceReview],
+  );
   useEffect(() => {
     const media = matchMedia('(max-width: 1199px)');
     const change = () => setCompact(media.matches);
@@ -304,6 +313,41 @@ export function WorkspaceFrame({
           <div className="workspace-context-tools">{tools}</div>
           <div className="workspace-layout-tools">
             {activity}
+            {compact && sourceReview && (
+              <nav
+                aria-label="Source review views"
+                className="source-mobile-views"
+              >
+                {(['List', 'Map', 'Details'] as const).map((label) => (
+                  <button
+                    key={label}
+                    aria-pressed={
+                      label === 'Map'
+                        ? focus
+                        : !focus &&
+                          active === (label === 'List' ? 'left' : 'right')
+                    }
+                    onClick={() => {
+                      setMaximized(null);
+                      setFocus(label === 'Map');
+                      if (label !== 'Map') {
+                        const pane = label === 'List' ? 'left' : 'right';
+                        setActive(pane);
+                        layout.update((old) => ({
+                          ...old,
+                          collapsed: {
+                            ...old.collapsed,
+                            [`${scope}:${pane}`]: false,
+                          },
+                        }));
+                      }
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </nav>
+            )}
             {(
               [
                 ['left', PanelLeft],

@@ -1,5 +1,22 @@
 # Production deployments
 
+## Source updates rollout — 11 October 2026 (in progress)
+
+[Draft PR #13](https://github.com/mrglasswillbreak/TurnRight/pull/13) contains the source-update inbox, frozen bulk selections, background worker, and documentation. Migration 041 is installed, including the final retention function. The bounded metadata backfill completed all 32,457 records at 07:27 UTC, committing at most 100 records per transaction.
+
+The worker and editor have not yet been promoted to production. Follow-up fixes are pushed at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`; the [full regression rerun](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38121519417) and fresh screenshot verification are in progress. Before deployment, complete the browser checks and inspect the captures. After deployment, verify both campuses’ status/inbox/login without deciding existing proposals. [Sanitized rollout receipt](assets/source-updates-rollout-2026-10-11.json).
+
+The initial CI passed the full unit suite, offline checks, and the new source-review journeys on Chromium and WebKit. Native database/import acceptance also passed. Follow-up changes fix accessibility lint, existing tests opening the relocated enrichment controls, the export test’s initial map-readiness race, and transparent review panels found during screenshot inspection. Both TypeScript projects pass. The 10,000-proposal database fixture completed in 400 transactions with 9,998 applied and two stale skips, preserving correction overlays and creating no releases. This fixture is not a production bulk-decision run.
+
+After backfill, production still had 15,432 source records, 351 corrections, 7,544 pending proposals and 46 releases, with no active imports or bulk operations. Source, correction, and proposal fingerprints exactly matched the pre-migration baseline. PostgreSQL’s start time remained 10 October 19:16:02 UTC. OAuth authorization returned HTTP 302 before, during and after backfill; the post-backfill probe took 1,323 ms. No production proposal was accepted or rejected during rollout. Authenticated verification of the deployed interface is pending.
+
+## Bounded import recovery and artifact retention — 11 October 2026
+
+[PR #11](https://github.com/mrglasswillbreak/TurnRight/pull/11) and [PR #12](https://github.com/mrglasswillbreak/TurnRight/pull/12) are merged. Migrations 039 and 040 are installed. The complete UNILAG daily import [run 38088544052](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38088544052) succeeded in 3m 36s after bounded queue staging, and daily ArcGIS checks were re-enabled. The earlier failed verification below is historical; migration 038 alone did not resolve the outage.
+
+The authorized [retention run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38111159593) removed 37 obsolete generated files totalling 516,513,589 bytes. All 176 protected files remained unchanged. Source features, saved edits, pending proposals, original uploads and releases remained 15,432 / 351 / 7,546 / 49 / 46. The editor and OAuth entry point remained available, with no database restart during cleanup. Automatic retention is enabled after imports and daily at 05:17 UTC.
+
+
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.
 

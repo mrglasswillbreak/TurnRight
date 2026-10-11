@@ -154,3 +154,9 @@ Account setup and the owner's ArcGIS redistribution confirmation are recorded in
 ### Photo comparison and encoder boundary
 
 `PhotoCompare` keeps both images on one pan/zoom transform and provides a keyboard-accessible comparison range. `PhotoOptimizer` owns local recipes, cancellation and metadata-panel composition; `PhotoManager` retains review and gallery commands. `photo-compression` bounds size-target searches without changing image dimensions or crossing the quality floor. Four pinned Squoosh WebAssembly encoders load on demand in the image worker from `public/photo-codecs/e8d35e0`; an integrity manifest controls explicit offline preparation. Workers verify and read cached module/WASM bytes directly because module imports in dedicated workers can bypass the service worker. Codec bytes do not enter public startup or the normal app precache. Previews replace output records without cloning retained originals or overwriting concurrent gallery associations. See [the current image workflow](PHOTO-EDITING.md).
+
+## Source update inbox and durable decisions
+
+Migration 041 stores lightweight proposal metadata and monotonically increasing review revisions. List/status APIs avoid geometry; a focused detail request retrieves one comparison. Cursor pages contain at most 50 summaries. A prepared selection stores IDs and revisions, and one durable operation per campus processes at most 25 decisions in a transaction with bounded locks. Baseline checks, source-review locks, campus capabilities, audit attribution, and correction overlays remain authoritative.
+
+Worker retries use the same operation/token and committed item receipts. Cancellation stops remaining work; changed proposals are skipped. Daily maintenance backfills 100 records per transaction and expires temporary bookkeeping without deleting proposals, source records, corrections, or decision audits. [Contracts and operation](SOURCE-UPDATES.md).

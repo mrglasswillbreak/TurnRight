@@ -43,7 +43,7 @@ export default function GisPublish({
   const load = async () => {
     const [r, s, v] = await Promise.all([
       gisApi('gis-reviews', {}),
-      api<{ releases: Release[] }>('review-status'),
+      api<{ releases: Release[] }>('review-status', { omitChanges: true }),
       gisApi('gis-views', {}),
     ]);
     setReviews(r.filter((r) => r.status === 'approved'));

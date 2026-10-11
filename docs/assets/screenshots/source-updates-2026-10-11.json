@@ -1,0 +1,62 @@
+{
+  "capturedDate": "2026-10-11",
+  "recordedAt": "2026-10-11T07:34:00.738Z",
+  "commit": "1feb53f77c954698c0c6d6dd3074db85a06399db",
+  "workflowRun": 38121589733,
+  "workflowUrl": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38121589733",
+  "browser": "Chromium 153.0.8010.12",
+  "playwright": "1.63.0",
+  "deviceScaleFactor": 1,
+  "unalteredBrowserCaptures": true,
+  "build": "Vite development server with isolated test authentication and API responses",
+  "fixture": {
+    "test": "web/tests/browser/editor.spec.ts: source updates bulk review desktop/phone",
+    "testFileSha256": "e6fb5f7df0bf7caef49804b241ba5e9e27dc59fc6bfca52e6d969399ae9fc83b",
+    "campus": "LASU lasu-4895a363b403 published package",
+    "proposals": 101,
+    "source": "Synthetic Campus ArcGIS",
+    "account": "Isolated owner fixture",
+    "noProductionDecisions": true
+  },
+  "captures": [
+    {
+      "file": "source-updates-confirm-desktop-2026-10-11.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "8262be5da4eb53d79ccc72302e400523e11687b3a21fbc909630557b65d7f652",
+      "artifactPath": "chromium/editor-source-updates-bulk-84808-mation-progress-and-results/source-updates-confirm-desktop.png"
+    },
+    {
+      "file": "source-updates-desktop-2026-10-11.png",
+      "width": 1440,
+      "height": 1000,
+      "theme": "light",
+      "sha256": "425b993312f62221cd1c42e3bbe6d2227f8a36990aa4861ac0ec8f275ad9ceec",
+      "artifactPath": "chromium/editor-source-updates-bulk-84808-mation-progress-and-results/source-updates-desktop.png"
+    },
+    {
+      "file": "source-updates-confirm-mobile-2026-10-11.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "7a0fa6cacab0664da9c198c99be2c51c1289ae27d0af43daf721fef06370e898",
+      "artifactPath": "chromium/editor-source-updates-bulk-b0c07-mation-progress-and-results/source-updates-confirm-mobile.png"
+    },
+    {
+      "file": "source-updates-mobile-2026-10-11.png",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "sha256": "a856aa8652dbec1f432ccfc73abd3f6c23999b075e7415c6f7f4e9a53bcaa056",
+      "artifactPath": "chromium/editor-source-updates-bulk-b0c07-mation-progress-and-results/source-updates-mobile.png"
+    }
+  ],
+  "validation": {
+    "chromiumDesktop": "passed",
+    "chromiumPhone": "passed",
+    "webkitDesktop": "passed",
+    "webkitPhone": "passed",
+    "visualInspection": "All four published Chromium images inspected individually"
+  }
+}

@@ -1,26 +1,15 @@
 import { campusUrl, requestedCampus } from './campus-context';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
-import {
-  Check,
-  Flag,
-  GitCompareArrows,
-  Layers,
-  MapPin,
-  RefreshCw,
-  Upload,
-  X,
-} from 'lucide-react';
+import { Flag, Layers, MapPin, RefreshCw, Upload } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
 import type { CampusData, MapChange, Release, StudentReport } from './types';
 import { api } from './supabase';
 import { AdminRequestError } from './admin-client';
 import { useReleaseImpact } from './useReleaseImpact';
-import { sourceComparison, sourceGeometry } from './source-comparison';
-import { SourceFieldReview } from './SourceFieldReview';
 import { EnrichmentReview } from './EnrichmentReview';
-import { firstPosition, type ValidationIssue } from './validation';
+import { type ValidationIssue } from './validation';
 import { downloadJson } from './download-json';
 import type { EditorWorkspace } from './editor-workspace';
 import type { EditorValidation } from './editor-validation';
@@ -61,8 +50,6 @@ export function EditorReview({
   mapRef,
   preview,
   setPreview,
-  review,
-  setReview,
   onApplyAppearances,
   onLocateBuilding,
   onPublishedWorkspace,
@@ -97,22 +84,17 @@ export function EditorReview({
   const [liveState, setLiveState] = useState(state);
   const [statusError, setStatusError] = useState<Error | null>(null);
   const [statusAttempt, setStatusAttempt] = useState(0);
-  const [sourceQuery, setSourceQuery] = useState('');
-  const [sourceFilter, setSourceFilter] = useState('');
-  const [sourceOffset, setSourceOffset] = useState(0);
-  const [sourceLoading, setSourceLoading] = useState(false);
   const impact = useReleaseImpact(
     published,
     validation.data,
     tab === 'releases' && !validation.pending,
   );
   useEffect(() => {
-    if (!['changes', 'releases'].includes(tab)) {
+    if (tab !== 'releases') {
       setLiveState(state);
       return;
     }
     setLiveState({ ...state, changes: [], hasMoreChanges: false });
-    setSourceLoading(true);
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -123,13 +105,14 @@ export function EditorReview({
               ReviewState,
               'jobs' | 'releases' | 'changes' | 'hasMoreChanges' | 'published'
             >
-          >('review-status', { sourceQuery: sourceFilter, sourceOffset });
+          >('review-status', {
+            omitChanges: true,
+          });
           if (!cancelled) {
             setLiveState((current) => ({ ...current, ...latest }));
             if (latest.published !== undefined)
               onPublishedWorkspace(latest.published);
             setStatusError(null);
-            setSourceLoading(false);
           }
         } catch (e) {
           if (!cancelled) setStatusError(e as Error);
@@ -143,14 +126,7 @@ export function EditorReview({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [
-    state,
-    tab,
-    statusAttempt,
-    onPublishedWorkspace,
-    sourceFilter,
-    sourceOffset,
-  ]);
+  }, [state, tab, statusAttempt, onPublishedWorkspace]);
   return (
     <>
       {statusError && (
@@ -174,7 +150,7 @@ export function EditorReview({
       )}
       {tab === 'changes' && (
         <>
-          <h2>Source review</h2>
+          <h2>Campus evidence</h2>
           {requestedCampus() === 'lasu' && (
             <>
               <EnrichmentReview
@@ -225,202 +201,6 @@ export function EditorReview({
               />
             </>
           )}
-          <p className="small-note">
-            Daily checks propose changes. Your campus corrections always take
-            precedence.
-          </p>
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() =>
-              action(
-                'check-sources',
-                {},
-                'Source check queued. Refresh to see its result.',
-              )
-            }
-          >
-            <RefreshCw /> Check now
-          </Button>
-          {liveState.jobs.slice(0, 3).map((job) => (
-            <div className={`job-status ${job.status}`} key={job.id}>
-              <strong>{job.status}</strong>
-              <p>{job.message || 'Import in progress'}</p>
-              <small>{new Date(job.created_at).toLocaleString()}</small>
-            </div>
-          ))}
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSourceFilter(sourceQuery.trim());
-              setSourceOffset(0);
-              setStatusAttempt((n) => n + 1);
-            }}
-          >
-            <label>
-              Filter by source ID prefix
-              <input
-                value={sourceQuery}
-                maxLength={160}
-                placeholder="e.g. feature:overture: or place:"
-                onChange={(event) => setSourceQuery(event.target.value)}
-              />
-            </label>
-            <Button type="submit" variant="outline" disabled={busy}>
-              Filter changes
-            </Button>
-          </form>
-          <div className="button-row">
-            <Button
-              variant="outline"
-              disabled={busy || sourceLoading || sourceOffset === 0}
-              onClick={() => setSourceOffset((n) => Math.max(0, n - 300))}
-            >
-              Previous changes
-            </Button>
-            <Button
-              variant="outline"
-              disabled={
-                busy ||
-                sourceLoading ||
-                !liveState.hasMoreChanges ||
-                sourceOffset >= 30000
-              }
-              onClick={() => setSourceOffset((n) => n + 300)}
-            >
-              Next changes
-            </Button>
-          </div>
-          <p className="small-note" aria-live="polite">
-            {sourceLoading
-              ? 'Loading source changes…'
-              : `Page ${sourceOffset / 300 + 1} · ${liveState.changes.length} pending changes${liveState.hasMoreChanges ? ' · more pages available' : ''}`}
-          </p>
-          {!sourceLoading && liveState.changes.length === 0 && (
-            <div className="empty-state">
-              <GitCompareArrows />
-              <h3>No pending changes on this page</h3>
-              <p>
-                Clear the filter or return to the previous page to see other
-                proposals.
-              </p>
-            </div>
-          )}
-          {liveState.changes.map((change) => (
-            <div
-              className={`change-card ${review?.id === change.id ? 'selected' : ''}`}
-              key={change.id}
-            >
-              <button
-                onClick={() => {
-                  setReview(change);
-                  const geometry =
-                    sourceGeometry(change.after) ||
-                    sourceGeometry(change.before);
-                  const point =
-                    geometry && 'coordinates' in geometry
-                      ? firstPosition(geometry.coordinates)
-                      : undefined;
-                  if (point) mapRef.current?.flyTo({ center: point, zoom: 18 });
-                }}
-              >
-                <span className="change-kind">{change.kind}</span>
-                <strong>{change.summary}</strong>
-              </button>
-              <p className="small-note">{change.source_id}</p>
-              <div className="button-row">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={busy}
-                  onClick={() =>
-                    action(
-                      'review-change',
-                      { id: change.id, accept: false },
-                      'Change rejected; source baseline retained.',
-                    )
-                  }
-                >
-                  <X /> Reject
-                </Button>
-                <Button
-                  size="sm"
-                  disabled={busy}
-                  onClick={() =>
-                    action(
-                      'review-change',
-                      { id: change.id, accept: true },
-                      'Change accepted into the source baseline. Publish a release to update the public map.',
-                    )
-                  }
-                >
-                  <Check /> Accept
-                </Button>
-              </div>
-              {review?.id === change.id &&
-                (() => {
-                  const comparison = sourceComparison(
-                    change.before,
-                    change.after,
-                  );
-                  const text = (value: unknown) =>
-                    value === undefined
-                      ? 'Not recorded'
-                      : typeof value === 'string'
-                        ? value
-                        : JSON.stringify(value);
-                  return (
-                    <div className="source-comparison">
-                      <SourceFieldReview
-                        key={change.id + JSON.stringify(change.before)}
-                        change={change}
-                        data={validation.data}
-                        busy={busy}
-                        action={action}
-                      />
-                      <p>Red: approved source · Green: proposed source</p>
-                      {comparison.geometryChanged && (
-                        <p className="notice">
-                          Geometry changed. Compare the highlighted outlines on
-                          the map.
-                        </p>
-                      )}
-                      {!!comparison.fields.length && (
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Property</th>
-                              <th>Before</th>
-                              <th>After</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {comparison.fields.map((f) => (
-                              <tr key={f.key}>
-                                <th>{f.key}</th>
-                                <td>{text(f.before)}</td>
-                                <td>{text(f.after)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
-                      {!comparison.fields.length && <p>No property changes.</p>}
-                      <details>
-                        <summary>Raw source records</summary>
-                        <pre>
-                          {JSON.stringify(
-                            { before: change.before, after: change.after },
-                            null,
-                            2,
-                          )}
-                        </pre>
-                      </details>
-                    </div>
-                  );
-                })()}
-            </div>
-          ))}
         </>
       )}
       {tab === 'reports' && (

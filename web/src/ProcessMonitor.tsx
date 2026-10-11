@@ -7,6 +7,7 @@ import {
   type ProcessRecord,
 } from './process-monitor';
 import { api } from './supabase';
+import type { SourceOperation } from './source-updates';
 import type { CampusImport } from './map-import-types';
 import type { ReviewState } from './EditorReview';
 import './process-monitor.css';
@@ -135,7 +136,10 @@ export default function ProcessMonitor({
             .filter((id) => /^[a-f0-9-]{36}$/i.test(id));
         const results = await Promise.allSettled([
           api<
-            Pick<ReviewState, 'jobs' | 'releases'> & { imports: CampusImport[] }
+            Pick<ReviewState, 'jobs' | 'releases'> & {
+              imports: CampusImport[];
+              sourceReviews?: SourceOperation[];
+            }
           >(
             'process-status',
             {
@@ -156,6 +160,29 @@ export default function ProcessMonitor({
         );
         processes.batch(() => {
           if (results[0].status === 'fulfilled') {
+            for (const op of results[0].value.sourceReviews || [])
+              processes.set({
+                id: 'source-review:' + op.id,
+                title: (op.accept ? 'Accept' : 'Reject') + ' source updates',
+                stage: op.message || op.status,
+                state:
+                  op.status === 'queued'
+                    ? 'waiting'
+                    : op.status === 'running'
+                      ? 'running'
+                      : op.status === 'failed' || op.failed > 0
+                        ? 'failed'
+                        : op.status === 'cancelled'
+                          ? 'cancelled'
+                          : 'complete',
+                started: Date.parse(op.created_at),
+                finished: op.completed_at
+                  ? Date.parse(op.completed_at)
+                  : undefined,
+                completed: op.applied + op.skipped + op.failed,
+                total: op.total,
+                unit: 'updates',
+              });
             for (const j of results[0].value.jobs || [])
               processes.set({
                 id: `job:${j.id}`,

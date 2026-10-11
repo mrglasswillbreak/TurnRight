@@ -1,6 +1,30 @@
 # Application tour and screenshot maintenance
 
-The October 2026 gallery contains sixteen application views plus two editor-control details. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/redesign-2026-10-07.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+The October 2026 gallery contains four new source-update views, sixteen earlier application views, and two editor-control details. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/redesign-2026-10-07.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+
+## Source updates capture workflow
+
+The new [Source updates workspace](SOURCE-UPDATES.md) has desktop and phone capture journeys in `web/tests/browser/editor.spec.ts`. They use the real React/MapLibre interface with isolated owner/API responses and 101 synthetic proposals. The names, proposal counts, removals, decisions, and progress are demonstration data; no production proposal is reviewed by these tests.
+
+Run sequentially from `web/` after installing the pinned dependencies and Playwright browsers:
+
+```powershell
+npm run test:browser -- tests/browser/editor.spec.ts --grep "source updates bulk review" --output ../test-results/source-updates-chromium
+npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source updates bulk review" --output ../test-results/source-updates-webkit
+```
+
+Each engine writes `source-updates-desktop.png`, `source-updates-mobile.png`, `source-updates-confirm-desktop.png`, and `source-updates-confirm-mobile.png` inside its per-test output directories. Desktop uses 1440 × 1000 and phone uses 390 × 844. The application regression workflow also retains them in its browser artifacts when the journeys reach the capture steps.
+
+Inspect the actual captures and successful test results before promoting any image into this gallery. Use a new dated filename and record the exact commit, browser version, fixture identity, dimensions, and SHA-256 digest. Keep earlier images and manifests. The four October 11 captures below passed their Chromium desktop/phone journeys and were inspected individually. Their [capture record](assets/screenshots/source-updates-2026-10-11.json) identifies the tested commit, pinned browser, fixture and file digests. The October 7 captures remain dated examples of the earlier interface. [Rollout status](PRODUCTION.md#source-updates-rollout--11-october-2026-in-progress).
+
+## Source updates · 11 October 2026
+
+| Inbox and comparison | Bulk confirmation |
+| --- | --- |
+| ![Desktop source inbox beside map outlines and editor overrides](assets/screenshots/source-updates-desktop-2026-10-11.png) | ![Desktop confirmation with exact counts and removal acknowledgement](assets/screenshots/source-updates-confirm-desktop-2026-10-11.png) |
+| ![Phone source inbox and selection controls](assets/screenshots/source-updates-mobile-2026-10-11.png) | ![Phone confirmation with geometry and removal warnings](assets/screenshots/source-updates-confirm-mobile-2026-10-11.png) |
+
+These unaltered captures use the Vite development server at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`, the published LASU package, and isolated owner/API fixtures with 101 synthetic proposals. They establish the appearance of the tested interface, not a production decision or deployment.
 
 ## Visual tour
 

@@ -22,7 +22,7 @@ The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stabl
 
 TurnRight keeps separate campus maps with campus-scoped team memberships. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography stays private until the team submits an immutable snapshot, obtains independent approval and publishes a campus release.
 
-**Required schema:** migrations 001–040. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–041. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 
@@ -121,11 +121,11 @@ reverting the change restores the existing preview without another build.
 Reopening a completed import retains recoverable mapping edits and the same
 checks. A successful background job alone does not bypass validation.
 
-Large validated batches use a bulk transaction (migration 016) with a bounded 60-second database allowance (migration 017). The server waits up to 75 seconds for this queue RPC; other database requests retain their usual limit. If a queue attempt fails, its transaction rolls back and the validated preview remains recoverable. Reopen the import before retrying to distinguish a completed queue from a failed request.
+Migration 039 stages validated candidates through small worker requests, then performs bounded atomic baseline validation and proposal insertion. The former whole-candidate RPC is retired. Reopen a failed import before retrying to distinguish a committed queue from an interrupted request; incomplete staging cannot change pending proposals.
 
 Repeat imports default to adding/updating selected layers. Choose **Replace selected layers** or **Replace the complete source** explicitly before missing records can be proposed for removal; verify source completeness first.
 
-Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace shared corrections, or publish anything. Source changes use existing whole-record and field review. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
+Use **Queue for review**, then **Open source review**. An import produces proposals; it does not accept source changes, replace shared corrections, or publish anything. Source changes use the Source updates inbox for individual supported fields and whole-record bulk decisions. Overlaps require an explicit duplicate decision. An incomplete ArcGIS response or OSM extract cannot generate removals. Large removal batches stop for investigation.
 
 Authored model assignments on matching building identities survive refreshes. Shared corrections remain separate from the source layer. Geometry changes can still require wall, roof, connection or duplicate review before publication.
 
@@ -216,3 +216,7 @@ The requested building footprints, Roads, Parcel, Greenspace and complete Greenl
 The initial import excluded Road width because feature 96 had a ring self-intersection near longitude 3.39490293674406, latitude 6.51373591493023. The September 30 upgrade repaired and inspected it, then included all 179 source identities. The truncated 1,000-feature Greenland upload was replaced by the complete 2,425-feature ArcGIS layer. Original uploads and source attributes remain private.
 
 [Successful production import job](https://github.com/mrglasswillbreak/TurnRight/actions/runs/36332555168). LASU source fingerprints were checked unchanged during UNILAG acceptance. The separately requested LASU release is `lasu-0b8025eb23b8` with 45 photographs; see [production evidence](PRODUCTION.md).
+
+## Reviewing ongoing source updates
+
+Open **Review → Source updates** for accurate per-source activity and pending counts. **Check now** reuses the configured import mapping and the bounded queue worker. The scheduler and manual check use an atomic source claim to avoid overlapping jobs. Uploaded files still use replacement uploads. Accepted/rejected changes are reviewed in batches of at most 25 decisions, separately from import staging and publication. [Source updates guide](SOURCE-UPDATES.md).

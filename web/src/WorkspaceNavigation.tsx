@@ -59,7 +59,7 @@ const groups: Record<string, [EditorSection, string][]> = {
   'gis-analyze': [],
   'gis-review': [
     ['gis-review', 'Overview'],
-    ['changes', 'Sources'],
+    ['changes', 'Source updates'],
     ['duplicates', 'Duplicates'],
     ['reports', 'Reports'],
   ],

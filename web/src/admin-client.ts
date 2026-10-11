@@ -16,6 +16,10 @@ export class AdminRequestError extends Error {
   }
 }
 const readable = new Set([
+  'source-updates-overview',
+  'source-updates-list',
+  'source-updates-detail',
+  'source-updates-history',
   'state',
   'sources',
   'review-baseline',

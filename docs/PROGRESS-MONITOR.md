@@ -50,3 +50,7 @@ npx playwright test --grep "offline image editor"
 ```
 
 See [map imports](CAMPUS-IMPORTS.md), [photo editing](PHOTO-EDITING.md) and [deployment](DEPLOYMENT.md).
+
+## Source review progress
+
+Activity includes background source acceptance/rejection with completed/total counts and terminal status. **Review → Source updates → Recent decisions** provides the detailed completed/skipped/failed breakdown, result pages, Stop remaining, Retry unfinished, and Resume worker. Source check cards use campus import jobs; publication jobs are not presented as source health. [Source updates](SOURCE-UPDATES.md).
