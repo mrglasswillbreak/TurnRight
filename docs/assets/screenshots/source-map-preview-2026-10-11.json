@@ -1,0 +1,53 @@
+{
+  "capturedDate": "2026-10-11",
+  "baseCommit": "4c85b2f3b955d422088f3a6e485fe5885e040a16",
+  "source": "Local working tree based on the base commit; component and final fixture hashes recorded below. The mobile panel capture precedes map-only framing refinements; its panel components are unchanged.",
+  "browser": "Chromium 153.0.8010.12",
+  "playwright": "1.63.0",
+  "build": "Vite development server, isolated owner/API fixtures",
+  "deviceScaleFactor": 1,
+  "unalteredBrowserCaptures": true,
+  "noProductionDecisions": true,
+  "captures": [
+    {
+      "theme": "light",
+      "source": "test-results/preview-gallery-integrated/editor-source-updates-map--3cfc1--shapes-and-read-only-close/source-map-preview-desktop.png",
+      "fixture": "101 synthetic proposals over LASU lasu-4e4c8008b38b",
+      "journey": "passed",
+      "width": 1440,
+      "file": "source-map-preview-desktop-2026-10-11.png",
+      "sha256": "6157fb8124154e16e26beed9034c15fd4f34d7a83f80a2503081aa3eecfeb5a4",
+      "height": 1000
+    },
+    {
+      "theme": "light",
+      "source": "test-results/preview-gallery-integrated/editor-source-updates-map--fb2ff--shapes-and-read-only-close/source-map-preview-mobile.png",
+      "fixture": "101 synthetic proposals over LASU lasu-4e4c8008b38b",
+      "journey": "passed",
+      "width": 390,
+      "file": "source-map-preview-mobile-2026-10-11.png",
+      "sha256": "2e304f1cf1362037b6d70e978bb0e02216216897b6ae757262e8d9cb33958ad4",
+      "height": 844
+    },
+    {
+      "theme": "light",
+      "source": "test-results/preview-chromium-final/editor-workspace-panes-mob-b7db3-g-keyboard-reset-and-reload/editor-adjustable-panel-mobile.png",
+      "fixture": "browserCampus synthetic Library edit",
+      "journey": "passed",
+      "width": 390,
+      "file": "editor-adjustable-panel-mobile-2026-10-11.png",
+      "sha256": "77d5426f72231d33c5758bd4f17a656e5d012610c605e42181a2eb338710794c",
+      "height": 844
+    }
+  ],
+  "sourceFileSha256": {
+    "web/src/WorkspaceFrame.tsx": "da582ea5c66b71ab6daa53513e0cbf52edd2c7b13a3f3e54b4cedd8c449ca8e6",
+    "web/tests/browser/editor.spec.ts": "b41426907bf2ae041eb5b22d50ebc84f549f182154488bf7f155c5a990918ef6",
+    "web/src/source-updates.css": "38de8e8e1be54966b1efdeb8ca34a01b791b41e8d37030fd9e42e0d06eb8d022",
+    "web/src/workspace-frame.css": "70ca8d4e3ff5d1b2f569bb78a8a7c79c0f0886fb2298a0c9003d732a61b84712",
+    "web/src/SourceMapPreview.tsx": "ae47745dd148c60b39fc351a6fa9c77a5b6ff87e4699b7a04d8fadabf0869b70",
+    "web/src/source-map-preview.ts": "607e1813019679029163df812034f0d45715c47aaafa1136a09734754b56c93e",
+    "web/src/WorkspaceSheetHandle.tsx": "5e8defd6675897ee3e55f04820144b0489d00143c2e4c2b770a24ce603fd58dd"
+  },
+  "visualInspection": "All three captures inspected at native dimensions; readable controls, fitted proposals, focused resize handle and no overlapping editing legend."
+}

@@ -278,7 +278,15 @@
   box-shadow: 0 4px 20px #0002;
   font-size: 12px;
 }
-.source-preview-launch { width: 100%; white-space: normal !important; height: auto; min-height: 40px; }
+.workspace-canvas:has(.source-map-preview) .editor-bottom {
+  display: none;
+}
+.source-preview-launch {
+  width: 100%;
+  white-space: normal !important;
+  height: auto;
+  min-height: 40px;
+}
 .source-map-preview header {
   display: flex;
   align-items: center;

@@ -40,6 +40,7 @@ export default function SourceMapPreview({
   const [reload, setReload] = useState(0);
   const [showBefore, setShowBefore] = useState(false);
   const [asOf, setAsOf] = useState('');
+  const panelRef = useRef<HTMLElement>(null);
   const filterKey = JSON.stringify(filters);
   const focusRef = useRef(onFocus);
   focusRef.current = onFocus;
@@ -205,10 +206,28 @@ export default function SourceMapPreview({
   ).length;
   const fit = () => {
     const bounds = proposalBounds(features);
-    if (bounds) mapRef.current?.fitBounds(bounds, { padding: 60, maxZoom: 18 });
+    const map = mapRef.current;
+    if (!bounds || !map) return;
+    const canvas = map.getContainer().getBoundingClientRect();
+    const panel = panelRef.current?.getBoundingClientRect();
+    const padding = { top: 48, bottom: 32, left: 48, right: 32 };
+    if (panel) {
+      if (canvas.width < 600)
+        padding.top = Math.min(
+          canvas.height * 0.55,
+          panel.bottom - canvas.top + 16,
+        );
+      else
+        padding.left = Math.min(
+          canvas.width * 0.55,
+          panel.right - canvas.left + 24,
+        );
+    }
+    map.fitBounds(bounds, { padding, maxZoom: 18 });
   };
   return (
     <section
+      ref={panelRef}
       className="source-map-preview"
       aria-label="Proposed changes map preview"
     >
