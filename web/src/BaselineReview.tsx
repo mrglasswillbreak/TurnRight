@@ -1,107 +1,18 @@
-import { useState } from 'react';
-import { api } from './supabase';
-import { AdminRequestError } from './admin-client';
-import type { ValidationIssue } from './validation';
-interface Review {
-  version: string;
-  expectedHash: string;
-  before: { places: number; edges: number };
-  after: { places: number; edges: number };
-  drafts: number;
-  issues: ValidationIssue[];
-  accessReviews: { id: string; name: string }[];
-}
-export function BaselineReview({
-  busy,
-  action,
-  onSignIn,
-}: {
-  busy: boolean;
-  action: (name: string, payload: unknown, success: string) => Promise<boolean>;
-  onSignIn: () => Promise<void>;
-}) {
-  const [review, setReview] = useState<Review | null>(null),
-    [error, setError] = useState(''),
-    [authError, setAuthError] = useState(false),
-    [loading, setLoading] = useState(false);
+/** Source acceptance already updates the working baseline; publication is separate. */
+export function BaselineReview() {
   return (
     <div className="change-card">
-      <strong>Reconcile with the published campus</strong>
+      <strong>Publish your accepted updates</strong>
       <p className="small-note">
-        Review the verified public package as the new source baseline. Saved
-        drafts and their history are retained and replayed. The previous source
-        snapshot is kept for recovery.
+        Accepted source updates are already in the working baseline. Your saved corrections still
+        take precedence. Resolve validation issues, submit the workspace in Review for approval,
+        then build and inspect a preview in Publish.
       </p>
-      <button
-        className="editor-secondary"
-        disabled={busy || loading}
-        onClick={async () => {
-          if (authError) {
-            await onSignIn();
-            return;
-          }
-          setLoading(true);
-          try {
-            setReview(await api<Review>('review-baseline'));
-            setError('');
-          } catch (e) {
-            setError((e as Error).message);
-            setAuthError(e instanceof AdminRequestError && e.reason === 'auth');
-          } finally {
-            setLoading(false);
-          }
-        }}
-      >
-        {authError
-          ? 'Sign in again'
-          : loading
-            ? 'Checking public package…'
-            : 'Review baseline reconciliation'}
-      </button>
-      {error && <p className="form-error">{error}</p>}
-      {review && (
-        <>
-          <p>Published package: {review.version}</p>
-          <p>
-            {review.before.places} → {review.after.places} places ·{' '}
-            {review.before.edges} → {review.after.edges} directed segments
-          </p>
-          <p>
-            {review.drafts} correction records retained. {review.issues.length}{' '}
-            draft issues remain after replay.
-          </p>
-          {review.accessReviews.length > 0 && (
-            <p className="small-note">
-              Retained access reviews:{' '}
-              {review.accessReviews.map((r) => r.name).join(', ')}
-            </p>
-          )}
-          {review.issues.map((i, n) => (
-            <p className="small-note" key={n}>
-              {i.message}
-            </p>
-          ))}
-          <button
-            className="editor-primary"
-            disabled={busy || loading}
-            onClick={async () => {
-              if (
-                await action(
-                  'reconcile-baseline',
-                  {
-                    version: review.version,
-                    expectedHash: review.expectedHash,
-                  },
-                  'Published baseline reconciled. Drafts and history retained; review remaining validation issues.',
-                )
-              )
-                setReview(null);
-            }}
-          >
-            Use this reviewed baseline
-          </button>
-        </>
-      )}
+      <p className="small-note">
+        A different baseline version is expected after source updates or a release. You do not need
+        to replace the baseline with the older public map. Restoring a previous release is a
+        separate reviewed action in Publish.
+      </p>
     </div>
   );
 }

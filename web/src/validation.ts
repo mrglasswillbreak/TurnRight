@@ -49,11 +49,8 @@ function validGeometry(geometry: Geometry): boolean {
   const line = (value: unknown, min = 2): value is number[][] =>
     Array.isArray(value) && value.length >= min && value.every(finitePosition);
   const ring = (value: unknown) =>
-    line(value, 4) &&
-    value[0][0] === value.at(-1)![0] &&
-    value[0][1] === value.at(-1)![1];
-  const polygon = (value: unknown) =>
-    Array.isArray(value) && value.length > 0 && value.every(ring);
+    line(value, 4) && value[0][0] === value.at(-1)![0] && value[0][1] === value.at(-1)![1];
+  const polygon = (value: unknown) => Array.isArray(value) && value.length > 0 && value.every(ring);
   switch (geometry.type) {
     case 'Point':
       return finitePosition(geometry.coordinates);
@@ -91,8 +88,7 @@ export function structuralIssues(
     message: string,
     referenceIds?: string[],
     coordinates?: Position,
-  ) =>
-    issues.push({ code, phase, featureId, message, referenceIds, coordinates });
+  ) => issues.push({ code, phase, featureId, message, referenceIds, coordinates });
   if (
     !data?.graph ||
     !Array.isArray(data.graph.nodes) ||
@@ -105,14 +101,12 @@ export function structuralIssues(
       {
         code: 'invalid-source',
         phase,
-        message:
-          'The campus source is incomplete. Restore a complete approved snapshot.',
+        message: 'The campus source is incomplete. Restore a complete approved snapshot.',
       },
     ];
   if (
     ![1, 2, 3].includes(data.schemaVersion) ||
-    (data.driving !== undefined &&
-      (data.schemaVersion < 2 || !validDrivingData(data.driving)))
+    (data.driving !== undefined && (data.schemaVersion < 2 || !validDrivingData(data.driving)))
   )
     add(
       'invalid-driving',
@@ -124,11 +118,7 @@ export function structuralIssues(
       add('invalid-driving', edge.sourceId, 'Invalid vehicle rules.');
   const nodes = new Map<string, CampusData['graph']['nodes'][number]>();
   for (const node of data.graph.nodes) {
-    if (
-      !node ||
-      typeof node.id !== 'string' ||
-      !finitePosition(node.coordinates)
-    ) {
+    if (!node || typeof node.id !== 'string' || !finitePosition(node.coordinates)) {
       add(
         'invalid-coordinate',
         node?.id || 'unknown node',
@@ -141,16 +131,10 @@ export function structuralIssues(
     nodes.set(node.id, node);
   }
   const ids = new Set<string>();
-  const features = new Map(
-    data.map.features.filter(Boolean).map((f) => [f.properties?.id, f]),
-  );
+  const features = new Map(data.map.features.filter(Boolean).map((f) => [f.properties?.id, f]));
   for (const edge of data.graph.edges) {
     if (!edge || typeof edge.id !== 'string') {
-      add(
-        'invalid-edge',
-        'unknown edge',
-        'Path segment is missing its identity.',
-      );
+      add('invalid-edge', 'unknown edge', 'Path segment is missing its identity.');
       continue;
     }
     const missing = [edge.from, edge.to].filter((id) => !nodes.has(id));
@@ -165,7 +149,7 @@ export function structuralIssues(
       add(
         'missing-endpoint',
         edge.sourceId || edge.id,
-        `Path ${edge.id} references missing or invalid nodes. Restore its source nodes or reconcile the published baseline.`,
+        `Path ${edge.id} references missing or invalid nodes. Review and restore its missing source nodes before publication.`,
         missing,
         point,
       );
@@ -213,7 +197,6 @@ export function structuralIssues(
         place?.id || 'unknown place',
         'Place or entrance has missing or invalid coordinates.',
       );
-  for (const message of arrivalIssues(data))
-    add('arrival-media', 'campus', message);
+  for (const message of arrivalIssues(data)) add('arrival-media', 'campus', message);
   return issues;
 }

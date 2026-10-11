@@ -17,12 +17,7 @@ interface Release {
   version?: string;
   review_id?: string;
 }
-export default function GisPublish({
-  datasets,
-  capabilities,
-  map,
-  mutate,
-}: GisPanelProps) {
+export default function GisPublish({ datasets, capabilities, map, mutate }: GisPanelProps) {
   const [reviews, setReviews] = useState<ReviewSubmission[]>([]),
     [releases, setReleases] = useState<Release[]>([]),
     [id, setId] = useState(''),
@@ -43,20 +38,29 @@ export default function GisPublish({
   const load = async () => {
     const [r, s, v] = await Promise.all([
       gisApi('gis-reviews', {}),
-      api<{ releases: Release[] }>('review-status', { omitChanges: true }),
+      api<{ releases: Release[] }>('review-status', { omitChanges: true, omitPublished: true }),
       gisApi('gis-views', {}),
     ]);
     setReviews(r.filter((r) => r.status === 'approved'));
     setReleases(s.releases);
     setViews(v);
+    setError('');
   };
   useEffect(() => {
-    void load().catch((e) => setError(e.message));
-    const timer = setInterval(
-      () => void load().catch((e) => setError(e.message)),
-      15000,
-    );
-    return () => clearInterval(timer);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      if (!document.hidden)
+        await load().catch((e) => {
+          if (!cancelled) setError(e.message);
+        });
+      if (!cancelled) timer = setTimeout(poll, 15000);
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, []);
   useEffect(() => {
     if (!map) return;
@@ -90,14 +94,7 @@ export default function GisPublish({
         if (disposed || current !== sequence) return;
         cleanups.forEach((fn) => fn());
         cleanups = results.map(({ d, page }) =>
-          showGisPage(
-            map,
-            d,
-            page.features,
-            new Set(),
-            () => {},
-            'layout-' + d.id,
-          ),
+          showGisPage(map, d, page.features, new Set(), () => {}, 'layout-' + d.id),
         );
         setMapComplete(!results.some((r) => r.page.nextCursor));
         setMapNotice(
@@ -137,9 +134,8 @@ export default function GisPublish({
         className="gis-pane gis-workspace"
       >
         <p>
-          Choose an approved snapshot, inspect its preview, then publish. Public
-          packages retain their existing hashes, campus isolation and offline
-          reader compatibility.
+          Choose an approved snapshot, inspect its preview, then publish. Public packages retain
+          their existing hashes, campus isolation and offline reader compatibility.
         </p>
         {error && (
           <p role="alert" className="form-error">
@@ -159,18 +155,12 @@ export default function GisPublish({
         </label>
         <label>
           Release summary
-          <textarea
-            value={summary}
-            maxLength={500}
-            onChange={(e) => setSummary(e.target.value)}
-          />
+          <textarea value={summary} maxLength={500} onChange={(e) => setSummary(e.target.value)} />
         </label>
         <button
           disabled={!canPublish || !id || summary.trim().length < 5 || busy}
           onClick={() =>
-            void attempt(() =>
-              mutate(() => api('prepare-release', { reviewId: id, summary })),
-            )
+            void attempt(() => mutate(() => api('prepare-release', { reviewId: id, summary })))
           }
         >
           Build approved preview
@@ -190,25 +180,20 @@ export default function GisPublish({
                   Published map
                 </a>
               )}
-              {r.status === 'published' &&
-                r.review_id &&
-                r.deployment_url &&
-                r.version && (
-                  <a
-                    href={releasedLayoutUrl(r.deployment_url, r.version)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Export released map layout
-                  </a>
-                )}
+              {r.status === 'published' && r.review_id && r.deployment_url && r.version && (
+                <a
+                  href={releasedLayoutUrl(r.deployment_url, r.version)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Export released map layout
+                </a>
+              )}
               {r.status === 'preview' && (
                 <button
                   disabled={!canPublish || busy}
                   onClick={() =>
-                    void attempt(() =>
-                      mutate(() => api('publish-release', { id: r.id })),
-                    )
+                    void attempt(() => mutate(() => api('publish-release', { id: r.id })))
                   }
                 >
                   Publish this preview
@@ -235,11 +220,7 @@ export default function GisPublish({
           </article>
         ))}
       </WorkspacePane>
-      <WorkspacePane
-        id="right"
-        title="Map views and exports"
-        className="gis-pane gis-workspace"
-      >
+      <WorkspacePane id="right" title="Map views and exports" className="gis-pane gis-workspace">
         <details>
           <summary>Shared map views</summary>
           <div className="gis-toolbar">
@@ -250,11 +231,7 @@ export default function GisPublish({
               onChange={(e) => setViewName(e.target.value)}
             />
             <button
-              disabled={
-                !map ||
-                !viewName.trim() ||
-                !capabilities.capabilities.includes('edit')
-              }
+              disabled={!map || !viewName.trim() || !capabilities.capabilities.includes('edit')}
               onClick={() => {
                 if (!map) return;
                 const center = map.getCenter(),
@@ -305,9 +282,7 @@ export default function GisPublish({
                   disabled={!visible.includes(d.id) && visible.length >= 5}
                   onChange={(e) =>
                     setVisible((v) =>
-                      e.target.checked
-                        ? [...v, d.id]
-                        : v.filter((id) => id !== d.id),
+                      e.target.checked ? [...v, d.id] : v.filter((id) => id !== d.id),
                     )
                   }
                 />
@@ -319,11 +294,10 @@ export default function GisPublish({
         <details>
           <summary>Map layout: A4 / A3 PNG and PDF</summary>
           <p>
-            Exports the current draft map view with title, scale, north arrow,
-            legend, attribution and date. Set a flat view for a conventional map
-            scale. PNG files retain the view, dataset revisions, styling and
-            source provenance in an embedded receipt. These are draft exports;
-            use the release preview to inspect approved public content.
+            Exports the current draft map view with title, scale, north arrow, legend, attribution
+            and date. Set a flat view for a conventional map scale. PNG files retain the view,
+            dataset revisions, styling and source provenance in an embedded receipt. These are draft
+            exports; use the release preview to inspect approved public content.
           </p>
           <label>
             Map title
@@ -331,20 +305,14 @@ export default function GisPublish({
           </label>
           <label>
             Paper
-            <select
-              value={paper}
-              onChange={(e) => setPaper(e.target.value as 'A4' | 'A3')}
-            >
+            <select value={paper} onChange={(e) => setPaper(e.target.value as 'A4' | 'A3')}>
               <option>A4</option>
               <option>A3</option>
             </select>
           </label>
           <label>
             Attribution
-            <input
-              value={attribution}
-              onChange={(e) => setAttribution(e.target.value)}
-            />
+            <input value={attribution} onChange={(e) => setAttribution(e.target.value)} />
           </label>
           <div className="gis-toolbar">
             <button
