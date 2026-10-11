@@ -1,25 +1,21 @@
-import { BrandMark } from './BrandMark';
-import {
-  WorkspaceFrame,
-  WorkspacePane,
-  useWorkspaceLayout,
-} from './WorkspaceFrame';
-import { WorkspaceNavigation, WorkspaceSections } from './WorkspaceNavigation';
-import { workspaceForSection, type EditorSection } from './editor-layout';
-import { EditorLegend } from './EditorLegend';
-import { propertyEdits } from './road-properties';
-import { campusUrl, lasuCampus } from './campus-context';
-import { PhotoSession, PhotoActivity } from './PhotoSession';
-import { canonicalBuildingId } from './arrival';
-import { searchKey } from './place-details';
+import { BrandMark } from "./BrandMark";
+import { WorkspaceFrame, WorkspacePane, useWorkspaceLayout } from "./WorkspaceFrame";
+import { WorkspaceNavigation, WorkspaceSections } from "./WorkspaceNavigation";
+import { workspaceForSection, type EditorSection } from "./editor-layout";
+import { EditorLegend } from "./EditorLegend";
+import { propertyEdits } from "./road-properties";
+import { campusUrl, lasuCampus } from "./campus-context";
+import { PhotoSession, PhotoActivity } from "./PhotoSession";
+import { canonicalBuildingId } from "./arrival";
+import { searchKey } from "./place-details";
 import {
   consumeEditorBuilding,
   editorHandoffStorage,
   editorSignInReturn,
   requestedEditorBuilding,
   restoreEditorCampusReturn,
-} from './editor-link';
-import type { BuildingSelection } from './visual-types';
+} from "./editor-link";
+import type { BuildingSelection } from "./visual-types";
 import {
   lazy,
   Suspense,
@@ -29,7 +25,7 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   ArrowUpRight,
   ArrowUp,
@@ -51,76 +47,61 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Flag,
-} from 'lucide-react';
-import type { Map as MapInstance } from 'maplibre-gl';
-import type { Feature, Geometry } from 'geojson';
-import { MapView } from './MapView';
-import { MapViewControl } from './MapViewControl';
-import { useSimple3D } from './useSimple3D';
-import { EditorSettings } from './EditorSettings';
-import type { Appearance } from './appearance';
-import { api, supabase } from './supabase';
-import { AdminRequestError, boundedSession } from './admin-client';
-import {
-  loadPreparedWorkspace,
-  offlineOwner,
-  rememberOfflineOwner,
-} from './editor-loading';
-import { downloadJson } from './download-json';
-import { EditorConflictReview } from './EditorConflictReview';
-import type { ValidationIssue } from './validation';
-import { canonical } from './editor-conflicts';
-import {
-  unpublishedEdits,
-  publishedBuildingRestore,
-} from './editor-publication';
-import { sourceGeometry } from './source-comparison';
-import { type SourceRecord } from './editor-model';
-import { assembleEditorSources } from './editor-validation';
-import { useEditorValidation } from './useEditorValidation';
-import { DuplicateReview } from './DuplicateReview';
-import { buildingPlace } from './map-display';
-import {
-  duplicateDecision,
-  exactDuplicateEdits,
-  type DuplicateCandidate,
-} from './duplicates';
-import { featureEdit, geometryEdits, type SnapTarget } from './editor-features';
-import { EditorMap } from './editor-map';
-import { editorCamera, focusEditorSelection } from './editor-camera';
-import { drawingProgress } from './drawing-state';
+} from "lucide-react";
+import type { Map as MapInstance } from "maplibre-gl";
+import type { Feature, Geometry } from "geojson";
+import { MapView } from "./MapView";
+import { MapViewControl } from "./MapViewControl";
+import { useSimple3D } from "./useSimple3D";
+import { EditorSettings } from "./EditorSettings";
+import type { Appearance } from "./appearance";
+import { api, supabase } from "./supabase";
+import { AdminRequestError, boundedSession } from "./admin-client";
+import { loadPreparedWorkspace, offlineOwner, rememberOfflineOwner } from "./editor-loading";
+import { downloadJson } from "./download-json";
+import { EditorConflictReview } from "./EditorConflictReview";
+import type { ValidationIssue } from "./validation";
+import { canonical } from "./editor-conflicts";
+import { unpublishedEdits, publishedBuildingRestore } from "./editor-publication";
+import { sourceGeometry } from "./source-comparison";
+import { type SourceRecord } from "./editor-model";
+import { assembleEditorSources } from "./editor-validation";
+import { useEditorValidation } from "./useEditorValidation";
+import { DuplicateReview } from "./DuplicateReview";
+import { buildingPlace } from "./map-display";
+import { duplicateDecision, exactDuplicateEdits, type DuplicateCandidate } from "./duplicates";
+import { featureEdit, geometryEdits, type SnapTarget } from "./editor-features";
+import { EditorMap } from "./editor-map";
+import { editorCamera, focusEditorSelection } from "./editor-camera";
+import { drawingProgress } from "./drawing-state";
 
-import { disconnectedSurveyPaths } from './survey-model';
-import { readSurveyContext, writeSurveyContext } from './survey-storage';
-import {
-  EditorWorkspace,
-  editKey,
-  type WorkspaceRecovery,
-} from './editor-workspace';
-import { useEditorWorkspace } from './useEditorWorkspace';
-import { withPublishedVisuals } from './editor-visuals';
-import { remapBuildingSurfaces } from './building-surfaces';
-import { photoEdits } from './photo-workspace';
-import type { ReviewState } from './EditorReview';
-const SourceUpdates = lazy(() => import('./SourceUpdates'));
+import { disconnectedSurveyPaths } from "./survey-model";
+import { readSurveyContext, writeSurveyContext } from "./survey-storage";
+import { EditorWorkspace, editKey, type WorkspaceRecovery } from "./editor-workspace";
+import { useEditorWorkspace } from "./useEditorWorkspace";
+import { withPublishedVisuals } from "./editor-visuals";
+import { remapBuildingSurfaces } from "./building-surfaces";
+import { photoEdits } from "./photo-workspace";
+import type { ReviewState } from "./EditorReview";
+const SourceUpdates = lazy(() => import("./SourceUpdates"));
 const EditorReview = lazy(() =>
-  import('./EditorReview').then((m) => ({ default: m.EditorReview })),
+  import("./EditorReview").then((m) => ({ default: m.EditorReview })),
 );
-const GisTeamWorkspace = lazy(() => import('./GisTeamWorkspace'));
-import { campusFacadeReviewIssues } from './building-facades';
+const GisTeamWorkspace = lazy(() => import("./GisTeamWorkspace"));
+import { campusFacadeReviewIssues } from "./building-facades";
 import {
   getPreference,
   setPreference,
   getActivePackage,
   installPackage,
   latestPackage,
-} from './offline';
-import { distance, projectSegment, meters } from './geo';
-import { useRoutes } from './useRoutes';
-import { placeHasConnection } from './routing';
-import type { CampusData, MapChange, MapEdit, Position, Route } from './types';
-import './editor.css';
-import './layer-workspace.css';
+} from "./offline";
+import { distance, projectSegment, meters } from "./geo";
+import { useRoutes } from "./useRoutes";
+import { placeHasConnection } from "./routing";
+import type { CampusData, MapChange, MapEdit, Position, Route } from "./types";
+import "./editor.css";
+import "./layer-workspace.css";
 import {
   campusLayers,
   layerFeatures,
@@ -129,30 +110,28 @@ import {
   editableLayer,
   layerKey,
   catalogueErrors,
-} from './campus-layers';
-import { validateEdit, applyEdits } from './editor-model';
-import type { LayerViewState } from './campus-layer-types';
+} from "./campus-layers";
+import { validateEdit, applyEdits } from "./editor-model";
+import type { LayerViewState } from "./campus-layer-types";
 
-const SurveyPanel = lazy(() =>
-  import('./SurveyPanel').then((m) => ({ default: m.SurveyPanel })),
-);
-const GisWorkspace = lazy(() => import('./GisWorkspace'));
-const CampusWorkspace = lazy(() => import('./CampusWorkspace'));
-const LayerWorkspace = lazy(() => import('./LayerWorkspace'));
-const LayerGeometry = lazy(() => import('./LayerGeometry'));
+const SurveyPanel = lazy(() => import("./SurveyPanel").then((m) => ({ default: m.SurveyPanel })));
+const GisWorkspace = lazy(() => import("./GisWorkspace"));
+const CampusWorkspace = lazy(() => import("./CampusWorkspace"));
+const LayerWorkspace = lazy(() => import("./LayerWorkspace"));
+const LayerGeometry = lazy(() => import("./LayerGeometry"));
 const EditorInspector = lazy(() =>
-  import('./EditorInspector').then((m) => ({ default: m.EditorInspector })),
+  import("./EditorInspector").then((m) => ({ default: m.EditorInspector })),
 );
 const BuildingAppearanceEditor = lazy(() =>
-  import('./BuildingAppearanceEditor').then((module) => ({
+  import("./BuildingAppearanceEditor").then((module) => ({
     default: module.BuildingAppearanceEditor,
   })),
 );
 
 interface EditorState extends ReviewState {
-  capabilities?: import('./gis-types').WorkspaceCapabilities;
+  capabilities?: import("./gis-types").WorkspaceCapabilities;
   base?: CampusData;
-  campus?: import('./campus-context').CampusIdentity;
+  campus?: import("./campus-context").CampusIdentity;
   edits: MapEdit[];
 }
 
@@ -180,17 +159,14 @@ export default function Admin({
   installUpdate?: () => Promise<void>;
 }) {
   useLayoutEffect(() => {
-    const restored = restoreEditorCampusReturn(
-      location.href,
-      editorHandoffStorage(),
-    );
-    if (restored) history.replaceState(null, '', restored);
+    const restored = restoreEditorCampusReturn(location.href, editorHandoffStorage());
+    if (restored) history.replaceState(null, "", restored);
   }, []);
   const [owner, setOwner] = useState<string | null>(null);
   const [state, setState] = useState<EditorState | null>(null);
   const [sources, setSources] = useState<SourceRecord[]>([]);
   const [workspace, setWorkspace] = useState<EditorWorkspace | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const generation = useRef(0);
   const initialCampus = useRef(data);
   const [loadEpoch, setLoadEpoch] = useState(0);
@@ -201,28 +177,20 @@ export default function Admin({
     if (!supabase) return;
     if (!navigator.onLine) setOwner(offlineOwner());
     else
-      void boundedSession('state', supabase.auth.getSession())
+      void boundedSession("state", supabase.auth.getSession())
         .then(({ data }) =>
-          setOwner(
-            data.session?.user.id ||
-              (!navigator.onLine ? offlineOwner() : null),
-          ),
+          setOwner(data.session?.user.id || (!navigator.onLine ? offlineOwner() : null)),
         )
         .catch((error) => {
           setError((error as Error).message);
           setOwner(offlineOwner());
         });
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT') rememberOfflineOwner(null);
-        setOwner(
-          session?.user.id ||
-            (!navigator.onLine && event !== 'SIGNED_OUT'
-              ? offlineOwner()
-              : null),
-        );
-      },
-    );
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") rememberOfflineOwner(null);
+      setOwner(
+        session?.user.id || (!navigator.onLine && event !== "SIGNED_OUT" ? offlineOwner() : null),
+      );
+    });
     return () => subscription.subscription.unsubscribe();
   }, []);
   useEffect(() => {
@@ -240,15 +208,13 @@ export default function Admin({
       const loaded = await loadPreparedWorkspace<OfflineEditor>(
         async () => {
           const [state, source] = await Promise.all([
-            api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
-            api<{ features: SourceRecord[] }>('sources', { gisKeys }),
+            api<EditorState>("state", { gisKeys, sourceReviewVersion: 2 }),
+            api<{ features: SourceRecord[] }>("sources", { gisKeys }),
           ]);
           if (state.base) initialCampus.current = state.base;
           rememberOfflineOwner(owner);
           const syncedAt = new Date().toISOString();
-          const cached = await readSurveyContext<OfflineEditor>(owner).catch(
-            () => undefined,
-          );
+          const cached = await readSurveyContext<OfflineEditor>(owner).catch(() => undefined);
           const context = {
             state,
             sources: source.features,
@@ -256,8 +222,7 @@ export default function Admin({
             prepared: !!cached?.prepared,
             syncedAt,
           };
-          if (cached?.prepared)
-            await writeSurveyContext(owner, context).catch(() => {});
+          if (cached?.prepared) await writeSurveyContext(owner, context).catch(() => {});
           return context;
         },
         () => readSurveyContext<OfflineEditor>(owner),
@@ -268,16 +233,9 @@ export default function Admin({
         setOfflineContext(loaded.offline);
         setSyncedAt(loaded.context.syncedAt);
       }
-      return [
-        loaded.context.state,
-        { features: loaded.context.sources },
-        loaded.offline,
-      ] as const;
+      return [loaded.context.state, { features: loaded.context.sources }, loaded.offline] as const;
     };
-    void Promise.all([
-      load(),
-      getPreference<WorkspaceRecovery | null>(key, null),
-    ])
+    void Promise.all([load(), getPreference<WorkspaceRecovery | null>(key, null)])
       .then(([[result, source, offline], recovery]) => {
         if (request !== generation.current) return;
         setSources(source.features);
@@ -285,26 +243,23 @@ export default function Admin({
         setWorkspace(
           new EditorWorkspace(
             offline && recovery ? recovery.saved : result.edits,
-            (batch) => api<MapEdit[]>('save-edits', batch),
+            (batch) => api<MapEdit[]>("save-edits", batch),
             (snapshot) => setPreference(key, snapshot),
             recovery,
             result.campus || initialCampus.current,
           ),
         );
-        setError('');
+        setError("");
       })
       .catch((e) => {
         if (request === generation.current) {
           setError(e.message);
-          setLoadAuthError(
-            e instanceof AdminRequestError && e.reason === 'auth',
-          );
+          setLoadAuthError(e instanceof AdminRequestError && e.reason === "auth");
         }
       });
   }, [owner, loadEpoch]);
   useEffect(() => {
-    if (state?.campus?.name)
-      document.title = `TurnRight · ${state.campus.name} editor`;
+    if (state?.campus?.name) document.title = `TurnRight · ${state.campus.name} editor`;
   }, [state?.campus?.name]);
 
   const refresh = async () => {
@@ -313,8 +268,8 @@ export default function Admin({
       .map(editKey)
       .slice(0, 500);
     const [result, source] = await Promise.all([
-      api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
-      api<{ features: SourceRecord[] }>('sources', { gisKeys }),
+      api<EditorState>("state", { gisKeys, sourceReviewVersion: 2 }),
+      api<{ features: SourceRecord[] }>("sources", { gisKeys }),
     ]);
     setState(result);
     setSources(source.features);
@@ -322,9 +277,7 @@ export default function Admin({
     const syncedAt = new Date().toISOString();
     setSyncedAt(syncedAt);
     if (owner) {
-      const cached = await readSurveyContext<OfflineEditor>(owner).catch(
-        () => undefined,
-      );
+      const cached = await readSurveyContext<OfflineEditor>(owner).catch(() => undefined);
       if (cached?.prepared)
         await writeSurveyContext(owner, {
           state: result,
@@ -339,33 +292,26 @@ export default function Admin({
   if (!workspace || !state)
     return (
       <main className="loading-screen">
-        <a
-          className="brandmark"
-          href={campusUrl('/')}
-          aria-label="TurnRight public map"
-        >
+        <a className="brandmark" href={campusUrl("/")} aria-label="TurnRight public map">
           <BrandMark />
         </a>
         <LockKeyhole size={28} />
         <h1>Campus map editor</h1>
         <p>
           {!supabase
-            ? 'Connect your Supabase project to enable the protected editor. The public campus map works without it.'
+            ? "Connect your Supabase project to enable the protected editor. The public campus map works without it."
             : owner
-              ? 'Opening your private workspace…'
-              : 'Sign in with a GitHub account that belongs to your campus team.'}
+              ? "Opening your private workspace…"
+              : "Sign in with a GitHub account that belongs to your campus team."}
         </p>
         {supabase && !owner && (
           <button
             className="editor-primary"
             onClick={() =>
               supabase!.auth.signInWithOAuth({
-                provider: 'github',
+                provider: "github",
                 options: {
-                  redirectTo: editorSignInReturn(
-                    location.href,
-                    editorHandoffStorage(),
-                  ),
+                  redirectTo: editorSignInReturn(location.href, editorHandoffStorage()),
                 },
               })
             }
@@ -385,12 +331,9 @@ export default function Admin({
               if (loadAuthError) {
                 try {
                   const result = await supabase?.auth.signInWithOAuth({
-                    provider: 'github',
+                    provider: "github",
                     options: {
-                      redirectTo: editorSignInReturn(
-                        location.href,
-                        editorHandoffStorage(),
-                      ),
+                      redirectTo: editorSignInReturn(location.href, editorHandoffStorage()),
                     },
                   });
                   if (result?.error) throw result.error;
@@ -400,25 +343,19 @@ export default function Admin({
               } else setLoadEpoch((n) => n + 1);
             }}
           >
-            {loadAuthError ? 'Sign in again' : 'Retry opening workspace'}
+            {loadAuthError ? "Sign in again" : "Retry opening workspace"}
           </button>
         )}
         {owner && (
-          <button
-            className="editor-secondary"
-            onClick={() => supabase?.auth.signOut()}
-          >
+          <button className="editor-secondary" onClick={() => supabase?.auth.signOut()}>
             Sign out
           </button>
         )}
-        <a href={campusUrl('/')}>Back to campus map</a>
+        <a href={campusUrl("/")}>Back to campus map</a>
       </main>
     );
-  if (state.capabilities && !state.capabilities.capabilities.includes('edit')) {
-    const view = applyEdits(
-      assembleEditorSources(sources, state.base || data).data,
-      state.edits,
-    );
+  if (state.capabilities && !state.capabilities.capabilities.includes("edit")) {
+    const view = applyEdits(assembleEditorSources(sources, state.base || data).data, state.edits);
     return (
       <Suspense fallback={<p>Opening team workspace…</p>}>
         <GisTeamWorkspace
@@ -454,18 +391,16 @@ export default function Admin({
             .map(editKey)
             .slice(0, 500);
           const [verified, source] = await Promise.all([
-            api<EditorState>('state', { gisKeys, sourceReviewVersion: 2 }),
-            api<{ features: SourceRecord[] }>('sources', { gisKeys }),
+            api<EditorState>("state", { gisKeys, sourceReviewVersion: 2 }),
+            api<{ features: SourceRecord[] }>("sources", { gisKeys }),
           ]);
           const manifest = await latestPackage();
           await installPackage(manifest, () => {});
           if (!(await getActivePackage())?.complete)
-            throw new Error(
-              'Offline map verification failed. Retry preparation.',
-            );
+            throw new Error("Offline map verification failed. Retry preparation.");
           if (!navigator.serviceWorker?.controller)
             throw new Error(
-              'The offline app is not ready. Reload once online, then retry preparation.',
+              "The offline app is not ready. Reload once online, then retry preparation.",
             );
           await writeSurveyContext(owner!, {
             state: verified,
@@ -522,11 +457,11 @@ function Editor({
   const [networkOnline, setNetworkOnline] = useState(navigator.onLine);
   useEffect(() => {
     const changed = () => setNetworkOnline(navigator.onLine);
-    window.addEventListener('online', changed);
-    window.addEventListener('offline', changed);
+    window.addEventListener("online", changed);
+    window.addEventListener("offline", changed);
     return () => {
-      window.removeEventListener('online', changed);
-      window.removeEventListener('offline', changed);
+      window.removeEventListener("online", changed);
+      window.removeEventListener("offline", changed);
     };
   }, []);
   const [taskError, setTaskError] = useState<{
@@ -537,31 +472,28 @@ function Editor({
   } | null>(null);
   const failTask = (error: unknown, label: string, retry: () => void) =>
     setTaskError({
-      message:
-        error instanceof Error
-          ? error.message
-          : 'This action could not finish.',
+      message: error instanceof Error ? error.message : "This action could not finish.",
       label,
       retry,
-      auth: error instanceof AdminRequestError && error.reason === 'auth',
+      auth: error instanceof AdminRequestError && error.reason === "auth",
     });
   const signIn = async () => {
     if (!(await workspace.preserveRecovery())) {
       setError(
-        'Browser recovery is unavailable. Download local recovery and keep this tab open until storage can save your work.',
+        "Browser recovery is unavailable. Download local recovery and keep this tab open until storage can save your work.",
       );
       return;
     }
     try {
       const result = await supabase?.auth.signInWithOAuth({
-        provider: 'github',
+        provider: "github",
         options: {
           redirectTo: editorSignInReturn(location.href, editorHandoffStorage()),
         },
       });
       if (result?.error) throw result.error;
     } catch (error) {
-      failTask(error, 'Retry sign in', signIn);
+      failTask(error, "Retry sign in", signIn);
     }
   };
   const [conflictServer, setConflictServer] = useState<MapEdit[] | null>(null);
@@ -570,7 +502,8 @@ function Editor({
     try {
       setConflictServer(
         (
-          await api<EditorState>('state', {
+          await api<EditorState>("state", {
+            sourceReviewVersion: 2,
             gisKeys: workspace.edits
               .filter((e) => e.properties.gisManaged)
               .map(editKey)
@@ -580,64 +513,53 @@ function Editor({
       );
       setTaskError(null);
     } catch (e) {
-      failTask(e, 'Retry conflict review', reviewConflicts);
+      failTask(e, "Retry conflict review", reviewConflicts);
     }
   };
   const [survey, setSurvey] = useState(false),
     [surveyRecording, setSurveyRecording] = useState(false);
   const surveying = useRef(false);
   surveying.current = survey;
-  const layout = useWorkspaceLayout(
-    owner,
-    state.campus?.id || 'lasu',
-    state.capabilities,
-  );
+  const layout = useWorkspaceLayout(owner, state.campus?.id || "lasu", state.capabilities);
   const [tab, setTab] = useState<string>(() =>
       workspace.unfinished ||
       workspace.roofDraft ||
       requestedEditorBuilding(location.href, editorHandoffStorage())
-        ? 'map'
+        ? "map"
         : layout.value.workspace,
     ),
-    [search, setSearch] = useState(''),
-    [filter, setFilter] = useState('needs'),
+    [search, setSearch] = useState(""),
+    [filter, setFilter] = useState("needs"),
     [explorer, setExplorer] = useState(true);
   const updateLayout = layout.update;
   useEffect(() => {
-    if (!['settings', 'members'].includes(tab))
+    if (!["settings", "members"].includes(tab))
       updateLayout({ workspace: workspaceForSection(tab) });
   }, [tab, updateLayout]);
   const [layersOpen, setLayersOpen] = useState(false),
     [layerView, setLayerView] = useState<LayerViewState>({});
   const [overlap, setOverlap] = useState<{
-    features: { kind: MapEdit['kind']; id: string }[];
+    features: { kind: MapEdit["kind"]; id: string }[];
     anchor: Position;
   } | null>(null);
   const [layerOperation, setLayerOperation] = useState<
-    import('./layer-geometry-engine').GeometryRequest | null
+    import("./layer-geometry-engine").GeometryRequest | null
   >(null);
-  const cutterRequest = useRef<
-    import('./layer-geometry-engine').GeometryRequest | null
-  >(null);
+  const cutterRequest = useRef<import("./layer-geometry-engine").GeometryRequest | null>(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => {
     try {
-      return (
-        localStorage.getItem('turnright:editor-welcome-dismissed') === 'true'
-      );
+      return localStorage.getItem("turnright:editor-welcome-dismissed") === "true";
     } catch {
       return false;
     }
   });
   const [selected, setSelected] = useState<MapEdit | null>(null),
-    [tool, setTool] = useState<MapEdit['kind'] | null>(null);
-  const [buildingMode, setBuildingMode] = useState<
-    'appearance' | 'outline' | 'roof'
-  >('appearance');
-  const [buildingSelection, setBuildingSelection] =
-    useState<BuildingSelection>();
+    [tool, setTool] = useState<MapEdit["kind"] | null>(null);
+  const [buildingMode, setBuildingMode] = useState<"appearance" | "outline" | "roof">("appearance");
+  const [buildingSelection, setBuildingSelection] = useState<BuildingSelection>();
   const [threeD, setThreeD] = useState(() => {
     try {
-      return localStorage.getItem('turnright:editor-view') === '3d';
+      return localStorage.getItem("turnright:editor-view") === "3d";
     } catch {
       return false;
     }
@@ -647,18 +569,14 @@ function Editor({
   const [opacity, setOpacity] = useState(1),
     [preview, setPreview] = useState(false),
     [ready, setReady] = useState(0);
-  const requestedBuilding = useRef(
-    requestedEditorBuilding(location.href, editorHandoffStorage()),
-  );
-  const [handoffNotice, setHandoffNotice] = useState('');
-  const [message, setMessage] = useState(
-      'Select a place or building to start mapping.',
-    ),
-    [hint, setHint] = useState(''),
-    [error, setError] = useState(''),
+  const requestedBuilding = useRef(requestedEditorBuilding(location.href, editorHandoffStorage()));
+  const [handoffNotice, setHandoffNotice] = useState("");
+  const [message, setMessage] = useState("Select a place or building to start mapping."),
+    [hint, setHint] = useState(""),
+    [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
-  const [testOrigin, setTestOrigin] = useState(''),
-    [testDest, setTestDest] = useState(''),
+  const [testOrigin, setTestOrigin] = useState(""),
+    [testDest, setTestDest] = useState(""),
     [routes, setRoutes] = useState<Route[]>([]),
     [showRoutes, setShowRoutes] = useState(false);
   const [review, setReview] = useState<MapChange | null>(null);
@@ -670,9 +588,7 @@ function Editor({
     edit: MapEdit;
     anchor?: Position;
   } | null>(null);
-  const selectionOverview = useRef<ReturnType<typeof editorCamera> | null>(
-    null,
-  );
+  const selectionOverview = useRef<ReturnType<typeof editorCamera> | null>(null);
   useEffect(() => {
     if (!focusRequest || !ready) return;
     const frame = requestAnimationFrame(() => {
@@ -681,11 +597,7 @@ function Editor({
         selectedRef.current &&
         editKey(selectedRef.current) === editKey(focusRequest.edit)
       )
-        focusEditorSelection(
-          mapRef.current,
-          focusRequest.edit.geometry,
-          focusRequest.anchor,
-        );
+        focusEditorSelection(mapRef.current, focusRequest.edit.geometry, focusRequest.anchor);
     });
     return () => cancelAnimationFrame(frame);
   }, [focusRequest, ready]);
@@ -693,9 +605,7 @@ function Editor({
     if (!selected) selectionOverview.current = null;
   }, [selected]);
   const routeRequest = useRef(0);
-  const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(
-    null,
-  );
+  const drawingPanels = useRef<{ explorer: boolean; routes: boolean } | null>(null);
   const restoreDrawingPanels = () => {
     if (!drawingPanels.current) return;
     setExplorer(drawingPanels.current.explorer);
@@ -706,9 +616,7 @@ function Editor({
   const [repairFocus, setRepairFocus] = useState<ValidationIssue | null>(null);
   const publishedBuilding = useMemo(
     () =>
-      selected
-        ? publishedBuildingRestore(selected, publishedWorkspace, data.version)
-        : undefined,
+      selected ? publishedBuildingRestore(selected, publishedWorkspace, data.version) : undefined,
     [selected, publishedWorkspace, data.version],
   );
   const [repairPreview, setRepairPreview] = useState<{
@@ -723,69 +631,47 @@ function Editor({
   const assembly = useMemo(
     () =>
       assembleEditorSources(
-        [
-          ...sources,
-          ...gisSources.filter((s) => !sources.some((r) => r.id === s.id)),
-        ],
+        [...sources, ...gisSources.filter((s) => !sources.some((r) => r.id === s.id))],
         data,
       ),
     [sources, gisSources, data],
   );
-  const base = useMemo(
-    () => withPublishedVisuals(assembly.data, data),
-    [assembly.data, data],
-  );
+  const base = useMemo(() => withPublishedVisuals(assembly.data, data), [assembly.data, data]);
   const selectedBuildingKey = selected?.id;
   useEffect(() => {
     const edit = selectedRef.current;
-    if (edit?.kind === 'building' && edit.id === selectedBuildingKey)
-      controller.current?.select(edit, buildingMode === 'outline');
+    if (edit?.kind === "building" && edit.id === selectedBuildingKey)
+      controller.current?.select(edit, buildingMode === "outline");
   }, [buildingMode, selectedBuildingKey]);
   useEffect(() => {
-    workspace.setSourceBaseline((edit) =>
-      featureEdit(base, edit.kind, edit.id, []),
-    );
+    workspace.setSourceBaseline((edit) => featureEdit(base, edit.kind, edit.id, []));
     return () => workspace.setSourceBaseline();
   }, [workspace, base]);
   const currentBase = useRef(base);
   currentBase.current = base;
-  const validation = useEditorValidation(
-    base,
-    workspace.edits,
-    data,
-    assembly.issues,
-  );
+  const validation = useEditorValidation(base, workspace.edits, data, assembly.issues);
   const exactBatch = useMemo(
     () =>
-      validation.pending || tab !== 'duplicates'
+      validation.pending || tab !== "duplicates"
         ? []
-        : exactDuplicateEdits(
-            validation.data,
-            workspace.edits,
-            validation.duplicates,
-          ),
+        : exactDuplicateEdits(validation.data, workspace.edits, validation.duplicates),
     [validation, workspace.edits, tab],
   );
   const mergeBatch = useCallback(
     async (batch: MapEdit[], success: string) => {
-      if (!batch.length || tool || workspace.unfinished || validation.pending)
-        return;
+      if (!batch.length || tool || workspace.unfinished || validation.pending) return;
       setBusy(true);
       const original = workspace.edits;
       try {
         const next = [
-          ...original.filter(
-            (e) => !batch.some((b) => editKey(b) === editKey(e)),
-          ),
+          ...original.filter((e) => !batch.some((b) => editKey(b) === editKey(e))),
           ...batch,
         ];
         const checked = await validation.check(next);
         if (workspace.edits !== original)
-          throw new Error('The draft changed. Review this pair again.');
-        const newErrors = checked.errors.filter(
-          (e) => !validation.errors.includes(e),
-        );
-        if (newErrors.length) throw new Error(newErrors.join(' '));
+          throw new Error("The draft changed. Review this pair again.");
+        const newErrors = checked.errors.filter((e) => !validation.errors.includes(e));
+        if (newErrors.length) throw new Error(newErrors.join(" "));
         workspace.commit(batch, null);
         setSelected(null);
         selectedRef.current = null;
@@ -800,21 +686,13 @@ function Editor({
     },
     [tool, workspace, validation],
   );
-  const decideDuplicate = async (
-    candidate: DuplicateCandidate,
-    survivor?: string,
-  ) => {
+  const decideDuplicate = async (candidate: DuplicateCandidate, survivor?: string) => {
     try {
       await mergeBatch(
-        duplicateDecision(
-          validation.data,
-          workspace.edits,
-          candidate,
-          survivor,
-        ),
+        duplicateDecision(validation.data, workspace.edits, candidate, survivor),
         survivor
-          ? 'Records merged. Saved place references and entrances now use the survivor. Undo restores both.'
-          : 'Records kept separate. This decision is retained through source refreshes.',
+          ? "Records merged. Saved place references and entrances now use the survivor. Undo restores both."
+          : "Records kept separate. This decision is retained through source refreshes.",
       );
     } catch (error) {
       setError((error as Error).message);
@@ -824,11 +702,7 @@ function Editor({
   const selectionForMap =
     selected &&
     (() => {
-      const {
-        photos: _photos,
-        arrival: _arrival,
-        ...properties
-      } = selected.properties;
+      const { photos: _photos, arrival: _arrival, ...properties } = selected.properties;
       return {
         id: selected.id,
         kind: selected.kind,
@@ -844,12 +718,11 @@ function Editor({
     [selectionSignature],
   );
   const renderedMap = useMemo(() => {
-    if (preview || mapSelection?.kind !== 'building' || mapSelection.deleted)
-      return visible.map;
+    if (preview || mapSelection?.kind !== "building" || mapSelection.deleted) return visible.map;
     const properties = {
       ...mapSelection.properties,
       id: mapSelection.id,
-      kind: 'building',
+      kind: "building",
     };
     const roof = workspace.roofDraft;
     if (roof?.buildingId === mapSelection.id)
@@ -858,7 +731,7 @@ function Editor({
         roofs: { ...properties.appearance?.roofs, [roof.partId]: roof.roof },
       };
     const feature = {
-      type: 'Feature' as const,
+      type: "Feature" as const,
       geometry: mapSelection.geometry,
       properties,
     };
@@ -866,59 +739,46 @@ function Editor({
       ...visible.map,
       features: [
         ...visible.map.features.filter(
-          (f) =>
-            !(
-              f.properties?.kind === 'building' &&
-              f.properties.id === mapSelection.id
-            ),
+          (f) => !(f.properties?.kind === "building" && f.properties.id === mapSelection.id),
         ),
         feature,
       ],
     };
   }, [visible.map, mapSelection, preview, workspace.roofDraft]);
   const rendered = useMemo(
-    () =>
-      layerPresentation({ ...visible, map: renderedMap }, !preview, layerView),
+    () => layerPresentation({ ...visible, map: renderedMap }, !preview, layerView),
     [visible, renderedMap, preview, layerView],
   );
   const invalid = useMemo(
     () =>
       new Set(
         validation.issues
-          .filter((i) => i.severity !== 'warning' && i.featureId)
+          .filter((i) => i.severity !== "warning" && i.featureId)
           .map((i) => i.featureId!),
       ),
     [validation.issues],
   );
   const select = (edit: MapEdit, refocus = false, anchor?: Position) => {
     const definitions = campusLayers(validation.data).items,
-      member = layerMembership(validation.data, definitions).get(
-        layerKey(edit.kind, edit.id),
-      ),
+      member = layerMembership(validation.data, definitions).get(layerKey(edit.kind, edit.id)),
       layer = definitions.find((l) => l.id === member);
     if (layer && !editableLayer(layer, definitions)) {
-      setMessage('Show and unlock this layer before editing its features.');
+      setMessage("Show and unlock this layer before editing its features.");
       return;
     }
     setOverlap(null);
     workspace.endHistoryGroup();
     if (workspace.roofDraft && workspace.roofDraft.buildingId !== edit.id) {
-      setMessage(
-        'Apply or cancel the roof plan before selecting another feature.',
-      );
+      setMessage("Apply or cancel the roof plan before selecting another feature.");
       return;
     }
     if (workspace.unfinished) {
-      setMessage(
-        'Finish or cancel the current drawing before selecting another feature.',
-      );
+      setMessage("Finish or cancel the current drawing before selecting another feature.");
       return;
     }
     if (
       mapRef.current &&
-      (refocus ||
-        !selectedRef.current ||
-        editKey(selectedRef.current) !== editKey(edit))
+      (refocus || !selectedRef.current || editKey(selectedRef.current) !== editKey(edit))
     ) {
       selectionOverview.current ??= editorCamera(mapRef.current);
       setFocusRequest({ edit, anchor });
@@ -928,27 +788,18 @@ function Editor({
     selectedRef.current = edit;
     setTool(null);
     setPreview(false);
-    setTab('map');
-    setBuildingMode(workspace.roofDraft ? 'roof' : 'appearance');
-    setBuildingSelection(
-      edit.kind === 'building' ? { buildingId: edit.id } : undefined,
-    );
-    controller.current?.select(edit, edit.kind !== 'building');
+    setTab("map");
+    setBuildingMode(workspace.roofDraft ? "roof" : "appearance");
+    setBuildingSelection(edit.kind === "building" ? { buildingId: edit.id } : undefined);
+    controller.current?.select(edit, edit.kind !== "building");
   };
-  const selectId = (
-    kind: MapEdit['kind'],
-    id: string,
-    refocus = false,
-    anchor?: Position,
-  ) => {
+  const selectId = (kind: MapEdit["kind"], id: string, refocus = false, anchor?: Position) => {
     const edit = featureEdit(validation.data, kind, id, workspace.edits);
     if (edit) select(edit, refocus, anchor);
   };
   const commit = (
     batch: MapEdit[],
-    current: MapEdit | null = batch.find(
-      (e) => !e.deleted && e.kind !== 'layer',
-    ) || null,
+    current: MapEdit | null = batch.find((e) => !e.deleted && e.kind !== "layer") || null,
   ) => {
     workspace.commit(batch, null);
     setSelected(current);
@@ -960,19 +811,16 @@ function Editor({
   };
   const commitLayers = (batch: MapEdit[]) => {
     const errors = batch.flatMap((e) => validateEdit(e));
-    const definitions = new Map(
-      campusLayers(validation.data).items.map((l) => [l.id, l]),
-    );
+    const definitions = new Map(campusLayers(validation.data).items.map((l) => [l.id, l]));
     for (const e of batch)
-      if (e.kind === 'layer')
+      if (e.kind === "layer")
         definitions.set(
           e.id,
-          e.properties
-            .layerDefinition as import('./campus-layer-types').CampusLayer,
+          e.properties.layerDefinition as import("./campus-layer-types").CampusLayer,
         );
     errors.push(...catalogueErrors([...definitions.values()]));
     if (errors.length) {
-      setError(errors.join(' '));
+      setError(errors.join(" "));
       return;
     }
     workspace.commit(batch, null);
@@ -984,36 +832,27 @@ function Editor({
     const points: Position[] = [];
     const collect = (v: unknown) => {
       if (!Array.isArray(v)) return;
-      if (typeof v[0] === 'number') points.push(v as Position);
+      if (typeof v[0] === "number") points.push(v as Position);
       else v.forEach(collect);
     };
     layerFeatures(validation.data)
       .filter((f) => keys.includes(f.key))
       .forEach((f) => {
-        if ('coordinates' in f.geometry) collect(f.geometry.coordinates);
+        if ("coordinates" in f.geometry) collect(f.geometry.coordinates);
       });
     if (points.length)
       mapRef.current?.fitBounds(
         [
-          [
-            Math.min(...points.map((p) => p[0])),
-            Math.min(...points.map((p) => p[1])),
-          ],
-          [
-            Math.max(...points.map((p) => p[0])),
-            Math.max(...points.map((p) => p[1])),
-          ],
+          [Math.min(...points.map((p) => p[0])), Math.min(...points.map((p) => p[1]))],
+          [Math.max(...points.map((p) => p[0])), Math.max(...points.map((p) => p[1]))],
         ],
         { padding: 100, maxZoom: 19 },
       );
   };
-  const stageRepair = (
-    batch: MapEdit[],
-    title = 'Review proposed geometry',
-  ) => {
+  const stageRepair = (batch: MapEdit[], title = "Review proposed geometry") => {
     workspace.endHistoryGroup();
     if (tool || workspace.unfinished || workspace.roofDraft) {
-      setMessage('Finish or cancel the drawing before reviewing a repair.');
+      setMessage("Finish or cancel the drawing before reviewing a repair.");
       return;
     }
     setRepairErrors([]);
@@ -1028,37 +867,31 @@ function Editor({
       .filter((e): e is MapEdit => !!e);
     setReviewOverlay([
       ...before.map((e) => ({
-        type: 'Feature' as const,
+        type: "Feature" as const,
         geometry: e.geometry,
-        properties: { color: '#d45555' },
+        properties: { color: "#d45555" },
       })),
       ...batch.map((e) => ({
-        type: 'Feature' as const,
+        type: "Feature" as const,
         geometry: e.geometry,
-        properties: { color: '#26a07c' },
+        properties: { color: "#26a07c" },
       })),
     ]);
     const coordinates: Position[] = [];
     const collect = (value: unknown) => {
       if (!Array.isArray(value)) return;
-      if (typeof value[0] === 'number' && typeof value[1] === 'number')
+      if (typeof value[0] === "number" && typeof value[1] === "number")
         coordinates.push([value[0], value[1]]);
       else value.forEach(collect);
     };
     [...before, ...batch].forEach((e) => {
-      if ('coordinates' in e.geometry) collect(e.geometry.coordinates);
+      if ("coordinates" in e.geometry) collect(e.geometry.coordinates);
     });
     if (coordinates.length)
       mapRef.current?.fitBounds(
         [
-          [
-            Math.min(...coordinates.map((p) => p[0])),
-            Math.min(...coordinates.map((p) => p[1])),
-          ],
-          [
-            Math.max(...coordinates.map((p) => p[0])),
-            Math.max(...coordinates.map((p) => p[1])),
-          ],
+          [Math.min(...coordinates.map((p) => p[0])), Math.min(...coordinates.map((p) => p[1]))],
+          [Math.max(...coordinates.map((p) => p[0])), Math.max(...coordinates.map((p) => p[1]))],
         ],
         {
           maxZoom: 20,
@@ -1069,10 +902,7 @@ function Editor({
             right: innerWidth < 700 ? 25 : 340,
             bottom:
               innerWidth < 700
-                ? Math.round(
-                    (mapRef.current?.getContainer().clientHeight ||
-                      innerHeight) * 0.64,
-                  )
+                ? Math.round((mapRef.current?.getContainer().clientHeight || innerHeight) * 0.64)
                 : 220,
           },
         },
@@ -1088,18 +918,14 @@ function Editor({
   const applyRepair = async () => {
     if (!repairPreview) return;
     if (workspace.unfinished || tool) {
-      setRepairErrors([
-        'Finish or cancel the drawing before applying a repair.',
-      ]);
+      setRepairErrors(["Finish or cancel the drawing before applying a repair."]);
       return;
     }
     if (
       repairPreview.stamp !== canonical(workspace.edits) ||
       repairPreview.base !== currentBase.current
     ) {
-      setRepairErrors([
-        'The map changed. Cancel and review this repair again.',
-      ]);
+      setRepairErrors(["The map changed. Cancel and review this repair again."]);
       return;
     }
     const original = workspace.edits;
@@ -1107,9 +933,7 @@ function Editor({
     setBusy(true);
     try {
       const check = await validation.check([
-        ...original.filter(
-          (e) => !batch.some((b) => editKey(e) === editKey(b)),
-        ),
+        ...original.filter((e) => !batch.some((b) => editKey(e) === editKey(b))),
         ...batch,
       ]);
       if (
@@ -1117,10 +941,8 @@ function Editor({
         workspace.unfinished ||
         repairPreview.base !== currentBase.current
       )
-        throw new Error('The map changed. Review this repair again.');
-      const added = check.errors.filter(
-        (error) => !validation.errors.includes(error),
-      );
+        throw new Error("The map changed. Review this repair again.");
+      const added = check.errors.filter((error) => !validation.errors.includes(error));
       if (!check.usable || added.length) {
         setRepairErrors(added.length ? added : check.errors);
         return;
@@ -1128,7 +950,7 @@ function Editor({
       commit(batch);
       dismissRepair();
       setRepairFocus(null);
-      setMessage('Reviewed repair applied. Undo restores the previous draft.');
+      setMessage("Reviewed repair applied. Undo restores the previous draft.");
     } catch (e) {
       setRepairErrors([(e as Error).message]);
     } finally {
@@ -1137,99 +959,84 @@ function Editor({
   };
   const openIssue = (issue: ValidationIssue) => {
     if (tool || workspace.unfinished || workspace.roofDraft) {
-      setMessage('Finish or cancel the drawing before opening a repair.');
+      setMessage("Finish or cancel the drawing before opening a repair.");
       return;
     }
     const edit =
       issue.featureId && issue.featureKind
-        ? featureEdit(
-            validation.data,
-            issue.featureKind,
-            issue.featureId,
-            workspace.edits,
-          )
+        ? featureEdit(validation.data, issue.featureKind, issue.featureId, workspace.edits)
         : undefined;
     if (edit) {
       select(edit, true);
       setRepairFocus(issue);
-      if (issue.repair === 'review-model')
+      if (issue.repair === "review-model")
         setBuildingSelection({
           buildingId: edit.id,
-          partId:
-            edit.properties.appearance?.facades?.[issue.field || '']?.partId,
-          wallId: issue.field === 'modelDocument' ? undefined : issue.field,
+          partId: edit.properties.appearance?.facades?.[issue.field || ""]?.partId,
+          wallId: issue.field === "modelDocument" ? undefined : issue.field,
         });
       setExplorer(false);
-    } else if (issue.coordinates)
-      mapRef.current?.flyTo({ center: issue.coordinates, zoom: 18 });
+    } else if (issue.coordinates) mapRef.current?.flyTo({ center: issue.coordinates, zoom: 18 });
     setMessage(
-      issue.field === 'modelDocument'
-        ? 'Review authored geometry and materials, then mark this model reviewed in Mesh tools.'
-        : issue.repair === 'review-model'
-          ? 'Review the selected wall’s placement and evidence, then mark only that wall reviewed.'
-          : issue.repair === 'choose-place'
-            ? 'Choose the place served by this entrance, then review the change.'
-            : issue.repair === 'connect-path'
-              ? 'Use the connection controls to choose a highlighted path or draw an approach.'
-              : 'Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.',
+      issue.field === "modelDocument"
+        ? "Review authored geometry and materials, then mark this model reviewed in Mesh tools."
+        : issue.repair === "review-model"
+          ? "Review the selected wall’s placement and evidence, then mark only that wall reviewed."
+          : issue.repair === "choose-place"
+            ? "Choose the place served by this entrance, then review the change."
+            : issue.repair === "connect-path"
+              ? "Use the connection controls to choose a highlighted path or draw an approach."
+              : "Inspect the highlighted segment and adjust its geometry. Review the proposed repair before applying it.",
     );
   };
-  const begin = (
-    kind: MapEdit['kind'],
-    props: MapEdit['properties'] = {},
-    seed?: Position[],
-  ) => {
+  const begin = (kind: MapEdit["kind"], props: MapEdit["properties"] = {}, seed?: Position[]) => {
     workspace.endHistoryGroup();
     if (repairPreview) {
-      setMessage(
-        'Apply or cancel the repair review before starting a drawing.',
-      );
+      setMessage("Apply or cancel the repair review before starting a drawing.");
       return;
     }
     if (tool || workspace.unfinished || workspace.roofDraft) {
-      setMessage('Finish or cancel the current drawing first.');
+      setMessage("Finish or cancel the current drawing first.");
       return;
     }
     if (!controller.current) return;
     drawingPanels.current = { explorer, routes: showRoutes };
     setExplorer(false);
     setShowRoutes(false);
-    setHint('');
+    setHint("");
     setSelected(null);
     selectedRef.current = null;
     setTool(kind);
     setPreview(false);
-    setTab('map');
+    setTab("map");
     const name =
-      kind === 'path'
-        ? 'Campus path'
-        : kind === 'entrance'
-          ? 'Entrance'
-          : kind === 'building'
-            ? 'Building'
-            : kind === 'closure'
-              ? 'Temporary closure'
-              : kind === 'barrier'
-                ? 'Barrier'
-                : 'Campus place';
+      kind === "path"
+        ? "Campus path"
+        : kind === "entrance"
+          ? "Entrance"
+          : kind === "building"
+            ? "Building"
+            : kind === "closure"
+              ? "Temporary closure"
+              : kind === "barrier"
+                ? "Barrier"
+                : "Campus place";
     controller.current?.begin(
       kind,
       {
         name,
-        ...(['land', 'overlay'].includes(kind)
-          ? {}
-          : { access: 'yes', category: 'other' }),
+        ...(["land", "overlay"].includes(kind) ? {} : { access: "yes", category: "other" }),
         ...props,
       },
       seed,
     );
     setMessage(
-      kind === 'entrance'
-        ? 'Click the ground edge of the building to place its entrance.'
-        : kind === 'path'
-          ? 'Click to add path points. Click a highlighted path to connect. Enter to finish.'
-          : kind === 'building'
-            ? 'Click around the ground footprint. Enter to finish the outline.'
+      kind === "entrance"
+        ? "Click the ground edge of the building to place its entrance."
+        : kind === "path"
+          ? "Click to add path points. Click a highlighted path to connect. Enter to finish."
+          : kind === "building"
+            ? "Click around the ground footprint. Enter to finish the outline."
             : `Click the map to add a ${kind}.`,
     );
   };
@@ -1238,33 +1045,30 @@ function Editor({
     if (!edit) return;
     const building = validation.data.map.features.find(
       (f) =>
-        f.properties?.kind === 'building' &&
-        (edit.kind === 'building'
+        f.properties?.kind === "building" &&
+        (edit.kind === "building"
           ? f.properties.id === edit.id
           : buildingPlace(validation.data, f)?.id === edit.id),
     );
     const place =
-      edit.kind === 'place'
+      edit.kind === "place"
         ? validation.data.places.find((p) => p.id === edit.id)
         : building
           ? buildingPlace(validation.data, building)
           : undefined;
     const buildingId = building?.properties?.id;
-    begin('entrance', {
-      name: `${place?.name || edit.properties.name || 'Building'} entrance`,
-      placeId: place?.id || '',
+    begin("entrance", {
+      name: `${place?.name || edit.properties.name || "Building"} entrance`,
+      placeId: place?.id || "",
       buildingId,
     });
   };
   const approach = () => {
     const edit = selectedRef.current;
-    if (!edit || edit.kind !== 'entrance' || edit.geometry.type !== 'Point')
-      return;
-    begin(
-      'path',
-      { name: `${edit.properties.name} approach`, entranceId: edit.id },
-      [edit.geometry.coordinates as Position],
-    );
+    if (!edit || edit.kind !== "entrance" || edit.geometry.type !== "Point") return;
+    begin("path", { name: `${edit.properties.name} approach`, entranceId: edit.id }, [
+      edit.geometry.coordinates as Position,
+    ]);
   };
   const create = (edit: MapEdit) => {
     if (
@@ -1273,8 +1077,7 @@ function Editor({
     ) {
       setLayerOperation({
         ...((cutterRequest.current ||
-          edit.properties
-            .geometryRequest) as import('./layer-geometry-engine').GeometryRequest),
+          edit.properties.geometryRequest) as import("./layer-geometry-engine").GeometryRequest),
         cutter: edit.geometry,
       });
       cutterRequest.current = null;
@@ -1285,18 +1088,18 @@ function Editor({
     }
     const batch = [edit];
     if (
-      edit.kind === 'path' &&
-      edit.geometry.type === 'LineString' &&
-      typeof edit.properties.entranceId === 'string'
+      edit.kind === "path" &&
+      edit.geometry.type === "LineString" &&
+      typeof edit.properties.entranceId === "string"
     ) {
       const entrance = featureEdit(
         validation.data,
-        'entrance',
+        "entrance",
         edit.properties.entranceId,
         workspace.edits,
       );
       if (
-        entrance?.geometry.type === 'Point' &&
+        entrance?.geometry.type === "Point" &&
         distance(
           entrance.geometry.coordinates as Position,
           edit.geometry.coordinates[0] as Position,
@@ -1308,7 +1111,7 @@ function Editor({
             ...entrance.properties,
             connectTo: undefined,
             connection: {
-              type: 'node',
+              type: "node",
               nodeId: edit.properties.vertexIds![0],
               coordinates: edit.geometry.coordinates[0] as Position,
             },
@@ -1316,17 +1119,12 @@ function Editor({
         });
     }
     commit(batch, edit);
-    setMessage('Added to your draft. Select it to adjust the details.');
+    setMessage("Added to your draft. Select it to adjust the details.");
   };
   const updateGeometry = (geometry: Geometry) => {
     const current = selectedRef.current;
     if (!current) return;
-    const batch = geometryEdits(
-      current,
-      geometry,
-      validation.data,
-      workspace.edits,
-    );
+    const batch = geometryEdits(current, geometry, validation.data, workspace.edits);
     for (const edit of batch)
       if (edit.properties.derivedSurface)
         edit.properties.derivedSurface = {
@@ -1350,25 +1148,23 @@ function Editor({
       setMessage(`${current.properties.name} removed. Undo to restore it.`);
     }
   };
-  const pick = (mode: 'start' | 'end' | 'join' | 'entrance-link' | 'block') => {
+  const pick = (mode: "start" | "end" | "join" | "entrance-link" | "block") => {
     controller.current?.pick(mode);
     setMessage(
-      mode === 'join'
-        ? 'Click the crossing where this path should join another path.'
-        : mode === 'block'
-          ? 'Click a path segment away from a junction to block it.'
-          : 'Click a highlighted path or junction to make the connection.',
+      mode === "join"
+        ? "Click the crossing where this path should join another path."
+        : mode === "block"
+          ? "Click a path segment away from a junction to block it."
+          : "Click a highlighted path or junction to make the connection.",
     );
   };
   const connect = (snap: SnapTarget, mode: string) => {
     const current = selectedRef.current;
     if (!current || !snap.target) return;
     const edit = structuredClone(current);
-    if (mode === 'block') {
-      if (snap.target.type !== 'segment') {
-        setMessage(
-          'Click the middle of a segment to choose which path to block.',
-        );
+    if (mode === "block") {
+      if (snap.target.type !== "segment") {
+        setMessage("Click the middle of a segment to choose which path to block.");
         return;
       }
       const target = snap.target;
@@ -1382,28 +1178,22 @@ function Editor({
         .map((e) => e.id);
       edit.properties.edgeIds = [
         ...new Set([
-          ...(Array.isArray(edit.properties.edgeIds)
-            ? (edit.properties.edgeIds as string[])
-            : []),
+          ...(Array.isArray(edit.properties.edgeIds) ? (edit.properties.edgeIds as string[]) : []),
           ...ids,
         ]),
       ];
-    } else if (edit.kind === 'entrance' && edit.geometry.type === 'Point') {
-      if (
-        distance(edit.geometry.coordinates as Position, snap.coordinates) > 5
-      ) {
-        setMessage(
-          'Draw a connecting path to cover the gap from this entrance.',
-        );
+    } else if (edit.kind === "entrance" && edit.geometry.type === "Point") {
+      if (distance(edit.geometry.coordinates as Position, snap.coordinates) > 5) {
+        setMessage("Draw a connecting path to cover the gap from this entrance.");
         return;
       }
       edit.geometry.coordinates = snap.coordinates;
       edit.properties.connection = snap.target;
       delete edit.properties.connectTo;
-    } else if (edit.kind === 'path' && edit.geometry.type === 'LineString') {
+    } else if (edit.kind === "path" && edit.geometry.type === "LineString") {
       const points = edit.geometry.coordinates as Position[];
-      let index = mode === 'start' ? 0 : points.length - 1;
-      if (mode === 'join') {
+      let index = mode === "start" ? 0 : points.length - 1;
+      if (mode === "join") {
         const candidates = points
           .slice(1)
           .map((p, i) => ({
@@ -1413,47 +1203,37 @@ function Editor({
           .sort((a, b) => a.projection.distance - b.projection.distance);
         if (!candidates[0] || candidates[0].projection.distance > 0.2) {
           setMessage(
-            'Choose a crossing on the selected path. Move an endpoint to connect across a gap.',
+            "Choose a crossing on the selected path. Move an endpoint to connect across a gap.",
           );
           return;
         }
-        const existing = points.findIndex(
-          (p) => distance(p, snap.coordinates) < 0.2,
-        );
+        const existing = points.findIndex((p) => distance(p, snap.coordinates) < 0.2);
         index = existing >= 0 ? existing : candidates[0].i;
         if (existing < 0) {
           points.splice(index, 0, snap.coordinates);
-          edit.properties.vertexIds!.splice(
-            index,
-            0,
-            `${edit.id}:vertex:${crypto.randomUUID()}`,
-          );
+          edit.properties.vertexIds!.splice(index, 0, `${edit.id}:vertex:${crypto.randomUUID()}`);
         }
       }
       if (distance(points[index], snap.coordinates) > 5) {
-        setMessage(
-          'Move the endpoint within 5 m of the intended connection first.',
-        );
+        setMessage("Move the endpoint within 5 m of the intended connection first.");
         return;
       }
       points[index] = snap.coordinates;
       const vertexId = edit.properties.vertexIds![index];
       edit.properties.connections = [
-        ...(edit.properties.connections || []).filter(
-          (c) => c.vertexId !== vertexId,
-        ),
+        ...(edit.properties.connections || []).filter((c) => c.vertexId !== vertexId),
         { vertexId, target: snap.target },
       ];
       delete edit.properties.connectStart;
       delete edit.properties.connectEnd;
     }
-    stageRepair([edit], 'Review proposed connection');
+    stageRepair([edit], "Review proposed connection");
   };
   const disconnect = (vertexId?: string) => {
     const current = selectedRef.current;
     if (!current) return;
     const edit = structuredClone(current);
-    if (edit.kind === 'entrance') {
+    if (edit.kind === "entrance") {
       delete edit.properties.connection;
       delete edit.properties.connectTo;
     } else {
@@ -1490,8 +1270,7 @@ function Editor({
     mapRef.current = map;
     map.setMaxPitch(60);
     const instance = new EditorMap(map, live.current.validation.data, {
-      select: (kind, id, anchor) =>
-        live.current.selectId(kind, id, false, anchor),
+      select: (kind, id, anchor) => live.current.selectId(kind, id, false, anchor),
       create: (edit) => live.current.create(edit),
       geometry: (geometry) => live.current.updateGeometry(geometry),
       remove: () => live.current.remove(),
@@ -1512,43 +1291,29 @@ function Editor({
     const requested = requestedBuilding.current;
     if (!requested || !ready) return;
     const id = canonicalBuildingId(validation.data, requested);
-    if (
-      workspace.unfinished ||
-      (workspace.roofDraft && workspace.roofDraft.buildingId !== id)
-    ) {
+    if (workspace.unfinished || (workspace.roofDraft && workspace.roofDraft.buildingId !== id)) {
       setHandoffNotice(
-        'Finish or discard the recovered drawing or roof before opening the building selected on the public map.',
+        "Finish or discard the recovered drawing or roof before opening the building selected on the public map.",
       );
       return;
     }
     requestedBuilding.current = undefined;
     history.replaceState(
       history.state,
-      '',
+      "",
       consumeEditorBuilding(location.href, editorHandoffStorage()),
     );
-    const target = featureEdit(
-      validation.data,
-      'building',
-      id,
-      workspace.edits,
-    );
+    const target = featureEdit(validation.data, "building", id, workspace.edits);
     if (!target || target.deleted) {
       setHandoffNotice(
-        'The building selected on the public map is unavailable in this workspace. It may have been removed or replaced.',
+        "The building selected on the public map is unavailable in this workspace. It may have been removed or replaced.",
       );
       return;
     }
-    setHandoffNotice('');
-    live.current.selectId('building', id, true);
+    setHandoffNotice("");
+    live.current.selectId("building", id, true);
     setExplorer(false);
-  }, [
-    ready,
-    validation.data,
-    workspace,
-    workspace.unfinished,
-    workspace.roofDraft,
-  ]);
+  }, [ready, validation.data, workspace, workspace.unfinished, workspace.roofDraft]);
   useEffect(() => {
     const definitions = campusLayers(validation.data).items;
     const current = selectedRef.current;
@@ -1575,15 +1340,14 @@ function Editor({
   useEffect(() => {
     const features: Feature[] = [];
     for (const [side, color] of [
-      [review?.before, '#d45555'],
-      [review?.after, '#26a07c'],
+      [review?.before, "#d45555"],
+      [review?.after, "#26a07c"],
     ] as const) {
       const geometry = sourceGeometry(side);
-      if (geometry)
-        features.push({ type: 'Feature', properties: { color }, geometry });
+      if (geometry) features.push({ type: "Feature", properties: { color }, geometry });
     }
     controller.current?.review(
-      reviewOverlay.length ? reviewOverlay : tab === 'changes' ? features : [],
+      reviewOverlay.length ? reviewOverlay : tab === "changes" ? features : [],
     );
   }, [review, ready, tab, reviewOverlay]);
   const undo = (redo = false) => {
@@ -1593,17 +1357,15 @@ function Editor({
       restoreDrawingPanels();
     }
     if (workspace.roofDraft) {
-      setMessage('Apply or cancel the roof plan before undoing other edits.');
+      setMessage("Apply or cancel the roof plan before undoing other edits.");
       return;
     }
     if (redo) workspace.redo();
     else workspace.undo();
     const previous = selectedRef.current;
-    const stored =
-      previous && workspace.edits.find((e) => editKey(e) === editKey(previous));
+    const stored = previous && workspace.edits.find((e) => editKey(e) === editKey(previous));
     const next =
-      previous &&
-      (!stored || (stored.deleted && stored.properties.revertToSource))
+      previous && (!stored || (stored.deleted && stored.properties.revertToSource))
         ? featureEdit(base, previous.kind, previous.id, [])
         : stored;
     setSelected(next && !next.deleted ? next : null);
@@ -1616,8 +1378,8 @@ function Editor({
     setTool(null);
     restoreDrawingPanels();
     setSelected(null);
-    setHint('');
-    setMessage('Drawing cancelled. Select a feature or choose a tool.');
+    setHint("");
+    setMessage("Drawing cancelled. Select a feature or choose a tool.");
   };
   const keyboard = useRef({ begin, undo, cancel, remove });
   keyboard.current = { begin, undo, cancel, remove };
@@ -1632,31 +1394,27 @@ function Editor({
         )
       )
         return;
-      if (
-        (event.target as HTMLElement)?.closest(
-          'input, textarea, select, [contenteditable=true]',
-        )
-      )
+      if ((event.target as HTMLElement)?.closest("input, textarea, select, [contenteditable=true]"))
         return;
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
         event.stopImmediatePropagation();
         keyboard.current.undo(event.shiftKey);
-      } else if (event.key === 'Escape') {
+      } else if (event.key === "Escape") {
         event.preventDefault();
         keyboard.current.cancel();
       } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
-        const kind = (
-          { p: 'path', e: 'entrance', b: 'building', m: 'place' } as const
-        )[event.key.toLowerCase() as 'p'];
+        const kind = ({ p: "path", e: "entrance", b: "building", m: "place" } as const)[
+          event.key.toLowerCase() as "p"
+        ];
         if (kind) {
           event.preventDefault();
           keyboard.current.begin(kind);
         }
       }
     };
-    window.addEventListener('keydown', keydown, true);
-    return () => window.removeEventListener('keydown', keydown, true);
+    window.addEventListener("keydown", keydown, true);
+    return () => window.removeEventListener("keydown", keydown, true);
   }, []);
   const uncertainAction = useRef(false);
   const action = async (name: string, payload: unknown, success: string) => {
@@ -1665,33 +1423,27 @@ function Editor({
     workspace.endHistoryGroup();
     let submitted = false;
     try {
-      if (
-        workspace.roofDraft &&
-        ['prepare-release', 'publish-release'].includes(name)
-      )
+      if (workspace.roofDraft && ["prepare-release", "publish-release"].includes(name))
         throw new Error(
-          'Apply or cancel the unfinished roof before preparing or publishing a release.',
+          "Apply or cancel the unfinished roof before preparing or publishing a release.",
         );
       if (uncertainAction.current) {
         workspace.reconcile(await refresh(), true);
         uncertainAction.current = false;
-        setMessage(
-          'Status checked. Review the result before requesting the action again.',
-        );
+        setMessage("Status checked. Review the result before requesting the action again.");
         return false;
       }
       if (!(await workspace.flush()))
-        throw new Error(workspace.error || 'Save or repair the draft first.');
-      if (name === 'prepare-release') {
+        throw new Error(workspace.error || "Save or repair the draft first.");
+      if (name === "prepare-release") {
         const check = await validation.check(workspace.saved);
         if (workspace.unfinished || workspace.roofDraft || check.errors.length)
           throw new Error(
             check.errors[0] ||
-              'Apply or cancel unfinished drawing and roof work before preparing a release.',
+              "Apply or cancel unfinished drawing and roof work before preparing a release.",
           );
         const modelReviews = campusFacadeReviewIssues(check.data);
-        if (modelReviews.length)
-          throw new Error(modelReviews.map((i) => i.message).join('\n'));
+        if (modelReviews.length) throw new Error(modelReviews.map((i) => i.message).join("\n"));
       }
       submitted = true;
       await api(name, payload);
@@ -1700,16 +1452,14 @@ function Editor({
       return true;
     } catch (e) {
       if (submitted) uncertainAction.current = true;
-      failTask(e, 'Check action status', async () => {
+      failTask(e, "Check action status", async () => {
         try {
           workspace.reconcile(await refresh(), true);
           uncertainAction.current = false;
           setTaskError(null);
-          setMessage(
-            'Status refreshed. Review the result before requesting the action again.',
-          );
+          setMessage("Status refreshed. Review the result before requesting the action again.");
         } catch (next) {
-          failTask(next, 'Check action status', () => {
+          failTask(next, "Check action status", () => {
             void refreshWorkspace();
           });
         }
@@ -1721,29 +1471,23 @@ function Editor({
   };
   const exportBackup = async () => {
     try {
-      const server = await api('export');
-      downloadJson(
-        `turnright-backup-${new Date().toISOString().slice(0, 10)}.json`,
-        {
-          ...workspace.localBackup(base.version),
-          server,
-          local: workspace.edits,
-          unfinished: workspace.unfinished,
-        },
-      );
+      const server = await api("export");
+      downloadJson(`turnright-backup-${new Date().toISOString().slice(0, 10)}.json`, {
+        ...workspace.localBackup(base.version),
+        server,
+        local: workspace.edits,
+        unfinished: workspace.unfinished,
+      });
       setTaskError(null);
     } catch (e) {
-      failTask(e, 'Retry export', exportBackup);
+      failTask(e, "Retry export", exportBackup);
     }
   };
   const localRecovery = () => {
     try {
-      downloadJson(
-        'turnright-local-recovery.json',
-        workspace.localBackup(base.version),
-      );
+      downloadJson("turnright-local-recovery.json", workspace.localBackup(base.version));
     } catch (e) {
-      failTask(e, 'Retry local recovery download', localRecovery);
+      failTask(e, "Retry local recovery download", localRecovery);
     }
   };
   const refreshWorkspace = async () => {
@@ -1752,7 +1496,7 @@ function Editor({
       workspace.reconcile(await refresh(), true);
       setTaskError(null);
     } catch (e) {
-      failTask(e, 'Retry refresh', refreshWorkspace);
+      failTask(e, "Retry refresh", refreshWorkspace);
     }
   };
   const previewTestRoute = async () => {
@@ -1770,14 +1514,8 @@ function Editor({
         const points = found[0].coordinates;
         mapRef.current?.fitBounds(
           [
-            [
-              Math.min(...points.map((p) => p[0])),
-              Math.min(...points.map((p) => p[1])),
-            ],
-            [
-              Math.max(...points.map((p) => p[0])),
-              Math.max(...points.map((p) => p[1])),
-            ],
+            [Math.min(...points.map((p) => p[0])), Math.min(...points.map((p) => p[1]))],
+            [Math.max(...points.map((p) => p[0])), Math.max(...points.map((p) => p[1]))],
           ],
           {
             maxZoom: 19,
@@ -1791,8 +1529,7 @@ function Editor({
         );
       }
     } catch (e) {
-      if (request === routeRequest.current)
-        failTask(e, 'Retry route', previewTestRoute);
+      if (request === routeRequest.current) failTask(e, "Retry route", previewTestRoute);
     } finally {
       setBusy(false);
     }
@@ -1800,64 +1537,54 @@ function Editor({
   const tasks = useMemo(() => {
     const result: {
       id: string;
-      kind: MapEdit['kind'];
+      kind: MapEdit["kind"];
       name: string;
       reason: string;
     }[] = [];
     for (const place of validation.data.places)
       result.push({
         id: place.id,
-        kind: 'place',
+        kind: "place",
         name: place.name,
         reason: !placeHasConnection(validation.data, place)
-          ? 'Missing walking connection'
-          : !(validation.data.entrances || []).some(
-                (e) => e.placeId === place.id,
-              )
-            ? 'Needs an entrance'
-            : 'Mapped place',
+          ? "Missing walking connection"
+          : !(validation.data.entrances || []).some((e) => e.placeId === place.id)
+            ? "Needs an entrance"
+            : "Mapped place",
       });
     for (const f of validation.data.map.features)
-      if (['building', 'path', 'land', 'overlay'].includes(f.properties?.kind))
+      if (["building", "path", "land", "overlay"].includes(f.properties?.kind))
         result.push({
           id: String(f.properties!.id),
           kind: f.properties!.kind,
           name: String(
             f.properties!.name ||
-              (f.properties!.kind === 'building'
-                ? 'Unnamed building'
-                : 'Campus path'),
+              (f.properties!.kind === "building" ? "Unnamed building" : "Campus path"),
           ),
           reason:
-            f.properties!.kind === 'building' && !Number(f.properties!.height)
-              ? 'Height unknown'
-              : 'Mapped geometry',
+            f.properties!.kind === "building" && !Number(f.properties!.height)
+              ? "Height unknown"
+              : "Mapped geometry",
         });
     for (const edit of workspace.edits.filter((e) => !e.deleted))
       if (
         validation.issues.some(
-          (i) =>
-            i.featureId === edit.id &&
-            (!i.featureKind || i.featureKind === edit.kind),
+          (i) => i.featureId === edit.id && (!i.featureKind || i.featureKind === edit.kind),
         )
       )
         result.unshift({
           id: edit.id,
           kind: edit.kind,
           name: String(edit.properties.name),
-          reason: invalid.has(edit.id) ? 'Needs repair' : 'Review connection',
+          reason: invalid.has(edit.id) ? "Needs repair" : "Review connection",
         });
     for (const edit of drafts)
-      if (
-        !result.some((task) => task.id === edit.id && task.kind === edit.kind)
-      )
+      if (!result.some((task) => task.id === edit.id && task.kind === edit.kind))
         result.push({
           id: edit.id,
           kind: edit.kind,
           name: String(edit.properties.name || edit.id),
-          reason: edit.deleted
-            ? 'Removed in this draft'
-            : 'Unpublished correction',
+          reason: edit.deleted ? "Removed in this draft" : "Unpublished correction",
         });
     const grouped = new Map<string, (typeof result)[number]>();
     for (const task of result) {
@@ -1866,18 +1593,13 @@ function Editor({
       const reasons = validation.issues
         .filter(
           (issue) =>
-            issue.featureId === task.id &&
-            (!issue.featureKind || issue.featureKind === task.kind),
+            issue.featureId === task.id && (!issue.featureKind || issue.featureKind === task.kind),
         )
         .map((issue) => issue.message);
       const combined = [
-        ...new Set([
-          ...(previous ? previous.reason.split(' · ') : []),
-          task.reason,
-          ...reasons,
-        ]),
+        ...new Set([...(previous ? previous.reason.split(" · ") : []), task.reason, ...reasons]),
       ];
-      grouped.set(key, { ...task, reason: combined.join(' · ') });
+      grouped.set(key, { ...task, reason: combined.join(" · ") });
     }
     return [...grouped.values()];
   }, [validation, workspace.edits, drafts, invalid]);
@@ -1885,25 +1607,23 @@ function Editor({
   const visibleTasks = tasks.filter(
     (t) =>
       searchKey(`${t.name} ${t.reason}`).includes(featureQuery) &&
-      (filter === 'all' ||
-        (filter === 'needs' &&
-          (!t.reason.startsWith('Mapped') || t.reason.includes(' · '))) ||
-        (filter === 'drafts' &&
-          drafts.some((e) => e.id === t.id && e.kind === t.kind))),
+      (filter === "all" ||
+        (filter === "needs" && (!t.reason.startsWith("Mapped") || t.reason.includes(" · "))) ||
+        (filter === "drafts" && drafts.some((e) => e.id === t.id && e.kind === t.kind))),
   );
   const toolButtons = [
-    { kind: null, name: 'Select', icon: MousePointer2, shortcut: '' },
-    { kind: 'entrance', name: 'Add entrance', icon: DoorOpen, shortcut: 'E' },
-    { kind: 'path', name: 'Draw path', icon: RouteIcon, shortcut: 'P' },
-    { kind: 'place', name: 'Add place', icon: MapPin, shortcut: 'M' },
-    { kind: 'building', name: 'Draw building', icon: Building2, shortcut: 'B' },
-    { kind: 'closure', name: 'Add closure', icon: Flag, shortcut: '' },
-    { kind: 'barrier', name: 'Draw barrier', icon: Shield, shortcut: '' },
+    { kind: null, name: "Select", icon: MousePointer2, shortcut: "" },
+    { kind: "entrance", name: "Add entrance", icon: DoorOpen, shortcut: "E" },
+    { kind: "path", name: "Draw path", icon: RouteIcon, shortcut: "P" },
+    { kind: "place", name: "Add place", icon: MapPin, shortcut: "M" },
+    { kind: "building", name: "Draw building", icon: Building2, shortcut: "B" },
+    { kind: "closure", name: "Add closure", icon: Flag, shortcut: "" },
+    { kind: "barrier", name: "Draw barrier", icon: Shield, shortcut: "" },
   ] as const;
   const toggleView = (value: boolean) => {
     setThreeD(value);
     try {
-      localStorage.setItem('turnright:editor-view', value ? '3d' : '2d');
+      localStorage.setItem("turnright:editor-view", value ? "3d" : "2d");
     } catch {
       /* View still works this session. */
     }
@@ -1915,46 +1635,38 @@ function Editor({
     setExplorer(false);
     setShowRoutes(false);
     const points =
-      drawing.geometry.type === 'LineString'
+      drawing.geometry.type === "LineString"
         ? drawing.geometry.coordinates
-        : drawing.geometry.type === 'Polygon'
+        : drawing.geometry.type === "Polygon"
           ? drawing.geometry.coordinates[0]
           : [];
     setTool(drawing.kind);
-    controller.current?.begin(
-      drawing.kind,
-      drawing.properties,
-      points as Position[],
-      drawing.id,
-    );
+    controller.current?.begin(drawing.kind, drawing.properties, points as Position[], drawing.id);
   };
   const selectSection = (id: EditorSection) => {
     document
-      .querySelectorAll<HTMLDetailsElement>('details.workspace-menu[open]')
+      .querySelectorAll<HTMLDetailsElement>("details.workspace-menu[open]")
       .forEach((menu) => {
         menu.open = false;
       });
     workspace.endHistoryGroup();
     if (survey) {
-      setError('Close the survey before changing workspace.');
+      setError("Close the survey before changing workspace.");
       return;
     }
-    if (
-      id !== 'settings' &&
-      (!!tool || !!workspace.unfinished || !!workspace.roofDraft)
-    ) {
-      setError('Finish or cancel the current edit before changing workspace.');
+    if (id !== "settings" && (!!tool || !!workspace.unfinished || !!workspace.roofDraft)) {
+      setError("Finish or cancel the current edit before changing workspace.");
       return;
     }
-    setLayersOpen(id === 'layers');
-    if (id === 'layers') {
+    setLayersOpen(id === "layers");
+    if (id === "layers") {
       setExplorer(false);
-      setTab('map');
+      setTab("map");
       return;
     }
     setReviewOverlay([]);
     setTab(id);
-    setExplorer(id === 'map');
+    setExplorer(id === "map");
   };
   const reviewPanel = (
     <Suspense fallback={<p>Opening source and release review…</p>}>
@@ -1977,13 +1689,13 @@ function Editor({
         setPreview={setPreview}
         review={review}
         setReview={setReview}
-        onLocateBuilding={(id) => selectId('building', id, true)}
+        onLocateBuilding={(id) => selectId("building", id, true)}
         onApplyAppearances={async (batch) => {
           if (
             tool ||
             workspace.unfinished ||
             workspace.roofDraft ||
-            workspace.status === 'Conflict'
+            workspace.status === "Conflict"
           )
             return;
           const original = workspace.edits;
@@ -1991,9 +1703,7 @@ function Editor({
           setBusy(true);
           try {
             const checked = await validation.check([
-              ...original.filter(
-                (e) => !batch.some((b) => editKey(b) === editKey(e)),
-              ),
+              ...original.filter((e) => !batch.some((b) => editKey(b) === editKey(e))),
               ...batch,
             ]);
             if (
@@ -2002,22 +1712,15 @@ function Editor({
               workspace.unfinished ||
               workspace.roofDraft
             )
-              throw new Error(
-                'The draft changed. Review the appearance batch again.',
-              );
-            const errors = checked.errors.filter(
-              (e) => !validation.errors.includes(e),
-            );
+              throw new Error("The draft changed. Review the appearance batch again.");
+            const errors = checked.errors.filter((e) => !validation.errors.includes(e));
             if (!checked.usable || errors.length)
               throw new Error(
-                errors.join(' ') ||
-                  'The proposed appearances could not be validated.',
+                errors.join(" ") || "The proposed appearances could not be validated.",
               );
             workspace.commit(batch);
             const current = batch.find(
-              (e) =>
-                e.kind === selectedRef.current?.kind &&
-                e.id === selectedRef.current?.id,
+              (e) => e.kind === selectedRef.current?.kind && e.id === selectedRef.current?.id,
             );
             if (current) {
               setSelected(current);
@@ -2036,21 +1739,19 @@ function Editor({
     </Suspense>
   );
   return (
-    <main className={`editor-shell ${survey ? 'survey-active' : ''}`}>
+    <main className={`editor-shell ${survey ? "survey-active" : ""}`}>
       {(offlineContext || !networkOnline) && (
         <output className="editor-offline">
-          Working offline · Last synchronized:{' '}
-          {syncedAt ? new Date(syncedAt).toLocaleString() : 'Unknown'}
+          Working offline · Last synchronized:{" "}
+          {syncedAt ? new Date(syncedAt).toLocaleString() : "Unknown"}
           <button onClick={refreshWorkspace}>Reconnect and synchronize</button>
           <button onClick={localRecovery}>Download local recovery</button>
         </output>
       )}
       {updateReady && (
         <output className="editor-update">
-          App update ready.{' '}
-          {surveyRecording
-            ? 'Pause recording before updating.'
-            : 'Recovery data will be kept.'}
+          App update ready.{" "}
+          {surveyRecording ? "Pause recording before updating." : "Recovery data will be kept."}
           <button
             disabled={surveyRecording}
             onClick={async () => {
@@ -2062,11 +1763,7 @@ function Editor({
         </output>
       )}
       <header className="editor-header">
-        <a
-          className="editor-brand"
-          href={campusUrl('/')}
-          aria-label="TurnRight public map"
-        >
+        <a className="editor-brand" href={campusUrl("/")} aria-label="TurnRight public map">
           <span className="brandmark">
             <BrandMark size={23} />
           </span>
@@ -2075,16 +1772,13 @@ function Editor({
           </strong>
         </a>
         <details className="workspace-menu campus-menu">
-          <summary>{state.campus?.name || 'LASU Ojo'}</summary>
+          <summary>{state.campus?.name || "LASU Ojo"}</summary>
           <div>
             <button
               disabled={
-                !!tool ||
-                !!workspace.unfinished ||
-                !!workspace.roofDraft ||
-                surveyRecording
+                !!tool || !!workspace.unfinished || !!workspace.roofDraft || surveyRecording
               }
-              onClick={() => selectSection('campuses')}
+              onClick={() => selectSection("campuses")}
             >
               Campuses
             </button>
@@ -2093,14 +1787,10 @@ function Editor({
         <WorkspaceNavigation
           section={tab}
           onSelect={selectSection}
-          disabled={
-            survey || !!tool || !!workspace.unfinished || !!workspace.roofDraft
-          }
+          disabled={survey || !!tool || !!workspace.unfinished || !!workspace.roofDraft}
         />
         <div className="editor-header-right">
-          <output
-            className={`editor-save-state ${workspace.status === 'Saved' ? 'saved' : ''}`}
-          >
+          <output className={`editor-save-state ${workspace.status === "Saved" ? "saved" : ""}`}>
             <span />
             {workspace.status}
           </output>
@@ -2109,7 +1799,7 @@ function Editor({
             aria-label="Settings"
             title="Settings"
             ref={settingsTrigger}
-            onClick={() => selectSection('settings')}
+            onClick={() => selectSection("settings")}
           >
             ⚙
           </button>
@@ -2122,15 +1812,13 @@ function Editor({
               <button
                 onClick={() => {
                   layout.reset();
-                  setTab('map');
+                  setTab("map");
                 }}
               >
                 Reset layout
               </button>
-              {state.capabilities?.capabilities.includes('manage') && (
-                <button onClick={() => selectSection('members')}>
-                  Campus memberships
-                </button>
+              {state.capabilities?.capabilities.includes("manage") && (
+                <button onClick={() => selectSection("members")}>Campus memberships</button>
               )}
               <button
                 onClick={async () => {
@@ -2144,7 +1832,7 @@ function Editor({
         </div>
       </header>
       <WorkspaceFrame
-        sourceReview={tab === 'changes'}
+        sourceReview={tab === "changes"}
         layout={layout}
         suspendPanes={survey}
         activity={<PhotoActivity />}
@@ -2152,25 +1840,20 @@ function Editor({
         tools={
           <>
             <WorkspaceSections
-              section={layersOpen ? 'layers' : tab}
+              section={layersOpen ? "layers" : tab}
               onSelect={selectSection}
-              disabled={
-                survey ||
-                !!tool ||
-                !!workspace.unfinished ||
-                !!workspace.roofDraft
-              }
-            />{' '}
-            {!survey && tab === 'map' && (
+              disabled={survey || !!tool || !!workspace.unfinished || !!workspace.roofDraft}
+            />{" "}
+            {!survey && tab === "map" && (
               <button
                 className="editor-survey-entry"
                 onClick={() => {
                   if (workspace.unfinished) {
-                    setError('Finish or cancel the drawing before surveying.');
+                    setError("Finish or cancel the drawing before surveying.");
                     return;
                   }
                   setSurvey(true);
-                  setTab('map');
+                  setTab("map");
                   setPreview(false);
                 }}
               >
@@ -2181,7 +1864,7 @@ function Editor({
         }
       >
         <section
-          className={`editor-map-workspace ${tab === 'settings' ? 'settings-open' : ''}`}
+          className={`editor-map-workspace ${tab === "settings" ? "settings-open" : ""}`}
           aria-label="Mapping workspace"
         >
           <MapView
@@ -2194,15 +1877,15 @@ function Editor({
               !!tool ||
               !!workspace.unfinished ||
               survey ||
-              (selected?.kind === 'building' && buildingMode === 'outline')
+              (selected?.kind === "building" && buildingMode === "outline")
             }
             buildingOpacity={
               survey ||
-              tool === 'entrance' ||
-              tool === 'path' ||
-              tool === 'barrier' ||
-              tool === 'building' ||
-              (selected?.kind === 'building' && buildingMode === 'outline')
+              tool === "entrance" ||
+              tool === "path" ||
+              tool === "barrier" ||
+              tool === "building" ||
+              (selected?.kind === "building" && buildingMode === "outline")
                 ? 0.2
                 : opacity
             }
@@ -2215,16 +1898,16 @@ function Editor({
                 if (
                   hit?.buildingId === workspace.roofDraft.buildingId &&
                   hit.partId === workspace.roofDraft.partId &&
-                  hit.role === 'roof'
+                  hit.role === "roof"
                 )
                   setBuildingSelection(hit);
                 return;
               }
-              if (selected?.id === hit?.buildingId && buildingMode === 'roof') {
+              if (selected?.id === hit?.buildingId && buildingMode === "roof") {
                 setBuildingSelection(hit);
                 return;
               }
-              selectId('building', String(feature.properties?.id));
+              selectId("building", String(feature.properties?.id));
               if (hit) setBuildingSelection(hit);
             }}
             onReady={mapReady}
@@ -2243,66 +1926,46 @@ function Editor({
                 view2D={() => setThreeD(false)}
                 apply={async (edits, previousIds) => {
                   const removed = workspace.edits
-                    .filter(
-                      (e) =>
-                        previousIds.includes(e.id) &&
-                        !edits.some((n) => n.id === e.id),
-                    )
+                    .filter((e) => previousIds.includes(e.id) && !edits.some((n) => n.id === e.id))
                     .map((e) => ({ ...e, deleted: true }));
                   edits = [...edits, ...removed];
                   const next = [
                     ...workspace.edits.filter(
-                      (e) =>
-                        !edits.some((n) => n.kind === e.kind && n.id === e.id),
+                      (e) => !edits.some((n) => n.kind === e.kind && n.id === e.id),
                     ),
                     ...edits,
                   ];
                   const checked = await validation.check(next);
-                  const addedErrors = checked.errors.filter(
-                    (e) => !validation.errors.includes(e),
-                  );
-                  if (addedErrors.length)
-                    throw new Error(addedErrors.join(' '));
-                  if (
-                    disconnectedSurveyPaths(
-                      validation.data,
-                      checked.data,
-                      edits,
-                    ).length
-                  )
+                  const addedErrors = checked.errors.filter((e) => !validation.errors.includes(e));
+                  if (addedErrors.length) throw new Error(addedErrors.join(" "));
+                  if (disconnectedSurveyPaths(validation.data, checked.data, edits).length)
                     throw new Error(
-                      'This section has no usable connection to the mapped network. Keep it as a saved survey until connected.',
+                      "This section has no usable connection to the mapped network. Keep it as a saved survey until connected.",
                     );
                   workspace.commit(next, null);
                   if (navigator.onLine && !(await workspace.flush()))
                     throw new Error(
-                      'Map changes are saved locally. Resolve the draft save issue before retrying.',
+                      "Map changes are saved locally. Resolve the draft save issue before retrying.",
                     );
                   return edits.map(
-                    (e) =>
-                      featureEdit(checked.data, e.kind, e.id, store.edits) || e,
+                    (e) => featureEdit(checked.data, e.kind, e.id, store.edits) || e,
                   );
                 }}
               />
             </Suspense>
           )}
-          <div
-            className="editor-tools editor-card"
-            role="toolbar"
-            aria-label="Map drawing tools"
-          >
+          <div className="editor-tools editor-card" role="toolbar" aria-label="Map drawing tools">
             {toolButtons.map(({ kind, name, icon: Icon, shortcut }) => (
               <button
                 key={name}
-                className={tool === kind ? 'active' : ''}
+                className={tool === kind ? "active" : ""}
                 aria-label={name}
                 aria-pressed={tool === kind}
-                title={`${name}${shortcut ? ` (${shortcut})` : ''}`}
+                title={`${name}${shortcut ? ` (${shortcut})` : ""}`}
                 disabled={
                   preview ||
                   !ready ||
-                  (!!kind &&
-                    (!!tool || !!workspace.unfinished || !!repairPreview))
+                  (!!kind && (!!tool || !!workspace.unfinished || !!repairPreview))
                 }
                 onClick={() => (kind ? begin(kind) : cancel())}
               >
@@ -2338,59 +2001,39 @@ function Editor({
               aria-label="Choose overlapping feature"
             >
               <strong>Choose a feature</strong>
-              <button
-                aria-label="Close feature chooser"
-                onClick={() => setOverlap(null)}
-              >
+              <button aria-label="Close feature chooser" onClick={() => setOverlap(null)}>
                 ×
               </button>
               {overlap.features.map((f) => {
-                const edit = featureEdit(
-                  validation.data,
-                  f.kind,
-                  f.id,
-                  workspace.edits,
-                );
+                const edit = featureEdit(validation.data, f.kind, f.id, workspace.edits);
                 const l = campusLayers(validation.data).items.find(
-                  (l) =>
-                    l.id ===
-                    layerMembership(validation.data).get(
-                      layerKey(f.kind, f.id),
-                    ),
+                  (l) => l.id === layerMembership(validation.data).get(layerKey(f.kind, f.id)),
                 );
                 return (
                   <button
                     key={`${f.kind}:${f.id}`}
-                    onClick={() =>
-                      selectId(f.kind, f.id, false, overlap.anchor)
-                    }
+                    onClick={() => selectId(f.kind, f.id, false, overlap.anchor)}
                   >
                     <strong>
-                      {f.kind === 'path'
-                        ? 'Routing path'
-                        : f.kind === 'land' && l?.role === 'road-surface'
-                          ? 'Road surface'
-                          : f.kind}{' '}
-                      · {String(edit?.properties.name || 'Unnamed')}
+                      {f.kind === "path"
+                        ? "Routing path"
+                        : f.kind === "land" && l?.role === "road-surface"
+                          ? "Road surface"
+                          : f.kind}{" "}
+                      · {String(edit?.properties.name || "Unnamed")}
                     </strong>
                     <small>
-                      {l?.name} ·{' '}
-                      {String(
-                        edit?.properties.surface ||
-                          edit?.properties.landClass ||
-                          '',
-                      )}{' '}
-                      · {String(edit?.properties.sourceId || f.id)}
+                      {l?.name} ·{" "}
+                      {String(edit?.properties.surface || edit?.properties.landClass || "")} ·{" "}
+                      {String(edit?.properties.sourceId || f.id)}
                     </small>
                   </button>
                 );
               })}
             </dialog>
           )}
-          {layersOpen && tab === 'map' && !tool && (
-            <Suspense
-              fallback={<div className="editor-card">Loading layers…</div>}
-            >
+          {layersOpen && tab === "map" && !tool && (
+            <Suspense fallback={<div className="editor-card">Loading layers…</div>}>
               <LayerWorkspace
                 data={validation.data}
                 issues={validation.issues}
@@ -2402,35 +2045,27 @@ function Editor({
                 onZoom={zoomLayers}
                 onImport={() => {
                   setLayersOpen(false);
-                  setTab('campuses');
+                  setTab("campuses");
                 }}
                 onClose={() => {
                   setLayersOpen(false);
                   setExplorer(true);
                 }}
                 onDraw={(layer, type) =>
-                  begin(layer.role === 'overlay' ? 'overlay' : 'land', {
+                  begin(layer.role === "overlay" ? "overlay" : "land", {
                     mapLayerId: layer.id,
-                    mapLayerSource: 'owner',
+                    mapLayerSource: "owner",
                     drawingGeometry: type,
                     name: layer.name,
-                    ...(layer.role === 'road-surface'
-                      ? { landClass: 'road' }
-                      : {}),
+                    ...(layer.role === "road-surface" ? { landClass: "road" } : {}),
                   })
                 }
-                onGeometry={(operation, keys) =>
-                  setLayerOperation({ operation, keys })
-                }
+                onGeometry={(operation, keys) => setLayerOperation({ operation, keys })}
               />
             </Suspense>
           )}
           {layerOperation && (
-            <Suspense
-              fallback={
-                <div className="editor-card">Loading geometry tools…</div>
-              }
-            >
+            <Suspense fallback={<div className="editor-card">Loading geometry tools…</div>}>
               <LayerGeometry
                 data={validation.data}
                 edits={workspace.edits}
@@ -2440,36 +2075,30 @@ function Editor({
                 onDrawCutter={(request) => {
                   cutterRequest.current = request;
                   setLayerOperation(null);
-                  begin('overlay', {
-                    name: 'Geometry preview',
+                  begin("overlay", {
+                    name: "Geometry preview",
                     temporaryGeometry: true,
                     geometryRequest: request,
-                    drawingGeometry:
-                      request.operation === 'split' ? 'LineString' : 'Polygon',
+                    drawingGeometry: request.operation === "split" ? "LineString" : "Polygon",
                   });
                 }}
                 onWindow={(part, ring, start) => {
                   const key = layerOperation.keys[0],
-                    index = key.indexOf(':');
-                  selectId(
-                    key.slice(0, index) as MapEdit['kind'],
-                    key.slice(index + 1),
-                  );
+                    index = key.indexOf(":");
+                  selectId(key.slice(0, index) as MapEdit["kind"], key.slice(index + 1));
                   controller.current?.selectWindow(part, ring, start);
                 }}
               />
             </Suspense>
           )}
-          {tab === 'map' && !layersOpen && (
+          {tab === "map" && !layersOpen && (
             <WorkspacePane id="left" title="Features" enabled={explorer}>
-              <div
-                className={`editor-explorer ${explorer && !layersOpen ? '' : 'collapsed'}`}
-              >
+              <div className={`editor-explorer ${explorer && !layersOpen ? "" : "collapsed"}`}>
                 {explorer ? (
                   <section className="editor-card">
                     <div className="editor-explorer-top">
                       <span className="editor-eyebrow">
-                        {state.campus?.name || 'LASU · OJO CAMPUS'}
+                        {state.campus?.name || "LASU · OJO CAMPUS"}
                       </span>
                       <button
                         className="editor-icon"
@@ -2492,27 +2121,23 @@ function Editor({
                     <button
                       className="editor-create-model"
                       disabled={
-                        preview ||
-                        !ready ||
-                        !!tool ||
-                        !!workspace.unfinished ||
-                        !!repairPreview
+                        preview || !ready || !!tool || !!workspace.unfinished || !!repairPreview
                       }
                       title="Draw a building footprint, then open Edit model"
-                      onClick={() => begin('building')}
+                      onClick={() => begin("building")}
                     >
                       <Building2 size={20} />
                       <span>Create model</span>
                     </button>
                     <div className="editor-filters">
                       {[
-                        ['needs', 'Needs mapping'],
-                        ['all', 'All'],
-                        ['drafts', 'Drafts'],
+                        ["needs", "Needs mapping"],
+                        ["all", "All"],
+                        ["drafts", "Drafts"],
                       ].map(([id, label]) => (
                         <button
                           key={id}
-                          className={filter === id ? 'active' : ''}
+                          className={filter === id ? "active" : ""}
                           onClick={() => setFilter(id)}
                         >
                           {label}
@@ -2520,8 +2145,7 @@ function Editor({
                       ))}
                     </div>
                     <div className="editor-result-count">
-                      {visibleTasks.length} features{' '}
-                      <span>Click to locate</span>
+                      {visibleTasks.length} features <span>Click to locate</span>
                     </div>
                     <div className="editor-feature-list">
                       {visibleTasks.slice(0, 100).map((t, i) => (
@@ -2529,17 +2153,15 @@ function Editor({
                           key={`${t.kind}:${t.id}:${i}`}
                           onClick={() => selectId(t.kind, t.id, true)}
                           className={
-                            selected?.kind === t.kind && selected.id === t.id
-                              ? 'selected'
-                              : ''
+                            selected?.kind === t.kind && selected.id === t.id ? "selected" : ""
                           }
                         >
                           <span className={`editor-feature-icon ${t.kind}`}>
-                            {t.kind === 'building' ? (
+                            {t.kind === "building" ? (
                               <Building2 size={17} />
-                            ) : t.kind === 'path' ? (
+                            ) : t.kind === "path" ? (
                               <RouteIcon size={17} />
-                            ) : t.kind === 'entrance' ? (
+                            ) : t.kind === "entrance" ? (
                               <DoorOpen size={17} />
                             ) : (
                               <MapPin size={17} />
@@ -2554,15 +2176,13 @@ function Editor({
                       ))}
                       {!visibleTasks.length && (
                         <p className="editor-empty">
-                          {filter === 'drafts' && !search
-                            ? 'No unpublished changes. Published work stays on the map.'
-                            : 'No matching features.'}
+                          {filter === "drafts" && !search
+                            ? "No unpublished changes. Published work stays on the map."
+                            : "No matching features."}
                         </p>
                       )}
                       {visibleTasks.length > 100 && (
-                        <p className="small-note">
-                          Search to narrow these results.
-                        </p>
+                        <p className="small-note">Search to narrow these results.</p>
                       )}
                     </div>
                     <div className="editor-explorer-bottom">
@@ -2570,10 +2190,7 @@ function Editor({
                         <DoorOpen size={15} />
                         {validation.data.entrances?.length || 0} entrances
                       </span>
-                      <button
-                        className="editor-text"
-                        onClick={() => setShowRoutes(!showRoutes)}
-                      >
+                      <button className="editor-text" onClick={() => setShowRoutes(!showRoutes)}>
                         <RouteIcon size={15} /> Test route
                       </button>
                     </div>
@@ -2632,42 +2249,31 @@ function Editor({
               </>
             )}
             <button
-              className={`editor-compare ${preview ? 'active' : ''}`}
+              className={`editor-compare ${preview ? "active" : ""}`}
               disabled={!!tool || !!workspace.unfinished}
               onClick={() => setPreview(!preview)}
             >
-              {preview ? 'Back to draft' : 'Compare base'}
+              {preview ? "Back to draft" : "Compare base"}
             </button>
           </div>
-          {(tab.startsWith('gis-') || tab === 'members') && (
-            <Suspense
-              fallback={
-                <p className="campus-workspace">Opening GIS workspace…</p>
-              }
-            >
+          {(tab.startsWith("gis-") || tab === "members") && (
+            <Suspense fallback={<p className="campus-workspace">Opening GIS workspace…</p>}>
               <GisWorkspace
                 section={tab}
                 capabilities={state.capabilities}
                 map={mapRef.current}
                 beforeChange={async () => {
-                  if (
-                    workspace.unfinished ||
-                    workspace.roofDraft ||
-                    !(await workspace.flush())
-                  )
-                    throw new Error(
-                      'Finish the current edit and resolve pending saves first.',
-                    );
+                  if (workspace.unfinished || workspace.roofDraft || !(await workspace.flush()))
+                    throw new Error("Finish the current edit and resolve pending saves first.");
                 }}
-                onClose={() => setTab('map')}
+                onClose={() => setTab("map")}
                 issues={validation.issues}
                 onIssue={(issue) => {
                   setRepairFocus(issue);
-                  setTab('map');
+                  setTab("map");
                 }}
                 onEndEditingSession={async () => {
-                  if (!(await workspace.flush()))
-                    throw Error('Resolve pending saves first.');
+                  if (!(await workspace.flush())) throw Error("Resolve pending saves first.");
                   workspace.releaseDatasetFeatures();
                   setGisSources([]);
                   setSelected(null);
@@ -2677,33 +2283,26 @@ function Editor({
                   if (
                     new Set([
                       ...gisSources.map((s) =>
-                        s.entity === 'feature'
-                          ? s.payload.properties.kind +
-                            ':' +
-                            s.payload.properties.id
-                          : 'place:' + s.payload.id,
+                        s.entity === "feature"
+                          ? s.payload.properties.kind + ":" + s.payload.properties.id
+                          : "place:" + s.payload.id,
                       ),
                       ...workspace.edits
                         .filter((e) => e.properties.gisManaged)
                         .map((e) => editKey(e)),
                     ]).size >= 500 &&
                     !gisSources.some((s) => s.id === source?.id) &&
-                    !workspace.edits.some(
-                      (e) => e.id === edit?.id && e.kind === edit?.kind,
-                    )
+                    !workspace.edits.some((e) => e.id === edit?.id && e.kind === edit?.kind)
                   )
                     throw new Error(
-                      'This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.',
+                      "This editing session contains 500 GIS features. Use Data → Geometry editing session to save and end it, or use a processing job.",
                     );
                   if (source)
-                    setGisSources((rows) => [
-                      ...rows.filter((r) => r.id !== source.id),
-                      source,
-                    ]);
+                    setGisSources((rows) => [...rows.filter((r) => r.id !== source.id), source]);
                   if (edit) workspace.includeServerFeature(edit);
                   const target =
                     edit ||
-                    (source?.entity === 'feature'
+                    (source?.entity === "feature"
                       ? {
                           id: source.payload.properties.id,
                           kind: source.payload.properties.kind,
@@ -2711,17 +2310,17 @@ function Editor({
                           properties: source.payload.properties,
                           deleted: false,
                         }
-                      : source?.entity === 'place'
+                      : source?.entity === "place"
                         ? {
                             id: source.payload.id,
-                            kind: 'place' as const,
+                            kind: "place" as const,
                             geometry: {
-                              type: 'Point' as const,
+                              type: "Point" as const,
                               coordinates: source.payload.coordinates,
                             },
                             properties: {
                               ...source.payload,
-                              kind: 'place',
+                              kind: "place",
                               gisManaged: true,
                             },
                             deleted: false,
@@ -2732,44 +2331,38 @@ function Editor({
               />
             </Suspense>
           )}
-          {tab === 'campuses' && (
-            <Suspense
-              fallback={<p className="campus-workspace">Opening campuses…</p>}
-            >
+          {tab === "campuses" && (
+            <Suspense fallback={<p className="campus-workspace">Opening campuses…</p>}>
               <CampusWorkspace
                 currentData={validation.data}
                 owner={owner}
                 current={state.campus || lasuCampus}
                 dark={dark}
-                onClose={() => setTab('map')}
+                onClose={() => setTab("map")}
                 onSwitch={async (campus) => {
-                  if (
-                    workspace.unfinished ||
-                    workspace.roofDraft ||
-                    surveyRecording
-                  )
+                  if (workspace.unfinished || workspace.roofDraft || surveyRecording)
                     throw new Error(
-                      'Finish the current edit or pause recording before switching campuses.',
+                      "Finish the current edit or pause recording before switching campuses.",
                     );
                   if (!(await workspace.flush()))
                     throw new Error(
-                      'Resolve pending saves before switching campuses. Your local edits are retained.',
+                      "Resolve pending saves before switching campuses. Your local edits are retained.",
                     );
-                  location.assign(campusUrl('/admin', campus.slug));
+                  location.assign(campusUrl("/admin", campus.slug));
                 }}
                 onReview={async () => {
                   await refresh();
-                  setTab('changes');
+                  setTab("changes");
                 }}
               />
             </Suspense>
           )}
-          {tab === 'settings' && (
+          {tab === "settings" && (
             <EditorSettings
               onResetLayout={layout.reset}
               onMemberships={
-                state.capabilities?.capabilities.includes('manage')
-                  ? () => selectSection('members')
+                state.capabilities?.capabilities.includes("manage")
+                  ? () => selectSection("members")
                   : undefined
               }
               appearance={appearance}
@@ -2782,44 +2375,36 @@ function Editor({
               opacity={opacity}
               onOpacity={setOpacity}
               onClose={() => {
-                setTab('map');
+                setTab("map");
                 settingsTrigger.current?.focus();
               }}
             />
           )}
-          {tab === 'changes' && (
+          {tab === "changes" && (
             <Suspense fallback={<p>Opening source updates…</p>}>
               <SourceUpdates
                 data={validation.data}
                 capabilities={state.capabilities}
                 busy={busy}
-                extras={
-                  (state.campus?.slug || 'lasu') === 'lasu'
-                    ? reviewPanel
-                    : undefined
-                }
+                extras={(state.campus?.slug || "lasu") === "lasu" ? reviewPanel : undefined}
                 beforeDecision={async () => {
                   if (
                     workspace.unfinished ||
                     workspace.roofDraft ||
-                    workspace.status === 'Conflict'
+                    workspace.status === "Conflict"
                   )
                     throw new Error(
-                      'Finish the current edit and resolve conflicts before applying source decisions.',
+                      "Finish the current edit and resolve conflicts before applying source decisions.",
                     );
                   if (!(await workspace.flush()))
-                    throw new Error(
-                      workspace.error || 'Save or repair the draft first.',
-                    );
+                    throw new Error(workspace.error || "Save or repair the draft first.");
                 }}
                 onRefresh={async () => {
                   if (!(await workspace.flush()))
-                    throw new Error(
-                      'Save or repair local edits, then refresh source updates.',
-                    );
+                    throw new Error("Save or repair local edits, then refresh source updates.");
                   workspace.reconcile(await refresh(), true);
                 }}
-                onImports={() => setTab('campuses')}
+                onImports={() => setTab("campuses")}
                 onSignIn={signIn}
                 action={action}
                 onFocus={setReview}
@@ -2827,12 +2412,12 @@ function Editor({
               />
             </Suspense>
           )}
-          {tab !== 'changes' &&
-          !tab.startsWith('gis-') &&
-          tab !== 'members' &&
-          tab !== 'map' &&
-          tab !== 'settings' &&
-          tab !== 'campuses' ? (
+          {tab !== "changes" &&
+          !tab.startsWith("gis-") &&
+          tab !== "members" &&
+          tab !== "map" &&
+          tab !== "settings" &&
+          tab !== "campuses" ? (
             <WorkspacePane id="right" title="Review details">
               <aside className="editor-review-panel editor-card">
                 <div className="editor-panel-heading">
@@ -2840,12 +2425,12 @@ function Editor({
                   <button
                     className="editor-icon"
                     aria-label="Close review panel"
-                    onClick={() => setTab('map')}
+                    onClick={() => setTab("map")}
                   >
                     <X size={18} />
                   </button>
                 </div>
-                {tab === 'duplicates' ? (
+                {tab === "duplicates" ? (
                   <DuplicateReview
                     data={validation.data}
                     candidates={validation.duplicates}
@@ -2858,7 +2443,7 @@ function Editor({
                     applyExact={(batch) =>
                       mergeBatch(
                         batch,
-                        'Reviewed duplicate cleanup applied. Undo restores the batch.',
+                        "Reviewed duplicate cleanup applied. Undo restores the batch.",
                       )
                     }
                   />
@@ -2867,13 +2452,9 @@ function Editor({
                 )}
               </aside>
             </WorkspacePane>
-          ) : selected && !preview && !showRoutes && tab === 'map' ? (
+          ) : selected && !preview && !showRoutes && tab === "map" ? (
             <Suspense
-              fallback={
-                <aside className="editor-inspector editor-card">
-                  Loading properties…
-                </aside>
-              }
+              fallback={<aside className="editor-inspector editor-card">Loading properties…</aside>}
             >
               <EditorInspector
                 photoOwner={owner}
@@ -2881,23 +2462,13 @@ function Editor({
                 publishedPhotos={data.photos}
                 onPhotoUndo={() => undo()}
                 onPhotos={(change) => {
-                  if (
-                    workspace.roofDraft ||
-                    workspace.unfinished ||
-                    validation.pending
-                  )
+                  if (workspace.roofDraft || workspace.unfinished || validation.pending)
                     throw Error(
-                      'Finish the current edit and wait for map validation before changing photos.',
+                      "Finish the current edit and wait for map validation before changing photos.",
                     );
-                  const batch = photoEdits(
-                    validation.data,
-                    workspace.edits,
-                    change,
-                  );
+                  const batch = photoEdits(validation.data, workspace.edits, change);
                   workspace.commit(batch, null);
-                  const next = batch.find(
-                    (e) => e.id === selected.id && e.kind === selected.kind,
-                  );
+                  const next = batch.find((e) => e.id === selected.id && e.kind === selected.kind);
                   if (next) {
                     setSelected(next);
                     selectedRef.current = next;
@@ -2907,7 +2478,7 @@ function Editor({
                   if (selected)
                     stageRepair(
                       [remapBuildingSurfaces(selected, geometry)],
-                      'Review corrected building geometry',
+                      "Review corrected building geometry",
                     );
                 }}
                 key={editKey(selected)}
@@ -2923,16 +2494,12 @@ function Editor({
                 focusField={repairFocus?.field}
                 onEndField={workspace.endHistoryGroup}
                 buildingEditor={
-                  selected.kind === 'building' && (
-                    <Suspense
-                      fallback={<output>Loading building tools…</output>}
-                    >
+                  selected.kind === "building" && (
+                    <Suspense fallback={<output>Loading building tools…</output>}>
                       <BuildingAppearanceEditor
                         reviewRequest={
-                          repairFocus?.repair === 'review-model' ||
-                          /^(height|floors|appearance|roof|wall)/i.test(
-                            repairFocus?.field || '',
-                          )
+                          repairFocus?.repair === "review-model" ||
+                          /^(height|floors|appearance|roof|wall)/i.test(repairFocus?.field || "")
                             ? repairFocus || undefined
                             : undefined
                         }
@@ -2946,7 +2513,7 @@ function Editor({
                         onMode={(mode) => {
                           workspace.endHistoryGroup();
                           setBuildingMode(mode);
-                          if (mode === 'roof')
+                          if (mode === "roof")
                             setBuildingSelection((s) => ({
                               buildingId: selected.id,
                               partId: s?.partId,
@@ -2971,9 +2538,7 @@ function Editor({
                           workspace.applyRoof(edit);
                           setSelected(edit);
                           selectedRef.current = edit;
-                          setMessage(
-                            'Roof applied. Undo restores the previous roof.',
-                          );
+                          setMessage("Roof applied. Undo restores the previous roof.");
                         }}
                       />
                     </Suspense>
@@ -2982,7 +2547,7 @@ function Editor({
                 onProperty={(key, value, continuous) => {
                   if (workspace.roofDraft) {
                     setMessage(
-                      'Apply or cancel the roof plan before changing other building properties.',
+                      "Apply or cancel the roof plan before changing other building properties.",
                     );
                     return;
                   }
@@ -2995,7 +2560,7 @@ function Editor({
                   );
                   const edit = batch[0];
                   if (repairFocus) {
-                    stageRepair(batch, 'Review feature repair');
+                    stageRepair(batch, "Review feature repair");
                     return;
                   }
                   workspace.commit(
@@ -3022,7 +2587,7 @@ function Editor({
                     ? () =>
                         stageRepair(
                           [publishedBuilding],
-                          'Restore published building · review before applying',
+                          "Restore published building · review before applying",
                         )
                     : undefined
                 }
@@ -3047,7 +2612,7 @@ function Editor({
             !tool &&
             !preview &&
             !showRoutes &&
-            tab === 'map' &&
+            tab === "map" &&
             !welcomeDismissed && (
               <aside className="editor-welcome editor-card">
                 <button
@@ -3058,10 +2623,7 @@ function Editor({
                   onClick={() => {
                     setWelcomeDismissed(true);
                     try {
-                      localStorage.setItem(
-                        'turnright:editor-welcome-dismissed',
-                        'true',
-                      );
+                      localStorage.setItem("turnright:editor-welcome-dismissed", "true");
                     } catch {
                       // Dismiss for this visit when browser storage is unavailable.
                     }
@@ -3073,17 +2635,14 @@ function Editor({
                 <span className="editor-welcome-icon">
                   <DoorOpen size={23} />
                 </span>
-                <span className="editor-eyebrow">
-                  FILL IN THE MISSING PIECES
-                </span>
+                <span className="editor-eyebrow">FILL IN THE MISSING PIECES</span>
                 <h2>
                   A better way
                   <br />
                   into every place.
                 </h2>
                 <p>
-                  Select a building, mark its entrance, and connect it to the
-                  paths people walk.
+                  Select a building, mark its entrance, and connect it to the paths people walk.
                 </p>
                 <div>
                   <span>1</span> Choose a place on the map
@@ -3097,7 +2656,7 @@ function Editor({
                 <button
                   className="editor-primary"
                   onClick={() => {
-                    setFilter('needs');
+                    setFilter("needs");
                     setExplorer(true);
                   }}
                 >
@@ -3106,7 +2665,7 @@ function Editor({
               </aside>
             )
           )}
-          {showRoutes && tab === 'map' && !layersOpen && (
+          {showRoutes && tab === "map" && !layersOpen && (
             <WorkspacePane id="right" title="Route test">
               <section className="editor-route-test editor-card">
                 <div className="editor-panel-heading">
@@ -3123,17 +2682,15 @@ function Editor({
                   </button>
                 </div>
                 {[
-                  [testOrigin, setTestOrigin, 'From'],
-                  [testDest, setTestDest, 'To'],
+                  [testOrigin, setTestOrigin, "From"],
+                  [testDest, setTestDest, "To"],
                 ].map(([value, set, label]) => (
                   <label className="field-label" key={String(label)}>
                     {String(label)}
                     <select
                       aria-label={`Test route ${label}`}
                       value={value as string}
-                      onChange={(e) =>
-                        (set as (s: string) => void)(e.target.value)
-                      }
+                      onChange={(e) => (set as (s: string) => void)(e.target.value)}
                     >
                       <option value="">Choose a place</option>
                       {validation.data.places
@@ -3148,21 +2705,18 @@ function Editor({
                 ))}
                 <button
                   className="editor-primary"
-                  disabled={
-                    !testOrigin || !testDest || busy || validation.pending
-                  }
+                  disabled={!testOrigin || !testDest || busy || validation.pending}
                   onClick={previewTestRoute}
                 >
                   <RouteIcon size={16} /> Preview route
                 </button>
                 {routes.map((route, i) => (
                   <p key={route.id}>
-                    {i ? 'Alternative' : 'Shortest walk'} ·{' '}
-                    {meters(route.distance)}
+                    {i ? "Alternative" : "Shortest walk"} · {meters(route.distance)}
                     {route.destinationEntranceId && (
                       <small>
-                        {' '}
-                        Arrive at{' '}
+                        {" "}
+                        Arrive at{" "}
                         {
                           validation.data.entrances?.find(
                             (e) => e.id === route.destinationEntranceId,
@@ -3182,9 +2736,7 @@ function Editor({
               threeD={threeD}
             />
             <output className="editor-guidance editor-card">
-              {preview
-                ? 'Approved source geometry · read-only comparison'
-                : hint || message}
+              {preview ? "Approved source geometry · read-only comparison" : hint || message}
               {tool && (
                 <span className="editor-finish-controls">
                   <span aria-live="polite" className="drawing-progress">
@@ -3193,9 +2745,7 @@ function Editor({
                   <button
                     className="editor-primary"
                     disabled={!progress.canFinish}
-                    title={
-                      progress.canFinish ? 'Finish drawing' : progress.message
-                    }
+                    title={progress.canFinish ? "Finish drawing" : progress.message}
                     onClick={() => controller.current?.finish()}
                   >
                     <Check size={15} /> Finish
@@ -3208,16 +2758,15 @@ function Editor({
             </output>
           </div>
           {workspace.roofDraft &&
-            (selected?.id !== workspace.roofDraft.buildingId ||
-              buildingMode !== 'roof') && (
+            (selected?.id !== workspace.roofDraft.buildingId || buildingMode !== "roof") && (
               <div className="editor-recovery editor-card">
                 <strong>Unfinished roof recovered</strong>
                 <button
                   className="editor-primary"
                   onClick={() => {
                     const draft = workspace.roofDraft!;
-                    selectId('building', draft.buildingId, true);
-                    setBuildingMode('roof');
+                    selectId("building", draft.buildingId, true);
+                    setBuildingMode("roof");
                     setBuildingSelection({
                       buildingId: draft.buildingId,
                       partId: draft.partId,
@@ -3226,9 +2775,7 @@ function Editor({
                 >
                   Resume roof
                 </button>
-                <button onClick={() => workspace.draftRoof(null)}>
-                  Discard roof
-                </button>
+                <button onClick={() => workspace.draftRoof(null)}>Discard roof</button>
               </div>
             )}
           {handoffNotice && (
@@ -3239,13 +2786,10 @@ function Editor({
                   requestedBuilding.current = undefined;
                   history.replaceState(
                     history.state,
-                    '',
-                    consumeEditorBuilding(
-                      location.href,
-                      editorHandoffStorage(),
-                    ),
+                    "",
+                    consumeEditorBuilding(location.href, editorHandoffStorage()),
                   );
-                  setHandoffNotice('');
+                  setHandoffNotice("");
                 }}
               >
                 Dismiss building request
@@ -3258,10 +2802,7 @@ function Editor({
               <button className="editor-primary" onClick={resume}>
                 Resume drawing
               </button>
-              <button
-                className="editor-text"
-                onClick={() => workspace.draft(null)}
-              >
+              <button className="editor-text" onClick={() => workspace.draft(null)}>
                 Discard drawing
               </button>
             </div>
@@ -3276,9 +2817,9 @@ function Editor({
               {repairPreview.batch.map((e) => (
                 <p key={editKey(e)}>
                   {e.kind} · {String(e.properties.name || e.id)}
-                  {e.kind === 'entrance' && e.properties.placeId
+                  {e.kind === "entrance" && e.properties.placeId
                     ? ` · Serves ${validation.data.places.find((p) => p.id === e.properties.placeId)?.name || e.properties.placeId}`
-                    : ''}
+                    : ""}
                 </p>
               ))}
               {repairErrors.map((message) => (
@@ -3289,12 +2830,7 @@ function Editor({
               <div className="button-row">
                 <button
                   className="editor-primary"
-                  disabled={
-                    busy ||
-                    validation.pending ||
-                    !!tool ||
-                    !!workspace.unfinished
-                  }
+                  disabled={busy || validation.pending || !!tool || !!workspace.unfinished}
                   onClick={applyRepair}
                 >
                   Apply reviewed repair
@@ -3324,14 +2860,14 @@ function Editor({
               compare={(local, remote) => {
                 setReviewOverlay([
                   ...[local].filter(Boolean).map((e) => ({
-                    type: 'Feature' as const,
+                    type: "Feature" as const,
                     geometry: e!.geometry,
-                    properties: { color: '#c26ce3' },
+                    properties: { color: "#c26ce3" },
                   })),
                   ...[remote].filter(Boolean).map((e) => ({
-                    type: 'Feature' as const,
+                    type: "Feature" as const,
                     geometry: e!.geometry,
-                    properties: { color: '#26a07c' },
+                    properties: { color: "#26a07c" },
                   })),
                 ]);
                 if (local || remote) select(local || remote!, true);
@@ -3343,7 +2879,7 @@ function Editor({
               {error && (
                 <div className="editor-card editor-error-row" role="alert">
                   <span>{error}</span>
-                  <button className="editor-text" onClick={() => setError('')}>
+                  <button className="editor-text" onClick={() => setError("")}>
                     Dismiss message
                   </button>
                 </div>
@@ -3358,12 +2894,9 @@ function Editor({
                       else taskError.retry();
                     }}
                   >
-                    {taskError.auth ? 'Sign in again' : taskError.label}
+                    {taskError.auth ? "Sign in again" : taskError.label}
                   </button>
-                  <button
-                    className="editor-text"
-                    onClick={() => setTaskError(null)}
-                  >
+                  <button className="editor-text" onClick={() => setTaskError(null)}>
                     Dismiss action error
                   </button>
                 </div>
@@ -3371,22 +2904,18 @@ function Editor({
               {workspace.error && (
                 <div className="editor-card editor-error-row" role="alert">
                   <span>{workspace.error}</span>
-                  {workspace.status === 'Conflict' ? (
-                    <button
-                      className="editor-secondary"
-                      onClick={reviewConflicts}
-                    >
+                  {workspace.status === "Conflict" ? (
+                    <button className="editor-secondary" onClick={reviewConflicts}>
                       Review conflicts
                     </button>
                   ) : (
                     <button
                       className="editor-secondary"
                       onClick={async () => {
-                        if ([401, 403].includes(workspace.errorStatus))
-                          await signIn();
+                        if ([401, 403].includes(workspace.errorStatus)) await signIn();
                         else {
                           if (
-                            workspace.status === 'Recovery unavailable' &&
+                            workspace.status === "Recovery unavailable" &&
                             !(await workspace.preserveRecovery())
                           )
                             return;
@@ -3395,10 +2924,10 @@ function Editor({
                       }}
                     >
                       {[401, 403].includes(workspace.errorStatus)
-                        ? 'Sign in again'
-                        : workspace.status === 'Recovery unavailable'
-                          ? 'Retry local recovery'
-                          : 'Retry save'}
+                        ? "Sign in again"
+                        : workspace.status === "Recovery unavailable"
+                          ? "Retry local recovery"
+                          : "Retry save"}
                     </button>
                   )}
                   <button className="editor-text" onClick={localRecovery}>

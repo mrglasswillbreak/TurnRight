@@ -393,11 +393,7 @@ export default function SourceUpdates({
             </button>
           </div>
         )}
-        {notice && (
-          <p role="status" className="notice">
-            {notice}
-          </p>
-        )}
+        {notice && <output className="notice">{notice}</output>}
         <details className="source-connected">
           <summary>Connected sources · {overview?.sources.length || 0}</summary>
           {overview?.sources.map((source) => (
@@ -942,7 +938,7 @@ export default function SourceUpdates({
       >
         <h2>Update details</h2>
         {detailLoading ? (
-          <p role="status">Loading comparison…</p>
+          <output>Loading comparison…</output>
         ) : !detail ? (
           <div className="empty-state">
             <h3>Choose an update</h3>

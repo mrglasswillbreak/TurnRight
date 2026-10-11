@@ -1,12 +1,12 @@
-import type { MapChange } from './types.js';
+import type { MapChange } from "./types.js";
 
 export interface SourceFilters {
   query?: string;
   source?: string;
   layer?: string;
   featureType?: string;
-  kind?: '' | 'add' | 'modify' | 'remove';
-  geometry?: '' | 'true' | 'false';
+  kind?: "" | "add" | "modify" | "remove";
+  geometry?: "" | "true" | "false";
 }
 export interface SourceCursor {
   createdAt: string;
@@ -17,7 +17,7 @@ export interface SourceSummary {
   revision: number;
   sourceId: string;
   sourceName: string;
-  kind: MapChange['kind'];
+  kind: MapChange["kind"];
   createdAt: string;
   meta: {
     source: string;
@@ -42,8 +42,8 @@ export interface SourceOverview {
   sources: Array<{
     id: string;
     name: string;
-    kind: 'file' | 'osm' | 'arcgis';
-    schedule: 'manual' | 'daily';
+    kind: "file" | "osm" | "arcgis";
+    schedule: "manual" | "daily";
     configured: boolean;
     lastSuccess?: string;
     latest?: {
@@ -65,13 +65,7 @@ export interface SourceOperation {
   id: string;
   actor: string;
   accept: boolean | null;
-  status:
-    | 'prepared'
-    | 'queued'
-    | 'running'
-    | 'completed'
-    | 'failed'
-    | 'cancelled';
+  status: "prepared" | "queued" | "running" | "completed" | "failed" | "cancelled";
   total: number;
   applied: number;
   skipped: number;
@@ -103,32 +97,31 @@ export interface SourceDetail {
   }>;
 }
 export const sourceKindLabel = {
-  add: 'Addition',
-  modify: 'Change',
-  remove: 'Removal',
+  add: "Addition",
+  modify: "Change",
+  remove: "Removal",
 } as const;
 export function sourceFieldLabel(key: string) {
+  if (key === "geometry") return "Shape or location";
   return key
-    .replace(/^properties\./, '')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replaceAll('_', ' ')
+    .replace(/^properties\./, "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replaceAll("_", " ")
     .replace(/^./, (c) => c.toUpperCase());
 }
 export function describeSourceChange(row: SourceSummary) {
   const fields = row.meta.fields.map(sourceFieldLabel);
-  if (row.kind === 'add') return 'New source feature';
-  if (row.kind === 'remove') return 'Missing from the latest source snapshot';
+  if (row.kind === "add") return "New source feature";
+  if (row.kind === "remove") return "Missing from the latest source snapshot";
   return (
     [
-      row.meta.geometryChanged ? 'Shape or location changed' : '',
+      row.meta.geometryChanged ? "Shape or location changed" : "",
       fields.length
-        ? fields.slice(0, 3).join(', ') +
-          (fields.length > 3 ? ` + ${fields.length - 3} more` : '')
-        : '',
+        ? fields.slice(0, 3).join(", ") + (fields.length > 3 ? ` + ${fields.length - 3} more` : "")
+        : "",
     ]
       .filter(Boolean)
-      .join(' · ') || 'Source details changed'
+      .join(" · ") || "Source details changed"
   );
 }
-export const operationActive = (op: SourceOperation) =>
-  ['queued', 'running'].includes(op.status);
+export const operationActive = (op: SourceOperation) => ["queued", "running"].includes(op.status);

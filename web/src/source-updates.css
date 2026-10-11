@@ -11,6 +11,10 @@
   margin: 5px 0 12px;
   letter-spacing: -0.025em;
 }
+.source-updates > output,
+.source-update-details > output {
+  display: block;
+}
 .source-updates h3,
 .source-update-details h3 {
   font-size: 15px;
@@ -32,7 +36,7 @@
 }
 .source-connected,
 .source-history {
-  border-block: 1px solid var(--border);
+  border-block: 1px solid var(--ed-line, #e4e9e5);
   padding: 12px 0;
   margin: 12px 0;
 }
@@ -43,10 +47,10 @@
 }
 .source-status-card {
   padding: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--ed-line, #e4e9e5);
   border-radius: 10px;
   margin: 10px 0;
-  background: var(--card);
+  background: var(--ed-bg, #fff);
 }
 .source-status-card p {
   margin: 5px 0;
@@ -68,15 +72,15 @@
   font-size: 12px;
   margin: 7px 0;
 }
-.source-updates input:not([type='checkbox']),
+.source-updates input:not([type="checkbox"]),
 .source-updates select {
   width: 100%;
   min-width: 0;
   padding: 7px 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--ed-line, #e4e9e5);
   border-radius: 7px;
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--ed-bg, #fff);
+  color: var(--ed-text, #24342f);
 }
 .source-filter-grid {
   display: grid;
@@ -84,7 +88,7 @@
   gap: 0 8px;
 }
 .source-selection {
-  border-block: 1px solid var(--border);
+  border-block: 1px solid var(--ed-line, #e4e9e5);
   padding: 9px 0;
   margin-top: 12px;
   display: flex;
@@ -105,24 +109,24 @@
   text-underline-offset: 3px;
   text-align: left;
 }
-.source-updates input[type='checkbox'] {
+.source-updates input[type="checkbox"] {
   appearance: auto;
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  accent-color: var(--primary);
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  accent-color: var(--ed-accent, #24785a);
   margin-top: 3px;
 }
 .source-update-row {
   display: flex;
   gap: 9px;
   padding: 12px 4px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--ed-line, #e4e9e5);
   border-left: 3px solid transparent;
 }
 .source-update-row.selected {
-  border-left-color: var(--primary);
-  background: var(--accent);
+  border-left-color: var(--ed-accent, #24785a);
+  background: var(--ed-soft, #f4f7f4);
 }
 .source-update-row > button {
   min-width: 0;
@@ -137,7 +141,7 @@
 }
 .source-update-row small,
 .source-update-row button > span:not(.source-kind) {
-  color: var(--muted-foreground);
+  color: var(--ed-muted, #607168);
 }
 .source-kind {
   font-size: 10px;
@@ -145,7 +149,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   width: fit-content;
-  border: 1px solid var(--border);
+  border: 1px solid var(--ed-line, #e4e9e5);
   border-radius: 4px;
   padding: 1px 5px;
 }
@@ -161,8 +165,8 @@
 .source-bulk-bar {
   position: sticky;
   bottom: 0;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--ed-bg, #fff);
+  border: 1px solid var(--ed-line, #e4e9e5);
   box-shadow: 0 -3px 12px #0001;
   border-radius: 9px;
   padding: 10px;
@@ -175,7 +179,7 @@
   width: 100%;
 }
 .source-confirmation {
-  border: 2px solid var(--primary);
+  border: 2px solid var(--ed-accent, #24785a);
   border-radius: 10px;
   padding: 12px;
   margin-top: 14px;
@@ -191,7 +195,7 @@
 .source-update-details th,
 .source-update-details td {
   padding: 9px 6px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--ed-line, #e4e9e5);
   text-align: left;
   vertical-align: top;
   overflow-wrap: anywhere;
@@ -209,7 +213,7 @@
   gap: 4px;
 }
 .source-map-key span:before {
-  content: '';
+  content: "";
   display: inline-block;
   border: 2px solid #ef4444;
   width: 18px;
@@ -220,7 +224,7 @@
 }
 .source-updates progress {
   width: 100%;
-  accent-color: var(--primary);
+  accent-color: var(--ed-accent, #24785a);
 }
 @media (max-width: 1199px) {
   .source-updates,
@@ -240,8 +244,8 @@
   padding: 6px 9px !important;
   min-width: 40px !important;
 }
-.source-mobile-views button[aria-pressed='true'] {
-  background: var(--accent);
+.source-mobile-views button[aria-pressed="true"] {
+  background: var(--ed-soft, #f4f7f4);
   font-weight: 700;
 }
 
@@ -252,8 +256,8 @@
   width: min(560px, calc(100vw - 32px));
   max-height: calc(100dvh - 40px);
   overflow: auto;
-  background: var(--card);
-  color: var(--foreground);
+  background: var(--ed-bg, #fff);
+  color: var(--ed-text, #24342f);
   padding: 20px;
 }
 .source-confirmation::backdrop {
