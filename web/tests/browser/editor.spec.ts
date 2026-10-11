@@ -8471,3 +8471,47 @@ for (const phone of [false, true]) {
     },
   );
 }
+
+test("accepted source updates proceed to review without replacing the public baseline", async ({
+  page,
+}) => {
+  await setup(page);
+  let replacementRequests = 0;
+  await page.route("**/api/admin", async (route) => {
+    const { action } = route.request().postDataJSON();
+    if (["review-baseline", "reconcile-baseline"].includes(action)) replacementRequests++;
+    if (action !== "sources") return route.fallback();
+    const data = browserCampus();
+    const { map, places, graph, ...meta } = data;
+    meta.version = "accepted-source-origin";
+    const record = (entity: string, id: string, payload: unknown) => ({
+      entity,
+      id,
+      payload,
+      source: "fixture",
+      hash: id,
+    });
+    await route.fulfill({
+      json: {
+        features: [
+          record("meta", "meta:campus", meta),
+          ...map.features.map((f, i) => record("feature", "feature:" + i, f)),
+          ...places.map((p) => record("place", "place:" + p.id, p)),
+          ...graph.nodes.map((n) => record("node", "node:" + n.id, n)),
+          ...graph.edges.map((e) => record("edge", "edge:" + e.id, e)),
+        ],
+      },
+    });
+  });
+  await page.reload();
+  await attachMap(page);
+  await openEditorSection(page, "Releases");
+  await expect(page.getByText("Publish your accepted updates", { exact: true })).toBeVisible();
+  await expect(page.getByText(/different version labels/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Use this reviewed baseline" })).toHaveCount(0);
+  await page
+    .getByPlaceholder("Describe the corrections in this release…")
+    .fill("Reviewed accepted source updates");
+  await expect(page.getByRole("button", { name: "Build review preview" })).toBeEnabled();
+  expect(replacementRequests).toBe(0);
+});
