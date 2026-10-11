@@ -1,5 +1,11 @@
 # Application screenshots
 
+## Source updates · 11 October 2026
+
+The four `source-updates-*-2026-10-11.png` images show the inbox/map comparison and bulk confirmation on desktop (1440 × 1000) and phone (390 × 844). They are unaltered Chromium 153.0.8010.12 captures from the successful dedicated journeys in [run 38121589733](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38121589733), at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`. Every image was visually inspected after checking the downloaded artifact digest.
+
+The actual React/MapLibre interface runs through Vite with isolated owner/API responses and the published LASU package. The 101 proposals, source names, removal and progress are synthetic demonstration data. No production proposal was changed. [Capture record](source-updates-2026-10-11.json) · [Gallery and reproduction](../../SCREENSHOTS.md#source-updates-capture-workflow).
+
 ## Workspace redesign · 7 October 2026
 
 The current README and workflow guides use the eighteen `redesign-*-2026-10-07.png` captures: sixteen product layouts and two compact-control states. See the [visual tour, provenance and reproduction instructions](../../SCREENSHOTS.md) and [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below. Earlier screenshots remain historical records.
