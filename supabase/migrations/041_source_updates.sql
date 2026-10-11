@@ -209,6 +209,10 @@ begin
   (o.status='prepared' and o.created_at<now()-interval '24 hours') or (o.status in ('completed','cancelled','failed') and o.updated_at<now()-interval '30 days') limit 1000)
  delete from source_review_items i using expired e where i.operation_id=e.operation_id and i.change_id=e.change_id;
  get diagnostics n=row_count;
+ -- Explicit selections also carry ID/revision pairs in the idempotency request.
+ -- Expire that copy along with item bookkeeping, retaining summary and audit.
+ with expired_receipts as (select id from source_review_operations where status in ('completed','cancelled','failed') and updated_at<now()-interval '30 days' and request<>'{}'::jsonb limit 100)
+ update source_review_operations o set request='{}'::jsonb from expired_receipts e where o.id=e.id;
  delete from source_review_operations o where status='prepared' and created_at<now()-interval '24 hours' and not exists(select 1 from source_review_items where operation_id=o.id);
  return n;
 end $$;
