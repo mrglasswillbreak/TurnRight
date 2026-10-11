@@ -18,7 +18,7 @@ const tables = {
   },
 };
 /** Active work and previously observed work cannot fall out of the recent-history window. */
-export async function processStatus(watch: unknown) {
+export async function processStatus(watch: unknown, actor?: string) {
   const known =
     watch && typeof watch === 'object'
       ? (watch as Record<string, unknown>)
@@ -67,5 +67,10 @@ export async function processStatus(watch: unknown) {
       ];
     }),
   );
-  return Object.fromEntries(entries);
+  const reviews = actor
+    ? await db<{ operations: unknown[] }>('rpc/source_review_history', 'POST', {
+        actor,
+      })
+    : { operations: [] };
+  return { ...Object.fromEntries(entries), sourceReviews: reviews.operations };
 }

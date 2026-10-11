@@ -8,6 +8,10 @@ import type {
 } from '../src/gis-types.js';
 const readActions = new Set([
   'state',
+  'source-updates-overview',
+  'source-updates-list',
+  'source-updates-detail',
+  'source-updates-history',
   'sources',
   'review-baseline',
   'review-status',
