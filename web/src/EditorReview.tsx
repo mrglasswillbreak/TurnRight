@@ -1,16 +1,7 @@
 import { campusUrl, requestedCampus } from './campus-context';
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
-import {
-  Check,
-  Flag,
-  GitCompareArrows,
-  Layers,
-  MapPin,
-  RefreshCw,
-  Upload,
-  X,
-} from 'lucide-react';
+import { Flag, Layers, MapPin, RefreshCw, Upload } from 'lucide-react';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Button } from '@/components/ui/button';
 import type { CampusData, MapChange, Release, StudentReport } from './types';
@@ -59,8 +50,6 @@ export function EditorReview({
   mapRef,
   preview,
   setPreview,
-  review,
-  setReview,
   onApplyAppearances,
   onLocateBuilding,
   onPublishedWorkspace,

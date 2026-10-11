@@ -346,6 +346,7 @@ export default function SourceUpdates({
   );
   const comparison =
     detail && sourceComparison(detail.change.before, detail.change.after);
+  const focusedSummary = page.rows.find((row) => row.id === detail?.change.id);
   const selectedPage =
     page.rows.length > 0 &&
     page.rows.every((row) => selected[row.id] === row.revision);
@@ -952,13 +953,28 @@ export default function SourceUpdates({
           </div>
         ) : (
           <>
-            <h3>
-              {page.rows.find((row) => row.id === detail.change.id)?.meta
-                .name || detail.change.summary}
-            </h3>
+            <h3>{focusedSummary?.meta.name || detail.change.summary}</h3>
             <p>
               {sourceKindLabel[detail.change.kind]} · {detail.change.status}
             </p>
+            <section aria-label="Source evidence">
+              <h3>Source evidence</h3>
+              <p>
+                {focusedSummary?.sourceName || 'Stored source proposal'}
+                {focusedSummary?.meta.layer &&
+                  ` · ${focusedSummary.meta.layer}`}
+              </p>
+              <p className="small-note">Record: {detail.change.source_id}</p>
+              {focusedSummary && (
+                <p className="small-note">
+                  Proposed: {date(focusedSummary.createdAt)}
+                </p>
+              )}
+              <p className="small-note">
+                These saved before/after records remain available when temporary
+                import files expire. A source proposal still needs your review.
+              </p>
+            </section>
             {detail.overrides.length > 0 && (
               <div className="notice">
                 <strong>Your editor corrections take precedence</strong>
