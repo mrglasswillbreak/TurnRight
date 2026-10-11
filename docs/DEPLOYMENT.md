@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–041 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–042 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -104,3 +104,7 @@ Earlier reader → migration → writer upgrades, migration timestamps, Vercel d
 Apply 041 after 040, then run **Maintain source review index and receipts** to backfill existing proposals in transactions of at most 100 rows. Deploy the `source-review.yml` worker and new UI after the schema is present; the UI explains when indexing is incomplete. No new credentials are required: reuse the existing workflow dispatch token and Supabase service secrets. Manual/daily source checks now share `queue_source_check`, so deploy migration 041 before the updated scheduler.
 
 Verify the 10,000-change fixture, both TypeScript projects, browser source-update tests in Chromium/WebKit, and production read-only inbox/login checks. Do not accept real pending proposals as a deployment test. Keep migrations 039–041 when rolling back the UI; never restore the unbounded import RPC. Details: [Source updates](SOURCE-UPDATES.md).
+
+## Editor availability upgrade (042)
+
+Apply the additive migration and complete the bounded published-correction backfill before deploying its readers. Follow [the rollout instructions](EDITOR-AVAILABILITY.md#migration-042-rollout). Existing proposals, accepted sources, correction records, review approvals and public packages remain untouched.

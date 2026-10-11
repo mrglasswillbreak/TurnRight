@@ -55,8 +55,10 @@ and queues ordinary source additions/modifications/removals. It does not publish
 
 ## Owner review and provenance
 
-Before the first enriched release, reconcile the accepted source baseline with
-the published map using the existing owner workflow. The daily workflow reads
+Accepted sources already form the working baseline. Validate the assembled
+workspace, obtain independent approval in Review, and inspect a new preview
+in Publish. Do not replace accepted updates with the older public map; see
+[editor availability](EDITOR-AVAILABILITY.md). The daily workflow reads
 accepted sources and owner corrections with the existing private service role;
 only counts and a fingerprint enter the coverage report. When those credentials
 are unavailable locally, the report states that limitation explicitly.
