@@ -16,7 +16,7 @@ Visitors do not need accounts. Signing in grants no campus access until an admin
 
 ## Database and private storage
 
-The current application requires migrations **001–043**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+The current application requires migrations **001–044**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -44,6 +44,8 @@ The current application requires migrations **001–043**. Consult [Production](
 Migration 042 adds lightweight published-correction summaries and retires full-map baseline replacement. Complete its one-release-per-call backfill before deploying readers; see [editor availability](EDITOR-AVAILABILITY.md#migration-042-rollout).
 
 Migration 043 adds the campus-authorized, read-only source map preview. It decodes at most 50 proposals per request and bounds each preview shape to 80 vertices. It needs no additional storage, scheduled job or backfill. Full geometry remains available through the single-change detail endpoint.
+
+Migration 044 resolves routing-link endpoints through a partial pending-proposal index and the existing campus/source primary key. It uses current/proposed node positions for before/after lines, keeps the same page limits and timeouts, and needs no backfill.
 
 | Private bucket | Purpose | Per-object limit |
 | --- | --- | ---: |

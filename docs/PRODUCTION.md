@@ -1,5 +1,11 @@
 # Production deployments
 
+## Map previews and adjustable mobile panels — 11 October 2026
+
+[PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15) merged as `1626e436eba983685a8ef087638d19af9ce4fc42`. Its [production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/88MmKkERgAPSdBYeREbJydYePuMc) became Ready at 13:14 UTC with `turnright.vercel.app` assigned. All 14 release checks passed, including four Chromium shards, both WebKit shards, quality/build checks, GIS and offline coverage.
+
+The updated editor loaded authenticated on both campuses. UNILAG's one remaining metadata proposal correctly reported no map location. LASU loaded all 3,898 proposals across bounded pages without decisions; this check exposed routing links whose locations require referenced-node lookups, addressed by migration 044. A fresh GitHub sign-in completed and opened the editor while that preview was loading. At 13:18 UTC the editor returned HTTP 200 in 509 ms, OAuth returned 302 in 624 ms, and anonymous administration returned 401. The public catalogue and both campus manifest hashes matched the pre-deployment baseline. Verification accepted/rejected no proposal and published no campus data.
+
 ## Editor availability and map-preview database upgrade — 11 October 2026
 
 Migrations **042 and 043** are installed in production. The published-correction backfill completed in two calls, each updating one current published release. Both campuses now have materialized correction summaries, and the bounded, campus-authorized map-preview function is installed. The application changes and release gates are tracked in [PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15); this entry records the database upgrade, not a new campus-map publication.
