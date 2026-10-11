@@ -195,7 +195,8 @@
   display: none;
 }
 /* Compact sheets and maximized panes leave their collapsed panel's bounds. */
-.workspace-frame:is([data-compact='true'], [data-maximized='true']) [data-panel] {
+.workspace-frame:is([data-compact='true'], [data-maximized='true'])
+  [data-panel] {
   overflow: visible !important;
 }
 .workspace-pane-heading {
@@ -423,7 +424,8 @@
     top: auto;
     bottom: 0;
     width: 100%;
-    max-height: 42%;
+    height: min(var(--mobile-pane-height, 42%), calc(100% - 110px));
+    max-height: calc(100% - 110px);
     border-top: 1px solid var(--ed-line);
   }
   .workspace-pane-host:focus-within {
@@ -457,6 +459,7 @@
     bottom: 0;
     width: min(340px, 50%);
     max-height: none;
+    height: auto;
   }
 }
 
@@ -546,7 +549,9 @@
         )[data-open='true']
     )
     .editor-bottom {
-    bottom: calc(42% + 12px);
+    bottom: calc(
+      min(var(--mobile-pane-height, 42%), calc(100% - 110px)) + 12px
+    );
   }
 }
 
@@ -585,4 +590,35 @@
 }
 .layer-attributes-pane > :not(.layer-table) {
   flex-shrink: 0;
+}
+.workspace-sheet-handle {
+  display: none;
+}
+@media (max-width: 767px) and (orientation: portrait) {
+  .workspace-sheet-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    flex: none;
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+    color: var(--ed-muted);
+    gap: 3px;
+  }
+  .workspace-sheet-handle span {
+    width: 40px;
+    height: 4px;
+    border-radius: 3px;
+    background: currentColor;
+  }
+  .workspace-sheet-handle small {
+    font-size: 9px;
+  }
+  .workspace-sheet-handle:focus-visible {
+    outline: 2px solid var(--ed-accent);
+    outline-offset: -3px;
+  }
 }

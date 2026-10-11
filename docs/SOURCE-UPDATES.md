@@ -1,5 +1,13 @@
 # Source updates
 
+## Preview the whole inbox on the map
+
+Choose **Preview all matching changes on map** to draw every pending proposal that matches the current filters, across all inbox pages. Additions are green, changes amber and removals red with dashed outlines. **Show previous shapes** adds grey dashed outlines; **Fit all changes** frames the loaded proposals. Click a shape to open its existing comparison, or use an inbox row for keyboard access. On phones the preview opens the Map view; List and Details remain available above it.
+
+The count shows progress and reports records without a map location. Large shapes are simplified or represented by their bounds; the detail comparison loads exact geometry. The overlay represents source proposals, with saved editor corrections still taking precedence. It does not select, accept, reject or publish anything. Refresh after imports or decisions; the preview time is shown under **About this preview**.
+
+Migration **043** provides a campus-authorized, read-only geometry endpoint. Each sequential request decodes at most 50 proposals and returns at most 80 vertices per before/after shape, with a five-second statement timeout. A fixed creation cutoff excludes later imports from pagination. Filters and closing the preview cancel pending client reads; ordinary status polling never fetches preview geometry. There is no geometry cache or backfill to retain.
+
 Open **Review → Source updates** to check connected sources, inspect proposed map changes, and accept or reject a selection. The workflow is **check → review → publish**. Accepting source data changes the private source baseline; it does not publish the public map. Saved editor corrections continue to take precedence.
 
 ![Source inbox with readable rows, map comparison and retained editor corrections](assets/screenshots/source-updates-desktop-2026-10-11.png)

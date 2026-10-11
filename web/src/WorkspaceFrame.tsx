@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type CSSProperties,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Group, Panel, Separator, useGroupRef } from 'react-resizable-panels';
@@ -31,6 +32,10 @@ import {
 } from './editor-layout';
 import type { WorkspaceCapabilities } from './gis-types';
 import './workspace-frame.css';
+import {
+  WorkspaceSheetHandle,
+  clampWorkspaceSheet,
+} from './WorkspaceSheetHandle';
 
 export function useWorkspaceLayout(
   owner: string,
@@ -79,9 +84,11 @@ interface FrameContext {
   layout: LayoutController;
   hosts: Partial<Record<PaneId, HTMLElement | null>>;
   register: (id: PaneId, title: string) => () => void;
+  reveal: (id: PaneId | 'map') => void;
 }
 const Context = createContext<FrameContext | null>(null);
 export const useFrameLayout = () => useContext(Context)?.layout;
+export const useWorkspaceView = () => useContext(Context)?.reveal;
 export function WorkspacePane({
   id,
   title,
@@ -145,6 +152,31 @@ export function WorkspaceFrame({
   const columnsElement = useRef<HTMLDivElement>(null);
   const scope = `${workspace}:${compact ? 'compact' : 'desktop'}`;
   const sizes = layout.value.sizes[scope];
+  const [dragHeight, setDragHeight] = useState<{
+    scope: string;
+    value: number;
+  } | null>(null);
+  const sheetHeight = clampWorkspaceSheet(
+    dragHeight?.scope === scope ? dragHeight.value : sizes?.sheet || 42,
+  );
+  const commitSheet = (value: number) => {
+    layout.update((old) => ({
+      ...old,
+      sizes: { ...old.sizes, [scope]: { ...old.sizes[scope], sheet: value } },
+    }));
+    setDragHeight(null);
+  };
+  const reveal = (id: PaneId | 'map') => {
+    setMaximized(null);
+    setFocus(id === 'map');
+    if (id !== 'map') {
+      setActive(id);
+      layout.update((old) => ({
+        ...old,
+        collapsed: { ...old.collapsed, [`${scope}:${id}`]: false },
+      }));
+    }
+  };
   const workspaceRef = useRef(workspace);
   workspaceRef.current = workspace;
   const register = useCallback(
@@ -190,6 +222,7 @@ export function WorkspaceFrame({
   useEffect(() => {
     setFocus(false);
     setMaximized(null);
+    setDragHeight(null);
   }, [layout.resetRevision]);
   const initialized = useRef(false);
   const sizesRef = useRef(sizes);
@@ -277,6 +310,14 @@ export function WorkspaceFrame({
       data-open={show(id)}
       data-maximized={maximized === id && show(id)}
     >
+      {compact && id !== 'bottom' && !maximized && (
+        <WorkspaceSheetHandle
+          height={sheetHeight}
+          onResize={(value) => setDragHeight({ scope, value })}
+          onCommit={commitSheet}
+          onCancel={() => setDragHeight(null)}
+        />
+      )}
       <header className="workspace-pane-heading">
         <strong>{present[id] || paneLabels[id]}</strong>
         <div>
@@ -302,12 +343,13 @@ export function WorkspaceFrame({
     </section>
   );
   return (
-    <Context value={{ hosts, register, layout }}>
+    <Context value={{ hosts, register, layout, reveal }}>
       <div
         className="workspace-frame"
         data-compact={compact}
         data-focus={focus}
         data-maximized={maximizedVisible}
+        style={{ '--mobile-pane-height': `${sheetHeight}%` } as CSSProperties}
       >
         <div className="workspace-commandbar">
           <div className="workspace-context-tools">{tools}</div>

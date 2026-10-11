@@ -1,5 +1,9 @@
 # Editor layout contract
 
+## Adjustable phone editing panel
+
+Drag **Drag to resize** at the top of the bottom editing panel. The grip is also keyboard accessible: arrows adjust the height, Home reduces it and End expands it. Height is remembered per signed-in account, campus and workspace. **Reset layout** restores the initial size. Panels stay below the navigation controls; short landscape screens retain their side-panel layout. Resizing preserves the map instance, current field input, saved edits and undo history.
+
 The shell is presentation state. It does not own map edits, renderer state, selections, undo commands, photo jobs or recovery. No server API or database migration is required for this redesign.
 
 ## Modules and identity

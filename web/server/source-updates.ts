@@ -61,7 +61,7 @@ export async function sourceUpdatesAction(
       scheduledOsmEnabled: process.env.OVERPASS_SCHEDULE_ALLOWED === "true",
     };
   }
-  if (action === "source-updates-list") {
+  if (action === "source-updates-list" || action === "source-updates-map") {
     const cursor = p.cursor as { id?: unknown; createdAt?: unknown } | null | undefined;
     if (
       cursor &&
@@ -71,11 +71,22 @@ export async function sourceUpdatesAction(
         !Number.isFinite(Date.parse(cursor.createdAt)))
     )
       throw new HttpError(400, "Invalid review page.");
-    return db("rpc/source_review_list", "POST", {
-      actor,
-      filters: sourceFilters(p.filters || {}),
-      page_cursor: cursor || null,
-    });
+    if (
+      action === "source-updates-map" &&
+      p.asOf !== undefined &&
+      (typeof p.asOf !== "string" || !Number.isFinite(Date.parse(p.asOf)))
+    )
+      throw new HttpError(400, "Invalid map preview time.");
+    return db(
+      action === "source-updates-map" ? "rpc/source_review_map" : "rpc/source_review_list",
+      "POST",
+      {
+        actor,
+        filters: sourceFilters(p.filters || {}),
+        page_cursor: cursor || null,
+        ...(action === "source-updates-map" ? { as_of: p.asOf || null } : {}),
+      },
+    );
   }
   if (action === "source-updates-detail") {
     if (typeof p.id !== "string" || p.id.length > 1000)

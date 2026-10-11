@@ -32,6 +32,7 @@ const readable = new Set([
   'media-list',
   'source-updates-overview',
   'source-updates-list',
+  'source-updates-map',
   'source-updates-detail',
   'source-updates-history',
   'state',

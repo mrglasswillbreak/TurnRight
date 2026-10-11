@@ -8235,6 +8235,7 @@ for (const phone of [false, true]) {
       let operation: SourceOperation | undefined;
       let preparedIds: string[] = [],
         confirmed = 0;
+      let mapRequests = 0;
       await page.route("**/api/admin", (route) => {
         const { action, payload } = route.request().postDataJSON();
         if (action === "source-updates-overview")
@@ -8263,6 +8264,39 @@ for (const phone of [false, true]) {
               ],
             },
           });
+        if (action === "source-updates-map") {
+          mapRequests++;
+          const matching = rows.filter(
+            (r) =>
+              !payload.filters.query ||
+              r.meta.name.toLowerCase().includes(payload.filters.query.toLowerCase()),
+          );
+          const offset = payload.cursor
+            ? matching.findIndex((r) => r.id === payload.cursor.id) + 1
+            : 0;
+          const selected = matching.slice(offset, offset + 50);
+          return route.fulfill({
+            json: {
+              total: matching.length,
+              asOf: "2026-10-11T12:00:00Z",
+              rows: selected.map((r) => ({
+                id: r.id,
+                revision: r.revision,
+                name: r.meta.name,
+                kind: r.kind,
+                before: { geometry: before.geometry, simplified: false },
+                after: r.kind === "remove" ? null : { geometry: after.geometry, simplified: false },
+              })),
+              nextCursor:
+                offset + 50 < matching.length
+                  ? {
+                      id: selected.at(-1)!.id,
+                      createdAt: selected.at(-1)!.createdAt,
+                    }
+                  : null,
+            },
+          });
+        }
         if (action === "source-updates-list") {
           const matching = rows.filter(
             (r) =>
@@ -8369,6 +8403,39 @@ for (const phone of [false, true]) {
       });
       await openEditorSection(page, "Sources");
       await expect(page.getByText("101 pending", { exact: true })).toBeVisible();
+      expect(mapRequests).toBe(0);
+      await page
+        .getByRole("button", {
+          name: "Preview all matching changes on map",
+          exact: true,
+        })
+        .click();
+      const previewMap = page.getByRole("region", {
+        name: "Proposed changes map preview",
+      });
+      await expect(previewMap).toContainText("Preview ready · 101 updates");
+      expect(mapRequests).toBe(3);
+      expect(confirmed).toBe(0);
+      await attachMap(page);
+      const previewFeatures = () => page.evaluate(async () => {
+        const source = window.editorTestMap.getSource('source-proposals') as import('maplibre-gl').GeoJSONSource | undefined;
+        return source ? ((await source.getData()) as import('geojson').FeatureCollection).features.length : 0;
+      });
+      await expect.poll(previewFeatures).toBe(101);
+      await previewMap.getByRole("checkbox", { name: /Show previous shapes/ }).check();
+      await expect.poll(previewFeatures).toBe(201);
+      await previewMap.getByRole("button", { name: "Fit all changes", exact: true }).click();
+      await expect.poll(() => page.evaluate(() => window.editorTestMap.isMoving())).toBe(false);
+      await page.screenshot({
+        path: testInfo.outputPath("source-map-preview-" + (phone ? "mobile" : "desktop") + ".png"),
+      });
+      await previewMap.getByRole("button", { name: "Close map preview", exact: true }).click();
+      if (phone)
+        await page
+          .getByRole("navigation", { name: "Source review views" })
+          .getByRole("button", { name: "List", exact: true })
+          .click();
+      await expect(previewMap).toBeHidden();
       await page.getByRole("checkbox", { name: "Select Senate House", exact: true }).check();
       await page.getByRole("button", { name: "Next", exact: true }).click();
       await expect(
@@ -8423,7 +8490,9 @@ for (const phone of [false, true]) {
       await expect(
         page.getByRole("heading", { name: "Accept 101 updates?", exact: true }),
       ).toBeVisible();
-      const decisionDialog = page.getByRole("dialog", { name: "Confirm source decisions" });
+      const decisionDialog = page.getByRole("dialog", {
+        name: "Confirm source decisions",
+      });
       await expect(decisionDialog).toHaveCSS("background-color", "rgb(255, 255, 255)");
       await expect(page.locator(".source-bulk-bar")).toHaveCSS(
         "background-color",
@@ -8461,7 +8530,10 @@ for (const phone of [false, true]) {
           { exact: true },
         ),
       ).toBeVisible();
-      const viewResults = page.getByRole("button", { name: "View results", exact: true });
+      const viewResults = page.getByRole("button", {
+        name: "View results",
+        exact: true,
+      });
       if (!(await viewResults.isVisible()))
         await page.getByText("Recent decisions", { exact: true }).click();
       await page.getByRole("button", { name: "View results", exact: true }).click();
@@ -8471,6 +8543,43 @@ for (const phone of [false, true]) {
     },
   );
 }
+
+test("workspace panes: mobile editing height supports drag, keyboard, reset and reload", async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const server = await setup(page);
+  const handle = page.getByRole("slider", { name: "Resize editing panel", exact: true });
+  await expect(handle).toBeVisible();
+  const pane = page.locator('.workspace-pane[data-pane="left"]');
+  const original = (await pane.boundingBox())!.height;
+  const grip = (await handle.boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2 - 120, { steps: 10 });
+  await page.mouse.up();
+  expect((await pane.boundingBox())!.height).toBeGreaterThan(original + 90);
+  await handle.press("Home");
+  await expect(handle).toHaveAttribute("aria-valuenow", "20");
+  await handle.press("ArrowUp");
+  await expect(handle).toHaveAttribute("aria-valuenow", "25");
+  await handle.press("End");
+  await expect(handle).toHaveAttribute("aria-valuenow", "85");
+  expect((await pane.boundingBox())!.y).toBeGreaterThan(110);
+  await page.getByRole("searchbox", { name: "Search map features" }).fill("Library");
+  await page.locator(".editor-feature-list button").filter({ hasText: "Library" }).click();
+  await page.getByLabel("Name", { exact: true }).fill("Resized library");
+  await handle.press("ArrowDown");
+  await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Resized library");
+  await expect(page.locator(".editor-save-state")).toHaveText("Saved");
+  await page.screenshot({ path: testInfo.outputPath("editor-adjustable-panel-mobile.png") });
+  expect(server.edits()[0].properties.name).toBe("Resized library");
+  await page.reload();
+  await expect(handle).toHaveAttribute("aria-valuenow", "80");
+  await page.getByRole("button", { name: "Reset layout", exact: true }).click();
+  await expect(handle).toHaveAttribute("aria-valuenow", "42");
+  expect(server.edits()[0].properties.name).toBe("Resized library");
+});
 
 test("accepted source updates proceed to review without replacing the public baseline", async ({
   page,

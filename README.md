@@ -127,3 +127,5 @@ Start with [Contributing](CONTRIBUTING.md). Changes should preserve campus ident
 Software licensing terms have not been declared in a root licence file. Data, photographs, codecs, and other assets have their own terms: consult [data attribution](data/ATTRIBUTION.md), [photo records](data/photos/README.md), and in-app credits. OpenStreetMap-derived data retains ODbL attribution; authorization to publish a source does not automatically grant broader reuse rights. [Brand assets and usage](docs/BRAND.md).
 
 For connection recovery and the accepted-updates → review → preview workflow, see [editor availability](docs/EDITOR-AVAILABILITY.md). Full-map baseline replacement is retired; accepted sources already form the working baseline.
+
+In **Review → Source updates**, choose **Preview all matching changes on map** to inspect the entire filtered inbox across pages. The read-only overlay distinguishes additions, changes and removals, with optional previous shapes. On phones, drag the editing panel's top handle to adjust its height; keyboard controls and remembered sizes are included. [Source updates](docs/SOURCE-UPDATES.md) · [Editor layout](docs/EDITOR-LAYOUT.md).
