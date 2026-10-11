@@ -145,6 +145,12 @@ it('requires removal acknowledgement, enforces one active job, and resumes only 
 });
 
 it('expires temporary selection data while retaining operation receipts and audit records', async () => {
+  const receiptId = randomUUID();
+  await db.query(
+    `insert into source_review_operations(id,campus_id,actor,request,status,total,applied,updated_at)
+     values($1,'lasu',$2,'{"mode":"ids","items":[{"id":"old-proposal","revision":1}]}','completed',1,1,now()-interval '31 days')`,
+    [receiptId, owner],
+  );
   const id = randomUUID();
   await prepare(id);
   await db.query(
@@ -153,6 +159,14 @@ it('expires temporary selection data while retaining operation receipts and audi
   );
   await expect(start(id, false)).rejects.toThrow('expired');
   await rpc('cleanup_source_reviews()');
+  expect(
+    (
+      await db.query(
+        'select request,total,applied from source_review_operations where id=$1',
+        [receiptId],
+      )
+    ).rows,
+  ).toEqual([{ request: {}, total: 1, applied: 1 }]);
   expect(
     (
       await db.query('select id from source_review_operations where id=$1', [
