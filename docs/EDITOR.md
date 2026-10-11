@@ -12,11 +12,11 @@ The last workspace, pane sizes and collapsed panes are remembered for this accou
 
 The campus menu contains **Campuses** and import management; **Data → Imports** also opens imports. Settings holds appearance, layout reset and authorized membership management. The Workspace menu groups backup, local recovery, refresh and sign-out. Save status remains in the header.
 
-![Desktop editor with a feature explorer, selected building and properties](assets/screenshots/redesign-editor-desktop-2026-10-07.png)
+![Desktop editor with a feature explorer, selected building and properties](assets/screenshots/b2-editor-desktop-2026-10-11.png)
 
 *The published LASU campus package is shown with an isolated owner account; this is a local application capture.*
 
-![Phone editor with a selected building and focused properties sheet](assets/screenshots/redesign-editor-mobile-2026-10-07.png)
+![Phone editor with a selected building and focused properties sheet](assets/screenshots/b2-editor-mobile-2026-10-11.png)
 
 Survey mode temporarily hides auxiliary panes while retaining their preferences. Close the survey to restore them and switch workspaces; recording and recovery continue in the survey workspace.
 
@@ -26,11 +26,11 @@ Close **Map legend** with its labelled close button to remove the New / Modified
 
 On phones, the legend temporarily hides while placing geometry to give drawing instructions and Finish/Cancel controls enough room. Your visibility preference returns when drawing ends.
 
-![Editor with the legend collapsed to its reopening control](assets/screenshots/redesign-legend-collapsed-2026-10-07.png)
+![Editor with the legend collapsed to its reopening control](assets/screenshots/b2-legend-collapsed-2026-10-11.png)
 
 The compact **Activity** icon opens upload and process history. It starts collapsed: saved private drafts and successful recovery do not add persistent text or zero counts. A badge counts active processes once, including photo jobs; an attention mark identifies failures or recovery/status errors. Screen readers receive meaningful status changes even while the control is collapsed.
 
-![Expanded activity panel showing private photo status and process history](assets/screenshots/redesign-activity-expanded-2026-10-07.png)
+![Expanded activity panel showing private photo status and process history](assets/screenshots/b2-activity-expanded-2026-10-11.png)
 
 Open Activity to inspect upload status, private drafts, recovery, process stages and available retry/cancel actions. Pause/Resume appears only while photo work is queued or running; the control is unavailable when another browser tab owns uploads. Closing the popover never stops uploads, recovery or server polling. Escape closes it and returns focus to the icon; clicking outside also closes it. Blocking recovery warnings still require resolution.
 
@@ -42,7 +42,7 @@ Use **Data → Edit → Analyze → Review → Publish** for the complete campus
 
 **Analyze** runs the processing catalogue against immutable input revisions. Inspect diagnostics and staged output before applying a private result layer. **Review** combines map-linked quality issues with assignments, comments and evidence; submit an immutable snapshot after validation. A non-contributor approves its exact hash. New data/schema/style/view changes require renewed approval. **Publish** creates and promotes only approved previews; restoration submits historical content for new review without replacing current drafts.
 
-![Typed dataset workspace](assets/screenshots/redesign-gis-data-2026-10-07.png)
+![Typed dataset workspace](assets/screenshots/b2-gis-data-2026-10-11.png)
 
 The geometry, sources, models, surveys and recovery tools below remain part of that workflow. Model/evidence review does not replace independent publication approval. Older dated receipts and screenshot labels describe their original version.
 
@@ -52,7 +52,7 @@ The editor includes a persistent **Layers / Features** explorer, road-surface ed
 
 **Campus menu → Campuses** opens the authorized campus directory and import workspace. Create a boundary, upload supported vector files or connect public OSM/ArcGIS sources, map fields and projections, then inspect a candidate before queuing it for source review. Each campus retains separate drafts, models, reports, survey sessions, source history and releases. Switching protects unfinished edits and pending saves. Public Editor links preserve the campus and selected building through sign-in.
 
-![Campus source and field mapping](assets/screenshots/redesign-imports-2026-10-07.png)
+![Campus source and field mapping](assets/screenshots/b2-imports-2026-10-11.png)
 
 See [Campuses and map imports](CAMPUS-IMPORTS.md) for the full workflow. Review and publication remain separate; a historical campus is restored through a new preview that preserves every other campus.
 

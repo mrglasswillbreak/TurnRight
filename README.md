@@ -13,13 +13,15 @@ TurnRight brings campus mapping, building authoring, and public navigation into 
 
 ## See TurnRight in action
 
+The current gallery shows the B2 campus identity: a blue right-turn arrow and graduation cap. See the [brand guide](docs/BRAND.md) and [dated screenshot records](docs/SCREENSHOTS.md#b2-campus-identity--11-october-2026).
+
 ### Explore a campus
 
 Search destinations, inspect 3D buildings and photographs, choose between walking or driving routes, and get GPS-enabled turn-by-turn directions. LASU Ojo and UNILAG Akoka have independent published packages and offline downloads.
 
 | Desktop map | Phone view |
 | --- | --- |
-| ![Desktop campus map with search and navigation](docs/assets/screenshots/redesign-public-desktop-2026-10-07.png) | <img src="docs/assets/screenshots/redesign-public-mobile-2026-10-07.png" width="260" alt="Campus place details in a phone browser viewport"> |
+| ![Desktop campus map with search and navigation](docs/assets/screenshots/b2-public-desktop-2026-10-11.png) | <img src="docs/assets/screenshots/b2-public-mobile-2026-10-11.png" width="260" alt="Campus place details in a phone browser viewport"> |
 
 ### Map and maintain
 
@@ -29,7 +31,7 @@ On phones, drag the editing panel's top handle to adjust its height. Keyboard re
 
 | Map editing | Structured data |
 | --- | --- |
-| ![Map editor with contextual navigation and docked panes](docs/assets/screenshots/redesign-editor-desktop-2026-10-07.png) | ![Data workspace with dataset catalogue, map and attribute table](docs/assets/screenshots/redesign-gis-data-2026-10-07.png) |
+| ![Map editor with contextual navigation and docked panes](docs/assets/screenshots/b2-editor-desktop-2026-10-11.png) | ![Data workspace with dataset catalogue, map and attribute table](docs/assets/screenshots/b2-gis-data-2026-10-11.png) |
 
 ### Model buildings and prepare photographs
 
@@ -37,7 +39,7 @@ Work with footprints, roofs, façades, surface text, curves, and meshes. Compare
 
 | Building authoring | Photo comparison |
 | --- | --- |
-| ![Building model beside its photographic reference](docs/assets/screenshots/redesign-model-desktop-2026-10-07.png) | ![Local image comparison with file and compression controls](docs/assets/screenshots/redesign-photo-desktop-2026-10-07.png) |
+| ![Building model beside its photographic reference](docs/assets/screenshots/b2-model-desktop-2026-10-11.png) | ![Local image comparison with file and compression controls](docs/assets/screenshots/b2-photo-desktop-2026-10-11.png) |
 
 ### Review and publish deliberately
 
@@ -64,7 +66,7 @@ Accepted sources already form the working baseline. For connection recovery and 
 
 | Independent review | Publication |
 | --- | --- |
-| ![Quality checks and immutable review submissions](docs/assets/screenshots/redesign-gis-review-2026-10-07.png) | ![Approved snapshots, releases and map export controls](docs/assets/screenshots/redesign-gis-publish-2026-10-07.png) |
+| ![Quality checks and immutable review submissions](docs/assets/screenshots/b2-gis-review-2026-10-11.png) | ![Approved snapshots, releases and map export controls](docs/assets/screenshots/b2-gis-publish-2026-10-11.png) |
 
 [More layouts and workflows](docs/SCREENSHOTS.md) · [Capture provenance](docs/assets/screenshots/README.md)
 

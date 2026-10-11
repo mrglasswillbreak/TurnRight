@@ -591,7 +591,7 @@ test('campus imports responsive screens and documentation captures', async ({
       name === 'mapping'
     )
       await page.screenshot({
-        path: '../docs/assets/screenshots/redesign-imports-2026-10-07.png',
+        path: `../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || 'redesign'}-imports-${process.env.TURNRIGHT_SCREENSHOT_DATE || '2026-10-07'}.png`,
       });
     if (process.env.UPDATE_CAMPUS_SCREENSHOTS === 'true')
       await page.screenshot({

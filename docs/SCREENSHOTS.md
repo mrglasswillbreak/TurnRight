@@ -1,6 +1,20 @@
 # Application tour and screenshot maintenance
 
-The October 2026 gallery includes source-update inboxes, map-wide previews and an adjustable phone editor, alongside earlier application views. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/redesign-2026-10-07.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+The current gallery shows the B2 campus identity across public navigation, team workspaces and supporting tools, alongside dated source-update and map-preview examples. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/b2-2026-10-11.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+
+## B2 campus identity · 11 October 2026
+
+Nineteen fresh Chromium captures update the README and linked workflow guides. The shared arrow-and-graduation-cap mark appears in public navigation, editor headers, the offline panel and sign-in. Public/editor/model/GIS views use the verified LASU `lasu-4895a363b403` package with isolated owner/team responses; sign-in is captured without an account. Photo and import fixtures are described below. These captures show the local application, with deployment status recorded separately in [Production](PRODUCTION.md).
+
+| Desktop navigation | Phone navigation |
+| --- | --- |
+| ![B2 identity in the desktop campus map](assets/screenshots/b2-public-desktop-2026-10-11.png) | <img src="assets/screenshots/b2-public-mobile-2026-10-11.png" width="260" alt="B2 identity and place details on a phone"> |
+
+| Editor entry | Offline controls |
+| --- | --- |
+| ![B2 icon above the signed-out campus editor](assets/screenshots/b2-signin-2026-10-11.png) | <img src="assets/screenshots/b2-offline-2026-10-11.png" width="260" alt="B2 icon in the offline maps panel"> |
+
+[Brand geometry, colours and platform icons](BRAND.md) · [Image and source hashes](assets/screenshots/b2-2026-10-11.json). Older source-update captures below retain their original dates and branding.
 
 ## Map previews and adjustable phone panels · 11 October 2026
 
@@ -40,24 +54,24 @@ These unaltered captures use the Vite development server at commit `1feb53f77c95
 
 | View | What it demonstrates | Capture |
 | --- | --- | --- |
-| Public desktop | Place search, building details and public navigation | [1440 × 1000, light](assets/screenshots/redesign-public-desktop-2026-10-07.png) |
-| Public mobile | A selected place in a phone viewport | [390 × 844, light](assets/screenshots/redesign-public-mobile-2026-10-07.png) |
-| Edit | Feature explorer, map and contextual properties | [1440 × 1000, light](assets/screenshots/redesign-editor-desktop-2026-10-07.png) |
-| Data | Datasets, map, attributes and schema/export controls | [1440 × 1000, light](assets/screenshots/redesign-gis-data-2026-10-07.png) |
-| Model reference split | Structure, model, photograph and inspector | [1440 × 1000, light](assets/screenshots/redesign-model-desktop-2026-10-07.png) |
-| Photo comparison | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/redesign-photo-desktop-2026-10-07.png) |
-| Review | Quality checks and independent immutable submissions | [1440 × 1000, light](assets/screenshots/redesign-gis-review-2026-10-07.png) |
-| Publish | Approved content, releases and map exports | [1440 × 1000, light](assets/screenshots/redesign-gis-publish-2026-10-07.png) |
-| Globe | Campus context at world scale | [1440 × 900, dark](assets/screenshots/redesign-globe-2026-10-07.png) |
-| Mobile editor | Workspace chooser and one active sheet | [390 × 844, light](assets/screenshots/redesign-editor-mobile-2026-10-07.png) |
-| Analyze | Tools, parameters and processing history | [1440 × 1000, light](assets/screenshots/redesign-gis-analyze-2026-10-07.png) |
-| Imports | Inspected fields in an isolated campus import | [1440 × 900, light](assets/screenshots/redesign-imports-2026-10-07.png) |
-| Model portrait | Selected wall in the full-screen model workspace | [390 × 844, light](assets/screenshots/redesign-model-portrait-2026-10-07.png) |
-| Model landscape | Selected wall in a short landscape viewport | [844 × 390, light](assets/screenshots/redesign-model-landscape-2026-10-07.png) |
-| Mobile photos | Full-screen photograph comparison | [390 × 844, light](assets/screenshots/redesign-photo-mobile-2026-10-07.png) |
-| Offline use | Package preparation and download controls | [390 × 844, light](assets/screenshots/redesign-offline-2026-10-07.png) |
+| Public desktop | Place search, building details and public navigation | [1440 × 1000, light](assets/screenshots/b2-public-desktop-2026-10-11.png) |
+| Public mobile | A selected place in a phone viewport | [390 × 844, light](assets/screenshots/b2-public-mobile-2026-10-11.png) |
+| Edit | Feature explorer, map and contextual properties | [1440 × 1000, light](assets/screenshots/b2-editor-desktop-2026-10-11.png) |
+| Data | Datasets, map, attributes and schema/export controls | [1440 × 1000, light](assets/screenshots/b2-gis-data-2026-10-11.png) |
+| Model reference split | Structure, model, photograph and inspector | [1440 × 1000, light](assets/screenshots/b2-model-desktop-2026-10-11.png) |
+| Photo comparison | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/b2-photo-desktop-2026-10-11.png) |
+| Review | Quality checks and independent immutable submissions | [1440 × 1000, light](assets/screenshots/b2-gis-review-2026-10-11.png) |
+| Publish | Approved content, releases and map exports | [1440 × 1000, light](assets/screenshots/b2-gis-publish-2026-10-11.png) |
+| Globe | Campus context at world scale | [1440 × 900, dark](assets/screenshots/b2-globe-2026-10-11.png) |
+| Mobile editor | Workspace chooser and one active sheet | [390 × 844, light](assets/screenshots/b2-editor-mobile-2026-10-11.png) |
+| Analyze | Tools, parameters and processing history | [1440 × 1000, light](assets/screenshots/b2-gis-analyze-2026-10-11.png) |
+| Imports | Inspected fields in an isolated campus import | [1440 × 900, light](assets/screenshots/b2-imports-2026-10-11.png) |
+| Model portrait | Selected wall in the full-screen model workspace | [390 × 844, light](assets/screenshots/b2-model-portrait-2026-10-11.png) |
+| Model landscape | Selected wall in a short landscape viewport | [844 × 390, light](assets/screenshots/b2-model-landscape-2026-10-11.png) |
+| Mobile photos | Full-screen photograph comparison | [390 × 844, light](assets/screenshots/b2-photo-mobile-2026-10-11.png) |
+| Offline use | Package preparation and download controls | [390 × 844, light](assets/screenshots/b2-offline-2026-10-11.png) |
 
-The [editor guide](EDITOR.md#legend-and-activity) also illustrates [collapsed legend](assets/screenshots/redesign-legend-collapsed-2026-10-07.png) and [expanded Activity](assets/screenshots/redesign-activity-expanded-2026-10-07.png) states. The normal editor view shows the collapsed Activity icon.
+The [editor guide](EDITOR.md#legend-and-activity) also illustrates [collapsed legend](assets/screenshots/b2-legend-collapsed-2026-10-11.png) and [expanded Activity](assets/screenshots/b2-activity-expanded-2026-10-11.png) states. The normal editor view shows the collapsed Activity icon. The [sign-in screen](assets/screenshots/b2-signin-2026-10-11.png) verifies B2 before authentication.
 
 ## Provenance
 
@@ -72,15 +86,19 @@ Phone views are browser viewports, not photographs of physical devices. The offl
 Use the pinned Node version, `npm ci` in `web/`, and installed Playwright Chromium/WebKit binaries. Public/model fixtures require the verified published assets under `web/work/model-benchmark/public`; preserve the package manifest and asset hashes when preparing that fixture. See the [existing fixture preparation record](assets/screenshots/README.md). Run these commands sequentially from `web/` (PowerShell):
 
 ```powershell
+$env:TURNRIGHT_SCREENSHOT_PREFIX = 'b2'
+$env:TURNRIGHT_SCREENSHOT_DATE = '2026-10-11'
 node node_modules/@playwright/test/cli.js test --config playwright.redesign-docs.config.ts --output work/capture-public-editor
 $env:TURNRIGHT_GIS_SCREENSHOTS = '1'
 node node_modules/@playwright/test/cli.js test --config playwright.gis-docs.config.ts --output work/capture-gis
 Remove-Item Env:TURNRIGHT_GIS_SCREENSHOTS
 $env:TURNRIGHT_REDESIGN_SCREENSHOTS = '1'
 node node_modules/@playwright/test/cli.js test tests/browser/campus-imports.spec.ts --grep 'responsive screens' --output work/capture-imports
-node node_modules/@playwright/test/cli.js test tests/browser/photo-processing.spec.ts --grep 'photo comparison edits' --output work/capture-photos
+node node_modules/@playwright/test/cli.js test tests/browser/photo-processing.spec.ts --grep 'photo comparison edits' --timeout=120000 --output work/capture-photos
 Remove-Item Env:TURNRIGHT_REDESIGN_SCREENSHOTS
 node scripts/record-screenshots.mjs
+Remove-Item Env:TURNRIGHT_SCREENSHOT_PREFIX
+Remove-Item Env:TURNRIGHT_SCREENSHOT_DATE
 node scripts/check-docs.mjs
 ```
 

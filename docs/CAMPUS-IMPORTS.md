@@ -8,7 +8,7 @@ For a one-off check while a source's schedule is paused, run **Check opted-in ca
 
 Use **Campus menu → Campuses**, or **Data → Imports**. Campus management is separate from the five primary workspaces. It opens a focused directory and import form, with a persistent heading and responsive scrolling. Close it to return to the map.
 
-![Isolated campus import fixture with inspected fields](assets/screenshots/redesign-imports-2026-10-07.png)
+![Isolated campus import fixture with inspected fields](assets/screenshots/b2-imports-2026-10-11.png)
 
 ## Import into the team GIS workflow
 

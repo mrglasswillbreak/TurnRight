@@ -6,7 +6,8 @@ import sharp from 'sharp';
 import { chromium } from '@playwright/test';
 
 const root = resolve(import.meta.dirname, '../..');
-const date = '2026-10-07';
+const date = process.env.TURNRIGHT_SCREENSHOT_DATE || '2026-10-07';
+const prefix = process.env.TURNRIGHT_SCREENSHOT_PREFIX || 'redesign';
 const names = [
   'public-desktop',
   'public-mobile',
@@ -26,6 +27,7 @@ const names = [
   'offline',
   'legend-collapsed',
   'activity-expanded',
+  ...(process.env.TURNRIGHT_SCREENSHOT_PREFIX ? ['signin'] : []),
 ];
 const source = execFileSync(
   'git',
@@ -58,7 +60,7 @@ const version = browser.version();
 await browser.close();
 const captures = [];
 for (const name of names) {
-  const file = `redesign-${name}-${date}.png`;
+  const file = `${prefix}-${name}-${date}.png`;
   const data = await readFile(resolve(root, 'docs/assets/screenshots', file));
   const { width, height } = await sharp(data).metadata();
   captures.push({
@@ -67,13 +69,16 @@ for (const name of names) {
     height,
     theme: name === 'globe' ? 'dark' : 'light',
     sha256: createHash('sha256').update(data).digest('hex'),
-    fixture: name.startsWith('photo-')
-      ? 'photo-harness: commons:112540966 (Abiolakintrunde, CC BY-SA 4.0)'
-      : name === 'imports'
-        ? 'campus-imports.spec.ts: synthetic campus and inspected layers'
-        : name.startsWith('gis-')
-          ? 'gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses'
-          : 'editor.spec.ts: lasu-4895a363b403 + isolated owner responses',
+    fixture:
+      name === 'signin'
+        ? 'signed-out configured application; no account fixture'
+        : name.startsWith('photo-')
+          ? 'photo-harness: commons:112540966 (Abiolakintrunde, CC BY-SA 4.0)'
+          : name === 'imports'
+            ? 'campus-imports.spec.ts: synthetic campus and inspected layers'
+            : name.startsWith('gis-')
+              ? 'gis-workflow.spec.ts: lasu-4895a363b403 + isolated team responses'
+              : 'editor.spec.ts: lasu-4895a363b403 + isolated owner responses',
     build:
       name.startsWith('photo-') || name === 'imports'
         ? 'Vite development harness'
@@ -81,7 +86,7 @@ for (const name of names) {
   });
 }
 await writeFile(
-  resolve(root, `docs/assets/screenshots/redesign-${date}.json`),
+  resolve(root, `docs/assets/screenshots/${prefix}-${date}.json`),
   JSON.stringify(
     {
       capturedDate: date,
@@ -91,7 +96,8 @@ await writeFile(
         encoding: 'utf8',
       }).trim(),
       sourceTreeSha256: digest.digest('hex'),
-      revision: 'Capture source is identified by baseCommit and sourceTreeSha256; not a deployment receipt',
+      revision:
+        'Capture source is identified by baseCommit and sourceTreeSha256; not a deployment receipt',
       browser: `Chromium ${version}`,
       deviceScaleFactor: 1,
       unalteredBrowserCaptures: true,
