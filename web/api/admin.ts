@@ -26,27 +26,19 @@ import { catalogueErrors } from '../src/campus-layers.js';
 import type { CampusLayer } from '../src/campus-layer-types.js';
 import { surveyAction } from '../server/surveys.js';
 import { mediaAction, validateMediaEdits } from '../server/building-media.js';
-import {
-  publishedCampus,
-  publishedRecords,
-  snapshotHash,
-} from '../server/release-validation.js';
-import { validateWorkspace } from '../src/editor-validation.js';
+import { publishedCampus } from '../server/release-validation.js';
 import { publishedWorkspace } from '../server/published-workspace.js';
 import { modelAssetAction, hydrateModelEdits } from '../server/model-assets.js';
-import {
-  sourceReviewQuery,
-  SOURCE_REVIEW_PAGE_SIZE,
-} from '../server/source-review-query.js';
+import { sourceReviewQuery, SOURCE_REVIEW_PAGE_SIZE } from '../server/source-review-query.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
+  const requestId = randomUUID();
+  res.setHeader('X-Request-Id', requestId);
+  let requestAction: string | undefined;
   try {
     const user = await requireIdentity(req);
-    const {
-      action,
-      payload = {},
-      campus: reference = 'lasu',
-    } = bodyOf(req, 3_000_000);
+    const { action, payload = {}, campus: reference = 'lasu' } = bodyOf(req, 3_000_000);
+    requestAction = typeof action === 'string' ? action : undefined;
     if (action === 'campus-list') {
       res.status(200).json(await campusAction(action, payload, user.id));
       return;
@@ -55,9 +47,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     await withCampusId(campus.id, async () => {
       const capabilities = await workspaceAccess(user.id, action);
       if (typeof action === 'string' && action.startsWith('source-updates-')) {
-        res
-          .status(200)
-          .json(await sourceUpdatesAction(user.id, action, payload));
+        res.status(200).json(await sourceUpdatesAction(user.id, action, payload));
         return;
       }
       if (action === 'workspace-capabilities') {
@@ -86,9 +76,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         case 'model-asset-begin':
         case 'model-asset-confirm':
         case 'model-asset-read':
-          res
-            .status(200)
-            .json(await modelAssetAction(user.id, action, payload));
+          res.status(200).json(await modelAssetAction(user.id, action, payload));
           break;
         case 'media-begin':
         case 'media-list':
@@ -108,19 +96,18 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           res.status(200).json(await surveyAction(user.id, action, payload));
           break;
         case 'state': {
-          const [edits, changes, reports, jobs, releases, published] =
-            await Promise.all([
-              allRows('map_edits', '&gis_managed=eq.false'),
-              payload.sourceReviewVersion === 2
-                ? Promise.resolve([])
-                : db<unknown[]>(sourceReviewQuery()),
-              db('reports?status=eq.pending&order=created_at.desc&limit=200'),
-              db('jobs?order=created_at.desc&limit=20'),
-              db(
-                'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
-              ),
-              publishedWorkspace(),
-            ]);
+          const [edits, changes, reports, jobs, releases, published] = await Promise.all([
+            allRows('map_edits', '&gis_managed=eq.false'),
+            payload.sourceReviewVersion === 2
+              ? Promise.resolve([])
+              : db<unknown[]>(sourceReviewQuery()),
+            db('reports?status=eq.pending&order=created_at.desc&limit=200'),
+            db('jobs?order=created_at.desc&limit=20'),
+            db(
+              'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
+            ),
+            publishedWorkspace(),
+          ]);
           const selected = await editorSelection(user.id, payload.gisKeys);
           res.status(200).json({
             campus,
@@ -130,9 +117,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               ...edits,
               ...selected.edits.filter(
                 (e: MapEdit) =>
-                  !edits.some(
-                    (old: MapEdit) => old.kind === e.kind && old.id === e.id,
-                  ),
+                  !edits.some((old: MapEdit) => old.kind === e.kind && old.id === e.id),
               ),
             ],
             changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
@@ -160,10 +145,8 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             db(
               'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
             ),
-            payload.omitChanges === true
-              ? Promise.resolve([])
-              : db<unknown[]>(changesQuery),
-            publishedWorkspace(),
+            payload.omitChanges === true ? Promise.resolve([]) : db<unknown[]>(changesQuery),
+            payload.omitPublished === true ? Promise.resolve(undefined) : publishedWorkspace(),
           ]);
           res.status(200).json({
             jobs,
@@ -176,10 +159,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         }
         case 'sources': {
           const selected = await editorSelection(user.id, payload.gisKeys);
-          const features = await allRows(
-            'source_features',
-            '&gis_managed=eq.false',
-          );
+          const features = await allRows('source_features', '&gis_managed=eq.false');
           res.status(200).json({
             features: [
               ...features,
@@ -191,57 +171,11 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'review-baseline':
-        case 'reconcile-baseline': {
-          const [published, features, edits] = await Promise.all([
-            publishedCampus(),
-            allRows('source_features'),
-            allRows('map_edits'),
-          ]);
-          const expectedHash = snapshotHash(features);
-          const validation = validateWorkspace(published, edits);
-          if (action === 'review-baseline') {
-            res.status(200).json({
-              version: published.version,
-              expectedHash,
-              before: {
-                places: features.filter((f) => f.entity === 'place').length,
-                edges: features.filter((f) => f.entity === 'edge').length,
-              },
-              after: {
-                places: published.places.length,
-                edges: published.graph.edges.length,
-              },
-              drafts: edits.length,
-              issues: validation.issues,
-              accessReviews:
-                published.accessPolicy?.connectionReviews?.map((r) => ({
-                  id: r.id,
-                  name: r.name,
-                })) || [],
-            });
-          } else {
-            if (
-              payload.version !== published.version ||
-              payload.expectedHash !== expectedHash
-            )
-              throw new HttpError(
-                409,
-                'The published package or source baseline changed. Review again.',
-              );
-            const receipt = await db(
-              'rpc/reconcile_published_baseline',
-              'POST',
-              {
-                actor: user.id,
-                published_version: published.version,
-                expected_sources: features,
-                records: publishedRecords(published),
-              },
-            );
-            res.status(200).json({ receipt, version: published.version });
-          }
-          break;
-        }
+        case 'reconcile-baseline':
+          throw new HttpError(
+            409,
+            'Accepted source updates already form the working baseline. Submit the workspace in Review, obtain approval, then build a preview in Publish. Full-map baseline replacement has been retired; to restore an older release, use the reviewed restoration workflow.',
+          );
         case 'save-edit':
         case 'save-edits': {
           const items =
@@ -253,13 +187,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
                   },
                 ]
               : payload.edits;
-          const operationId =
-            action === 'save-edit' ? randomUUID() : payload.operationId;
+          const operationId = action === 'save-edit' ? randomUUID() : payload.operationId;
           if (
             typeof operationId !== 'string' ||
-            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-              operationId,
-            ) ||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(operationId) ||
             !Array.isArray(items) ||
             !items.length ||
             items.length > 500
@@ -277,8 +208,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               throw new HttpError(400, 'Invalid draft revision.');
             const { id, kind, geometry, properties, deleted } = item.edit;
             const key = `${kind}:${id}`;
-            if (keys.has(key))
-              throw new HttpError(400, 'Duplicate edit in batch.');
+            if (keys.has(key)) throw new HttpError(400, 'Duplicate edit in batch.');
             keys.add(key);
             return {
               edit: { id, kind, geometry, properties, deleted: !!deleted },
@@ -291,30 +221,19 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               400,
               'Upload the editable model as a verified private asset before saving.',
             );
-          const currentModels = (await editorSelection(user.id, [...keys]))
-            .edits as MapEdit[];
+          const currentModels = (await editorSelection(user.id, [...keys])).edits as MapEdit[];
           if (clean.some((i) => i.edit.kind === 'layer')) {
             if (payload.layerManagementVersion !== 1)
-              throw new HttpError(
-                409,
-                'Update the editor before saving layers.',
-              );
+              throw new HttpError(409, 'Update the editor before saving layers.');
             const layers = new Map(
               ((await allRows('map_edits', '&kind=eq.layer')) as MapEdit[])
                 .filter((e) => e.kind === 'layer' && !e.deleted)
-                .map((e) => [
-                  e.id,
-                  e.properties.layerDefinition as CampusLayer,
-                ]),
+                .map((e) => [e.id, e.properties.layerDefinition as CampusLayer]),
             );
             for (const item of clean)
               if (item.edit.kind === 'layer') {
                 if (item.edit.deleted) layers.delete(item.edit.id);
-                else
-                  layers.set(
-                    item.edit.id,
-                    item.edit.properties.layerDefinition as CampusLayer,
-                  );
+                else layers.set(item.edit.id, item.edit.properties.layerDefinition as CampusLayer);
               }
             const errors = catalogueErrors([...layers.values()]);
             if (errors.length) throw new HttpError(400, errors.join(' '));
@@ -383,10 +302,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'review-change': {
-          if (
-            typeof payload.id !== 'string' ||
-            typeof payload.accept !== 'boolean'
-          )
+          if (typeof payload.id !== 'string' || typeof payload.accept !== 'boolean')
             throw new HttpError(400, 'Invalid review decision');
           if (payload.fields !== undefined) {
             if (
@@ -398,8 +314,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             const [change] = await db<MapChange[]>(
               `map_changes?id=eq.${encodeURIComponent(payload.id)}&status=eq.pending`,
             );
-            if (!change)
-              throw new HttpError(409, 'Change is no longer pending');
+            if (!change) throw new HttpError(409, 'Change is no longer pending');
             let next;
             try {
               next = selectSourceFields(change, payload.fields);
@@ -412,12 +327,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
                 : v && typeof v === 'object'
                   ? Object.fromEntries(
                       Object.entries(v)
-                        .filter(
-                          ([key]) =>
-                            !['createdAt', 'retrievedAt', 'checkedAt'].includes(
-                              key,
-                            ),
-                        )
+                        .filter(([key]) => !['createdAt', 'retrievedAt', 'checkedAt'].includes(key))
                         .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
                         .map(([k, value]) => [k, stable(value)]),
                     )
@@ -445,10 +355,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           break;
         }
         case 'resolve-report': {
-          if (
-            !['resolved', 'dismissed'].includes(payload.status) ||
-            typeof payload.id !== 'string'
-          )
+          if (!['resolved', 'dismissed'].includes(payload.status) || typeof payload.id !== 'string')
             throw new HttpError(400, 'Invalid report action');
           await db(`reports?id=eq.${encodeURIComponent(payload.id)}`, 'PATCH', {
             status: payload.status,
@@ -473,9 +380,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
               })) as { job: { id: string } };
               await mapImportAction('import-run', {
                 importId: result.job.id,
-                phase: source.configuration.layers.length
-                  ? 'preview'
-                  : 'inspect',
+                phase: source.configuration.layers.length ? 'preview' : 'inspect',
               });
             }
             res.status(202).json({ started: online.length });
@@ -484,10 +389,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           const recent = await db(
             'jobs?kind=eq.import&status=in.(queued,running)&order=created_at.desc&limit=1',
           );
-          if (
-            recent[0] &&
-            Date.now() - Date.parse(recent[0].created_at) < 15 * 60000
-          )
+          if (recent[0] && Date.now() - Date.parse(recent[0].created_at) < 15 * 60000)
             throw new HttpError(409, 'An import is already running.');
           const [job] = await db('jobs', 'POST', {
             kind: 'import',
@@ -508,9 +410,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         case 'prepare-release':
         case 'publish-release':
         case 'rollback':
-          res
-            .status(202)
-            .json(await publicationAction(user.id, action, payload));
+          res.status(202).json(await publicationAction(user.id, action, payload));
           break;
         case 'export':
           res.status(200).json({
@@ -524,7 +424,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       }
     });
   } catch (error) {
-    fail(res, error);
+    fail(res, error, { requestId, action: requestAction });
   }
 }
 
