@@ -1,5 +1,11 @@
 # Application screenshots
 
+## B2 campus identity · 11 October 2026
+
+The nineteen `b2-*-2026-10-11.png` files are unaltered local Chromium captures of the B2 app revision. They replace the October 7 images in the current README and workflow guides; earlier files and records remain historical evidence. [Gallery, fixture scope and reproduction](../../SCREENSHOTS.md#b2-campus-identity--11-october-2026) · [Source and image hashes](b2-2026-10-11.json).
+
+Public/editor/model/GIS views use the verified LASU `lasu-4895a363b403` package and isolated account/API fixtures. Sign-in has no account fixture. Imports and photo processing use the documented local demonstration harnesses. The dark globe capture checks the mark on dark surfaces; phone dimensions simulate a browser viewport. Each image was visually inspected. No production edits, source decisions or map publications were made to create these screenshots.
+
 ## Map-wide preview and phone resizing · 11 October 2026
 
 `source-map-preview-desktop-2026-10-11.png`, `source-map-preview-mobile-2026-10-11.png` and `editor-adjustable-panel-mobile-2026-10-11.png` are unaltered Chromium 153.0.8010.12 captures from successful local browser journeys. The map previews use 101 synthetic proposals distributed over the checked-in LASU `lasu-4e4c8008b38b` seed; the resizable panel uses the small `browserCampus` fixture. Account/API data and edits are isolated. No production proposal or public package changed. All three images were individually inspected. [Capture record](source-map-preview-2026-10-11.json) · [Gallery and reproduction](../../SCREENSHOTS.md#map-previews-and-adjustable-phone-panels--11-october-2026).
@@ -12,9 +18,9 @@ The actual React/MapLibre interface runs through Vite with isolated owner/API re
 
 ## Workspace redesign · 7 October 2026
 
-The current README and workflow guides use the eighteen `redesign-*-2026-10-07.png` captures: sixteen product layouts and two compact-control states. See the [visual tour, provenance and reproduction instructions](../../SCREENSHOTS.md) and [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below. Earlier screenshots remain historical records.
+The eighteen `redesign-*-2026-10-07.png` captures record the October 7 workspace redesign: sixteen product layouts and two compact-control states. The B2 gallery above supersedes them in current guides. See the [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below.
 
-Historical reproduction commands refer to the code revision recorded with that capture. Current gallery drivers write the October 7 files; use the current instructions above when updating today's documentation.
+Historical reproduction commands refer to the code revision recorded with that capture. Gallery drivers retain their original default filenames; set `TURNRIGHT_SCREENSHOT_PREFIX` and `TURNRIGHT_SCREENSHOT_DATE` as shown in the current reproduction instructions to create a new dated set.
 
 ## Campus GIS workflow · 5 October 2026
 

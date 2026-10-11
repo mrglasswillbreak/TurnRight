@@ -1,0 +1,80 @@
+{
+  "capturedAt": "2026-10-11T17:55:26.778Z",
+  "commit": "23d6cf114dbcf59f3fdc561ad6bc291e0db38ed3",
+  "workingTree": "uncommitted B2 icon rollout",
+  "browser": "Chromium 153.0.8010.12",
+  "environment": "local Vite development server; existing local campus data; no authenticated session",
+  "theme": "light",
+  "capture": {
+    "name": "public-mobile",
+    "route": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "sha256": "e43d366c4564c1e53cf29fffd1f4f3aece5c5e57daa19613b97276b1f906e915",
+    "brandBox": {
+      "x": 26.5,
+      "y": 29.75,
+      "width": 23,
+      "height": 23
+    },
+    "file": "b2-public-mobile-2026-10-11.png"
+  },
+  "artwork": {
+    "matchesApprovedB2": true,
+    "componentPixelMatch": [
+      16,
+      24,
+      32,
+      42,
+      192,
+      512
+    ],
+    "outsideMaskableSafeArea": 0,
+    "assets": [
+      {
+        "name": "icon-16.png",
+        "size": 16,
+        "bytes": 458,
+        "sha256": "f71079d7298d4d1f4435e15125c6cd48d9c2ee9f8f1666482e0fda45293908b1"
+      },
+      {
+        "name": "icon-32.png",
+        "size": 32,
+        "bytes": 837,
+        "sha256": "138d3391eb331926650e96f46168433adc554b660929e27fe2f3b9fb61c7d3c8"
+      },
+      {
+        "name": "icon-192.png",
+        "size": 192,
+        "bytes": 4790,
+        "sha256": "f33e04a1f5d6dbe66b669c39d303736f4854aed5b5fcb9b42c7efc4a0e8a46c7"
+      },
+      {
+        "name": "icon-512.png",
+        "size": 512,
+        "bytes": 16722,
+        "sha256": "5893b92c686ab185dda456875464afd6eeba857d9cf20c84b7a1a031ceb7cbc3"
+      },
+      {
+        "name": "icon-maskable-192.png",
+        "size": 192,
+        "bytes": 3658,
+        "sha256": "1e553801412ef505411c355f8ad6da1ff1a6e64cfcf8016b2136413aa9930a12"
+      },
+      {
+        "name": "icon-maskable-512.png",
+        "size": 512,
+        "bytes": 13530,
+        "sha256": "de74758fcc23b302e9069ddb5caec1b42bd61547ffddb5146d5d0f4f3efcd5cc"
+      },
+      {
+        "name": "apple-touch-icon.png",
+        "size": 180,
+        "bytes": 3309,
+        "sha256": "167f75ed97a85b72dca1ebf0000926a82510349e6d09cb81b2d3c9da16d0626a"
+      }
+    ]
+  }
+}

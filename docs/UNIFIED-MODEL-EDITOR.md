@@ -4,11 +4,11 @@
 
 Modes follow **Outline → Appearance → Roof → Details → Mesh → Review**. Orbit, Edit surface, Photo and Reference split are view controls; switching a view retains the editing mode and selected part. Desktop uses a resizable structure tree, canvas and inspector. The options menu can hide properties, focus the canvas or reset layout. Portrait uses a focused bottom sheet; short landscape screens use side sheets. Return to the map preserves its selection and camera.
 
-![Building and photograph in the reference split](assets/screenshots/redesign-model-desktop-2026-10-07.png)
+![Building and photograph in the reference split](assets/screenshots/b2-model-desktop-2026-10-11.png)
 
 | Portrait canvas | Landscape workspace |
 | --- | --- |
-| ![Model editor on a portrait phone viewport](assets/screenshots/redesign-model-portrait-2026-10-07.png) | ![Model editor on a short landscape viewport](assets/screenshots/redesign-model-landscape-2026-10-07.png) |
+| ![Model editor on a portrait phone viewport](assets/screenshots/b2-model-portrait-2026-10-11.png) | ![Model editor on a short landscape viewport](assets/screenshots/b2-model-landscape-2026-10-11.png) |
 
 The building workspace brings architectural details, appearance, roofs, outlines and review into one draft. Open **Edit model** from a building inspector. Its read-only summary shows wings, recorded height/floors and review status; model forms live inside the workspace. Linked place photographs still belong to their building.
 

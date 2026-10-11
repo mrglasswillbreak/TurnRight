@@ -8100,7 +8100,7 @@ test("redesign documentation gallery: public, editor and model layouts", async (
     await page.screenshot({
       path: fileURLToPath(
         new URL(
-          `../../../docs/assets/screenshots/redesign-${name}-2026-10-07.png`,
+          `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || "redesign"}-${name}-${process.env.TURNRIGHT_SCREENSHOT_DATE || "2026-10-07"}.png`,
           import.meta.url,
         ),
       ),
@@ -8191,6 +8191,32 @@ test("redesign documentation gallery: public, editor and model layouts", async (
   );
   await expect.poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded())).toBe(true);
   await shot("globe");
+  if (process.env.TURNRIGHT_SCREENSHOT_PREFIX) {
+    const signedOut = await page
+      .context()
+      .browser()!
+      .newContext({
+        baseURL: info.project.use.baseURL,
+        viewport: { width: 1440, height: 1000 },
+        colorScheme: 'light',
+      });
+    try {
+      const entry = await signedOut.newPage();
+      await entry.goto('/admin');
+      await expect(entry.getByRole('button', { name: /GitHub/ })).toBeVisible();
+      await entry.evaluate(() => document.fonts.ready);
+      await entry.screenshot({
+        path: fileURLToPath(
+          new URL(
+            `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX}-signin-${process.env.TURNRIGHT_SCREENSHOT_DATE || '2026-10-07'}.png`,
+            import.meta.url,
+          ),
+        ),
+      });
+    } finally {
+      await signedOut.close();
+    }
+  }
 });
 
 for (const previewOnly of [false, true])

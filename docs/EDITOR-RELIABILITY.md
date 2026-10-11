@@ -4,7 +4,7 @@
 
 Layout preferences are optional local presentation state, separate from durable map/photo/model recovery. Reset layout changes pane sizes, collapsed state and legend visibility; it does not discard edits. Recovery and explicit building links take priority over remembered workspace navigation. Activity is collapsed by default but continues subscribing to recovery and jobs; recovery failures still show attention and retain existing blocking protections.
 
-![Offline package controls in a phone viewport](assets/screenshots/redesign-offline-2026-10-07.png)
+![Offline package controls in a phone viewport](assets/screenshots/b2-offline-2026-10-11.png)
 
 *This view demonstrates the download interface. Offline correctness is verified separately by the prepared-package browser gates.*
 

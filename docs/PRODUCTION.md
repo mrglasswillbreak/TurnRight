@@ -1,5 +1,11 @@
 # Production deployments
 
+## B2 campus identity and documentation — 11 October 2026
+
+[PR #18](https://github.com/mrglasswillbreak/TurnRight/pull/18) carries the B2 arrow-and-graduation-cap identity across the shared public/editor mark, browser icons, installed-app icons, Apple touch icon and documentation wordmarks. Its release checks and deployment result are attached to that pull request. This application-only change requires no database migration or worker update; the build retains the published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages.
+
+The README and workflow guides use nineteen fresh, unaltered local Chromium captures. [Gallery and reproduction](SCREENSHOTS.md#b2-campus-identity--11-october-2026) · [Source, fixture and image hashes](assets/screenshots/b2-2026-10-11.json) · [Brand exports and installed-icon behavior](BRAND.md). Screenshot fixtures make no production edits or source-review decisions.
+
 ## Map previews and adjustable mobile panels — 11 October 2026
 
 [PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15) merged as `1626e436eba983685a8ef087638d19af9ce4fc42`. Its [production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/88MmKkERgAPSdBYeREbJydYePuMc) became Ready at 13:14 UTC with `turnright.vercel.app` assigned. All 14 release checks passed, including four Chromium shards, both WebKit shards, quality/build checks, GIS and offline coverage.

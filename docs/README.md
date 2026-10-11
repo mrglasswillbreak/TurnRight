@@ -30,7 +30,7 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 
 ## Develop
 
-Start with [contributing](../CONTRIBUTING.md), [brand usage](BRAND.md), and [maintaining screenshots](SCREENSHOTS.md). The [workspace shell contract](EDITOR-LAYOUT.md) explains pane identity and preferences.
+Start with [contributing](../CONTRIBUTING.md), [B2 brand assets and usage](BRAND.md), and [the current gallery and screenshot maintenance](SCREENSHOTS.md). The [workspace shell contract](EDITOR-LAYOUT.md) explains pane identity and preferences.
 
 | Area | Reference |
 | --- | --- |

@@ -500,7 +500,7 @@ test("GIS documentation gallery uses the current workspace and an isolated team 
     await page.screenshot({
       path: fileURLToPath(
         new URL(
-          "../../../docs/assets/screenshots/redesign-gis-" + name + "-2026-10-07.png",
+          `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || "redesign"}-gis-${name}-${process.env.TURNRIGHT_SCREENSHOT_DATE || "2026-10-07"}.png`,
           import.meta.url,
         ),
       ),
