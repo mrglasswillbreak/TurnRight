@@ -1,18 +1,11 @@
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error Shared Node pipeline module intentionally uses plain JavaScript.
-import {
-  compareSources,
-  flatten,
-  hash,
-  preserveReviewedMetadata,
-} from '../../scripts/cloud.mjs';
+import { compareSources, flatten, hash, preserveReviewedMetadata } from '../../scripts/cloud.mjs';
 import { campusFixture } from './fixture';
 import { validateReleaseSnapshot } from '../server/release-validation';
 describe('source updates', () => {
   it('ignores retrieval timestamps and JSON key order', () => {
-    expect(
-      hash({ name: 'Library', retrievedAt: 'today', geometry: [1, 2] }),
-    ).toBe(
+    expect(hash({ name: 'Library', retrievedAt: 'today', geometry: [1, 2] })).toBe(
       hash({ geometry: [1, 2], retrievedAt: 'yesterday', name: 'Library' }),
     );
   });
@@ -23,9 +16,7 @@ describe('source updates', () => {
     const changes = compareSources(old, flatten(updated));
     expect(changes).toHaveLength(1);
     expect(changes[0].status).toBe('pending');
-    expect(old.find((r: any) => r.entity === 'place').payload.name).toBe(
-      'Library',
-    );
+    expect(old.find((r: any) => r.entity === 'place').payload.name).toBe('Library');
   });
   it('fails closed on a suspiciously incomplete source result', () => {
     const old = flatten(campusFixture());
@@ -43,11 +34,11 @@ describe('source updates', () => {
     expect(validateReleaseSnapshot(snapshot, published).places[0].name).toBe(
       'Reviewed library name',
     );
-    expect(() =>
+    expect(
       validateReleaseSnapshot(snapshot, {
         ...published,
         version: 'newer-public-release',
-      }),
-    ).toThrow(/predates/);
+      }).places[0].name,
+    ).toBe('Reviewed library name');
   });
 });

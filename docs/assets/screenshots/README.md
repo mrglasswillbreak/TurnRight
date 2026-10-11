@@ -1,5 +1,9 @@
 # Application screenshots
 
+## Map-wide preview and phone resizing · 11 October 2026
+
+`source-map-preview-desktop-2026-10-11.png`, `source-map-preview-mobile-2026-10-11.png` and `editor-adjustable-panel-mobile-2026-10-11.png` are unaltered Chromium 153.0.8010.12 captures from successful local browser journeys. The map previews use 101 synthetic proposals distributed over the checked-in LASU `lasu-4e4c8008b38b` seed; the resizable panel uses the small `browserCampus` fixture. Account/API data and edits are isolated. No production proposal or public package changed. All three images were individually inspected. [Capture record](source-map-preview-2026-10-11.json) · [Gallery and reproduction](../../SCREENSHOTS.md#map-previews-and-adjustable-phone-panels--11-october-2026).
+
 ## Source updates · 11 October 2026
 
 The four `source-updates-*-2026-10-11.png` images show the inbox/map comparison and bulk confirmation on desktop (1440 × 1000) and phone (390 × 844). They are unaltered Chromium 153.0.8010.12 captures from the successful dedicated journeys in [run 38121589733](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38121589733), at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`. Every image was visually inspected after checking the downloaded artifact digest.

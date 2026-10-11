@@ -1,6 +1,16 @@
 # Application tour and screenshot maintenance
 
-The October 2026 gallery contains four new source-update views, sixteen earlier application views, and two editor-control details. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/redesign-2026-10-07.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+The October 2026 gallery includes source-update inboxes, map-wide previews and an adjustable phone editor, alongside earlier application views. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/redesign-2026-10-07.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+
+## Map previews and adjustable phone panels · 11 October 2026
+
+| All matching source proposals | Phone map preview | Resized editing panel |
+| --- | --- | --- |
+| ![Desktop source map preview frames proposals beside its controls](assets/screenshots/source-map-preview-desktop-2026-10-11.png) | ![Phone preview fits the changes below its legend and controls](assets/screenshots/source-map-preview-mobile-2026-10-11.png) | ![Phone properties panel expanded with its accessible drag handle](assets/screenshots/editor-adjustable-panel-mobile-2026-10-11.png) |
+
+The preview captures show 101 synthetic proposals over the checked-in LASU `lasu-4e4c8008b38b` seed. The panel capture uses the small `browserCampus` fixture and a synthetic Library edit. These are unaltered local Chromium captures, not production decisions. [Source and image digests](assets/screenshots/source-map-preview-2026-10-11.json).
+
+Reproduce with `npm run test:browser -- tests/browser/editor.spec.ts --grep "source updates map preview|workspace panes: mobile editing height" --output ../test-results/source-map-preview` from `web/`. Use `npm run test:survey-webkit` with the same arguments for WebKit. The independent preview journeys verify all pages, actual rendered source data, previous shapes and read-only closing; the resizing journey checks dragging, keyboard access, input preservation, reload and reset.
 
 ## Source updates capture workflow
 

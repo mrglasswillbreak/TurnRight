@@ -10,6 +10,7 @@ const readActions = new Set([
   'state',
   'source-updates-overview',
   'source-updates-list',
+  'source-updates-map',
   'source-updates-detail',
   'source-updates-history',
   'sources',

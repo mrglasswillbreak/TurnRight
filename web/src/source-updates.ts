@@ -1,4 +1,20 @@
 import type { MapChange } from "./types.js";
+import type { Geometry } from "geojson";
+
+export interface SourceMapRow {
+  id: string;
+  revision: number;
+  name: string;
+  kind: MapChange["kind"];
+  before: { geometry: Geometry; simplified: boolean } | null;
+  after: { geometry: Geometry; simplified: boolean } | null;
+}
+export interface SourceMapPage {
+  rows: SourceMapRow[];
+  total: number;
+  asOf: string;
+  nextCursor: SourceCursor | null;
+}
 
 export interface SourceFilters {
   query?: string;

@@ -8,7 +8,7 @@ import {
 import type { Map as MapInstance } from 'maplibre-gl';
 import { Check, ChevronLeft, ChevronRight, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { WorkspacePane } from './WorkspaceFrame';
+import { WorkspacePane, useWorkspaceView } from './WorkspaceFrame';
 import { SourceFieldReview } from './SourceFieldReview';
 import { sourceComparison, sourceGeometry } from './source-comparison';
 import { api } from './supabase';
@@ -30,6 +30,7 @@ import {
 import type { CampusData, MapChange } from './types';
 import type { WorkspaceCapabilities } from './gis-types';
 import './source-updates.css';
+import SourceMapPreview from './SourceMapPreview';
 
 const date = (value?: string | null) =>
   value ? new Date(value).toLocaleString() : 'Not checked yet';
@@ -66,6 +67,8 @@ export default function SourceUpdates({
   mapRef: RefObject<MapInstance | null>;
 }) {
   const [overview, setOverview] = useState<SourceOverview>();
+  const [mapPreview, setMapPreview] = useState(false);
+  const reveal = useWorkspaceView();
   const [page, setPage] = useState<SourcePage>(emptyPage);
   const [filters, setFilters] = useState<SourceFilters>({});
   const [cursors, setCursors] = useState<Array<SourceCursor | null>>([null]);
@@ -353,6 +356,18 @@ export default function SourceUpdates({
 
   return (
     <>
+      {mapPreview && (
+        <SourceMapPreview
+          mapRef={mapRef}
+          filters={filters}
+          revision={attempt}
+          onFocus={(id) => {
+            setFocusId(id);
+            if (innerWidth < 1200) reveal?.('right');
+          }}
+          onClose={() => setMapPreview(false)}
+        />
+      )}
       <WorkspacePane
         id="left"
         title="Source updates"
@@ -528,6 +543,23 @@ export default function SourceUpdates({
           <h3>Review inbox</h3>
           <span>{page.total.toLocaleString()} pending</span>
         </div>
+        <Button
+          variant="outline"
+          aria-pressed={mapPreview}
+          className="source-preview-launch"
+          onClick={() => {
+            setMapPreview(!mapPreview);
+            if (!mapPreview) {
+              setFocusId('');
+              onFocus(null);
+              if (innerWidth < 1200) reveal?.('map');
+            }
+          }}
+        >
+          {mapPreview
+            ? 'Hide map preview'
+            : 'Preview all matching changes on map'}
+        </Button>
         {overview && !overview.ready && (
           <p className="notice">
             Preparing the source update index. Review will be available shortly.

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { adminRequest, boundedSession } from './admin-client';
+import { adminRequest, boundedSession, sessionAccessToken } from './admin-client';
 import { requestedCampus } from './campus-context';
 const url = import.meta.env.VITE_SUPABASE_URL,
   anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -38,9 +38,9 @@ export async function api<T = unknown>(
   options: Parameters<typeof adminRequest>[3] = {},
 ): Promise<T> {
   const campus = requestedCampus();
-  const session = supabase
-    ? (await boundedSession(action, supabase.auth.getSession())).data.session
-    : null;
+  const token = supabase
+    ? sessionAccessToken(action, await boundedSession(action, supabase.auth.getSession()))
+    : undefined;
   options.signal?.throwIfAborted();
   const tracked =
     /^(prepare-release|publish-release|rollback|refresh-source|import-run|import-upload|import-queue|media-process|media-approve|model-upload|model-save|survey-upload)$/.test(
@@ -52,13 +52,7 @@ export async function api<T = unknown>(
         )
       : undefined;
   try {
-    const result = await adminRequest<T>(
-      action,
-      payload,
-      session?.access_token,
-      options,
-      campus,
-    );
+    const result = await adminRequest<T>(action, payload, token, options, campus);
     tracked?.finish(
       /release|import-(run|queue)|rollback/.test(action)
         ? 'Request accepted; background job status appears in Activity'

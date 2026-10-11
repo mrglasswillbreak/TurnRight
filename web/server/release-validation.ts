@@ -17,10 +17,7 @@ function stable(value: unknown, source = false): unknown {
   if (value && typeof value === 'object')
     return Object.fromEntries(
       Object.entries(value)
-        .filter(
-          ([key]) =>
-            !source || !['createdAt', 'retrievedAt', 'checkedAt'].includes(key),
-        )
+        .filter(([key]) => !source || !['createdAt', 'retrievedAt', 'checkedAt'].includes(key))
         .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
         .map(([key, v]) => [key, stable(v, source)]),
     );
@@ -32,9 +29,7 @@ export function snapshotHash(features: SourceRecord[], edits: MapEdit[] = []) {
       JSON.stringify(
         stable({
           features: [...features].sort((a, b) => a.id.localeCompare(b.id)),
-          edits: [...edits].sort((a, b) =>
-            `${a.kind}:${a.id}`.localeCompare(`${b.kind}:${b.id}`),
-          ),
+          edits: [...edits].sort((a, b) => `${a.kind}:${a.id}`.localeCompare(`${b.kind}:${b.id}`)),
         }),
       ),
     )
@@ -43,23 +38,18 @@ export function snapshotHash(features: SourceRecord[], edits: MapEdit[] = []) {
 export async function publishedCampus(): Promise<CampusData> {
   const origin = process.env.PUBLISHED_MAP_URL;
   if (!origin)
-    throw new HttpError(
-      503,
-      'Configure PUBLISHED_MAP_URL before reconciling or publishing campus data.',
-    );
+    throw new HttpError(503, 'Configure PUBLISHED_MAP_URL before publishing campus data.');
   const root = new URL(origin);
-  if (root.protocol !== 'https:')
-    throw new HttpError(503, 'The published map must use HTTPS.');
+  if (root.protocol !== 'https:') throw new HttpError(503, 'The published map must use HTTPS.');
   let manifestUrl = '/packages/latest.json';
   if (currentCampusId() !== 'lasu') {
     const { activeCampus } = await import('./campuses.js');
     const campus = await activeCampus();
-    const catalogResponse = await fetch(
-      new URL('/packages/campuses.json', root),
-      { cache: 'no-store', signal: AbortSignal.timeout(15000) },
-    );
-    if (catalogResponse.status === 404)
-      return emptyCampus(campus, campus.boundary);
+    const catalogResponse = await fetch(new URL('/packages/campuses.json', root), {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    });
+    if (catalogResponse.status === 404) return emptyCampus(campus, campus.boundary);
     if (!catalogResponse.ok)
       throw new HttpError(503, 'Cannot verify the published campus directory.');
     const catalogue: unknown = await catalogResponse.json();
@@ -74,10 +64,7 @@ export async function publishedCampus(): Promise<CampusData> {
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok)
-    throw new HttpError(
-      503,
-      'Cannot verify the current public package. Retry while online.',
-    );
+    throw new HttpError(503, 'Cannot verify the current public package. Retry while online.');
   const manifest = (await response.json()) as CampusPackage;
   const asset = manifest.assets?.find((a) => a.url === manifest.dataUrl);
   if (
@@ -90,8 +77,7 @@ export async function publishedCampus(): Promise<CampusData> {
   const dataResponse = await fetch(new URL(manifest.dataUrl, root), {
     signal: AbortSignal.timeout(20000),
   });
-  if (!dataResponse.ok)
-    throw new HttpError(503, 'Cannot download the public campus baseline.');
+  if (!dataResponse.ok) throw new HttpError(503, 'Cannot download the public campus baseline.');
   const bytes = Buffer.from(await dataResponse.arrayBuffer());
   if (
     bytes.length !== asset.bytes ||
@@ -106,12 +92,7 @@ export async function publishedCampus(): Promise<CampusData> {
 export function publishedRecords(data: CampusData): SourceRecord[] {
   const { map, places, graph, ...meta } = data;
   const records: SourceRecord[] = [];
-  const add = (
-    entity: SourceRecord['entity'],
-    id: string,
-    payload: unknown,
-    source: string,
-  ) =>
+  const add = (entity: SourceRecord['entity'], id: string, payload: unknown, source: string) =>
     records.push({
       id: `${entity}:${id}`,
       entity,
@@ -123,12 +104,7 @@ export function publishedRecords(data: CampusData): SourceRecord[] {
     });
   add('meta', 'campus', meta, 'published-review');
   map.features.forEach((f) =>
-    add(
-      'feature',
-      String(f.properties?.id),
-      f,
-      String(f.properties?.source || 'campus'),
-    ),
+    add('feature', String(f.properties?.id), f, String(f.properties?.source || 'campus')),
   );
   places.forEach((p) => add('place', p.id, p, p.source));
   graph.nodes.forEach((n) => add('node', n.id, n, 'published-review'));
@@ -153,10 +129,7 @@ export function validateReleaseSnapshot(
     if (document) {
       const errors = modelDocumentErrors(document);
       if (errors.length) throw new HttpError(400, errors.join(' '));
-      if (
-        edit.properties.reviewedModelRevision !==
-        modelDocumentRevision(document)
-      )
+      if (edit.properties.reviewedModelRevision !== modelDocumentRevision(document))
         throw new HttpError(
           400,
           `${edit.properties.name || edit.id}: review the authored geometry in Mesh before publishing.`,
@@ -165,19 +138,14 @@ export function validateReleaseSnapshot(
   }
   const gis = publicationInputs(snapshot);
   const assembled = assembleSources(gis.features, published);
-  const base = options.restoring
-    ? assembled
-    : withPublishedVisuals(assembled, published);
-  if (!options.restoring && base.version !== published.version)
-    throw new HttpError(
-      409,
-      'This baseline predates the public package. Reconcile it and build a new preview.',
-    );
+  const base = options.restoring ? assembled : withPublishedVisuals(assembled, published);
+  // The source metadata version is its origin, not a freshness token. Approval
+  // and promotion verify the exact workspace hash and published catalogue revision.
+  // Replacing accepted sources just to match a public version would undo review.
   for (const source of base.sources) {
     if (
       source.id.startsWith('import:') &&
-      (!(source as typeof source & { redistributionConfirmed?: boolean })
-        .redistributionConfirmed ||
+      (!(source as typeof source & { redistributionConfirmed?: boolean }).redistributionConfirmed ||
         !source.attribution ||
         !source.license)
     )
@@ -191,7 +159,6 @@ export function validateReleaseSnapshot(
   const facadeIssues = result.data.map.features
     .filter((f) => f.properties?.kind === 'building')
     .flatMap((f) => facadeErrors(f, result.data.photos, true));
-  if (facadeIssues.length)
-    throw new HttpError(400, [...new Set(facadeIssues)].join('\n'));
+  if (facadeIssues.length) throw new HttpError(400, [...new Set(facadeIssues)].join('\n'));
   return gis.decorate(result.data);
 }

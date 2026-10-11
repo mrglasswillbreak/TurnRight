@@ -1333,10 +1333,10 @@ function Editor({
       drafts,
       data,
       invalid,
-      preview || survey,
+      preview || survey || tab === "changes",
       layerView,
     );
-  }, [validation, drafts, data, invalid, preview, ready, survey, layerView]);
+  }, [validation, drafts, data, invalid, preview, ready, survey, layerView, tab]);
   useEffect(() => {
     const features: Feature[] = [];
     for (const [side, color] of [

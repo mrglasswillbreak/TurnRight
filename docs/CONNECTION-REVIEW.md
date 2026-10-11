@@ -155,11 +155,7 @@ update** and wait for **Ready offline**. The version should then be
 `lasu-4e4c8008b38b`. An active navigation session keeps its prior package until
 it ends; an offline device cannot know about this update before reconnecting.
 
-The editor currently has an older approved source baseline and an outstanding
-source-change backlog. This reviewed Git package is separate from that
-baseline. Before an editor-led map release, reconcile its source candidates
-and saved corrections, then validate and preview the assembled snapshot. Do
-not promote the older immutable editor preview as this connection update.
+The baseline mismatch described here is historical. For current editor-led releases, review source proposals and saved access corrections, validate the assembled workspace, obtain snapshot approval, and inspect a new preview. Full-map baseline replacement is retired; see [editor availability](EDITOR-AVAILABILITY.md). Do not promote an older immutable preview as this connection update.
 
 Five place approaches still lie on smaller components: Building
 Underconstruction, New Science Block, Ongoing Construction, Ongoing Student

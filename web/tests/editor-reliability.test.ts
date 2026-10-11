@@ -3,6 +3,7 @@ import {
   adminRequest,
   AdminRequestError,
   boundedSession,
+  sessionAccessToken,
 } from '../src/admin-client';
 import { loadPreparedWorkspace } from '../src/editor-loading';
 import { EditorWorkspace } from '../src/editor-workspace';
@@ -35,24 +36,17 @@ describe('operation-specific admin requests', () => {
   it('retains the original campus across a save retry after navigation', async () => {
     vi.stubGlobal('location', { search: '?campus=lasu' });
     const campuses: string[] = [];
-    const fetcher = vi
-      .fn<typeof fetch>()
-      .mockImplementation(async (_url, init) => {
-        campuses.push(JSON.parse(String(init?.body)).campus);
-        if (campuses.length === 1) throw new TypeError('Lost response');
-        return new Response('[]');
-      });
-    await adminRequest(
-      'save-edits',
-      { operationId: 'same-save', edits: [] },
-      'owner',
-      {
-        fetcher,
-        delay: async () => {
-          vi.stubGlobal('location', { search: '?campus=unilag' });
-        },
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (_url, init) => {
+      campuses.push(JSON.parse(String(init?.body)).campus);
+      if (campuses.length === 1) throw new TypeError('Lost response');
+      return new Response('[]');
+    });
+    await adminRequest('save-edits', { operationId: 'same-save', edits: [] }, 'owner', {
+      fetcher,
+      delay: async () => {
+        vi.stubGlobal('location', { search: '?campus=unilag' });
       },
-    );
+    });
     expect(campuses).toEqual(['lasu', 'lasu']);
   });
   it('retries a lost save acknowledgement with the identical operation and payload', async () => {
@@ -80,18 +74,15 @@ describe('operation-specific admin requests', () => {
       expect(fetcher).toHaveBeenCalledOnce();
     },
   );
-  it.each([401, 403])(
-    'preserves authentication status %s without retrying',
-    async (status) => {
-      const fetcher = vi
-        .fn<typeof fetch>()
-        .mockResolvedValue(new Response('Denied', { status }));
-      await expect(
-        adminRequest('export', {}, undefined, { fetcher }),
-      ).rejects.toMatchObject({ action: 'export', status, reason: 'auth' });
-      expect(fetcher).toHaveBeenCalledOnce();
-    },
-  );
+  it.each([401, 403])('preserves authentication status %s without retrying', async (status) => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response('Denied', { status }));
+    await expect(adminRequest('export', {}, undefined, { fetcher })).rejects.toMatchObject({
+      action: 'export',
+      status,
+      reason: 'auth',
+    });
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
   it('bounds a hanging request and distinguishes it from a configuration failure', async () => {
     vi.useFakeTimers();
     const fetcher = vi.fn<typeof fetch>().mockImplementation(
@@ -152,9 +143,7 @@ describe('operation-specific admin requests', () => {
   it('describes non-JSON responses without blaming setup', async () => {
     const fetcher = vi
       .fn<typeof fetch>()
-      .mockResolvedValue(
-        new Response('<html>Proxy failure</html>', { status: 502 }),
-      );
+      .mockResolvedValue(new Response('<html>Proxy failure</html>', { status: 502 }));
     await expect(
       adminRequest('export', {}, undefined, { fetcher, retries: 0 }),
     ).rejects.toMatchObject({
@@ -256,9 +245,7 @@ describe('field history and recovery exports', () => {
   it('merges independent first corrections using the original source feature', () => {
     const w = workspace([]);
     w.setSourceBaseline(() => feature());
-    w.commit([
-      { ...feature(), properties: { ...feature().properties, name: 'Local' } },
-    ]);
+    w.commit([{ ...feature(), properties: { ...feature().properties, name: 'Local' } }]);
     const remote = [
       {
         ...feature(),
@@ -278,9 +265,7 @@ describe('field history and recovery exports', () => {
     });
     const w = new EditorWorkspace([], send, async () => {});
     w.setSourceBaseline(() => feature());
-    w.commit([
-      { ...feature(), properties: { ...feature().properties, name: 'Local' } },
-    ]);
+    w.commit([{ ...feature(), properties: { ...feature().properties, name: 'Local' } }]);
     await w.flush();
     const remote = [
       {
@@ -288,12 +273,7 @@ describe('field history and recovery exports', () => {
         properties: { ...feature().properties, faculty: 'Remote' },
       },
     ];
-    const reopened = new EditorWorkspace(
-      remote,
-      send,
-      async () => {},
-      w.recoveryCopy(),
-    );
+    const reopened = new EditorWorkspace(remote, send, async () => {}, w.recoveryCopy());
     await reopened.flush();
     expect(reopened.status).toBe('Conflict');
     expect(reopened.reviewConflicts(remote).conflicts).toEqual([]);
@@ -454,11 +434,8 @@ describe('three-way field conflict review', () => {
   it('requires a whole-feature choice when deletion conflicts with a remote edit', () => {
     const b = feature();
     expect(
-      mergeWorkspace(
-        [b],
-        [{ ...b, deleted: true }],
-        [{ ...b, properties: { name: 'Remote' } }],
-      ).unresolved[0].field,
+      mergeWorkspace([b], [{ ...b, deleted: true }], [{ ...b, properties: { name: 'Remote' } }])
+        .unresolved[0].field,
     ).toBe('Feature existence');
   });
   it('keeps the original conflict base across reload', () => {
@@ -485,5 +462,42 @@ describe('three-way field conflict review', () => {
       name: 'Local',
       faculty: 'Arts',
     });
+  });
+});
+
+describe('temporary startup and session failures', () => {
+  it.each([
+    'workspace-capabilities',
+    'campus-list',
+    'process-status',
+    'gis-datasets',
+    'import-list',
+  ])('recovers a transient %s read without changing campus or credentials', async (action) => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response('{"error":"Unavailable"}', { status: 503 }))
+      .mockResolvedValueOnce(new Response('{}'));
+    await adminRequest(action, {}, 'same-session', { fetcher, delay: async () => {} }, 'unilag');
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls[0][1]?.body).toBe(fetcher.mock.calls[1][1]?.body);
+    expect(fetcher.mock.calls[1][1]?.headers).toMatchObject({
+      Authorization: 'Bearer same-session',
+    });
+  });
+  it.each([0, 500, 503])('keeps refresh failure %s distinct from expiry', (status) => {
+    try {
+      sessionAccessToken('state', { data: { session: null }, error: { status } });
+      throw Error('expected failure');
+    } catch (e) {
+      expect(e).toMatchObject({ reason: 'network', status });
+    }
+  });
+  it('does not ignore a refresh rejection or discard a valid token', () => {
+    expect(() =>
+      sessionAccessToken('state', { data: { session: null }, error: { status: 400 } }),
+    ).toThrow('expired');
+    expect(
+      sessionAccessToken('state', { data: { session: { access_token: 'valid' } }, error: null }),
+    ).toBe('valid');
   });
 });

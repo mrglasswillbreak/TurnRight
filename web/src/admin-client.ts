@@ -5,19 +5,34 @@ export class AdminRequestError extends Error {
     public action: string,
     message: string,
     public status = 0,
-    public reason:
-      | 'network'
-      | 'timeout'
-      | 'auth'
-      | 'server'
-      | 'response' = 'server',
+    public reason: 'network' | 'timeout' | 'auth' | 'server' | 'response' = 'server',
   ) {
     super(message);
   }
 }
 const readable = new Set([
+  'workspace-capabilities',
+  'campus-list',
+  'process-status',
+  'import-list',
+  'import-get',
+  'gis-datasets',
+  'gis-query',
+  'gis-statistics',
+  'gis-jobs',
+  'gis-reviews',
+  'gis-issues',
+  'gis-members',
+  'gis-feature',
+  'gis-review-details',
+  'gis-review-query',
+  'gis-job-preview',
+  'gis-views',
+  'model-asset-read',
+  'media-list',
   'source-updates-overview',
   'source-updates-list',
+  'source-updates-map',
   'source-updates-detail',
   'source-updates-history',
   'state',
@@ -37,10 +52,30 @@ export function isConnectionFailure(error: unknown) {
     ['network', 'timeout', 'response', 'server'].includes(error.reason) &&
     (error.status === 0 ||
       error.status >= 500 ||
-      (error.reason === 'response' &&
-        error.status >= 200 &&
-        error.status < 300))
+      (error.reason === 'response' && error.status >= 200 && error.status < 300))
   );
+}
+/** Preserve the difference between an invalid session and a failed refresh. */
+export function sessionAccessToken(
+  action: string,
+  result: {
+    data: { session: { access_token: string } | null };
+    error: { status?: number } | null;
+  },
+) {
+  if (result.error) {
+    const status = result.error.status || 0;
+    const expired = [400, 401, 403].includes(status);
+    throw new AdminRequestError(
+      action,
+      expired
+        ? 'Your session has expired. Sign in again; your local work is retained.'
+        : 'Could not refresh your session. Your local work is retained. Retry the connection shortly.',
+      status,
+      expired ? 'auth' : 'network',
+    );
+  }
+  return result.data.session?.access_token;
 }
 export async function boundedSession<T>(
   action: string,
@@ -83,12 +118,8 @@ export async function adminRequest<T>(
   const batch = payload as {
     edits?: Array<{ edit?: { properties?: { modelDocument?: unknown } } }>;
   } | null;
-  if (
-    action === 'save-edits' &&
-    batch?.edits?.some((i) => i.edit?.properties?.modelDocument)
-  ) {
-    const { prepareModelSave, hydrateModelResponse } =
-      await import('./model-asset-client');
+  if (action === 'save-edits' && batch?.edits?.some((i) => i.edit?.properties?.modelDocument)) {
+    const { prepareModelSave, hydrateModelResponse } = await import('./model-asset-client');
     return hydrateModelResponse(
       await api<T>(action, await prepareModelSave(payload, api, ownerKey)),
       api,
@@ -103,15 +134,8 @@ export async function adminRequest<T>(
   const edits = Array.isArray(result)
     ? result
     : [...(envelope?.edits || []), ...(envelope?.published?.edits || [])];
-  if (
-    Array.isArray(edits) &&
-    edits.some((e) => e?.properties?.modelDocumentAsset)
-  )
-    return (await import('./model-asset-client')).hydrateModelResponse(
-      result,
-      api,
-      ownerKey,
-    );
+  if (Array.isArray(edits) && edits.some((e) => e?.properties?.modelDocumentAsset))
+    return (await import('./model-asset-client')).hydrateModelResponse(result, api, ownerKey);
   return result;
 }
 async function wireAdminRequest<T>(
@@ -128,20 +152,14 @@ async function wireAdminRequest<T>(
   campus = requestedCampus(),
 ): Promise<T> {
   const fetcher = options.fetcher || fetch;
-  const retries =
-    readable.has(action) || action === 'save-edits'
-      ? (options.retries ?? 1)
-      : 0;
+  const retries = readable.has(action) || action === 'save-edits' ? (options.retries ?? 1) : 0;
   for (let attempt = 0; ; attempt++) {
     const started = performance.now();
     options.signal?.throwIfAborted();
     const controller = new AbortController();
     const abort = () => controller.abort(options.signal?.reason);
     options.signal?.addEventListener('abort', abort, { once: true });
-    const timer = setTimeout(
-      () => controller.abort(),
-      options.timeoutMs ?? 30_000,
-    );
+    const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 30_000);
     try {
       const response = await fetcher('/api/admin', {
         method: 'POST',
@@ -205,14 +223,12 @@ async function wireAdminRequest<T>(
         'media-preview': 'signing',
         'media-draft': 'private-save',
       } as const;
-      if (action in phase)
-        measureOperation(phase[action as keyof typeof phase], started);
+      if (action in phase) measureOperation(phase[action as keyof typeof phase], started);
       clearTimeout(timer);
       options.signal?.removeEventListener('abort', abort);
     }
-    await (
-      options.delay ||
-      ((ms) => new Promise((resolve) => setTimeout(resolve, ms)))
-    )(1000 * (attempt + 1));
+    await (options.delay || ((ms) => new Promise((resolve) => setTimeout(resolve, ms))))(
+      1000 * (attempt + 1),
+    );
   }
 }

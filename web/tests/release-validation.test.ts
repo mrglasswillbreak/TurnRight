@@ -61,26 +61,17 @@ describe('server release guards', () => {
         .join('\n');
     expect(campusFacadeReviewIssues(data)).toHaveLength(2);
     expect(() =>
-      validateReleaseSnapshot(
-        { features: publishedRecords(data), edits: [] },
-        data,
-      ),
+      validateReleaseSnapshot({ features: publishedRecords(data), edits: [] }, data),
     ).toThrow(messages());
     facades[walls[0].wallId].needsReview = false;
     expect(campusFacadeReviewIssues(data)).toHaveLength(1);
     expect(messages()).toContain('Wing 1 · wall 2');
     expect(() =>
-      validateReleaseSnapshot(
-        { features: publishedRecords(data), edits: [] },
-        data,
-      ),
+      validateReleaseSnapshot({ features: publishedRecords(data), edits: [] }, data),
     ).toThrow(messages());
     facades[walls[1].wallId].needsReview = false;
     expect(
-      validateReleaseSnapshot(
-        { features: publishedRecords(data), edits: [] },
-        data,
-      ).map.features,
+      validateReleaseSnapshot({ features: publishedRecords(data), edits: [] }, data).map.features,
     ).toHaveLength(1);
   });
   it('rejects source endpoint errors even when the browser is bypassed', () => {
@@ -88,21 +79,22 @@ describe('server release guards', () => {
       base = campusFixture();
     base.graph.nodes.shift();
     expect(() =>
-      validateReleaseSnapshot(
-        { features: publishedRecords(base), edits: [] },
-        publicData,
-      ),
+      validateReleaseSnapshot({ features: publishedRecords(base), edits: [] }, publicData),
     ).toThrow('missing or invalid nodes');
   });
-  it('rejects an older baseline and retains directed edges when current', () => {
+  it('publishes the approved source geometry even when its origin version differs', () => {
     const data = campusFixture();
     const snapshot = { features: publishedRecords(data), edits: [] };
-    expect(validateReleaseSnapshot(snapshot, data).graph.edges).toEqual(
-      data.graph.edges,
+    expect(validateReleaseSnapshot(snapshot, data).graph.edges).toEqual(data.graph.edges);
+    const changed = structuredClone(snapshot);
+    const place = changed.features.find((f) => f.entity === 'place')!;
+    place.payload.name = 'Accepted source name';
+    const result = validateReleaseSnapshot(changed, { ...data, version: 'new-public' });
+    expect(result.places.find((p) => p.id === place.payload.id)?.name).toBe('Accepted source name');
+    expect(result.graph.edges).toEqual(data.graph.edges);
+    expect(snapshot.features.find((f) => f.entity === 'place')?.payload.name).not.toBe(
+      'Accepted source name',
     );
-    expect(() =>
-      validateReleaseSnapshot(snapshot, { ...data, version: 'new-public' }),
-    ).toThrow('predates');
   });
   it('detects source and edit changes but tolerates row ordering', () => {
     const features = publishedRecords(campusFixture());

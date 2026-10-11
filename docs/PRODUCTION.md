@@ -1,5 +1,15 @@
 # Production deployments
 
+## Editor availability and map-preview database upgrade — 11 October 2026
+
+Migrations **042 and 043** are installed in production. The published-correction backfill completed in two calls, each updating one current published release. Both campuses now have materialized correction summaries, and the bounded, campus-authorized map-preview function is installed. The application changes and release gates are tracked in [PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15); this entry records the database upgrade, not a new campus-map publication.
+
+Post-upgrade readback retained LASU **4,858 sources / 150 corrections / 3,898 pending proposals** and UNILAG **10,574 / 201 / 1**. PostgreSQL's start time remained **11 October 10:39:28.991007 UTC**. The upgrade accepted or rejected no proposal, replaced no source baseline and published no campus data. The earlier user-run review operations had already applied 3,645 decisions and skipped one stale proposal without failures.
+
+The incident investigation found a failed full-map replacement request and repeated expansion of compressed release snapshots during normal reads. The replacement path is retired; accepted sources already form the working baseline. Authentication transport failures now preserve sessions and use availability errors. The logs establish database restarts and timeouts, but do not establish a host OOM kill or a shared cause for the earlier browser connection failure. [Evidence, safeguards and rollout instructions](EDITOR-AVAILABILITY.md).
+
+Local pinned-runtime verification passed 760 unit tests across 109 files, both TypeScript projects, lint, production/configured build budgets, and an isolated 10,000-proposal preview in 200 bounded pages with corrections preserved. Dated Chromium [preview and resize captures](SCREENSHOTS.md#map-previews-and-adjustable-phone-panels--11-october-2026) use isolated fixtures. Required CI and deployed application status remain visible on the linked pull request; production verification must remain read-only.
+
 ## Source updates rollout — 11 October 2026
 
 [PR #13](https://github.com/mrglasswillbreak/TurnRight/pull/13) is merged. Production revision `f230fa60dfc13aa06dfbfb0ca7264f7326772fad` is **Ready** on [Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/67KYgiCzSqNvcv2MmCLvB8vXPdCB), with `turnright.vercel.app` assigned at 08:46 UTC. The source-update inbox and background review workflows are deployed for UNILAG and LASU. [Sanitized rollout receipt](assets/source-updates-rollout-2026-10-11.json).
