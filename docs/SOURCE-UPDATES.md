@@ -121,6 +121,8 @@ Identical rejected changes remain rejected. Changed content creates a new revisi
 
 Additional private API actions are `check-detail`, `group-detail`, `reverify`, `decisions`, `provenance`, `undo-preview`, and `undo-confirm`, using the `source-updates-` prefix. Read and mutation permissions are checked separately and remain campus-scoped.
 
+Raw comparison snapshots use compressed, shared batches so unchanged daily checks do not create another complete copy of the database. The two latest successful raw snapshots per source remain available for legacy-provenance inspection. Older unused raw snapshots expire, with the expiry shown in check history; their durable receipts, counts and hashes remain. Observations and routing records referenced by proposals, accepted state or any decision's before/after recovery history never expire with these snapshots. Compaction copies and verifies legacy evidence before reclaiming duplicates and does not change the map or past decisions.
+
 ## Staged reliability rollout
 
 1. Apply migrations **045, 046, 047 and 048** in order before changing workers. The database guards are active immediately; new proposal generation defaults to disabled for every source.

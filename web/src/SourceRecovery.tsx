@@ -6,6 +6,7 @@ interface Check {
   id: string;
   source_key: string;
   status: string;
+  evidence_retention?: { rawSnapshot?: string };
   receipt: {
     url?: string;
     retrievedAt: string;
@@ -109,6 +110,13 @@ export default function SourceRecovery({
             {new Date(check.receipt.retrievedAt).toLocaleString()}. Cached
             checks retain this time.
           </p>
+          {check.evidence_retention?.rawSnapshot === 'expired' && (
+            <p>
+              This older check retains its receipt and decision evidence. Its
+              temporary raw snapshot has expired to save space. Verify again to
+              inspect fresh legacy provenance.
+            </p>
+          )}
           {check.receipt.url?.startsWith('https://') && (
             <a href={check.receipt.url} target="_blank" rel="noreferrer">
               View source
@@ -144,7 +152,9 @@ export default function SourceRecovery({
           </details>
           <Button
             variant="outline"
-            disabled={busy}
+            disabled={
+              busy || check.evidence_retention?.rawSnapshot === 'expired'
+            }
             onClick={() =>
               void run(async () => {
                 const result = await api<{

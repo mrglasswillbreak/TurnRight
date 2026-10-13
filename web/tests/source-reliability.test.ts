@@ -15,6 +15,7 @@ import {
 import {
   boundedComparison,
   batches,
+  evidenceBatches,
   runSourceCheck,
 } from '../../scripts/source-check-worker.mjs';
 // @ts-expect-error Shared Node hash.
@@ -67,6 +68,32 @@ const receipt = {
   configurationHash: 'configuration',
   collections: [{ identity: 'ways', complete: true, count: 1 }],
 };
+it('keeps 100,000-feature archive batches bounded and localizes changes to one identity bucket', () => {
+  const rows = Array.from({ length: 100000 }, (_, i) => ({
+    identity: `object-${i}`,
+    value: i,
+  }));
+  const key = (r: { identity: string }) => r.identity;
+  const before = evidenceBatches(rows, key);
+  const after = evidenceBatches([...rows].reverse(), key);
+  expect(after).toEqual(before);
+  expect(before.flatMap((b: any) => b.records)).toHaveLength(100000);
+  expect(
+    before.every(
+      (b: any) =>
+        b.records.length <= 100 &&
+        Buffer.byteLength(JSON.stringify(b.records)) < 384 * 1024,
+    ),
+  ).toBe(true);
+  const fingerprints = new Set(before.map((b: any) => hash(b.records)));
+  const changed = evidenceBatches(
+    [...rows, { identity: 'new-object', value: -1 }],
+    key,
+  );
+  expect(
+    changed.filter((b: any) => !fingerprints.has(hash(b.records))).length,
+  ).toBeLessThan(10);
+});
 it('waits for bounded finalization beyond the ordinary HTTP deadline without duplicate dispatch', async () => {
   vi.useFakeTimers();
   vi.stubEnv('SUPABASE_URL', 'https://source-check-test.invalid');
