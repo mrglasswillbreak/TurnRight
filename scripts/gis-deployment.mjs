@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import {createWriteStream, createReadStream} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {createHash,randomBytes,createCipheriv,publicEncrypt,constants} from 'node:crypto';
+import {createHash,randomBytes,createCipheriv,publicEncrypt,createPublicKey,constants} from 'node:crypto';
 import {createGzip} from 'node:zlib';
 import {pipeline} from 'node:stream/promises';
 import {once} from 'node:events';
@@ -19,6 +19,8 @@ if(mode==='migrate'){
   const receipt=await (await request('/rest/v1/rpc/turnright_apply_gis_20261005',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_bundle:bundle})})).json();
   await fs.writeFile(path.join(out,'migration-receipt.json'),JSON.stringify(receipt,null,2));console.log('Applied verified GIS migrations; receipt saved.');
 }else if(mode==='backup'){
+  // Workflow text inputs can carry literal \n sequences without losing PEM line breaks.
+  const publicKey=createPublicKey(process.env.GIS_BACKUP_PUBLIC_KEY?.replace(/\\n/g,'\n') || await fs.readFile(path.join(root,'scripts/gis/deployment-backup-public.pem')));
   const key=randomBytes(32),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv),gzip=createGzip({level:6});
   const destination=path.join(out,'application-backup.enc');const finished=pipeline(gzip,cipher,createWriteStream(destination,{flags:'wx'}));
   const counts={},objects=[];let totalBytes=0;
@@ -35,7 +37,6 @@ if(mode==='migrate'){
     }
     await append({kind:'receipt',counts,objects:objects.length});gzip.end();await finished;
     const digest=createHash('sha256');for await(const chunk of createReadStream(destination))digest.update(chunk);
-    const publicKey=process.env.GIS_BACKUP_PUBLIC_KEY || await fs.readFile(path.join(root,'scripts/gis/deployment-backup-public.pem'));
     const receipt={format:1,algorithm:'RSA-OAEP-SHA256 + AES-256-GCM + gzip',iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),wrappedKey:publicEncrypt({key:publicKey,oaepHash:'sha256',padding:constants.RSA_PKCS1_OAEP_PADDING},key).toString('base64'),sha256:digest.digest('hex'),counts,storageObjects:objects.length,storageBytes:objects.reduce((n,o)=>n+o.bytes,0),scope:'Public application tables and private storage; Supabase Auth and platform configuration are not included'};
     await fs.writeFile(path.join(out,'backup-receipt.json'),JSON.stringify(receipt,null,2));console.log('Encrypted application backup complete.');
   }catch(error){gzip.destroy(error);await finished.catch(()=>{});throw error;}
