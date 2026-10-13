@@ -57,7 +57,7 @@ jobs:
             web/work/campus-layer-baselines.json
             web/work/gis-deployment/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 90
       - if: inputs.mode == 'backup'
         uses: actions/upload-artifact@v4
         with:
