@@ -6,6 +6,7 @@ import {createHash,randomBytes,createCipheriv,publicEncrypt,createPublicKey,cons
 import {createGzip} from 'node:zlib';
 import {pipeline} from 'node:stream/promises';
 import {once} from 'node:events';
+import {verifyDeploymentBackup} from './gis/verify-deployment-backup.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const base=process.env.SUPABASE_URL,secret=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!base||!secret)throw Error('Deployment credentials are missing');
@@ -41,5 +42,8 @@ if(mode==='migrate'){
     const digest=createHash('sha256');for await(const chunk of createReadStream(destination))digest.update(chunk);
     const receipt={format:1,algorithm:'RSA-OAEP-SHA256 + AES-256-GCM + gzip',iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),wrappedKey:publicEncrypt({key:publicKey,oaepHash:'sha256',padding:constants.RSA_PKCS1_OAEP_PADDING},key).toString('base64'),sha256:digest.digest('hex'),counts,excludedTables,storageObjects:objects.length,storageBytes:objects.reduce((n,o)=>n+o.bytes,0),scope:'Public application tables and private storage; Supabase Auth and platform configuration are not included'};
     await fs.writeFile(path.join(out,'backup-receipt.json'),JSON.stringify(receipt,null,2));console.log('Encrypted application backup complete.');
+    const verified=await verifyDeploymentBackup(out,key);
+    console.log('Full encrypted readback verified: '+verified.storageObjects+' private files; recovery key fingerprint recorded.');
+    key.fill(0);
   }catch(error){gzip.destroy(error);await finished.catch(()=>{});throw error;}
 }else throw Error('Use GIS_DEPLOYMENT_MODE=backup or migrate');

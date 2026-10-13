@@ -58,6 +58,15 @@ jobs:
             web/work/gis-deployment/
           if-no-files-found: error
           retention-days: 14
+      - if: inputs.mode == 'backup'
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-backup-verification
+          path: |
+            web/work/gis-deployment/verification.json
+            web/work/gis-deployment/backup-receipt.json
+          if-no-files-found: error
+          retention-days: 90
 
   backup-download:
     if: inputs.mode == 'backup-download'

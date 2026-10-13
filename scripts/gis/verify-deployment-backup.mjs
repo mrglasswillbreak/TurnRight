@@ -6,18 +6,18 @@ import { createGunzip } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { pipeline } from 'node:stream/promises';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 
 // Extract the encrypted artifact alongside its separately retained private key.
 // Verification streams plaintext in memory and never writes decrypted records.
-const directory = process.argv[2];
-if (!directory) throw Error('Usage: node scripts/gis/verify-deployment-backup.mjs <private-backup-directory>');
+export async function verifyDeploymentBackup(directory, inMemoryKey) {
 const file = (name) => path.join(directory, name);
 const receipt = JSON.parse(await fs.readFile(file('backup-receipt.json'), 'utf8'));
 assert.equal(receipt.format, 1);
 const hash = createHash('sha256');
 for await (const chunk of createReadStream(file('application-backup.enc'))) hash.update(chunk);
 assert.equal(hash.digest('hex'), receipt.sha256, 'Encrypted backup hash');
-const key = privateDecrypt({
+const key = inMemoryKey || privateDecrypt({
   key: await fs.readFile(file('backup-private.pem')),
   oaepHash: 'sha256', padding: constants.RSA_PKCS1_OAEP_PADDING,
 }, Buffer.from(receipt.wrappedKey, 'base64'));
@@ -53,9 +53,17 @@ assert.equal(objects, receipt.storageObjects);
 assert.equal(storageBytes, receipt.storageBytes);
 const verification = {
   verifiedAt: new Date().toISOString(), sha256: receipt.sha256,
+  recoveryKeySha256: createHash('sha256').update(key).digest('hex'),
+  keyMode: inMemoryKey ? 'in-memory encryption key' : 'RSA recovery key',
   counts, storageObjects: objects, storageBytes,
-  checks: ['ciphertext SHA-256', 'RSA key unwrap', 'AES-GCM authentication', 'gzip records', 'row counts and identities', 'storage content hashes'],
+  checks: ['ciphertext SHA-256', ...(inMemoryKey ? [] : ['RSA key unwrap']), 'AES-GCM authentication', 'gzip records', 'row counts and identities', 'storage content hashes'],
   scope: receipt.scope,
 };
 await fs.writeFile(file('verification.json'), JSON.stringify(verification, null, 2));
-console.log(JSON.stringify(verification, null, 2));
+return verification;
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  if (!process.argv[2]) throw Error('Usage: node scripts/gis/verify-deployment-backup.mjs <private-backup-directory>');
+  console.log(JSON.stringify(await verifyDeploymentBackup(process.argv[2]), null, 2));
+}
