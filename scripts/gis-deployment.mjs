@@ -35,7 +35,7 @@ if(mode==='migrate'){
     }
     await append({kind:'receipt',counts,objects:objects.length});gzip.end();await finished;
     const digest=createHash('sha256');for await(const chunk of createReadStream(destination))digest.update(chunk);
-    const publicKey=await fs.readFile(path.join(root,'scripts/gis/deployment-backup-public.pem'));
+    const publicKey=process.env.GIS_BACKUP_PUBLIC_KEY || await fs.readFile(path.join(root,'scripts/gis/deployment-backup-public.pem'));
     const receipt={format:1,algorithm:'RSA-OAEP-SHA256 + AES-256-GCM + gzip',iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),wrappedKey:publicEncrypt({key:publicKey,oaepHash:'sha256',padding:constants.RSA_PKCS1_OAEP_PADDING},key).toString('base64'),sha256:digest.digest('hex'),counts,storageObjects:objects.length,storageBytes:objects.reduce((n,o)=>n+o.bytes,0),scope:'Public application tables and private storage; Supabase Auth and platform configuration are not included'};
     await fs.writeFile(path.join(out,'backup-receipt.json'),JSON.stringify(receipt,null,2));console.log('Encrypted application backup complete.');
   }catch(error){gzip.destroy(error);await finished.catch(()=>{});throw error;}

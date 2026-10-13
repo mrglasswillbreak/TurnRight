@@ -7,6 +7,10 @@ on:
         type: choice
         options: [baseline, backup, migrate]
         default: baseline
+      backup_public_key:
+        description: "Optional RSA public key for this encrypted backup; retain the private key separately"
+        type: string
+        required: false
   push:
     branches: [codex/lasu-campus-layers]
     paths: [.github/workflows/campus-layer-baselines.yml]
@@ -35,6 +39,7 @@ jobs:
         run: node scripts/gis-deployment.mjs
         env:
           GIS_DEPLOYMENT_MODE: ${{ inputs.mode }}
+          GIS_BACKUP_PUBLIC_KEY: ${{ inputs.backup_public_key }}
       - uses: actions/upload-artifact@v4
         with:
           name: campus-layer-baselines
