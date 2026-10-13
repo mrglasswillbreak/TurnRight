@@ -552,6 +552,7 @@ test("workspace panes preserve the canvas, restore preferences and dismiss the l
   await expect(page.getByRole("button", { name: "Close map legend", exact: true })).toBeVisible();
   const retainedCanvas = await page.locator(".map-canvas").elementHandle();
   await page.getByRole("button", { name: /^Activity/ }).click();
+  await expect(page.getByRole("region", { name: "Builds and processes" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: /^Activity/ })).toBeFocused();
   await page.getByRole("button", { name: "Focus canvas", exact: true }).click();
@@ -586,7 +587,12 @@ test("workspace panes preserve the canvas, restore preferences and dismiss the l
       .getByRole("button", { name: "Data", exact: true }),
   ).toHaveAttribute("aria-current", "page");
   await page.setViewportSize({ width: 390, height: 844 });
+  // WebKit can finish resizing before the matchMedia listener commits the
+  // compact toolbar. Wait for that layout before choosing a click position.
+  await expect(page.locator(".workspace-frame")).toHaveAttribute("data-compact", "true");
+  await expect(page.getByRole("combobox", { name: "Workspace", exact: true })).toBeVisible();
   await page.getByRole("button", { name: /^Activity/ }).click();
+  await expect(page.getByRole("region", { name: "Builds and processes" })).toBeVisible();
   const activityBounds = (await page.locator("#process-list").boundingBox())!;
   expect(activityBounds.x).toBeGreaterThanOrEqual(0);
   expect(activityBounds.x + activityBounds.width).toBeLessThanOrEqual(390);
