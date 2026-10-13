@@ -11,6 +11,10 @@ on:
         description: "Optional RSA public key for this encrypted backup; retain the private key separately"
         type: string
         required: false
+      backup_excluded_tables:
+        description: "Optional comma-separated restricted tables backed up separately through the database dashboard"
+        type: string
+        required: false
   push:
     branches: [codex/lasu-campus-layers]
     paths: [.github/workflows/campus-layer-baselines.yml]
@@ -40,6 +44,7 @@ jobs:
         env:
           GIS_DEPLOYMENT_MODE: ${{ inputs.mode }}
           GIS_BACKUP_PUBLIC_KEY: ${{ inputs.backup_public_key }}
+          GIS_BACKUP_EXCLUDED_TABLES: ${{ inputs.backup_excluded_tables }}
       - uses: actions/upload-artifact@v4
         with:
           name: campus-layer-baselines
