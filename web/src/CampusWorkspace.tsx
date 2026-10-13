@@ -255,7 +255,7 @@ export default function CampusWorkspace({
           ? 'Wait for the current operation to finish.'
           : !job.summary
             ? 'Preview details are unavailable. Reopen this import or rebuild its preview.'
-            : job.summary.errors.length
+            : job.summary.errors.length && !job.summary.comparisonVersion
               ? 'Resolve the preview errors shown above, then rebuild the preview.'
               : !sameImportConfiguration(configuration, job.configuration)
                 ? 'Settings changed since this preview was built. Rebuild preview to include your changes.'

@@ -1,9 +1,12 @@
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { allRows, compareSources, db, flatten, preserveReviewedMetadata } from "./cloud.mjs";
+import { allRows, db, flatten, hash, evidenceHash } from "./cloud.mjs";
+import { attachDerivedRecords } from "./source-comparison.mjs";
+import { runSourceCheck } from "./source-check-worker.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let jobId = process.env.JOB_ID;
+let checkMessage = "Approved source baseline initialized.";
 try {
   if (!jobId) {
     const [job] = await db("jobs", "POST", { kind: "import", status: "running" });
@@ -28,25 +31,48 @@ try {
   } else {
     if (!previous.length)
       throw new Error("Run the documented one-time bootstrap before source checks.");
-    const changes = compareSources(previous, preserveReviewedMetadata(previous, candidate));
-    // Suppress identical rejected decisions, but replace obsolete pending proposals.
-    const known = await allRows("map_changes"),
-      knownIds = new Set(known.map((c) => c.id)),
-      newIds = new Set(changes.map((c) => c.id));
-    for (const obsolete of known.filter((c) => c.status === "pending" && !newIds.has(c.id)))
-      await db(`map_changes?id=eq.${obsolete.id}`, "PATCH", { status: "superseded" });
-    const fresh = changes.filter((c) => !knownIds.has(c.id));
-    for (let i = 0; i < fresh.length; i += 100)
-      await db("map_changes", "POST", fresh.slice(i, i + 100));
+    const upstream = JSON.parse(
+      await fs.readFile(path.join(root, "data/candidates/enrichment/observations.json"), "utf8"),
+    );
+    const observations = attachDerivedRecords(upstream.observations, candidate);
+    const coverage = JSON.parse(
+      await fs.readFile(path.join(root, "data/candidates/enrichment/coverage.json"), "utf8"),
+    );
+    const snapshots = data.sourceSnapshots || [];
+    if (!snapshots.length || snapshots.some((s) => !s.retrievedAt))
+      throw new Error(
+        "Original source retrieval receipts are missing. Refresh the upstream downloads.",
+      );
+    // Retained snapshots carry the retrieval times. Filesystem modification time
+    // and check time are not substitutes for evidence of source retrieval.
+    const receipt = {
+      url: "https://github.com/mrglasswillbreak/TurnRight/actions/workflows/source-update.yml",
+      retrievedAt: snapshots
+        .map((s) => s.retrievedAt)
+        .filter(Boolean)
+        .sort()[0],
+      contentHash: evidenceHash(observations.map((o) => o.content)),
+      configurationHash: hash({ bounds: data.bounds, importer: "lasu-enrichment/2" }),
+      boundary: data.bounds,
+      importerVersion: "lasu-enrichment/2",
+      snapshots,
+      providerRevision: coverage.overtureRelease,
+      extractBoundary: "3.190,6.455,3.215,6.489",
+      collections: upstream.collections,
+    };
+    const result = await runSourceCheck({ sourceKey: "lasu-enrichment", observations, receipt });
+    checkMessage =
+      result.status === "shadow"
+        ? "Shadow comparison saved. Proposal generation remains disabled during rollout."
+        : "Source comparison saved. Verified groups await review; uncertain groups remain blocked.";
+    console.log(`Source comparison saved (${result.status}).`);
   }
   await db(`jobs?id=eq.${jobId}`, "PATCH", {
     status: "succeeded",
-    message: bootstrap
-      ? "Approved source baseline initialized."
-      : "Source check complete. Proposed changes await review.",
+    message: checkMessage,
     completed_at: new Date().toISOString(),
   });
-  console.log(bootstrap ? "Source baseline initialized." : "Source changes queued for review.");
+  console.log(checkMessage);
 } catch (error) {
   if (jobId)
     await db(`jobs?id=eq.${jobId}`, "PATCH", {

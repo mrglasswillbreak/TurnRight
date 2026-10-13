@@ -98,7 +98,7 @@ class MapImportTests(unittest.TestCase):
         layer['features'][0]['properties']['internal_note']='private source attribute'
         result=normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')
         self.assertFalse(result['summary']['errors'])
-        building=next(p['after'] for p in result['proposals'] if p['after'] and p['after']['entity']=='feature')
+        building=next(r for r in result['convertedRecords'] if r['entity']=='feature')
         self.assertEqual(len(building['payload']['geometry']['coordinates']),2)
         self.assertEqual(len(building['payload']['geometry']['coordinates'][0]),2)
         self.assertNotIn('internal_note',building['payload']['properties'])
@@ -113,7 +113,7 @@ class MapImportTests(unittest.TestCase):
             return {'features':[{'attributes':{'OBJECTID':int(i)},'geometry':{'x':3.2,'y':6.46}} for i in form['objectIds'].split(',')]}
         result=layer_features('https://services.example/FeatureServer/0',CAMPUS['bounds'],get)
         self.assertEqual(len(result['features']),3)
-        self.assertEqual([f['objectIds'] for _,f in calls if f and 'objectIds' in f],['7,8','9'])
+        self.assertEqual([f['objectIds'] for _,f in calls if f and 'objectIds' in f],['7,8','9','7,8','9'])
         def partial(url,form=None):
             value=get(url,form)
             if form and 'objectIds' in form: value['features']=[]
@@ -143,9 +143,34 @@ class MapImportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'cycle'):
             discover('https://example.org/map',CAMPUS['bounds'],lambda *args: {'operationalLayers':[{'url':'https://example.org/map'}]})
 
+    def test_arcgis_detects_content_churn_without_an_editing_revision(self):
+        pages=0
+        def get(url,form=None):
+            nonlocal pages
+            if form is None: return {'id':0,'capabilities':'Query','objectIdField':'OBJECTID'}
+            if 'returnCountOnly' in form: return {'count':1}
+            if 'returnIdsOnly' in form: return {'objectIds':[7]}
+            pages+=1
+            return {'features':[{'attributes':{'OBJECTID':7,'name':str(pages)},'geometry':{'x':3,'y':6}}]}
+        with self.assertRaisesRegex(ValueError,'independent completeness'):
+            layer_features('https://example.org/FeatureServer/0',CAMPUS['bounds'],get)
+
+    def test_failed_arcgis_collection_does_not_discard_complete_collections(self):
+        def get(url,form=None):
+            if url.endswith('FeatureServer?f=json'): return {'layers':[{'id':0,'name':'Held'},{'id':1,'name':'Complete'}]}
+            if '/0?' in url: raise OSError('Unavailable layer')
+            if form is None: return {'id':1,'name':'Complete','geometryType':'esriGeometryPolygon','capabilities':'Query','objectIdField':'OBJECTID'}
+            if 'returnCountOnly' in form: return {'count':0}
+            return {'objectIds':[]}
+        layers,warnings=discover('https://example.org/FeatureServer',CAMPUS['bounds'],get)
+        self.assertEqual(len(layers),2)
+        self.assertEqual(layers[0]['retrievalError'],'Unavailable layer')
+        self.assertNotIn('retrievalError',layers[1])
+        self.assertTrue(warnings)
+
     def test_source_refresh_preserves_authored_building_and_coded_labels(self):
         initial=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'first')
-        previous=[p['after'] for p in initial['proposals'] if p['after']]
+        previous=initial['convertedRecords']
         building=next(r for r in previous if r['entity']=='feature')
         building['payload']['properties']['appearance']={'walls':{'material':'brick'}}
         building['payload']['properties']['modelDocumentAsset']={'id':'private-asset'}
@@ -154,16 +179,17 @@ class MapImportTests(unittest.TestCase):
         layer['features'][0]['properties']['category']=7
         layer['fields'].append({'name':'category','codedValues':{'7':'Library'}})
         refreshed=normalise([layer],SOURCE,CAMPUS,previous,CONFIG,'second')
-        changed=next(p['after'] for p in refreshed['proposals'] if p['after'] and p['after']['entity']=='feature')
+        changed=next(r for r in refreshed['convertedRecords'] if r['entity']=='feature')
         self.assertEqual(changed['payload']['properties']['modelDocumentAsset'],{'id':'private-asset'})
         self.assertEqual(changed['payload']['properties']['appearance'],{'walls':{'material':'brick'}})
-        self.assertEqual(next(p['after'] for p in refreshed['proposals'] if p['after'] and p['after']['entity']=='place')['payload']['category'],'library')
+        self.assertEqual(next(r for r in refreshed['convertedRecords'] if r['entity']=='place')['payload']['category'],'library')
 
     def test_native_mapping_identity_and_repeat_import(self):
         candidate=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'upload-one')
         self.assertFalse(candidate['summary']['errors'])
-        self.assertEqual(candidate['summary']['counts']['added'],2)
-        accepted=[p['after'] for p in candidate['proposals'] if p['after']]
+        self.assertEqual(len([r for r in candidate['convertedRecords'] if r['entity']!='meta']),2)
+        self.assertEqual(candidate['proposals'],[]) # Only the shared comparator creates decisions.
+        accepted=candidate['convertedRecords']
         repeated=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,accepted,CONFIG,'upload-two')
         self.assertEqual(repeated['proposals'],[])
         self.assertEqual(next(r for r in accepted if r['entity']=='place')['payload']['name'],'Bibliothèque')
@@ -176,14 +202,14 @@ class MapImportTests(unittest.TestCase):
         config=copy.deepcopy(CONFIG); del config['layers'][0]['idField']
         a=normalise([LAYER],SOURCE,CAMPUS,[META],config,'one')
         b=normalise([LAYER],SOURCE,CAMPUS,[META],config,'two')
-        self.assertEqual(a['proposals'][0]['source_id'],b['proposals'][0]['source_id'])
+        self.assertEqual(a['observations'][0]['nativeId'],b['observations'][0]['nativeId'])
 
     def test_generic_paths_keep_distinct_endpoints_and_restricted_access(self):
         line={'type':'Feature','properties':{'id':'path'},'geometry':{'type':'LineString','coordinates':[[3.2,6.46],[3.201,6.46]]}}
         layer={'name':'Paths','features':[line],'fields':[],'crs':'EPSG:4326','geometryTypes':['LineString'],'suggestedRole':'path'}
         config={**CONFIG,'layers':[{'layer':'Paths','role':'path','idField':'id'}]}
         result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
-        records=[p['after'] for p in result['proposals'] if p['after']]
+        records=result['convertedRecords']
         self.assertEqual(len([r for r in records if r['entity']=='edge']),2)
         self.assertTrue(all(r['payload']['walkingAccess']=='private' for r in records if r['entity']=='edge'))
         self.assertFalse(next(r for r in records if r['entity']=='feature')['payload']['properties']['autoConnectCrossings'])

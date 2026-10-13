@@ -357,3 +357,16 @@
     font-size: 11px;
   }
 }
+.source-recovery {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.source-recovery details {
+  margin-block: 0.75rem;
+}
+.source-recovery pre {
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

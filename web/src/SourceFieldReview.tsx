@@ -12,7 +12,7 @@ export function SourceFieldReview({
   busy,
   action,
 }: {
-  change: MapChange;
+  change: MapChange & { review_revision?: number };
   data: CampusData;
   busy: boolean;
   action: (name: string, payload: unknown, success: string) => Promise<boolean>;
@@ -108,7 +108,12 @@ export function SourceFieldReview({
               if (
                 await action(
                   'review-change',
-                  { id: change.id, accept: true, fields: selected },
+                  {
+                    id: change.id,
+                    accept: true,
+                    fields: selected,
+                    revision: change.review_revision,
+                  },
                   'Selected details accepted. Remaining differences still await review.',
                 )
               )

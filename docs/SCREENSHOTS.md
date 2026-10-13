@@ -2,6 +2,16 @@
 
 The current gallery shows the B2 campus identity across public navigation, team workspaces and supporting tools, alongside dated source-update and map-preview examples. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/b2-2026-10-11.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
+## Source reliability and private undo · 13 October 2026
+
+| Desktop recovery | Phone recovery |
+| --- | --- |
+| ![Desktop evidence and private undo preview](assets/screenshots/source-reliability-desktop-2026-10-13.png) | ![Phone undo preview with preserved editor corrections and separate publication](assets/screenshots/source-reliability-mobile-2026-10-13.png) |
+
+These direct WebKit captures use the local working tree and isolated owner/API fixtures: one blocked path, one incomplete check and one reversible decision. Counts and decisions are synthetic. No production data is changed. Phone uses a browser viewport, not a physical iPhone. [Capture provenance and hashes](assets/screenshots/source-reliability-2026-10-13.json).
+
+Run `npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source updates reliability" --output ../test-results/source-reliability-webkit` from `web/`. Run the same filter with `npm run test:browser` for Chromium. The journeys inspect exclusion of unverified removals, check receipts, a fresh verification request and a previewed private reversal. Broader `--grep "source updates"` journeys also cover frozen bulk decisions and read-only map comparisons.
+
 ## B2 campus identity · 11 October 2026
 
 Nineteen fresh Chromium captures update the README and linked workflow guides. The shared arrow-and-graduation-cap mark appears in public navigation, editor headers, the offline panel and sign-in. Public/editor/model/GIS views use the verified LASU `lasu-4895a363b403` package with isolated owner/team responses; sign-in is captured without an account. Photo and import fixtures are described below. These captures show the local application, with deployment status recorded separately in [Production](PRODUCTION.md).

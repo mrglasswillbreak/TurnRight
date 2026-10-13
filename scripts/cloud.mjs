@@ -57,8 +57,12 @@ export async function db(
     signal: AbortSignal.timeout(timeoutMs),
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok)
-    throw new Error(data?.message || `Database request failed (${response.status})`);
+  if (!response.ok) {
+    const error = new Error(data?.message || `Database request failed (${response.status})`);
+    error.status = response.status;
+    error.code = data?.code;
+    throw error;
+  }
   return data;
 }
 export async function allRows(table) {
@@ -70,20 +74,26 @@ export async function allRows(table) {
   }
   throw new Error("Campus dataset exceeds expected bounds");
 }
-export function canonical(value) {
-  if (Array.isArray(value)) return value.map(canonical);
+export function canonical(value, preserveAllFields = false) {
+  if (Array.isArray(value)) return value.map((item) => canonical(item, preserveAllFields));
   if (value && typeof value === "object")
     return Object.fromEntries(
       Object.keys(value)
         .sort()
-        .filter((k) => !["createdAt", "retrievedAt", "checkedAt"].includes(k))
-        .map((k) => [k, canonical(value[k])]),
+        .filter((k) => preserveAllFields || !["createdAt", "retrievedAt", "checkedAt"].includes(k))
+        .map((k) => [k, canonical(value[k], preserveAllFields)]),
     );
   return value;
 }
 export const hash = (value) =>
   createHash("sha256")
     .update(JSON.stringify(canonical(value)))
+    .digest("hex");
+// Raw provider evidence contains no TurnRight check receipts. Preserve every
+// upstream field, including legitimate provider attributes named createdAt.
+export const evidenceHash = (value) =>
+  createHash("sha256")
+    .update(JSON.stringify(canonical(value, true)))
     .digest("hex");
 export function flatten(data) {
   const records = [];

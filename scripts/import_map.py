@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from map_import.formats import inspect_file, check_expanded_batch
 from map_import.geometry import preview_features
 from map_import.network import MAX_BYTES, fetch_public
-from map_import.queue import queue_import
+from map_import.queue import queue_verified_import as queue_import
 
 
 def encoded(value):
@@ -48,6 +48,8 @@ def convert(folder):
         progress(f"Inspecting file {index+1} of {len(request['files'])}: {source_file.get('label',source_file['path'])}")
         data = inspect_file(folder/source_file['path'],request['configuration'],folder/'expanded',source_file.get('label'))
         for layer in data:
+            for key in ('sourceUrl','layerIdentity','providerRevision','embedded','sourceCollection','snapshotHash','retrievalError'):
+                if source_file.get(key) is not None: layer[key] = source_file[key]
             # Expose aliases and domain labels in the mapping UI without losing original values.
             fields = {f['name']:f for f in source_file.get('fields',[])}
             for field in layer['fields']:
@@ -145,6 +147,7 @@ def run_job():
         with tempfile.TemporaryDirectory(prefix='turnright-import-') as temp:
             folder=Path(temp); files=[]; warnings=[]
             raw_snapshot=None
+            retrieved_at=job.get('retrieval_receipt',{}).get('retrievedAt')
             if source['kind']=='file':
                 assets=db(f'campus_import_assets?import_id=eq.{import_id}&order=name')
                 if not assets: raise ValueError('Upload at least one map file before inspection.')
@@ -163,13 +166,16 @@ def run_job():
                     if filename != asset['name'] or '\\' in filename or ':' in filename: raise ValueError('Invalid upload filename.')
                     (folder/filename).write_bytes(content)
                     files.append({'path':filename,'label':Path(asset['name']).stem})
+                retrieved_at=retrieved_at or datetime.now(timezone.utc).isoformat()
             else:
-                if source['kind']=='osm' and not job.get('snapshot_path'):
+                if source['kind']=='osm' and not job.get('snapshot_path') and not job.get('force_uncached'):
                     recent=db(f"campus_imports?source_id=eq.{source['id']}&snapshot_path=not.is.null&status=in.(mapping,preview,reviewed)&order=updated_at.desc&limit=1")
-                    if recent:
-                        age=(datetime.now(timezone.utc)-datetime.fromisoformat(recent[0]['updated_at'].replace('Z','+00:00'))).total_seconds()
+                    if recent and recent[0].get('retrieval_receipt',{}).get('retrievedAt'):
+                        original_time=recent[0]['retrieval_receipt']['retrievedAt']
+                        age=(datetime.now(timezone.utc)-datetime.fromisoformat(original_time.replace('Z','+00:00'))).total_seconds()
                         if age<900 and recent[0]['snapshot_path'].startswith(f"{campus_id}/{recent[0]['id']}/"):
                             raw_snapshot=remote('storage/v1/object/campus-imports/'+recent[0]['snapshot_path'],raw=True)
+                            retrieved_at=original_time
                             warnings.append('Reused the source snapshot downloaded within the last 15 minutes.')
                 if job.get('snapshot_path'):
                     if not job['snapshot_path'].startswith(f'{campus_id}/{import_id}/'): raise ValueError('Snapshot identity mismatch.')
@@ -179,6 +185,7 @@ def run_job():
                 elif source['kind']=='arcgis':
                     layers,warnings=discover(source['url'],campus['bounds'],progress=progress)
                     raw_snapshot=encoded({'layers':layers,'warnings':warnings})
+                    retrieved_at=datetime.now(timezone.utc).isoformat()
                 else:
                     progress('Downloading complete OpenStreetMap geometry and relation members')
                     polygon=campus['boundary']['geometry']
@@ -189,19 +196,20 @@ def run_job():
                         queries.append(f'nwr(poly:"{coords}");')
                     query='[out:xml][timeout:90][maxsize:268435456];('+''.join(queries)+');(._;>>;);out meta;'
                     raw_snapshot=fetch_public(os.environ.get('OVERPASS_URL','https://overpass-api.de/api/interpreter'),form={'data':query})
+                    retrieved_at=datetime.now(timezone.utc).isoformat()
                 if source['kind']=='arcgis':
                     snapshot=json.loads(raw_snapshot)
                     warnings=snapshot.get('warnings',[])
                     for index,layer in enumerate(snapshot['layers']):
                         filename=f'arcgis-{index}.json'; (folder/filename).write_bytes(encoded(layer))
-                        files.append({'path':filename,'label':layer['name'],'fields':layer.get('fields',[])})
+                        files.append({'path':filename,'label':layer['name'],'fields':layer.get('fields',[]), **{key:layer.get(key) for key in ('sourceUrl','layerIdentity','providerRevision','embedded','sourceCollection','snapshotHash','retrievalError')}})
                 else:
                     (folder/'source.osm').write_bytes(raw_snapshot); files=[{'path':'source.osm'}]
                 if not job.get('snapshot_path'):
                     if len(raw_snapshot)>MAX_BYTES: raise ValueError('The downloaded source exceeds 50 MiB. Choose a smaller boundary or individual layers.')
                     snapshot_path=f'{campus_id}/{import_id}/snapshot-{token}.json'
                     remote('storage/v1/object/campus-imports/'+snapshot_path,'POST',raw_snapshot)
-                    db(selector+'&status=eq.running','PATCH',{'snapshot_path':snapshot_path,'source_hash':hashlib.sha256(raw_snapshot).hexdigest()})
+                    db(selector+'&status=eq.running','PATCH',{'snapshot_path':snapshot_path,'source_hash':hashlib.sha256(raw_snapshot).hexdigest(),'retrieval_receipt':{'retrievedAt':retrieved_at}})
             live()
             request={'files':files,'warnings':warnings,'source':source,'campus':campus,'previous':previous,'configuration':job['configuration'],'phase':job['phase'],'importId':import_id}
             (folder/'request.json').write_bytes(encoded(request))
@@ -230,6 +238,21 @@ def run_job():
                 raise ValueError(message[:1000])
             live()
             result=json.loads((folder/'result.json').read_text(encoding='utf-8'))
+            if job['phase']=='preview':
+                from map_import.normalise import digest
+                if not retrieved_at: raise ValueError('This legacy cached snapshot has no original retrieval receipt. Download it again before checking updates.')
+                result['sourceKey']='import:'+source['id']
+                result['summary']['comparisonVersion']='source-observations/1'
+                result['summary']['reviewableCollections']=sum(bool(c.get('complete')) for c in result['collections'])
+                result['completeReplacement']=source['kind']!='file' or job['configuration'].get('refreshMode') in ('replace-source','replace-layer')
+                result['receipt']={'url':source.get('url'),'retrievedAt':retrieved_at,
+                    'contentHash':hashlib.sha256(raw_snapshot).hexdigest() if raw_snapshot else digest([a['sha256'] for a in assets]),
+                    'configurationHash':digest({'boundary':campus['boundary'],'provider':source['kind'],'url':source.get('url'),'mapping':{k:v for k,v in job['configuration'].items() if k!='refreshMode'},'importer':'map-import/2'}),
+                    'boundary':campus['boundary'],'mapping':job['configuration'],'importerVersion':'map-import/2',
+                    'collections':result['collections']}
+                (folder/'result.json').write_bytes(encoded(result))
+                subprocess.run(['node',str(Path(__file__).with_name('source-check-worker.mjs')),str(folder/'result.json'),'--preview'],check=True,timeout=120)
+                result=json.loads((folder/'result.json').read_text(encoding='utf-8'))
             progress(f"Saving inspection results: {result['summary']['totalFeatures']} features")
             update={'status':'mapping' if job['phase']=='inspect' else 'preview','summary':result['summary'],'message':'Choose layer mappings' if job['phase']=='inspect' else 'Preview ready; review before applying','updated_at':datetime.now(timezone.utc).isoformat()}
             if job['phase']=='preview':
@@ -239,7 +262,7 @@ def run_job():
                 remote('storage/v1/object/campus-imports/'+path,'POST',candidate_bytes)
                 update['candidate_path']=path
             changed=db(selector+'&status=eq.running&select=id','PATCH',update)
-            if changed and job.get('auto_queue') and job['phase']=='preview' and not result['summary']['errors']:
+            if changed and job.get('auto_queue') and job['phase']=='preview':
                 queue_import(db,import_id,token,result,progress)
             db('campus_sources?id=eq.'+source['id'],'PATCH',{'last_checked_at':datetime.now(timezone.utc).isoformat()})
     except Exception as error:

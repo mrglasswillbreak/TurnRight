@@ -3,12 +3,13 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from place_enrichment import names, classify, details, enrich_osm
 from overture_enrichment import read_extract, apply_overture
-from download_overture import matching_assets
-from enrich_campus import candidate_version, preserve_published_owner_data
+from download_overture import matching_assets, RangeFile
+from enrich_campus import candidate_version, preserve_published_owner_data, download_extracts
 
 
 def campus():
@@ -22,6 +23,65 @@ def place(identifier='test', name='LASU Cafe', x=.2, category=True):
 
 
 class EnrichmentTests(unittest.TestCase):
+    def test_core_download_failure_still_records_independent_overture_evidence(self):
+        import hashlib
+        from enrich_campus import main, BBOX
+        def extracts(directory,release,strict):
+            directory.mkdir(parents=True)
+            for kind in ('place','building','segment','connector'):
+                path=directory/(kind+'.geojson')
+                path.write_text(json.dumps({'type':'FeatureCollection','features':[place()] if kind=='place' else []}),encoding='utf8')
+                (directory/(kind+'.receipt.json')).write_text(json.dumps({'release':release,'bbox':BBOX,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'originalRetrieval':'2026-10-12T12:00:00Z'}),encoding='utf8')
+            return {}
+        with tempfile.TemporaryDirectory() as tmp:
+            root=pathlib.Path(tmp)
+            baseline=campus()
+            baseline.update(version='fixture',bounds=[[0,0],[1,1]],coverage={})
+            baseline['graph']['nodes']=[]
+            (root/'base.json').write_text(json.dumps(baseline),encoding='utf8')
+            arguments=['enrich_campus','--base',str(root/'base.json'),'--raw-dir',str(root/'raw'),'--output',str(root/'output'),'--release','2026-08-19.0']
+            with patch.object(sys,'argv',arguments),patch('enrich_campus.import_campus.fetch',side_effect=OSError('source unavailable')),patch('enrich_campus.download_extracts',side_effect=extracts),patch('enrich_campus.subprocess.run') as compare,patch('enrich_campus.import_campus.RAW',root/'unused'):
+                main()
+                compare.assert_not_called()
+            observations=json.loads((root/'output/observations.json').read_text(encoding='utf8'))
+            self.assertEqual({o['provider'] for o in observations['observations']},{'overture'})
+            self.assertFalse(observations['collections'][0]['complete'])
+            self.assertFalse(observations['collections'][1]['complete'])
+            self.assertTrue(all(c['complete'] for c in observations['collections'][2:]))
+            self.assertEqual(json.loads((root/'base.json').read_text(encoding='utf8')),baseline)
+
+    def test_independent_overture_requests_revalidate_http_caches(self):
+        import io
+        calls=[]
+        def response(request,timeout):
+            calls.append(request)
+            value=io.BytesIO(b'ab')
+            value.status=206
+            value.headers={'Content-Range':'bytes 0-1/16'}
+            return value
+        with patch('urllib.request.urlopen',side_effect=response):
+            with RangeFile('https://example.org/pinned.parquet',no_cache=True) as stream:
+                self.assertEqual(stream.read(2),b'ab')
+        self.assertEqual(len(calls),2)
+        self.assertTrue(all(c.get_header('Cache-control')=='no-cache, no-store' for c in calls))
+
+    def test_failed_overture_download_holds_only_its_collection(self):
+        kinds=[]
+        class Process:
+            def __init__(self,command):
+                kind=command[command.index('--kind')+1]
+                kinds.append(kind)
+                self.returncode=1 if kind=='building' else 0
+                if not self.returncode:
+                    pathlib.Path(command[-1]).write_text('{"type":"FeatureCollection","features":[]}',encoding='utf8')
+            def wait(self,timeout=None): return self.returncode
+        with tempfile.TemporaryDirectory() as tmp,patch('enrich_campus.subprocess.Popen',side_effect=Process):
+            result=download_extracts(pathlib.Path(tmp),'2026-08-19.0',strict=False)
+            self.assertEqual(set(result),{'overture:building'})
+            self.assertTrue((pathlib.Path(tmp)/'connector.receipt.json').exists())
+            self.assertFalse((pathlib.Path(tmp)/'building.receipt.json').exists())
+        self.assertEqual(kinds,['place','building','segment','connector'])
+
     def test_owner_geometry_and_access_survive_repeated_refreshes(self):
         import copy
         baseline = campus()
@@ -122,6 +182,13 @@ class EnrichmentTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Incomplete'): read_extract(p,'place')
             p.write_text('{')
             with self.assertRaises(json.JSONDecodeError): read_extract(p,'place')
+
+    def test_duplicate_overture_identity_is_not_a_complete_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=pathlib.Path(tmp)/'places.json'
+            path.write_text(json.dumps({'type':'FeatureCollection','features':[place(),place()]}),encoding='utf8')
+            with self.assertRaisesRegex(ValueError,'Duplicate Overture native identity'):
+                read_extract(path,'place')
 
 
 if __name__ == '__main__': unittest.main()

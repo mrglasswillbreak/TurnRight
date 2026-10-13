@@ -24,10 +24,15 @@ def read_extract(path, kind):
         raise ValueError('Overture extract exceeds expected campus bounds')
     if kind == 'place' and data['features'] and not any(any(k in f.get('properties', {}) for k in ('basic_category', 'taxonomy', 'categories')) for f in data['features']):
         raise ValueError('Unsupported Overture place taxonomy')
+    identities = set()
     for f in data['features']:
         p = f.get('properties', {})
         if not (p.get('id') or f.get('id')) or p.get('type', kind) != kind or not f.get('geometry'):
             raise ValueError('Unsupported Overture schema: identity/type/geometry missing')
+        identity = str(p.get('id') or f.get('id'))
+        if identity in identities:
+            raise ValueError('Duplicate Overture native identity; collection held')
+        identities.add(identity)
         if kind == 'place' and any(p.get(k) is not None and not isinstance(p[k], str if k == 'basic_category' else dict) for k in ('basic_category', 'taxonomy', 'categories')):
             raise ValueError('Unsupported Overture place taxonomy')
     return data['features']

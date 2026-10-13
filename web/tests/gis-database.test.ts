@@ -565,7 +565,7 @@ it('lets editors accept source fields and attributes the change to independent r
     JSON.stringify(before),
     JSON.stringify(after),
     JSON.stringify(after),
-    JSON.stringify(['name']),
+    JSON.stringify(['properties.name']),
   ];
   await expect(
     db.query('select review_map_fields($1,$2,$3,$4,$5,$6)', [

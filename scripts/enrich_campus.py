@@ -89,14 +89,16 @@ def published_snapshot(origin, directory):
     return read(directory / 'campus.json')
 
 
-def download_extracts(directory, release):
+def download_extracts(directory, release, strict=True):
     directory.mkdir(parents=True, exist_ok=True)
+    failures = {}
     for kind in ('place', 'building', 'segment', 'connector'):
         dest = directory / (kind + '.geojson')
         receipt = directory / (kind + '.receipt.json')
         if dest.exists() and receipt.exists():
-            previous = read(receipt)
-            if previous.get('bbox') == BBOX and previous.get('release') == release and previous.get('sha256') == hashlib.sha256(dest.read_bytes()).hexdigest():
+            try: previous = read(receipt)
+            except (ValueError, OSError): previous = {}
+            if previous.get('originalRetrieval') and previous.get('bbox') == BBOX and previous.get('release') == release and previous.get('sha256') == hashlib.sha256(dest.read_bytes()).hexdigest():
                 print(f'Using verified cached Overture {kind} ({release})', flush=True)
                 continue
         print(f'Downloading bounded Overture {kind} ({release})', flush=True)
@@ -117,12 +119,22 @@ def download_extracts(directory, release):
             else:
                 process.kill()
             process.wait()
-            raise
+            if strict: raise
+            failures['overture:'+kind] = 'Extraction timed out; collection held.'
+            continue
         if process.returncode:
-            raise RuntimeError(f'Overture {kind} extraction failed; previous successful snapshot retained.')
-        read_extract(tmp, kind)
+            message = f'Overture {kind} extraction failed; previous successful snapshot retained.'
+            if strict: raise RuntimeError(message)
+            failures['overture:'+kind] = message
+            continue
+        try: read_extract(tmp, kind)
+        except (ValueError, OSError) as error:
+            if strict: raise
+            failures['overture:'+kind] = str(error)
+            continue
         tmp.replace(dest)
-        write(receipt, {'bbox': BBOX, 'release': release, 'sha256': hashlib.sha256(dest.read_bytes()).hexdigest()})
+        write(receipt, {'bbox': BBOX, 'release': release, 'sha256': hashlib.sha256(dest.read_bytes()).hexdigest(), 'originalRetrieval':dt.datetime.now(dt.timezone.utc).isoformat()})
+    return failures
 
 
 def changed_records(before, after):
@@ -159,14 +171,18 @@ def main():
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     print('Verifying published campus baseline', flush=True)
     baseline = read(args.base) if args.base else (read(args.raw_dir / 'published/campus.json') if args.offline else published_snapshot(args.published_url, args.raw_dir / 'published'))
+    failed_collections = {}
     if args.release:
         release = args.release
     elif args.offline:
         release = read(args.raw_dir / 'selected-release.json')['release']
     else:
         from overturemaps.core import get_latest_release
-        release = get_latest_release()
-    if not re.fullmatch(r'\d{4}-\d{2}-\d{2}\.\d+', release):
+        try: release = get_latest_release()
+        except Exception as error:
+            release = None
+            failed_collections.update({'overture:'+kind:'Release discovery failed: '+str(error) for kind in ('place','building','segment','connector')})
+    if release is not None and not re.fullmatch(r'\d{4}-\d{2}-\d{2}\.\d+', release):
         raise ValueError('Invalid Overture release')
     raw = args.raw_dir / 'sources'
     raw.mkdir(parents=True, exist_ok=True)
@@ -175,44 +191,74 @@ def main():
                           ('arcgis-metadata.json', f'https://www.arcgis.com/sharing/rest/content/items/{import_campus.APP_ID}?f=json'),
                           ('osm.xml', 'https://www.openstreetmap.org/api/0.6/map?bbox=' + BBOX)]:
             print(f'Refreshing {name}', flush=True)
-            import_campus.fetch(url, raw / name)
-    overture = args.raw_dir / ('overture-' + release)
-    if not args.offline:
-        download_extracts(overture, release)
+            try: import_campus.fetch(url, raw / name)
+            except (ValueError, OSError) as error:
+                failed_collections['osm:objects' if name=='osm.xml' else 'arcgis:'+import_campus.APP_ID] = str(error)
+    overture = args.raw_dir / ('overture-' + (release or 'unavailable'))
+    if not args.offline and release:
+        failed_collections.update(download_extracts(overture, release, strict=False))
         write(args.raw_dir / 'selected-release.json', {'release': release})
+    valid_kinds = []
     for kind in ('place', 'building', 'segment', 'connector'):
-        path=overture/(kind+'.geojson')
-        receipt=read(overture/(kind+'.receipt.json'))
-        if receipt.get('release') != release or receipt.get('bbox') != BBOX or receipt.get('sha256') != hashlib.sha256(path.read_bytes()).hexdigest():
-            raise ValueError('Overture snapshot receipt mismatch: '+kind)
+        if 'overture:'+kind in failed_collections: continue
+        try:
+            path=overture/(kind+'.geojson')
+            receipt=read(overture/(kind+'.receipt.json'))
+            if not receipt.get('originalRetrieval') or receipt.get('release') != release or receipt.get('bbox') != BBOX or receipt.get('sha256') != hashlib.sha256(path.read_bytes()).hexdigest():
+                raise ValueError('Overture snapshot receipt mismatch: '+kind)
+            read_extract(path,kind)
+            valid_kinds.append(kind)
+        except (ValueError, OSError) as error:
+            failed_collections['overture:'+kind] = str(error)
     import_campus.RAW = raw
-    candidate = import_campus.build()
+    from source_observations import collect
+    try:
+        if any(key in failed_collections for key in ('osm:objects','arcgis:'+import_campus.APP_ID)):
+            raise ValueError('Core source retrieval failed')
+        collect(raw,overture,import_campus.APP_ID,failed_collections)
+        candidate = import_campus.build()
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        # The legacy LASU converter joins ArcGIS places and OSM routing. Hold
+        # both sides of that dependency; independent Overture input can proceed.
+        # Published content is only conversion context, never an accepted source
+        # baseline, and no held observation is sent to the comparator.
+        reason = 'Dependent LASU conversion held: '+str(error)
+        failed_collections.setdefault('osm:objects',reason)
+        failed_collections.setdefault('arcgis:'+import_campus.APP_ID,reason)
+        candidate = copy.deepcopy(baseline)
+        candidate.setdefault('sourceSnapshots',[])
+        # Reconvert complete Overture observations from their own raw content;
+        # old published Overture shapes must not suppress those fresh values.
+        candidate['map']['features'] = [f for f in candidate['map']['features'] if not f['properties']['id'].startswith('overture:')]
+        candidate['places'] = [p for p in candidate['places'] if not p['id'].startswith('overture:')]
     source_issues = candidate.pop('_sourceIssues', [])
     # Owner-created roads/buildings are not upstream deletions. Keep the actual
     # published geometry and graph, including its restrictions and identities.
     preserve_published_owner_data(baseline, candidate)
-    extracts = {kind: read_extract(overture / (kind + '.geojson'), kind) for kind in ('place', 'building', 'segment')}
-    checked = dt.datetime.fromtimestamp((overture / 'place.geojson').stat().st_mtime, dt.timezone.utc).isoformat()
-    rows, overlay = apply_overture(candidate, extracts, release, checked)
+    extracts = {kind: read_extract(overture / (kind + '.geojson'), kind) for kind in valid_kinds if kind != 'connector'}
+    checked = min((read(overture / (kind+'.receipt.json'))['originalRetrieval'] for kind in valid_kinds),default=None)
+    rows, overlay = apply_overture(candidate, extracts, release, checked) if checked else ([],{'type':'FeatureCollection','features':[]})
     update_coverage(candidate)
-    candidate['sourceSnapshots'] += snapshot_manifest(overture, [(kind + '.geojson', 'https://stac.overturemaps.org/' + release + '/catalog.json', 'Per-record licensing; see sources') for kind in ('place', 'building', 'segment', 'connector')])
+    candidate['sourceSnapshots'] += snapshot_manifest(overture, [(kind + '.geojson', 'https://stac.overturemaps.org/' + release + '/catalog.json', 'Per-record licensing; see sources') for kind in valid_kinds])
     candidate['version'] = candidate_version(candidate)
     ledger = source_issues + rows + changed_records(baseline, candidate)
     report = {'createdAt': now, 'baselineVersion': baseline['version'], 'baselineSource': str(args.base) if args.base else args.published_url,
               'candidateVersion': candidate['version'], 'overtureRelease': release, 'before': coverage(baseline), 'after': coverage(candidate),
               'decisions': dict(collections.Counter(row['status'] for row in ledger)), 'candidates': ledger,
               'limitations': ['No owner approvals or production publication performed.', 'Private accepted source records and corrections must be reconciled in the owner editor before publication.', 'Source coverage is not a complete field inventory. Unknown names, entrances and access require evidence.'],
-              'snapshots': candidate['sourceSnapshots']}
+              'snapshots': candidate['sourceSnapshots'], 'heldCollections':failed_collections}
     context = args.raw_dir / 'owner-context.json'
     report['ownerContext'] = read(context) if context.exists() else {'available': False, 'reason': 'Authenticated baseline export unavailable locally; owner reconciliation required before publication.'}
     args.output.mkdir(parents=True, exist_ok=True)
     write(args.output / 'campus.json', candidate)
+    write(args.output / 'observations.json', collect(raw, overture, import_campus.APP_ID, failed_collections))
     write(args.output / 'coverage.json', report)
     write(args.output / 'review.geojson', overlay)
     write(args.output / 'source-issues.json', source_issues)
-    subprocess.run([sys.executable, str(ROOT / 'scripts/compare_overture.py'), '--segments', str(overture / 'segment.geojson'),
-                    '--connectors', str(overture / 'connector.geojson'), '--release', release, '--base', str(args.base or args.raw_dir / 'published/campus.json'),
-                    '--osm', str(raw / 'osm.xml'), '--output', str(args.output / 'transportation')], check=True)
+    if 'osm:objects' not in failed_collections and all(kind in valid_kinds for kind in ('segment','connector')):
+        subprocess.run([sys.executable, str(ROOT / 'scripts/compare_overture.py'), '--segments', str(overture / 'segment.geojson'),
+                        '--connectors', str(overture / 'connector.geojson'), '--release', release, '--base', str(args.base or args.raw_dir / 'published/campus.json'),
+                        '--osm', str(raw / 'osm.xml'), '--output', str(args.output / 'transportation')], check=True)
     print(json.dumps({k: report[k] for k in ('baselineVersion', 'candidateVersion', 'overtureRelease', 'before', 'after', 'decisions')}, ensure_ascii=False))
 
 

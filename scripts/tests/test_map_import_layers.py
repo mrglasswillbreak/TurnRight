@@ -14,16 +14,17 @@ class VectorLayerTests(unittest.TestCase):
         self.assertNotEqual(result.get('vegetation'),'trees')
     def test_merge_retains_absent_layers_and_explicit_replacement_removes(self):
         initial=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'one')
-        previous=[p['after'] for p in initial['proposals'] if p['after']]
+        previous=initial['convertedRecords']
         empty={**LAYER,'features':[]}
         merged=normalise([empty],SOURCE,CAMPUS,previous,CONFIG,'two')
         self.assertEqual(merged['summary']['counts']['removed'],0)
         replaced=normalise([empty],SOURCE,CAMPUS,previous,{**CONFIG,'refreshMode':'replace-layer'},'two')
-        self.assertGreater(replaced['summary']['counts']['removed'],0)
+        self.assertFalse(any(r['entity']=='feature' for o in replaced['observations'] for r in o['records']))
+        self.assertEqual(replaced['proposals'],[]) # Absence must be independently verified by the shared worker.
 
     def test_renamed_layer_preserves_identity_and_owner_corrections(self):
         initial=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'one')
-        previous=[p['after'] for p in initial['proposals'] if p['after']]
+        previous=initial['convertedRecords']
         renamed={**copy.deepcopy(LAYER),'name':'renamed'}
         config={**CONFIG,'layers':[{**CONFIG['layers'][0],'layer':'renamed','identity':LAYER['name']}]}
         result=normalise([renamed],SOURCE,CAMPUS,previous,config,'two')
@@ -39,7 +40,7 @@ class VectorLayerTests(unittest.TestCase):
         config={**CONFIG,'layers':[{**CONFIG['layers'][0],'role':'overlay'}]}
         result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
         self.assertFalse(result['summary']['errors'])
-        self.assertEqual(len([p for p in result['proposals'] if p.get('after',{}).get('entity')=='feature']),2)
+        self.assertEqual(len([r for r in result['convertedRecords'] if r['entity']=='feature']),2)
 
     def test_sampling_includes_late_small_layers(self):
         large={**LAYER,'features':LAYER['features']*3000}
@@ -64,7 +65,7 @@ class VectorLayerTests(unittest.TestCase):
         layer=copy.deepcopy(LAYER);layer['features'][0]['properties']['NAME']='Drive-Unpaved'
         config={**CONFIG,'layers':[{**CONFIG['layers'][0],'role':'road-surface','nameField':'NAME'}]}
         result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
-        records=[p['after'] for p in result['proposals'] if p['after']]
+        records=result['convertedRecords']
         feature=next(r for r in records if r['entity']=='feature')
         self.assertEqual(feature['payload']['properties']['landClass'],'road')
         self.assertEqual(feature['payload']['properties']['surface'],'unpaved')
@@ -80,7 +81,7 @@ class VectorLayerTests(unittest.TestCase):
         config={**CONFIG,'layers':[{**CONFIG['layers'][0],'role':'place'}]}
         result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
         self.assertFalse(result['summary']['errors'])
-        self.assertEqual(len([p for p in result['proposals'] if p.get('after',{}).get('entity')=='place']),2)
+        self.assertEqual(len([r for r in result['convertedRecords'] if r['entity']=='place']),2)
 
     def test_collapsed_polygon_requires_review(self):
         with self.assertRaisesRegex(ValueError,'components|dimension'):

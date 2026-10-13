@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-13",
+  "scope": "Local implementation and validation; not a deployment or publication receipt",
+  "baseCommit": "23d6cf114dbcf59f3fdc561ad6bc291e0db38ed3",
+  "workingTree": true,
+  "sourceManifest": "screenshots/source-reliability-2026-10-13.json",
+  "environment": {
+    "platform": "Windows",
+    "node": "22.23.3",
+    "python": "3.12",
+    "playwright": "1.63.0",
+    "memoryGiB": 8,
+    "databaseTests": "PGlite with PostGIS; native PostgreSQL acceptance remains a separate gate"
+  },
+  "rollout": {
+    "migrations": [45, 46, 47, 48],
+    "migrationsDeployed": false,
+    "newProposalGenerationDefault": "disabled; shadow comparisons only",
+    "requiresPerSourceOptIn": true,
+    "automaticAcceptance": false,
+    "publicPublication": false,
+    "historicalDecisionsModified": false,
+    "unverifiableRemovalOverride": false,
+    "rollback": "Disable source_check_policy.enabled; retain database guards and recovery evidence"
+  },
+  "lasuRegression": {
+    "candidateRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38227965373",
+    "publicFixture": "web/tests/fixtures/source-regeneration-lasu.json.gz",
+    "publishedPaths": 95,
+    "survivingPublishedPaths": 95,
+    "missingEditorGeneratedSegmentIds": 908,
+    "wholePathRemovalProposals": 0,
+    "pathGeometryDifferencesRetainedForReview": 20,
+    "privateReplay": {
+      "authorization": "User-authorized export obtained through the authenticated editor",
+      "sourceRecords": 6047,
+      "upstreamPaths": 89,
+      "candidateUpstreamPaths": 89,
+      "wholePathRemovalProposals": 0,
+      "regeneratedSegmentsProposedAsPaths": 0,
+      "privateContentsIncludedInRepository": false
+    }
+  },
+  "validation": {
+    "unitAndDatabase": {
+      "status": "passed",
+      "files": 112,
+      "tests": 797,
+      "log": "test-results/source-reliability-all-unit-final.log",
+      "coverage": [
+        "10000 frozen proposals in bounded 25-decision transactions",
+        "100000 upstream observations",
+        "Provider completeness and identity/configuration changes",
+        "Private campus permissions, legacy endpoint bypasses and displayed revision guards",
+        "Atomic routing dependencies, shared nodes, arrivals and editor corrections",
+        "Interrupted staging, immutable evidence retries, stale workers and scoped superseding",
+        "Rejected-change suppression, recurrence after superseding or reversal, guided undo"
+      ]
+    },
+    "pythonImporters": {
+      "status": "passed with native-driver skips",
+      "tests": 92,
+      "passed": 88,
+      "skipped": 4,
+      "log": "test-results/source-reliability-python-final.log"
+    },
+    "sourceUpdatesWebKit": {
+      "status": "passed across focused run and final retries",
+      "uniqueJourneys": 7,
+      "logs": [
+        "test-results/source-reliability-webkit-focused.log",
+        "test-results/source-reliability-webkit-undo-final.log"
+      ],
+      "repair": "Desktop undo confirmation now appears immediately after a confirmed reversal. Delayed or failed workspace refresh does not erase that successful outcome.",
+      "captures": "screenshots/source-reliability-2026-10-13.json"
+    },
+    "sourceUpdatesChromium": {
+      "status": "passed",
+      "finalUndoJourneys": 2,
+      "log": "test-results/source-reliability-chromium-undo-final.log",
+      "coverage": "Desktop and phone blocked groups, evidence, fresh verification, guided undo, delayed refresh, failed refresh and refreshed decision history"
+    },
+    "offline": {
+      "status": "passed",
+      "tests": 9,
+      "log": "test-results/source-reliability-pwa-final.log"
+    },
+    "lintAndBuild": {
+      "status": "passed",
+      "checks": ["TypeScript application and server", "repository lint", "production build", "configured production build", "bundle and offline asset budgets"],
+      "lintWarnings": "Existing and added explicit-any warnings remain non-fatal; no lint errors",
+      "configuredPublicStartupGzipBytes": 434151,
+      "configuredPublicStartupBudgetBytes": 435200,
+      "configuredOwnerEditorGzipBytes": 181885,
+      "configuredOwnerEditorBudgetBytes": 189440,
+      "logs": [
+        "test-results/source-reliability-lint-final.log",
+        "test-results/source-reliability-build-final.log",
+        "test-results/source-reliability-configured-final.log"
+      ]
+    },
+    "documentation": {
+      "status": "passed",
+      "relativeLinksAndAssets": 495,
+      "guides": 27,
+      "diffCheck": "passed",
+      "exclusion": "Existing unrelated .codex-reliability-backup-20261011 directory excluded through an ephemeral Git configuration; workspace and Git configuration unchanged"
+    }
+  },
+  "broaderBrowserResults": {
+    "chromiumInitial": {
+      "passed": 190,
+      "skipped": 14,
+      "failed": 6,
+      "failures": [
+        "enhanced zoom restores visible facade detail on the public map",
+        "map two entrances and their approaches in 2D, save and reload",
+        "map two entrances and their approaches in 3D, save and reload",
+        "individual generated windows edit, undo and reopen without ungrouping",
+        "surface workspace wall and roof text saves, reopens and rejects invalid placement",
+        "photo comparison edits and restores local recipes at 1440px"
+      ],
+      "retry": "Public facade test still exceeded its 150-second timeout; the editor facade test passed. Broader retry was stopped after reproducing the failure; remaining failures are unresolved.",
+      "evidence": "test-results/source-reliability-chromium-recheck"
+    },
+    "webkitBroad": {
+      "status": "partial; not a full-suite pass",
+      "uniqueJourneysPassedBeforeFocusedRun": 40,
+      "note": "Initial 39 passes plus one path-rotation failure; that rotation test passed on retry. Remaining validation focused on the seven Source Updates journeys.",
+      "logs": [
+        "test-results/source-reliability-webkit-suite.log",
+        "test-results/source-reliability-webkit-remaining.log"
+      ]
+    }
+  },
+  "remainingRolloutGates": [
+    "Run the native PostgreSQL/PostGIS bounded-import and retention acceptance workflows; Docker is unavailable locally.",
+    "Run the four skipped GIS driver cases in the repository's native GDAL container.",
+    "Resolve the broader Chromium failures and complete required browser/device checks in the release environment.",
+    "Apply database guards first, audit/backfill exact provenance, inspect shadow receipts, and enable verified proposals separately for each source."
+  ],
+  "notes": [
+    "Pre-existing worktree changes were preserved; this record does not attribute unrelated changes to this update.",
+    "Temporary runtimes, private exports, raw incident artifacts and local test logs remain ignored.",
+    "The existing unrelated backup directory is excluded only for the documentation link check; it is not removed or changed.",
+    "Browser screenshots use synthetic decisions and browser viewports, not physical iPhone/Android testing."
+  ]
+}
