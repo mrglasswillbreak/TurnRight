@@ -1,5 +1,9 @@
 # Application screenshots
 
+## Source reliability and private undo · 13 October 2026
+
+The desktop and phone `source-reliability-*-2026-10-13.png` images are unaltered local WebKit 26.6 captures. They show the actual recovery interface with a synthetic blocked path, incomplete check and accepted decision. The map canvas is not evidence of source geometry in these captures; separate map-preview journeys verify that behavior. No production decision or publication changed. [Capture record](source-reliability-2026-10-13.json) · [Gallery and reproduction](../../SCREENSHOTS.md#source-reliability-and-private-undo--13-october-2026).
+
 ## B2 campus identity · 11 October 2026
 
 The nineteen `b2-*-2026-10-11.png` files are unaltered local Chromium captures of the B2 app revision. They replace the October 7 images in the current README and workflow guides; earlier files and records remain historical evidence. [Gallery, fixture scope and reproduction](../../SCREENSHOTS.md#b2-campus-identity--11-october-2026) · [Source and image hashes](b2-2026-10-11.json).

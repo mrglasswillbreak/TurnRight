@@ -1,0 +1,152 @@
+{
+  "capturedDate": "2026-10-13",
+  "recordedAt": "2026-10-13T17:30:55.824Z",
+  "baseCommit": "23d6cf114dbcf59f3fdc561ad6bc291e0db38ed3",
+  "workingTree": true,
+  "sourceDigest": "479fe83968fd774695601efe11c2a5aae0438a718ef95291f5de234f4e52e9b6",
+  "sourceFiles": [
+    {
+      "file": "scripts/cloud.mjs",
+      "sha256": "ccef21ee9490d128a41bb1abaa2059176c0b11a6036e8d4d7f0d26054c6c6a1e"
+    },
+    {
+      "file": "scripts/download_overture.py",
+      "sha256": "385975e1a441036bd56f876758ab094e3eb2c5ccf76d10b23ecc453e2620f20f"
+    },
+    {
+      "file": "scripts/enrich_campus.py",
+      "sha256": "b197a18ca3cae6c4a0d372d4338d23f8006930763181cfc39f29f38899728af8"
+    },
+    {
+      "file": "scripts/import_map.py",
+      "sha256": "ffb59f9e0c9f2320d6dd25dc814ddbc59827dab942dea249575469c3bba2b2ac"
+    },
+    {
+      "file": "scripts/map_import/arcgis.py",
+      "sha256": "34807cb4ef5f82e65d0d4b956089da461fa7f7837636e437a8f128c21b82be33"
+    },
+    {
+      "file": "scripts/map_import/normalise.py",
+      "sha256": "6f24b8c3a9997b8bbfd016bbbeff96ee29a78b2e18348cbfbf8546b507a346d5"
+    },
+    {
+      "file": "scripts/map_import/osm.py",
+      "sha256": "911d3eb10a69c59dfbd42a3ce9c68d403dd70c818f95d48b8e096d002ce6f9dc"
+    },
+    {
+      "file": "scripts/overture_enrichment.py",
+      "sha256": "567eb30fa907c8240eabe02f5451af4cda0e722da40588939e3330e8fcfddc9b"
+    },
+    {
+      "file": "scripts/source-check-worker.mjs",
+      "sha256": "270755a796dc366bff7e0baf2c58b2059465adfb533f9c4a37a2ad04089920eb"
+    },
+    {
+      "file": "scripts/source-comparison.mjs",
+      "sha256": "8ad15ebb1fa8897d5462e1993f7a9d19c9cf1c302fcfbc3beb62896f1ebd5a07"
+    },
+    {
+      "file": "scripts/source-snapshot-confirmation.mjs",
+      "sha256": "2be4076f3780c8e99733fe40e41d791c87a2a6b8b9125e54c6668cbaefce17d5"
+    },
+    {
+      "file": "scripts/source-verification.mjs",
+      "sha256": "1d7eaef6cc09f363c46a64704b1a52ad278a659a0f402b7d638079f81424f38d"
+    },
+    {
+      "file": "scripts/source_observations.py",
+      "sha256": "2551ce48a551d49bfabdc48afd23fb12fbbd56065fc0f3a3187e5c81bb8cc95d"
+    },
+    {
+      "file": "scripts/sync-sources.mjs",
+      "sha256": "6bc1634782430511872de60978ec281082b8afeb5f3a79343c32855625b3a2d4"
+    },
+    {
+      "file": "supabase/migrations/045_source_reliability.sql",
+      "sha256": "079eb13c178e588e2b9bd635717efb0dcee88ab57f60650076499cacca4af2bc"
+    },
+    {
+      "file": "supabase/migrations/046_source_recovery.sql",
+      "sha256": "4a2f0a761cd0761f7ff5dcc922d2ef87a17addbbd384d836e605126ddb315a24"
+    },
+    {
+      "file": "supabase/migrations/047_source_provenance.sql",
+      "sha256": "ee6b18e8aa45af3c01b2884f173685e3091b0ec6fc7e33df2889def88efc6306"
+    },
+    {
+      "file": "supabase/migrations/048_source_check_retries.sql",
+      "sha256": "4cb7fd475aa2b4a1605c768fcab8ee1b502fee9c886d2951faf045c3ed59fdfc"
+    },
+    {
+      "file": "web/api/admin.ts",
+      "sha256": "c09a252fe6b689490ed386b87b36d945951c08e0ddf634bb50398be7a996549b"
+    },
+    {
+      "file": "web/server/source-updates.ts",
+      "sha256": "ed5d5c78c5ec8112b66b4071b5a2350fe2bdadf3695fe6bfcd820322509bbb04"
+    },
+    {
+      "file": "web/src/SourceFieldReview.tsx",
+      "sha256": "10424295f7b4b0729838397d221ba0bfe993ebf8bcbcc9463672451ff53d624b"
+    },
+    {
+      "file": "web/src/SourceGroupDetails.tsx",
+      "sha256": "f8bcbc80147ec090b936341965f385fa1a290da297089dc6c635db8c55fbd5c6"
+    },
+    {
+      "file": "web/src/SourceRecovery.tsx",
+      "sha256": "b99aa0b1888f165131f6ea910ddaad5d813a9953c7445e353524324eb00a06f6"
+    },
+    {
+      "file": "web/src/SourceUpdates.tsx",
+      "sha256": "05c5b0556617f36ace0037145b5843bf27c3432285f64fbe5059515fcbd64f10"
+    },
+    {
+      "file": "web/src/source-updates.css",
+      "sha256": "88157c87415cbfc22c945345f3c8387cb1f02631fc1915808b09f0a9857f2439"
+    },
+    {
+      "file": "web/src/source-updates.ts",
+      "sha256": "0f05a917f6d8d38aa426cad64ad1108fd81e94c1f9673a3126e1d5fe6d1b0d7d"
+    },
+    {
+      "file": "web/tests/browser/editor.spec.ts",
+      "sha256": "ca6ef7c02052dacd4ec70d8c38548ca3b67a9b50a473d66b03ac94d71b18969e"
+    }
+  ],
+  "browser": "WebKit 26.6 (Playwright Windows build 2359)",
+  "playwright": "1.63.0",
+  "node": "22.23.3",
+  "build": "Vite development server with isolated owner and API responses",
+  "unalteredBrowserCaptures": true,
+  "visualInspection": "Both final images inspected individually; undo text and controls fit the viewport.",
+  "fixture": {
+    "test": "source updates reliability desktop/phone",
+    "blockedPaths": 1,
+    "incompleteChecks": 1,
+    "reversibleDecisions": 1,
+    "dependencies": 4,
+    "noProductionDecisions": true,
+    "mapCanvasIsNotGeometryEvidence": true
+  },
+  "validation": {
+    "webkitDesktop": "passed; delayed refresh and refresh failure preserve the confirmed undo",
+    "webkitPhone": "passed; delayed refresh then updated decision history"
+  },
+  "captures": [
+    {
+      "file": "source-reliability-desktop-2026-10-13.png",
+      "artifactPath": "test-results/source-reliability-webkit-undo-final/editor-source-updates-reli-880ee-nce-and-guided-private-undo/source-reliability-desktop.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "38b79fc23a8aded9725b2e2522177112c6153506794f4a8da915969a800ecc18"
+    },
+    {
+      "file": "source-reliability-mobile-2026-10-13.png",
+      "artifactPath": "test-results/source-reliability-webkit-undo-final/editor-source-updates-reli-c3c15-nce-and-guided-private-undo/source-reliability-mobile.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "cfe56ad67f27db5d7eb314b351fe204790a4c5cf681eaed00d70804cf7b38c16"
+    }
+  ]
+}

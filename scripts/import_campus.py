@@ -33,6 +33,7 @@ def fetch(url, destination):
     # Only replace after successful parsing; a failed fetch never erases a snapshot.
     ET.fromstring(data) if destination.suffix == '.xml' else json.loads(data)
     temp.replace(destination)
+    destination.with_suffix('.receipt.json').write_text(json.dumps({'originalRetrieval':dt.datetime.now(dt.timezone.utc).isoformat(),'url':url,'sha256':hashlib.sha256(data).hexdigest()}),encoding='utf-8')
 
 def distance(a, b):
     x = math.radians(b[0] - a[0]) * math.cos(math.radians((a[1] + b[1]) / 2))
@@ -143,7 +144,7 @@ def build(access_policy=None):
     for way in tree.findall('way'):
         tags = {t.attrib['k']: t.attrib['v'] for t in way.findall('tag')}
         refs = [x.attrib['ref'] for x in way.findall('nd')]
-        if not all(r in osm_nodes for r in refs): continue
+        if not all(r in osm_nodes for r in refs): raise ValueError('OSM way has missing nodes; this extract cannot establish source removals')
         coords = [osm_nodes[r]['coordinates'] for r in refs]
         if not any(inside(p, ring) for p in coords): continue
         identifier = 'osm:way:' + way.attrib['id']

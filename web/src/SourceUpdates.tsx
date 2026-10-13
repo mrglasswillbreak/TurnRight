@@ -18,7 +18,7 @@ import {
   describeSourceChange,
   operationActive,
   sourceFieldLabel,
-  sourceKindLabel,
+  sourceChangeLabel,
   type SourceCursor,
   type SourceDetail,
   type SourceFilters,
@@ -31,6 +31,8 @@ import type { CampusData, MapChange } from './types';
 import type { WorkspaceCapabilities } from './gis-types';
 import './source-updates.css';
 import SourceMapPreview from './SourceMapPreview';
+import SourceRecovery from './SourceRecovery';
+import SourceGroupDetails from './SourceGroupDetails';
 
 const date = (value?: string | null) =>
   value ? new Date(value).toLocaleString() : 'Not checked yet';
@@ -276,9 +278,10 @@ export default function SourceUpdates({
   const prepare = (accept: boolean) =>
     work(async () => {
       const selection = allMatching
-        ? { mode: 'filter', filters }
+        ? { mode: 'filter', filters, accept }
         : {
             mode: 'ids',
+            accept,
             items: Object.entries(selected).map(([id, revision]) => ({
               id,
               revision,
@@ -728,10 +731,23 @@ export default function SourceUpdates({
                 aria-label={`Review ${row.meta.name}`}
               >
                 <span className={`source-kind ${row.kind}`}>
-                  {sourceKindLabel[row.kind]}
+                  {sourceChangeLabel(row.kind, row.reliability)}
                 </span>
-                <strong>{row.meta.name}</strong>
+                <strong>
+                  {row.meta.featureType === 'edge' && 'Routing segment · '}
+                  {row.meta.name}
+                </strong>
                 <span>{describeSourceChange(row)}</span>
+                <small>
+                  {row.reliability?.eligible === false
+                    ? row.reliability.verification === 'unverified'
+                      ? 'Needs verification'
+                      : 'Blocked'
+                    : 'Ready to review'}
+                  {row.reliability?.dependencyCount
+                    ? ` · ${row.reliability.dependencyCount} dependent records`
+                    : ''}
+                </small>
                 <small>
                   {row.sourceName} ·{' '}
                   {row.meta.layer || sourceFieldLabel(row.meta.featureType)}
@@ -778,6 +794,16 @@ export default function SourceUpdates({
             <Check /> Accept selected
           </Button>
         </div>
+        {!!page.excludedTotal && (
+          <p className="notice">
+            {page.excludedTotal} blocked or unverified groups are excluded from
+            bulk acceptance. They remain available to inspect or reject.
+          </p>
+        )}
+        <SourceRecovery
+          canEdit={canEdit && !disabled && !active}
+          onRefresh={onRefresh}
+        />
         {active && (
           <p className="notice">
             A bulk review is running. You can inspect updates while it finishes.
@@ -804,6 +830,12 @@ export default function SourceUpdates({
               {prepared.op.breakdown.modify} changes ·{' '}
               {prepared.op.breakdown.remove} removals
             </p>
+            {!!prepared.op.breakdown.excluded && (
+              <p>
+                {prepared.op.breakdown.excluded} ineligible groups were
+                excluded.
+              </p>
+            )}
             {prepared.op.breakdown.geometry > 0 && (
               <p className="notice">
                 {prepared.op.breakdown.geometry} updates affect shapes,
@@ -983,7 +1015,8 @@ export default function SourceUpdates({
           <>
             <h3>{focusedSummary?.meta.name || detail.change.summary}</h3>
             <p>
-              {sourceKindLabel[detail.change.kind]} · {detail.change.status}
+              {sourceChangeLabel(detail.change.kind, detail.reliability)} ·{' '}
+              {detail.change.status}
             </p>
             <section aria-label="Source evidence">
               <h3>Source evidence</h3>
@@ -993,6 +1026,46 @@ export default function SourceUpdates({
                   ` · ${focusedSummary.meta.layer}`}
               </p>
               <p className="small-note">Record: {detail.change.source_id}</p>
+              {detail.reliability && (
+                <div className="notice">
+                  <strong>
+                    {detail.reliability.eligible
+                      ? 'Ready to review'
+                      : detail.reliability.verification === 'unverified'
+                        ? 'Needs verification'
+                        : 'Blocked'}
+                  </strong>
+                  <p>
+                    {detail.reliability.classification.replaceAll('_', ' ')} ·{' '}
+                    {detail.reliability.dependencyCount} dependent records
+                  </p>
+                  {detail.reliability.blockingReasons.map((reason) => (
+                    <p key={reason}>{reason}</p>
+                  ))}
+                  {detail.reliability.checkId && (
+                    <Button
+                      variant="outline"
+                      disabled={disabled}
+                      onClick={() =>
+                        void work(async () => {
+                          await api('source-updates-reverify', {
+                            checkId: detail.reliability?.checkId,
+                          });
+                          setNotice('A fresh verification was requested.');
+                        })
+                      }
+                    >
+                      Verify source again
+                    </Button>
+                  )}
+                </div>
+              )}
+              {detail.reliability?.groupId && (
+                <SourceGroupDetails
+                  key={detail.reliability.groupId}
+                  id={detail.reliability.groupId}
+                />
+              )}
               {focusedSummary && (
                 <p className="small-note">
                   Proposed: {date(focusedSummary.createdAt)}
@@ -1029,7 +1102,9 @@ export default function SourceUpdates({
                 key={detail.change.id + detail.change.review_revision}
                 change={detail.change}
                 data={data}
-                busy={disabled || !!active}
+                busy={
+                  disabled || !!active || detail.reliability?.eligible === false
+                }
                 action={async (name, payload, success) => {
                   const ok = await action(name, payload, success);
                   if (ok) refresh();

@@ -5,6 +5,20 @@ MAX_BATCH_BYTES = 384 * 1024
 MAX_BATCH_RECORDS = 100
 
 
+def queue_verified_import(db, import_id, token, candidate, progress=None):
+    """Both import families use the same comparator, staging and DB guards."""
+    import subprocess
+    import tempfile
+    from pathlib import Path
+    if 'observations' not in candidate or 'receipt' not in candidate:
+        raise ValueError('Rebuild this legacy preview to obtain upstream observations and retrieval evidence.')
+    if progress: progress('Verifying source identities and complete dependency groups')
+    with tempfile.TemporaryDirectory(prefix='turnright-source-check-') as folder:
+        path = Path(folder)/'check.json'
+        path.write_text(json.dumps({**candidate,'runId':token,'importId':import_id,'token':token},ensure_ascii=False,allow_nan=False),encoding='utf-8')
+        subprocess.run(['node',str(Path(__file__).resolve().parents[1]/'source-check-worker.mjs'),str(path)],check=True,timeout=1100)
+
+
 def batches(records):
     batch, size, offset = [], 2, 0
     for record in records:

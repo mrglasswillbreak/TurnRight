@@ -1,9 +1,13 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner } from './gis-database-fixture';
 let db: Awaited<ReturnType<typeof gisDatabase>>;
-beforeAll(async () => {
-  db = await gisDatabase();
-}, 60000);
+beforeAll(
+  async () => {
+    db = await gisDatabase();
+    // PostGIS WebAssembly startup is slower on Windows; SQL time limits stay unchanged.
+  },
+  process.platform === 'win32' ? 180000 : 60000,
+);
 afterAll(async () => {
   await db?.close();
 });

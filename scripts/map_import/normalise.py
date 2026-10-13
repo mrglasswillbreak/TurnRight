@@ -4,17 +4,16 @@ import hashlib
 import json
 import math
 import re
-from datetime import datetime, timezone
 
 from .formats import MAX_FEATURES
 from .geometry import components as geometry_components, prepare_geometry, preview_features
 from .semantics import mapped_properties, public_tags
 
 
-def digest(value):
+def digest(value, preserve_all_fields=False):
     def stable(v):
         if isinstance(v, list): return [stable(x) for x in v]
-        if isinstance(v, dict): return {k:stable(x) for k,x in sorted(v.items()) if k not in ('createdAt','retrievedAt','checkedAt')}
+        if isinstance(v, dict): return {k:stable(x) for k,x in sorted(v.items()) if preserve_all_fields or k not in ('createdAt','retrievedAt','checkedAt')}
         if isinstance(v, float) and v.is_integer(): return int(v)
         return v
     return hashlib.sha256(json.dumps(stable(value),separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).hexdigest()
@@ -30,7 +29,6 @@ def distance(a,b):
 def normalise(layers, source, campus, previous, configuration, import_id):
     from shapely.geometry import shape, mapping
     from shapely.validation import explain_validity
-    now = datetime.now(timezone.utc).isoformat()
     owner_source = 'import:' + source['id']
     boundary = shape(campus['boundary']['geometry'])
     if not boundary.is_valid or boundary.is_empty: raise ValueError('Repair the campus boundary before importing.')
@@ -38,6 +36,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     region = boundary.buffer(0.0001)
     mappings = {m['layer']:m for m in configuration['layers']}
     records, warnings, errors, preview, duplicates = {}, [], [], [], []
+    observations, observation_key, collections = {}, None, []
     repairs, diagnostics, mapped_layers = [], [], []
     previous_by_id = {r['id']:r for r in previous}
     skipped, feature_count = 0, 0
@@ -54,6 +53,8 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         if metadata is not None: record['gis_metadata']=metadata
         if key in records and records[key]['hash'] != record['hash']: raise ValueError('Duplicate source identity: ' + ident)
         records[key] = record
+        if observation_key is not None:
+            observations[observation_key]['records'][key] = record
     for layer in layers:
         m = mappings.get(layer['name'])
         if not m or m['role'] == 'skip':
@@ -61,6 +62,8 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         if not layer.get('crs'):
             errors.append(layer['name'] + ': choose the source coordinate system.'); continue
         role = m['role']
+        layer_error_start = len(errors)
+        collections.append({'identity':layer.get('sourceCollection') or layer.get('sourceUrl') or m.get('identity') or layer['name'],'count':len(layer['features']),'layer':layer['name'],'contentHash':layer.get('snapshotHash')})
         is_osm = 'osmNodes' in layer
         if not m.get('idField') and not is_osm:
             warnings.append(layer['name'] + ': using feature IDs or content identities. Select a stable field to match records whose contents change.')
@@ -70,9 +73,9 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             for component, geometry in geometry_components(feature.get('geometry')):
                 if geometry and geometry.get('type')=='MultiPoint' and role in ('place','entrance'):
                     for index, coordinates in enumerate(geometry['coordinates']):
-                        expanded.append({**feature,'geometry':{'type':'Point','coordinates':coordinates},'_component':component+':point:'+str(index)})
+                        expanded.append({**feature,'geometry':{'type':'Point','coordinates':coordinates},'_component':component+':point:'+str(index), '_sourceContent':{'geometry':feature['geometry'],'properties':feature.get('properties',{})}})
                 else:
-                    expanded.append({**feature, 'geometry':geometry, '_component':component})
+                    expanded.append({**feature, 'geometry':geometry, '_component':component, '_sourceContent':{'geometry':feature['geometry'],'properties':feature.get('properties',{})}})
         mapped_layer = {**layer, 'features':[], 'suggestedRole':role, 'crs':'EPSG:4326'}
         mapped_layers.append(mapped_layer)
         for feature in expanded:
@@ -99,7 +102,6 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 errors.append(f"{layer['name']} {feature.get('id','')}: {error}"); continue
             if repair:
                 repairs.append({'layer':layer['name'],'sourceId':receipt_id,**repair})
-            if not region.intersects(geom): skipped += 1; continue
             attrs = feature.get('properties') or {}
             def mapped_value(field, fallback):
                 key = m.get(field) or fallback
@@ -107,14 +109,27 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 definition = next((f for f in layer.get('fields',[]) if f['name']==key),{})
                 return definition.get('codedValues',{}).get(str(value),value)
             native = attrs.get(m.get('idField')) if m.get('idField') else feature.get('id')
+            stable_native = native is not None and str(native) != ''
             if native is None and not m.get('idField'):
                 native = digest({'geometry':feature['geometry'],'properties':attrs})[:24]
             if native is None or str(native) == '':
                 errors.append(layer['name'] + ': a feature is missing its selected identifier.'); continue
+            upstream_native = str(native)
+            collection = layer.get('sourceCollection') or layer.get('sourceUrl') or m.get('identity') or layer['name']
+            observation_key = (collection, upstream_native)
+            if observation_key not in observations:
+                observations[observation_key] = {'provider':source['kind'], 'collection':collection,
+                    'nativeId':upstream_native,'stable':stable_native,'featureType':role,
+                    'content':feature['_sourceContent'],'records':{},'providerVersion':feature.get('providerVersion'),
+                    'embedded':{**layer['embedded'],'nativeField':m.get('idField')} if layer.get('embedded') and m.get('idField') else None,
+                    'queryUrl':layer.get('sourceUrl'),'layerIdentity':layer.get('layerIdentity')}
             native = str(native) + feature.get('_component','')
             if native in seen_identities:
                 errors.append(f"{layer['name']}: duplicate source identity {native}; select a unique identifier or repair the source."); continue
             seen_identities.add(native)
+            # Presence outside the campus filter is still source evidence. It
+            # cannot be mistaken for a deletion in a complete replacement file.
+            if not region.intersects(geom): skipped += 1; continue
             layer_identity = m.get('identity') or layer['name']
             ident = f"{owner_source}:{digest(layer_identity)[:8]}:{native}"
             if len(ident) > 180: ident = f"{owner_source}:{digest([layer['name'],native])}"
@@ -189,6 +204,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
                 if role=='building': place['buildingId']=ident
                 add('place',place_id,place)
             if role=='entrance': warnings.append('Imported entrance pins require an explicit building/place assignment and path connection in the editor.')
+        collections[-1]['complete'] = len(errors) == layer_error_start and not layer.get('retrievalError')
     # Detect overlaps with other sources. They are review candidates, never auto-merged.
     from shapely.strtree import STRtree
     incoming_buildings = [r for r in records.values() if r['entity']=='feature' and r['payload']['properties']['kind']=='building']
@@ -229,24 +245,29 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     components=len({component(n) for n in parents})
     if not components: warnings.append('Directions unavailable: there are no reviewed, permitted walking paths. A map-only campus can still be published.')
     elif components>1: warnings.append(f'Routing gap: {components} disconnected walking networks. Review endpoint connections and entrances; bridges and tunnels are never joined by proximity.')
-    proposals=[]
-    for key in sorted(set(old)|set(records)):
-        before,after = old.get(key),records.get(key)
-        if before and after and before['hash']==after['hash']: continue
-        kind = 'add' if not before else 'remove' if not after else 'modify'
-        proposals.append({'id':digest({'source':source['id'],'id':key,'before':before and before['hash'],'after':after and after['hash']}),'source_id':key,'kind':kind,'before':before,'after':after,'base_hash':before and before['hash'],'summary':f"{kind}: {(after or before)['payload'].get('name',key)}"})
     # Shared campus metadata is updated from the complete accepted baseline, never from just this source.
     meta_record = next((r for r in previous if r['entity']=='meta'),None)
     if not meta_record: raise ValueError('Campus metadata is missing.')
     meta = copy.deepcopy(meta_record)
     metadata = meta['payload']
-    metadata['sources'] = [s for s in metadata.get('sources',[]) if s['id']!=owner_source] + [{'id':owner_source,'name':source['name'],'url':source.get('url') or '','attribution':configuration['attribution'],'license':configuration['license'],'redistributionConfirmed':configuration['redistributionConfirmed'],'retrievedAt':now}]
+    metadata['sources'] = [s for s in metadata.get('sources',[]) if s['id']!=owner_source] + [{'id':owner_source,'name':source['name'],'url':source.get('url') or '','attribution':configuration['attribution'],'license':configuration['license'],'redistributionConfirmed':configuration['redistributionConfirmed']}]
     meta['hash']=digest(metadata)
-    if meta['hash']!=meta_record['hash']:
-        proposals.append({'id':digest({'id':meta['id'],'before':meta_record['hash'],'after':meta['hash']}),'source_id':meta['id'],'kind':'modify','before':meta_record,'after':meta,'base_hash':meta_record['hash'],'summary':'Update campus source attribution'})
+    observations[('__attribution__',source['id'])] = {'provider':'configuration','collection':'__attribution__','nativeId':source['id'],'stable':True,'featureType':'attribution','content':next(s for s in metadata['sources'] if s['id']==owner_source),'records':{meta['id']:meta}}
+    collections.append({'identity':'__attribution__','count':1,'layer':'Source attribution','complete':True})
     preview, sampling = preview_features(mapped_layers)
-    summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers], 'counts':{**{k:sum(p['kind']==kind for p in proposals) for k,kind in [('added','add'),('modified','modify'),('removed','remove')]},'skipped':skipped},'warnings':list(dict.fromkeys(warnings)),'errors':list(dict.fromkeys(errors))[:500],'duplicates':duplicates[:500],'features':preview,'sampling':sampling,'repairs':repairs[:500],'diagnostics':diagnostics[:500],'totalFeatures':feature_count}
-    if old and summary['counts']['removed'] > len(old)*0.2: summary['errors'].append('Source removed more than 20% of records. Check the boundary, layer mapping and completeness before retrying.')
+    summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers], 'counts':{'added':0,'modified':0,'removed':0,'skipped':skipped},'warnings':list(dict.fromkeys(warnings)),'errors':list(dict.fromkeys(errors))[:500],'duplicates':duplicates[:500],'features':preview,'sampling':sampling,'repairs':repairs[:500],'diagnostics':diagnostics[:500],'totalFeatures':feature_count}
     if duplicates: summary['warnings'].append('Overlapping buildings need a keep/merge decision in the existing duplicate review workflow.')
     summary['reportCounts']={'repairs':len(repairs),'diagnostics':len(diagnostics),'errors':len(set(errors)),'duplicates':len(duplicates)}
-    return {'summary':summary,'proposals':proposals,'expectedSources':previous,'repairReport':repairs,'diagnosticReport':diagnostics,'errorReport':list(dict.fromkeys(errors)),'duplicateReport':duplicates}
+    # Only the shared Node comparator may create review proposals. Raw upstream
+    # content is separate from converted shapes, routing and owner corrections.
+    for observation in observations.values(): observation['records'] = list(observation['records'].values())
+    # Display layers can change without changing the provider collection (OSM).
+    combined={}
+    for collection in collections:
+        key=collection['identity']
+        if key not in combined: combined[key]=collection.copy()
+        else:
+            combined[key]['complete']=combined[key].get('complete',False) and collection.get('complete',False)
+            combined[key]['count']+=collection['count']
+    collections=list(combined.values())
+    return {'summary':summary,'proposals':[], 'convertedRecords':list(records.values())+[meta], 'collections':collections, 'observations':list(observations.values()),'expectedSources':previous,'repairReport':repairs,'diagnosticReport':diagnostics,'errorReport':list(dict.fromkeys(errors)),'duplicateReport':duplicates}

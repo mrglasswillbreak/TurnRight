@@ -6,10 +6,11 @@ import sys
 import threading
 import time
 import uuid
+import subprocess
+import tempfile
 import psycopg
 from psycopg.types.json import Jsonb
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from map_import.queue import queue_import
 
 url = os.environ['GIS_TEST_DATABASE_URL']
 with psycopg.connect(url, autocommit=True) as db:
@@ -28,11 +29,11 @@ with psycopg.connect(url, autocommit=True) as db:
     db.execute("insert into source_features(id,source,entity,payload,hash) select 'feature:scale:'||lpad(i::text,6,'0'),%s,'feature',jsonb_build_object('data',(select string_agg(md5(i::text||':'||j::text),'') from generate_series(1,90) j)),md5(i::text) from generate_series(1,10574) i", ('import:' + source,))
     db.execute("update source_features set payload=jsonb_build_object('data',%s::text) where id='feature:scale:000001'", (os.urandom(83500).hex(),))
     baseline = [r[0] for r in db.execute('select to_jsonb(s) from source_features s order by id')]
-    proposals = [{'id': 'scale-change-' + str(i), 'source_id': r['id'], 'kind': 'modify', 'before': r, 'after': {**r, 'hash': 'new-' + r['hash']}, 'base_hash': r['hash'], 'summary': 'Scale review'} for i, r in enumerate(baseline[:3647])]
-    candidate = {'summary': {'errors': []}, 'expectedSources': baseline, 'proposals': proposals}
+    observations = [{'provider':'file','collection':'scale','nativeId':r['id'],'stable':True,'featureType':'building','content':{'revision':2,'id':r['id']},'records':[{**r,'hash':'new-'+r['hash']}]} for r in baseline[:3647]]
+    candidate = {'runId':job,'token':token,'importId':job,'sourceKey':'import:'+source,'observations':observations,'receipt':{'retrievedAt':'2026-10-13T00:00:00Z','contentHash':'scale-fixture','configurationHash':'scale-config','collections':[{'identity':'scale','complete':True,'count':3647}]}}
+    db.execute("insert into source_check_policy values ('lasu',%s,true)",('import:'+source,))
     size = len(json.dumps(candidate).encode())
-    assert size > 31454509
-    assert 256 * 1024 < len(json.dumps(proposals[0]).encode()) < 384 * 1024
+    assert size + len(json.dumps(baseline).encode()) > 31454509
     latencies, failures, requests = [], [], []
     stopped = threading.Event()
     def monitor():
@@ -49,14 +50,26 @@ with psycopg.connect(url, autocommit=True) as db:
     thread = threading.Thread(target=monitor); thread.start()
     def rpc(path, method, body):
         name = path.removeprefix('rpc/')
-        assert name in ('begin_campus_import_queue', 'stage_campus_import_queue', 'finish_campus_import_queue')
+        assert name in ('source_check_begin','source_check_baseline','source_check_stage','source_check_evidence','source_check_finish','source_check_interrupted')
         requests.append(len(json.dumps(body, ensure_ascii=False, separators=(',', ':')).encode()))
-        values = [Jsonb(value) if isinstance(value, list) else value for value in body.values()]
+        values = [Jsonb(value) if isinstance(value, (list,dict)) else value for value in body.values()]
         return db.execute('select ' + name + '(' + ','.join(key + ' => %s' for key in body) + ')', values).fetchone()[0]
     start = time.monotonic()
     try:
-        assert queue_import(rpc, job, token, candidate) == 3647
-        assert rpc('rpc/finish_campus_import_queue', 'POST', {'import_id': job, 'expected_token': token}) == 3647
+        with tempfile.TemporaryDirectory(prefix='turnright-native-check-') as folder:
+            fixture=Path(folder)/'candidate.json';fixture.write_text(json.dumps(candidate),encoding='utf8')
+            worker=subprocess.Popen(['node',str(Path(__file__).with_name('source-check-database-bridge.mjs')),str(fixture)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,encoding='utf8')
+            completed=None
+            for line in worker.stdout:
+                request=json.loads(line)
+                if 'finished' in request: completed=request;continue
+                if 'error' in request: raise AssertionError(request['error'])
+                try: response={'result':rpc(request['route'],request['method'],request['body'])}
+                except Exception as error: response={'error':str(error)}
+                worker.stdin.write(json.dumps(response,default=str)+'\n');worker.stdin.flush()
+            assert worker.wait(timeout=10)==0
+            assert completed['finished']['counts']['group']==3647
+            assert completed['retry']['status']=='complete'
     finally:
         stopped.set(); thread.join()
     elapsed = time.monotonic() - start
@@ -66,6 +79,7 @@ with psycopg.connect(url, autocommit=True) as db:
     assert elapsed < 120
     assert db.execute('select pg_postmaster_start_time()').fetchone()[0] == boot
     assert db.execute('select count(*) from source_features').fetchone()[0] == 10574
-    assert db.execute('select count(*) from campus_import_queue_records').fetchone()[0] == 0
+    assert db.execute('select count(*) from source_proposal_groups').fetchone()[0] == 3647
+    assert db.execute('select count(*) from source_accepted_observations').fetchone()[0] == 0
     assert db.execute('select status from campus_imports where id=%s', (job,)).fetchone()[0] == 'reviewed'
     print(json.dumps({'candidateBytes': size, 'sources': 10574, 'proposals': 3647, 'requests': len(requests), 'largestRequestBytes': max(requests), 'elapsedSeconds': round(elapsed, 3), 'authTableProbes': len(latencies), 'slowestProbeSeconds': round(max(latencies), 3), 'databaseRestarted': False}))

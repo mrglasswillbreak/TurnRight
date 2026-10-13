@@ -216,5 +216,5 @@ def snapshot_manifest(raw, files):
         receipt=json.loads(receipt_path.read_text(encoding='utf-8')) if receipt_path.exists() else {}
         rows.append({'file': name, 'url': url, 'license': license_name,
                      'sha256': hashlib.sha256(content).hexdigest(), 'bytes': len(content),
-                     'retrievedAt': receipt.get('originalRetrieval') or dt.datetime.fromtimestamp(path.stat().st_mtime, dt.timezone.utc).isoformat()})
+                     'retrievedAt': receipt.get('originalRetrieval')})
     return rows

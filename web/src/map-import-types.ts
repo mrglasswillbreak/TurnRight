@@ -91,6 +91,8 @@ export function suggestedImportIdentifier(layer: ImportLayer) {
   )?.name;
 }
 export interface ImportPreview {
+  comparisonVersion?: string;
+  reviewableCollections?: number;
   reportCounts?: {
     repairs: number;
     diagnostics: number;

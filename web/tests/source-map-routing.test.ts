@@ -2,9 +2,13 @@ import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner } from './gis-database-fixture';
 
 let db: Awaited<ReturnType<typeof gisDatabase>>;
-beforeAll(async () => {
-  db = await gisDatabase();
-}, 60000);
+beforeAll(
+  async () => {
+    db = await gisDatabase();
+    // PostGIS WebAssembly startup is slower on Windows; SQL time limits stay unchanged.
+  },
+  process.platform === 'win32' ? 180000 : 60000,
+);
 afterAll(async () => db?.close());
 
 const node = (id: string, coordinates: number[]) => ({
@@ -119,8 +123,10 @@ it('keeps endpoint lookups private and scoped to the current campus', async () =
   ).rejects.toThrow('Campus access');
 });
 
-it('previews 10,000 routing links in bounded pages while retaining decisions and corrections', async () => {
-  await db.exec(`insert into source_features(id,source,entity,payload,hash) values
+it(
+  'previews 10,000 routing links in bounded pages while retaining decisions and corrections',
+  async () => {
+    await db.exec(`insert into source_features(id,source,entity,payload,hash) values
     ('node:bulk-a','routing-bulk','node','{"id":"bulk-a","coordinates":[3.2,6.4]}','a'),
     ('node:bulk-b','routing-bulk','node','{"id":"bulk-b","coordinates":[3.21,6.41]}','b');
     insert into map_changes(id,source_id,kind,after,summary)
@@ -129,53 +135,57 @@ it('previews 10,000 routing links in bounded pages while retaining decisions and
     'Routing change' from generate_series(1,10000) n;
     insert into map_edits(id,kind,geometry,properties) values('routing-correction','path',
     '{"type":"LineString","coordinates":[[3.2,6.4],[3.21,6.41]]}','{"name":"Saved correction"}');`);
-  const ids = new Set<string>();
-  let cursor = null,
-    asOf = null,
-    pages = 0;
-  do {
-    const page = (
-      await db.query<any>('select source_review_map($1,$2,$3,$4) result', [
-        owner,
-        JSON.stringify({ source: 'routing-bulk' }),
-        cursor && JSON.stringify(cursor),
-        asOf,
-      ])
-    ).rows[0].result;
-    expect(page.rows.length).toBeLessThanOrEqual(50);
-    expect(JSON.stringify(page).length).toBeLessThan(30000);
-    for (const row of page.rows) {
-      expect(ids.has(row.id)).toBe(false);
-      ids.add(row.id);
-      expect(row.after.geometry).toEqual({
-        type: 'LineString',
-        coordinates: [
-          [3.2, 6.4],
-          [3.21, 6.41],
-        ],
-      });
-    }
-    cursor = page.nextCursor;
-    asOf = page.asOf;
-    pages++;
-  } while (cursor);
-  expect(ids.size).toBe(10000);
-  expect(pages).toBe(200);
-  expect(
-    (
-      await db.query<any>(
-        "select count(*)::int n from map_changes where status='pending' and source_id like 'edge:routing-%'",
-      )
-    ).rows[0].n,
-  ).toBe(10000);
-  expect(
-    (
-      await db.query<any>(
-        "select properties->>'name' name from map_edits where id='routing-correction'",
-      )
-    ).rows[0].name,
-  ).toBe('Saved correction');
-  expect(
-    (await db.query<any>('select count(*)::int n from releases')).rows[0].n,
-  ).toBe(0);
-}, 120000);
+    const ids = new Set<string>();
+    let cursor = null,
+      asOf = null,
+      pages = 0;
+    do {
+      const page = (
+        await db.query<any>('select source_review_map($1,$2,$3,$4) result', [
+          owner,
+          JSON.stringify({ source: 'routing-bulk' }),
+          cursor && JSON.stringify(cursor),
+          asOf,
+        ])
+      ).rows[0].result;
+      expect(page.rows.length).toBeLessThanOrEqual(50);
+      expect(JSON.stringify(page).length).toBeLessThan(30000);
+      for (const row of page.rows) {
+        expect(ids.has(row.id)).toBe(false);
+        ids.add(row.id);
+        expect(row.after.geometry).toEqual({
+          type: 'LineString',
+          coordinates: [
+            [3.2, 6.4],
+            [3.21, 6.41],
+          ],
+        });
+      }
+      cursor = page.nextCursor;
+      asOf = page.asOf;
+      pages++;
+    } while (cursor);
+    expect(ids.size).toBe(10000);
+    expect(pages).toBe(200);
+    expect(
+      (
+        await db.query<any>(
+          "select count(*)::int n from map_changes where status='pending' and source_id like 'edge:routing-%'",
+        )
+      ).rows[0].n,
+    ).toBe(10000);
+    expect(
+      (
+        await db.query<any>(
+          "select properties->>'name' name from map_edits where id='routing-correction'",
+        )
+      ).rows[0].name,
+    ).toBe('Saved correction');
+    expect(
+      (await db.query<any>('select count(*)::int n from releases')).rows[0].n,
+    ).toBe(0);
+    // Allow the 200-page WebAssembly replay to finish on Windows without changing
+    // the database's per-request limit or the 50-record response bound.
+  },
+  process.platform === 'win32' ? 300000 : 120000,
+);

@@ -19,10 +19,11 @@ from overturemaps.writers import copy, get_writer
 
 class RangeFile(io.RawIOBase):
     """Read only selected parquet byte ranges, with response and transfer limits."""
-    def __init__(self, url):
+    def __init__(self, url, no_cache=False):
         self.url, self.position, self.transferred = url, 0, 0
+        self.request_headers = {'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache'} if no_cache else {}
         self.cache_start, self.cache = 0, b''
-        with urllib.request.urlopen(urllib.request.Request(url, headers={'Range': 'bytes=-8'}), timeout=30) as response:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={**self.request_headers, 'Range': 'bytes=-8'}), timeout=30) as response:
             if response.status != 206: raise ValueError('Source did not support bounded range reads')
             self.length = int(response.headers['Content-Range'].split('/')[-1])
     def readable(self): return True
@@ -41,7 +42,7 @@ class RangeFile(io.RawIOBase):
             return self.cache[start:start+size]
         if size > 32_000_000 or self.transferred + size > 200_000_000: raise ValueError('Campus source transfer budget exceeded')
         start=self.position
-        with urllib.request.urlopen(urllib.request.Request(self.url, headers={'Range': f'bytes={start}-{start+size-1}'}), timeout=30) as response:
+        with urllib.request.urlopen(urllib.request.Request(self.url, headers={**self.request_headers, 'Range': f'bytes={start}-{start+size-1}'}), timeout=30) as response:
             if response.status != 206 or response.headers.get('Content-Range') != f'bytes {start}-{start+size-1}/{self.length}': raise ValueError('Incorrect source byte range')
             content=response.read(size+1)
         if len(content)!=size: raise ValueError('Truncated source byte range')
@@ -82,11 +83,13 @@ def main():
     parser.add_argument('--kind', choices=['place','building','segment','connector'],required=True)
     parser.add_argument('--release',required=True)
     parser.add_argument('--output',type=pathlib.Path,required=True)
+    parser.add_argument('--no-cache',action='store_true',help='Revalidate upstream responses for independent source verification')
     args=parser.parse_args()
     bbox=(3.190,6.455,3.215,6.489)
     index=args.output.parent/'collections.parquet'
-    if not index.exists():
-        with urllib.request.urlopen(f'https://stac.overturemaps.org/{args.release}/collections.parquet',timeout=60) as response:
+    if args.no_cache or not index.exists():
+        request=urllib.request.Request(f'https://stac.overturemaps.org/{args.release}/collections.parquet',headers={'Cache-Control':'no-cache, no-store','Pragma':'no-cache'} if args.no_cache else {})
+        with urllib.request.urlopen(request,timeout=60) as response:
             content=response.read(30_000_001)
         if len(content)>30_000_000: raise ValueError('Overture index exceeds size limit')
         pq.read_table(io.BytesIO(content))
@@ -103,7 +106,7 @@ def main():
     tables=[]
     for file in files:
         url='https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/'+file.split('/',1)[1]
-        with RangeFile(url) as stream:
+        with RangeFile(url,no_cache=args.no_cache) as stream:
             parquet=pq.ParquetFile(stream,pre_buffer=False)
             indices={parquet.metadata.schema.column(i).path:i for i in range(parquet.metadata.num_columns)}
             for key in ('xmin','xmax','ymin','ymax'):

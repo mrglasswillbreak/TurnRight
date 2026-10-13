@@ -4,6 +4,9 @@ import re
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from .network import public_json
 
+class ArcGISStructureError(ValueError):
+    pass
+
 
 def endpoint(url, operation=None):
     parts = urlsplit(url)
@@ -45,7 +48,23 @@ def layer_features(url, bounds, get=public_json, progress=lambda message: None, 
     final_values = final_ids.get('objectIds') or []
     if final_ids.get('exceededTransferLimit') or len(final_values) != expected or set(final_values) != set(ids):
         raise ValueError('ArcGIS identifiers changed during import. Retry to obtain a complete snapshot.')
-    return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'objectIdFieldName':field, 'sourceUrl':url}
+    final_meta = get(endpoint(url) + '?f=json')
+    if any(meta.get(key)!=final_meta.get(key) for key in ('editingInfo','fields','serviceItemId','id','objectIdField','objectIdFieldName')):
+        raise ValueError('ArcGIS layer contents or identity changed during retrieval. Retry the check.')
+    from .normalise import digest
+    # Layers without an editing revision need a second content pass. Matching
+    # counts and IDs alone would miss attribute/geometry edits between pages.
+    if not (meta.get('editingInfo') or {}).get('lastEditDate'):
+        expected_records={str(f['attributes'][field]):digest(f,True) for f in records}
+        for start in range(0,len(ids),size):
+            batch=ids[start:start+size]
+            page=get(query,{'f':'json','objectIds':','.join(map(str,batch)),'outFields':'*','returnGeometry':'true','outSR':4326})
+            confirmed=page.get('features',[])
+            received=[f.get('attributes',{}).get(field) for f in confirmed]
+            if page.get('exceededTransferLimit') or len(received)!=len(batch) or set(received)!=set(batch) or any(expected_records[str(f['attributes'][field])]!=digest(f,True) for f in confirmed):
+                raise ValueError('ArcGIS contents changed during the independent completeness pass. Retry the check.')
+    layer_identity = digest({'id':meta.get('id'),'serviceItemId':meta.get('serviceItemId'),'fields':meta.get('fields'),'objectIdField':meta.get('objectIdField') or meta.get('objectIdFieldName')})
+    return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'objectIdFieldName':field, 'sourceUrl':url, 'layerIdentity':layer_identity, 'providerRevision':meta.get('editingInfo')}
 
 
 def discover(url, bounds, get=public_json, _visited=None, progress=lambda message: None):
@@ -57,7 +76,7 @@ def discover(url, bounds, get=public_json, _visited=None, progress=lambda messag
     visited = set() if _visited is None else _visited
     identity = endpoint(url) + '?' + urlsplit(url).query
     if identity in visited or len(visited) >= 100:
-        raise ValueError('ArcGIS references contain a cycle or exceed 100 layers. Choose a smaller service.')
+        raise ArcGISStructureError('ArcGIS references contain a cycle or exceed 100 layers. Choose a smaller service.')
     visited.add(identity)
     parts = urlsplit(url)
     item = parse_qs(parts.query).get('id', [None])[0]
@@ -77,6 +96,15 @@ def discover(url, bounds, get=public_json, _visited=None, progress=lambda messag
     else:
         value = get(endpoint(url) + '?f=json')
     layers, warnings = [], []
+    def hold_layer(layer_url, meta, error):
+        name=meta.get('name') or meta.get('title') or layer_url
+        warnings.append(str(name)+': '+str(error)+'; this collection is held for verification.')
+        layers.append({'name':name,'features':[],'fields':meta.get('fields',[]),'geometryType':meta.get('geometryType','esriGeometryPoint'),'spatialReference':{'wkid':4326},'sourceUrl':layer_url,'retrievalError':str(error)})
+    def collect_layer(layer_url, meta=None):
+        try:
+            layers.append(layer_features(layer_url,bounds,get,progress,meta))
+        except (ValueError, OSError) as error:
+            hold_layer(layer_url,meta or {},error)
     def visit(entry):
         if entry.get('layers') and not entry.get('url'):
             for child in entry['layers']: visit(child)
@@ -87,13 +115,20 @@ def discover(url, bounds, get=public_json, _visited=None, progress=lambda messag
                 definition = layer.get('layerDefinition', {})
                 name = entry.get('title', definition.get('name', f'Layer {index+1}'))
                 if len(embedded)>1: name += ' / ' + str(definition.get('name') or definition.get('id',index+1))
-                layers.append({**definition, **feature_set, 'name':name, 'fields':definition.get('fields', feature_set.get('fields', []))})
+                from .normalise import digest
+                embedded_receipt = {'itemId':item,'itemUrl':root,'entryId':entry.get('id'),'layerId':definition.get('id',index)} if item and entry.get('id') is not None else None
+                source_collection = 'arcgis:'+item+':'+str(entry['id'])+':'+str(definition.get('id',index)) if embedded_receipt else None
+                layers.append({**definition, **feature_set, 'name':name, 'fields':definition.get('fields', feature_set.get('fields', [])), 'embedded':embedded_receipt,'sourceCollection':source_collection,'layerIdentity':digest(definition),'snapshotHash':digest(feature_set.get('features',[]),True)})
         elif entry.get('url'):
             if any(s in entry.get('layerType','').lower() for s in ('tile','imagery','image')):
                 warnings.append(f"Skipped non-vector layer: {entry.get('title',entry['url'])}")
                 return
-            child_layers, notes = discover(entry['url'], bounds, get, visited, progress)
-            layers.extend(child_layers); warnings.extend(notes)
+            try:
+                child_layers, notes = discover(entry['url'], bounds, get, visited, progress)
+                layers.extend(child_layers); warnings.extend(notes)
+            except (ValueError,OSError) as error:
+                if isinstance(error,ArcGISStructureError): raise
+                hold_layer(entry['url'],entry,error)
         else:
             warnings.append('Skipped unsupported Web Map layer: ' + str(entry.get('title','unnamed')))
     if 'operationalLayers' in value:
@@ -105,15 +140,17 @@ def discover(url, bounds, get=public_json, _visited=None, progress=lambda messag
             if len(layers) >= 100:
                 raise ValueError('Choose a service with at most 100 layers.')
             child = endpoint(url) + '/' + str(layer['id'])
-            meta = get(child + '?f=json')
+            try: meta = get(child + '?f=json')
+            except (ValueError,OSError) as error:
+                hold_layer(child,layer,error);continue
             if 'Query' not in meta.get('capabilities',''):
                 warnings.append('Skipped non-queryable layer: '+str(layer.get('name',child)))
             else:
-                layers.append(layer_features(child,bounds,get,progress,meta))
+                collect_layer(child,meta)
                 if sum(len(layer.get('features', [])) for layer in layers) > 100000:
                     raise ValueError('ArcGIS source exceeds the layer or feature limit.')
     elif 'geometryType' in value:
-        layers.append(layer_features(url,bounds,get,progress,value))
+        collect_layer(url,value)
     else:
         raise ValueError('Use a public Web Map, FeatureServer or queryable MapServer layer URL.')
     if len(layers) > 100 or sum(len(layer.get('features', [])) for layer in layers) > 100000:

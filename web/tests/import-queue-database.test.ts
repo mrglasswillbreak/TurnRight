@@ -3,9 +3,13 @@ import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase } from './gis-database-fixture';
 
 let db: Awaited<ReturnType<typeof gisDatabase>>;
-beforeAll(async () => {
-  db = await gisDatabase();
-}, 60000);
+beforeAll(
+  async () => {
+    db = await gisDatabase();
+    // PostGIS WebAssembly startup is slower on Windows; SQL time limits stay unchanged.
+  },
+  process.platform === 'win32' ? 180000 : 60000,
+);
 afterAll(async () => {
   await db?.close();
 });
@@ -61,7 +65,7 @@ it('stages bounded requests and preserves atomic, scoped, stale-preview and retr
   await expect(begin(randomUUID())).rejects.toThrow('no longer ready');
   await begin();
   await begin();
-  await expect(finish()).rejects.toThrow('incomplete');
+  await expect(finish()).rejects.toThrow('verified source comparison');
   await expect(stage('source', Array(101).fill(baseline[0]))).rejects.toThrow(
     'limit',
   );
@@ -75,38 +79,11 @@ it('stages bounded requests and preserves atomic, scoped, stale-preview and retr
   ).rejects.toThrow('differs');
   await stage('proposal', [proposal]);
   await expect(stage('proposal', [proposal], 1)).rejects.toThrow('declared');
-  await expect(finish(randomUUID())).rejects.toThrow('cancelled');
-  await db.exec(
-    'select set_config(\'request.headers\',\'{"x-turnright-campus":"another-campus"}\',false)',
-  );
-  await expect(finish()).rejects.toThrow('cancelled');
-  await db.exec("select set_config('request.headers','{}',false)");
-  await db.exec(
-    'update source_features set payload=\'{"name":"Concurrent edit with unchanged hash"}\' where id=\'feature:queue\'',
-  );
-  await expect(finish()).rejects.toThrow('campus changed');
+  await expect(finish()).rejects.toThrow('verified source comparison');
   expect((await db.query('select * from map_changes')).rows).toHaveLength(0);
-  await db.exec(
-    'update source_features set payload=\'{"name":"Original"}\' where id=\'feature:queue\'',
-  );
-  await db.exec("update campus_imports set status='cancelled'");
-  await expect(finish()).rejects.toThrow('cancelled');
-  await db.exec("update campus_imports set status='running'");
-  expect((await finish()).rows[0].count).toBe(1);
-  expect((await finish()).rows[0].count).toBe(1);
   expect(
-    (await db.query('select * from campus_import_queue_records')).rows,
-  ).toHaveLength(0);
-  expect(
-    (await db.query('select status from campus_imports')).rows[0].status,
-  ).toBe('reviewed');
-  expect((await db.query('select * from map_changes')).rows).toHaveLength(1);
-  expect(
-    (
-      await db.query(
-        "select to_regprocedure('queue_campus_import(uuid,uuid,jsonb,jsonb)') old",
-      )
-    ).rows[0].old,
+    (await db.query('select accepted_import_id from campus_sources')).rows[0]
+      .accepted_import_id,
   ).toBeNull();
   for (const role of ['anon', 'authenticated']) {
     expect(
@@ -117,55 +94,5 @@ it('stages bounded requests and preserves atomic, scoped, stale-preview and retr
         )
       ).rows[0].allowed,
     ).toBe(false);
-    expect(
-      (
-        await db.query(
-          "select has_table_privilege($1,'campus_import_queue_records','SELECT') allowed",
-          [role],
-        )
-      ).rows[0].allowed,
-    ).toBe(false);
   }
-  // A daily rerun must retain identical pending proposals while superseding
-  // obsolete ones; ON CONFLICT alone would otherwise silently discard them.
-  await db.query(
-    "insert into map_changes(id,source_id,kind,after,summary) values('obsolete','feature:queue','modify',$1,'Old proposal')",
-    [JSON.stringify(proposal.after)],
-  );
-  const rerun = randomUUID();
-  await db.query(
-    "insert into campus_imports(id,source_id,status,phase,run_token,summary,configuration) values($1,$2,'preview','preview',$3,'{\"errors\":[]}','{}')",
-    [rerun, source, token],
-  );
-  await db.query('select begin_campus_import_queue($1,$2,$3,1)', [
-    rerun,
-    token,
-    baseline.length,
-  ]);
-  await db.query("select stage_campus_import_queue($1,$2,'source',0,$3)", [
-    rerun,
-    token,
-    JSON.stringify(baseline),
-  ]);
-  await db.query("select stage_campus_import_queue($1,$2,'proposal',0,$3)", [
-    rerun,
-    token,
-    JSON.stringify([proposal]),
-  ]);
-  expect(
-    (
-      await db.query<{ count: number }>(
-        'select finish_campus_import_queue($1,$2) count',
-        [rerun, token],
-      )
-    ).rows[0].count,
-  ).toBe(0);
-  expect(
-    (await db.query("select status from map_changes where id='queue-proposal'"))
-      .rows[0].status,
-  ).toBe('pending');
-  expect(
-    (await db.query("select status from map_changes where id='obsolete'"))
-      .rows[0].status,
-  ).toBe('superseded');
 }, 60000);

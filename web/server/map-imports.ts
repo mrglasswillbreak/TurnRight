@@ -165,6 +165,7 @@ async function jobById(id: unknown, statusOnly = false) {
 export async function mapImportAction(
   action: string,
   p: Record<string, unknown>,
+  actor: string | null = null,
 ) {
   if (action === 'import-list') {
     const [sources, imports] = await Promise.all([
@@ -214,6 +215,7 @@ export async function mapImportAction(
     const [job] = await db<CampusImport[]>('campus_imports', 'POST', {
       id: randomUUID(),
       source_id: source.id,
+      requested_by: actor,
       configuration: source.configuration,
       run_token: randomUUID(),
     });
@@ -393,7 +395,7 @@ export async function mapImportAction(
       !job.candidate_path.startsWith(`${currentCampusId()}/${job.id}/`)
     )
       throw new HttpError(409, 'Prepare a complete import preview first.');
-    if (job.summary?.errors.length)
+    if (job.summary?.errors.length && !job.summary.comparisonVersion)
       throw new HttpError(409, 'Repair import errors before review.');
     const token = randomUUID();
     const rows = await db<CampusImport[]>(

@@ -1,11 +1,11 @@
-import type { MapChange } from "./types.js";
-import type { Geometry } from "geojson";
+import type { MapChange } from './types.js';
+import type { Geometry } from 'geojson';
 
 export interface SourceMapRow {
   id: string;
   revision: number;
   name: string;
-  kind: MapChange["kind"];
+  kind: MapChange['kind'];
   before: { geometry: Geometry; simplified: boolean } | null;
   after: { geometry: Geometry; simplified: boolean } | null;
 }
@@ -21,19 +21,20 @@ export interface SourceFilters {
   source?: string;
   layer?: string;
   featureType?: string;
-  kind?: "" | "add" | "modify" | "remove";
-  geometry?: "" | "true" | "false";
+  kind?: '' | 'add' | 'modify' | 'remove';
+  geometry?: '' | 'true' | 'false';
 }
 export interface SourceCursor {
   createdAt: string;
   id: string;
 }
 export interface SourceSummary {
+  reliability?: SourceReliability;
   id: string;
   revision: number;
   sourceId: string;
   sourceName: string;
-  kind: MapChange["kind"];
+  kind: MapChange['kind'];
   createdAt: string;
   meta: {
     source: string;
@@ -45,6 +46,8 @@ export interface SourceSummary {
   };
 }
 export interface SourcePage {
+  eligibleTotal?: number;
+  excludedTotal?: number;
   rows: SourceSummary[];
   total: number;
   nextCursor: SourceCursor | null;
@@ -58,8 +61,8 @@ export interface SourceOverview {
   sources: Array<{
     id: string;
     name: string;
-    kind: "file" | "osm" | "arcgis";
-    schedule: "manual" | "daily";
+    kind: 'file' | 'osm' | 'arcgis';
+    schedule: 'manual' | 'daily';
     configured: boolean;
     lastSuccess?: string;
     latest?: {
@@ -81,12 +84,24 @@ export interface SourceOperation {
   id: string;
   actor: string;
   accept: boolean | null;
-  status: "prepared" | "queued" | "running" | "completed" | "failed" | "cancelled";
+  status:
+    | 'prepared'
+    | 'queued'
+    | 'running'
+    | 'completed'
+    | 'failed'
+    | 'cancelled';
   total: number;
   applied: number;
   skipped: number;
   failed: number;
-  breakdown: { add: number; modify: number; remove: number; geometry: number };
+  breakdown: {
+    add: number;
+    modify: number;
+    remove: number;
+    geometry: number;
+    excluded?: number;
+  };
   message?: string;
   created_at: string;
   updated_at: string;
@@ -104,6 +119,7 @@ export interface SourceHistory {
   items: SourceResult[];
 }
 export interface SourceDetail {
+  reliability?: SourceReliability;
   change: MapChange & { review_revision: number };
   overrides: Array<{
     id: string;
@@ -112,32 +128,65 @@ export interface SourceDetail {
     deleted: boolean;
   }>;
 }
+export interface SourceReliability {
+  eligible: boolean;
+  blockingReasons: string[];
+  classification: string;
+  verification: string;
+  dependencyCount: number;
+  checkId?: string;
+  groupId?: string;
+}
+export const sourceReadiness = (value?: SourceReliability) =>
+  value?.eligible === false
+    ? value.verification === 'unverified'
+      ? 'Needs verification'
+      : 'Blocked'
+    : 'Ready to review';
 export const sourceKindLabel = {
-  add: "Addition",
-  modify: "Change",
-  remove: "Removal",
+  add: 'Addition',
+  modify: 'Change',
+  remove: 'Removal',
 } as const;
+export function sourceChangeLabel(
+  kind: 'add' | 'modify' | 'remove',
+  reliability?: SourceReliability,
+) {
+  if (reliability?.classification.includes('configuration_change'))
+    return 'Import configuration';
+  if (reliability?.classification.includes('scope_change'))
+    return 'Scope change';
+  if (reliability?.classification.includes('routing_regeneration'))
+    return 'Routing rebuild';
+  if (reliability?.classification.includes('unresolved_identity'))
+    return 'Identity check';
+  return sourceKindLabel[kind];
+}
 export function sourceFieldLabel(key: string) {
-  if (key === "geometry") return "Shape or location";
+  if (key === 'edge') return 'Routing segment';
+  if (key === 'node') return 'Routing junction';
+  if (key === 'geometry') return 'Shape or location';
   return key
-    .replace(/^properties\./, "")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replaceAll("_", " ")
+    .replace(/^properties\./, '')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replaceAll('_', ' ')
     .replace(/^./, (c) => c.toUpperCase());
 }
 export function describeSourceChange(row: SourceSummary) {
   const fields = row.meta.fields.map(sourceFieldLabel);
-  if (row.kind === "add") return "New source feature";
-  if (row.kind === "remove") return "Missing from the latest source snapshot";
+  if (row.kind === 'add') return 'New source feature';
+  if (row.kind === 'remove') return 'Missing from the latest source snapshot';
   return (
     [
-      row.meta.geometryChanged ? "Shape or location changed" : "",
+      row.meta.geometryChanged ? 'Shape or location changed' : '',
       fields.length
-        ? fields.slice(0, 3).join(", ") + (fields.length > 3 ? ` + ${fields.length - 3} more` : "")
-        : "",
+        ? fields.slice(0, 3).join(', ') +
+          (fields.length > 3 ? ` + ${fields.length - 3} more` : '')
+        : '',
     ]
       .filter(Boolean)
-      .join(" · ") || "Source details changed"
+      .join(' · ') || 'Source details changed'
   );
 }
-export const operationActive = (op: SourceOperation) => ["queued", "running"].includes(op.status);
+export const operationActive = (op: SourceOperation) =>
+  ['queued', 'running'].includes(op.status);

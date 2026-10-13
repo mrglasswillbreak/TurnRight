@@ -5,8 +5,20 @@ on:
       mode:
         description: "Preserve existing layer receipts, encrypted GIS application backup, or apply the exact authorized GIS migration bundle"
         type: choice
-        options: [baseline, backup, migrate]
+        options: [baseline, backup, backup-download, migrate]
         default: baseline
+      backup_public_key:
+        description: "Optional RSA public key for this encrypted backup; retain the private key separately"
+        type: string
+        required: false
+      backup_excluded_tables:
+        description: "Optional comma-separated restricted tables backed up separately through the database dashboard"
+        type: string
+        required: false
+      backup_run_id:
+        description: "Completed backup run to split into smaller encrypted downloads (no database access)"
+        type: string
+        required: false
   push:
     branches: [codex/lasu-campus-layers]
     paths: [.github/workflows/campus-layer-baselines.yml]
@@ -14,6 +26,7 @@ permissions:
   contents: read
 jobs:
   preserve:
+    if: inputs.mode != 'backup-download'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -35,6 +48,8 @@ jobs:
         run: node scripts/gis-deployment.mjs
         env:
           GIS_DEPLOYMENT_MODE: ${{ inputs.mode }}
+          GIS_BACKUP_PUBLIC_KEY: ${{ inputs.backup_public_key }}
+          GIS_BACKUP_EXCLUDED_TABLES: ${{ inputs.backup_excluded_tables }}
       - uses: actions/upload-artifact@v4
         with:
           name: campus-layer-baselines
@@ -42,4 +57,168 @@ jobs:
             web/work/campus-layer-baselines.json
             web/work/gis-deployment/
           if-no-files-found: error
+          retention-days: 14
+
+  backup-download:
+    if: inputs.mode == 'backup-download'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: campus-layer-baselines
+          run-id: ${{ inputs.backup_run_id }}
+          github-token: ${{ github.token }}
+          path: backup
+      - name: Split encrypted recovery archive
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          encrypted = list(Path('backup').rglob('application-backup.enc'))
+          assert len(encrypted) == 1, 'Expected exactly one encrypted backup'
+          source = encrypted[0]
+          receipt = source.with_name('backup-receipt.json')
+          assert receipt.is_file(), 'Backup receipt required'
+          out = Path('parts'); out.mkdir()
+          manifest = {'format': 1, 'parts': [], 'sha256': hashlib.sha256(source.read_bytes()).hexdigest()}
+          with source.open('rb') as stream:
+              for index in range(1, 21):
+                  data = stream.read(20 * 1024 * 1024)
+                  if not data: break
+                  folder = out / str(index); folder.mkdir()
+                  name = f'application-backup.enc.part-{index:02d}'
+                  (folder / name).write_bytes(data)
+                  manifest['parts'].append({'file': name, 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
+              assert not stream.read(1), 'Backup exceeds bounded 400 MiB transfer; increase reviewed limit'
+          meta = out / 'receipt'; meta.mkdir()
+          (meta / 'backup-receipt.json').write_bytes(receipt.read_bytes())
+          (meta / 'parts.json').write_text(json.dumps(manifest, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-receipt
+          path: parts/receipt/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-01
+          path: parts/1/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-02
+          path: parts/2/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-03
+          path: parts/3/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-04
+          path: parts/4/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-05
+          path: parts/5/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-06
+          path: parts/6/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-07
+          path: parts/7/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-08
+          path: parts/8/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-09
+          path: parts/9/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-10
+          path: parts/10/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-11
+          path: parts/11/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-12
+          path: parts/12/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-13
+          path: parts/13/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-14
+          path: parts/14/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-15
+          path: parts/15/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-16
+          path: parts/16/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-17
+          path: parts/17/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-18
+          path: parts/18/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-19
+          path: parts/19/
+          if-no-files-found: ignore
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-download-20
+          path: parts/20/
+          if-no-files-found: ignore
           retention-days: 14

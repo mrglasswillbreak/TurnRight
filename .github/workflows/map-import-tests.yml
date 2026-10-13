@@ -5,6 +5,10 @@ on:
   push:
     paths:
       - "scripts/map_import/**"
+      - "scripts/source-*"
+      - "scripts/source_observations.py"
+      - "supabase/migrations/**"
+      - "web/tests/source-reliability*.test.ts"
       - "scripts/import_map.py"
       - "scripts/tests/test_map_import*.py"
       - "scripts/tests/check_map_import_worker.py"
