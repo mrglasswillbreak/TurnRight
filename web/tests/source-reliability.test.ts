@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 // @ts-expect-error Shared Node comparator deliberately uses plain JavaScript.
 import {
   compareObservations,
@@ -15,6 +15,7 @@ import {
 import {
   boundedComparison,
   batches,
+  evidenceBatches,
   runSourceCheck,
 } from '../../scripts/source-check-worker.mjs';
 // @ts-expect-error Shared Node hash.
@@ -67,6 +68,84 @@ const receipt = {
   configurationHash: 'configuration',
   collections: [{ identity: 'ways', complete: true, count: 1 }],
 };
+it('keeps 100,000-feature archive batches bounded and localizes changes to one identity bucket', () => {
+  const rows = Array.from({ length: 100000 }, (_, i) => ({
+    identity: `object-${i}`,
+    value: i,
+  }));
+  const key = (r: { identity: string }) => r.identity;
+  const before = evidenceBatches(rows, key);
+  const after = evidenceBatches([...rows].reverse(), key);
+  expect(after).toEqual(before);
+  expect(before.flatMap((b: any) => b.records)).toHaveLength(100000);
+  expect(
+    before.every(
+      (b: any) =>
+        b.records.length <= 100 &&
+        Buffer.byteLength(JSON.stringify(b.records)) < 384 * 1024,
+    ),
+  ).toBe(true);
+  const fingerprints = new Set(before.map((b: any) => hash(b.records)));
+  const changed = evidenceBatches(
+    [...rows, { identity: 'new-object', value: -1 }],
+    key,
+  );
+  expect(
+    changed.filter((b: any) => !fingerprints.has(hash(b.records))).length,
+  ).toBeLessThan(10);
+});
+it('waits for bounded finalization beyond the ordinary HTTP deadline without duplicate dispatch', async () => {
+  vi.useFakeTimers();
+  vi.stubEnv('SUPABASE_URL', 'https://source-check-test.invalid');
+  vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'fixture-only');
+  vi.spyOn(AbortSignal, 'timeout').mockImplementation((ms) => {
+    const controller = new AbortController();
+    setTimeout(
+      () => controller.abort(new DOMException('Timeout', 'TimeoutError')),
+      ms,
+    );
+    return controller.signal;
+  });
+  const calls: string[] = [];
+  vi.stubGlobal('fetch', async (url: string, options: RequestInit) => {
+    const route = new URL(url).pathname.split('/').at(-1)!;
+    calls.push(route);
+    if (route === 'source_check_finish') {
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(resolve, 45000);
+        options.signal!.addEventListener('abort', () =>
+          reject(options.signal!.reason),
+        );
+      });
+      return Response.json({ status: 'shadow', counts: { observation: 0 } });
+    }
+    return Response.json(
+      route === 'source_check_begin' ? { status: 'staging' } : [],
+    );
+  });
+  try {
+    const result = runSourceCheck({
+      sourceKey: 'slow-finalization',
+      observations: [],
+      receipt: {
+        ...receipt,
+        retrievedAt: '2026-10-13T12:00:00Z',
+        contentHash: 'empty',
+      },
+    });
+    void result.catch(() => {});
+    await vi.advanceTimersByTimeAsync(45000);
+    expect(calls.filter((c) => c === 'source_check_finish')).toHaveLength(1);
+    expect(calls).not.toContain('source_check_interrupted');
+    expect(await result).toMatchObject({ status: 'shadow' });
+  } finally {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  }
+});
 it('checkpoints independent verification and resumes without repeating completed identities', async () => {
   const accepted = Array.from({ length: 301 }, (_, i) => {
     const item = { ...observation(String(i)), provider: 'file' };

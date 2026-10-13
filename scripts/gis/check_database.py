@@ -25,6 +25,33 @@ with psycopg.connect(url,autocommit=True) as db:
     for actor in [owner,editor,reviewer,publisher]:db.execute('insert into auth.users values(%s)',(actor,))
     db.execute('insert into admin_users(id) values(%s)',(owner,))
     for actor,role in [(editor,'editor'),(reviewer,'reviewer'),(publisher,'publisher')]:db.execute("insert into campus_memberships values('lasu',%s,array[%s])",(actor,role))
+    assert db.execute('select source_decision_history(%s)',(reviewer,)).fetchone()[0] == {'decisions': [], 'legacyFindings': []}
+    db.execute("insert into source_decision_receipts(campus_id,group_id,actor,outcome,members) values('lasu','history-regression',%s,'accepted','[]')",(owner,))
+    history=db.execute('select source_decision_history(%s,%s)',(reviewer,'history-regression')).fetchone()[0]
+    assert len(history['decisions'])==1 and history['decisions'][0]['actor']==owner
+    assert db.execute('select source_decision_history(%s,%s)',(reviewer,'another-group')).fetchone()[0]['decisions']==[]
+    print('Native source history preserves the decision actor and group filter')
+    # Exercise real PostgreSQL TOAST compression and bounded storage at the
+    # 100,000-feature import limit, including repeated daily shadow checks.
+    source_receipt={'retrievedAt':'2026-10-13T00:00:00Z','contentHash':'native-storage-fixture','configurationHash':'native-storage-fixture','collections':[{'identity':'context','complete':True,'count':100000}]}
+    source_counts={'observation':100000,'record':0,'group':0,'member':0}
+    packed_started=time.monotonic()
+    for repetition in range(3):
+        check_id,check_token=str(uuid.uuid4()),str(uuid.uuid4())
+        db.execute('select source_check_begin(%s,%s,%s,%s)',(check_id,check_token,'native-storage',json.dumps(source_receipt)))
+        for offset in range(0,100000,100):
+            batch=[{'identity':'context:'+str(i),'recordCount':0,'content':{'id':i,'detail':'retained evidence '*60}} for i in range(offset,offset+100)]
+            db.execute('select source_check_stage(%s,%s,%s,%s,%s)',(check_id,check_token,'observation',offset,json.dumps(batch)))
+        finished=db.execute('select source_check_finish(%s,%s,%s)',(check_id,check_token,json.dumps(source_counts))).fetchone()[0]
+        assert finished['status']=='shadow' and finished['counts']==source_counts
+        for _ in range(10):
+            if db.execute('select source_check_maintain()').fetchone()[0]['work']==0:break
+        assert db.execute('select count(*) from source_check_payloads').fetchone()[0]==1000
+        assert db.execute('select count(*) from source_observations').fetchone()[0]==0
+    packed,raw=db.execute('select sum(pg_column_size(value)),sum(octet_length(value::text)) from source_check_payloads').fetchone()
+    assert packed<raw/5
+    assert db.execute('select count(distinct run_id) from source_check_pages').fetchone()[0]==2
+    print('Three 100,000-feature shadow checks: deduplicated compressed evidence',packed,'bytes vs',raw,'raw bytes in',round(time.monotonic()-packed_started,2),'seconds')
     schema=json.dumps({'version':1,'fields':[{'name':'height','type':'number'}]})
     db.execute("insert into gis_datasets(campus_id,id,name,schema) values('lasu','native-scale','Native scale',%s)",(schema,))
     started=time.monotonic()

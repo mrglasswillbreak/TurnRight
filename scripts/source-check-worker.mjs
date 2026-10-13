@@ -35,6 +35,40 @@ export function batches(values) {
   if (batch.length) result.push({ offset, records: batch });
   return result;
 }
+// Stable identity buckets avoid rewriting every later batch when one upstream
+// object is inserted. The database deduplicates canonical JSON within a campus.
+export function evidenceBatches(values, key) {
+  const buckets = new Map();
+  for (const value of values) {
+    const bucket = hash(key(value)).slice(0, 2);
+    if (!buckets.has(bucket)) buckets.set(bucket, []);
+    buckets.get(bucket).push(value);
+  }
+  const result = [];
+  let offset = 0;
+  for (const bucket of [...buckets.keys()].sort()) {
+    for (const chunk of batches(buckets.get(bucket).sort((a, b) => key(a).localeCompare(key(b))))) {
+      result.push({ ...chunk, offset });
+      offset += chunk.records.length;
+    }
+  }
+  return result;
+}
+export async function maintainSourceEvidence(database = db) {
+  for (let i = 0; i < 200; i++) {
+    const result = await database(
+      "rpc/source_check_maintain",
+      "POST",
+      {},
+      "return=representation",
+      45000,
+    );
+    if (!result?.work) return;
+  }
+  throw new Error(
+    "Evidence compaction needs another maintenance run; retained decisions are safe.",
+  );
+}
 // Keep independently reviewable groups available when one source feature exceeds
 // a request limit. Only its identity and hashes are retained in the staged view;
 // it is explicitly blocked, and the original import artifact stays referenced.
@@ -137,6 +171,7 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
     throw new Error(
       "The original retrieval receipt is required; cached data cannot invent a retrieval time",
     );
+  await maintainSourceEvidence(database);
   const identity = { run_id, run_token };
   const begun = await database("rpc/source_check_begin", "POST", {
     ...identity,
@@ -287,7 +322,12 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
       })),
       member: result.groups.flatMap((g) => g.members.map((m) => ({ ...m, groupId: g.id }))),
     };
-    const staged = Object.entries(parts).map(([part, values]) => [part, batches(values)]);
+    const staged = Object.entries(parts).map(([part, values]) => [
+      part,
+      part === "observation" || part === "record"
+        ? evidenceBatches(values, (value) => value.identity + (value.record?.id || ""))
+        : batches(values),
+    ]);
     if (Object.values(parts).some((values) => values.length > 300000))
       throw new Error(
         "Check exceeds the bounded staging limit. Split the source into independent collections.",
@@ -307,13 +347,23 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         classification: g.classification,
         message: g.blockingReasons.join(" "),
       }));
-    return await database("rpc/source_check_finish", "POST", {
-      ...identity,
-      counts: Object.fromEntries(
-        Object.entries(parts).map(([key, values]) => [key, values.length]),
-      ),
-      diagnostic_summary: [...findings, ...result.diagnostics].slice(0, 500),
-    });
+    // Finalization has a 60-second SQL budget. A shorter HTTP deadline can
+    // abandon a successful transaction and exhaust retries against its lock.
+    const completed = await database(
+      "rpc/source_check_finish",
+      "POST",
+      {
+        ...identity,
+        counts: Object.fromEntries(
+          Object.entries(parts).map(([key, values]) => [key, values.length]),
+        ),
+        diagnostic_summary: [...findings, ...result.diagnostics].slice(0, 500),
+      },
+      "return=representation",
+      75000,
+    );
+    await maintainSourceEvidence(database);
+    return completed;
   } catch (error) {
     await database("rpc/source_check_interrupted", "POST", {
       ...identity,
