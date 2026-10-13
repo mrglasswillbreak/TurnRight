@@ -307,13 +307,21 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         classification: g.classification,
         message: g.blockingReasons.join(" "),
       }));
-    return await database("rpc/source_check_finish", "POST", {
-      ...identity,
-      counts: Object.fromEntries(
-        Object.entries(parts).map(([key, values]) => [key, values.length]),
-      ),
-      diagnostic_summary: [...findings, ...result.diagnostics].slice(0, 500),
-    });
+    // Finalization has a 60-second SQL budget. A shorter HTTP deadline can
+    // abandon a successful transaction and exhaust retries against its lock.
+    return await database(
+      "rpc/source_check_finish",
+      "POST",
+      {
+        ...identity,
+        counts: Object.fromEntries(
+          Object.entries(parts).map(([key, values]) => [key, values.length]),
+        ),
+        diagnostic_summary: [...findings, ...result.diagnostics].slice(0, 500),
+      },
+      "return=representation",
+      75000,
+    );
   } catch (error) {
     await database("rpc/source_check_interrupted", "POST", {
       ...identity,

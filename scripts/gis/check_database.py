@@ -25,6 +25,12 @@ with psycopg.connect(url,autocommit=True) as db:
     for actor in [owner,editor,reviewer,publisher]:db.execute('insert into auth.users values(%s)',(actor,))
     db.execute('insert into admin_users(id) values(%s)',(owner,))
     for actor,role in [(editor,'editor'),(reviewer,'reviewer'),(publisher,'publisher')]:db.execute("insert into campus_memberships values('lasu',%s,array[%s])",(actor,role))
+    assert db.execute('select source_decision_history(%s)',(reviewer,)).fetchone()[0] == {'decisions': [], 'legacyFindings': []}
+    db.execute("insert into source_decision_receipts(campus_id,group_id,actor,outcome,members) values('lasu','history-regression',%s,'accepted','[]')",(owner,))
+    history=db.execute('select source_decision_history(%s,%s)',(reviewer,'history-regression')).fetchone()[0]
+    assert len(history['decisions'])==1 and history['decisions'][0]['actor']==owner
+    assert db.execute('select source_decision_history(%s,%s)',(reviewer,'another-group')).fetchone()[0]['decisions']==[]
+    print('Native source history preserves the decision actor and group filter')
     schema=json.dumps({'version':1,'fields':[{'name':'height','type':'number'}]})
     db.execute("insert into gis_datasets(campus_id,id,name,schema) values('lasu','native-scale','Native scale',%s)",(schema,))
     started=time.monotonic()

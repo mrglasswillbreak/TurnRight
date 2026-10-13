@@ -75,6 +75,15 @@ const input = (id: string, name = 'Library') => ({
     },
   ],
 });
+it('loads empty check and decision history before the first source decision', async () => {
+  expect(await rpc('source_check_detail', { actor: owner })).toEqual({
+    checks: [],
+  });
+  expect(await rpc('source_decision_history', { actor: owner })).toEqual({
+    decisions: [],
+    legacyFindings: [],
+  });
+});
 it('shadows first, stages bounded data, and only advances accepted observations on acceptance', async () => {
   expect((await runSourceCheck(input('shadow'), database)).status).toBe(
     'shadow',
@@ -110,6 +119,31 @@ it('shadows first, stages bounded data, and only advances accepted observations 
   expect(
     (await db.query('select count(*)::int n from releases')).rows[0].n,
   ).toBe(0);
+});
+it('history returns the decision actor rather than the caller and filters by group', async () => {
+  const history = await rpc('source_decision_history', { actor: reviewer });
+  expect(history.decisions).toHaveLength(1);
+  expect(history.decisions[0]).toMatchObject({
+    actor: owner,
+    outcome: 'accepted',
+  });
+  expect(
+    await rpc('source_decision_history', {
+      actor: reviewer,
+      change_id: history.decisions[0].group_id,
+    }),
+  ).toEqual(history);
+  expect(
+    (
+      await rpc('source_decision_history', {
+        actor: reviewer,
+        change_id: 'another-group',
+      })
+    ).decisions,
+  ).toEqual([]);
+  await expect(
+    rpc('source_decision_history', { actor: randomUUID() }),
+  ).rejects.toThrow('Campus access required');
 });
 it('prevents old single, bulk, and private helper removal bypasses', async () => {
   await db.exec(

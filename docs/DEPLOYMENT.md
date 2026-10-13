@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–048 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–049 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -118,3 +118,5 @@ Apply `044_source_preview_routing.sql` after 043 to include graph links stored a
 ## Source reliability deployment (migrations 045–048)
 
 Apply 045–048 in order after the release gates pass. Deploy the matching API, UI and shared source workers with proposal generation disabled (the default). Audit exact retained provenance without replacing accepted records or map content; verify the LASU public/private regressions before enabling any source. Keep publication separate. See [rollout, recovery and rollback](SOURCE-UPDATES.md#staged-reliability-rollout).
+
+Migration **049** repairs the source decision-history reader by qualifying the receipt actor. It preserves existing function grants and does not alter data. Source finalization waits up to 75 seconds for its existing 60-second database budget; other request and transaction limits remain unchanged.
