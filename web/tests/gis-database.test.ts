@@ -186,11 +186,52 @@ it('requires independent approval, invalidates stale submissions and audits owne
       'Looks correct',
     ]),
   ).rejects.toThrow(/contributor/);
-  await db.query('select gis_decide_review($1,$2,true,$3,false)', [
-    reviewer,
-    id,
-    'Checked the submitted changes',
-  ]);
+  const decision = (
+    await db.query<{ result: Record<string, unknown> }>(
+      'select gis_decide_review($1,$2,true,$3,false) result',
+      [reviewer, id, 'Checked the submitted changes'],
+    )
+  ).rows[0].result;
+  const stored = (
+    await db.query<{ result: Record<string, unknown> }>(
+      "select to_jsonb(r)-'snapshot' result from gis_reviews r where id=$1",
+      [id],
+    )
+  ).rows[0].result;
+  expect(decision).toEqual(stored);
+  expect(decision).not.toHaveProperty('snapshot');
+  // Enumerate every column so adding an unprotected field cannot silently pass.
+  const protectedChanges: Record<string, string> = {
+    campus_id: "'another-campus'",
+    id: 'gen_random_uuid()',
+    summary: "'Changed summary'",
+    content_hash: "'changed-hash'",
+    snapshot: 'snapshot || \'{"changed":true}\'::jsonb',
+    contributors: "'{}'::uuid[]",
+    submitted_by: `'${owner}'`,
+    created_at: "created_at + interval '1 second'",
+    restore_release_id: 'gen_random_uuid()',
+  };
+  const columns = (
+    await db.query<{ column_name: string }>(
+      "select column_name from information_schema.columns where table_schema='public' and table_name='gis_reviews'",
+    )
+  ).rows
+    .map((r) => r.column_name)
+    .sort();
+  expect(columns).toEqual(
+    [
+      ...Object.keys(protectedChanges),
+      'status',
+      'reviewed_by',
+      'reason',
+      'reviewed_at',
+    ].sort(),
+  );
+  for (const [column, value] of Object.entries(protectedChanges))
+    await expect(
+      db.query(`update gis_reviews set ${column}=${value} where id=$1`, [id]),
+    ).rejects.toThrow('Review snapshots are immutable');
   const release = (
     await db.query<{ id: string }>(
       'select gis_prepare_release($1,$2,$3,$4) id',
