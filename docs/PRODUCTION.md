@@ -12,21 +12,36 @@ The live draft audit corrected twelve numeric schema declarations across five UN
 
 Publication uses immutable approved snapshots, reviewed previews, the complete release gates and the production promotion guard. The original owner authorized the audited independent-review exception for this publication. Current review hashes, reasons, release states and preview links are available in the authenticated editor; a submitted or queued item is not a published map. Each campus is promoted separately so the other campus's package remains intact.
 
-[PR #22](https://github.com/mrglasswillbreak/TurnRight/pull/22) records the approval recovery, clearer building-specific validation and two test repairs found during release checks. The model-detail test keeps its camera gesture active until the reduced-detail response is observed, then verifies restoration after stopping. Import fixtures declare their own campus; CI exercises unit tests with a non-default worker campus. This addresses the [UNILAG preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38699608433) that passed all release gates but stopped in the worker's unit suite before building its snapshot. That failed run did not publish UNILAG. The pull request's full checks and deployment status are the authority for the follow-up application revision.
+[PR #22](https://github.com/mrglasswillbreak/TurnRight/pull/22) records the approval recovery, clearer building-specific validation and two test repairs found during release checks. The model-detail test keeps its camera gesture active until the reduced-detail response is observed, then verifies restoration after stopping. Import fixtures declare their own campus; CI exercises unit tests with a non-default worker campus. This addresses the [UNILAG preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38699608433) that passed all release gates but stopped in the worker's unit suite before building its snapshot. That failed run did not publish UNILAG. PR #22 merged as `f6d5ee01b22803210095a43039863d71a3acee41` after the complete required workflows passed on `81025915b18839bd961193708ddce7f418b30ca0`. The application deployment retained both existing campus packages before the new UNILAG preview was built. Quality reported 808 unit passes and one skip, both type projects, 80 lint warnings with no errors, and zero dependency audit vulnerabilities. The first full run stalled on a WebKit model-tree keyboard action; the unchanged complete WebKit group passed its single rerun. Earlier failures remain recorded and real Safari/device acceptance remains open.
+
+## Published campus drafts · 15 October 2026
+
+Both approved editor snapshots were built, inspected and published through the guarded release workflow using the user-authorized audited owner exception. [Exact review/release IDs, hashes, workflow IDs and public integrity receipt](assets/campus-publication-2026-10-15.json). LASU promotion preserved the prior UNILAG manifest; subsequent UNILAG promotion preserved the new LASU manifest.
+
+| Campus | Published package     | Destinations | Verified assets | Unmapped arrivals |
+| ------ | --------------------- | ------------ | --------------- | ----------------- |
+| LASU   | `lasu-6796771f6052`   | 281          | 129/129         | 27                |
+| UNILAG | `unilag-bd659bbd6df2` | 116          | 46/46           | 46                |
+
+Every packaged asset matched its declared size and SHA-256. Public map/editor entry points and the service worker returned 200; unauthenticated editor API access returned 401 with no-store caching. The public datasets passed structural validation. Mapped-place route previews and place/photo details were inspected in the browser; this is not GPS or field acceptance. The receipt includes the complete list of unmapped destinations and duplicate candidates. Candidates are names/overlaps requiring identity review; neither campus contained an exact duplicate candidate.
+
+The installed browser updated UNILAG from `unilag-faa044ebdd24` to `unilag-bd659bbd6df2` through **Offline → Download update**, then reported **Ready offline** and all model files verified. Existing device downloads need this update; physical-phone restart/GPS acceptance remains separate. The [complete production browser and offline verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38726264387) passed **175 asset checks, 32 Chromium/WebKit campus/theme/viewport/2D/3D combinations and four offline journeys**. The [public verification report](assets/campus-browser-verification-2026-10-15.json) records the package and inspected place/building identities. Chromium used browser offline mode; WebKit served identical live bytes from a local origin, stopped that origin and reopened the cached destination, photographs and model package. These checks do not replace physical-device restart acceptance.
+
+The [initial verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38724644094) stopped on an offline photograph assertion after selecting the first same-named Senate record, which owned no photos. The verifier now follows the public place/building photo relationship, retains its actual loaded-image assertion and records the inspected identities. No campus content changed for this repair.
 
 ## Remaining acceptance and owner decisions
 
 The [manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) gives the exact device, field, account and recovery checks still required, with expected outcomes.
 
-| Area | Required evidence or input |
-| --- | --- |
-| Physical devices | Android and iPhone installation/relaunch, downloaded-campus offline use, GPS navigation, keyboard input, spoken directions and dense-model performance on representative phones. Follow [Acceptance](ACCEPTANCE.md) and [Performance](PERFORMANCE.md). |
-| Campus fieldwork | Verify entrances, access restrictions, stairs, hazards and representative walks. **26 LASU and 3 UNILAG crossing-building segments remain excluded from routing** pending inspection. Do not reconnect them merely to clear warnings. |
-| Team roles and rollback | Exercise sign-in and revocation with separate real accounts and rehearse restoration of an approved public campus release. Isolated permission/restore tests do not establish live operational acceptance. |
-| Complete recovery | Obtain a complete database and Auth/platform backup through the direct database/platform backup channel and rehearse recovery in isolation. The API backup attempts on this date did **not** complete: the first encountered a deliberately restricted table; the second timed out reading baseline history. Function-definition backups and the native fixture's dump/restore test are not a full production backup. No permissions were widened to make an archive pass. |
-| Software and asset rights | Select a root software licence and confirm the security contact. Check ArcGIS/source redistribution permissions and each photo's licence/attribution; a saved licence label is not independent evidence of rights. |
-| Source automation | Production had zero enabled source policies and four shadow-check receipts when inspected. Complete per-source shadow parity and the [staged reliability rollout](SOURCE-UPDATES.md#staged-reliability-rollout) before enabling proposal generation. |
-| Technical debt | Existing lint warnings and the documented dense-model/startup performance limits remain. Passing configured budgets is not a claim that every physical-device target is met. |
+| Area                      | Required evidence or input                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Physical devices          | Android and iPhone installation/relaunch, downloaded-campus offline use, GPS navigation, keyboard input, spoken directions and dense-model performance on representative phones. Follow [Acceptance](ACCEPTANCE.md) and [Performance](PERFORMANCE.md).                                                                                                                                                                                                                     |
+| Campus fieldwork          | Verify entrances, access restrictions, stairs, hazards and representative walks. **26 LASU and 3 UNILAG crossing-building segments remain excluded from routing** pending inspection. Do not reconnect them merely to clear warnings.                                                                                                                                                                                                                                      |
+| Team roles and rollback   | Exercise sign-in and revocation with separate real accounts and rehearse restoration of an approved public campus release. Isolated permission/restore tests do not establish live operational acceptance.                                                                                                                                                                                                                                                                 |
+| Complete recovery         | Obtain a complete database and Auth/platform backup through the direct database/platform backup channel and rehearse recovery in isolation. The API backup attempts on this date did **not** complete: the first encountered a deliberately restricted table; the second timed out reading baseline history. Function-definition backups and the native fixture's dump/restore test are not a full production backup. No permissions were widened to make an archive pass. |
+| Software and asset rights | Select a root software licence and confirm the security contact. Check ArcGIS/source redistribution permissions and each photo's licence/attribution; a saved licence label is not independent evidence of rights.                                                                                                                                                                                                                                                         |
+| Source automation         | Production had zero enabled source policies and four shadow-check receipts when inspected. Complete per-source shadow parity and the [staged reliability rollout](SOURCE-UPDATES.md#staged-reliability-rollout) before enabling proposal generation.                                                                                                                                                                                                                       |
+| Technical debt            | Existing lint warnings and the documented dense-model/startup performance limits remain. Passing configured budgets is not a claim that every physical-device target is met.                                                                                                                                                                                                                                                                                               |
 
 Use the [deployment sequence](DEPLOYMENT.md) for subsequent changes and record the actual revision, package hashes, deployment result and operational checks. Earlier dated receipts below remain historical evidence.
 
@@ -69,7 +84,6 @@ README and 15 related guides were updated, with four genuine desktop/phone brows
 [PR #11](https://github.com/mrglasswillbreak/TurnRight/pull/11) and [PR #12](https://github.com/mrglasswillbreak/TurnRight/pull/12) are merged. Migrations 039 and 040 are installed. The complete UNILAG daily import [run 38088544052](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38088544052) succeeded in 3m 36s after bounded queue staging, and daily ArcGIS checks were re-enabled. The earlier failed verification below is historical; migration 038 alone did not resolve the outage.
 
 The authorized [retention run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38111159593) removed 37 obsolete generated files totalling 516,513,589 bytes. All 176 protected files remained unchanged. Source features, saved edits, pending proposals, original uploads and releases remained 15,432 / 351 / 7,546 / 49 / 46. The editor and OAuth entry point remained available, with no database restart during cleanup. Automatic retention is enabled after imports and daily at 05:17 UTC.
-
 
 ## B2 campus identity and documentation — 11 October 2026
 
@@ -420,8 +434,7 @@ pass in both themes and preserve entered source text through switching.
 Verification at **11:04:21 UTC** confirmed the served correction in
 `CampusWorkspace-BtdEXSmy.css`, SHA-256
 `5996d7a951eb5fb2edb5a450ce8d421d8a376a831e03a13d687a29fcffd2e599`.
-Public/admin/shell routes return 200 and unauthenticated admin requests return
-401. The catalogue still lists only LASU, and the manifest plus all **84 assets /
+Public/admin/shell routes return 200 and unauthenticated admin requests return 401. The catalogue still lists only LASU, and the manifest plus all **84 assets /
 20,228,832 bytes** remain identical to the preserved baseline. No map release
 was published by this code fix.
 
@@ -450,13 +463,13 @@ The `campus-imports` bucket is private with a **50 MiB** upload limit. LASU is t
 only campus record. Before/after record counts and fingerprints match for:
 
 | Preserved private data | Records |
-| --- | ---: |
-| Source features | 4,777 |
-| Owner edits | 133 |
-| Releases | 32 |
-| Surveys | 2 |
-| Building media | 25 |
-| Model assets | 1 |
+| ---------------------- | ------: |
+| Source features        |   4,777 |
+| Owner edits            |     133 |
+| Releases               |      32 |
+| Surveys                |       2 |
+| Building media         |      25 |
+| Model assets           |       1 |
 
 Live verification at **10:46:33 UTC** returned 200 for `/`, `/admin` and `/sw.js`
 and the expected 401 for unauthenticated `/api/admin`. The new public catalogue
@@ -633,7 +646,6 @@ See [model verification](MODEL-EDITOR-VERIFICATION.md) and the
 [screenshot inventory](assets/screenshots/README.md). Physical-phone, native
 keyboard and screen-reader acceptance remain outstanding.
 
-
 ## Mobile controls, live globe location and baseline repair — 25 September 2026
 
 The original × close control is restored beside Undo/Redo. Short landscape tools
@@ -715,8 +727,7 @@ passed byte-length and SHA-256 checks. The published manifest is unchanged:
 **`lasu-313d8a168635`**, schema 2, **395 buildings, 220 places, 39 photographs** and
 **18,880,327 bytes**. The public bundle is `index-YhkE0g8I.js`, the editor is
 `Admin-DlLq0BHh.js`, and the precached workspace is
-`PhotoModelWorkspace-BmPAn2fJ.js`. Unauthenticated media/status/save requests returned
-401. No map release, database migration or package-schema change was made.
+`PhotoModelWorkspace-BmPAn2fJ.js`. Unauthenticated media/status/save requests returned 401. No map release, database migration or package-schema change was made.
 
 ## Unified Photo & model editor — 24 September 2026
 

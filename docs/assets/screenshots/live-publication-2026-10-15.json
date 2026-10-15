@@ -1,0 +1,29 @@
+{
+  "capturedDate": "2026-10-15",
+  "browser": "Codex in-app browser (Chromium)",
+  "scope": "Unaltered production public pages. No private account or device location. Phone viewport is a desktop browser simulation.",
+  "captures": [
+    {
+      "file": "live-lasu-published-2026-10-15.jpg",
+      "capturedAt": "2026-10-15T07:35:37.101Z",
+      "applicationRevision": "3d9c517a5d6f3d4cb5e71b9ed473bfaa29db2e3b",
+      "width": 1280,
+      "height": 720,
+      "sha256": "c44b431a194ceaa6724d764abf9be39ab475bbdfd69c769e30437cfcd4725844",
+      "url": "https://turnright.vercel.app/?campus=lasu",
+      "packageVersion": "lasu-6796771f6052",
+      "manifestSha256": "a5d30e7fa89749411af50bd5e0906b7c7abe6749ca507480adb0021282e2fcfb"
+    },
+    {
+      "file": "live-unilag-published-2026-10-15.jpg",
+      "capturedAt": "2026-10-15T11:09:13.207Z",
+      "applicationRevision": "f6d5ee01b22803210095a43039863d71a3acee41",
+      "width": 390,
+      "height": 844,
+      "sha256": "d86995abd5d35960159428a611c7c672ec8ca96a63512593af4e3b7df14e07f4",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "packageVersion": "unilag-bd659bbd6df2",
+      "manifestSha256": "7c1e507e1592bf5db6de8be756e8b9611015efd9e7fadbae961997e129b6ccfc"
+    }
+  ]
+}

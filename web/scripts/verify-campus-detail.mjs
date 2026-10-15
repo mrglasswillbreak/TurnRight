@@ -16,7 +16,9 @@ const headers = bypass ? { 'x-vercel-protection-bypass': bypass } : {};
 const get = async (url) => {
   const target = new URL(url, origin);
   assert.equal(target.origin, new URL(origin).origin);
-  const response = await requestPublishedAsset(origin, target.href, 45000, { headers });
+  const response = await requestPublishedAsset(origin, target.href, 45000, {
+    headers,
+  });
   assert(response.ok, `${url}: ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 };
@@ -90,7 +92,17 @@ for (const slug of ['lasu', 'unilag']) {
       }),
     );
   const data = JSON.parse(await get(manifest.dataUrl));
-  campuses.push({ slug, entry, manifest, data });
+  // Separate source records may share a name. The offline photo check must
+  // reopen the record that actually owns the photograph, not the first label.
+  const photographedPlace = data.places.find(
+    (place) =>
+      /senate/i.test(place.name) &&
+      data.photos?.some(
+        (photo) => photo.buildingId === (place.buildingId || place.id),
+      ),
+  );
+  assert(photographedPlace, `${slug}: missing photographed Senate destination`);
+  campuses.push({ slug, entry, manifest, data, photographedPlace });
   console.log(
     `${slug}: verified ${manifest.assets.length} assets for ${manifest.version}`,
   );
@@ -98,7 +110,7 @@ for (const slug of ['lasu', 'unilag']) {
 const report = {
   origin,
   checkedAt: new Date().toISOString(),
-  campuses: campuses.map(({ slug, manifest, data }) => ({
+  campuses: campuses.map(({ slug, manifest, data, photographedPlace }) => ({
     slug,
     version: manifest.version,
     assets: manifest.assets.length,
@@ -107,6 +119,8 @@ const report = {
       .length,
     places: data.places.length,
     photos: data.photos?.length || 0,
+    inspectedPlaceId: photographedPlace.id,
+    inspectedBuildingId: photographedPlace.buildingId || photographedPlace.id,
   })),
   views: [],
   offline: [],
@@ -189,8 +203,7 @@ for (const [engine, launcher] of [
             },
             { theme },
           );
-          const senate = campus.data.places.find((p) => /senate/i.test(p.name));
-          assert(senate);
+          const senate = campus.photographedPlace;
           await page.goto(
             `${origin}/?campus=${campus.slug}&place=${encodeURIComponent(senate.id)}`,
             { waitUntil: 'domcontentloaded' },
@@ -257,7 +270,7 @@ for (const [engine, launcher] of [
             );
             if (campus.slug === 'unilag') assert.equal(state.roadSurfaces, 179);
             assert.equal(errors.length, 0, errors.join('\n'));
-            const name = `${campus.slug}-${mobile ? 'mobile' : 'desktop'}-${theme}-${mode}-2026-09-30.png`;
+            const name = `${campus.slug}-${mobile ? 'mobile' : 'desktop'}-${theme}-${mode}-${report.checkedAt.slice(0, 10)}.png`;
             await page.screenshot({
               path: path.join(output, engine + '-' + name),
             });
@@ -285,7 +298,7 @@ for (const [engine, launcher] of [
       console.log(`${engine} ${campus.slug}: starting offline download`);
       outageOrigin = engine === 'webkit' ? await offlineOrigin() : undefined;
       const offlineBase = outageOrigin?.origin || origin;
-      const senate = campus.data.places.find((p) => /senate/i.test(p.name));
+      const senate = campus.photographedPlace;
       await page.goto(`${offlineBase}/?campus=${campus.slug}`);
       await attach(page);
       await page.waitForFunction(

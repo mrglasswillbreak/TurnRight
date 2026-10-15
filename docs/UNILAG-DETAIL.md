@@ -1,5 +1,7 @@
 # UNILAG detail and evidence coverage · 30 September 2026
 
+This is a dated source/release record. The [15 October publication](PRODUCTION.md#published-campus-drafts--15-october-2026) supersedes its package inventory; retained source evidence and unresolved field checks still apply.
+
 The detail upgrade uses LASU's shared map palette, labels, place icons and 2D/3D presentation while retaining UNILAG's geography and existing route permissions. [Production receipt](PRODUCTION.md) records the actual published version and asset checks.
 
 ## Road editing and parcel classification follow-up
@@ -10,15 +12,15 @@ The reviewed parcel patch uses source-layer identity and explicit land use for a
 
 ## Coverage
 
-| Measure | Before | Reviewed release |
-| --- | ---: | ---: |
-| Map features | 3,646 | 3,928 |
-| Buildings | 629 | 723 |
-| Destinations | 71 | 116 |
-| Road surfaces | 0 | 179 |
-| Photographs | 0 | 16, covering 11 buildings |
-| Additional landscape polygons | — | 9 |
-| Existing private corrections | 188 | All retained |
+| Measure                       | Before |          Reviewed release |
+| ----------------------------- | -----: | ------------------------: |
+| Map features                  |  3,646 |                     3,928 |
+| Buildings                     |    629 |                       723 |
+| Destinations                  |     71 |                       116 |
+| Road surfaces                 |      0 |                       179 |
+| Photographs                   |      0 | 16, covering 11 buildings |
+| Additional landscape polygons |      — |                         9 |
+| Existing private corrections  |    188 |              All retained |
 
 The 94 additional building footprints come from the downloaded OSM extract. Acceptance requires containment in both the OSM campus boundary and the existing published extent, separation from the detailed survey, minimum area, and no intersection with existing road centrelines. Shifted/overlapping footprints remain review candidates. Existing destinations retain their IDs and coordinates. New destinations have an unmapped arrival state unless independently connected; no route is invented.
 
@@ -30,12 +32,12 @@ Ten footprint-bound architecture references add observed colours, facade/roof no
 
 The original `Road width.geojson.json` is 748,261 bytes, SHA-256 `82659e26dcbeb4a8829b18fb14c2aa264bec6c877710147aac3ded1125d087b4`. Its exact bytes and raw attributes are preserved in private campus-import storage and verified by read-back. The public patch contains only mapped application properties.
 
-| `NAME` classification | Features |
-| --- | ---: |
-| Drive-Paved + Tarred-Road | 80 |
-| Drive-Unpaved + Untarred-Road | 24 |
-| Sidewalk | 75 |
-| Total, identified by `OBJECTID_1` | **179** |
+| `NAME` classification             | Features |
+| --------------------------------- | -------: |
+| Drive-Paved + Tarred-Road         |       80 |
+| Drive-Unpaved + Untarred-Road     |       24 |
+| Sidewalk                          |       75 |
+| Total, identified by `OBJECTID_1` |  **179** |
 
 Source identity is `bd74d5cc-2b8d-4d42-977a-00165dc70b7e`; accepted layer identity is `UNILAG Road width`. Every ID from 1 through 179 has a valid, nonempty public geometry. Multipart geometry and holes use the same component-preserving importer.
 
@@ -60,19 +62,19 @@ Reproduce the additive patch with `scripts/enrich_unilag.py`, the original downl
 
 ## Architecture and unresolved conflicts
 
-| Building / group | Supported detail | Remaining uncertainty |
-| --- | --- | --- |
-| Senate | Identifiable cream concrete frame, dark glazing and red-brown sun screens; architect describes 14 storeys | Sources report 11–14 using differing conventions. The 42 m display estimate uses 3 m/floor; lower wings/chambers and stepped tower massing need measured treatment. |
-| Faculty of Arts | Six visible upper window bands plus ground in the reviewed dated facade view; approximate palette | OSM says four levels; a tender calls it six-storey. The 7-level display estimate applies to the photographed main block; wings need verification. |
-| CITS | Three visible levels, yellow walls and red-brown bands | Metre height, rear facade and roof construction unknown. |
-| Faculty of Education | Two visible levels and vertical sunshades | Auxiliary-wing heights and current finish unknown. |
-| Main Library | Fins, deep canopy and signed identity; three credited reference views | Parcel label points toward small building 97; association uses footprint 96 and identifiable facade. The library FAQ mentions a third floor, not a full floor schedule. Height remains illustrative. |
-| Akintunde Ojo Memorial Hall | Signed glazed facade and roof planes | Overhang dimensions and complete heights unknown. |
-| Afe Babalola Auditorium | Pale walls, glazing and red pitched roof | Gable is approximate; ridge, pitch and eave height need a roof plan. |
-| Engineering | Existing authored model retained; exterior reference added | Courtyard photo does not resolve each wing's dimensions. |
-| Science / Management Sciences | Identifiable facade references and colours | Floor totals, roof construction and obscured elevations unknown. |
-| Jaja / Moremi / other halls | Names/aliases reconciled where identity is supported; dated Jaja context photo | Makama Bida, Eni Njoku and Shodeinde assignments conflict. High-rise A/B/C pins and footprints are shifted; no automatic association. |
-| Medical centre, worship buildings, main auditorium | Landmark names/categories and supported footprint associations reviewed | No confidently reusable matched exterior references in the searched set for several buildings; illustrative treatment retained. |
+| Building / group                                   | Supported detail                                                                                          | Remaining uncertainty                                                                                                                                                                                |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Senate                                             | Identifiable cream concrete frame, dark glazing and red-brown sun screens; architect describes 14 storeys | Sources report 11–14 using differing conventions. The 42 m display estimate uses 3 m/floor; lower wings/chambers and stepped tower massing need measured treatment.                                  |
+| Faculty of Arts                                    | Six visible upper window bands plus ground in the reviewed dated facade view; approximate palette         | OSM says four levels; a tender calls it six-storey. The 7-level display estimate applies to the photographed main block; wings need verification.                                                    |
+| CITS                                               | Three visible levels, yellow walls and red-brown bands                                                    | Metre height, rear facade and roof construction unknown.                                                                                                                                             |
+| Faculty of Education                               | Two visible levels and vertical sunshades                                                                 | Auxiliary-wing heights and current finish unknown.                                                                                                                                                   |
+| Main Library                                       | Fins, deep canopy and signed identity; three credited reference views                                     | Parcel label points toward small building 97; association uses footprint 96 and identifiable facade. The library FAQ mentions a third floor, not a full floor schedule. Height remains illustrative. |
+| Akintunde Ojo Memorial Hall                        | Signed glazed facade and roof planes                                                                      | Overhang dimensions and complete heights unknown.                                                                                                                                                    |
+| Afe Babalola Auditorium                            | Pale walls, glazing and red pitched roof                                                                  | Gable is approximate; ridge, pitch and eave height need a roof plan.                                                                                                                                 |
+| Engineering                                        | Existing authored model retained; exterior reference added                                                | Courtyard photo does not resolve each wing's dimensions.                                                                                                                                             |
+| Science / Management Sciences                      | Identifiable facade references and colours                                                                | Floor totals, roof construction and obscured elevations unknown.                                                                                                                                     |
+| Jaja / Moremi / other halls                        | Names/aliases reconciled where identity is supported; dated Jaja context photo                            | Makama Bida, Eni Njoku and Shodeinde assignments conflict. High-rise A/B/C pins and footprints are shifted; no automatic association.                                                                |
+| Medical centre, worship buildings, main auditorium | Landmark names/categories and supported footprint associations reviewed                                   | No confidently reusable matched exterior references in the searched set for several buildings; illustrative treatment retained.                                                                      |
 
 The 2005 survey table grades **building condition**, not floor count. It is used for historical names only. Official images are not republished without a usable licence. Every unknown building retains an explicit illustrative height; gaps are not filled to reach LASU's counts.
 

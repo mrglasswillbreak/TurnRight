@@ -1,13 +1,16 @@
 # Application screenshots
 
+## Current public maps · 15 October 2026
+
+The README public desktop and phone images now show the newly published LASU and UNILAG packages. [Capture provenance](live-publication-2026-10-15.json) records their exact hashes, dimensions, application revisions and package identities. The images are unaltered production captures; the phone viewport is a desktop browser simulation. The remaining editor/globe/offline tour below keeps its isolated-fixture provenance.
+
 ## Current product tour · 15 October 2026
 
-The README and current guides use eighteen new, unaltered Chromium captures covering the public map, globe, mobile/offline experience, editor panes, Data/Analyze/Review/Publish, model reference/portrait/landscape, imports and photo editing. They use the current local source, verified public LASU assets, and isolated owner/team/API responses. No production draft, decision or release was changed.
+The complete local product tour contains eighteen unaltered Chromium captures covering the public map, globe, mobile/offline experience, editor panes, Data/Analyze/Review/Publish, model reference/portrait/landscape, imports and photo editing. They use the current local source, verified public LASU assets, and isolated owner/team/API responses. No production draft, decision or release was changed.
 
 [Gallery and reproduction](../../SCREENSHOTS.md) · [Source, fixture and image manifest](tour-2026-10-15.json).
 
 The selected B2 brand is visible in these captures. Phone images are viewport simulations. GIS totals, source names and review decisions are demonstration fixtures. The archived images below retain their original dates and evidence; mentions of the “current README” in historical entries refer to that date.
-
 
 ## Source reliability and private undo · 13 October 2026
 
@@ -37,10 +40,10 @@ Authentication, tree attributes, catalogue totals and review decisions are isola
 
 Reproduce after preparing the verified public assets described below:
 
-~~~sh
+```sh
 cd web
 TURNRIGHT_GIS_SCREENSHOTS=1 npx playwright test --config playwright.gis-docs.config.ts
-~~~
+```
 
 In PowerShell set the TURNRIGHT_GIS_SCREENSHOTS environment variable before invoking the command. The opt-in capture test uses the real production-built React/MapLibre UI and writes these dated files. Review the resulting images before updating documentation. [Current scope](../../GIS-PLATFORM.md) · [Deployment receipts](../../PRODUCTION.md).
 
@@ -118,7 +121,6 @@ Run `playwright.photos.webkit.config.ts`, `playwright.photos.pwa.config.ts`, and
 
 The theme and chooser globe captures were refreshed from the configured production build with the brighter star field. `globe-portrait-chooser` is 390×844; the desktop chooser is 1280×720. The globe/chooser data are isolated fixtures and do not imply a second published campus. The still screenshots demonstrate the controls and star orientation; animation and occlusion have separate pixel/workflow assertions.
 
-
 ## Globe and import recovery · 27 September 2026
 
 The new `globe-*-2026-09-27.png` captures show the current navy star background, different globe orientations, Light's retained sunlit horizon, Dark without horizon glow, the campus chooser and a centred mobile landscape globe. `import-resume-2026-09-27.png` shows recovery from an unavailable uploaded file. These replace the affected September 26 globe/chooser views in current guides; older files remain dated archives.
@@ -141,7 +143,6 @@ Renderer checks read actual pixels for deterministic star orientation and Earth 
 Nine `campus-*-2026-09-26.png` captures cover the directory, creation/boundary preview, source selection, field mapping, preview/review, phone landscape, public switcher, per-campus offline controls and the corrected dark-theme import form. They are unaltered Chromium captures with isolated owner/import API responses. The original eight use checked-in LASU `lasu-4e4c8008b38b` geography; `campus-dark` uses the small automated campus fixture. Second-campus names, counts and URLs are illustrative. No private account, uploaded file or production draft is exposed; no second production campus is implied.
 
 Regenerate from `web/` with `UPDATE_CAMPUS_SCREENSHOTS=true npx playwright test campus-imports.spec.ts` (PowerShell: set `$env:UPDATE_CAMPUS_SCREENSHOTS='true'` first). `--grep 'readable headers'` refreshes just the dark form. Review every image after capture. Offline captures show controls, not proof of a disconnected session. The root README includes **55 distinct screenshots**: the existing 46-image model/navigation gallery plus these nine campus views.
-
 
 ## Current application gallery · 26 September 2026
 
@@ -168,20 +169,20 @@ Eight additions, also dated `2026-09-26`, cover the current extension. `referenc
 
 The 26 filename prefixes listed in the earlier inventory below have all been refreshed with the current UI and campus. Twelve additional captures, all ending in `-2026-09-26.png`, cover:
 
-| Filename prefix | Current view |
-| --- | --- |
-| `editor-model-wall-text` | Wall lettering with wording and size controls |
-| `editor-model-roof-text` | Roof lettering and properties |
-| `editor-model-tree-actions` | Nested structure, selected window and Ungroup |
-| `editor-model-orbit-current` | Orbit restored after surface editing |
-| `editor-model-landscape` | Model beside one editing panel at 844 × 390 |
-| `editor-sources-current` | Source review and baseline status |
-| `editor-releases-current` | Model review blockers before publication |
-| `editor-survey-current` | Survey workspace before recording |
-| `editor-model-window-instance` | One window edited independently, with unchanged neighbours |
-| `editor-model-bulk-review` | Building Review and Mark all as reviewed |
-| `public-building-actions` | Directions and place actions before credits and arrival options |
-| `editor-public-building-handoff` | Selected public building opened in its general editing card |
+| Filename prefix                  | Current view                                                    |
+| -------------------------------- | --------------------------------------------------------------- |
+| `editor-model-wall-text`         | Wall lettering with wording and size controls                   |
+| `editor-model-roof-text`         | Roof lettering and properties                                   |
+| `editor-model-tree-actions`      | Nested structure, selected window and Ungroup                   |
+| `editor-model-orbit-current`     | Orbit restored after surface editing                            |
+| `editor-model-landscape`         | Model beside one editing panel at 844 × 390                     |
+| `editor-sources-current`         | Source review and baseline status                               |
+| `editor-releases-current`        | Model review blockers before publication                        |
+| `editor-survey-current`          | Survey workspace before recording                               |
+| `editor-model-window-instance`   | One window edited independently, with unchanged neighbours      |
+| `editor-model-bulk-review`       | Building Review and Mark all as reviewed                        |
+| `public-building-actions`        | Directions and place actions before credits and arrival options |
+| `editor-public-building-handoff` | Selected public building opened in its general editing card     |
 
 The building card now shows one Edit model button and a read-only summary. The desktop workspace opens in Orbit. Roof and footprint captures use surface-aligned editing; mobile uses the same Edit surface control, with an automatic 2D renderer fallback when needed. Normal editor opacity is 100%; property headers remain outside the scrolling desktop form. Desktop images are 1440 × 1000, desktop globe 1440 × 900, portrait 390 × 844, and landscape 844 × 390. Public screens block service workers to avoid an older installed UI. The offline screenshot shows download controls, not proof of a disconnected session. Walking previews use a manual Clinic origin without GPS; the survey screenshot does not start recording.
 
@@ -211,34 +212,34 @@ That README revision contained **26 distinct unaltered PNG captures** from produ
 
 All current public and owner views are captured by `web/playwright.docs.config.ts`, including the eight focused mobile model views. Public screenshots block service workers to avoid an older installed UI. Offline-download screenshots show the actual interface state, not proof of a disconnected session. Separate production PWA journeys verify preparation and offline reloads.
 
-| Filename prefix (all end `-2026-09-25.png`) | View |
-| --- | --- |
-| `public-place-desktop-current` | Campus and Senate destination, Light |
-| `public-panel-resized-current` | Same destination with shortened panel |
-| `public-map-mobile-current` | Compact campus map |
-| `public-place-mobile-current` | Destination and gallery |
-| `public-settings-mobile-current` | Public settings |
-| `public-offline-mobile-current` | Package status and download controls |
-| `public-globe-desktop-current` | Illustrated globe, Light |
-| `public-globe-mobile-current` | Illustrated globe, Dark |
-| `public-route-desktop-current` | Manual Clinic–Senate walking route, Dark |
-| `public-route-mobile-current` | Mobile walking preview; no GPS navigation started |
-| `editor-workspace-current` | Explorer and 3D campus |
-| `editor-building-current` | Building inspector and gallery at the top |
-| `editor-building-mobile-current` | Compact building inspector |
-| `editor-settings-mobile-current` | Owner view settings |
-| `editor-photos-current` | Visual photo manager |
-| `editor-roof-current` | Integrated roof mode |
-| `editor-outline-current` | Geographic outline mode |
-| `unified-model-desktop` | Measured canvas, hierarchy, model and photo |
-| `editor-model-canvas-mobile` | Canvas, selected detail and explicit Move/Resize actions |
-| `editor-model-actions-mobile` | Selection menu with commands and shortcuts |
-| `editor-model-properties-mobile` | Precise dimensions and focused edit sheet |
-| `editor-model-height-mobile` | Whole-building height/floors inside Appearance |
-| `editor-model-roof-mobile` | Central geographic roof plan |
-| `editor-model-outline-mobile` | Outline plan in Light appearance |
-| `editor-model-photo-mobile` | Shared building photograph and independent zoom |
-| `editor-model-review-mobile` | Targeted review sheet |
+| Filename prefix (all end `-2026-09-25.png`) | View                                                     |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `public-place-desktop-current`              | Campus and Senate destination, Light                     |
+| `public-panel-resized-current`              | Same destination with shortened panel                    |
+| `public-map-mobile-current`                 | Compact campus map                                       |
+| `public-place-mobile-current`               | Destination and gallery                                  |
+| `public-settings-mobile-current`            | Public settings                                          |
+| `public-offline-mobile-current`             | Package status and download controls                     |
+| `public-globe-desktop-current`              | Illustrated globe, Light                                 |
+| `public-globe-mobile-current`               | Illustrated globe, Dark                                  |
+| `public-route-desktop-current`              | Manual Clinic–Senate walking route, Dark                 |
+| `public-route-mobile-current`               | Mobile walking preview; no GPS navigation started        |
+| `editor-workspace-current`                  | Explorer and 3D campus                                   |
+| `editor-building-current`                   | Building inspector and gallery at the top                |
+| `editor-building-mobile-current`            | Compact building inspector                               |
+| `editor-settings-mobile-current`            | Owner view settings                                      |
+| `editor-photos-current`                     | Visual photo manager                                     |
+| `editor-roof-current`                       | Integrated roof mode                                     |
+| `editor-outline-current`                    | Geographic outline mode                                  |
+| `unified-model-desktop`                     | Measured canvas, hierarchy, model and photo              |
+| `editor-model-canvas-mobile`                | Canvas, selected detail and explicit Move/Resize actions |
+| `editor-model-actions-mobile`               | Selection menu with commands and shortcuts               |
+| `editor-model-properties-mobile`            | Precise dimensions and focused edit sheet                |
+| `editor-model-height-mobile`                | Whole-building height/floors inside Appearance           |
+| `editor-model-roof-mobile`                  | Central geographic roof plan                             |
+| `editor-model-outline-mobile`               | Outline plan in Light appearance                         |
+| `editor-model-photo-mobile`                 | Shared building photograph and independent zoom          |
+| `editor-model-review-mobile`                | Targeted review sheet                                    |
 
 Desktop application views are 1440 × 1000, the desktop globe is 1440 × 900 and mobile views are 390 × 844. Walking previews use a manual Clinic origin with no active GPS navigation; their camera and panel are adjusted to show the route and approach notice. These are Chromium/SwiftShader browser captures, not physical-phone or human screen-reader tests. Images contain the application's own labels, credits and theme colours; no interface elements are composited or removed.
 
@@ -264,11 +265,11 @@ The previous four-image gallery (`public-globe-*-2026-09-24.jpg` and `photo-mode
 
 Unmodified JPEG captures from application revision **`b69cde0`**, using the real editor in the **Codex in-app browser**. The local preview loaded the checked-in **`lasu-4e4c8008b38b`** campus seed. A temporary development fixture supplied a local sample owner, empty drafts/reports/releases and no source updates. Save/publish requests were disabled in that fixture; no production session or private workspace was opened.
 
-| Image | View | Captured dimensions |
-| --- | --- | --- |
-| [editor-workspace-desktop-2026-09-17.jpg](editor-workspace-desktop-2026-09-17.jpg) | Dark desktop workspace, explorer, drawing tools and campus in 3D | 1248 × 900 |
-| [editor-building-mobile-2026-09-17.jpg](editor-building-mobile-2026-09-17.jpg) | Faculty of Law selected with the compact appearance inspector | 390 × 844 |
-| [editor-settings-mobile-2026-09-17.jpg](editor-settings-mobile-2026-09-17.jpg) | Compact mobile Settings in Light mode | 390 × 844 |
+| Image                                                                              | View                                                             | Captured dimensions |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------- |
+| [editor-workspace-desktop-2026-09-17.jpg](editor-workspace-desktop-2026-09-17.jpg) | Dark desktop workspace, explorer, drawing tools and campus in 3D | 1248 × 900          |
+| [editor-building-mobile-2026-09-17.jpg](editor-building-mobile-2026-09-17.jpg)     | Faculty of Law selected with the compact appearance inspector    | 390 × 844           |
+| [editor-settings-mobile-2026-09-17.jpg](editor-settings-mobile-2026-09-17.jpg)     | Compact mobile Settings in Light mode                            | 390 × 844           |
 
 To reproduce, use isolated owner/API responses like the existing editor browser-test fixture, serve the current editor and campus seed locally, and open it in the in-app browser. Capture the desktop workspace in 3D. Switch to a 390 × 844 viewport, search for Faculty Of Law, select its building record, and capture the inspector. Open Settings and select Light for the final image. Unknown heights remain labelled illustrative; no feature edits are needed. Remove the temporary fixture and reset the viewport afterward.
 
@@ -276,10 +277,10 @@ To reproduce, use isolated owner/API responses like the existing editor browser-
 
 Actual, unmodified JPEG captures from the local production PWA in the **Codex in-app browser**, using the new globe interface, the checked-in **`lasu-4e4c8008b38b`** campus package and bundled Natural Earth v5.1.2 world geometry. The preview server was stopped before reloading and capturing both views: geometry and country labels came from the saved app/package. No device GPS or private editor data was used.
 
-| Image | View | Captured dimensions |
-| --- | --- | --- |
-| [public-globe-mobile-dark-2026-09-17.jpg](public-globe-mobile-dark-2026-09-17.jpg) | Dark globe with compact search dock and the existing side controls | 390 × 844 |
-| [public-globe-desktop-light-2026-09-17.jpg](public-globe-desktop-light-2026-09-17.jpg) | Light globe beside the full-height public panel and Back to campus action | 1248 × 900 |
+| Image                                                                                  | View                                                                      | Captured dimensions |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------- |
+| [public-globe-mobile-dark-2026-09-17.jpg](public-globe-mobile-dark-2026-09-17.jpg)     | Dark globe with compact search dock and the existing side controls        | 390 × 844           |
+| [public-globe-desktop-light-2026-09-17.jpg](public-globe-desktop-light-2026-09-17.jpg) | Light globe beside the full-height public panel and Back to campus action | 1248 × 900          |
 
 To reproduce: build and serve the production app, install its waiting app update if necessary, finish the campus download, stop the local server and reload. Zoom out, then adjust the wheel/pinch zoom until the entire planet fits. Capture mobile in Dark mode and desktop in Light mode, without changing the world data. These are responsive-browser checks, not physical-device airplane-mode or GPS tests.
 
@@ -289,14 +290,14 @@ Captured from the local production preview in the **Codex in-app browser**, usin
 
 The map uses the checked-in **`lasu-4e4c8008b38b`** campus seed. The app renders its real React/MapLibre interface in Device appearance, which resolved to Dark on this machine. The Senate Building is labelled with an unknown/illustrative height in this seed; this gallery does not claim that all enhanced model assets are present. No production owner session, private drafts, reports or GPS coordinates from a device were used.
 
-| Image | View | Captured dimensions |
-| --- | --- | --- |
-| [public-desktop-full-2026-09-17.jpg](public-desktop-full-2026-09-17.jpg) | Full-height desktop destination panel; search, navigation and map controls above its scrolling details | 1248 × 900 |
-| [public-desktop-resized-2026-09-17.jpg](public-desktop-resized-2026-09-17.jpg) | The same panel shortened to 548 px using its top handle | 1248 × 900 |
-| [public-mobile-map-2026-09-17.jpg](public-mobile-map-2026-09-17.jpg) | Compact bottom search dock; view/compass on the left and zoom/location on the right | 390 × 844 |
-| [public-mobile-place-2026-09-17.jpg](public-mobile-place-2026-09-17.jpg) | Destination card resized to 432 px with pinned navigation | 390 × 844 |
-| [public-mobile-settings-2026-09-17.jpg](public-mobile-settings-2026-09-17.jpg) | Settings dialog shortened to 440 px | 390 × 844 |
-| [public-mobile-update-2026-09-17.jpg](public-mobile-update-2026-09-17.jpg) | The public update-ready notice with an explicit install button | 390 × 844 |
+| Image                                                                          | View                                                                                                   | Captured dimensions |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------- |
+| [public-desktop-full-2026-09-17.jpg](public-desktop-full-2026-09-17.jpg)       | Full-height desktop destination panel; search, navigation and map controls above its scrolling details | 1248 × 900          |
+| [public-desktop-resized-2026-09-17.jpg](public-desktop-resized-2026-09-17.jpg) | The same panel shortened to 548 px using its top handle                                                | 1248 × 900          |
+| [public-mobile-map-2026-09-17.jpg](public-mobile-map-2026-09-17.jpg)           | Compact bottom search dock; view/compass on the left and zoom/location on the right                    | 390 × 844           |
+| [public-mobile-place-2026-09-17.jpg](public-mobile-place-2026-09-17.jpg)       | Destination card resized to 432 px with pinned navigation                                              | 390 × 844           |
+| [public-mobile-settings-2026-09-17.jpg](public-mobile-settings-2026-09-17.jpg) | Settings dialog shortened to 440 px                                                                    | 390 × 844           |
+| [public-mobile-update-2026-09-17.jpg](public-mobile-update-2026-09-17.jpg)     | The public update-ready notice with an explicit install button                                         | 390 × 844           |
 
 These are unmodified JPEG browser captures: no interface elements were composited, removed or recoloured. The update screenshot uses a real waiting service worker triggered by a comment-only revision to the local built `dist/sw.js`. The original built file was restored after capture; no application source or live deployment was changed for the demonstration.
 
@@ -315,15 +316,15 @@ These images show the application UI from revision `5d878a2`, including original
 
 The capture uses the checked-in `lasu-4e4c8008b38b` seed geometry and `data/visuals/catalogue.json` / sector assets through the repository's enhanced-campus fixture. Reviewed ring corrections are accepted in that fixture. Owner login and API responses are isolated test data; no production reports, credentials or owner draft contents are captured. The roof screenshot shows an unfinished demonstration plan, not a surveyed or published roof change.
 
-| Image | View | Viewport |
-| --- | --- | --- |
-| [public-campus-dark.jpg](public-campus-dark.jpg) | Selected Senate Building and enhanced campus in Dark mode | 1440 × 1000 |
-| [public-place-phone.jpg](public-place-phone.jpg) | Public destination details and enhanced architecture | 390 × 844 |
-| [editor-workspace.jpg](editor-workspace.jpg) | Workspace, explorer and campus context | 1440 × 1000 |
-| [editor-building.jpg](editor-building.jpg) | Building Appearance inspector and selected model | 1440 × 1000 |
-| [editor-roof.jpg](editor-roof.jpg) | Wing roof plan and custom-roof controls | 1440 × 1000 |
-| [editor-settings.jpg](editor-settings.jpg) | Appearance, rendering, tilt and opacity | 1440 × 1000 |
-| [editor-settings-phone.jpg](editor-settings-phone.jpg) | Editor Settings in a phone viewport | 390 × 844 |
+| Image                                                  | View                                                      | Viewport    |
+| ------------------------------------------------------ | --------------------------------------------------------- | ----------- |
+| [public-campus-dark.jpg](public-campus-dark.jpg)       | Selected Senate Building and enhanced campus in Dark mode | 1440 × 1000 |
+| [public-place-phone.jpg](public-place-phone.jpg)       | Public destination details and enhanced architecture      | 390 × 844   |
+| [editor-workspace.jpg](editor-workspace.jpg)           | Workspace, explorer and campus context                    | 1440 × 1000 |
+| [editor-building.jpg](editor-building.jpg)             | Building Appearance inspector and selected model          | 1440 × 1000 |
+| [editor-roof.jpg](editor-roof.jpg)                     | Wing roof plan and custom-roof controls                   | 1440 × 1000 |
+| [editor-settings.jpg](editor-settings.jpg)             | Appearance, rendering, tilt and opacity                   | 1440 × 1000 |
+| [editor-settings-phone.jpg](editor-settings-phone.jpg) | Editor Settings in a phone viewport                       | 390 × 844   |
 
 PNG browser captures are encoded as JPEG at the original dimensions for repository size. No interface elements are composited, removed or recoloured. The map, lighting and settings backgrounds come from the application itself. No GPS fix, active walk or completed physical-device test is implied.
 
@@ -333,11 +334,11 @@ The earlier gallery was produced using the repository’s opt-in documentation-c
 
 The earlier files below remain as historical references and are no longer the main README gallery. They were captured from application revision `cec03c5` and campus package `lasu-44f8af5654f1`.
 
-| Image | View | Viewport |
-| --- | --- | --- |
-| [desktop-explore.jpg](desktop-explore.jpg) | Public explorer in Light mode | 1248 × 720 |
+| Image                                            | View                                                   | Viewport   |
+| ------------------------------------------------ | ------------------------------------------------------ | ---------- |
+| [desktop-explore.jpg](desktop-explore.jpg)       | Public explorer in Light mode                          | 1248 × 720 |
 | [desktop-route-dark.jpg](desktop-route-dark.jpg) | Manually selected Clinic–Senate route and alternatives | 1248 × 720 |
-| [mobile-place.jpg](mobile-place.jpg) | Senate place details | 390 × 844 |
-| [appearance.jpg](appearance.jpg) | Public Device appearance setting | 390 × 844 |
+| [mobile-place.jpg](mobile-place.jpg)             | Senate place details                                   | 390 × 844  |
+| [appearance.jpg](appearance.jpg)                 | Public Device appearance setting                       | 390 × 844  |
 
 All phone screenshots use responsive browser viewports. Physical Android/iPhone installation, GPS, touch and offline checks are tracked separately in [the acceptance checklist](../../ACCEPTANCE.md).

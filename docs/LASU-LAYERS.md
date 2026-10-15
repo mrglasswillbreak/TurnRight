@@ -1,5 +1,7 @@
 # LASU roads and landscape review — 30 September 2026
 
+This is a dated source/release record. The [15 October publication](PRODUCTION.md#published-campus-drafts--15-october-2026) supersedes its package inventory; retained source evidence and unresolved field checks still apply.
+
 **Release status:** LASU package `lasu-4895a363b403` was published on 30 September 2026 from reviewed release `aee5cdc6-51dd-42a0-b2ae-1b5d1ad03b4a`. Its 82 illustrative road surfaces and corrected landscape classes are live. The [release log](PRODUCTION.md) records asset, offline and rollback checks and the separate UNILAG release status.
 
 Baseline: `lasu-2b70a39ca041`, with 393 building footprints, 220 destinations, 44 photographs, 95 routing paths and 30 landscape polygons. The enrichment retains the routing graph, permissions, destinations, photographs and authored models.

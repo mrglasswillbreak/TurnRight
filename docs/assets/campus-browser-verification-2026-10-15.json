@@ -1,0 +1,578 @@
+{
+  "origin": "https://turnright.vercel.app",
+  "checkedAt": "2026-10-15T11:18:41.365Z",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "version": "lasu-6796771f6052",
+      "assets": 129,
+      "features": 830,
+      "buildings": 614,
+      "places": 281,
+      "photos": 43,
+      "inspectedPlaceId": "arcgis:University_Property:120",
+      "inspectedBuildingId": "arcgis:University_Property:120"
+    },
+    {
+      "slug": "unilag",
+      "version": "unilag-bd659bbd6df2",
+      "assets": 46,
+      "features": 3928,
+      "buildings": 723,
+      "places": 116,
+      "photos": 16,
+      "inspectedPlaceId": "review:unilag:parcel:328",
+      "inspectedBuildingId": "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:89"
+    }
+  ],
+  "views": [
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 832,
+      "roadSurfaces": 0,
+      "displayPaths": 53,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 45,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": false,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "light",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "light",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "3d",
+      "pitch": 40,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "mobile": true,
+      "theme": "dark",
+      "mode": "2d",
+      "pitch": 0,
+      "features": 3928,
+      "roadSurfaces": 179,
+      "displayPaths": 18,
+      "canvas": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    }
+  ],
+  "offline": [
+    {
+      "engine": "chromium",
+      "campus": "lasu",
+      "version": "lasu-6796771f6052",
+      "passed": true,
+      "disruption": "browser-offline"
+    },
+    {
+      "engine": "chromium",
+      "campus": "unilag",
+      "version": "unilag-bd659bbd6df2",
+      "passed": true,
+      "disruption": "browser-offline"
+    },
+    {
+      "engine": "webkit",
+      "campus": "lasu",
+      "version": "lasu-6796771f6052",
+      "passed": true,
+      "disruption": "origin-stopped"
+    },
+    {
+      "engine": "webkit",
+      "campus": "unilag",
+      "version": "unilag-bd659bbd6df2",
+      "passed": true,
+      "disruption": "origin-stopped"
+    }
+  ],
+  "workflow": {
+    "id": 38726264387,
+    "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38726264387",
+    "sourceRevision": "81270c197b1e2c463aff05f743a170a6cfa1d0da",
+    "conclusion": "success"
+  }
+}
