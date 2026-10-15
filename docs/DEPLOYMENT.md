@@ -4,7 +4,7 @@ TurnRight deploys a public campus PWA, a private team GIS API and isolated proce
 
 ## Existing-installation upgrade
 
-1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–053**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
+1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–055**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
 2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
 3. Pass unit/database tests, both TypeScript projects, lint, configured build/budgets, Chromium/WebKit, offline, native PostGIS and isolated GIS/importer checks. Resolve failures before production migration.
 4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–053 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–055 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -131,8 +131,10 @@ Apply **050** before deploying the matching workers. It stores bounded raw check
 
 For an existing 045–049 installation, run `source_check_maintain()` repeatedly until `work` is zero for each affected campus. It verifies identical archived content before reclaiming old staging and unreferenced observation copies. Inspect database size and the preserved accepted-data/decision hashes. Deletion makes pages reusable but does not reduce the physical database quota immediately: during this one-time upgrade, an operator may run `VACUUM (FULL, ANALYZE)` separately on `source_check_staging`, `source_observations` and `source_observation_records` after compaction, using a short lock timeout and with no source check running. Do not rebuild the accepted map tables. Thereafter ordinary autovacuum reuses bounded staging space; unchanged checks share existing payloads. Verify two successive shadow runs and quota headroom before calling the rollout complete.
 
-## Typed imports and review requests (051–053)
+## Typed imports and review requests (051–055)
 
 Migration 051 retains inferred numeric/boolean types when an import supplies field names without type declarations; explicitly configured team schemas remain authoritative. Existing affected datasets require a reviewed schema correction; the migration does not rewrite values or publish data. Migration 052 gives review inspection, decisions and publication hash checks the same 60-second bound used by submission, without changing permissions or approval requirements. It also avoids serializing the entire stored snapshot merely to construct a review header. Preserve the existing function definitions, apply both additive migrations, then verify current/stale snapshot checks and authenticated review loading.
 
 Migration 053 computes the identical canonical snapshot hash by serializing each ordered row once, avoiding repeated construction of the whole JSONB snapshot during inspection and approval. It changes no hash format, authorization rule or stale-snapshot check. Apply after 052 and verify hash equivalence against the current immutable review on each campus before committing the production migration transaction. Keep the serializer equivalence tests synchronized with any future snapshot-field changes.
+
+Migration 054 returns review metadata directly instead of copying the snapshot into response headers. Migration 055 compares all immutable review fields directly instead of repeatedly copying full snapshots into JSONB. The decision, permission, ownership and stale-hash checks remain enforced; tests enumerate every protected column and reject mutations. Preserve the previous function definitions before applying either migration.
