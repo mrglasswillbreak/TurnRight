@@ -16,4 +16,6 @@ These checks remain open. Passing automated tests or viewing a desktop browser d
 
 Owner input is still needed for the root software licence, the security reporting contact, and confirmation of source/photo/ArcGIS redistribution rights. Existing metadata records a claim or attribution; it does not independently establish permission.
 
+The focused Windows WebKit model run on this date completed with **two passes and four timeouts across six attempts**. Failures occurred around reference split, Orbit and short-landscape controls. Earlier Linux PR runs also showed a renderer crash and a separate click stall; the later Linux release/PR runs passed these cases. Traces do not establish a single application or browser cause. Keep reference split, repeated opening/closing, rotation and editing on the real Safari/iPhone checklist. Playwright's [browser documentation](https://playwright.dev/docs/browsers#webkit) explains that its WebKit build and platform capabilities differ from shipped Safari. Passing Linux automation does not close this device acceptance item.
+
 Source proposal generation remains disabled by policy. Before enabling it, complete per-source shadow parity and the [staged source rollout](SOURCE-UPDATES.md#staged-reliability-rollout). This is separate from publishing the already reviewed campus drafts.
