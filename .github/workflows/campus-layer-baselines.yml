@@ -5,7 +5,7 @@ on:
       mode:
         description: "Preserve existing layer receipts, encrypted GIS application backup, or apply the exact authorized GIS migration bundle"
         type: choice
-        options: [baseline, backup, backup-download, migrate]
+        options: [baseline, audit-release, backup, backup-download, migrate]
         default: baseline
       backup_public_key:
         description: "Optional RSA public key for this encrypted backup; retain the private key separately"
@@ -44,6 +44,8 @@ jobs:
       - if: inputs.mode == 'baseline' || inputs.mode == ''
         run: npx tsx ../scripts/audit-campus-layers.mts
         working-directory: web
+      - if: inputs.mode == 'audit-release'
+        run: node scripts/audit-release-readiness.mjs
       - if: inputs.mode == 'backup' || inputs.mode == 'migrate'
         run: node scripts/gis-deployment.mjs
         env:
@@ -56,6 +58,7 @@ jobs:
           path: |
             web/work/campus-layer-baselines.json
             web/work/gis-deployment/
+            web/work/release-readiness/
           if-no-files-found: error
           retention-days: 14
 
