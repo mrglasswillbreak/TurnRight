@@ -2819,9 +2819,13 @@ for (const editor of [false, true])
     }
     await page.evaluate(() => {
       (window as unknown as { zoomDetail: { slow: boolean } }).zoomDetail.slow = true;
-      window.editorTestMap.easeTo({ zoom: 18.5, duration: 5000 });
+      // Software-rendered CI can produce too few frames in a fixed five-second
+      // gesture. Keep moving until the slow-frame response is observed, then
+      // end the real gesture and verify that its moveend restores full detail.
+      window.editorTestMap.easeTo({ zoom: 18.5, duration: 30000 });
     });
-    await expect.poll(async () => (await drawing()).reducedSeen).toBe(true);
+    await expect.poll(async () => (await drawing()).reducedSeen, { timeout: 30000 }).toBe(true);
+    await page.evaluate(() => window.editorTestMap.stop());
     await expect.poll(() => page.evaluate(() => window.editorTestMap.isMoving())).toBe(false);
     await expect(page.getByText("Detail reduced for smoother movement")).toHaveCount(0);
     await expect.poll(async () => (await drawing()).indices).toBe(full.indices);
