@@ -1,4 +1,4 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { mapImportAction } from '../server/map-imports';
 
 const id = '11111111-1111-4111-8111-111111111111';
@@ -9,6 +9,9 @@ const payload = {
   bytes: 40,
   sha256: 'a'.repeat(64),
 };
+// Release workers supply their real campus through the environment. These
+// isolated fixtures must declare their own campus instead of inheriting it.
+beforeEach(() => vi.stubEnv('CAMPUS_ID', 'lasu'));
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
@@ -30,9 +33,7 @@ it('keeps expired import history readable but rejects retries before any write',
   expect(await mapImportAction('import-get', { importId: id })).toMatchObject({
     job: expired,
   });
-  fetcher
-    .mockReset()
-    .mockImplementation(async () => Response.json([expired]));
+  fetcher.mockReset().mockImplementation(async () => Response.json([expired]));
   for (const action of [
     'import-run',
     'import-queue',
@@ -48,38 +49,66 @@ it('keeps expired import history readable but rejects retries before any write',
     true,
   );
 });
-it('dispatches manual review to the worker without downloading a large candidate', async () => {
+it.each(['lasu', 'campus-test'])(
+  'dispatches manual review for %s without downloading a large candidate',
+  async (campusId) => {
+    vi.stubEnv('CAMPUS_ID', campusId);
+    vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');
+    vi.stubEnv('GITHUB_REPOSITORY', 'test/repository');
+    vi.stubEnv('GITHUB_WORKFLOW_TOKEN', 'test-only');
+    const preview = {
+      ...job,
+      status: 'preview',
+      candidate_path: `${campusId}/${id}/candidate.json`,
+      summary: { errors: [] },
+    };
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json([preview]))
+      .mockResolvedValueOnce(
+        Response.json([{ ...preview, status: 'queued', phase: 'queue' }]),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetcher);
+    expect(
+      await mapImportAction('import-queue', { importId: id }),
+    ).toMatchObject({ job: { status: 'queued', phase: 'queue' } });
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(String(fetcher.mock.calls[2][0])).toContain(
+      'map-import.yml/dispatches',
+    );
+    expect(JSON.parse(fetcher.mock.calls[2][1].body).inputs.campus_id).toBe(
+      campusId,
+    );
+    expect(
+      fetcher.mock.calls.some(
+        (c) =>
+          String(c[0]).includes('/storage/') || String(c[0]).includes('/rpc/'),
+      ),
+    ).toBe(false);
+  },
+);
+it('rejects another campus candidate before dispatch or writes', async () => {
   vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-only');
-  vi.stubEnv('GITHUB_REPOSITORY', 'test/repository');
-  vi.stubEnv('GITHUB_WORKFLOW_TOKEN', 'test-only');
-  const preview = {
-    ...job,
-    status: 'preview',
-    candidate_path: `lasu/${id}/candidate.json`,
-    summary: { errors: [] },
-  };
-  const fetcher = vi
-    .fn()
-    .mockResolvedValueOnce(Response.json([preview]))
-    .mockResolvedValueOnce(
-      Response.json([{ ...preview, status: 'queued', phase: 'queue' }]),
-    )
-    .mockResolvedValueOnce(new Response(null, { status: 204 }));
+  vi.stubEnv('CAMPUS_ID', 'campus-test');
+  const fetcher = vi.fn().mockResolvedValueOnce(
+    Response.json([
+      {
+        ...job,
+        status: 'preview',
+        candidate_path: `lasu/${id}/candidate.json`,
+        summary: { errors: [] },
+      },
+    ]),
+  );
   vi.stubGlobal('fetch', fetcher);
-  expect(await mapImportAction('import-queue', { importId: id })).toMatchObject(
-    { job: { status: 'queued', phase: 'queue' } },
-  );
-  expect(fetcher).toHaveBeenCalledTimes(3);
-  expect(String(fetcher.mock.calls[2][0])).toContain(
-    'map-import.yml/dispatches',
-  );
-  expect(
-    fetcher.mock.calls.some(
-      (c) =>
-        String(c[0]).includes('/storage/') || String(c[0]).includes('/rpc/'),
-    ),
-  ).toBe(false);
+  await expect(
+    mapImportAction('import-queue', { importId: id }),
+  ).rejects.toThrow('Prepare a complete import preview first');
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(fetcher.mock.calls[0][1].method).toBe('GET');
 });
 it('omits large preview summaries from the import history', async () => {
   vi.stubEnv('SUPABASE_URL', 'https://test.supabase.co');
