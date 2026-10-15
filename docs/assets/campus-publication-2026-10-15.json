@@ -1,0 +1,3279 @@
+{
+  "recordedAt": "2026-10-15T11:10:35.789Z",
+  "applicationRevisionsAtPublication": {
+    "lasu": "3d9c517a5d6f3d4cb5e71b9ed473bfaa29db2e3b",
+    "unilag": "f6d5ee01b22803210095a43039863d71a3acee41"
+  },
+  "applicationRecovery": {
+    "mergedAt": "2026-10-15T09:04:24.548Z",
+    "pullRequest": "https://github.com/mrglasswillbreak/TurnRight/pull/22",
+    "testedHead": "81025915b18839bd961193708ddce7f418b30ca0",
+    "mergeCommit": "f6d5ee01b22803210095a43039863d71a3acee41",
+    "workflows": [
+      {
+        "id": 38704304833,
+        "name": "Application regression audit",
+        "conclusion": "success",
+        "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38704304833"
+      },
+      {
+        "id": 38704304772,
+        "name": "GIS database and engine acceptance",
+        "conclusion": "success",
+        "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38704304772"
+      },
+      {
+        "id": 38704304775,
+        "name": "GIS import regression tests",
+        "conclusion": "success",
+        "url": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/38704304775"
+      }
+    ],
+    "result": "Pull Request successfully merged"
+  },
+  "approval": [
+    {
+      "id": "ca210957-e8a1-497e-89e6-306c383b3fa8",
+      "hash": "e0095ffcb1243624c64cb5b8d35949e0e16dd9abec8a09b53f44cff322132620",
+      "campus": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "status": "approved",
+      "reviewedAt": "2026-10-15T06:29:38.013066+00:00"
+    },
+    {
+      "id": "474e101b-1b53-4e5f-a99e-8c856c1e8ece",
+      "hash": "eac09a4128a6744fee24bbda9decce65254d1dd02e1e10f45610311dc9c3ebbc",
+      "campus": "lasu",
+      "status": "approved",
+      "reviewedAt": "2026-10-15T06:24:04.609771+00:00"
+    }
+  ],
+  "approvalMethod": "User-authorized audited original-owner exception",
+  "releases": [
+    {
+      "id": "f79149ca-734e-44d0-84df-c417f16a9963",
+      "error": "Release workflow failed before completion. Check GitHub Actions and Vercel status before retrying.",
+      "campus": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "status": "failed",
+      "version": null,
+      "reviewId": "ca210957-e8a1-497e-89e6-306c383b3fa8",
+      "createdAt": "2026-10-15T07:33:48.216224+00:00",
+      "previewUrl": null,
+      "publishedAt": null,
+      "deploymentUrl": null
+    },
+    {
+      "id": "9c3fee57-d47e-47fa-a9cb-83c959b60480",
+      "error": null,
+      "campus": "lasu",
+      "status": "published",
+      "version": "lasu-6796771f6052",
+      "reviewId": "474e101b-1b53-4e5f-a99e-8c856c1e8ece",
+      "createdAt": "2026-10-15T06:27:22.010738+00:00",
+      "previewUrl": "https://turnright-7erpunq6e-muhammed-abdulhadi-s-projects.vercel.app",
+      "publishedAt": "2026-10-15T07:32:18.284+00:00",
+      "deploymentUrl": "https://turnright-6oop0p1yw-muhammed-abdulhadi-s-projects.vercel.app"
+    },
+    {
+      "id": "63b3a531-917d-4e1e-a044-958198efe2b2",
+      "error": null,
+      "campus": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "status": "published",
+      "version": "unilag-bd659bbd6df2",
+      "reviewId": "ca210957-e8a1-497e-89e6-306c383b3fa8",
+      "createdAt": "2026-10-15T09:07:28.088419+00:00",
+      "previewUrl": "https://turnright-mn5hftoj8-muhammed-abdulhadi-s-projects.vercel.app",
+      "publishedAt": "2026-10-15T10:14:17.04+00:00",
+      "deploymentUrl": "https://turnright-4yy4cv8ly-muhammed-abdulhadi-s-projects.vercel.app"
+    }
+  ],
+  "databaseStarted": "2026-10-15T06:04:58.170613+00:00",
+  "workflows": {
+    "lasuPreview": 38692511659,
+    "lasuPublish": 38696128376,
+    "failedUnilagWorkerTests": 38699608433,
+    "unilagPreview": 38710648848,
+    "unilagPublish": 38714490506,
+    "applicationRecoveryMainRegression": 38710242554,
+    "applicationRecoveryMainImport": 38710242567,
+    "publishedBrowserVerification": 38726264387,
+    "initialBrowserVerificationPhotoSelectionFailure": 38724644094
+  },
+  "integrity": {
+    "checkedAt": "2026-10-15T11:02:27.710Z",
+    "origin": "https://turnright.vercel.app",
+    "catalogueSha256": "866cbe441b881102727b82ac876c018661d5d3f20e93cdd5e5dae63db90f9135",
+    "campuses": [
+      {
+        "id": "lasu",
+        "slug": "lasu",
+        "manifest": "/packages/lasu-6796771f6052/manifest.json",
+        "version": "lasu-6796771f6052",
+        "manifestSha256": "a5d30e7fa89749411af50bd5e0906b7c7abe6749ca507480adb0021282e2fcfb",
+        "dataSha256": "abe568f55bede07f7d18411a3894a6273ee485fd717daac0c4a61a32b674e6fa",
+        "dataBytes": 4376452,
+        "features": 830,
+        "places": 281,
+        "nodes": 1382,
+        "edges": 2830,
+        "photos": 43,
+        "assets": 129,
+        "verifiedAssets": 129,
+        "assetBytes": 22381672
+      },
+      {
+        "id": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+        "slug": "unilag",
+        "manifest": "/packages/unilag-bd659bbd6df2/manifest.json",
+        "version": "unilag-bd659bbd6df2",
+        "manifestSha256": "7c1e507e1592bf5db6de8be756e8b9611015efd9e7fadbae961997e129b6ccfc",
+        "dataSha256": "15fb24183970241830bc1865ba44a049461176ba027c98b68fc078fe37fc6ae1",
+        "dataBytes": 9331587,
+        "features": 3928,
+        "places": 116,
+        "nodes": 2114,
+        "edges": 4252,
+        "photos": 16,
+        "assets": 46,
+        "verifiedAssets": 46,
+        "assetBytes": 14821493
+      }
+    ],
+    "endpoints": [
+      {
+        "path": "/",
+        "status": 200,
+        "ms": 505,
+        "cache": "public, max-age=0, must-revalidate",
+        "sha256": "d4b9741000cfe7bc8b0193ebbf051cba93e7d9c5d7d86d279b093b1be0e30f1d"
+      },
+      {
+        "path": "/admin",
+        "status": 200,
+        "ms": 399,
+        "cache": "public, max-age=0, must-revalidate",
+        "sha256": "d4b9741000cfe7bc8b0193ebbf051cba93e7d9c5d7d86d279b093b1be0e30f1d"
+      },
+      {
+        "path": "/sw.js",
+        "status": 200,
+        "ms": 347,
+        "cache": "no-cache, no-store, must-revalidate",
+        "sha256": "ee13d2253158decfde9ee7a0095505b7af4c766ee1098426a5abbf8b43b0f9b6"
+      },
+      {
+        "path": "/api/admin",
+        "status": 401,
+        "cache": "no-store"
+      }
+    ]
+  },
+  "fieldReview": {
+    "checkedAt": "2026-10-15T11:03:36.352Z",
+    "scope": "Public-package review candidates; repeated names and overlaps are not automatically duplicate physical places.",
+    "campuses": [
+      {
+        "slug": "lasu",
+        "version": "lasu-6796771f6052",
+        "structuralIssues": [],
+        "unmappedDestinations": [
+          {
+            "id": "arcgis:Infrastructure:1",
+            "name": "Sport Center",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:104",
+            "name": "LASU Main Auditorium",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:128",
+            "name": "Proposed TECH Hub",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:71",
+            "name": "Lagos Home  Block 1",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:72",
+            "name": "Lagos Home  Block 2",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:73",
+            "name": "Lagos Home  Block 3",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:77",
+            "name": "LASU Int. Sch. Building 2",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:Infrastructure:79",
+            "name": "Ongoing Student Village 2",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:0",
+            "name": "New Staff Quarters Block 1",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:107",
+            "name": "FMS Extension",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:124",
+            "name": "LASU Int. Sch. Building 2",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:38",
+            "name": "Ongoing FMS Extension",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:53",
+            "name": "Staff School",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:64",
+            "name": "New Staff Quarters Block 3",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:72",
+            "name": "New Staff Quarters Block 2",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "arcgis:University_Property:92",
+            "name": "Sports Center",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:1fa7edcc-9e89-4d63-8cd0-aca2605c5f3d",
+            "name": "Senior Staff Club",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:4a44de47-0fb4-4229-9ba7-08fe0334536b",
+            "name": "Leus Travels and Tours",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:6104489c-e212-4a3b-a851-d37caeedb25c",
+            "name": "Lasu-Aceitse",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:7ad07290-62d8-41bf-b72e-d95b3c810c06",
+            "name": "Lagos State University",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e",
+            "name": "Chapel Of Light",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:9148b370-d614-43b0-8624-99201fff2d3e",
+            "name": "Golden touch makeover",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:ae7ab1f6-7652-4c83-842e-249659180447",
+            "name": "Sun & Dry laundry",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:c169b9c6-c0b2-4027-9cac-bf1d9f47796c",
+            "name": "Temma's Closet",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:d2d5fbdf-f0e1-401e-a066-fa1221b145a8",
+            "name": "Lasu Faculty of Management",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2",
+            "name": "Lagos State University Open and Distance Learning and Research Institute",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "85fccf12-42d9-43de-a282-893714317cba",
+            "name": "Campus place",
+            "arrivalKind": "unmapped"
+          }
+        ],
+        "duplicateCandidates": [
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:88",
+              "arcgis:University_Property:89"
+            ],
+            "names": ["Staff Club", "Cooperative Multi-Purpose"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 0,
+            "key": "building:arcgis:University_Property:88|arcgis:University_Property:89"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:9ec232ea-28b4-48f9-b53e-9e9f801e21b2",
+              "overture:b45dcca8-1f76-416b-bee2-0a331fdf4f07"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 3.7614752299712007,
+            "key": "building:overture:9ec232ea-28b4-48f9-b53e-9e9f801e21b2|overture:b45dcca8-1f76-416b-bee2-0a331fdf4f07"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:74f5b28a-579c-4431-b1c2-bbb552fe8b71",
+              "overture:9d674d01-dddb-43cd-8c0c-7b6b4b6e018d"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 4.545154584474626,
+            "key": "building:overture:74f5b28a-579c-4431-b1c2-bbb552fe8b71|overture:9d674d01-dddb-43cd-8c0c-7b6b4b6e018d"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:dd8e0095-eabd-4c63-8243-b09e9a88e13f",
+              "overture:fe7a7d99-6465-4c55-aa6c-6ac170003042"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 5.203297878374812,
+            "key": "building:overture:dd8e0095-eabd-4c63-8243-b09e9a88e13f|overture:fe7a7d99-6465-4c55-aa6c-6ac170003042"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:11b6bdf1-0e42-4fb3-98ae-75d4ba5fb868",
+              "overture:cfedd430-ce93-4af3-880b-c554bbb7ad7a"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 5.586057198824773,
+            "key": "building:overture:11b6bdf1-0e42-4fb3-98ae-75d4ba5fb868|overture:cfedd430-ce93-4af3-880b-c554bbb7ad7a"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:3ce7c3c1-a524-4657-b376-495b47aee966",
+              "overture:dfe01a6a-bfc5-4165-822a-a7f238cfc074"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 5.745391315725271,
+            "key": "building:overture:3ce7c3c1-a524-4657-b376-495b47aee966|overture:dfe01a6a-bfc5-4165-822a-a7f238cfc074"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:bbdd0bc9-8a23-4867-b7c4-f9c9b8385df5",
+              "overture:e8286d91-897c-40f5-92a8-2244f2e4ff64"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 5.834920748332325,
+            "key": "building:overture:bbdd0bc9-8a23-4867-b7c4-f9c9b8385df5|overture:e8286d91-897c-40f5-92a8-2244f2e4ff64"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:35", "osm:way:591396725"],
+            "names": ["Sch. Car Park", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 5.850910936651411,
+            "key": "building:arcgis:University_Property:35|osm:way:591396725"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267689299", "arcgis:University_Property:16"],
+            "names": ["Unnamed building", "Admin Block 2"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 6.351731912567284,
+            "key": "building:arcgis:University_Property:16|osm:way:1267689299"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:63", "osm:way:591396672"],
+            "names": ["Physics Lab 1", "Physics Laboratory"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 6.406834549499991,
+            "key": "place:arcgis:University_Property:63|osm:way:591396672"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267674449", "arcgis:University_Property:7"],
+            "names": ["Unnamed building", "Fac. Office (Law) 1"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 6.567750463141304,
+            "key": "building:arcgis:University_Property:7|osm:way:1267674449"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:50", "osm:way:1267291959"],
+            "names": ["LASU Coop. Annex", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 6.59148229979324,
+            "key": "building:arcgis:University_Property:50|osm:way:1267291959"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:32",
+              "arcgis:University_Property:12"
+            ],
+            "names": ["Religion Dept.", "Religion Dept."],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 6.680661769271697,
+            "key": "place:arcgis:Infrastructure:32|arcgis:University_Property:12"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:266ff1df-7173-460d-8d25-7684844d11d4",
+              "overture:ee091a23-bc89-4b62-9e0a-5432dc0b8a17"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 7.2618692422291105,
+            "key": "building:overture:266ff1df-7173-460d-8d25-7684844d11d4|overture:ee091a23-bc89-4b62-9e0a-5432dc0b8a17"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:87",
+              "arcgis:University_Property:95"
+            ],
+            "names": ["FMS Marketing Studio", "FMS Marketing Studio"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 7.5858738973048885,
+            "key": "place:arcgis:Infrastructure:87|arcgis:University_Property:95"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:18", "osm:way:591396694"],
+            "names": ["Computer Science Lab", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 7.927626263545666,
+            "key": "building:arcgis:University_Property:18|osm:way:591396694"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:2b97b0eb-1a8d-4ae4-939a-a235da6c2f4e",
+              "overture:b3a11373-ada2-40b1-abf6-6118dfa17ca0"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 8.142404031796687,
+            "key": "building:overture:2b97b0eb-1a8d-4ae4-939a-a235da6c2f4e|overture:b3a11373-ada2-40b1-abf6-6118dfa17ca0"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:67cda5ab-0b44-4cf6-8b0f-8f46bcaf8ab1",
+              "overture:b3a11373-ada2-40b1-abf6-6118dfa17ca0"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 8.35670016178124,
+            "key": "building:overture:67cda5ab-0b44-4cf6-8b0f-8f46bcaf8ab1|overture:b3a11373-ada2-40b1-abf6-6118dfa17ca0"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:1a8db5d8-d039-4175-b7a3-a7320115f1e4",
+              "overture:5e6bb1f5-bd53-404a-9b1d-f8042351cacd"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 8.6976299299788,
+            "key": "building:overture:1a8db5d8-d039-4175-b7a3-a7320115f1e4|overture:5e6bb1f5-bd53-404a-9b1d-f8042351cacd"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:49",
+              "arcgis:University_Property:50"
+            ],
+            "names": ["LASU Coop. Annex", "LASU Coop. Annex"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 8.723683874063665,
+            "key": "place:arcgis:Infrastructure:49|arcgis:University_Property:50"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:126", "osm:way:591385266"],
+            "names": ["Old Female Hostel", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.140896727933855,
+            "key": "building:arcgis:University_Property:126|osm:way:591385266"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:45",
+              "arcgis:University_Property:127"
+            ],
+            "names": [
+              "Stu. Affairs (Career & Councelling)",
+              "Student Affairs (Career & Councelling)"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 9.177570028256124,
+            "key": "place:arcgis:Infrastructure:45|arcgis:University_Property:127"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:97",
+              "arcgis:University_Property:99"
+            ],
+            "names": ["LASU Public Toilet", "LASU Public Toilet"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 9.274674133311857,
+            "key": "place:arcgis:Infrastructure:97|arcgis:University_Property:99"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:49", "osm:way:1267291961"],
+            "names": ["Science Library", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.568307848100465,
+            "key": "building:arcgis:University_Property:49|osm:way:1267291961"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:16",
+              "arcgis:University_Property:34"
+            ],
+            "names": ["Information Block", "Information Block"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 9.632497959885395,
+            "key": "place:arcgis:Infrastructure:16|arcgis:University_Property:34"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:131", "osm:way:1267674451"],
+            "names": ["Building Underconstruction", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.728468476275339,
+            "key": "building:arcgis:University_Property:131|osm:way:1267674451"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:40", "arcgis:University_Property:9"],
+            "names": ["Art Classroom", "Art Classroom"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 9.743486764103494,
+            "key": "place:arcgis:Infrastructure:40|arcgis:University_Property:9"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:21", "osm:way:1272948161"],
+            "names": ["Staff Quarter Block 4", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.833629694571414,
+            "key": "building:arcgis:University_Property:21|osm:way:1272948161"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:63",
+              "arcgis:University_Property:42"
+            ],
+            "names": ["S.L.Edu. Hall", "S.L.Edu. Hall"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 9.910830945000885,
+            "key": "place:arcgis:Infrastructure:63|arcgis:University_Property:42"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:82", "osm:way:1272944912"],
+            "names": ["Staff Quarter Block 3", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.949173597956184,
+            "key": "building:arcgis:University_Property:82|osm:way:1272944912"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:35",
+              "arcgis:University_Property:45"
+            ],
+            "names": ["F.A. Classroom", "F.A. Classroom"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 10.224054307583222,
+            "key": "place:arcgis:Infrastructure:35|arcgis:University_Property:45"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:127", "osm:way:1267689305"],
+            "names": [
+              "Student Affairs (Career & Councelling)",
+              "Unnamed building"
+            ],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 10.244160839979202,
+            "key": "building:arcgis:University_Property:127|osm:way:1267689305"
+          },
+          {
+            "kind": "place",
+            "ids": ["osm:way:1347307291", "arcgis:University_Property:103"],
+            "names": [
+              "SCHOOL OF TRANSPORT AND LOGISTICS",
+              "School Of Transport"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 10.283277848322687,
+            "key": "place:arcgis:University_Property:103|osm:way:1347307291"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:84", "osm:way:1272944914"],
+            "names": ["Staff Quarter Block 1", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 10.346295758590836,
+            "key": "building:arcgis:University_Property:84|osm:way:1272944914"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:8", "arcgis:University_Property:5"],
+            "names": ["Student Center (Law)", "Student Center (Law)"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 10.73648233427411,
+            "key": "place:arcgis:Infrastructure:8|arcgis:University_Property:5"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:88",
+              "overture:1fa7edcc-9e89-4d63-8cd0-aca2605c5f3d"
+            ],
+            "names": ["Staff Club", "Senior Staff Club"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 10.849189381611934,
+            "key": "place:arcgis:University_Property:88|overture:1fa7edcc-9e89-4d63-8cd0-aca2605c5f3d"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:29", "osm:way:591396708"],
+            "names": ["Mosque", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 10.87926331528264,
+            "key": "building:arcgis:University_Property:29|osm:way:591396708"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:10",
+              "arcgis:University_Property:65"
+            ],
+            "names": ["Moot Court", "Moot Court"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 11.423556405807767,
+            "key": "place:arcgis:Infrastructure:10|arcgis:University_Property:65"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:83", "osm:way:1272944913"],
+            "names": ["Staff Quarter Block 2", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 11.648062266716545,
+            "key": "building:arcgis:University_Property:83|osm:way:1272944913"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:111",
+              "arcgis:University_Property:4"
+            ],
+            "names": ["LASU  (SIEU)", "LASU  (SIEU)"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 11.788466296904986,
+            "key": "place:arcgis:Infrastructure:111|arcgis:University_Property:4"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:62",
+              "arcgis:University_Property:59"
+            ],
+            "names": ["Benson Hall", "Benson Hall"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 11.850900372739542,
+            "key": "place:arcgis:Infrastructure:62|arcgis:University_Property:59"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "overture:2b97b0eb-1a8d-4ae4-939a-a235da6c2f4e",
+              "overture:fe5d5563-6a5c-41a2-a990-54b18caa87a7"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 11.960121988240397,
+            "key": "building:overture:2b97b0eb-1a8d-4ae4-939a-a235da6c2f4e|overture:fe5d5563-6a5c-41a2-a990-54b18caa87a7"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:37", "osm:relation:8332297"],
+            "names": ["Admin Block 1", "Admin Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 12.974278078957491,
+            "key": "place:arcgis:University_Property:37|osm:relation:8332297"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:48",
+              "arcgis:University_Property:128"
+            ],
+            "names": ["Iya Wariz", "Iya Wariz"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 13.001592804494924,
+            "key": "place:arcgis:Infrastructure:48|arcgis:University_Property:128"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:107",
+              "arcgis:University_Property:22"
+            ],
+            "names": ["Mass Comm", "Mass Communication"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 13.256630043302875,
+            "key": "place:arcgis:Infrastructure:107|arcgis:University_Property:22"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267692229", "arcgis:University_Property:47"],
+            "names": ["Unnamed building", "C.P.S"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 13.2719584914384,
+            "key": "building:arcgis:University_Property:47|osm:way:1267692229"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:83",
+              "arcgis:University_Property:106"
+            ],
+            "names": ["PSY Lab", "PSY Lab"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 13.368516351525281,
+            "key": "place:arcgis:Infrastructure:83|arcgis:University_Property:106"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:7", "arcgis:University_Property:77"],
+            "names": ["Law Office1 2", "Law Office1 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 13.403181678213892,
+            "key": "place:arcgis:Infrastructure:7|arcgis:University_Property:77"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:28",
+              "arcgis:University_Property:27"
+            ],
+            "names": [
+              "ASUU LASU Cooperative Golden Pharmacy",
+              "ASUU LASU Cooperative Golden Pharmacy"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 13.62507852450987,
+            "key": "place:arcgis:Infrastructure:28|arcgis:University_Property:27"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267689300", "arcgis:University_Property:17"],
+            "names": ["Unnamed building", "Mosque"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 13.77811789001191,
+            "key": "building:arcgis:University_Property:17|osm:way:1267689300"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:117",
+              "arcgis:University_Property:69"
+            ],
+            "names": ["Staff Qtrs 5A&B", "Staff Quarters Duplex 5A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 13.831877240812975,
+            "key": "place:arcgis:Infrastructure:117|arcgis:University_Property:69"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:105",
+              "arcgis:University_Property:93"
+            ],
+            "names": ["Public Toilet", "Public Toilet"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 14.07982774800329,
+            "key": "place:arcgis:Infrastructure:105|arcgis:University_Property:93"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:6", "osm:way:1272816928"],
+            "names": ["Faculty Of Law", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 14.146561482352746,
+            "key": "building:arcgis:University_Property:6|osm:way:1272816928"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:90",
+              "overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2"
+            ],
+            "names": [
+              "LASU Distance Learning",
+              "Lagos State University Open and Distance Learning and Research Institute"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 14.271154602051546,
+            "key": "place:arcgis:Infrastructure:90|overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:106",
+              "arcgis:University_Property:55"
+            ],
+            "names": ["LASU Radio", "LASU Radio"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 14.816366764886158,
+            "key": "place:arcgis:Infrastructure:106|arcgis:University_Property:55"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:88",
+              "arcgis:University_Property:94"
+            ],
+            "names": ["FMS Kitchen", "FMS Kitchen"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 15.215648608329376,
+            "key": "place:arcgis:Infrastructure:88|arcgis:University_Property:94"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:48", "osm:way:1267692232"],
+            "names": ["Old Zenith Bank", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 15.21565407468783,
+            "key": "building:arcgis:University_Property:48|osm:way:1267692232"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:42", "osm:relation:8332298"],
+            "names": ["Admin Block 2", "Admin Block 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 15.526815592271648,
+            "key": "place:arcgis:Infrastructure:42|osm:relation:8332298"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:73",
+              "arcgis:University_Property:64"
+            ],
+            "names": ["Lagos Home  Block 3", "New Staff Quarters Block 3"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 15.538009554773215,
+            "key": "place:arcgis:Infrastructure:73|arcgis:University_Property:64"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:98",
+              "arcgis:University_Property:100"
+            ],
+            "names": ["Fac. Of Edu. Kitchen", "Faculty Of Education Kitchen"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 15.633293846228252,
+            "key": "place:arcgis:Infrastructure:98|arcgis:University_Property:100"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:6", "osm:way:1272816927"],
+            "names": ["Faculty Of Law", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 15.815296649218046,
+            "key": "building:arcgis:University_Property:6|osm:way:1272816927"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1272798823", "arcgis:University_Property:26"],
+            "names": ["Unnamed building", "Language Lab"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 15.97997316977321,
+            "key": "building:arcgis:University_Property:26|osm:way:1272798823"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:41", "osm:relation:8332297"],
+            "names": ["Admin Block 1", "Admin Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 15.985379969211461,
+            "key": "place:arcgis:Infrastructure:41|osm:relation:8332297"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:71", "arcgis:University_Property:0"],
+            "names": ["Lagos Home  Block 1", "New Staff Quarters Block 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 16.262167745109128,
+            "key": "place:arcgis:Infrastructure:71|arcgis:University_Property:0"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:72",
+              "arcgis:University_Property:72"
+            ],
+            "names": ["Lagos Home  Block 2", "New Staff Quarters Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 16.268527833670895,
+            "key": "place:arcgis:Infrastructure:72|arcgis:University_Property:72"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:16", "osm:relation:8332298"],
+            "names": ["Admin Block 2", "Admin Block 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 16.32044799061979,
+            "key": "place:arcgis:University_Property:16|osm:relation:8332298"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:2", "arcgis:University_Property:78"],
+            "names": ["Law Clinic", "Law Clinic"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 16.332606503869428,
+            "key": "place:arcgis:Infrastructure:2|arcgis:University_Property:78"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:20",
+              "arcgis:University_Property:119"
+            ],
+            "names": ["Alumni Block", "Alumni Block"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 16.370813711655632,
+            "key": "place:arcgis:Infrastructure:20|arcgis:University_Property:119"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:92",
+              "arcgis:University_Property:105"
+            ],
+            "names": ["FSS Kitchen", "FSS Kitchen"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 16.408094922026798,
+            "key": "place:arcgis:Infrastructure:92|arcgis:University_Property:105"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:81",
+              "arcgis:University_Property:108"
+            ],
+            "names": ["ACEIISE", "ACEIISE"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 16.665022868258262,
+            "key": "place:arcgis:Infrastructure:81|arcgis:University_Property:108"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:77",
+              "arcgis:University_Property:124"
+            ],
+            "names": ["LASU Int. Sch. Building 2", "LASU Int. Sch. Building 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 16.916496980126244,
+            "key": "place:arcgis:Infrastructure:77|arcgis:University_Property:124"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:102",
+              "arcgis:University_Property:97"
+            ],
+            "names": [
+              "Ongoing Construction Beside Edu.",
+              "Ongoing Construction Beside Edu."
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 17.423541796561963,
+            "key": "place:arcgis:Infrastructure:102|arcgis:University_Property:97"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:95",
+              "arcgis:University_Property:102"
+            ],
+            "names": ["LASU Ent Centre", "LASU Ent Centre"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 17.516999033207128,
+            "key": "place:arcgis:Infrastructure:95|arcgis:University_Property:102"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:43",
+              "arcgis:University_Property:79"
+            ],
+            "names": ["Sch. Library", "School Library"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 17.633861142276544,
+            "key": "place:arcgis:Infrastructure:43|arcgis:University_Property:79"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:94",
+              "arcgis:University_Property:103"
+            ],
+            "names": ["School Of Transport", "School Of Transport"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 18.06352167147843,
+            "key": "place:arcgis:Infrastructure:94|arcgis:University_Property:103"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:15", "arcgis:University_Property:8"],
+            "names": ["CESD", "EDUCATION ANNEX./CESD"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 18.24775199461964,
+            "key": "place:arcgis:Infrastructure:15|arcgis:University_Property:8"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:50",
+              "overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e"
+            ],
+            "names": ["Chapel", "Chapel Of Light"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 18.668364454140495,
+            "key": "place:arcgis:Infrastructure:50|overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:104",
+              "arcgis:University_Property:2"
+            ],
+            "names": ["LASU Main Auditorium", "LASU Main Auditorium"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 18.92786012852648,
+            "key": "place:arcgis:Infrastructure:104|arcgis:University_Property:2"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:132",
+              "arcgis:University_Property:48"
+            ],
+            "names": ["Old Zenith Bank", "Old Zenith Bank"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 19.043814873446024,
+            "key": "place:arcgis:Infrastructure:132|arcgis:University_Property:48"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:118",
+              "arcgis:University_Property:57"
+            ],
+            "names": ["Staff Qtrs 6A&B", "Staff Quarters Duplex 6A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 19.22632074685092,
+            "key": "place:arcgis:Infrastructure:118|arcgis:University_Property:57"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:47",
+              "arcgis:University_Property:49"
+            ],
+            "names": ["Science Library", "Science Library"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 19.377485139006755,
+            "key": "place:arcgis:Infrastructure:47|arcgis:University_Property:49"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:6", "arcgis:University_Property:76"],
+            "names": ["Law Library", "Law Library"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 19.497361156410165,
+            "key": "place:arcgis:Infrastructure:6|arcgis:University_Property:76"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:123",
+              "arcgis:University_Property:36"
+            ],
+            "names": ["Staff Qtrs 2A&B", "Staff Quarters Duplex 2A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 19.605564275340036,
+            "key": "place:arcgis:Infrastructure:123|arcgis:University_Property:36"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:124",
+              "arcgis:University_Property:56"
+            ],
+            "names": ["Staff Qtrs 1A&B", "Staff Quarters Duplex 1A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 19.63090758158471,
+            "key": "place:arcgis:Infrastructure:124|arcgis:University_Property:56"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:37",
+              "arcgis:University_Property:47"
+            ],
+            "names": ["C.P.S", "C.P.S"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 19.799452477964877,
+            "key": "place:arcgis:Infrastructure:37|arcgis:University_Property:47"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:121",
+              "arcgis:University_Property:23"
+            ],
+            "names": ["Staff Qtrs 4A&B", "Staff Quarters Duplex 4A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 19.84073512181473,
+            "key": "place:arcgis:Infrastructure:121|arcgis:University_Property:23"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:90",
+              "arcgis:University_Property:40"
+            ],
+            "names": ["LASU Distance Learning", "LASU Distance Learning"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 20.021855120191177,
+            "key": "place:arcgis:Infrastructure:90|arcgis:University_Property:40"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267689304", "arcgis:University_Property:17"],
+            "names": ["Unnamed building", "Mosque"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 20.094843970357186,
+            "key": "building:arcgis:University_Property:17|osm:way:1267689304"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:85", "osm:way:591396720"],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 20.32261617440643,
+            "key": "building:arcgis:University_Property:85|osm:way:591396720"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:119",
+              "arcgis:University_Property:58"
+            ],
+            "names": ["Staff Qtrs 7A&B", "Staff Quarters Duplex 7A&B"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 20.3827028455359,
+            "key": "place:arcgis:Infrastructure:119|arcgis:University_Property:58"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:112",
+              "arcgis:University_Property:113"
+            ],
+            "names": ["UBA Bank", "Sterling Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 20.697201660043078,
+            "key": "place:arcgis:University_Property:112|arcgis:University_Property:113"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:13",
+              "arcgis:University_Property:91"
+            ],
+            "names": ["Naval Base/Kitchen", "Naval Base Kitchen"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 21.02896146060474,
+            "key": "place:arcgis:Infrastructure:13|arcgis:University_Property:91"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:112",
+              "arcgis:University_Property:113"
+            ],
+            "names": ["UBA Bank", "Sterling Bank"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 21.062546605479675,
+            "key": "building:arcgis:University_Property:112|arcgis:University_Property:113"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:113",
+              "arcgis:University_Property:115"
+            ],
+            "names": ["Sterling Bank", "WEMA Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 21.616424953060314,
+            "key": "place:arcgis:University_Property:113|arcgis:University_Property:115"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:12",
+              "arcgis:University_Property:31"
+            ],
+            "names": ["ICT", "ICT"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 21.799279820850618,
+            "key": "place:arcgis:Infrastructure:12|arcgis:University_Property:31"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:27",
+              "arcgis:University_Property:118"
+            ],
+            "names": [
+              "ECO LIBRARYT Business Centres",
+              "Eco Library and Business Centres"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 21.812177659592734,
+            "key": "place:arcgis:Infrastructure:27|arcgis:University_Property:118"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:41",
+              "arcgis:University_Property:37"
+            ],
+            "names": ["Admin Block 1", "Admin Block 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 22.0336162980128,
+            "key": "place:arcgis:Infrastructure:41|arcgis:University_Property:37"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:71", "arcgis:Infrastructure:72"],
+            "names": ["Lagos Home  Block 1", "Lagos Home  Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 22.254761093944982,
+            "key": "place:arcgis:Infrastructure:71|arcgis:Infrastructure:72"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:86",
+              "arcgis:University_Property:96"
+            ],
+            "names": ["FMS 2 IN 1", "FMS 2 IN 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 22.34079141262908,
+            "key": "place:arcgis:Infrastructure:86|arcgis:University_Property:96"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:53",
+              "arcgis:University_Property:62"
+            ],
+            "names": ["Botanical Garden", "Botanical Garden"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 23.011337343758573,
+            "key": "place:arcgis:Infrastructure:53|arcgis:University_Property:62"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:94", "osm:way:1347307291"],
+            "names": [
+              "School Of Transport",
+              "SCHOOL OF TRANSPORT AND LOGISTICS"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 23.19667896896051,
+            "key": "place:arcgis:Infrastructure:94|osm:way:1347307291"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:44",
+              "arcgis:University_Property:14"
+            ],
+            "names": ["Bookshop", "Bookshop"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 23.463589566679286,
+            "key": "place:arcgis:Infrastructure:44|arcgis:University_Property:14"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:60",
+              "arcgis:University_Property:19"
+            ],
+            "names": ["Science Lab. 1", "Science Lab. 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 23.852927252669243,
+            "key": "place:arcgis:Infrastructure:60|arcgis:University_Property:19"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:14",
+              "arcgis:University_Property:28"
+            ],
+            "names": [
+              "Makanjuola Lecture Theatre",
+              "Makanjuola Lecture Theatre"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 23.875549725284493,
+            "key": "place:arcgis:Infrastructure:14|arcgis:University_Property:28"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:18",
+              "arcgis:University_Property:33"
+            ],
+            "names": ["SDG-PHC FACILITY", "SDG-PHC FACILITY"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 24.013929860945183,
+            "key": "place:arcgis:Infrastructure:18|arcgis:University_Property:33"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:40",
+              "overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2"
+            ],
+            "names": [
+              "LASU Distance Learning",
+              "Lagos State University Open and Distance Learning and Research Institute"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 24.187266116749164,
+            "key": "place:arcgis:University_Property:40|overture:e506f4bd-b1ad-411b-ab16-1d4f1ee359d2"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:101",
+              "arcgis:University_Property:98"
+            ],
+            "names": ["Zenith I.C.T", "Zenith I.C.T"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 24.30824236300361,
+            "key": "place:arcgis:Infrastructure:101|arcgis:University_Property:98"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:42",
+              "arcgis:University_Property:16"
+            ],
+            "names": ["Admin Block 2", "Admin Block 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 24.66525289110638,
+            "key": "place:arcgis:Infrastructure:42|arcgis:University_Property:16"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:24",
+              "arcgis:University_Property:63"
+            ],
+            "names": ["Physics Lab 2", "Physics Lab 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 24.691859154729553,
+            "key": "place:arcgis:University_Property:24|arcgis:University_Property:63"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:51",
+              "overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e"
+            ],
+            "names": ["Chapel", "Chapel Of Light"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 24.937483429313254,
+            "key": "place:arcgis:University_Property:51|overture:8d0505d6-dc95-4187-b5ab-2f085a2d682e"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:67",
+              "arcgis:University_Property:82"
+            ],
+            "names": ["S.Q. Block 3", "Staff Quarter Block 3"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 25.028197584465204,
+            "key": "place:arcgis:Infrastructure:67|arcgis:University_Property:82"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:114",
+              "arcgis:University_Property:116"
+            ],
+            "names": ["Union Bank", "New Zenith Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 25.70870437259978,
+            "key": "place:arcgis:University_Property:114|arcgis:University_Property:116"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:65",
+              "arcgis:University_Property:68"
+            ],
+            "names": ["Business Area (Science)", "Business Area (Science)"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 25.939393276895885,
+            "key": "place:arcgis:Infrastructure:65|arcgis:University_Property:68"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:0",
+              "arcgis:University_Property:72"
+            ],
+            "names": [
+              "New Staff Quarters Block 1",
+              "New Staff Quarters Block 2"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 26.43252705592139,
+            "key": "place:arcgis:University_Property:0|arcgis:University_Property:72"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:33",
+              "arcgis:University_Property:46"
+            ],
+            "names": ["Art Auditorium", "Art Auditorium"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 26.651486486587775,
+            "key": "place:arcgis:Infrastructure:33|arcgis:University_Property:46"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:64",
+              "arcgis:University_Property:72"
+            ],
+            "names": [
+              "New Staff Quarters Block 3",
+              "New Staff Quarters Block 2"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 26.680122091743893,
+            "key": "place:arcgis:University_Property:64|arcgis:University_Property:72"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:114",
+              "arcgis:University_Property:116"
+            ],
+            "names": ["Union Bank", "New Zenith Bank"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 27.208998710097436,
+            "key": "building:arcgis:University_Property:114|arcgis:University_Property:116"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:51",
+              "arcgis:University_Property:52"
+            ],
+            "names": ["Chapel", "Chapel Extension"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 27.368266442580712,
+            "key": "place:arcgis:University_Property:51|arcgis:University_Property:52"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:72", "arcgis:University_Property:0"],
+            "names": ["Lagos Home  Block 2", "New Staff Quarters Block 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 27.43823455350696,
+            "key": "place:arcgis:Infrastructure:72|arcgis:University_Property:0"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:61",
+              "arcgis:University_Property:67"
+            ],
+            "names": ["Science Lab 2", "Science Lab 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 27.779425760162958,
+            "key": "place:arcgis:Infrastructure:61|arcgis:University_Property:67"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:34",
+              "arcgis:University_Property:70"
+            ],
+            "names": ["Sch. Car Park", "School Car Park"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 27.96197967217906,
+            "key": "place:arcgis:Infrastructure:34|arcgis:University_Property:70"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:69",
+              "arcgis:University_Property:84"
+            ],
+            "names": ["S.Q. Block 1", "Staff Quarter Block 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 28.22860184345818,
+            "key": "place:arcgis:Infrastructure:69|arcgis:University_Property:84"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:17",
+              "arcgis:University_Property:129"
+            ],
+            "names": ["LASU  Clinic", "LASU Clinic"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 28.359638368708016,
+            "key": "place:arcgis:Infrastructure:17|arcgis:University_Property:129"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:68",
+              "arcgis:University_Property:83"
+            ],
+            "names": ["S.Q. Block 2", "Staff Quarter Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 28.461478720620285,
+            "key": "place:arcgis:Infrastructure:68|arcgis:University_Property:83"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:129", "arcgis:Infrastructure:96"],
+            "names": ["NEW BUILDING", "Fac. Of Edu. New Building"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 28.47504121213585,
+            "key": "place:arcgis:Infrastructure:129|arcgis:Infrastructure:96"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:4", "arcgis:University_Property:7"],
+            "names": ["Fac. Office (Law) 1", "Fac. Office (Law) 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 28.5312320631323,
+            "key": "place:arcgis:Infrastructure:4|arcgis:University_Property:7"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:11",
+              "arcgis:University_Property:43"
+            ],
+            "names": ["PG School", "PG School"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 29.271279513873754,
+            "key": "place:arcgis:Infrastructure:11|arcgis:University_Property:43"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:64",
+              "arcgis:University_Property:75"
+            ],
+            "names": ["M.B.A.", "M.B.A"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 29.387057540334393,
+            "key": "place:arcgis:Infrastructure:64|arcgis:University_Property:75"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:57",
+              "arcgis:University_Property:29"
+            ],
+            "names": ["Mosque", "Mosque"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 29.561759950016587,
+            "key": "place:arcgis:Infrastructure:57|arcgis:University_Property:29"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:63",
+              "arcgis:University_Property:59"
+            ],
+            "names": ["S.L.Edu. Hall", "Benson Hall"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 30.06828580824322,
+            "key": "place:arcgis:Infrastructure:63|arcgis:University_Property:59"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:113",
+              "arcgis:University_Property:86"
+            ],
+            "names": ["Store", "Store"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 30.217818580328423,
+            "key": "place:arcgis:Infrastructure:113|arcgis:University_Property:86"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267689302", "arcgis:University_Property:16"],
+            "names": ["Unnamed building", "Admin Block 2"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 30.35484879052836,
+            "key": "building:arcgis:University_Property:16|osm:way:1267689302"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:56",
+              "arcgis:University_Property:131"
+            ],
+            "names": [
+              "Building Underconstruction",
+              "Building Underconstruction"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 30.567110341109334,
+            "key": "place:arcgis:Infrastructure:56|arcgis:University_Property:131"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:24", "osm:way:591396672"],
+            "names": ["Physics Lab 2", "Physics Laboratory"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 30.85496709352953,
+            "key": "place:arcgis:University_Property:24|osm:way:591396672"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:71",
+              "arcgis:University_Property:72"
+            ],
+            "names": ["Lagos Home  Block 1", "New Staff Quarters Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 30.862333666730937,
+            "key": "place:arcgis:Infrastructure:71|arcgis:University_Property:72"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:61",
+              "arcgis:University_Property:19"
+            ],
+            "names": ["Science Lab 2", "Science Lab. 1"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.243148859987734,
+            "key": "place:arcgis:Infrastructure:61|arcgis:University_Property:19"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:22",
+              "arcgis:University_Property:115"
+            ],
+            "names": ["Wema", "WEMA Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.702255695319742,
+            "key": "place:arcgis:Infrastructure:22|arcgis:University_Property:115"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:66",
+              "arcgis:University_Property:21"
+            ],
+            "names": ["S.Q. Block 4", "Staff Quarter Block 4"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.718461022414772,
+            "key": "place:arcgis:Infrastructure:66|arcgis:University_Property:21"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:72", "arcgis:Infrastructure:73"],
+            "names": ["Lagos Home  Block 2", "Lagos Home  Block 3"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 32.276186911323784,
+            "key": "place:arcgis:Infrastructure:72|arcgis:Infrastructure:73"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:73",
+              "arcgis:University_Property:72"
+            ],
+            "names": ["Lagos Home  Block 3", "New Staff Quarters Block 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 32.2903018143066,
+            "key": "place:arcgis:Infrastructure:73|arcgis:University_Property:72"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:23",
+              "arcgis:University_Property:114"
+            ],
+            "names": ["Union", "Union Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 32.44899202296628,
+            "key": "place:arcgis:Infrastructure:23|arcgis:University_Property:114"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:47",
+              "arcgis:University_Property:18"
+            ],
+            "names": ["Science Library", "Computer Science Lab"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 32.805454521304995,
+            "key": "place:arcgis:Infrastructure:47|arcgis:University_Property:18"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:113",
+              "arcgis:University_Property:115"
+            ],
+            "names": ["Sterling Bank", "WEMA Bank"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 33.36207621478106,
+            "key": "building:arcgis:University_Property:113|arcgis:University_Property:115"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:6", "osm:way:1272816926"],
+            "names": ["Faculty Of Law", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 33.754695828218686,
+            "key": "building:arcgis:University_Property:6|osm:way:1272816926"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:50",
+              "arcgis:University_Property:51"
+            ],
+            "names": ["Chapel", "Chapel"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 34.06513005794911,
+            "key": "place:arcgis:Infrastructure:50|arcgis:University_Property:51"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:62", "arcgis:Infrastructure:63"],
+            "names": ["Benson Hall", "S.L.Edu. Hall"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.32755573337523,
+            "key": "place:arcgis:Infrastructure:62|arcgis:Infrastructure:63"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:72",
+              "arcgis:University_Property:64"
+            ],
+            "names": ["Lagos Home  Block 2", "New Staff Quarters Block 3"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.4325372690081,
+            "key": "place:arcgis:Infrastructure:72|arcgis:University_Property:64"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:96",
+              "arcgis:University_Property:101"
+            ],
+            "names": [
+              "Fac. Of Edu. New Building",
+              "Faculty Of Education New Building"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.55652781566381,
+            "key": "place:arcgis:Infrastructure:96|arcgis:University_Property:101"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:21",
+              "arcgis:University_Property:116"
+            ],
+            "names": ["Zenith", "New Zenith Bank"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.65350045234056,
+            "key": "place:arcgis:Infrastructure:21|arcgis:University_Property:116"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:19",
+              "arcgis:University_Property:67"
+            ],
+            "names": ["Science Lab. 1", "Science Lab 2"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.91947453900584,
+            "key": "place:arcgis:University_Property:19|arcgis:University_Property:67"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:109",
+              "arcgis:University_Property:120"
+            ],
+            "names": ["LASU Senate Building", "LASU Senate Building"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 35.00097802755428,
+            "key": "place:arcgis:Infrastructure:109|arcgis:University_Property:120"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267692207", "arcgis:University_Property:117"],
+            "names": ["Unnamed building", "Access Bank"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 38.92210729995689,
+            "key": "building:arcgis:University_Property:117|osm:way:1267692207"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:75",
+              "arcgis:University_Property:111"
+            ],
+            "names": ["Ongoing Student Village 1", "Ongoing Student Village 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 39.22527583484199,
+            "key": "place:arcgis:Infrastructure:75|arcgis:University_Property:111"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:68", "osm:way:591394159"],
+            "names": ["Business Area (Science)", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 40.074791973416275,
+            "key": "building:arcgis:University_Property:68|osm:way:591394159"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:131", "osm:way:1267674450"],
+            "names": ["Building Underconstruction", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 41.76751628316001,
+            "key": "building:arcgis:University_Property:131|osm:way:1267674450"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:74",
+              "arcgis:University_Property:126"
+            ],
+            "names": ["Old Female Hostel", "Old Female Hostel"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 42.16063722922656,
+            "key": "place:arcgis:Infrastructure:74|arcgis:University_Property:126"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:85",
+              "arcgis:University_Property:39"
+            ],
+            "names": ["FMS", "FMS"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 42.62141333140925,
+            "key": "place:arcgis:Infrastructure:85|arcgis:University_Property:39"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:116",
+              "arcgis:University_Property:89"
+            ],
+            "names": ["Cooperative Multi-Purpose", "Cooperative Multi-Purpose"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 42.77065741245958,
+            "key": "place:arcgis:Infrastructure:116|arcgis:University_Property:89"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267367183", "arcgis:University_Property:110"],
+            "names": ["Unnamed building", "Ongoing Student Village 2"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 42.88368821511782,
+            "key": "building:arcgis:University_Property:110|osm:way:1267367183"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:115",
+              "arcgis:University_Property:88"
+            ],
+            "names": ["Staff Club", "Staff Club"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 44.16526835501242,
+            "key": "place:arcgis:Infrastructure:115|arcgis:University_Property:88"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:112",
+              "arcgis:University_Property:122"
+            ],
+            "names": ["LASU Water Works", "LASU Water Works"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 44.464685074071845,
+            "key": "place:arcgis:Infrastructure:112|arcgis:University_Property:122"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:591396658", "arcgis:University_Property:7"],
+            "names": ["Unnamed building", "Fac. Office (Law) 1"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 44.81321346928796,
+            "key": "building:arcgis:University_Property:7|osm:way:591396658"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1273234548", "arcgis:University_Property:54"],
+            "names": ["Unnamed building", "Faculty Of Education 3 In 1"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 46.16170913308893,
+            "key": "building:arcgis:University_Property:54|osm:way:1273234548"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267516602", "arcgis:University_Property:108"],
+            "names": ["Unnamed building", "ACEIISE"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 47.18784956020191,
+            "key": "building:arcgis:University_Property:108|osm:way:1267516602"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:93",
+              "arcgis:University_Property:104"
+            ],
+            "names": ["Automedis Limited", "Automedis Limited"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 47.823781350652645,
+            "key": "place:arcgis:Infrastructure:93|arcgis:University_Property:104"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1273141550", "arcgis:University_Property:2"],
+            "names": ["Unnamed building", "LASU Main Auditorium"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 49.65043237902445,
+            "key": "building:arcgis:University_Property:2|osm:way:1273141550"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:18",
+              "arcgis:University_Property:80"
+            ],
+            "names": ["Computer Science Lab", "PGD Hall"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 51.65756680424843,
+            "key": "building:arcgis:University_Property:18|arcgis:University_Property:80"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:19",
+              "arcgis:University_Property:32"
+            ],
+            "names": ["Student Arcade", "Student Arcade"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 51.971552585353905,
+            "key": "place:arcgis:Infrastructure:19|arcgis:University_Property:32"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:89",
+              "arcgis:University_Property:73"
+            ],
+            "names": ["LASU CBT", "LASU CBT"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 52.29243728782251,
+            "key": "place:arcgis:Infrastructure:89|arcgis:University_Property:73"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:47", "osm:way:591396683"],
+            "names": ["C.P.S", "Building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 52.69666621955022,
+            "key": "building:arcgis:University_Property:47|osm:way:591396683"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:78",
+              "arcgis:University_Property:109"
+            ],
+            "names": [
+              "Site For Materials Production",
+              "Site For Materials Production"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 54.822203942915,
+            "key": "place:arcgis:Infrastructure:78|arcgis:University_Property:109"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:42", "osm:relation:8332297"],
+            "names": ["Admin Block 2", "Admin Block 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 55.78068864829829,
+            "key": "place:arcgis:Infrastructure:42|osm:relation:8332297"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267502643", "arcgis:University_Property:3"],
+            "names": ["Unnamed building", "LASU International Library"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 56.363727148062466,
+            "key": "building:arcgis:University_Property:3|osm:way:1267502643"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:17",
+              "arcgis:University_Property:29"
+            ],
+            "names": ["Mosque", "Mosque"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 59.2353341323176,
+            "key": "place:arcgis:University_Property:17|arcgis:University_Property:29"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:55",
+              "arcgis:University_Property:30"
+            ],
+            "names": ["New Science Block", "New Science Block"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 59.89778956311297,
+            "key": "place:arcgis:Infrastructure:55|arcgis:University_Property:30"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:76",
+              "arcgis:University_Property:125"
+            ],
+            "names": ["LASU Int. Sch. Building 1", "LASU Int. Sch. Building 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 63.153921853968946,
+            "key": "place:arcgis:Infrastructure:76|arcgis:University_Property:125"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:16", "osm:relation:8332297"],
+            "names": ["Admin Block 2", "Admin Block 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 63.75896358479425,
+            "key": "place:arcgis:University_Property:16|osm:relation:8332297"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:120",
+              "arcgis:University_Property:90"
+            ],
+            "names": ["Zoological Garden", "Zoological Garden"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 73.18712172535412,
+            "key": "place:arcgis:Infrastructure:120|arcgis:University_Property:90"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:123", "osm:way:1267516598"],
+            "names": ["Faculty of Social Science", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 74.83387566909221,
+            "key": "building:arcgis:University_Property:123|osm:way:1267516598"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:University_Property:37", "osm:relation:8332298"],
+            "names": ["Admin Block 1", "Admin Block 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 75.08465236161176,
+            "key": "place:arcgis:University_Property:37|osm:relation:8332298"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1339042050", "arcgis:University_Property:39"],
+            "names": ["Unnamed building", "FMS"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 76.16668186585606,
+            "key": "building:arcgis:University_Property:39|osm:way:1339042050"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:57",
+              "arcgis:University_Property:17"
+            ],
+            "names": ["Mosque", "Mosque"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 80.84325460533543,
+            "key": "place:arcgis:Infrastructure:57|arcgis:University_Property:17"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "arcgis:University_Property:86",
+              "arcgis:University_Property:87"
+            ],
+            "names": ["Store", "Works Department"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 81.07125286388589,
+            "key": "building:arcgis:University_Property:86|arcgis:University_Property:87"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:41", "osm:relation:8332298"],
+            "names": ["Admin Block 1", "Admin Block 1"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 81.42212020577887,
+            "key": "place:arcgis:Infrastructure:41|osm:relation:8332298"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:80",
+              "arcgis:University_Property:38"
+            ],
+            "names": ["Ongoing FMS Extension", "Ongoing FMS Extension"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 86.06299966734402,
+            "key": "place:arcgis:Infrastructure:80|arcgis:University_Property:38"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:51",
+              "arcgis:University_Property:53"
+            ],
+            "names": ["Staff School", "Staff School"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 92.70441580901874,
+            "key": "place:arcgis:Infrastructure:51|arcgis:University_Property:53"
+          },
+          {
+            "kind": "building",
+            "ids": ["osm:way:1267502653", "arcgis:University_Property:3"],
+            "names": ["Unnamed building", "LASU International Library"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 94.56732394370773,
+            "key": "building:arcgis:University_Property:3|osm:way:1267502653"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:108",
+              "arcgis:University_Property:3"
+            ],
+            "names": [
+              "LASU International Library",
+              "LASU International Library"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 109.55956414638784,
+            "key": "place:arcgis:Infrastructure:108|arcgis:University_Property:3"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:1",
+              "arcgis:University_Property:104"
+            ],
+            "names": ["Automedis Limited", "Automedis Limited"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 119.5699692216502,
+            "key": "place:arcgis:University_Property:1|arcgis:University_Property:104"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:38", "osm:way:1267566619"],
+            "names": ["Ongoing FMS Extension", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 123.57084082935097,
+            "key": "building:arcgis:University_Property:38|osm:way:1267566619"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:93", "arcgis:University_Property:1"],
+            "names": ["Automedis Limited", "Automedis Limited"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 144.047417684221,
+            "key": "place:arcgis:Infrastructure:93|arcgis:University_Property:1"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:79",
+              "arcgis:University_Property:110"
+            ],
+            "names": ["Ongoing Student Village 2", "Ongoing Student Village 2"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 155.0128932531579,
+            "key": "place:arcgis:Infrastructure:79|arcgis:University_Property:110"
+          },
+          {
+            "kind": "building",
+            "ids": ["arcgis:University_Property:111", "osm:way:1267559128"],
+            "names": ["Ongoing Student Village 1", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 158.31783301186795,
+            "key": "building:arcgis:University_Property:111|osm:way:1267559128"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:17",
+              "arcgis:University_Property:11"
+            ],
+            "names": ["LASU  Clinic", "LASU  Clinic"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 163.30351219707177,
+            "key": "place:arcgis:Infrastructure:17|arcgis:University_Property:11"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:11",
+              "arcgis:University_Property:129"
+            ],
+            "names": ["LASU  Clinic", "LASU Clinic"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 186.03787097561596,
+            "key": "place:arcgis:University_Property:11|arcgis:University_Property:129"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:82",
+              "arcgis:University_Property:107"
+            ],
+            "names": ["FMS Extension", "FMS Extension"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 207.53044641305544,
+            "key": "place:arcgis:Infrastructure:82|arcgis:University_Property:107"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:20",
+              "arcgis:University_Property:93"
+            ],
+            "names": ["Public Toilet", "Public Toilet"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 641.5000142531728,
+            "key": "place:arcgis:University_Property:20|arcgis:University_Property:93"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:105",
+              "arcgis:University_Property:20"
+            ],
+            "names": ["Public Toilet", "Public Toilet"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 650.4905076297063,
+            "key": "place:arcgis:Infrastructure:105|arcgis:University_Property:20"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:126", "arcgis:Infrastructure:70"],
+            "names": ["Ongoing Construction", "Ongoing Construction"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 675.4134560214594,
+            "key": "place:arcgis:Infrastructure:126|arcgis:Infrastructure:70"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:131", "arcgis:Infrastructure:70"],
+            "names": ["Ongoing Construction", "Ongoing Construction"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 687.8423373590036,
+            "key": "place:arcgis:Infrastructure:131|arcgis:Infrastructure:70"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:56",
+              "arcgis:University_Property:74"
+            ],
+            "names": [
+              "Building Underconstruction",
+              "Building Underconstruction"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 785.3922671808912,
+            "key": "place:arcgis:Infrastructure:56|arcgis:University_Property:74"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "osm:way:591396726",
+              "overture:7ad07290-62d8-41bf-b72e-d95b3c810c06"
+            ],
+            "names": ["Lagos State University", "Lagos State University"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 808.5934772043452,
+            "key": "place:osm:way:591396726|overture:7ad07290-62d8-41bf-b72e-d95b3c810c06"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:131",
+              "arcgis:University_Property:74"
+            ],
+            "names": [
+              "Building Underconstruction",
+              "Building Underconstruction"
+            ],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 812.5186852776158,
+            "key": "place:arcgis:University_Property:131|arcgis:University_Property:74"
+          },
+          {
+            "kind": "place",
+            "ids": ["arcgis:Infrastructure:126", "arcgis:Infrastructure:131"],
+            "names": ["Ongoing Construction", "Ongoing Construction"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 870.9102575081736,
+            "key": "place:arcgis:Infrastructure:126|arcgis:Infrastructure:131"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:University_Property:106",
+              "arcgis:University_Property:81"
+            ],
+            "names": ["PSY Lab", "PSY Lab"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 937.6921338068533,
+            "key": "place:arcgis:University_Property:106|arcgis:University_Property:81"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:83",
+              "arcgis:University_Property:81"
+            ],
+            "names": ["PSY Lab", "PSY Lab"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 938.3271859948907,
+            "key": "place:arcgis:Infrastructure:83|arcgis:University_Property:81"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "arcgis:Infrastructure:34",
+              "arcgis:University_Property:35"
+            ],
+            "names": ["Sch. Car Park", "Sch. Car Park"],
+            "exact": false,
+            "reason": "Repeated place name",
+            "distance": 1252.0182487078596,
+            "key": "place:arcgis:Infrastructure:34|arcgis:University_Property:35"
+          }
+        ],
+        "exactCandidates": 0
+      },
+      {
+        "slug": "unilag",
+        "version": "unilag-bd659bbd6df2",
+        "structuralIssues": [],
+        "unmappedDestinations": [
+          {
+            "id": "review:unilag:detail:01d6520a99f03422",
+            "name": "UNILAG Science Diploma Building",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:0562b03328927d94",
+            "name": "Ozolua Bq",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:1c298e5c46808136",
+            "name": "Salado Cafeteria",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:2298288f95ac4d85",
+            "name": "Fagunwa Hostel",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:2522e6a6afa2d81b",
+            "name": "University Of Lagos Women Society (Creche)",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:25b04a0d48bc37cc",
+            "name": "Akintunde Ojo Memorial Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:301d57e958c1f193",
+            "name": "Access Bank Plc - UNILAG",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:345f81f27fba1d86",
+            "name": "Henry Carr Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:3c438fbaed7e9328",
+            "name": "Faculty Of Arts",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:419847604296f706",
+            "name": "International School, UNILAG",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:41bef0b150da7a76",
+            "name": "King Jaja Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:4a400b8f4338f388",
+            "name": "Faculty Of Law",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:4fd4ce8315a78f0f",
+            "name": "Students Lodge",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:516742f0cef3c547",
+            "name": "Rahman Bello Auditorium",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:561e30127729c959",
+            "name": "Madam Tinubu Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:6248e708e31a6cf8",
+            "name": "St Thomas More Catholic Chaplaincy",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:62f5e9c27219d52f",
+            "name": "Kaaf Medical Center",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:67619008948c696f",
+            "name": "Cits (Centre For Information And Technology System)",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:676519616d53008e",
+            "name": "Nord",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:69c1ff4ceb94b56f",
+            "name": "Guest House",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:69e6339f121af49e",
+            "name": "Faculty Of Management Sciences",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:6fc6e3fc608ac317",
+            "name": "Moremi Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:7047685317c3ba1c",
+            "name": "Faculty Of Education",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:71b9beee08234299",
+            "name": "Faculty Of Mass Communication",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:779ee8086501956f",
+            "name": "Yem-Yem Supermarket",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:7cd59335fb9ed522",
+            "name": "UNILAG Fire Station",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:880d07dc4369c62c",
+            "name": "Faculty Of Engineering",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:8d63feb1addcc268",
+            "name": "Education Bus Stop",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:912759d3e492d01d",
+            "name": "Mariere Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:914e333d7b2c866f",
+            "name": "UNILAG Bus Terminal",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:ab54df53747abe3f",
+            "name": "Department Of Chemical Engineering",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:af5e89c5cf6820ff",
+            "name": "Faculty Of Environmental Sciences",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:b3df9cb6213337de",
+            "name": "UNILAG Pharmacy",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:bc4af118152a1c47",
+            "name": "Department Of Geoscience",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:cb07f63f4ced70a4",
+            "name": "Queen Amina Hall",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:cc5553c24956bc9b",
+            "name": "ISLamic Institute",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:cf5250470c1340ac",
+            "name": "El Kanemi Hall-UNILAG",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:cf84711545abe060",
+            "name": "UNILAG Bookshop",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:e1eb0c9e5bba60a7",
+            "name": "Faculty Of Science",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:e4517548658b28c5",
+            "name": "Faculty Of Science Library",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:e60c2be54fd4c110",
+            "name": "Oyewusi Ibidapo-Obe House",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:f10f46c6db1fb4ff",
+            "name": "J. F. Ade Ajayi Auditorium",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:f4882ab14d1450ed",
+            "name": "Iya Moria",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:faa1c523a5745521",
+            "name": "UNILAG Gate House",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:detail:fdec1607f09c120f",
+            "name": "University Of Lagos Women Society Hostel",
+            "arrivalKind": "unmapped"
+          },
+          {
+            "id": "review:unilag:parcel:329",
+            "name": "Main Library",
+            "arrivalKind": "unmapped"
+          }
+        ],
+        "duplicateCandidates": [
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:01d6520a99f03422",
+              "review:unilag:parcel:248"
+            ],
+            "names": ["UNILAG Science Diploma Building", "Diploma Hall"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 3.015594861380137,
+            "key": "place:review:unilag:detail:01d6520a99f03422|review:unilag:parcel:248"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:6248e708e31a6cf8",
+              "review:unilag:parcel:350"
+            ],
+            "names": [
+              "St Thomas More Catholic Chaplaincy",
+              "St Thomas Mor Catholic Chapel"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 4.6409537889489885,
+            "key": "place:review:unilag:detail:6248e708e31a6cf8|review:unilag:parcel:350"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:551",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:553"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 8.812682534182152,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:551|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:553"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:300", "review:unilag:parcel:304"],
+            "names": ["Civil Engineering Lab.", "Mechanical Engineering Lab."],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 9.435254840841354,
+            "key": "place:review:unilag:parcel:300|review:unilag:parcel:304"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:242",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:243"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 9.71869822503963,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:242|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:243"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:ab54df53747abe3f",
+              "review:unilag:parcel:260"
+            ],
+            "names": [
+              "Department Of Chemical Engineering",
+              "Chemical And Pet. & Gas Engineering"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 9.909001700871418,
+            "key": "place:review:unilag:detail:ab54df53747abe3f|review:unilag:parcel:260"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:240",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:242"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 10.824671505675916,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:240|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:242"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:67619008948c696f",
+              "review:unilag:parcel:418"
+            ],
+            "names": [
+              "Cits (Centre For Information And Technology System)",
+              "Centre for Information Technology and Systems"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 12.454797329135772,
+            "key": "place:review:unilag:detail:67619008948c696f|review:unilag:parcel:418"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:279", "review:unilag:parcel:294"],
+            "names": [
+              "Faculty Of Bus. Admin. Lecture Theater",
+              "Faculty Of Bus. Admin. Lecture Room"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 13.858624870887919,
+            "key": "place:review:unilag:parcel:279|review:unilag:parcel:294"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:71b9beee08234299",
+              "review:unilag:parcel:421"
+            ],
+            "names": ["Faculty Of Mass Communication", "Mass Com. Dept."],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 14.780564207943602,
+            "key": "place:review:unilag:detail:71b9beee08234299|review:unilag:parcel:421"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:210",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:211"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 15.634900013217376,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:210|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:211"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:880d07dc4369c62c",
+              "review:unilag:parcel:304"
+            ],
+            "names": ["Faculty Of Engineering", "Mechanical Engineering Lab."],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 17.627023640184383,
+            "key": "place:review:unilag:detail:880d07dc4369c62c|review:unilag:parcel:304"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:280",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:283"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 18.887155065370038,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:280|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:283"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:373", "review:unilag:parcel:388"],
+            "names": [
+              "Chapel Auditorium",
+              "Extension Of Chapel Of Christ Our Light"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 24.90031602207506,
+            "key": "place:review:unilag:parcel:373|review:unilag:parcel:388"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:af5e89c5cf6820ff",
+              "review:unilag:parcel:400"
+            ],
+            "names": [
+              "Faculty Of Environmental Sciences",
+              "Faculty Of Environmental Science Auditorium"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 24.904267871897876,
+            "key": "place:review:unilag:detail:af5e89c5cf6820ff|review:unilag:parcel:400"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:305", "review:unilag:parcel:382"],
+            "names": ["System Engineering", "Systems Engineering Building"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 26.140323424054735,
+            "key": "place:review:unilag:parcel:305|review:unilag:parcel:382"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:880d07dc4369c62c",
+              "review:unilag:parcel:300"
+            ],
+            "names": ["Faculty Of Engineering", "Civil Engineering Lab."],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 26.412077820833087,
+            "key": "place:review:unilag:detail:880d07dc4369c62c|review:unilag:parcel:300"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:135",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:136"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 26.841016897318855,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:135|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:136"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:af5e89c5cf6820ff",
+              "review:unilag:parcel:404"
+            ],
+            "names": [
+              "Faculty Of Environmental Sciences",
+              "Faculty Of Environmental Science Extension"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 27.054089504906393,
+            "key": "place:review:unilag:detail:af5e89c5cf6820ff|review:unilag:parcel:404"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:294", "review:unilag:parcel:295"],
+            "names": [
+              "Faculty Of Bus. Admin. Lecture Room",
+              "Faculty Of Law Lecture Theater"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 30.20142037866704,
+            "key": "place:review:unilag:parcel:294|review:unilag:parcel:295"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:310", "review:unilag:parcel:390"],
+            "names": [
+              "Extension Of UNILAG Central Mosque",
+              "UNILAG Central Mosque"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 30.750262782869317,
+            "key": "place:review:unilag:parcel:310|review:unilag:parcel:390"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:faa1c523a5745521",
+              "review:unilag:parcel:377"
+            ],
+            "names": [
+              "UNILAG Gate House",
+              "UNILAG Alumni And Endowment Office"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.003552567497913,
+            "key": "place:review:unilag:detail:faa1c523a5745521|review:unilag:parcel:377"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:914e333d7b2c866f",
+              "review:unilag:detail:b3df9cb6213337de"
+            ],
+            "names": ["UNILAG Bus Terminal", "UNILAG Pharmacy"],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.161826366867956,
+            "key": "place:review:unilag:detail:914e333d7b2c866f|review:unilag:detail:b3df9cb6213337de"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:30",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:31"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 31.23202691480895,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:30|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:31"
+          },
+          {
+            "kind": "place",
+            "ids": ["review:unilag:parcel:278", "review:unilag:parcel:279"],
+            "names": [
+              "Faculty Of Business Admin. Classes",
+              "Faculty Of Bus. Admin. Lecture Theater"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 31.777054451681188,
+            "key": "place:review:unilag:parcel:278|review:unilag:parcel:279"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:29",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:31"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 32.052836810257006,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:29|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:31"
+          },
+          {
+            "kind": "place",
+            "ids": [
+              "review:unilag:detail:af5e89c5cf6820ff",
+              "review:unilag:parcel:315"
+            ],
+            "names": [
+              "Faculty Of Environmental Sciences",
+              "Faculty Of Environmental Science"
+            ],
+            "exact": false,
+            "reason": "Nearby similar names",
+            "distance": 34.78104744347222,
+            "key": "place:review:unilag:detail:af5e89c5cf6820ff|review:unilag:parcel:315"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:293",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:294"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 35.08664995420761,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:293|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:294"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:143",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:144"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 36.049754128954106,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:143|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:144"
+          },
+          {
+            "kind": "building",
+            "ids": [
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:208",
+              "import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:211"
+            ],
+            "names": ["Unnamed building", "Unnamed building"],
+            "reason": "Overlapping building footprints",
+            "exact": false,
+            "distance": 37.38573139917392,
+            "key": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:208|import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:211"
+          }
+        ],
+        "exactCandidates": 0
+      }
+    ]
+  },
+  "browserVerification": {
+    "report": "campus-browser-verification-2026-10-15.json",
+    "checkedAt": "2026-10-15T11:18:41.365Z",
+    "conclusion": "success",
+    "views": 32,
+    "offlineJourneys": 4,
+    "initialFailure": "The verifier selected the first same-named Senate record, which owned no photographs. Selection now follows the published place/building photo relationship; no campus content was changed for this repair.",
+    "offlineScope": "Chromium uses browser offline mode. WebKit reopens identical public bytes from a local origin after that origin is stopped. Physical device acceptance remains open."
+  }
+}
