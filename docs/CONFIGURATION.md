@@ -16,7 +16,7 @@ Visitors do not need accounts. Signing in grants no campus access until an admin
 
 ## Database and private storage
 
-The current application requires migrations **001–052**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+The current application requires migrations **001–053**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -46,7 +46,7 @@ The current application requires migrations **001–052**. Consult [Production](
 | 043–044 | Read-only source map preview and routing endpoint lookup |
 | 045–048 | Source evidence, private undo, accepted provenance and retry protection |
 | 049–050 | Qualified decision-history reads and compressed, reusable source evidence with protected recovery |
-| 051–052 | Preserve inferred import types and give review hash checks the bounded submission budget |
+| 051–053 | Preserve inferred import types, bound review requests and serialize equivalent snapshot hashes efficiently |
 
 Migrations 045–048 require [shadow comparisons and per-source enablement](SOURCE-UPDATES.md#staged-reliability-rollout). Their presence in Git is not an installed-schema receipt. The [local reliability record](assets/source-reliability-2026-10-13.json) explicitly reports them as undeployed at its checkpoint.
 

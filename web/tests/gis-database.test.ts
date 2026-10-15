@@ -9,6 +9,38 @@ import {
 } from './gis-database-fixture';
 import type { PGlite } from '@electric-sql/pglite';
 let db: PGlite;
+async function expectIdenticalWorkspaceHashes() {
+  const result = (
+    await db.query<{ original: string; serialized: string }>(
+      'select gis_content_hash(gis_workspace_snapshot()) original, gis_workspace_content_hash() serialized',
+    )
+  ).rows[0];
+  expect(result.serialized).toBe(result.original);
+}
+it('preserves canonical review hashes for nested values, Unicode and ancillary records', async () => {
+  await db.exec('begin');
+  try {
+    await db.query("insert into gis_views values('lasu',$1,$2,$3,1)", [
+      randomUUID(),
+      'Lagos – 研究',
+      JSON.stringify({
+        nested: { z: null, a: [true, 12.5, 'line\n"quoted"'] },
+      }),
+    ]);
+    await db.query(
+      "insert into gis_issues(campus_id,id,severity,code,message,comments,evidence) values('lasu',$1,'warning','hash-test',$2,$3,$4)",
+      [
+        randomUUID(),
+        'Café / 校園',
+        JSON.stringify([{ text: 'line\nnext', number: 1.25 }]),
+        JSON.stringify([{ label: 'Map', url: 'https://example.org/?a=1&b=2' }]),
+      ],
+    );
+    await expectIdenticalWorkspaceHashes();
+  } finally {
+    await db.exec('rollback');
+  }
+});
 beforeAll(async () => {
   db = await gisDatabase();
 }, 120000);
@@ -16,6 +48,7 @@ afterAll(async () => {
   await db?.close();
 });
 it('migrates with real PostGIS and backfills the existing owner', async () => {
+  await expectIdenticalWorkspaceHashes();
   expect(
     (await db.query<{ v: string }>('select extensions.postgis_version() v'))
       .rows[0].v,
@@ -113,6 +146,7 @@ it('indexes sources, validates atomic private attributes and rejects stale curso
   ).rejects.toThrow(/permission/);
 });
 it('requires independent approval, invalidates stale submissions and audits owner overrides', async () => {
+  await expectIdenticalWorkspaceHashes();
   const id = randomUUID();
   await db.query('select gis_submit_review($1,$2,$3)', [
     editor,
@@ -168,6 +202,7 @@ it('requires independent approval, invalidates stale submissions and audits owne
     "update gis_datasets set revision=revision+1 where id='gis-test'",
   );
   expect((await inspect()).current).toBe(false);
+  await expectIdenticalWorkspaceHashes();
   await expect(
     db.query('select gis_assert_release_approval($1)', [release]),
   ).rejects.toThrow(/stale/);
