@@ -17,7 +17,7 @@ TurnRight combines a public campus map and globe with a private GIS editor. Visi
 
 ### Discover and explore
 
-Start with the campus map or open **Choose a campus** to explore the globe. Select a published campus by name, pin, or boundary. The existing map stays open during switching, and unavailable downloads leave the current campus usable. LASU Ojo and UNILAG Akoka have separate published packages; campus identity follows shared links, saved places, and offline downloads.
+Start with the campus map or open **Choose a campus** to explore the globe. Select a published campus by name, pin, or boundary. The existing map stays open during switching, and unavailable downloads leave the current campus usable. [LASU Ojo](https://turnright.vercel.app/?campus=lasu) and [UNILAG Akoka](https://turnright.vercel.app/?campus=unilag) have separate published packages; campus identity follows shared links, saved places, and offline downloads.
 
 | Campus map                                                                                                                | World view                                                                                                          |
 | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
