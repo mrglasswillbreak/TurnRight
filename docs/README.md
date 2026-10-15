@@ -60,7 +60,7 @@ Start with Node 22.23.3 from `.node-version` and `npm ci` inside `web/`. `npm ru
 | Maintain operational settings | [Configuration](CONFIGURATION.md) |
 | Check deployed revisions and dated release receipts | [Production](PRODUCTION.md) |
 | Recover private work and handle conflicts | [Editor reliability](EDITOR-RELIABILITY.md) |
-| Verify offline and release readiness | [Acceptance](ACCEPTANCE.md) |
+| Verify offline and release readiness | [Acceptance](ACCEPTANCE.md) and [15 October manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) |
 
 ## Reference and history
 

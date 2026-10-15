@@ -14,6 +14,8 @@ Publication uses immutable approved snapshots, reviewed previews, the complete r
 
 ## Remaining acceptance and owner decisions
 
+The [manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) gives the exact device, field, account and recovery checks still required, with expected outcomes.
+
 | Area | Required evidence or input |
 | --- | --- |
 | Physical devices | Android and iPhone installation/relaunch, downloaded-campus offline use, GPS navigation, keyboard input, spoken directions and dense-model performance on representative phones. Follow [Acceptance](ACCEPTANCE.md) and [Performance](PERFORMANCE.md). |
