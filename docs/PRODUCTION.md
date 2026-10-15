@@ -12,6 +12,8 @@ The live draft audit corrected twelve numeric schema declarations across five UN
 
 Publication uses immutable approved snapshots, reviewed previews, the complete release gates and the production promotion guard. The original owner authorized the audited independent-review exception for this publication. Current review hashes, reasons, release states and preview links are available in the authenticated editor; a submitted or queued item is not a published map. Each campus is promoted separately so the other campus's package remains intact.
 
+[PR #22](https://github.com/mrglasswillbreak/TurnRight/pull/22) records the approval recovery, clearer building-specific validation and two test repairs found during release checks. The model-detail test keeps its camera gesture active until the reduced-detail response is observed, then verifies restoration after stopping. Import fixtures declare their own campus; CI exercises unit tests with a non-default worker campus. This addresses the [UNILAG preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38699608433) that passed all release gates but stopped in the worker's unit suite before building its snapshot. That failed run did not publish UNILAG. The pull request's full checks and deployment status are the authority for the follow-up application revision.
+
 ## Remaining acceptance and owner decisions
 
 The [manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) gives the exact device, field, account and recovery checks still required, with expected outcomes.
