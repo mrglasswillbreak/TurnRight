@@ -1,7 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import type { CampusData, CampusPackage } from "../../src/types";
 import type { Map as MapInstance } from "maplibre-gl";
 import { campusLayers } from "../../src/campus-layers";
@@ -27,7 +26,7 @@ async function setup(page: Page, roles: WorkspaceCapabilities["roles"] = ["admin
   const manifest: CampusPackage | undefined = capture
     ? JSON.parse(
         readFileSync(
-          new URL("../../work/model-benchmark/public/packages/latest.json", import.meta.url),
+          new URL("../../work/docs-fixture/public/packages/latest.json", import.meta.url),
           "utf8",
         ),
       )
@@ -35,7 +34,7 @@ async function setup(page: Page, roles: WorkspaceCapabilities["roles"] = ["admin
   const data: CampusData = manifest
     ? JSON.parse(
         readFileSync(
-          new URL("../../work/model-benchmark/public" + manifest.dataUrl, import.meta.url),
+          new URL("../../work/docs-fixture/public" + manifest.dataUrl, import.meta.url),
           "utf8",
         ),
       )
@@ -45,7 +44,7 @@ async function setup(page: Page, roles: WorkspaceCapabilities["roles"] = ["admin
       await page.route("**" + asset.url, (r) =>
         r.fulfill({
           body: readFileSync(
-            new URL("../../work/model-benchmark/public" + asset.url, import.meta.url),
+            new URL("../../work/docs-fixture/public" + asset.url, import.meta.url),
           ),
           contentType: asset.url.endsWith(".json")
             ? "application/json"
@@ -498,12 +497,7 @@ test("GIS documentation gallery uses the current workspace and an isolated team 
         e.scrollTop = 0;
       });
     await page.screenshot({
-      path: fileURLToPath(
-        new URL(
-          `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || "redesign"}-gis-${name}-${process.env.TURNRIGHT_SCREENSHOT_DATE || "2026-10-07"}.png`,
-          import.meta.url,
-        ),
-      ),
+      path: (await import("./documentation-capture")).documentationCapturePath(`gis-${name}`),
     });
   };
   await nav.getByRole("button", { name: "Data", exact: true }).click();

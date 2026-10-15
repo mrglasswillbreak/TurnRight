@@ -1,5 +1,21 @@
 # TurnRight architecture
 
+## System overview
+
+TurnRight serves two connected surfaces: a public map/globe and an authenticated campus workspace. Public navigation reads immutable published packages; the editor works with private source observations, accepted records, corrections, typed datasets, evidence, and review snapshots.
+
+| Boundary | Modules and responsibility |
+| --- | --- |
+| Public experience | `App.tsx`, `MapView.tsx`, `CampusSwitcher.tsx`, `world-*`, `useCampusSwitch.ts`: discovery, globe/campus rendering and in-place switching |
+| Navigation and local state | `routing*`, `navigation.ts`, `useGps.ts`, `audio.ts`, `offline.ts`, `sw.ts`: routing, foreground guidance, verified packages and recovery |
+| Team interface | `Admin.tsx`, `WorkspaceFrame.tsx`, `Gis*`, source/model/photo workspaces: scoped editing, analysis, review and publication |
+| Private backend | `web/api/`, `web/server/`, `supabase/migrations/`: authentication, capabilities, PostGIS state, immutable approvals and operation receipts |
+| Workers and releases | `scripts/`, isolated GIS containers and Actions: source checks, staged processing, verified package construction and reviewed promotion |
+
+The public app does not read private drafts. Source acceptance changes the working baseline; publication changes a campus package only after approved snapshot verification. A code deployment preserves existing public packages through the build preservation contract. Browser recovery and offline storage are local conveniences, not substitutes for server backups.
+
+[Public map](PUBLIC-MAP.md) · [Editor](EDITOR.md) · [Repository ownership](REPOSITORY.md) · [Deployment](DEPLOYMENT.md).
+
 ## Shared editor shell
 
 [Editor layout contract](EDITOR-LAYOUT.md) documents typed workspace/pane identities, stable canvas hosts, responsive sheets and versioned preferences. The new shell and combined Activity presentation use existing state stores and APIs. Model and photo editors retain their existing workers, queues, undo and recovery ownership. No database migration accompanies the layout or identity changes.

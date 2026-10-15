@@ -1,73 +1,131 @@
-import { readFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { resolve, dirname, relative, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const root = resolve(import.meta.dirname, '../..');
-const listed = execFileSync(
-  'git',
-  ['ls-files', '--modified', '--others', '--exclude-standard'],
-  { cwd: root, encoding: 'utf8' },
-)
-  .split(/\r?\n/)
-  .filter((p) => p.endsWith('.md'));
 const files = [
-  ...new Set([
-    'README.md',
-    'CONTRIBUTING.md',
-    ...[
-      'README',
-      'EDITOR',
-      'EDITOR-LAYOUT',
-      'REDESIGN-VERIFICATION',
-      'DEPLOYMENT',
-      'EDITOR-RELIABILITY',
-      'ARCHITECTURE',
-      'BRAND',
-      'SCREENSHOTS',
-      'GIS-PLATFORM',
-      'CAMPUS-GLOBE',
-      'CAMPUS-IMPORTS',
-      'PHOTO-EDITING',
-      'PROGRESS-MONITOR',
-      'UNIFIED-MODEL-EDITOR',
-    ].map((name) => `docs/${name}.md`),
-    'docs/assets/screenshots/README.md',
-    ...listed,
-  ]),
-];
-let checked = 0;
+  ...new Set(
+    execFileSync(
+      'git',
+      ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+      { cwd: root, encoding: 'utf8' },
+    ).split('\0'),
+  ),
+]
+  .filter((file) => file.endsWith('.md') && existsSync(resolve(root, file)))
+  .sort();
 const errors = [];
-for (const file of files) {
-  const text = readFileSync(resolve(root, file), 'utf8');
-  const links = [...text.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)].map((m) => m[1]);
-  links.push(
-    ...[...text.matchAll(/(?:src|srcset)="([^"]+)"/g)].map((m) => m[1]),
+let checked = 0;
+function withoutFences(text) {
+  return text.replace(
+    /^([ \t]*)(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\2[ \t]*$/gm,
+    '',
   );
+}
+function anchors(text) {
+  const counts = new Map();
+  const found = new Set();
+  for (const [, heading] of withoutFences(text).matchAll(
+    /^#{1,6}\s+(.+?)\s*#*\s*$/gm,
+  )) {
+    const slug = heading
+      .toLowerCase()
+      .replace(/<[^>]*>/g, '')
+      .replace(/[^\p{L}\p{N}_ -]/gu, '')
+      .replace(/ /g, '-');
+    const count = counts.get(slug) || 0;
+    found.add(count ? slug + '-' + count : slug);
+    counts.set(slug, count + 1);
+  }
+  for (const [, id] of text.matchAll(/(?:id|name)=["']([^"']+)["']/g))
+    found.add(id);
+  return found;
+}
+function exactCase(target) {
+  const path = relative(root, target);
+  if (path.startsWith('..') || path === '') return true;
+  let current = root;
+  for (const part of path.split(sep)) {
+    if (!readdirSync(current).includes(part)) return false;
+    current = resolve(current, part);
+  }
+  return true;
+}
+const headingCache = new Map();
+for (const file of files) {
+  const text = withoutFences(readFileSync(resolve(root, file), 'utf8'));
+  const links = [
+    ...text.matchAll(
+      /!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+["'][^"']*["'])?\)/g,
+    ),
+  ].map((m) => m[1]);
+  links.push(
+    ...[...text.matchAll(/^\s*\[[^\]]+\]:\s*(\S+)/gm)].map((m) => m[1]),
+  );
+  links.push(
+    ...[...text.matchAll(/(?:src|href)=["']([^"']+)["']/g)].map((m) => m[1]),
+  );
+  for (const [, values] of text.matchAll(/srcset=["']([^"']+)["']/g))
+    links.push(
+      ...values.split(',').map((value) => value.trim().split(/\s/)[0]),
+    );
   for (let link of links) {
-    link = link.replace(/^<|>$/g, '').split(/\s+"/)[0];
-    if (/^(?:https?:|mailto:|data:|app:)/.test(link)) continue;
+    link = link.replace(/^<|>$/g, '');
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(link)) continue;
     const [path, anchor] = link.split('#');
-    const actual = path
-      ? resolve(dirname(resolve(root, file)), decodeURIComponent(path))
-      : resolve(root, file);
-    checked++;
-    if (!existsSync(actual)) {
-      errors.push(`${file}: missing ${link}`);
+    let actual;
+    try {
+      actual = path
+        ? resolve(
+            dirname(resolve(root, file)),
+            decodeURIComponent(path.split('?')[0]),
+          )
+        : resolve(root, file);
+    } catch {
+      errors.push(file + ': invalid URL ' + link);
       continue;
     }
-    if (anchor && actual.endsWith('.md')) {
-      const headings = [
-        ...readFileSync(actual, 'utf8').matchAll(/^#{1,6} (.+)$/gm),
-      ].map((m) =>
-        m[1]
-          .toLowerCase()
-          .replace(/<[^>]*>/g, '')
-          .replace(/[^\p{L}\p{N}_ -]/gu, '')
-          .replace(/ /g, '-'),
-      );
-      if (!headings.includes(decodeURIComponent(anchor)))
-        errors.push(`${file}: missing heading ${link}`);
+    checked++;
+    if (!existsSync(actual)) {
+      errors.push(file + ': missing ' + link);
+      continue;
     }
+    if (!exactCase(actual))
+      errors.push(file + ': filename case mismatch ' + link);
+    if (anchor && actual.endsWith('.md')) {
+      if (!headingCache.has(actual))
+        headingCache.set(actual, anchors(readFileSync(actual, 'utf8')));
+      if (!headingCache.get(actual).has(decodeURIComponent(anchor)))
+        errors.push(file + ': missing heading ' + link);
+    }
+  }
+}
+// Current tour manifests are immutable evidence; accidental image replacement fails CI.
+const directory = resolve(root, 'docs/assets/screenshots');
+let captures = 0;
+for (const filename of readdirSync(directory).filter((name) =>
+  /^tour-\d{4}-\d{2}-\d{2}\.json$/.test(name),
+)) {
+  const manifest = JSON.parse(
+    readFileSync(resolve(directory, filename), 'utf8'),
+  );
+  for (const entry of manifest.captures) {
+    const target = resolve(directory, entry.file);
+    if (!target.startsWith(directory + sep) || !existsSync(target)) {
+      errors.push(filename + ': missing/invalid capture ' + entry.file);
+      continue;
+    }
+    const bytes = readFileSync(target);
+    if (createHash('sha256').update(bytes).digest('hex') !== entry.sha256)
+      errors.push(filename + ': changed capture ' + entry.file);
+    if (
+      bytes.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
+      bytes.readUInt32BE(16) !== entry.width ||
+      bytes.readUInt32BE(20) !== entry.height
+    )
+      errors.push(filename + ': dimensions/format mismatch ' + entry.file);
+    captures++;
   }
 }
 if (errors.length) {
@@ -75,5 +133,5 @@ if (errors.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Validated ${checked} relative links/assets in ${files.length} current or changed guides.`,
+    `Validated ${checked} local links/assets across all ${files.length} Markdown files and ${captures} recorded tour captures.`,
   );

@@ -104,7 +104,7 @@ const browser = await chromium.launch({
 const runs = [];
 if (process.argv.includes('--final')) {
   const previous = JSON.parse(
-    await fs.readFile('../docs/mobile-model-performance.json', 'utf8'),
+    await fs.readFile('../docs/assets/measurements/mobile-model-performance.json', 'utf8'),
   );
   if (
     previous.baselineCommit !== '0fc9dca' ||
@@ -421,7 +421,7 @@ try {
     await fs.writeFile(
       process.argv.includes('--smoke')
         ? 'work/mobile-model-smoke.json'
-        : '../docs/mobile-model-performance.json',
+        : '../docs/assets/measurements/mobile-model-performance.json',
       JSON.stringify(
         {
           date: new Date().toISOString(),

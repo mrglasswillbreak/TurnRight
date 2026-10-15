@@ -371,7 +371,7 @@ for (const viewport of [
       [1440, 390].includes(viewport.width)
     ) {
       await page.screenshot({
-        path: `../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || 'redesign'}-photo-${viewport.width === 1440 ? 'desktop' : 'mobile'}-${process.env.TURNRIGHT_SCREENSHOT_DATE || '2026-10-07'}.png`,
+        path: (await import("./documentation-capture")).documentationCapturePath(`photo-${viewport.width === 1440 ? 'desktop' : 'mobile'}`),
       });
     }
     await dialog.getByRole('button', { name: 'Close image editor' }).click();

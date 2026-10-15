@@ -4,7 +4,7 @@ TurnRight deploys a public campus PWA, a private team GIS API and isolated proce
 
 ## Existing-installation upgrade
 
-1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. This GIS milestone appends **023–037** after 022.
+1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–053**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
 2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
 3. Pass unit/database tests, both TypeScript projects, lint, configured build/budgets, Chromium/WebKit, offline, native PostGIS and isolated GIS/importer checks. Resolve failures before production migration.
 4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–049 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–053 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -55,6 +55,8 @@ Set these in **both Preview and Production**:
 
 Never store service credentials in browser variables, Git, screenshots or public artifacts. PUBLISHED_MAP_URL makes ordinary code builds fetch and verify the current catalogue, campus packages and retained assets. If verification fails, the build stops. Initially omit it only when no public release exists.
 
+Complete required backfills and the per-source reliability rollout before enabling proposal generation.
+
 ### GitHub Actions
 
 Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID. Service credentials remain on the runner; isolated parsing containers receive files and no network. Keep an included-usage spending limit and do not enable paid upgrades as part of ordinary deployment.
@@ -66,6 +68,8 @@ Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN
 | map-import-tests.yml | Native import-format and private worker-mount regressions |
 | gis-processing.yml | One campus-scoped analysis/export job with cancellation, leases and staged output |
 | map-import.yml / map-source-check.yml | Private source inspection/preview and opted-in refresh candidates |
+| source-review.yml / source-review-maintenance.yml | Bounded source decisions, index backfill and receipt housekeeping |
+| import-retention.yml | Bounded cleanup of eligible import artifacts; referenced evidence remains protected |
 | release.yml | Gated preview or publication of an approved immutable submission |
 | campus-detail-verification.yml | Served package hashes, real-campus browser views, offline reopening and retained restore assets |
 
@@ -115,12 +119,20 @@ Apply `043_source_map_preview.sql` before deploying the map preview reader. It a
 
 Apply `044_source_preview_routing.sql` after 043 to include graph links stored as node references. It adds a partial pending-identity index and campus-scoped endpoint readers, while retaining the existing read-only API. Verify a routing-link preview and unchanged proposal/correction counts. No graph-wide backfill or materialized geometry is required.
 
-## Source reliability deployment (migrations 045–048)
+## Source reliability upgrade (045–048)
 
-Apply 045–048 in order after the release gates pass. Deploy the matching API, UI and shared source workers with proposal generation disabled (the default). Audit exact retained provenance without replacing accepted records or map content; verify the LASU public/private regressions before enabling any source. Keep publication separate. See [rollout, recovery and rollback](SOURCE-UPDATES.md#staged-reliability-rollout).
+Apply 045–048 in order before deploying the matching workers. These migrations add evidence-backed source checks, private undo, accepted provenance, and retry guards. New proposal generation defaults to disabled. Run shadow comparisons, inspect receipts, recover legacy provenance only where retained evidence proves an exact match, and complete the provider/database/native acceptance gates before enabling an individual source.
+
+Follow [the staged reliability rollout](SOURCE-UPDATES.md#staged-reliability-rollout), including the per-source policy and rollback instructions. A new UI build is not sufficient. Do not accept real proposals as a smoke test or remove database guards when rolling back application code. The [13 October record](assets/source-reliability-2026-10-13.json) reports local verification with these migrations undeployed at that checkpoint; obtain a new installed-schema receipt for an actual rollout.
 
 Migration **049** repairs the source decision-history reader by qualifying the receipt actor. It preserves existing function grants and does not alter data. Source finalization waits up to 75 seconds for its existing 60-second database budget; other request and transaction limits remain unchanged.
 
 Apply **050** before deploying the matching workers. It stores bounded raw check batches in campus-private, compressed, content-deduplicated pages. Only proposal dependencies are expanded into individual observation/record rows. Checks and the existing daily review-maintenance job run bounded compaction; the last two successful raw snapshots per source are retained. Permanent check receipts, accepted observations, proposal dependencies and decision/undo evidence remain independent of raw-snapshot retention.
 
 For an existing 045–049 installation, run `source_check_maintain()` repeatedly until `work` is zero for each affected campus. It verifies identical archived content before reclaiming old staging and unreferenced observation copies. Inspect database size and the preserved accepted-data/decision hashes. Deletion makes pages reusable but does not reduce the physical database quota immediately: during this one-time upgrade, an operator may run `VACUUM (FULL, ANALYZE)` separately on `source_check_staging`, `source_observations` and `source_observation_records` after compaction, using a short lock timeout and with no source check running. Do not rebuild the accepted map tables. Thereafter ordinary autovacuum reuses bounded staging space; unchanged checks share existing payloads. Verify two successive shadow runs and quota headroom before calling the rollout complete.
+
+## Typed imports and review requests (051–053)
+
+Migration 051 retains inferred numeric/boolean types when an import supplies field names without type declarations; explicitly configured team schemas remain authoritative. Existing affected datasets require a reviewed schema correction; the migration does not rewrite values or publish data. Migration 052 gives review inspection, decisions and publication hash checks the same 60-second bound used by submission, without changing permissions or approval requirements. It also avoids serializing the entire stored snapshot merely to construct a review header. Preserve the existing function definitions, apply both additive migrations, then verify current/stale snapshot checks and authenticated review loading.
+
+Migration 053 computes the identical canonical snapshot hash by serializing each ordered row once, avoiding repeated construction of the whole JSONB snapshot during inspection and approval. It changes no hash format, authorization rule or stale-snapshot check. Apply after 052 and verify hash equivalence against the current immutable review on each campus before committing the production migration transaction. Keep the serializer equivalence tests synchronized with any future snapshot-field changes.

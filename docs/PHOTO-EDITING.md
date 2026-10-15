@@ -4,9 +4,9 @@
 
 Desktop separates the file list, comparison canvas and inspector. **Edit** contains crop, orientation, adjustment, privacy and resize controls; **Compress** contains output format and quality; **Details** contains image metadata. Pane controls collapse, resize or maximize the surrounding tools without interrupting processing. Phones retain a full-screen comparison with one focused controls sheet.
 
-![Desktop photo comparison with file list and inspector](assets/screenshots/b2-photo-desktop-2026-10-11.png)
+![Desktop photo comparison with file list and inspector](assets/screenshots/tour-photo-desktop-2026-10-15.png)
 
-![Phone photo comparison](assets/screenshots/b2-photo-mobile-2026-10-11.png)
+![Phone photo comparison](assets/screenshots/tour-photo-mobile-2026-10-15.png)
 
 These captures use the local editor harness and an attributed repository photograph; see [capture records](SCREENSHOTS.md).
 

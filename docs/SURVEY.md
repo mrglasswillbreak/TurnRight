@@ -54,7 +54,7 @@ The editor's **Install update** notice requires paused recording and flushed rec
 
 ## Migration and deployment
 
-For a current installation, apply all migrations through 015 as described in [Deployment](DEPLOYMENT.md). Migration 013 scopes the original survey tables and save RPC by campus with composite foreign keys. The numbered steps and verification below describe the original migration-004 rollout on 12 September, not a complete current installation.
+For a current installation, apply all migrations through 048 and the required staged rollout as described in [Deployment](DEPLOYMENT.md). Migration 013 scopes the original survey tables and save RPC by campus with composite foreign keys. The numbered steps and verification below describe the original migration-004 rollout on 12 September, not a complete current installation.
 
 1. Run `supabase/migrations/004_private_surveys.sql` in a transaction on the existing Supabase project, after migration 003. It adds `surveys`, `survey_revisions`, `survey_chunks` and the service-role-only `save_survey_revision` function. Authenticated reads are restricted to each row's owner.
 2. Verify owner reads, denied direct authenticated writes, unauthorized API rejection, a chunked upload, a retry and a concurrent-version conflict.

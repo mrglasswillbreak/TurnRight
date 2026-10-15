@@ -69,6 +69,7 @@ with psycopg.connect(url,autocommit=True) as db:
     assert len(claim['inputs']['input']['features'])==100000
     db.execute('select gis_cancel_job(%s,%s)',(editor,job['operationId']))
     assert db.execute('select gis_finish_job(%s,%s,%s)',(job['operationId'],claim['run_token'],'{}')).fetchone()[0] is False
+    assert db.execute('select gis_workspace_content_hash()=gis_content_hash(gis_workspace_snapshot())').fetchone()[0]
     review=str(uuid.uuid4());db.execute('select gis_submit_review(%s,%s,%s)',(editor,review,'Native review of campus dataset'))
     db.execute('select gis_decide_review(%s,%s,true,%s,false)',(reviewer,review,'Independent native database verification'))
     release=db.execute('select gis_prepare_release(%s,%s,%s,%s)',(publisher,review,'catalogue','Native release')).fetchone()[0]

@@ -1,5 +1,7 @@
 # TurnRight verification and release checklist
 
+Use this checklist against an identified source revision and package version. Local browser fixtures, native CI, live account checks, physical devices, and campus field work establish different things; record each separately. Dated sections retain historical results. The [current readiness summary](PRODUCTION.md#current-source-and-release-readiness--15-october-2026) identifies outstanding rollout and operational gates.
+
 ## Campus GIS team release
 
 Use the current [workflow and rollout guide](GIS-PLATFORM.md), with dated results in [Production](PRODUCTION.md). The items below are requirements; dated receipts identify completed checks.

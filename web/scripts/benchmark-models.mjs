@@ -393,7 +393,7 @@ try {
         console.log(`Editor ${rate}x trial ${run}/5`);
       }
     await fs.writeFile(
-      '../docs/photo-model-performance.json',
+      '../docs/assets/measurements/photo-model-performance.json',
       JSON.stringify(
         {
           baseline: base.version,

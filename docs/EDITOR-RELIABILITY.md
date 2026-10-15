@@ -4,7 +4,7 @@
 
 Layout preferences are optional local presentation state, separate from durable map/photo/model recovery. Reset layout changes pane sizes, collapsed state and legend visibility; it does not discard edits. Recovery and explicit building links take priority over remembered workspace navigation. Activity is collapsed by default but continues subscribing to recovery and jobs; recovery failures still show attention and retain existing blocking protections.
 
-![Offline package controls in a phone viewport](assets/screenshots/b2-offline-2026-10-11.png)
+![Offline package controls in a phone viewport](assets/screenshots/tour-offline-2026-10-15.png)
 
 *This view demonstrates the download interface. Offline correctness is verified separately by the prepared-package browser gates.*
 
@@ -39,7 +39,7 @@ revision, so later edits restore the usual leave protection.
 - Validation issues carry feature identity/kind, severity, affected field and a supported repair action. Existing error/warning strings remain available to server release validation and older callers.
 - Place sharing uses `/?place=<encoded stable ID>` and existing public place aliases. No account or device location is included.
 - Public package readers support schemas 1–3; these reliability repairs do not change the schema. Steps remain optional booleans in routing edges; missing information remains unknown. A private edit can explicitly reset steps knowledge to unknown, which omits the public edge flag.
-- The original reliability patch required no database migration. Current installations must follow migrations 001–038 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
+- The original reliability patch required no database migration. Current installations must follow migrations 001–053 in [Deployment](DEPLOYMENT.md). Recovery changes do not publish campus corrections.
 
 ## Validation
 

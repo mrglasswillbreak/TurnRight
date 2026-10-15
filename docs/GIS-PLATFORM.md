@@ -4,7 +4,7 @@
 
 The five workspaces share a persistent map canvas with a left explorer, right inspector and optional bottom table/history. Data starts with attributes below the map; Analyze has tools left, parameters right and jobs below. Review holds quality and submission lists, while Publish groups approved snapshots, release history and export actions. Source changes, duplicates and reports are under Review; releases are under Publish. See [pane controls and saved layouts](EDITOR.md#arrange-your-workspace).
 
-![Analysis tools, map, parameters and processing history](assets/screenshots/b2-gis-analyze-2026-10-11.png)
+![Analysis tools, map, parameters and processing history](assets/screenshots/tour-gis-analyze-2026-10-15.png)
 
 This implementation connects the existing campus importer, geometry editor, model/photo assets and immutable release pipeline to team permissions, typed datasets, indexed feature queries and repeatable analysis. It retains React, MapLibre, Supabase/PostGIS, Vercel and GitHub Actions. The changes are additive after migration 022. [Production](PRODUCTION.md) records the actual migration/deployment state and [Deployment](DEPLOYMENT.md) is the operational runbook.
 
@@ -124,6 +124,8 @@ Pull requests run the quality, browser, offline, importer and native GIS workflo
 6. Expand after the native service/container gates, browser/offline journeys and backup-restoration exercise pass. Application rollback must retain the additive database data/guards. Restoring public content uses the reviewed campus restoration flow; it does not overwrite drafts or promote an old whole-site deployment. Do not delete new tables or discard private dataset attributes during rollback.
 
 ## Verification status
+
+This section records the **5 October 2026** GIS release. It is retained evidence, not the latest test count or confirmation that subsequent migrations are installed. Consult [current readiness](PRODUCTION.md) before a new release.
 
 Implementation and Linux release verification use Node 22.23.3. The [release gate receipt](assets/gis-platform-release-gates-2026-10-05.json) binds the completed checks to application revision a963329:
 

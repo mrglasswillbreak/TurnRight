@@ -3,88 +3,88 @@
   <img src="docs/assets/brand/wordmark.svg" width="330" alt="TurnRight">
 </picture>
 
-# Campus maps, made together
+# TurnRight
 
-TurnRight brings campus mapping, building authoring, and public navigation into one application. Small teams can import spatial data, edit a shared draft, investigate quality issues, obtain independent approval, and publish maps that visitors can download for offline use.
+**Explore a campus. Build a better map.**
 
-[Explore the map](https://turnright.vercel.app/) · [Team workspace](https://turnright.vercel.app/admin) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
+TurnRight combines a public campus map and globe with a private GIS editor. Visitors can discover campuses, inspect places and buildings, plan journeys, and download maps for offline use. Campus teams can import data, edit geometry and building models, review source changes, and publish independently approved map releases.
 
-> TurnRight is an independent project, not an official university service. Routes have not been field-verified; mapped approaches and building models do not establish entrance access or accessibility.
+[Explore the map](https://turnright.vercel.app/) · [Open the editor](https://turnright.vercel.app/admin) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
 
-## See TurnRight in action
+> Independent project; not an official university service. Routes and entrances still require field verification. Building models and mapped approaches do not establish access or step-free accessibility. See [release readiness](docs/PRODUCTION.md) for verification status and remaining checks.
 
-The current gallery shows the B2 campus identity: a blue right-turn arrow and graduation cap. See the [brand guide](docs/BRAND.md) and [dated screenshot records](docs/SCREENSHOTS.md#b2-campus-identity--11-october-2026).
+## Public map and globe
 
-### Explore a campus
+### Discover and explore
 
-Search destinations, inspect 3D buildings and photographs, choose between walking or driving routes, and get GPS-enabled turn-by-turn directions. LASU Ojo and UNILAG Akoka have independent published packages and offline downloads.
+Start with the campus map or open **Choose a campus** to explore the globe. Select a published campus by name, pin, or boundary. The existing map stays open during switching, and unavailable downloads leave the current campus usable. LASU Ojo and UNILAG Akoka have separate published packages; campus identity follows shared links, saved places, and offline downloads.
 
-| Desktop map | Phone view |
-| --- | --- |
-| ![Desktop campus map with search and navigation](docs/assets/screenshots/b2-public-desktop-2026-10-11.png) | <img src="docs/assets/screenshots/b2-public-mobile-2026-10-11.png" width="260" alt="Campus place details in a phone browser viewport"> |
+| Campus map                                                                                                                | World view                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| ![Public campus map with selected building and place details](docs/assets/screenshots/tour-public-desktop-2026-10-15.png) | ![Dark globe view showing geographic context around West Africa](docs/assets/screenshots/tour-globe-2026-10-15.png) |
 
-### Map and maintain
+- Search destinations and streets, browse categories, save places, and share destination links.
+- Switch between 2D and 3D, use light/dark/device appearance, and adjust map rendering and motion settings.
+- Inspect building footprints, authored models, photographs, source credits, and arrival information. Recorded, estimated, and illustrative dimensions remain distinguishable.
+- Submit a correction report or keep a local report draft for later. Reports enter private review and do not immediately change the map.
 
-Five workspaces follow the team workflow: **Data → Edit → Analyze → Review → Publish**. Resizable panes keep the map, feature explorer, properties, and attribute table in predictable places. The workspace remembers your layout; focus mode and compact mobile sheets make room for the task at hand.
+### Navigate and prepare for offline use
 
-On phones, drag the editing panel's top handle to adjust its height. Keyboard resizing and remembered sizes are included. [Editor layout](docs/EDITOR-LAYOUT.md).
+Preview walking or driving routes from a selected origin. Foreground GPS, route instructions, spoken guidance, and deviation handling support a journey over the mapped network. Driving includes mapped vehicle restrictions, parking, and a walking handoff where available.
 
-| Map editing | Structured data |
-| --- | --- |
-| ![Map editor with contextual navigation and docked panes](docs/assets/screenshots/b2-editor-desktop-2026-10-11.png) | ![Data workspace with dataset catalogue, map and attribute table](docs/assets/screenshots/b2-gis-data-2026-10-11.png) |
+Download each campus from **Offline** and wait for **Ready offline** before disconnecting. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
-### Model buildings and prepare photographs
+| Place details on a phone                                                                                                                           | Offline preparation                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/assets/screenshots/tour-public-mobile-2026-10-15.png" width="280" alt="Place details and map controls in a phone browser viewport"> | <img src="docs/assets/screenshots/tour-offline-2026-10-15.png" width="280" alt="Campus download and offline verification controls"> |
 
-Work with footprints, roofs, façades, surface text, curves, and meshes. Compare models with photographic references. Crop, adjust, redact, resize, and compress photographs locally before attaching them to campus work.
+Navigation runs in the foreground. There is no cross-campus route planner, indoor room navigation, or verified step-free guarantee. An offline campus directory can list campuses that have not been downloaded. [Public map guide](docs/PUBLIC-MAP.md) · [Globe and switching](docs/CAMPUS-GLOBE.md) · [Driving](docs/DRIVING.md) · [Voice](docs/VOICE.md).
 
-| Building authoring | Photo comparison |
-| --- | --- |
-| ![Building model beside its photographic reference](docs/assets/screenshots/b2-model-desktop-2026-10-11.png) | ![Local image comparison with file and compression controls](docs/assets/screenshots/b2-photo-desktop-2026-10-11.png) |
+## Editor and campus team workflow
 
-### Review and publish deliberately
+The authenticated editor organizes work as **Data → Edit → Analyze → Review → Publish**. Campus-scoped roles control access. Desktop panes resize around a persistent map; phones use a workspace chooser and adjustable sheets. Layout preferences, unsaved input, recovery, and feature selection are preserved through supported workspace changes.
 
-Keep external map data current in **Review → Source updates**. Check connected sources, compare readable changes against the map, and accept or reject selected rows or all matching results. Bulk decisions continue in the background, preserve editor corrections, and remain separate from publication. [Source update guide](docs/SOURCE-UPDATES.md).
+| Map editing                                                                                                                | Dataset management                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ![Editor with feature explorer, map and contextual properties](docs/assets/screenshots/tour-editor-desktop-2026-10-15.png) | ![Data workspace with dataset catalogue and paged attribute table](docs/assets/screenshots/tour-gis-data-2026-10-15.png) |
 
-Choose **Preview all matching changes on map** to inspect the entire filtered inbox across pages. The read-only overlay distinguishes additions, changes and removals, with optional previous shapes and click-through comparisons.
+| Workspace   | Capabilities                                                                                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Data**    | Create/manage campuses; inspect GIS files, OSM and public ArcGIS sources; map fields; maintain typed datasets, provenance, filters and saved views; import CSV joins and export supported formats. |
+| **Edit**    | Edit places, paths, entrances, boundaries, roads and layers; control junctions, restrictions and closures; use geometry tools, undo/redo, conflict handling and recovery.                          |
+| **Analyze** | Run bounded spatial tools such as buffers, overlays, joins and measurements against immutable inputs; inspect jobs and staged results before applying changes.                                     |
+| **Review**  | Resolve map-linked issues, reports and duplicates; compare source updates; inspect provenance and removal evidence; submit immutable content for independent approval.                             |
+| **Publish** | Preview an approved snapshot, style/export A4 or A3 maps, publish a campus package, and prepare a historical campus restore for renewed review.                                                    |
 
-| Source inbox and map comparison | Bulk confirmation on a phone |
-| --- | --- |
-| ![Source updates inbox beside a labelled source outline and retained editor correction](docs/assets/screenshots/source-updates-desktop-2026-10-11.png) | ![Phone confirmation with a fixed selection count, geometry warning and removal acknowledgement](docs/assets/screenshots/source-updates-confirm-mobile-2026-10-11.png) |
+### Buildings, photographs, and field evidence
 
-These October 11 captures use 101 synthetic proposals and isolated decisions. [Capture record](docs/assets/screenshots/source-updates-2026-10-11.json).
+The model workspace supports footprints, walls, roofs, façades, surface lettering, curves, mesh components, and photographic references. Supported static geometry and appearance can pass through GLB/glTF, OBJ, and STL; native parameters, review history, and recovery remain in TurnRight. Native surface editing has a 2D fallback; mesh editing requires WebGL.
 
-| Preview all matching changes | Adjustable phone editor |
-| --- | --- |
-| ![Source proposals across the campus with before and after outline controls](docs/assets/screenshots/source-map-preview-desktop-2026-10-11.png) | <img src="docs/assets/screenshots/editor-adjustable-panel-mobile-2026-10-11.png" width="260" alt="Expanded phone editing panel with a keyboard-accessible drag handle"> |
+Photographs can be cropped, adjusted, redacted, resized, compressed, compared, and reordered locally before upload. Attribution, approval, private drafts, upload recovery, and arrival guides stay connected to campus work. Private walking surveys collect path and entrance evidence for review.
 
-These local fixture views demonstrate the map preview and saved panel sizing. [Capture record](docs/assets/screenshots/source-map-preview-2026-10-11.json).
+| Building authoring                                                                                                              | Photo editing                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| ![Building model with structure controls and photographic reference](docs/assets/screenshots/tour-model-desktop-2026-10-15.png) | ![Photograph comparison and local compression controls](docs/assets/screenshots/tour-photo-desktop-2026-10-15.png) |
 
+[Editor guide](docs/EDITOR.md) · [Model authoring](docs/MODEL-AUTHORING.md) · [Photo editing](docs/PHOTO-EDITING.md) · [Walking surveys](docs/SURVEY.md).
 
-Resolve map-linked issues, submit immutable content, and obtain approval from someone who did not contribute to it. Publish an approved preview or submit historical content for renewed review.
+### Source review and controlled publication
 
-Accepted sources already form the working baseline. For connection recovery and the accepted-updates → review → preview workflow, see [editor availability](docs/EDITOR-AVAILABILITY.md).
+**Review → Source updates** separates upstream observations, accepted source data, and editor corrections. Filter proposals, compare previous/proposed shapes, preview all matching changes on the map, and apply a frozen selection through bounded background work. Evidence checks block unverified removals. Eligible decisions have a previewed private undo that retains later editor corrections.
 
-| Independent review | Publication |
-| --- | --- |
-| ![Quality checks and immutable review submissions](docs/assets/screenshots/b2-gis-review-2026-10-11.png) | ![Approved snapshots, releases and map export controls](docs/assets/screenshots/b2-gis-publish-2026-10-11.png) |
+Accepting a source update changes the private working map. Publication requires a validated immutable snapshot and independent approval, or an explicitly audited original-owner override. Application code deployment preserves published campus packages. Restoring one campus does not restore the whole website or replace other campuses.
 
-[More layouts and workflows](docs/SCREENSHOTS.md) · [Capture provenance](docs/assets/screenshots/README.md)
+| Independent review                                                                                                   | Approved publication                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ![Review workspace with validation and immutable submission](docs/assets/screenshots/tour-gis-review-2026-10-15.png) | ![Publication workspace with approved snapshot and map export](docs/assets/screenshots/tour-gis-publish-2026-10-15.png) |
 
-Screenshots illustrate the local application with published campus assets and isolated demonstration accounts/API responses. Phone views are browser simulations. Demonstration counts and edits are not production inventories or performance measurements; published deployment status is recorded separately in [Production](docs/PRODUCTION.md).
+The source reliability changes in migrations **045–048** require a staged rollout and per-source enablement. Their checked-in validation record is local evidence, not a production deployment receipt. [Source updates](docs/SOURCE-UPDATES.md) · [Deployment](docs/DEPLOYMENT.md) · [Production status](docs/PRODUCTION.md).
 
-## What you can do
-
-- **Manage spatial data:** import common GIS formats, configure typed attributes, filter and page datasets, retain source provenance, and export GeoJSON, CSV, or GeoPackage.
-- **Edit and analyze:** author geometry with undo and recovery; run buffers, overlays, joins, measurements, and other bounded spatial operations.
-- **Coordinate a team:** use campus-scoped roles, assignments, evidence, validation, independent approval, and an audit trail.
-- **Publish useful maps:** style layers, preview approved releases, export A4/A3 maps, and distribute separately verified campus packages.
-- **Navigate on site:** find places, plan walking/driving journeys, use foreground GPS and spoken guidance, and reopen downloaded campuses offline.
-
-Server queries, team synchronization, analysis, and publication need a connection. Prepared personal editing and image recovery have separate offline support. There is no cross-campus routing, indoor navigation, or verified step-free guarantee. See [supported workflows and limits](docs/GIS-PLATFORM.md).
+Images above are dated captures of the local application with public campus assets and isolated demonstration accounts/API responses. Phone images are browser simulations. Example counts and approvals are not production inventories. [Full gallery, provenance, and reproduction](docs/SCREENSHOTS.md).
 
 ## Run locally
 
-Prerequisite: **Node 22.23.3**, pinned in `.node-version` and `.nvmrc`.
+Use **Node 22.23.3**, pinned in [.node-version](.node-version) and [.nvmrc](.nvmrc).
 
 ```sh
 cd web
@@ -92,50 +92,64 @@ npm ci
 npm run dev
 ```
 
-The public map runs without credentials. Vite does not emulate the private Vercel APIs. Team authentication, imports, database queries, analysis, and publication require the [deployment configuration](docs/DEPLOYMENT.md). Keep service credentials out of `VITE_*` variables and Git.
+Open the address printed by Vite. The public seed map works without credentials. The local seed is a development fixture; it need not match the current public catalogue.
 
-Typical checks, from `web/`:
+Vite alone does not serve the private Vercel APIs. For connected editing, follow [deployment and authentication setup](docs/DEPLOYMENT.md) and [environment configuration](docs/CONFIGURATION.md). Copy [web/.env.example](web/.env.example) only when configuring those services. Never put service credentials in `VITE_*` variables.
+
+For a production build and local static preview:
+
+```sh
+npm run build
+npm run preview
+```
+
+Python **3.12** and the pinned Linux GIS containers are needed for importer/native processing work, not for starting the public web app. See [Contributing](CONTRIBUTING.md) for the complete development and verification workflow.
+
+## Architecture and repository
+
+React and TypeScript provide the PWA and editor. MapLibre renders the public map, globe, and shared editing map; Three.js supports model authoring. IndexedDB and the service worker handle local recovery and verified offline packages. Supabase/PostGIS holds private campus work, roles, review records, and processing state. Vercel serves the web app/API; GitHub Actions and isolated workers process imports, analysis, and releases.
+
+```text
+Public sources → private imports and observations → team edits and review
+                                                       ↓
+                                               approved snapshot
+                                                       ↓
+Visitors ← verified offline packages ← published campus release
+```
+
+| Path                            | Responsibility                                                                   |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| [web/](web/README.md)           | App, API, browser tooling, unit/database/browser tests and public runtime assets |
+| [scripts/](scripts/README.md)   | Importers, isolated workers, packaging, release and data verification            |
+| [supabase/](supabase/README.md) | Ordered additive database migrations                                             |
+| [data/](data/README.md)         | Attributed source records, seed data, licences and research evidence             |
+| [docs/](docs/README.md)         | User guides, architecture, operations, screenshots and dated evidence            |
+| `.github/workflows/`            | CI, scheduled source checks, processing and reviewed release gates               |
+
+[Architecture](docs/ARCHITECTURE.md) · [Repository conventions](docs/REPOSITORY.md) · [Configuration](docs/CONFIGURATION.md).
+
+## Quality and release readiness
+
+Run from `web/`:
 
 ```sh
 npm test -- --maxWorkers=2
 npm run lint
+npm run check:docs
+npm run check:dependencies
+npm run build
 npm run check:configured-build
 npm run test:browser
+npm run test:survey-webkit
+npm run test:survey-pwa
 ```
 
-See [Contributing](CONTRIBUTING.md) for focused browser checks, offline verification, native GIS requirements, and documentation maintenance.
+Install Playwright browsers first with `npx playwright install chromium webkit`. CI also checks native PostGIS, importer isolation, backup restoration, photo workflows, offline behavior, and map/globe/voice/JavaScript budgets. The configured-build command uses test authentication placeholders; its output must not be deployed.
 
-## Find your guide
+Physical Android/iPhone checks, campus field verification, live role acceptance, and a public rollback rehearsal remain explicit release gates. [Acceptance checklist](docs/ACCEPTANCE.md) · [Readiness and deployment evidence](docs/PRODUCTION.md) · [Performance bounds](docs/PERFORMANCE.md).
 
-| I want to… | Start here |
-| --- | --- |
-| Understand the complete team workflow | [Campus GIS platform](docs/GIS-PLATFORM.md) |
-| Learn the editor, panes, and shortcuts | [Editor guide](docs/EDITOR.md) |
-| Import campus data | [Campuses and imports](docs/CAMPUS-IMPORTS.md) |
-| Check sources and review many updates | [Source updates and bulk review](docs/SOURCE-UPDATES.md) |
-| Build and review a model | [Unified model editor](docs/UNIFIED-MODEL-EDITOR.md) |
-| Edit and compress photographs | [Photo editing](docs/PHOTO-EDITING.md) |
-| Understand the code and data flow | [Architecture](docs/ARCHITECTURE.md) |
-| Configure and operate a deployment | [Deployment](docs/DEPLOYMENT.md) and [Configuration](docs/CONFIGURATION.md) |
-| Check measured limits and verification | [Performance](docs/PERFORMANCE.md), [Acceptance](docs/ACCEPTANCE.md), [Production](docs/PRODUCTION.md) |
+## Contributing, security, and rights
 
-## Architecture at a glance
+Read [Contributing](CONTRIBUTING.md) before changing data or workflows, and [Security](SECURITY.md) for reporting a vulnerability. Preserve campus isolation, source provenance, private attributes, recovery, and independent publication review.
 
-React and TypeScript power the PWA; MapLibre provides the shared campus map and Three.js supports building authoring. Supabase/PostGIS stores scoped team data and review records. Vercel serves the app/API, while isolated workers and GitHub Actions handle processing and release gates.
-
-Public packages and private drafts are distinct. Application deployments preserve published campus content; data becomes public through the reviewed publication workflow. Arbitrary dataset attributes remain private until explicitly selected for publication.
-
-| Directory | Purpose |
-| --- | --- |
-| `web/src` | Public app and editor workspaces |
-| `web/api`, `web/server` | Authentication, data, processing, review, publication |
-| `web/tests` | Unit, database, browser, and offline checks |
-| `scripts` | Import, processing, packaging, and verification tooling |
-| `supabase/migrations` | Additive database migrations |
-| `data`, `docs` | Attributed sources, guides, and dated evidence |
-
-## Contributing and attribution
-
-Start with [Contributing](CONTRIBUTING.md). Changes should preserve campus identities, provenance, private attributes, recovery, independent review, and existing resource budgets.
-
-Software licensing terms have not been declared in a root licence file. Data, photographs, codecs, and other assets have their own terms: consult [data attribution](data/ATTRIBUTION.md), [photo records](data/photos/README.md), and in-app credits. OpenStreetMap-derived data retains ODbL attribution; authorization to publish a source does not automatically grant broader reuse rights. [Brand assets and usage](docs/BRAND.md).
+No root software licence has been declared. Do not assume the code is licensed for reuse. Data, photographs, codecs, fonts, and other assets retain their own terms: consult [data attribution](data/ATTRIBUTION.md), [photograph records](data/photos/README.md), and in-app credits. Source redistribution permission does not grant broader reuse rights. [Brand assets](docs/BRAND.md).

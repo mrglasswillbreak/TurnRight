@@ -8,7 +8,7 @@ For a one-off check while a source's schedule is paused, run **Check opted-in ca
 
 Use **Campus menu → Campuses**, or **Data → Imports**. Campus management is separate from the five primary workspaces. It opens a focused directory and import form, with a persistent heading and responsive scrolling. Close it to return to the map.
 
-![Isolated campus import fixture with inspected fields](assets/screenshots/b2-imports-2026-10-11.png)
+![Isolated campus import fixture with inspected fields](assets/screenshots/tour-imports-2026-10-15.png)
 
 ## Import into the team GIS workflow
 
@@ -22,7 +22,7 @@ The [campus layer workflow](CAMPUS-LAYERS.md) connects accepted imports to stabl
 
 TurnRight keeps separate campus maps with campus-scoped team memberships. LASU is the first-visit default. A plain public home visit reopens the last successfully loaded campus on that browser; explicit campus links and legacy destination/editor links retain their original meaning. Imported geography stays private until the team submits an immutable snapshot, obtains independent approval and publishes a campus release.
 
-**Required schema:** migrations 001–041. Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
+**Required schema:** migrations 001–053, including the staged source-reliability rollout described in [Deployment](DEPLOYMENT.md#source-reliability-upgrade-045048). Campus imports and layer editing use the campus-scoped APIs; migration 021 bounds large reviewed release snapshots without changing ordinary request limits, 022 preserves conflict detection for rapid successive saves, and 023–037 add team permissions, datasets, processing and independent review. Migration 038 compares import source snapshots row by row and rejects overlapping campus review calls. Code deployments preserve published campus packages; publishing an
 explicitly reviewed release remains a separate operation.
 [Production evidence](PRODUCTION.md) records the deployment and checks.
 

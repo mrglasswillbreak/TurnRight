@@ -9,6 +9,38 @@ import {
 } from './gis-database-fixture';
 import type { PGlite } from '@electric-sql/pglite';
 let db: PGlite;
+async function expectIdenticalWorkspaceHashes() {
+  const result = (
+    await db.query<{ original: string; serialized: string }>(
+      'select gis_content_hash(gis_workspace_snapshot()) original, gis_workspace_content_hash() serialized',
+    )
+  ).rows[0];
+  expect(result.serialized).toBe(result.original);
+}
+it('preserves canonical review hashes for nested values, Unicode and ancillary records', async () => {
+  await db.exec('begin');
+  try {
+    await db.query("insert into gis_views values('lasu',$1,$2,$3,1)", [
+      randomUUID(),
+      'Lagos – 研究',
+      JSON.stringify({
+        nested: { z: null, a: [true, 12.5, 'line\n"quoted"'] },
+      }),
+    ]);
+    await db.query(
+      "insert into gis_issues(campus_id,id,severity,code,message,comments,evidence) values('lasu',$1,'warning','hash-test',$2,$3,$4)",
+      [
+        randomUUID(),
+        'Café / 校園',
+        JSON.stringify([{ text: 'line\nnext', number: 1.25 }]),
+        JSON.stringify([{ label: 'Map', url: 'https://example.org/?a=1&b=2' }]),
+      ],
+    );
+    await expectIdenticalWorkspaceHashes();
+  } finally {
+    await db.exec('rollback');
+  }
+});
 beforeAll(async () => {
   db = await gisDatabase();
 }, 120000);
@@ -16,6 +48,7 @@ afterAll(async () => {
   await db?.close();
 });
 it('migrates with real PostGIS and backfills the existing owner', async () => {
+  await expectIdenticalWorkspaceHashes();
   expect(
     (await db.query<{ v: string }>('select extensions.postgis_version() v'))
       .rows[0].v,
@@ -113,12 +146,26 @@ it('indexes sources, validates atomic private attributes and rejects stale curso
   ).rejects.toThrow(/permission/);
 });
 it('requires independent approval, invalidates stale submissions and audits owner overrides', async () => {
+  await expectIdenticalWorkspaceHashes();
   const id = randomUUID();
   await db.query('select gis_submit_review($1,$2,$3)', [
     editor,
     id,
     'Review campus attributes',
   ]);
+  const inspect = async () =>
+    (
+      await db.query<{
+        details: {
+          id: string;
+          current: boolean;
+          sourceCount: number;
+          snapshot?: unknown;
+        };
+      }>('select gis_review_details($1,$2) details', [reviewer, id])
+    ).rows[0].details;
+  expect(await inspect()).toMatchObject({ id, current: true, sourceCount: 4 });
+  expect(await inspect()).not.toHaveProperty('snapshot');
   await expect(
     db.query('select gis_decide_review($1,$2,true,$3,false)', [
       editor,
@@ -154,6 +201,8 @@ it('requires independent approval, invalidates stale submissions and audits owne
   await db.query(
     "update gis_datasets set revision=revision+1 where id='gis-test'",
   );
+  expect((await inspect()).current).toBe(false);
+  await expectIdenticalWorkspaceHashes();
   await expect(
     db.query('select gis_assert_release_approval($1)', [release]),
   ).rejects.toThrow(/stale/);
@@ -336,6 +385,51 @@ it('queries 100,000 indexed features with bounded pages and an indexed spatial e
     "delete from gis_feature_index where dataset_id='scale-test';delete from gis_datasets where id='scale-test'",
   );
 }, 120000);
+
+it('retains inferred types when imported field metadata has no declaration', async () => {
+  await db.query(
+    "update source_features set gis_metadata=$1,private_attributes=private_attributes||$2::jsonb where id='gis-source:0'",
+    [
+      JSON.stringify({
+        fields: [
+          { name: 'OBJECTID' },
+          { name: 'enabled' },
+          { name: 'oid', type: 'esriFieldTypeOID' },
+          { name: 'large_id', type: 'int64' },
+          { name: 'inspected', type: 'Date' },
+          { name: 'asset_code', type: 'String' },
+        ],
+      }),
+      JSON.stringify({
+        OBJECTID: 47,
+        enabled: true,
+        oid: null,
+        large_id: null,
+        inspected: null,
+      }),
+    ],
+  );
+  const fields = (
+    await db.query<{
+      fields: { name: string; type: string; public: boolean }[];
+    }>("select schema->'fields' fields from gis_datasets where id='gis-test'")
+  ).rows[0].fields;
+  for (const [name, type] of Object.entries({
+    OBJECTID: 'number',
+    enabled: 'boolean',
+    oid: 'number',
+    large_id: 'number',
+    inspected: 'date',
+    asset_code: 'text',
+  }))
+    expect(fields.find((field) => field.name === name)).toMatchObject({
+      type,
+      public: false,
+    });
+  await db.exec(
+    "select gis_validate_values(d.schema,i.properties) from gis_feature_index i join gis_datasets d on d.campus_id=i.campus_id and d.id=i.dataset_id where i.feature_key='land:gis-test-0'",
+  );
+});
 
 it('freezes corrected historical geometry and retains source metadata on reindex', async () => {
   await db.query(
