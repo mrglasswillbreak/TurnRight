@@ -8070,13 +8070,13 @@ test("redesign documentation gallery: public, editor and model layouts", async (
   );
   const manifest = JSON.parse(
     readFileSync(
-      new URL("../../work/model-benchmark/public/packages/latest.json", import.meta.url),
+      new URL("../../work/docs-fixture/public/packages/latest.json", import.meta.url),
       "utf8",
     ),
   ) as CampusPackage;
   const data = JSON.parse(
     readFileSync(
-      new URL(`../../work/model-benchmark/public${manifest.dataUrl}`, import.meta.url),
+      new URL(`../../work/docs-fixture/public${manifest.dataUrl}`, import.meta.url),
       "utf8",
     ),
   ) as CampusData;
@@ -8084,7 +8084,7 @@ test("redesign documentation gallery: public, editor and model layouts", async (
     await page.context().route(`**${asset.url}`, (route) =>
       route.fulfill({
         body: readFileSync(
-          new URL(`../../work/model-benchmark/public${asset.url}`, import.meta.url),
+          new URL(`../../work/docs-fixture/public${asset.url}`, import.meta.url),
         ),
         contentType: asset.url.endsWith(".webp")
           ? "image/webp"
@@ -8098,12 +8098,7 @@ test("redesign documentation gallery: public, editor and model layouts", async (
     await expect.poll(() => page.evaluate(() => window.editorTestMap.isMoving())).toBe(false);
     await page.waitForTimeout(700);
     await page.screenshot({
-      path: fileURLToPath(
-        new URL(
-          `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX || "redesign"}-${name}-${process.env.TURNRIGHT_SCREENSHOT_DATE || "2026-10-07"}.png`,
-          import.meta.url,
-        ),
-      ),
+      path: (await import("./documentation-capture")).documentationCapturePath(name),
     });
   };
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -8206,12 +8201,7 @@ test("redesign documentation gallery: public, editor and model layouts", async (
       await expect(entry.getByRole('button', { name: /GitHub/ })).toBeVisible();
       await entry.evaluate(() => document.fonts.ready);
       await entry.screenshot({
-        path: fileURLToPath(
-          new URL(
-            `../../../docs/assets/screenshots/${process.env.TURNRIGHT_SCREENSHOT_PREFIX}-signin-${process.env.TURNRIGHT_SCREENSHOT_DATE || '2026-10-07'}.png`,
-            import.meta.url,
-          ),
-        ),
+        path: (await import("./documentation-capture")).documentationCapturePath("signin"),
       });
     } finally {
       await signedOut.close();
