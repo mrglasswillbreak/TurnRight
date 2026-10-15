@@ -7,12 +7,14 @@ import { db } from './cloud.mjs';
 const owners = await db('admin_users?select=id&limit=2');
 if (owners.length !== 1) throw Error('Expected one original owner for the permission-checked audit.');
 const actor = owners[0].id;
+const identities = await db('campuses?select=id,slug&slug=in.(lasu,unilag)');
+if (identities.length !== 2) throw Error('Both requested campus identities are required.');
 const result = { recordedAt: new Date().toISOString(), revision: process.env.GITHUB_SHA, readOnly: true, campuses: [] };
-for (const campus of ['lasu', 'unilag']) {
+for (const {id: campus, slug} of identities) {
   process.env.CAMPUS_ID = campus;
   const datasets = await db('rpc/gis_dataset_catalogue', 'POST', { actor });
   const quality = await db('rpc/gis_quality', 'POST', { actor });
-  const record = { campus, quality: quality.map(({feature_key, severity, code, message})=>({feature_key,severity,code,message})), datasets: [] };
+  const record = { campus, slug, quality: quality.map(({feature_key, severity, code, message})=>({feature_key,severity,code,message})), datasets: [] };
   for (const dataset of datasets) {
     const counts = Object.fromEntries(dataset.schema.fields.map(field=>[field.name,{}]));
     const digest = createHash('sha256');
