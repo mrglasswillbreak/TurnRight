@@ -16,7 +16,7 @@ The [whole-application audit](AUDIT-2026-10-03.md) uses the current LASU and UNI
 
 The final configured build, including the map-credit layout correction, measures 434,489 public, 188,613 additional owner and 10,497 lazy photo gzip bytes against unchanged 435,200 / 189,440 / 12,288 budgets. Bundle size passing is not a claim about frame rate. The audit distinguishes processing microbenchmarks from whole-map startup and records remaining device and rendering gaps.
 
-Current [model-workspace measurements](MODEL-EDITOR-VERIFICATION.md#current-audit--3-october-2026) preserve twenty trials, no generation while typing and consistent per-trial worker/GPU retention. At 4× CPU, published input/click p95 is 84.4/199.9 ms; the synthetic 100-detail wall reaches 244.7/228.2 ms and remains over the 200 ms target. This is a separate current measurement, not an improvement claim against older fixtures.
+The [3 October model-workspace measurements](MODEL-EDITOR-VERIFICATION.md#measured-audit--3-october-2026) preserve twenty trials, no generation while typing and consistent per-trial worker/GPU retention. At 4× CPU, published input/click p95 is 84.4/199.9 ms; the synthetic 100-detail wall reaches 244.7/228.2 ms and remains over the 200 ms target. These dated measurements do not establish performance for later campus packages or an improvement against older fixtures.
 
 ## 3 October campus discovery
 

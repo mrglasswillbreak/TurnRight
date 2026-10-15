@@ -1,7 +1,8 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { resolve, dirname, relative, sep } from 'node:path';
+import { resolve, dirname, relative, sep, extname } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import sharp from 'sharp';
 
 const root = resolve(import.meta.dirname, '../..');
 const files = [
@@ -101,11 +102,11 @@ for (const file of files) {
     }
   }
 }
-// Current tour manifests are immutable evidence; accidental image replacement fails CI.
+// Capture manifests are immutable evidence; accidental image replacement fails CI.
 const directory = resolve(root, 'docs/assets/screenshots');
 let captures = 0;
 for (const filename of readdirSync(directory).filter((name) =>
-  /^tour-\d{4}-\d{2}-\d{2}\.json$/.test(name),
+  /^(?:tour|live-publication)-\d{4}-\d{2}-\d{2}\.json$/.test(name),
 )) {
   const manifest = JSON.parse(
     readFileSync(resolve(directory, filename), 'utf8'),
@@ -119,12 +120,21 @@ for (const filename of readdirSync(directory).filter((name) =>
     const bytes = readFileSync(target);
     if (createHash('sha256').update(bytes).digest('hex') !== entry.sha256)
       errors.push(filename + ': changed capture ' + entry.file);
-    if (
-      bytes.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
-      bytes.readUInt32BE(16) !== entry.width ||
-      bytes.readUInt32BE(20) !== entry.height
-    )
-      errors.push(filename + ': dimensions/format mismatch ' + entry.file);
+    try {
+      const metadata = await sharp(bytes).metadata();
+      const format = { '.png': 'png', '.jpg': 'jpeg', '.jpeg': 'jpeg' }[
+        extname(target).toLowerCase()
+      ];
+      if (
+        !format ||
+        metadata.format !== format ||
+        metadata.width !== entry.width ||
+        metadata.height !== entry.height
+      )
+        errors.push(filename + ': dimensions/format mismatch ' + entry.file);
+    } catch {
+      errors.push(filename + ': unreadable capture ' + entry.file);
+    }
     captures++;
   }
 }
@@ -133,5 +143,5 @@ if (errors.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Validated ${checked} local links/assets across all ${files.length} Markdown files and ${captures} recorded tour captures.`,
+    `Validated ${checked} local links/assets across all ${files.length} Markdown files and ${captures} recorded captures.`,
   );
