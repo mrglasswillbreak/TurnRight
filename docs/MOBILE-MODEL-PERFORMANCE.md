@@ -38,7 +38,7 @@ npx vite build --config vite.performance.config.ts
 node scripts/benchmark-mobile-model.mjs
 ```
 
-Run this study without other browser suites, builds or CPU-heavy tests. `--smoke` checks one published-data trial per version and writes only `work/mobile-model-smoke.json`. `--final` retains a matching recorded baseline and repeats the final groups. `--prepare` only retrieves and verifies the public package for documentation captures. The full run writes [raw measurements](mobile-model-performance.json).
+Run this study without other browser suites, builds or CPU-heavy tests. `--smoke` checks one published-data trial per version and writes only `work/mobile-model-smoke.json`. `--final` retains a matching recorded baseline and repeats the final groups. `--prepare` only retrieves and verifies the public package for documentation captures. The full run writes [raw measurements](assets/measurements/mobile-model-performance.json).
 
 ## Coverage limits
 

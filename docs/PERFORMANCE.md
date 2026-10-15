@@ -56,11 +56,11 @@ The sequential five-run image-storage comparison measured recipe-write p95 at
 21.7 ms before and 1.4 ms after. The current production photo harness measured
 caption/selection/tab p95 at 15.9/15.3/18.2 ms on desktop and 38.6/42.3/66.1 ms
 with a mobile viewport and 4× CPU throttling. All three interactions meet the
-existing 100/200 ms lab targets. [Storage samples](image-storage-performance-2026-09-27.json)
-and [photo interaction samples](photo-performance-audit-2026-09-27.json) preserve
+existing 100/200 ms lab targets. [Storage samples](assets/measurements/image-storage-performance-2026-09-27.json)
+and [photo interaction samples](assets/measurements/photo-performance-audit-2026-09-27.json) preserve
 each trial. These are controlled lab timings, not field INP.
 
-The [20-run model audit](model-editor-audit-2026-09-27.json) recorded no model
+The [20-run model audit](assets/measurements/model-editor-audit-2026-09-27.json) recorded no model
 generation during typing, no extra preview workers after closing, and consistent
 retained GPU counts within each fixture.
 At 4× CPU throttling, published-fixture input/click p95 was 104.3/197.5 ms;
@@ -170,7 +170,7 @@ That is not a measurement of the public map's startup time. The public startup
 contract is tested separately by delaying asset verification until after the
 verified campus data is returned. Rendered queue cards stay at 20; only visible
 images are decoded. Removed local previews release their object URLs and files.
-The [measurement record](performance-measurements.json) retains the five-run
+The [measurement record](assets/measurements/performance-measurements.json) retains the five-run
 baseline and final samples, requests, long tasks and core measurements.
 
 The final five-run core benchmark measured 420 label lookups at 0.10–0.47 ms
