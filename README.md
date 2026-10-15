@@ -21,7 +21,7 @@ Start with the campus map or open **Choose a campus** to explore the globe. Sele
 
 | Campus map                                                                                                                | World view                                                                                                          |
 | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| ![Public campus map with selected building and place details](docs/assets/screenshots/tour-public-desktop-2026-10-15.png) | ![Dark globe view showing geographic context around West Africa](docs/assets/screenshots/tour-globe-2026-10-15.png) |
+| ![Public campus map with selected building and place details](docs/assets/screenshots/live-lasu-published-2026-10-15.jpg) | ![Dark globe view showing geographic context around West Africa](docs/assets/screenshots/tour-globe-2026-10-15.png) |
 
 - Search destinations and streets, browse categories, save places, and share destination links.
 - Switch between 2D and 3D, use light/dark/device appearance, and adjust map rendering and motion settings.
@@ -34,9 +34,9 @@ Preview walking or driving routes from a selected origin. Foreground GPS, route 
 
 Download each campus from **Offline** and wait for **Ready offline** before disconnecting. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
-| Place details on a phone                                                                                                                           | Offline preparation                                                                                                                 |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/assets/screenshots/tour-public-mobile-2026-10-15.png" width="280" alt="Place details and map controls in a phone browser viewport"> | <img src="docs/assets/screenshots/tour-offline-2026-10-15.png" width="280" alt="Campus download and offline verification controls"> |
+| Place details on a phone                                                                                                                              | Offline preparation                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/assets/screenshots/live-unilag-published-2026-10-15.jpg" width="280" alt="Place details and map controls in a phone browser viewport"> | <img src="docs/assets/screenshots/tour-offline-2026-10-15.png" width="280" alt="Campus download and offline verification controls"> |
 
 Navigation runs in the foreground. There is no cross-campus route planner, indoor room navigation, or verified step-free guarantee. An offline campus directory can list campuses that have not been downloaded. [Public map guide](docs/PUBLIC-MAP.md) · [Globe and switching](docs/CAMPUS-GLOBE.md) · [Driving](docs/DRIVING.md) · [Voice](docs/VOICE.md).
 
@@ -80,7 +80,7 @@ Accepting a source update changes the private working map. Publication requires 
 
 The source reliability changes in migrations **045–048** require a staged rollout and per-source enablement. Their checked-in validation record is local evidence, not a production deployment receipt. [Source updates](docs/SOURCE-UPDATES.md) · [Deployment](docs/DEPLOYMENT.md) · [Production status](docs/PRODUCTION.md).
 
-Images above are dated captures of the local application with public campus assets and isolated demonstration accounts/API responses. Phone images are browser simulations. Example counts and approvals are not production inventories. [Full gallery, provenance, and reproduction](docs/SCREENSHOTS.md).
+The LASU desktop and UNILAG phone images show the public packages published on 15 October. The remaining images are dated captures of the local application with public campus assets and isolated demonstration accounts/API responses. Phone images are browser simulations. Example editor counts and approvals are not production inventories. [Full gallery, provenance, and reproduction](docs/SCREENSHOTS.md).
 
 ## Run locally
 

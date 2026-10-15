@@ -2,34 +2,38 @@
 
 The main product tour was refreshed on **15 October 2026** from the current local application, including the public map/globe, editor, all GIS workspaces, building models, photographs and offline controls. Dated source-update and recovery captures remain below. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/tour-2026-10-15.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
+## Published campus maps · 15 October 2026
+
+The [LASU desktop](assets/screenshots/live-lasu-published-2026-10-15.jpg) and [UNILAG phone viewport](assets/screenshots/live-unilag-published-2026-10-15.jpg) were captured directly from production after their approved map releases. [Capture hashes, dimensions and package identities](assets/screenshots/live-publication-2026-10-15.json) · [Publication and full asset checks](assets/campus-publication-2026-10-15.json). These captures replace the two public map images in the README; the complete local editor tour below retains its original fixture provenance.
+
 ## Current visual tour · 15 October 2026
 
-| View | What it demonstrates | Capture |
-| --- | --- | --- |
-| Public desktop | Place search, building details and public navigation | [1440 × 1000, light](assets/screenshots/tour-public-desktop-2026-10-15.png) |
-| Public mobile | A selected place in a phone viewport | [390 × 844, light](assets/screenshots/tour-public-mobile-2026-10-15.png) |
-| Edit | Feature explorer, map and contextual properties | [1440 × 1000, light](assets/screenshots/tour-editor-desktop-2026-10-15.png) |
-| Data | Datasets, map, attributes and schema/export controls | [1440 × 1000, light](assets/screenshots/tour-gis-data-2026-10-15.png) |
-| Model reference split | Structure, model, photograph and inspector | [1440 × 1000, light](assets/screenshots/tour-model-desktop-2026-10-15.png) |
-| Photo comparison | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/tour-photo-desktop-2026-10-15.png) |
-| Review | Quality checks and independent immutable submissions | [1440 × 1000, light](assets/screenshots/tour-gis-review-2026-10-15.png) |
-| Publish | Approved content, releases and map exports | [1440 × 1000, light](assets/screenshots/tour-gis-publish-2026-10-15.png) |
-| Globe | Campus context at world scale | [1440 × 900, dark](assets/screenshots/tour-globe-2026-10-15.png) |
-| Mobile editor | Workspace chooser and one active sheet | [390 × 844, light](assets/screenshots/tour-editor-mobile-2026-10-15.png) |
-| Analyze | Tools, parameters and processing history | [1440 × 1000, light](assets/screenshots/tour-gis-analyze-2026-10-15.png) |
-| Imports | Inspected fields in an isolated campus import | [1440 × 900, light](assets/screenshots/tour-imports-2026-10-15.png) |
-| Model portrait | Selected wall in the full-screen model workspace | [390 × 844, light](assets/screenshots/tour-model-portrait-2026-10-15.png) |
-| Model landscape | Selected wall in a short landscape viewport | [844 × 390, light](assets/screenshots/tour-model-landscape-2026-10-15.png) |
-| Mobile photos | Full-screen photograph comparison | [390 × 844, light](assets/screenshots/tour-photo-mobile-2026-10-15.png) |
-| Offline use | Package preparation and download controls | [390 × 844, light](assets/screenshots/tour-offline-2026-10-15.png) |
+| View                  | What it demonstrates                                    | Capture                                                                     |
+| --------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Public desktop        | Place search, building details and public navigation    | [1440 × 1000, light](assets/screenshots/tour-public-desktop-2026-10-15.png) |
+| Public mobile         | A selected place in a phone viewport                    | [390 × 844, light](assets/screenshots/tour-public-mobile-2026-10-15.png)    |
+| Edit                  | Feature explorer, map and contextual properties         | [1440 × 1000, light](assets/screenshots/tour-editor-desktop-2026-10-15.png) |
+| Data                  | Datasets, map, attributes and schema/export controls    | [1440 × 1000, light](assets/screenshots/tour-gis-data-2026-10-15.png)       |
+| Model reference split | Structure, model, photograph and inspector              | [1440 × 1000, light](assets/screenshots/tour-model-desktop-2026-10-15.png)  |
+| Photo comparison      | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/tour-photo-desktop-2026-10-15.png)   |
+| Review                | Quality checks and independent immutable submissions    | [1440 × 1000, light](assets/screenshots/tour-gis-review-2026-10-15.png)     |
+| Publish               | Approved content, releases and map exports              | [1440 × 1000, light](assets/screenshots/tour-gis-publish-2026-10-15.png)    |
+| Globe                 | Campus context at world scale                           | [1440 × 900, dark](assets/screenshots/tour-globe-2026-10-15.png)            |
+| Mobile editor         | Workspace chooser and one active sheet                  | [390 × 844, light](assets/screenshots/tour-editor-mobile-2026-10-15.png)    |
+| Analyze               | Tools, parameters and processing history                | [1440 × 1000, light](assets/screenshots/tour-gis-analyze-2026-10-15.png)    |
+| Imports               | Inspected fields in an isolated campus import           | [1440 × 900, light](assets/screenshots/tour-imports-2026-10-15.png)         |
+| Model portrait        | Selected wall in the full-screen model workspace        | [390 × 844, light](assets/screenshots/tour-model-portrait-2026-10-15.png)   |
+| Model landscape       | Selected wall in a short landscape viewport             | [844 × 390, light](assets/screenshots/tour-model-landscape-2026-10-15.png)  |
+| Mobile photos         | Full-screen photograph comparison                       | [390 × 844, light](assets/screenshots/tour-photo-mobile-2026-10-15.png)     |
+| Offline use           | Package preparation and download controls               | [390 × 844, light](assets/screenshots/tour-offline-2026-10-15.png)          |
 
 The [editor guide](EDITOR.md#legend-and-activity) also illustrates [collapsed legend](assets/screenshots/tour-legend-collapsed-2026-10-15.png) and [expanded Activity](assets/screenshots/tour-activity-expanded-2026-10-15.png) states. The normal editor view shows the collapsed Activity icon.
 
 ## Provenance
 
-The 15 October public, editor, model and GIS captures render the published **LASU lasu-4895a363b403** package and its attributed assets in the actual local application. Owner/team authentication and private API responses are isolated test fixtures. The GIS 100,000-row label demonstrates paged controls; it is not a campus inventory or performance measurement. Example submissions and approvals never modify production data.
+The eighteen local tour captures from 15 October render the published **LASU lasu-4895a363b403** package and its attributed assets in the actual local application. Owner/team authentication and private API responses are isolated test fixtures. The GIS 100,000-row label demonstrates paged controls; it is not a campus inventory or performance measurement. Example submissions and approvals never modify production data.
 
-Imports use `campus-imports.spec.ts`'s small synthetic campus, source and inspected-layer responses. Photos use the actual PhotoOptimizer component in `photo-harness.html` with the repository's *School of Communication exterior*: **Abiolakintrunde**, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [original photograph](https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg), catalogue ID `commons:112540966`. The application resizes/compresses a private copy for comparison. Source rights and modifications remain in [photo records](../data/photos/README.md).
+Imports use `campus-imports.spec.ts`'s small synthetic campus, source and inspected-layer responses. Photos use the actual PhotoOptimizer component in `photo-harness.html` with the repository's _School of Communication exterior_: **Abiolakintrunde**, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [original photograph](https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg), catalogue ID `commons:112540966`. The application resizes/compresses a private copy for comparison. Source rights and modifications remain in [photo records](../data/photos/README.md).
 
 Phone views are browser viewports, not photographs of physical devices. The offline screenshot demonstrates the interface; prepared-package tests separately verify offline behavior. These local captures do not claim that this working-tree revision is deployed. See [Production](PRODUCTION.md) for deployment evidence.
 
@@ -55,7 +59,7 @@ Remove-Item Env:TURNRIGHT_DOCS_DATE
 
 The public/editor and GIS galleries use configured production builds. Import and photograph fixtures use Vite's development server to expose their test harnesses. Keep each Playwright run's output directory separate; concurrent runs must not share an output directory or a server port.
 
-The current recorder expects all eighteen tour views. It derives the campus version from the prepared manifest and records the actual source digest, browser, Node runtime, image dimensions and SHA-256 hashes. `check:docs` checks every non-ignored Markdown file plus recorded tour image hashes/dimensions. Historical captures must be reproduced from their recorded revision; their commands are not current maintenance instructions.
+The current recorder expects all eighteen tour views. It derives the campus version from the prepared manifest and records the actual source digest, browser, Node runtime, image dimensions and SHA-256 hashes. `check:docs` checks every non-ignored Markdown file plus recorded tour and live-publication image hashes/dimensions. Historical captures must be reproduced from their recorded revision; their commands are not current maintenance instructions.
 
 ## Maintenance checklist
 
@@ -68,8 +72,8 @@ The current recorder expects all eighteen tour views. It derives the campus vers
 
 ## Source reliability and private undo · 13 October 2026
 
-| Desktop recovery | Phone recovery |
-| --- | --- |
+| Desktop recovery                                                                                           | Phone recovery                                                                                                                                |
+| ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![Desktop evidence and private undo preview](assets/screenshots/source-reliability-desktop-2026-10-13.png) | ![Phone undo preview with preserved editor corrections and separate publication](assets/screenshots/source-reliability-mobile-2026-10-13.png) |
 
 These direct WebKit captures use the local working tree and isolated owner/API fixtures: one blocked path, one incomplete check and one reversible decision. Counts and decisions are synthetic. No production data is changed. Phone uses a browser viewport, not a physical iPhone. [Capture provenance and hashes](assets/screenshots/source-reliability-2026-10-13.json).
@@ -78,8 +82,8 @@ Run `npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source u
 
 ## Map previews and adjustable phone panels · 11 October 2026
 
-| All matching source proposals | Phone map preview | Resized editing panel |
-| --- | --- | --- |
+| All matching source proposals                                                                                                    | Phone map preview                                                                                                            | Resized editing panel                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | ![Desktop source map preview frames proposals beside its controls](assets/screenshots/source-map-preview-desktop-2026-10-11.png) | ![Phone preview fits the changes below its legend and controls](assets/screenshots/source-map-preview-mobile-2026-10-11.png) | ![Phone properties panel expanded with its accessible drag handle](assets/screenshots/editor-adjustable-panel-mobile-2026-10-11.png) |
 
 The preview captures show 101 synthetic proposals over the checked-in LASU `lasu-4e4c8008b38b` seed. The panel capture uses the small `browserCampus` fixture and a synthetic Library edit. These are unaltered local Chromium captures, not production decisions. [Source and image digests](assets/screenshots/source-map-preview-2026-10-11.json).
@@ -103,10 +107,10 @@ Inspect the actual captures and successful test results before promoting any ima
 
 ## Source updates · 11 October 2026
 
-| Inbox and comparison | Bulk confirmation |
-| --- | --- |
+| Inbox and comparison                                                                                                       | Bulk confirmation                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | ![Desktop source inbox beside map outlines and editor overrides](assets/screenshots/source-updates-desktop-2026-10-11.png) | ![Desktop confirmation with exact counts and removal acknowledgement](assets/screenshots/source-updates-confirm-desktop-2026-10-11.png) |
-| ![Phone source inbox and selection controls](assets/screenshots/source-updates-mobile-2026-10-11.png) | ![Phone confirmation with geometry and removal warnings](assets/screenshots/source-updates-confirm-mobile-2026-10-11.png) |
+| ![Phone source inbox and selection controls](assets/screenshots/source-updates-mobile-2026-10-11.png)                      | ![Phone confirmation with geometry and removal warnings](assets/screenshots/source-updates-confirm-mobile-2026-10-11.png)               |
 
 These unaltered captures use the Vite development server at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`, the published LASU package, and isolated owner/API fixtures with 101 synthetic proposals. They establish the appearance of the tested interface, not a production decision or deployment.
 
