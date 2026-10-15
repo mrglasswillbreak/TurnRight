@@ -77,6 +77,9 @@ for (const { id: campus, slug } of identities) {
       included: dataset.included,
       rows: seen,
       attributesSha256: digest.digest('hex'),
+      declaredFields: (dataset.provenance?.importMetadata?.fields || []).map(
+        ({ name, type }) => ({ name, type }),
+      ),
       fields: dataset.schema.fields.map((field) => ({
         name: field.name,
         type: field.type,
