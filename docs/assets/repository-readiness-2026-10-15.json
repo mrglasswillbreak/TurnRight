@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-15",
+  "recordedAt": "2026-10-15T04:37:11.844Z",
+  "scope": "Local documentation, repository cleanup and verification; no deployment or campus publication",
+  "baseCommit": "23d6cf114dbcf59f3fdc561ad6bc291e0db38ed3",
+  "workingTree": true,
+  "environment": {
+    "platform": "win32",
+    "node": "v22.23.3",
+    "python": "3.12",
+    "browserRendering": "Playwright Chromium with software WebGL"
+  },
+  "applicationSourceSha256": "8fa75a42d2e5392d5209710b533f07cc5f42017147acdfb53b4b9de00a1651de",
+  "screenshotManifest": "screenshots/tour-2026-10-15.json",
+  "dependencyLockSha256": "30c82536ad6ec832f96461b410a62370e0ec23bcca6adee060772ae06207dd89",
+  "cleanup": {
+    "removedUiComponents": [
+      "web/components/ui/accordion.tsx",
+      "web/components/ui/alert-dialog.tsx",
+      "web/components/ui/alert.tsx",
+      "web/components/ui/aspect-ratio.tsx",
+      "web/components/ui/attachment.tsx",
+      "web/components/ui/avatar.tsx",
+      "web/components/ui/badge.tsx",
+      "web/components/ui/breadcrumb.tsx",
+      "web/components/ui/bubble.tsx",
+      "web/components/ui/button-group.tsx",
+      "web/components/ui/calendar.tsx",
+      "web/components/ui/card.tsx",
+      "web/components/ui/carousel.tsx",
+      "web/components/ui/chart.tsx",
+      "web/components/ui/checkbox.tsx",
+      "web/components/ui/collapsible.tsx",
+      "web/components/ui/combobox.tsx",
+      "web/components/ui/command.tsx",
+      "web/components/ui/context-menu.tsx",
+      "web/components/ui/direction.tsx",
+      "web/components/ui/drawer.tsx",
+      "web/components/ui/empty.tsx",
+      "web/components/ui/field.tsx",
+      "web/components/ui/hover-card.tsx",
+      "web/components/ui/input-group.tsx",
+      "web/components/ui/input-otp.tsx",
+      "web/components/ui/input.tsx",
+      "web/components/ui/item.tsx",
+      "web/components/ui/kbd.tsx",
+      "web/components/ui/label.tsx",
+      "web/components/ui/marker.tsx",
+      "web/components/ui/menubar.tsx",
+      "web/components/ui/message-scroller.tsx",
+      "web/components/ui/message.tsx",
+      "web/components/ui/native-select.tsx",
+      "web/components/ui/navigation-menu.tsx",
+      "web/components/ui/pagination.tsx",
+      "web/components/ui/popover.tsx",
+      "web/components/ui/progress.tsx",
+      "web/components/ui/radio-group.tsx",
+      "web/components/ui/resizable.tsx",
+      "web/components/ui/scroll-area.tsx",
+      "web/components/ui/select.tsx",
+      "web/components/ui/separator.tsx",
+      "web/components/ui/sheet.tsx",
+      "web/components/ui/sidebar.tsx",
+      "web/components/ui/skeleton.tsx",
+      "web/components/ui/slider.tsx",
+      "web/components/ui/spinner.tsx",
+      "web/components/ui/switch.tsx",
+      "web/components/ui/table.tsx",
+      "web/components/ui/tabs.tsx",
+      "web/components/ui/textarea.tsx",
+      "web/components/ui/toast.tsx"
+    ],
+    "removedDirectDependencies": [
+      "@shadcn/react",
+      "cmdk",
+      "date-fns",
+      "embla-carousel-react",
+      "input-otp",
+      "react-day-picker",
+      "recharts"
+    ],
+    "relocatedMeasurementRecords": 9,
+    "localBackupsPreservedAndIgnored": true
+  },
+  "verification": {
+    "cleanInstall": "passed",
+    "dependencyAudit": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "unitAndDatabase": {
+      "passed": 797,
+      "files": 112,
+      "log": "web/work/docs-final-unit.log"
+    },
+    "typesAndLint": {
+      "status": "passed",
+      "existingWarningsBefore": 74,
+      "warningsAfter": 74
+    },
+    "builds": {
+      "standard": "passed",
+      "authenticationConfigured": "passed",
+      "allAssetAndBundleBudgets": "passed",
+      "publicStartupGzipBytes": 434151,
+      "publicStartupBudgetBytes": 435200
+    },
+    "chromiumPublicGlobeGis": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 1,
+      "log": "web/work/docs-final-chromium.log"
+    },
+    "chromiumSourceUpdates": {
+      "initial": {
+        "passed": 6,
+        "failed": 1,
+        "skipped": 0,
+        "log": "web/work/docs-final-source-review.log"
+      },
+      "failedScenarioRerun": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "log": "web/work/docs-final-source-review-rerun.log"
+      },
+      "note": "Desktop map preview initially exceeded the unchanged 10-second assertion for 101 pending. Its isolated rerun passed in 29.0 seconds with no source or test changes."
+    },
+    "chromiumPreparedOffline": {
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "log": "web/work/docs-final-offline.log"
+    },
+    "python": {
+      "total": 92,
+      "passed": 87,
+      "skipped": 5,
+      "nativeDriverCasesRequireLinux": true
+    },
+    "gallery": {
+      "scenarios": 7,
+      "inspectedImages": 18,
+      "desktopPhotoInitialTimeout": true,
+      "desktopPhotoFocusedRerun": "passed with 120s allowance"
+    },
+    "captureGuards": "missing date, existing image and path rejection passed",
+    "measurements": "all nine relocated records retain original content"
+  },
+  "outstanding": [
+    "Final-revision full Linux Chromium/WebKit and native GIS/PostGIS/restore CI",
+    "Source reliability migrations 045–048 staged rollout and per-source enablement",
+    "Physical Android/iPhone and campus field acceptance",
+    "Live multi-role publication and public campus rollback rehearsal",
+    "Software licence decision"
+  ]
+}

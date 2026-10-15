@@ -2,7 +2,7 @@
 
 ## Current view
 
-![Campus globe in a desktop dark theme](assets/screenshots/b2-globe-2026-10-11.png)
+![Campus globe in a desktop dark theme](assets/screenshots/tour-globe-2026-10-15.png)
 
 *Local application capture using published campus assets; phone/desktop screenshots do not establish physical-device performance.*
 

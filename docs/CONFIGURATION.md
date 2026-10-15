@@ -16,7 +16,7 @@ Visitors do not need accounts. Signing in grants no campus access until an admin
 
 ## Database and private storage
 
-The current application requires migrations **001–044**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+The current application requires migrations **001–050**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -40,6 +40,20 @@ The current application requires migrations **001–044**. Consult [Production](
 | 032–034 | Saved views, unified quality checks and bounded geometry sessions |
 | 035–037 | Historical geometry/asset integrity, source metadata and typed review guards |
 | 038 | Import snapshot comparison without a second whole-campus JSON copy, bounded lock waiting and fail-fast overlapping review requests |
+| 039–040 | Bounded import queue and artifact retention with referenced-evidence protection |
+| 041 | Indexed source inbox, frozen selections and durable bulk decisions |
+| 042 | Published-correction summaries and retirement of full-map replacement |
+| 043–044 | Read-only source map preview and routing endpoint lookup |
+| 045–048 | Source evidence, private undo, accepted provenance and retry protection |
+| 049–050 | Qualified decision-history reads and compressed, reusable source evidence with protected recovery |
+
+Migrations 045–048 require [shadow comparisons and per-source enablement](SOURCE-UPDATES.md#staged-reliability-rollout). Their presence in Git is not an installed-schema receipt. The [local reliability record](assets/source-reliability-2026-10-13.json) explicitly reports them as undeployed at its checkpoint.
+
+Migration 042 adds lightweight published-correction summaries and retires full-map baseline replacement. Complete its one-release-per-call backfill before deploying readers; see [editor availability](EDITOR-AVAILABILITY.md#migration-042-rollout).
+
+Migration 043 adds the campus-authorized, read-only source map preview. It decodes at most 50 proposals per request and bounds each preview shape to 80 vertices. It needs no additional storage, scheduled job or backfill. Full geometry remains available through the single-change detail endpoint.
+
+Migration 044 resolves routing-link endpoints through a partial pending-proposal index and the existing campus/source primary key. It uses current/proposed node positions for before/after lines, keeps the same page limits and timeouts, and needs no backfill.
 
 Migration 042 adds lightweight published-correction summaries and retires full-map baseline replacement. Complete its one-release-per-call backfill before deploying readers; see [editor availability](EDITOR-AVAILABILITY.md#migration-042-rollout).
 
@@ -117,3 +131,5 @@ The owner confirmed permission to redistribute LASU ArcGIS data offline and sepa
 Migration 041 adds indexed proposal summaries, revisions, frozen selections, and durable bulk operations. `source-review.yml` dispatches the dependency-free review worker using existing `GITHUB_WORKFLOW_TOKEN`, `GITHUB_REPOSITORY`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` configuration. Browser roles have no direct worker-RPC or receipt-table access.
 
 `source-review-maintenance.yml` runs daily at 05:22 UTC and on manual dispatch. Prepared selections expire after 24 hours; completed/cancelled/failed per-item bookkeeping expires after 30 days. Summaries and decision audits remain. Existing import-file retention and the OSM scheduling permission gates are unchanged. [Source updates setup](SOURCE-UPDATES.md#deployment-and-maintenance).
+
+For the current worker, also apply migrations 045–048 and follow [source reliability deployment](DEPLOYMENT.md#source-reliability-upgrade-045048). New proposal generation stays disabled until each source passes its shadow/evidence checks. No additional browser secret or public bucket is required.

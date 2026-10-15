@@ -1,6 +1,6 @@
 # Application tour and screenshot maintenance
 
-The current gallery shows the B2 campus identity across public navigation, team workspaces and supporting tools, alongside dated source-update and map-preview examples. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/b2-2026-10-11.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
+The main product tour was refreshed on **15 October 2026** from the current local application, including the public map/globe, editor, all GIS workspaces, building models, photographs and offline controls. Dated source-update and recovery captures remain below. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/tour-2026-10-15.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
 ## Source reliability and private undo · 13 October 2026
 
@@ -11,20 +11,6 @@ The current gallery shows the B2 campus identity across public navigation, team 
 These direct WebKit captures use the local working tree and isolated owner/API fixtures: one blocked path, one incomplete check and one reversible decision. Counts and decisions are synthetic. No production data is changed. Phone uses a browser viewport, not a physical iPhone. [Capture provenance and hashes](assets/screenshots/source-reliability-2026-10-13.json).
 
 Run `npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source updates reliability" --output ../test-results/source-reliability-webkit` from `web/`. Run the same filter with `npm run test:browser` for Chromium. The journeys inspect exclusion of unverified removals, check receipts, a fresh verification request and a previewed private reversal. Broader `--grep "source updates"` journeys also cover frozen bulk decisions and read-only map comparisons.
-
-## B2 campus identity · 11 October 2026
-
-Nineteen fresh Chromium captures update the README and linked workflow guides. The shared arrow-and-graduation-cap mark appears in public navigation, editor headers, the offline panel and sign-in. Public/editor/model/GIS views use the verified LASU `lasu-4895a363b403` package with isolated owner/team responses; sign-in is captured without an account. Photo and import fixtures are described below. These captures show the local application, with deployment status recorded separately in [Production](PRODUCTION.md).
-
-| Desktop navigation | Phone navigation |
-| --- | --- |
-| ![B2 identity in the desktop campus map](assets/screenshots/b2-public-desktop-2026-10-11.png) | <img src="assets/screenshots/b2-public-mobile-2026-10-11.png" width="260" alt="B2 identity and place details on a phone"> |
-
-| Editor entry | Offline controls |
-| --- | --- |
-| ![B2 icon above the signed-out campus editor](assets/screenshots/b2-signin-2026-10-11.png) | <img src="assets/screenshots/b2-offline-2026-10-11.png" width="260" alt="B2 icon in the offline maps panel"> |
-
-[Brand geometry, colours and platform icons](BRAND.md) · [Image and source hashes](assets/screenshots/b2-2026-10-11.json). Older source-update captures below retain their original dates and branding.
 
 ## Map previews and adjustable phone panels · 11 October 2026
 
@@ -60,32 +46,32 @@ Inspect the actual captures and successful test results before promoting any ima
 
 These unaltered captures use the Vite development server at commit `1feb53f77c954698c0c6d6dd3074db85a06399db`, the published LASU package, and isolated owner/API fixtures with 101 synthetic proposals. They establish the appearance of the tested interface, not a production decision or deployment.
 
-## Visual tour
+## Current visual tour · 15 October 2026
 
 | View | What it demonstrates | Capture |
 | --- | --- | --- |
-| Public desktop | Place search, building details and public navigation | [1440 × 1000, light](assets/screenshots/b2-public-desktop-2026-10-11.png) |
-| Public mobile | A selected place in a phone viewport | [390 × 844, light](assets/screenshots/b2-public-mobile-2026-10-11.png) |
-| Edit | Feature explorer, map and contextual properties | [1440 × 1000, light](assets/screenshots/b2-editor-desktop-2026-10-11.png) |
-| Data | Datasets, map, attributes and schema/export controls | [1440 × 1000, light](assets/screenshots/b2-gis-data-2026-10-11.png) |
-| Model reference split | Structure, model, photograph and inspector | [1440 × 1000, light](assets/screenshots/b2-model-desktop-2026-10-11.png) |
-| Photo comparison | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/b2-photo-desktop-2026-10-11.png) |
-| Review | Quality checks and independent immutable submissions | [1440 × 1000, light](assets/screenshots/b2-gis-review-2026-10-11.png) |
-| Publish | Approved content, releases and map exports | [1440 × 1000, light](assets/screenshots/b2-gis-publish-2026-10-11.png) |
-| Globe | Campus context at world scale | [1440 × 900, dark](assets/screenshots/b2-globe-2026-10-11.png) |
-| Mobile editor | Workspace chooser and one active sheet | [390 × 844, light](assets/screenshots/b2-editor-mobile-2026-10-11.png) |
-| Analyze | Tools, parameters and processing history | [1440 × 1000, light](assets/screenshots/b2-gis-analyze-2026-10-11.png) |
-| Imports | Inspected fields in an isolated campus import | [1440 × 900, light](assets/screenshots/b2-imports-2026-10-11.png) |
-| Model portrait | Selected wall in the full-screen model workspace | [390 × 844, light](assets/screenshots/b2-model-portrait-2026-10-11.png) |
-| Model landscape | Selected wall in a short landscape viewport | [844 × 390, light](assets/screenshots/b2-model-landscape-2026-10-11.png) |
-| Mobile photos | Full-screen photograph comparison | [390 × 844, light](assets/screenshots/b2-photo-mobile-2026-10-11.png) |
-| Offline use | Package preparation and download controls | [390 × 844, light](assets/screenshots/b2-offline-2026-10-11.png) |
+| Public desktop | Place search, building details and public navigation | [1440 × 1000, light](assets/screenshots/tour-public-desktop-2026-10-15.png) |
+| Public mobile | A selected place in a phone viewport | [390 × 844, light](assets/screenshots/tour-public-mobile-2026-10-15.png) |
+| Edit | Feature explorer, map and contextual properties | [1440 × 1000, light](assets/screenshots/tour-editor-desktop-2026-10-15.png) |
+| Data | Datasets, map, attributes and schema/export controls | [1440 × 1000, light](assets/screenshots/tour-gis-data-2026-10-15.png) |
+| Model reference split | Structure, model, photograph and inspector | [1440 × 1000, light](assets/screenshots/tour-model-desktop-2026-10-15.png) |
+| Photo comparison | File list, before/after canvas and compression settings | [1440 × 900, light](assets/screenshots/tour-photo-desktop-2026-10-15.png) |
+| Review | Quality checks and independent immutable submissions | [1440 × 1000, light](assets/screenshots/tour-gis-review-2026-10-15.png) |
+| Publish | Approved content, releases and map exports | [1440 × 1000, light](assets/screenshots/tour-gis-publish-2026-10-15.png) |
+| Globe | Campus context at world scale | [1440 × 900, dark](assets/screenshots/tour-globe-2026-10-15.png) |
+| Mobile editor | Workspace chooser and one active sheet | [390 × 844, light](assets/screenshots/tour-editor-mobile-2026-10-15.png) |
+| Analyze | Tools, parameters and processing history | [1440 × 1000, light](assets/screenshots/tour-gis-analyze-2026-10-15.png) |
+| Imports | Inspected fields in an isolated campus import | [1440 × 900, light](assets/screenshots/tour-imports-2026-10-15.png) |
+| Model portrait | Selected wall in the full-screen model workspace | [390 × 844, light](assets/screenshots/tour-model-portrait-2026-10-15.png) |
+| Model landscape | Selected wall in a short landscape viewport | [844 × 390, light](assets/screenshots/tour-model-landscape-2026-10-15.png) |
+| Mobile photos | Full-screen photograph comparison | [390 × 844, light](assets/screenshots/tour-photo-mobile-2026-10-15.png) |
+| Offline use | Package preparation and download controls | [390 × 844, light](assets/screenshots/tour-offline-2026-10-15.png) |
 
-The [editor guide](EDITOR.md#legend-and-activity) also illustrates [collapsed legend](assets/screenshots/b2-legend-collapsed-2026-10-11.png) and [expanded Activity](assets/screenshots/b2-activity-expanded-2026-10-11.png) states. The normal editor view shows the collapsed Activity icon. The [sign-in screen](assets/screenshots/b2-signin-2026-10-11.png) verifies B2 before authentication.
+The [editor guide](EDITOR.md#legend-and-activity) also illustrates [collapsed legend](assets/screenshots/tour-legend-collapsed-2026-10-15.png) and [expanded Activity](assets/screenshots/tour-activity-expanded-2026-10-15.png) states. The normal editor view shows the collapsed Activity icon.
 
 ## Provenance
 
-Public, editor, model and GIS captures render the published **LASU lasu-4895a363b403** package and its attributed assets in the actual local application. Owner/team authentication and private API responses are isolated test fixtures. The GIS 100,000-row label demonstrates paged controls; it is not a campus inventory or performance measurement. Example submissions and approvals never modify production data.
+The 15 October public, editor, model and GIS captures render the published **LASU lasu-4895a363b403** package and its attributed assets in the actual local application. Owner/team authentication and private API responses are isolated test fixtures. The GIS 100,000-row label demonstrates paged controls; it is not a campus inventory or performance measurement. Example submissions and approvals never modify production data.
 
 Imports use `campus-imports.spec.ts`'s small synthetic campus, source and inspected-layer responses. Photos use the actual PhotoOptimizer component in `photo-harness.html` with the repository's *School of Communication exterior*: **Abiolakintrunde**, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [original photograph](https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg), catalogue ID `commons:112540966`. The application resizes/compresses a private copy for comparison. Source rights and modifications remain in [photo records](../data/photos/README.md).
 
@@ -93,11 +79,11 @@ Phone views are browser viewports, not photographs of physical devices. The offl
 
 ## Reproduce
 
-Use the pinned Node version, `npm ci` in `web/`, and installed Playwright Chromium/WebKit binaries. Public/model fixtures require the verified published assets under `web/work/model-benchmark/public`; preserve the package manifest and asset hashes when preparing that fixture. See the [existing fixture preparation record](assets/screenshots/README.md). Run these commands sequentially from `web/` (PowerShell):
+Use the pinned Node version, `npm ci` in `web/`, and installed Playwright Chromium/WebKit binaries. Run `npm run docs:prepare` to fetch and hash-check the public campus catalogue and packages into ignored `web/work/docs-fixture/public`. This reads public assets only. The preparation receipt records the origin, retrieval time and catalogue revision; no private account or production write is used. Run these commands sequentially from `web/` (PowerShell):
 
 ```powershell
-$env:TURNRIGHT_SCREENSHOT_PREFIX = 'b2'
-$env:TURNRIGHT_SCREENSHOT_DATE = '2026-10-11'
+npm run docs:prepare
+$env:TURNRIGHT_DOCS_DATE = '2026-10-15' # Replace with the new capture date.
 node node_modules/@playwright/test/cli.js test --config playwright.redesign-docs.config.ts --output work/capture-public-editor
 $env:TURNRIGHT_GIS_SCREENSHOTS = '1'
 node node_modules/@playwright/test/cli.js test --config playwright.gis-docs.config.ts --output work/capture-gis
@@ -106,19 +92,24 @@ $env:TURNRIGHT_REDESIGN_SCREENSHOTS = '1'
 node node_modules/@playwright/test/cli.js test tests/browser/campus-imports.spec.ts --grep 'responsive screens' --output work/capture-imports
 node node_modules/@playwright/test/cli.js test tests/browser/photo-processing.spec.ts --grep 'photo comparison edits' --timeout=120000 --output work/capture-photos
 Remove-Item Env:TURNRIGHT_REDESIGN_SCREENSHOTS
-node scripts/record-screenshots.mjs
-Remove-Item Env:TURNRIGHT_SCREENSHOT_PREFIX
-Remove-Item Env:TURNRIGHT_SCREENSHOT_DATE
-node scripts/check-docs.mjs
+npm run docs:record
+npm run check:docs
+Remove-Item Env:TURNRIGHT_DOCS_DATE
 ```
 
 The public/editor and GIS galleries use configured production builds. Import and photograph fixtures use Vite's development server to expose their test harnesses. Keep each Playwright run's output directory separate; concurrent runs must not share an output directory or a server port.
 
+The current recorder expects all eighteen tour views. It derives the campus version from the prepared manifest and records the actual source digest, browser, Node runtime, image dimensions and SHA-256 hashes. `check:docs` checks every non-ignored Markdown file plus recorded tour image hashes/dimensions. Historical captures must be reproduced from their recorded revision; their commands are not current maintenance instructions.
+
 ## Maintenance checklist
 
-- Give new captures a new date; never overwrite an older dated image to make historical evidence look current. Change the gallery's output date and record script together.
+- Give new captures a new date; never overwrite an older dated image to make historical evidence look current. Set `TURNRIGHT_DOCS_DATE` to the new date. The current capture helper and recorder refuse to overwrite existing images/manifests. Inspect and explicitly remove only a failed, unpublished capture before retrying; do not reuse an older evidence date.
 - Verify the intended viewport, theme, completed loading, legible labels, credits, and selected state. Inspect every image at native size; check phone and landscape controls for overlap and clipping.
 - Use public or explicitly synthetic data. Do not capture private accounts, location histories, tokens, or production drafts. Label fixture counts and simulated states.
 - Keep a concise caption and useful alt text wherever an image is embedded. Describe the feature shown, not the file name.
 - Regenerate the record after the final captures. Record the base commit and working-tree source digest, browser version, fixture identities, image dimensions and SHA-256 hashes.
 - Run the documentation link/asset checker and the relevant browser, offline and accessibility checks. Screenshots supplement behavioral tests; they do not replace them.
+
+## B2 campus identity · 11 October 2026
+
+The earlier nineteen-view B2 gallery is preserved in its [dated manifest](assets/screenshots/b2-2026-10-11.json), including the [sign-in view](assets/screenshots/b2-signin-2026-10-11.png). These captures belong to the recorded October 11 revision.

@@ -1,14 +1,17 @@
 # Application screenshots
 
+## Current product tour · 15 October 2026
+
+The README and current guides use eighteen new, unaltered Chromium captures covering the public map, globe, mobile/offline experience, editor panes, Data/Analyze/Review/Publish, model reference/portrait/landscape, imports and photo editing. They use the current local source, verified public LASU assets, and isolated owner/team/API responses. No production draft, decision or release was changed.
+
+[Gallery and reproduction](../../SCREENSHOTS.md) · [Source, fixture and image manifest](tour-2026-10-15.json).
+
+The selected B2 brand is visible in these captures. Phone images are viewport simulations. GIS totals, source names and review decisions are demonstration fixtures. The archived images below retain their original dates and evidence; mentions of the “current README” in historical entries refer to that date.
+
+
 ## Source reliability and private undo · 13 October 2026
 
 The desktop and phone `source-reliability-*-2026-10-13.png` images are unaltered local WebKit 26.6 captures. They show the actual recovery interface with a synthetic blocked path, incomplete check and accepted decision. The map canvas is not evidence of source geometry in these captures; separate map-preview journeys verify that behavior. No production decision or publication changed. [Capture record](source-reliability-2026-10-13.json) · [Gallery and reproduction](../../SCREENSHOTS.md#source-reliability-and-private-undo--13-october-2026).
-
-## B2 campus identity · 11 October 2026
-
-The nineteen `b2-*-2026-10-11.png` files are unaltered local Chromium captures of the B2 app revision. They replace the October 7 images in the current README and workflow guides; earlier files and records remain historical evidence. [Gallery, fixture scope and reproduction](../../SCREENSHOTS.md#b2-campus-identity--11-october-2026) · [Source and image hashes](b2-2026-10-11.json).
-
-Public/editor/model/GIS views use the verified LASU `lasu-4895a363b403` package and isolated account/API fixtures. Sign-in has no account fixture. Imports and photo processing use the documented local demonstration harnesses. The dark globe capture checks the mark on dark surfaces; phone dimensions simulate a browser viewport. Each image was visually inspected. No production edits, source decisions or map publications were made to create these screenshots.
 
 ## Map-wide preview and phone resizing · 11 October 2026
 
@@ -22,9 +25,9 @@ The actual React/MapLibre interface runs through Vite with isolated owner/API re
 
 ## Workspace redesign · 7 October 2026
 
-The eighteen `redesign-*-2026-10-07.png` captures record the October 7 workspace redesign: sixteen product layouts and two compact-control states. The B2 gallery above supersedes them in current guides. See the [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below.
+The 7 October README and workflow guides used the eighteen `redesign-*-2026-10-07.png` captures: sixteen product layouts and two compact-control states. See the [visual tour, provenance and reproduction instructions](../../SCREENSHOTS.md) and [capture manifest](redesign-2026-10-07.json). These local application captures use published assets with isolated fixtures; they do not change the deployment history below. Earlier screenshots remain historical records.
 
-Historical reproduction commands refer to the code revision recorded with that capture. Gallery drivers retain their original default filenames; set `TURNRIGHT_SCREENSHOT_PREFIX` and `TURNRIGHT_SCREENSHOT_DATE` as shown in the current reproduction instructions to create a new dated set.
+Historical reproduction commands refer to the code revision recorded with that capture. Current gallery drivers require an explicit new date and write `tour-<view>-<date>.png`; use [current capture instructions](../../SCREENSHOTS.md#reproduce) for maintenance.
 
 ## Campus GIS workflow · 5 October 2026
 

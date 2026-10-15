@@ -1,11 +1,12 @@
 # TurnRight documentation
 
-TurnRight is a campus GIS platform for small teams: import, typed data, geometry editing, spatial analysis, quality review, independent approval, cartography and controlled publication. The same product provides public navigation, offline campus packages, field surveys, photographs and building authoring. Start with the [team workflow](GIS-PLATFORM.md), [project overview and screenshots](../README.md), and [verified production state](PRODUCTION.md).
+TurnRight combines a public campus map/globe with a private GIS editing and publication platform. Start with the [project overview](../README.md), [public map guide](PUBLIC-MAP.md), or [team workflow](GIS-PLATFORM.md). [Production readiness](PRODUCTION.md) distinguishes the current source, local verification, deployed revisions, and remaining release gates.
 
 ## Use TurnRight
 
 | Task | Guide |
 | --- | --- |
+| Explore places, plan journeys, download maps, and report a problem | [Public map and globe](PUBLIC-MAP.md) |
 | Work as a campus team: typed datasets, analysis, independent review, publication and exports | [Campus GIS platform and rollout](GIS-PLATFORM.md) |
 | Select campus silhouettes, switch smoothly and use downloaded campuses offline | [Campus globe](CAMPUS-GLOBE.md) |
 | Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |
@@ -14,6 +15,8 @@ TurnRight is a campus GIS platform for small teams: import, typed data, geometry
 | Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
 | Edit places, paths, entrances, access and source changes | [Team editor](EDITOR.md) |
+| Check connected sources, compare evidence, review bulk changes and preview private undo | [Source updates](SOURCE-UPDATES.md) |
+| Recover availability failures and understand the accepted-source baseline | [Editor availability](EDITOR-AVAILABILITY.md) |
 | Edit windows, walls, roofs, footprints, text and model review | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
 | Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL | [Model authoring](MODEL-AUTHORING.md) |
 | Edit standard and custom roof plans | [Building roofs](BUILDING-ROOFS.md) |
@@ -35,11 +38,14 @@ Start with [contributing](../CONTRIBUTING.md), [B2 brand assets and usage](BRAND
 | Area | Reference |
 | --- | --- |
 | Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| Workspace redesign, compact controls, branding and current automated results | [Redesign verification](REDESIGN-VERIFICATION.md) |
+| Latest documentation, screenshot, cleanup and dependency verification | [15 October repository review](AUDIT-2026-10-15.md) |
+| File ownership, generated output, naming and documentation maintenance | [Repository structure](REPOSITORY.md) |
+| Vulnerability reporting and operational security boundaries | [Security](../SECURITY.md) |
+| Dated workspace redesign and its automated results | [7 October redesign verification](REDESIGN-VERIFICATION.md) |
 | Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
 | Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
 | Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
-| Current bug reproductions, fixes, measurements and verification limits | [3 October audit](AUDIT-2026-10-03.md) |
+| Dated bug reproductions, fixes, measurements and verification limits | [3 October audit](AUDIT-2026-10-03.md) |
 | Theme tokens and text contrast | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md) |
 | Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
 | Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
