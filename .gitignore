@@ -18,3 +18,14 @@ __pycache__/
 *.pyc
 web/lint-results.json
 web/lint-check.txt
+
+# Local recovery copies and design exploration are not application source.
+.codex-*-backup*/
+docs/assets/brand/drafts/
+
+# Platform metadata and generated diagnostics.
+.DS_Store
+Thumbs.db
+Desktop.ini
+coverage/
+*.log
