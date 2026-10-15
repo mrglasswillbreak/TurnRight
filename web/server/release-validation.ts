@@ -158,7 +158,14 @@ export function validateReleaseSnapshot(
   if (result.errors.length) throw new HttpError(400, result.errors.join('\n'));
   const facadeIssues = result.data.map.features
     .filter((f) => f.properties?.kind === 'building')
-    .flatMap((f) => facadeErrors(f, result.data.photos, true));
+    .flatMap((f) => {
+      const label = String(f.properties?.name || f.properties?.id);
+      return facadeErrors(f, result.data.photos, true).map((message) =>
+        message.startsWith(`${label} · `) || message.startsWith(`${label}: `)
+          ? message
+          : `${label}: ${message}`,
+      );
+    });
   if (facadeIssues.length) throw new HttpError(400, [...new Set(facadeIssues)].join('\n'));
   return gis.decorate(result.data);
 }

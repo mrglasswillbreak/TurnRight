@@ -1,20 +1,34 @@
 # Production readiness and deployment records
 
-## Current source and release readiness · 15 October 2026
+## Verified application and database baseline · 15 October 2026
 
-The release branch contains the public map/globe, private GIS editor, and source reliability changes through migration **050**, including the later main-branch history and evidence-storage fixes. The initial documentation review below tested an older local working tree; production rollout and publication require their own recorded checks.
+[PR #21](https://github.com/mrglasswillbreak/TurnRight/pull/21) merged as `3d9c517a5d6f3d4cb5e71b9ed473bfaa29db2e3b`. Its production deployment reported success. The README and guides cover the public globe/map, routing and offline packages alongside the private editor's Data, Edit, Analyze, Review and Publish workflows. The [18-image tour](SCREENSHOTS.md) records its fixture scope and source hashes; it is not field evidence.
 
-| Area | Evidence and next gate |
+The final PR revision `2970acb` passed [all six browser shards, offline, quality and build gates](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38688001950), [native PostGIS and isolated engine checks](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38688002109), and GIS import checks. Quality reported **806 unit tests passed, one skipped**, both TypeScript projects, **80 lint warnings and no errors**, configured build budgets, **793 documentation references across 71 Markdown files**, 87 Python tests passed with five skipped, and **zero npm audit vulnerabilities**. Counts describe this revision, not future changes.
+
+Production functions through **055** are installed. The 051–055 repairs preserve inferred import field types, bound review requests, retain byte-identical snapshot hashes, return compact review metadata, and compare immutable fields without repeated copies of the complete snapshot. Before applying 053, both live draft hashes were checked against their immutable submissions in the migration transaction. Tests exercise every immutable review column, independent approval, the audited owner exception, stale hashes and campus isolation. Saved function rollback definitions for 051–055 were restored successfully in an isolated PostGIS fixture.
+
+The live draft audit corrected twelve numeric schema declarations across five UNILAG datasets without changing their attribute hashes. LASU's C.P.S rings were regrouped into three wings without moving coordinates; a stale manual path connection was removed. Four unavailable photograph references were removed from Makanjuola Lecture Theatre façades, preserving model geometry, gallery photographs and their illustrative-estimate classification. These repairs resolve software/data validation failures; they do not certify real-world access.
+
+Publication uses immutable approved snapshots, reviewed previews, the complete release gates and the production promotion guard. The original owner authorized the audited independent-review exception for this publication. Current review hashes, reasons, release states and preview links are available in the authenticated editor; a submitted or queued item is not a published map. Each campus is promoted separately so the other campus's package remains intact.
+
+[PR #22](https://github.com/mrglasswillbreak/TurnRight/pull/22) records the approval recovery, clearer building-specific validation and two test repairs found during release checks. The model-detail test keeps its camera gesture active until the reduced-detail response is observed, then verifies restoration after stopping. Import fixtures declare their own campus; CI exercises unit tests with a non-default worker campus. This addresses the [UNILAG preview run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38699608433) that passed all release gates but stopped in the worker's unit suite before building its snapshot. That failed run did not publish UNILAG. The pull request's full checks and deployment status are the authority for the follow-up application revision.
+
+## Remaining acceptance and owner decisions
+
+The [manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) gives the exact device, field, account and recovery checks still required, with expected outcomes.
+
+| Area | Required evidence or input |
 | --- | --- |
-| Public map and editor documentation | Updated together; current local screenshots and capture receipts are in [the gallery](SCREENSHOTS.md). |
-| Source reliability 045–048 | The [13 October implementation record](assets/source-reliability-2026-10-13.json) says these migrations were **not deployed**. Complete [staged rollout](SOURCE-UPDATES.md#staged-reliability-rollout) and record fresh schema/worker verification. |
-| Automated verification | See the [15 October repository review](AUDIT-2026-10-15.md) for local results and limits; require final-revision CI. Dated counts below apply only to their recorded revisions. |
-| Physical devices and field routes | Android/iPhone installation, keyboard/GPS/audio, campus access, entrances, and representative walks still need the [acceptance checks](ACCEPTANCE.md). |
-| Live team and recovery acceptance | Separate-role login/revocation, complete team publication and a public campus rollback rehearsal remain operational gates. |
-| Performance | [Measured constraints](PERFORMANCE.md) include unresolved dense-model/startup targets; software WebGL is not a physical-phone benchmark. |
-| Software licensing | No root software licence has been selected. Data and asset terms remain independent. |
+| Physical devices | Android and iPhone installation/relaunch, downloaded-campus offline use, GPS navigation, keyboard input, spoken directions and dense-model performance on representative phones. Follow [Acceptance](ACCEPTANCE.md) and [Performance](PERFORMANCE.md). |
+| Campus fieldwork | Verify entrances, access restrictions, stairs, hazards and representative walks. **26 LASU and 3 UNILAG crossing-building segments remain excluded from routing** pending inspection. Do not reconnect them merely to clear warnings. |
+| Team roles and rollback | Exercise sign-in and revocation with separate real accounts and rehearse restoration of an approved public campus release. Isolated permission/restore tests do not establish live operational acceptance. |
+| Complete recovery | Obtain a complete database and Auth/platform backup through the direct database/platform backup channel and rehearse recovery in isolation. The API backup attempts on this date did **not** complete: the first encountered a deliberately restricted table; the second timed out reading baseline history. Function-definition backups and the native fixture's dump/restore test are not a full production backup. No permissions were widened to make an archive pass. |
+| Software and asset rights | Select a root software licence and confirm the security contact. Check ArcGIS/source redistribution permissions and each photo's licence/attribution; a saved licence label is not independent evidence of rights. |
+| Source automation | Production had zero enabled source policies and four shadow-check receipts when inspected. Complete per-source shadow parity and the [staged reliability rollout](SOURCE-UPDATES.md#staged-reliability-rollout) before enabling proposal generation. |
+| Technical debt | Existing lint warnings and the documented dense-model/startup performance limits remain. Passing configured budgets is not a claim that every physical-device target is met. |
 
-Before release, complete the [deployment sequence](DEPLOYMENT.md), required native/browser/offline gates, source-rights checks, and applicable field acceptance. Record the source revision, migration receipt, deployed revision, package hashes, and actual outcomes. A documentation refresh or local test run does not establish full production readiness.
+Use the [deployment sequence](DEPLOYMENT.md) for subsequent changes and record the actual revision, package hashes, deployment result and operational checks. Earlier dated receipts below remain historical evidence.
 
 ## Dated deployment history
 
@@ -62,43 +76,6 @@ The authorized [retention run](https://github.com/mrglasswillbreak/TurnRight/act
 [PR #18](https://github.com/mrglasswillbreak/TurnRight/pull/18) carries the B2 arrow-and-graduation-cap identity across the shared public/editor mark, browser icons, installed-app icons, Apple touch icon and documentation wordmarks. Its release checks and deployment result are attached to that pull request. This application-only change requires no database migration or worker update; the build retains the published LASU `lasu-4895a363b403` and UNILAG `unilag-faa044ebdd24` packages.
 
 The README and workflow guides use nineteen fresh, unaltered local Chromium captures. [Gallery and reproduction](SCREENSHOTS.md#b2-campus-identity--11-october-2026) · [Source, fixture and image hashes](assets/screenshots/b2-2026-10-11.json) · [Brand exports and installed-icon behavior](BRAND.md). Screenshot fixtures make no production edits or source-review decisions.
-
-## Map previews and adjustable mobile panels — 11 October 2026
-
-[PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15) merged as `1626e436eba983685a8ef087638d19af9ce4fc42`. Its [production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/88MmKkERgAPSdBYeREbJydYePuMc) became Ready at 13:14 UTC with `turnright.vercel.app` assigned. All 14 release checks passed, including four Chromium shards, both WebKit shards, quality/build checks, GIS and offline coverage.
-
-The updated editor loaded authenticated on both campuses. UNILAG's one remaining metadata proposal correctly reported no map location. LASU loaded all 3,898 proposals across bounded pages without decisions; this check exposed routing links whose locations require referenced-node lookups, addressed by migration 044. A fresh GitHub sign-in completed and opened the editor while that preview was loading. At 13:18 UTC the editor returned HTTP 200 in 509 ms, OAuth returned 302 in 624 ms, and anonymous administration returned 401. The public catalogue and both campus manifest hashes matched the pre-deployment baseline. Verification accepted/rejected no proposal and published no campus data.
-
-## Editor availability and map-preview database upgrade — 11 October 2026
-
-Migrations **042 and 043** are installed in production. The published-correction backfill completed in two calls, each updating one current published release. Both campuses now have materialized correction summaries, and the bounded, campus-authorized map-preview function is installed. The application changes and release gates are tracked in [PR #15](https://github.com/mrglasswillbreak/TurnRight/pull/15); this entry records the database upgrade, not a new campus-map publication.
-
-Post-upgrade readback retained LASU **4,858 sources / 150 corrections / 3,898 pending proposals** and UNILAG **10,574 / 201 / 1**. PostgreSQL's start time remained **11 October 10:39:28.991007 UTC**. The upgrade accepted or rejected no proposal, replaced no source baseline and published no campus data. The earlier user-run review operations had already applied 3,645 decisions and skipped one stale proposal without failures.
-
-The incident investigation found a failed full-map replacement request and repeated expansion of compressed release snapshots during normal reads. The replacement path is retired; accepted sources already form the working baseline. Authentication transport failures now preserve sessions and use availability errors. The logs establish database restarts and timeouts, but do not establish a host OOM kill or a shared cause for the earlier browser connection failure. [Evidence, safeguards and rollout instructions](EDITOR-AVAILABILITY.md).
-
-Local pinned-runtime verification passed 760 unit tests across 109 files, both TypeScript projects, lint, production/configured build budgets, and an isolated 10,000-proposal preview in 200 bounded pages with corrections preserved. Dated Chromium [preview and resize captures](SCREENSHOTS.md#map-previews-and-adjustable-phone-panels--11-october-2026) use isolated fixtures. Required CI and deployed application status remain visible on the linked pull request; production verification must remain read-only.
-
-## Source updates rollout — 11 October 2026
-
-[PR #13](https://github.com/mrglasswillbreak/TurnRight/pull/13) is merged. Production revision `f230fa60dfc13aa06dfbfb0ca7264f7326772fad` is **Ready** on [Vercel](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/67KYgiCzSqNvcv2MmCLvB8vXPdCB), with `turnright.vercel.app` assigned at 08:46 UTC. The source-update inbox and background review workflows are deployed for UNILAG and LASU. [Sanitized rollout receipt](assets/source-updates-rollout-2026-10-11.json).
-
-Migration 041, including the final retention function, was installed before deployment. Its bounded metadata backfill completed all 32,457 existing records at 07:27 UTC, committing at most 100 records per transaction. The deployed [maintenance verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38125975975) succeeded in 10 seconds, confirmed the index ready and removed zero expired rows. Daily maintenance runs at 05:22 UTC; existing import-file retention remains at 05:17 UTC and after imports.
-
-The [full regression audit](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38124124909) passed on tested revision `6a3c53d3ffdd3ab6c18262053995f55454c2f0eb`: unit tests, lint, configured build, documentation, Python, four Chromium shards, both WebKit shards, image-editor and offline coverage. [Database and engine acceptance](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38124124849) and [GIS import checks](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38124124874) also passed. The 10,000-proposal database fixture completed in 400 transactions, with 9,998 applied, two stale skips, correction overlays preserved and no releases. It was an isolated fixture, not a production bulk decision. Windows blocked local process execution, so executable checks ran in GitHub Actions on the pinned runtime; local TypeScript and documentation checks used in-process tooling.
-
-Authenticated production checks loaded both campuses, actual source status, 50-row inboxes and on-demand comparisons without making review decisions. UNILAG showed 3,646 pending proposals and LASU 3,898. At 08:49 UTC, `/admin` returned 200, unauthenticated `/api/admin` returned 401, and the OAuth entry point returned 302 in 842 ms. The app-update prompt loaded the new build in the verification tab; the original editor tab was left open.
-
-Post-deployment checks retained 15,432 source records, 351 corrections, 7,544 pending proposals and 46 releases, with zero unindexed proposals, active imports or bulk operations. Source and correction fingerprints matched the pre-migration and pre-deployment baselines. PostgreSQL's start time remained 10 October 19:16:02 UTC. The scheduled [LASU shared source check](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38126008429) succeeded during verification and replaced one pending campus-metadata proposal; this explains the changed proposal checksum without any accepted or rejected proposal. The public catalogue and both published package manifests remained byte-for-byte unchanged: `lasu-4895a363b403` and `unilag-faa044ebdd24`.
-
-README and 15 related guides were updated, with four genuine desktop/phone browser captures. The [capture manifest](assets/screenshots/source-updates-2026-10-11.json) records fixture scope, capture revision, dimensions, browser and hashes. All 640 local documentation links, anchors and assets across 53 guides passed validation. The captures use isolated synthetic proposals; no production proposal was accepted or rejected for screenshots or rollout.
-
-## Bounded import recovery and artifact retention — 11 October 2026
-
-[PR #11](https://github.com/mrglasswillbreak/TurnRight/pull/11) and [PR #12](https://github.com/mrglasswillbreak/TurnRight/pull/12) are merged. Migrations 039 and 040 are installed. The complete UNILAG daily import [run 38088544052](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38088544052) succeeded in 3m 36s after bounded queue staging, and daily ArcGIS checks were re-enabled. The earlier failed verification below is historical; migration 038 alone did not resolve the outage.
-
-The authorized [retention run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/38111159593) removed 37 obsolete generated files totalling 516,513,589 bytes. All 176 protected files remained unchanged. Source features, saved edits, pending proposals, original uploads and releases remained 15,432 / 351 / 7,546 / 49 / 46. The editor and OAuth entry point remained available, with no database restart during cleanup. Automatic retention is enabled after imports and daily at 05:17 UTC.
-
 
 Entries are dated receipts. Later entries supersede earlier deployment status,
 package counts and interface labels; older evidence is retained for audit.

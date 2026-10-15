@@ -37,6 +37,9 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm test -- --maxWorkers=2
+        # Catch fixtures that accidentally inherit the release worker's campus.
+        env:
+          CAMPUS_ID: ci-non-default-campus
       - run: npm run lint
       - run: npm run check:docs
       - run: npm run check:dependencies

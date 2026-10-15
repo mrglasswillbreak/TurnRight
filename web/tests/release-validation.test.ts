@@ -73,6 +73,11 @@ describe('server release guards', () => {
     expect(
       validateReleaseSnapshot({ features: publishedRecords(data), edits: [] }, data).map.features,
     ).toHaveLength(1);
+    data.photos = [];
+    facades[walls[0].wallId].photoIds = ['missing-photo'];
+    expect(() =>
+      validateReleaseSnapshot({ features: publishedRecords(data), edits: [] }, data),
+    ).toThrow('Lecture theatre: Façade photographs must belong to this building.');
   });
   it('rejects source endpoint errors even when the browser is bypassed', () => {
     const publicData = campusFixture(),
