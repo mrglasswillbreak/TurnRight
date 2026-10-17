@@ -3,11 +3,11 @@
   "date": "2026-10-17",
   "state": "application-deployed-campus-details-approved-awaiting-preview-publication",
   "application": {
-    "commit": "3b059ab74c7a36a35daba0cee6f403bd1abfc4a5",
-    "deploymentId": "7134218330",
-    "productionReadyAt": "2026-10-17T03:30:06Z",
-    "url": "https://turnright.vercel.app",
-    "pullRequest": 24
+    "deploymentId": "7135198486",
+    "productionReadyAt": "2026-10-17T05:16:09Z",
+    "pullRequest": 26,
+    "commit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+    "url": "https://turnright.vercel.app"
   },
   "preparationRevision": "cf8e87aa317459390008e2bffb25c493902c1550",
   "applyRuns": [
@@ -41,7 +41,15 @@
         "status": "approved",
         "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
       },
-      "reconciliationId": "b9d52e5d-667b-439e-ab70-97e3289e4037"
+      "reconciliationId": "b9d52e5d-667b-439e-ab70-97e3289e4037",
+      "draftRecheck": {
+        "checkedAt": "2026-10-17T05:52:20.4661633Z",
+        "method": "Authenticated Review > Inspect immutable submission",
+        "matchesCurrentDraft": true,
+        "sources": 6047,
+        "corrections": 158,
+        "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
+      }
     },
     {
       "campusId": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
@@ -73,7 +81,7 @@
         "previewReadyAt": "2026-10-17T04:19:59Z",
         "verificationRun": 39002274618,
         "verificationStatus": "passed",
-        "disposition": "Awaiting replacement preview with scenery lifecycle fix before publication",
+        "disposition": "Superseded by verified-renderer preview 6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1; never published",
         "verifiedAssets": 218,
         "rollbackVersion": "unilag-bd659bbd6df2",
         "verificationCredentialRevoked": true
@@ -103,8 +111,57 @@
       "release": {
         "previewRun": 39007270314,
         "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
-        "status": "queued",
-        "requestedAt": "2026-10-17T05:42:53Z"
+        "status": "preview",
+        "requestedAt": "2026-10-17T05:42:53Z",
+        "id": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+        "version": "unilag-4667e8f529d6",
+        "previewUrl": "https://turnright-cz3x48iqi-muhammed-abdulhadi-s-projects.vercel.app",
+        "previewReadyAt": "2026-10-17T06:07:50Z",
+        "verificationRun": 39008825568,
+        "verificationStatus": "passed",
+        "manualChecks": {
+          "navigation": "130 m library-to-Senate preview, route and destination remain with all optional layers hidden; GPS not requested",
+          "preferences": "All five hidden choices survive reload; LASU defaults remain independently visible",
+          "browser": "Chromium in-app browser",
+          "checkedAt": "2026-10-17T06:13:27.717831Z",
+          "landmark3D": "Senate Building: 2D to framed 3D",
+          "photoEvidence": "Historical date and source checked date shown",
+          "landmarkFilter": 3,
+          "layerControls": "All five toggled successfully"
+        },
+        "verifiedAssets": 218,
+        "verifiedVisualCombinations": 32,
+        "verifiedOfflineJourneys": 4,
+        "rollbackVersion": "unilag-bd659bbd6df2",
+        "verificationCredentialRevoked": true,
+        "protectedDataFingerprints": "All nine unchanged for both campuses",
+        "verificationArtifact": 12092730041,
+        "verificationArtifactSha256": "e2e1e3af57b4ec167fa96cfca67e26e6bfd7824e54f3aa54042208fac9580bf3",
+        "publicationRun": 39009448556,
+        "publicationRequestedAt": "2026-10-17T06:18:56Z",
+        "publicationStatus": "complete unchanged WebKit shard and downstream promotion rerunning",
+        "publicationFailures": [
+          {
+            "failure": "Add locator reached performing click action, then the test exceeded 120 seconds",
+            "published": false,
+            "capturedConsoleErrors": 0,
+            "artifact": 12092418439,
+            "run": 39009448556,
+            "attempt": 1,
+            "artifactSha256": "a0cc7d22b90fdc25f8bc467f7e2941283b7800ffad423f2be8c41db92772848b",
+            "diagnosis": "Root cause unproven; complete unchanged WebKit shard rerun requested",
+            "job": 117328604993,
+            "test": "compact plan and photograph tools: all modes preserve the canvas at 1024x390"
+          }
+        ]
+      },
+      "draftRecheck": {
+        "checkedAt": "2026-10-17T05:50:44.5907536Z",
+        "method": "Authenticated Review > Inspect immutable submission",
+        "matchesCurrentDraft": true,
+        "sources": 10574,
+        "corrections": 201,
+        "contentHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb"
       }
     }
   ],
@@ -120,7 +177,6 @@
     "assets": 175,
     "visualCombinations": 32
   },
-  "unilagPreviewRun": 38999895100,
   "approvalReason": "Owner authorizes the October 17 presentation updates without a separate reviewer; geometry, routing and corrections are preserved, new ArcGIS discoveries remain held, and physical-device/field verification remains outstanding.",
   "nativeGeometryReview": "measurements/campus-geometry-warnings-2026-10-17.json",
   "preparationFix": {
@@ -175,5 +231,12 @@
   "nativeBatchAppearance": "measurements/pro-batch-appearance-2026-10-17.json",
   "localIdTutorial": "measurements/id-browser-study-2026-10-17.json",
   "projectReferenceAudit": "measurements/pro-project-portability-2026-10-17.json",
-  "portableResearchIndex": "measurements/portable-research-index-2026-10-17.json"
+  "portableResearchIndex": "measurements/portable-research-index-2026-10-17.json",
+  "initialApplication": {
+    "commit": "3b059ab74c7a36a35daba0cee6f403bd1abfc4a5",
+    "deploymentId": "7134218330",
+    "productionReadyAt": "2026-10-17T03:30:06Z",
+    "url": "https://turnright.vercel.app",
+    "pullRequest": 24
+  }
 }
