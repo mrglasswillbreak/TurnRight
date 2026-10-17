@@ -2,9 +2,11 @@
 import { randomBytes } from "node:crypto";
 import { db } from "./cloud.mjs";
 import { vercelApi, withRetainedPackageAccess } from "./vercel-api.mjs";
-const [release] = await db(`releases?id=eq.${process.env.RELEASE_ID}&select=preview_url,status`);
+const [release] = await db(`releases?id=eq.${process.env.RELEASE_ID}&select=preview_url,status,campus_id`);
 if (!release?.preview_url || release.status !== "preview")
   throw Error("A ready preview is required");
+if (!release.campus_id || release.campus_id !== process.env.CAMPUS_ID)
+  throw Error("Preview campus does not match the verification request");
 const url = new URL(release.preview_url);
 if (url.protocol !== "https:" || !url.hostname.endsWith(".vercel.app"))
   throw Error("Unexpected preview origin");
@@ -44,9 +46,9 @@ try {
   if (process.env.VERIFY_SCOPE !== "rollback")
     await import("../web/scripts/verify-campus-detail.mjs");
   const [historical] = await db(
-    "releases?status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url,deployment_id",
+    `releases?campus_id=eq.${encodeURIComponent(release.campus_id)}&status=eq.published&order=published_at.desc&limit=1&select=id,version,deployment_url,deployment_id,campus_id`,
   );
-  if (!historical?.version || !historical.deployment_url)
+  if (!historical?.version || !historical.deployment_url || historical.campus_id !== release.campus_id)
     throw Error("Rollback package record missing");
   const { preservePublished } = await import("../web/scripts/published-assets.mjs");
   await withRetainedPackageAccess(historical, (headers, retainedOrigin) =>
