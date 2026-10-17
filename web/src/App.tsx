@@ -1681,11 +1681,23 @@ export default function App() {
                     f.properties?.kind === 'building' &&
                     buildingPlace(data, f)?.id === selected.id,
                 );
+                const target: Feature | undefined =
+                  building ||
+                  (selected.landmark
+                    ? {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                          type: 'Point',
+                          coordinates: selected.coordinates,
+                        },
+                      }
+                    : undefined);
                 return (
-                  building && (
+                  target && (
                     <Suspense fallback={null}>
                       <LandmarkViewButton
-                        feature={building}
+                        feature={target}
                         map={map.current}
                         mobile={mobileMapControls}
                         onEnable={() => {
@@ -1696,7 +1708,9 @@ export default function App() {
                           });
                         }}
                       />
-                      <BuildingVisualDetails data={data} feature={building} />
+                      {building && (
+                        <BuildingVisualDetails data={data} feature={building} />
+                      )}
                     </Suspense>
                   )
                 );

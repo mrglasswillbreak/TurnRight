@@ -3814,6 +3814,47 @@ test('public map defaults to 3D, frames campus and opens building details', asyn
   expect(errors).toEqual([]);
 });
 
+test('campus detail landmark points offer a 3D area view without a building association', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const server = await setup(page, false, false, {
+    mutateCampus(data) {
+      data.places.push({
+        ...data.places[0],
+        id: 'landmark-point',
+        sourceId: 'landmark-point',
+        name: 'Library landmark point',
+        coordinates: [3.2008, 6.4608],
+        buildingId: undefined,
+        landmark: true,
+      });
+    },
+  });
+  await page.goto('/');
+  await attachMap(page);
+  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
+  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
+  await page.getByRole('button', { name: 'Landmarks', exact: true }).click();
+  await page.getByRole('button', { name: /Library landmark point/ }).click();
+  await page
+    .getByRole('button', { name: 'View area in 3D', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Switch to 2D', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+    .toBeGreaterThan(0);
+  await expect
+    .poll(() => page.evaluate(() => window.editorTestMap.getZoom()))
+    .toBeLessThanOrEqual(18.001);
+  expect(
+    server.campus.places.find((p) => p.id === 'landmark-point')?.buildingId,
+  ).toBeUndefined();
+  expect(server.edits()).toEqual([]);
+});
+
 test('public initial camera includes the northern campus', async ({ page }) => {
   const { campus } = await setup(page, true);
   await page.goto('/');
