@@ -77,6 +77,10 @@ for (const change of plan.changes) {
 }
 const meta = records.find((r) => r.entity === "meta");
 if (!meta) throw Error("Source metadata missing");
+const sourceBaselineVersion = meta.payload.version;
+// The additive-patch RPC records the public package used for this reconciliation.
+// Keep source dates/hashes intact; only advance the package baseline identity.
+meta.payload.version = published.version;
 const current = applyEdits(
   withPublishedVisuals(assembleSources(records, published), published),
   hydrated,
@@ -152,6 +156,7 @@ const report: Record<string, unknown> = {
   campus,
   slug,
   baselineVersion: published.version,
+  sourceBaselineVersion,
   expectedHash,
   planHash: hash(plan),
   sourcePatches: patches.length,
@@ -193,6 +198,9 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
   await fs.writeFile(reportFile, JSON.stringify(report, null, 2));
   if (snapshotHash(await allRows("source_features"), await allRows("map_edits")) !== expectedHash)
     throw Error("Workspace changed while preserving backup");
+  const [activeRelease] = await db("releases?status=in.(queued,building)&select=id&limit=1");
+  if (activeRelease)
+    throw Error("A campus release is being built; complete it before applying detail");
   if (patches.length)
     report.reconciliationId = await db(
       "rpc/apply_additive_source_patch",
@@ -212,6 +220,8 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
       "return=representation",
       75000,
     );
+  // Persist a successful mutation receipt even if subsequent readback/submission fails.
+  await fs.writeFile(reportFile, JSON.stringify(report, null, 2));
   const accepted = await allRows("source_features"),
     saved = await allRows("map_edits");
   if (
@@ -221,6 +231,7 @@ if (process.env.APPLY_LAYER_UPGRADE === "true") {
   )
     throw Error("Apply readback differs; inspect the retained reconciliation before retrying");
   report.workspaceHash = snapshotHash(accepted, saved);
+  await fs.writeFile(reportFile, JSON.stringify(report, null, 2));
   const review = await db(
     "rpc/gis_submit_review",
     "POST",
