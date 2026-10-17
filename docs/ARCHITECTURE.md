@@ -6,7 +6,7 @@ The [ArcGIS bridge](../scripts/arcgis/bridge.py) produces a versioned exchange m
 
 Precision drawing shares the editor's command, undo, autosave and recovery paths. Reference snapping changes coordinates; explicit topology commands create routing connections. Geometry previews preserve polygon parts and holes. Batch appearance is a temporary rendering overlay until its single transaction is applied.
 
-Optional scenery recipes live in the reviewed visual catalogue. The release visual builder retains the recipe, the packager counts its bytes and validates its schema, and the browser verifies region geometry revisions before generating deterministic instances. Shared meshes/materials use the existing MapLibre/Three.js context and zoom/performance detail controls. Visitor visibility filters affect presentation while essential route and destination markers remain visible. [Contracts and release order](CAMPUS-DETAIL-UPGRADE.md).
+Optional scenery recipes live in the reviewed visual catalogue. The release visual builder retains the recipe, the packager counts its bytes and validates its schema, and the browser verifies region geometry revisions before generating deterministic instances. Shared meshes/materials use the existing MapLibre/Three.js context and zoom/performance detail controls. Scenery lifetime follows authoritative campus data independently of visitor-filtered display data; selection and visibility changes reuse instances, while source geometry or routing updates rebuild exclusions. Visitor visibility filters affect presentation while essential route and destination markers remain visible. [Contracts and release order](CAMPUS-DETAIL-UPGRADE.md).
 
 ## System overview
 

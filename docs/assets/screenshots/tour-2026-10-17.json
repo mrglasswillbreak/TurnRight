@@ -1,0 +1,20 @@
+{
+  "capturedDate": "2026-10-17",
+  "browser": "Codex in-app browser (Chromium)",
+  "scope": "Local candidate regression view; no GPS, authentication, production edit or physical-device claim. All detail layers are hidden and the mapped route and destination remain visible.",
+  "captures": [
+    {
+      "file": "tour-route-layers-2026-10-17.jpg",
+      "capturedAt": "2026-10-17T05:38:40.466592+01:00",
+      "applicationRevision": "07c72701965303d1135b724a9df0bfe78e8061c1",
+      "width": 1280,
+      "height": 720,
+      "sha256": "d9a708677ddd37b8114c9d78cb0e53b9bf16f412b11905044a104947001e5da5",
+      "url": "http://127.0.0.1:5197/?campus=unilag",
+      "fixture": "Local UNILAG candidate derived from unilag-bd659bbd6df2; actual release versions are recorded separately"
+    }
+  ],
+  "limitations": [
+    "Local Vite rejected a symlinked font path; this interaction capture uses a system-font fallback. Final publication captures are recorded separately."
+  ]
+}

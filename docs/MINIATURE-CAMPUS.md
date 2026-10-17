@@ -1,5 +1,7 @@
 # Miniature campus implementation · 14 September 2026
 
+The [17 October campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) extends this renderer across LASU and UNILAG with reviewed presentation plans, illustrative instanced greenery and visitor controls. Its coverage and budget measurements supersede the dated figures below. [Production](PRODUCTION.md) records what is actually deployed and published.
+
 ## Current authored-model extension
 
 [Expanded authoring](MODEL-AUTHORING.md) adds curves, editable topology and model files. Public compilation adds optional normals, PBR materials and hashed textures while preserving legacy fingerprints. The globe supports gentle rotation and decorative clouds through MapLibre projection helpers. The dated assessment below remains historical.

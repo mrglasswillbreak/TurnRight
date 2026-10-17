@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-17",
+  "state": "application-deployed-campus-details-approved-awaiting-preview-publication",
+  "application": {
+    "commit": "3b059ab74c7a36a35daba0cee6f403bd1abfc4a5",
+    "deploymentId": "7134218330",
+    "productionReadyAt": "2026-10-17T03:30:06Z",
+    "url": "https://turnright.vercel.app",
+    "pullRequest": 24
+  },
+  "preparationRevision": "cf8e87aa317459390008e2bffb25c493902c1550",
+  "applyRuns": [
+    38999412838,
+    38999509829
+  ],
+  "failedInitialApply": {
+    "run": 38999070603,
+    "reason": "Metadata package baseline was not advanced; additive-patch transaction rejected version mismatch",
+    "sourceChangesCommitted": 0,
+    "rollbackCopyVerified": true
+  },
+  "campuses": [
+    {
+      "campusId": "lasu",
+      "slug": "lasu",
+      "publishedBaseline": "lasu-6796771f6052",
+      "sourceBaselineBefore": "lasu-2b70a39ca041",
+      "workspaceBefore": "7a7c36bbedf7290a1bb18338f156e195675aa60a8904088f5e4e80c0e4d727a9",
+      "workspaceAfter": "e32ff03a298067ab62beb863387988d2b84c2e5ad738149b6a62176627bc5760",
+      "planHash": "421416511a6cc13147a6aa33eaab05db2b5a5fbf34368354d75552275a61f0ab",
+      "presentationChanges": 481,
+      "sourcePatches": 482,
+      "held": 5,
+      "correctionsPreserved": 158,
+      "geometryUnchanged": true,
+      "routingUnchanged": true,
+      "regions": 8,
+      "review": {
+        "id": "748818c4-7634-4955-ada2-3674b0b9f66b",
+        "status": "approved",
+        "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
+      },
+      "reconciliationId": "b9d52e5d-667b-439e-ab70-97e3289e4037"
+    },
+    {
+      "campusId": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "slug": "unilag",
+      "publishedBaseline": "unilag-bd659bbd6df2",
+      "sourceBaselineBefore": "unilag-a3779f9c3603",
+      "workspaceBefore": "acafd4e0345de1c32008c1ee334a0379ebd40042fcceab7420f7a41f6a801de9",
+      "workspaceAfter": "36df445633c2c4f117e02e0cdacee8b0d8948b2764a8d0df620efb4bacaa3be7",
+      "planHash": "82f69d76b7454277e0ab08945cd343895d2adf8526851adb9860704665efdd45",
+      "presentationChanges": 669,
+      "sourcePatches": 670,
+      "held": 29,
+      "correctionsPreserved": 201,
+      "geometryUnchanged": true,
+      "routingUnchanged": true,
+      "regions": 2429,
+      "review": {
+        "id": "cabb3184-e1de-47ca-82aa-394ef6fd8f73",
+        "status": "approved",
+        "contentHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb"
+      },
+      "reconciliationId": "210b7fcc-934b-4ed9-bd1f-c92199a8d2fe",
+      "release": {
+        "previewRun": 39005599892,
+        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+        "status": "queued",
+        "requestedAt": "2026-10-17T05:15:34Z",
+        "gateFailure": {
+          "job": 117317315711,
+          "test": "photo comparison edits and restores local recipes at 390px in dark mode",
+          "assertion": "Download edited image remained disabled after 30 seconds",
+          "artifact": 12090663967,
+          "artifactSha256": "1f7aa26a07b967b95b942a02fde968b411989377ca8e0c8a33436222103daa6d",
+          "diagnosticRun": 39006423579,
+          "diagnosticRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "changeToTests": false,
+          "applicationOrNetworkErrorCaptured": false,
+          "diagnosticStatus": "passed unchanged; root cause not established"
+        }
+      },
+      "initialPreview": {
+        "id": "fbc8a26a-49f3-4139-84ff-e75c222eccf0",
+        "version": "unilag-e066fb9863bc",
+        "previewRun": 38999895100,
+        "status": "preview",
+        "previewUrl": "https://turnright-co8t2f30z-muhammed-abdulhadi-s-projects.vercel.app",
+        "previewReadyAt": "2026-10-17T04:19:59Z",
+        "verificationRun": 39002274618,
+        "verificationStatus": "passed",
+        "disposition": "Awaiting replacement preview with scenery lifecycle fix before publication",
+        "verifiedAssets": 218,
+        "rollbackVersion": "unilag-bd659bbd6df2",
+        "verificationCredentialRevoked": true
+      }
+    }
+  ],
+  "newArcgisCandidatesPublished": false,
+  "physicalPhoneVerification": false,
+  "approvalRequired": "Independent reviewer or explicit original-owner override for each exact immutable hash",
+  "productionBrowserAuditRun": 38999072900,
+  "ownerAuthorization": "Explicit user authorization for both exact hashes and the recorded original-owner exception; preview verification and separate publication authorized.",
+  "productionBrowserAudit": {
+    "packages": "October 15 packages with October 17 application",
+    "offlineJourneys": 4,
+    "result": "passed",
+    "assets": 175,
+    "visualCombinations": 32
+  },
+  "unilagPreviewRun": 38999895100,
+  "approvalReason": "Owner authorizes the October 17 presentation updates without a separate reviewer; geometry, routing and corrections are preserved, new ArcGIS discoveries remain held, and physical-device/field verification remains outstanding.",
+  "nativeGeometryReview": "measurements/campus-geometry-warnings-2026-10-17.json",
+  "preparationFix": {
+    "pullRequest": 25,
+    "commit": "74702e17acf96e0f64edf3c532c3ef12ee454fd2",
+    "auditRun": 38999307136,
+    "attempts": 2,
+    "result": "passed",
+    "initialFailure": "WebKit rotation layout assertion; complete unchanged shard passed on rerun",
+    "deploymentUrl": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/Esojj1U7R1KcTML2Hot2F5qWURzz",
+    "deploymentStatus": "success"
+  },
+  "rendererFix": {
+    "pullRequest": 26,
+    "commit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+    "reason": "Visitor filtering regenerated unchanged scenery; key scenery lifetime to authoritative data",
+    "localGenerationMs": [
+      985,
+      864
+    ],
+    "localGenerationScope": "UNILAG candidate, 2429 regions, 1500 instances, Node 22 on development machine; not an FPS measurement",
+    "localLifecycleTests": "passed",
+    "localLayerControls": "All five controls changed without automation timeout after fix",
+    "status": "deployed",
+    "commits": [
+      "07c72701965303d1135b724a9df0bfe78e8061c1",
+      "554e32e5efd735a4463b25328b1945576ac2bcff"
+    ],
+    "pointLandmarks": "Mapped points use View area in 3D; linked buildings keep bounds/model evidence; no source association inferred",
+    "auditRun": 39004159633,
+    "pointLandmarkBrowserCheck": "LASU Senate mapped-point action changed 2D to a framed 3D area; approved place/building relationships unchanged",
+    "quality": {
+      "unitPassed": 824,
+      "unitSkipped": 1,
+      "files": 114,
+      "lazy3DKiBGzip": 264.2,
+      "publicStartupGzipBytes": 428785,
+      "additionalOwnerGzipBytes": 186064,
+      "webkitPassed": 102,
+      "webkitSkipped": 1,
+      "additionalWebkitPhotoPassed": 15,
+      "offline": "passed",
+      "nativeImportAndDatabase": "passed",
+      "chromiumPassed": 202,
+      "chromiumSkipped": 14
+    },
+    "testedHead": "554e32e5efd735a4463b25328b1945576ac2bcff",
+    "productionDeploymentId": "7135198486",
+    "productionReadyAt": "2026-10-17T05:16:09Z",
+    "deploymentUrl": "https://turnright-ps4tainbn-muhammed-abdulhadi-s-projects.vercel.app"
+  },
+  "nativeBatchAppearance": "measurements/pro-batch-appearance-2026-10-17.json",
+  "localIdTutorial": "measurements/id-browser-study-2026-10-17.json",
+  "projectReferenceAudit": "measurements/pro-project-portability-2026-10-17.json",
+  "portableResearchIndex": "measurements/portable-research-index-2026-10-17.json"
+}

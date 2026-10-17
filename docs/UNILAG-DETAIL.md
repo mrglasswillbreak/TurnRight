@@ -1,6 +1,6 @@
 # UNILAG detail and evidence coverage · 30 September 2026
 
-This is a dated source/release record. The [15 October publication](PRODUCTION.md#published-campus-drafts--15-october-2026) supersedes its package inventory; retained source evidence and unresolved field checks still apply.
+This is a dated source/release record. The [current campus detail record](CAMPUS-DETAIL-UPGRADE.md) and [production receipts](PRODUCTION.md) supersede its package inventory; retained source evidence and unresolved field checks still apply.
 
 The detail upgrade uses LASU's shared map palette, labels, place icons and 2D/3D presentation while retaining UNILAG's geography and existing route permissions. [Production receipt](PRODUCTION.md) records the actual published version and asset checks.
 

@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-17T03:52:37.672262+00:00",
+  "proVersion": "3.7",
+  "sourceMutation": false,
+  "geometryRepair": false,
+  "units": {
+    "area": "square metres",
+    "length": "metres"
+  },
+  "measurement": "ArcPy geodesic measurements on copied source geometry",
+  "layers": [
+    {
+      "campus": "lasu",
+      "sourceCollection": "arcgis:3050f375e48b40feb1dbb67566002397:LULC_shapefile_1022:0",
+      "name": "Land Use Land Cover \u00b7 0842fb",
+      "nativeCopy": "lasu_1",
+      "spatialReference": 4326,
+      "datasetProblems": [],
+      "features": [
+        {
+          "nativeFeatureId": 7,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 177,
+          "rings": 1,
+          "areaM2": 510466.40520100767,
+          "lengthM": 6156.5840560974175
+        },
+        {
+          "nativeFeatureId": 8,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 100,
+          "rings": 1,
+          "areaM2": 251852.58812610054,
+          "lengthM": 3944.2263738658
+        },
+        {
+          "nativeFeatureId": 10,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 20,
+          "rings": 1,
+          "areaM2": 50184.500772035026,
+          "lengthM": 947.868427052669
+        },
+        {
+          "nativeFeatureId": 11,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 22,
+          "rings": 1,
+          "areaM2": 11278.036862132887,
+          "lengthM": 499.07441458311206
+        },
+        {
+          "nativeFeatureId": 12,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 81,
+          "rings": 6,
+          "areaM2": 10049.75912945794,
+          "lengthM": 1393.4713687751794
+        },
+        {
+          "nativeFeatureId": 13,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 36,
+          "rings": 1,
+          "areaM2": 10535.608396622305,
+          "lengthM": 549.8543672679663
+        },
+        {
+          "nativeFeatureId": 16,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 83,
+          "rings": 1,
+          "areaM2": 191600.25383613142,
+          "lengthM": 3455.4359872816763
+        },
+        {
+          "nativeFeatureId": 17,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 107,
+          "rings": 4,
+          "areaM2": 157035.79976638115,
+          "lengthM": 4941.9091249895355
+        },
+        {
+          "nativeFeatureId": 20,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 63,
+          "rings": 1,
+          "areaM2": 32519.177313395423,
+          "lengthM": 1586.3635438863357
+        },
+        {
+          "nativeFeatureId": 26,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 8,
+          "rings": 1,
+          "areaM2": 11653.529523808245,
+          "lengthM": 454.6554993975535
+        },
+        {
+          "nativeFeatureId": 27,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 11,
+          "rings": 1,
+          "areaM2": 22990.48848879816,
+          "lengthM": 647.0048416681634
+        },
+        {
+          "nativeFeatureId": 29,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 9,
+          "rings": 1,
+          "areaM2": 776.4599933612408,
+          "lengthM": 113.46048754640415
+        },
+        {
+          "nativeFeatureId": 30,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 18,
+          "rings": 1,
+          "areaM2": 14277.323915208563,
+          "lengthM": 548.2798525329406
+        }
+      ],
+      "nullSourceRecords": 0
+    },
+    {
+      "campus": "lasu",
+      "sourceCollection": "arcgis:ffd68667b1464eeb999c0050897a82a0:LU_Type_shapefile_8803:0",
+      "name": "Land Use Land Cover \u00b7 6389bd",
+      "nativeCopy": "lasu_5",
+      "spatialReference": 4326,
+      "datasetProblems": [],
+      "features": [
+        {
+          "nativeFeatureId": 1,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 20,
+          "rings": 1,
+          "areaM2": 50184.500772035026,
+          "lengthM": 947.868427052669
+        },
+        {
+          "nativeFeatureId": 2,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 22,
+          "rings": 1,
+          "areaM2": 11278.036862132887,
+          "lengthM": 499.07441458311206
+        },
+        {
+          "nativeFeatureId": 9,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 81,
+          "rings": 6,
+          "areaM2": 10049.75912945794,
+          "lengthM": 1393.4713687751794
+        },
+        {
+          "nativeFeatureId": 10,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 36,
+          "rings": 1,
+          "areaM2": 10535.608396622305,
+          "lengthM": 549.8543672679663
+        },
+        {
+          "nativeFeatureId": 11,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 63,
+          "rings": 1,
+          "areaM2": 32519.177313395423,
+          "lengthM": 1586.3635438863357
+        },
+        {
+          "nativeFeatureId": 22,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 83,
+          "rings": 1,
+          "areaM2": 191600.25383613142,
+          "lengthM": 3455.4359872816763
+        },
+        {
+          "nativeFeatureId": 23,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 8,
+          "rings": 1,
+          "areaM2": 11653.529523808245,
+          "lengthM": 454.6554993975535
+        },
+        {
+          "nativeFeatureId": 24,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 11,
+          "rings": 1,
+          "areaM2": 22990.48848879816,
+          "lengthM": 647.0048416681634
+        },
+        {
+          "nativeFeatureId": 26,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 107,
+          "rings": 4,
+          "areaM2": 157035.79976638115,
+          "lengthM": 4941.9091249895355
+        },
+        {
+          "nativeFeatureId": 27,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 177,
+          "rings": 1,
+          "areaM2": 510466.40520100767,
+          "lengthM": 6156.5840560974175
+        },
+        {
+          "nativeFeatureId": 28,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 100,
+          "rings": 1,
+          "areaM2": 251852.58812610054,
+          "lengthM": 3944.2263738658
+        },
+        {
+          "nativeFeatureId": 29,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 9,
+          "rings": 1,
+          "areaM2": 776.4599933612408,
+          "lengthM": 113.46048754640415
+        },
+        {
+          "nativeFeatureId": 30,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 18,
+          "rings": 1,
+          "areaM2": 14277.323915208563,
+          "lengthM": 548.2798525329406
+        }
+      ],
+      "nullSourceRecords": 0
+    },
+    {
+      "campus": "unilag",
+      "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/15",
+      "name": "Greenland \u00b7 c27d7a",
+      "nativeCopy": "unilag_1",
+      "spatialReference": 4326,
+      "datasetProblems": [
+        {
+          "nativeFeatureId": -1,
+          "problems": [
+            "bad dataset extent"
+          ]
+        }
+      ],
+      "features": [],
+      "nullSourceRecords": 0
+    },
+    {
+      "campus": "unilag",
+      "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/4",
+      "name": "RoadCtl \u00b7 cefa32",
+      "nativeCopy": "unilag_29",
+      "spatialReference": 4326,
+      "datasetProblems": [],
+      "features": [
+        {
+          "nativeFeatureId": 25,
+          "problems": [
+            "short segments"
+          ],
+          "parts": 1,
+          "points": 67,
+          "rings": 0,
+          "areaM2": null,
+          "lengthM": 976.5124291051162
+        }
+      ],
+      "nullSourceRecords": 0
+    },
+    {
+      "campus": "unilag",
+      "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/6",
+      "name": "SportsPolygon \u00b7 f5fcee",
+      "nativeCopy": "unilag_31",
+      "spatialReference": 4326,
+      "datasetProblems": [],
+      "features": [],
+      "nullSourceRecords": 1
+    }
+  ]
+}

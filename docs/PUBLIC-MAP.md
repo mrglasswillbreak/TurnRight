@@ -2,7 +2,13 @@
 
 TurnRight lets visitors explore published campuses and use prepared maps offline. No account is required. Open [the public map](https://turnright.vercel.app/) or run the development seed using the [quick start](../README.md#run-locally).
 
-The local [campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) adds **Map layers** controls with preferences saved per campus, a curated **Landmarks** filter and **View in 3D**. Decorative vegetation is illustrative and does not describe surveyed trees or route obstacles. LASU/UNILAG detail candidates still require private review and independent publication; their presence in local code does not mean the public packages have changed.
+The [campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) provides **Map layers** controls with preferences saved per campus, a curated **Landmarks** filter and **View in 3D** for eligible places in approved packages. Decorative vegetation is illustrative and does not describe surveyed trees or route obstacles. Application updates and campus publication are separate; [Production](PRODUCTION.md) records the actual live campus versions.
+
+Open **Map layers** to show or hide Buildings, Greenery, Surfaces, Amenities and Landmarks, or choose **Show all**. Route guidance, entrances, gates and the selected destination remain visible. The category-row **Landmarks** filter changes the place list; the layer checkbox changes map visibility. **View in 3D** frames the linked building. Curated point landmarks offer **View area in 3D**, centred on their mapped location without inferring a building association. Both actions respect reduced-motion preferences. Older downloaded packages continue to work with their existing content and display defaults. Use **Offline → Download update** to receive a newly published campus package.
+
+![Mapped route and destination remain visible with detail layers hidden](assets/screenshots/tour-route-layers-2026-10-17.jpg)
+
+This dated local regression capture demonstrates layer behaviour; [capture provenance](assets/screenshots/tour-2026-10-17.json) and [production receipts](PRODUCTION.md) identify its scope and the actual released packages.
 
 ## Choose and explore a campus
 

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-17T05:12:00.8832090Z",
+  "kind": "private-campus-research-index",
+  "campusFilesReverified": 123,
+  "reaFilesCopiedAndVerified": 6,
+  "publicImportAuthorized": false,
+  "files": [
+    {
+      "file": "lasu/archive.json",
+      "bytes": 6930,
+      "sha256": "77e1960f137f672d9af3ca2c225bff8f91b8dd848d30237a42e795fdbcdf38f7"
+    },
+    {
+      "file": "unilag/archive.json",
+      "bytes": 31651,
+      "sha256": "2aa5da9144de4113a558d65416affdf520070cdef7d23674ba769239b7cbccf9"
+    },
+    {
+      "file": "native-source-review-final/source-review.json",
+      "bytes": 3126192,
+      "sha256": "e7e1159ec1ac31c0d69873c9915551cbeeb9965b8ceddfbf67f14218b13b8de5"
+    },
+    {
+      "file": "native-source-review-final/geometry-warning-details.json",
+      "bytes": 9715,
+      "sha256": "3e72b652b364d9558c7b5bc62951b9b1df989eb1591f1c9c56233ee6af9b3254"
+    },
+    {
+      "file": "synthetic-workflows/results.json",
+      "bytes": 2092,
+      "sha256": "7397c2c34c81f82ddc392a08b6c596916c3d6dcce3c003d55d57d281f53b47cb"
+    },
+    {
+      "file": "synthetic-workflows/turnright-glb-import.json",
+      "bytes": 398,
+      "sha256": "7f33ec6470f36126b8c301c8a58206920e541078f52f7fdd38426b81e4851499"
+    },
+    {
+      "file": "pro-batch-appearance/results.json",
+      "bytes": 1104,
+      "sha256": "c6265cb4cadb0f13cae4d1a69bea7eb47fc6ebeb15db4a63f81494c9bf57dd28"
+    },
+    {
+      "file": "pro-batch-appearance/portable-check.json",
+      "bytes": 229,
+      "sha256": "440d7f8975f135e9d5c672f0fa2d6ddf5178c9bacd1906d857e1b2fb760d8ec9"
+    },
+    {
+      "file": "rea-evidence/archive.json",
+      "bytes": 1332,
+      "sha256": "9712712f72f4e6c71a52f2dc0eb62ebc13c284157a2aea4dd4c9162a2e201693"
+    },
+    {
+      "file": "id-browser-study/report.json",
+      "bytes": 1453,
+      "sha256": "956d4fe9a48655ab680797a44e1399ab1bb5e761b508b1a4731584a2e8a25477"
+    },
+    {
+      "file": "START-HERE.txt",
+      "bytes": 2068,
+      "sha256": "1ab8c8ef84ba2cb53365dbda6082ea2b9a5a05adeebdd23d9e05448fa7a3bbbe"
+    }
+  ]
+}

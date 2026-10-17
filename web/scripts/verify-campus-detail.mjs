@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { chromium, webkit, expect } from '@playwright/test';
 import { createServer } from 'node:http';
 import { requestPublishedAsset } from './published-assets.mjs';
+import { packageInvariants } from './package-invariants.mjs';
 const origin = process.env.VERIFY_ORIGIN || 'https://turnright.vercel.app';
 const output = path.resolve(
   process.env.VERIFY_OUTPUT || 'work/campus-detail-verification',
@@ -119,6 +120,15 @@ const report = {
       .length,
     places: data.places.length,
     photos: data.photos?.length || 0,
+    landmarks: data.places.filter((place) => place.landmark).length,
+    visuals: {
+      revision: data.visuals?.revision,
+      bytes: data.visuals?.bytes,
+      buildings: data.visuals?.buildings?.length,
+      sceneryRegions: data.visuals?.scenery?.regions?.length || 0,
+      maxInstances: data.visuals?.scenery?.maxInstances || 0,
+    },
+    invariants: packageInvariants(data),
     inspectedPlaceId: photographedPlace.id,
     inspectedBuildingId: photographedPlace.buildingId || photographedPlace.id,
   })),

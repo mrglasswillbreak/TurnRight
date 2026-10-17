@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-17T05:19:56.9235166Z",
+  "method": "ArcGIS Pro 3.7 ArcPy project read; no project edits",
+  "project": "Documents/ArcGIS/Projects/TurnRightDetail/TurnRightDetail.aprx",
+  "maps": [
+    {
+      "name": "LASU Ojo · 3D review",
+      "type": "SCENE",
+      "layers": 1,
+      "broken": 0
+    },
+    {
+      "name": "LASU Ojo · source review",
+      "type": "MAP",
+      "layers": 10,
+      "broken": 0
+    },
+    {
+      "name": "UNILAG Akoka · 3D review",
+      "type": "SCENE",
+      "layers": 1,
+      "broken": 0
+    },
+    {
+      "name": "UNILAG Akoka · source review",
+      "type": "MAP",
+      "layers": 35,
+      "broken": 0
+    }
+  ],
+  "localSources": 45,
+  "localSourcesWithinProject": 45,
+  "projectSha256": "e0401f2f1df91a819550640e537bf2b63279cfd15ce0597d6e97914b480914c9",
+  "limitation": "Layer readability is not source permission, current survey evidence or completed desktop editing acceptance."
+}

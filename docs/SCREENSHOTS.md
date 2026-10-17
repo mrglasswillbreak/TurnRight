@@ -2,6 +2,10 @@
 
 The main product tour was refreshed on **15 October 2026** from the current local application, including the public map/globe, editor, all GIS workspaces, building models, photographs and offline controls. Dated source-update and recovery captures remain below. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/tour-2026-10-15.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
+## Visitor-layer regression · 17 October 2026
+
+The [UNILAG route-layer capture](assets/screenshots/tour-route-layers-2026-10-17.jpg) shows a local candidate with all five presentation layers hidden. The route, destination and mapped approach remain visible. It verifies the scenery lifecycle fix and presentation separation, not a public release or physical-phone performance. [Capture identity and hash](assets/screenshots/tour-2026-10-17.json).
+
 ## Published campus maps · 15 October 2026
 
 The [LASU desktop](assets/screenshots/live-lasu-published-2026-10-15.jpg) and [UNILAG phone viewport](assets/screenshots/live-unilag-published-2026-10-15.jpg) were captured directly from production after their approved map releases. [Capture hashes, dimensions and package identities](assets/screenshots/live-publication-2026-10-15.json) · [Publication and full asset checks](assets/campus-publication-2026-10-15.json). These captures replace the two public map images in the README; the complete local editor tour below retains its original fixture provenance.
