@@ -1,5 +1,13 @@
 # Production readiness and deployment records
 
+## Campus detail publication · 17 October 2026
+
+UNILAG's reviewed detail package is published as **`unilag-4667e8f529d6`**. The [promotion workflow](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39009448556) verified production and domain assignment at **10:31:02 UTC**, after the complete WebKit shard passed on its third attempt. The earlier failures and focused diagnostic are recorded below. LASU's separately approved preview is in progress; its public version remains `lasu-6796771f6052` at this checkpoint.
+
+The [public readback](assets/campus-detail-integrity-2026-10-17-after-unilag.json) and [baseline comparison](assets/campus-detail-integrity-2026-10-17-unilag-public-comparison.json) preserve all nine geometry/navigation/source-relationship fingerprints for both campuses. LASU's version and manifest hash are unchanged. UNILAG contains 723 buildings, three curated landmarks and 2,429 illustrative scenery regions with a 1,500-instance cap. Its 1,681,918 packaged visual bytes remain below the 12 MiB budget.
+
+The installed public browser updated UNILAG through **Offline → Download update** and reported **Ready offline**, all model files verified and all 16 approved photographs retained. Landmark details and 3D framing were checked on that installed package. [Dated public captures](assets/screenshots/live-publication-2026-10-17.json) identify the exact version and image hashes. Browser checks do not establish physical-phone frame rate, GPS/field accuracy or source rights.
+
 ## Campus detail application deployment · 17 October 2026
 
 [PR #24](https://github.com/mrglasswillbreak/TurnRight/pull/24) merged through the protected branch as `3b059ab74c7a36a35daba0cee6f403bd1abfc4a5`. Its [Vercel production deployment](https://vercel.com/muhammed-abdulhadi-s-projects/turnright/BHrnofSLmsKB34BZ9xmtUFjNaxwu) reported success at **03:30:06 UTC**. The deployed application adds the ArcGIS exchange reader, precision tools, illustrative scenery renderer, visitor-layer preferences and landmark controls. No new database migration was required; production remains compatible with migrations through 055.

@@ -1,0 +1,29 @@
+{
+  "capturedDate": "2026-10-17",
+  "browser": "Codex in-app browser (Chromium)",
+  "scope": "Actual published maps and verified installed downloads. No GPS requested; not physical-phone or field acceptance.",
+  "captures": [
+    {
+      "file": "live-unilag-offline-2026-10-17.jpg",
+      "capturedAt": "2026-10-17T13:35:10.653Z",
+      "applicationRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+      "packageVersion": "unilag-4667e8f529d6",
+      "width": 1280,
+      "height": 720,
+      "sha256": "5d8e4da2b2c095e5af5aef7473e5197fc88003ac992477dc6f70c855fb0b172a",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "fixture": "Actual published campus, updated through the public offline controls; no synthetic account or data"
+    },
+    {
+      "file": "live-unilag-published-2026-10-17.jpg",
+      "capturedAt": "2026-10-17T13:37:19.053Z",
+      "applicationRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+      "packageVersion": "unilag-4667e8f529d6",
+      "width": 1280,
+      "height": 720,
+      "sha256": "5fe135fba7843516486e64f8d9688d4a16e16fa414066b91d0c95f227dac882e",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "fixture": "Actual published campus, updated through the public offline controls; no synthetic account or data"
+    }
+  ]
+}

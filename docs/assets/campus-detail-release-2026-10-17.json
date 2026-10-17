@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "date": "2026-10-17",
-  "state": "application-deployed-campus-details-approved-awaiting-preview-publication",
+  "state": "unilag-published-lasu-preview-running",
   "application": {
     "deploymentId": "7135198486",
     "productionReadyAt": "2026-10-17T05:16:09Z",
@@ -43,12 +43,19 @@
       },
       "reconciliationId": "b9d52e5d-667b-439e-ab70-97e3289e4037",
       "draftRecheck": {
-        "checkedAt": "2026-10-17T05:52:20.4661633Z",
+        "checkedAt": "2026-10-17T13:32:55.533993Z",
         "method": "Authenticated Review > Inspect immutable submission",
         "matchesCurrentDraft": true,
         "sources": 6047,
         "corrections": 158,
         "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
+      },
+      "release": {
+        "requestedAt": "2026-10-17T13:31:58Z",
+        "previewRun": 39036949833,
+        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+        "status": "queued",
+        "retainedOtherCampus": "unilag-4667e8f529d6"
       }
     },
     {
@@ -111,7 +118,7 @@
       "release": {
         "previewRun": 39007270314,
         "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
-        "status": "preview",
+        "status": "published",
         "requestedAt": "2026-10-17T05:42:53Z",
         "id": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
         "version": "unilag-4667e8f529d6",
@@ -139,7 +146,7 @@
         "verificationArtifactSha256": "e2e1e3af57b4ec167fa96cfca67e26e6bfd7824e54f3aa54042208fac9580bf3",
         "publicationRun": 39009448556,
         "publicationRequestedAt": "2026-10-17T06:18:56Z",
-        "publicationStatus": "Complete unchanged WebKit shard rerun, attempt 3",
+        "publicationStatus": "passed on attempt 3; production and domain assignment verified",
         "publicationFailures": [
           {
             "failure": "Add locator reached performing click action, then the test exceeded 120 seconds",
@@ -175,6 +182,21 @@
           "processesStopped": true,
           "output": "web/work/rotation-diagnostic",
           "limitation": "Vite denied the symlinked font URL; local software rendering and test initialization exceeded the existing 120-second bound"
+        },
+        "productionVerifiedAt": "2026-10-17T10:31:02Z",
+        "publicReadbackAt": "2026-10-17T13:28:34Z",
+        "publicUrl": "https://turnright.vercel.app/?campus=unilag",
+        "otherCampusManifestUnchanged": true,
+        "installedBrowserCheck": {
+          "landmark3D": true,
+          "allModelsVerified": true,
+          "action": "Offline > Download update",
+          "previousVersion": "unilag-bd659bbd6df2",
+          "photos": 16,
+          "screenshots": "screenshots/live-publication-2026-10-17.json",
+          "readyOffline": true,
+          "currentVersion": "unilag-4667e8f529d6",
+          "checkedAt": "2026-10-17T13:38:11.0628457Z"
         }
       },
       "draftRecheck": {

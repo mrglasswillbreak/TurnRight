@@ -1,0 +1,64 @@
+{
+  "checkedAt": "2026-10-17T13:28:26.632Z",
+  "origin": "https://turnright.vercel.app",
+  "label": "after-unilag",
+  "catalogueSha256": "c25780466d777931f8bb8f6e6548e11f441be1f15f9457c2437a35d896edb486",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "version": "lasu-6796771f6052",
+      "manifestSha256": "a5d30e7fa89749411af50bd5e0906b7c7abe6749ca507480adb0021282e2fcfb",
+      "dataSha256": "abe568f55bede07f7d18411a3894a6273ee485fd717daac0c4a61a32b674e6fa",
+      "assets": 129,
+      "features": 830,
+      "buildings": 614,
+      "landmarks": 0,
+      "visuals": {
+        "revision": "5fa109405ff911ee",
+        "bytes": 10095226,
+        "buildings": 614,
+        "sceneryRegions": 0,
+        "maxInstances": 0
+      },
+      "invariants": {
+        "geometry": "b218c79e4818bf49f4b62042d94c9c52bba101d9758a5fd7be87a9aa0a905e6f",
+        "boundary": "ae47c22bf831bf0fbed0cb382a60e91f09b386afc2106e0c440f81d6b557d2dc",
+        "graph": "2bf3d306f1e742d38164b3bc4358445d9d2112f22cf9b340cdab213cf3f9a469",
+        "entrances": "538c6432ccd7ab4992316ffcca2763c57ce409834af371b470b9feb9abd9a02d",
+        "photos": "23d73256d0b88d8e9b7fbc8579a021099a704664242db7d8b9f1e6748d315433",
+        "closures": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "driving": "6465ad82b16eb9827536f9052db34a6878df862531f41f1b55e363b08843c594",
+        "accessPolicy": "47326dea07f680d1245c5660d62dd033747d2e0b20b34ca3c5bee402efe434cb",
+        "places": "671f4b5e1d2678773a44efa5dac38fe1e928b474035f458b722b1899686581d5"
+      }
+    },
+    {
+      "slug": "unilag",
+      "version": "unilag-4667e8f529d6",
+      "manifestSha256": "93d4fe6d9fc7535a1149d5e27a6b4989b42f842ccf3407068323fe0203525ba6",
+      "dataSha256": "edf9ec5a9164ec87956e4329aa81f1df35af507856b6c5259f62f8c84f35d56d",
+      "assets": 89,
+      "features": 3928,
+      "buildings": 723,
+      "landmarks": 3,
+      "visuals": {
+        "revision": "574591a99962272e",
+        "bytes": 1681918,
+        "buildings": 723,
+        "sceneryRegions": 2429,
+        "maxInstances": 1500
+      },
+      "invariants": {
+        "geometry": "dfce40f3bb8336fe6ee617e1efec89d8b825f55b9dbd7b7b9374ffad46d0e0ca",
+        "boundary": "40568e89a882ecd9e48d7db195d8ba324de2e98d41016afcf12bd10ea39fb84b",
+        "graph": "b34e29ac64895deb333beafa827aa9491d434d7b1aa9cf53ce8783b91a427dab",
+        "entrances": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "photos": "54f928f1889494d177bb99075f8a612ce910b7707e1f71301f436817c49a7bec",
+        "closures": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "driving": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "accessPolicy": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "places": "deefad6495c23bef038c9b4cf6067b0a4c12d4b50bfddf50e7ef92f29f786666"
+      }
+    }
+  ]
+}
