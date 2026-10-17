@@ -64,24 +64,6 @@
         "contentHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb"
       },
       "reconciliationId": "210b7fcc-934b-4ed9-bd1f-c92199a8d2fe",
-      "release": {
-        "previewRun": 39005599892,
-        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
-        "status": "queued",
-        "requestedAt": "2026-10-17T05:15:34Z",
-        "gateFailure": {
-          "job": 117317315711,
-          "test": "photo comparison edits and restores local recipes at 390px in dark mode",
-          "assertion": "Download edited image remained disabled after 30 seconds",
-          "artifact": 12090663967,
-          "artifactSha256": "1f7aa26a07b967b95b942a02fde968b411989377ca8e0c8a33436222103daa6d",
-          "diagnosticRun": 39006423579,
-          "diagnosticRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
-          "changeToTests": false,
-          "applicationOrNetworkErrorCaptured": false,
-          "diagnosticStatus": "passed unchanged; root cause not established"
-        }
-      },
       "initialPreview": {
         "id": "fbc8a26a-49f3-4139-84ff-e75c222eccf0",
         "version": "unilag-e066fb9863bc",
@@ -95,6 +77,34 @@
         "verifiedAssets": 218,
         "rollbackVersion": "unilag-bd659bbd6df2",
         "verificationCredentialRevoked": true
+      },
+      "failedPreviews": [
+        {
+          "previewRun": 39005599892,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "status": "failed before package build",
+          "requestedAt": "2026-10-17T05:15:34Z",
+          "gateFailure": {
+            "job": 117317315711,
+            "test": "photo comparison edits and restores local recipes at 390px in dark mode",
+            "assertion": "Download edited image remained disabled after 30 seconds",
+            "artifact": 12090663967,
+            "artifactSha256": "1f7aa26a07b967b95b942a02fde968b411989377ca8e0c8a33436222103daa6d",
+            "diagnosticRun": 39006423579,
+            "diagnosticRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+            "changeToTests": false,
+            "applicationOrNetworkErrorCaptured": false,
+            "diagnosticStatus": "passed unchanged; root cause not established"
+          },
+          "id": "eec360da-e2eb-4a20-9a36-f06b2dd4debd",
+          "failureRecordedAt": "2026-10-17T05:40:47Z"
+        }
+      ],
+      "release": {
+        "previewRun": 39007270314,
+        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+        "status": "queued",
+        "requestedAt": "2026-10-17T05:42:53Z"
       }
     }
   ],

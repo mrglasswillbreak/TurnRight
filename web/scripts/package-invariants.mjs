@@ -16,6 +16,7 @@ const sorted = (items) =>
   [...(items || [])].sort((a, b) =>
     String(a.id ?? a.properties?.id).localeCompare(
       String(b.id ?? b.properties?.id),
+      'en',
     ),
   );
 
