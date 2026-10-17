@@ -24,6 +24,17 @@
       "sha256": "5fe135fba7843516486e64f8d9688d4a16e16fa414066b91d0c95f227dac882e",
       "url": "https://turnright.vercel.app/?campus=unilag",
       "fixture": "Actual published campus, updated through the public offline controls; no synthetic account or data"
+    },
+    {
+      "file": "live-unilag-route-layers-2026-10-17.jpg",
+      "capturedAt": "2026-10-17T14:11:57.575Z",
+      "applicationRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+      "packageVersion": "unilag-4667e8f529d6",
+      "width": 1280,
+      "height": 720,
+      "sha256": "63afa31300105393811110fc3a2d8c34ccbb3b550bcfaa6e4a9e79096a3b997d",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "fixture": "Actual published campus, updated through the public offline controls; no synthetic account or data"
     }
   ]
 }

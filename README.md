@@ -19,7 +19,9 @@ TurnRight combines a public campus map and globe with a private GIS editor. Visi
 
 The LASU Ojo and UNILAG Akoka upgrade adds precision drawing, previewed geometry refinement, reusable building palettes, illustrative greenery, per-campus visitor layers and landmark exploration. It retains the MapLibre/Three.js renderer, authored buildings, routing, source attribution and existing editor corrections. Recorded, estimated and illustrative dimensions remain distinct.
 
-The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, local previews and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. ArcGIS Pro is an optional research workstation; published navigation and portable evidence do not require its licence. The remaining Pro window is prioritized for native analysis and durable exports.
+The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, source review and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. It keeps portal authentication local and sends imports through the existing private review workflow.
+
+The October 17 Pro review checked 52 copied vector layers and preserved GeoJSON, GeoPackage, provenance, geometry findings and synthetic GLB examples outside the repository's temporary output. The dedicated LASU/UNILAG project has four maps/scenes and no broken references. [Archive index and remaining Pro priorities](docs/CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) explain what is saved and what still needs evidence during the 21-day access window. Published navigation and portable exports continue to work after Pro access ends. [REA and local iD studies](docs/CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification) inform the editor; native API exercises and browser observations are recorded separately from complete desktop workflow acceptance.
 
 | LASU detail candidate | UNILAG detail candidate |
 | --- | --- |

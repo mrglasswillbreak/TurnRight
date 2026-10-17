@@ -51,12 +51,35 @@
         "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
       },
       "release": {
-        "requestedAt": "2026-10-17T13:31:58Z",
-        "previewRun": 39036949833,
+        "previewRun": 39039475212,
         "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+        "requestedAt": "2026-10-17T14:08:26Z",
         "status": "queued",
         "retainedOtherCampus": "unilag-4667e8f529d6"
-      }
+      },
+      "failedPreviews": [
+        {
+          "requestedAt": "2026-10-17T13:31:58Z",
+          "previewRun": 39036949833,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "status": "failed before package build",
+          "retainedOtherCampus": "unilag-4667e8f529d6",
+          "gateFailure": {
+            "job": 117408609728,
+            "test": "model workspace touch layouts: landscape side panel and portrait input survive rotation and keyboard resize",
+            "artifact": 12103270767,
+            "artifactSha256": "656235d21a3188cae4053d744b6b87b18bc1d4fe6dbbc19f6449821753d7cf0d",
+            "diagnosis": "Correct model-landscape snapshots and bounds at 667x375, 844x390 and 1024x768. Browser observations ceased during resize to 1280x591; the subsequent class assertion returned no observation. No captured console error; root cause not established.",
+            "diagnosticRun": 39038609269,
+            "diagnosticStatus": "Targeted rotation case passed unchanged on Chromium and WebKit (30.7s on WebKit); quality/offline passed. The separate WebKit photo run failed with Target crashed in automatic compression/failed-original preservation; 14 other photo cases passed.",
+            "testOrGuardChanges": false,
+            "diagnosticPhotoArtifact": 12103077178,
+            "diagnosticPhotoArtifactSha256": "e9b5c17ec7359327bf18327b943014ac6b2e9f628fd27b69d37a591eb9f45aa4"
+          },
+          "id": "88df856c-6843-4192-80ff-3d3fd80f9e32",
+          "failureRecordedAt": "2026-10-17T14:02:28Z"
+        }
+      ]
     },
     {
       "campusId": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
@@ -196,7 +219,22 @@
           "screenshots": "screenshots/live-publication-2026-10-17.json",
           "readyOffline": true,
           "currentVersion": "unilag-4667e8f529d6",
-          "checkedAt": "2026-10-17T13:38:11.0628457Z"
+          "checkedAt": "2026-10-17T13:38:11.0628457Z",
+          "publicLayerRouteCheck": {
+            "checkedAt": "2026-10-17T14:15:34.624Z",
+            "version": "unilag-4667e8f529d6",
+            "origin": "Teslim Olawale Elias Library",
+            "destination": "Senate Building",
+            "routeMetres": 130,
+            "routeMinutes": 2,
+            "allOptionalLayersHidden": true,
+            "routeAndArrivalMarkerRetained": true,
+            "allFivePreferencesSurviveReload": true,
+            "allLayersRestored": true,
+            "gpsStarted": false,
+            "capture": "screenshots/live-unilag-route-layers-2026-10-17.jpg",
+            "limitation": "Some local browser-control commands reported dispatch deadlines; fresh accessibility state confirmed their completed changes. No interaction-latency or physical-device claim."
+          }
         }
       },
       "draftRecheck": {
