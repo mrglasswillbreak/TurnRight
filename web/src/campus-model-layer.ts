@@ -115,11 +115,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     .makeTranslation(origin.x, origin.y, origin.z)
     .scale(new Vector3(scale, -scale, scale));
   let readyKey = '';
-  let scenery = createScenery(
-    initial.sceneryData || initial.data,
-    origin,
-    scale,
-  );
+  let indexedSceneryData = initial.sceneryData || initial.data;
+  let scenery = createScenery(indexedSceneryData, origin, scale);
   scene.add(scenery.group);
   const publish = () => {
     const ids = [
@@ -315,14 +312,14 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         release(group);
         loaded.delete(id);
       }
-    if (indexedData !== options.data) {
+    const sceneryData = options.sceneryData || options.data;
+    if (indexedSceneryData !== sceneryData) {
       scenery.dispose();
-      scenery = createScenery(
-        options.sceneryData || options.data,
-        origin,
-        scale,
-      );
+      scenery = createScenery(sceneryData, origin, scale);
       scene.add(scenery.group);
+      indexedSceneryData = sceneryData;
+    }
+    if (indexedData !== options.data) {
       indexedData = options.data;
       visuals = visualLookup(catalogue);
       features = new Map(

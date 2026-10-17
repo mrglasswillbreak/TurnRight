@@ -44,7 +44,7 @@ export default function LandmarkViewButton({
             padding: mobile
               ? { top: 90, bottom: 300, left: 45, right: 45 }
               : { top: 100, bottom: 100, left: 420, right: 100 },
-            maxZoom: 19,
+            maxZoom: feature.geometry.type === 'Point' ? 18 : 19,
             pitch: 58,
             bearing: -20,
             duration: matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -54,7 +54,7 @@ export default function LandmarkViewButton({
         );
       }}
     >
-      View in 3D
+      {feature.geometry.type === 'Point' ? 'View area in 3D' : 'View in 3D'}
     </Button>
   );
 }
