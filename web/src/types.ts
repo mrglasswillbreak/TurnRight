@@ -106,6 +106,8 @@ export interface PlaceDetails {
   evidence?: FieldEvidence;
 }
 export interface Place extends PlaceDetails {
+  /** Curated in the reviewed campus package, never inferred from names at runtime. */
+  landmark?: boolean;
   id: string;
   name: string;
   category: Category;
@@ -194,7 +196,10 @@ export interface Closure {
 }
 export interface CampusData {
   /** Reviewed public cartography only; private schemas and processing actors are excluded. */
-  gisPresentation?: Pick<import('./gis-types.js').Dataset, 'id' | 'name' | 'revision' | 'style'>[];
+  gisPresentation?: Pick<
+    import('./gis-types.js').Dataset,
+    'id' | 'name' | 'revision' | 'style'
+  >[];
   layers?: import('./campus-layer-types.js').CampusLayers;
   sourceSnapshots?: {
     file: string;

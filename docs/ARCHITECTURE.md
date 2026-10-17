@@ -1,5 +1,13 @@
 # TurnRight architecture
 
+## Campus detail extension
+
+The [ArcGIS bridge](../scripts/arcgis/bridge.py) produces a versioned exchange manifest and hash-verified GeoJSON/GeoPackage evidence. The existing file-import reader checks identities, campus/baseline, CRS, units, permissions and transformation history. Pro tokens remain local; third-party service requests never receive the portal credential.
+
+Precision drawing shares the editor's command, undo, autosave and recovery paths. Reference snapping changes coordinates; explicit topology commands create routing connections. Geometry previews preserve polygon parts and holes. Batch appearance is a temporary rendering overlay until its single transaction is applied.
+
+Optional scenery recipes live in the reviewed visual catalogue. The release visual builder retains the recipe, the packager counts its bytes and validates its schema, and the browser verifies region geometry revisions before generating deterministic instances. Shared meshes/materials use the existing MapLibre/Three.js context and zoom/performance detail controls. Visitor visibility filters affect presentation while essential route and destination markers remain visible. [Contracts and release order](CAMPUS-DETAIL-UPGRADE.md).
+
 ## System overview
 
 TurnRight serves two connected surfaces: a public map/globe and an authenticated campus workspace. Public navigation reads immutable published packages; the editor works with private source observations, accepted records, corrections, typed datasets, evidence, and review snapshots.

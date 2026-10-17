@@ -130,6 +130,10 @@ def inspect_file(path, configuration, work, label=None):
         return inspect_osm(path)
     if suffix in ('.zip','.kmz'):
         files = unpack(path,Path(work)/path.stem)
+        from .exchange import inspect_exchange
+        exchange = inspect_exchange(files, configuration, work, inspect_file)
+        if exchange is not None:
+            return exchange
         geodatabases = sorted({p.parent for p in files if p.suffix.lower()=='.gdbtable' and p.parent.suffix.lower()=='.gdb'})
         known = {'.'+ext for capability in CAPABILITIES for ext in capability['extensions']}
         targets = [p for p in files if p.suffix.lower() in ({'.kml'} if suffix == '.kmz' else known - SIDECARS - {'.zip','.kmz'}) and not any(g in p.parents for g in geodatabases)] + geodatabases

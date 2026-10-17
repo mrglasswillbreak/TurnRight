@@ -2,6 +2,10 @@ import { test, expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { campusFixture } from '../fixture';
+// Reset network emulation before the shared browser closes this context.
+test.afterEach(async ({ context }) => {
+  await context.setOffline(false);
+});
 async function prepare(page: Page, schema: 1 | 3 = 1) {
   const data = campusFixture();
   data.schemaVersion = schema;

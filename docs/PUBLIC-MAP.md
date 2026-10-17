@@ -2,6 +2,8 @@
 
 TurnRight lets visitors explore published campuses and use prepared maps offline. No account is required. Open [the public map](https://turnright.vercel.app/) or run the development seed using the [quick start](../README.md#run-locally).
 
+The local [campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) adds **Map layers** controls with preferences saved per campus, a curated **Landmarks** filter and **View in 3D**. Decorative vegetation is illustrative and does not describe surveyed trees or route obstacles. LASU/UNILAG detail candidates still require private review and independent publication; their presence in local code does not mean the public packages have changed.
+
 ## Choose and explore a campus
 
 Open **Choose a campus** beside search. Use the list, name search, globe pin, or published boundary to select a campus. The current map remains usable while another campus loads. Selection, URL, and remembered campus change only after successful loading. See [Campus globe](CAMPUS-GLOBE.md) for keyboard behavior, overlapping boundaries, failures, and browser history.

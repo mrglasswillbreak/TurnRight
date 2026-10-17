@@ -12,6 +12,7 @@ export interface SurfaceStyle {
   windows?: boolean;
   windowSpacing?: number;
   roofPitch?: number;
+  roofOrientation?: 'long' | 'short';
   roofForm?: RoofForm;
   height?: number;
   floors?: number;
@@ -226,6 +227,8 @@ export interface VisualSector extends PackageAsset {
   buildingIds: string[];
 }
 export interface VisualCatalogue {
+  /** Deterministic decorative planting; never survey or routing data. */
+  scenery?: SceneryRecipe;
   modelTextures?: PackageAsset[];
   textures?: VisualTexture[];
   schemaVersion: 1;
@@ -240,6 +243,18 @@ export interface VisualCatalogue {
     license: string;
     date: string;
     licenseUrl?: string;
+  }[];
+}
+export interface SceneryRecipe {
+  version: 1;
+  classification: 'illustrative';
+  seed: number;
+  spacing: number;
+  maxInstances: number;
+  regions: {
+    featureId: string;
+    geometryRevision: string;
+    reviewedAt: string;
   }[];
 }
 export interface ModelMesh {

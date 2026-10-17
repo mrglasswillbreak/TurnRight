@@ -1,5 +1,13 @@
 # TurnRight verification and release checklist
 
+## Campus detail release
+
+For LASU and UNILAG, retain the [detail evidence ledger](CAMPUS-DETAIL-UPGRADE.md), the current source revision, the preparation workspace hash, immutable review hash and released package identity. Account for every building with a treatment or hold reason. Resolve source rights per item; a held candidate must not enter an approved package.
+
+Verify precision drawing with mouse, keyboard and touch; snap bypass; holes/multipart geometry; cancelled previews; undo/redo and reload recovery. Check palette previews and apply/cancel controls in the phone table. Verify the scenery recipe survives the actual release builder and stays inside the visual budget. Test the resulting packages in light/dark, 2D/3D, active routes, layer preferences, landmark framing, offline switching and corrupt/missing-asset recovery. Preserve the other campus during each promotion and restore.
+
+The 300 KiB compressed lazy-renderer and 12 MiB per-campus visual budgets remain unchanged. The target of 30 fps on representative physical Android/iPhone interaction remains a hardware check; software WebGL, viewport simulations and WebKit automation cannot establish it. Record the actual device and fallback behaviour separately.
+
 Use this checklist against an identified source revision and package version. Local browser fixtures, native CI, live account checks, physical devices, and campus field work establish different things; record each separately. Dated sections retain historical results. The [current readiness summary](PRODUCTION.md#remaining-acceptance-and-owner-decisions) identifies outstanding rollout and operational gates.
 
 ## Campus GIS team release

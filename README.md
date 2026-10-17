@@ -15,6 +15,18 @@ TurnRight combines a public campus map and globe with a private GIS editor. Visi
 
 ## Public map and globe
 
+### Campus detail upgrade
+
+The LASU Ojo and UNILAG Akoka upgrade adds precision drawing, previewed geometry refinement, reusable building palettes, illustrative greenery, per-campus visitor layers and landmark exploration. It retains the MapLibre/Three.js renderer, authored buildings, routing, source attribution and existing editor corrections. Recorded, estimated and illustrative dimensions remain distinct.
+
+The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, local previews and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. ArcGIS Pro is an optional research workstation; published navigation and portable evidence do not require its licence. The remaining Pro window is prioritized for native analysis and durable exports.
+
+| LASU detail candidate | UNILAG detail candidate |
+| --- | --- |
+| ![LASU local 3D review candidate](docs/assets/screenshots/campus-detail-lasu-2026-10-17.png) | ![UNILAG local 3D review candidate](docs/assets/screenshots/campus-detail-unilag-2026-10-17.png) |
+
+These are dated local candidate views, not proof of publication or new surveys. Extra ArcGIS sources remain held until their exact permissions, dates and feature conflicts are resolved. Follow [production receipts](docs/PRODUCTION.md) for deployed application and campus versions.
+
 ### Discover and explore
 
 Start with the campus map or open **Choose a campus** to explore the globe. Select a published campus by name, pin, or boundary. The existing map stays open during switching, and unavailable downloads leave the current campus usable. [LASU Ojo](https://turnright.vercel.app/?campus=lasu) and [UNILAG Akoka](https://turnright.vercel.app/?campus=unilag) have separate published packages; campus identity follows shared links, saved places, and offline downloads.

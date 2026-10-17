@@ -4,8 +4,75 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { campusFixture } from './fixture';
 // @ts-expect-error Packaging is an executable ESM pipeline.
 import { packageVisuals } from '../../scripts/visual-package.mjs';
+it('retains the reviewed scenery recipe through the real visual builder and rejects surveyed classification', async () => {
+  const temp = await mkdtemp(path.join(tmpdir(), 'turnright-visual-test-'));
+  try {
+    const data = campusFixture();
+    data.map.features = [];
+    const recipe = {
+      version: 1 as const,
+      classification: 'illustrative' as const,
+      seed: 7,
+      spacing: 15,
+      maxInstances: 100,
+      regions: [
+        {
+          featureId: 'green',
+          geometryRevision: 'checked',
+          reviewedAt: '2026-10-17T12:00:00Z',
+        },
+      ],
+    };
+    data.visuals = {
+      schemaVersion: 1,
+      revision: 'test',
+      bytes: 0,
+      buildings: [],
+      sectors: [],
+      references: [],
+      scenery: recipe,
+    };
+    const input = path.join(temp, 'campus.json'),
+      output = path.join(temp, 'visuals');
+    await writeFile(input, JSON.stringify(data));
+    execFileSync(
+      process.execPath,
+      [
+        '--import',
+        'tsx',
+        'scripts/build-campus-visuals.ts',
+        input,
+        output,
+        '--reviewed',
+      ],
+      {
+        cwd: fileURLToPath(new URL('..', import.meta.url)),
+        timeout: 45000,
+        stdio: 'pipe',
+      },
+    );
+    const result = await packageVisuals(output, async () => {});
+    expect(result.catalogue.scenery).toEqual(recipe);
+    result.catalogue.scenery.classification = 'surveyed';
+    await writeFile(
+      path.join(output, 'catalogue.json'),
+      JSON.stringify(result.catalogue),
+    );
+    await expect(packageVisuals(output, async () => {})).rejects.toThrow(
+      'Invalid illustrative scenery',
+    );
+  } finally {
+    if (
+      path.dirname(temp) === path.resolve(tmpdir()) &&
+      path.basename(temp).startsWith('turnright-visual-test-')
+    )
+      await rm(temp, { recursive: true });
+  }
+}, 60000);
 it('keeps textures separate from legacy sector declarations and rejects missing credit or corrupt bytes', async () => {
   const temp = await mkdtemp(path.join(tmpdir(), 'turnright-visual-test-'));
   const bytes = Buffer.from('verified derivative'),

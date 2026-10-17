@@ -162,6 +162,7 @@ export function featureEdit(
           ...Object.fromEntries(detailFields.map((key) => [key, p[key]])),
           evidence: p.evidence,
           category: p.category,
+          landmark: p.landmark,
           parking: data.driving?.parking.find((parking) => parking.id === p.id),
           aliases: p.aliases.join(', '),
           department: p.department,

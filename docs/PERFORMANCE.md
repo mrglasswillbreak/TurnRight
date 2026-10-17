@@ -1,5 +1,11 @@
 # Responsiveness and recovery
 
+## Campus detail renderer
+
+The upgrade shares instanced tree/shrub geometry and materials inside the existing Three.js context. It keeps sector loading, reduces decoration at lower zoom and during slow rendering, and fades distant decoration. Geometry revisions invalidate stale region placement. Scenery is presentation data and does not participate in routing obstacles.
+
+The October 17 local candidate build measured 264.2 KiB gzip for lazy 3D, below the unchanged 300 KiB limit. LASU and UNILAG candidate visuals measured 10,844,005 and 2,174,608 bytes respectively, below 12 MiB each. Those are candidate measurements; the actual release builder must repeat the checks after rebasing on current private content. Physical-phone 30 fps is still unverified. [Measurements and test scope](CAMPUS-DETAIL-UPGRADE.md#verification-and-release-gates).
+
 ## Campus GIS scope · 5 October 2026
 
 GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. Data renders 100 rows; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.

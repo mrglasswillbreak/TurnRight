@@ -64,7 +64,7 @@ def layer_features(url, bounds, get=public_json, progress=lambda message: None, 
             if page.get('exceededTransferLimit') or len(received)!=len(batch) or set(received)!=set(batch) or any(expected_records[str(f['attributes'][field])]!=digest(f,True) for f in confirmed):
                 raise ValueError('ArcGIS contents changed during the independent completeness pass. Retry the check.')
     layer_identity = digest({'id':meta.get('id'),'serviceItemId':meta.get('serviceItemId'),'fields':meta.get('fields'),'objectIdField':meta.get('objectIdField') or meta.get('objectIdFieldName')})
-    return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'objectIdFieldName':field, 'sourceUrl':url, 'layerIdentity':layer_identity, 'providerRevision':meta.get('editingInfo')}
+    return {'name':str(meta.get('name', 'Layer')), 'features':records, 'fields':meta.get('fields',[]), 'geometryType':meta.get('geometryType'), 'spatialReference':{'wkid':4326}, 'originalSpatialReference':meta.get('sourceSpatialReference') or meta.get('extent', {}).get('spatialReference'), 'objectIdFieldName':field, 'sourceUrl':url, 'layerIdentity':layer_identity, 'providerRevision':meta.get('editingInfo')}
 
 
 def discover(url, bounds, get=public_json, _visited=None, progress=lambda message: None):

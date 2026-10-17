@@ -645,9 +645,9 @@ export default function CampusWorkspace({
               </output>
               {job.artifacts_expired_at && (
                 <p className="notice">
-                  Source files expired under the storage retention policy.
-                  This summary and all review changes are still available.
-                  Use Check source to download a fresh import.
+                  Source files expired under the storage retention policy. This
+                  summary and all review changes are still available. Use Check
+                  source to download a fresh import.
                 </p>
               )}
               {(job.status === 'draft' || job.status === 'failed') && (
@@ -750,6 +750,23 @@ export default function CampusWorkspace({
                               'Projection required'}
                           </span>
                         </summary>
+                        {layer.exchange && (
+                          <p className="small-note">
+                            ArcGIS Pro exchange · source ID:{' '}
+                            {layer.exchange.idField} · survey:{' '}
+                            {layer.exchange.surveyDate || 'not recorded'} ·
+                            portal modification:{' '}
+                            {layer.exchange.modifiedAt
+                              ? new Date(
+                                  layer.exchange.modifiedAt,
+                                ).toLocaleDateString()
+                              : 'not recorded'}
+                            .{' '}
+                            {layer.exchange.rights.redistributionConfirmed
+                              ? 'Source rights declared in the exchange receipt; release review is still required.'
+                              : 'Reuse rights unresolved. Review this layer’s licence in the local inspection receipt and export again before preparing candidates.'}
+                          </p>
+                        )}
                         <div className="campus-fields">
                           <label>
                             Import as

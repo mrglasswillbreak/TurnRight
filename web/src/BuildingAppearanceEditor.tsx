@@ -893,6 +893,24 @@ export function BuildingAppearanceEditor({
                       1,
                       60,
                     )}
+                  {resolved.roofForm !== 'flat' && canPitch && (
+                    <div className="surface-field">
+                      <label className="field-label">
+                        Ridge direction
+                        <select
+                          aria-label="Ridge direction"
+                          value={resolved.roofOrientation || 'long'}
+                          onChange={(e) =>
+                            change('roofOrientation', e.target.value)
+                          }
+                        >
+                          <option value="long">Along the long edge</option>
+                          <option value="short">Across the long edge</option>
+                        </select>
+                      </label>
+                      {reset('roofOrientation')}
+                    </div>
+                  )}
                   <p className="small-note">
                     Custom roof plans override standard forms. Complex outlines
                     use a flat cap until a custom roof is applied.

@@ -1,5 +1,7 @@
 # Editing the campus map
 
+The [campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) adds **Precision drawing** (reference snaps, numeric lengths/bearings, rectangles and tracing), previewed square/straighten/align/offset operations, and **Layers → Features → Preview appearance**. Reference snapping changes coordinates only; use the existing connection tools to alter routing topology. Palette previews apply as one undoable operation and preserve authored models.
+
 ## Arrange your workspace
 
 The primary navigation follows **Data → Edit → Analyze → Review → Publish**. Each workspace keeps the map in the centre, an explorer on the left, contextual properties on the right, and an optional table or activity pane below. Desktop panes start near 260 px and 320 px. Drag a divider or focus it and use the arrow keys to resize it. Pane headings stay visible while their contents scroll.

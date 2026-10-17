@@ -610,6 +610,10 @@ export function applyEdits(
           category: (props.category ||
             previous?.category ||
             'other') as Place['category'],
+          landmark:
+            typeof props.landmark === 'boolean'
+              ? props.landmark
+              : previous?.landmark,
           coordinates: edit.geometry.coordinates as Position,
           aliases: String(props.aliases || '')
             .split(',')

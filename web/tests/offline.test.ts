@@ -13,6 +13,16 @@ import {
 } from '../src/offline';
 import type { CampusPackage } from '../src/types';
 const saved = new Map<string, Response>();
+it('keeps visitor layer preferences independent per campus', async () => {
+  await setPreference('visitor-layers', { buildings: false }, 'lasu');
+  await setPreference('visitor-layers', { greenery: false }, 'unilag');
+  expect(await getPreference('visitor-layers', {}, 'lasu')).toEqual({
+    buildings: false,
+  });
+  expect(await getPreference('visitor-layers', {}, 'unilag')).toEqual({
+    greenery: false,
+  });
+});
 const cache = {
   delete: async (url: string) => saved.delete(url),
   match: async (url: string) => saved.get(url)?.clone(),
@@ -50,7 +60,10 @@ it('captures explicit preference scopes before asynchronous storage and URL chan
 
 it('fails an undownloaded offline target without altering the active campus', async () => {
   const p = await pkg('retained-offline');
-  vi.stubGlobal('fetch', vi.fn(async () => new Response(p.bytes)));
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response(p.bytes)),
+  );
   await installPackage(p.manifest, () => {});
   vi.stubGlobal('navigator', { onLine: false });
   await expect(loadCampus('missing')).rejects.toThrow('not downloaded');

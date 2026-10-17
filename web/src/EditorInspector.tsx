@@ -46,7 +46,9 @@ export function EditorInspector({
   onEndField: () => void;
   focusField?: string;
   onGeometry: (geometry: Geometry) => void;
-  onLayerGeometry?: (operation: 'hole' | 'regenerate') => void;
+  onLayerGeometry?: (
+    operation: 'hole' | 'regenerate' | 'square' | 'straighten',
+  ) => void;
   onEntrance: () => void;
   onApproach: () => void;
   onPick: (mode: 'start' | 'end' | 'join' | 'entrance-link' | 'block') => void;
@@ -159,6 +161,17 @@ export function EditorInspector({
           {['land', 'overlay'].includes(edit.kind) && (
             <button onClick={() => onLayerGeometry?.('hole')}>
               Parts, holes and geometry tools
+            </button>
+          )}
+          {['building', 'path', 'barrier'].includes(edit.kind) && (
+            <button
+              onClick={() =>
+                onLayerGeometry?.(
+                  edit.kind === 'building' ? 'square' : 'straighten',
+                )
+              }
+            >
+              Precision geometry tools
             </button>
           )}
           {(edit.kind === 'path' || !!p.derivedSurface) && (
@@ -311,6 +324,14 @@ export function EditorInspector({
           )}
           {edit.kind === 'place' && (
             <>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={p.landmark === true}
+                  onChange={(e) => onProperty('landmark', e.target.checked)}
+                />
+                Curated public landmark
+              </label>
               <label className="field-label">
                 Category
                 <select

@@ -2,6 +2,10 @@ import { test, expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { campusFixture } from '../fixture';
 
+test.afterEach(async ({ context }) => {
+  await context.setOffline(false);
+});
+
 async function prepare(page: Page) {
   const data = campusFixture();
   data.places.push({

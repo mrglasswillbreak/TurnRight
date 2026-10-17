@@ -1,5 +1,11 @@
 # Reference editing and authored models
 
+## Precision and reusable appearance
+
+Use **Precision drawing** for vertex, endpoint, midpoint and edge references, numeric length/bearing, rectangles, right-angle/parallel/perpendicular constraints and boundary tracing. Reference snapping never creates a routing junction. Preview square, straighten, align or offset before committing geometry, especially on footprints with courtyards or multiple parts.
+
+Under **Layers → Features**, select generated buildings and choose **Preview appearance** for a reusable palette. The live preview has Apply/Cancel controls in the feature table, including on phones, and commits through the existing undo/recovery system. Authored meshes retain their materials. Existing dimensions, per-surface styles and custom roof plans remain authoritative. Standard roofs also expose long/across-axis orientation; this does not infer a roof from imagery. [Detailed workflow and limits](CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification).
+
 ## Campus GIS integration
 
 Model authoring now participates in the campus team workflow. Ready immutable assets attached to current or historical campus work are readable by authorized teammates, while unfinished/unattached assets and recovery remain personal. Model review does not replace independent campus snapshot approval. [Team workflow and roles](GIS-PLATFORM.md).

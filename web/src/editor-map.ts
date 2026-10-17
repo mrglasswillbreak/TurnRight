@@ -32,6 +32,13 @@ import {
 } from './campus-layers';
 import type { LayerViewState } from './campus-layer-types';
 import { vertexCount, geometryWindow, replaceWindow } from './geometry-window';
+import {
+  DEFAULT_PRECISION,
+  ReferenceSnapIndex,
+  constrainPoint,
+  constructPoint,
+  type PrecisionSettings,
+} from './editor-precision';
 
 type Interaction =
   | 'select'
@@ -83,6 +90,11 @@ export class EditorMap {
   private layerView: LayerViewState = {};
   private window: ReturnType<typeof geometryWindow> | null = null;
   private hint = '';
+  private precision: PrecisionSettings = { ...DEFAULT_PRECISION };
+  private references = new ReferenceSnapIndex([]);
+  private referenceRevision = '';
+  private referenceMap: CampusData['map'] | undefined;
+  private referenceOnlyPoints = new Set<string>();
   private disposed = false;
   private previousSources = new Map<string, string>();
   private lastDraft: UnfinishedDrawing | null = null;
@@ -94,10 +106,50 @@ export class EditorMap {
     this.source = data;
     const snapping = {
       toCustom: (event: TerraDrawMouseEvent) => {
-        if (event.heldKeys.includes('Alt')) return undefined;
-        const target = this.snap([event.lng, event.lat]);
+        if (this.setting || event.heldKeys.includes('Alt')) {
+          this.showTarget(undefined);
+          return undefined;
+        }
+        const original: Position = [event.lng, event.lat];
+        const point = constrainPoint(
+          original,
+          this.constructionPoints(),
+          this.precision,
+        );
+        const route =
+          this.kind === 'path' || this.kind === 'entrance'
+            ? this.snap(point)
+            : undefined;
+        const reference = this.references.snap(
+          point,
+          (p) => this.map.project(p),
+          this.precision,
+          this.selected?.id,
+          this.map.getZoom(),
+        );
+        let target = route || reference;
+        if (
+          target &&
+          this.precision.constraint !== 'free' &&
+          distance(
+            target.coordinates,
+            constrainPoint(
+              target.coordinates,
+              this.constructionPoints(),
+              this.precision,
+            ),
+          ) > 0.02
+        )
+          target = undefined;
+        if (target === reference && reference)
+          this.referenceOnlyPoints.add(reference.coordinates.join(','));
+        else if (target)
+          this.referenceOnlyPoints.delete(target.coordinates.join(','));
         this.showTarget(target);
-        return target?.coordinates;
+        return (
+          target?.coordinates ||
+          (this.precision.constraint !== 'free' ? point : undefined)
+        );
       },
     };
     this.line = new TerraDrawLineStringMode({
@@ -107,6 +159,7 @@ export class EditorMap {
       keyEvents: { finish: 'Enter', cancel: null },
     });
     this.polygon = new TerraDrawPolygonMode({
+      snapping,
       pointerDistance: 8,
       keyEvents: { finish: 'Enter', cancel: null },
     });
@@ -308,6 +361,8 @@ export class EditorMap {
         geometry: structuredClone(feature.geometry),
         properties: { ...this.properties },
       };
+      delete edit.properties.drawingPrecision;
+      delete edit.properties.drawingReferencePoints;
       if (edit.kind === 'entrance' && edit.geometry.type === 'Point') {
         const point = edit.geometry.coordinates as Position;
         const snap = snapTarget(
@@ -328,7 +383,8 @@ export class EditorMap {
             const snap = snapTarget(this.source, p as Position, (p) =>
               this.map.project(p),
             );
-            return snap?.target &&
+            return !this.referenceOnlyPoints.has(p.join(',')) &&
+              snap?.target &&
               distance(p as Position, snap.coordinates) < 0.15
               ? [
                   {
@@ -427,6 +483,7 @@ export class EditorMap {
   }
   private mousemove = (event: MapMouseEvent) => {
     if (this.compare || (!this.kind && this.interaction === 'select')) return;
+    if (this.kind && this.draw.getMode() !== 'point') return;
     const target = this.snap([event.lngLat.lng, event.lngLat.lat]);
     this.showTarget(target);
   };
@@ -728,6 +785,14 @@ export class EditorMap {
     this.kind = kind;
     this.creationId = id;
     this.properties = properties;
+    this.referenceOnlyPoints = new Set(
+      (properties.drawingReferencePoints as string[] | undefined) || [],
+    );
+    if (properties.drawingPrecision)
+      this.precision = {
+        ...DEFAULT_PRECISION,
+        ...(properties.drawingPrecision as PrecisionSettings),
+      };
     this.interaction = 'select';
     this.draw.setMode(
       kind === 'path' ||
@@ -785,17 +850,114 @@ export class EditorMap {
       );
     if (!feature) return;
     const geometry = structuredClone(feature.geometry);
+    const committed = Number(feature.properties.committedCoordinateCount);
     if (geometry.type === 'LineString')
-      geometry.coordinates = geometry.coordinates.slice(0, -1);
+      geometry.coordinates = geometry.coordinates.slice(
+        0,
+        Number.isInteger(committed) ? committed : -1,
+      );
     if (geometry.type === 'Polygon')
-      geometry.coordinates = [geometry.coordinates[0].slice(0, -2)];
+      geometry.coordinates = [
+        geometry.coordinates[0].slice(
+          0,
+          Number.isInteger(committed) ? committed : -2,
+        ),
+      ];
     this.lastDraft = {
       id: this.creationId,
       kind: this.kind,
       geometry,
-      properties: this.properties,
+      properties: {
+        ...this.properties,
+        drawingPrecision: this.precision,
+        drawingReferencePoints: [...this.referenceOnlyPoints],
+      },
     };
     this.callbacks.draft(this.lastDraft);
+  }
+  setPrecision(settings: PrecisionSettings) {
+    this.precision = {
+      ...settings,
+      tolerance: Math.max(4, Math.min(30, settings.tolerance)),
+    };
+    if (this.kind) this.captureDraft();
+  }
+  getPrecision() {
+    return { ...this.precision };
+  }
+  private constructionPoints(): Position[] {
+    const feature = this.draw
+      .getSnapshot()
+      .find((f) => f.properties.mode === this.draw.getMode());
+    const committed = Number(feature?.properties.committedCoordinateCount);
+    if (feature?.geometry.type === 'LineString')
+      return feature.geometry.coordinates.slice(
+        0,
+        Number.isInteger(committed) ? committed : -1,
+      ) as Position[];
+    if (feature?.geometry.type === 'Polygon')
+      return feature.geometry.coordinates[0].slice(
+        0,
+        Number.isInteger(committed) ? committed : -2,
+      ) as Position[];
+    return [];
+  }
+  appendReference(points: Position[]) {
+    if (!this.kind || !['polygon', 'linestring'].includes(this.draw.getMode()))
+      throw new Error('Start a line or polygon drawing first.');
+    if (points.length + this.constructionPoints().length > 2000)
+      throw new Error('Use at most 2,000 vertices per construction.');
+    const mode = this.draw.getMode() === 'polygon' ? this.polygon : this.line;
+    // Replaying exact construction must not re-snap or constrain its vertices.
+    this.setting = true;
+    try {
+      const existing = this.constructionPoints();
+      const first = existing[0] || points[0];
+      for (let i = 0; i < points.length; i++) {
+        const point = points[i];
+        if (
+          i === points.length - 1 &&
+          this.draw.getMode() === 'polygon' &&
+          first &&
+          distance(first, point) < 0.01 &&
+          points.length > 2
+        )
+          continue;
+        const last = this.constructionPoints().at(-1);
+        if (last && distance(last, point) < 0.01) continue;
+        this.referenceOnlyPoints.add(point.join(','));
+        const p = this.map.project(point);
+        const event: TerraDrawMouseEvent = {
+          lng: point[0],
+          lat: point[1],
+          containerX: p.x,
+          containerY: p.y,
+          button: 'left',
+          heldKeys: [],
+          isContextMenu: false,
+        };
+        mode.onMouseMove(event);
+        mode.onClick(event);
+      }
+    } finally {
+      this.setting = false;
+    }
+    this.captureDraft();
+  }
+  addSegment(length: number, bearing: number) {
+    const point = this.constructionPoints().at(-1);
+    if (!point) throw new Error('Place the first point on the map.');
+    this.appendReference([constructPoint(point, length, bearing)]);
+  }
+  rectangle(width: number, depth: number, bearing: number) {
+    const points = this.constructionPoints();
+    if (this.draw.getMode() !== 'polygon' || points.length !== 1)
+      throw new Error('Start a polygon and place exactly one corner first.');
+    const a = points[0],
+      b = constructPoint(a, width, bearing),
+      d = constructPoint(a, depth, bearing + 90);
+    const c = constructPoint(b, depth, bearing + 90);
+    this.appendReference([b, c, d]);
   }
   finish() {
     this.captureDraft();
@@ -837,6 +999,19 @@ export class EditorMap {
     this.source = data;
     this.layerView = layerView;
     const presentation = layerPresentation(data, true, layerView);
+    const referenceRevision = JSON.stringify([
+      data.layers,
+      layerView.hidden,
+      layerView.isolated,
+    ]);
+    if (
+      this.referenceMap !== data.map ||
+      this.referenceRevision !== referenceRevision
+    ) {
+      this.references = new ReferenceSnapIndex(presentation.map.features);
+      this.referenceMap = data.map;
+      this.referenceRevision = referenceRevision;
+    }
     const definitions = campusLayers(data).items,
       membership = layerMembership(data, definitions);
     const hidden = new Set([

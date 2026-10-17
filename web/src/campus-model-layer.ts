@@ -18,6 +18,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { createModelRenderMaterial } from './model-render-material';
+import { createScenery } from './scenery-renderer';
 import type { ModelRenderMaterial } from './model-render-types';
 import {
   MercatorCoordinate,
@@ -51,6 +52,8 @@ export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
 export interface ModelOptions {
   data: CampusData;
+  sceneryData?: CampusData;
+  sceneryEnabled?: boolean;
   enabled: boolean;
   dark: boolean;
   selectedId: string;
@@ -112,6 +115,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     .makeTranslation(origin.x, origin.y, origin.z)
     .scale(new Vector3(scale, -scale, scale));
   let readyKey = '';
+  let scenery = createScenery(
+    initial.sceneryData || initial.data,
+    origin,
+    scale,
+  );
+  scene.add(scenery.group);
   const publish = () => {
     const ids = [
       ...loaded.values(),
@@ -307,12 +316,25 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         loaded.delete(id);
       }
     if (indexedData !== options.data) {
+      scenery.dispose();
+      scenery = createScenery(
+        options.sceneryData || options.data,
+        origin,
+        scale,
+      );
+      scene.add(scenery.group);
       indexedData = options.data;
       visuals = visualLookup(catalogue);
       features = new Map(
         options.data.map.features.map((f) => [String(f.properties?.id), f]),
       );
     }
+    scenery.update(
+      active && options.sceneryEnabled !== false,
+      reduced,
+      map.getZoom(),
+      options.dark,
+    );
     const draftIds = new Set(options.overrides?.map((o) => o.model.id) || []);
     for (const [id, group] of drafts)
       if (!draftIds.has(id)) {
@@ -605,6 +627,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       for (const group of drafts.values()) release(group);
       drafts.clear();
       textures.dispose();
+      scenery.dispose();
       if (map.getLayer(layer.id)) map.removeLayer(layer.id);
       options.onReady([]);
     },

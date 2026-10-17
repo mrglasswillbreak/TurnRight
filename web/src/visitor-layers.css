@@ -1,0 +1,47 @@
+.visitor-layers {
+  position: absolute;
+  right: 16px;
+  top: 148px;
+  z-index: 6;
+  border: 1px solid var(--border, #dce3eb);
+  border-radius: 14px;
+  background: var(--background, #fff);
+  color: var(--foreground, #25344a);
+  box-shadow: 0 6px 20px #132c4315;
+  max-width: 230px;
+}
+.visitor-layers summary {
+  padding: 11px 15px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+}
+.visitor-layers fieldset {
+  display: grid;
+  gap: 10px;
+  padding: 8px 15px 15px;
+  border: 0;
+}
+.visitor-layers legend {
+  font-size: 12px;
+  padding-top: 6px;
+}
+.visitor-layers label {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 14px;
+  min-height: 26px;
+}
+.visitor-layers small {
+  font-size: 11px;
+  line-height: 1.5;
+  max-width: 190px;
+}
+@media (max-width: 700px) {
+  .visitor-layers {
+    right: 12px;
+    top: 140px;
+    max-width: 190px;
+  }
+}

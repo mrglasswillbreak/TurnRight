@@ -49,6 +49,11 @@ const catalogue: VisualCatalogue = {
   buildings: [],
   sectors: [],
   references: evidence.references,
+  // Preserve the recipe from the reviewed immutable snapshot. The public
+  // packager validates its schema and includes its bytes in the visual budget.
+  ...(data.visuals?.scenery
+    ? { scenery: structuredClone(data.visuals.scenery) }
+    : {}),
 };
 for (const sourceFeature of buildings) {
   const repair = repairArcGisParts(sourceFeature);
@@ -350,7 +355,10 @@ const textureBytes = [...textures, ...authoredTextures.values()].reduce(
   (sum, texture) => sum + texture.bytes,
   0,
 );
-if (catalogue.bytes + textureBytes > 12 * 1024 * 1024)
+const sceneryBytes = catalogue.scenery
+  ? Buffer.byteLength(JSON.stringify(catalogue.scenery))
+  : 0;
+if (catalogue.bytes + textureBytes + sceneryBytes > 12 * 1024 * 1024)
   throw new Error(
     'Campus geometry and textures exceed 12 MiB. Optimize the meshes or textures.',
   );
