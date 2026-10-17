@@ -48,6 +48,8 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             if entity == 'feature': payload.setdefault('properties',{})['gisManaged'] = True
             elif entity in ('place','node','edge'): payload['gisManaged'] = True
         metadata = {'sourceCRS':layer['crs'],'fields':layer.get('fields',[]),'layer':layer['name']} if private_attributes is not None else None
+        if metadata is not None and layer.get('exchange'):
+            metadata['exchange'] = layer['exchange']
         record = {'id':key,'entity':entity,'source':owner_source,'payload':payload,'hash':digest({'payload':payload,'private_attributes':private_attributes,'gis_metadata':metadata}) if private_attributes is not None else digest(payload)}
         if private_attributes is not None: record['private_attributes']=private_attributes
         if metadata is not None: record['gis_metadata']=metadata
@@ -62,6 +64,15 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         if not layer.get('crs'):
             errors.append(layer['name'] + ': choose the source coordinate system.'); continue
         role = m['role']
+        if layer.get('exchange'):
+            rights = layer['exchange']['rights']
+            if rights.get('redistributionConfirmed') is not True or not rights.get('license') or not rights.get('attribution'):
+                errors.append(layer['name'] + ': resolve exchange source rights and export again before preparing candidates.')
+                continue
+            if m.get('idField') != layer['exchange']['idField']:
+                errors.append(layer['name'] + ': retain the exchange stable ID field to preserve source identity.')
+                continue
+            m = {**m, 'identity': layer['sourceCollection']}
         layer_error_start = len(errors)
         collections.append({'identity':layer.get('sourceCollection') or layer.get('sourceUrl') or m.get('identity') or layer['name'],'count':len(layer['features']),'layer':layer['name'],'contentHash':layer.get('snapshotHash')})
         is_osm = 'osmNodes' in layer

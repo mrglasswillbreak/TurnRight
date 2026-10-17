@@ -13,6 +13,7 @@ TurnRight combines a public campus map/globe with a private GIS editing and publ
 | Inspect published LASU road estimates, reviewed sources and landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
 | Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
 | Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
+| Use the ArcGIS toolbox, precision tools, campus detail candidates and visitor layers | [Campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) |
 | Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
 | Edit places, paths, entrances, access and source changes | [Team editor](EDITOR.md) |
 | Check connected sources, compare evidence, review bulk changes and preview private undo | [Source updates](SOURCE-UPDATES.md) |

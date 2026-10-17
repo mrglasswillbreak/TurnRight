@@ -1,0 +1,1031 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-17T03:57:15.895842+01:00",
+  "proVersion": "3.7",
+  "sourceMutation": false,
+  "automaticRepair": false,
+  "campuses": [
+    {
+      "slug": "lasu",
+      "baselineVersion": "lasu-6796771f6052",
+      "archiveSha256": "77e1960f137f672d9af3ca2c225bff8f91b8dd848d30237a42e795fdbcdf38f7",
+      "candidateCounts": {
+        "conflict": 326,
+        "addition-candidate": 260
+      },
+      "layers": [
+        {
+          "sourceCollection": "arcgis:3050f375e48b40feb1dbb67566002397:UniBound_shapefile_2309:0",
+          "name": "University Boundary · 3bb424",
+          "itemId": "3050f375e48b40feb1dbb67566002397",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/3050f375e48b40feb1dbb67566002397",
+          "features": 1,
+          "nativeCheckedFeatures": 1,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1681893333000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:3050f375e48b40feb1dbb67566002397:LULC_shapefile_1022:0",
+          "name": "Land Use Land Cover · 0842fb",
+          "itemId": "3050f375e48b40feb1dbb67566002397",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/3050f375e48b40feb1dbb67566002397",
+          "features": 30,
+          "nativeCheckedFeatures": 30,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {
+            "short segments": 13
+          },
+          "surveyDate": null,
+          "modifiedAt": 1681893333000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:3050f375e48b40feb1dbb67566002397:Buildings_shapefile_6892:0",
+          "name": "Buildings · dbd4e4",
+          "itemId": "3050f375e48b40feb1dbb67566002397",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/3050f375e48b40feb1dbb67566002397",
+          "features": 125,
+          "nativeCheckedFeatures": 125,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1681893333000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:3050f375e48b40feb1dbb67566002397:UniProp3_shapefile_8954:0",
+          "name": "University Property · be7123",
+          "itemId": "3050f375e48b40feb1dbb67566002397",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/3050f375e48b40feb1dbb67566002397",
+          "features": 132,
+          "nativeCheckedFeatures": 132,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1681893333000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:ffd68667b1464eeb999c0050897a82a0:LASU_INF_shapefile_9747:0",
+          "name": "Infrastructure · 7a4643",
+          "itemId": "ffd68667b1464eeb999c0050897a82a0",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/ffd68667b1464eeb999c0050897a82a0",
+          "features": 135,
+          "nativeCheckedFeatures": 135,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1687510996000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:ffd68667b1464eeb999c0050897a82a0:LU_Type_shapefile_8803:0",
+          "name": "Land Use Land Cover · 6389bd",
+          "itemId": "ffd68667b1464eeb999c0050897a82a0",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/ffd68667b1464eeb999c0050897a82a0",
+          "features": 30,
+          "nativeCheckedFeatures": 30,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {
+            "short segments": 13
+          },
+          "surveyDate": null,
+          "modifiedAt": 1687510996000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:ffd68667b1464eeb999c0050897a82a0:Boundary_shapefile_155:0",
+          "name": "Boundary · a508fe",
+          "itemId": "ffd68667b1464eeb999c0050897a82a0",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/ffd68667b1464eeb999c0050897a82a0",
+          "features": 1,
+          "nativeCheckedFeatures": 1,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1687510996000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "arcgis:ffd68667b1464eeb999c0050897a82a0:University_Property_shapefile_7048:0",
+          "name": "University_Property · 26ed44",
+          "itemId": "ffd68667b1464eeb999c0050897a82a0",
+          "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/ffd68667b1464eeb999c0050897a82a0",
+          "features": 132,
+          "nativeCheckedFeatures": 132,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1687510996000,
+          "rights": {
+            "attribution": "MangroveandpartnersLimited",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        }
+      ]
+    },
+    {
+      "slug": "unilag",
+      "baselineVersion": "unilag-bd659bbd6df2",
+      "archiveSha256": "2aa5da9144de4113a558d65416affdf520070cdef7d23674ba769239b7cbccf9",
+      "candidateCounts": {
+        "addition-candidate": 2072,
+        "duplicate": 3667,
+        "invalid-geometry": 4,
+        "conflict": 340
+      },
+      "layers": [
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/16",
+          "name": "Boundary · b85825",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/16",
+          "features": 1,
+          "nativeCheckedFeatures": 1,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/15",
+          "name": "Greenland · c27d7a",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/15",
+          "features": 2425,
+          "nativeCheckedFeatures": 2425,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {
+            "bad dataset extent": 1
+          },
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/14",
+          "name": "Parcel · 6b06f4",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/14",
+          "features": 426,
+          "nativeCheckedFeatures": 426,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/13",
+          "name": "Greenspace · b100fe",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/13",
+          "features": 9,
+          "nativeCheckedFeatures": 9,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/12",
+          "name": "Building_footprint · c7ab71",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/12",
+          "features": 633,
+          "nativeCheckedFeatures": 633,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/11",
+          "name": "Road width · 87fa59",
+          "itemId": "05db06811e91443595f6b323cce453d8",
+          "sourceUrl": "https://services2.arcgis.com/gaeOdaaXXwDtQcuc/arcgis/rest/services/Unilag_Campus/FeatureServer/11",
+          "features": 179,
+          "nativeCheckedFeatures": 179,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1719972447000,
+          "rights": {
+            "attribution": "Onasanya_Oluwademilade",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/19",
+          "name": "Recreation_Religious_Center · 92128f",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/19",
+          "features": 4,
+          "nativeCheckedFeatures": 4,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/18",
+          "name": "Transport_Access_Facilities · e82bbd",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/18",
+          "features": 11,
+          "nativeCheckedFeatures": 11,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/17",
+          "name": "Administrative_Facilities · a9cee9",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/17",
+          "features": 3,
+          "nativeCheckedFeatures": 3,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/16",
+          "name": "Commercial_Facilities · ae4e87",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/16",
+          "features": 9,
+          "nativeCheckedFeatures": 9,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/15",
+          "name": "Health_Emergency_Facilities · dac772",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/15",
+          "features": 6,
+          "nativeCheckedFeatures": 6,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/14",
+          "name": "Academic_Facilities · 19f21e",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/14",
+          "features": 34,
+          "nativeCheckedFeatures": 34,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/13",
+          "name": "Residential_Facilities · 9798dc",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/13",
+          "features": 19,
+          "nativeCheckedFeatures": 19,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/1",
+          "name": "Unilag_Roads · bf8bdb",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/1",
+          "features": 34,
+          "nativeCheckedFeatures": 34,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/2",
+          "name": "Buildings · e53d37",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/2",
+          "features": 54,
+          "nativeCheckedFeatures": 54,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/3",
+          "name": "Unilag_Boundary · 3011bf",
+          "itemId": "18c645c3189f4c40aa6f29a301b01554",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Newly_Updated_map_WFL1/FeatureServer/3",
+          "features": 1,
+          "nativeCheckedFeatures": 1,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789989607000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/19",
+          "name": "Recreation_Religious_Center · 11adc6",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/19",
+          "features": 4,
+          "nativeCheckedFeatures": 4,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/18",
+          "name": "Transport_Access_Facilities · 2a8cc8",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/18",
+          "features": 11,
+          "nativeCheckedFeatures": 11,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/17",
+          "name": "Administrative_Facilities · 33e219",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/17",
+          "features": 3,
+          "nativeCheckedFeatures": 3,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/16",
+          "name": "Commercial_Facilities · 5a22d8",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/16",
+          "features": 9,
+          "nativeCheckedFeatures": 9,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/15",
+          "name": "Health_Emergency_Facilities · 65d0e1",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/15",
+          "features": 6,
+          "nativeCheckedFeatures": 6,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/13",
+          "name": "Residential_Facilities · 4ecd7e",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/13",
+          "features": 19,
+          "nativeCheckedFeatures": 19,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/1",
+          "name": "Unilag_Roads · 48121e",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/1",
+          "features": 34,
+          "nativeCheckedFeatures": 34,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/2",
+          "name": "Buildings · 3d8c09",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/2",
+          "features": 54,
+          "nativeCheckedFeatures": 54,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/3",
+          "name": "Unilag_Boundary · d74103",
+          "itemId": "3ae5894e76fe4b89b8a7f07bb9f3b2fc",
+          "sourceUrl": "https://services8.arcgis.com/dmauH753guPhYUcJ/arcgis/rest/services/Updated_UnilagMap_WFL1/FeatureServer/3",
+          "features": 1,
+          "nativeCheckedFeatures": 1,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1789982276000,
+          "rights": {
+            "attribution": "temitayoakande",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/0",
+          "name": "BroadLanduse · 419e43",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/0",
+          "features": 180,
+          "nativeCheckedFeatures": 180,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/1",
+          "name": "BuildingAttributes · 7f82a0",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/1",
+          "features": 806,
+          "nativeCheckedFeatures": 806,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/2",
+          "name": "BuildingPoints · 3600e7",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/2",
+          "features": 808,
+          "nativeCheckedFeatures": 808,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/3",
+          "name": "Pavements · 61e811",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/3",
+          "features": 90,
+          "nativeCheckedFeatures": 90,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/4",
+          "name": "RoadCtl · cefa32",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/4",
+          "features": 151,
+          "nativeCheckedFeatures": 151,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {
+            "short segments": 1
+          },
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/5",
+          "name": "RoadPolygon · c28881",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/5",
+          "features": 22,
+          "nativeCheckedFeatures": 22,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/6",
+          "name": "SportsPolygon · f5fcee",
+          "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+          "sourceUrl": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/6",
+          "features": 35,
+          "nativeCheckedFeatures": 34,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {
+            "null source geometry": 1
+          },
+          "surveyDate": null,
+          "modifiedAt": 1564946462000,
+          "rights": {
+            "attribution": "yolu10",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/0",
+          "name": "points · a3a811",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/0",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/1",
+          "name": "places · e14eab",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/1",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/2",
+          "name": "Lagos_Island_Geocoded_Landmarks · 265dac",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/2",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/3",
+          "name": "urban_flood_risk_by_percentage · 0ad471",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/3",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/4",
+          "name": "urban_flood_risk_by_distance · 875953",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/4",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/5",
+          "name": "roads · 21ae07",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/5",
+          "features": 2,
+          "nativeCheckedFeatures": 2,
+          "nativeStatus": "checked",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/6",
+          "name": "railways · 128b27",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/6",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/7",
+          "name": "waterways · 159a7c",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/7",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/8",
+          "name": "buildings · b2b809",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/8",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/9",
+          "name": "natural · 3da14f",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/9",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/10",
+          "name": "active_urban_landuse · 790674",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/10",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        },
+        {
+          "sourceCollection": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/11",
+          "name": "landuse · fe23f2",
+          "itemId": "a6596da378cd4ca78a5ca1ec4ba2e6a2",
+          "sourceUrl": "https://services7.arcgis.com/yiuFazTjHE8F5gzQ/arcgis/rest/services/Lagos_Island_Flood_Risk_Map_WFL1/FeatureServer/11",
+          "features": 0,
+          "nativeCheckedFeatures": 0,
+          "nativeStatus": "empty-or-null-geometry",
+          "nativeGeometryProblems": {},
+          "surveyDate": null,
+          "modifiedAt": 1785827613000,
+          "rights": {
+            "attribution": "Ahmad_Jibril",
+            "license": "",
+            "redistributionConfirmed": false
+          },
+          "disposition": "held-source-rights-and-date-review",
+          "reason": "Public availability does not establish permission. Compare exact existing permission records before any new use; upload time is not survey time."
+        }
+      ]
+    }
+  ]
+}

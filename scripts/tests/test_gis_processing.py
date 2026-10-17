@@ -111,8 +111,12 @@ class ProcessingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             file=pathlib.Path(directory)/'data.gpkg';file.write_bytes(result['data.gpkg'])
             dataset=ogr.Open(str(file));layer=dataset.GetLayer(0);row=layer.GetNextFeature()
-            self.assertEqual(row.GetField('code'),'001');self.assertIsNone(row.GetField('value'))
-            self.assertEqual(row.GetField(json.loads(result['metadata.json'])['identityField']),'a')
-            self.assertEqual(row.GetField('number'),3.5);self.assertEqual(layer.GetSpatialRef().GetAuthorityCode(None),'4326')
+            try:
+                self.assertEqual(row.GetField('code'),'001');self.assertIsNone(row.GetField('value'))
+                self.assertEqual(row.GetField(json.loads(result['metadata.json'])['identityField']),'a')
+                self.assertEqual(row.GetField('number'),3.5);self.assertEqual(layer.GetSpatialRef().GetAuthorityCode(None),'4326')
+            finally:
+                # Windows retains the GeoPackage lock until every OGR handle closes.
+                row=None;layer=None;dataset=None
 
 if __name__=='__main__': unittest.main()

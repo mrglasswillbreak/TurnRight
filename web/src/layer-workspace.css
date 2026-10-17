@@ -27,13 +27,13 @@
 .layer-workspace header {
   justify-content: space-between;
 }
-.layer-workspace h2,
-.layer-workspace h3 {
+:is(.layer-workspace, .layer-attributes-pane) h2,
+:is(.layer-workspace, .layer-attributes-pane) h3 {
   margin: 0;
   font-size: 16px;
 }
-.layer-workspace input,
-.layer-workspace select {
+:is(.layer-workspace, .layer-attributes-pane) input,
+:is(.layer-workspace, .layer-attributes-pane) select {
   max-width: 100%;
   min-width: 0;
   background: var(--background);
@@ -42,7 +42,7 @@
   border-radius: 6px;
   padding: 6px;
 }
-.layer-workspace button {
+:is(.layer-workspace, .layer-attributes-pane) button {
   min-height: 36px;
   padding: 5px 9px;
   border: 1px solid var(--border);
@@ -50,14 +50,14 @@
   background: var(--soft);
   color: var(--foreground);
 }
-.layer-workspace button:focus-visible {
+:is(.layer-workspace, .layer-attributes-pane) button:focus-visible {
   outline: 2px solid var(--link);
   outline-offset: 2px;
 }
-.layer-workspace button:disabled {
+:is(.layer-workspace, .layer-attributes-pane) button:disabled {
   opacity: 0.5;
 }
-.layer-workspace input[type='checkbox'] {
+:is(.layer-workspace, .layer-attributes-pane) input[type='checkbox'] {
   flex: none;
   width: 16px;
   height: 16px;
@@ -99,19 +99,19 @@
   min-width: 0;
   overflow: hidden;
 }
-.layer-workspace strong,
-.layer-workspace small {
+:is(.layer-workspace, .layer-attributes-pane) strong,
+:is(.layer-workspace, .layer-attributes-pane) small {
   display: block;
 }
-.layer-workspace small {
+:is(.layer-workspace, .layer-attributes-pane) small {
   font-size: 11px;
   color: var(--muted);
   overflow-wrap: anywhere;
 }
-.layer-workspace details {
+:is(.layer-workspace, .layer-attributes-pane) details {
   flex: none;
 }
-.layer-workspace summary {
+:is(.layer-workspace, .layer-attributes-pane) summary {
   cursor: pointer;
   padding: 8px 0;
   font-weight: 600;
@@ -214,7 +214,7 @@
   border: 1px solid var(--link);
   border-radius: 8px;
 }
-.layer-workspace output {
+:is(.layer-workspace, .layer-attributes-pane) output {
   white-space: pre-wrap;
   font-size: 12px;
 }

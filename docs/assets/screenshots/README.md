@@ -4,6 +4,10 @@
 
 The README public desktop and phone images now show the newly published LASU and UNILAG packages. [Capture provenance](live-publication-2026-10-15.json) records their exact hashes, dimensions, application revisions and package identities. The images are unaltered production captures; the phone viewport is a desktop browser simulation. The remaining editor/globe/offline tour below keeps its isolated-fixture provenance.
 
+## Campus detail candidates · 17 October 2026
+
+[LASU](campus-detail-lasu-2026-10-17.png) and [UNILAG](campus-detail-unilag-2026-10-17.png) are unaltered local Chromium captures of the review candidates, with illustrative colours and scenery. Existing authored buildings remain. They are not new source surveys or published releases. The full local comparison covers both campuses, before/after packages, light/dark 3D and 2D, using the current renderer. [Implementation and reproduction](../../CAMPUS-DETAIL-UPGRADE.md) · [Verification record](../measurements/campus-detail-2026-10-17.json).
+
 ## Current product tour · 15 October 2026
 
 The complete local product tour contains eighteen unaltered Chromium captures covering the public map, globe, mobile/offline experience, editor panes, Data/Analyze/Review/Publish, model reference/portrait/landscape, imports and photo editing. They use the current local source, verified public LASU assets, and isolated owner/team/API responses. No production draft, decision or release was changed.

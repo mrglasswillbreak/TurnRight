@@ -1,5 +1,11 @@
 # Source updates
 
+## ArcGIS Pro campus discovery
+
+The October 17 discovery pass archives eight LASU and 44 UNILAG candidate layers separately from accepted sources. Every retrieved candidate has a comparison disposition; additions remain candidates, duplicates are not imported twice, conflicts retain existing corrections, and null geometry remains invalid. Survey dates are recorded independently from upload/modification timestamps. No explicit reuse licence appeared in the captured item metadata, so new use remains held pending an exact match to retained permission evidence. Existing permission for a recorded source does not cover a different item or publisher.
+
+Use the [toolbox and portable-review procedure](CAMPUS-DETAIL-UPGRADE.md) before Pro access expires. Native geometry checks work on copied datasets and never repair the source automatically. Keep 2008 UNILAG imagery as historical reference. Source acceptance, presentation-only scenery and public release approval are separate decisions. Scenery recipes do not create surveyed trees, entrances, access claims or routing obstacles.
+
 Open **Review → Source updates** to check connected sources, inspect proposed map changes, and accept or reject a selection. The workflow is **check → review → publish**. Accepting source data changes the private source baseline; it does not publish the public map. Saved editor corrections continue to take precedence.
 
 ## Preview the whole inbox on the map

@@ -1,4 +1,6 @@
 import { BrandMark } from './BrandMark';
+import { useVisitorLayers } from './visitor-layers';
+const LandmarkViewButton = lazy(() => import('./LandmarkViewButton'));
 import {
   requestedCampus,
   DEFAULT_CAMPUS,
@@ -74,8 +76,17 @@ import { useSimple3D } from './useSimple3D';
 
 import type { Feature } from 'geojson';
 import { buildingPlace, resolvePlaceId, resolvePlaceIds } from './map-display';
-import { BuildingVisualDetails } from './BuildingVisualDetails';
-import { ArrivalSection, PhotoGallery } from './ArrivalGuide';
+const BuildingVisualDetails = lazy(() =>
+  import('./BuildingVisualDetails').then((m) => ({
+    default: m.BuildingVisualDetails,
+  })),
+);
+const ArrivalSection = lazy(() =>
+  import('./ArrivalGuide').then((m) => ({ default: m.ArrivalSection })),
+);
+const PhotoGallery = lazy(() =>
+  import('./ArrivalGuide').then((m) => ({ default: m.PhotoGallery })),
+);
 import { buildingPhotos, placeBuildingId } from './arrival';
 import { useMapViewPreference } from './useMapViewPreference';
 import {
@@ -90,7 +101,9 @@ const OfflinePanel = lazy(() =>
 );
 const PublicMapLayout = lazy(() => import('./PublicMapLayout'));
 
-import { RoutePanel } from './RoutePanel';
+const RoutePanel = lazy(() =>
+  import('./RoutePanel').then((m) => ({ default: m.RoutePanel })),
+);
 import { OfflineVoice } from './audio';
 import { useVoiceGuidance } from './useVoiceGuidance';
 import { advanceNavigation, initialNavigation } from './navigation';
@@ -113,6 +126,7 @@ const AppearanceSettings = lazy(() =>
     default: m.AppearanceSettings,
   })),
 );
+const VisitorLayerControls = lazy(() => import('./VisitorLayerControls'));
 const MapRenderingSettings = lazy(() =>
   import('./MapRenderingSettings').then((m) => ({
     default: m.MapRenderingSettings,
@@ -559,6 +573,10 @@ export default function App() {
     entranceId,
   ]);
   const deferredQuery = useDeferredValue(query);
+  const [visitorLayers, setVisitorLayers] = useVisitorLayers(
+    manifest?.campus?.slug || DEFAULT_CAMPUS,
+  );
+  const [landmarksOnly, setLandmarksOnly] = useState(false);
   const [visiblePlaceCount, setVisiblePlaceCount] = useState(50);
   useEffect(() => {
     setVisiblePlaceCount(50);
@@ -569,6 +587,7 @@ export default function App() {
         .filter(
           (p) =>
             (!savedOnly || saved.includes(p.id)) &&
+            (!landmarksOnly || p.landmark === true) &&
             (category === 'all' || p.category === category) &&
             placeMatches(p, deferredQuery),
         )
@@ -578,14 +597,14 @@ export default function App() {
             Number(/library|senate|health|faculty/i.test(b.name)) -
               Number(/library|senate|health|faculty/i.test(a.name)),
         ),
-    [data, deferredQuery, category, saved, savedOnly, recent],
+    [data, deferredQuery, category, saved, savedOnly, recent, landmarksOnly],
   );
   const streets = useMemo(
     () =>
-      category === 'all' && !savedOnly
+      category === 'all' && !savedOnly && !landmarksOnly
         ? streetResults(data, deferredQuery)
         : [],
-    [data, deferredQuery, category, savedOnly],
+    [data, deferredQuery, category, savedOnly, landmarksOnly],
   );
   const [selectedStreet, setSelectedStreet] = useState<string | null>(null);
   const selectPlace = useCallback(
@@ -1087,6 +1106,7 @@ export default function App() {
       }
     >
       <MapView
+        visitorLayers={visitorLayers}
         animationPaused={!!dialog || !!selectedStreet || campusSearch}
         selectedStreet={selectedStreet}
         data={data}
@@ -1123,6 +1143,15 @@ export default function App() {
       />
 
       {mapControls}
+      {!worldView && !navigating && (
+        <Suspense fallback={null}>
+          <VisitorLayerControls
+            value={visitorLayers}
+            onChange={setVisitorLayers}
+            illustrative={!!data.visuals?.scenery}
+          />
+        </Suspense>
+      )}
       {campusMap && new URLSearchParams(location.search).has('mapLayout') && (
         <Suspense fallback={null}>
           <PublicMapLayout
@@ -1371,76 +1400,91 @@ export default function App() {
             </output>
           )}
           {routeView && selected ? (
-            <RoutePanel
-              data={data}
-              destination={selected}
-              mode={travelMode}
-              parkingId={parkingId}
-              entranceId={entranceId}
-              onEntrance={(id) => {
-                setEntranceId(id);
-                void previewRoute(origin, travelMode, parkingId, id);
-              }}
-              onMode={(mode) => {
-                setTravelMode(mode);
-                setActiveLeg(0);
-                try {
-                  localStorage.setItem('turnright-travel-mode', mode);
-                } catch {
-                  setToast('Travel mode is saved for this session only.');
+            <Suspense
+              fallback={<output className="notice">Loading directions…</output>}
+            >
+              <RoutePanel
+                data={data}
+                destination={selected}
+                mode={travelMode}
+                parkingId={parkingId}
+                entranceId={entranceId}
+                onEntrance={(id) => {
+                  setEntranceId(id);
+                  void previewRoute(origin, travelMode, parkingId, id);
+                }}
+                onMode={(mode) => {
+                  setTravelMode(mode);
+                  setActiveLeg(0);
+                  try {
+                    localStorage.setItem('turnright-travel-mode', mode);
+                  } catch {
+                    setToast('Travel mode is saved for this session only.');
+                  }
+                  void previewRoute(origin, mode);
+                }}
+                onParking={(id) => {
+                  setParkingId(id);
+                  void previewRoute(origin, travelMode, id);
+                }}
+                activeRoute={navigating ? currentRoute : undefined}
+                onParked={() => {
+                  voice.current.stop();
+                  setActiveLeg(1);
+                  setNav(initialNavigation);
+                  gps.start();
+                  setFollow(true);
+                }}
+                routes={routes}
+                chosen={chosen}
+                origin={origin}
+                busy={busy}
+                error={
+                  routeError ||
+                  (origin === 'gps' || navigating ? gps.error : '')
                 }
-                void previewRoute(origin, mode);
-              }}
-              onParking={(id) => {
-                setParkingId(id);
-                void previewRoute(origin, travelMode, id);
-              }}
-              activeRoute={navigating ? currentRoute : undefined}
-              onParked={() => {
-                voice.current.stop();
-                setActiveLeg(1);
-                setNav(initialNavigation);
-                gps.start();
-                setFollow(true);
-              }}
-              routes={routes}
-              chosen={chosen}
-              origin={origin}
-              busy={busy}
-              error={
-                routeError || (origin === 'gps' || navigating ? gps.error : '')
-              }
-              navigating={navigating}
-              nav={nav}
-              muted={muted}
-              onOrigin={(from) => {
-                if (from === 'gps') gps.start();
-                void previewRoute(from);
-              }}
-              onChoose={setChosen}
-              onStart={() => {
-                void motionService().requestFromGesture();
-                void startNavigation();
-              }}
-              fix={gps.fix}
-              following={follow}
-              onStop={stopNavigation}
-              onBack={() => {
-                routeRequest.current++;
-                startRequested.current = false;
-                gps.stop();
-                setRouteView(false);
-                setRoutes([]);
-              }}
-              onMute={() => {
-                setMuted(!muted);
-                void setPreference('muted', !muted);
-              }}
-              onRepeat={repeatDirections}
-            />
+                navigating={navigating}
+                nav={nav}
+                muted={muted}
+                onOrigin={(from) => {
+                  if (from === 'gps') gps.start();
+                  void previewRoute(from);
+                }}
+                onChoose={setChosen}
+                onStart={() => {
+                  void motionService().requestFromGesture();
+                  void startNavigation();
+                }}
+                fix={gps.fix}
+                following={follow}
+                onStop={stopNavigation}
+                onBack={() => {
+                  routeRequest.current++;
+                  startRequested.current = false;
+                  gps.stop();
+                  setRouteView(false);
+                  setRoutes([]);
+                }}
+                onMute={() => {
+                  setMuted(!muted);
+                  void setPreference('muted', !muted);
+                }}
+                onRepeat={repeatDirections}
+              />
+            </Suspense>
           ) : !selected ? (
             <>
               <div className="category-strip">
+                <button
+                  className={landmarksOnly ? 'category active' : 'category'}
+                  aria-pressed={landmarksOnly}
+                  onClick={() => {
+                    setLandmarksOnly((v) => !v);
+                    setCategory('all');
+                  }}
+                >
+                  Landmarks
+                </button>
                 {categories.map(({ id, label, Icon }) => (
                   <button
                     key={id}
@@ -1555,75 +1599,79 @@ export default function App() {
                 {selected.category.toUpperCase()} · {campusName}
               </span>
               <h1>{selected.name}</h1>
-              <PhotoGallery
-                key={selected.id}
-                photos={buildingPhotos(data, placeBuildingId(data, selected))}
-                actions={
-                  <fieldset
-                    className="place-primary-actions"
-                    aria-label="Place actions"
-                  >
-                    <Button
-                      className="primary-action"
-                      onClick={() => void previewRoute()}
+              <Suspense fallback={null}>
+                <PhotoGallery
+                  key={selected.id}
+                  photos={buildingPhotos(data, placeBuildingId(data, selected))}
+                  actions={
+                    <fieldset
+                      className="place-primary-actions"
+                      aria-label="Place actions"
                     >
-                      <Navigation size={18} /> Directions
-                    </Button>
-                    <div className="button-row place-actions">
-                      {typeof navigator.share === 'function' && (
+                      <Button
+                        className="primary-action"
+                        onClick={() => void previewRoute()}
+                      >
+                        <Navigation size={18} /> Directions
+                      </Button>
+                      <div className="button-row place-actions">
+                        {typeof navigator.share === 'function' && (
+                          <Button
+                            variant="outline"
+                            onClick={() => void shareDestination()}
+                          >
+                            <Share2 /> Share
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
-                          onClick={() => void shareDestination()}
+                          onClick={() => void shareDestination(true)}
                         >
-                          <Share2 /> Share
+                          <Copy /> Copy link
                         </Button>
+                        <Button variant="outline" onClick={toggleSaved}>
+                          <Heart
+                            fill={
+                              saved.includes(selected.id)
+                                ? 'currentColor'
+                                : 'none'
+                            }
+                          />
+                          {saved.includes(selected.id) ? 'Saved' : 'Save'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setReportPin(undefined);
+                            setDialog('report');
+                          }}
+                        >
+                          <Flag /> Report
+                        </Button>
+                      </div>
+                      {shareFallback && (
+                        <label className="field-label">
+                          Destination link
+                          <input
+                            aria-label="Destination link"
+                            readOnly
+                            value={shareFallback}
+                            onFocus={(event) => event.target.select()}
+                          />
+                        </label>
                       )}
-                      <Button
-                        variant="outline"
-                        onClick={() => void shareDestination(true)}
-                      >
-                        <Copy /> Copy link
-                      </Button>
-                      <Button variant="outline" onClick={toggleSaved}>
-                        <Heart
-                          fill={
-                            saved.includes(selected.id)
-                              ? 'currentColor'
-                              : 'none'
-                          }
-                        />
-                        {saved.includes(selected.id) ? 'Saved' : 'Save'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setReportPin(undefined);
-                          setDialog('report');
-                        }}
-                      >
-                        <Flag /> Report
-                      </Button>
-                    </div>
-                    {shareFallback && (
-                      <label className="field-label">
-                        Destination link
-                        <input
-                          aria-label="Destination link"
-                          readOnly
-                          value={shareFallback}
-                          onFocus={(event) => event.target.select()}
-                        />
-                      </label>
-                    )}
-                  </fieldset>
-                }
-              />
-              <ArrivalSection
-                data={data}
-                place={selected}
-                entranceId={entranceId}
-                onEntrance={setEntranceId}
-              />
+                    </fieldset>
+                  }
+                />
+              </Suspense>
+              <Suspense fallback={null}>
+                <ArrivalSection
+                  data={data}
+                  place={selected}
+                  entranceId={entranceId}
+                  onEntrance={setEntranceId}
+                />
+              </Suspense>
               <Suspense fallback={<p>Loading place details…</p>}>
                 <PlaceInformation place={selected} sources={data.sources} />
               </Suspense>
@@ -1635,7 +1683,21 @@ export default function App() {
                 );
                 return (
                   building && (
-                    <BuildingVisualDetails data={data} feature={building} />
+                    <Suspense fallback={null}>
+                      <LandmarkViewButton
+                        feature={building}
+                        map={map.current}
+                        mobile={mobileMapControls}
+                        onEnable={() => {
+                          setThreeD(true);
+                          setVisitorLayers({
+                            ...visitorLayers,
+                            buildings: true,
+                          });
+                        }}
+                      />
+                      <BuildingVisualDetails data={data} feature={building} />
+                    </Suspense>
                   )
                 );
               })()}
@@ -1745,13 +1807,18 @@ export default function App() {
           <div className="dialog-scroll-content">
             {dialog === 'building' && unlinkedBuilding && (
               <div className="settings-content">
-                <BuildingVisualDetails data={data} feature={unlinkedBuilding} />
-                <PhotoGallery
-                  photos={buildingPhotos(
-                    data,
-                    String(unlinkedBuilding.properties?.id || ''),
-                  )}
-                />
+                <Suspense fallback={null}>
+                  <BuildingVisualDetails
+                    data={data}
+                    feature={unlinkedBuilding}
+                  />
+                  <PhotoGallery
+                    photos={buildingPhotos(
+                      data,
+                      String(unlinkedBuilding.properties?.id || ''),
+                    )}
+                  />
+                </Suspense>
                 <a
                   className="editor-primary"
                   href={publicEditorHref(

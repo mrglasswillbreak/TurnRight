@@ -16,6 +16,10 @@ on:
       expected_hash:
         description: Reviewed complete workspace hash; required for apply
         required: false
+      upgrade:
+        type: choice
+        options: [layers, detail]
+        default: layers
 permissions:
   contents: read
 jobs:
@@ -39,7 +43,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
-      - run: npx tsx ../scripts/prepare-campus-layer-release.mts
+      - if: inputs.upgrade != 'detail'
+        run: npx tsx ../scripts/prepare-campus-layer-release.mts
+        working-directory: web
+      - if: inputs.upgrade == 'detail'
+        run: npx tsx ../scripts/prepare-campus-detail-release.mts
         working-directory: web
       - uses: actions/upload-artifact@v4
         if: always()
@@ -48,4 +56,5 @@ jobs:
           path: |
             web/work/*-layer-receipt.json
             web/work/*-layer-preview.json
+            web/work/*-detail-receipt.json
           retention-days: 14

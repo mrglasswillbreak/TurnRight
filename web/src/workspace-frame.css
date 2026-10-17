@@ -333,7 +333,7 @@
   left: 10px;
 }
 .workspace-canvas .editor-bottom {
-  left: 12px;
+  left: 74px;
   right: 64px;
 }
 .workspace-canvas .editor-welcome {
@@ -582,6 +582,8 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 .layer-attributes-pane > .layer-table {
   flex: 1;

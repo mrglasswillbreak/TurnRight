@@ -1,5 +1,7 @@
 # Campuses and editable map imports
 
+For local ArcGIS Pro discovery and analysis, use the [TurnRight toolbox and versioned exchange bundle](CAMPUS-DETAIL-UPGRADE.md#exchange-contract-and-import). Import its ZIP through the existing file workflow. The reader checks campus identity, stable IDs, counts, hashes and CRS declarations; unresolved redistribution rights block candidate preparation. ArcGIS authentication stays on the workstation.
+
 ## Finding imports
 
 Migration 039 replaces the whole-candidate queue RPC with private staging: at most 100 records and 384 KiB of JSON per worker batch, within the database's 512 KiB limit, followed by one atomic baseline validation and review transaction. Cancellation, stale previews and incomplete batches leave the review queue unchanged. Manual **Queue for review** runs in the worker and shows progress. Import history and active-job polling omit preview geometry. The retired unbounded RPC must not be restored when rolling back application code.

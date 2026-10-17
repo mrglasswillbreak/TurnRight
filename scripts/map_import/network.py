@@ -20,8 +20,8 @@ def public_addresses(host):
 
 
 class PinnedHTTPS(http.client.HTTPSConnection):
-    def __init__(self, host, address):
-        super().__init__(host, timeout=90, context=ssl.create_default_context())
+    def __init__(self, host, address, timeout=90):
+        super().__init__(host, timeout=timeout, context=ssl.create_default_context())
         self.address = address
 
     def connect(self):
@@ -29,7 +29,7 @@ class PinnedHTTPS(http.client.HTTPSConnection):
         self.sock = self._context.wrap_socket(raw, server_hostname=self.host)
 
 
-def fetch_public(url, *, form=None, limit=MAX_BYTES, cache=None):
+def fetch_public(url, *, form=None, limit=MAX_BYTES, cache=None, timeout=90):
     key = hashlib.sha256((url + json.dumps(form, sort_keys=True)).encode()).hexdigest()
     cached = Path(cache) / key if cache else None
     if cached and cached.exists() and time.time() - cached.stat().st_mtime < 3600:
@@ -38,7 +38,7 @@ def fetch_public(url, *, form=None, limit=MAX_BYTES, cache=None):
         parsed = urlsplit(url)
         if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password or parsed.port not in (None, 443):
             raise ValueError('Use a public HTTPS source without credentials.')
-        connection = PinnedHTTPS(parsed.hostname, public_addresses(parsed.hostname)[0])
+        connection = PinnedHTTPS(parsed.hostname, public_addresses(parsed.hostname)[0], timeout=timeout)
         path = parsed.path or '/'
         if parsed.query:
             path += '?' + parsed.query
@@ -75,8 +75,8 @@ def fetch_public(url, *, form=None, limit=MAX_BYTES, cache=None):
     raise ValueError('Too many source redirects.')
 
 
-def public_json(url, form=None, cache=None):
-    value = json.loads(fetch_public(url, form=form, cache=cache))
+def public_json(url, form=None, cache=None, timeout=90):
+    value = json.loads(fetch_public(url, form=form, cache=cache, timeout=timeout))
     if isinstance(value, dict) and value.get('error'):
         raise ValueError('The source rejected this request: ' + str(value['error'].get('message', value['error'])))
     return value

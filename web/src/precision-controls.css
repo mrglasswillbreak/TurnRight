@@ -1,0 +1,48 @@
+.precision-controls {
+  position: absolute;
+  z-index: 15;
+  left: 76px;
+  top: 76px;
+  width: min(310px, calc(100vw - 100px));
+  max-height: calc(100dvh - 160px);
+  overflow: auto;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.precision-controls header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.precision-controls label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.precision-controls fieldset {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--border, #d8dfe6);
+  padding: 10px;
+  border-radius: 10px;
+}
+.precision-controls input[type='number'],
+.precision-controls select {
+  width: 100%;
+  min-height: 34px;
+}
+.precision-controls small {
+  font-size: 12px;
+  line-height: 1.45;
+}
+@media (max-width: 700px) {
+  .precision-controls {
+    left: 12px;
+    top: 110px;
+    width: calc(100vw - 24px);
+    max-height: calc(70dvh - 120px);
+  }
+}

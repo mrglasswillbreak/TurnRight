@@ -33,12 +33,19 @@ export function wallLength(
   latitude = (coordinates[0][1] + coordinates[1][1]) / 2,
 ) {
   const k = (Math.PI / 180) * 6371008.8;
-  return coordinates.slice(1).reduce((total,point,i)=>total+Math.hypot(
-    (point[0] - coordinates[i][0]) *
-      k *
-      Math.cos((latitude * Math.PI) / 180),
-    (point[1] - coordinates[i][1]) * k,
-  ),0);
+  return coordinates
+    .slice(1)
+    .reduce(
+      (total, point, i) =>
+        total +
+        Math.hypot(
+          (point[0] - coordinates[i][0]) *
+            k *
+            Math.cos((latitude * Math.PI) / 180),
+          (point[1] - coordinates[i][1]) * k,
+        ),
+      0,
+    );
 }
 export function wallMetrics(
   feature: Feature,
@@ -80,7 +87,7 @@ export function wallMetrics(
         ? 6
         : (override?.height ?? part?.height ?? visual.height);
   const custom = appearance.roofs?.[wall.partId];
-  const width = Math.min(
+  const width = (partStyle.roofOrientation === 'short' ? Math.max : Math.min)(
     ...polygon[0]
       .slice(0, -1)
       .map((p, i) => wallLength([p, polygon[0][i + 1]], latitude)),

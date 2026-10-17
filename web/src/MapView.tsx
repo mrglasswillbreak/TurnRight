@@ -24,6 +24,11 @@ import { applyMapTheme } from './map-theme';
 import { installPlaceBadges } from './place-badges';
 import type { createCampusModels, ModelStatus } from './campus-model-layer';
 import { placeFeatures, closureFeatures } from './map-sources';
+import {
+  visitorPresentation,
+  ALL_VISITOR_LAYERS,
+  type VisitorLayers,
+} from './visitor-layers';
 const empty: FeatureCollection = { type: 'FeatureCollection', features: [] };
 maplibregl.setWorkerUrl(mapWorkerUrl);
 const noRoutes: Route[] = [];
@@ -32,6 +37,7 @@ const WorldAnimation = lazy(() =>
   import('./WorldAnimation').catch(() => ({ default: () => <></> })),
 );
 export interface MapViewProps {
+  visitorLayers?: VisitorLayers;
   animationPaused?: boolean;
   selectedStreet?: string | null;
   data: CampusData;
@@ -57,7 +63,8 @@ export interface MapViewProps {
 }
 export function MapView({
   animationPaused = false,
-  data,
+  data: originalData,
+  visitorLayers = ALL_VISITOR_LAYERS,
   selectedStreet,
   selected,
   routes = noRoutes,
@@ -79,6 +86,13 @@ export function MapView({
   onWorldViewChange,
   onReady,
 }: MapViewProps) {
+  const data = useMemo(
+    () =>
+      editor
+        ? originalData
+        : visitorPresentation(originalData, visitorLayers, selected?.id),
+    [originalData, visitorLayers, selected?.id, editor],
+  );
   const container = useRef<HTMLDivElement>(null),
     mapRef = useRef<MapInstance | null>(null);
   const callbacks = useRef({
@@ -1133,6 +1147,8 @@ export function MapView({
   });
   modelOptions.current = {
     data,
+    sceneryData: originalData,
+    sceneryEnabled: editor || visitorLayers.greenery,
     enabled: threeD && !simple && !editing,
     selection: buildingSelection,
     opacity: buildingOpacity,

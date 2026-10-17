@@ -33,6 +33,14 @@ export default function LayerGeometry({
     [error, setError] = useState(''),
     [result, setResult] = useState<GeometryResult | null>(null);
   const worker = useRef<Worker | null>(null);
+  const [offset, setOffset] = useState('1'),
+    [bearing, setBearing] = useState('0');
+  useEffect(() => {
+    worker.current?.terminate();
+    worker.current = null;
+    setBusy(false);
+    setResult(null);
+  }, [mode, part, ring, cutter, replaceManual, offset, bearing]);
   const input = useRef({ data, edits });
   input.current = { data, edits };
   const resultInput = useRef<{ data: CampusData; edits: MapEdit[] } | null>(
@@ -106,6 +114,8 @@ export default function LayerGeometry({
         part,
         ring,
         replaceManual,
+        distance: Number(offset),
+        bearing: Number(bearing),
       },
     });
   };
@@ -148,6 +158,10 @@ export default function LayerGeometry({
             'remove-hole',
             'remove-part',
             'regenerate',
+            'square',
+            'straighten',
+            'align',
+            'offset',
           ].map((value) => (
             <option key={value} value={value}>
               {value}
@@ -155,6 +169,29 @@ export default function LayerGeometry({
           ))}
         </select>
       </label>
+      {mode === 'offset' && (
+        <label>
+          Offset in metres (negative shrinks)
+          <input
+            type="number"
+            min="-100"
+            max="100"
+            step="0.1"
+            value={offset}
+            onChange={(e) => setOffset(e.target.value)}
+          />
+        </label>
+      )}
+      {mode === 'align' && (
+        <label>
+          Longest-edge bearing (° clockwise from north)
+          <input
+            type="number"
+            value={bearing}
+            onChange={(e) => setBearing(e.target.value)}
+          />
+        </label>
+      )}
       {['split', 'hole'].includes(mode) && (
         <button onClick={() => onDrawCutter({ ...request, operation: mode })}>
           Draw {mode === 'split' ? 'cutting line' : 'hole'} on map

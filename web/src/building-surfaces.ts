@@ -439,11 +439,14 @@ export function standardRoofSupported(polygon: number[][][]) {
   });
   return signs.every((sign) => sign !== 0 && sign === signs[0]);
 }
-export function roofWidth(polygon: number[][][]) {
+export function roofWidth(
+  polygon: number[][][],
+  orientation?: 'long' | 'short',
+) {
   const ring = polygon[0].slice(0, -1),
     sy = (Math.PI / 180) * 6371008.8,
     sx = sy * Math.cos((ring[0][1] * Math.PI) / 180);
-  return Math.min(
+  return (orientation === 'short' ? Math.max : Math.min)(
     ...ring.map((p, i) => {
       const q = ring[(i + 1) % ring.length];
       return Math.hypot((p[0] - q[0]) * sx, (p[1] - q[1]) * sy);

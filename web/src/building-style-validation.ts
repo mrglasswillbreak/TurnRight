@@ -149,6 +149,11 @@ export function validateBuildingStyle(
     if (style.windows !== undefined && typeof style.windows !== 'boolean')
       errors.push('Window visibility must be on or off.');
     if (
+      style.roofOrientation !== undefined &&
+      !['long', 'short'].includes(style.roofOrientation)
+    )
+      errors.push('Choose a supported roof orientation.');
+    if (
       style.windowSpacing !== undefined &&
       (!Number.isFinite(style.windowSpacing) ||
         style.windowSpacing < 0.5 ||
@@ -209,7 +214,8 @@ export function validateBuildingStyle(
                 ? 6
                 : (own?.height ?? inheritedHeight(index));
         if (
-          (roofWidth(polygon[index]) / 2) * Math.tan((pitch * Math.PI) / 180) >=
+          (roofWidth(polygon[index], style.roofOrientation) / 2) *
+            Math.tan((pitch * Math.PI) / 180) >=
           height
         )
           errors.push(

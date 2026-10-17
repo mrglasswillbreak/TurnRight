@@ -177,7 +177,7 @@ export function createBuildingModel(
     // Roof rise is an explicitly inferred share of total height, never added above it.
     const pitched =
       !custom && style.roofForm !== 'flat' && standardRoofSupported(polygon);
-    const width = Math.min(
+    const width = (style.roofOrientation === 'short' ? Math.max : Math.min)(
       ...outer.map((a, i) =>
         Math.hypot(
           a[0] - outer[(i + 1) % outer.length][0],
@@ -212,8 +212,8 @@ export function createBuildingModel(
         });
         const segmentWallId =
           topology.parts[partIndex].rings[ringIndex].wallIds[wallIndex];
-        const curve=curvedWall(feature,segmentWallId);
-        const wallId=curve?.wallIds[0]||segmentWallId;
+        const curve = curvedWall(feature, segmentWallId);
+        const wallId = curve?.wallIds[0] || segmentWallId;
         scope = { partId, wallId };
         const facade = styleFor(appearance, surfaceVisual, partId, wallId);
         const wallMesh = mesh(facade.wallColour!);
@@ -229,20 +229,43 @@ export function createBuildingModel(
           [...b, eaves],
           [...a, eaves],
         ]);
-        if(curve) {
-          if(segmentWallId===curve.wallIds[0]) {
-            const sourceRing=topology.parts[partIndex].rings[ringIndex];
-            const path=curve.vertexIds.map(id=>original[sourceRing.vertexIds.indexOf(id)]);
-            const total=pathDistances(path).total;
-            const description=appearance.facades?.[wallId] || editableFacade(feature,wallId,visual);
-            if((!description.needsReview||options.previewUnreviewed)&&facadeMatches(description,feature)) {
-              const firstRight=alongPath(path,0).right;
-              const sign=firstRight[0]*(b[1]-a[1])/length-firstRight[1]*(b[0]-a[0])/length>0?1:-1;
-              const details=facadeMeshes(description,[0,0],[total,0],[0,-1],eaves,facade.wallColour!,facade.trimColour);
-              for(const detail of details)for(let v=0;v<detail.positions.length;v+=3) {
-                const at=alongPath(path,detail.positions[v]),out=-detail.positions[v+1]*sign;
-                detail.positions[v]=at.point[0]+at.right[0]*out;detail.positions[v+1]=at.point[1]+at.right[1]*out;
-              }
+        if (curve) {
+          if (segmentWallId === curve.wallIds[0]) {
+            const sourceRing = topology.parts[partIndex].rings[ringIndex];
+            const path = curve.vertexIds.map(
+              (id) => original[sourceRing.vertexIds.indexOf(id)],
+            );
+            const total = pathDistances(path).total;
+            const description =
+              appearance.facades?.[wallId] ||
+              editableFacade(feature, wallId, visual);
+            if (
+              (!description.needsReview || options.previewUnreviewed) &&
+              facadeMatches(description, feature)
+            ) {
+              const firstRight = alongPath(path, 0).right;
+              const sign =
+                (firstRight[0] * (b[1] - a[1])) / length -
+                  (firstRight[1] * (b[0] - a[0])) / length >
+                0
+                  ? 1
+                  : -1;
+              const details = facadeMeshes(
+                description,
+                [0, 0],
+                [total, 0],
+                [0, -1],
+                eaves,
+                facade.wallColour!,
+                facade.trimColour,
+              );
+              for (const detail of details)
+                for (let v = 0; v < detail.positions.length; v += 3) {
+                  const at = alongPath(path, detail.positions[v]),
+                    out = -detail.positions[v + 1] * sign;
+                  detail.positions[v] = at.point[0] + at.right[0] * out;
+                  detail.positions[v + 1] = at.point[1] + at.right[1] * out;
+                }
               detailedMeshes.push(...details);
             }
           }
@@ -369,6 +392,7 @@ export function createBuildingModel(
         Math.hypot(outer[2][0] - outer[1][0], outer[2][1] - outer[1][1])
       )
         outer.push(outer.shift()!);
+      if (style.roofOrientation === 'short') outer.push(outer.shift()!);
       const midpoint = (a: number[], b: number[]) => [
         (a[0] + b[0]) / 2,
         (a[1] + b[1]) / 2,

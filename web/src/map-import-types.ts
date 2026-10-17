@@ -66,6 +66,19 @@ export interface CampusSource {
   updated_at: string;
 }
 export interface ImportLayer {
+  exchange?: {
+    idField: string;
+    sourceCollection: string;
+    sourceCrs: string;
+    originalCrs?: unknown;
+    surveyDate?: string;
+    modifiedAt?: number;
+    rights: {
+      attribution: string;
+      license: string;
+      redistributionConfirmed: boolean;
+    };
+  };
   format?: string;
   name: string;
   count: number;
@@ -82,6 +95,7 @@ export interface ImportLayer {
   requiresCoordinates?: boolean;
 }
 export function suggestedImportIdentifier(layer: ImportLayer) {
+  if (layer.exchange?.idField) return layer.exchange.idField;
   const fields = layer.fields.filter((f) =>
     /^(id|objectid(?:_\d+)?|fid|globalid)$/i.test(f.name),
   );

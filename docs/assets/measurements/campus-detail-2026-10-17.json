@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-17",
+  "state": "local-candidates-not-published",
+  "portableArchiveLocation": "Documents/ArcGIS/Projects/TurnRightDetail/PortableEvidence/2026-10-17",
+  "portableCopyFilesVerified": 123,
+  "unitTests": 810,
+  "unitFiles": 113,
+  "pythonTests": 106,
+  "pythonSkipped": 1,
+  "pythonSkipReason": "OSM integration requires the pinned Linux GIS image",
+  "arcPySyntheticStudiesPassed": [
+    "12 by 8 metre footprint",
+    "Endpoint, vertex and edge snapping",
+    "Courtyard boundary with inner ring",
+    "3D Analyst footprint regularization",
+    "OBJ to Pro to GLB with roof and facade materials"
+  ],
+  "syntheticGlbBytes": 1660,
+  "syntheticGlbSha256": "dbeee56309b93e668a6ac4e197a31d596921bce5ed3460293a5885e89515d784",
+  "syntheticGlbTurnRightImport": {
+    "passed": true,
+    "dimensionsMetres": [12, 8, 8],
+    "faces": 16,
+    "materials": 2,
+    "missingAssets": [],
+    "warnings": []
+  },
+  "browserChecks": [
+    "Mouse rectangle, undo/redo, reload",
+    "Touch rectangle, undo/redo, reload",
+    "Live palette preview, cancel, apply, undo/redo",
+    "Older package walking directions"
+  ],
+  "fixedViews": 12,
+  "fixedViewPageErrors": [],
+  "pwaBrowserTestsPassed": 9,
+  "webkitCampusDetailTestsPassed": 3,
+  "finalChromiumJourneys": {
+    "passed": 2,
+    "timeoutMs": 120000,
+    "journeys": ["Sensor orientation and reload", "Desktop palette preview, cancel, apply and undo/redo"]
+  },
+  "broadBrowserRuns": {
+    "chromium": {
+      "passed": 25,
+      "skipped": 3,
+      "failed": 1,
+      "notRun": 186,
+      "failure": "Sensor journey exceeded its 60 second timeout; initial isolated retry timed out. Final 120 second retry passed in 56.9 seconds. Full suite remains incomplete."
+    },
+    "webkit": {
+      "passed": 3,
+      "failed": 1,
+      "notRun": 95,
+      "failure": "Map attachment during globe gesture setup exceeded its 120 second timeout"
+    }
+  },
+  "lazy3DGzipKiB": 264.2,
+  "lazy3DBudgetKiB": 300,
+  "publicStartupGzipBytes": 428746,
+  "publicStartupBudgetBytes": 435200,
+  "configuredPublicStartupGzipBytes": 428740,
+  "configuredOwnerExtraGzipBytes": 186062,
+  "configuredOwnerExtraBudgetBytes": 189440,
+  "proAccess": {
+    "reportedOn": "2026-10-17",
+    "remainingDays": 21,
+    "workingEndDate": "2026-11-07",
+    "exactExpiryConfirmed": false,
+    "priority": "Complete Pro-dependent analysis and portable exports before access ends"
+  },
+  "campusVisualBudgetBytes": 12582912,
+  "campuses": [
+    {
+      "slug": "lasu",
+      "baselineVersion": "lasu-6796771f6052",
+      "buildings": 614,
+      "illustrativeDetail": 466,
+      "sourceHeightDetail": 0,
+      "preserved": 60,
+      "held": 88,
+      "vegetationRegions": 8,
+      "illustrativeInstances": 1500,
+      "visualBytes": 10844005,
+      "vectorLayers": 8,
+      "candidateFeatures": 586,
+      "additionalPortalReferencesHeld": 69,
+      "portableArchiveManifestSha256": "77e1960f137f672d9af3ca2c225bff8f91b8dd848d30237a42e795fdbcdf38f7"
+    },
+    {
+      "slug": "unilag",
+      "baselineVersion": "unilag-bd659bbd6df2",
+      "buildings": 723,
+      "illustrativeDetail": 694,
+      "sourceHeightDetail": 1,
+      "preserved": 9,
+      "held": 19,
+      "vegetationRegions": 2429,
+      "illustrativeInstances": 1500,
+      "visualBytes": 2174608,
+      "vectorLayers": 44,
+      "candidateFeatures": 6083,
+      "additionalPortalReferencesHeld": 37,
+      "portableArchiveManifestSha256": "2aa5da9144de4113a558d65416affdf520070cdef7d23674ba769239b7cbccf9"
+    }
+  ],
+  "releaseGates": [
+    "Rebase on current private workspace",
+    "Resolve source redistribution evidence",
+    "Complete interactive workflow studies",
+    "Private release-package offline and active-route review",
+    "Physical Android and iPhone performance",
+    "Independent approval and publication per campus"
+  ]
+}

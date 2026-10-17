@@ -42,6 +42,7 @@ def convert(folder):
         temporary.write_bytes(encoded({'message':message}))
         temporary.replace(folder/'progress.json')
     request = json.loads((folder/'request.json').read_text(encoding='utf-8'))
+    request['configuration']['_campusId'] = request.get('campus', {}).get('id')
     check_expanded_batch([folder/f['path'] for f in request['files']])
     layers, warnings = [], request.get('warnings',[])
     for index,source_file in enumerate(request['files']):

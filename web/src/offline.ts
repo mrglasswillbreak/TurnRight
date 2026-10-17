@@ -55,10 +55,14 @@ export const hashBytes = async (bytes: ArrayBuffer) =>
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 const preferenceKey = (key: string, campus = requestedCampus()) =>
-  /^(saved$|recent$|report|editor-workspace:|photo-)/.test(key)
+  /^(saved$|recent$|visitor-layers$|report|editor-workspace:|photo-)/.test(key)
     ? campusKey(key, campus)
     : key;
-export async function getPreference<T>(key: string, fallback: T, campus = requestedCampus()): Promise<T> {
+export async function getPreference<T>(
+  key: string,
+  fallback: T,
+  campus = requestedCampus(),
+): Promise<T> {
   key = preferenceKey(key, campus);
   try {
     return (await (await database()).get('preferences', key)) ?? fallback;
@@ -66,11 +70,18 @@ export async function getPreference<T>(key: string, fallback: T, campus = reques
     return fallback;
   }
 }
-export async function setPreference(key: string, value: unknown, campus = requestedCampus()) {
+export async function setPreference(
+  key: string,
+  value: unknown,
+  campus = requestedCampus(),
+) {
   key = preferenceKey(key, campus);
   await (await database()).put('preferences', value, key);
 }
-export async function discardReportDraft(key: string, campus = requestedCampus()) {
+export async function discardReportDraft(
+  key: string,
+  campus = requestedCampus(),
+) {
   const transaction = (await database()).transaction(
     'preferences',
     'readwrite',
@@ -100,7 +111,9 @@ export async function latestPackage(
   }
   const response = await fetch(url, {
     cache: 'no-store',
-    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
+    signal: signal
+      ? AbortSignal.any([signal, AbortSignal.timeout(15000)])
+      : AbortSignal.timeout(15000),
   });
   if (!response.ok)
     throw new Error(
@@ -241,7 +254,10 @@ async function verifiedAsset(response: Response, asset: PackageAsset) {
     (await hashBytes(bytes)) === asset.sha256
   );
 }
-export async function loadCampus(campus = requestedCampus(), signal?: AbortSignal): Promise<{
+export async function loadCampus(
+  campus = requestedCampus(),
+  signal?: AbortSignal,
+): Promise<{
   data: CampusData;
   manifest: CampusPackage;
   downloaded: boolean;
@@ -280,10 +296,15 @@ export async function loadCampus(campus = requestedCampus(), signal?: AbortSigna
     }
   }
   signal?.throwIfAborted();
-  if (navigator.onLine === false) throw new Error('This campus is not downloaded. Connect to the internet to open it.');
+  if (navigator.onLine === false)
+    throw new Error(
+      'This campus is not downloaded. Connect to the internet to open it.',
+    );
   const manifest = await latestPackage(campus, signal);
   const response = await fetch(manifest.dataUrl, {
-    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000),
+    signal: signal
+      ? AbortSignal.any([signal, AbortSignal.timeout(20000)])
+      : AbortSignal.timeout(20000),
   }).catch((error) => {
     if (error instanceof DOMException && error.name === 'TimeoutError')
       throw new Error(
@@ -297,13 +318,18 @@ export async function loadCampus(campus = requestedCampus(), signal?: AbortSigna
     );
   const bytes = await response.arrayBuffer();
   const asset = manifest.assets.find((a) => a.url === manifest.dataUrl);
-  if (!asset || bytes.byteLength !== asset.bytes || (await hashBytes(bytes)) !== asset.sha256)
+  if (
+    !asset ||
+    bytes.byteLength !== asset.bytes ||
+    (await hashBytes(bytes)) !== asset.sha256
+  )
     throw new Error(
       'Campus data did not pass its integrity check. Please retry.',
     );
   const data = JSON.parse(new TextDecoder().decode(bytes)) as CampusData;
   if (
-    data.version !== manifest.version || data.schemaVersion !== manifest.schemaVersion ||
+    data.version !== manifest.version ||
+    data.schemaVersion !== manifest.schemaVersion ||
     structuralIssues(data).length
   )
     throw new Error('This campus package is invalid or needs a newer app.');

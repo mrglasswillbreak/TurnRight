@@ -22,6 +22,11 @@ import type {
 import { featureEdit } from './editor-features';
 import { surfaceStale } from './surface-generation';
 import { propertyEdits } from './road-properties';
+import {
+  BUILDING_PRESETS,
+  presetEdit,
+  type BuildingPreset,
+} from './building-presets';
 import './layer-workspace.css';
 
 export default function LayerWorkspace({
@@ -36,6 +41,7 @@ export default function LayerWorkspace({
   onImport,
   onDraw,
   onGeometry,
+  onAppearancePreview,
   onClose,
 }: {
   data: CampusData;
@@ -44,6 +50,7 @@ export default function LayerWorkspace({
   view: LayerViewState;
   onView: (value: LayerViewState) => void;
   onCommit: (edits: MapEdit[]) => void;
+  onAppearancePreview: (edits: MapEdit[] | null) => void;
   onSelect: (kind: MapEdit['kind'], id: string) => void;
   onZoom: (ids: string[]) => void;
   onImport: () => void;
@@ -52,7 +59,15 @@ export default function LayerWorkspace({
     type: 'Point' | 'LineString' | 'Polygon',
   ) => void;
   onGeometry: (
-    operation: 'merge' | 'split' | 'hole' | 'regenerate',
+    operation:
+      | 'merge'
+      | 'split'
+      | 'hole'
+      | 'regenerate'
+      | 'square'
+      | 'straighten'
+      | 'align'
+      | 'offset',
     keys: string[],
   ) => void;
   onClose: () => void;
@@ -115,6 +130,46 @@ export default function LayerWorkspace({
     } | null>(null),
     [moveTarget, setMoveTarget] = useState('');
   const selected = view.selected || [];
+  const [preset, setPreset] = useState<BuildingPreset>('limestone');
+  const [pendingLabel, setPendingLabel] = useState('');
+  const previewPanel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (pending) {
+      previewPanel.current?.focus({ preventScroll: true });
+      previewPanel.current?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [pending]);
+  useEffect(() => {
+    onAppearancePreview(
+      pendingLabel && pendingBase?.data === data && pendingBase?.edits === edits
+        ? pending
+        : null,
+    );
+    return () => onAppearancePreview(null);
+  }, [pendingLabel, pendingBase, pending, data, edits, onAppearancePreview]);
+  const previewAppearance = () => {
+    if (!selectionEditable()) return;
+    try {
+      if (selected.length > 500)
+        throw new Error('Select up to 500 buildings per appearance edit.');
+      const batch = selected.map((key) => {
+        const f = featureIndex.get(key);
+        const edit =
+          f &&
+          f.kind === 'building' &&
+          featureEdit(data, 'building', f.id, edits);
+        if (!edit) throw new Error('Select building rows only.');
+        return presetEdit(edit, preset);
+      });
+      setPendingLabel(
+        `${BUILDING_PRESETS[preset].name}: illustrative colours across ${batch.length} ${batch.length === 1 ? 'building' : 'buildings'}. Heights, custom roofs and individual wall styles are retained.`,
+      );
+      setPendingBase({ data, edits });
+      setPending(batch);
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
+  };
   const selectedKeys = useMemo(
     () => new Set(view.selected || []),
     [view.selected],
@@ -194,6 +249,7 @@ export default function LayerWorkspace({
   const style = (patch: Partial<LayerStyle>) =>
     setDraft((d) => (d ? { ...d, style: { ...d.style, ...patch } } : null));
   const previewBulk = () => {
+    setPendingLabel('');
     if (!selectionEditable()) return;
     const changes = selected
       .map((key) => featureIndex.get(key))
@@ -301,6 +357,7 @@ export default function LayerWorkspace({
     URL.revokeObjectURL(url);
   };
   const move = () => {
+    setPendingLabel('');
     if (!selectionEditable()) return;
     const target = items.find((l) => l.id === moveTarget);
     if (!target || !editableLayer(target, items)) {
@@ -1102,6 +1159,27 @@ export default function LayerWorkspace({
               <details open>
                 <summary>Selected features</summary>
                 <div className="layer-actions">
+                  <label>
+                    Building palette
+                    <select
+                      value={preset}
+                      onChange={(e) => {
+                        setPreset(e.target.value as BuildingPreset);
+                        setPending(null);
+                      }}
+                    >
+                      {Object.entries(BUILDING_PRESETS).map(([id, value]) => (
+                        <option key={id} value={id}>
+                          {value.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button onClick={previewAppearance}>
+                    Preview appearance
+                  </button>
+                </div>
+                <div className="layer-actions">
                   <select
                     aria-label="Bulk field"
                     value={bulk.field}
@@ -1142,63 +1220,99 @@ export default function LayerWorkspace({
                   <button onClick={move}>Preview move</button>
                 </div>
                 <div className="layer-actions">
-                  {(['merge', 'split', 'hole', 'regenerate'] as const).map(
-                    (op) => (
-                      <button
-                        key={op}
-                        onClick={() => {
-                          if (selectionEditable()) onGeometry(op, selected);
-                        }}
-                      >
-                        {op === 'hole'
-                          ? 'Add / remove hole'
-                          : op === 'regenerate'
-                            ? 'Rebuild road surfaces'
-                            : op}
-                      </button>
-                    ),
-                  )}
+                  {(
+                    [
+                      'merge',
+                      'split',
+                      'hole',
+                      'regenerate',
+                      'square',
+                      'straighten',
+                      'align',
+                      'offset',
+                    ] as const
+                  ).map((op) => (
+                    <button
+                      key={op}
+                      onClick={() => {
+                        if (selectionEditable()) onGeometry(op, selected);
+                      }}
+                    >
+                      {op === 'hole'
+                        ? 'Add / remove hole'
+                        : op === 'regenerate'
+                          ? 'Rebuild road surfaces'
+                          : op}
+                    </button>
+                  ))}
                 </div>
               </details>
             )}
+            {pending && (
+              <div
+                ref={previewPanel}
+                tabIndex={-1}
+                role="alert"
+                className="layer-preview"
+              >
+                <strong>
+                  Review {pending.length}{' '}
+                  {pending.length === 1 ? 'change' : 'changes'} affecting{' '}
+                  {selected.length}{' '}
+                  {selected.length === 1 ? 'feature' : 'features'}
+                </strong>
+                <p>
+                  {pendingLabel ||
+                    (pending[0]?.kind === 'layer'
+                      ? 'Move membership without changing geometry or source identities.'
+                      : `${bulk.field}: ${bulk.value}. This operation can be undone as one command.`)}
+                </p>
+                {pendingLabel && (
+                  <div
+                    aria-label="Proposed building colours"
+                    style={{ display: 'flex', gap: 12 }}
+                  >
+                    {Object.entries(BUILDING_PRESETS[preset].style).map(
+                      ([name, colour]) => (
+                        <span
+                          key={name}
+                          style={{ borderBottom: `12px solid ${colour}` }}
+                        >
+                          {name.replace('Colour', '')}
+                        </span>
+                      ),
+                    )}
+                  </div>
+                )}
+                <button
+                  className="editor-primary"
+                  disabled={
+                    pendingBase?.data !== data || pendingBase?.edits !== edits
+                  }
+                  onClick={() => {
+                    if (
+                      pendingBase?.data === data &&
+                      pendingBase?.edits === edits &&
+                      selectionEditable()
+                    ) {
+                      onCommit(pending);
+                      setPending(null);
+                    }
+                  }}
+                >
+                  Apply changes
+                </button>
+                {(pendingBase?.data !== data ||
+                  pendingBase?.edits !== edits) && (
+                  <p>The workspace changed. Preview again before applying.</p>
+                )}
+                <button onClick={() => setPending(null)}>Cancel</button>
+              </div>
+            )}
+            {message && <output>{message}</output>}
           </WorkspacePane>
         )}
-        {pending && (
-          <div role="alert" className="layer-preview">
-            <strong>
-              Review {pending.length} changes affecting {selected.length}{' '}
-              features
-            </strong>
-            <p>
-              {pending[0]?.kind === 'layer'
-                ? 'Move membership without changing geometry or source identities.'
-                : `${bulk.field}: ${bulk.value}. This operation can be undone as one command.`}
-            </p>
-            <button
-              className="editor-primary"
-              disabled={
-                pendingBase?.data !== data || pendingBase?.edits !== edits
-              }
-              onClick={() => {
-                if (
-                  pendingBase?.data === data &&
-                  pendingBase?.edits === edits &&
-                  selectionEditable()
-                ) {
-                  onCommit(pending);
-                  setPending(null);
-                }
-              }}
-            >
-              Apply changes
-            </button>
-            {(pendingBase?.data !== data || pendingBase?.edits !== edits) && (
-              <p>The workspace changed. Preview again before applying.</p>
-            )}
-            <button onClick={() => setPending(null)}>Cancel</button>
-          </div>
-        )}
-        {message && <output>{message}</output>}
+        {message && explorerTab !== 'features' && <output>{message}</output>}
       </section>
     </WorkspacePane>
   );

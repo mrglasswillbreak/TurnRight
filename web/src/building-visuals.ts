@@ -24,6 +24,7 @@ export function buildingRevision(feature: Feature): string {
         'windowSpacing',
         'windows',
         'roofPitch',
+        'roofOrientation',
         'parts',
         'walls',
         'roofs',
@@ -101,7 +102,8 @@ export function validBuildingModel(model: BuildingModel): boolean {
       (part) =>
         !!part &&
         /^#[a-f0-9]{6}$/i.test(part.colour) &&
-        (part.material===undefined||validModelRenderMaterial(part.material)) &&
+        (part.material === undefined ||
+          validModelRenderMaterial(part.material)) &&
         (part.minZoom === undefined ||
           (Number.isFinite(part.minZoom) &&
             part.minZoom >= 0 &&
@@ -120,7 +122,8 @@ export function validBuildingModel(model: BuildingModel): boolean {
             ))) &&
         (part.normals === undefined ||
           (Array.isArray(part.normals) &&
-            Array.isArray(part.positions) && part.normals.length === part.positions.length &&
+            Array.isArray(part.positions) &&
+            part.normals.length === part.positions.length &&
             part.normals.every(
               (n) => Number.isFinite(n) && Math.abs(n) <= 1.001,
             ))) &&

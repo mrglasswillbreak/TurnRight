@@ -77,6 +77,16 @@ Protect main with an up-to-date branch requirement and these GitHub Actions chec
 
 ## Team publication
 
+### Campus detail preparation
+
+Deploy compatible application and import/visual workers before enabling the detail writer. This upgrade adds optional exchange, scenery and landmark fields and requires no new database migration beyond the current installation. Existing packages retain their display defaults. ArcGIS authentication stays on the research workstation.
+
+The **Prepare reviewed campus layer release** workflow accepts `upgrade: detail`. Run `operation: prepare` separately for LASU and UNILAG on the reviewed application revision. It checks the exact published baseline, validates the live private workspace, and returns a workspace hash and sanitized receipt. The checked-in presentation plans contain existing public identities, expected geometry hashes, appearance changes and illustrative region recipes; they contain no ArcGIS credentials or new unlicensed source geometry.
+
+Run `operation: apply` with that campus's reviewed `expected_hash` only after inspecting its receipt. The worker preserves and verifies a private rollback copy, rejects a changed baseline, leaves all saved corrections intact, excludes changed/authored/styled buildings, and checks unchanged geometry and routing. It then submits an immutable review. It does not approve or publish the submission. Inspect the exact review hash through the existing team workflow before building a preview, checking its actual assets/offline behaviour and publishing each campus independently. A failed or uncertain mutation must be inspected using its receipt before retrying.
+
+Retain the preceding campus package and rollback assets. A local preview or successful application deployment does not establish campus publication, physical-device performance or source permission. [Detail implementation and Pro priorities](CAMPUS-DETAIL-UPGRADE.md).
+
 Editors accept source proposals into the shared draft, edit attributes/geometry and apply inspected analysis results. New arbitrary attributes and result layers stay private. Model/photograph approval and source acceptance do not replace independent campus snapshot approval.
 
 In **Review**, resolve blocking issues and submit a validated immutable snapshot. A reviewer who did not contribute approves the exact hash, or the original owner records an explicit override reason. New content invalidates approval. Publishers use **Publish** to build the approved preview, inspect it, then publish the same source. Both API and SQL recheck current roles; a short publication lease prevents concurrent draft changes during promotion.

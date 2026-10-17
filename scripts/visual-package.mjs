@@ -69,13 +69,54 @@ export async function packageVisuals(directory, writeAsset) {
       await writeAsset(texture.url, content, "image/webp");
     }
   }
-  for(const texture of catalogue.modelTextures || []) {
-    if(!texture||!/^\/packages\/model-texture-[a-f0-9]{64}\.(png|jpg|webp)$/.test(texture.url)||textureUrls.has(texture.url)||!['image/png','image/jpeg','image/webp'].includes(texture.contentType))throw new Error('Invalid authored model texture.');
-    const content=await fs.readFile(path.join(directory,path.basename(texture.url)));
-    if(!content.length||content.length!==texture.bytes||content.length>4*1024*1024||createHash('sha256').update(content).digest('hex')!==texture.sha256)throw new Error('Authored model texture failed integrity verification.');
-    textureBytes+=content.length;textureUrls.add(texture.url);await writeAsset(texture.url,content,texture.contentType);
+  for (const texture of catalogue.modelTextures || []) {
+    if (
+      !texture ||
+      !/^\/packages\/model-texture-[a-f0-9]{64}\.(png|jpg|webp)$/.test(texture.url) ||
+      textureUrls.has(texture.url) ||
+      !["image/png", "image/jpeg", "image/webp"].includes(texture.contentType)
+    )
+      throw new Error("Invalid authored model texture.");
+    const content = await fs.readFile(path.join(directory, path.basename(texture.url)));
+    if (
+      !content.length ||
+      content.length !== texture.bytes ||
+      content.length > 4 * 1024 * 1024 ||
+      createHash("sha256").update(content).digest("hex") !== texture.sha256
+    )
+      throw new Error("Authored model texture failed integrity verification.");
+    textureBytes += content.length;
+    textureUrls.add(texture.url);
+    await writeAsset(texture.url, content, texture.contentType);
   }
-  if (bytes + textureBytes > 12 * 1024 * 1024)
+  let sceneryBytes = 0;
+  if (catalogue.scenery !== undefined) {
+    const r = catalogue.scenery;
+    if (
+      !r ||
+      r.version !== 1 ||
+      r.classification !== "illustrative" ||
+      !Number.isSafeInteger(r.seed) ||
+      !Number.isFinite(r.spacing) ||
+      r.spacing < 8 ||
+      r.spacing > 60 ||
+      !Number.isInteger(r.maxInstances) ||
+      r.maxInstances < 0 ||
+      r.maxInstances > 2000 ||
+      !Array.isArray(r.regions) ||
+      r.regions.length > 10000 ||
+      r.regions.some(
+        (p) =>
+          !p ||
+          typeof p.featureId !== "string" ||
+          typeof p.geometryRevision !== "string" ||
+          !Number.isFinite(Date.parse(p.reviewedAt)),
+      )
+    )
+      throw new Error("Invalid illustrative scenery recipe");
+    sceneryBytes = Buffer.byteLength(JSON.stringify(r));
+  }
+  if (bytes + textureBytes + sceneryBytes > 12 * 1024 * 1024)
     throw new Error("Campus geometry and textures exceed 12 MiB");
   return {
     catalogue,
