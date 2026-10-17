@@ -139,7 +139,7 @@
         "verificationArtifactSha256": "e2e1e3af57b4ec167fa96cfca67e26e6bfd7824e54f3aa54042208fac9580bf3",
         "publicationRun": 39009448556,
         "publicationRequestedAt": "2026-10-17T06:18:56Z",
-        "publicationStatus": "complete unchanged WebKit shard and downstream promotion rerunning",
+        "publicationStatus": "Complete unchanged WebKit shard rerun, attempt 3",
         "publicationFailures": [
           {
             "failure": "Add locator reached performing click action, then the test exceeded 120 seconds",
@@ -152,8 +152,30 @@
             "diagnosis": "Root cause unproven; complete unchanged WebKit shard rerun requested",
             "job": 117328604993,
             "test": "compact plan and photograph tools: all modes preserve the canvas at 1024x390"
+          },
+          {
+            "job": 117367208766,
+            "capturedConsoleErrors": 0,
+            "diagnosis": "CI trace retained model-landscape at 667x375; after setting 844x390, no new DOM snapshot or screencast arrived. Cause unproven; focused unchanged CI diagnostic requested.",
+            "artifactSha256": "f8cd8fadd752e9ae82cd4ef2b593768f84c20247736b0cf0e12ae8afc0f8b589",
+            "failure": "No class assertion response after resizing from 667x375 to 844x390; last DOM snapshots retained model-landscape",
+            "published": false,
+            "attempt": 2,
+            "run": 39009448556,
+            "test": "model workspace touch layouts: landscape side panel and portrait input survive rotation and keyboard resize",
+            "artifact": 12097402078,
+            "diagnosticRun": 39023937188,
+            "diagnosticStatus": "Complete focused diagnostic passed unchanged, including both affected cases, extra photo tests, quality and offline; root cause remains unproven"
           }
-        ]
+        ],
+        "localRotationDiagnostic": {
+          "status": "Stopped after broader setup/viewport timeouts; not a clean CI reproduction",
+          "environment": "Windows WebKit, development worktree with shared node_modules",
+          "testChanges": false,
+          "processesStopped": true,
+          "output": "web/work/rotation-diagnostic",
+          "limitation": "Vite denied the symlinked font URL; local software rendering and test initialization exceeded the existing 120-second bound"
+        }
       },
       "draftRecheck": {
         "checkedAt": "2026-10-17T05:50:44.5907536Z",

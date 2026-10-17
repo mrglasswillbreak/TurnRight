@@ -44,7 +44,7 @@ Start with the campus map or open **Choose a campus** to explore the globe. Sele
 
 Preview walking or driving routes from a selected origin. Foreground GPS, route instructions, spoken guidance, and deviation handling support a journey over the mapped network. Driving includes mapped vehicle restrictions, parking, and a walking handoff where available.
 
-Download each campus from **Offline** and wait for **Ready offline** before disconnecting. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
+Download each campus from **Offline** and wait for **Ready offline** before disconnecting. For an existing download, choose **Download update** after a campus release. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
 | Place details on a phone                                                                                                                              | Offline preparation                                                                                                                 |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
