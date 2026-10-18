@@ -1,14 +1,10 @@
-let publicationLease: string | undefined;
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
-import { db, allRows } from "./cloud.mjs";
-import {
-  publishedCampus,
-  snapshotHash,
-  validateReleaseSnapshot,
-} from "../web/server/release-validation";
+import { db } from "./cloud.mjs";
+import { publishReviewedRelease } from "./release-publication.mjs";
+import { publishedCampus, validateReleaseSnapshot } from "../web/server/release-validation";
 import { preservePublished } from "../web/scripts/published-assets.mjs";
 import {
   preserveCampusCatalogue,
@@ -24,6 +20,7 @@ import {
   uploadSource,
   waitForDeployment,
   publishDeployment,
+  verifyPublishedDeployment,
   withRetainedPackageAccess,
 } from "./vercel-api.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
@@ -55,7 +52,10 @@ try {
   progressJob = job?.id;
   const campus = await activeCampus();
   const catalog = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!);
-  if (!release.catalogue_revision || catalog.revision !== release.catalogue_revision)
+  if (
+    operation === "preview" &&
+    (!release.catalogue_revision || catalog.revision !== release.catalogue_revision)
+  )
     throw Error("The campus directory changed. Create a fresh reviewed preview.");
   if (operation === "preview") {
     if (release.status !== "queued") throw new Error("Only queued releases can be built");
@@ -196,57 +196,19 @@ try {
     await db(`releases?id=eq.${id}`, "PATCH", { status: "preview", preview_url: url });
     console.log(`Preview ready: ${url}`);
   } else if (operation === "publish") {
-    publicationLease = await db("rpc/gis_begin_publication", "POST", { release_identity: id });
-    if (operation === "publish" && release.status !== "preview")
-      throw new Error("Review a ready preview first");
-    if (!release.deployment_id) throw new Error("Deployment is missing");
-    await db(`releases?id=eq.${id}`, "PATCH", { error: null });
-    if (operation === "publish") {
-      validateReleaseSnapshot(
-        { ...release.snapshot, edits: await hydrateModelEdits(release.snapshot.edits) },
-        await publishedCampus(),
-        { restoring: !!release.restored_from },
-      );
-      if (!release.review_id && !release.restored_from) {
-        const [features, edits] = await Promise.all([
-          allRows("source_features"),
-          allRows("map_edits"),
-        ]);
-        if (
-          (release.snapshot.workspaceHash ||
-            snapshotHash(release.snapshot.features, release.snapshot.edits)) !==
-          snapshotHash(features, edits)
-        )
-          throw new Error("Preview is stale. Create a fresh reviewed preview.");
-      }
-    }
-    if (
-      (await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !==
-      release.catalogue_revision
-    )
-      throw Error("Another campus changed before publication. Build a fresh preview.");
-    await progress("Publishing reviewed preview and verifying production");
-    const deployment = await publishDeployment(release.deployment_id, {
-      releaseId: id,
-      operation,
-      onCreated: (deploymentId: string) =>
-        db(`releases?id=eq.${id}`, "PATCH", {
-          deployment_id: deploymentId,
-          error: null,
-        }),
-    });
-    if (
-      (await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!)).revision !==
-      release.published_catalogue_revision
-    )
-      throw Error(
-        "Published campus directory verification failed. Inspect the production deployment before retrying.",
-      );
-    await db(`releases?id=eq.${id}`, "PATCH", {
-      status: "published",
-      deployment_url: `https://${deployment.url}`,
-      published_at: new Date().toISOString(),
-      error: null,
+    await publishReviewedRelease(release, {
+      db,
+      readCatalogue: () => readPublishedCatalogue(process.env.PUBLISHED_MAP_URL!),
+      validateSnapshot: async () => {
+        validateReleaseSnapshot(
+          { ...release.snapshot, edits: await hydrateModelEdits(release.snapshot.edits) },
+          await publishedCampus(),
+          { restoring: !!release.restored_from },
+        );
+      },
+      promote: publishDeployment,
+      verifyCurrent: verifyPublishedDeployment,
+      progress,
     });
     console.log("Production release and domain assignment verified.");
   } else throw new Error("Unknown release operation");
@@ -268,13 +230,8 @@ try {
     `releases?id=eq.${id}`,
     "PATCH",
     operation === "preview" ? { status: "failed", error: message } : { error: message },
+    "return=minimal",
   ).catch(() => {});
   console.error(message);
   process.exitCode = 1;
-} finally {
-  if (publicationLease)
-    await db("rpc/gis_end_publication", "POST", {
-      release_identity: id,
-      lease_token: publicationLease,
-    }).catch(() => {});
 }
