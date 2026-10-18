@@ -1,8 +1,16 @@
 # Application screenshots
 
-## Current public maps · 15 October 2026
+## Published campus detail · 18 October 2026
 
-The README public desktop and phone images now show the newly published LASU and UNILAG packages. [Capture provenance](live-publication-2026-10-15.json) records their exact hashes, dimensions, application revisions and package identities. The images are unaltered production captures; the phone viewport is a desktop browser simulation. The remaining editor/globe/offline tour below keeps its isolated-fixture provenance.
+The current [LASU](live-lasu-published-2026-10-18.png), [UNILAG](live-unilag-published-2026-10-18.png), [UNILAG phone](live-unilag-phone-2026-10-18.png) and [LASU dark](live-lasu-dark-2026-10-18.png) images are unaltered public production captures. [Provenance](live-publication-2026-10-18.json) records exact source files, application and package identities, dimensions and hashes. They come from the successful 32-view Chromium/WebKit production audit; the phone is a viewport simulation. Historical photographs retain their visible dates and source labels. [Full gallery and verification](../../SCREENSHOTS.md#published-campus-detail--18-october-2026).
+
+## Precision and appearance controls · 18 October 2026
+
+The new [desktop precision panel](tour-precision-desktop-2026-10-18.png), [phone numeric controls](tour-precision-phone-2026-10-18.png) and [batch appearance preview](tour-palette-preview-2026-10-18.png) are unaltered captures from three successful local Chromium journeys. They use isolated geometry and owner/API fixtures. The tests verify 12 × 8 metre construction, preview/cancellation, undo/redo and reload recovery; touch input is simulated. [Capture manifest](tour-2026-10-18.json) · [Reproduction](../../SCREENSHOTS.md#precision-and-appearance-controls--18-october-2026).
+
+## Public maps · 15 October 2026
+
+These historical public desktop and phone images show the LASU and UNILAG packages published on that date. [Capture provenance](live-publication-2026-10-15.json) records their exact hashes, dimensions, application revisions and package identities. The images are unaltered production captures; the phone viewport is a desktop browser simulation. The editor/globe/offline tour below keeps its isolated-fixture provenance. Consult [Production](../../PRODUCTION.md) for current releases.
 
 ## Campus detail candidates · 17 October 2026
 

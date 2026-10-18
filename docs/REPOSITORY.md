@@ -35,6 +35,7 @@ Existing local backup copies and unselected brand drafts are ignored, not produc
 - Update feature guides with behavior changes. A screenshot of a local fixture is not proof of deployment, performance, physical-device behavior, or route safety.
 - Store fresh screenshots under a new date and record source/package/browser identities and hashes. Follow [Screenshot maintenance](SCREENSHOTS.md).
 - Keep accepted source observations, licences, historical model fingerprints, migration files, deployment receipts, and test fixtures even when a newer version exists. They support attribution, compatibility, and recovery.
+- Preserve licence-dependent ArcGIS/REA research outside ignored work folders before cleanup. The [campus detail archive](CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) contains portable exports, original identities, source dispositions, treatment ledgers and independent hash verifiers. Keep raw private evidence local; publish only sanitized reports and approved application assets.
 - Run `npm run check:docs` from `web/` for every documentation or file-location change. It checks all versioned and new non-ignored Markdown files and local links/assets.
 
 ## Toolchain and checks

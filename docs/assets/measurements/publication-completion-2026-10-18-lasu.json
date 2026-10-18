@@ -1,0 +1,39 @@
+{
+  "review": {
+    "status": "approved",
+    "contentHash": "47a91db93f32da0e51b382f70abb2e09ef29cd2ef27141fc05ee1933ae17fc1b"
+  },
+  "release": {
+    "id": "104201de-f87e-406d-8172-2780011d5415",
+    "error": null,
+    "status": "published",
+    "version": "lasu-41ec73876464",
+    "campusId": "lasu",
+    "reviewId": "319220f2-289a-4a98-8ecc-9d2f904696d6",
+    "previewUrl": "https://turnright-cbfqkt8tw-muhammed-abdulhadi-s-projects.vercel.app",
+    "publishedAt": "2026-10-18T06:12:37.321883+00:00",
+    "deploymentId": "dpl_E4TWbUvxbTFBgSEbVgMhMcrgqMn3",
+    "deploymentUrl": "https://turnright-ctfkl5sz3-muhammed-abdulhadi-s-projects.vercel.app",
+    "publishedCatalogueRevision": "b35c90f5db4221d6f276ed9f0467a888c5159fb26d63d17bfce374dcbf8e781f"
+  },
+  "checkedAt": "2026-10-18T06:15:11.659152+00:00",
+  "recentAudit": [
+    {
+      "action": "publication-complete",
+      "created_at": "2026-10-18T06:12:37.321883+00:00"
+    },
+    {
+      "action": "publication-start",
+      "created_at": "2026-10-18T06:10:51.990873+00:00"
+    },
+    {
+      "action": "publication-request",
+      "created_at": "2026-10-18T05:31:25.53287+00:00"
+    },
+    {
+      "action": "release-prepare",
+      "created_at": "2026-10-18T04:54:20.306793+00:00"
+    }
+  ],
+  "activePublicationLeases": 0
+}

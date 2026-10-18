@@ -1,0 +1,49 @@
+{
+  "capturedDate": "2026-10-18",
+  "browser": "Chromium 153.0.8010.12",
+  "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+  "driver": "web/tests/browser/editor.spec.ts",
+  "driverSha256": "8154add7932d60056c7eaf2f3991d5399d2ad0638527f4ddc370ea054bdfb60a",
+  "driverChanges": "Frame the existing palette fixture and capture the existing rectangle preview before its apply/undo/reload assertions.",
+  "validation": {
+    "testsPassed": 3,
+    "durationSeconds": 120,
+    "mouse": true,
+    "touchSimulation": true,
+    "physicalDevice": false
+  },
+  "localConfiguration": "Loopback-only Vite uses the worktree and its existing dependency junction as allowed roots, with a separate ignored cache. No production configuration changed.",
+  "fixture": "Isolated browserCampus test data and owner API responses. The LASU label is fixture context, not a published campus inventory. No production data or account changes.",
+  "captures": [
+    {
+      "file": "tour-palette-preview-2026-10-18.png",
+      "view": "Live palette preview and explicit Apply/Cancel controls",
+      "capturedAt": "2026-10-18T05:03:28.324Z",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "919982a955176e9c30f2299114c3a0b25f9b0c4446c466348c44465ba391022a",
+      "theme": "light",
+      "fixture": "Isolated browserCampus test data and owner API responses. The LASU label is fixture context, not a published campus inventory. No production data or account changes."
+    },
+    {
+      "file": "tour-precision-desktop-2026-10-18.png",
+      "view": "Desktop 12 by 8 metre rectangle preview, snapping and numeric controls",
+      "capturedAt": "2026-10-18T05:04:07.056Z",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "c3d71ce346d85042a3e5c7350856afd0d4f18b4f28bf391f703d63e9ad3943e5",
+      "theme": "light",
+      "fixture": "Isolated browserCampus test data and owner API responses. The LASU label is fixture context, not a published campus inventory. No production data or account changes."
+    },
+    {
+      "file": "tour-precision-phone-2026-10-18.png",
+      "view": "Simulated phone numeric rectangle controls and Finish/Cancel",
+      "capturedAt": "2026-10-18T05:04:35.500Z",
+      "width": 390,
+      "height": 844,
+      "sha256": "6f296acc501f1c4f6f3311374ea700d6c2cb6aa29b581b6b175e550f799b004e",
+      "theme": "light",
+      "fixture": "Isolated browserCampus test data and owner API responses. The LASU label is fixture context, not a published campus inventory. No production data or account changes."
+    }
+  ]
+}

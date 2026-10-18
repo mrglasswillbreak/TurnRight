@@ -15,27 +15,27 @@ TurnRight combines a public campus map and globe with a private GIS editor. Visi
 
 ## Public map and globe
 
-### Campus detail upgrade
+### Published campus detail
 
-The LASU Ojo and UNILAG Akoka upgrade adds precision drawing, previewed geometry refinement, reusable building palettes, illustrative greenery, per-campus visitor layers and landmark exploration. It retains the MapLibre/Three.js renderer, authored buildings, routing, source attribution and existing editor corrections. Recorded, estimated and illustrative dimensions remain distinct.
+Published on **18 October 2026**, the LASU Ojo and UNILAG Akoka upgrade adds precision drawing, previewed geometry refinement, reusable building palettes, illustrative greenery, per-campus visitor layers and landmark exploration. It retains the MapLibre/Three.js renderer, authored buildings, routing, source attribution and existing editor corrections. Recorded, estimated and illustrative dimensions remain distinct.
 
 The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, source review and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. It keeps portal authentication local and sends imports through the existing private review workflow.
 
-The October 17–18 Pro review checked 52 copied vector layers and preserved GeoJSON, GeoPackage, provenance, geometry findings and synthetic GLB examples outside the repository's temporary output. The dedicated LASU/UNILAG project has four maps/scenes and no broken references. A controlled desktop study verified exact numeric construction and undo/redo, and recorded reference snapping, cancellation and measured trace limitations. [Archive index and remaining Pro priorities](docs/CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) explain what is saved during the 21-day access window. Published navigation and portable exports continue to work after Pro access ends. [REA and local iD studies](docs/CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification) inform the editor; API, desktop and browser evidence retain their distinct verification scope.
+The October 17–18 Pro review checked 52 copied vector layers and preserved GeoJSON, GeoPackage, provenance, geometry findings and synthetic GLB examples outside the repository's temporary output. The dedicated LASU/UNILAG project has four maps/scenes and no broken references. Controlled desktop studies verified exact numeric construction, undo/redo, separate-output building regularization and batch appearance with saved-data readback, and recorded reference snapping, cancellation and measured trace limitations. Pro's Licensing page confirms expiry on **6 November 2026**. [Archive index and remaining Pro priorities](docs/CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) explain what is saved during the limited access window. Published navigation and portable exports continue to work after Pro access ends. [REA and local iD studies](docs/CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification) inform the editor; API, desktop and browser evidence retain their distinct verification scope.
 
-| LASU detail candidate | UNILAG detail candidate |
-| --- | --- |
-| ![LASU local 3D review candidate](docs/assets/screenshots/campus-detail-lasu-2026-10-17.png) | ![UNILAG local 3D review candidate](docs/assets/screenshots/campus-detail-unilag-2026-10-17.png) |
+| LASU Ojo · published 3D                                                                                    | UNILAG Akoka · published 3D                                                                                    |
+| ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| ![Published LASU 3D map and Senate photograph](docs/assets/screenshots/live-lasu-published-2026-10-18.png) | ![Published UNILAG 3D map and Senate photograph](docs/assets/screenshots/live-unilag-published-2026-10-18.png) |
 
-These are dated local candidate views, not proof of publication or new surveys. Extra ArcGIS sources remain held until their exact permissions, dates and feature conflicts are resolved. Follow [production receipts](docs/PRODUCTION.md) for deployed application and campus versions.
+These are unaltered public captures of **LASU `lasu-41ec73876464`** and **UNILAG `unilag-b7655a90045c`**. The final production audit passes 236 asset hashes, 32 Chromium/WebKit views and four offline journeys. Existing geometry, routes and detailed models are preserved. Extra ArcGIS sources remain held for permissions, dates and feature conflicts. [Production receipts](docs/PRODUCTION.md) · [Capture provenance](docs/assets/screenshots/live-publication-2026-10-18.json).
 
 ### Discover and explore
 
 Start with the campus map or open **Choose a campus** to explore the globe. Select a published campus by name, pin, or boundary. The existing map stays open during switching, and unavailable downloads leave the current campus usable. [LASU Ojo](https://turnright.vercel.app/?campus=lasu) and [UNILAG Akoka](https://turnright.vercel.app/?campus=unilag) have separate published packages; campus identity follows shared links, saved places, and offline downloads.
 
-| Campus map                                                                                                                | World view                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| ![Public campus map with selected building and place details](docs/assets/screenshots/live-lasu-published-2026-10-15.jpg) | ![Dark globe view showing geographic context around West Africa](docs/assets/screenshots/tour-globe-2026-10-15.png) |
+| Campus map                                                                                                           | World view                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| ![Public campus map with selected building and place details](docs/assets/screenshots/live-lasu-dark-2026-10-18.png) | ![Dark globe view showing geographic context around West Africa](docs/assets/screenshots/tour-globe-2026-10-15.png) |
 
 - Search destinations and streets, browse categories, save places, and share destination links.
 - Switch between 2D and 3D, use light/dark/device appearance, and adjust map rendering and motion settings.
@@ -48,9 +48,9 @@ Preview walking or driving routes from a selected origin. Foreground GPS, route 
 
 Download each campus from **Offline** and wait for **Ready offline** before disconnecting. For an existing download, choose **Download update** after a campus release. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
-| Place details on a phone                                                                                                                              | Offline preparation                                                                                                                 |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/assets/screenshots/live-unilag-published-2026-10-15.jpg" width="280" alt="Place details and map controls in a phone browser viewport"> | <img src="docs/assets/screenshots/tour-offline-2026-10-15.png" width="280" alt="Campus download and offline verification controls"> |
+| Place details on a phone                                                                                                                          | Offline preparation                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/assets/screenshots/live-unilag-phone-2026-10-18.png" width="280" alt="Place details and map controls in a phone browser viewport"> | <img src="docs/assets/screenshots/tour-offline-2026-10-15.png" width="280" alt="Campus download and offline verification controls"> |
 
 Navigation runs in the foreground. There is no cross-campus route planner, indoor room navigation, or verified step-free guarantee. An offline campus directory can list campuses that have not been downloaded. [Public map guide](docs/PUBLIC-MAP.md) · [Globe and switching](docs/CAMPUS-GLOBE.md) · [Driving](docs/DRIVING.md) · [Voice](docs/VOICE.md).
 
@@ -58,9 +58,9 @@ Navigation runs in the foreground. There is no cross-campus route planner, indoo
 
 The authenticated editor organizes work as **Data → Edit → Analyze → Review → Publish**. Campus-scoped roles control access. Desktop panes resize around a persistent map; phones use a workspace chooser and adjustable sheets. Layout preferences, unsaved input, recovery, and feature selection are preserved through supported workspace changes.
 
-| Map editing                                                                                                                | Dataset management                                                                                                       |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| ![Editor with feature explorer, map and contextual properties](docs/assets/screenshots/tour-editor-desktop-2026-10-15.png) | ![Data workspace with dataset catalogue and paged attribute table](docs/assets/screenshots/tour-gis-data-2026-10-15.png) |
+| Precision drawing                                                                                                                        | Dataset management                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ![Numeric rectangle construction, reference snapping and drawing preview](docs/assets/screenshots/tour-precision-desktop-2026-10-18.png) | ![Data workspace with dataset catalogue and paged attribute table](docs/assets/screenshots/tour-gis-data-2026-10-15.png) |
 
 | Workspace   | Capabilities                                                                                                                                                                                       |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -94,7 +94,7 @@ Accepting a source update changes the private working map. Publication requires 
 
 The source reliability changes in migrations **045–048** require a staged rollout and per-source enablement. Their checked-in validation record is local evidence, not a production deployment receipt. [Source updates](docs/SOURCE-UPDATES.md) · [Deployment](docs/DEPLOYMENT.md) · [Production status](docs/PRODUCTION.md).
 
-The LASU desktop and UNILAG phone images show the public packages published on 15 October. The remaining images are dated captures of the local application with public campus assets and isolated demonstration accounts/API responses. Phone images are browser simulations. Example editor counts and approvals are not production inventories. [Full gallery, provenance, and reproduction](docs/SCREENSHOTS.md).
+The LASU/UNILAG campus images show the public packages published on 18 October. The editor, globe and offline-control images are dated local application captures with isolated demonstration accounts/API responses. Phone images are browser simulations. Example editor counts and approvals are not production inventories. [Full gallery, provenance, and reproduction](docs/SCREENSHOTS.md).
 
 ## Run locally
 

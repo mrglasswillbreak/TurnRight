@@ -2,35 +2,37 @@
 
 TurnRight combines a public campus map/globe with a private GIS editing and publication platform. Start with the [project overview](../README.md), [public map guide](PUBLIC-MAP.md), or [team workflow](GIS-PLATFORM.md). [Production readiness](PRODUCTION.md) distinguishes the current source, local verification, deployed revisions, and remaining release gates.
 
-The [October 18 continuation receipt](assets/campus-detail-release-2026-10-18.json) records the refreshed LASU approval, newer UNILAG model preview, independent campus publication and verification results. The [campus detail guide](CAMPUS-DETAIL-UPGRADE.md) links the limited-window Pro archive and separates native API, assisted desktop, browser and physical-device evidence. Historical receipts retain their original dates and package identities.
+The [October 18 continuation receipt](assets/campus-detail-release-2026-10-18.json) records the refreshed LASU approval, newer UNILAG model preview, independent campus publication and verification results. The [campus detail guide](CAMPUS-DETAIL-UPGRADE.md) links the Pro archive, the confirmed **6 November licence expiry**, and separate native API, assisted desktop, browser and physical-device evidence. It includes measured numeric construction, separate-output footprint regularization and assisted desktop batch appearance with saved-data readback; historical receipts retain their original dates and package identities.
+
+Start precision work with the [numeric drawing and tracing instructions](EDITOR.md#draw-and-refine-precisely), then use [building appearance previews](MODEL-AUTHORING.md) for a selected set. The [18 October control captures](SCREENSHOTS.md#precision-and-appearance-controls--18-october-2026) show the actual controls with isolated fixtures. All 1,337 initial building treatment/evidence records now have [verified portable copies](assets/measurements/building-treatment-archive-2026-10-18.json), alongside the source-review archives.
 
 ## Use TurnRight
 
-| Task | Guide |
-| --- | --- |
-| Explore places, plan journeys, download maps, and report a problem | [Public map and globe](PUBLIC-MAP.md) |
-| Work as a campus team: typed datasets, analysis, independent review, publication and exports | [Campus GIS platform and rollout](GIS-PLATFORM.md) |
-| Select campus silhouettes, switch smoothly and use downloaded campuses offline | [Campus globe](CAMPUS-GLOBE.md) |
-| Organize campus layers and edit road surfaces | [Layer workflow](CAMPUS-LAYERS.md) |
-| Inspect published LASU road estimates, reviewed sources and landscape classes | [LASU layer coverage](LASU-LAYERS.md) |
-| Create a campus, import GIS files/OSM/public ArcGIS, map fields and review | [Campuses and map imports](CAMPUS-IMPORTS.md) |
-| Review the UNILAG road, building, destination and photograph evidence | [UNILAG detail coverage](UNILAG-DETAIL.md) |
-| Use the ArcGIS toolbox, precision tools, campus detail evidence and visitor layers | [Campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) |
-| Download UNILAG ArcGIS/OSM files and reproduce the source comparison | [UNILAG downloads](UNILAG-DOWNLOADS.md) |
-| Edit places, paths, entrances, access and source changes | [Team editor](EDITOR.md) |
-| Check connected sources, compare evidence, review bulk changes and preview private undo | [Source updates](SOURCE-UPDATES.md) |
-| Recover availability failures and understand the accepted-source baseline | [Editor availability](EDITOR-AVAILABILITY.md) |
-| Edit windows, walls, roofs, footprints, text and model review | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
-| Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL | [Model authoring](MODEL-AUTHORING.md) |
-| Edit standard and custom roof plans | [Building roofs](BUILDING-ROOFS.md) |
-| Upload, credit, recover and approve photographs; edit arrival guides | [Arrival guides and photos](ARRIVAL-GUIDES.md) |
-| Automatically compress added photos, compare and edit offline; drag gallery order | [Photo editing and compression](PHOTO-EDITING.md) |
-| Follow import inspection, builds, uploads and local processing | [Build and process progress](PROGRESS-MONITOR.md) |
-| Record and review private path/entrance evidence | [Walking surveys](SURVEY.md) |
-| Use vehicle routes, parking and the walking handoff | [Driving](DRIVING.md) |
-| Understand offline spoken guidance | [Voice](VOICE.md) |
-| Use compass/location assistance and decorative globe animation | [Motion](MOTION.md) |
-| Recover incomplete edits, resolve conflicts and inspect release changes | [Editor reliability](EDITOR-RELIABILITY.md) |
+| Task                                                                                         | Guide                                                                                      |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Explore places, plan journeys, download maps, and report a problem                           | [Public map and globe](PUBLIC-MAP.md)                                                      |
+| Work as a campus team: typed datasets, analysis, independent review, publication and exports | [Campus GIS platform and rollout](GIS-PLATFORM.md)                                         |
+| Select campus silhouettes, switch smoothly and use downloaded campuses offline               | [Campus globe](CAMPUS-GLOBE.md)                                                            |
+| Organize campus layers and edit road surfaces                                                | [Layer workflow](CAMPUS-LAYERS.md)                                                         |
+| Inspect published LASU road estimates, reviewed sources and landscape classes                | [LASU layer coverage](LASU-LAYERS.md)                                                      |
+| Create a campus, import GIS files/OSM/public ArcGIS, map fields and review                   | [Campuses and map imports](CAMPUS-IMPORTS.md)                                              |
+| Review the UNILAG road, building, destination and photograph evidence                        | [UNILAG detail coverage](UNILAG-DETAIL.md)                                                 |
+| Use the ArcGIS toolbox, precision tools, campus detail evidence and visitor layers           | [Campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md)                                          |
+| Download UNILAG ArcGIS/OSM files and reproduce the source comparison                         | [UNILAG downloads](UNILAG-DOWNLOADS.md)                                                    |
+| Edit places, paths, entrances, access and source changes                                     | [Team editor](EDITOR.md)                                                                   |
+| Check connected sources, compare evidence, review bulk changes and preview private undo      | [Source updates](SOURCE-UPDATES.md)                                                        |
+| Recover availability failures and understand the accepted-source baseline                    | [Editor availability](EDITOR-AVAILABILITY.md)                                              |
+| Edit windows, walls, roofs, footprints, text and model review                                | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
+| Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL                      | [Model authoring](MODEL-AUTHORING.md)                                                      |
+| Edit standard and custom roof plans                                                          | [Building roofs](BUILDING-ROOFS.md)                                                        |
+| Upload, credit, recover and approve photographs; edit arrival guides                         | [Arrival guides and photos](ARRIVAL-GUIDES.md)                                             |
+| Automatically compress added photos, compare and edit offline; drag gallery order            | [Photo editing and compression](PHOTO-EDITING.md)                                          |
+| Follow import inspection, builds, uploads and local processing                               | [Build and process progress](PROGRESS-MONITOR.md)                                          |
+| Record and review private path/entrance evidence                                             | [Walking surveys](SURVEY.md)                                                               |
+| Use vehicle routes, parking and the walking handoff                                          | [Driving](DRIVING.md)                                                                      |
+| Understand offline spoken guidance                                                           | [Voice](VOICE.md)                                                                          |
+| Use compass/location assistance and decorative globe animation                               | [Motion](MOTION.md)                                                                        |
+| Recover incomplete edits, resolve conflicts and inspect release changes                      | [Editor reliability](EDITOR-RELIABILITY.md)                                                |
 
 Native surface editing can fall back to 2D when WebGL is unavailable; mesh editing requires WebGL. Standard model files preserve supported static geometry and appearance, while native parameters, review state and history remain in TurnRight. GIS imports do not include imagery/PDF alignment or private ArcGIS authentication. No cross-campus routing or interior room workflow is provided.
 
@@ -38,32 +40,32 @@ Native surface editing can fall back to 2D when WebGL is unavailable; mesh editi
 
 Start with [contributing](../CONTRIBUTING.md), [B2 brand assets and usage](BRAND.md), and [the current gallery and screenshot maintenance](SCREENSHOTS.md). The [workspace shell contract](EDITOR-LAYOUT.md) explains pane identity and preferences.
 
-| Area | Reference |
-| --- | --- |
-| Module ownership, data flow, workers, persistence and compatibility | [Architecture](ARCHITECTURE.md) |
-| Latest documentation, screenshot, cleanup and dependency verification | [15 October repository review](AUDIT-2026-10-15.md) |
-| File ownership, generated output, naming and documentation maintenance | [Repository structure](REPOSITORY.md) |
-| Vulnerability reporting and operational security boundaries | [Security](../SECURITY.md) |
-| Dated workspace redesign and its automated results | [7 October redesign verification](REDESIGN-VERIFICATION.md) |
-| Automated acceptance and uncompleted physical-device/field checks | [Acceptance](ACCEPTANCE.md) |
-| Model commands, renderer identity, regression and budget evidence | [Model editor verification](MODEL-EDITOR-VERIFICATION.md) |
-| Worker bounds, upload behavior and measurements | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md) |
-| Dated bug reproductions, fixes, measurements and verification limits | [3 October audit](AUDIT-2026-10-03.md) |
-| Theme tokens and text contrast | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md) |
-| Screenshot files, fixture provenance and reproduction | [Screenshot inventory](assets/screenshots/README.md) |
-| Source/data reuse and public credits | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
+| Area                                                                   | Reference                                                                                  |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Module ownership, data flow, workers, persistence and compatibility    | [Architecture](ARCHITECTURE.md)                                                            |
+| Latest documentation, screenshot, cleanup and dependency verification  | [15 October repository review](AUDIT-2026-10-15.md)                                        |
+| File ownership, generated output, naming and documentation maintenance | [Repository structure](REPOSITORY.md)                                                      |
+| Vulnerability reporting and operational security boundaries            | [Security](../SECURITY.md)                                                                 |
+| Dated workspace redesign and its automated results                     | [7 October redesign verification](REDESIGN-VERIFICATION.md)                                |
+| Automated acceptance and uncompleted physical-device/field checks      | [Acceptance](ACCEPTANCE.md)                                                                |
+| Model commands, renderer identity, regression and budget evidence      | [Model editor verification](MODEL-EDITOR-VERIFICATION.md)                                  |
+| Worker bounds, upload behavior and measurements                        | [Performance](PERFORMANCE.md) and [mobile model performance](MOBILE-MODEL-PERFORMANCE.md)  |
+| Dated bug reproductions, fixes, measurements and verification limits   | [3 October audit](AUDIT-2026-10-03.md)                                                     |
+| Theme tokens and text contrast                                         | [Dark-mode readability](DARK-MODE-READABILITY.md) and [map styling](DARK-MAP-STYLING.md)   |
+| Screenshot files, fixture provenance and reproduction                  | [Screenshot inventory](assets/screenshots/README.md)                                       |
+| Source/data reuse and public credits                                   | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
 
 Start with Node 22.23.3 from `.node-version` and `npm ci` inside `web/`. `npm run dev` serves the public seed with no credentials; it does not serve the Vercel APIs. Browser workflows isolate authentication and private data. `npm test`, `npm run lint`, `npm run build` and `npm run check:configured-build` cover the app and budgets. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
 
 ## Operate
 
-| Task | Guide |
-| --- | --- |
-| Install, migrate, configure credentials and run release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery) |
-| Maintain operational settings | [Configuration](CONFIGURATION.md) |
-| Check deployed revisions and dated release receipts | [Production](PRODUCTION.md) |
-| Recover private work and handle conflicts | [Editor reliability](EDITOR-RELIABILITY.md) |
-| Verify offline and release readiness | [Acceptance](ACCEPTANCE.md) and [15 October manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) |
+| Task                                                         | Guide                                                                                          |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Install, migrate, configure credentials and run release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery)   |
+| Maintain operational settings                                | [Configuration](CONFIGURATION.md)                                                              |
+| Check deployed revisions and dated release receipts          | [Production](PRODUCTION.md)                                                                    |
+| Recover private work and handle conflicts                    | [Editor reliability](EDITOR-RELIABILITY.md)                                                    |
+| Verify offline and release readiness                         | [Acceptance](ACCEPTANCE.md) and [15 October manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) |
 
 ## Reference and history
 

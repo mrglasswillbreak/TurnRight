@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-18T04:53:24.746Z",
+  "baseline": "work/public-integrity-after-runner-recovery.json",
+  "candidate": "work/public-integrity-after-unilag-completion.json",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "beforeVersion": "lasu-6796771f6052",
+      "afterVersion": "lasu-6796771f6052",
+      "checks": {
+        "geometry": true,
+        "boundary": true,
+        "graph": true,
+        "entrances": true,
+        "photos": true,
+        "closures": true,
+        "driving": true,
+        "accessPolicy": true,
+        "places": true
+      },
+      "otherCampusUnchanged": true
+    },
+    {
+      "slug": "unilag",
+      "beforeVersion": "unilag-b7655a90045c",
+      "afterVersion": "unilag-b7655a90045c",
+      "checks": {
+        "geometry": true,
+        "boundary": true,
+        "graph": true,
+        "entrances": true,
+        "photos": true,
+        "closures": true,
+        "driving": true,
+        "accessPolicy": true,
+        "places": true
+      }
+    }
+  ]
+}

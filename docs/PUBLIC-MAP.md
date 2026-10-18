@@ -8,7 +8,7 @@ Open **Map layers** to show or hide Buildings, Greenery, Surfaces, Amenities and
 
 ![Published UNILAG route and destination remain visible with detail layers hidden](assets/screenshots/live-unilag-route-layers-2026-10-17.jpg)
 
-This public capture uses `unilag-4667e8f529d6`. The library-to-Senate route, destination and unverified mapped approach remain visible with all five optional layers hidden. [Capture provenance](assets/screenshots/live-publication-2026-10-17.json) and [production receipts](PRODUCTION.md) identify its scope; GPS was not started.
+This historical October 17 public capture uses `unilag-4667e8f529d6`. The library-to-Senate route, destination and unverified mapped approach remain visible with all five optional layers hidden. [Capture provenance](assets/screenshots/live-publication-2026-10-17.json) and [production receipts](PRODUCTION.md) identify its scope; GPS was not started.
 
 ## Choose and explore a campus
 
@@ -16,7 +16,7 @@ Open **Choose a campus** beside search. Use the list, name search, globe pin, or
 
 Search places or streets and browse available categories. Select a result or mapped building to inspect its name, source information, photos, available arrival guide, and route actions. Save places for return visits or share a campus-specific destination link. A building can be visible without a usable routing connection.
 
-![Public map and destination details](assets/screenshots/tour-public-desktop-2026-10-15.png)
+![Public map and destination details](assets/screenshots/live-lasu-published-2026-10-18.png)
 
 Use 2D/3D, zoom, orientation, appearance, and rendering controls to suit the device. Unknown building heights are illustrative; floor-derived dimensions and authored models are not measured access evidence. **Settings → Appearance** supports Device, Light, and Dark. Motion preferences and reduced-motion behavior are described in [Motion](MOTION.md).
 

@@ -10,7 +10,9 @@ The original layer table selects at most 500 matching features. Its header check
 
 The layer workspace is deployed. [Production receipts](PRODUCTION.md) record the released campus packages, browser checks and preserved drafts.
 
-The owner editor has a persistent **Layers** entry. The desktop explorer resizes horizontally; the same Layers / Features workflow appears in a sheet on phones. Layer changes join ordinary feature corrections in transactional autosave, undo/redo, backups, recovery and immutable release snapshots. There is no visitor layer switcher.
+The owner editor has a persistent **Layers** entry. The desktop explorer resizes horizontally; the same Layers / Features workflow appears in a sheet on phones. Layer changes join ordinary feature corrections in transactional autosave, undo/redo, backups, recovery and immutable release snapshots.
+
+Visitors use **Map layers** to show or hide approved Buildings, Greenery, Surfaces, Amenities and Landmarks. These preferences persist per campus; they do not edit private layer records or create a new release. Route guidance, entrances, gate markers and the selected destination remain visible. Older packages retain their existing default display. [Visitor controls](PUBLIC-MAP.md) · [Campus detail contract](CAMPUS-DETAIL-UPGRADE.md).
 
 ## Find and edit a feature
 

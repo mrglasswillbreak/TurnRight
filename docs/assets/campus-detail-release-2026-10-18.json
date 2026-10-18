@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "date": "2026-10-18",
-  "state": "unilag-publicly-served-completion-timeout-lasu-approved",
+  "state": "both-campuses-published-production-verified",
   "previousReceipt": "campus-detail-release-2026-10-17.json",
   "documentationAndVerification": {
     "pullRequest": 27,
@@ -52,11 +52,18 @@
         "temporaryCredentialRevoked": true,
         "report": "campus-browser-verification-2026-10-18-unilag-preview.json",
         "invariantComparison": "campus-detail-integrity-2026-10-18-unilag-preview.json",
-        "manualChecks": ["Senate photographs and historical dates", "View in 3D", "130 m library-to-Senate route", "Route and approach markers survive all five optional layers hidden", "All five preferences retained after reload", "All layers restored after verification"],
+        "manualChecks": [
+          "Senate photographs and historical dates",
+          "View in 3D",
+          "130 m library-to-Senate route",
+          "Route and approach markers survive all five optional layers hidden",
+          "All five preferences retained after reload",
+          "All layers restored after verification"
+        ],
         "gpsRequested": false
       },
       "publicationRun": 39088892710,
-      "publicationStatus": "all gates passed on attempt 2; production serves the new package, but the database completion update timed out and its release status remains preview",
+      "publicationStatus": "published; exact existing production promotion reconciled without another promotion",
       "productionDeploymentId": "dpl_9iND6dH2t2xbj7F3QqzZJfCJ25mG",
       "productionDeploymentUrl": "https://turnright-ag31vs733-muhammed-abdulhadi-s-projects.vercel.app",
       "completionError": "canceling statement due to statement timeout",
@@ -83,7 +90,11 @@
           "otherGatesPassed": true,
           "firstAttemptCompletedAt": "2026-10-18T02:36:37Z"
         }
-      ]
+      ],
+      "completionRecoveryRun": 39096742335,
+      "publishedAt": "2026-10-18T04:52:27.903164+00:00",
+      "completionReceipt": "measurements/publication-completion-2026-10-18-unilag.json",
+      "recoveryIntegrityComparison": "campus-detail-integrity-2026-10-18-unilag-completion.json"
     },
     {
       "slug": "lasu",
@@ -98,9 +109,142 @@
       "approvalStatus": "approved",
       "authorization": "Owner explicitly authorized refreshed LASU original-owner override.",
       "auditReason": "Owner authorizes the refreshed LASU presentation snapshot without a separate reviewer, preserving current editor visibility and save metadata. Geometry, routing, authored models and corrections are unchanged; new ArcGIS discoveries remain held and physical-device/field checks remain outstanding.",
-      "publicationStatus": "awaiting fresh preview after UNILAG publication"
+      "publicationStatus": "published",
+      "releaseId": "104201de-f87e-406d-8172-2780011d5415",
+      "previewRun": 39098713603,
+      "applicationCommit": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+      "previewRequestedAt": "2026-10-18T04:54:20.306793+00:00",
+      "catalogueBaseline": "7ee7c0ecd32affe3f3b81b14ec8c1a9ad0c4e36b60cb5eb5cd2606434a19e087",
+      "version": "lasu-41ec73876464",
+      "previewUrl": "https://turnright-cbfqkt8tw-muhammed-abdulhadi-s-projects.vercel.app",
+      "previewDeploymentId": "dpl_4zLke9rcMSYTYMgTPekEYkau3Upb",
+      "previewCompletedAt": "2026-10-18T05:21:45.4584429Z",
+      "previewStatus": "success",
+      "previewCatalogueRevision": "b35c90f5db4221d6f276ed9f0467a888c5159fb26d63d17bfce374dcbf8e781f",
+      "verification": {
+        "run": 39100299610,
+        "status": "success",
+        "manualReport": "measurements/lasu-detail-manual-review-2026-10-18.json",
+        "artifact": 12126114045,
+        "artifactSha256": "d2e9febde6bf98f0216d5898b512adcb304d0c42822455f268bef324d4e5404c",
+        "assetChecks": 236,
+        "views": 32,
+        "offlineJourneys": 4,
+        "rollbackPackage": "lasu-6796771f6052",
+        "temporaryCredentialRevoked": true,
+        "report": "campus-browser-verification-2026-10-18-lasu-preview.json",
+        "invariantComparison": "campus-detail-integrity-2026-10-18-lasu-preview.json",
+        "screenshotReview": "Eight representative desktop/mobile, light/dark, 2D/3D captures across Chromium and WebKit inspected directly; all 32 views passed automated checks.",
+        "gpsRequested": false
+      },
+      "publicationRun": 39100844031,
+      "publicationGateFailures": [
+        {
+          "attempt": 1,
+          "job": 117596618414,
+          "engine": "webkit",
+          "shard": "2/2",
+          "artifact": 12127000530,
+          "artifactSha256": "bdf10ea8a0cc3519399902b823dc5d85d9e12fde0b4976b79664532c4f584b0a",
+          "failedTests": [
+            {
+              "test": "readable interface dark phone: tips, public dialogs and editor panels",
+              "error": "Undefined editorTestMap while collapseExplorer checks canvas size after workspace switching",
+              "failedAt": "2026-10-18T05:32:49Z"
+            },
+            {
+              "test": "compact plan and photograph tools: all modes preserve the canvas at 768x900",
+              "error": "Expected four saved texture corners; persisted fixture remained undefined",
+              "failedAt": "2026-10-18T05:36:23Z",
+              "observation": "Trace shows alignment handles appeared after Start / reset alignment; no console error was captured. The cause of the missing observed save remains unproven."
+            }
+          ],
+          "passedTests": 48,
+          "skippedTests": 1,
+          "diagnosticRun": 39101816036,
+          "diagnosticStatus": "success on unchanged 4b3d4e1b5be50819f80adf8df3f87e5bfc008119; both cases pass in Chromium and WebKit",
+          "testOrGuardChanged": false,
+          "promotionOccurred": false,
+          "retryStatus": "Full unchanged WebKit group passed on attempt 2, job 117600912968: 50 passes and one existing skip."
+        }
+      ],
+      "publicationAttempt": 2,
+      "publicationReleaseJob": 117602899068,
+      "publishedAt": "2026-10-18T06:12:37.321883+00:00",
+      "productionDeploymentId": "dpl_E4TWbUvxbTFBgSEbVgMhMcrgqMn3",
+      "productionDeploymentUrl": "https://turnright-ctfkl5sz3-muhammed-abdulhadi-s-projects.vercel.app",
+      "completionReceipt": "measurements/publication-completion-2026-10-18-lasu.json",
+      "integrityComparison": "campus-detail-integrity-2026-10-18-lasu-completion.json",
+      "protectedModelComparison": "measurements/protected-models-2026-10-18-lasu-publication.json",
+      "publicInvariantsUnchanged": true,
+      "otherCampusUnchanged": true
     }
   ],
   "arcgisDesktopEvidence": "measurements/pro-native-ui-study-2026-10-18.json",
-  "remainingAcceptance": ["Physical Android and iPhone frame rate, restart and native Safari", "GPS and campus field verification", "Unresolved new-source permissions and survey currency", "Exact shared-boundary desktop trace acceptance", "Interactive ArcGIS square, roof/façade and batch-appearance studies"]
+  "remainingAcceptance": [
+    "Physical Android and iPhone frame rate, restart and native Safari",
+    "GPS and campus field verification",
+    "Unresolved new-source permissions and survey currency",
+    "Exact shared-boundary desktop trace acceptance",
+    "In-place interactive ArcGIS square and roof/façade studies"
+  ],
+  "publicationRecovery": {
+    "pullRequest": 28,
+    "testedHead": "67fb3c2f65480162810a09fc6c4284cadd8ab88b",
+    "mergeCommit": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+    "migration": "056",
+    "migrationAppliedAt": "2026-10-18T04:19:42.387583Z",
+    "releaseSnapshotsPreserved": true,
+    "serviceOnly": true,
+    "rpcTimeoutSeconds": 60,
+    "exactApprovalReadbackSeconds": 3.544748,
+    "run": 39096742335,
+    "releaseJob": 117589648939,
+    "status": "success",
+    "unitPassed": 856,
+    "unitSkipped": 1,
+    "unitFiles": 117,
+    "allSixBrowserGroupsPassed": true,
+    "offlinePassed": true,
+    "nativeGisPassed": true,
+    "lazy3DGzipKiB": 264.2,
+    "lazy3DBudgetKiB": 300,
+    "lintWarnings": 80,
+    "lintErrors": 0,
+    "dependencyVulnerabilities": 0,
+    "productionAppDeployment": {
+      "githubId": 7150132461,
+      "environment": "Production",
+      "completedAt": "2026-10-18T04:55:07Z",
+      "url": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/BKLvgCCjxsF7NtNyw98rYWUmd11T"
+    }
+  },
+  "arcgisDesktopRefinementEvidence": "measurements/pro-native-refinement-study-2026-10-18.json",
+  "arcgisLicenceObservation": "measurements/pro-licence-window-2026-10-18.json",
+  "arcgisDuplicateGeometryEvidence": "measurements/campus-duplicate-geometry-2026-10-18.json",
+  "arcgisDuplicateAttributeEvidence": "measurements/campus-duplicate-attributes-2026-10-18.json",
+  "buildingTreatmentArchive": "measurements/building-treatment-archive-2026-10-18.json",
+  "productionVerification": {
+    "run": 39103394177,
+    "job": 117604089898,
+    "artifact": 12127563062,
+    "artifactSha256": "5c8c714ac97f2ad453981af0786015a1ec3deb798745a761d58093a7a52ad803",
+    "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+    "assetHashes": 236,
+    "views": 32,
+    "offlineJourneys": 4,
+    "report": "campus-browser-verification-2026-10-18-published.json",
+    "captureManifest": "screenshots/live-publication-2026-10-18.json",
+    "installedUpdate": "measurements/installed-campus-update-2026-10-18.json",
+    "physicalDevices": false,
+    "gps": false
+  },
+  "nativeAppearanceStudy": {
+    "report": "measurements/pro-native-appearance-study-2026-10-18.json",
+    "syntheticOnly": true,
+    "humanAssisted": true,
+    "savedReadback": "2026-10-18T14:06:46.602206+00:00",
+    "geometryUnchanged": true,
+    "controlUnchanged": true
+  }
 }

@@ -6,6 +6,10 @@ Use **Precision drawing** for vertex, endpoint, midpoint and edge references, nu
 
 Under **Layers → Features**, select generated buildings and choose **Preview appearance** for a reusable palette. The live preview has Apply/Cancel controls in the feature table, including on phones, and commits through the existing undo/recovery system. Authored meshes retain their materials. Existing dimensions, per-surface styles and custom roof plans remain authoritative. Standard roofs also expose long/across-axis orientation; this does not infer a roof from imagery. [Detailed workflow and limits](CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification).
 
+![Palette preview with retained dimensions and explicit Apply/Cancel controls](assets/screenshots/tour-palette-preview-2026-10-18.png)
+
+The October 18 capture uses isolated test geometry. The selected feature remains highlighted; the preview lists proposed wall, roof, trim and window colours. The corresponding journey verifies the map's proposed appearance, cancellation, one-step apply, undo and redo. [Capture provenance](assets/screenshots/tour-2026-10-18.json) · [Numeric construction and tracing steps](EDITOR.md#draw-and-refine-precisely).
+
 ## Campus GIS integration
 
 Model authoring now participates in the campus team workflow. Ready immutable assets attached to current or historical campus work are readable by authorized teammates, while unfinished/unattached assets and recovery remain personal. Model review does not replace independent campus snapshot approval. [Team workflow and roles](GIS-PLATFORM.md).
@@ -26,11 +30,11 @@ The centre region must provide at least 720 × 320 CSS pixels. The model keeps a
 
 In **Outline → Add wall**, choose one of three operations:
 
-| Operation | Behaviour |
-| --- | --- |
+| Operation                         | Behaviour                                                                                   |
+| --------------------------------- | ------------------------------------------------------------------------------------------- |
 | Replace boundary between vertices | Start at the selected vertex, choose an existing end vertex, and draw the replacement path. |
-| New wing | Close a new exterior outline using points, a circle or an ellipse. |
-| New courtyard | Close an interior outline in the selected wing. It must fit within the exterior boundary. |
+| New wing                          | Close a new exterior outline using points, a circle or an ellipse.                          |
+| New courtyard                     | Close an interior outline in the selected wing. It must fit within the exterior boundary.   |
 
 Tap the aligned model or enter east/north metre coordinates relative to the building's fixed editing origin. Existing vertices snap exactly; free points use a 0.1 m grid. **Apply boundary** commits one undoable operation. Invalid drawings remain available for repair; **Cancel boundary** removes only the preview.
 
@@ -60,11 +64,11 @@ Choose **Mesh → Import model**, supply the main file and its companion files, 
 
 ![Import preview, dimensions and conversion controls](assets/screenshots/model-import-preview-2026-09-26.png)
 
-| Format | Import | Export |
-| --- | --- | --- |
-| GLB / glTF 2 | Static hierarchy, geometry, UVs and core metallic-roughness materials. | GLB is preferred. glTF exports a portable JSON document with an embedded binary buffer. Both use metres and Y up. |
-| OBJ + MTL | Geometry, normals, UVs, diffuse colour/opacity and supplied diffuse textures. | ZIP containing OBJ, companion MTL and textures; explicit units and up axis. |
-| STL | Geometry only; choose intended units and up axis. | Binary STL, geometry only; explicit units and up axis. |
+| Format       | Import                                                                        | Export                                                                                                            |
+| ------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| GLB / glTF 2 | Static hierarchy, geometry, UVs and core metallic-roughness materials.        | GLB is preferred. glTF exports a portable JSON document with an embedded binary buffer. Both use metres and Y up. |
+| OBJ + MTL    | Geometry, normals, UVs, diffuse colour/opacity and supplied diffuse textures. | ZIP containing OBJ, companion MTL and textures; explicit units and up axis.                                       |
+| STL          | Geometry only; choose intended units and up axis.                             | Binary STL, geometry only; explicit units and up axis.                                                            |
 
 The preview reports dimensions, complexity, material conversions and missing dependencies. Animation, rigging, morphs and unsupported material extensions are not retained; compressed glTF extensions must be removed by re-exporting first. Choose metres, centimetres, millimetres, feet or inches and Y/Z up as appropriate. Placement converts to local metres and can centre/ground the object at the building origin.
 
@@ -80,15 +84,15 @@ Migration **013_campus_isolation.sql** adds campus identity to asset metadata an
 
 The current authored revision must be marked reviewed in Mesh tools. Any subsequent geometry or material change requires another review. Releases hydrate and validate the immutable source, compile authored geometry and package supported textures. Only the existing owner **review → preview → publish** workflow changes public campus content. Ordinary application deployment preserves the published campus package.
 
-| Limit | Current bound |
-| --- | --- |
-| Import input | 100 files / 50 MiB total |
-| Model source | 100 objects, 100,000 vertices, 200,000 faces, 25 MiB JSON |
-| Textures | 32 images, 4 MiB each, 4096 px per side, 16 megapixels combined |
-| Curve profiles | 4096 generated points per profile |
-| Owner model asset storage | 500 MiB |
-| Published model package | Existing 12 MiB combined geometry and texture budget |
-| Decoded authored textures | Shared, reference-counted 32-megapixel renderer budget |
+| Limit                     | Current bound                                                   |
+| ------------------------- | --------------------------------------------------------------- |
+| Import input              | 100 files / 50 MiB total                                        |
+| Model source              | 100 objects, 100,000 vertices, 200,000 faces, 25 MiB JSON       |
+| Textures                  | 32 images, 4 MiB each, 4096 px per side, 16 megapixels combined |
+| Curve profiles            | 4096 generated points per profile                               |
+| Owner model asset storage | 500 MiB                                                         |
+| Published model package   | Existing 12 MiB combined geometry and texture budget            |
+| Decoded authored textures | Shared, reference-counted 32-megapixel renderer budget          |
 
 Oversized or unsupported content stays private and recoverable. Reduce geometry/texture complexity before saving or publishing. Imported objects can cover a large footprint visually, but they never silently alter routing geometry. Interior layouts, sculpting and advanced modifiers are outside this release.
 

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-18T14:06:46.602206+00:00",
+  "syntheticOnly": true,
+  "workflow": "ArcGIS Pro desktop: shared Attributes palette, Cancel, Apply, Undo, Redo and Save Edits",
+  "selection": [
+    "fixture-1",
+    "fixture-2"
+  ],
+  "control": "fixture-3",
+  "humanAssistance": "Owner opened the prepared project and selected the two grey footprints after floating-dialog/drag input failed. Subsequent shared-attribute Cancel/Apply, Undo/Redo and Save Edits were operated by the helper.",
+  "cancelVerified": true,
+  "batchApplyVerified": true,
+  "singleUndoVerified": true,
+  "redoVerified": true,
+  "savedReadbackVerified": true,
+  "geometryUnchanged": true,
+  "controlUnchanged": true,
+  "baselineSha256": "b93f533305a209c6547c00c6f337a452a57689387e57e8b2855d9be705d0b784",
+  "spatialReference": 32631,
+  "features": [
+    {
+      "id": "fixture-1",
+      "palette": "terracotta",
+      "initialPalette": "original",
+      "geometryUnchanged": true,
+      "areaSquareMetres": 96,
+      "perimeterMetres": 40,
+      "spatialReference": 32631,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500000,
+              715000
+            ],
+            [
+              500000,
+              715008
+            ],
+            [
+              500012,
+              715008
+            ],
+            [
+              500012,
+              715000
+            ],
+            [
+              500000,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": "fixture-2",
+      "palette": "terracotta",
+      "initialPalette": "original",
+      "geometryUnchanged": true,
+      "areaSquareMetres": 96,
+      "perimeterMetres": 40,
+      "spatialReference": 32631,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500020,
+              715000
+            ],
+            [
+              500020,
+              715008
+            ],
+            [
+              500032,
+              715008
+            ],
+            [
+              500032,
+              715000
+            ],
+            [
+              500020,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": "fixture-3",
+      "palette": "terracotta",
+      "initialPalette": "terracotta",
+      "geometryUnchanged": true,
+      "areaSquareMetres": 96,
+      "perimeterMetres": 40,
+      "spatialReference": 32631,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500040,
+              715000
+            ],
+            [
+              500040,
+              715008
+            ],
+            [
+              500052,
+              715008
+            ],
+            [
+              500052,
+              715000
+            ],
+            [
+              500040,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    }
+  ],
+  "observations": [
+    {
+      "observedAt": "2026-10-18T14:00:16.065Z",
+      "step": "selection-and-cancel",
+      "observed": "Owner assisted selection of fixture-1 and fixture-2; helper selected the layer-level shared attributes. Terracotta was staged with Auto Apply off. Cancel restored original; Apply and Cancel disabled. Both footprints remained grey; control remained terracotta.",
+      "humanAssistance": "Owner closed untargetable Select By Attributes and selected the two grey rectangles."
+    },
+    {
+      "observedAt": "2026-10-18T14:02:43.895Z",
+      "step": "apply",
+      "observed": "Both selected footprints changed from grey to terracotta after one Apply; fixture-3 remained terracotta."
+    },
+    {
+      "observedAt": "2026-10-18T14:03:16.232Z",
+      "step": "undo",
+      "observed": "One Ctrl+Z restored both selected footprints to grey/original; third control remained terracotta."
+    },
+    {
+      "observedAt": "2026-10-18T14:03:52.633Z",
+      "step": "redo",
+      "observed": "One Ctrl+Y restored terracotta on both selected footprints; third control remained unchanged."
+    },
+    {
+      "observedAt": "2026-10-18T14:06:19.318Z",
+      "step": "save-edits",
+      "observed": "Save Edits was invoked; Save and Discard became disabled with both selected footprints terracotta. No confirmation dialog was visible."
+    }
+  ],
+  "files": [
+    {
+      "file": "baseline-esri.json",
+      "bytes": 1578,
+      "sha256": "b93f533305a209c6547c00c6f337a452a57689387e57e8b2855d9be705d0b784"
+    },
+    {
+      "file": "baseline.geojson",
+      "bytes": 1125,
+      "sha256": "2335eef0a73202d159f20e66d6a405effd9605111d2d60a0bc32b792c02560a5"
+    },
+    {
+      "file": "fixture.json",
+      "bytes": 568,
+      "sha256": "0fa063f5ddb55365f8c67e7ce6b2824c680dcefb410149eed963ca07d0cd0c42"
+    },
+    {
+      "file": "create-prepared-fixture.py",
+      "bytes": 2765,
+      "sha256": "ef0d3abea76092ed8fb45c058c0b91e944f0dafcaf6d199d5da2ffbe0e369b05"
+    },
+    {
+      "file": "readback-appearance.py",
+      "bytes": 2528,
+      "sha256": "45349668e464d4185fef5ab2fe3dac66b8b6f64ea1add5068f54156300e06f00"
+    },
+    {
+      "file": "prepared-readback-2026-10-18.json",
+      "bytes": 2869,
+      "sha256": "28ab8106a54b7cb98f2df48f4b2b53aced4a925cf93c1f61125ec18d2ee3dc5d"
+    },
+    {
+      "file": "cancelled-readback-2026-10-18.json",
+      "bytes": 2869,
+      "sha256": "e1af3574c0eb22a0f235cb608956a059db5ca1ff075a6bb3d2ace552dd236be1"
+    },
+    {
+      "file": "saved-readback-2026-10-18.json",
+      "bytes": 2872,
+      "sha256": "eb202f2769425a9199f298615b875c9a29ec6b387a07cd6738167608dccdc646"
+    },
+    {
+      "file": "desktop-observations.json",
+      "bytes": 1417,
+      "sha256": "1fa82c1a41a6546fb91153a03efea2d121b4cf51a3cbadf4da213391ebd533f6"
+    },
+    {
+      "file": "SyntheticAppearance.aprx",
+      "bytes": 17251,
+      "sha256": "f2ff9d74ef2c2c216e3ceecdd9cb442d17257dda59858cbbf7f98c57d12c5376"
+    }
+  ],
+  "portableDirectory": "PortableEvidence/2026-10-18/native-appearance-ui-study",
+  "limitations": [
+    "Synthetic 2D renderer field exercise; not roof/façade or multipatch editing.",
+    "Desktop interaction observations and saved-data readback are distinct evidence.",
+    "The prepared initial snapshot remains historical; the current project has the completed result.",
+    "No campus/source data or routing changed."
+  ]
+}

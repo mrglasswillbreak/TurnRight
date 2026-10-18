@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-18T04:39:07.363832+00:00",
+  "readOnly": true,
+  "sourceMutation": false,
+  "automaticAcceptance": false,
+  "inputReportSha256": "c85017d517e4c5b52cdbfba8837efcd1c32d6ccc6655cdd598c3440dce94fbb5",
+  "method": "Resolve native OBJECTID_1 to the unique archived GeoJSON OBJECTID; verify matching native geometry and shared ordinary attributes; compare original attributes excluding OBJECTID.",
+  "disposition": "held-source-rights-date-and-feature-review",
+  "layers": [
+    {
+      "campus": "unilag",
+      "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/3",
+      "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+      "nativeCopy": "unilag_28",
+      "sourceGeoJsonSha256": "02f5ded9c16db5b78a4689285d96bde6eaea31f5c0d88e168915bb84d70fd801",
+      "groups": [
+        {
+          "nativeCopyIds": [
+            69,
+            90
+          ],
+          "originalObjectIds": [
+            69,
+            90
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Id",
+            "Shape__Area",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "Id"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        }
+      ],
+      "sourceUnchanged": true,
+      "nativeContentSha256": "885dcefa1073828022acf05c3f278a9555c64dd8a6e6b85c6267415832168f45"
+    },
+    {
+      "campus": "unilag",
+      "sourceCollection": "https://services7.arcgis.com/qtp07HKUAdVN1xi8/arcgis/rest/services/Map_WFL1/FeatureServer/4",
+      "itemId": "5eb6f9b7d1e2473d9670cc3101f2afb5",
+      "nativeCopy": "unilag_29",
+      "sourceGeoJsonSha256": "b4ee4c5b900907ca94d8a3ff8d11e91aaf4e01646d87f3b3453993221ddc605e",
+      "groups": [
+        {
+          "nativeCopyIds": [
+            11,
+            75
+          ],
+          "originalObjectIds": [
+            11,
+            75
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [],
+          "attributesIdenticalExcludingOriginalObjectId": true
+        },
+        {
+          "nativeCopyIds": [
+            92,
+            144
+          ],
+          "originalObjectIds": [
+            93,
+            145
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "LineWt"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        },
+        {
+          "nativeCopyIds": [
+            93,
+            145
+          ],
+          "originalObjectIds": [
+            94,
+            146
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "LineWt"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        },
+        {
+          "nativeCopyIds": [
+            99,
+            143
+          ],
+          "originalObjectIds": [
+            100,
+            144
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "LineWt",
+            "Shape__Length"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        },
+        {
+          "nativeCopyIds": [
+            100,
+            140
+          ],
+          "originalObjectIds": [
+            101,
+            141
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "LineWt"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        },
+        {
+          "nativeCopyIds": [
+            101,
+            141
+          ],
+          "originalObjectIds": [
+            102,
+            142
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "LineWt"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        },
+        {
+          "nativeCopyIds": [
+            102,
+            142
+          ],
+          "originalObjectIds": [
+            103,
+            143
+          ],
+          "nativeToOriginalIdentityVerified": true,
+          "comparedFields": [
+            "Color",
+            "Elevation",
+            "Entity",
+            "FID_",
+            "Layer",
+            "LineWt",
+            "Linetype",
+            "RefName",
+            "Shape__Length"
+          ],
+          "differingFields": [
+            "Entity",
+            "LineWt"
+          ],
+          "attributesIdenticalExcludingOriginalObjectId": false
+        }
+      ],
+      "sourceUnchanged": true,
+      "nativeContentSha256": "842f2f3237b45a2d145ca6fef42ae6975cb0b7917cfd0f7861711521c0806721"
+    }
+  ]
+}

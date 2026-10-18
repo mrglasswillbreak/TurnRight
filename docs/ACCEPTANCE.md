@@ -2,11 +2,17 @@
 
 ## Campus detail release
 
+The October 18 releases are published and pass the [production browser and offline matrix](assets/campus-browser-verification-2026-10-18-published.json). [Publication receipts](PRODUCTION.md) retain approval hashes, preservation checks and failed-attempt history. These results do not close the physical-device, field, live-role or public rollback-rehearsal items below.
+
 For LASU and UNILAG, retain the [detail evidence ledger](CAMPUS-DETAIL-UPGRADE.md), the current source revision, the preparation workspace hash, immutable review hash and released package identity. Account for every building with a treatment or hold reason. Resolve source rights per item; a held candidate must not enter an approved package.
 
 Verify precision drawing with mouse, keyboard and touch; snap bypass; holes/multipart geometry; cancelled previews; undo/redo and reload recovery. Check palette previews and apply/cancel controls in the phone table. Verify the scenery recipe survives the actual release builder and stays inside the visual budget. Test the resulting packages in light/dark, 2D/3D, active routes, layer preferences, landmark framing, offline switching and corrupt/missing-asset recovery. Preserve the other campus during each promotion and restore.
 
-The [October 17 release receipt](assets/campus-detail-release-2026-10-17.json) distinguishes application deployment, private preparation, exact owner-authorized review decisions and package publication; [Production](PRODUCTION.md) records later releases. The [native source findings](assets/measurements/campus-source-review-2026-10-17.json) and [feature-level warning measurements](assets/measurements/campus-geometry-warnings-2026-10-17.json) preserve the Pro-dependent work. The [batch appearance fixture](assets/measurements/pro-batch-appearance-2026-10-17.json) verifies native renderer persistence and portable exports. The [October 18 desktop study](assets/measurements/pro-native-ui-study-2026-10-18.json) verifies the exact numeric rectangle, observed undo/redo, labelled reference snaps and cancellation with explicit human help for numeric dialogs. Its pointer traces retain measured differences and do not pass exact-boundary acceptance. Interactive square, roof/façade and batch studies, along with unresolved source permissions/dates, remain explicit research needs.
+The [October 17 release receipt](assets/campus-detail-release-2026-10-17.json) distinguishes application deployment, private preparation, exact owner-authorized review decisions and package publication; [Production](PRODUCTION.md) records later releases. The [native source findings](assets/measurements/campus-source-review-2026-10-17.json) and [feature-level warning measurements](assets/measurements/campus-geometry-warnings-2026-10-17.json) preserve the Pro-dependent work. The [batch appearance fixture](assets/measurements/pro-batch-appearance-2026-10-17.json) verifies native renderer persistence and portable exports. The [October 18 desktop study](assets/measurements/pro-native-ui-study-2026-10-18.json) verifies the exact numeric rectangle, observed undo/redo, labelled reference snaps and cancellation with explicit human help for numeric dialogs. Its pointer traces retain measured differences and do not pass exact-boundary acceptance. The [desktop refinement continuation](assets/measurements/pro-native-refinement-study-2026-10-18.json) verifies three separate-output regularizations, successful status, near-right-angle corners and unchanged originals. The [assisted desktop appearance study](assets/measurements/pro-native-appearance-study-2026-10-18.json) verifies two-feature selection, staged cancellation, batch apply, one-step undo/redo and saved-data readback with unchanged geometry/control. In-place interactive square and roof/façade studies, along with unresolved source permissions/dates, remain explicit research needs. Complete remaining licence-dependent work before the [displayed 6 November expiry](assets/measurements/pro-licence-window-2026-10-18.json).
+
+The [October 18 duplicate diagnostic](assets/measurements/campus-duplicate-geometry-2026-10-18.json) accounts for 52 archived layer entries and checks all 41 non-empty native copies (6,668 geometries). LASU has no within-layer duplicate groups; UNILAG has eight groups involving 16 pavement/road-centreline records. Input geometry-and-attribute fingerprints remain unchanged. The 223-file output archive passes independent hash verification without ArcPy. These findings remain held; review attributes, original source identities, permissions and survey dates before any disposition changes.
+
+The [attribute continuation](assets/measurements/campus-duplicate-attributes-2026-10-18.json) verifies all 16 original-ID mappings and finds only one pair with identical original attributes apart from `OBJECTID`. Seven pairs differ. Its five-file archive passes independent hash and attribute-comparison checks without ArcPy; no finding changes source acceptance.
 
 The 300 KiB compressed lazy-renderer and 12 MiB per-campus visual budgets remain unchanged. The target of 30 fps on representative physical Android/iPhone interaction remains a hardware check; software WebGL, viewport simulations and WebKit automation cannot establish it. Record the actual device and fallback behaviour separately.
 
@@ -142,7 +148,6 @@ provenance, and [PRODUCTION.md](PRODUCTION.md) for exact deployed state.
 
 Use [MODEL-EDITOR-VERIFICATION.md](MODEL-EDITOR-VERIFICATION.md) for the unified workspace's checks, measured performance, responsive captures and remaining hardware gaps. Its completed-command autosave replaces the old one-shot façade Apply workflow. Building review stays targeted and architectural work never grants navigation permissions. The dated records below are historical evidence, not current suite totals or proof of physical-device acceptance.
 
-
 Current model acceptance includes one Edit model entry, keyboard/search tree
 navigation, shared canvas identity, Orbit camera restoration, aligned wall/roof/
 footprint edits, wall and roof text, grouping/detachment, invalid input recovery,
@@ -153,7 +158,6 @@ Browser zoom uses equivalent CSS dimensions rather than browser chrome controls.
 Native keyboards, physical rotation and assistive-technology acceptance remain
 manual device checks. Screenshots document the rendered states, not completion
 of those hardware checks.
-
 
 ## Evidence from implementation
 
@@ -210,7 +214,7 @@ Record model, OS, browser version, package version and date. Test on at least on
 - Edit a name; import a conflicting source name. The correction must remain. Review additions, geometry changes and removals. Force an incomplete import; no baseline records may be deleted.
 - Import generic lines or draw a path with **Connect crossings automatically** disabled: a crossing alone must not create a junction. Enable it on a suitable editor-authored path and verify same-level connections while bridges, tunnels, barriers and restrictions remain respected. Add an explicit endpoint connection within five metres and verify routing, undo/redo, saved junctions and building conflicts.
 - Connect an entrance only to the correct place and path. Confirm private/no-access paths and both directions of selected closures are excluded. Set an overdue reopening date: closure must remain until explicitly reopened and republished.
-- Build a reviewed snapshot and verify its Vercel preview. Make a subsequent draft change: it must not alter the immutable preview. Simulate a failed build/promotion in a staging setup; the old production release must remain. Publish, inspect the production domain and metadata, then prepare and publish a restore preview for that campus while asserting every other campus’s manifest and assets remain unchanged.
+- Build a reviewed snapshot and verify its Vercel preview. Make a subsequent draft change: it must not alter the immutable preview. In staging, verify a failure before promotion leaves the old production release intact. Separately simulate a database completion failure after successful promotion: the new public package can already be live, so verify the exact promotion/catalogue and use the guarded completion recovery without another promotion. Publish, inspect the production domain and metadata, then prepare and publish a restore preview for that campus while asserting every other campus’s manifest and assets remain unchanged. [Recovery procedure](DEPLOYMENT.md#publication-completion-after-a-timeout).
 - Export approved records and edit history. Rehearse a restore to a separate test project and compare stable IDs and routes.
 
 ## LASU field survey
@@ -221,12 +225,11 @@ Prioritize connecting the campus gates to the permitted pedestrian network; then
 
 Use a log such as:
 
-| Date / package | Origin → destination / entrance | Path and barrier checks | Wrong-turn / audio / arrival result | Device | Reviewer | Status |
-|---|---|---|---|---|---|---|
-| Pending | Representative gate → building | Pending survey | Pending | — | — | Unverified |
+| Date / package | Origin → destination / entrance | Path and barrier checks | Wrong-turn / audio / arrival result | Device | Reviewer | Status     |
+| -------------- | ------------------------------- | ----------------------- | ----------------------------------- | ------ | -------- | ---------- |
+| Pending        | Representative gate → building  | Pending survey          | Pending                             | —      | —        | Unverified |
 
 Publish only after the user accepts the preview and the relevant checks pass. Keep untested destinations and sections explicitly unverified.
-
 
 ## Offline image tools and activity · 27 September 2026
 
