@@ -28,6 +28,8 @@ External downloads and cloud publication are disabled in the local environment; 
 
 This release requires no production schema migration. App deployment must retain the current LASU and UNILAG manifest identities and every declared asset hash. Workers must reach `main` with matching API changes. Production testing must not accept real proposals or publish drafts. Rollback restores compatible application code while retaining current database state and campus packages.
 
+The [pre-deployment receipt](assets/licensing-production-before-2026-10-18.json) identifies production `17f7582`, the [installed-schema readback](assets/licensing-installed-schema-2026-10-18.json) and the [236 verified public asset hashes](assets/licensing-public-baseline-2026-10-18.json). Reproduce the package comparison with `node scripts/audit-public-packages.mjs output.json docs/assets/licensing-public-baseline-2026-10-18.json`. The existing campus verification workflow also accepts an application deployment ID for protected preview verification without creating a campus release.
+
 Physical Android/iPhone, native Safari, live multi-user pilot, GPS/field routing and full Supabase-platform restoration retain their existing documented limitations. CI browser emulation and the native application-database restore exercise do not establish those results. A higher score, licensing acceptance or income remains DataFactor's decision.
 
 ## Prepared reassessment note

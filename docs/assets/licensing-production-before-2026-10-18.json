@@ -1,0 +1,13 @@
+{
+  "observedAt": "2026-10-18T18:28:00Z",
+  "source": "Authenticated Vercel project overview",
+  "origin": "https://turnright.vercel.app",
+  "revision": "17f758277bda9d4c2e85658aa6858a2d24dc9b24",
+  "deploymentId": "8iC1ZswheJwLhRWfRw1cenitBcMV",
+  "deploymentOrigin": "https://turnright-gjbj5xndp-muhammed-abdulhadi-s-projects.vercel.app",
+  "status": "Ready",
+  "branch": "main",
+  "schemaReceipt": "licensing-installed-schema-2026-10-18.json",
+  "packageBaseline": "licensing-public-baseline-2026-10-18.json",
+  "schemaChangeRequired": false
+}

@@ -1,0 +1,23 @@
+{
+  "readOnly": true,
+  "recordedAt": "2026-10-18T18:26:05.413779+00:00",
+  "source": "Authenticated Supabase SQL editor; SELECT of PostgreSQL schema metadata only",
+  "publicTables": 54,
+  "postgisVersion": "3.3.7",
+  "tableSchemaMd5": "6a0ea90c2a9d69ef69f4ecd88b7301f1",
+  "postgresVersion": "17.6",
+  "completionFunction": {
+    "identity": "gis_complete_publication(uuid,uuid,text,text)",
+    "settings": ["search_path=public", "statement_timeout=60s"],
+    "definitionMd5": "f26e871ec87f21bcd78c58ef2c87cdeb",
+    "serviceExecute": true,
+    "securityDefiner": true,
+    "anonymousExecute": false,
+    "authenticatedExecute": false
+  },
+  "publicFunctionsMd5": "6b1e4875816d12d5e0f8775c083c32cc",
+  "migrationReceiptSchemas": ["turnright_gis_20261005"],
+  "publicationBeginSettings": ["search_path=public", "statement_timeout=60s"],
+  "migrationRequiredForThisRelease": false,
+  "scope": "Current metadata fingerprints and final 056 publication RPC settings; historical migration application evidence remains in PRODUCTION.md. No migration or private data mutation performed."
+}
