@@ -1,0 +1,1384 @@
+{
+  "baseline": "17f758277bda9d4c2e85658aa6858a2d24dc9b24",
+  "snapshotHead": "23d6cf114dbcf59f3fdc561ad6bc291e0db38ed3",
+  "snapshotSha256": "6e0085a326798d204822bc64d7b045825fb21ef3f15b3db5b3b1e3ca02a54ef6",
+  "comparison": "UTF-8 content compared after CRLF/LF normalization. History matches compare exact normalized file content. Remaining paths individually reviewed.",
+  "counts": {
+    "already-merged": 229,
+    "superseded-history": 29,
+    "superseded": 14,
+    "already-deleted": 63,
+    "format-only": 3
+  },
+  "paths": [
+    {
+      "path": ".editorconfig",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/gis-acceptance.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/import-retention.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/map-import-tests.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/map-import.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/regression-audit.yml",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": ".github/workflows/source-review-maintenance.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".github/workflows/source-review.yml",
+      "disposition": "already-merged"
+    },
+    {
+      "path": ".gitignore",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "README.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "SECURITY.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "data/README.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/AUDIT-2026-09-27.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/AUDIT-2026-10-03.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/AUDIT-2026-10-15.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/BRAND.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/CAMPUS-DETAIL-UPGRADE.md",
+      "disposition": "superseded",
+      "reason": "Current main records completed October 18 publication and portable evidence; old candidate-only status is obsolete."
+    },
+    {
+      "path": "docs/CAMPUS-GLOBE.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/CAMPUS-IMPORTS.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056."
+    },
+    {
+      "path": "docs/CONFIGURATION.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056."
+    },
+    {
+      "path": "docs/CONNECTION-REVIEW.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/DEPLOYMENT.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056 and publication completion recovery."
+    },
+    {
+      "path": "docs/EDITOR-AVAILABILITY.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/EDITOR-LAYOUT.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/EDITOR-RELIABILITY.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056."
+    },
+    {
+      "path": "docs/EDITOR.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056 and current guide formatting."
+    },
+    {
+      "path": "docs/ENRICHMENT.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/GIS-PLATFORM.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/MAP-IMPROVEMENTS.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/MOBILE-MODEL-PERFORMANCE.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/MODEL-EDITOR-VERIFICATION.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/PERFORMANCE.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/PHOTO-EDITING.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/PHOTO-MODEL-VERIFICATION.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/PRODUCTION.md",
+      "disposition": "superseded",
+      "reason": "Keep exact October 18 package identities, CI, schema and recovery receipts."
+    },
+    {
+      "path": "docs/PROGRESS-MONITOR.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/PUBLIC-MAP.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/README.md",
+      "disposition": "superseded",
+      "reason": "Keep current evidence and screenshot index."
+    },
+    {
+      "path": "docs/REPOSITORY.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/SCREENSHOTS.md",
+      "disposition": "superseded",
+      "reason": "Keep expanded current tour and dated historical gallery."
+    },
+    {
+      "path": "docs/SOURCE-UPDATES.md",
+      "disposition": "superseded",
+      "reason": "Do not reintroduce an obsolete 001-048 installation claim."
+    },
+    {
+      "path": "docs/SURVEY.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/UNIFIED-MODEL-EDITOR.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/assets/brand/b2-capture-2026-10-11.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/b2-public-mobile-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/symbol-mono.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/symbol-reversed.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/symbol.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/wordmark-mono.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/wordmark-reversed.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/brand/wordmark.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/campus-detail-2026-10-17.json",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "docs/assets/measurements/core-performance-2026-09-27.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/image-storage-performance-2026-09-27.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/mobile-model-performance.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/model-editor-audit-2026-09-27.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/model-editor-audit-2026-10-03.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/model-editor-performance.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/performance-measurements.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/photo-model-performance.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/measurements/photo-performance-audit-2026-09-27.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/repository-readiness-2026-10-15.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/README.md",
+      "disposition": "superseded",
+      "reason": "Keep complete current tour and preserved capture provenance."
+    },
+    {
+      "path": "docs/assets/screenshots/campus-detail-lasu-2026-10-17.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/campus-detail-unilag-2026-10-17.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/editor-adjustable-panel-mobile-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-map-preview-2026-10-11.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-map-preview-desktop-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-map-preview-mobile-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-reliability-2026-10-13.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-reliability-desktop-2026-10-13.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-reliability-mobile-2026-10-13.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-updates-2026-10-11.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-updates-confirm-desktop-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-updates-confirm-mobile-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-updates-desktop-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/source-updates-mobile-2026-10-11.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-2026-10-15.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-activity-expanded-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-editor-desktop-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-editor-mobile-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-gis-analyze-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-gis-data-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-gis-publish-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-gis-review-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-globe-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-imports-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-legend-collapsed-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-model-desktop-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-model-landscape-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-model-portrait-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-offline-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-photo-desktop-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-photo-mobile-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-public-desktop-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/screenshots/tour-public-mobile-2026-10-15.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/source-reliability-2026-10-13.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/assets/source-updates-rollout-2026-10-11.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "docs/core-performance-2026-09-27.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/image-storage-performance-2026-09-27.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/mobile-model-performance.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/model-editor-audit-2026-09-27.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/model-editor-audit-2026-10-03.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/model-editor-performance.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/performance-measurements.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/photo-model-performance.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "docs/photo-performance-audit-2026-09-27.json",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "scripts/README.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "scripts/arcgis/.gitignore",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/TurnRight.pyt",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/bridge.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/capture_baselines.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/create_project.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/export_portable.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/setup.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/study_workflows.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/arcgis/summarize_evidence.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/check_map_sources.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/cleanup_imports.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/cloud.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/download_overture.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/enrich_campus.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/import_campus.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/import_map.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/arcgis.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/exchange.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/formats.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/network.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/normalise.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/osm.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/map_import/queue.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/overture_enrichment.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/place_enrichment.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/source-check-worker.mjs",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "scripts/source-comparison.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/source-review-maintenance.mjs",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "scripts/source-review-worker.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/source-snapshot-confirmation.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/source-verification.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/source_observations.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/sync-sources.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/check_import_queue_database.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/check_import_retention_database.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/source-check-database-bridge.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_arcgis_exchange.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_arcgis_portable.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_enrichment.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_gis_processing.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_map_import.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_map_import_layers.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_map_import_retention.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/tests/test_source_observations.py",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "scripts/visual-package.mjs",
+      "disposition": "format-only",
+      "reason": "Only quoting, indentation and line wrapping differ; retained main and scheduled uniform formatting separately."
+    },
+    {
+      "path": "supabase/README.md",
+      "disposition": "superseded",
+      "reason": "Keep migrations through 056 and timeout-recovery guidance."
+    },
+    {
+      "path": "supabase/migrations/040_import_artifact_retention.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/041_source_updates.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/042_editor_availability.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/043_source_map_preview.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/044_source_preview_routing.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/045_source_reliability.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/046_source_recovery.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/047_source_provenance.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "supabase/migrations/048_source_check_retries.sql",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/.env.example",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/.gitignore",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/README.md",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/api/admin.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/components/ui/accordion.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/alert-dialog.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/alert.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/aspect-ratio.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/attachment.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/avatar.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/badge.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/breadcrumb.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/bubble.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/button-group.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/calendar.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/card.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/carousel.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/chart.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/checkbox.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/collapsible.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/combobox.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/command.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/context-menu.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/direction.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/drawer.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/empty.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/field.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/hover-card.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/input-group.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/input-otp.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/input.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/item.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/kbd.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/label.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/marker.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/menubar.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/message-scroller.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/message.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/native-select.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/navigation-menu.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/pagination.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/popover.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/progress.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/radio-group.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/resizable.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/scroll-area.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/select.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/separator.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/sheet.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/sidebar.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/skeleton.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/slider.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/spinner.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/switch.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/table.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/tabs.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/textarea.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/components/ui/toast.tsx",
+      "disposition": "already-deleted"
+    },
+    {
+      "path": "web/package-lock.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/package.json",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/playwright.webkit.config.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/apple-touch-icon.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/favicon.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-16.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-192.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-32.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-512.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-maskable-192.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon-maskable-512.png",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/public/icon.svg",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/benchmark-mobile-model.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/benchmark-model-editor.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/benchmark-models.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/brand-assets.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/check-docs.mjs",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/scripts/prepare-campus-detail.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/prepare-screenshots.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/record-screenshots.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/research-editor-workflows.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/review-campus-detail.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/scripts/serve-campus-detail.mjs",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/backend.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/map-imports.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/process-status.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/published-workspace.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/release-validation.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/server/source-updates.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/server/workspace-access.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/Admin.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/App.tsx",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/src/BaselineReview.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/BrandMark.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/BuildingAppearanceEditor.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/CampusWorkspace.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/EditorInspector.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/EditorReview.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/GisPublish.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/LandmarkViewButton.tsx",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/src/LayerGeometry.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/LayerWorkspace.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/MapView.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/PrecisionControls.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/ProcessMonitor.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/SourceFieldReview.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/SourceGroupDetails.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/SourceMapPreview.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/SourceRecovery.tsx",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/src/SourceUpdates.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/VisitorLayerControls.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/WorkspaceFrame.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/WorkspaceNavigation.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/WorkspaceSheetHandle.tsx",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/admin-client.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/building-model.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/building-presets.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/building-style-validation.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/building-surfaces.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/building-visuals.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/campus-model-layer.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/src/campus-scenery.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/editor-features.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/editor-map.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/editor-model.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/editor-precision.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/layer-geometry-engine.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/layer-workspace.css",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/map-import-types.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/model-authoring.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/offline.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/precision-controls.css",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/scenery-renderer.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/source-map-preview.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/source-updates.css",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/source-updates.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/supabase.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/types.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/validation.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/visitor-layers.css",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/visitor-layers.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/visual-types.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/src/workspace-frame.css",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/backend-availability.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/browser/arrival.spec.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/browser/campus-imports.spec.ts",
+      "disposition": "format-only",
+      "reason": "Only quoting, indentation and line wrapping differ; retained main and scheduled uniform formatting separately."
+    },
+    {
+      "path": "web/tests/browser/documentation-capture.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/browser/driving.spec.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/browser/editor-navigation.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/browser/editor.spec.ts",
+      "disposition": "superseded",
+      "reason": "Keep movement/readiness, landmark, benchmark-path and capture fixes; mobile pane/source-review tests already exist in main at different positions."
+    },
+    {
+      "path": "web/tests/browser/enrichment.spec.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/browser/gis-workflow.spec.ts",
+      "disposition": "superseded",
+      "reason": "Keep region visibility and compact-layout readiness waits; screenshot helper differences are equivalent."
+    },
+    {
+      "path": "web/tests/browser/photo-processing.spec.ts",
+      "disposition": "format-only",
+      "reason": "Only quoting, indentation and line wrapping differ; retained main and scheduled uniform formatting separately."
+    },
+    {
+      "path": "web/tests/campus-upgrade.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/editor-availability-database.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/editor-reliability.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/fixtures/source-regeneration-lasu.json.gz",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/fixtures/source-regeneration-lasu.md",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/gis-database.test.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/import-queue-database.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/map-import-recovery.test.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/offline.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/published-workspace.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/release-validation.test.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/source-map-database.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-map-preview.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-map-routing.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-reliability-database.test.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/source-reliability.test.ts",
+      "disposition": "superseded-history"
+    },
+    {
+      "path": "web/tests/source-review-database.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-review-worker.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-updates-inbox.test.ts",
+      "disposition": "already-merged"
+    },
+    {
+      "path": "web/tests/source-updates.test.ts",
+      "disposition": "already-merged"
+    }
+  ]
+}
