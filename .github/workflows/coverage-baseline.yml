@@ -1,0 +1,34 @@
+name: Historical coverage baseline
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  historical-coverage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: Restore the unchanged pre-refactor source
+        run: |
+          git fetch --depth=1 origin 17f758277bda9d4c2e85658aa6858a2d24dc9b24
+          mkdir baseline
+          git archive 17f758277bda9d4c2e85658aa6858a2d24dc9b24 | tar -x -C baseline
+          # Instrument the historical source with the release's locked tools
+          # and complete include patterns. Do not modify historical tests.
+          cp web/package.json web/package-lock.json web/vitest.config.ts baseline/web/
+      - run: npm ci
+        working-directory: baseline/web
+      - run: npm run test:coverage
+        working-directory: baseline/web
+        env:
+          CAMPUS_ID: ci-non-default-campus
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: historical-unit-coverage
+          path: baseline/web/coverage/
+          retention-days: 30
