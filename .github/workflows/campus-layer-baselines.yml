@@ -5,7 +5,7 @@ on:
       mode:
         description: "Preserve existing layer receipts, encrypted GIS application backup, or apply the exact authorized GIS migration bundle"
         type: choice
-        options: [baseline, audit-release, backup, backup-download, migrate]
+        options: [baseline, audit-release, audit-publication, backup, backup-download, migrate]
         default: baseline
       backup_public_key:
         description: "Optional RSA public key for this encrypted backup; retain the private key separately"
@@ -46,6 +46,13 @@ jobs:
         working-directory: web
       - if: inputs.mode == 'audit-release'
         run: node scripts/audit-release-readiness.mjs
+      - if: inputs.mode == 'audit-publication'
+        run: node scripts/audit-publication-state.mjs
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          PUBLISHED_MAP_URL: https://turnright.vercel.app
       - if: inputs.mode == 'backup' || inputs.mode == 'migrate'
         run: node scripts/gis-deployment.mjs
         env:
