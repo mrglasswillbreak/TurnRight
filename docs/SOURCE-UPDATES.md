@@ -6,6 +6,8 @@ The October 17 discovery pass archives eight LASU and 44 UNILAG candidate layers
 
 Use the [toolbox and portable-review procedure](CAMPUS-DETAIL-UPGRADE.md) before Pro access expires. Native geometry checks work on copied datasets and never repair the source automatically. Keep 2008 UNILAG imagery as historical reference. Source acceptance, presentation-only scenery and public release approval are separate decisions. Scenery recipes do not create surveyed trees, entrances, access claims or routing obstacles.
 
+The October 17 live continuation retained one pending metadata proposal per campus. LASU requires reconciliation of a changed OSM snapshot hash. UNILAG’s metadata-only rejection was skipped by the stale-baseline guard: zero completed, one skipped, zero failed. Neither was forced through. [Native per-layer findings](assets/measurements/campus-source-review-2026-10-17.json) and [feature warning measurements](assets/measurements/campus-geometry-warnings-2026-10-17.json) remain separate from the approved presentation plans. Refresh the inbox and compare its current baseline before any later decision.
+
 Open **Review → Source updates** to check connected sources, inspect proposed map changes, and accept or reject a selection. The workflow is **check → review → publish**. Accepting source data changes the private source baseline; it does not publish the public map. Saved editor corrections continue to take precedence.
 
 ## Preview the whole inbox on the map

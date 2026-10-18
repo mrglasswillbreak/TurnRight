@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-17",
+  "state": "unilag-published-lasu-preview-gate-repair",
+  "application": {
+    "deploymentId": "7135198486",
+    "productionReadyAt": "2026-10-17T05:16:09Z",
+    "pullRequest": 26,
+    "commit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+    "url": "https://turnright.vercel.app"
+  },
+  "preparationRevision": "cf8e87aa317459390008e2bffb25c493902c1550",
+  "applyRuns": [
+    38999412838,
+    38999509829
+  ],
+  "failedInitialApply": {
+    "run": 38999070603,
+    "reason": "Metadata package baseline was not advanced; additive-patch transaction rejected version mismatch",
+    "sourceChangesCommitted": 0,
+    "rollbackCopyVerified": true
+  },
+  "campuses": [
+    {
+      "campusId": "lasu",
+      "slug": "lasu",
+      "publishedBaseline": "lasu-6796771f6052",
+      "sourceBaselineBefore": "lasu-2b70a39ca041",
+      "workspaceBefore": "7a7c36bbedf7290a1bb18338f156e195675aa60a8904088f5e4e80c0e4d727a9",
+      "workspaceAfter": "e32ff03a298067ab62beb863387988d2b84c2e5ad738149b6a62176627bc5760",
+      "planHash": "421416511a6cc13147a6aa33eaab05db2b5a5fbf34368354d75552275a61f0ab",
+      "presentationChanges": 481,
+      "sourcePatches": 482,
+      "held": 5,
+      "correctionsPreserved": 158,
+      "geometryUnchanged": true,
+      "routingUnchanged": true,
+      "regions": 8,
+      "review": {
+        "id": "748818c4-7634-4955-ada2-3674b0b9f66b",
+        "status": "approved",
+        "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
+      },
+      "reconciliationId": "b9d52e5d-667b-439e-ab70-97e3289e4037",
+      "draftRecheck": {
+        "checkedAt": "2026-10-17T13:32:55.533993Z",
+        "method": "Authenticated Review > Inspect immutable submission",
+        "matchesCurrentDraft": true,
+        "sources": 6047,
+        "corrections": 158,
+        "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
+      },
+      "release": {
+        "status": "awaiting tested navigation helper and fresh preview",
+        "retainedOtherCampus": "unilag-4667e8f529d6"
+      },
+      "failedPreviews": [
+        {
+          "requestedAt": "2026-10-17T13:31:58Z",
+          "previewRun": 39036949833,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "status": "failed before package build",
+          "retainedOtherCampus": "unilag-4667e8f529d6",
+          "gateFailure": {
+            "job": 117408609728,
+            "test": "model workspace touch layouts: landscape side panel and portrait input survive rotation and keyboard resize",
+            "artifact": 12103270767,
+            "artifactSha256": "656235d21a3188cae4053d744b6b87b18bc1d4fe6dbbc19f6449821753d7cf0d",
+            "diagnosis": "Correct model-landscape snapshots and bounds at 667x375, 844x390 and 1024x768. Browser observations ceased during resize to 1280x591; the subsequent class assertion returned no observation. No captured console error; root cause not established.",
+            "diagnosticRun": 39038609269,
+            "diagnosticStatus": "Targeted rotation case passed unchanged on Chromium and WebKit (30.7s on WebKit); quality/offline passed. The separate WebKit photo run failed with Target crashed in automatic compression/failed-original preservation; 14 other photo cases passed.",
+            "testOrGuardChanges": false,
+            "diagnosticPhotoArtifact": 12103077178,
+            "diagnosticPhotoArtifactSha256": "e9b5c17ec7359327bf18327b943014ac6b2e9f628fd27b69d37a591eb9f45aa4"
+          },
+          "id": "88df856c-6843-4192-80ff-3d3fd80f9e32",
+          "failureRecordedAt": "2026-10-17T14:02:28Z"
+        },
+        {
+          "previewRun": 39039475212,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "requestedAt": "2026-10-17T14:08:26Z",
+          "status": "failed before package build",
+          "retainedOtherCampus": "unilag-4667e8f529d6",
+          "id": "264658b2-9798-4089-92f1-8b5816f95d2d",
+          "failureRecordedAt": "2026-10-17T14:29:29Z",
+          "gateFailure": {
+            "job": 117415843558,
+            "test": "building references desktop: review, apply, undo and reload without moving the map",
+            "artifact": 12103803137,
+            "artifactSha256": "d838e0f5ffdd4ce22aba8903395b59e7eb8c17c56c22512749294ae03a5aa4e2",
+            "diagnosis": "Initial source list/overview/history responses completed during the enrichment-summary pointer action. The inbox height changed and the enrichment details remained closed, making Building appearances invisible. The test navigation helper now waits for the existing Pending source updates aria-busy=false state before subsequent interactions.",
+            "assertionsRemoved": false,
+            "applicationChanges": false,
+            "otherGateResults": "All remaining browser shards, quality, offline and three GIS jobs passed."
+          }
+        }
+      ]
+    },
+    {
+      "campusId": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "slug": "unilag",
+      "publishedBaseline": "unilag-bd659bbd6df2",
+      "sourceBaselineBefore": "unilag-a3779f9c3603",
+      "workspaceBefore": "acafd4e0345de1c32008c1ee334a0379ebd40042fcceab7420f7a41f6a801de9",
+      "workspaceAfter": "36df445633c2c4f117e02e0cdacee8b0d8948b2764a8d0df620efb4bacaa3be7",
+      "planHash": "82f69d76b7454277e0ab08945cd343895d2adf8526851adb9860704665efdd45",
+      "presentationChanges": 669,
+      "sourcePatches": 670,
+      "held": 29,
+      "correctionsPreserved": 201,
+      "geometryUnchanged": true,
+      "routingUnchanged": true,
+      "regions": 2429,
+      "review": {
+        "id": "cabb3184-e1de-47ca-82aa-394ef6fd8f73",
+        "status": "approved",
+        "contentHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb"
+      },
+      "reconciliationId": "210b7fcc-934b-4ed9-bd1f-c92199a8d2fe",
+      "initialPreview": {
+        "id": "fbc8a26a-49f3-4139-84ff-e75c222eccf0",
+        "version": "unilag-e066fb9863bc",
+        "previewRun": 38999895100,
+        "status": "preview",
+        "previewUrl": "https://turnright-co8t2f30z-muhammed-abdulhadi-s-projects.vercel.app",
+        "previewReadyAt": "2026-10-17T04:19:59Z",
+        "verificationRun": 39002274618,
+        "verificationStatus": "passed",
+        "disposition": "Superseded by verified-renderer preview 6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1; never published",
+        "verifiedAssets": 218,
+        "rollbackVersion": "unilag-bd659bbd6df2",
+        "verificationCredentialRevoked": true
+      },
+      "failedPreviews": [
+        {
+          "previewRun": 39005599892,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "status": "failed before package build",
+          "requestedAt": "2026-10-17T05:15:34Z",
+          "gateFailure": {
+            "job": 117317315711,
+            "test": "photo comparison edits and restores local recipes at 390px in dark mode",
+            "assertion": "Download edited image remained disabled after 30 seconds",
+            "artifact": 12090663967,
+            "artifactSha256": "1f7aa26a07b967b95b942a02fde968b411989377ca8e0c8a33436222103daa6d",
+            "diagnosticRun": 39006423579,
+            "diagnosticRevision": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+            "changeToTests": false,
+            "applicationOrNetworkErrorCaptured": false,
+            "diagnosticStatus": "passed unchanged; root cause not established"
+          },
+          "id": "eec360da-e2eb-4a20-9a36-f06b2dd4debd",
+          "failureRecordedAt": "2026-10-17T05:40:47Z"
+        }
+      ],
+      "release": {
+        "previewRun": 39007270314,
+        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+        "status": "published",
+        "requestedAt": "2026-10-17T05:42:53Z",
+        "id": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+        "version": "unilag-4667e8f529d6",
+        "previewUrl": "https://turnright-cz3x48iqi-muhammed-abdulhadi-s-projects.vercel.app",
+        "previewReadyAt": "2026-10-17T06:07:50Z",
+        "verificationRun": 39008825568,
+        "verificationStatus": "passed",
+        "manualChecks": {
+          "navigation": "130 m library-to-Senate preview, route and destination remain with all optional layers hidden; GPS not requested",
+          "preferences": "All five hidden choices survive reload; LASU defaults remain independently visible",
+          "browser": "Chromium in-app browser",
+          "checkedAt": "2026-10-17T06:13:27.717831Z",
+          "landmark3D": "Senate Building: 2D to framed 3D",
+          "photoEvidence": "Historical date and source checked date shown",
+          "landmarkFilter": 3,
+          "layerControls": "All five toggled successfully"
+        },
+        "verifiedAssets": 218,
+        "verifiedVisualCombinations": 32,
+        "verifiedOfflineJourneys": 4,
+        "rollbackVersion": "unilag-bd659bbd6df2",
+        "verificationCredentialRevoked": true,
+        "protectedDataFingerprints": "All nine unchanged for both campuses",
+        "verificationArtifact": 12092730041,
+        "verificationArtifactSha256": "e2e1e3af57b4ec167fa96cfca67e26e6bfd7824e54f3aa54042208fac9580bf3",
+        "publicationRun": 39009448556,
+        "publicationRequestedAt": "2026-10-17T06:18:56Z",
+        "publicationStatus": "passed on attempt 3; production and domain assignment verified",
+        "publicationFailures": [
+          {
+            "failure": "Add locator reached performing click action, then the test exceeded 120 seconds",
+            "published": false,
+            "capturedConsoleErrors": 0,
+            "artifact": 12092418439,
+            "run": 39009448556,
+            "attempt": 1,
+            "artifactSha256": "a0cc7d22b90fdc25f8bc467f7e2941283b7800ffad423f2be8c41db92772848b",
+            "diagnosis": "Root cause unproven; complete unchanged WebKit shard rerun requested",
+            "job": 117328604993,
+            "test": "compact plan and photograph tools: all modes preserve the canvas at 1024x390"
+          },
+          {
+            "job": 117367208766,
+            "capturedConsoleErrors": 0,
+            "diagnosis": "CI trace retained model-landscape at 667x375; after setting 844x390, no new DOM snapshot or screencast arrived. Cause unproven; focused unchanged CI diagnostic requested.",
+            "artifactSha256": "f8cd8fadd752e9ae82cd4ef2b593768f84c20247736b0cf0e12ae8afc0f8b589",
+            "failure": "No class assertion response after resizing from 667x375 to 844x390; last DOM snapshots retained model-landscape",
+            "published": false,
+            "attempt": 2,
+            "run": 39009448556,
+            "test": "model workspace touch layouts: landscape side panel and portrait input survive rotation and keyboard resize",
+            "artifact": 12097402078,
+            "diagnosticRun": 39023937188,
+            "diagnosticStatus": "Complete focused diagnostic passed unchanged, including both affected cases, extra photo tests, quality and offline; root cause remains unproven"
+          }
+        ],
+        "localRotationDiagnostic": {
+          "status": "Stopped after broader setup/viewport timeouts; not a clean CI reproduction",
+          "environment": "Windows WebKit, development worktree with shared node_modules",
+          "testChanges": false,
+          "processesStopped": true,
+          "output": "web/work/rotation-diagnostic",
+          "limitation": "Vite denied the symlinked font URL; local software rendering and test initialization exceeded the existing 120-second bound"
+        },
+        "productionVerifiedAt": "2026-10-17T10:31:02Z",
+        "publicReadbackAt": "2026-10-17T13:28:34Z",
+        "publicUrl": "https://turnright.vercel.app/?campus=unilag",
+        "otherCampusManifestUnchanged": true,
+        "installedBrowserCheck": {
+          "landmark3D": true,
+          "allModelsVerified": true,
+          "action": "Offline > Download update",
+          "previousVersion": "unilag-bd659bbd6df2",
+          "photos": 16,
+          "screenshots": "screenshots/live-publication-2026-10-17.json",
+          "readyOffline": true,
+          "currentVersion": "unilag-4667e8f529d6",
+          "checkedAt": "2026-10-17T13:38:11.0628457Z",
+          "publicLayerRouteCheck": {
+            "checkedAt": "2026-10-17T14:15:34.624Z",
+            "version": "unilag-4667e8f529d6",
+            "origin": "Teslim Olawale Elias Library",
+            "destination": "Senate Building",
+            "routeMetres": 130,
+            "routeMinutes": 2,
+            "allOptionalLayersHidden": true,
+            "routeAndArrivalMarkerRetained": true,
+            "allFivePreferencesSurviveReload": true,
+            "allLayersRestored": true,
+            "gpsStarted": false,
+            "capture": "screenshots/live-unilag-route-layers-2026-10-17.jpg",
+            "limitation": "Some local browser-control commands reported dispatch deadlines; fresh accessibility state confirmed their completed changes. No interaction-latency or physical-device claim."
+          }
+        }
+      },
+      "draftRecheck": {
+        "checkedAt": "2026-10-17T05:50:44.5907536Z",
+        "method": "Authenticated Review > Inspect immutable submission",
+        "matchesCurrentDraft": true,
+        "sources": 10574,
+        "corrections": 201,
+        "contentHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb"
+      }
+    }
+  ],
+  "newArcgisCandidatesPublished": false,
+  "physicalPhoneVerification": false,
+  "approvalRequired": "Independent reviewer or explicit original-owner override for each exact immutable hash",
+  "productionBrowserAuditRun": 38999072900,
+  "ownerAuthorization": "Explicit user authorization for both exact hashes and the recorded original-owner exception; preview verification and separate publication authorized.",
+  "productionBrowserAudit": {
+    "packages": "October 15 packages with October 17 application",
+    "offlineJourneys": 4,
+    "result": "passed",
+    "assets": 175,
+    "visualCombinations": 32
+  },
+  "approvalReason": "Owner authorizes the October 17 presentation updates without a separate reviewer; geometry, routing and corrections are preserved, new ArcGIS discoveries remain held, and physical-device/field verification remains outstanding.",
+  "nativeGeometryReview": "measurements/campus-geometry-warnings-2026-10-17.json",
+  "preparationFix": {
+    "pullRequest": 25,
+    "commit": "74702e17acf96e0f64edf3c532c3ef12ee454fd2",
+    "auditRun": 38999307136,
+    "attempts": 2,
+    "result": "passed",
+    "initialFailure": "WebKit rotation layout assertion; complete unchanged shard passed on rerun",
+    "deploymentUrl": "https://vercel.com/muhammed-abdulhadi-s-projects/turnright/Esojj1U7R1KcTML2Hot2F5qWURzz",
+    "deploymentStatus": "success"
+  },
+  "rendererFix": {
+    "pullRequest": 26,
+    "commit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+    "reason": "Visitor filtering regenerated unchanged scenery; key scenery lifetime to authoritative data",
+    "localGenerationMs": [
+      985,
+      864
+    ],
+    "localGenerationScope": "UNILAG candidate, 2429 regions, 1500 instances, Node 22 on development machine; not an FPS measurement",
+    "localLifecycleTests": "passed",
+    "localLayerControls": "All five controls changed without automation timeout after fix",
+    "status": "deployed",
+    "commits": [
+      "07c72701965303d1135b724a9df0bfe78e8061c1",
+      "554e32e5efd735a4463b25328b1945576ac2bcff"
+    ],
+    "pointLandmarks": "Mapped points use View area in 3D; linked buildings keep bounds/model evidence; no source association inferred",
+    "auditRun": 39004159633,
+    "pointLandmarkBrowserCheck": "LASU Senate mapped-point action changed 2D to a framed 3D area; approved place/building relationships unchanged",
+    "quality": {
+      "unitPassed": 824,
+      "unitSkipped": 1,
+      "files": 114,
+      "lazy3DKiBGzip": 264.2,
+      "publicStartupGzipBytes": 428785,
+      "additionalOwnerGzipBytes": 186064,
+      "webkitPassed": 102,
+      "webkitSkipped": 1,
+      "additionalWebkitPhotoPassed": 15,
+      "offline": "passed",
+      "nativeImportAndDatabase": "passed",
+      "chromiumPassed": 202,
+      "chromiumSkipped": 14
+    },
+    "testedHead": "554e32e5efd735a4463b25328b1945576ac2bcff",
+    "productionDeploymentId": "7135198486",
+    "productionReadyAt": "2026-10-17T05:16:09Z",
+    "deploymentUrl": "https://turnright-ps4tainbn-muhammed-abdulhadi-s-projects.vercel.app"
+  },
+  "nativeBatchAppearance": "measurements/pro-batch-appearance-2026-10-17.json",
+  "localIdTutorial": "measurements/id-browser-study-2026-10-17.json",
+  "projectReferenceAudit": "measurements/pro-project-portability-2026-10-17.json",
+  "portableResearchIndex": "measurements/portable-research-index-2026-10-17.json",
+  "initialApplication": {
+    "commit": "3b059ab74c7a36a35daba0cee6f403bd1abfc4a5",
+    "deploymentId": "7134218330",
+    "productionReadyAt": "2026-10-17T03:30:06Z",
+    "url": "https://turnright.vercel.app",
+    "pullRequest": 24
+  }
+}

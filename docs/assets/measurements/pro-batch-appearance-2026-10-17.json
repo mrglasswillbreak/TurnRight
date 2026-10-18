@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-17T04:41:27.450861+00:00",
+  "syntheticOnly": true,
+  "proVersion": "3.7",
+  "licence": "ArcInfo",
+  "task": "batch-appearance-api",
+  "status": "passed",
+  "features": 3,
+  "selectedFeatures": 2,
+  "originalUnchanged": true,
+  "geometryUnchanged": true,
+  "savedRenderer": "UniqueValueRenderer",
+  "reopenedColoursRGBA": {
+    "original": [
+      206,
+      213,
+      209,
+      100
+    ],
+    "terracotta": [
+      227,
+      213,
+      188,
+      100
+    ]
+  },
+  "source": "https://doc.esri.com/en/arcgis-pro/latest/arcpy/mapping/uniquevaluerenderer-class.html",
+  "limitations": [
+    "API styling on synthetic copies, not a campus import.",
+    "Desktop preview, cancellation and undo remain unobserved."
+  ],
+  "exports": [
+    {
+      "file": "appearance-preview.geojson",
+      "bytes": 1127,
+      "sha256": "009e98e3b19fdaa51c361a0978d406f26bffbc2ae63f6374c2586db54ecca5b6"
+    },
+    {
+      "file": "appearance-preview.lyrx",
+      "bytes": 18178,
+      "sha256": "f83aa626a602cbbd64894148161a7c2a31cd6ecdae2f6a98f37a56ee9ca4528a"
+    },
+    {
+      "file": "original.geojson",
+      "bytes": 1123,
+      "sha256": "6c3b1cd20e757cb6251d5045795f7b83024696b03a7d74d7ee3f11068d465032"
+    },
+    {
+      "file": "palettes.json",
+      "bytes": 177,
+      "sha256": "56d3c6f6abbf0638b5e7588ada7a4c0878792ed2d0d0ff68d01e82ed85a383c7"
+    }
+  ],
+  "portableValidation": {
+    "runtime": "Standard Python, no ArcPy imported",
+    "filesHashVerified": 4,
+    "geojsonFeatures": 3,
+    "changedPaletteIDs": [
+      "fixture-1",
+      "fixture-2"
+    ],
+    "geometryUnchanged": true,
+    "result": "passed"
+  }
+}

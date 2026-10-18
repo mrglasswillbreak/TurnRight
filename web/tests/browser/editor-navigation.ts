@@ -52,5 +52,12 @@ export async function openEditorSection(
       });
     await expect(button).toBeVisible();
     await button.click();
+    if (name === 'Sources') {
+      // Initial source results change the inbox height. Wait for its public
+      // ready signal before clicking enrichment controls below the results.
+      await expect(
+        page.getByLabel('Pending source updates', { exact: true }),
+      ).toHaveAttribute('aria-busy', 'false');
+    }
   }
 }

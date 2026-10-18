@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "date": "2026-10-17",
-  "state": "local-candidates-not-published",
+  "state": "initial-local-candidate-study",
   "portableArchiveLocation": "Documents/ArcGIS/Projects/TurnRightDetail/PortableEvidence/2026-10-17",
   "portableCopyFilesVerified": 123,
   "unitTests": 810,
@@ -20,7 +20,11 @@
   "syntheticGlbSha256": "dbeee56309b93e668a6ac4e197a31d596921bce5ed3460293a5885e89515d784",
   "syntheticGlbTurnRightImport": {
     "passed": true,
-    "dimensionsMetres": [12, 8, 8],
+    "dimensionsMetres": [
+      12,
+      8,
+      8
+    ],
     "faces": 16,
     "materials": 2,
     "missingAssets": [],
@@ -39,7 +43,10 @@
   "finalChromiumJourneys": {
     "passed": 2,
     "timeoutMs": 120000,
-    "journeys": ["Sensor orientation and reload", "Desktop palette preview, cancel, apply and undo/redo"]
+    "journeys": [
+      "Sensor orientation and reload",
+      "Desktop palette preview, cancel, apply and undo/redo"
+    ]
   },
   "broadBrowserRuns": {
     "chromium": {
@@ -112,5 +119,7 @@
     "Private release-package offline and active-route review",
     "Physical Android and iPhone performance",
     "Independent approval and publication per campus"
-  ]
+  ],
+  "scope": "Historical local study before integration with current production. Later CI, private application, owner approval and release status are recorded separately.",
+  "continuationReceipt": "../campus-detail-release-2026-10-17.json"
 }

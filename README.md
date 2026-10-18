@@ -19,7 +19,9 @@ TurnRight combines a public campus map and globe with a private GIS editor. Visi
 
 The LASU Ojo and UNILAG Akoka upgrade adds precision drawing, previewed geometry refinement, reusable building palettes, illustrative greenery, per-campus visitor layers and landmark exploration. It retains the MapLibre/Three.js renderer, authored buildings, routing, source attribution and existing editor corrections. Recorded, estimated and illustrative dimensions remain distinct.
 
-The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, local previews and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. ArcGIS Pro is an optional research workstation; published navigation and portable evidence do not require its licence. The remaining Pro window is prioritized for native analysis and durable exports.
+The [campus detail guide](docs/CAMPUS-DETAIL-UPGRADE.md) describes the implementation, source review and release evidence. The [ArcGIS Python toolbox](scripts/arcgis/TurnRight.pyt) discovers sources, inspects coverage, compares candidates and exports versioned review bundles. It keeps portal authentication local and sends imports through the existing private review workflow.
+
+The October 17 Pro review checked 52 copied vector layers and preserved GeoJSON, GeoPackage, provenance, geometry findings and synthetic GLB examples outside the repository's temporary output. The dedicated LASU/UNILAG project has four maps/scenes and no broken references. [Archive index and remaining Pro priorities](docs/CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) explain what is saved and what still needs evidence during the 21-day access window. Published navigation and portable exports continue to work after Pro access ends. [REA and local iD studies](docs/CAMPUS-DETAIL-UPGRADE.md#rea-studies-and-interaction-specification) inform the editor; native API exercises and browser observations are recorded separately from complete desktop workflow acceptance.
 
 | LASU detail candidate | UNILAG detail candidate |
 | --- | --- |
@@ -44,7 +46,7 @@ Start with the campus map or open **Choose a campus** to explore the globe. Sele
 
 Preview walking or driving routes from a selected origin. Foreground GPS, route instructions, spoken guidance, and deviation handling support a journey over the mapped network. Driving includes mapped vehicle restrictions, parking, and a walking handoff where available.
 
-Download each campus from **Offline** and wait for **Ready offline** before disconnecting. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
+Download each campus from **Offline** and wait for **Ready offline** before disconnecting. For an existing download, choose **Download update** after a campus release. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
 | Place details on a phone                                                                                                                              | Offline preparation                                                                                                                 |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -158,7 +160,7 @@ npm run test:survey-pwa
 
 Install Playwright browsers first with `npx playwright install chromium webkit`. CI also checks native PostGIS, importer isolation, backup restoration, photo workflows, offline behavior, and map/globe/voice/JavaScript budgets. The configured-build command uses test authentication placeholders; its output must not be deployed.
 
-Physical Android/iPhone checks, campus field verification, live role acceptance, and a public rollback rehearsal remain explicit release gates. [Acceptance checklist](docs/ACCEPTANCE.md) · [Readiness and deployment evidence](docs/PRODUCTION.md) · [Performance bounds](docs/PERFORMANCE.md).
+Physical Android/iPhone checks, campus field verification, live role acceptance, and a public rollback rehearsal remain outstanding acceptance checks. Exact-snapshot approvals and any explicitly authorized owner exception are recorded in the release evidence. [Acceptance checklist](docs/ACCEPTANCE.md) · [Readiness and deployment evidence](docs/PRODUCTION.md) · [Performance bounds](docs/PERFORMANCE.md).
 
 ## Contributing, security, and rights
 

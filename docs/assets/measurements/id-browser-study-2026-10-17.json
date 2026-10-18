@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-17T05:07:01.3342848Z",
+  "target": "OpenStreetMap iD local tutorial",
+  "revision": "32c05ed6f78c83c7f551f27bfc8bb13076613ebf",
+  "browser": "Codex in-app Chromium",
+  "authenticationUsed": false,
+  "osmUpload": false,
+  "mode": "Tutorial fixture",
+  "completed": [
+    "Draw and close a four-vertex area",
+    "Apply House preset",
+    "Select footprint edge and apply Square"
+  ],
+  "observedResult": "Tutorial confirms that the building corners moved into place",
+  "usefulInteraction": "Draw, classify, then refine the selected footprint; keep operation labels accessible and do not assign measured dimensions from imagery",
+  "limitations": [
+    "Pointer tracing was approximate and does not verify numeric precision",
+    "Snap, shared-boundary trace, roof/facade and batch appearance interactions are not covered by this exercise",
+    "The local build omitted some icon sprites; the Square button was identified from its DOM class and tutorial text",
+    "One input timeout was reconciled against visible state before continuing"
+  ],
+  "evidence": [
+    {
+      "file": "square-result.jpg",
+      "bytes": 58069,
+      "sha256": "19f077fc4e0b41331092cfab3f5cb1be1dba8fb20d09cfab821462d8e7754dcb"
+    },
+    {
+      "file": "square-result.txt",
+      "bytes": 3983,
+      "sha256": "631fc499254e4f10654032f8befa07d737f717896d66c049177046b736b1eda2"
+    }
+  ]
+}

@@ -4,6 +4,8 @@
 
 Modes follow **Outline → Appearance → Roof → Details → Mesh → Review**. Orbit, Edit surface, Photo and Reference split are view controls; switching a view retains the editing mode and selected part. Desktop uses a resizable structure tree, canvas and inspector. The options menu can hide properties, focus the canvas or reset layout. Portrait uses a focused bottom sheet; short landscape screens use side sheets. Return to the map preserves its selection and camera.
 
+For precise new footprints, use the map's **Precision drawing** controls before opening the model workspace: reference snapping, numeric length/bearing, rectangles, constraints and tracing are described in [Editor](EDITOR.md). Standard roof forms offer long/across-axis orientation in the roof controls. To apply a reusable palette across generated buildings, use **Layers → Features → Preview appearance**, inspect the live result and choose Apply or Cancel; it preserves authored meshes and custom surface details. [Model authoring](MODEL-AUTHORING.md) explains the batch limits, evidence labels and undo behavior.
+
 ![Building and photograph in the reference split](assets/screenshots/tour-model-desktop-2026-10-15.png)
 
 | Portrait canvas | Landscape workspace |

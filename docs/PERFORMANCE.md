@@ -4,6 +4,8 @@
 
 The upgrade shares instanced tree/shrub geometry and materials inside the existing Three.js context. It keeps sector loading, reduces decoration at lower zoom and during slow rendering, and fades distant decoration. Geometry revisions invalidate stale region placement. Scenery is presentation data and does not participate in routing obstacles.
 
+Preview review exposed repeated scenery generation when a visitor changed an optional layer. Scenery now follows the authoritative campus snapshot independently of the filtered display data: selection and visibility changes reuse its instances; a new authoritative snapshot replaces and disposes them. Regression tests exercise both lifetimes. On this development machine, generating the UNILAG candidate's 1,500 instances from 2,429 reviewed regions took 985 ms initially and 864 ms on a second invocation in Node 22. These timings explain the avoided interaction work; they do not measure browser frame rate. [Release evidence](assets/campus-detail-release-2026-10-17.json).
+
 The October 17 local candidate build measured 264.2 KiB gzip for lazy 3D, below the unchanged 300 KiB limit. LASU and UNILAG candidate visuals measured 10,844,005 and 2,174,608 bytes respectively, below 12 MiB each. Those are candidate measurements; the actual release builder must repeat the checks after rebasing on current private content. Physical-phone 30 fps is still unverified. [Measurements and test scope](CAMPUS-DETAIL-UPGRADE.md#verification-and-release-gates).
 
 ## Campus GIS scope · 5 October 2026

@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-17T06:17:27.374Z",
+  "baseline": "work/public-integrity-before-detail.json",
+  "candidate": "work/unilag-final-preview-verification/campus-detail-verification/report.json",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "beforeVersion": "lasu-6796771f6052",
+      "afterVersion": "lasu-6796771f6052",
+      "checks": {
+        "geometry": true,
+        "boundary": true,
+        "graph": true,
+        "entrances": true,
+        "photos": true,
+        "closures": true,
+        "driving": true,
+        "accessPolicy": true,
+        "places": true
+      },
+      "otherCampusUnchanged": true
+    },
+    {
+      "slug": "unilag",
+      "beforeVersion": "unilag-bd659bbd6df2",
+      "afterVersion": "unilag-4667e8f529d6",
+      "checks": {
+        "geometry": true,
+        "boundary": true,
+        "graph": true,
+        "entrances": true,
+        "photos": true,
+        "closures": true,
+        "driving": true,
+        "accessPolicy": true,
+        "places": true
+      }
+    }
+  ]
+}
