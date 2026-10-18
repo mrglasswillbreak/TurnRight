@@ -33,16 +33,18 @@ are recorded separately from the new implementation commits.
 ## Coverage baseline
 
 A pristine archive of the baseline revision was tested with Node 22.23.3,
-Vitest/V8 5.0.0 and the new explicit first-party include patterns, before component
-refactoring. All 117 test files passed: 856 tests passed and one optional test
+Vitest/V8 5.0.0 and explicit first-party include patterns, before component
+refactoring. A Linux remeasurement added the initially omitted `lib/` and `hooks/`
+roots without modifying historical source or tests. All 117 test files passed:
+856 tests passed and one optional test
 requiring an ignored private source export was skipped, as on clean CI clones.
 Application, component, server and API files are counted even when unimported.
 
 | Metric | Baseline | Enforced whole-project floor |
 | --- | ---: | ---: |
-| Statements | 38.19% | 38% |
-| Lines | 38.23% | 38% |
-| Functions | 32.59% | 32% |
+| Statements | 38.18% | 38% |
+| Lines | 38.21% | 38% |
+| Functions | 32.58% | 32% |
 | Branches | 35.82% | 35% |
 
 [Machine-readable baseline](assets/coverage-baseline-2026-10-18.json) records the
