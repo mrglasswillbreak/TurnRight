@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import sharp from '../../web/node_modules/sharp/lib/index.js';
+import { createRequire } from 'node:module';
+import type sharpType from '../../web/node_modules/sharp/lib/index.js';
 import {
   newModelDocument,
   type ModelAssetReference,
 } from '../../web/src/model-document.ts';
 import { primitive } from '../../web/src/model-primitives.ts';
+
+const sharp: typeof sharpType = createRequire(
+  new URL('../../web/package.json', import.meta.url),
+)('sharp');
 
 export type LocalApi = <T = Record<string, unknown>>(
   role: string,
