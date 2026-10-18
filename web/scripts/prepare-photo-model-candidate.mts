@@ -16,7 +16,10 @@ for (const p of proposals)
     const f = data.map.features.find((f) => f.properties?.id === p.edit.id);
     f.properties = { ...p.edit.properties, id: p.edit.id };
   }
-await fs.writeFile(process.argv[3] || 'work/photo-model/candidate.json', JSON.stringify(data));
+await fs.writeFile(
+  process.argv[3] || 'work/photo-model/candidate.json',
+  JSON.stringify(data),
+);
 await fs.writeFile(
   '../data/photo-models/proposals.json',
   JSON.stringify(

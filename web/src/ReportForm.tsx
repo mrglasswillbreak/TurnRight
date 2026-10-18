@@ -23,10 +23,14 @@ export function ReportForm({
     [website, setWebsite] = useState('');
   const draftKey = `report:${place?.id || coordinates?.join(',') || 'general'}`;
   useEffect(() => {
-    getPreference(draftKey, {
-      description: '',
-      category: 'incorrect-place',
-    }, campus).then((d) => {
+    getPreference(
+      draftKey,
+      {
+        description: '',
+        category: 'incorrect-place',
+      },
+      campus,
+    ).then((d) => {
       setDescription(d.description);
       setCategory(d.category);
     });

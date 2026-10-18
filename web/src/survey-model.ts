@@ -1,4 +1,8 @@
-import { insideCampusMappingArea, lasuCampus, type MappingArea } from './campus-context';
+import {
+  insideCampusMappingArea,
+  lasuCampus,
+  type MappingArea,
+} from './campus-context';
 import { distance, projectSegment } from './geo';
 import type {
   CampusData,

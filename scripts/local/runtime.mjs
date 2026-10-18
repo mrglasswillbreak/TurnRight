@@ -6,39 +6,86 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtime = path.join(root, '.local-runtime');
 export const origin = 'http://127.0.0.1:5180';
-export const supabaseCli = path.join(root, 'node_modules/supabase/dist/supabase.js');
+export const supabaseCli = path.join(
+  root,
+  'node_modules/supabase/dist/supabase.js',
+);
 
 export function requireLocalUrl(value, name = 'Service URL') {
   const url = new URL(value);
-  if (url.hostname !== '127.0.0.1' || !['http:', 'postgresql:'].includes(url.protocol))
+  if (
+    url.hostname !== '127.0.0.1' ||
+    !['http:', 'postgresql:'].includes(url.protocol)
+  )
     throw Error(`${name} must use the isolated loopback environment.`);
   return url;
 }
 
 export function requireDevelopmentHost() {
-  if (process.env.VERCEL || process.env.CI_PRODUCTION || process.env.NODE_ENV === 'production')
-    throw Error('Local development commands cannot run in a production environment.');
+  if (
+    process.env.VERCEL ||
+    process.env.CI_PRODUCTION ||
+    process.env.NODE_ENV === 'production'
+  )
+    throw Error(
+      'Local development commands cannot run in a production environment.',
+    );
 }
 
-export async function command(binary, args, { capture = false, env = process.env, input, timeout = 20 * 60_000 } = {}) {
-  if (binary === supabaseCli) { args = [supabaseCli, ...args]; binary = process.execPath; }
+export async function command(
+  binary,
+  args,
+  { capture = false, env = process.env, input, timeout = 20 * 60_000 } = {},
+) {
+  if (binary === supabaseCli) {
+    args = [supabaseCli, ...args];
+    binary = process.execPath;
+  }
   return new Promise((resolve, reject) => {
-    const child = spawn(binary, args, { cwd: root, env, windowsHide: true, timeout, stdio: ['pipe', capture ? 'pipe' : 'inherit', capture ? 'pipe' : 'inherit'] });
-    let stdout = '', stderr = '';
-    child.stdout?.on('data', value => { stdout += value; });
-    child.stderr?.on('data', value => { stderr = (stderr + value).slice(-8000); });
+    const child = spawn(binary, args, {
+      cwd: root,
+      env,
+      windowsHide: true,
+      timeout,
+      stdio: [
+        'pipe',
+        capture ? 'pipe' : 'inherit',
+        capture ? 'pipe' : 'inherit',
+      ],
+    });
+    let stdout = '',
+      stderr = '';
+    child.stdout?.on('data', (value) => {
+      stdout += value;
+    });
+    child.stderr?.on('data', (value) => {
+      stderr = (stderr + value).slice(-8000);
+    });
     child.on('error', reject);
-    child.on('close', code => code === 0 ? resolve(stdout) : reject(Error(`${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`)));
+    child.on('close', (code) =>
+      code === 0
+        ? resolve(stdout)
+        : reject(
+            Error(
+              `${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`,
+            ),
+          ),
+    );
     child.stdin.end(input);
   });
 }
 
 export async function readConfig() {
   requireDevelopmentHost();
-  const config = JSON.parse(await readFile(path.join(runtime, 'services.json'), 'utf8'));
+  const config = JSON.parse(
+    await readFile(path.join(runtime, 'services.json'), 'utf8'),
+  );
   requireLocalUrl(config.API_URL, 'Supabase URL');
   requireLocalUrl(config.DB_URL, 'Database URL');
-  if (!config.SERVICE_ROLE_KEY || !config.ANON_KEY) throw Error('Local Supabase credentials are missing. Run npm run local:up.');
+  if (!config.SERVICE_ROLE_KEY || !config.ANON_KEY)
+    throw Error(
+      'Local Supabase credentials are missing. Run npm run local:up.',
+    );
   return config;
 }
 
@@ -47,7 +94,12 @@ export function localEnvironment(config) {
   requireLocalUrl(config.API_URL);
   const env = { ...process.env };
   for (const key of Object.keys(env))
-    if (/^(VITE_|SUPABASE_|VERCEL_|GITHUB_|PUBLISHED_MAP_URL$|ADMIN_USER_ID$|CAMPUS_ID$|SOURCE_|OVERPASS_|TURNRIGHT_LOCAL|GIS_)/.test(key)) delete env[key];
+    if (
+      /^(VITE_|SUPABASE_|VERCEL_|GITHUB_|PUBLISHED_MAP_URL$|ADMIN_USER_ID$|CAMPUS_ID$|SOURCE_|OVERPASS_|TURNRIGHT_LOCAL|GIS_)/.test(
+        key,
+      )
+    )
+      delete env[key];
   return {
     ...env,
     NODE_ENV: 'development',
@@ -68,5 +120,9 @@ export function localEnvironment(config) {
 
 export async function savePrivate(name, value) {
   await mkdir(runtime, { recursive: true, mode: 0o700 });
-  await writeFile(path.join(runtime, name), JSON.stringify(value, null, 2) + '\n', { mode: 0o600 });
+  await writeFile(
+    path.join(runtime, name),
+    JSON.stringify(value, null, 2) + '\n',
+    { mode: 0o600 },
+  );
 }

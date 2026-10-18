@@ -44,8 +44,16 @@ async function setup(page: Page, overlap = false) {
     const data = campusFixture();
     const offset = index * 0.2;
     data.version = `globe-${slug}`;
-    data.sources = [{ id: slug, name: slug, url: 'https://example.test', license: 'Test',
-      attribution: `${slug} campus source`, retrievedAt: data.createdAt }];
+    data.sources = [
+      {
+        id: slug,
+        name: slug,
+        url: 'https://example.test',
+        license: 'Test',
+        attribution: `${slug} campus source`,
+        retrievedAt: data.createdAt,
+      },
+    ];
     data.bounds = data.bounds.map(([x, y]) => [
       x + offset,
       y,
@@ -166,9 +174,16 @@ test('campus globe switches in place, restores scoped preferences and follows br
   });
   await choose(page, 'north campus');
   await selected(page, 'north');
-  await expect(page.locator('.maplibregl-ctrl-attrib-inner')).toContainText('north campus source');
-  await expect(page.locator('.maplibregl-ctrl-attrib-inner')).not.toContainText('lasu campus source');
-  await page.waitForFunction(() => window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving());
+  await expect(page.locator('.maplibregl-ctrl-attrib-inner')).toContainText(
+    'north campus source',
+  );
+  await expect(page.locator('.maplibregl-ctrl-attrib-inner')).not.toContainText(
+    'lasu campus source',
+  );
+  await page.waitForFunction(
+    () =>
+      window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving(),
+  );
   expect(await page.evaluate(() => window.editorTestMap.getBearing())).toBe(0);
   expect(
     await page.evaluate(() => window.editorTestMap.getZoom()),
@@ -185,56 +200,86 @@ test('campus globe switches in place, restores scoped preferences and follows br
   await page.goBack();
   await selected(page, 'north');
   await page.getByRole('button', { name: 'Saved', exact: true }).click();
-  await expect(page.getByRole('button', { name: /north library Library/ })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /north library Library/ }),
+  ).toBeVisible();
   await page.goBack();
   await selected(page, 'lasu');
   await page.getByRole('button', { name: 'Saved', exact: true }).click();
-  await expect(page.getByRole('button', { name: /lasu library Library/ })).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: /lasu library Library/ }),
+  ).toHaveCount(0);
   await page.goForward();
   await selected(page, 'north');
 });
 
-test('campus globe resolves shared history against the target campus and cancels a pending selection on Back', async ({ page }) => {
+test('campus globe resolves shared history against the target campus and cancels a pending selection on Back', async ({
+  page,
+}) => {
   const entries = await setup(page);
   await page.evaluate(() => {
     history.replaceState(null, '', '/?campus=lasu&place=library');
     dispatchEvent(new PopStateEvent('popstate'));
   });
-  await expect(page.getByRole('heading', { name: 'lasu library', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'lasu library', exact: true }),
+  ).toBeVisible();
   await choose(page, 'north campus');
   await selected(page, 'north');
   await page.goBack();
   await selected(page, 'lasu');
-  await expect(page.getByRole('heading', { name: 'lasu library', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'north library', exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: 'lasu library', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'north library', exact: true }),
+  ).toHaveCount(0);
   await page.evaluate(() => history.pushState(null, '', '/?campus=lasu'));
   let release!: () => void;
-  const held = new Promise<void>((resolve) => { release = resolve; });
-  await page.route('**/packages/globe-north/campus.json', async (r) => { await held; await r.fulfill({ body: entries[1].bytes, contentType: 'application/json' }).catch(() => {}); });
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/packages/globe-north/campus.json', async (r) => {
+    await held;
+    await r
+      .fulfill({ body: entries[1].bytes, contentType: 'application/json' })
+      .catch(() => {});
+  });
   await choose(page, 'north campus');
-  await expect(page.getByText('Opening north campus…', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Opening north campus…', { exact: true }),
+  ).toBeVisible();
   await page.goBack();
   await selected(page, 'lasu');
   release();
-  await expect(page.getByText('Opening north campus…', { exact: true })).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'lasu library', exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Opening north campus…', { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: 'lasu library', exact: true }),
+  ).toBeVisible();
 });
 
-test('campus globe manual gestures interrupt flights without reverting the campus or 2D preference', async ({ page }) => {
+test('campus globe manual gestures interrupt flights without reverting the campus or 2D preference', async ({
+  page,
+}) => {
   await setup(page);
   await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
   await choose(page, 'east campus');
   await selected(page, 'east');
   await page.waitForFunction(() => window.editorTestMap.isMoving());
   const box = (await page.locator('.maplibregl-canvas').boundingBox())!;
-  const x = box.x + box.width * 0.8, y = box.y + box.height * 0.25;
+  const x = box.x + box.width * 0.8,
+    y = box.y + box.height * 0.25;
   await page.mouse.move(x, y);
   await page.mouse.down();
   await page.mouse.move(x - 65, y + 45, { steps: 8 });
   await page.mouse.up();
   await page.waitForFunction(() => !window.editorTestMap.isMoving());
   await selected(page, 'east');
-  await expect(page.getByRole('button', { name: 'Switch to 3D', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Switch to 3D', exact: true }),
+  ).toBeVisible();
   expect(await page.evaluate(() => window.editorTestMap.getPitch())).toBe(0);
 });
 
@@ -253,8 +298,13 @@ test('campus globe silhouette and pin clicks share selection and leave detailed 
   let hit = await point(page, [3.405, 6.48]);
   await page.mouse.click(hit.x, hit.y);
   await selected(page, 'north');
-  await page.waitForFunction(() => window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving());
-  await page.evaluate(() => window.editorTestMap.jumpTo({ center: [3.401, 6.46], zoom: 17 }));
+  await page.waitForFunction(
+    () =>
+      window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving(),
+  );
+  await page.evaluate(() =>
+    window.editorTestMap.jumpTo({ center: [3.401, 6.46], zoom: 17 }),
+  );
   await page.waitForFunction(() => window.editorTestMap.loaded());
   const library = await point(page, [3.401, 6.46]);
   await page.mouse.click(library.x, library.y);
@@ -353,8 +403,12 @@ test('campus globe uses verified offline targets, refuses missing downloads and 
     await installPackage(manifest, () => {});
   }, entries[1].manifest);
   // Vite has no service worker: prepare the lazy globe UI before disconnecting.
-  await page.getByRole('button', { name: 'Choose a campus', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Hide stars', exact: true })).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Choose a campus', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Hide stars', exact: true }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await context.setOffline(true);
   await choose(page, 'north campus');

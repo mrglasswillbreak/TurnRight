@@ -104,8 +104,10 @@ import { remapBuildingSurfaces } from './building-surfaces';
 import { photoEdits } from './photo-workspace';
 import type { ReviewState } from './EditorReview';
 const SourceUpdates = lazy(() => import('./SourceUpdates'));
-const LocalSignIn = import.meta.env.DEV && import.meta.env.VITE_LOCAL_DEVELOPMENT === 'true'
-  ? lazy(() => import('./LocalSignIn')) : null;
+const LocalSignIn =
+  import.meta.env.DEV && import.meta.env.VITE_LOCAL_DEVELOPMENT === 'true'
+    ? lazy(() => import('./LocalSignIn'))
+    : null;
 const EditorReview = lazy(() =>
   import('./EditorReview').then((m) => ({ default: m.EditorReview })),
 );
@@ -359,7 +361,11 @@ export default function Admin({
               ? 'Opening your private workspace…'
               : 'Sign in with a GitHub account that belongs to your campus team.'}
         </p>
-        {supabase && !owner && LocalSignIn && <Suspense fallback={<p>Opening local sign-in…</p>}><LocalSignIn /></Suspense>}
+        {supabase && !owner && LocalSignIn && (
+          <Suspense fallback={<p>Opening local sign-in…</p>}>
+            <LocalSignIn />
+          </Suspense>
+        )}
         {supabase && !owner && !LocalSignIn && (
           <button
             className="editor-primary"

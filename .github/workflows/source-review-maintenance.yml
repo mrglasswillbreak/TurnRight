@@ -2,7 +2,7 @@ name: Maintain source review index and receipts
 on:
   workflow_dispatch:
   schedule:
-    - cron: "22 5 * * *"
+    - cron: '22 5 * * *'
 permissions:
   contents: read
 concurrency:

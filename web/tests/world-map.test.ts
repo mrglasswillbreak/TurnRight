@@ -10,7 +10,14 @@ import {
   followZoom,
   returnToCampus,
 } from '../src/world-map';
-import { WORLD_MAX_BYTES, WORLD_URL, installWorldLayers, loadWorld, validWorldData, type WorldData } from '../src/world-overview';
+import {
+  WORLD_MAX_BYTES,
+  WORLD_URL,
+  installWorldLayers,
+  loadWorld,
+  validWorldData,
+  type WorldData,
+} from '../src/world-overview';
 import { mapTheme } from '../src/map-theme';
 
 const bytes = readFileSync(
@@ -21,11 +28,34 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('offline world overview', () => {
   it('ships complete pinned raster zooms and detailed geography within 8 MiB', () => {
-    const manifest=JSON.parse(readFileSync(new URL('../public/world/manifest.json',import.meta.url),'utf8'));
-    expect(manifest.bytes).toBeLessThan(8*1024*1024);
-    expect(manifest.assets.filter((a:{url:string})=>a.url.endsWith('.webp'))).toHaveLength(341);
-    for(const asset of manifest.assets){const content=readFileSync(new URL('../public'+asset.url,import.meta.url));expect(content.length).toBe(asset.bytes);expect(createHash('sha256').update(content).digest('hex')).toBe(asset.sha256);}
-    const detailed=JSON.parse(readFileSync(new URL('../public/world/countries-50m-v5.1.2.geojson',import.meta.url),'utf8'));
+    const manifest = JSON.parse(
+      readFileSync(
+        new URL('../public/world/manifest.json', import.meta.url),
+        'utf8',
+      ),
+    );
+    expect(manifest.bytes).toBeLessThan(8 * 1024 * 1024);
+    expect(
+      manifest.assets.filter((a: { url: string }) => a.url.endsWith('.webp')),
+    ).toHaveLength(341);
+    for (const asset of manifest.assets) {
+      const content = readFileSync(
+        new URL('../public' + asset.url, import.meta.url),
+      );
+      expect(content.length).toBe(asset.bytes);
+      expect(createHash('sha256').update(content).digest('hex')).toBe(
+        asset.sha256,
+      );
+    }
+    const detailed = JSON.parse(
+      readFileSync(
+        new URL(
+          '../public/world/countries-50m-v5.1.2.geojson',
+          import.meta.url,
+        ),
+        'utf8',
+      ),
+    );
     expect(validWorldData(detailed)).toBe(true);
     expect(detailed.features.length).toBeGreaterThan(200);
   });

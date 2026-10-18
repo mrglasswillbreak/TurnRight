@@ -1,5 +1,5 @@
-import { useLayoutEffect, useState, useSyncExternalStore } from "react";
-import { createAppearanceStore } from "./appearance";
+import { useLayoutEffect, useState, useSyncExternalStore } from 'react';
+import { createAppearanceStore } from './appearance';
 
 export function useAppearance() {
   const [store] = useState(createAppearanceStore);

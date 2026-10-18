@@ -17,27 +17,48 @@ export function assetTarget(publicDir, url) {
     throw new Error('Asset escaped public directory');
   return target;
 }
-export async function requestPublishedAsset(origin, pathname, timeout, { headers = {} } = {}) {
+export async function requestPublishedAsset(
+  origin,
+  pathname,
+  timeout,
+  { headers = {} } = {},
+) {
   const base = new URL(origin);
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
-    let target = new URL(pathname, base);
-    for (let attempt = 0; attempt < 10; attempt++) {
-      if (target.origin !== base.origin || target.username || target.password)
-        throw Error('Published asset origin changed');
-      assetTarget('.', target.pathname);
-      const response = await fetch(target, {headers,redirect:'manual',cache:'no-store',signal:AbortSignal.timeout(timeout)});
-      if (![301,302,303,307,308].includes(response.status)) return response;
-      const next = new URL(response.headers.get('location') || '', target);
-      if (next.origin === base.origin) { target = next; continue; }
-      // Protection configuration propagates independently to edge asset paths.
-      if (headers['x-vercel-protection-bypass'] && next.hostname === 'vercel.com' && /^\/(sso-api|login)/.test(next.pathname)) {
-        await new Promise(resolve=>setTimeout(resolve,2000));
-        continue;
-      }
-      throw Error(`Published asset ${target.pathname} redirected outside its origin (${next.origin}${next.pathname})`);
+  let target = new URL(pathname, base);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    if (target.origin !== base.origin || target.username || target.password)
+      throw Error('Published asset origin changed');
+    assetTarget('.', target.pathname);
+    const response = await fetch(target, {
+      headers,
+      redirect: 'manual',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(timeout),
+    });
+    if (![301, 302, 303, 307, 308].includes(response.status)) return response;
+    const next = new URL(response.headers.get('location') || '', target);
+    if (next.origin === base.origin) {
+      target = next;
+      continue;
     }
-    throw Error(`Published asset ${pathname} remained protected or redirected repeatedly`);
+    // Protection configuration propagates independently to edge asset paths.
+    if (
+      headers['x-vercel-protection-bypass'] &&
+      next.hostname === 'vercel.com' &&
+      /^\/(sso-api|login)/.test(next.pathname)
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      continue;
+    }
+    throw Error(
+      `Published asset ${target.pathname} redirected outside its origin (${next.origin}${next.pathname})`,
+    );
+  }
+  throw Error(
+    `Published asset ${pathname} remained protected or redirected repeatedly`,
+  );
 }
 
 export async function preservePublished(
@@ -46,13 +67,14 @@ export async function preservePublished(
   activate = false,
   expectedVersion,
   manifestPath = '/packages/latest.json',
-  {headers = {}} = {},
+  { headers = {} } = {},
 ) {
   const base = new URL(origin);
   if (base.protocol !== 'https:' || base.username || base.password)
     throw new Error('Published map URL must be HTTPS');
   assetTarget(publicDir, manifestPath);
-  const request = (pathname, timeout) => requestPublishedAsset(origin, pathname, timeout, { headers });
+  const request = (pathname, timeout) =>
+    requestPublishedAsset(origin, pathname, timeout, { headers });
   const response = await request(manifestPath, 20000);
   if (!response.ok)
     throw new Error(
@@ -68,17 +90,38 @@ export async function preservePublished(
     ![1, 2, 3].includes(manifest.schemaVersion) ||
     !/^[a-z0-9][a-z0-9-]*-[a-f0-9]+$/.test(manifest.version) ||
     !Array.isArray(manifest.assets) ||
-    !Number.isSafeInteger(manifest.bytes) || manifest.bytes <= 0
+    !Number.isSafeInteger(manifest.bytes) ||
+    manifest.bytes <= 0
   )
     throw new Error('Unsupported published map manifest');
   const photoUrls = new Set(manifest.photos?.assetUrls || []);
   const regular = manifest.assets.filter((a) => !photoUrls.has(a.url));
-  if (regular.length > 200 || regular.reduce((n, a) => n + a.bytes, 0) > 25 * 1024 * 1024 ||
-      new Set(manifest.assets.map((a) => a.url)).size !== manifest.assets.length ||
-      manifest.assets.some((a) => !Number.isSafeInteger(a.bytes) || a.bytes <= 0 || !/^[a-f0-9]{64}$/.test(a.sha256)) ||
-      manifest.bytes !== manifest.assets.reduce((n, a) => n + a.bytes, 0) ||
-      [...photoUrls].some((url) => !manifest.assets.some((a) => a.url === url && a.url === `/packages/photos/${a.sha256}.webp` && a.bytes <= 250 * 1024)) ||
-      (manifest.photos?.bytes || 0) !== manifest.assets.filter((a) => photoUrls.has(a.url)).reduce((n, a) => n + a.bytes, 0))
+  if (
+    regular.length > 200 ||
+    regular.reduce((n, a) => n + a.bytes, 0) > 25 * 1024 * 1024 ||
+    new Set(manifest.assets.map((a) => a.url)).size !==
+      manifest.assets.length ||
+    manifest.assets.some(
+      (a) =>
+        !Number.isSafeInteger(a.bytes) ||
+        a.bytes <= 0 ||
+        !/^[a-f0-9]{64}$/.test(a.sha256),
+    ) ||
+    manifest.bytes !== manifest.assets.reduce((n, a) => n + a.bytes, 0) ||
+    [...photoUrls].some(
+      (url) =>
+        !manifest.assets.some(
+          (a) =>
+            a.url === url &&
+            a.url === `/packages/photos/${a.sha256}.webp` &&
+            a.bytes <= 250 * 1024,
+        ),
+    ) ||
+    (manifest.photos?.bytes || 0) !==
+      manifest.assets
+        .filter((a) => photoUrls.has(a.url))
+        .reduce((n, a) => n + a.bytes, 0)
+  )
     throw new Error('Invalid published asset manifest');
   if (expectedVersion && manifest.version !== expectedVersion)
     throw new Error(

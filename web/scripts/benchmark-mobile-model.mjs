@@ -104,7 +104,10 @@ const browser = await chromium.launch({
 const runs = [];
 if (process.argv.includes('--final')) {
   const previous = JSON.parse(
-    await fs.readFile('../docs/assets/measurements/mobile-model-performance.json', 'utf8'),
+    await fs.readFile(
+      '../docs/assets/measurements/mobile-model-performance.json',
+      'utf8',
+    ),
   );
   if (
     previous.baselineCommit !== '0fc9dca' ||

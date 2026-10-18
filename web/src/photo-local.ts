@@ -200,15 +200,13 @@ export async function updateLocalPhoto(
       updated: Date.now(),
     });
     if (outputBytes)
-      await tx
-        .objectStore('content')
-        .put({
-          owner: scopedOwner,
-          id,
-          kind: 'output',
-          bytes: outputBytes,
-          type: output!.type,
-        });
+      await tx.objectStore('content').put({
+        owner: scopedOwner,
+        id,
+        kind: 'output',
+        bytes: outputBytes,
+        type: output!.type,
+      });
     else if (clearOutput)
       await tx.objectStore('content').delete([scopedOwner, id, 'output']);
     await tx.done;

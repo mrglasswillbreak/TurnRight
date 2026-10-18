@@ -2,7 +2,9 @@
   "name": "turnright-workspace",
   "version": "0.2.0",
   "private": true,
-  "engines": { "node": ">=22.13.0 <23" },
+  "engines": {
+    "node": ">=22.13.0 <23"
+  },
   "scripts": {
     "setup": "npm ci --prefix web",
     "dev": "npm run dev --prefix web",
@@ -19,5 +21,7 @@
     "local:reset": "node scripts/local/control.mjs reset",
     "local:test": "node scripts/local/control.mjs test"
   },
-  "devDependencies": { "supabase": "2.121.0" }
+  "devDependencies": {
+    "supabase": "2.121.0"
+  }
 }

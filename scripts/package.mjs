@@ -1,21 +1,29 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { createHash } from "node:crypto";
-import { packageVisuals } from "./visual-package.mjs";
-import { publicCampus } from "./public-campus.mjs";
-import { packageGlyphs } from "./package-glyphs.mjs";
-import { packagePhotos } from "./photo-package.mjs";
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const publicDir = path.join(root, "web/public");
-const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const input = process.env.CAMPUS_INPUT || "data/seed/campus.json";
-const data = publicCampus(JSON.parse(await fs.readFile(path.join(root, input), "utf8")));
-if (![1, 2, 3].includes(data.schemaVersion) || !Array.isArray(data.graph?.edges))
-  throw new Error("No valid campus graph to package");
-const audioDir = path.join(root, "data/audio");
-const files = (await fs.readdir(audioDir)).filter((f) => f.endsWith(".wav")).sort();
-if (files.length < 15) throw new Error("Offline audio clips missing. See data/audio/README.md.");
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { packageVisuals } from './visual-package.mjs';
+import { publicCampus } from './public-campus.mjs';
+import { packageGlyphs } from './package-glyphs.mjs';
+import { packagePhotos } from './photo-package.mjs';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const publicDir = path.join(root, 'web/public');
+const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const input = process.env.CAMPUS_INPUT || 'data/seed/campus.json';
+const data = publicCampus(
+  JSON.parse(await fs.readFile(path.join(root, input), 'utf8')),
+);
+if (
+  ![1, 2, 3].includes(data.schemaVersion) ||
+  !Array.isArray(data.graph?.edges)
+)
+  throw new Error('No valid campus graph to package');
+const audioDir = path.join(root, 'data/audio');
+const files = (await fs.readdir(audioDir))
+  .filter((f) => f.endsWith('.wav'))
+  .sort();
+if (files.length < 15)
+  throw new Error('Offline audio clips missing. See data/audio/README.md.');
 const assets = [],
   audio = {};
 async function asset(url, bytes, contentType) {
@@ -27,42 +35,57 @@ async function asset(url, bytes, contentType) {
 for (const file of files) {
   const bytes = await fs.readFile(path.join(audioDir, file));
   const url = `/audio/${hash(bytes).slice(0, 16)}/${file}`;
-  await asset(url, bytes, "audio/wav");
-  audio[file.replace(".wav", "")] = url;
+  await asset(url, bytes, 'audio/wav');
+  audio[file.replace('.wav', '')] = url;
 }
 await packageGlyphs(data, publicDir, asset);
 const visuals = await packageVisuals(
-  path.resolve(root, process.env.VISUALS_INPUT || "data/visuals"),
+  path.resolve(root, process.env.VISUALS_INPUT || 'data/visuals'),
   asset,
 );
 if (process.env.VISUALS_INPUT && !visuals)
-  throw new Error("The rebuilt visual catalogue is missing; release packaging stopped.");
+  throw new Error(
+    'The rebuilt visual catalogue is missing; release packaging stopped.',
+  );
 if (visuals) data.visuals = visuals.catalogue;
 const photos = await packagePhotos(data, root, asset);
-data.schemaVersion = data.photos?.some((p) => p.sourceKind === "author-upload" && !p.sourceUrl)
+data.schemaVersion = data.photos?.some(
+  (p) => p.sourceKind === 'author-upload' && !p.sourceUrl,
+)
   ? 3
   : data.driving
     ? 2
     : 1;
 const campusId = process.env.CAMPUS_ID || 'lasu';
 const campusSlug = process.env.CAMPUS_SLUG || 'lasu';
-if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(campusSlug)) throw Error('Invalid campus slug');
-const version = campusSlug + '-' + hash(JSON.stringify({ data, audio })).slice(0, 12);
+if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(campusSlug))
+  throw Error('Invalid campus slug');
+const version =
+  campusSlug + '-' + hash(JSON.stringify({ data, audio })).slice(0, 12);
 data.version = version;
 const dataUrl = `/packages/${version}/campus.json`;
-await asset(dataUrl, Buffer.from(JSON.stringify(data)), "application/json");
+await asset(dataUrl, Buffer.from(JSON.stringify(data)), 'application/json');
 await asset(
   `/packages/${version}/audio.json`,
   Buffer.from(JSON.stringify(audio)),
-  "application/json",
+  'application/json',
 );
 const manifest = {
-  ...(campusId !== 'lasu' ? {campus:{id:campusId,slug:campusSlug,name:process.env.CAMPUS_NAME}} : {}),
+  ...(campusId !== 'lasu'
+    ? {
+        campus: {
+          id: campusId,
+          slug: campusSlug,
+          name: process.env.CAMPUS_NAME,
+        },
+      }
+    : {}),
   schemaVersion: data.schemaVersion,
   version,
   createdAt: data.createdAt,
   summary:
-    process.env.RELEASE_SUMMARY || "LASU Ojo campus · source-derived map and walking approaches",
+    process.env.RELEASE_SUMMARY ||
+    'LASU Ojo campus · source-derived map and walking approaches',
   dataUrl,
   bytes: assets.reduce((sum, a) => sum + a.bytes, 0),
   assets,
@@ -71,12 +94,20 @@ const manifest = {
   ...(photos ? { photos } : {}),
 };
 const manifestJson = JSON.stringify(manifest, null, 2);
-await fs.writeFile(path.join(publicDir, "packages", version, "manifest.json"), manifestJson);
-const latestPath = path.join(publicDir, campusId === 'lasu' ? 'packages/latest.json' : `packages/${campusSlug}/latest.json`);
-await fs.mkdir(path.dirname(latestPath),{recursive:true});
+await fs.writeFile(
+  path.join(publicDir, 'packages', version, 'manifest.json'),
+  manifestJson,
+);
+const latestPath = path.join(
+  publicDir,
+  campusId === 'lasu'
+    ? 'packages/latest.json'
+    : `packages/${campusSlug}/latest.json`,
+);
+await fs.mkdir(path.dirname(latestPath), { recursive: true });
 await fs.writeFile(latestPath, manifestJson);
 await fs.writeFile(
-  path.join(root, "data/coverage-report.json"),
+  path.join(root, 'data/coverage-report.json'),
   JSON.stringify(data.coverage, null, 2),
 );
 console.log(

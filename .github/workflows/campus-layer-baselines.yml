@@ -3,20 +3,28 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Preserve existing layer receipts, encrypted GIS application backup, or apply the exact authorized GIS migration bundle"
+        description: 'Preserve existing layer receipts, encrypted GIS application backup, or apply the exact authorized GIS migration bundle'
         type: choice
-        options: [baseline, audit-release, audit-publication, backup, backup-download, migrate]
+        options:
+          [
+            baseline,
+            audit-release,
+            audit-publication,
+            backup,
+            backup-download,
+            migrate,
+          ]
         default: baseline
       backup_public_key:
-        description: "Optional RSA public key for this encrypted backup; retain the private key separately"
+        description: 'Optional RSA public key for this encrypted backup; retain the private key separately'
         type: string
         required: false
       backup_excluded_tables:
-        description: "Optional comma-separated restricted tables backed up separately through the database dashboard"
+        description: 'Optional comma-separated restricted tables backed up separately through the database dashboard'
         type: string
         required: false
       backup_run_id:
-        description: "Completed backup run to split into smaller encrypted downloads (no database access)"
+        description: 'Completed backup run to split into smaller encrypted downloads (no database access)'
         type: string
         required: false
   push:

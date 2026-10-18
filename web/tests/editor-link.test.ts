@@ -22,15 +22,42 @@ it('encodes a building ID and keeps an empty selection at the ordinary editor', 
     '/admin?building=footprint',
   );
 });
-it('restores another campus through the existing exact OAuth callback',()=>{
-  const values=new Map<string,string>();
-  const storage={getItem:(k:string)=>values.get(k)||null,setItem:(k:string,v:string)=>{values.set(k,v);},removeItem:(k:string)=>{values.delete(k);}};
-  expect(editorSignInReturn('https://turnright.vercel.app/admin?campus=north-campus&building=library',storage)).toBe('https://turnright.vercel.app/admin');
-  const restored=restoreEditorCampusReturn('https://turnright.vercel.app/admin?code=oauth-code',storage);
-  expect(restored).toBe('/admin?code=oauth-code&campus=north-campus&building=library');
-  expect(requestedEditorBuilding('https://turnright.vercel.app/admin?campus=north-campus',storage)).toBe('library');
-  expect(requestedEditorBuilding('https://turnright.vercel.app/admin',storage)).toBeUndefined();
-  expect(restoreEditorCampusReturn('https://turnright.vercel.app/admin',storage)).toBeNull();
+it('restores another campus through the existing exact OAuth callback', () => {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (k: string) => values.get(k) || null,
+    setItem: (k: string, v: string) => {
+      values.set(k, v);
+    },
+    removeItem: (k: string) => {
+      values.delete(k);
+    },
+  };
+  expect(
+    editorSignInReturn(
+      'https://turnright.vercel.app/admin?campus=north-campus&building=library',
+      storage,
+    ),
+  ).toBe('https://turnright.vercel.app/admin');
+  const restored = restoreEditorCampusReturn(
+    'https://turnright.vercel.app/admin?code=oauth-code',
+    storage,
+  );
+  expect(restored).toBe(
+    '/admin?code=oauth-code&campus=north-campus&building=library',
+  );
+  expect(
+    requestedEditorBuilding(
+      'https://turnright.vercel.app/admin?campus=north-campus',
+      storage,
+    ),
+  ).toBe('library');
+  expect(
+    requestedEditorBuilding('https://turnright.vercel.app/admin', storage),
+  ).toBeUndefined();
+  expect(
+    restoreEditorCampusReturn('https://turnright.vercel.app/admin', storage),
+  ).toBeNull();
 });
 it('retains a target through OAuth and consumes it without touching other URL state', () => {
   const values = new Map<string, string>();

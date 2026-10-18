@@ -54,52 +54,88 @@ it('accepts bounded mappings and rejects duplicate layer roles and credential UR
 
 it('compares preview configurations after JSONB key reordering and draft recovery', () => {
   const local: ImportConfiguration = {
-    layers: [{
-      layer: 'Buildings',
-      role: 'building',
-      idField: 'OBJECTID',
-      nameField: 'NAME',
-      heightField: undefined,
-    }],
+    layers: [
+      {
+        layer: 'Buildings',
+        role: 'building',
+        idField: 'OBJECTID',
+        nameField: 'NAME',
+        heightField: undefined,
+      },
+    ],
     attribution: 'University GIS team',
     license: 'CC0',
     redistributionConfirmed: true,
   };
   const stored: ImportConfiguration = {
     license: 'CC0',
-    layers: [{ nameField: 'NAME', idField: 'OBJECTID', role: 'building', layer: 'Buildings' }],
+    layers: [
+      {
+        nameField: 'NAME',
+        idField: 'OBJECTID',
+        role: 'building',
+        layer: 'Buildings',
+      },
+    ],
     redistributionConfirmed: true,
     attribution: 'University GIS team',
   };
   expect(JSON.stringify(local)).not.toBe(JSON.stringify(stored));
   expect(sameImportConfiguration(local, stored)).toBe(true);
   expect(sameImportConfiguration(structuredClone(local), stored)).toBe(true);
-  expect(sameImportConfiguration(local, {
-    ...stored, attribution: 'Different credit',
-  })).toBe(false);
-  expect(sameImportConfiguration(local, {
-    ...stored, license: 'Different permission',
-  })).toBe(false);
-  expect(sameImportConfiguration(local, {
-    ...stored, redistributionConfirmed: false,
-  })).toBe(false);
-  expect(sameImportConfiguration(local, {
-    ...stored, layers: [{ ...stored.layers[0], nameField: 'TITLE' }],
-  })).toBe(false);
-  expect(sameImportConfiguration(local, {
-    ...stored, layers: [{ ...stored.layers[0], role: 'skip' }],
-  })).toBe(false);
-  expect(sameImportConfiguration(local, {
-    ...stored, layers: [{ ...stored.layers[0], crs: 'EPSG:3857' }],
-  })).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      attribution: 'Different credit',
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      license: 'Different permission',
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      redistributionConfirmed: false,
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      layers: [{ ...stored.layers[0], nameField: 'TITLE' }],
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      layers: [{ ...stored.layers[0], role: 'skip' }],
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(local, {
+      ...stored,
+      layers: [{ ...stored.layers[0], crs: 'EPSG:3857' }],
+    }),
+  ).toBe(false);
   const layers: ImportConfiguration = {
     ...local,
-    layers: [...local.layers, { layer: 'Paths', role: 'path', walkingAccess: 'private' }],
+    layers: [
+      ...local.layers,
+      { layer: 'Paths', role: 'path', walkingAccess: 'private' },
+    ],
   };
-  expect(sameImportConfiguration(layers, {
-    ...layers, layers: [...layers.layers].reverse(),
-  })).toBe(false);
-  expect(sameImportConfiguration(layers, {
-    ...layers, layers: [layers.layers[0], { ...layers.layers[1], walkingAccess: 'yes' }],
-  })).toBe(false);
+  expect(
+    sameImportConfiguration(layers, {
+      ...layers,
+      layers: [...layers.layers].reverse(),
+    }),
+  ).toBe(false);
+  expect(
+    sameImportConfiguration(layers, {
+      ...layers,
+      layers: [layers.layers[0], { ...layers.layers[1], walkingAccess: 'yes' }],
+    }),
+  ).toBe(false);
 });

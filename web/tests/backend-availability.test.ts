@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { db, fail, requireIdentity } from '../server/backend';
 import admin from '../api/admin';
-const request = { method: 'POST', headers: { authorization: 'Bearer private-token' } };
+const request = {
+  method: 'POST',
+  headers: { authorization: 'Bearer private-token' },
+};
 function response() {
   return {
     code: 0,
@@ -28,17 +31,28 @@ afterEach(() => {
 it.each([429, 500, 502, 503, 504])(
   'reports Auth %s as unavailable, not expired',
   async (status) => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('Gateway Timeout', { status })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('Gateway Timeout', { status })),
+    );
     await expect(requireIdentity(request)).rejects.toMatchObject({
       status: 503,
       dependency: 'authentication',
     });
   },
 );
-it.each([401, 403])('retains invalid identity handling for Auth %s', async (status) => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status })));
-  await expect(requireIdentity(request)).rejects.toMatchObject({ status: 401 });
-});
+it.each([401, 403])(
+  'retains invalid identity handling for Auth %s',
+  async (status) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('{}', { status })),
+    );
+    await expect(requireIdentity(request)).rejects.toMatchObject({
+      status: 401,
+    });
+  },
+);
 it('treats broken transport and malformed identities as availability failures', async () => {
   const fetcher = vi
     .fn()
@@ -77,7 +91,9 @@ it('does not replay an uncertain database write and records a safe correlation r
   expect(res.code).toBe(503);
   expect(res.body.requestId).toBe('ref-123');
   expect(res.body.error).not.toContain('expired');
-  expect(JSON.stringify(log.mock.calls)).not.toMatch(/private-service-key|geometry|Bearer/);
+  expect(JSON.stringify(log.mock.calls)).not.toMatch(
+    /private-service-key|geometry|Bearer/,
+  );
   expect(log).toHaveBeenCalledWith(
     'admin-request-failed',
     expect.objectContaining({ requestId: 'ref-123', dependency: 'database' }),
@@ -94,14 +110,19 @@ it.each(['review-baseline', 'reconcile-baseline'])(
     vi.stubGlobal('fetch', fetcher);
     const res = response();
     await admin(
-      { ...request, body: { action, payload: { version: 'old', expectedHash: 'old' } } },
+      {
+        ...request,
+        body: { action, payload: { version: 'old', expectedHash: 'old' } },
+      },
       res,
     );
     expect(res.code).toBe(409);
     expect(res.body.error).toContain('Accepted source updates');
     expect(fetcher).toHaveBeenCalledTimes(3);
-    expect(fetcher.mock.calls.every(([, init]) => !init?.method || init.method === 'GET')).toBe(
-      true,
-    );
+    expect(
+      fetcher.mock.calls.every(
+        ([, init]) => !init?.method || init.method === 'GET',
+      ),
+    ).toBe(true);
   },
 );

@@ -39,7 +39,7 @@ export function compileModelDocument(
     if (!visible) continue;
     const object = source.curve
       ? {
-          ...curveMesh(source.curve, source.name,source.faces[0]?.material),
+          ...curveMesh(source.curve, source.name, source.faces[0]?.material),
           id: source.id,
           transform: source.transform,
         }

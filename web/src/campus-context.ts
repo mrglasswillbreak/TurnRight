@@ -48,7 +48,8 @@ export function validCatalogue(value: unknown): value is CampusCatalogue {
   if (
     c?.schemaVersion !== 1 ||
     !Array.isArray(c.campuses) ||
-    !c.campuses.length || c.campuses.length > 1000
+    !c.campuses.length ||
+    c.campuses.length > 1000
   )
     return false;
   const ids = new Set<string>(),
@@ -134,29 +135,51 @@ export const MAPPING_BUFFER_METRES = 500;
 export type MappingArea = Pick<CampusIdentity, 'bounds'>;
 export function insideCampusMappingArea(point: unknown, area?: MappingArea) {
   if (
-    !Array.isArray(point) || point.length !== 2 ||
+    !Array.isArray(point) ||
+    point.length !== 2 ||
     !point.every((n) => typeof n === 'number' && Number.isFinite(n)) ||
-    Math.abs(point[0]) > 180 || Math.abs(point[1]) > 90
-  ) return false;
+    Math.abs(point[0]) > 180 ||
+    Math.abs(point[1]) > 90
+  )
+    return false;
   // Pure geometry tools may validate before a workspace is loaded. Save and
   // release callers always supply the independently resolved campus extent.
   if (!area) return true;
   const bounds = area.bounds;
-  if (!Array.isArray(bounds) || bounds.length !== 2 ||
-      !bounds.every((p) => Array.isArray(p) && p.length === 2 &&
+  if (
+    !Array.isArray(bounds) ||
+    bounds.length !== 2 ||
+    !bounds.every(
+      (p) =>
+        Array.isArray(p) &&
+        p.length === 2 &&
         p.every((n) => typeof n === 'number' && Number.isFinite(n)) &&
-        Math.abs(p[0]) <= 180 && Math.abs(p[1]) <= 90)) return false;
+        Math.abs(p[0]) <= 180 &&
+        Math.abs(p[1]) <= 90,
+    )
+  )
+    return false;
   const [[west, south], [east, north]] = bounds;
   if (south > north) return false;
   const latitudeBuffer = MAPPING_BUFFER_METRES / 111320;
   if (point[1] < south - latitudeBuffer || point[1] > north + latitudeBuffer)
     return false;
-  const longitudeBuffer = Math.min(180, latitudeBuffer /
-    Math.max(0.00001, Math.cos(Math.max(Math.abs(south), Math.abs(north)) * Math.PI / 180)));
-  const width = ((east - west) % 360 + 360) % 360;
-  const offset = ((point[0] - west) % 360 + 360) % 360;
-  return east - west === 360 || width + 2 * longitudeBuffer >= 360 ||
-    offset <= width + longitudeBuffer || offset >= 360 - longitudeBuffer;
+  const longitudeBuffer = Math.min(
+    180,
+    latitudeBuffer /
+      Math.max(
+        0.00001,
+        Math.cos((Math.max(Math.abs(south), Math.abs(north)) * Math.PI) / 180),
+      ),
+  );
+  const width = (((east - west) % 360) + 360) % 360;
+  const offset = (((point[0] - west) % 360) + 360) % 360;
+  return (
+    east - west === 360 ||
+    width + 2 * longitudeBuffer >= 360 ||
+    offset <= width + longitudeBuffer ||
+    offset >= 360 - longitudeBuffer
+  );
 }
 
 /** Restore only a plain public entry; shared destinations and owner links stay explicit. */
@@ -164,16 +187,26 @@ export function restorePublicCampus() {
   try {
     const url = new URL(location.href);
     const slug = localStorage.getItem('turnright:last-campus');
-    if (url.pathname === '/' && !url.search && !url.hash &&
-        slug && /^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
+    if (
+      url.pathname === '/' &&
+      !url.search &&
+      !url.hash &&
+      slug &&
+      /^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)
+    ) {
       url.searchParams.set('campus', slug);
       history.replaceState(history.state, '', url);
     }
-  } catch { /* Storage or history can be unavailable; use the ordinary link. */ }
+  } catch {
+    /* Storage or history can be unavailable; use the ordinary link. */
+  }
 }
 
 /** Remember successful public loads only, including verified offline packages. */
 export function rememberPublicCampus(slug: string) {
-  try { localStorage.setItem('turnright:last-campus', slug); }
-  catch { /* The map remains usable when browser storage is blocked. */ }
+  try {
+    localStorage.setItem('turnright:last-campus', slug);
+  } catch {
+    /* The map remains usable when browser storage is blocked. */
+  }
 }

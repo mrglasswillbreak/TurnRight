@@ -32,51 +32,74 @@ export function ImportMapPreview({
     callback = useRef({ drawing, onVertex, vertices });
   callback.current = { drawing, onVertex, vertices };
   const [hidden, setHidden] = useState<string[]>([]);
-  const layerNames = [...new Set((features?.features || []).map(f => String(f.properties?.importLayer || 'Imported layer')))];
-  const shown = useMemo(() => (features?.features || []).filter(f => !hidden.includes(String(f.properties?.importLayer || 'Imported layer'))), [features, hidden]);
+  const layerNames = [
+    ...new Set(
+      (features?.features || []).map((f) =>
+        String(f.properties?.importLayer || 'Imported layer'),
+      ),
+    ),
+  ];
+  const shown = useMemo(
+    () =>
+      (features?.features || []).filter(
+        (f) =>
+          !hidden.includes(
+            String(f.properties?.importLayer || 'Imported layer'),
+          ),
+      ),
+    [features, hidden],
+  );
   const data = useMemo(
     () => ({
       ...(base || emptyCampus(campus, boundary)),
-      places: [...(base?.places || []), ...shown.flatMap((feature, index) => {
-        const points =
-          feature.geometry?.type === 'Point'
-            ? [feature.geometry.coordinates]
-            : feature.geometry?.type === 'MultiPoint'
-              ? feature.geometry.coordinates
-              : [];
-        return points.map((coordinates, i) => ({
-          id: `import-point-${index}-${i}`,
-          sourceId: `${index}-${i}`,
-          arrivalKind: 'unmapped' as const,
-          name: String(
-            feature.properties?.name ||
-              feature.properties?.Name ||
-              `Point ${index + 1}`,
-          ),
-          coordinates: coordinates as Position,
-          category: 'other' as const,
-          aliases: [],
-          source: 'import-preview',
-        }));
-      })],
+      places: [
+        ...(base?.places || []),
+        ...shown.flatMap((feature, index) => {
+          const points =
+            feature.geometry?.type === 'Point'
+              ? [feature.geometry.coordinates]
+              : feature.geometry?.type === 'MultiPoint'
+                ? feature.geometry.coordinates
+                : [];
+          return points.map((coordinates, i) => ({
+            id: `import-point-${index}-${i}`,
+            sourceId: `${index}-${i}`,
+            arrivalKind: 'unmapped' as const,
+            name: String(
+              feature.properties?.name ||
+                feature.properties?.Name ||
+                `Point ${index + 1}`,
+            ),
+            coordinates: coordinates as Position,
+            category: 'other' as const,
+            aliases: [],
+            source: 'import-preview',
+          }));
+        }),
+      ],
       map: {
         type: 'FeatureCollection' as const,
-        features: [...(base?.map.features.filter(f => !shown.some(s => s.properties?.id === f.properties?.id)) || []), ...shown
-          .filter((f) => f.geometry)
-          .map((f, i) => ({
-            ...f,
-            properties: {
-              ...f.properties,
-              id: f.properties?.id || `preview-${i}`,
-              kind:
-                f.properties?.kind ||
-                (/Polygon/.test(f.geometry.type)
-                  ? 'overlay'
-                  : /Line/.test(f.geometry.type)
+        features: [
+          ...(base?.map.features.filter(
+            (f) => !shown.some((s) => s.properties?.id === f.properties?.id),
+          ) || []),
+          ...shown
+            .filter((f) => f.geometry)
+            .map((f, i) => ({
+              ...f,
+              properties: {
+                ...f.properties,
+                id: f.properties?.id || `preview-${i}`,
+                kind:
+                  f.properties?.kind ||
+                  (/Polygon/.test(f.geometry.type)
                     ? 'overlay'
-                    : 'place'),
-            },
-          }))],
+                    : /Line/.test(f.geometry.type)
+                      ? 'overlay'
+                      : 'place'),
+              },
+            })),
+        ],
       },
     }),
     [campus, shown, boundary, base],
@@ -152,21 +175,40 @@ export function ImportMapPreview({
   );
   return (
     <>
-    {!!layerNames.length && <div className="import-layer-controls" aria-label="Preview layers">{layerNames.map(name => <label key={name}><input type="checkbox" checked={!hidden.includes(name)} onChange={e => setHidden(old => e.target.checked ? old.filter(n => n!==name) : [...old,name])} />{name}</label>)}</div>}
-    <div
-      className={`import-map ${drawing ? 'drawing' : ''}`}
-      aria-label={
-        drawing ? 'Draw campus boundary on the map' : 'Import map preview'
-      }
-    >
-      <MapView
-        data={data}
-        editor
-        dark={dark}
-        onSelect={() => {}}
-        onReady={ready}
-      />
-    </div>
+      {!!layerNames.length && (
+        <div className="import-layer-controls" aria-label="Preview layers">
+          {layerNames.map((name) => (
+            <label key={name}>
+              <input
+                type="checkbox"
+                checked={!hidden.includes(name)}
+                onChange={(e) =>
+                  setHidden((old) =>
+                    e.target.checked
+                      ? old.filter((n) => n !== name)
+                      : [...old, name],
+                  )
+                }
+              />
+              {name}
+            </label>
+          ))}
+        </div>
+      )}
+      <div
+        className={`import-map ${drawing ? 'drawing' : ''}`}
+        aria-label={
+          drawing ? 'Draw campus boundary on the map' : 'Import map preview'
+        }
+      >
+        <MapView
+          data={data}
+          editor
+          dark={dark}
+          onSelect={() => {}}
+          onReady={ready}
+        />
+      </div>
     </>
   );
 }

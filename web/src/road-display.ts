@@ -56,7 +56,9 @@ export function requestRoadDisplay(
     fallback();
     return stop;
   }
-  worker.onmessage = (event: MessageEvent<FeatureCollection | { error: true }>) => {
+  worker.onmessage = (
+    event: MessageEvent<FeatureCollection | { error: true }>,
+  ) => {
     if ('error' in event.data) {
       worker?.terminate();
       fallback();

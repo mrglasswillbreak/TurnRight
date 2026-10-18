@@ -11,7 +11,8 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
   const reference = JSON.stringify({ buildings: [{ id: 'public-reference' }] });
   const fixtures = {
     'data/building-evidence.json': reference,
-    'scripts/map_import/capabilities.json': '[{"name":"GeoJSON","extensions":["json"]}]',
+    'scripts/map_import/capabilities.json':
+      '[{"name":"GeoJSON","extensions":["json"]}]',
     'data/photo-models/inventory.json': '{"buildings":[]}',
     'data/photo-models/private-review.json': 'private notes',
     'data/raw/private.json': 'raw import',
@@ -65,7 +66,11 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
       'data/photo-models/inventory.json',
     ]);
     expect(files.some((file) => file.file.includes('.env'))).toBe(false);
-    expect(files.some((file) => file.file === 'scripts/map_import/capabilities.json')).toBe(true);
+    expect(
+      files.some(
+        (file) => file.file === 'scripts/map_import/capabilities.json',
+      ),
+    ).toBe(true);
     expect(
       files.some(
         (file) => file.file === 'web/public/packages/lasu-abc123/campus.json',

@@ -151,13 +151,19 @@ export async function preserveCampusCatalogue(
   // Regenerate on code builds, publication and restore, never from owner drafts.
   for (const campus of catalogue.campuses) {
     const manifest = manifests.get(campus.id);
-    const core = manifest.assets.find((asset) => asset.url === manifest.dataUrl);
+    const core = manifest.assets.find(
+      (asset) => asset.url === manifest.dataUrl,
+    );
     if (!core) throw Error('Campus outline has no verified source asset.');
     const bytes = await fs.readFile(assetTarget(publicDir, manifest.dataUrl));
-    if (bytes.length !== core.bytes || createHash('sha256').update(bytes).digest('hex') !== core.sha256)
+    if (
+      bytes.length !== core.bytes ||
+      createHash('sha256').update(bytes).digest('hex') !== core.sha256
+    )
       throw Error('Campus outline source checksum mismatch.');
     const outline = JSON.parse(bytes.toString()).boundary?.geometry;
-    if (!validCampusOutline(outline)) throw Error(`Invalid published boundary for ${campus.slug}.`);
+    if (!validCampusOutline(outline))
+      throw Error(`Invalid published boundary for ${campus.slug}.`);
     campus.outline = { type: outline.type, coordinates: outline.coordinates };
   }
   await fs.mkdir(directory, { recursive: true });

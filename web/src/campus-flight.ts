@@ -70,10 +70,12 @@ export function flyToCampus(
   // MapLibre's globe flight uses acos(dot) without clamping: an almost
   // identical centre can yield NaN. A straight zoom needs no flight arc.
   const center = camera.center;
-  const target: [number, number] = !center ? campusCenter(bounds) : Array.isArray(center)
-    ? center : ['lng' in center ? center.lng : center.lon, center.lat];
-  if (flightDistance(start, target) < 0.001)
-    map.easeTo(options);
+  const target: [number, number] = !center
+    ? campusCenter(bounds)
+    : Array.isArray(center)
+      ? center
+      : ['lng' in center ? center.lng : center.lon, center.lat];
+  if (flightDistance(start, target) < 0.001) map.easeTo(options);
   else map.flyTo(options);
   return () => {
     map.off('moveend', finish);

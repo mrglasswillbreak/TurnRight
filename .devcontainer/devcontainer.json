@@ -1,12 +1,16 @@
 {
   "name": "TurnRight local editor",
   "build": { "dockerfile": "Dockerfile" },
-  "features": { "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {} },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
   "runArgs": ["--network=host"],
   "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
   "workspaceFolder": "${localWorkspaceFolder}",
   "remoteUser": "vscode",
   "postCreateCommand": "npm ci && npm run setup && python -m pip install -r scripts/requirements-data.txt",
   "forwardPorts": [5180],
-  "portsAttributes": { "5180": { "label": "Local TurnRight", "onAutoForward": "notify" } }
+  "portsAttributes": {
+    "5180": { "label": "Local TurnRight", "onAutoForward": "notify" }
+  }
 }

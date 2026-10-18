@@ -1,23 +1,31 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import { createHash } from "node:crypto";
-import { publicCampus } from "./public-campus.mjs";
-import { syntheticPhotoEvidence } from "./photo-source.mjs";
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { publicCampus } from './public-campus.mjs';
+import { syntheticPhotoEvidence } from './photo-source.mjs';
 
-export async function packagePhotos(data, root, asset, { fetcher = fetch } = {}) {
-  const catalogueFile = path.join(root, "data/photos/catalogue.json");
+export async function packagePhotos(
+  data,
+  root,
+  asset,
+  { fetcher = fetch } = {},
+) {
+  const catalogueFile = path.join(root, 'data/photos/catalogue.json');
   const catalogue = await fs
-    .readFile(catalogueFile, "utf8")
+    .readFile(catalogueFile, 'utf8')
     .then(JSON.parse)
     .catch((e) => {
-      if (e.code === "ENOENT") return [];
+      if (e.code === 'ENOENT') return [];
       throw e;
     });
   const audit = await fs
-    .readFile(path.join(root, "data/photos/research/source-metadata-audit.json"), "utf8")
+    .readFile(
+      path.join(root, 'data/photos/research/source-metadata-audit.json'),
+      'utf8',
+    )
     .then(JSON.parse)
     .catch((e) => {
-      if (e.code === "ENOENT") return { pages: [] };
+      if (e.code === 'ENOENT') return { pages: [] };
       throw e;
     });
   const withdrawn = new Set(
@@ -27,7 +35,7 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
   );
   const buildings = new Set(
     data.map.features
-      .filter((f) => f.properties?.kind === "building")
+      .filter((f) => f.properties?.kind === 'building')
       .map((f) => String(f.properties.id)),
   );
   const resolve = (id) => {
@@ -53,7 +61,7 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
   // withdrawn after original metadata revealed synthetic content.
   const photos = publicCampus(
     combined.filter((p) => !withdrawn.has(p.id)),
-    "photos",
+    'photos',
   );
   const assets = new Map();
   for (const photo of photos) {
@@ -70,21 +78,24 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
       throw Error(`Invalid approved photograph ${photo.id}`);
     if (assets.has(photo.url)) {
       if (assets.get(photo.url).bytes !== photo.bytes)
-        throw Error("Conflicting photograph asset size");
+        throw Error('Conflicting photograph asset size');
       continue;
     }
     let bytes;
-    for (const folder of ["data/release-photos", "data/photos"]) {
+    for (const folder of ['data/release-photos', 'data/photos']) {
       try {
-        bytes = await fs.readFile(path.join(root, folder, `${photo.sha256}.webp`));
+        bytes = await fs.readFile(
+          path.join(root, folder, `${photo.sha256}.webp`),
+        );
         break;
       } catch (e) {
-        if (e.code !== "ENOENT") throw e;
+        if (e.code !== 'ENOENT') throw e;
       }
     }
     if (!bytes && process.env.PUBLISHED_MAP_URL) {
       const origin = new URL(process.env.PUBLISHED_MAP_URL);
-      if (origin.protocol !== "https:") throw Error("Published map must use HTTPS");
+      if (origin.protocol !== 'https:')
+        throw Error('Published map must use HTTPS');
       const response = await fetcher(new URL(photo.url, origin), {
         signal: AbortSignal.timeout(30000),
       });
@@ -94,20 +105,22 @@ export async function packagePhotos(data, root, asset, { fetcher = fetch } = {})
       !bytes ||
       bytes.length !== photo.bytes ||
       bytes.length > 250 * 1024 ||
-      createHash("sha256").update(bytes).digest("hex") !== photo.sha256 ||
-      bytes.toString("ascii", 0, 4) !== "RIFF" ||
-      bytes.toString("ascii", 8, 12) !== "WEBP"
+      createHash('sha256').update(bytes).digest('hex') !== photo.sha256 ||
+      bytes.toString('ascii', 0, 4) !== 'RIFF' ||
+      bytes.toString('ascii', 8, 12) !== 'WEBP'
     )
       throw Error(
         `Photograph missing or failed integrity: ${photo.id}. No release images may be omitted.`,
       );
-    await asset(photo.url, bytes, "image/webp");
+    await asset(photo.url, bytes, 'image/webp');
     assets.set(photo.url, { bytes: bytes.length });
   }
   if (photos.length) data.photos = photos;
   else delete data.photos;
   const bytes = [...assets.values()].reduce((sum, a) => sum + a.bytes, 0);
   if (bytes > 20 * 1024 * 1024)
-    console.warn("Photographs exceed 20 MiB; all approved photographs remain included.");
+    console.warn(
+      'Photographs exceed 20 MiB; all approved photographs remain included.',
+    );
   return photos.length ? { bytes, assetUrls: [...assets.keys()] } : undefined;
 }

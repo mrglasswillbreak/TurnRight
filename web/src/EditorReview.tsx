@@ -77,7 +77,10 @@ export function EditorReview({
   draftCount: number;
 }) {
   const [summary, setSummary] = useState('');
-  const modelReviews = useMemo(() => campusFacadeReviewIssues(validation.data), [validation.data]);
+  const modelReviews = useMemo(
+    () => campusFacadeReviewIssues(validation.data),
+    [validation.data],
+  );
   const [liveState, setLiveState] = useState(state);
   const [statusError, setStatusError] = useState<Error | null>(null);
   const [statusAttempt, setStatusAttempt] = useState(0);
@@ -98,13 +101,17 @@ export function EditorReview({
       if (!document.hidden) {
         try {
           const latest = await api<
-            Pick<ReviewState, 'jobs' | 'releases' | 'changes' | 'hasMoreChanges' | 'published'>
+            Pick<
+              ReviewState,
+              'jobs' | 'releases' | 'changes' | 'hasMoreChanges' | 'published'
+            >
           >('review-status', {
             omitChanges: true,
           });
           if (!cancelled) {
             setLiveState((current) => ({ ...current, ...latest }));
-            if (latest.published !== undefined) onPublishedWorkspace(latest.published);
+            if (latest.published !== undefined)
+              onPublishedWorkspace(latest.published);
             setStatusError(null);
           }
         } catch (e) {
@@ -128,12 +135,14 @@ export function EditorReview({
           <button
             className="editor-text"
             onClick={() =>
-              statusError instanceof AdminRequestError && statusError.reason === 'auth'
+              statusError instanceof AdminRequestError &&
+              statusError.reason === 'auth'
                 ? void onSignIn()
                 : setStatusAttempt((n) => n + 1)
             }
           >
-            {statusError instanceof AdminRequestError && statusError.reason === 'auth'
+            {statusError instanceof AdminRequestError &&
+            statusError.reason === 'auth'
               ? 'Sign in again'
               : 'Retry status refresh'}
           </button>
@@ -145,7 +154,9 @@ export function EditorReview({
           {requestedCampus() === 'lasu' && (
             <>
               <EnrichmentReview
-                onLocate={(center) => mapRef.current?.flyTo({ center, zoom: 19 })}
+                onLocate={(center) =>
+                  mapRef.current?.flyTo({ center, zoom: 19 })
+                }
               />
               <BuildingRoofReview
                 data={validation.data}
@@ -259,7 +270,10 @@ export function EditorReview({
           <button
             className="editor-secondary"
             onClick={() =>
-              downloadJson('turnright-local-recovery.json', workspace.localBackup(baselineVersion))
+              downloadJson(
+                'turnright-local-recovery.json',
+                workspace.localBackup(baselineVersion),
+              )
             }
           >
             Download local recovery
@@ -272,9 +286,9 @@ export function EditorReview({
           </p>
           {baselineVersion !== publishedVersion && (
             <p className="notice">
-              The working baseline and public package have different version labels. Review the
-              actual changes below; accepted updates and saved access corrections are retained for
-              the next release.
+              The working baseline and public package have different version
+              labels. Review the actual changes below; accepted updates and
+              saved access corrections are retained for the next release.
             </p>
           )}
           <div className="validation-card">
@@ -292,13 +306,20 @@ export function EditorReview({
             {modelReviews.length > 0 && (
               <section aria-label="Model release blockers">
                 <p>
-                  Draft saves are safe. Review these surfaces and authored models in Edit model
-                  before building a preview. Geometry and material changes require another review.
+                  Draft saves are safe. Review these surfaces and authored
+                  models in Edit model before building a preview. Geometry and
+                  material changes require another review.
                 </p>
                 {modelReviews.map((issue) => (
-                  <div key={`${issue.featureId}:${issue.field}`} className="form-error">
+                  <div
+                    key={`${issue.featureId}:${issue.field}`}
+                    className="form-error"
+                  >
                     <p>{issue.message}</p>
-                    <button className="editor-secondary" onClick={() => onIssue(issue)}>
+                    <button
+                      className="editor-secondary"
+                      onClick={() => onIssue(issue)}
+                    >
                       Review model · {issue.message.split(': ')[0]}
                     </button>
                   </div>
@@ -307,16 +328,19 @@ export function EditorReview({
             )}
             {!validation.usable && (
               <p className="notice">
-                Showing the last usable map. The current draft has not passed validation.
+                Showing the last usable map. The current draft has not passed
+                validation.
               </p>
             )}
             <p>
-              {validation.data.places.length} places · {validation.data.graph.edges.length} path
-              segments
+              {validation.data.places.length} places ·{' '}
+              {validation.data.graph.edges.length} path segments
             </p>
             {validation.issues.map((issue, index) => (
               <div
-                className={issue.severity === 'warning' ? 'small-note' : 'form-error'}
+                className={
+                  issue.severity === 'warning' ? 'small-note' : 'form-error'
+                }
                 key={`${issue.code}:${index}`}
               >
                 <p>{issue.message}</p>
@@ -325,10 +349,15 @@ export function EditorReview({
                   {issue.featureId ? ` · ${issue.featureId}` : ''}
                 </small>
                 {issue.referenceIds?.length && (
-                  <p className="small-note">References: {issue.referenceIds.join(', ')}</p>
+                  <p className="small-note">
+                    References: {issue.referenceIds.join(', ')}
+                  </p>
                 )}
                 {issue.repair && (
-                  <button className="editor-secondary" onClick={() => onIssue(issue)}>
+                  <button
+                    className="editor-secondary"
+                    onClick={() => onIssue(issue)}
+                  >
                     {issue.repair === 'choose-place'
                       ? 'Choose entrance’s place'
                       : issue.repair === 'connect-path'
@@ -337,7 +366,10 @@ export function EditorReview({
                   </button>
                 )}
                 {issue.coordinates && (
-                  <button className="text-button" onClick={() => onIssue(issue)}>
+                  <button
+                    className="text-button"
+                    onClick={() => onIssue(issue)}
+                  >
                     <MapPin size={15} /> Locate feature
                   </button>
                 )}
@@ -352,7 +384,11 @@ export function EditorReview({
               ))}
           </div>
           <div className="button-row">
-            <Button variant="outline" disabled={validation.pending} onClick={validation.retry}>
+            <Button
+              variant="outline"
+              disabled={validation.pending}
+              onClick={validation.retry}
+            >
               <RefreshCw /> Retry validation
             </Button>
             <Button
@@ -399,13 +435,14 @@ export function EditorReview({
                     !e.vehicle.conditional,
                 ).length
               }{' '}
-              permitted directed road segments; {validation.data.driving.parking.length}{' '}
-              parking/drop-off points. Driving and walking connections are validated separately.
+              permitted directed road segments;{' '}
+              {validation.data.driving.parking.length} parking/drop-off points.
+              Driving and walking connections are validated separately.
             </p>
           )}
           <p className="notice">
-            {validation.data.coverage.disconnected.length} places still lack a mapped approach.
-            Source-derived routes have not been field-verified.
+            {validation.data.coverage.disconnected.length} places still lack a
+            mapped approach. Source-derived routes have not been field-verified.
           </p>
           <Button
             variant="outline"
@@ -430,12 +467,27 @@ export function EditorReview({
             {impact.result && (
               <>
                 <p>
-                  {impact.result.changes.filter((c) => c.change === 'added').length} added ·{' '}
-                  {impact.result.changes.filter((c) => c.change === 'changed').length} changed ·{' '}
-                  {impact.result.changes.filter((c) => c.change === 'deleted').length} deleted
+                  {
+                    impact.result.changes.filter((c) => c.change === 'added')
+                      .length
+                  }{' '}
+                  added ·{' '}
+                  {
+                    impact.result.changes.filter((c) => c.change === 'changed')
+                      .length
+                  }{' '}
+                  changed ·{' '}
+                  {
+                    impact.result.changes.filter((c) => c.change === 'deleted')
+                      .length
+                  }{' '}
+                  deleted
                 </p>
                 <details>
-                  <summary>Changed features and entrances ({impact.result.changes.length})</summary>
+                  <summary>
+                    Changed features and entrances (
+                    {impact.result.changes.length})
+                  </summary>
                   {impact.result.changes.map((c) => (
                     <p key={`${c.kind}:${c.id}`}>
                       {c.change} · {c.kind} · {c.name}
@@ -443,8 +495,9 @@ export function EditorReview({
                   ))}
                 </details>
                 <p>
-                  {impact.result.newlyDisconnected.length} newly disconnected destinations (lost
-                  approach or reachability from the comparison origin).
+                  {impact.result.newlyDisconnected.length} newly disconnected
+                  destinations (lost approach or reachability from the
+                  comparison origin).
                 </p>
                 {impact.result.newlyDisconnected.map((p) => (
                   <p className="notice" key={p.id}>
@@ -461,21 +514,25 @@ export function EditorReview({
                       </tr>
                     </thead>
                     <tbody>
-                      {[...impact.result.walks, ...impact.result.drives].map((walk) => (
-                        <tr key={walk.name}>
-                          <th>{walk.name}</th>
-                          <td>
-                            {walk.before.status}
-                            {walk.before.distance !== undefined
-                              ? ` · ${walk.before.distance} m`
-                              : ''}
-                          </td>
-                          <td>
-                            {walk.after.status}
-                            {walk.after.distance !== undefined ? ` · ${walk.after.distance} m` : ''}
-                          </td>
-                        </tr>
-                      ))}
+                      {[...impact.result.walks, ...impact.result.drives].map(
+                        (walk) => (
+                          <tr key={walk.name}>
+                            <th>{walk.name}</th>
+                            <td>
+                              {walk.before.status}
+                              {walk.before.distance !== undefined
+                                ? ` · ${walk.before.distance} m`
+                                : ''}
+                            </td>
+                            <td>
+                              {walk.after.status}
+                              {walk.after.distance !== undefined
+                                ? ` · ${walk.after.distance} m`
+                                : ''}
+                            </td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -522,7 +579,10 @@ export function EditorReview({
               {release.preview_url && (
                 <a
                   className="source-link"
-                  href={new URL(campusUrl(release.preview_url), release.preview_url).href}
+                  href={
+                    new URL(campusUrl(release.preview_url), release.preview_url)
+                      .href
+                  }
                   target="_blank"
                   rel="noreferrer"
                 >

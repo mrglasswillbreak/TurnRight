@@ -1,21 +1,27 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { db } from "./cloud.mjs";
-import { vercelApi } from "./vercel-api.mjs";
-import { readPublishedCatalogue } from "../web/scripts/published-campus-catalogue.mjs";
+import { mkdir, writeFile } from 'node:fs/promises';
+import { db } from './cloud.mjs';
+import { vercelApi } from './vercel-api.mjs';
+import { readPublishedCatalogue } from '../web/scripts/published-campus-catalogue.mjs';
 
 // Read only: no deployment, credential generation, lease or database mutation.
 // Export bounded release metadata, never snapshots, identities or credentials.
-const result = { recordedAt: new Date().toISOString(), readOnly: true, campuses: [] };
-const campuses = await db("campuses?select=id,slug&slug=in.(lasu,unilag)");
+const result = {
+  recordedAt: new Date().toISOString(),
+  readOnly: true,
+  campuses: [],
+};
+const campuses = await db('campuses?select=id,slug&slug=in.(lasu,unilag)');
 for (const campus of campuses) {
   process.env.CAMPUS_ID = campus.id;
   const releases = await db(
-    "releases?select=id,status,summary,version,review_id,catalogue_revision,published_catalogue_revision,deployment_id,preview_url,deployment_url,error,created_at,published_at&order=created_at.desc&limit=6",
+    'releases?select=id,status,summary,version,review_id,catalogue_revision,published_catalogue_revision,deployment_id,preview_url,deployment_url,error,created_at,published_at&order=created_at.desc&limit=6',
   );
   const records = [];
   for (const release of releases) {
     const review = release.review_id
-      ? await db(`gis_reviews?id=eq.${release.review_id}&select=id,status,content_hash,reviewed_at`)
+      ? await db(
+          `gis_reviews?id=eq.${release.review_id}&select=id,status,content_hash,reviewed_at`,
+        )
       : [];
     const jobs = await db(
       `jobs?kind=like.release:${release.id}:*&select=id,kind,status,message,created_at,completed_at&order=created_at.desc&limit=5`,
@@ -26,7 +32,9 @@ for (const campus of campuses) {
     let deployment;
     if (release.deployment_id) {
       try {
-        const d = await vercelApi(`/v13/deployments/${encodeURIComponent(release.deployment_id)}`);
+        const d = await vercelApi(
+          `/v13/deployments/${encodeURIComponent(release.deployment_id)}`,
+        );
         deployment = {
           id: d.id,
           url: d.url,
@@ -42,8 +50,8 @@ for (const campus of campuses) {
           },
         };
       } catch (error) {
-        if (!error.message.startsWith("Vercel 404:")) throw error;
-        deployment = { id: release.deployment_id, unavailable: "not-found" };
+        if (!error.message.startsWith('Vercel 404:')) throw error;
+        deployment = { id: release.deployment_id, unavailable: 'not-found' };
       }
     }
     records.push({ release, review: review[0], jobs, audit, deployment });
@@ -67,9 +75,9 @@ result.production = production && {
   },
 };
 result.catalogue = await readPublishedCatalogue(process.env.PUBLISHED_MAP_URL);
-await mkdir("web/work/release-readiness", { recursive: true });
+await mkdir('web/work/release-readiness', { recursive: true });
 await writeFile(
-  "web/work/release-readiness/publication-state.json",
-  JSON.stringify(result, null, 2) + "\n",
+  'web/work/release-readiness/publication-state.json',
+  JSON.stringify(result, null, 2) + '\n',
 );
-console.log("Read-only publication state captured for both campuses.");
+console.log('Read-only publication state captured for both campuses.');

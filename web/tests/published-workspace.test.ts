@@ -14,8 +14,13 @@ vi.mock('../server/backend', () => ({
 }));
 afterEach(() => vi.resetAllMocks());
 it('reads only the latest materialized corrections without expanding source snapshots', async () => {
-  vi.mocked(db).mockResolvedValue([{ version: 'public', edits: [{ id: 'saved' }] }]);
-  expect(await publishedWorkspace()).toEqual({ version: 'public', edits: [{ id: 'saved' }] });
+  vi.mocked(db).mockResolvedValue([
+    { version: 'public', edits: [{ id: 'saved' }] },
+  ]);
+  expect(await publishedWorkspace()).toEqual({
+    version: 'public',
+    edits: [{ id: 'saved' }],
+  });
   const path = vi.mocked(db).mock.calls[0][0];
   expect(path).toContain('edits:editor_edits');
   expect(path).toContain('limit=1');
