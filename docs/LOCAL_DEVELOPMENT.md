@@ -22,7 +22,7 @@ Alternatively, install those Node/Python versions in your Linux environment.
 ```sh
 npm ci
 npm run setup
-python -m pip install -r scripts/requirements-data.txt
+python -m pip install --require-hashes -r scripts/requirements-data.lock
 npm run local:up
 ```
 
@@ -70,8 +70,8 @@ npm run local:reset -- --confirm-local-reset  # Delete local work and reseed
 ```
 
 Reset is explicit and always targets the local CLI stack. Never use linked-project
-or production database flags. Reopen the app and sign in with the newly generated
-account passwords after resetting.
+or production database flags. Reset stops the application. Run `npm run local:up`
+again, reopen the app and sign in with the newly generated account passwords.
 
 ## Troubleshooting and verification
 
@@ -84,6 +84,8 @@ semantics. Restart does not interpret an uncertain worker result as success.
 The `Licensing readiness / local-stack` Linux CI job installs committed locks,
 builds the development image, applies migrations to a clean Supabase stack and
 checks real sign-in, roles, campus denial, editing, idempotent saves, independent
-review, isolated file import, export, cancellation, restart persistence and reset.
+review (including denial when a contributor also holds the reviewer role), metric
+buffer analysis, isolated file import and source acceptance, export, private
+photograph/model upload and readback, cancellation, restart persistence and reset.
 Its receipt records the exact revision. Existing browser, native GIS, database,
 offline and restoration checks remain separate required release evidence.

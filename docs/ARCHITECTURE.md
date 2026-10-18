@@ -42,6 +42,12 @@ Browser journeys verify campus/history isolation, autosave and undo, unfinished 
 
 [Editor layout contract](EDITOR-LAYOUT.md) documents typed workspace/pane identities, stable canvas hosts, responsive sheets and versioned preferences. The new shell and combined Activity presentation use existing state stores and APIs. Model and photo editors retain their existing workers, queues, undo and recovery ownership. No database migration accompanies the layout or identity changes.
 
+## Local runtime and diagnostics
+
+`scripts/local` owns the development-only Supabase lifecycle, idempotent synthetic seeding, loopback HTTP adapter and bounded worker dispatcher. The adapter imports the same `web/api` handlers used in production; Supabase sessions and existing campus capability checks remain authoritative. Local orchestration removes hosted credentials and accepts only fixed GIS, uploaded-file import and source-review worker inputs. The isolated processing images retain their existing resource and network controls. [Fresh-clone setup and operational limits](LOCAL_DEVELOPMENT.md).
+
+`web/server/request-envelope.ts` validates admin envelopes before domain dispatch while preserving authentication order and successful contracts. `web/server/diagnostics.mjs` emits JSON events from an allowlist of fields and dependency names; request completion includes timestamp, duration, status and a request reference, never raw errors or payloads. Existing worker receipts remain authoritative for uncertain completion. `ApplicationRecovery` offers reload after a rendering failure without deleting stored work. `/api/health` exposes only application status and release revision.
+
 ## Campus GIS workflow
 
 The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while lazy **Data, Analyze, Review and Publish** workspaces coordinate the existing **Edit** tools. Read-only team members receive the same map and review surfaces without geometry editing controls.

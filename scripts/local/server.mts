@@ -217,7 +217,7 @@ const server = createServer(async (req, res) => {
       if (url.pathname === '/api/admin') {
         const value = JSON.parse(payload || '{}');
         if (
-          /^(check-sources|refresh-source|source-schedule|source-updates-check|prepare-release|publish-release|rollback)$/.test(
+          /^(check-sources|refresh-source|source-schedule|source-updates-check|source-updates-reverify|prepare-release|publish-release|rollback)$/.test(
             value.action || '',
           ) ||
           (value.action === 'import-start' &&

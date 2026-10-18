@@ -108,7 +108,7 @@ npm run dev
 
 Open the address printed by Vite. The public seed map works without credentials. The local seed is a development fixture; it need not match the current public catalogue.
 
-Vite alone does not serve the private Vercel APIs. For connected editing, follow [deployment and authentication setup](docs/DEPLOYMENT.md) and [environment configuration](docs/CONFIGURATION.md). Copy [web/.env.example](web/.env.example) only when configuring those services. Never put service credentials in `VITE_*` variables.
+For the complete editor, follow [local development](docs/LOCAL_DEVELOPMENT.md): the pinned Linux/WSL2 development container and `npm run local:up` provide local Supabase/PostGIS, real role-based sessions, private storage and isolated workers with two synthetic campuses. No hosted credentials are needed. Startup preserves local work; reset is explicit. Vite alone serves the public app. Hosted editing uses [deployment and authentication setup](docs/DEPLOYMENT.md) and [environment configuration](docs/CONFIGURATION.md). Never put service credentials in `VITE_*` variables.
 
 For a production build and local static preview:
 
@@ -166,4 +166,4 @@ Physical Android/iPhone checks, campus field verification, live role acceptance,
 
 Read [Contributing](CONTRIBUTING.md) before changing data or workflows, and [Security](SECURITY.md) for reporting a vulnerability. Preserve campus isolation, source provenance, private attributes, recovery, and independent publication review.
 
-No root software licence has been declared. Do not assume the code is licensed for reuse. Data, photographs, codecs, fonts, and other assets retain their own terms: consult [data attribution](data/ATTRIBUTION.md), [photograph records](data/photos/README.md), and in-app credits. Source redistribution permission does not grant broader reuse rights. [Brand assets](docs/BRAND.md).
+Original software is proprietary under [LICENSE](LICENSE); commercial licensing requires a separate written agreement. [Third-party notices](THIRD_PARTY.md) distinguish dependencies and assets from original code. Data, photographs, codecs and fonts retain their own terms: consult [data attribution](data/ATTRIBUTION.md), [photograph records](data/photos/README.md), and in-app credits. Source redistribution permission does not grant broader reuse rights. [Brand assets](docs/BRAND.md).

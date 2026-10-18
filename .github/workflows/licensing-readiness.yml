@@ -85,7 +85,7 @@ jobs:
             if curl --fail --silent http://127.0.0.1:5180/packages/campuses.json > /dev/null; then break; fi
             sleep 5
           done
-          npm run local:test
+          npm run local:test -- --after-reset
       - name: Stop local services
         if: always()
         run: npm run local:down

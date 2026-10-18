@@ -95,7 +95,7 @@ if (operation === 'down') {
   const config = await readConfig();
   await command(
     process.execPath,
-    [...nodeArgs, 'scripts/local/acceptance.mts'],
+    [...nodeArgs, 'scripts/local/acceptance.mts', ...process.argv.slice(3)],
     { env: localEnvironment(config) },
   );
 } else {
