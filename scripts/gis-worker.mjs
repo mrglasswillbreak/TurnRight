@@ -1,4 +1,5 @@
 import { db } from './cloud.mjs';
+import { emitEvent } from '../web/server/diagnostics.mjs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -6,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
 const id = process.env.GIS_JOB_ID;
+const startedAt = Date.now();
 if (!/^[a-f0-9-]{36}$/i.test(id || '')) throw Error('GIS_JOB_ID is required');
 let job, directory, child, poll, containerName;
 const stopContainer = () =>
@@ -157,7 +159,7 @@ try {
   });
   if (!finished)
     throw Error('Job was cancelled, expired, or its author lost access');
-  console.log('GIS job completed');
+  emitEvent('worker-completed', { worker: 'gis', startedAt, status: 200 });
 } catch (error) {
   if (!job)
     await db(`gis_jobs?id=eq.${id}&status=eq.queued`, 'PATCH', {
@@ -171,7 +173,12 @@ try {
       token: job.run_token,
       result: { error: String(error.message).slice(0, 12000) },
     }).catch(() => {});
-  console.error(error.message);
+  emitEvent('worker-failed', {
+    worker: 'gis',
+    startedAt,
+    status: 500,
+    dependency: 'worker',
+  });
   process.exitCode = 1;
 } finally {
   clearInterval(poll);

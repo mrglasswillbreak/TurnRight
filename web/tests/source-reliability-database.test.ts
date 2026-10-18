@@ -1,6 +1,29 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { gisDatabase, owner, reviewer, editor } from './gis-database-fixture';
+import type { SourceOperation } from '../src/source-updates';
+import type {
+  SourceFixtureRecord,
+  SourceFixtureObservation,
+} from './source-fixture-types';
+interface RpcResults {
+  source_decision_history: {
+    decisions: Array<{ actor: string; outcome: string; group_id: string }>;
+    legacyFindings: unknown[];
+  };
+  source_review_prepare: SourceOperation;
+  source_review_control: SourceOperation & { run_token: string };
+  source_review_step: SourceOperation;
+  source_undo_preview: { eligible: boolean };
+  source_group_eligibility: { eligible: boolean };
+  source_provenance_backfill: {
+    recovered: number;
+    findings: Array<{ recoverable: boolean }>;
+  };
+}
+type RpcResult<Name extends string> = Name extends keyof RpcResults
+  ? RpcResults[Name]
+  : unknown;
 // @ts-expect-error Shared Node worker module.
 import {
   runSourceCheck,
@@ -15,7 +38,10 @@ beforeAll(async () => {
 afterAll(async () => {
   await db?.close();
 });
-const rpc = async (name: string, args: Record<string, unknown>) => {
+const rpc = async <Name extends string>(
+  name: Name,
+  args: Record<string, unknown>,
+): Promise<RpcResult<Name>> => {
   if (
     ['team_review_source', 'review_map_fields'].includes(name) &&
     !Object.hasOwn(args, 'expected_revision')
@@ -29,7 +55,7 @@ const rpc = async (name: string, args: Record<string, unknown>) => {
     args = { ...args, expected_revision: revision ?? null };
   }
   return (
-    await db.query<{ result: any }>(
+    await db.query<{ result: RpcResult<Name> }>(
       `select ${name}(${Object.keys(args)
         .map((key, i) => `${key} => $${i + 1}`)
         .join(',')}) result`,
@@ -54,7 +80,7 @@ const input = (id: string, name = 'Library') => ({
     configurationHash: 'config',
     collections: [{ identity: 'buildings', complete: true, count: 1 }],
   },
-  observations: [
+  observations: <SourceFixtureObservation[]>[
     {
       provider: 'file',
       collection: 'buildings',
@@ -286,7 +312,11 @@ async function enabledInput(key: string, name = 'First') {
 }
 async function pending(key: string) {
   return (
-    await db.query<{ id: string; before: any; after: any }>(
+    await db.query<{
+      id: string;
+      before: SourceFixtureRecord;
+      after: SourceFixtureRecord;
+    }>(
       "select m.* from map_changes m join source_proposal_groups g using(campus_id,id) where g.source_key=$1 and m.status='pending'",
       [key],
     )
@@ -431,8 +461,12 @@ it('requires complete replacement evidence and preserves later overrides during 
   ).toBe(1);
 });
 it('applies a whole routing group atomically and protects shared nodes and explicit connections', async () => {
-  const request: any = await enabledInput('routing');
-  const record = (entity: string, id: string, payload: any) => ({
+  const request = await enabledInput('routing');
+  const record = (
+    entity: string,
+    id: string,
+    payload: SourceFixtureRecord['payload'],
+  ) => ({
     id: entity + ':' + id,
     entity,
     source: 'routing',
@@ -526,7 +560,13 @@ it('supports descriptive-field review and audited undo without changing the raw 
     await db.query(
       "select o.value,a.record_overrides from source_accepted_observations a join source_observations o on o.run_id=a.run_id and o.identity=a.identity where a.source_key='fields'",
     )
-  ).rows[0] as any;
+  ).rows[0] as {
+    value: { content: { name: string } };
+    record_overrides: Record<
+      string,
+      { payload: { properties: { name: string } } }
+    >;
+  };
   expect(accepted.value.content.name).toBe('First');
   expect(
     accepted.record_overrides['feature:fields'].payload.properties.name,
@@ -693,7 +733,7 @@ it('can review a recurring change after audited undo while retaining the earlier
   ).toHaveLength(3);
 });
 it('database graph guards roll back a missing arrival even if a worker mislabels eligibility', async () => {
-  const request: any = await enabledInput('missing-arrival');
+  const request = await enabledInput('missing-arrival');
   request.observations[0].records = [
     {
       id: 'place:missing-arrival',
@@ -733,7 +773,7 @@ it('database graph guards roll back a missing arrival even if a worker mislabels
 });
 
 it('compresses complete raw evidence, deduplicates repeated checks, and bounds snapshot retention', async () => {
-  const request: any = { ...input('storage'), sourceKey: 'storage-bounded' };
+  const request = { ...input('storage'), sourceKey: 'storage-bounded' };
   request.observations = Array.from({ length: 1200 }, (_, i) => ({
     ...request.observations[0],
     nativeId: `context-${i}`,
@@ -798,7 +838,7 @@ it('compresses complete raw evidence, deduplicates repeated checks, and bounds s
 }, 60000);
 
 it('losslessly compacts pre-upgrade duplicates and leaves accepted and undo observations pinned', async () => {
-  const request: any = {
+  const request = {
     ...input('legacy-packed'),
     sourceKey: 'storage-legacy',
   };

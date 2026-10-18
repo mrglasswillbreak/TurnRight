@@ -54,13 +54,24 @@ import type {
   CampusPhoto,
 } from './types.js';
 import type { Geometry } from 'geojson';
-export interface SourceRecord {
+interface SourceIdentity {
   id: string;
   source: string;
-  entity: 'meta' | 'feature' | 'place' | 'node' | 'edge';
-  payload: any;
   hash: string;
 }
+export type SourceRecord = SourceIdentity &
+  (
+    | { entity: 'meta'; payload: Omit<CampusData, 'map' | 'places' | 'graph'> }
+    | { entity: 'feature'; payload: CampusData['map']['features'][number] }
+    | { entity: 'place'; payload: Place }
+    | { entity: 'node'; payload: GraphNode & { gisManaged?: boolean } }
+    | {
+        entity: 'edge';
+        payload: CampusData['graph']['edges'][number] & {
+          gisManaged?: boolean;
+        };
+      }
+  );
 const walkingAccessValues = ['yes', 'campus', 'private', 'no'];
 export function pathWalkingAccess(data: CampusData, id: string): WalkingAccess {
   const declared = data.map.features.find((f) => f.properties?.id === id)

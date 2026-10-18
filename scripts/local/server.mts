@@ -28,6 +28,7 @@ if (
   throw Error('Start the development server through npm run local:up.');
 const { default: admin } = await import('../../web/api/admin.ts');
 const { default: reports } = await import('../../web/api/reports.ts');
+const { default: health } = await import('../../web/api/health.ts');
 const { db } = await import('../../web/server/backend.ts');
 const { withCampusId } = await import('../../web/server/campus-scope.ts');
 await mkdir(path.join(runtime, 'jobs'), { recursive: true });
@@ -47,7 +48,8 @@ const vite = await createViteServer({
         '**/.env.*',
         '**/*.{crt,pem}',
         '**/.git/**',
-        '**/work/**',
+        // Match our private scratch folder, not GitHub's /home/runner/work checkout.
+        path.join(root, 'web/work/**').replaceAll('\\', '/'),
         '**/.local-runtime/**',
         '**/supabase/.temp/**',
       ],
@@ -62,10 +64,11 @@ const vite = await createViteServer({
 const pending: Array<{ workflow: string; inputs: Record<string, string> }> = [];
 const active = new Map<string, ChildProcess>();
 const queued = new Set<string>();
+let stopping = false;
 const keyOf = (job: (typeof pending)[number]) =>
   `${job.workflow}:${job.inputs.job_id || job.inputs.import_id || job.inputs.operation_id}`;
 function runNext() {
-  if (active.size || !pending.length) return;
+  if (stopping || active.size || !pending.length) return;
   const job = pending.shift()!;
   const key = keyOf(job);
   const env = {
@@ -151,6 +154,7 @@ function internalToken(req: IncomingMessage) {
   );
 }
 async function enqueue(value: unknown) {
+  if (stopping) throw Error('The local dispatcher is stopping.');
   const job = value as { workflow: string; inputs: Record<string, string> };
   if (
     !job ||
@@ -208,15 +212,14 @@ const server = createServer(async (req, res) => {
       json(res, 404, { error: 'Unknown local control.' });
       return;
     }
-    if (url.pathname === '/api/admin' || url.pathname === '/api/reports') {
+    if (['/api/admin', '/api/reports', '/api/health'].includes(url.pathname)) {
       const payload = await body(req);
       if (url.pathname === '/api/admin') {
         const value = JSON.parse(payload || '{}');
         if (
-          /^(refresh-source|source-schedule|prepare-release|publish-release|rollback)$/.test(
+          /^(check-sources|refresh-source|source-schedule|source-updates-check|prepare-release|publish-release|rollback)$/.test(
             value.action || '',
           ) ||
-          /source-updates-.*check/.test(value.action || '') ||
           (value.action === 'import-start' &&
             value.payload?.kind &&
             value.payload.kind !== 'file')
@@ -246,10 +249,13 @@ const server = createServer(async (req, res) => {
         headers: req.headers,
         body: payload,
       };
-      await (url.pathname === '/api/admin' ? admin : reports)(
-        request,
-        response,
-      );
+      await (
+        url.pathname === '/api/admin'
+          ? admin
+          : url.pathname === '/api/reports'
+            ? reports
+            : health
+      )(request, response);
       return;
     }
     if (url.pathname.startsWith('/packages/')) {
@@ -284,6 +290,9 @@ const server = createServer(async (req, res) => {
   }
 });
 async function stop() {
+  if (stopping) return;
+  stopping = true;
+  pending.length = 0;
   for (const child of active.values()) child.kill('SIGTERM');
   await vite.close();
   server.close();

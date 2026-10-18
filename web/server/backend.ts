@@ -1,5 +1,6 @@
 import { currentCampusId, scopeDatabaseRequest } from './campus-scope.js';
 import { createHash } from 'node:crypto';
+import { emitEvent } from './diagnostics.mjs';
 import {
   localDispatchConfiguration,
   validateLocalJob,
@@ -7,7 +8,7 @@ import {
 export interface RequestLike {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
-  body?: any;
+  body?: unknown;
 }
 export interface ResponseLike {
   status: (code: number) => ResponseLike;
@@ -33,7 +34,7 @@ async function serviceRequest(
   try {
     const response = await fetch(url, init);
     let validJson = true;
-    const result: any = await response.json().catch(() => {
+    const result: unknown = await response.json().catch(() => {
       validJson = false;
       return null;
     });
@@ -53,7 +54,7 @@ export function requireConfig() {
       'The backend is not connected yet. Follow docs/DEPLOYMENT.md to configure Supabase.',
     );
 }
-export async function db<T = any>(
+export async function db<T = unknown>(
   path: string,
   method = 'GET',
   body?: unknown,
@@ -89,7 +90,9 @@ export async function db<T = any>(
           : 400,
       response.status >= 500
         ? 'The database is temporarily unavailable. Your local work is retained. Check Activity before retrying a change.'
-        : result?.message || 'Database request failed.',
+        : isObject(result) && typeof result.message === 'string'
+          ? result.message
+          : 'Database request failed.',
       'database',
       response.status,
     );
@@ -100,12 +103,12 @@ export async function db<T = any>(
       'database',
       response.status,
     );
-  return result;
+  return result as T;
 }
-export async function allRows(table: string, filter = '') {
-  const rows: any[] = [];
+export async function allRows<T = unknown>(table: string, filter = '') {
+  const rows: T[] = [];
   for (let offset = 0; offset < 300000; offset += 1000) {
-    const page = await db(
+    const page = await db<T[]>(
       `${table}?select=*&order=${table === 'map_edits' ? 'id,kind' : 'id'}&limit=1000&offset=${offset}${filter}`,
     );
     rows.push(...page);
@@ -131,18 +134,21 @@ export async function requireIdentity(req: RequestLike) {
   );
   if ([401, 403].includes(response.status))
     throw new HttpError(401, 'Your session expired. Sign in again.');
-  if (!response.ok || typeof user?.id !== 'string')
+  if (!response.ok || !isObject(user) || typeof user.id !== 'string')
     throw new HttpError(
       503,
       'Sign-in verification is temporarily unavailable. Your local work is retained. Retry the connection shortly.',
       'authentication',
       response.status,
     );
-  return user;
+  return { id: user.id };
+}
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 export function bodyOf(req: RequestLike, limit = 100000) {
   if (req.method !== 'POST') throw new HttpError(405, 'Use POST');
-  let body;
+  let body: unknown;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   } catch {
@@ -150,19 +156,21 @@ export function bodyOf(req: RequestLike, limit = 100000) {
   }
   if (!body || JSON.stringify(body).length > limit)
     throw new HttpError(413, 'Request is too large.');
+  if (!isObject(body)) throw new HttpError(400, 'Use a JSON object request.');
   return body;
 }
 export function fail(
   res: ResponseLike,
   error: unknown,
-  context?: { requestId: string; action?: string },
+  context?: { requestId: string; action?: string; startedAt?: number },
 ) {
   const status = error instanceof HttpError ? error.status : 500;
   if (status >= 500) {
     // Do not log tokens, query strings, payloads, raw upstream errors or user data.
-    console.error('admin-request-failed', {
+    emitEvent('admin-request-failed', {
       status,
       requestId: context?.requestId,
+      startedAt: context?.startedAt,
       action: /^[a-z-]{1,64}$/.test(context?.action || '')
         ? context?.action
         : undefined,
@@ -182,6 +190,27 @@ export function fail(
       (status >= 500 && context ? ' Reference: ' + context.requestId : ''),
     ...(context ? { requestId: context.requestId } : {}),
   });
+}
+export function observeResponse(
+  res: ResponseLike,
+  context: { requestId: string; startedAt: number; action?: string },
+): ResponseLike {
+  let status = 200;
+  const observed: ResponseLike = {
+    status(code) {
+      status = code;
+      res.status(code);
+      return observed;
+    },
+    setHeader(name, value) {
+      res.setHeader(name, value);
+    },
+    json(body) {
+      emitEvent('request-completed', { ...context, status });
+      res.json(body);
+    },
+  };
+  return observed;
 }
 export function privateHeaders(res: ResponseLike) {
   res.setHeader('Cache-Control', 'no-store');

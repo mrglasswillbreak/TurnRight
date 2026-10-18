@@ -8,7 +8,7 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
   "workspaceFolder": "${localWorkspaceFolder}",
   "remoteUser": "vscode",
-  "postCreateCommand": "npm ci && npm run setup && python -m pip install -r scripts/requirements-data.txt",
+  "postCreateCommand": "npm ci && npm run setup && python -m pip install --require-hashes -r scripts/requirements-data.lock",
   "forwardPorts": [5180],
   "portsAttributes": {
     "5180": { "label": "Local TurnRight", "onAutoForward": "notify" }

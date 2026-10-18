@@ -1,4 +1,5 @@
 import { db } from './cloud.mjs';
+import { emitEvent } from '../web/server/diagnostics.mjs';
 
 export async function runSourceReview({
   operationId,
@@ -44,6 +45,7 @@ export async function runSourceReview({
 }
 
 if (process.env.SOURCE_REVIEW_OPERATION_ID) {
+  const startedAt = Date.now();
   const operationId = process.env.SOURCE_REVIEW_OPERATION_ID,
     token = process.env.SOURCE_REVIEW_RUN_TOKEN;
   if (
@@ -52,18 +54,22 @@ if (process.env.SOURCE_REVIEW_OPERATION_ID) {
     throw Error('Valid review operation and run token required');
   try {
     const result = await runSourceReview({ operationId, token });
-    console.log(
-      JSON.stringify({
-        id: result.id,
-        status: result.status,
-        applied: result.applied,
-        skipped: result.skipped,
-        failed: result.failed,
-      }),
+    emitEvent(
+      result.status === 'failed' ? 'worker-failed' : 'worker-completed',
+      {
+        worker: 'source-review',
+        startedAt,
+        status: result.status === 'failed' ? 500 : 200,
+      },
     );
     if (result.status === 'failed') process.exitCode = 1;
-  } catch (error) {
-    console.error(error.message);
+  } catch {
+    emitEvent('worker-failed', {
+      worker: 'source-review',
+      startedAt,
+      status: 500,
+      dependency: 'database',
+    });
     process.exitCode = 1;
   }
 }

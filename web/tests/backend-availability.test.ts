@@ -8,13 +8,13 @@ const request = {
 function response() {
   return {
     code: 0,
-    body: null as any,
+    body: {} as { error?: string; requestId?: string },
     status(n: number) {
       this.code = n;
       return this;
     },
     json(body: unknown) {
-      this.body = body;
+      this.body = body as { error?: string; requestId?: string };
     },
     setHeader: vi.fn(),
   };

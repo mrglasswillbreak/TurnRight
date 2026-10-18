@@ -7,9 +7,23 @@ import { runtime, origin } from './runtime.mjs';
 const accounts: Array<{ role: string; email: string; password: string }> =
   JSON.parse(await readFile(path.join(runtime, 'accounts.json'), 'utf8'));
 const account = accounts.find((item) => item.role === 'editor')!;
-const browser = await playwright.chromium.launch({ headless: true });
+const browser = await playwright.chromium.launch({
+  headless: true,
+  args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
+});
 try {
   const page = await browser.newPage();
+  page.on('pageerror', (error) =>
+    console.error('Local browser:', error.message),
+  );
+  page.on('response', (response) => {
+    if (response.status() >= 400)
+      console.error(
+        'Local browser HTTP',
+        response.status(),
+        new URL(response.url()).pathname,
+      );
+  });
   await page.goto(origin + '/admin');
   await page.getByLabel('Email', { exact: true }).fill(account.email);
   await page.getByLabel('Password', { exact: true }).fill(account.password);

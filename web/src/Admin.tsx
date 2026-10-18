@@ -2767,10 +2767,12 @@ function Editor({
                     new Set([
                       ...gisSources.map((s) =>
                         s.entity === 'feature'
-                          ? s.payload.properties.kind +
+                          ? s.payload.properties?.kind +
                             ':' +
-                            s.payload.properties.id
-                          : 'place:' + s.payload.id,
+                            s.payload.properties?.id
+                          : s.entity === 'place'
+                            ? 'place:' + s.payload.id
+                            : s.id,
                       ),
                       ...workspace.edits
                         .filter((e) => e.properties.gisManaged)
@@ -2794,10 +2796,11 @@ function Editor({
                     edit ||
                     (source?.entity === 'feature'
                       ? {
-                          id: source.payload.properties.id,
-                          kind: source.payload.properties.kind,
+                          id: String(source.payload.properties?.id),
+                          kind: source.payload.properties
+                            ?.kind as MapEdit['kind'],
                           geometry: source.payload.geometry,
-                          properties: source.payload.properties,
+                          properties: source.payload.properties || {},
                           deleted: false,
                         }
                       : source?.entity === 'place'

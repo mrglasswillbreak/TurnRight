@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner } from './gis-database-fixture';
+import type { SourceMapPage, SourceMapRow } from '../src/source-updates';
 let db: Awaited<ReturnType<typeof gisDatabase>>;
 beforeAll(
   async () => {
@@ -18,12 +19,10 @@ const preview = async (
   actor = owner,
 ) =>
   (
-    await db.query<any>('select source_review_map($1,$2,$3,$4) result', [
-      actor,
-      JSON.stringify(filters),
-      cursor && JSON.stringify(cursor),
-      asOf,
-    ])
+    await db.query<{ result: SourceMapPage }>(
+      'select source_review_map($1,$2,$3,$4) result',
+      [actor, JSON.stringify(filters), cursor && JSON.stringify(cursor), asOf],
+    )
   ).rows[0].result;
 
 it('previews 10,000 updates in bounded pages without reviewing or changing corrections', async () => {
@@ -53,17 +52,18 @@ it('previews 10,000 updates in bounded pages without reviewing or changing corre
   expect((await preview({ query: 'Building 10000' })).rows).toHaveLength(1);
   expect(
     (
-      await db.query<any>(
+      await db.query<{ n: number }>(
         "select count(*)::int n from map_changes where status='pending'",
       )
     ).rows[0].n,
   ).toBe(10000);
   expect(
-    (await db.query<any>('select count(*)::int n from releases')).rows[0].n,
+    (await db.query<{ n: number }>('select count(*)::int n from releases'))
+      .rows[0].n,
   ).toBe(0);
   expect(
     (
-      await db.query<any>(
+      await db.query<{ name: string }>(
         "select properties->>'name' name from map_edits where id='preview-1'",
       )
     ).rows[0].name,
@@ -93,9 +93,10 @@ it('limits complex shapes, tolerates non-spatial records, and excludes later imp
     },
   };
   const result = (
-    await db.query<any>('select source_preview_geometry($1) result', [
-      JSON.stringify(complex),
-    ])
+    await db.query<{ result: NonNullable<SourceMapRow['after']> }>(
+      'select source_preview_geometry($1) result',
+      [JSON.stringify(complex)],
+    )
   ).rows[0].result;
   expect(result.simplified).toBe(true);
   expect(result.geometry.type).toBe('Polygon');
@@ -105,7 +106,7 @@ it('limits complex shapes, tolerates non-spatial records, and excludes later imp
   expect(missing.after).toBeNull();
   expect(
     (
-      await db.query<any>(
+      await db.query<{ allowed: boolean }>(
         "select has_function_privilege('authenticated','source_review_map(uuid,jsonb,jsonb,timestamptz)','execute') allowed",
       )
     ).rows[0].allowed,

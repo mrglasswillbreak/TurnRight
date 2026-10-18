@@ -7,6 +7,7 @@ import {
   validateReleaseSnapshot,
 } from './release-validation.js';
 import { hydrateModelEdits } from './model-assets.js';
+import type { GisSnapshot } from './gis-publication.js';
 
 export async function publicationAction(
   actor: string,
@@ -20,7 +21,7 @@ export async function publicationAction(
     if (!validUuid(payload.id))
       throw new HttpError(400, 'Choose a published release.');
     // The compatibility action now creates a restoration submission for independent approval.
-    const review = await db('rpc/gis_submit_restore', 'POST', {
+    const review = await db<{ id: string }>('rpc/gis_submit_restore', 'POST', {
       actor,
       operation_id: crypto.randomUUID(),
       release_identity: payload.id,
@@ -40,7 +41,7 @@ export async function publicationAction(
       );
     let reviewId = payload.reviewId;
     if (!reviewId) {
-      const [latest] = await db(
+      const [latest] = await db<{ id: string }[]>(
         'gis_reviews?status=eq.approved&order=reviewed_at.desc&select=id&limit=1',
       );
       reviewId = latest?.id;
@@ -57,9 +58,9 @@ export async function publicationAction(
       release_summary: payload.summary.trim(),
     });
     try {
-      const [release] = await db(
-        `releases?id=eq.${id}&select=snapshot,restored_from`,
-      );
+      const [release] = await db<
+        { snapshot: GisSnapshot; restored_from?: string }[]
+      >(`releases?id=eq.${id}&select=snapshot,restored_from`);
       validateReleaseSnapshot(
         {
           ...release.snapshot,
@@ -84,7 +85,14 @@ export async function publicationAction(
   }
   if (action !== 'publish-release' || !validUuid(payload.id))
     throw new HttpError(400, 'Choose a release.');
-  const [release] = await db(
+  const [release] = await db<
+    {
+      id: string;
+      status: string;
+      deployment_id?: string;
+      catalogue_revision: string;
+    }[]
+  >(
     `releases?id=eq.${payload.id}&select=id,status,deployment_id,catalogue_revision`,
   );
   if (!release?.deployment_id || release.status !== 'preview')

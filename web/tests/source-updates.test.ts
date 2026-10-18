@@ -23,9 +23,9 @@ describe('source updates', () => {
     const changes = compareSources(old, flatten(updated));
     expect(changes).toHaveLength(1);
     expect(changes[0].status).toBe('pending');
-    expect(old.find((r: any) => r.entity === 'place').payload.name).toBe(
-      'Library',
-    );
+    expect(
+      old.find((r: { entity: string }) => r.entity === 'place').payload.name,
+    ).toBe('Library');
   });
   it('fails closed on a suspiciously incomplete source result', () => {
     const old = flatten(campusFixture());

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { db, hash } from './cloud.mjs';
+import { emitEvent } from '../web/server/diagnostics.mjs';
 import {
   compareObservations,
   identityOf,
@@ -428,6 +429,7 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   const input = JSON.parse(await fs.readFile(process.argv[2], 'utf8'));
+  const startedAt = Date.now();
   try {
     if (process.argv.includes('--preview')) {
       const result = compareObservations({
@@ -447,9 +449,21 @@ if (
         removed: result.groups.filter((g) => g.kind === 'remove').length,
       };
       await fs.writeFile(process.argv[2], JSON.stringify(input));
-    } else console.log(JSON.stringify(await runSourceCheck(input)));
-  } catch (error) {
-    console.error(error.message);
+    } else {
+      await runSourceCheck(input);
+      emitEvent('worker-completed', {
+        worker: 'source-check',
+        startedAt,
+        status: 200,
+      });
+    }
+  } catch {
+    emitEvent('worker-failed', {
+      worker: 'source-check',
+      startedAt,
+      status: 500,
+      dependency: 'worker',
+    });
     process.exitCode = 1;
   }
 }

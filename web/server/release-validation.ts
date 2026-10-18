@@ -124,7 +124,7 @@ export function publishedRecords(data: CampusData): SourceRecord[] {
       hash: createHash('sha256')
         .update(JSON.stringify(stable(payload, true)))
         .digest('hex'),
-    });
+    } as SourceRecord);
   add('meta', 'campus', meta, 'published-review');
   map.features.forEach((f) =>
     add(

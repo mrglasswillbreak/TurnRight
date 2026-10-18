@@ -65,12 +65,24 @@ if (operation === 'down') {
     );
   const config = await readConfig();
   requireLocalUrl(config.DB_URL);
+  // Stop dispatch before deleting state: no queued worker may repopulate a reset.
+  try {
+    await fetch(`${origin}/__local/stop`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${config.dispatchToken}` },
+    });
+  } catch {
+    /* The application may already be stopped. */
+  }
   // Never pass --linked or a caller-supplied database URL.
   await command(supabaseCli, ['db', 'reset', '--local', '--no-seed']);
   await command(
     process.execPath,
     [...nodeArgs, 'scripts/local/seed.mts', '--reset'],
     { env: localEnvironment(await services()) },
+  );
+  console.log(
+    'Local work was reset. Run npm run local:up to reopen the editor.',
   );
 } else if (operation === 'test') {
   const config = await readConfig();

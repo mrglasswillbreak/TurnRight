@@ -1,4 +1,9 @@
 import { db, HttpError } from './backend.js';
+type SurveyRevisionRow = {
+  owner: string;
+  chunk_count: number;
+  [field: string]: unknown;
+};
 
 const uuid = (v: unknown) =>
   typeof v === 'string' &&
@@ -16,7 +21,7 @@ export async function surveyAction(
   if (action === 'survey-get') {
     if (!uuid(input.revisionId))
       throw new HttpError(400, 'Invalid survey revision.');
-    let [revision] = await db(
+    let [revision] = await db<SurveyRevisionRow[]>(
       `survey_revisions?id=eq.${input.revisionId}&owner=eq.${actor}`,
     );
     if (
@@ -25,7 +30,7 @@ export async function surveyAction(
         revision_identity: input.revisionId,
       }))
     ) {
-      [revision] = await db(
+      [revision] = await db<SurveyRevisionRow[]>(
         `survey_revisions?id=eq.${input.revisionId}&status=eq.complete`,
       );
     }
@@ -33,7 +38,7 @@ export async function surveyAction(
     const offset = Number(input.offset || 0);
     if (!Number.isInteger(offset) || offset < 0 || offset > 2000)
       throw new HttpError(400, 'Invalid chunk offset.');
-    const chunks = await db(
+    const chunks = await db<unknown[]>(
       `survey_chunks?revision_id=eq.${input.revisionId}&owner=eq.${encodeURIComponent(revision.owner)}&order=chunk_index&limit=4&offset=${offset}`,
     );
     return {

@@ -11,10 +11,10 @@ export default defineConfig({
       include: [
         'src/**/*.{ts,tsx,mjs}',
         'components/**/*.{ts,tsx}',
-        'server/**/*.ts',
+        'server/**/*.{ts,mjs}',
         'api/**/*.ts',
       ],
-      exclude: ['**/*.d.ts'],
+      exclude: ['**/*.d.ts', '**/*.d.mts'],
       reporter: ['text-summary', 'json-summary', 'lcov', 'html'],
       reportsDirectory: 'coverage',
       thresholds: {
@@ -23,6 +23,18 @@ export default defineConfig({
         functions: 32,
         branches: 35,
         'server/local-dispatch.ts': {
+          statements: 80,
+          lines: 80,
+          functions: 80,
+          branches: 70,
+        },
+        'server/{diagnostics.mjs,request-envelope.ts}': {
+          statements: 80,
+          lines: 80,
+          functions: 80,
+          branches: 70,
+        },
+        'api/health.ts': {
           statements: 80,
           lines: 80,
           functions: 80,

@@ -4,12 +4,12 @@ import reports from '../api/reports';
 function response() {
   return {
     code: 0,
-    body: null as any,
+    body: null as unknown,
     status(code: number) {
       this.code = code;
       return this;
     },
-    json(body: any) {
+    json(body: unknown) {
       this.body = body;
     },
     setHeader: vi.fn(),
