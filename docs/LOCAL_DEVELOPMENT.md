@@ -56,7 +56,9 @@ containers retain their memory, CPU and scratch-directory controls. Job logs sta
 in the ignored `.local-runtime/jobs` directory.
 
 Uploaded file sources in this loopback sandbox enable proposal generation when
-dispatched, so their comparisons can reach source review. Acceptance remains an
+dispatched, so their comparisons can reach source review. The dispatcher uses a
+fixed SQL statement through the local database container's administrative role;
+the canonical API-role restrictions on source policy remain intact. Acceptance remains an
 explicit editor action and snapshot approval remains independent. Hosted sources
 retain the existing shadow-first rollout and per-source administrative policy.
 
