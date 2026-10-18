@@ -533,7 +533,8 @@
 }
 @media (max-width: 767px) {
   .workspace-layout-tools > button:disabled {
-    display: none;
+    /* Reserve the target positions while lazy panes register after loading. */
+    visibility: hidden;
   }
   .workspace-layout-tools > button[aria-label='Focus canvas'] {
     display: none;

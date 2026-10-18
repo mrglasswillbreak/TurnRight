@@ -644,6 +644,54 @@ test('GIS documentation gallery uses the current workspace and an isolated team 
   await shot('publish');
 });
 
+test('workspace panes keep Activity in place while phone data panes load', async ({
+  page,
+}) => {
+  await setup(page);
+  await page
+    .getByRole('navigation', { name: 'Editor sections' })
+    .getByRole('button', { name: 'Data', exact: true })
+    .click();
+  await expect(
+    page.getByRole('checkbox', { name: 'Select this page' }),
+  ).toBeVisible();
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let waiting = false;
+  await page.route('**/api/admin', async (route) => {
+    if (route.request().postDataJSON().action === 'gis-datasets') {
+      waiting = true;
+      await pending;
+    }
+    await route.fallback();
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await page
+    .getByRole('combobox', { name: 'Workspace', exact: true })
+    .selectOption('gis-data');
+  await expect.poll(() => waiting).toBe(true);
+  const trigger = page.getByRole('button', { name: /^Activity/ });
+  await expect(trigger).toBeVisible();
+  const before = (await trigger.boundingBox())!;
+  release();
+  await expect(
+    page.getByRole('checkbox', { name: 'Select this page' }),
+  ).toBeVisible();
+  const after = (await trigger.boundingBox())!;
+  expect(Math.abs(after.x - before.x)).toBeLessThan(1);
+  expect(Math.abs(after.y - before.y)).toBeLessThan(1);
+  await page.mouse.click(
+    before.x + before.width / 2,
+    before.y + before.height / 2,
+  );
+  await expect(
+    page.getByRole('region', { name: 'Builds and processes' }),
+  ).toBeVisible();
+});
+
 test('workspace panes preserve the canvas, restore preferences and dismiss the legend', async ({
   page,
 }, info) => {
