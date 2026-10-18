@@ -8,6 +8,8 @@ Preview review exposed repeated scenery generation when a visitor changed an opt
 
 The October 17 local candidate build measured 264.2 KiB gzip for lazy 3D, below the unchanged 300 KiB limit. LASU and UNILAG candidate visuals measured 10,844,005 and 2,174,608 bytes respectively, below 12 MiB each. Those are candidate measurements; the actual release builder must repeat the checks after rebasing on current private content. Physical-phone 30 fps is still unverified. [Measurements and test scope](CAMPUS-DETAIL-UPGRADE.md#verification-and-release-gates).
 
+The October 18 published LASU package contains **10,784,918 bytes** of visual assets/recipes; the independently published UNILAG package contains **1,869,074 bytes**. Both remain below the unchanged 12 MiB campus limit. Each recipe permits up to 1,500 illustrative instances, with eight LASU regions and 2,429 UNILAG regions. These figures come from the [built-package verification report](assets/campus-browser-verification-2026-10-18-published.json), rather than the initial candidate generator. The release gates again passed the 264.2/300 KiB lazy-3D budget. Counts and byte budgets do not establish physical-phone frame rate.
+
 ## Campus GIS scope · 5 October 2026
 
 GIS feature reads use a GiST-indexed, rebuildable effective representation and revision-consistent cursors. Data renders 100 rows; server responses cap at 500 features/2 MB. Geometry sessions load at most 500 GIS features and unload on completion. Dataset filtering, statistics, spatial selection and processing input capture run server-side. Explicit baseline maintenance remains separate from routine interactive reads.
@@ -91,7 +93,6 @@ The mobile workspace now uses a full-screen canvas and focused sheets. Wall gest
 
 The unified model editor extends this work with a measured canvas, commit-on-completion numeric fields, shared history and private input recovery. Appearance-only changes reuse routing results; wall selection and façade evidence notes do not rebuild models. Preview generation is bounded to one active and one newest pending request, with explicit resource disposal and retry. The [current model-editor report](MODEL-EDITOR-VERIFICATION.md) records five-run production comparisons at published campus scale and a 100-detail wall, including 4× CPU throttling. The photo-upload measurements below retain their original scope and dates.
 
-
 The historical photo-management update below targeted repeated editor work and
 offline startup without changing package schemas or the database. The later
 campus-layer release adds migrations 020–021 and optional reviewed layer metadata;
@@ -159,11 +160,11 @@ The original desktop caption p95 was 3,160–3,540 ms across five runs. Its firs
 4× throttled run exceeded 180 seconds, so a complete throttled baseline is not
 available. The final five-run pooled p95 measurements are:
 
-| Interaction | Desktop, normal CPU | Mobile viewport, 4× CPU | Target |
-| --- | ---: | ---: | --- |
-| Caption typing | **17.1 ms** | **44.1 ms** | <100 / <200 ms |
-| Previous/next photograph | **14.4 ms** | **100.5 ms** | <100 / <200 ms |
-| Gallery/review tab switching | **16.5 ms** | **141.6 ms** | <100 / <200 ms |
+| Interaction                  | Desktop, normal CPU | Mobile viewport, 4× CPU | Target         |
+| ---------------------------- | ------------------: | ----------------------: | -------------- |
+| Caption typing               |         **17.1 ms** |             **44.1 ms** | <100 / <200 ms |
+| Previous/next photograph     |         **14.4 ms** |            **100.5 ms** | <100 / <200 ms |
+| Gallery/review tab switching |         **16.5 ms** |            **141.6 ms** | <100 / <200 ms |
 
 All three pooled targets pass. Final per-run caption p95 ranges are 15.7–18.1 ms
 and 30.2–58.4 ms. No desktop caption long tasks were recorded; one mobile run

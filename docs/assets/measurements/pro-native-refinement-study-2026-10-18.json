@@ -1,0 +1,302 @@
+{
+  "recordedAt": "2026-10-18T04:11:04.873450+00:00",
+  "syntheticOnly": true,
+  "workflow": "ArcGIS Pro desktop Geoprocessing: Regularize Building Footprint",
+  "parameters": {
+    "method": "RIGHT_ANGLES",
+    "toleranceM": 0.5,
+    "densificationM": 0.25,
+    "precisionM": 0.25
+  },
+  "sourceUnchanged": true,
+  "outputCreatedSeparately": true,
+  "undoInPlaceTested": false,
+  "holesAndMultipartTested": false,
+  "licence": "ArcInfo",
+  "spatialReference": 32631,
+  "source": [
+    {
+      "id": 1,
+      "label": "Synthetic building 1",
+      "palette": "original",
+      "areaM2": 97.59499999025837,
+      "perimeterM": 40.25410937195191,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500000,
+              715000
+            ],
+            [
+              500000.1500000004,
+              715008
+            ],
+            [
+              500012,
+              715008.1999999993
+            ],
+            [
+              500012.0999999996,
+              714999.9000000004
+            ],
+            [
+              500000,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": 2,
+      "label": "Synthetic building 2",
+      "palette": "original",
+      "areaM2": 97.59499999025837,
+      "perimeterM": 40.25410937195191,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500020,
+              715000
+            ],
+            [
+              500020.1500000004,
+              715008
+            ],
+            [
+              500032,
+              715008.1999999993
+            ],
+            [
+              500032.0999999996,
+              714999.9000000004
+            ],
+            [
+              500020,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": 3,
+      "label": "Synthetic building 3",
+      "palette": "original",
+      "areaM2": 97.59499999025837,
+      "perimeterM": 40.25410937195191,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500040,
+              715000
+            ],
+            [
+              500040.1500000004,
+              715008
+            ],
+            [
+              500052,
+              715008.1999999993
+            ],
+            [
+              500052.0999999996,
+              714999.9000000004
+            ],
+            [
+              500040,
+              715000
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    }
+  ],
+  "output": [
+    {
+      "id": 1,
+      "sourceId": 1,
+      "status": 0,
+      "label": "Synthetic building 1",
+      "palette": "original",
+      "areaM2": 97.75005342490846,
+      "perimeterM": 40.30508982300524,
+      "partCount": 1,
+      "vertexCount": 4,
+      "maximumRightAngleErrorDegrees": 0.0004362759418654605,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500000.07650000043,
+              715008.0582999997
+            ],
+            [
+              500012.0971999997,
+              715008.0952000003
+            ],
+            [
+              500012.1222000001,
+              714999.9635000005
+            ],
+            [
+              500000.10140000004,
+              714999.9265999999
+            ],
+            [
+              500000.07650000043,
+              715008.0582999997
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": 2,
+      "sourceId": 2,
+      "status": 0,
+      "label": "Synthetic building 2",
+      "palette": "original",
+      "areaM2": 97.75005342490846,
+      "perimeterM": 40.30508982300524,
+      "partCount": 1,
+      "vertexCount": 4,
+      "maximumRightAngleErrorDegrees": 0.0004362759418654605,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500020.07650000043,
+              715008.0582999997
+            ],
+            [
+              500032.0971999997,
+              715008.0952000003
+            ],
+            [
+              500032.1222000001,
+              714999.9635000005
+            ],
+            [
+              500020.10140000004,
+              714999.9265999999
+            ],
+            [
+              500020.07650000043,
+              715008.0582999997
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    },
+    {
+      "id": 3,
+      "sourceId": 3,
+      "status": 0,
+      "label": "Synthetic building 3",
+      "palette": "original",
+      "areaM2": 97.75005342490846,
+      "perimeterM": 40.30508982300524,
+      "partCount": 1,
+      "vertexCount": 4,
+      "maximumRightAngleErrorDegrees": 0.0004362759418654605,
+      "geometry": {
+        "rings": [
+          [
+            [
+              500040.07650000043,
+              715008.0582999997
+            ],
+            [
+              500052.0971999997,
+              715008.0952000003
+            ],
+            [
+              500052.1222000001,
+              714999.9635000005
+            ],
+            [
+              500040.10140000004,
+              714999.9265999999
+            ],
+            [
+              500040.07650000043,
+              715008.0582999997
+            ]
+          ]
+        ],
+        "spatialReference": {
+          "wkid": 32631,
+          "latestWkid": 32631
+        }
+      }
+    }
+  ],
+  "outputFields": [
+    "OBJECTID",
+    "Shape",
+    "Label",
+    "Palette",
+    "ORIG_OID",
+    "STATUS",
+    "Shape_Length",
+    "Shape_Area"
+  ],
+  "files": [
+    {
+      "name": "rough-footprints-esri.json",
+      "bytes": 1828,
+      "sha256": "8011cfd01ae45f833ff76bd78fa77b7294327b15fd927c5fb4d7c8029bb33322"
+    },
+    {
+      "name": "regularized-footprints-esri.json",
+      "bytes": 2372,
+      "sha256": "4cb5a1cc89c3d3c6ba88947230cfea0e438c95cf19dd2029598523c8a0e00a80"
+    },
+    {
+      "name": "previous-study-readback.json",
+      "bytes": 463,
+      "sha256": "1cb4e1b7c83da4d77b94fa9e558d491e07bb848df054255db552de1960b7cd7a"
+    }
+  ],
+  "schemaVersion": 1,
+  "project": {
+    "file": "SyntheticRefinement.aprx",
+    "bytes": 18879,
+    "sha256": "159d62117e4b760a85a2ae35f150121fad20589ea1eb3cc754c013049a2c10e5"
+  },
+  "previousStudyReadback": {
+    "checkedAt": "2026-10-18T03:51:15.619629+00:00",
+    "geometryUnchanged": true,
+    "recordedProjectSha256": "1663afa1b95333c32b9a282f7787458cfae07025937e60442696dcbb2fdc6e26",
+    "currentProjectSha256": "47fa2bc30e5802ac8d4e0bcd75ea6858d2443eb307127bf09ab3459802fb4499",
+    "note": "The prior project was saved after the original measurement receipt. Its current saved feature geometries are identical; the original receipt and exports remain untouched."
+  },
+  "humanAssistance": [
+    "The owner opened the prepared project and entered the geoprocessing search. Automation opened the tool, set parameters, ran it and saved the project."
+  ],
+  "interpretation": "Three synthetic rough quadrilaterals became four-corner polygons in a separate output layer. All output STATUS values are zero; maximum corner-angle error is below 0.0005 degrees. Input geometry and attributes were preserved. This verifies the desktop geoprocessing workflow, not in-place interactive squaring, routing, holes, multipart or field accuracy."
+}

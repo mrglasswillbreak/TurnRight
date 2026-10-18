@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-18T06:19:38.830Z",
+  "origin": "https://turnright.vercel.app",
+  "campus": "lasu",
+  "fromVersion": "lasu-6796771f6052",
+  "toVersion": "lasu-41ec73876464",
+  "operation": "Offline → Check updates → Download update",
+  "observedText": "Offline maps\n\nTake LASU · Ojo with you.\n\nYour campus. Anywhere.\n\nDownload LASU Ojo once. Search, campus routes, arrival guides, photographs and voice directions stay with you when the connection doesn’t.\n\nLASU · Ojo campus\n22.18 MB · Map & voice directions + enhanced 3D + all approved photographs\nUpdated 18/10/2026\nReady offline\n\nVersion lasu-41ec73876464 · LASU Ojo only. Other campus downloads are kept separately.\n\nBuilding models: 10.29 MB. The basic map works while these download.\n\nEnhanced 3D ready offline · all model files verified\n\nIncludes all 43 photographs: 5.70 MB. Every photograph is checked before the map is ready offline. Credits and recorded arrival information are saved with the map.\n\nVerify / repair download\nStored on this device\nCheck updates\nRemove downloaded map\nRemove\n\nThe world overview is saved with the app. Zoom out to explore land, oceans and countries offline. Detailed places and reviewed routes are available for each campus you download. Routes do not cross campuses.\n\nYour phone supplies location. Keep the app open during navigation. Offline maps only include closures known at the last download.\n\nClose",
+  "physicalDevice": false,
+  "gpsStarted": false,
+  "otherCampusAfter": {
+    "campus": "unilag",
+    "version": "unilag-b7655a90045c",
+    "readyOffline": true,
+    "allModelFilesVerified": true,
+    "observedText": "Offline maps\n\nTake UNILAG with you.\n\nYour campus. Anywhere.\n\nDownload UNILAG once. Search, campus routes, arrival guides, photographs and voice directions stay with you when the connection doesn’t.\n\nUNILAG\n16.43 MB · Map & voice directions + enhanced 3D + all approved photographs\nUpdated 18/10/2026\nReady offline\n\nVersion unilag-b7655a90045c · UNILAG only. Other campus downloads are kept separately.\n\nBuilding models: 1.78 MB. The basic map works while these download.\n\nEnhanced 3D ready offline · all model files verified\n\nIncludes all 16 photographs: 3.33 MB. Every photograph is checked before the map is ready offline. Credits and recorded arrival information are saved with the map.\n\nVerify / repair download\nStored on this device\nCheck updates\nRemove downloaded map\nRemove\n\nThe world overview is saved with the app. Zoom out to explore land, oceans and countries offline. Detailed places and reviewed routes are available for each campus you download. Routes do not cross campuses.\n\nYour phone supplies location. Keep the app open during navigation. Offline maps only include closures known at the last download.\n\nClose"
+  }
+}

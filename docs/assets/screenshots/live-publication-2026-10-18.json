@@ -1,0 +1,67 @@
+{
+  "capturedDate": "2026-10-18",
+  "browser": "Chromium and WebKit, GitHub Actions Linux",
+  "scope": "Unaltered screenshots from actual public production verification. Phone views are simulated; no GPS or physical-device/field acceptance.",
+  "workflow": 39103394177,
+  "artifact": 12127563062,
+  "artifactSha256": "5c8c714ac97f2ad453981af0786015a1ec3deb798745a761d58093a7a52ad803",
+  "verificationStartedAt": "2026-10-18T06:16:36.177Z",
+  "captures": [
+    {
+      "file": "live-lasu-published-2026-10-18.png",
+      "source": "chromium-lasu-desktop-light-3d-2026-10-18.png",
+      "engine": "chromium",
+      "theme": "light",
+      "mode": "3d",
+      "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+      "packageVersion": "lasu-41ec73876464",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "9459aff5765adac63198936593f68889868482a6058ae80a55e62ce7950bd0a0",
+      "url": "https://turnright.vercel.app/?campus=lasu",
+      "fixture": "Actual public campus package; no synthetic data or account"
+    },
+    {
+      "file": "live-unilag-published-2026-10-18.png",
+      "source": "chromium-unilag-desktop-light-3d-2026-10-18.png",
+      "engine": "chromium",
+      "theme": "light",
+      "mode": "3d",
+      "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+      "packageVersion": "unilag-b7655a90045c",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "48308ad1d9c93a346d3cf1b9069e8eff7517ed3a8bcdf1373124c5158f9afe44",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "fixture": "Actual public campus package; no synthetic data or account"
+    },
+    {
+      "file": "live-unilag-phone-2026-10-18.png",
+      "source": "webkit-unilag-mobile-light-3d-2026-10-18.png",
+      "engine": "webkit",
+      "theme": "light",
+      "mode": "3d",
+      "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+      "packageVersion": "unilag-b7655a90045c",
+      "width": 390,
+      "height": 844,
+      "sha256": "ab591c0d4de47dad83f146a2c16a9c8b436bf9d2948b74aedacac03a3b450965",
+      "url": "https://turnright.vercel.app/?campus=unilag",
+      "fixture": "Actual public campus package; no synthetic data or account"
+    },
+    {
+      "file": "live-lasu-dark-2026-10-18.png",
+      "source": "webkit-lasu-desktop-dark-3d-2026-10-18.png",
+      "engine": "webkit",
+      "theme": "dark",
+      "mode": "3d",
+      "applicationRevision": "4b3d4e1b5be50819f80adf8df3f87e5bfc008119",
+      "packageVersion": "lasu-41ec73876464",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "194f34569aa6bf8baeef1d8bb564babc82b9db8b57d5b0a9fc8b4af6d3d7b10d",
+      "url": "https://turnright.vercel.app/?campus=lasu",
+      "fixture": "Actual public campus package; no synthetic data or account"
+    }
+  ]
+}

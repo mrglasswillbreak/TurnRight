@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "observedOn": "2026-10-18",
+  "source": "ArcGIS Pro desktop: Project > Licensing, read-only observation",
+  "licenceType": "Named User",
+  "level": "Advanced",
+  "licensed": true,
+  "displayedExpiry": "06/11/2026",
+  "expiryDate": "2026-11-06",
+  "dateInterpretation": "Day/month/year; consistent with the current October session and reported limited access window.",
+  "visibleLicensedExtensionsWithSameExpiry": ["3D Analyst", "Data Reviewer", "Geostatistical Analyst", "Image Analyst"],
+  "licensingSettingsChanged": false,
+  "authenticationChanged": false,
+  "note": "This replaces the earlier working estimate of about 7 November. The visible list is not an exhaustive extension inventory. Preserve portable evidence before the displayed expiry; no renewal or paid service is assumed."
+}

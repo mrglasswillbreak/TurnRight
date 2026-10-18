@@ -29,29 +29,29 @@ Use the existing bootstrap workflow only on an empty source baseline; it refuses
 
 ### Vercel
 
-| Setting | Value |
-| --- | --- |
-| Framework / root | Vite / web |
-| Include source outside root | Enabled for repository tooling |
-| Node | 22.x; development and CI pin 22.23.3 |
-| Install / build / output | npm ci / npm run build / dist |
-| Production branch | main |
-| Ignored Build Step | Automatic |
+| Setting                     | Value                                |
+| --------------------------- | ------------------------------------ |
+| Framework / root            | Vite / web                           |
+| Include source outside root | Enabled for repository tooling       |
+| Node                        | 22.x; development and CI pin 22.23.3 |
+| Install / build / output    | npm ci / npm run build / dist        |
+| Production branch           | main                                 |
+| Ignored Build Step          | Automatic                            |
 
 Keep preview protection and existing project cost limits. Review a compatible preview before switching production. Do not promote an old whole-site deployment to restore only one campus.
 
 Set these in **both Preview and Production**:
 
-| Variable | Purpose and exposure |
-| --- | --- |
-| VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY | Public client configuration; RLS still applies |
-| SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY | Server-only API configuration; use the supported service-role JWT |
-| ADMIN_USER_ID | Original-owner Auth UUID; bootstrap and explicit override identity |
-| GITHUB_REPOSITORY | Worker repository |
-| GITHUB_WORKFLOW_TOKEN | Repository-scoped Actions dispatch credential, server-only |
-| REPORT_RATE_SALT | Server-only unique random report-rate salt |
-| SOURCE_REDISTRIBUTION_APPROVED | Build confirmation for source rights |
-| PUBLISHED_MAP_URL | Stable production origin; enable after the first public release |
+| Variable                                  | Purpose and exposure                                               |
+| ----------------------------------------- | ------------------------------------------------------------------ |
+| VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY | Public client configuration; RLS still applies                     |
+| SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   | Server-only API configuration; use the supported service-role JWT  |
+| ADMIN_USER_ID                             | Original-owner Auth UUID; bootstrap and explicit override identity |
+| GITHUB_REPOSITORY                         | Worker repository                                                  |
+| GITHUB_WORKFLOW_TOKEN                     | Repository-scoped Actions dispatch credential, server-only         |
+| REPORT_RATE_SALT                          | Server-only unique random report-rate salt                         |
+| SOURCE_REDISTRIBUTION_APPROVED            | Build confirmation for source rights                               |
+| PUBLISHED_MAP_URL                         | Stable production origin; enable after the first public release    |
 
 Never store service credentials in browser variables, Git, screenshots or public artifacts. PUBLISHED_MAP_URL makes ordinary code builds fetch and verify the current catalogue, campus packages and retained assets. If verification fails, the build stops. Initially omit it only when no public release exists.
 
@@ -61,17 +61,17 @@ Complete required backfills and the per-source reliability rollout before enabli
 
 Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID. Service credentials remain on the runner; isolated parsing containers receive files and no network. Keep an included-usage spending limit and do not enable paid upgrades as part of ordinary deployment.
 
-| Workflow | Responsibility |
-| --- | --- |
-| regression-audit.yml | Unit/types/lint/configured build, Chromium/WebKit and prepared offline checks |
-| gis-acceptance.yml | Native PostGIS migrations, 100,000-feature queries/jobs, approval locks, pg_dump/pg_restore and isolated engine/GeoPackage tests |
-| map-import-tests.yml | Native import-format and private worker-mount regressions |
-| gis-processing.yml | One campus-scoped analysis/export job with cancellation, leases and staged output |
-| map-import.yml / map-source-check.yml | Private source inspection/preview and opted-in refresh candidates |
-| source-review.yml / source-review-maintenance.yml | Bounded source decisions, index backfill and receipt housekeeping |
-| import-retention.yml | Bounded cleanup of eligible import artifacts; referenced evidence remains protected |
-| release.yml | Gated preview or publication of an approved immutable submission |
-| campus-detail-verification.yml | Served package hashes, real-campus browser views, offline reopening and retained restore assets |
+| Workflow                                          | Responsibility                                                                                                                   |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| regression-audit.yml                              | Unit/types/lint/configured build, Chromium/WebKit and prepared offline checks                                                    |
+| gis-acceptance.yml                                | Native PostGIS migrations, 100,000-feature queries/jobs, approval locks, pg_dump/pg_restore and isolated engine/GeoPackage tests |
+| map-import-tests.yml                              | Native import-format and private worker-mount regressions                                                                        |
+| gis-processing.yml                                | One campus-scoped analysis/export job with cancellation, leases and staged output                                                |
+| map-import.yml / map-source-check.yml             | Private source inspection/preview and opted-in refresh candidates                                                                |
+| source-review.yml / source-review-maintenance.yml | Bounded source decisions, index backfill and receipt housekeeping                                                                |
+| import-retention.yml                              | Bounded cleanup of eligible import artifacts; referenced evidence remains protected                                              |
+| release.yml                                       | Gated preview or publication of an approved immutable submission                                                                 |
+| campus-detail-verification.yml                    | Served package hashes, real-campus browser views, offline reopening and retained restore assets                                  |
 
 Protect main with an up-to-date branch requirement and these GitHub Actions checks: `quality`, `offline`, `browsers (chromium, 1, 4)` through `browsers (chromium, 4, 4)`, `browsers (webkit, 1, 2)`, `browsers (webkit, 2, 2)`, `native-postgis`, `isolated-engine` and `gis`. Bind them to the GitHub Actions app and enforce them for administrators too. All three workflows run on every pull request, including documentation changes, so a required check cannot remain pending because of a path filter. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
 
@@ -103,7 +103,7 @@ The complete snapshot also includes saved metadata and private dataset revisions
 
 When a publication gate fails, preserve the failed job's log and trace before retrying. Distinguish a captured application failure from an unavailable browser observation or browser-process crash. A failed job may be rerun only after its enclosing Actions run finishes; keep the complete shard and its assertions. An unchanged successful rerun is evidence of that rerun, not proof of the first failure's cause. Application changes require the reviewed build/preview procedure above.
 
-The worker validates schemas, selected public fields, styles, lineage and assets, creates immutable packages, waits for Vercel READY and verifies production assignment. A failed job leaves the preceding public release active. **Activity** reports stages; an uncertain request should be inspected before retrying.
+The worker validates schemas, selected public fields, styles, lineage and assets, creates immutable packages, waits for Vercel READY and verifies production assignment. Failure before promotion leaves the preceding public release active. A failure after promotion can leave the new package live while the database still reports Preview; inspect the actual deployment, catalogue and completion receipt before retrying. **Activity** reports stages; use the [completion recovery procedure](#publication-completion-after-a-timeout) for an uncertain outcome.
 
 Restoring one campus creates a new review submission from historical content. It leaves the shared current draft intact and preserves every other campus's current package. Retain immutable hashes, snapshots and referenced assets. Older clients remain on their downloaded version until a verified replacement is selected.
 

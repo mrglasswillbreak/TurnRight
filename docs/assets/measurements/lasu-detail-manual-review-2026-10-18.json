@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T05:29:32.521Z",
+  "origin": "https://turnright-cbfqkt8tw-muhammed-abdulhadi-s-projects.vercel.app",
+  "version": "lasu-41ec73876464",
+  "releaseId": "104201de-f87e-406d-8172-2780011d5415",
+  "approvedHash": "47a91db93f32da0e51b382f70abb2e09ef29cd2ef27141fc05ee1933ae17fc1b",
+  "browser": "Codex in-app browser (Chromium)",
+  "gpsRequested": false,
+  "physicalDevice": false,
+  "campusDataChanged": false,
+  "observations": {
+    "landmarkFilter": {
+      "count": 3,
+      "names": [
+        "LASU International Library",
+        "LASU Senate Building",
+        "Makanjuola Lecture Theatre"
+      ]
+    },
+    "pointLandmark": {
+      "id": "arcgis:Infrastructure:108",
+      "action": "View area in 3D",
+      "approachMetres": 4,
+      "connectedEntranceVerified": false
+    },
+    "building": {
+      "id": "arcgis:University_Property:120",
+      "action": "View in 3D",
+      "photographs": 4,
+      "firstPhotoLoadedPixels": 1320,
+      "firstPhotoDate": "2023-07-07",
+      "firstPhotoLabel": "Historical view",
+      "secondPhotoDate": "2026-08-27",
+      "sourceCheckedDate": "2026-09-23",
+      "heightLabel": "Approximately 21 m · 7 visually observed floors × 3 m",
+      "evidencePanelRetainsSupportedInferredAndReviewGaps": true,
+      "ownerAuthoredRoofStillExplicitlyUnverified": true
+    },
+    "optionalLayers": {
+      "names": [
+        "Buildings",
+        "Greenery",
+        "Surfaces",
+        "Amenities",
+        "Landmarks"
+      ],
+      "allHiddenRetainsDestinationMarkerAndRouteResult": true,
+      "allFiveHiddenPreferencesRetainedAfterReload": true,
+      "campusIsolation": "LASU greenery off; UNILAG remained on; returning to LASU restored off",
+      "allRestoredVisibleAfterChecks": true
+    },
+    "connectedRoute": {
+      "origin": "arcgis:Infrastructure:0",
+      "originName": "A.J",
+      "destination": "arcgis:Infrastructure:10",
+      "destinationName": "Moot Court",
+      "distance": 249.0216794103422,
+      "edges": 24,
+      "displayedDistanceMetres": 250,
+      "displayedMinutes": 3,
+      "displayedAlternativeMetres": 325,
+      "startWalkingNotInvoked": true
+    },
+    "knownRouteGaps": {
+      "destination": "arcgis:Infrastructure:108",
+      "cases": [
+        {
+          "origin": "arcgis:University_Property:120",
+          "destination": "arcgis:Infrastructure:108",
+          "error": "No connected walking route is available. A path may be closed or missing from the map."
+        },
+        {
+          "origin": "arcgis:Infrastructure:109",
+          "destination": "arcgis:Infrastructure:108",
+          "error": "No connected walking route is available. A path may be closed or missing from the map."
+        },
+        {
+          "origin": "arcgis:Infrastructure:14",
+          "destination": "arcgis:Infrastructure:108",
+          "error": "No connected walking route is available. A path may be closed or missing from the map."
+        }
+      ],
+      "sameOutcomeOnPrecedingBaseline": true,
+      "precedingVersion": "lasu-6796771f6052",
+      "evidence": "Read-only findRoutes evaluation of the independently hash-verified archived baseline; no graph edits or inferred connections"
+    }
+  },
+  "limitations": [
+    "Route preview and approach marker checks do not verify a doorway or field navigation.",
+    "The in-app screenshot viewport is clipped; full release screenshots are recorded separately by the verification workflow.",
+    "Physical Android/iPhone performance, GPS and field checks remain outstanding."
+  ],
+  "supportingFiles": {
+    "routeCaseReportSha256": "8ab13af35aaa10a3b778946b28274de235916cebf51230a0a0f3c645bb76d3fb"
+  }
+}

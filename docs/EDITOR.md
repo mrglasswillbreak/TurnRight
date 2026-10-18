@@ -2,6 +2,28 @@
 
 The [campus detail upgrade](CAMPUS-DETAIL-UPGRADE.md) adds **Precision drawing** (reference snaps, numeric lengths/bearings, rectangles and tracing), previewed square/straighten/align/offset operations, and **Layers → Features → Preview appearance**. Reference snapping changes coordinates only; use the existing connection tools to alter routing topology. Palette previews apply as one undoable operation and preserve authored models.
 
+## Draw and refine precisely
+
+Open **Precision drawing** from the map toolbar. **Reference snapping** uses visible reference geometry; choose endpoint, vertex, midpoint and edge targets and set the tolerance in screen pixels. Check the snap indicator before placing a point. Hold **Alt** to bypass snapping temporarily. A shared coordinate does not create a routing connection; use the explicit entrance/path connection tools for topology.
+
+To construct a 12 × 8 metre footprint:
+
+1. Choose **Draw building** and place its first point on the map.
+2. Open **Precision drawing**, enter **12** in **Length / width (m)** and **8** in **Rectangle depth (m)**, set the bearing clockwise from north, then choose **Construct rectangle from first point**.
+3. Inspect the four-point preview. **Finish** commits the drawing; **Cancel** discards it. Undo/redo and reload recovery use the normal editor history.
+
+For one exact edge, enter length and bearing and choose **Add precise segment**. **Segment constraint** provides right angles or alignment parallel/perpendicular to **Reference bearing**. Reference direction and numeric construction bearing are separate controls.
+
+![Desktop precision drawing with a 12 by 8 metre rectangle preview](assets/screenshots/tour-precision-desktop-2026-10-18.png)
+
+To trace existing geometry, select the reference feature before starting the new drawing and choose **Use selected feature as reference**. Pick its **Part / ring**, a consecutive range from **First vertex (0 based)** to **Last vertex**, and optional **Reverse direction**. Start the drawing, then choose **Add reference vertices to drawing**. Review the result before finishing; select the appropriate courtyard ring or multipart section explicitly.
+
+For existing features, open **Layers → Features**, select the intended rows and choose **square**, **straighten**, **align** or **offset**. Review the proposed geometry before applying it. Align takes a longest-edge bearing; offset takes a distance in metres. Inspect courtyard holes, multipart outlines and connected paths in the preview. Cancel leaves the saved geometry alone; applying uses the normal undo, autosave and conflict checks.
+
+<img src="assets/screenshots/tour-precision-phone-2026-10-18.png" width="280" alt="Numeric rectangle controls and Finish/Cancel in a simulated phone viewport">
+
+These October 18 captures use isolated test geometry. The mouse/touch journeys verify dimensions, undo/redo and reload recovery; the phone viewport does not establish physical-device acceptance. [Capture provenance](assets/screenshots/tour-2026-10-18.json).
+
 ## Arrange your workspace
 
 The primary navigation follows **Data → Edit → Analyze → Review → Publish**. Each workspace keeps the map in the centre, an explorer on the left, contextual properties on the right, and an optional table or activity pane below. Desktop panes start near 260 px and 320 px. Drag a divider or focus it and use the arrow keys to resize it. Pane headings stay visible while their contents scroll.
@@ -16,7 +38,7 @@ The campus menu contains **Campuses** and import management; **Data → Imports*
 
 ![Desktop editor with a feature explorer, selected building and properties](assets/screenshots/tour-editor-desktop-2026-10-15.png)
 
-*The published LASU campus package is shown with an isolated owner account; this is a local application capture.*
+_The published LASU campus package is shown with an isolated owner account; this is a local application capture._
 
 ![Phone editor with a selected building and focused properties sheet](assets/screenshots/tour-editor-mobile-2026-10-15.png)
 
@@ -57,7 +79,6 @@ The editor includes a persistent **Layers / Features** explorer, road-surface ed
 ![Campus source and field mapping](assets/screenshots/tour-imports-2026-10-15.png)
 
 See [Campuses and map imports](CAMPUS-IMPORTS.md) for the full workflow. Review and publication remain separate; a historical campus is restored through a new preview that preserves every other campus.
-
 
 ## Reference, mesh and model files
 
@@ -107,17 +128,17 @@ Automatic connections cover actual intersections, touching endpoints and overlap
 
 ## Views and controls
 
-| Control | Action |
-| --- | --- |
-| 2D / 3D button | Shows the view you can switch to. Tap to change view without losing your drawing or selection; the preference is remembered. |
-| Settings → 3D rendering | Choose Enhanced (the default) or Simple. The choice is shared with the public map's Settings. |
-| Settings → Tilt | Adjust the 3D camera angle; the slider follows the current tilt. |
-| Rotation / north arrow | Orient the map. Mouse rotation also works. |
-| Settings → Building opacity | Starts at 100%; adjust building transparency. Entrance and outline tools temporarily expose ground footprints. |
-| Compare base | Temporarily show approved source geometry without draft corrections. Finish an active drawing first. |
-| E / P / B / M | Add entrance / draw path / draw building / add place. |
-| Enter / Escape | Finish / cancel a drawing. |
-| Ctrl+Z / Ctrl+Shift+Z | Undo / redo a complete edit, including properties and connections. Cmd works on macOS. |
+| Control                     | Action                                                                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 2D / 3D button              | Shows the view you can switch to. Tap to change view without losing your drawing or selection; the preference is remembered. |
+| Settings → 3D rendering     | Choose Enhanced (the default) or Simple. The choice is shared with the public map's Settings.                                |
+| Settings → Tilt             | Adjust the 3D camera angle; the slider follows the current tilt.                                                             |
+| Rotation / north arrow      | Orient the map. Mouse rotation also works.                                                                                   |
+| Settings → Building opacity | Starts at 100%; adjust building transparency. Entrance and outline tools temporarily expose ground footprints.               |
+| Compare base                | Temporarily show approved source geometry without draft corrections. Finish an active drawing first.                         |
+| E / P / B / M               | Add entrance / draw path / draw building / add place.                                                                        |
+| Enter / Escape              | Finish / cancel a drawing.                                                                                                   |
+| Ctrl+Z / Ctrl+Shift+Z       | Undo / redo a complete edit, including properties and connections. Cmd works on macOS.                                       |
 
 Public and editor views share the same height rules. Recorded heights take precedence, documented floor counts use 3 m per floor, and unknown heights use muted illustrative 6 m blocks. The illustrative heights are never stored as measurements or exported into campus packages. The public map defaults to 3D and remembers a visitor's 2D/3D choice. Building details explain height provenance. This editor models outdoor ground-level geometry, not building interiors or terrain.
 
@@ -238,4 +259,4 @@ Choose **Preview all matching changes on map** to see proposals across every pag
 
 ![Source inbox beside its map comparison and editor override explanation](assets/screenshots/source-updates-desktop-2026-10-11.png)
 
-*October 11 demonstration fixture; source decisions are isolated from production. [Capture provenance](assets/screenshots/source-updates-2026-10-11.json).*
+_October 11 demonstration fixture; source decisions are isolated from production. [Capture provenance](assets/screenshots/source-updates-2026-10-11.json)._

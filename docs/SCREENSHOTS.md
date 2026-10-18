@@ -2,6 +2,18 @@
 
 The main product tour was refreshed on **15 October 2026** from the current local application, including the public map/globe, editor, all GIS workspaces, building models, photographs and offline controls. Dated source-update and recovery captures remain below. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/tour-2026-10-15.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
+## Published campus detail · 18 October 2026
+
+The current [LASU desktop](assets/screenshots/live-lasu-published-2026-10-18.png), [UNILAG desktop](assets/screenshots/live-unilag-published-2026-10-18.png), [UNILAG phone viewport](assets/screenshots/live-unilag-phone-2026-10-18.png) and [LASU dark view](assets/screenshots/live-lasu-dark-2026-10-18.png) come from the actual public origin after both independent publications. They retain the released geometry, building treatments, illustrative greenery and historical-photo labels. Each image was visually inspected and copied unchanged from the successful [production verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39103394177).
+
+[Capture hashes and source files](assets/screenshots/live-publication-2026-10-18.json) identify the exact application revision and campus versions. The complete [report](assets/campus-browser-verification-2026-10-18-published.json) covers 236 asset hashes, 32 views and four offline journeys. Phone views are simulations; these images do not establish physical-device frame rate, current survey conditions or accessibility. The October 15–17 captures below remain historical.
+
+## Precision and appearance controls · 18 October 2026
+
+Three new direct Chromium captures show the [desktop precision panel](assets/screenshots/tour-precision-desktop-2026-10-18.png), [phone numeric controls](assets/screenshots/tour-precision-phone-2026-10-18.png) and [appearance preview](assets/screenshots/tour-palette-preview-2026-10-18.png). The actual application runs against isolated `browserCampus` geometry and owner API responses; the LASU label is fixture context, not a public map inventory. All three mouse/touch/appearance journeys pass, including measured rectangle dimensions, cancellation, undo/redo and reload recovery. Phone input is simulated. [Image hashes, dimensions, browser, source revision and driver identity](assets/screenshots/tour-2026-10-18.json).
+
+Reproduce from `web/` with `npx playwright test tests/browser/editor.spec.ts --grep "campus detail (palette preview cancels cleanly|precision rectangle)" --workers=1`. The three PNGs are written inside the matching test-output folders. Inspect them, copy to new dated filenames and record their source, dimensions and SHA-256 values before updating a guide. On this Windows worktree, a temporary loopback-only Vite configuration allowed its existing dependency junction and used a separate cache; production configuration was unchanged.
+
 ## Published campus detail · 17 October 2026
 
 The [UNILAG 3D map](assets/screenshots/live-unilag-published-2026-10-17.jpg) and [installed offline package](assets/screenshots/live-unilag-offline-2026-10-17.jpg) were captured from the public application after updating to `unilag-4667e8f529d6`. They show the released presentation, landmark controls and verified download state. [Capture hashes and package identities](assets/screenshots/live-publication-2026-10-17.json) distinguish these images from the local candidates and historical tour below. See [Production](PRODUCTION.md) for each campus's current release.

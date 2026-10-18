@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T06:15:44.349Z",
+  "scope": "Existing appearance, detailed visual or authored model declarations; compiled model content checked separately from packaging.",
+  "campuses": [
+    {
+      "slug": "lasu",
+      "beforeVersion": "lasu-6796771f6052",
+      "afterVersion": "lasu-41ec73876464",
+      "protectedBuildingsChecked": 60,
+      "explicitAuthoredModelsChecked": 0,
+      "compiledModelsChecked": 60,
+      "protectedPropertiesUnchanged": true,
+      "compiledModelsUnchanged": true,
+      "totalProtectedBuildingsAfter": 523
+    },
+    {
+      "slug": "unilag",
+      "beforeVersion": "unilag-b7655a90045c",
+      "afterVersion": "unilag-b7655a90045c",
+      "protectedBuildingsChecked": 675,
+      "explicitAuthoredModelsChecked": 0,
+      "compiledModelsChecked": 675,
+      "protectedPropertiesUnchanged": true,
+      "compiledModelsUnchanged": true,
+      "totalProtectedBuildingsAfter": 675
+    }
+  ]
+}

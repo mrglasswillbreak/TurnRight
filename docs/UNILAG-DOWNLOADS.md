@@ -2,6 +2,8 @@
 
 The 27 September 2026 research package keeps ArcGIS and OpenStreetMap data separate. It covers UNILAG Akoka plus a 500 m access-road buffer and does **not** import or publish a campus in TurnRight. Raw datasets and the illustrated instructions are delivered under the user's Downloads folder, not committed to this repository.
 
+For the later October 17–18 source discovery, use the [ArcGIS toolbox and portable archive](CAMPUS-DETAIL-UPGRADE.md#arcgis-pro-workstation). That review accounts for 44 UNILAG vector layers, retains source dates/rights and original IDs, and adds native geometry and duplicate diagnostics. Its broader results do not supersede this dated download snapshot or establish permission to use a newly discovered layer. New candidates remain private until reviewed.
+
 ## Reproduce the package
 
 Use Python 3.11+ and the two pinned GIS dependencies in an isolated environment:

@@ -12,13 +12,13 @@ Optional scenery recipes live in the reviewed visual catalogue. The release visu
 
 TurnRight serves two connected surfaces: a public map/globe and an authenticated campus workspace. Public navigation reads immutable published packages; the editor works with private source observations, accepted records, corrections, typed datasets, evidence, and review snapshots.
 
-| Boundary | Modules and responsibility |
-| --- | --- |
-| Public experience | `App.tsx`, `MapView.tsx`, `CampusSwitcher.tsx`, `world-*`, `useCampusSwitch.ts`: discovery, globe/campus rendering and in-place switching |
-| Navigation and local state | `routing*`, `navigation.ts`, `useGps.ts`, `audio.ts`, `offline.ts`, `sw.ts`: routing, foreground guidance, verified packages and recovery |
-| Team interface | `Admin.tsx`, `WorkspaceFrame.tsx`, `Gis*`, source/model/photo workspaces: scoped editing, analysis, review and publication |
-| Private backend | `web/api/`, `web/server/`, `supabase/migrations/`: authentication, capabilities, PostGIS state, immutable approvals and operation receipts |
-| Workers and releases | `scripts/`, isolated GIS containers and Actions: source checks, staged processing, verified package construction and reviewed promotion |
+| Boundary                   | Modules and responsibility                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Public experience          | `App.tsx`, `MapView.tsx`, `CampusSwitcher.tsx`, `world-*`, `useCampusSwitch.ts`: discovery, globe/campus rendering and in-place switching  |
+| Navigation and local state | `routing*`, `navigation.ts`, `useGps.ts`, `audio.ts`, `offline.ts`, `sw.ts`: routing, foreground guidance, verified packages and recovery  |
+| Team interface             | `Admin.tsx`, `WorkspaceFrame.tsx`, `Gis*`, source/model/photo workspaces: scoped editing, analysis, review and publication                 |
+| Private backend            | `web/api/`, `web/server/`, `supabase/migrations/`: authentication, capabilities, PostGIS state, immutable approvals and operation receipts |
+| Workers and releases       | `scripts/`, isolated GIS containers and Actions: source checks, staged processing, verified package construction and reviewed promotion    |
 
 The public app does not read private drafts. Source acceptance changes the working baseline; publication changes a campus package only after approved snapshot verification. A code deployment preserves existing public packages through the build preservation contract. Browser recovery and offline storage are local conveniences, not substitutes for server backups.
 
@@ -32,7 +32,7 @@ The public app does not read private drafts. Source acceptance changes the worki
 
 The platform separates public navigation from a shared private campus draft. React/MapLibre retains one map, selection, command history and recovery while lazy **Data, Analyze, Review and Publish** workspaces coordinate the existing **Edit** tools. Read-only team members receive the same map and review surfaces without geometry editing controls.
 
-~~~mermaid
+```mermaid
 flowchart LR
   Sources[Spatial sources and asset CSV] --> Draft[Authoritative sources and corrections]
   Draft --> Index[Rebuildable PostGIS index]
@@ -43,7 +43,7 @@ flowchart LR
   Draft --> Review[Immutable submission and independent approval]
   Review --> Release[Validated preview and publication]
   Release --> Public[Hashed public package and offline navigation]
-~~~
+```
 
 Migrations **023–037** add campus memberships, typed dataset schemas, private attribute overlays, indexed effective geometry, processing jobs, QA issues, saved views, immutable reviews and publication guards. Existing source_features/map_edits remain authoritative; gis_feature_index is rebuilt from those records. Source metadata includes CRS and declared field types. Configured team field definitions survive reimports.
 
@@ -72,7 +72,6 @@ GIS processing stays outside browser bundles. Authorized editor uploads feed res
 The container uses the host runner's UID/GID to access its private 0700 temporary directory while retaining disabled network access, dropped capabilities and a read-only root filesystem. The Linux regression workflow exercises that actual mount/command as well as individual drivers. Inspection selects the GeoJSON/ESRIJSON driver from the parsed JSON dialect rather than a short header probe, rejects truncated exports before GDAL conversion, reports unique candidate ID fields, and accepts a layer's `/query` URL with an explicit notice that query filters are replaced by campus-bound inspection. Failed uploads can resume their reserved storage objects; resetting the job invalidates its old run token and candidate.
 
 Code builds preserve all published campus assets. Release snapshots record the catalogue baseline, and serialized publication rejects stale previews. Campus rollback copies its historical immutable package into a new preview alongside the other current campuses. See [formats and workflows](CAMPUS-IMPORTS.md).
-
 
 ## Campus layers and road editing
 
@@ -107,7 +106,6 @@ The lazy building workspace routes completed commands through `EditorWorkspace`;
 Building inspector tools load when a building is selected. Shared controls and validation use entry-aware chunks so the model workspace does not import the owner authentication entry, and public startup does not pull in building controls. All lazy dependencies are precached for prepared offline use. Configured-build checks retain authentication dependencies, enforce the existing budgets and verify these boundaries.
 
 The server rejects an older editor write that could discard model-authoring metadata. Public package schemas 1–3 remain compatible. Expanded authored assets use migration 012; the earlier native-metadata rollout needed no migration. Architectural-only edits reuse topology/routing validation; publication always runs full validation. Selection and evidence are separated from geometry work, and per-instance picking ranges survive material batching. Preview builds keep one active/newest pending request; drags draw lightweight canvas geometry until completion. See [owner workflow](UNIFIED-MODEL-EDITOR.md) and [verification](MODEL-EDITOR-VERIFICATION.md).
-
 
 `web/` is a Vite React application. MapLibre renders campus GeoJSON as vector layers and loads approved building meshes locally. The illustrated globe adds bundled zoom-0–4 raster tiles derived from the September 2004 NASA composite, plus pinned Natural Earth vectors; there is no external routing or map-tile service. This is dated overview imagery, not current campus satellite coverage. Public exploration starts in 3D at 45° on desktop and 40° on mobile, with a persistent 2D/3D preference. `map-display.ts` derives rendering-only heights from recorded metres, documented floors at 3 m each, or illustrative 6 m blocks. Fonts/icons and the campus label glyph range are bundled.
 
@@ -170,6 +168,8 @@ Each editor command is immediately visible and recoverable in owner- and campus-
 `web/api/admin.ts` validates the Supabase session, resolves the campus and checks its membership capabilities before dispatch. The singleton original-owner record bootstraps administrators and identifies the audited override authority; it is no longer the sole workspace access rule. RLS and explicit grants protect private tables; mutations use server-validated transactional functions. Personal uploads/recovery remain user-scoped, while verified assets attached to shared work are readable by authorized teammates. Mutations run in small server endpoints using a service-role JWT. `web/api/reports.ts` validates anonymous submissions and consumes an atomic, daily salted IP-derived rate bucket (five reports/hour). No raw IP is stored in application tables; platform HTTP logs remain subject to hosting-provider behavior. Reports remain private and never edit routes.
 
 The release RPC snapshots approved sources plus corrections; a trigger prevents mutation of snapshot content. Migration 021 adds a service-only reviewed snapshot RPC with a local 60-second bound, administrator/campus validation, a supplied immutable release identity and idempotent retry checks. GitHub Actions validates and packages the snapshot, uploads only allowed application files through Vercel's API, and waits for READY. A publish action builds production from the exact reviewed source and verifies both the production alias and catalogue revision before recording success. A campus restore first prepares a new preview containing that historical campus and the other current campuses. Source imports do not deploy code or maps. Failures and quota interruptions are stored as job/release errors when the backend is available.
+
+Migration 056 adds service-only, 60-second publication lease/completion RPCs while ordinary PostgREST requests retain their shorter timeout. Completion preserves the exact review hash, approved immutable snapshot and campus lease checks. If promotion succeeds before the completion write times out, the worker first verifies the recorded production deployment and catalogue, then completes that same publication without another promotion. An ambiguous result requires the bounded read-only publication audit. [Deployment and recovery](DEPLOYMENT.md#publication-completion-after-a-timeout).
 
 `PUBLISHED_MAP_URL` protects ordinary code builds from reverting published data to the seed. The build fetches and verifies current map files, failing safely if they are unavailable. Controlled releases freeze their own version and preserve the preceding immutable assets. A campus rollback reuses its historical package in a fresh preview; a device already holding a newer map keeps it until it consents to the version change.
 

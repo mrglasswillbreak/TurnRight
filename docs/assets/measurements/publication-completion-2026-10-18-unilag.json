@@ -1,0 +1,42 @@
+{
+  "review": {
+    "status": "approved",
+    "contentHash": "93df94d7aa645976eb8ab87002001b480b9f8fc57bdca0447c0acffc1d185cba"
+  },
+  "release": {
+    "id": "72b01f8d-9a3f-44fa-ac81-5124fbe157ec",
+    "error": null,
+    "status": "published",
+    "version": "unilag-b7655a90045c",
+    "campusId": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+    "reviewId": "d50d7404-0541-45e3-aec6-f8c38ccf4fd3",
+    "publishedAt": "2026-10-18T04:52:27.903164+00:00",
+    "deploymentId": "dpl_9iND6dH2t2xbj7F3QqzZJfCJ25mG",
+    "deploymentUrl": "https://turnright-ag31vs733-muhammed-abdulhadi-s-projects.vercel.app",
+    "publishedCatalogueRevision": "7ee7c0ecd32affe3f3b81b14ec8c1a9ad0c4e36b60cb5eb5cd2606434a19e087"
+  },
+  "checkedAt": "2026-10-18T04:53:05.426664+00:00",
+  "recentAudit": [
+    {
+      "action": "publication-complete",
+      "created_at": "2026-10-18T04:52:27.903164+00:00"
+    },
+    {
+      "action": "publication-start",
+      "created_at": "2026-10-18T04:52:19.667722+00:00"
+    },
+    {
+      "action": "publication-start",
+      "created_at": "2026-10-18T02:55:06.93465+00:00"
+    },
+    {
+      "action": "publication-request",
+      "created_at": "2026-10-18T02:06:28.545048+00:00"
+    },
+    {
+      "action": "release-prepare",
+      "created_at": "2026-10-18T00:37:05.128466+00:00"
+    }
+  ],
+  "activePublicationLeases": 0
+}

@@ -3511,6 +3511,7 @@ test('campus detail palette preview cancels cleanly and commits as one undo step
 }, testInfo) => {
   test.setTimeout(120000);
   const state = await setup(page, false, false, { startupTimeout: 30000 });
+  await focusCampus(page);
   const shownRoof = () =>
     page.evaluate(async () => {
       const source = window.editorTestMap.getSource(
@@ -3585,7 +3586,7 @@ test('campus detail palette preview cancels cleanly and commits as one undo step
 for (const touch of [false, true])
   test(`campus detail precision rectangle, recovery and undo with ${touch ? 'touch' : 'mouse'}`, async ({
     browser,
-  }) => {
+  }, testInfo) => {
     const context = await browser.newContext({
       baseURL: 'http://127.0.0.1:5183',
       viewport: touch
@@ -3616,6 +3617,7 @@ for (const touch of [false, true])
         .getByRole('button', { name: 'Construct rectangle from first point' })
         .click();
       await expect(page.locator('.drawing-progress')).toContainText('4');
+      await page.screenshot({ path: testInfo.outputPath('precision-rectangle-preview.png') });
       await page
         .getByRole('button', { name: 'Close precision drawing' })
         .click();

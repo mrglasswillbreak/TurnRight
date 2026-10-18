@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-18T05:13:25.873Z",
+  "scope": "Initial October 17 candidate studies; not publication evidence",
+  "requiresArcGISPro": false,
+  "campuses": [
+    {
+      "slug": "lasu",
+      "baselineVersion": "lasu-6796771f6052",
+      "buildings": 614,
+      "counts": {
+        "illustrative-detail-candidate": 466,
+        "held-geometry-or-duplicate-review": 88,
+        "preserve-authored": 60
+      },
+      "coverageSha256": "c0cb8c6235356e434176aa8735d40cafc1c5f97862c67df95aa678d5482ada30",
+      "everyBuildingHasTreatmentAndEvidenceNeeds": true
+    },
+    {
+      "slug": "unilag",
+      "baselineVersion": "unilag-bd659bbd6df2",
+      "buildings": 723,
+      "counts": {
+        "illustrative-detail-candidate": 694,
+        "held-geometry-or-duplicate-review": 19,
+        "preserve-authored": 9,
+        "source-height-detail-candidate": 1
+      },
+      "coverageSha256": "2c766caaf8a1d093b41a95b3d51c25b7dfc6f28173ee05192bafc611927d98d6",
+      "everyBuildingHasTreatmentAndEvidenceNeeds": true
+    }
+  ],
+  "files": 178,
+  "archiveLocation": "Documents/ArcGIS/Projects/TurnRightDetail/PortableEvidence/2026-10-18/building-treatment-archive",
+  "totalBytes": 46982460,
+  "manifestSha256": "1e40e5d1649129f35eaa887ba341d3c46ff27733add908590fe15b1c43b4b74a"
+}
