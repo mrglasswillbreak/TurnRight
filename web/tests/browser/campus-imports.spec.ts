@@ -591,7 +591,9 @@ test('campus imports responsive screens and documentation captures', async ({
       name === 'mapping'
     )
       await page.screenshot({
-        path: (await import("./documentation-capture")).documentationCapturePath("imports"),
+        path: (
+          await import('./documentation-capture')
+        ).documentationCapturePath('imports'),
       });
     if (process.env.UPDATE_CAMPUS_SCREENSHOTS === 'true')
       await page.screenshot({

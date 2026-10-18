@@ -12,8 +12,16 @@ export function syntheticPhotoEvidence(info) {
 
 export function requirePhotographicSource(page, audit) {
   const source = audit?.imageinfo?.[0];
-  if (!source || !Array.isArray(source.commonmetadata) || source.sha1 !== page.imageinfo?.[0]?.sha1)
-    throw Error(`Original source metadata audit missing or stale: ${page.title}`);
+  if (
+    !source ||
+    !Array.isArray(source.commonmetadata) ||
+    source.sha1 !== page.imageinfo?.[0]?.sha1
+  )
+    throw Error(
+      `Original source metadata audit missing or stale: ${page.title}`,
+    );
   if (syntheticPhotoEvidence(source))
-    throw Error(`Synthetic image cannot be published as a building photograph: ${page.title}`);
+    throw Error(
+      `Synthetic image cannot be published as a building photograph: ${page.title}`,
+    );
 }

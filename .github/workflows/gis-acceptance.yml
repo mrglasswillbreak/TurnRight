@@ -16,7 +16,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: disposable-test-only
           POSTGRES_DB: turnright_import_test
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --memory 512m --memory-swap 512m
           --health-cmd pg_isready
@@ -30,8 +30,8 @@ jobs:
           node-version-file: .node-version
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: python -m pip install 'psycopg[binary]==3.2.12'
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes -r scripts/requirements-test.lock
       - run: python scripts/tests/check_import_queue_database.py
         env:
           GIS_TEST_DATABASE_URL: postgresql://postgres:disposable-test-only@127.0.0.1:5432/turnright_import_test
@@ -49,7 +49,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: disposable-test-only
           POSTGRES_DB: turnright_gis_test
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
@@ -59,8 +59,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: python -m pip install 'psycopg[binary]==3.2.12'
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes -r scripts/requirements-test.lock
       - run: python scripts/gis/check_database.py
         env:
           GIS_TEST_DATABASE_URL: postgresql://postgres:disposable-test-only@127.0.0.1:5432/turnright_gis_test

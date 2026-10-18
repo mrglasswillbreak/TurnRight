@@ -112,7 +112,7 @@ export function publicationInputs(snapshot: GisSnapshot) {
     [...hidden].map((key) => key.slice(key.indexOf(':') + 1)),
   );
   const visibleEdges = snapshot.features.filter(
-    (s) =>
+    (s): s is Extract<GisSnapshot['features'][number], { entity: 'edge' }> =>
       s.entity === 'edge' &&
       (!s.payload.gisManaged || !hiddenIds.has(s.payload.sourceId)),
   );

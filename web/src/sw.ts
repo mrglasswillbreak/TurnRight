@@ -31,7 +31,11 @@ precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
-    denylist: [/^\/api\//, /^\/auth\//, /^\/(packages|audio|glyphs|photo-codecs)\//],
+    denylist: [
+      /^\/api\//,
+      /^\/auth\//,
+      /^\/(packages|audio|glyphs|photo-codecs)\//,
+    ],
   }),
 );
 self.addEventListener('message', (event) => {

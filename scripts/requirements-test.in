@@ -1,0 +1,2 @@
+-r requirements-data.txt
+psycopg[binary]==3.2.12

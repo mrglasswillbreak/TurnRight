@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner, reviewer } from './gis-database-fixture';
+import type { SourceOperation, SourcePage } from '../src/source-updates';
+type Operation = SourceOperation & { run_token: string };
 let db: Awaited<ReturnType<typeof gisDatabase>>;
 beforeAll(
   async () => {
@@ -12,17 +14,16 @@ beforeAll(
 afterAll(async () => {
   await db?.close();
 });
-const rpc = async (sql: string, args: unknown[] = []) =>
-  (await db.query<{ result: any }>(`select ${sql} result`, args)).rows[0]
-    .result;
+const rpc = async <T = unknown>(sql: string, args: unknown[] = []) =>
+  (await db.query<{ result: T }>(`select ${sql} result`, args)).rows[0].result;
 const prepare = (id: string, filters = {}) =>
-  rpc('source_review_prepare($1,$2,$3)', [
+  rpc<Operation>('source_review_prepare($1,$2,$3)', [
     owner,
     id,
     JSON.stringify({ mode: 'filter', filters }),
   ]);
 const start = (id: string, accept = true, acknowledge = false) =>
-  rpc("source_review_control($1,$2,'start',$3,$4)", [
+  rpc<Operation>("source_review_control($1,$2,'start',$3,$4)", [
     owner,
     id,
     accept,
@@ -37,18 +38,18 @@ it(
       'payload',jsonb_build_object('type','Feature','properties',jsonb_build_object('id','bulk-'||n,'kind','building','name','Building '||n),'geometry',jsonb_build_object('type','Point','coordinates',jsonb_build_array(3.2,6.4)))), 'Imported building'
     from generate_series(1,10000) n;
     insert into map_edits(id,kind,geometry,properties) values('bulk-1','building','{"type":"Point","coordinates":[3.2,6.4]}','{"name":"Editor name"}');`);
-    const first = await rpc('source_review_list($1)', [owner]);
+    const first = await rpc<SourcePage>('source_review_list($1)', [owner]);
     expect(first.rows).toHaveLength(50);
     expect(first.total).toBe(10000);
     expect(JSON.stringify(first)).not.toContain('coordinates');
-    const second = await rpc('source_review_list($1,$2,$3)', [
+    const second = await rpc<SourcePage>('source_review_list($1,$2,$3)', [
       owner,
       '{}',
       JSON.stringify(first.nextCursor),
     ]);
-    expect(
-      new Set([...first.rows, ...second.rows].map((r: any) => r.id)).size,
-    ).toBe(100);
+    expect(new Set([...first.rows, ...second.rows].map((r) => r.id)).size).toBe(
+      100,
+    );
     const id = randomUUID();
     const frozen = await prepare(id);
     expect(frozen.total).toBe(10000);
@@ -62,7 +63,10 @@ it(
     let previous = 0,
       steps = 0;
     while (['queued', 'running'].includes(operation.status)) {
-      operation = await rpc('source_review_step($1,$2)', [id, token]);
+      operation = await rpc<Operation>('source_review_step($1,$2)', [
+        id,
+        token,
+      ]);
       const processed =
         operation.applied + operation.skipped + operation.failed;
       expect(processed - previous).toBeLessThanOrEqual(25);
@@ -72,7 +76,8 @@ it(
       // Light read requests remain bounded during processing.
       if (steps % 50 === 0)
         expect(
-          (await rpc('source_review_list($1)', [owner])).rows.length,
+          (await rpc<SourcePage>('source_review_list($1)', [owner])).rows
+            .length,
         ).toBeLessThanOrEqual(50);
     }
     expect(steps).toBe(400);
@@ -82,9 +87,9 @@ it(
       failed: 0,
       status: 'completed',
     });
-    expect(await rpc('source_review_step($1,$2)', [id, token])).toEqual(
-      operation,
-    );
+    expect(
+      await rpc<Operation>('source_review_step($1,$2)', [id, token]),
+    ).toEqual(operation);
     expect(
       (
         await db.query(
@@ -119,16 +124,19 @@ it('requires removal acknowledgement, enforces one active job, and resumes only 
   const nextId = randomUUID();
   await prepare(nextId, { kind: 'remove' });
   await expect(start(nextId, false)).rejects.toThrow('already running');
-  await rpc('source_review_step($1,$2)', [id, op.run_token]);
-  await rpc("source_review_control($1,$2,'cancel')", [owner, id]);
+  await rpc<Operation>('source_review_step($1,$2)', [id, op.run_token]);
+  await rpc<Operation>("source_review_control($1,$2,'cancel')", [owner, id]);
   await expect(
-    rpc('source_review_step($1,$2)', [id, op.run_token]),
+    rpc<Operation>('source_review_step($1,$2)', [id, op.run_token]),
   ).rejects.toThrow('replaced');
-  const resumed = await rpc("source_review_control($1,$2,'retry')", [
+  const resumed = await rpc<Operation>("source_review_control($1,$2,'retry')", [
     owner,
     id,
   ]);
-  const done = await rpc('source_review_step($1,$2)', [id, resumed.run_token]);
+  const done = await rpc<Operation>('source_review_step($1,$2)', [
+    id,
+    resumed.run_token,
+  ]);
   expect(done.applied).toBe(0);
   expect(done.failed).toBe(frozen.total);
   await expect(
@@ -142,7 +150,7 @@ it('requires removal acknowledgement, enforces one active job, and resumes only 
     `select set_config('request.headers','{"x-turnright-campus":"another-campus"}',false)`,
   );
   await expect(
-    rpc('source_review_step($1,$2)', [id, resumed.run_token]),
+    rpc<Operation>('source_review_step($1,$2)', [id, resumed.run_token]),
   ).rejects.toThrow('replaced');
   await db.exec("select set_config('request.headers','{}',false)");
   for (const role of ['anon', 'authenticated'])

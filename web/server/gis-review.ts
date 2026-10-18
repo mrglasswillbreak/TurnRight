@@ -6,6 +6,7 @@ import {
   validateReleaseSnapshot,
 } from './release-validation.js';
 import { hydrateModelEdits } from './model-assets.js';
+import type { GisSnapshot } from './gis-publication.js';
 export async function reviewAction(
   actor: string,
   action: string,
@@ -73,7 +74,9 @@ export async function reviewAction(
     )
       throw new HttpError(400, 'Record a review decision and reason.');
     if (input.approve) {
-      const [review] = await db(
+      const [review] = await db<
+        { snapshot: GisSnapshot; restore_release_id?: string }[]
+      >(
         'gis_reviews?id=eq.' + input.id + '&select=snapshot,restore_release_id',
       );
       if (!review) throw new HttpError(404, 'Submission not found.');

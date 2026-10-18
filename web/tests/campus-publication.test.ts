@@ -32,8 +32,25 @@ beforeEach(async () => {
     path.join(tmpdir(), 'turnright-campus-publication-'),
   );
   for (const c of catalogue.campuses) {
-    const bytes = Buffer.from(JSON.stringify({ boundary: { type: 'Feature', properties: {},
-      geometry: { type: 'Polygon', coordinates: [[[3.19, 6.45], [3.22, 6.45], [3.22, 6.49], [3.19, 6.45]]] } } })),
+    const bytes = Buffer.from(
+        JSON.stringify({
+          boundary: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [3.19, 6.45],
+                  [3.22, 6.45],
+                  [3.22, 6.49],
+                  [3.19, 6.45],
+                ],
+              ],
+            },
+          },
+        }),
+      ),
       url = `/packages/${c.id}-abc123/campus.json`;
     content.set(url, bytes);
     manifests.set(c.manifestUrl!, {
@@ -103,7 +120,9 @@ it('publishes or restores one campus while retaining every other manifest and as
     replacement: { campus: north, manifest: replacement },
   });
   expect(result.catalogue.campuses[0]).toMatchObject(catalogue.campuses[0]);
-  expect(result.catalogue.campuses.every((c) => c.outline?.type === 'Polygon')).toBe(true);
+  expect(
+    result.catalogue.campuses.every((c) => c.outline?.type === 'Polygon'),
+  ).toBe(true);
   expect(result.catalogue.campuses[1].manifestUrl).toBe(
     '/packages/north-def456/manifest.json',
   );

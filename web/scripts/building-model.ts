@@ -1,1 +1,4 @@
-export { createBuildingModel, footprintAssessment } from '../src/building-model';
+export {
+  createBuildingModel,
+  footprintAssessment,
+} from '../src/building-model';

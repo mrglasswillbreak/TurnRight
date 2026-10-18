@@ -1,9 +1,14 @@
 import { currentCampusId, scopeDatabaseRequest } from './campus-scope.js';
 import { createHash } from 'node:crypto';
+import { emitEvent } from './diagnostics.mjs';
+import {
+  localDispatchConfiguration,
+  validateLocalJob,
+} from './local-dispatch.js';
 export interface RequestLike {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
-  body?: any;
+  body?: unknown;
 }
 export interface ResponseLike {
   status: (code: number) => ResponseLike;
@@ -21,11 +26,15 @@ export class HttpError extends Error {
   }
 }
 /** Map upstream transport failures to availability, never to an expired identity. */
-async function serviceRequest(url: string, init: RequestInit, dependency: string) {
+async function serviceRequest(
+  url: string,
+  init: RequestInit,
+  dependency: string,
+) {
   try {
     const response = await fetch(url, init);
     let validJson = true;
-    const result: any = await response.json().catch(() => {
+    const result: unknown = await response.json().catch(() => {
       validJson = false;
       return null;
     });
@@ -45,7 +54,7 @@ export function requireConfig() {
       'The backend is not connected yet. Follow docs/DEPLOYMENT.md to configure Supabase.',
     );
 }
-export async function db<T = any>(
+export async function db<T = unknown>(
   path: string,
   method = 'GET',
   body?: unknown,
@@ -64,7 +73,9 @@ export async function db<T = any>(
         Prefer: prefer,
         'X-TurnRight-Campus': currentCampusId(),
       },
-      ...(body !== undefined && method !== 'GET' ? { body: JSON.stringify(body) } : {}),
+      ...(body !== undefined && method !== 'GET'
+        ? { body: JSON.stringify(body) }
+        : {}),
       // The import RPC has a 60-second database budget (migration 017).
       signal: AbortSignal.timeout(path.startsWith('rpc/gis_') ? 75000 : 20000),
     },
@@ -79,7 +90,9 @@ export async function db<T = any>(
           : 400,
       response.status >= 500
         ? 'The database is temporarily unavailable. Your local work is retained. Check Activity before retrying a change.'
-        : result?.message || 'Database request failed.',
+        : isObject(result) && typeof result.message === 'string'
+          ? result.message
+          : 'Database request failed.',
       'database',
       response.status,
     );
@@ -90,12 +103,12 @@ export async function db<T = any>(
       'database',
       response.status,
     );
-  return result;
+  return result as T;
 }
-export async function allRows(table: string, filter = '') {
-  const rows: any[] = [];
+export async function allRows<T = unknown>(table: string, filter = '') {
+  const rows: T[] = [];
   for (let offset = 0; offset < 300000; offset += 1000) {
-    const page = await db(
+    const page = await db<T[]>(
       `${table}?select=*&order=${table === 'map_edits' ? 'id,kind' : 'id'}&limit=1000&offset=${offset}${filter}`,
     );
     rows.push(...page);
@@ -121,18 +134,21 @@ export async function requireIdentity(req: RequestLike) {
   );
   if ([401, 403].includes(response.status))
     throw new HttpError(401, 'Your session expired. Sign in again.');
-  if (!response.ok || typeof user?.id !== 'string')
+  if (!response.ok || !isObject(user) || typeof user.id !== 'string')
     throw new HttpError(
       503,
       'Sign-in verification is temporarily unavailable. Your local work is retained. Retry the connection shortly.',
       'authentication',
       response.status,
     );
-  return user;
+  return { id: user.id };
+}
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 export function bodyOf(req: RequestLike, limit = 100000) {
   if (req.method !== 'POST') throw new HttpError(405, 'Use POST');
-  let body;
+  let body: unknown;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   } catch {
@@ -140,22 +156,27 @@ export function bodyOf(req: RequestLike, limit = 100000) {
   }
   if (!body || JSON.stringify(body).length > limit)
     throw new HttpError(413, 'Request is too large.');
+  if (!isObject(body)) throw new HttpError(400, 'Use a JSON object request.');
   return body;
 }
 export function fail(
   res: ResponseLike,
   error: unknown,
-  context?: { requestId: string; action?: string },
+  context?: { requestId: string; action?: string; startedAt?: number },
 ) {
   const status = error instanceof HttpError ? error.status : 500;
   if (status >= 500) {
     // Do not log tokens, query strings, payloads, raw upstream errors or user data.
-    console.error('admin-request-failed', {
+    emitEvent('admin-request-failed', {
       status,
       requestId: context?.requestId,
-      action: /^[a-z-]{1,64}$/.test(context?.action || '') ? context?.action : undefined,
+      startedAt: context?.startedAt,
+      action: /^[a-z-]{1,64}$/.test(context?.action || '')
+        ? context?.action
+        : undefined,
       dependency: error instanceof HttpError ? error.dependency : undefined,
-      upstreamStatus: error instanceof HttpError ? error.upstreamStatus : undefined,
+      upstreamStatus:
+        error instanceof HttpError ? error.upstreamStatus : undefined,
     });
     res.setHeader('Retry-After', '5');
   }
@@ -164,16 +185,62 @@ export function fail(
       ? error.message
       : 'The operation could not be confirmed. Your local work is retained. Check Activity before retrying a change.';
   res.status(status).json({
-    error: message + (status >= 500 && context ? ' Reference: ' + context.requestId : ''),
+    error:
+      message +
+      (status >= 500 && context ? ' Reference: ' + context.requestId : ''),
     ...(context ? { requestId: context.requestId } : {}),
   });
+}
+export function observeResponse(
+  res: ResponseLike,
+  context: { requestId: string; startedAt: number; action?: string },
+): ResponseLike {
+  let status = 200;
+  const observed: ResponseLike = {
+    status(code) {
+      status = code;
+      res.status(code);
+      return observed;
+    },
+    setHeader(name, value) {
+      res.setHeader(name, value);
+    },
+    json(body) {
+      emitEvent('request-completed', { ...context, status });
+      res.json(body);
+    },
+  };
+  return observed;
 }
 export function privateHeaders(res: ResponseLike) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
 }
-export const hash = (value: string) => createHash('sha256').update(value).digest('hex');
-export async function dispatch(workflow: string, inputs: Record<string, string> = {}) {
+export const hash = (value: string) =>
+  createHash('sha256').update(value).digest('hex');
+export async function dispatch(
+  workflow: string,
+  inputs: Record<string, string> = {},
+) {
+  const local = localDispatchConfiguration(process.env);
+  if (local) {
+    validateLocalJob(workflow, inputs);
+    const result = await fetch(local.url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${local.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ workflow, inputs }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!result.ok)
+      throw new HttpError(
+        503,
+        'The local worker could not accept this job. Check the development terminal.',
+      );
+    return;
+  }
   if (!process.env.GITHUB_WORKFLOW_TOKEN || !process.env.GITHUB_REPOSITORY)
     throw new HttpError(
       503,

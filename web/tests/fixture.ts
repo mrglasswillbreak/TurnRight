@@ -1,5 +1,5 @@
-import type { CampusData, Position } from "../src/types";
-import { distance } from "../src/geo";
+import type { CampusData, Position } from '../src/types';
+import { distance } from '../src/geo';
 export function campusFixture(): CampusData {
   const points: Record<string, Position> = {
     a: [3.2, 6.46],
@@ -9,10 +9,10 @@ export function campusFixture(): CampusData {
     isolated: [3.202, 6.462],
   };
   const edges = [
-    ["a", "b"],
-    ["b", "c"],
-    ["a", "d"],
-    ["d", "c"],
+    ['a', 'b'],
+    ['b', 'c'],
+    ['a', 'd'],
+    ['d', 'c'],
   ].flatMap(([a, b]) =>
     [
       [a, b],
@@ -22,23 +22,23 @@ export function campusFixture(): CampusData {
       from,
       to,
       distance: distance(points[from], points[to]),
-      name: from === "a" ? "Library path" : "Science path",
+      name: from === 'a' ? 'Library path' : 'Science path',
       accessible: true,
       sourceId: from + to,
     })),
   );
   return {
     schemaVersion: 1,
-    version: "fixture",
-    createdAt: "2026-09-08T00:00:00Z",
+    version: 'fixture',
+    createdAt: '2026-09-08T00:00:00Z',
     bounds: [
       [3.19, 6.455],
       [3.215, 6.49],
     ],
     boundary: {
-      type: "Feature",
+      type: 'Feature',
       geometry: {
-        type: "Polygon",
+        type: 'Polygon',
         coordinates: [
           [
             [3.19, 6.455],
@@ -51,22 +51,25 @@ export function campusFixture(): CampusData {
       },
       properties: {},
     },
-    map: { type: "FeatureCollection", features: [] },
+    map: { type: 'FeatureCollection', features: [] },
     places: [
       {
-        id: "library",
-        name: "Library",
-        category: "library",
+        id: 'library',
+        name: 'Library',
+        category: 'library',
         coordinates: points.c,
         aliases: [],
-        source: "test",
-        sourceId: "library",
-        graphNode: "c",
-        arrivalKind: "entrance",
+        source: 'test',
+        sourceId: 'library',
+        graphNode: 'c',
+        arrivalKind: 'entrance',
       },
     ],
     graph: {
-      nodes: Object.entries(points).map(([id, coordinates]) => ({ id, coordinates })),
+      nodes: Object.entries(points).map(([id, coordinates]) => ({
+        id,
+        coordinates,
+      })),
       edges,
     },
     closures: [],

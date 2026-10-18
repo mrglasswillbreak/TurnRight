@@ -1,4 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import type {
+  SourceFixtureObservation,
+  ComparisonGroup,
+  ComparisonFeature,
+  ComparisonMember,
+} from './source-fixture-types';
 // @ts-expect-error Shared Node comparator deliberately uses plain JavaScript.
 import {
   compareObservations,
@@ -39,7 +45,7 @@ const feature = (id: string, name = 'Path') => ({
   },
   hash: hash({ id, name }),
 });
-const observation = (id: string, name = 'Path') => {
+const observation = (id: string, name = 'Path'): SourceFixtureObservation => {
   const content = {
     name,
     geometry: [
@@ -77,21 +83,27 @@ it('keeps 100,000-feature archive batches bounded and localizes changes to one i
   const before = evidenceBatches(rows, key);
   const after = evidenceBatches([...rows].reverse(), key);
   expect(after).toEqual(before);
-  expect(before.flatMap((b: any) => b.records)).toHaveLength(100000);
+  expect(before.flatMap((b: { records: unknown[] }) => b.records)).toHaveLength(
+    100000,
+  );
   expect(
     before.every(
-      (b: any) =>
+      (b: { records: unknown[] }) =>
         b.records.length <= 100 &&
         Buffer.byteLength(JSON.stringify(b.records)) < 384 * 1024,
     ),
   ).toBe(true);
-  const fingerprints = new Set(before.map((b: any) => hash(b.records)));
+  const fingerprints = new Set(
+    before.map((b: { records: unknown[] }) => hash(b.records)),
+  );
   const changed = evidenceBatches(
     [...rows, { identity: 'new-object', value: -1 }],
     key,
   );
   expect(
-    changed.filter((b: any) => !fingerprints.has(hash(b.records))).length,
+    changed.filter(
+      (b: { records: unknown[] }) => !fingerprints.has(hash(b.records)),
+    ).length,
   ).toBeLessThan(10);
 });
 it('waits for bounded finalization beyond the ordinary HTTP deadline without duplicate dispatch', async () => {
@@ -151,7 +163,7 @@ it('checkpoints independent verification and resumes without repeating completed
     const item = { ...observation(String(i)), provider: 'file' };
     return { ...item, identity: identityOf(item) };
   });
-  const saved = new Map<string, unknown>();
+  const saved = new Map<string, { status: string }>();
   const request = {
     sourceKey: 'verification-fixture',
     runId: '11111111-1111-4111-8111-111111111111',
@@ -165,7 +177,14 @@ it('checkpoints independent verification and resumes without repeating completed
     completeReplacement: true,
   };
   let calls = 0;
-  const transport = async (route: string, _method: string, args: any) => {
+  const transport = async (
+    route: string,
+    _method: string,
+    args: {
+      part?: string;
+      records: Array<{ identity: string; value: { status: string } }>;
+    },
+  ) => {
     if (route.endsWith('source_check_begin')) return { status: 'staging' };
     if (route.endsWith('source_check_baseline'))
       return args.part === 'observations'
@@ -178,14 +197,14 @@ it('checkpoints independent verification and resumes without repeating completed
     if (route.endsWith('source_check_finish')) return { status: 'complete' };
     return null;
   };
-  const proof = (o: any) => ({
+  const proof = (o: SourceFixtureObservation) => ({
     status: 'verified',
     method: 'declared-complete-file',
     contentHash: o.contentHash,
     configurationHash: receipt.configurationHash,
   });
   await expect(
-    runSourceCheck(request, transport, async (o: any) => {
+    runSourceCheck(request, transport, async (o: SourceFixtureObservation) => {
       if (++calls === 101) throw new Error('Worker interrupted');
       return proof(o);
     }),
@@ -193,16 +212,18 @@ it('checkpoints independent verification and resumes without repeating completed
   expect(saved.size).toBe(100);
   calls = 0;
   expect(
-    await runSourceCheck(request, transport, async (o: any) => {
-      calls++;
-      return proof(o);
-    }),
+    await runSourceCheck(
+      request,
+      transport,
+      async (o: SourceFixtureObservation) => {
+        calls++;
+        return proof(o);
+      },
+    ),
   ).toEqual({ status: 'complete' });
   expect(calls).toBe(201);
   expect(saved.size).toBe(301);
-  expect([...saved.values()].every((v: any) => v.status === 'verified')).toBe(
-    true,
-  );
+  expect([...saved.values()].every((v) => v.status === 'verified')).toBe(true);
 });
 describe('source observation comparison', () => {
   it('reviews changed layer mappings as configuration even when native content is unchanged', () => {
@@ -223,13 +244,13 @@ describe('source observation comparison', () => {
     expect(result.groups[0].kind).toBe('modify');
   });
   it('retains provider timestamp attributes in upstream evidence without hashing check times', () => {
-    const original: any = observation('provider-time');
+    const original = observation('provider-time');
     original.content.createdAt = '2026-10-01';
     const changed = {
       ...original,
       content: { ...original.content, createdAt: '2026-10-02' },
     };
-    const check = (o: any, time: string) =>
+    const check = (o: SourceFixtureObservation, time: string) =>
       compareObservations({
         observations: [o],
         receipt: { ...receipt, retrievedAt: time },
@@ -252,7 +273,7 @@ describe('source observation comparison', () => {
         },
       ],
     };
-    const path: any = observation('linked-path');
+    const path = observation('linked-path');
     path.records.push({
       id: 'node:junction',
       entity: 'node',
@@ -294,7 +315,7 @@ describe('source observation comparison', () => {
     ).toBe(false);
   });
   it('holds oversized evidence while keeping independent groups reviewable', () => {
-    const large: any = observation('huge');
+    const large = observation('huge');
     large.content.description = 'x'.repeat(400000);
     large.records[0].payload.description = 'x'.repeat(400000);
     const result = boundedComparison(
@@ -304,20 +325,27 @@ describe('source observation comparison', () => {
       }),
     );
     expect(
-      result.groups.find((g: any) => g.source_id === 'feature:huge').eligible,
+      result.groups.find((g: ComparisonGroup) => g.source_id === 'feature:huge')
+        .eligible,
     ).toBe(false);
     expect(
-      result.groups.find((g: any) => g.source_id === 'feature:small').eligible,
+      result.groups.find(
+        (g: ComparisonGroup) => g.source_id === 'feature:small',
+      ).eligible,
     ).toBe(true);
     expect(
-      result.observations.find((o: any) => o.nativeId === 'way:huge')
-        .evidenceUnavailable,
+      result.observations.find(
+        (o: SourceFixtureObservation) => o.nativeId === 'way:huge',
+      ).evidenceUnavailable,
     ).toBe(true);
     expect(() =>
       batches(
         result.groups.map(
-          ({ features: _features, members: _members, ...header }: any) =>
-            header,
+          ({
+            features: _features,
+            members: _members,
+            ...header
+          }: ComparisonGroup) => header,
         ),
       ),
     ).not.toThrow();
@@ -381,15 +409,16 @@ describe('source observation comparison', () => {
       records: old.records,
       receipt,
     });
-    expect(result.groups.find((g: any) => g.kind === 'remove').eligible).toBe(
-      false,
-    );
-    expect(result.groups.find((g: any) => g.kind === 'add').eligible).toBe(
-      true,
-    );
+    expect(
+      result.groups.find((g: ComparisonGroup) => g.kind === 'remove').eligible,
+    ).toBe(false);
+    expect(
+      result.groups.find((g: ComparisonGroup) => g.kind === 'add').eligible,
+    ).toBe(true);
     expect(
       result.diagnostics.some(
-        (d: any) => d.classification === 'partition_loss',
+        (d: { classification: string }) =>
+          d.classification === 'partition_loss',
       ),
     ).toBe(true);
   });
@@ -613,12 +642,14 @@ it.skipIf(!existsSync(new URL('private-export.json', audit)))(
       readFileSync(new URL('candidate.json', audit), 'utf8'),
     );
     const observations = legacyObservations(flatten(candidate));
-    const accepted = legacyObservations(records).map((o: any) => ({
-      ...o,
-      identity: identityOf(o),
-      contentHash: hash(o.content),
-      legacy: true,
-    }));
+    const accepted = legacyObservations(records).map(
+      (o: SourceFixtureObservation) => ({
+        ...o,
+        identity: identityOf(o),
+        contentHash: hash(o.content),
+        legacy: true,
+      }),
+    );
     const result = compareObservations({
       records,
       accepted,
@@ -627,24 +658,27 @@ it.skipIf(!existsSync(new URL('private-export.json', audit)))(
         ...receipt,
         collections: [
           ...new Set(
-            [...observations, ...accepted].map((o: any) => o.collection),
+            [...observations, ...accepted].map(
+              (o: SourceFixtureObservation) => o.collection,
+            ),
           ),
         ].map((identity) => ({ identity, complete: true })),
       },
     });
     expect(
       result.groups.filter(
-        (g: any) =>
+        (g: ComparisonGroup) =>
           g.kind === 'remove' &&
           g.features.some(
-            (f: any) => (f.observation || f.accepted).featureType === 'path',
+            (f: ComparisonFeature) =>
+              (f.observation || f.accepted).featureType === 'path',
           ),
       ),
     ).toHaveLength(0);
     expect(
-      result.groups.every((g: any) =>
+      result.groups.every((g: ComparisonGroup) =>
         g.members.every(
-          (m: any) =>
+          (m: ComparisonMember) =>
             (m.after || m.before).entity !== 'edge' ||
             g.classification === 'unresolved_identity',
         ),
@@ -663,21 +697,25 @@ it('replays the archived LASU incident without inferring path loss from regenera
   );
   expect(provenance.publishedPathCount).toBe(95);
   expect(provenance.candidatePathCount).toBe(95);
-  const incomingEdgeIds = new Set(candidate.graph.edges.map((e: any) => e.id));
+  const incomingEdgeIds = new Set(
+    candidate.graph.edges.map((e: { id: string; sourceId: string }) => e.id),
+  );
   expect(
     published.graph.edges.filter(
-      (e: any) =>
+      (e: { id: string; sourceId: string }) =>
         !incomingEdgeIds.has(e.id) && e.id.startsWith(e.sourceId + ':osm:'),
     ),
   ).toHaveLength(908);
   const records = flatten(published),
     observations = legacyObservations(flatten(candidate));
-  const accepted = legacyObservations(records).map((o: any) => ({
-    ...o,
-    identity: identityOf(o),
-    contentHash: hash(o.content),
-    legacy: true,
-  }));
+  const accepted = legacyObservations(records).map(
+    (o: SourceFixtureObservation) => ({
+      ...o,
+      identity: identityOf(o),
+      contentHash: hash(o.content),
+      legacy: true,
+    }),
+  );
   const result = compareObservations({
     records,
     accepted,
@@ -686,21 +724,26 @@ it('replays the archived LASU incident without inferring path loss from regenera
       ...receipt,
       collections: [
         ...new Set(
-          [...observations, ...accepted].map((o: any) => o.collection),
+          [...observations, ...accepted].map(
+            (o: SourceFixtureObservation) => o.collection,
+          ),
         ),
       ].map((identity) => ({ identity, complete: true })),
     },
   });
-  const pathGroups = result.groups.filter((g: any) =>
+  const pathGroups = result.groups.filter((g: ComparisonGroup) =>
     g.features.some(
-      (f: any) => (f.observation || f.accepted).featureType === 'path',
+      (f: ComparisonFeature) =>
+        (f.observation || f.accepted).featureType === 'path',
     ),
   );
-  expect(pathGroups.filter((g: any) => g.kind === 'remove')).toHaveLength(0);
+  expect(
+    pathGroups.filter((g: ComparisonGroup) => g.kind === 'remove'),
+  ).toHaveLength(0);
   const geometryChanges = pathGroups
-    .flatMap((g: any) => g.members)
+    .flatMap((g: ComparisonGroup) => g.members)
     .filter(
-      (m: any) =>
+      (m: ComparisonMember) =>
         m.before?.entity === 'feature' &&
         m.after?.entity === 'feature' &&
         hash(m.before.payload.geometry) !== hash(m.after.payload.geometry),

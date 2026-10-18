@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { globeFitZoom } from '../src/world-camera';
 
-
 describe('responsive globe silhouette', () => {
   for (const [width, height] of [
     [667, 375],
@@ -33,4 +32,3 @@ describe('responsive globe silhouette', () => {
     });
   }
 });
-

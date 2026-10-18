@@ -21,7 +21,11 @@ export function SourceFieldReview({
   const fields = selectableSourceFields(change);
   const record = change.after as SourceRecord | null;
   const properties =
-    record?.entity === 'feature' ? record.payload.properties : record?.payload;
+    record?.entity === 'feature'
+      ? record.payload.properties
+      : record?.entity === 'place'
+        ? record.payload
+        : undefined;
   const refs = Object.values(properties?.evidence || {}).flat() as {
     sourceId: string;
     recordId: string;

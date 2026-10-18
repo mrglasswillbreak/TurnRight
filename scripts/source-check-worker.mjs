@@ -1,16 +1,17 @@
-import fs from "node:fs/promises";
-import { randomUUID } from "node:crypto";
-import { pathToFileURL } from "node:url";
-import { setTimeout as delay } from "node:timers/promises";
-import { db, hash } from "./cloud.mjs";
+import fs from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
+import { setTimeout as delay } from 'node:timers/promises';
+import { db, hash } from './cloud.mjs';
+import { emitEvent } from '../web/server/diagnostics.mjs';
 import {
   compareObservations,
   identityOf,
   legacyObservations,
   COMPARATOR_VERSION,
-} from "./source-comparison.mjs";
-import { verifyMissing } from "./source-verification.mjs";
-import { confirmOverture } from "./source-snapshot-confirmation.mjs";
+} from './source-comparison.mjs';
+import { verifyMissing } from './source-verification.mjs';
+import { confirmOverture } from './source-snapshot-confirmation.mjs';
 
 export function batches(values) {
   const result = [];
@@ -21,7 +22,7 @@ export function batches(values) {
     const size = Buffer.byteLength(JSON.stringify(value)) + 2;
     if (size > 384 * 1024)
       throw new Error(
-        "Source evidence record exceeds 384 KiB. Split or simplify this source; nothing was queued.",
+        'Source evidence record exceeds 384 KiB. Split or simplify this source; nothing was queued.',
       );
     if (batch.length && (batch.length === 100 || bytes + size > 384 * 1024)) {
       result.push({ offset, records: batch });
@@ -47,7 +48,9 @@ export function evidenceBatches(values, key) {
   const result = [];
   let offset = 0;
   for (const bucket of [...buckets.keys()].sort()) {
-    for (const chunk of batches(buckets.get(bucket).sort((a, b) => key(a).localeCompare(key(b))))) {
+    for (const chunk of batches(
+      buckets.get(bucket).sort((a, b) => key(a).localeCompare(key(b))),
+    )) {
       result.push({ ...chunk, offset });
       offset += chunk.records.length;
     }
@@ -57,25 +60,32 @@ export function evidenceBatches(values, key) {
 export async function maintainSourceEvidence(database = db) {
   for (let i = 0; i < 200; i++) {
     const result = await database(
-      "rpc/source_check_maintain",
-      "POST",
+      'rpc/source_check_maintain',
+      'POST',
       {},
-      "return=representation",
+      'return=representation',
       45000,
     );
     if (!result?.work) return;
   }
   throw new Error(
-    "Evidence compaction needs another maintenance run; retained decisions are safe.",
+    'Evidence compaction needs another maintenance run; retained decisions are safe.',
   );
 }
 // Keep independently reviewable groups available when one source feature exceeds
 // a request limit. Only its identity and hashes are retained in the staged view;
 // it is explicitly blocked, and the original import artifact stays referenced.
 export function boundedComparison(result) {
-  const tooLarge = (value) => Buffer.byteLength(JSON.stringify(value)) > 380 * 1024;
+  const tooLarge = (value) =>
+    Buffer.byteLength(JSON.stringify(value)) > 380 * 1024;
   const stub = (r) =>
-    r && { id: r.id, entity: r.entity, source: r.source, hash: r.hash, evidenceUnavailable: true };
+    r && {
+      id: r.id,
+      entity: r.entity,
+      source: r.source,
+      hash: r.hash,
+      evidenceUnavailable: true,
+    };
   const omitted = new Set();
   result.observations = result.observations.map((o) => {
     let changed = false;
@@ -87,7 +97,11 @@ export function boundedComparison(result) {
     const { records: _records, ...header } = o;
     const largeHeader = tooLarge(header);
     if (largeHeader || changed) omitted.add(o.identity);
-    return { ...o, records, ...(largeHeader ? { content: null, evidenceUnavailable: true } : {}) };
+    return {
+      ...o,
+      records,
+      ...(largeHeader ? { content: null, evidenceUnavailable: true } : {}),
+    };
   });
   result.groups = result.groups.map((g) => {
     let blocked = g.features.some((f) => omitted.has(f.identity));
@@ -103,16 +117,24 @@ export function boundedComparison(result) {
         features.map((f) => ({
           identity: f.identity,
           evidence: f.evidence,
-          observation: f.observation && { collection: f.observation.collection },
+          observation: f.observation && {
+            collection: f.observation.collection,
+          },
           accepted: f.accepted && { collection: f.accepted.collection },
         })),
       );
     blocked ||= largeHeader;
     if (!blocked) return g;
     const message =
-      "Evidence exceeds the bounded review request. Split or simplify the affected source features and check again; this group cannot be accepted.";
-    result.diagnostics.push({ groupId: g.id, classification: "oversized_group", message });
-    const scopes = [...new Set(features.map((f) => (f.observation || f.accepted).collection))];
+      'Evidence exceeds the bounded review request. Split or simplify the affected source features and check again; this group cannot be accepted.';
+    result.diagnostics.push({
+      groupId: g.id,
+      classification: 'oversized_group',
+      message,
+    });
+    const scopes = [
+      ...new Set(features.map((f) => (f.observation || f.accepted).collection)),
+    ];
     return {
       ...g,
       members,
@@ -123,9 +145,9 @@ export function boundedComparison(result) {
             before: stub(g.before),
             after: stub(g.after),
             features: scopes.map((collection) => ({
-              identity: "oversized:" + collection,
+              identity: 'oversized:' + collection,
               classification: g.classification,
-              evidence: { status: "unverified" },
+              evidence: { status: 'unverified' },
               observation: { collection },
               accepted: null,
             })),
@@ -136,7 +158,11 @@ export function boundedComparison(result) {
   });
   return result;
 }
-export async function runSourceCheck(input, transport = db, verify = verifyMissing) {
+export async function runSourceCheck(
+  input,
+  transport = db,
+  verify = verifyMissing,
+) {
   const database =
     transport !== db
       ? transport
@@ -148,11 +174,11 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
               if (
                 attempt >= 2 ||
                 !(
-                  error.name === "TimeoutError" ||
+                  error.name === 'TimeoutError' ||
                   error instanceof TypeError ||
                   error.status === 429 ||
                   error.status >= 500 ||
-                  ["55P03", "57014"].includes(error.code)
+                  ['55P03', '57014'].includes(error.code)
                 )
               )
                 throw error;
@@ -167,24 +193,28 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
     completeReplacement: input.completeReplacement === true,
     comparatorVersion: COMPARATOR_VERSION,
   };
-  if (!receipt.retrievedAt || !receipt.contentHash || !receipt.configurationHash)
+  if (
+    !receipt.retrievedAt ||
+    !receipt.contentHash ||
+    !receipt.configurationHash
+  )
     throw new Error(
-      "The original retrieval receipt is required; cached data cannot invent a retrieval time",
+      'The original retrieval receipt is required; cached data cannot invent a retrieval time',
     );
   await maintainSourceEvidence(database);
   const identity = { run_id, run_token };
-  const begun = await database("rpc/source_check_begin", "POST", {
+  const begun = await database('rpc/source_check_begin', 'POST', {
     ...identity,
     source_identity: input.sourceKey,
     check_receipt: receipt,
     import_identity: input.importId || null,
   });
-  if (["shadow", "complete"].includes(begun.status)) return begun;
+  if (['shadow', 'complete'].includes(begun.status)) return begun;
   try {
     async function read(part) {
       const all = [];
       for (let offset = 0; offset < 300000; offset += 1000) {
-        const page = await database("rpc/source_check_baseline", "POST", {
+        const page = await database('rpc/source_check_baseline', 'POST', {
           ...identity,
           part,
           page_offset: offset,
@@ -192,18 +222,20 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         all.push(...page);
         if (page.length < 1000) return all;
       }
-      throw new Error("Baseline exceeds its bounded comparison limit");
+      throw new Error('Baseline exceeds its bounded comparison limit');
     }
     const [records, accepted, savedEvidence] = await Promise.all([
-      read("records"),
-      read("observations"),
-      read("evidence"),
+      read('records'),
+      read('observations'),
+      read('evidence'),
     ]);
-    if (input.sourceKey === "lasu-enrichment") {
+    if (input.sourceKey === 'lasu-enrichment') {
       const retained = new Set(accepted.map((o) => o.identity));
       const byRoot = new Map(input.observations.map((o) => [o.rootId, o]));
       for (const original of legacyObservations(records)) {
-        const recovered = byRoot.get(original.records[0]?.payload.properties.id);
+        const recovered = byRoot.get(
+          original.records[0]?.payload.properties.id,
+        );
         const o = recovered
           ? {
               ...original,
@@ -222,7 +254,9 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
       }
     }
     const observed = new Set(input.observations.map(identityOf));
-    const verification = Object.fromEntries(savedEvidence.map((e) => [e.identity, e.value]));
+    const verification = Object.fromEntries(
+      savedEvidence.map((e) => [e.identity, e.value]),
+    );
     // Sequential provider requests avoid creating a load spike on public services.
     const confirmations = new Map();
     const verificationDeadline = Date.now() + 600000;
@@ -230,7 +264,7 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
     let pendingEvidence = [];
     async function saveEvidence() {
       for (const chunk of batches(pendingEvidence))
-        await database("rpc/source_check_evidence", "POST", {
+        await database('rpc/source_check_evidence', 'POST', {
           ...identity,
           records: chunk.records,
         });
@@ -241,8 +275,8 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         if (verification[o.identity]) continue;
         if (o.legacy) {
           verification[o.identity] = {
-            status: "unverified",
-            reason: "Legacy upstream receipt unavailable",
+            status: 'unverified',
+            reason: 'Legacy upstream receipt unavailable',
           };
           continue;
         }
@@ -250,16 +284,20 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         // verifies the entire collection. Bound individual public-service calls.
         if (
           Date.now() > verificationDeadline ||
-          (!["file", "overture"].includes(o.provider) && verifiedRequests++ >= 300)
+          (!['file', 'overture'].includes(o.provider) &&
+            verifiedRequests++ >= 300)
         ) {
           verification[o.identity] = {
-            status: "unverified",
+            status: 'unverified',
             reason:
-              "Verification budget reached. This check is incomplete for this identity; narrow the source scope or retry a smaller collection.",
+              'Verification budget reached. This check is incomplete for this identity; narrow the source scope or retry a smaller collection.',
           };
-        } else if (o.provider === "overture" && verify === verifyMissing) {
+        } else if (o.provider === 'overture' && verify === verifyMissing) {
           if (!confirmations.has(o.collection))
-            confirmations.set(o.collection, await confirmOverture(o.collection, receipt));
+            confirmations.set(
+              o.collection,
+              await confirmOverture(o.collection, receipt),
+            );
           const confirmation = confirmations.get(o.collection);
           verification[o.identity] = {
             ...confirmation.receipt,
@@ -267,21 +305,30 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
             contentHash: o.contentHash,
             configurationHash: receipt.configurationHash,
             status:
-              confirmation.status === "verified"
+              confirmation.status === 'verified'
                 ? confirmation.identities.has(o.nativeId)
-                  ? "present"
-                  : "verified"
-                : "unverified",
+                  ? 'present'
+                  : 'verified'
+                : 'unverified',
           };
         } else verification[o.identity] = await verify(o, receipt);
-        pendingEvidence.push({ identity: o.identity, value: verification[o.identity] });
+        pendingEvidence.push({
+          identity: o.identity,
+          value: verification[o.identity],
+        });
         if (pendingEvidence.length >= 100) await saveEvidence();
       }
     await saveEvidence();
     for (const chunk of batches(
-      Object.entries(verification).map(([identity, value]) => ({ identity, value })),
+      Object.entries(verification).map(([identity, value]) => ({
+        identity,
+        value,
+      })),
     ))
-      await database("rpc/source_check_evidence", "POST", { ...identity, records: chunk.records });
+      await database('rpc/source_check_evidence', 'POST', {
+        ...identity,
+        records: chunk.records,
+      });
     const result = boundedComparison(
       compareObservations({
         accepted,
@@ -320,21 +367,26 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         })),
         memberCount: members.length,
       })),
-      member: result.groups.flatMap((g) => g.members.map((m) => ({ ...m, groupId: g.id }))),
+      member: result.groups.flatMap((g) =>
+        g.members.map((m) => ({ ...m, groupId: g.id })),
+      ),
     };
     const staged = Object.entries(parts).map(([part, values]) => [
       part,
-      part === "observation" || part === "record"
-        ? evidenceBatches(values, (value) => value.identity + (value.record?.id || ""))
+      part === 'observation' || part === 'record'
+        ? evidenceBatches(
+            values,
+            (value) => value.identity + (value.record?.id || ''),
+          )
         : batches(values),
     ]);
     if (Object.values(parts).some((values) => values.length > 300000))
       throw new Error(
-        "Check exceeds the bounded staging limit. Split the source into independent collections.",
+        'Check exceeds the bounded staging limit. Split the source into independent collections.',
       );
     for (const [part, chunks] of staged)
       for (const chunk of chunks)
-        await database("rpc/source_check_stage", "POST", {
+        await database('rpc/source_check_stage', 'POST', {
           ...identity,
           part,
           start_offset: chunk.offset,
@@ -345,13 +397,13 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
       .map((g) => ({
         groupId: g.id,
         classification: g.classification,
-        message: g.blockingReasons.join(" "),
+        message: g.blockingReasons.join(' '),
       }));
     // Finalization has a 60-second SQL budget. A shorter HTTP deadline can
     // abandon a successful transaction and exhaust retries against its lock.
     const completed = await database(
-      "rpc/source_check_finish",
-      "POST",
+      'rpc/source_check_finish',
+      'POST',
       {
         ...identity,
         counts: Object.fromEntries(
@@ -359,23 +411,27 @@ export async function runSourceCheck(input, transport = db, verify = verifyMissi
         ),
         diagnostic_summary: [...findings, ...result.diagnostics].slice(0, 500),
       },
-      "return=representation",
+      'return=representation',
       75000,
     );
     await maintainSourceEvidence(database);
     return completed;
   } catch (error) {
-    await database("rpc/source_check_interrupted", "POST", {
+    await database('rpc/source_check_interrupted', 'POST', {
       ...identity,
       reason: error.message,
     }).catch(() => {});
     throw error;
   }
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const input = JSON.parse(await fs.readFile(process.argv[2], "utf8"));
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  const input = JSON.parse(await fs.readFile(process.argv[2], 'utf8'));
+  const startedAt = Date.now();
   try {
-    if (process.argv.includes("--preview")) {
+    if (process.argv.includes('--preview')) {
       const result = compareObservations({
         records: input.expectedSources,
         observations: input.observations,
@@ -388,14 +444,26 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       }));
       input.summary.counts = {
         ...input.summary.counts,
-        added: result.groups.filter((g) => g.kind === "add").length,
-        modified: result.groups.filter((g) => g.kind === "modify").length,
-        removed: result.groups.filter((g) => g.kind === "remove").length,
+        added: result.groups.filter((g) => g.kind === 'add').length,
+        modified: result.groups.filter((g) => g.kind === 'modify').length,
+        removed: result.groups.filter((g) => g.kind === 'remove').length,
       };
       await fs.writeFile(process.argv[2], JSON.stringify(input));
-    } else console.log(JSON.stringify(await runSourceCheck(input)));
-  } catch (error) {
-    console.error(error.message);
+    } else {
+      await runSourceCheck(input);
+      emitEvent('worker-completed', {
+        worker: 'source-check',
+        startedAt,
+        status: 200,
+      });
+    }
+  } catch {
+    emitEvent('worker-failed', {
+      worker: 'source-check',
+      startedAt,
+      status: 500,
+      dependency: 'worker',
+    });
     process.exitCode = 1;
   }
 }

@@ -3617,7 +3617,9 @@ for (const touch of [false, true])
         .getByRole('button', { name: 'Construct rectangle from first point' })
         .click();
       await expect(page.locator('.drawing-progress')).toContainText('4');
-      await page.screenshot({ path: testInfo.outputPath('precision-rectangle-preview.png') });
+      await page.screenshot({
+        path: testInfo.outputPath('precision-rectangle-preview.png'),
+      });
       await page
         .getByRole('button', { name: 'Close precision drawing' })
         .click();

@@ -55,7 +55,7 @@ Start with [contributing](../CONTRIBUTING.md), [B2 brand assets and usage](BRAND
 | Screenshot files, fixture provenance and reproduction                  | [Screenshot inventory](assets/screenshots/README.md)                                       |
 | Source/data reuse and public credits                                   | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
 
-Start with Node 22.23.3 from `.node-version` and `npm ci` inside `web/`. `npm run dev` serves the public seed with no credentials; it does not serve the Vercel APIs. Browser workflows isolate authentication and private data. `npm test`, `npm run lint`, `npm run build` and `npm run check:configured-build` cover the app and budgets. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
+Start with Node 22.23.3 from `.node-version`, then root `npm ci` and `npm run setup`. [Local development](LOCAL_DEVELOPMENT.md) provides the complete synthetic editor with Supabase and isolated workers on Linux/WSL2; `npm run dev` serves only the public seed. Root `test`, `typecheck`, `lint`, `format:check`, `test:coverage` and `build` commands expose independent checks. The web package also provides `check:configured-build`. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
 
 ## Operate
 

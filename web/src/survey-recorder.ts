@@ -96,7 +96,12 @@ export class SurveyRecorder {
         (fix) => {
           if (this.recording.session.state !== 'recording' || document.hidden)
             return;
-          const sample = acceptSample(this.recording, fix, Date.now(), this.mappingArea);
+          const sample = acceptSample(
+            this.recording,
+            fix,
+            Date.now(),
+            this.mappingArea,
+          );
           this.latest = sample;
           void this.save(sample)
             .then(() => this.changed())

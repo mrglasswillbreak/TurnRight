@@ -104,7 +104,10 @@ const audit = process.argv.includes('--audit');
 const runs =
   process.argv.includes('--final') && !audit
     ? JSON.parse(
-        await fs.readFile('../docs/assets/measurements/model-editor-performance.json', 'utf8'),
+        await fs.readFile(
+          '../docs/assets/measurements/model-editor-performance.json',
+          'utf8',
+        ),
       ).runs.filter((r) => r.version === 'baseline')
     : [];
 function quantile(values, q = 0.95) {
@@ -435,9 +438,10 @@ try {
       }
   if (!process.argv.includes('--capture'))
     await fs.writeFile(
-      process.env.BENCHMARK_OUTPUT || (audit
-        ? `../docs/assets/measurements/model-editor-audit-${new Date().toISOString().slice(0, 10)}.json`
-        : '../docs/assets/measurements/model-editor-performance.json'),
+      process.env.BENCHMARK_OUTPUT ||
+        (audit
+          ? `../docs/assets/measurements/model-editor-audit-${new Date().toISOString().slice(0, 10)}.json`
+          : '../docs/assets/measurements/model-editor-performance.json'),
       JSON.stringify(
         {
           date: new Date().toISOString(),

@@ -1,5 +1,5 @@
-import { db } from "./cloud.mjs";
-import { pathToFileURL } from "node:url";
+import { db } from './cloud.mjs';
+import { pathToFileURL } from 'node:url';
 
 export async function recordFailure(env = process.env, database = db) {
   if (env.RELEASE_ID) {
@@ -7,23 +7,24 @@ export async function recordFailure(env = process.env, database = db) {
     const [release] = await database(`${route}&select=error`);
     // release.mts saves the specific failure first. The workflow's final fallback
     // must not erase it, including after a partially completed publication.
-    await database(route, "PATCH", {
+    await database(route, 'PATCH', {
       error:
         release?.error ||
-        "Release workflow failed before completion. Check GitHub Actions and Vercel status before retrying.",
-      ...(env.RELEASE_OPERATION === "preview" ? { status: "failed" } : {}),
+        'Release workflow failed before completion. Check GitHub Actions and Vercel status before retrying.',
+      ...(env.RELEASE_OPERATION === 'preview' ? { status: 'failed' } : {}),
     });
   } else if (env.JOB_ID) {
-    await database(`jobs?id=eq.${env.JOB_ID}`, "PATCH", {
-      status: "failed",
-      message: "Source workflow failed; the last successful dataset is unchanged.",
+    await database(`jobs?id=eq.${env.JOB_ID}`, 'PATCH', {
+      status: 'failed',
+      message:
+        'Source workflow failed; the last successful dataset is unchanged.',
       completed_at: new Date().toISOString(),
     });
   } else {
-    await database("jobs", "POST", {
-      kind: "import",
-      status: "failed",
-      message: "Scheduled import failed; check GitHub Actions logs.",
+    await database('jobs', 'POST', {
+      kind: 'import',
+      status: 'failed',
+      message: 'Scheduled import failed; check GitHub Actions logs.',
       completed_at: new Date().toISOString(),
     });
   }

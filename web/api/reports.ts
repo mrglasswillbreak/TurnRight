@@ -1,4 +1,5 @@
 import { lasuCampus } from '../src/campus-context.js';
+import { randomUUID } from 'node:crypto';
 import { resolveCampus } from '../server/campuses.js';
 import { withCampusId } from '../server/campus-scope.js';
 import {
@@ -8,11 +9,19 @@ import {
   hash,
   HttpError,
   privateHeaders,
+  observeResponse,
   type RequestLike,
   type ResponseLike,
 } from '../server/backend.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
+  const context = {
+    requestId: randomUUID(),
+    startedAt: Date.now(),
+    action: 'report',
+  };
+  res.setHeader('X-Request-Id', context.requestId);
+  res = observeResponse(res, context);
   try {
     const body = bodyOf(req, 5000);
     if (body.website) {
@@ -47,6 +56,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           'Use a description between 10 and 1,000 characters.',
         );
       if (
+        typeof category !== 'string' ||
         !['incorrect-place', 'blocked-path', 'missing-path', 'other'].includes(
           category,
         )
@@ -92,6 +102,6 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       res.status(201).json({ accepted: true });
     });
   } catch (error) {
-    fail(res, error);
+    fail(res, error, context);
   }
 }

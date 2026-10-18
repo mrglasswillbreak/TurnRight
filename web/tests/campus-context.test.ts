@@ -248,12 +248,23 @@ it('restores the last public campus before loading and makes LASU switches expli
   vi.stubGlobal('history', { state: { retained: true }, replaceState });
   restorePublicCampus();
   expect(replaceState).toHaveBeenCalledOnce();
-  expect(replaceState.mock.calls[0][2].href).toBe('https://map.test/?campus=unilag');
+  expect(replaceState.mock.calls[0][2].href).toBe(
+    'https://map.test/?campus=unilag',
+  );
   expect(replaceState.mock.calls[0][0]).toEqual({ retained: true });
   expect(campusUrl('/', 'lasu')).toBe('/?campus=lasu');
 });
-it.each(['/?campus=lasu', '/?campus=unilag', '/?place=senate', '/?building=legacy', '/#map', '/admin', '/auth/callback'])(
-  'does not replace an explicit or legacy link %s with the remembered campus', (path) => {
+it.each([
+  '/?campus=lasu',
+  '/?campus=unilag',
+  '/?place=senate',
+  '/?building=legacy',
+  '/#map',
+  '/admin',
+  '/auth/callback',
+])(
+  'does not replace an explicit or legacy link %s with the remembered campus',
+  (path) => {
     const replaceState = vi.fn();
     vi.stubGlobal('location', new URL(path, 'https://map.test'));
     vi.stubGlobal('localStorage', { getItem: () => 'unilag' });
@@ -263,7 +274,8 @@ it.each(['/?campus=lasu', '/?campus=unilag', '/?place=senate', '/?building=legac
   },
 );
 it.each([null, '', '../../private', 'https://elsewhere.test', 'UNILAG'])(
-  'ignores missing or malformed remembered campus %s', (saved) => {
+  'ignores missing or malformed remembered campus %s',
+  (saved) => {
     const replaceState = vi.fn();
     vi.stubGlobal('location', new URL('https://map.test/'));
     vi.stubGlobal('localStorage', { getItem: () => saved });
@@ -277,9 +289,19 @@ it('remembers campus choice and stays usable when browser storage is unavailable
   vi.stubGlobal('localStorage', { setItem });
   rememberPublicCampus('unilag');
   rememberPublicCampus('lasu');
-  expect(setItem.mock.calls).toEqual([['turnright:last-campus', 'unilag'], ['turnright:last-campus', 'lasu']]);
+  expect(setItem.mock.calls).toEqual([
+    ['turnright:last-campus', 'unilag'],
+    ['turnright:last-campus', 'lasu'],
+  ]);
   vi.stubGlobal('location', new URL('https://map.test/'));
-  vi.stubGlobal('localStorage', { getItem: () => { throw Error('Blocked'); }, setItem: () => { throw Error('Full'); } });
+  vi.stubGlobal('localStorage', {
+    getItem: () => {
+      throw Error('Blocked');
+    },
+    setItem: () => {
+      throw Error('Full');
+    },
+  });
   expect(() => restorePublicCampus()).not.toThrow();
   expect(() => rememberPublicCampus('unilag')).not.toThrow();
 });

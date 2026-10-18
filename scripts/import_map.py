@@ -8,6 +8,8 @@ import subprocess
 import sys
 import tempfile
 import re
+import time
+from diagnostics import emit_worker
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -278,4 +280,13 @@ if __name__=='__main__':
     if len(sys.argv)>1 and sys.argv[1]=='fail':
         db(f"campus_imports?id=eq.{os.environ['IMPORT_ID']}&run_token=eq.{os.environ['RUN_TOKEN']}&status=in.(queued,running,preview)&select=id",'PATCH',{'status':'failed','message':'The processing job was interrupted or its runtime could not start. Retry this import.','updated_at':datetime.now(timezone.utc).isoformat()})
     elif len(sys.argv)>1 and sys.argv[1]=='convert': convert(sys.argv[2])
-    else: run_job()
+    else:
+        started = time.monotonic()
+        try:
+            run_job()
+            emit_worker('map-import', started, True)
+        except Exception:
+            # The private job receipt retains the actionable failure. Never print
+            # an upstream traceback, payload, URL or credential into runner logs.
+            emit_worker('map-import', started, False)
+            sys.exit(1)

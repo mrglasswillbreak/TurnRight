@@ -1,4 +1,5 @@
 import { publicationAction } from '../server/publication.js';
+import { adminEnvelope } from '../server/request-envelope.js';
 import { sourceUpdatesAction } from '../server/source-updates.js';
 import { processStatus } from '../server/process-status.js';
 import { workspaceAccess } from '../server/workspace-access.js';
@@ -9,14 +10,15 @@ import { resolveCampus, campusAction } from '../server/campuses.js';
 import { randomUUID, createHash } from 'node:crypto';
 import { selectSourceFields } from '../src/source-field-review.js';
 import type { MapChange, MapEdit } from '../src/types.js';
+import type { SourceRecord } from '../src/editor-model.js';
 import {
   allRows,
-  bodyOf,
   db,
   dispatch,
   fail,
   HttpError,
   privateHeaders,
+  observeResponse,
   requireIdentity,
   type RequestLike,
   type ResponseLike,
@@ -37,15 +39,20 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   const requestId = randomUUID();
   res.setHeader('X-Request-Id', requestId);
-  let requestAction: string | undefined;
+  const context = {
+    requestId,
+    startedAt: Date.now(),
+    action: undefined as string | undefined,
+  };
+  res = observeResponse(res, context);
   try {
     const user = await requireIdentity(req);
     const {
       action,
       payload = {},
       campus: reference = 'lasu',
-    } = bodyOf(req, 3_000_000);
-    requestAction = typeof action === 'string' ? action : undefined;
+    } = adminEnvelope(req);
+    context.action = action;
     if (action === 'campus-list') {
       res.status(200).json(await campusAction(action, payload, user.id));
       return;
@@ -109,7 +116,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         case 'state': {
           const [edits, changes, reports, jobs, releases, published] =
             await Promise.all([
-              allRows('map_edits', '&gis_managed=eq.false'),
+              allRows<MapEdit>('map_edits', '&gis_managed=eq.false'),
               payload.sourceReviewVersion === 2
                 ? Promise.resolve([])
                 : db<unknown[]>(sourceReviewQuery()),
@@ -177,7 +184,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         }
         case 'sources': {
           const selected = await editorSelection(user.id, payload.gisKeys);
-          const features = await allRows(
+          const features = await allRows<SourceRecord>(
             'source_features',
             '&gis_managed=eq.false',
           );
@@ -321,7 +328,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
                 'Update the app before editing this building. Its model uses newer authoring controls. Your changes are retained locally.',
               );
           }
-          const result = await db(
+          const result = await db<MapEdit[]>(
             payload.layerManagementVersion === 1
               ? 'rpc/save_editor_layer_batch'
               : authored
@@ -413,6 +420,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         }
         case 'resolve-report': {
           if (
+            typeof payload.status !== 'string' ||
             !['resolved', 'dismissed'].includes(payload.status) ||
             typeof payload.id !== 'string'
           )
@@ -448,7 +456,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             res.status(202).json({ started: online.length });
             break;
           }
-          const recent = await db(
+          const recent = await db<{ created_at: string }[]>(
             'jobs?kind=eq.import&status=in.(queued,running)&order=created_at.desc&limit=1',
           );
           if (
@@ -456,7 +464,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
             Date.now() - Date.parse(recent[0].created_at) < 15 * 60000
           )
             throw new HttpError(409, 'An import is already running.');
-          const [job] = await db('jobs', 'POST', {
+          const [job] = await db<{ id: string }[]>('jobs', 'POST', {
             kind: 'import',
             status: 'queued',
           });
@@ -491,7 +499,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       }
     });
   } catch (error) {
-    fail(res, error, { requestId, action: requestAction });
+    fail(res, error, context);
   }
 }
 
@@ -503,5 +511,9 @@ async function editorSelection(actor: string, keys: unknown) {
     keys.some((key) => typeof key !== 'string' || key.length > 500)
   )
     throw new HttpError(400, 'Load at most 500 selected GIS features.');
-  return db('rpc/gis_hydrate_editor', 'POST', { actor, keys });
+  return db<{ features: SourceRecord[]; edits: MapEdit[] }>(
+    'rpc/gis_hydrate_editor',
+    'POST',
+    { actor, keys },
+  );
 }

@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner } from './gis-database-fixture';
+import type { SourceMapPage, SourceMapRow } from '../src/source-updates';
 
 let db: Awaited<ReturnType<typeof gisDatabase>>;
 beforeAll(
@@ -28,7 +29,7 @@ const shape = async (
   cutoff: string | null = null,
 ) =>
   (
-    await db.query<any>(
+    await db.query<{ result: SourceMapRow['after'] }>(
       'select source_preview_record($1,$2,coalesce($3::timestamptz,clock_timestamp())) result',
       [JSON.stringify(record), side, cutoff],
     )
@@ -54,8 +55,9 @@ it('resolves current and proposed link endpoints, including additions, removals 
       [3.21, 6.41],
     ],
   });
-  const cutoff = (await db.query<any>('select clock_timestamp()::text t'))
-    .rows[0].t;
+  const cutoff = (
+    await db.query<{ t: string }>('select clock_timestamp()::text t')
+  ).rows[0].t;
   await db.query(
     `insert into map_changes(id,source_id,kind,before,after,summary,created_at)
     values('node-move','node:a','modify',$1,$2,'Move node',$3::timestamptz+interval '1 second')`,
@@ -66,9 +68,10 @@ it('resolves current and proposed link endpoints, including additions, removals 
     ],
   );
   const later = (
-    await db.query<any>("select ($1::timestamptz+interval '1 day')::text t", [
-      cutoff,
-    ])
+    await db.query<{ t: string }>(
+      "select ($1::timestamptz+interval '1 day')::text t",
+      [cutoff],
+    )
   ).rows[0].t;
   expect(await shape(edge(), 'after', cutoff)).toEqual(original);
   expect((await shape(edge(), 'before', later)).geometry).toEqual(
@@ -111,7 +114,7 @@ it('keeps endpoint lookups private and scoped to the current campus', async () =
     ('other','node:private','routing-test','node','{"id":"private","coordinates":[20,30]}','private');`);
   expect(await shape(edge('a', 'private'))).toBeNull();
   const privileges = (
-    await db.query<any>(`select
+    await db.query<{ nodes: boolean; records: boolean }>(`select
     has_function_privilege('authenticated','source_preview_node(text,text,timestamptz)','execute') nodes,
     has_function_privilege('anon','source_preview_record(jsonb,text,timestamptz)','execute') records`)
   ).rows[0];
@@ -141,12 +144,15 @@ it(
       pages = 0;
     do {
       const page = (
-        await db.query<any>('select source_review_map($1,$2,$3,$4) result', [
-          owner,
-          JSON.stringify({ source: 'routing-bulk' }),
-          cursor && JSON.stringify(cursor),
-          asOf,
-        ])
+        await db.query<{ result: SourceMapPage }>(
+          'select source_review_map($1,$2,$3,$4) result',
+          [
+            owner,
+            JSON.stringify({ source: 'routing-bulk' }),
+            cursor && JSON.stringify(cursor),
+            asOf,
+          ],
+        )
       ).rows[0].result;
       expect(page.rows.length).toBeLessThanOrEqual(50);
       expect(JSON.stringify(page).length).toBeLessThan(30000);
@@ -169,20 +175,21 @@ it(
     expect(pages).toBe(200);
     expect(
       (
-        await db.query<any>(
+        await db.query<{ n: number }>(
           "select count(*)::int n from map_changes where status='pending' and source_id like 'edge:routing-%'",
         )
       ).rows[0].n,
     ).toBe(10000);
     expect(
       (
-        await db.query<any>(
+        await db.query<{ name: string }>(
           "select properties->>'name' name from map_edits where id='routing-correction'",
         )
       ).rows[0].name,
     ).toBe('Saved correction');
     expect(
-      (await db.query<any>('select count(*)::int n from releases')).rows[0].n,
+      (await db.query<{ n: number }>('select count(*)::int n from releases'))
+        .rows[0].n,
     ).toBe(0);
     // Allow the 200-page WebAssembly replay to finish on Windows without changing
     // the database's per-request limit or the 50-record response bound.

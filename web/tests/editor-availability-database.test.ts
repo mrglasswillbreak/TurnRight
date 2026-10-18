@@ -17,7 +17,7 @@ it('captures correction data and preserves snapshot immutability', async () => {
     edits: [{ id: 'retained correction' }],
   };
   const row = (
-    await db.query<any>(
+    await db.query<{ id: string; editor_edits: unknown[] }>(
       "insert into releases(summary,snapshot) values('summary',$1) returning id,editor_edits",
       [JSON.stringify(snapshot)],
     )
@@ -31,9 +31,10 @@ it('captures correction data and preserves snapshot immutability', async () => {
   ).rejects.toThrow('Release snapshots are immutable');
   expect(
     (
-      await db.query<any>('select editor_edits from releases where id=$1', [
-        row.id,
-      ])
+      await db.query<{ editor_edits: unknown[] }>(
+        'select editor_edits from releases where id=$1',
+        [row.id],
+      )
     ).rows[0].editor_edits,
   ).toEqual(snapshot.edits);
 });
@@ -44,7 +45,7 @@ it('backfills one latest summary without rewriting historical snapshots', async 
     ['latest', '2026-01-02'],
   ]) {
     const rows = (
-      await db.query<any>(
+      await db.query<{ id: string }>(
         "insert into releases(summary,snapshot,status,version,published_at) values($1,$2,'published',$1,$3) returning id",
         [
           version,
@@ -60,11 +61,17 @@ it('backfills one latest summary without rewriting historical snapshots', async 
     [ids],
   );
   const result = (
-    await db.query<any>('select backfill_release_editor_edits() result')
+    await db.query<{ result: { updated: string | null; complete: boolean } }>(
+      'select backfill_release_editor_edits() result',
+    )
   ).rows[0].result;
   expect(result).toEqual({ updated: ids[1], complete: true });
   const rows = (
-    await db.query<any>(
+    await db.query<{
+      id: string;
+      editor_edits: unknown[] | null;
+      snapshot: { features: unknown[] };
+    }>(
       'select id,editor_edits,snapshot from releases where id=any($1::uuid[]) order by published_at',
       [ids],
     )
@@ -73,13 +80,18 @@ it('backfills one latest summary without rewriting historical snapshots', async 
   expect(rows[1].editor_edits).toEqual([{ id: 'latest' }]);
   expect(rows[1].snapshot.features).toEqual([1, 2, 3]);
   expect(
-    (await db.query<any>('select backfill_release_editor_edits() result'))
-      .rows[0].result,
+    (
+      await db.query<{ result: { updated: string | null; complete: boolean } }>(
+        'select backfill_release_editor_edits() result',
+      )
+    ).rows[0].result,
   ).toEqual({ updated: null, complete: true });
 });
 it('refuses old replacement calls without applying data or exposing maintenance', async () => {
   const before = (
-    await db.query<any>('select count(*)::integer n from source_features')
+    await db.query<{ n: number }>(
+      'select count(*)::integer n from source_features',
+    )
   ).rows[0].n;
   await expect(
     db.query("select reconcile_published_baseline($1,'old','[]','[]')", [
@@ -87,18 +99,21 @@ it('refuses old replacement calls without applying data or exposing maintenance'
     ]),
   ).rejects.toThrow('retired');
   expect(
-    (await db.query<any>('select count(*)::integer n from source_features'))
-      .rows[0].n,
+    (
+      await db.query<{ n: number }>(
+        'select count(*)::integer n from source_features',
+      )
+    ).rows[0].n,
   ).toBe(before);
   expect(
     (
-      await db.query<any>(
+      await db.query<{ n: number }>(
         'select count(*)::integer n from baseline_reconciliations',
       )
     ).rows[0].n,
   ).toBe(0);
   const rights = (
-    await db.query<any>(
+    await db.query<{ anon: boolean; authenticated: boolean }>(
       "select has_function_privilege('anon','backfill_release_editor_edits()','execute') anon, has_function_privilege('authenticated','reconcile_published_baseline(uuid,text,jsonb,jsonb)','execute') authenticated",
     )
   ).rows[0];

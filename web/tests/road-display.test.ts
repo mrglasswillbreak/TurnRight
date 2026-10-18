@@ -5,15 +5,22 @@ afterEach(() => vi.unstubAllGlobals());
 it('recovers a worker module failure and releases the worker', async () => {
   const terminate = vi.fn();
   let worker: Worker;
-  vi.stubGlobal('Worker', class {
-    onerror: Worker['onerror'] = null;
-    onmessage: Worker['onmessage'] = null;
-    terminate = terminate;
-    postMessage() {}
-    constructor() { worker = this as unknown as Worker; }
-  });
+  vi.stubGlobal(
+    'Worker',
+    class {
+      onerror: Worker['onerror'] = null;
+      onmessage: Worker['onmessage'] = null;
+      terminate = terminate;
+      postMessage() {}
+      constructor() {
+        worker = this as unknown as Worker;
+      }
+    },
+  );
   const source: FeatureCollection = { type: 'FeatureCollection', features: [] };
-  const result = new Promise<FeatureCollection>((resolve) => requestRoadDisplay(source, resolve));
+  const result = new Promise<FeatureCollection>((resolve) =>
+    requestRoadDisplay(source, resolve),
+  );
   worker!.onmessage!({ data: { error: true } } as MessageEvent);
   expect(await result).toEqual(source);
   expect(terminate).toHaveBeenCalled();
@@ -57,13 +64,18 @@ it('terminates pending work on pagehide without starting a fallback import', asy
   vi.stubGlobal('window', lifecycle);
   const terminate = vi.fn();
   let worker: Worker;
-  vi.stubGlobal('Worker', class {
-    onerror: Worker['onerror'] = null;
-    onmessage: Worker['onmessage'] = null;
-    terminate = terminate;
-    postMessage() {}
-    constructor() { worker = this as unknown as Worker; }
-  });
+  vi.stubGlobal(
+    'Worker',
+    class {
+      onerror: Worker['onerror'] = null;
+      onmessage: Worker['onmessage'] = null;
+      terminate = terminate;
+      postMessage() {}
+      constructor() {
+        worker = this as unknown as Worker;
+      }
+    },
+  );
   const receive = vi.fn();
   requestRoadDisplay({ type: 'FeatureCollection', features: [] }, receive);
   lifecycle.dispatchEvent(new Event('pagehide'));
@@ -73,31 +85,46 @@ it('terminates pending work on pagehide without starting a fallback import', asy
   expect(receive).not.toHaveBeenCalled();
 });
 
-it.each([true, false])('preserves cached-page work and handles its next lifecycle event (reply: %s)', (reply) => {
-  const lifecycle = new EventTarget();
-  vi.stubGlobal('window', lifecycle);
-  const terminate = vi.fn();
-  let worker: Worker;
-  vi.stubGlobal('Worker', class {
-    onerror: Worker['onerror'] = null;
-    onmessage: Worker['onmessage'] = null;
-    terminate = terminate;
-    postMessage() {}
-    constructor() { worker = this as unknown as Worker; }
-  });
-  const receive = vi.fn();
-  const geometry: FeatureCollection = { type: 'FeatureCollection', features: [] };
-  requestRoadDisplay(geometry, receive);
-  lifecycle.dispatchEvent(Object.assign(new Event('pagehide'), { persisted: true }));
-  expect(terminate).not.toHaveBeenCalled();
-  if (reply) {
-    worker!.onmessage!({ data: geometry } as MessageEvent<FeatureCollection>);
-    expect(receive).toHaveBeenCalledWith(geometry);
-  } else {
-    lifecycle.dispatchEvent(Object.assign(new Event('pagehide'), { persisted: false }));
-    expect(receive).not.toHaveBeenCalled();
-  }
-  expect(terminate).toHaveBeenCalledOnce();
-  lifecycle.dispatchEvent(new Event('pagehide'));
-  expect(terminate).toHaveBeenCalledOnce();
-});
+it.each([true, false])(
+  'preserves cached-page work and handles its next lifecycle event (reply: %s)',
+  (reply) => {
+    const lifecycle = new EventTarget();
+    vi.stubGlobal('window', lifecycle);
+    const terminate = vi.fn();
+    let worker: Worker;
+    vi.stubGlobal(
+      'Worker',
+      class {
+        onerror: Worker['onerror'] = null;
+        onmessage: Worker['onmessage'] = null;
+        terminate = terminate;
+        postMessage() {}
+        constructor() {
+          worker = this as unknown as Worker;
+        }
+      },
+    );
+    const receive = vi.fn();
+    const geometry: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [],
+    };
+    requestRoadDisplay(geometry, receive);
+    lifecycle.dispatchEvent(
+      Object.assign(new Event('pagehide'), { persisted: true }),
+    );
+    expect(terminate).not.toHaveBeenCalled();
+    if (reply) {
+      worker!.onmessage!({ data: geometry } as MessageEvent<FeatureCollection>);
+      expect(receive).toHaveBeenCalledWith(geometry);
+    } else {
+      lifecycle.dispatchEvent(
+        Object.assign(new Event('pagehide'), { persisted: false }),
+      );
+      expect(receive).not.toHaveBeenCalled();
+    }
+    expect(terminate).toHaveBeenCalledOnce();
+    lifecycle.dispatchEvent(new Event('pagehide'));
+    expect(terminate).toHaveBeenCalledOnce();
+  },
+);

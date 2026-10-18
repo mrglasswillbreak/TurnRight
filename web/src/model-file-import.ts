@@ -111,7 +111,24 @@ export async function importModelFiles(
   const ext = primary.split('.').at(-1)?.toLowerCase();
   try {
     if (ext === 'gltf' || ext === 'glb') {
-      let json: Record<string, any>, binary: ArrayBuffer | undefined;
+      let json: {
+          asset?: { version?: string };
+          animations?: unknown[];
+          skins?: unknown[];
+          extensionsUsed?: string[];
+          extensionsRequired?: string[];
+          meshes?: Array<{
+            primitives?: Array<{ targets?: unknown[]; mode?: number }>;
+          }>;
+          materials?: Array<{
+            extensions?: unknown;
+            occlusionTexture?: unknown;
+            normalTexture?: { scale?: number };
+          }>;
+          buffers?: Array<{ uri?: string }>;
+          images?: Array<{ uri?: string }>;
+        },
+        binary: ArrayBuffer | undefined;
       if (ext === 'glb') {
         const view = new DataView(file.data);
         if (
