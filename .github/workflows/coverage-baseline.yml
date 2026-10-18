@@ -1,6 +1,8 @@
 name: Historical coverage baseline
 on:
   workflow_dispatch:
+  pull_request:
+    paths: [.github/workflows/coverage-baseline.yml]
 permissions:
   contents: read
 jobs:
