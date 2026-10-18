@@ -30,11 +30,24 @@ for (const account of accounts) {
       }),
     },
   );
-  assert.equal(response.status, 200, `Real authentication for ${account.role}`);
   const session = await response.json();
+  assert.equal(
+    response.status,
+    200,
+    `Real authentication for ${account.role} (${typeof session.error_code === 'string' && /^[a-z_]+$/.test(session.error_code) ? session.error_code : 'no diagnostic code'})`,
+  );
   assert.equal(session.user.id, account.id);
   sessions.set(account.role, session.access_token);
 }
+const signup = await fetch(config.API_URL + '/auth/v1/signup', {
+  method: 'POST',
+  headers: { apikey: config.ANON_KEY, 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'uninvited@turnright.local',
+    password: 'Uninvited-test-only-password',
+  }),
+});
+assert.equal(signup.status, 422, 'Public registration remains disabled');
 async function api<T = Record<string, unknown>>(
   role: string,
   action: string,
