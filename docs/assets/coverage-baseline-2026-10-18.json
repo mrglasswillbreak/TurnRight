@@ -10,33 +10,36 @@
   "include": [
     "src/**/*.{ts,tsx,mjs}",
     "components/**/*.{ts,tsx}",
-    "server/**/*.ts",
+    "lib/**/*.{ts,tsx,mjs}",
+    "hooks/**/*.{ts,tsx,mjs}",
+    "server/**/*.{ts,mjs}",
     "api/**/*.ts"
   ],
   "exclude": [
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "**/*.d.mts"
   ],
   "total": {
     "lines": {
-      "total": 23138,
-      "covered": 8846,
+      "total": 23150,
+      "covered": 8847,
       "skipped": 0,
-      "pct": 38.23
+      "pct": 38.21
     },
     "statements": {
-      "total": 25494,
-      "covered": 9738,
+      "total": 25507,
+      "covered": 9739,
       "skipped": 0,
-      "pct": 38.19
+      "pct": 38.18
     },
     "functions": {
-      "total": 6568,
-      "covered": 2141,
+      "total": 6574,
+      "covered": 2142,
       "skipped": 0,
-      "pct": 32.59
+      "pct": 32.58
     },
     "branches": {
-      "total": 22218,
+      "total": 22219,
       "covered": 7960,
       "skipped": 0,
       "pct": 35.82
@@ -47,5 +50,9 @@
       "skipped": 0,
       "pct": 100
     }
-  }
+  },
+  "environment": "Ubuntu 24.04 GitHub Actions",
+  "verificationRun": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/39163482913",
+  "instrumentationRevision": "59b21e59f02e780e187bd5a99ef93fdb79d22d19",
+  "scopeCorrection": "Remeasured unchanged historical source after adding the previously omitted lib/ and hooks/ roots. Historical tests and whole-project floors are unchanged."
 }

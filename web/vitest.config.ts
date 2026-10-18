@@ -11,6 +11,8 @@ export default defineConfig({
       include: [
         'src/**/*.{ts,tsx,mjs}',
         'components/**/*.{ts,tsx}',
+        'lib/**/*.{ts,tsx,mjs}',
+        'hooks/**/*.{ts,tsx,mjs}',
         'server/**/*.{ts,mjs}',
         'api/**/*.ts',
       ],
@@ -23,18 +25,21 @@ export default defineConfig({
         functions: 32,
         branches: 35,
         'server/local-dispatch.ts': {
+          perFile: true,
           statements: 80,
           lines: 80,
           functions: 80,
           branches: 70,
         },
         'server/{diagnostics.mjs,request-envelope.ts}': {
+          perFile: true,
           statements: 80,
           lines: 80,
           functions: 80,
           branches: 70,
         },
         'api/health.ts': {
+          perFile: true,
           statements: 80,
           lines: 80,
           functions: 80,
