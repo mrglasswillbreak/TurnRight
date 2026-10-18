@@ -31,7 +31,7 @@ jobs:
       CAMPUS_ID: campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a
       PUBLISHED_MAP_URL: https://turnright.vercel.app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version

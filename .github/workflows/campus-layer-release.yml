@@ -35,7 +35,7 @@ jobs:
       APPLY_LAYER_UPGRADE: ${{ inputs.operation == 'apply' }}
       EXPECTED_SNAPSHOT: ${{ inputs.expected_hash }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
