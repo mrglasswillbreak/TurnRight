@@ -15,13 +15,20 @@ async function get(relative) {
   assert.equal(url.origin, new URL(origin).origin);
   const response = await fetch(url, {
     cache: 'no-store',
-    redirect: 'error',
+    redirect: 'manual',
     headers: process.env.VERIFY_BYPASS
       ? { 'x-vercel-protection-bypass': process.env.VERIFY_BYPASS }
       : {},
     signal: AbortSignal.timeout(45000),
   });
-  assert.equal(response.status, 200, relative);
+  const location = response.headers.get('location');
+  // Report the public path, never redirect queries, bypass credentials or bodies.
+  const redirected = location ? new URL(location, url) : null;
+  assert.equal(
+    response.status,
+    200,
+    `${url.pathname}${redirected ? ` redirected to ${redirected.origin}${redirected.pathname}` : ''}`,
+  );
   return Buffer.from(await response.arrayBuffer());
 }
 const catalogueBytes = await get('/packages/campuses.json');
