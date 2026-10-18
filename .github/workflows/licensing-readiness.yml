@@ -45,7 +45,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             web/package-lock.json
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - run: npm ci && npm run setup
