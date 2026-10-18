@@ -55,6 +55,11 @@ one job at a time with a bounded queue; the existing network-disabled GDAL
 containers retain their memory, CPU and scratch-directory controls. Job logs stay
 in the ignored `.local-runtime/jobs` directory.
 
+Uploaded file sources in this loopback sandbox enable proposal generation when
+dispatched, so their comparisons can reach source review. Acceptance remains an
+explicit editor action and snapshot approval remains independent. Hosted sources
+retain the existing shadow-first rollout and per-source administrative policy.
+
 External source downloads and cloud publication are disabled. Use uploaded
 files locally. Production publication requires the separately configured hosted
 environment described in [DEPLOYMENT.md](DEPLOYMENT.md), including independent
