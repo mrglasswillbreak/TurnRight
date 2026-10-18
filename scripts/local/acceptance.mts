@@ -2,7 +2,13 @@ import assert from 'node:assert/strict';
 import { randomUUID, createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { readConfig, runtime, origin } from './runtime.mjs';
+import { readConfig, runtime, origin, command } from './runtime.mjs';
+import { verifyPrivateAssets } from './acceptance-assets.mts';
+import type {
+  SourceHistory,
+  SourceOperation,
+  SourcePage,
+} from '../../web/src/source-updates.ts';
 import type {
   Dataset,
   ProcessingJob,
@@ -108,8 +114,38 @@ if (process.argv.includes('--persistence')) {
     datasets.some((dataset) => dataset.name === previous.datasetName),
     'Edited data survives service restart',
   );
+  const model = await api<{ url: string }>('editor', 'model-asset-read', {
+    reference: previous.assets.model,
+  });
+  assert.equal(
+    createHash('sha256')
+      .update(Buffer.from(await (await fetch(model.url)).arrayBuffer()))
+      .digest('hex'),
+    previous.assets.model.sha256,
+  );
+  const photo = await api<{ status: string }>('editor', 'media-status', {
+    id: previous.assets.photoId,
+  });
+  assert.equal(photo.status, 'processed', 'Private media survives restart');
   console.log('Restart persistence and role isolation passed.');
   process.exit(0);
+}
+if (process.argv.includes('--after-reset')) {
+  const previous = JSON.parse(
+    await readFile(path.join(runtime, 'acceptance-receipt.json'), 'utf8'),
+  );
+  const datasets = await api<Dataset[]>('editor', 'gis-datasets');
+  assert(
+    !datasets.some((dataset) => dataset.name === previous.datasetName),
+    'Explicit reset removes previous local edits',
+  );
+  await api(
+    'editor',
+    'media-status',
+    { id: previous.assets.photoId },
+    'lasu',
+    404,
+  );
 }
 
 const datasetName = 'Local acceptance ' + randomUUID();
@@ -145,13 +181,29 @@ const submission = await api<ReviewSubmission>('editor', 'gis-review-submit', {
   operationId: randomUUID(),
   summary: 'Synthetic local acceptance review',
 });
-await api(
+const editorId = accounts.find((account) => account.role === 'editor')!.id;
+await api('administrator', 'gis-member-save', {
+  operationId: randomUUID(),
+  userId: editorId,
+  roles: ['editor', 'reviewer'],
+});
+const selfApproval = await api(
   'editor',
   'gis-review-decide',
   { id: submission.id, approve: true, reason: 'Self approval must fail' },
   'lasu',
   403,
 );
+assert.match(
+  String(selfApproval.error),
+  /contributor/i,
+  'Independent review is enforced even when the contributor holds the reviewer role',
+);
+await api('administrator', 'gis-member-save', {
+  operationId: randomUUID(),
+  userId: editorId,
+  roles: ['editor'],
+});
 await api('reviewer', 'gis-review-decide', {
   id: submission.id,
   approve: true,
@@ -200,6 +252,38 @@ assert.equal(
   '504b0304',
   'Export is a ZIP archive',
 );
+const spatial = datasets.find(
+  (row) => !row.id.startsWith('table:') && (row.count || 0) > 0,
+);
+assert(spatial, 'Synthetic geometry is indexed for analysis');
+const buffer = await api<ProcessingJob>('editor', 'gis-job-start', {
+  operationId: randomUUID(),
+  tool: 'buffer',
+  name: 'Synthetic ten metre buffer',
+  input: { datasetId: spatial.id, revision: spatial.revision },
+  parameters: { distance: 10 },
+});
+const buffered = await waitFor(
+  () => api<ProcessingJob[]>('editor', 'gis-jobs'),
+  (rows) =>
+    rows.some(
+      (row) =>
+        row.id === buffer.id && !['queued', 'running'].includes(row.status),
+    ),
+  'Spatial analysis',
+);
+assert.equal(buffered.find((row) => row.id === buffer.id)?.status, 'succeeded');
+const geometry = await api<Array<{ geometry: { type: string } }>>(
+  'editor',
+  'gis-job-preview',
+  { id: buffer.id },
+);
+assert(
+  geometry.length > 0 &&
+    geometry.every((feature) => /Polygon$/.test(feature.geometry.type)),
+  'Metric buffer produces polygon geometry',
+);
+const assets = await verifyPrivateAssets(api, config.API_URL);
 
 const source = await api<{ job: CampusImport }>('editor', 'import-start', {
   kind: 'file',
@@ -240,19 +324,98 @@ const inspected = await waitFor(
   'Isolated file import',
 );
 assert.equal(inspected.job.status, 'mapping', inspected.job.message);
-await api('editor', 'import-cancel', { importId: source.job.id });
-const cancelled = await api<{ job: CampusImport }>('editor', 'import-get', {
+const layer = inspected.job.summary?.layers[0];
+assert(layer, 'File inspection returns a mappable layer');
+await api('editor', 'import-run', {
   importId: source.job.id,
+  phase: 'preview',
+  configuration: {
+    layers: [
+      { layer: layer.name, role: 'overlay', idField: 'id', nameField: 'name' },
+    ],
+    attribution: 'TurnRight synthetic local fixture',
+    license: 'Synthetic acceptance fixture',
+    redistributionConfirmed: true,
+  },
+});
+const preview = await waitFor(
+  () =>
+    api<{ job: CampusImport }>('editor', 'import-get', {
+      importId: source.job.id,
+    }),
+  (value) => !['queued', 'running'].includes(value.job.status),
+  'File preview',
+);
+assert.equal(preview.job.status, 'preview', preview.job.message);
+await api('editor', 'import-queue', { importId: source.job.id });
+const queued = await waitFor(
+  () =>
+    api<{ job: CampusImport }>('editor', 'import-get', {
+      importId: source.job.id,
+    }),
+  (value) => !['queued', 'running'].includes(value.job.status),
+  'Source proposal staging',
+);
+assert.equal(queued.job.status, 'reviewed', queued.job.message);
+const proposals = await api<SourcePage>('editor', 'source-updates-list', {
+  filters: { source: 'import:' + source.job.source_id },
+});
+assert(proposals.rows.length > 0, 'Uploaded file creates reviewable proposals');
+const operation = await api<SourceOperation>(
+  'editor',
+  'source-updates-prepare',
+  {
+    operationId: randomUUID(),
+    selection: {
+      mode: 'ids',
+      items: proposals.rows.map(({ id, revision }) => ({ id, revision })),
+    },
+  },
+);
+await api('editor', 'source-updates-control', {
+  operationId: operation.id,
+  command: 'start',
+  accept: true,
+});
+const reviewed = await waitFor(
+  () =>
+    api<SourceHistory>('editor', 'source-updates-history', {
+      operationId: operation.id,
+    }),
+  (value) =>
+    value.operations.some(
+      (row) =>
+        row.id === operation.id &&
+        !['prepared', 'queued', 'running'].includes(row.status),
+    ),
+  'Source review worker',
+);
+const completed = reviewed.operations.find((row) => row.id === operation.id)!;
+assert.equal(completed.status, 'completed');
+assert(
+  completed.applied > 0 && completed.failed === 0,
+  'Source review applies the synthetic proposals',
+);
+const toCancel = await api<{ job: CampusImport }>('editor', 'import-start', {
+  kind: 'file',
+  name: 'Cancelled synthetic import',
+});
+await api('editor', 'import-cancel', { importId: toCancel.job.id });
+const cancelled = await api<{ job: CampusImport }>('editor', 'import-get', {
+  importId: toCancel.job.id,
 });
 assert.equal(cancelled.job.status, 'cancelled');
 await writeFile(
   path.join(runtime, 'acceptance-receipt.json'),
   JSON.stringify({
     datasetName,
-    revision: process.env.GITHUB_SHA || 'local',
+    assets,
+    revision: String(
+      await command('git', ['rev-parse', 'HEAD'], { capture: true }),
+    ).trim(),
     completedAt: new Date().toISOString(),
   }),
 );
 console.log(
-  'Real Auth, role/campus isolation, persistent editing, idempotent save, independent review, export, isolated file import and cancellation passed.',
+  'Real Auth, role/campus isolation, persistent editing, independent review, spatial analysis, export, private media/model storage, file imports, source review and cancellation passed.',
 );

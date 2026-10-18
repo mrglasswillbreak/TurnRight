@@ -35,7 +35,12 @@ export function requireDevelopmentHost() {
 export async function command(
   binary,
   args,
-  { capture = false, env = process.env, input, timeout = 20 * 60_000 } = {},
+  {
+    capture = false,
+    env = process.env,
+    input = '',
+    timeout = 20 * 60_000,
+  } = {},
 ) {
   if (binary === supabaseCli) {
     args = [supabaseCli, ...args];

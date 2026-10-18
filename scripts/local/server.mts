@@ -15,6 +15,7 @@ import {
   origin,
   readConfig,
   requireDevelopmentHost,
+  command,
 } from './runtime.mjs';
 import { validateLocalJob } from '../../web/server/local-dispatch.ts';
 import type { RequestLike, ResponseLike } from '../../web/server/backend.ts';
@@ -97,7 +98,10 @@ function runNext() {
   }
   const log = createWriteStream(
     path.join(runtime, 'jobs', `${key.replace(':', '-')}.log`),
-    { flags: 'a', mode: 0o600 },
+    {
+      flags: 'a',
+      mode: 0o600,
+    },
   );
   const child = spawn(binary, args, {
     cwd: root,
@@ -178,6 +182,41 @@ async function enqueue(value: unknown) {
         : [];
       if (sources[0]?.kind !== 'file')
         throw Error('Only uploaded file sources are enabled locally.');
+      // New hosted sources deliberately start in shadow mode. Local uploads
+      // have no remote provider; enable proposal generation only in this
+      // loopback sandbox. Acceptance and publication guards remain separate.
+      // Canonical migration 045 intentionally denies this operator-only table
+      // to every API role. Use only our fixed local database container; retain
+      // those grants and never accept a caller-supplied SQL command or target.
+      await command(
+        'docker',
+        [
+          'exec',
+          '-i',
+          'supabase_db_turnright-local',
+          'psql',
+          '-X',
+          '-q',
+          '-U',
+          'postgres',
+          '-d',
+          'postgres',
+          '-v',
+          'ON_ERROR_STOP=1',
+          '-v',
+          `campus_id=${job.inputs.campus_id}`,
+          '-v',
+          `source_id=${jobs[0].source_id}`,
+        ],
+        {
+          capture: true,
+          timeout: 30_000,
+          input: `INSERT INTO public.source_check_policy (campus_id, source_key, enabled)
+SELECT campus_id, 'import:' || id, true FROM public.campus_sources
+WHERE id = :'source_id'::uuid AND campus_id = :'campus_id' AND kind = 'file'
+ON CONFLICT (campus_id, source_key) DO UPDATE SET enabled = true;`,
+        },
+      );
     });
   }
   queued.add(keyOf(job));
@@ -217,7 +256,7 @@ const server = createServer(async (req, res) => {
       if (url.pathname === '/api/admin') {
         const value = JSON.parse(payload || '{}');
         if (
-          /^(check-sources|refresh-source|source-schedule|source-updates-check|prepare-release|publish-release|rollback)$/.test(
+          /^(check-sources|refresh-source|source-schedule|source-updates-check|source-updates-reverify|prepare-release|publish-release|rollback)$/.test(
             value.action || '',
           ) ||
           (value.action === 'import-start' &&

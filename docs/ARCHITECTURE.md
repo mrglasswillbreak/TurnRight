@@ -26,7 +26,27 @@ The public app does not read private drafts. Source acceptance changes the worki
 
 ## Shared editor shell
 
+### Application entry boundaries
+
+The three entry components coordinate typed hooks and presentation modules, each kept below approximately 500 lines. The extraction retains the existing stores, API contracts, selectors, command history and focus handling; it introduces no database change.
+
+| Entry | State and commands | Presentation |
+| --- | --- | --- |
+| `App.tsx` | `usePublicAppState`, `usePublicOfflineLifecycle`, `usePublicNavigationTracking`, `usePublicSearch`, `usePublicDestination`, `usePublicRouting` | `PublicSearchBar`, `PublicPlaceBrowse`, `PublicDestinationDetails`, `PublicExplorePanel`, `PublicSettingsContent`, `PublicDialogs` |
+| `Admin.tsx` → `EditorWorkspaceView` | `useEditorSessionState`, `useEditorSources`, `useEditorSelection`, `useEditorDrawing`, `useEditorRepair`, `useEditorConnections`, lifecycle/synchronization/task hooks | `EditorMapWorkspace`, `EditorMapStage`, feature explorer, GIS/team/inspection/recovery panels and route tester |
+| `PhotoModelWorkspace.tsx` → `ModelWorkspaceView` | `useModelWorkspaceState`, `useModelWorkspaceSelection`, `useModelCommit`, `useModelDetailCommands`, `useModelEditingControls`, `useModelSelectionActions` | Model toolbar/stage, recovery review, property inspector, detail/wall/pattern controls and responsive dialog/layout |
+
+Each hook accepts a typed subset of preceding coordination state. State remains owned by the mounted entry; moving a panel does not create another store or undo stack. The `*-shared.tsx` modules contain common types, constants and lazy imports. Duplicate review has its own Suspense boundary, so opening that panel loads its code without suspending the editor canvas. Public, editor, photo and renderer bundle budgets still count shared static dependencies.
+
+Browser journeys verify campus/history isolation, autosave and undo, unfinished drawing recovery, model/roof editing, duplicate review and focus restoration. These results are reported separately from V8 unit coverage; extracting an existing UI hook does not establish unit coverage of its interactions.
+
 [Editor layout contract](EDITOR-LAYOUT.md) documents typed workspace/pane identities, stable canvas hosts, responsive sheets and versioned preferences. The new shell and combined Activity presentation use existing state stores and APIs. Model and photo editors retain their existing workers, queues, undo and recovery ownership. No database migration accompanies the layout or identity changes.
+
+## Local runtime and diagnostics
+
+`scripts/local` owns the development-only Supabase lifecycle, idempotent synthetic seeding, loopback HTTP adapter and bounded worker dispatcher. The adapter imports the same `web/api` handlers used in production; Supabase sessions and existing campus capability checks remain authoritative. Local orchestration removes hosted credentials and accepts only fixed GIS, uploaded-file import and source-review worker inputs. The isolated processing images retain their existing resource and network controls. [Fresh-clone setup and operational limits](LOCAL_DEVELOPMENT.md).
+
+`web/server/request-envelope.ts` validates admin envelopes before domain dispatch while preserving authentication order and successful contracts. `web/server/diagnostics.mjs` emits JSON events from an allowlist of fields and dependency names; request completion includes timestamp, duration, status and a request reference, never raw errors or payloads. Existing worker receipts remain authoritative for uncertain completion. `ApplicationRecovery` offers reload after a rendering failure without deleting stored work. `/api/health` exposes only application status and release revision.
 
 ## Campus GIS workflow
 
