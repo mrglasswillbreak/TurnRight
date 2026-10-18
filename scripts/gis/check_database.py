@@ -79,6 +79,15 @@ with psycopg.connect(url,autocommit=True) as db:
         raise AssertionError('Publication lease allowed a concurrent edit')
     except psycopg.Error as error:
         assert error.sqlstate=='PT409'
+    db.execute("update releases set status='preview',deployment_id='dpl_native',version='native-publication',published_catalogue_revision='after' where id=%s",(release,))
+    try:
+        db.execute('select gis_complete_publication(%s,%s,%s,%s)',(release,str(uuid.uuid4()),'dpl_native','https://native.vercel.app'))
+        raise AssertionError('Publication accepted a mismatched lease')
+    except psycopg.Error as error: assert error.sqlstate=='PT409'
+    receipt=db.execute('select gis_complete_publication(%s,%s,%s,%s)',(release,lease,'dpl_native','https://native.vercel.app')).fetchone()[0]
+    assert receipt['status']=='published' and 'snapshot' not in receipt
+    assert db.execute('select gis_complete_publication(%s,%s,%s,%s)',(release,lease,'dpl_native','https://native.vercel.app')).fetchone()[0]==receipt
+    assert db.execute("select count(*) from workspace_audit where action='publication-complete' and subject=%s",(str(release),)).fetchone()[0]==1
     db.execute('select gis_end_publication(%s,%s)',(release,lease))
     db.execute("update gis_datasets set revision=revision+1 where id='native-scale'")
     try:

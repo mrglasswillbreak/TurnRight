@@ -1,0 +1,438 @@
+{
+  "recordedAt": "2026-10-18T01:47:17.309Z",
+  "revision": "4050c4f6947794047cc81ae4c3ef7a06e4071520",
+  "readOnly": true,
+  "valuesRedacted": true,
+  "campuses": [
+    {
+      "campus": "lasu",
+      "reviewId": "748818c4-7634-4955-ada2-3674b0b9f66b",
+      "approvedHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc",
+      "status": "approved",
+      "currentHash": "47a91db93f32da0e51b382f70abb2e09ef29cd2ef27141fc05ee1933ae17fc1b",
+      "sections": {
+        "features": {
+          "beforeCount": 6047,
+          "currentCount": 6047,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "edits": {
+          "beforeCount": 158,
+          "currentCount": 158,
+          "changed": 9,
+          "differences": [
+            {
+              "id": "building:arcgis:University_Property:28",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "28d6c33c7550c28fe5f46e2588951b2ab0735956d37f0341d76f812cf467da56",
+              "afterHash": "ffe34688b52623d698216e2f14b4e21968098b111577ce0d3b274cceafd4c55b"
+            },
+            {
+              "id": "layer:map-layer:03ffe2a133388e8d",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "c68f6ae233e5f903e068bf605921129752e3c450ef31956d21082bde0b3c3b34",
+              "afterHash": "cabc36ea61874e6077c0b0a43f1af857881d3b565555bca7df023f47192ae74a"
+            },
+            {
+              "id": "layer:map-layer:1eb6e4263552e7f2",
+              "kind": "changed",
+              "fields": [
+                "properties.layerDefinition.editorVisible",
+                "updated_at"
+              ],
+              "beforeHash": "b0a494f0a312e17070e1c1230aafd1c24e2f1095f58a58c808eda786c9e57e89",
+              "afterHash": "ac169521284c7ef6add2de40cfb438d0c4f55f0e4b6c70a69cbd8b5ed0a040ec"
+            },
+            {
+              "id": "layer:map-layer:59daf7cb29d68149",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "1b2502c10e8ab9a1bec1a6221371bffcd346a0f1731cdd9680b2609f8a8f8457",
+              "afterHash": "035aca613e07642f00c000632c8b18c61bafa2f59a2ae4d6e8bbf266f816aaa5"
+            },
+            {
+              "id": "layer:map-layer:5a29eb8b49c2437f",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "40635a1a4b96f9be00fba39cdc04e4fd5077e2520600308c940e3b6955bc6a19",
+              "afterHash": "389ae97840ed0cbb98e7f869790263ca0e7375745d43194f72d1a3e4505d123a"
+            },
+            {
+              "id": "layer:map-layer:8a5939a88b5425bc",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "e7aa4b66f4eaea0ead94fb45c81bdfa0cee4112486242c0b3a591c2124ce3f2d",
+              "afterHash": "07e63afa3ebbb136186674950c003185011cbb5b9f64dbc927f781f498e6d14a"
+            },
+            {
+              "id": "layer:map-layer:aa0fe3610e445987",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "037f49710b54cf57e782d1ad98e007e60764dec65b9f4678a595632c501aba63",
+              "afterHash": "2c1b5133b9452aec3404219ccc72c9716b550b0c10177b0e14beaca1a6612d32"
+            },
+            {
+              "id": "layer:map-layer:d4e4e392d06695c4",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "b2414fe3715ca96e43c3a03fd12756d36a9de4533233f15044e294c1300b0a0d",
+              "afterHash": "1325d0b59de840ce67fdf6329dde39fadba97d0ed3e346d720f3eaa8ab521d11"
+            },
+            {
+              "id": "layer:map-layer:d6a2ebe0bd035584",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "8072905f6e3e17afcc9e2cb55e9ad7a4f30722d236151cdd5e9e20997dfaed2a",
+              "afterHash": "08b3c32b24275d7b6ad16e8aea794f6949cdf2c5ee1ac40d3a3dc0dad1c69f4d"
+            }
+          ],
+          "truncated": false
+        },
+        "datasets": {
+          "beforeCount": 20,
+          "currentCount": 20,
+          "changed": 1,
+          "differences": [
+            {
+              "id": "dataset:8b6b7e202d40e205a3098d99de90c12f",
+              "kind": "changed",
+              "fields": [
+                "revision"
+              ],
+              "beforeHash": "c37caf1db975e909f638a654d2cd7b8ebe57b8f1fbaddc40e33935a9c82f7d7e",
+              "afterHash": "cb976257822bdf16ae0e82b5146c5aba3b94d2e7e5045c288297ee81ee8f91c5"
+            }
+          ],
+          "truncated": false
+        },
+        "attributes": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "tables": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "issues": {
+          "beforeCount": 1,
+          "currentCount": 1,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "views": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        }
+      },
+      "events": [
+        {
+          "action": "release-prepare",
+          "subject": "264658b2-9798-4089-92f1-8b5816f95d2d",
+          "created_at": "2026-10-17T14:08:21.391826+00:00"
+        },
+        {
+          "action": "release-prepare",
+          "subject": "88df856c-6843-4192-80ff-3d3fd80f9e32",
+          "created_at": "2026-10-17T13:31:50.36154+00:00"
+        },
+        {
+          "action": "review-owner-override",
+          "subject": "748818c4-7634-4955-ada2-3674b0b9f66b",
+          "created_at": "2026-10-17T03:45:54.840343+00:00"
+        }
+      ],
+      "matchesApproved": false
+    },
+    {
+      "campus": "campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a",
+      "reviewId": "cabb3184-e1de-47ca-82aa-394ef6fd8f73",
+      "approvedHash": "5b76a7633c93e9f216eb30dde6917dad4c0d67bba077abc675d57ed7d5155ecb",
+      "status": "approved",
+      "currentHash": "93df94d7aa645976eb8ab87002001b480b9f8fc57bdca0447c0acffc1d185cba",
+      "sections": {
+        "features": {
+          "beforeCount": 10574,
+          "currentCount": 10574,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "edits": {
+          "beforeCount": 201,
+          "currentCount": 204,
+          "changed": 6,
+          "differences": [
+            {
+              "id": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:87",
+              "kind": "changed",
+              "fields": [
+                "deleted",
+                "geometry.coordinates",
+                "properties.appearance.facades",
+                "properties.appearance.parts",
+                "properties.buildingTopology",
+                "properties.category",
+                "properties.importLayer",
+                "properties.modelAuthoring",
+                "properties.name",
+                "properties.revertToSource",
+                "updated_at"
+              ],
+              "beforeHash": "5aa33d83540cefc19f773f85eeb3468c92f0d043240b7690941c54fa51884bef",
+              "afterHash": "0ca774a034adaa507fa67b5076878781e6543db6c93988ad3100756f038ddadf"
+            },
+            {
+              "id": "layer:map-layer:7adabef4cb9685c4",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "adad66768243ab30478f6c43e9861409b0260ed0ddd46b382f6a268b487d3d19",
+              "afterHash": "199ce6561802782144285738e6d0071be78686464eb679eef3ab1ef58c8ec68b"
+            },
+            {
+              "id": "layer:map-layer:c82b2d57365713e5",
+              "kind": "changed",
+              "fields": [
+                "updated_at"
+              ],
+              "beforeHash": "893476cb03e3c6f2feaad77cc47e0f77cc14852e2c354ca7d0968b4bcb9c7bce",
+              "afterHash": "f376d4005f900c2a2fe8778778bfa982a607a2b9d2e7bcf35715ecfade02e5c7"
+            },
+            {
+              "id": "building:import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:89",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "94302dcd758c28a2017bd2e072c9d04afc88bffb18a83ca3d2eba3992683840c"
+            },
+            {
+              "id": "land:import:4e362956-36db-49d4-884d-de4c7b933255:0d35646b:1",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "0bf3d2dcbccccbe0d0611d44a4dc09f5279d398fcbc0360ba883306cbc1a7b47"
+            },
+            {
+              "id": "land:import:4e362956-36db-49d4-884d-de4c7b933255:9a396140:296",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "af95b8a5e97586b5fa9057df7afccf7feebc36ca513c1ae9e8f4d57504f0f820"
+            }
+          ],
+          "truncated": false
+        },
+        "datasets": {
+          "beforeCount": 13,
+          "currentCount": 16,
+          "changed": 6,
+          "differences": [
+            {
+              "id": "dataset:766b20bfb97f6762fd8e60733dbca3a4",
+              "kind": "changed",
+              "fields": [
+                "revision"
+              ],
+              "beforeHash": "23f2c4e29e558c0f4c67b95a79e7ef063b415b94cecc9c109fd95da54514668d",
+              "afterHash": "580bcf0041a154130da3b5ff54a9b224e0b6911659a6585e5f8757903543c795"
+            },
+            {
+              "id": "dataset:7d766e45e9f0f5b5cfa08c6229c827e7",
+              "kind": "changed",
+              "fields": [
+                "revision"
+              ],
+              "beforeHash": "03afffeb235b986d53e14e0f80b602045a96d122b2a26d80de7194d93a124340",
+              "afterHash": "0dfb9e0139f38bafb9eca13b71c11dc9904ea535cd1722fb52f37981c07d01af"
+            },
+            {
+              "id": "dataset:a6a1235b4df46df1eb0551570a698eea",
+              "kind": "changed",
+              "fields": [
+                "revision"
+              ],
+              "beforeHash": "88ffbc0ee52253f6cdb0d896ee1db166f2a8f429b7fd80b2e3abf7e04e62fa48",
+              "afterHash": "c8dbfba3210224eb72cc684b3916e7f74077969c9f2e92507845402e19953127"
+            },
+            {
+              "id": "map-layer:07c756762eba5412",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "25a9cac7c9e93d91f042021b8c5d764f08b1bc24fb8cc3581c93b24002e29079"
+            },
+            {
+              "id": "map-layer:2cd1e88a87100250",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "75558c9d034d3e9d09a5493fa5e8901de65365f6ae89a643c9b3af4a6abd3f7e"
+            },
+            {
+              "id": "map-layer:c82b2d57365713e5",
+              "kind": "added",
+              "fields": [
+                ""
+              ],
+              "beforeHash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "afterHash": "42231c71f94437808fb1dd84398fde326e68a689a9f7fcec93477970ef52169b"
+            }
+          ],
+          "truncated": false
+        },
+        "attributes": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "tables": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "issues": {
+          "beforeCount": 1,
+          "currentCount": 1,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        },
+        "views": {
+          "beforeCount": 0,
+          "currentCount": 0,
+          "changed": 0,
+          "differences": [],
+          "truncated": false
+        }
+      },
+      "events": [
+        {
+          "action": "release-prepare",
+          "subject": "72b01f8d-9a3f-44fa-ac81-5124fbe157ec",
+          "created_at": "2026-10-18T00:37:05.128466+00:00"
+        },
+        {
+          "action": "review-owner-override",
+          "subject": "d50d7404-0541-45e3-aec6-f8c38ccf4fd3",
+          "created_at": "2026-10-18T00:35:37.510839+00:00"
+        },
+        {
+          "action": "review-submit",
+          "subject": "d50d7404-0541-45e3-aec6-f8c38ccf4fd3",
+          "created_at": "2026-10-18T00:32:02.392243+00:00"
+        },
+        {
+          "action": "publication-request",
+          "subject": "c4702b36-aafb-465e-b3d1-a061ea675f3e",
+          "created_at": "2026-10-18T00:31:06.54761+00:00"
+        },
+        {
+          "action": "publication-request",
+          "subject": "c4702b36-aafb-465e-b3d1-a061ea675f3e",
+          "created_at": "2026-10-18T00:24:47.80891+00:00"
+        },
+        {
+          "action": "publication-request",
+          "subject": "c4702b36-aafb-465e-b3d1-a061ea675f3e",
+          "created_at": "2026-10-18T00:23:35.726515+00:00"
+        },
+        {
+          "action": "release-prepare",
+          "subject": "c4702b36-aafb-465e-b3d1-a061ea675f3e",
+          "created_at": "2026-10-17T22:16:05.183929+00:00"
+        },
+        {
+          "action": "review-owner-override",
+          "subject": "85129e5b-4959-4ae9-8da3-afd45982e03d",
+          "created_at": "2026-10-17T22:13:58.319689+00:00"
+        },
+        {
+          "action": "review-submit",
+          "subject": "85129e5b-4959-4ae9-8da3-afd45982e03d",
+          "created_at": "2026-10-17T22:08:37.120439+00:00"
+        },
+        {
+          "action": "publication-complete",
+          "subject": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+          "created_at": "2026-10-17T10:30:55.41352+00:00"
+        },
+        {
+          "action": "publication-start",
+          "subject": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+          "created_at": "2026-10-17T10:29:25.696683+00:00"
+        },
+        {
+          "action": "publication-request",
+          "subject": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+          "created_at": "2026-10-17T06:18:55.113722+00:00"
+        },
+        {
+          "action": "release-prepare",
+          "subject": "6751b7c2-ae9f-48dc-9e6f-5d1aeb6aa1a1",
+          "created_at": "2026-10-17T05:42:42.112571+00:00"
+        },
+        {
+          "action": "release-prepare",
+          "subject": "eec360da-e2eb-4a20-9a36-f06b2dd4debd",
+          "created_at": "2026-10-17T05:15:21.45258+00:00"
+        },
+        {
+          "action": "release-prepare",
+          "subject": "fbc8a26a-49f3-4139-84ff-e75c222eccf0",
+          "created_at": "2026-10-17T03:43:44.574969+00:00"
+        },
+        {
+          "action": "review-owner-override",
+          "subject": "cabb3184-e1de-47ca-82aa-394ef6fd8f73",
+          "created_at": "2026-10-17T03:42:24.04024+00:00"
+        }
+      ],
+      "matchesApproved": false
+    }
+  ]
+}

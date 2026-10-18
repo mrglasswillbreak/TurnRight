@@ -4,7 +4,7 @@ TurnRight deploys a public campus PWA, a private team GIS API and isolated proce
 
 ## Existing-installation upgrade
 
-1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–055**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
+1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–056**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
 2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
 3. Pass unit/database tests, both TypeScript projects, lint, configured build/budgets, Chromium/WebKit, offline, native PostGIS and isolated GIS/importer checks. Resolve failures before production migration.
 4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
@@ -21,7 +21,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–055 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–056 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 
@@ -99,11 +99,23 @@ Editors accept source proposals into the shared draft, edit attributes/geometry 
 
 In **Review**, resolve blocking issues and submit a validated immutable snapshot. A reviewer who did not contribute approves the exact hash, or the original owner records an explicit override reason. New content invalidates approval. Publishers use **Publish** to build the approved preview, inspect it, then publish the same source. Both API and SQL recheck current roles; a short publication lease prevents concurrent draft changes during promotion.
 
+The complete snapshot also includes saved metadata and private dataset revisions. A changed timestamp or layer visibility can therefore require a new submission even when geometry is unchanged. Compare the immutable snapshot with the current workspace read-only, retain the field-level comparison, and obtain approval for the refreshed hash. Do not restore older metadata merely to make an approval match. The [October 18 receipt](assets/campus-detail-release-2026-10-18.json) records this procedure for LASU.
+
+When a publication gate fails, preserve the failed job's log and trace before retrying. Distinguish a captured application failure from an unavailable browser observation or browser-process crash. A failed job may be rerun only after its enclosing Actions run finishes; keep the complete shard and its assertions. An unchanged successful rerun is evidence of that rerun, not proof of the first failure's cause. Application changes require the reviewed build/preview procedure above.
+
 The worker validates schemas, selected public fields, styles, lineage and assets, creates immutable packages, waits for Vercel READY and verifies production assignment. A failed job leaves the preceding public release active. **Activity** reports stages; an uncertain request should be inspected before retrying.
 
 Restoring one campus creates a new review submission from historical content. It leaves the shared current draft intact and preserves every other campus's current package. Retain immutable hashes, snapshots and referenced assets. Older clients remain on their downloaded version until a verified replacement is selected.
 
 ## Recovery and operational limits
+
+### Publication completion after a timeout
+
+Migration **056** gives publication lease acquisition and completion their own bounded 60-second RPC requests. A nested approval trigger does not give an ordinary table update the same PostgREST request budget. The completion RPC returns a small receipt and retains the existing approval, snapshot, reviewer-access and lease guard. Apply this additive migration before deploying the matching release worker; anonymous and authenticated clients cannot call it. Ordinary API timeouts remain unchanged. [Supabase function timeout documentation](https://supabase.com/docs/guides/database/postgres/timeouts).
+
+If Vercel has published a package but the release record still says Preview, first run **Preserve campus layer baselines → audit-publication**. It reads bounded release/job/audit metadata, the current Vercel deployment and the public catalogue without changing them. An expired historical deployment is recorded as unavailable; it does not stop inspection of current releases. Preserve this receipt and verify the actual public package assets and the other campuses before retrying the same release.
+
+The release worker recognizes the already-published catalogue only when it matches that release's frozen expected catalogue. Recovery verifies the current production deployment's project, readiness, domain assignment, promotion identity and original preview. It acquires a fresh exact-review lease, validates the snapshot again, checks the catalogue again and completes the SQL record. Recovery performs no Vercel promotion. A changed catalogue, stale approval or different production deployment stops the operation. A retry after completion only verifies the existing result. Never change status manually, remove approval checks or overwrite another campus's catalogue to repair a lost receipt.
 
 Retain additive database tables/guards when rolling application code back. Do not discard dataset attributes, approvals or operation receipts. Recover one campus's public content through a reviewed restore, not a whole-site rollback. Restoring a private database backup requires an explicit controlled restoration procedure; there is no public browser restore endpoint.
 

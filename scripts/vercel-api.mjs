@@ -161,6 +161,20 @@ export async function waitForDeployment(id, promoting = false, projectId) {
 // Preview builds need a new production build from their frozen source. The
 // promote endpoint only accepts production deployments (and requires a body).
 // See vercel/vercel packages/cli/src/commands/promote/request-promote.ts.
+export async function verifyPublishedDeployment(id, { releaseId }) {
+  const project = await vercelApi(`/v9/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID)}`);
+  const current = project.targets?.production?.id;
+  if (!current) throw Error('The current production deployment is unavailable');
+  const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(current)}`);
+  if (deployment.id !== current || deployment.projectId !== process.env.VERCEL_PROJECT_ID ||
+      deployment.target !== 'production' || deployment.readyState !== 'READY' ||
+      !deployment.aliasAssigned || deployment.aliasError ||
+      deployment.meta?.turnrightPromotion !== releaseId ||
+      (deployment.id !== id && deployment.meta?.turnrightPreview !== id))
+    throw Error('Current production does not match this reviewed release');
+  return deployment;
+}
+
 export async function publishDeployment(id, { releaseId, operation, onCreated }) {
   const projectId = encodeURIComponent(process.env.VERCEL_PROJECT_ID);
   const deployment = await vercelApi(`/v13/deployments/${encodeURIComponent(id)}`);

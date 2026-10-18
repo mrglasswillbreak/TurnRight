@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T02:19:31.833008+00:00",
+  "syntheticOnly": true,
+  "epsg": 32631,
+  "units": "metres",
+  "layers": {
+    "ReferenceBuildings": {
+      "count": 2,
+      "features": [
+        {
+          "id": 1,
+          "areaSquareMetres": 96,
+          "perimeterMetres": 40,
+          "extent": [
+            500000,
+            715000,
+            500012,
+            715008
+          ],
+          "geometry": {
+            "rings": [
+              [
+                [
+                  500000,
+                  715000
+                ],
+                [
+                  500000,
+                  715008
+                ],
+                [
+                  500012,
+                  715008
+                ],
+                [
+                  500012,
+                  715000
+                ],
+                [
+                  500000,
+                  715000
+                ]
+              ]
+            ],
+            "spatialReference": {
+              "wkid": 32631,
+              "latestWkid": 32631
+            }
+          }
+        },
+        {
+          "id": 2,
+          "areaSquareMetres": 96,
+          "perimeterMetres": 40,
+          "extent": [
+            500024,
+            715000,
+            500036,
+            715008
+          ],
+          "geometry": {
+            "rings": [
+              [
+                [
+                  500024,
+                  715000
+                ],
+                [
+                  500024,
+                  715008
+                ],
+                [
+                  500036,
+                  715008
+                ],
+                [
+                  500036,
+                  715000
+                ],
+                [
+                  500024,
+                  715000
+                ]
+              ]
+            ],
+            "spatialReference": {
+              "wkid": 32631,
+              "latestWkid": 32631
+            }
+          }
+        }
+      ],
+      "export": "ReferenceBuildings-esri.json",
+      "sha256": "d43ed6c94e898b8ab98eeafd145002072c46710b0f9e66265674fc0243e7ee60"
+    },
+    "DrawnBuildings": {
+      "count": 3,
+      "features": [
+        {
+          "id": 1,
+          "areaSquareMetres": 96,
+          "perimeterMetres": 40,
+          "extent": [
+            500000,
+            715004,
+            500012,
+            715012
+          ],
+          "geometry": {
+            "rings": [
+              [
+                [
+                  500000,
+                  715012
+                ],
+                [
+                  500012,
+                  715012
+                ],
+                [
+                  500012,
+                  715004
+                ],
+                [
+                  500000,
+                  715004
+                ],
+                [
+                  500000,
+                  715012
+                ]
+              ]
+            ],
+            "spatialReference": {
+              "wkid": 32631,
+              "latestWkid": 32631
+            }
+          }
+        },
+        {
+          "id": 2,
+          "areaSquareMetres": 94.02799999713898,
+          "perimeterMetres": 39.506999999284744,
+          "extent": [
+            500024,
+            715000,
+            500035.75349999964,
+            715008
+          ],
+          "geometry": {
+            "rings": [
+              [
+                [
+                  500024,
+                  715008
+                ],
+                [
+                  500035.75349999964,
+                  715008
+                ],
+                [
+                  500035.75349999964,
+                  715000
+                ],
+                [
+                  500024,
+                  715000
+                ],
+                [
+                  500024,
+                  715000.1863000002
+                ],
+                [
+                  500024,
+                  715008
+                ]
+              ]
+            ],
+            "spatialReference": {
+              "wkid": 32631,
+              "latestWkid": 32631
+            }
+          }
+        },
+        {
+          "id": 3,
+          "areaSquareMetres": 95.66940000280738,
+          "perimeterMetres": 39.945026500215654,
+          "extent": [
+            500024,
+            715000,
+            500036,
+            715008
+          ],
+          "geometry": {
+            "rings": [
+              [
+                [
+                  500024,
+                  715007.9449000005
+                ],
+                [
+                  500036,
+                  715008
+                ],
+                [
+                  500036,
+                  715000
+                ],
+                [
+                  500024,
+                  715000
+                ],
+                [
+                  500024,
+                  715007.9449000005
+                ]
+              ]
+            ],
+            "spatialReference": {
+              "wkid": 32631,
+              "latestWkid": 32631
+            }
+          }
+        }
+      ],
+      "export": "DrawnBuildings-esri.json",
+      "sha256": "973792ed200ef974f019ce0df97f93682aebcb937e69483da89f2ebe53210029"
+    }
+  },
+  "preciseRectangle": {
+    "passed": true,
+    "widthMetres": 12,
+    "heightMetres": 8,
+    "userEnteredCoordinatesAndDimensions": true,
+    "undoRedoObserved": true,
+    "saveConfirmedByUser": true
+  },
+  "edgeSnap": {
+    "observedLabel": "ReferenceBuildings::Edge",
+    "cancelShortcut": "Ctrl+Delete",
+    "savedFeatureCountAfterCancellation": 3
+  },
+  "interpretation": "Numeric rectangle is exact. Pointer traces are exploratory and retain measured endpoint differences; neither is accepted as an exact shared boundary. Snap feedback and cancellation were observed. No campus data was edited.",
+  "traces": [
+    {
+      "featureIndex": 1,
+      "snappingEnabled": false,
+      "symmetricDifferenceSquareMetres": 1.972000002861023,
+      "equalsReference": false,
+      "areaSquareMetres": 94.02799999713898
+    },
+    {
+      "featureIndex": 2,
+      "snappingEnabled": true,
+      "symmetricDifferenceSquareMetres": 0.33059999719262123,
+      "equalsReference": false,
+      "areaSquareMetres": 95.66940000280738
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "boundary-traced-snapping.png",
+      "sha256": "002d0410e9cb9f9f0e3fc56e59108ac40069c64463b9fe5c9c955540f4a5df72"
+    },
+    {
+      "file": "boundary-traced.png",
+      "sha256": "9825dc5f190b0b97779be0e8486abdd171c1c89316f9e3b3312debe5eabf0bb3"
+    },
+    {
+      "file": "rectangle-redone.png",
+      "sha256": "61a475b822ffd0670d71da142e78e0cfda2a5a5def593b97a9468bc2b6b75864"
+    },
+    {
+      "file": "rectangle-undone.png",
+      "sha256": "c728d4307656ef21b8ba2306c1bf595debc5ca67bcefa31b5e2b44fe02dbc8fc"
+    },
+    {
+      "file": "reference-edge-snap.png",
+      "sha256": "0d1964a9253a3aee0b17b9c3f87fdef295e6ec013c48d011d972e389f41bb245"
+    },
+    {
+      "file": "reference-vertex-snap.png",
+      "sha256": "bccca3bd07855d4dc08dbe053da989ae6ccbb836f383b58153cfde2b49ab3982"
+    }
+  ],
+  "project": {
+    "file": "SyntheticPrecision.aprx",
+    "sha256": "1663afa1b95333c32b9a282f7787458cfae07025937e60442696dcbb2fdc6e26",
+    "layers": [
+      {
+        "map": "Synthetic precision study",
+        "layer": "DrawnBuildings",
+        "source": "Synthetic.gdb/DrawnBuildings",
+        "broken": false
+      },
+      {
+        "map": "Synthetic precision study",
+        "layer": "ReferenceBuildings",
+        "source": "Synthetic.gdb/ReferenceBuildings",
+        "broken": false
+      }
+    ]
+  },
+  "portableVerification": {
+    "checkedAt": "2026-10-18T02:19:36.484Z",
+    "runtime": "v22.23.3",
+    "arcPyImported": false,
+    "verifiedFiles": 9,
+    "rectangleAreaSquareMetres": 96,
+    "featureCountAfterCancellation": 3
+  }
+}
