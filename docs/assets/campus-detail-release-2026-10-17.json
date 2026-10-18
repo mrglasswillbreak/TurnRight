@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "date": "2026-10-17",
-  "state": "unilag-published-lasu-preview-running",
+  "state": "unilag-published-lasu-preview-gate-repair",
   "application": {
     "deploymentId": "7135198486",
     "productionReadyAt": "2026-10-17T05:16:09Z",
@@ -51,10 +51,7 @@
         "contentHash": "56628cea1a199ad72b0d75b7dac50a5114bd349986c6fda251d39cc3b2814edc"
       },
       "release": {
-        "previewRun": 39039475212,
-        "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
-        "requestedAt": "2026-10-17T14:08:26Z",
-        "status": "queued",
+        "status": "awaiting tested navigation helper and fresh preview",
         "retainedOtherCampus": "unilag-4667e8f529d6"
       },
       "failedPreviews": [
@@ -78,6 +75,25 @@
           },
           "id": "88df856c-6843-4192-80ff-3d3fd80f9e32",
           "failureRecordedAt": "2026-10-17T14:02:28Z"
+        },
+        {
+          "previewRun": 39039475212,
+          "applicationCommit": "de516e34f72f027cc434c2dce5748b8c6e4d38f6",
+          "requestedAt": "2026-10-17T14:08:26Z",
+          "status": "failed before package build",
+          "retainedOtherCampus": "unilag-4667e8f529d6",
+          "id": "264658b2-9798-4089-92f1-8b5816f95d2d",
+          "failureRecordedAt": "2026-10-17T14:29:29Z",
+          "gateFailure": {
+            "job": 117415843558,
+            "test": "building references desktop: review, apply, undo and reload without moving the map",
+            "artifact": 12103803137,
+            "artifactSha256": "d838e0f5ffdd4ce22aba8903395b59e7eb8c17c56c22512749294ae03a5aa4e2",
+            "diagnosis": "Initial source list/overview/history responses completed during the enrichment-summary pointer action. The inbox height changed and the enrichment details remained closed, making Building appearances invisible. The test navigation helper now waits for the existing Pending source updates aria-busy=false state before subsequent interactions.",
+            "assertionsRemoved": false,
+            "applicationChanges": false,
+            "otherGateResults": "All remaining browser shards, quality, offline and three GIS jobs passed."
+          }
         }
       ]
     },
