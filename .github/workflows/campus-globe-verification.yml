@@ -22,7 +22,7 @@ jobs:
         working-directory: web
         env:
           VERIFY_BASELINE: ../docs/assets/campus-globe-baseline-2026-10-03.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: campus-globe-verification
