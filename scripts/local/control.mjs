@@ -75,7 +75,14 @@ if (operation === 'down') {
     /* The application may already be stopped. */
   }
   // Never pass --linked or a caller-supplied database URL.
-  await command(supabaseCli, ['db', 'reset', '--local', '--no-seed']);
+  await command(supabaseCli, [
+    'db',
+    'reset',
+    '--local',
+    '--no-seed',
+    '--network-id',
+    'turnright-local',
+  ]);
   await command(
     process.execPath,
     [...nodeArgs, 'scripts/local/seed.mts', '--reset'],

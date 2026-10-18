@@ -106,7 +106,16 @@ try {
       timeout: 120000,
     },
   );
-  assert.match(executed.stdout, /GIS job completed/);
+  const event = JSON.parse(executed.stdout.trim());
+  assert.equal(event.event, 'worker-completed');
+  assert.equal(event.worker, 'gis');
+  assert.equal(event.status, 200);
+  assert.ok(Number.isFinite(event.durationMs) && event.durationMs >= 0);
+  assert.ok(Number.isFinite(Date.parse(event.timestamp)));
+  assert.doesNotMatch(
+    executed.stdout,
+    /disposable-test-fixture|tree-1|coordinates/,
+  );
   assert.equal(result.error, undefined);
   assert.equal(result.artifact.format, 'gpkg');
   assert.equal(result.artifact.bytes, archive.length);

@@ -60,12 +60,12 @@ it('uses separate structured success and failure sinks', () => {
   const error = vi.spyOn(console, 'error').mockImplementation(() => {});
   emitEvent('worker-completed', { worker: 'source-review', status: 200 });
   emitEvent('worker-failed');
-  expect(info).toHaveBeenCalledWith(
-    'worker-completed',
-    expect.objectContaining({ status: 200, worker: 'source-review' }),
-  );
-  expect(error).toHaveBeenCalledWith(
-    'worker-failed',
-    expect.objectContaining({ event: 'worker-failed' }),
-  );
+  expect(JSON.parse(info.mock.calls[0][0])).toMatchObject({
+    event: 'worker-completed',
+    status: 200,
+    worker: 'source-review',
+  });
+  expect(JSON.parse(error.mock.calls[0][0])).toMatchObject({
+    event: 'worker-failed',
+  });
 });

@@ -94,10 +94,11 @@ it('does not replay an uncertain database write and records a safe correlation r
   expect(JSON.stringify(log.mock.calls)).not.toMatch(
     /private-service-key|geometry|Bearer/,
   );
-  expect(log).toHaveBeenCalledWith(
-    'admin-request-failed',
-    expect.objectContaining({ requestId: 'ref-123', dependency: 'database' }),
-  );
+  expect(JSON.parse(log.mock.calls[0][0])).toMatchObject({
+    event: 'admin-request-failed',
+    requestId: 'ref-123',
+    dependency: 'database',
+  });
 });
 it.each(['review-baseline', 'reconcile-baseline'])(
   'refuses obsolete %s without loading source geometry or making a write',

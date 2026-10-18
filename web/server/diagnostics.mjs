@@ -43,5 +43,7 @@ export function eventRecord(event, context = {}, now = Date.now()) {
 
 export function emitEvent(event, context = {}) {
   const record = eventRecord(event, context);
-  (event.endsWith('failed') ? console.error : console.info)(event, record);
+  (event.endsWith('failed') ? console.error : console.info)(
+    JSON.stringify(record),
+  );
 }
