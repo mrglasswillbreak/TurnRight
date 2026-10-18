@@ -42,6 +42,12 @@ V8 coverage includes unimported application, component, server and API modules. 
 
 Reproduce Python locks with uv **0.12.5**: `uv pip compile scripts/requirements-data.txt --python-version 3.12 --python-platform linux --generate-hashes --output-file scripts/requirements-data.lock` and the same command with input `scripts/requirements-test.in` and output `scripts/requirements-test.lock`. Use `--upgrade` only for an intentional dependency update, review the lock diff and run normal CI. The separate voice environment and pinned native GIS images retain their existing toolchains.
 
+Weekly Python dependency updates cover the core import/GIS and test manifests.
+Regenerate both affected hash locks when reviewing a manifest update before
+merging through normal protected CI. The voice `.in` and `.txt` manifests are
+excluded from this general scan: their pinned inference environment is maintained
+and validated separately, so its resolver constraints do not block core updates.
+
 Format changed files with `npx oxfmt <files>`. Documentation validation covers all tracked and new non-ignored Markdown files, local heading anchors, filename case, and current screenshot hashes/dimensions. For a fresh gallery, use `npm run docs:prepare`, an explicit new `TURNRIGHT_DOCS_DATE`, the documented capture journeys, then `npm run docs:record`. See [screenshot maintenance](docs/SCREENSHOTS.md#reproduce). Keep historical evidence intact and inspect every image.
 
 ## Data and licensing

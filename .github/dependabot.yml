@@ -17,6 +17,10 @@ updates:
     open-pull-requests-limit: 5
   - package-ecosystem: pip
     directory: /scripts
+    # The separately pinned voice environment has its own validation workflow.
+    exclude-paths:
+      - voice-requirements.in
+      - voice-requirements.txt
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
