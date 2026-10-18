@@ -17,8 +17,13 @@ for (const campus of campuses) {
     const audit = await db(`workspace_audit?subject=eq.${release.id}&select=action,created_at,details&order=id.desc&limit=10`);
     let deployment;
     if (release.deployment_id) {
+      try {
       const d = await vercelApi(`/v13/deployments/${encodeURIComponent(release.deployment_id)}`);
       deployment = { id: d.id, url: d.url, projectId: d.projectId, target: d.target, readyState: d.readyState, aliasAssigned: d.aliasAssigned, meta: { turnrightPromotion: d.meta?.turnrightPromotion, turnrightPreview: d.meta?.turnrightPreview, turnrightRelease: d.meta?.turnrightRelease, turnrightVersion: d.meta?.turnrightVersion } };
+      } catch (error) {
+        if (!error.message.startsWith('Vercel 404:')) throw error;
+        deployment = { id: release.deployment_id, unavailable: 'not-found' };
+      }
     }
     records.push({ release, review: review[0], jobs, audit, deployment });
   }
