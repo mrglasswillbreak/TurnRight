@@ -84,7 +84,7 @@ jobs:
     permissions:
       actions: read
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: campus-layer-baselines
           run-id: ${{ inputs.backup_run_id }}
