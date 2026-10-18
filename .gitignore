@@ -28,4 +28,8 @@ docs/assets/brand/drafts/
 Thumbs.db
 Desktop.ini
 coverage/
+node_modules/
+.local-runtime/
+supabase/.temp/
+supabase/.branches/
 *.log

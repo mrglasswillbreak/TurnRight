@@ -11,6 +11,7 @@ import { facadeErrors } from '../src/building-facades.js';
 import { modelDocumentRevision } from '../src/model-document-revision.js';
 import { modelDocumentErrors } from '../src/model-document.js';
 import { publicationInputs, type GisSnapshot } from './gis-publication.js';
+import { isLocalPublishedOrigin } from './local-dispatch.js';
 
 function stable(value: unknown, source = false): unknown {
   if (Array.isArray(value)) return value.map((v) => stable(v, source));
@@ -40,7 +41,7 @@ export async function publishedCampus(): Promise<CampusData> {
   if (!origin)
     throw new HttpError(503, 'Configure PUBLISHED_MAP_URL before publishing campus data.');
   const root = new URL(origin);
-  if (root.protocol !== 'https:') throw new HttpError(503, 'The published map must use HTTPS.');
+  if (root.protocol !== 'https:' && !isLocalPublishedOrigin(root, process.env)) throw new HttpError(503, 'The published map must use HTTPS.');
   let manifestUrl = '/packages/latest.json';
   if (currentCampusId() !== 'lasu') {
     const { activeCampus } = await import('./campuses.js');

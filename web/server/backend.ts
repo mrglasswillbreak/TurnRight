@@ -1,5 +1,6 @@
 import { currentCampusId, scopeDatabaseRequest } from './campus-scope.js';
 import { createHash } from 'node:crypto';
+import { localDispatchConfiguration, validateLocalJob } from './local-dispatch.js';
 export interface RequestLike {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
@@ -174,6 +175,18 @@ export function privateHeaders(res: ResponseLike) {
 }
 export const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 export async function dispatch(workflow: string, inputs: Record<string, string> = {}) {
+  const local = localDispatchConfiguration(process.env);
+  if (local) {
+    validateLocalJob(workflow, inputs);
+    const result = await fetch(local.url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${local.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workflow, inputs }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!result.ok) throw new HttpError(503, 'The local worker could not accept this job. Check the development terminal.');
+    return;
+  }
   if (!process.env.GITHUB_WORKFLOW_TOKEN || !process.env.GITHUB_REPOSITORY)
     throw new HttpError(
       503,

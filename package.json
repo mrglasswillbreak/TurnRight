@@ -1,0 +1,23 @@
+{
+  "name": "turnright-workspace",
+  "version": "0.2.0",
+  "private": true,
+  "engines": { "node": ">=22.13.0 <23" },
+  "scripts": {
+    "setup": "npm ci --prefix web",
+    "dev": "npm run dev --prefix web",
+    "test": "npm test --prefix web --",
+    "typecheck": "npm run typecheck --prefix web",
+    "lint": "npm run lint --prefix web",
+    "format:check": "node scripts/format-check.mjs",
+    "test:coverage": "npm run test:coverage --prefix web",
+    "build": "npm run build --prefix web",
+    "check:docs": "npm run check:docs --prefix web",
+    "check:dependencies": "npm audit --audit-level=high && npm run check:dependencies --prefix web",
+    "local:up": "node scripts/local/control.mjs up",
+    "local:down": "node scripts/local/control.mjs down",
+    "local:reset": "node scripts/local/control.mjs reset",
+    "local:test": "node scripts/local/control.mjs test"
+  },
+  "devDependencies": { "supabase": "2.121.0" }
+}
