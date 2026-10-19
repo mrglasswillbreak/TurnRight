@@ -42,7 +42,7 @@
     "idb": "^8.0.3",
     "jsts": "2.12.1",
     "lucide-react": "1.31.0",
-    "maplibre-gl": "^6.8.0",
+    "maplibre-gl": "^6.14.0",
     "proj4": "2.22.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
