@@ -220,13 +220,14 @@ test('review separate building wings, edit their geometry, save and undo without
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await collapseExplorer(page);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.19978, 6.47109],
-      zoom: 18,
-      pitch: 0,
-      padding: { top: 0, right: 300, bottom: 0, left: 0 },
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.19978, 6.47109],
+        zoom: 18,
+        pitch: 0,
+        padding: { top: 0, right: 300, bottom: 0, left: 0 },
+      }),
   );
   await clickMap(page, [3.1997, 6.47128]);
   const chooser = page.getByRole('dialog', {
@@ -419,7 +420,7 @@ for (const phone of [false, true])
       .getByRole('button', { name: 'Close', exact: true })
       .click();
     await focusModels(page, phone);
-    await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14 }));
+    await page.evaluate(() => void window.editorTestMap.jumpTo({ zoom: 14 }));
     await expect
       .poll(() =>
         page.evaluate(() =>

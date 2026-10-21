@@ -73,8 +73,8 @@ test('motion assistance public permission timing, orientation modes, fallback an
       page.evaluate(() => Math.round(window.editorTestMap.getBearing())),
     )
     .toBe(-90);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({ zoom: 19, pitch: 40 }),
+  await page.evaluate(
+    () => void window.editorTestMap.jumpTo({ zoom: 19, pitch: 40 }),
   );
   await mode.selectOption('north');
   await expect
@@ -160,13 +160,14 @@ test('decorative globe clouds render and rotation yields to controls and reduced
   await page.goto('/');
   await attachMap(page);
   await page.waitForFunction(() => !!window.editorTestMap.getSource('world'));
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [0, 20],
-      zoom: 1,
-      pitch: 0,
-      bearing: 0,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [0, 20],
+        zoom: 1,
+        pitch: 0,
+        bearing: 0,
+      }),
   );
   await expect(
     page.getByRole('button', { name: 'Hide clouds', exact: true }),
@@ -207,8 +208,8 @@ test('decorative globe clouds render and rotation yields to controls and reduced
   await expect(
     page.getByRole('button', { name: 'Rotate globe', exact: true }),
   ).toHaveAttribute('aria-pressed', 'false');
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({ center: [3.2, 6.46], zoom: 17 }),
+  await page.evaluate(
+    () => void window.editorTestMap.jumpTo({ center: [3.2, 6.46], zoom: 17 }),
   );
   await expect(
     page.getByRole('button', { name: 'Rotate globe', exact: true }),
@@ -251,16 +252,17 @@ test('globe retains live location and facing direction while exploring without n
     };
   });
   await expect(page.locator('.motion-phone')).toBeVisible();
-  await page.evaluate(() => window.editorTestMap.fire('dragstart'));
+  await page.evaluate(() => void window.editorTestMap.fire('dragstart'));
   await page.waitForTimeout(100);
   await page.waitForFunction(() => !!window.editorTestMap.getSource('world'));
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.2, 6.46],
-      zoom: 2,
-      pitch: 0,
-      bearing: 0,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.2, 6.46],
+        zoom: 2,
+        pitch: 0,
+        bearing: 0,
+      }),
   );
   await expect(
     page.getByLabel('Interactive world map', { exact: true }),
@@ -304,8 +306,8 @@ test('globe retains live location and facing direction while exploring without n
     })
     .toBe(true);
   expect(await page.evaluate(() => window.editorTestMap.getZoom())).toBe(2);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({ center: [179, 0], zoom: 1 }),
+  await page.evaluate(
+    () => void window.editorTestMap.jumpTo({ center: [179, 0], zoom: 1 }),
   );
   await pushSurveyFix(page, [179.99, 0]);
   await page.evaluate(() => {

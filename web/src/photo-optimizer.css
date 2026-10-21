@@ -1,5 +1,10 @@
 /* Squoosh-inspired comparison layout, using TurnRight's shared theme tokens.
    Codec licences: /photo-codecs/e8d35e0/. */
+.photo-optimizer-overlay[data-slot='dialog-overlay'] {
+  /* The opaque fullscreen editor covers this backdrop; blurring it only adds
+     compositor work and can stall capture on software-rendered desktops. */
+  backdrop-filter: none;
+}
 .photo-optimizer[data-slot='dialog-content'] {
   --photo-accent: #1764ed;
   --photo-shadow: 0 6px 24px #071b3226;

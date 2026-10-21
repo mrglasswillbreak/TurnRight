@@ -99,7 +99,7 @@ for (const editor of [false, true])
             .toBe(false);
           await page.evaluate(
             ({ zoom, latitude, phone, mode }) =>
-              window.editorTestMap.jumpTo({
+              void window.editorTestMap.jumpTo({
                 center: [3.19978, latitude],
                 zoom,
                 bearing: -12,
@@ -241,11 +241,12 @@ test('covered paths remain selectable through the overlap chooser', async ({
         features: { geometry: { coordinates: number[][] } }[];
       }>;
     };
-    return source.getData().then((data) =>
-      window.editorTestMap.jumpTo({
-        center: data.features[0].geometry.coordinates[1] as [number, number],
-        zoom: 19,
-      }),
+    return source.getData().then(
+      (data) =>
+        void window.editorTestMap.jumpTo({
+          center: data.features[0].geometry.coordinates[1] as [number, number],
+          zoom: 19,
+        }),
     );
   });
   const position = await page.evaluate(() =>

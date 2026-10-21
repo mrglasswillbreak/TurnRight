@@ -367,7 +367,7 @@ test('view settings: preserves the map, saved roof and unfinished drawing', asyn
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
     .toBe(36);
-  await page.evaluate(() => window.editorTestMap.setPitch(43));
+  await page.evaluate(() => void window.editorTestMap.setPitch(43));
   await expect(page.getByLabel('Map tilt', { exact: true })).toHaveValue('43');
   await page.screenshot({ path: 'test-results/view-settings-editor.png' });
   await page

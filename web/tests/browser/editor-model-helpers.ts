@@ -31,7 +31,7 @@ export async function closeBuildingModel(page: Page) {
 export async function focusModels(page: Page, phone = false) {
   await page.evaluate(
     (phone) =>
-      window.editorTestMap.jumpTo({
+      void window.editorTestMap.jumpTo({
         center: [3.19978, 6.47109],
         zoom: 18,
         pitch: 50,

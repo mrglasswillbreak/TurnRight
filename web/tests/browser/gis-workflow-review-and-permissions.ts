@@ -44,7 +44,7 @@ export function registerReviewAndPermissions(
         await page.evaluate(() => document.fonts.ready);
         await page.evaluate(
           (bounds) =>
-            window.editorTestMap.fitBounds(bounds, {
+            void window.editorTestMap.fitBounds(bounds, {
               padding: { left: 36, right: 36, top: 45, bottom: 45 },
               pitch: 0,
               bearing: 0,

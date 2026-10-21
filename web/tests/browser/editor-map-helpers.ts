@@ -138,14 +138,15 @@ export async function clickMap(page: Page, coordinates: Position) {
 }
 
 export async function focusCampus(page: Page) {
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.2003, 6.4602],
-      zoom: 19,
-      bearing: 0,
-      pitch: 0,
-      padding: { top: 0, bottom: 0, left: 0, right: 0 },
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.2003, 6.4602],
+        zoom: 19,
+        bearing: 0,
+        pitch: 0,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+      }),
   );
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))

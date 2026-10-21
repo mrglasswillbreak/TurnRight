@@ -78,12 +78,13 @@ test(
         exact: true,
       });
       if (await three.isVisible()) await three.click();
-      await page.evaluate(() =>
-        window.editorTestMap.jumpTo({
-          center: [3.1998, 6.471],
-          zoom: 17.3,
-          pitch: 45,
-        }),
+      await page.evaluate(
+        () =>
+          void window.editorTestMap.jumpTo({
+            center: [3.1998, 6.471],
+            zoom: 17.3,
+            pitch: 45,
+          }),
       );
       await expect
         .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
@@ -319,12 +320,13 @@ test(
       await page.goto('/');
       await attachMap(page);
       await page.emulateMedia({ colorScheme: 'light' });
-      await page.evaluate(() =>
-        window.editorTestMap.jumpTo({
-          center: [3.1998, 6.471],
-          zoom: 17.6,
-          pitch: 45,
-        }),
+      await page.evaluate(
+        () =>
+          void window.editorTestMap.jumpTo({
+            center: [3.1998, 6.471],
+            zoom: 17.6,
+            pitch: 45,
+          }),
       );
       await page.getByLabel('Search campus').fill('Senate');
       await page
@@ -380,13 +382,14 @@ test(
       if (await collapse.isVisible()) await collapse.click();
       await shot('public-map-mobile-current');
       await page.emulateMedia({ colorScheme: 'dark' });
-      await page.evaluate(() =>
-        window.editorTestMap.jumpTo({
-          center: [14, 12],
-          zoom: -0.7,
-          pitch: 0,
-          bearing: 0,
-        }),
+      await page.evaluate(
+        () =>
+          void window.editorTestMap.jumpTo({
+            center: [14, 12],
+            zoom: -0.7,
+            pitch: 0,
+            bearing: 0,
+          }),
       );
       await expect
         .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
@@ -394,13 +397,14 @@ test(
       await shot('public-globe-mobile-current');
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ colorScheme: 'light' });
-      await page.evaluate(() =>
-        window.editorTestMap.jumpTo({
-          center: [14, 12],
-          zoom: 1.65,
-          pitch: 0,
-          bearing: 0,
-        }),
+      await page.evaluate(
+        () =>
+          void window.editorTestMap.jumpTo({
+            center: [14, 12],
+            zoom: 1.65,
+            pitch: 0,
+            bearing: 0,
+          }),
       );
       await expect
         .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))

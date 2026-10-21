@@ -55,6 +55,7 @@ export default function PhotoOptimizer(props: PhotoOptimizerProps) {
         positioning="viewport"
         showCloseButton={false}
         className="photo-optimizer"
+        overlayClassName="photo-optimizer-overlay"
         data-wide={widePhoto}
       >
         <DialogTitle className="sr-only">

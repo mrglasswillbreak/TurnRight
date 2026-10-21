@@ -30,19 +30,20 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
     const initial = await fixture().camera(page),
       a = await fixture().pixels(page);
     await page.screenshot({ path: info.outputPath('stars-africa.png') });
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({
-        center: [150, -20],
-        bearing: 25,
-        pitch: 10,
-      }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [150, -20],
+          bearing: 25,
+          pitch: 10,
+        }),
     );
     const b = await fixture().pixels(page);
     expect(a).not.toEqual(b);
     await page.screenshot({ path: info.outputPath('stars-pacific.png') });
     await page.evaluate(
       (c) =>
-        window.editorTestMap.jumpTo({
+        void window.editorTestMap.jumpTo({
           ...c,
           center: c.center as [number, number],
         }),
@@ -173,7 +174,7 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
     ]) {
       await page.evaluate(
         (center) =>
-          window.editorTestMap.jumpTo({
+          void window.editorTestMap.jumpTo({
             center: center as [number, number],
             bearing: 25,
             pitch: 10,
@@ -188,8 +189,13 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
       );
     }
     expect(hashes.size).toBe(5);
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({ center: [150, -20], bearing: 0, pitch: 0 }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [150, -20],
+          bearing: 0,
+          pitch: 0,
+        }),
     );
     await fixture().pixels(page);
     await page.screenshot({ path: info.outputPath('globe-dark-pacific.png') });
@@ -202,7 +208,7 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
     await fixture().pixels(page);
     await page.screenshot({ path: info.outputPath('globe-light-pacific.png') });
     expect(a.some((v, i) => i % 4 !== 3 && v > 32)).toBe(true);
-    await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 6 }));
+    await page.evaluate(() => void window.editorTestMap.jumpTo({ zoom: 6 }));
     await expect
       .poll(() =>
         page

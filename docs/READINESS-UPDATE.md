@@ -89,6 +89,13 @@ Client diagnostics remain bounded, in memory and explicitly exported. API and
 worker diagnostics correlate safe request and job identifiers without payloads,
 credentials or private content. See [diagnostic behavior](DIAGNOSTICS.md).
 
+Full-suite verification also exposed two rendering/test overhead problems.
+The full-screen photo editor no longer blurs an invisible backdrop beneath its
+opaque content; desktop capture and editing/recovery checks retain their original
+test time limits. Browser camera commands discard unused MapLibre return values
+instead of transferring complete map instances through Playwright. All movement,
+shader-colour, level-of-detail and recovery assertions remain in place.
+
 The primary CI workflow exposes root quality, browser coverage and local-stack
 acceptance while preserving the thirteen required check names. Additional
 security jobs audit npm and locked Python dependencies, scan Git history for

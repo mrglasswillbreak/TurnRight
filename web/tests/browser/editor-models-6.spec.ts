@@ -388,8 +388,12 @@ test('public footprint dialog opens its unlinked building in the editor', async 
   await expect(
     page.getByRole('link', { name: 'Editor', exact: true }),
   ).toHaveAttribute('href', '/admin');
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({ center: [3.20012, 6.46022], zoom: 20 }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.20012, 6.46022],
+        zoom: 20,
+      }),
   );
   await clickMap(page, [3.20012, 6.46022]);
   const link = page

@@ -89,8 +89,8 @@ for (const phone of [false, true]) {
     await page
       .getByRole('button', { name: 'Switch to 3D', exact: true })
       .click();
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({ zoom: 18, pitch: 48 }),
+    await page.evaluate(
+      () => void window.editorTestMap.jumpTo({ zoom: 18, pitch: 48 }),
     );
     const camera = await page.evaluate(() => [
       window.editorTestMap.getCenter().toArray(),
@@ -194,12 +194,13 @@ test('building references campus batch: all eligible facades regenerate without 
   page.on('pageerror', (e) => errors.push(e.message));
   const state = await setup(page, true, true);
   await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.201, 6.4667],
-      zoom: 17.6,
-      pitch: 48,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.201, 6.4667],
+        zoom: 17.6,
+        pitch: 48,
+      }),
   );
   await openEditorSection(page, 'Sources');
   await page

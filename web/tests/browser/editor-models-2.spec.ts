@@ -97,14 +97,15 @@ for (const editor of [false, true])
       await page
         .getByRole('button', { name: 'Switch to 3D', exact: true })
         .click();
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({
-        center: [3.20025, 6.4603],
-        zoom: 18,
-        pitch: 50,
-        bearing: 0,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
-      }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [3.20025, 6.4603],
+          zoom: 18,
+          pitch: 50,
+          bearing: 0,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        }),
     );
     const rendered = () =>
       page.evaluate(() =>
@@ -253,7 +254,7 @@ for (const editor of [false, true])
     await expect
       .poll(async () => (await drawing()).reducedSeen, { timeout: 30000 })
       .toBe(true);
-    await page.evaluate(() => window.editorTestMap.stop());
+    await page.evaluate(() => void window.editorTestMap.stop());
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
       .toBe(false);
@@ -267,14 +268,16 @@ for (const editor of [false, true])
     });
     // Cross both LOD boundaries repeatedly without touching the view toggle.
     for (let cycle = 0; cycle < 3; cycle++) {
-      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 14.9 }));
+      await page.evaluate(
+        () => void window.editorTestMap.jumpTo({ zoom: 14.9 }),
+      );
       await expect.poll(rendered).not.toContain('library');
-      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 16 }));
+      await page.evaluate(() => void window.editorTestMap.jumpTo({ zoom: 16 }));
       await expect.poll(rendered).toContain('library');
       await expect
         .poll(async () => (await drawing()).indices)
         .toBeLessThan(full.indices);
-      await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 18 }));
+      await page.evaluate(() => void window.editorTestMap.jumpTo({ zoom: 18 }));
       await expect
         .poll(async () => (await drawing()).indices)
         .toBe(full.indices);
@@ -333,12 +336,13 @@ test('miniature models fall back for unavailable sectors and keep drawing unobst
     );
   await page.reload();
   await attachMap(page);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.19978, 6.47109],
-      zoom: 18,
-      pitch: 50,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.19978, 6.47109],
+        zoom: 18,
+        pitch: 50,
+      }),
   );
   await expect(
     page.getByRole('button', { name: 'Switch to 2D', exact: true }),
@@ -393,12 +397,13 @@ test('public map defaults to 3D, frames campus and opens building details', asyn
   await focusCampus(page);
   await clickMap(page, [3.20012, 6.46022]);
   await expect(page.getByText('15 m · recorded height')).toBeVisible();
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.2007, 6.4603],
-      zoom: 19,
-      padding: { top: 0, right: 0, bottom: 0, left: 0 },
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.2007, 6.4603],
+        zoom: 19,
+        padding: { top: 0, right: 0, bottom: 0, left: 0 },
+      }),
   );
   await clickMap(page, [3.2007, 6.4603]);
   await expect(page.getByRole('dialog')).toContainText(

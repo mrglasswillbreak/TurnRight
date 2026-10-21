@@ -32,7 +32,7 @@ for (const threeD of [false, true])
     for (const [i, x] of [3.20018, 3.20033].entries()) {
       await page.evaluate(
         (threeD) =>
-          window.editorTestMap.jumpTo({
+          void window.editorTestMap.jumpTo({
             center: [3.2003, 6.4602],
             zoom: 19,
             pitch: threeD ? 50 : 0,
@@ -65,7 +65,7 @@ for (const threeD of [false, true])
       // Reframe the ground target after selection and dock resizing, as an
       // owner would before placing a connecting point outside the current view.
       await page.evaluate(
-        (x) => window.editorTestMap.panTo([x, 6.46], { duration: 0 }),
+        (x) => void window.editorTestMap.panTo([x, 6.46], { duration: 0 }),
         x,
       );
       await clickMap(page, [x, 6.46]);

@@ -198,7 +198,7 @@ test('campus layers polygon 96 preserves vertices and holes through property and
   const point = road.geometry.coordinates[45][1];
   await page.evaluate(
     (point) =>
-      window.editorTestMap.jumpTo({
+      void window.editorTestMap.jumpTo({
         center: point,
         zoom: 22,
         pitch: 0,

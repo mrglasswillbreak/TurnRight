@@ -65,12 +65,13 @@ test(
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.emulateMedia({ colorScheme: 'light' });
     await setup(page, false, false, { snapshot: { data, manifest } });
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({
-        center: [3.1998, 6.471],
-        zoom: 17.3,
-        pitch: 45,
-      }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [3.1998, 6.471],
+          zoom: 17.3,
+          pitch: 45,
+        }),
     );
     await page.getByRole('button', { name: 'All', exact: true }).click();
     await page.getByLabel('Search map features').fill('Senate');
@@ -123,12 +124,13 @@ test(
     await page.goto('/');
     await attachMap(page);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({
-        center: [3.1998, 6.471],
-        zoom: 17.6,
-        pitch: 45,
-      }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [3.1998, 6.471],
+          zoom: 17.6,
+          pitch: 45,
+        }),
     );
     await page.getByLabel('Search campus').fill('Senate');
     await page
@@ -151,13 +153,14 @@ test(
     await attachMap(page);
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ colorScheme: 'dark' });
-    await page.evaluate(() =>
-      window.editorTestMap.jumpTo({
-        center: [14, 12],
-        zoom: 1.65,
-        pitch: 0,
-        bearing: 0,
-      }),
+    await page.evaluate(
+      () =>
+        void window.editorTestMap.jumpTo({
+          center: [14, 12],
+          zoom: 1.65,
+          pitch: 0,
+          bearing: 0,
+        }),
     );
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))

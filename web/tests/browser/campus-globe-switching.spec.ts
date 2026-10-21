@@ -290,12 +290,13 @@ test('campus globe silhouette and pin clicks share selection and leave detailed 
   page,
 }) => {
   await setup(page);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.4025, 6.4725],
-      zoom: 11.4,
-      pitch: 0,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.4025, 6.4725],
+        zoom: 11.4,
+        pitch: 0,
+      }),
   );
   await page.waitForFunction(() => window.editorTestMap.loaded());
   let hit = await point(page, [3.405, 6.48]);
@@ -305,8 +306,8 @@ test('campus globe silhouette and pin clicks share selection and leave detailed 
     () =>
       window.editorTestMap.getZoom() > 12 && !window.editorTestMap.isMoving(),
   );
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({ center: [3.401, 6.46], zoom: 17 }),
+  await page.evaluate(
+    () => void window.editorTestMap.jumpTo({ center: [3.401, 6.46], zoom: 17 }),
   );
   await page.waitForFunction(() => window.editorTestMap.loaded());
   const library = await point(page, [3.401, 6.46]);
@@ -314,12 +315,13 @@ test('campus globe silhouette and pin clicks share selection and leave detailed 
   await expect(
     page.getByRole('button', { name: 'Directions', exact: true }),
   ).toBeVisible();
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.6025, 6.4725],
-      zoom: 8,
-      pitch: 0,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.6025, 6.4725],
+        zoom: 8,
+        pitch: 0,
+      }),
   );
   await page.waitForFunction(() => window.editorTestMap.loaded());
   hit = await point(page, [3.6025, 6.4725]);
@@ -331,12 +333,13 @@ test('campus globe overlap chooser stays non-modal and can select on the map whi
   page,
 }) => {
   await setup(page, true);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.4025, 6.4725],
-      zoom: 11.3,
-      pitch: 0,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.4025, 6.4725],
+        zoom: 11.3,
+        pitch: 0,
+      }),
   );
   await page.waitForFunction(() => window.editorTestMap.loaded());
   const hit = await point(page, [3.405, 6.48]);

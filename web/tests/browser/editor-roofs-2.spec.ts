@@ -180,13 +180,14 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.isMoving()))
     .toBe(false);
-  await page.evaluate(() =>
-    window.editorTestMap.jumpTo({
-      center: [3.1980018, 6.4742127],
-      zoom: 18.2,
-      pitch: 55,
-      bearing: 15,
-    }),
+  await page.evaluate(
+    () =>
+      void window.editorTestMap.jumpTo({
+        center: [3.1980018, 6.4742127],
+        zoom: 18.2,
+        pitch: 55,
+        bearing: 15,
+      }),
   );
   const camera = await page.evaluate(() => [
     window.editorTestMap.getCenter().toArray(),
@@ -245,7 +246,7 @@ test(
       .getByRole('button', { name: 'Switch to 3D', exact: true })
       .click();
     await focusModels(page);
-    await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 17.3 }));
+    await page.evaluate(() => void window.editorTestMap.jumpTo({ zoom: 17.3 }));
     await expect
       .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
       .toBe(true);
