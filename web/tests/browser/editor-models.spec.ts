@@ -18,51 +18,56 @@ test.afterEach(async ({ context }) => {
   await context.setOffline(false);
 });
 
-test('prepared public map verifies enhanced architecture, repairs corruption and reopens it offline', async ({
-  page,
-  context,
-}, testInfo) => {
-  test.skip(
-    !testInfo.config.configFile?.includes('pwa.config'),
-    'Requires production service worker.',
-  );
-  test.setTimeout(120000);
-  await page.emulateMedia({ colorScheme: 'dark' });
-  const { campus } = await setup(page, true, true);
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.goto('/');
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(
-    page.getByText('Enhanced 3D ready offline · all model files verified'),
-  ).toBeVisible();
-  await page.evaluate(async (url) => {
-    const cache = await caches.open('turnright-assets-v1');
-    await cache.put(url, new Response('corrupted model file'));
-  }, campus.visuals!.sectors[0].url);
-  await page.reload();
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await expect(
-    page.getByText('Enhanced 3D ready offline · all model files verified'),
-  ).toHaveCount(0);
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(
-    page.getByText('Enhanced 3D ready offline · all model files verified'),
-  ).toBeVisible();
-  await context.setOffline(true);
-  await page.goto('/');
-  await attachMap(page);
-  await focusModels(page);
-  await page.screenshot({ path: 'test-results/miniature-offline.png' });
-});
+test(
+  'prepared public map verifies enhanced architecture, repairs corruption and reopens it offline',
+  { tag: '@offline' },
+  async ({ page, context }, testInfo) => {
+    test.skip(
+      !testInfo.config.configFile?.includes('pwa.config'),
+      'Requires production service worker.',
+    );
+    test.setTimeout(120000);
+    await page.emulateMedia({ colorScheme: 'dark' });
+    const { campus } = await setup(page, true, true);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.goto('/');
+    await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Enhanced 3D ready offline · all model files verified'),
+    ).toBeVisible();
+    await page.evaluate(async (url) => {
+      const cache = await caches.open('turnright-assets-v1');
+      await cache.put(url, new Response('corrupted model file'));
+    }, campus.visuals!.sectors[0].url);
+    await page.reload();
+    await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await expect(
+      page.getByText('Enhanced 3D ready offline · all model files verified'),
+    ).toHaveCount(0);
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Enhanced 3D ready offline · all model files verified'),
+    ).toBeVisible();
+    await context.setOffline(true);
+    await page.goto('/');
+    await attachMap(page);
+    await focusModels(page);
+    await page.screenshot({ path: 'test-results/miniature-offline.png' });
+  },
+);
 
 test('an upload keeps its original building when the inspector changes mid-upload', async ({
   page,

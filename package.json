@@ -38,6 +38,7 @@
     "lint:python": "python3 -m ruff check scripts && python3 -m ruff format --check scripts"
   },
   "devDependencies": {
+    "@bcoe/v8-coverage": "1.0.2",
     "@playwright/test": "^1.63.0",
     "@supabase/supabase-js": "^2.116.0",
     "@vitest/istanbul-lib-coverage": "1.0.2",

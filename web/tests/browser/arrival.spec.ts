@@ -189,45 +189,45 @@ for (const width of [1440, 390])
     ).toBeVisible();
   });
 for (const schema of [1, 3] as const)
-  test(`prepared offline arrival schema ${schema} photographs survive reload with credits and entrance selection`, async ({
-    page,
-    context,
-    baseURL,
-  }) => {
-    test.skip(!baseURL?.includes('5184'), 'Production service worker test');
-    await prepare(page, schema);
-    await page.goto('/?place=library&entrance=door-c');
-    await expect(
-      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-    ).toBeVisible();
-    await page.getByRole('button', { name: 'Offline', exact: true }).click();
-    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-    await page
-      .getByRole('button', { name: 'Download campus map', exact: true })
-      .click();
-    await expect(
-      page.getByText('Ready offline', { exact: true }),
-    ).toBeVisible();
-    await context.setOffline(true);
-    await page.reload();
-    await expect(
-      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByLabel('Destination entrance', { exact: true }),
-    ).toHaveValue('door-c');
-    await page.getByText('Photo credits & license', { exact: true }).click();
-    await expect(
-      page.getByText('Campus photographer · CC BY-SA 4.0', { exact: true }),
-    ).toBeVisible();
-    if (schema === 3)
+  test(
+    `prepared offline arrival schema ${schema} photographs survive reload with credits and entrance selection`,
+    { tag: '@offline' },
+    async ({ page, context, baseURL }) => {
+      test.skip(!baseURL?.includes('5184'), 'Production service worker test');
+      await prepare(page, schema);
+      await page.goto('/?place=library&entrance=door-c');
       await expect(
-        page.getByText('Photograph provided by the author', { exact: true }),
+        page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
       ).toBeVisible();
-    const loaded = await page
-      .getByRole('img', { name: 'Library exterior view 1', exact: true })
-      .evaluate(
-        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
-      );
-    expect(loaded).toBe(true);
-  });
+      await page.getByRole('button', { name: 'Offline', exact: true }).click();
+      await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+      await page
+        .getByRole('button', { name: 'Download campus map', exact: true })
+        .click();
+      await expect(
+        page.getByText('Ready offline', { exact: true }),
+      ).toBeVisible();
+      await context.setOffline(true);
+      await page.reload();
+      await expect(
+        page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByLabel('Destination entrance', { exact: true }),
+      ).toHaveValue('door-c');
+      await page.getByText('Photo credits & license', { exact: true }).click();
+      await expect(
+        page.getByText('Campus photographer · CC BY-SA 4.0', { exact: true }),
+      ).toBeVisible();
+      if (schema === 3)
+        await expect(
+          page.getByText('Photograph provided by the author', { exact: true }),
+        ).toBeVisible();
+      const loaded = await page
+        .getByRole('img', { name: 'Library exterior view 1', exact: true })
+        .evaluate(
+          (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+        );
+      expect(loaded).toBe(true);
+    },
+  );

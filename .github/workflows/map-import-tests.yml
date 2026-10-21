@@ -32,7 +32,7 @@ jobs:
       - name: Enforce Python processing coverage with every native test enabled
         run: |
           mkdir -p coverage/python
-          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -e PYTHONDONTWRITEBYTECODE=1 -v "${{ github.workspace }}:/repo:ro" -v "${{ github.workspace }}/coverage/python:/repo/coverage/python:rw" -w /repo --entrypoint python3 turnright-gis-import-test scripts/test_python.py
+          docker run --rm --user "$(id -u):$(id -g)" --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -e PYTHONDONTWRITEBYTECODE=1 -v "${{ github.workspace }}:/repo:ro" -v "${{ github.workspace }}/coverage/python:/repo/coverage/python:rw" -w /repo --entrypoint python3 turnright-gis-import-test scripts/test_python.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

@@ -5,6 +5,7 @@ import { create, createContext } from '@vitest/istanbul-lib-report';
 import { root } from './toolchain.mjs';
 import { coverageSnapshot, coveredSource } from './coverage-scope.mjs';
 import { authoredCode } from './source-files.mjs';
+import { requiredBrowserJourneys } from './browser-coverage-inventory.mjs';
 
 const web = path.join(root, 'web');
 const read = async (file) =>
@@ -19,6 +20,14 @@ if (
 )
   throw Error(
     'Coverage must come from passing tests on exactly the current source and dependency snapshot.',
+  );
+const completed = new Set(browser.journeys);
+const missingJourneys = requiredBrowserJourneys().filter(
+  ({ id }) => !completed.has(id),
+);
+if (missingJourneys.length)
+  throw Error(
+    `Coverage requires the complete browser suite; missing: ${missingJourneys.map(({ title }) => title).join('; ')}`,
   );
 const map = createCoverageMap({});
 for (const report of [

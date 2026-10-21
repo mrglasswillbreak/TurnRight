@@ -230,82 +230,88 @@ test('roof campus batch: complex roof plans generate without fallback or camera 
   expect(errors).toEqual([]);
 });
 
-test('documentation capture: editor appearance, roof and settings', async ({
-  page,
-}, testInfo) => {
-  test.skip(
-    !process.env.TURNRIGHT_DOCS_SCREENSHOTS,
-    'Opt-in README captures with local API fixtures.',
-  );
-  test.setTimeout(240000);
-  await page.emulateMedia({ colorScheme: 'dark' });
-  const state = await setup(page, true, true);
-  await page.getByRole('button', { name: 'Switch to 3D', exact: true }).click();
-  await focusModels(page);
-  await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 17.3 }));
-  await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
-    .toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('editor-workspace.png') });
-  await collapseExplorer(page);
-  await focusModels(page);
-  const roof = await position(page, [3.19978, 6.47109]);
-  await page.mouse.click(roof.x, roof.y - 80);
-  await expect(
-    page.getByRole('textbox', { name: 'Name', exact: true }),
-  ).toHaveValue('LASU Senate Building');
-  await expect(
-    page.getByRole('button', { name: 'Appearance', exact: true }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
-    .toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('editor-building.png') });
-  await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
-  await page.getByRole('button', { name: 'Roof', exact: true }).click();
-  await page.getByRole('button', { name: 'Create custom roof' }).click();
-  await expect(
-    page.getByRole('button', { name: 'Apply roof', exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByText('Updating 3D preview…', { exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
-  ).toHaveCount(0);
-  // Show the complete roof plan without changing the application's panel layout.
-  await page.locator('.editor-inspector-body').evaluate((element) => {
-    element.scrollTop = 300;
-  });
-  await page.screenshot({ path: testInfo.outputPath('editor-roof.png') });
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await page.getByRole('radio', { name: 'Dark', exact: true }).check();
-  await page.screenshot({ path: testInfo.outputPath('editor-settings.png') });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expect(
-    page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
-  ).toHaveCount(0);
-  await page.screenshot({
-    path: testInfo.outputPath('editor-settings-phone.png'),
-  });
-  expect(state.edits()).toHaveLength(0);
-  await page.goto('/');
-  await attachMap(page);
-  await focusModels(page, true);
-  const place = await position(page, [3.19978, 6.47109]);
-  await page.mouse.click(place.x, place.y - 12);
-  await expect(
-    page.getByRole('heading', { name: 'LASU Senate Building', exact: true }),
-  ).toBeVisible();
-  await page.screenshot({
-    path: testInfo.outputPath('public-place-phone.png'),
-  });
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await focusModels(page);
-  await page.screenshot({
-    path: testInfo.outputPath('public-campus-dark.png'),
-  });
-});
+test(
+  'documentation capture: editor appearance, roof and settings',
+  { tag: '@documentation' },
+  async ({ page }, testInfo) => {
+    test.skip(
+      !process.env.TURNRIGHT_DOCS_SCREENSHOTS,
+      'Opt-in README captures with local API fixtures.',
+    );
+    test.setTimeout(240000);
+    await page.emulateMedia({ colorScheme: 'dark' });
+    const state = await setup(page, true, true);
+    await page
+      .getByRole('button', { name: 'Switch to 3D', exact: true })
+      .click();
+    await focusModels(page);
+    await page.evaluate(() => window.editorTestMap.jumpTo({ zoom: 17.3 }));
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
+      .toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('editor-workspace.png'),
+    });
+    await collapseExplorer(page);
+    await focusModels(page);
+    const roof = await position(page, [3.19978, 6.47109]);
+    await page.mouse.click(roof.x, roof.y - 80);
+    await expect(
+      page.getByRole('textbox', { name: 'Name', exact: true }),
+    ).toHaveValue('LASU Senate Building');
+    await expect(
+      page.getByRole('button', { name: 'Appearance', exact: true }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.loaded()))
+      .toBe(true);
+    await page.screenshot({ path: testInfo.outputPath('editor-building.png') });
+    await page.getByLabel('Building or wing').selectOption({ label: 'Wing 1' });
+    await page.getByRole('button', { name: 'Roof', exact: true }).click();
+    await page.getByRole('button', { name: 'Create custom roof' }).click();
+    await expect(
+      page.getByRole('button', { name: 'Apply roof', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Updating 3D preview…', { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+    ).toHaveCount(0);
+    // Show the complete roof plan without changing the application's panel layout.
+    await page.locator('.editor-inspector-body').evaluate((element) => {
+      element.scrollTop = 300;
+    });
+    await page.screenshot({ path: testInfo.outputPath('editor-roof.png') });
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page.getByRole('radio', { name: 'Dark', exact: true }).check();
+    await page.screenshot({ path: testInfo.outputPath('editor-settings.png') });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(
+      page.getByRole('button', { name: 'Retry 3D preview', exact: true }),
+    ).toHaveCount(0);
+    await page.screenshot({
+      path: testInfo.outputPath('editor-settings-phone.png'),
+    });
+    expect(state.edits()).toHaveLength(0);
+    await page.goto('/');
+    await attachMap(page);
+    await focusModels(page, true);
+    const place = await position(page, [3.19978, 6.47109]);
+    await page.mouse.click(place.x, place.y - 12);
+    await expect(
+      page.getByRole('heading', { name: 'LASU Senate Building', exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: testInfo.outputPath('public-place-phone.png'),
+    });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await focusModels(page);
+    await page.screenshot({
+      path: testInfo.outputPath('public-campus-dark.png'),
+    });
+  },
+);
 
 test('unified model roof and outline tools share draft history', async ({
   page,

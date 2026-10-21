@@ -21,6 +21,7 @@ def main():
             + ", ".join(missing)
         )
     before = snapshot()
+    REPORT.mkdir(parents=True, exist_ok=True)
     measured = coverage.Coverage(config_file=str(ROOT / "pyproject.toml"))
     measured.start()
     suite = unittest.TestLoader().discover(str(ROOT / "scripts/tests"))

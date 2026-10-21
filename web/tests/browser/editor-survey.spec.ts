@@ -344,87 +344,90 @@ test('phone survey marks two entrances, connects both approaches and tests their
   ).toBeVisible();
 });
 
-test('prepared offline survey cold-starts, records, recovers and privately syncs after reconnecting', async ({
-  page,
-  context,
-}, testInfo) => {
-  test.skip(
-    !testInfo.config.configFile?.includes('pwa.config'),
-    'Requires the production service worker configuration.',
-  );
-  await page.setViewportSize({ width: 390, height: 844 });
-  await surveyGps(page);
-  await sensorHardware(page);
-  await setup(page);
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  const commands: {
-    command: string;
-    revisionId: string;
-    samples?: unknown[];
-  }[] = [];
-  await page.route('**/api/admin', (route) => {
-    const { action, payload } = route.request().postDataJSON();
-    if (action !== 'survey-save') return route.fallback();
-    commands.push(payload);
-    return route.fulfill({
-      json:
-        payload.command === 'finalize'
-          ? {
-              status: 'complete',
-              revisionId: payload.revisionId,
-              headRevision: payload.revisionId,
-            }
-          : { ok: true },
+test(
+  'prepared offline survey cold-starts, records, recovers and privately syncs after reconnecting',
+  { tag: '@offline' },
+  async ({ page, context }, testInfo) => {
+    test.skip(
+      !testInfo.config.configFile?.includes('pwa.config'),
+      'Requires the production service worker configuration.',
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await surveyGps(page);
+    await sensorHardware(page);
+    await setup(page);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    const commands: {
+      command: string;
+      revisionId: string;
+      samples?: unknown[];
+    }[] = [];
+    await page.route('**/api/admin', (route) => {
+      const { action, payload } = route.request().postDataJSON();
+      if (action !== 'survey-save') return route.fallback();
+      commands.push(payload);
+      return route.fulfill({
+        json:
+          payload.command === 'finalize'
+            ? {
+                status: 'complete',
+                revisionId: payload.revisionId,
+                headRevision: payload.revisionId,
+              }
+            : { ok: true },
+      });
     });
-  });
-  await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
-    .click();
-  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
-  await context.setOffline(true);
-  await page.reload();
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Record new path', exact: true })
-    .click();
-  await pushSurveyFix(page, [3.20015, 6.46]);
-  await expect(
-    page.getByText('Approximate compass available', { exact: true }),
-  ).toBeVisible();
-  await page.waitForTimeout(1100);
-  await pushSurveyFix(page, [3.20015, 6.459975]);
-  await page.getByRole('button', { name: 'Finish', exact: true }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
-    .toBe(0);
-  await page.getByRole('button', { name: 'Save survey', exact: true }).click();
-  await expect(page.getByText(/private upload queued/)).toBeVisible();
-  expect(commands).toHaveLength(0);
-  await page.reload();
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Saved surveys', exact: true })
-    .click();
-  await page
-    .getByRole('button', { name: /Walking survey · review · On this device/ })
-    .click();
-  await context.setOffline(false);
-  await expect
-    .poll(() => commands.some((c) => c.command === 'finalize'))
-    .toBe(true);
-  expect(
-    commands
-      .filter((c) => c.command === 'chunk')
-      .flatMap((c) => c.samples || []),
-  ).toHaveLength(2);
-  await expect(
-    page.getByText('Saved privately', { exact: true }),
-  ).toBeVisible();
-  expect(JSON.stringify(commands)).not.toMatch(
-    /webkitCompass|rotationRate|acceleration|phoneHeading|motion-assistance/,
-  );
-  expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
-});
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+      .click();
+    await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+    await context.setOffline(true);
+    await page.reload();
+    await attachMap(page);
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Record new path', exact: true })
+      .click();
+    await pushSurveyFix(page, [3.20015, 6.46]);
+    await expect(
+      page.getByText('Approximate compass available', { exact: true }),
+    ).toBeVisible();
+    await page.waitForTimeout(1100);
+    await pushSurveyFix(page, [3.20015, 6.459975]);
+    await page.getByRole('button', { name: 'Finish', exact: true }).click();
+    await expect
+      .poll(() => page.evaluate(() => window.motionTest.listenerCount()))
+      .toBe(0);
+    await page
+      .getByRole('button', { name: 'Save survey', exact: true })
+      .click();
+    await expect(page.getByText(/private upload queued/)).toBeVisible();
+    expect(commands).toHaveLength(0);
+    await page.reload();
+    await attachMap(page);
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Saved surveys', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: /Walking survey · review · On this device/ })
+      .click();
+    await context.setOffline(false);
+    await expect
+      .poll(() => commands.some((c) => c.command === 'finalize'))
+      .toBe(true);
+    expect(
+      commands
+        .filter((c) => c.command === 'chunk')
+        .flatMap((c) => c.samples || []),
+    ).toHaveLength(2);
+    await expect(
+      page.getByText('Saved privately', { exact: true }),
+    ).toBeVisible();
+    expect(JSON.stringify(commands)).not.toMatch(
+      /webkitCompass|rotationRate|acceleration|phoneHeading|motion-assistance/,
+    );
+    expect(await page.evaluate(() => window.motionTest.requests)).toEqual([]);
+  },
+);

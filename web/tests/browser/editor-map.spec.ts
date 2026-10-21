@@ -8,53 +8,60 @@ test.afterEach(async ({ context }) => {
   await context.setOffline(false);
 });
 
-test('prepared public map reopens in 3D offline with its saved view preference', async ({
-  page,
-  context,
-}, testInfo) => {
-  test.skip(
-    !testInfo.config.configFile?.includes('pwa.config'),
-    'Requires the production service worker configuration.',
-  );
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await setup(page);
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.goto('/');
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(
-    page.getByText('Ready offline', { exact: true }).first(),
-  ).toBeVisible();
-  await context.setOffline(true);
-  await page.goto('/');
-  await attachMap(page);
-  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
-    .toBe(45);
-  expect(
-    await page.evaluate(async () => {
-      const data = (await (
-        window.editorTestMap.getSource(
-          'campus',
-        ) as import('maplibre-gl').GeoJSONSource
-      ).getData()) as import('geojson').FeatureCollection;
-      return data.features.find(
-        (f) => f.properties?.heightKind === 'illustrative',
-      )?.properties?.displayHeight;
-    }),
-  ).toBe(6);
-  await page.getByRole('button', { name: 'Switch to 2D', exact: true }).click();
-  await page.reload();
-  await attachMap(page);
-  await expect
-    .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
-    .toBe(0);
-});
+test(
+  'prepared public map reopens in 3D offline with its saved view preference',
+  { tag: '@offline' },
+  async ({ page, context }, testInfo) => {
+    test.skip(
+      !testInfo.config.configFile?.includes('pwa.config'),
+      'Requires the production service worker configuration.',
+    );
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await setup(page);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.goto('/');
+    await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Ready offline', { exact: true }).first(),
+    ).toBeVisible();
+    await context.setOffline(true);
+    await page.goto('/');
+    await attachMap(page);
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+      .toBe(45);
+    expect(
+      await page.evaluate(async () => {
+        const data = (await (
+          window.editorTestMap.getSource(
+            'campus',
+          ) as import('maplibre-gl').GeoJSONSource
+        ).getData()) as import('geojson').FeatureCollection;
+        return data.features.find(
+          (f) => f.properties?.heightKind === 'illustrative',
+        )?.properties?.displayHeight;
+      }),
+    ).toBe(6);
+    await page
+      .getByRole('button', { name: 'Switch to 2D', exact: true })
+      .click();
+    await page.reload();
+    await attachMap(page);
+    await expect
+      .poll(() => page.evaluate(() => window.editorTestMap.getPitch()))
+      .toBe(0);
+  },
+);
 
 test('published corrections leave Drafts and map highlights without losing saved edits', async ({
   page,

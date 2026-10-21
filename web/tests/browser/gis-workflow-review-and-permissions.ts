@@ -4,112 +4,116 @@ import type { GisWorkflowFixture } from './gis-workflow.spec';
 export function registerReviewAndPermissions(
   fixture: () => GisWorkflowFixture,
 ): void {
-  test('GIS documentation gallery uses the current workspace and an isolated team fixture', async ({
-    page,
-  }) => {
-    test.skip(
-      process.env.TURNRIGHT_GIS_SCREENSHOTS !== '1',
-      'Opt-in documentation capture only',
-    );
-    const { reviews, data } = await fixture().setup(page);
-    await page.waitForFunction(() => {
-      type Hook = { memoizedState?: { current?: MapInstance }; next?: Hook };
-      type Fiber = { memoizedState?: Hook; return?: Fiber };
-      const el = document.querySelector('.map-canvas');
-      const key = Object.keys(el || {}).find((k) =>
-        k.startsWith('__reactFiber'),
+  test(
+    'GIS documentation gallery uses the current workspace and an isolated team fixture',
+    { tag: '@documentation' },
+    async ({ page }) => {
+      test.skip(
+        process.env.TURNRIGHT_GIS_SCREENSHOTS !== '1',
+        'Opt-in documentation capture only',
       );
-      let fiber =
-        el && key ? (el as unknown as Record<string, Fiber>)[key] : undefined;
-      while (fiber) {
-        let hook = fiber.memoizedState;
-        while (hook) {
-          const map = hook.memoizedState?.current;
-          if (
-            typeof map?.getCanvas === 'function' &&
-            typeof map?.project === 'function'
-          ) {
-            window.editorTestMap = map;
-            return map.loaded();
+      const { reviews, data } = await fixture().setup(page);
+      await page.waitForFunction(() => {
+        type Hook = { memoizedState?: { current?: MapInstance }; next?: Hook };
+        type Fiber = { memoizedState?: Hook; return?: Fiber };
+        const el = document.querySelector('.map-canvas');
+        const key = Object.keys(el || {}).find((k) =>
+          k.startsWith('__reactFiber'),
+        );
+        let fiber =
+          el && key ? (el as unknown as Record<string, Fiber>)[key] : undefined;
+        while (fiber) {
+          let hook = fiber.memoizedState;
+          while (hook) {
+            const map = hook.memoizedState?.current;
+            if (
+              typeof map?.getCanvas === 'function' &&
+              typeof map?.project === 'function'
+            ) {
+              window.editorTestMap = map;
+              return map.loaded();
+            }
+            hook = hook.next;
           }
-          hook = hook.next;
+          fiber = fiber.return;
         }
-        fiber = fiber.return;
-      }
-      return false;
-    });
-    const nav = page.getByRole('navigation', { name: 'Editor sections' });
-    const shot = async (name: string) => {
-      await page.evaluate(() => document.fonts.ready);
-      await page.evaluate(
-        (bounds) =>
-          window.editorTestMap.fitBounds(bounds, {
-            padding: { left: 36, right: 36, top: 45, bottom: 45 },
-            pitch: 0,
-            bearing: 0,
-            duration: 0,
-          }),
-        data.bounds,
-      );
-      await expect
-        .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
-        .toBe(true);
-      await page
-        .locator('.gis-workspace')
-        .first()
-        .evaluate((e) => {
-          e.scrollTop = 0;
-        });
-      await page.screenshot({
-        path: (
-          await import('./documentation-capture')
-        ).documentationCapturePath(`gis-${name}`),
+        return false;
       });
-    };
-    await nav.getByRole('button', { name: 'Data', exact: true }).click();
-    await expect(page.getByText(/100,000 matching/)).toBeVisible();
-    await page
-      .getByRole('textbox', { name: 'height', exact: true })
-      .first()
-      .fill('12');
-    await page
-      .getByRole('textbox', { name: 'height', exact: true })
-      .first()
-      .press('Tab');
-    await shot('data');
-    await nav.getByRole('button', { name: 'Analyze', exact: true }).click();
-    await page
-      .getByLabel('Result name', { exact: true })
-      .fill('Demonstration tree buffers');
-    await shot('analyze');
-    reviews.push({
-      id: '22222222-2222-4222-8222-222222222222',
-      summary: 'Demonstration tree survey and buffer review',
-      status: 'submitted',
-      content_hash: 'a'.repeat(64),
-      contributors: ['33333333-3333-4333-8333-333333333333'],
-      submitted_by: '33333333-3333-4333-8333-333333333333',
-      created_at: '2026-10-05T00:00:00Z',
-    });
-    await nav.getByRole('button', { name: 'Review', exact: true }).click();
-    await page
-      .getByRole('button', { name: 'Inspect immutable submission' })
-      .click();
-    await page.getByText(/^Map validation \(/).click();
-    await shot('review');
-    reviews[0].status = 'approved';
-    await nav.getByRole('button', { name: 'Publish', exact: true }).click();
-    await page
-      .getByText('Map layout: A4 / A3 PNG and PDF', { exact: true })
-      .click();
-    await page
-      .getByRole('combobox', { name: 'Approved snapshot', exact: true })
-      .selectOption('22222222-2222-4222-8222-222222222222');
-    await page
-      .getByLabel('Release summary', { exact: true })
-      .fill('Demonstration campus review');
-    await shot('publish');
-  });
+      const nav = page.getByRole('navigation', { name: 'Editor sections' });
+      const shot = async (name: string) => {
+        await page.evaluate(() => document.fonts.ready);
+        await page.evaluate(
+          (bounds) =>
+            window.editorTestMap.fitBounds(bounds, {
+              padding: { left: 36, right: 36, top: 45, bottom: 45 },
+              pitch: 0,
+              bearing: 0,
+              duration: 0,
+            }),
+          data.bounds,
+        );
+        await expect
+          .poll(() =>
+            page.evaluate(() => window.editorTestMap.areTilesLoaded()),
+          )
+          .toBe(true);
+        await page
+          .locator('.gis-workspace')
+          .first()
+          .evaluate((e) => {
+            e.scrollTop = 0;
+          });
+        await page.screenshot({
+          path: (
+            await import('./documentation-capture')
+          ).documentationCapturePath(`gis-${name}`),
+        });
+      };
+      await nav.getByRole('button', { name: 'Data', exact: true }).click();
+      await expect(page.getByText(/100,000 matching/)).toBeVisible();
+      await page
+        .getByRole('textbox', { name: 'height', exact: true })
+        .first()
+        .fill('12');
+      await page
+        .getByRole('textbox', { name: 'height', exact: true })
+        .first()
+        .press('Tab');
+      await shot('data');
+      await nav.getByRole('button', { name: 'Analyze', exact: true }).click();
+      await page
+        .getByLabel('Result name', { exact: true })
+        .fill('Demonstration tree buffers');
+      await shot('analyze');
+      reviews.push({
+        id: '22222222-2222-4222-8222-222222222222',
+        summary: 'Demonstration tree survey and buffer review',
+        status: 'submitted',
+        content_hash: 'a'.repeat(64),
+        contributors: ['33333333-3333-4333-8333-333333333333'],
+        submitted_by: '33333333-3333-4333-8333-333333333333',
+        created_at: '2026-10-05T00:00:00Z',
+      });
+      await nav.getByRole('button', { name: 'Review', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Inspect immutable submission' })
+        .click();
+      await page.getByText(/^Map validation \(/).click();
+      await shot('review');
+      reviews[0].status = 'approved';
+      await nav.getByRole('button', { name: 'Publish', exact: true }).click();
+      await page
+        .getByText('Map layout: A4 / A3 PNG and PDF', { exact: true })
+        .click();
+      await page
+        .getByRole('combobox', { name: 'Approved snapshot', exact: true })
+        .selectOption('22222222-2222-4222-8222-222222222222');
+      await page
+        .getByLabel('Release summary', { exact: true })
+        .fill('Demonstration campus review');
+      await shot('publish');
+    },
+  );
   test('workspace panes keep Activity in place while phone data panes load', async ({
     page,
   }) => {

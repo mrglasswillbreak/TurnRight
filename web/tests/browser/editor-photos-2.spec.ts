@@ -301,121 +301,132 @@ for (const viewport of [
   });
 }
 
-test('prepared offline image tools reload originals and recipes and queue without uploading', async ({
-  page,
-  context,
-}, info) => {
-  test.skip(
-    !info.config.configFile?.includes('photos.pwa.config'),
-    'Requires production service worker.',
-  );
-  test.setTimeout(180000);
-  await setup(page);
-  let offline = false;
-  let uploads = 0;
-  await page.route('**/api/admin', async (route) => {
-    if (offline) return route.abort('internetdisconnected');
-    if (route.request().postDataJSON()?.action === 'media-begin') uploads++;
-    return route.fallback();
-  });
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
-    .click();
-  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
-  await page.getByRole('button', { name: 'Close survey', exact: true }).click();
-  await focusCampus(page);
-  await collapseExplorer(page);
-  await clickMap(page, [3.20012, 6.46022]);
-  await page.getByRole('button', { name: /Manage photos/ }).click();
-  const gallery = page.getByRole('dialog', { name: 'Photos · Library' });
-  const editor = page.getByRole('dialog', { name: 'Edit & optimise photos' });
-  const sample = JSON.parse(
-    readFileSync(
-      new URL('../../../data/photos/catalogue.json', import.meta.url),
-      'utf8',
-    ),
-  )[0];
-  await gallery.getByLabel('Add photos', { exact: true }).setInputFiles({
-    name: 'offline-building.webp',
-    mimeType: 'image/webp',
-    buffer: readFileSync(
-      new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
-    ),
-  });
-  await editor
-    .getByRole('button', { name: 'Local image drafts', exact: true })
-    .click();
-  await editor
-    .getByRole('button', { name: 'Prepare for offline use', exact: true })
-    .click();
-  await expect(
-    editor.getByRole('button', { name: 'Ready offline', exact: true }),
-  ).toBeVisible({
-    timeout: 30000,
-  });
-  expect(
-    await page.evaluate(
-      async () =>
-        (await (await caches.open('turnright-assets-v1')).keys()).filter((r) =>
-          new URL(r.url).pathname.startsWith('/photo-codecs/'),
-        ).length,
-    ),
-  ).toBe(8);
-  offline = true;
-  await context.setOffline(true);
-  await editor
-    .getByRole('button', { name: 'Image settings', exact: true })
-    .click();
-  await editor.getByText('Resize', { exact: true }).click();
-  await editor.getByLabel('Longest edge (px)', { exact: true }).fill('640');
-  await editor
-    .getByRole('button', { name: 'Preview changes', exact: true })
-    .click();
-  await expect(
-    editor.getByRole('button', { name: 'Download edited image', exact: true }),
-  ).toBeEnabled();
-  const download = page.waitForEvent('download');
-  await editor
-    .getByRole('button', { name: 'Download edited image', exact: true })
-    .click();
-  expect((await download).suggestedFilename()).toMatch(/webp$/);
-  await editor.getByRole('button', { name: 'Close image editor' }).click();
-  await page.reload();
-  await attachMap(page);
-  await focusCampus(page);
-  const collapse = page.getByRole('button', { name: 'Collapse explorer' });
-  if (await collapse.isVisible()) await collapse.click();
-  await clickMap(page, [3.20012, 6.46022]);
-  await page.getByRole('button', { name: /Manage photos/ }).click();
-  await gallery
-    .getByRole('button', { name: 'Local image drafts · edit offline' })
-    .click();
-  await editor.getByText('Resize', { exact: true }).click();
-  await expect(
-    editor.getByLabel('Longest edge (px)', { exact: true }),
-  ).toHaveValue('640');
-  await editor
-    .getByRole('button', { name: 'Preview changes', exact: true })
-    .click();
-  await expect(
-    editor.getByRole('button', { name: 'Download edited image', exact: true }),
-  ).toBeEnabled();
-  await page.screenshot({ path: info.outputPath('photo-editing-offline.png') });
-  await editor
-    .getByRole('button', { name: 'Use for map', exact: true })
-    .click();
-  await expect(editor).toHaveCount(0);
-  await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
-  await gallery.getByRole('button', { name: 'Close', exact: true }).click();
-  await page.reload();
-  await attachMap(page);
-  await focusCampus(page);
-  if (await collapse.isVisible()) await collapse.click();
-  await clickMap(page, [3.20012, 6.46022]);
-  await page.getByRole('button', { name: /Manage photos/ }).click();
-  await gallery.getByRole('button', { name: /Review uploads/ }).click();
-  await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
-  expect(uploads).toBe(0);
-});
+test(
+  'prepared offline image tools reload originals and recipes and queue without uploading',
+  { tag: '@offline' },
+  async ({ page, context }, info) => {
+    test.skip(
+      !info.config.configFile?.includes('photos.pwa.config'),
+      'Requires production service worker.',
+    );
+    test.setTimeout(180000);
+    await setup(page);
+    let offline = false;
+    let uploads = 0;
+    await page.route('**/api/admin', async (route) => {
+      if (offline) return route.abort('internetdisconnected');
+      if (route.request().postDataJSON()?.action === 'media-begin') uploads++;
+      return route.fallback();
+    });
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+      .click();
+    await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+    await page
+      .getByRole('button', { name: 'Close survey', exact: true })
+      .click();
+    await focusCampus(page);
+    await collapseExplorer(page);
+    await clickMap(page, [3.20012, 6.46022]);
+    await page.getByRole('button', { name: /Manage photos/ }).click();
+    const gallery = page.getByRole('dialog', { name: 'Photos · Library' });
+    const editor = page.getByRole('dialog', { name: 'Edit & optimise photos' });
+    const sample = JSON.parse(
+      readFileSync(
+        new URL('../../../data/photos/catalogue.json', import.meta.url),
+        'utf8',
+      ),
+    )[0];
+    await gallery.getByLabel('Add photos', { exact: true }).setInputFiles({
+      name: 'offline-building.webp',
+      mimeType: 'image/webp',
+      buffer: readFileSync(
+        new URL(`../../../data/photos/${sample.sha256}.webp`, import.meta.url),
+      ),
+    });
+    await editor
+      .getByRole('button', { name: 'Local image drafts', exact: true })
+      .click();
+    await editor
+      .getByRole('button', { name: 'Prepare for offline use', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', { name: 'Ready offline', exact: true }),
+    ).toBeVisible({
+      timeout: 30000,
+    });
+    expect(
+      await page.evaluate(
+        async () =>
+          (await (await caches.open('turnright-assets-v1')).keys()).filter(
+            (r) => new URL(r.url).pathname.startsWith('/photo-codecs/'),
+          ).length,
+      ),
+    ).toBe(8);
+    offline = true;
+    await context.setOffline(true);
+    await editor
+      .getByRole('button', { name: 'Image settings', exact: true })
+      .click();
+    await editor.getByText('Resize', { exact: true }).click();
+    await editor.getByLabel('Longest edge (px)', { exact: true }).fill('640');
+    await editor
+      .getByRole('button', { name: 'Preview changes', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', {
+        name: 'Download edited image',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    const download = page.waitForEvent('download');
+    await editor
+      .getByRole('button', { name: 'Download edited image', exact: true })
+      .click();
+    expect((await download).suggestedFilename()).toMatch(/webp$/);
+    await editor.getByRole('button', { name: 'Close image editor' }).click();
+    await page.reload();
+    await attachMap(page);
+    await focusCampus(page);
+    const collapse = page.getByRole('button', { name: 'Collapse explorer' });
+    if (await collapse.isVisible()) await collapse.click();
+    await clickMap(page, [3.20012, 6.46022]);
+    await page.getByRole('button', { name: /Manage photos/ }).click();
+    await gallery
+      .getByRole('button', { name: 'Local image drafts · edit offline' })
+      .click();
+    await editor.getByText('Resize', { exact: true }).click();
+    await expect(
+      editor.getByLabel('Longest edge (px)', { exact: true }),
+    ).toHaveValue('640');
+    await editor
+      .getByRole('button', { name: 'Preview changes', exact: true })
+      .click();
+    await expect(
+      editor.getByRole('button', {
+        name: 'Download edited image',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await page.screenshot({
+      path: info.outputPath('photo-editing-offline.png'),
+    });
+    await editor
+      .getByRole('button', { name: 'Use for map', exact: true })
+      .click();
+    await expect(editor).toHaveCount(0);
+    await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
+    await gallery.getByRole('button', { name: 'Close', exact: true }).click();
+    await page.reload();
+    await attachMap(page);
+    await focusCampus(page);
+    if (await collapse.isVisible()) await collapse.click();
+    await clickMap(page, [3.20012, 6.46022]);
+    await page.getByRole('button', { name: /Manage photos/ }).click();
+    await gallery.getByRole('button', { name: /Review uploads/ }).click();
+    await expect(gallery.getByText('queued', { exact: true })).toBeVisible();
+    expect(uploads).toBe(0);
+  },
+);

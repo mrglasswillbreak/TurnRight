@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
+  grepInvert: undefined,
   grep: /documentation current gallery/,
   timeout: 300000,
   use: {

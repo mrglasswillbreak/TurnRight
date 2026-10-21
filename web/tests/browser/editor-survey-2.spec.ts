@@ -51,29 +51,31 @@ test('phone survey pauses when hidden and requires explicit resume after reload'
   expect(await page.evaluate(() => window.surveyGpsWatchCount)).toBe(0);
 });
 
-test('prepared offline survey editor opens its cache after backend failure while the browser is online', async ({
-  page,
-}, testInfo) => {
-  test.skip(
-    !testInfo.config.configFile?.includes('pwa.config'),
-    'Requires the production service worker configuration.',
-  );
-  await setup(page);
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.getByRole('button', { name: 'Survey', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Prepare for offline survey', exact: true })
-    .click();
-  await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
-  await page.route('**/api/admin', (route) => route.abort('failed'));
-  expect(await page.evaluate(() => navigator.onLine)).toBe(true);
-  await page.reload();
-  await attachMap(page);
-  await expect(page.locator('.editor-offline')).toContainText(
-    'Working offline',
-  );
-  await expect(page.locator('.editor-offline')).not.toContainText('Unknown');
-  await expect(
-    page.getByRole('button', { name: 'Draw path', exact: true }),
-  ).toBeEnabled();
-});
+test(
+  'prepared offline survey editor opens its cache after backend failure while the browser is online',
+  { tag: '@offline' },
+  async ({ page }, testInfo) => {
+    test.skip(
+      !testInfo.config.configFile?.includes('pwa.config'),
+      'Requires the production service worker configuration.',
+    );
+    await setup(page);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.getByRole('button', { name: 'Survey', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Prepare for offline survey', exact: true })
+      .click();
+    await expect(page.getByText(/Ready for offline surveying/)).toBeVisible();
+    await page.route('**/api/admin', (route) => route.abort('failed'));
+    expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+    await page.reload();
+    await attachMap(page);
+    await expect(page.locator('.editor-offline')).toContainText(
+      'Working offline',
+    );
+    await expect(page.locator('.editor-offline')).not.toContainText('Unknown');
+    await expect(
+      page.getByRole('button', { name: 'Draw path', exact: true }),
+    ).toBeEnabled();
+  },
+);

@@ -108,35 +108,37 @@ for (const width of [1440, 390])
     ).toHaveCount(0);
   });
 
-test('prepared offline enrichment retains business details on reload', async ({
-  page,
-  context,
-  baseURL,
-}) => {
-  test.skip(!baseURL?.includes('5184'), 'Production service worker test');
-  await prepare(page);
-  await page.goto('/?place=cafe');
-  await expect(
-    page.getByRole('heading', { name: 'Campus Café', exact: true }),
-  ).toBeVisible();
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(page.getByText('Ready offline', { exact: true })).toBeVisible();
-  // Remove fixture transport: the reopened details must come from the verified download.
-  await context.unroute('**/packages/latest.json');
-  await context.unroute('**/packages/fixture/campus.json');
-  await context.setOffline(true);
-  await page.reload();
-  await expect(
-    page.getByRole('heading', { name: 'Campus Café', exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByText('Mo-Fr 08:00-18:00', { exact: false }),
-  ).toBeVisible();
-});
+test(
+  'prepared offline enrichment retains business details on reload',
+  { tag: '@offline' },
+  async ({ page, context, baseURL }) => {
+    test.skip(!baseURL?.includes('5184'), 'Production service worker test');
+    await prepare(page);
+    await page.goto('/?place=cafe');
+    await expect(
+      page.getByRole('heading', { name: 'Campus Café', exact: true }),
+    ).toBeVisible();
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Ready offline', { exact: true }),
+    ).toBeVisible();
+    // Remove fixture transport: the reopened details must come from the verified download.
+    await context.unroute('**/packages/latest.json');
+    await context.unroute('**/packages/fixture/campus.json');
+    await context.setOffline(true);
+    await page.reload();
+    await expect(
+      page.getByRole('heading', { name: 'Campus Café', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Mo-Fr 08:00-18:00', { exact: false }),
+    ).toBeVisible();
+  },
+);

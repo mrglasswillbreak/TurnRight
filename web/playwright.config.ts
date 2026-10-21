@@ -1,6 +1,13 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/browser',
+  // Offline journeys use a production service worker; documentation captures
+  // require their prepared fixtures. Their dedicated configurations select them.
+  grepInvert:
+    process.env.TURNRIGHT_DOCS_SCREENSHOTS ||
+    process.env.TURNRIGHT_GIS_SCREENSHOTS === '1'
+      ? /@offline/
+      : /@offline|@documentation/,
   timeout: 60000,
   expect: { timeout: 10000 },
   fullyParallel: false,
