@@ -7,7 +7,6 @@ import stat
 import zipfile
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
-from defusedxml import ElementTree as ET
 
 MAX_EXPANDED = 250 * 1024 * 1024
 MAX_FEATURES = 100000
@@ -65,6 +64,10 @@ def safe_xml(path):
             "External XML entities and KML network links are not supported."
         )
     if path.suffix.lower() == ".kml":
+        # Parsing runs in the locked converter, while the host imports only
+        # the standard-library size checks and command-building helpers.
+        from defusedxml import ElementTree as ET
+
         for element in ET.fromstring(content).iter():
             tag = element.tag.rsplit("}", 1)[-1].lower()
             if tag not in ("href", "styleurl") or not element.text:
