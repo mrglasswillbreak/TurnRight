@@ -4,6 +4,11 @@ TurnRight keeps support evidence inside the application and existing API/worker
 logs. It does not require a hosted monitoring account or send browser diagnostics
 to an external endpoint.
 
+API and host-worker failures are also grouped by [private operational monitoring](ERROR-MONITORING.md).
+The application owner can use **Workspace → System health** to inspect recurrence
+and resolve an observed group. Only allowlisted metadata is stored; browser
+diagnostics below still require an explicit download. Python uses standard-library logging.
+
 ## Browser recovery
 
 The [desktop recovery panel](assets/screenshots/tour-recovery-desktop-2026-10-21.png)

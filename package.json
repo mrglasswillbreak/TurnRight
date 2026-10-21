@@ -35,7 +35,9 @@
     "test:coverage:check": "node scripts/browser-coverage.mjs && node scripts/check-coverage.mjs",
     "check": "npm run doctor && npm run check:configuration && npm run check:architecture && npm run lint && npm run typecheck && npm run format:check && npm run check:docs",
     "test:python": "python3 -m unittest discover -s scripts/tests -v",
-    "lint:python": "python3 -m ruff check scripts && python3 -m ruff format --check scripts"
+    "lint:python": "python3 -m ruff check scripts && python3 -m ruff format --check scripts",
+    "setup:python": "python3 -m pip install --require-hashes -r requirements.txt",
+    "test:python:isolated": "node scripts/test-python-isolated.mjs"
   },
   "devDependencies": {
     "@bcoe/v8-coverage": "1.0.2",

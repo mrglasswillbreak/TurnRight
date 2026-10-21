@@ -12,6 +12,7 @@ ENTRYPOINTS = (
     "scripts/check_map_sources.py",
     "scripts/cleanup_imports.py",
     "scripts/diagnostics.py",
+    "scripts/error_monitoring.py",
     "scripts/source_observations.py",
 )
 
@@ -44,6 +45,11 @@ def check():
         | {
             path.relative_to(ROOT).as_posix()
             for path in (ROOT / "scripts/map_import").rglob("*.py")
+        }
+        | {
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / "scripts/gis").glob("*.py")
+            if not path.name.startswith("check_")
         }
     )
     absent = [name for name in scope if name not in files]

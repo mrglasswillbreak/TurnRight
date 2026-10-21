@@ -1,0 +1,4 @@
+# Python quality and portable tests, pinned with hashes. Native GDAL/osmium tests
+# use scripts/map_import/Dockerfile; GIS processing uses scripts/gis/Dockerfile.
+# Install: python -m pip install --require-hashes -r requirements.txt
+-r scripts/requirements-quality.lock

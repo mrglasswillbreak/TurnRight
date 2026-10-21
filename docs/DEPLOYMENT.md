@@ -1,5 +1,12 @@
 # Deploying TurnRight
 
+The operational-monitoring release requires additive migration **057** before the
+updated API/workers. It creates private error groups and service-role RPCs only.
+Existing backend credentials configure capture; `ERROR_MONITORING_ENABLED=false`
+disables it. The configured application owner can use **Workspace → System health**.
+Verify a labeled synthetic delivery probe at the deployed revision, resolve it and
+check retention. [Setup, verification and rollback](ERROR-MONITORING.md).
+
 TurnRight deploys a public campus PWA, a private team GIS API and isolated processing/release workers. Application deployment preserves the already published campus packages. Publishing changed campus data is a separate, independently approved operation. [Current account settings](CONFIGURATION.md) · [Actual production receipts](PRODUCTION.md) · [Team workflow](GIS-PLATFORM.md).
 
 ## Existing-installation upgrade

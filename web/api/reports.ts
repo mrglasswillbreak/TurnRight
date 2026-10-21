@@ -1,4 +1,5 @@
 import { lasuCampus } from '../src/campus-context.js';
+import { flushErrorMonitoring } from '../server/error-monitoring.mjs';
 import { randomUUID } from 'node:crypto';
 import { resolveCampus } from '../server/campuses.js';
 import { withCampusId } from '../server/campus-scope.js';
@@ -103,5 +104,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     });
   } catch (error) {
     fail(res, error, context);
+  } finally {
+    await flushErrorMonitoring();
   }
 }

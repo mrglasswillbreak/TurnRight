@@ -1,3 +1,4 @@
+import { flushErrorMonitoring } from '../web/server/error-monitoring.mjs';
 import { db } from './cloud.mjs';
 import { emitEvent } from '../web/server/diagnostics.mjs';
 
@@ -75,3 +76,4 @@ if (process.env.SOURCE_REVIEW_OPERATION_ID) {
     process.exitCode = 1;
   }
 }
+await flushErrorMonitoring();

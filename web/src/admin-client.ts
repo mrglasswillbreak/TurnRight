@@ -18,6 +18,7 @@ export class AdminRequestError extends Error {
   }
 }
 const readable = new Set([
+  'monitoring-list',
   'workspace-capabilities',
   'campus-list',
   'process-status',

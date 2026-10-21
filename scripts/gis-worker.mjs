@@ -1,3 +1,4 @@
+import { flushErrorMonitoring } from '../web/server/error-monitoring.mjs';
 import { db } from './cloud.mjs';
 import { emitEvent } from '../web/server/diagnostics.mjs';
 import { promises as fs } from 'node:fs';
@@ -187,6 +188,7 @@ try {
   });
   process.exitCode = 1;
 } finally {
+  await flushErrorMonitoring();
   clearInterval(poll);
   await stopContainer();
   // Only remove the mkdtemp directory created by this invocation.

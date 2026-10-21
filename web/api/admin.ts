@@ -1,4 +1,6 @@
 import { publicationAction } from '../server/publication.js';
+import { monitoringAction } from '../server/monitoring.js';
+import { flushErrorMonitoring } from '../server/error-monitoring.mjs';
 import { adminEnvelope } from '../server/request-envelope.js';
 import { sourceUpdatesAction } from '../server/source-updates.js';
 import { processStatus } from '../server/process-status.js';
@@ -55,6 +57,10 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       campus: reference = 'lasu',
     } = adminEnvelope(req);
     context.action = action;
+    if (action.startsWith('monitoring-')) {
+      res.status(200).json(await monitoringAction(action, payload, user.id));
+      return;
+    }
     if (action === 'campus-list') {
       res.status(200).json(await campusAction(action, payload, user.id));
       return;
@@ -470,5 +476,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     });
   } catch (error) {
     fail(res, error, context);
+  } finally {
+    await flushErrorMonitoring();
   }
 }

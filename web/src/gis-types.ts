@@ -16,6 +16,7 @@ export interface WorkspaceCapabilities {
   userId: string;
   roles: WorkspaceRole[];
   capabilities: WorkspaceCapability[];
+  operationalMonitoring?: boolean;
 }
 export interface CampusMembership {
   user_id: string;

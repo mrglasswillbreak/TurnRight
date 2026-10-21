@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Follow the 65.1 reassessment with clearer root setup, dependency, coverage and CI evidence. Generate the complete environment template from the checked inventory; distinguish configuration from provider and per-job values.
+- Split the remaining large Python import, routing, normalization, enrichment, ArcGIS and GIS files by responsibility. Extend the module-size gate to Python and retain extracted runtime modules in native coverage.
+- Add private error monitoring on the existing backend, owner-only System health, redacted failure grouping, recurrence alerts, conflict-safe resolution and bounded retention. Migration 057 is additive; browser diagnostics remain explicitly shared.
+- Expose the network-isolated native Python gate locally. Use root linter/formatter configs, hashed `requirements.txt` includes, and conventional `docker-compose.yml`. See [follow-up verification](docs/READINESS-FOLLOWUP.md).
+
 - Consolidate installation into a private root npm workspace with one dependency lock, root configuration checks, a pinned runtime doctor and a shared Docker/development-container entry.
 - Split large map, survey, import, layer, photo and model components into domain modules. Split the browser and database suites while preserving test assertions and shared setup. Add bounded, cancellable import polling and regression tests.
 - Check authored source, tests and tools with lint, types and formatting; enforce the 500-line boundary and immutable external CI action revisions.

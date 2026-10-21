@@ -4,9 +4,9 @@ RUN apt-get -o Dir::Etc::sourcelist="sources.list.d/ubuntu.sources" -o Dir::Etc:
  && apt-get -o Dir::Etc::sourcelist="sources.list.d/ubuntu.sources" -o Dir::Etc::sourceparts="-" install -y --no-install-recommends python3-venv \
  && python3 -m venv --system-site-packages /opt/venv \
  && /opt/venv/bin/python -m pip install --no-cache-dir --require-hashes -r /requirements.lock
-COPY process.py /app/process.py
+COPY *.py /app/gis/
 ENV PYTHONDONTWRITEBYTECODE=1 PROJ_NETWORK=OFF PATH="/opt/venv/bin:${PATH}"
-ENTRYPOINT ["python3", "/app/process.py"]
+ENTRYPOINT ["python3", "/app/gis/process.py"]
 
 FROM base AS test
 COPY requirements-test.lock /requirements-test.lock

@@ -1,5 +1,7 @@
 # TurnRight account configuration
 
+The root [.env.example](../.env.example) and [complete inventory](ENVIRONMENT.md) are generated together and checked in CI. Automatic/provider/per-job variables remain commented examples, not global settings. Private [error monitoring](ERROR-MONITORING.md) uses existing backend credentials and optional server-only `ERROR_MONITORING_ENABLED`; apply migration 057 before deploying its collectors.
+
 ArcGIS Pro is optional for local discovery and native analysis. Its active portal session remains on the workstation; no Pro token or credential belongs in Vercel, GitHub or browser configuration. Portable GeoJSON/GeoPackage evidence and GLB exports remain usable after the licence expires, subject to their source terms. [Toolbox setup and trial-window priorities](CAMPUS-DETAIL-UPGRADE.md).
 
 This is the current configuration guide. [Deployment](DEPLOYMENT.md) contains the setup sequence; [Production](PRODUCTION.md) records dated changes and live verification. Credentials belong in service secret stores, never in this repository or browser screenshots.

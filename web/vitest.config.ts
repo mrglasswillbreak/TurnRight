@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/postcss';
 import { playwright } from '@vitest/browser-playwright';
 import { VitePWA } from 'vite-plugin-pwa';
 import {
@@ -8,8 +9,12 @@ import {
   coverageExcludes,
 } from '../scripts/coverage-scope.mjs';
 export default defineConfig({
+  css: { postcss: { plugins: [tailwindcss()] } },
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   test: {
+    // Unit/component tests never contact a configured monitoring backend.
+    // Delivery tests explicitly enable it and supply a mocked transport.
+    env: { ERROR_MONITORING_ENABLED: 'false' },
     environment: 'node',
     restoreMocks: true,
     projects: [

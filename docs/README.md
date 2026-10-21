@@ -1,5 +1,8 @@
 # TurnRight documentation
 
+[Quality checks and setup evidence](QUALITY.md) · [Readiness follow-up](READINESS-FOLLOWUP.md)
+· [Private operational error monitoring](ERROR-MONITORING.md).
+
 TurnRight combines a public campus map/globe with a private GIS editing and publication platform. Start with the [project overview](../README.md), [public map guide](PUBLIC-MAP.md), or [team workflow](GIS-PLATFORM.md). [Production readiness](PRODUCTION.md) distinguishes the current source, local verification, deployed revisions, and remaining release gates.
 
 The [October 18 continuation receipt](assets/campus-detail-release-2026-10-18.json) records the refreshed LASU approval, newer UNILAG model preview, independent campus publication and verification results. The [campus detail guide](CAMPUS-DETAIL-UPGRADE.md) links the Pro archive, the confirmed **6 November licence expiry**, and separate native API, assisted desktop, browser and physical-device evidence. It includes measured numeric construction, separate-output footprint regularization and assisted desktop batch appearance with saved-data readback; historical receipts retain their original dates and package identities.

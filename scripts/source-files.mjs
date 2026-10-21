@@ -29,3 +29,11 @@ export function authoredCode() {
       !/(?:^|\/)(?:node_modules|vendor|generated|work)\//.test(file),
   );
 }
+
+export function authoredPython() {
+  return repositoryFiles().filter(
+    (file) =>
+      /^scripts\/.*\.py$/.test(file) &&
+      !/(?:^|\/)(?:vendor|generated|work)\//.test(file),
+  );
+}

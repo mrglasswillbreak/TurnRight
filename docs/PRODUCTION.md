@@ -1,5 +1,7 @@
 # Production readiness and deployment records
 
+The [21 October readiness follow-up](READINESS-FOLLOWUP.md) adds private operational monitoring and Python structure/setup improvements. Its deployment requires additive migration 057 and a synthetic monitoring-delivery probe at the deployed revision. Existing dated receipts below remain evidence for their own revisions; the follow-up PR/release receipt must record new CI, deployment and campus-package preservation results.
+
 ## Repository readiness application update · 21 October 2026
 
 [PR #47](https://github.com/mrglasswillbreak/TurnRight/pull/47) tracks the application/workflow update, protected checks and deployment receipt. The [readiness ledger](READINESS-UPDATE.md) records the verified code revision, coverage, security checks and operational limits. This update requires no database migration; migrations 001–056 remain the schema contract.

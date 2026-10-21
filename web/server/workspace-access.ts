@@ -86,5 +86,13 @@ export async function workspaceAccess(
     capabilities = capabilitiesFor(roles);
   if (!capabilities.includes(capabilityForAction(action)))
     throw new HttpError(403, 'Your campus role does not allow this action.');
-  return { userId, campusId: currentCampusId(), roles, capabilities };
+  return {
+    userId,
+    campusId: currentCampusId(),
+    roles,
+    capabilities,
+    ...(userId === process.env.ADMIN_USER_ID
+      ? { operationalMonitoring: true }
+      : {}),
+  };
 }

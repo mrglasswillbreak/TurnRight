@@ -1,3 +1,4 @@
+import { flushErrorMonitoring } from '../web/server/error-monitoring.mjs';
 import fs from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -469,3 +470,4 @@ if (
     process.exitCode = 1;
   }
 }
+await flushErrorMonitoring();

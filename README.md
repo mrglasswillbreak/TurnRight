@@ -7,6 +7,34 @@
 
 **Explore a campus. Build a better map.**
 
+TurnRight is a **full-stack TypeScript/React and Python GIS application**: the `web` npm workspace includes the browser app and Node API, Supabase/PostgreSQL holds private editor data, and isolated Python workers process imports. The root `package.json` declares the workspace; runtime dependencies are in `web/package.json` and resolved by the single root `package-lock.json`.
+
+## Developer quick start and verification
+
+Use Node **22.23.3**, npm **10.9.9**, and Python **3.12**. From a fresh clone:
+
+```sh
+npm ci
+npm run doctor
+npm run dev
+```
+
+The public app needs no credentials. For the full editor, use `npm run local:container` on Linux/WSL2 with Docker; the root `Dockerfile`, `docker-compose.yml` and `.devcontainer` supply the toolchain and disposable local services. Initial dependency/image downloads require internet access. [Full setup](docs/LOCAL_DEVELOPMENT.md).
+
+```sh
+python -m pip install --require-hashes -r requirements.txt
+npx playwright install chromium webkit
+npm run check
+npm test
+npm run test:coverage
+npm run test:python:isolated
+npm run build
+```
+
+Every PR runs [CI](.github/workflows/ci.yml), [native GIS acceptance](.github/workflows/gis-acceptance.yml), [network-isolated Python acceptance](.github/workflows/map-import-tests.yml), and [security checks](.github/workflows/security.yml). Combined unit/browser coverage includes unexecuted application files and requires **80% statements, lines and functions / 70% branches**; Python processing requires **80% lines / 70% branches** with no skipped native tests. Root `.oxlintrc.json`, `.oxfmtrc.json` and `pyproject.toml` configure actual enforced lint/format checks. Authored JavaScript, TypeScript and Python source/tests/tools must stay below 500 lines.
+
+The generated [.env.example](.env.example) lists every inventoried setting, distinguishing user configuration from automatic/per-job values. Python dependencies use seven hash-locked profiles; `requirements.txt` is the portable quality/test entry point, and native Dockerfiles install their dedicated locks. [Quality evidence and commands](docs/QUALITY.md) · [Private error monitoring](docs/ERROR-MONITORING.md).
+
 TurnRight combines a public campus map and globe with a private GIS editor. Visitors can discover campuses, inspect places and buildings, plan journeys, and download maps for offline use. Campus teams can import data, edit geometry and building models, review source changes, and publish independently approved map releases.
 
 [Explore the map](https://turnright.vercel.app/) · [Open the editor](https://turnright.vercel.app/admin) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)

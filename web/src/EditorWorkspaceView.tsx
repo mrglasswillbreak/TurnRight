@@ -1,4 +1,5 @@
 import { BrandMark } from './BrandMark';
+import { SystemHealthButton } from './SystemHealthButton';
 import { PhotoActivity } from './PhotoSession';
 import { WorkspaceFrame } from './WorkspaceFrame';
 import { WorkspaceNavigation, WorkspaceSections } from './WorkspaceNavigation';
@@ -185,6 +186,9 @@ export function Editor(props: {
           <details className="workspace-menu">
             <summary>Workspace</summary>
             <div>
+              {state.capabilities?.operationalMonitoring && (
+                <SystemHealthButton />
+              )}
               <button onClick={localRecovery}>Download local recovery</button>
               <button onClick={exportBackup}>Export backup</button>
               <button onClick={refreshWorkspace}>Refresh workspace</button>

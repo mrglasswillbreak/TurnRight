@@ -1,15 +1,19 @@
 """Deterministic, network-free GIS processing. Inputs and outputs are private job files."""
 
-import ast
-import csv
+import sys
+from pathlib import Path
+
+# The same package path supports the direct container CLI and imported worker tests.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from gis.export import export_data as export_data
+
+from gis.fields import calculate as calculate, infer_schema as infer_schema
+
 import hashlib
 import json
 import math
-import operator
 import pathlib
-import re
-import sys
-import zipfile
 from collections import defaultdict
 
 import pyproj
@@ -19,116 +23,7 @@ from shapely.geometry import shape, mapping
 from shapely.ops import transform, unary_union
 from shapely.strtree import STRtree
 
-MAX_FEATURES = 100000
-MAX_BYTES = 50 * 1024 * 1024
-
-
-def calculate(expression, values):
-    """Interpret a small expression tree; never execute Python or access attributes."""
-    if not isinstance(expression, str) or len(expression) > 2000:
-        raise ValueError("Use an expression of at most 2,000 characters")
-    tree = ast.parse(expression, mode="eval")
-    if len(list(ast.walk(tree))) > 200:
-        raise ValueError("Calculation is too complex")
-    binary = {
-        ast.Add: operator.add,
-        ast.Sub: operator.sub,
-        ast.Mult: operator.mul,
-        ast.Div: operator.truediv,
-        ast.Mod: operator.mod,
-    }
-    functions = {
-        "abs": abs,
-        "round": round,
-        "min": min,
-        "max": max,
-        "coalesce": lambda *v: next((x for x in v if x is not None), None),
-        "concat": lambda *v: "".join("" if x is None else str(x) for x in v),
-        "lower": lambda v: str(v).lower(),
-        "upper": lambda v: str(v).upper(),
-    }
-
-    def visit(node):
-        if isinstance(node, ast.Expression):
-            return visit(node.body)
-        if isinstance(node, ast.Constant) and isinstance(
-            node.value, (str, int, float, bool, type(None))
-        ):
-            return node.value
-        if isinstance(node, ast.Name) and not node.id.startswith("_"):
-            if node.id not in values:
-                raise ValueError("Unknown field: " + node.id)
-            return values[node.id]
-        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.USub, ast.UAdd)):
-            value = visit(node.operand)
-            if not isinstance(value, (int, float)):
-                raise ValueError("Arithmetic needs numeric values")
-            return -value if isinstance(node.op, ast.USub) else value
-        if isinstance(node, ast.BinOp) and type(node.op) in binary:
-            a, b = visit(node.left), visit(node.right)
-            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-                raise ValueError("Arithmetic needs numbers; use concat for text")
-            return binary[type(node.op)](a, b)
-        if (
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Name)
-            and node.func.id in functions
-            and not node.keywords
-            and len(node.args) <= 20
-        ):
-            return functions[node.func.id](*(visit(v) for v in node.args))
-        raise ValueError(
-            "Allowed: fields, constants, arithmetic, abs, round, min, max, coalesce, concat, lower, upper"
-        )
-
-    result = visit(tree)
-    if isinstance(result, (float, int)) and (
-        not math.isfinite(result) or abs(result) > 1e100
-    ):
-        raise ValueError("Calculation is not a finite number")
-    if isinstance(result, str) and len(result) > 10000:
-        raise ValueError("Calculated text is too long")
-    return result
-
-
-def infer_schema(features, original):
-    present = {k for feature in features for k in feature["properties"]}
-    known = {
-        f["name"]: dict(f, public=False)
-        for f in original.get("fields", [])
-        if f["name"] in present
-    }
-    inferred = {}
-    for feature in features:
-        for key, value in feature["properties"].items():
-            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,62}", key) or key in (
-                "__proto__",
-                "constructor",
-                "prototype",
-            ):
-                raise ValueError(
-                    "Rename fields before processing: "
-                    + key
-                    + " is not a supported output field name"
-                )
-            if key not in known and value is not None:
-                kind = (
-                    "boolean"
-                    if isinstance(value, bool)
-                    else "number"
-                    if isinstance(value, (float, int))
-                    else "text"
-                )
-                if key in inferred and inferred[key] != kind:
-                    raise ValueError(
-                        "Calculated values have inconsistent types: " + key
-                    )
-                inferred[key] = kind
-    for key in sorted(present - known.keys()):
-        known[key] = {"name": key, "type": inferred.get(key, "text"), "public": False}
-    if len(known) > 100:
-        raise ValueError("Result exceeds 100 fields; choose fewer join fields")
-    return {"version": 1, "fields": list(known.values())}
+from gis.limits import MAX_FEATURES, MAX_BYTES
 
 
 def run(job, output_directory):
@@ -483,110 +378,6 @@ def run(job, output_directory):
         json.dumps(result, allow_nan=False), encoding="utf8"
     )
     return result
-
-
-def export_data(features, schema, params, output, metadata):
-    format = params.get("format", "geojson")
-    if format not in ("geojson", "csv", "gpkg"):
-        raise ValueError("Choose GeoJSON, CSV or GeoPackage")
-    target = output / ("data." + format)
-    if format == "geojson":
-        if params.get("crs", "EPSG:4326") != "EPSG:4326":
-            raise ValueError("GeoJSON uses WGS84 longitude/latitude")
-        target.write_text(
-            json.dumps(
-                {
-                    "type": "FeatureCollection",
-                    "features": features,
-                    "turnright": metadata,
-                },
-                allow_nan=False,
-            ),
-            encoding="utf8",
-        )
-    elif format == "csv":
-        fields = [f["name"] for f in schema["fields"]]
-        with target.open("w", newline="", encoding="utf-8-sig") as stream:
-            # Every exported user cell passes cell() below, which prefixes spreadsheet formula markers; schema field names are validated identifiers.
-            # nosemgrep: local-runtime.semgrep-rules.python.lang.security.use-defusedcsv
-            writer = csv.writer(stream)
-            writer.writerow(["feature_id", *fields, "geometry_wkt"])
-
-            def cell(v):
-                return (
-                    "'" + v
-                    if isinstance(v, str)
-                    and v.lstrip().startswith(("=", "+", "-", "@", "\t", "\r"))
-                    else v
-                )
-
-            for f in features:
-                writer.writerow(
-                    [
-                        cell(str(f["id"])),
-                        *[cell(f["properties"].get(k)) for k in fields],
-                        shape(f["geometry"]).wkt if f.get("geometry") else "",
-                    ]
-                )
-    else:
-        from osgeo import ogr, osr, gdal
-
-        gdal.UseExceptions()
-        code = params.get("crs", "EPSG:4326")
-        if code != "EPSG:4326" and code != metadata["engine"]["analysisCRS"]:
-            raise ValueError("Choose WGS84 or the validated analysis CRS")
-        srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(code.split(":")[1]))
-        srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-        dataset = ogr.GetDriverByName("GPKG").CreateDataSource(str(target))
-        layer = dataset.CreateLayer("features", srs, ogr.wkbUnknown)
-        identity_field = "turnright_feature_id"
-        while identity_field in {f["name"] for f in schema["fields"]}:
-            identity_field = "_" + identity_field
-        layer.CreateField(ogr.FieldDefn(identity_field, ogr.OFTString))
-        metadata["identityField"] = identity_field
-        for field in schema["fields"]:
-            kind = {
-                "number": ogr.OFTReal,
-                "boolean": ogr.OFTInteger,
-                "date": ogr.OFTDateTime,
-                "text": ogr.OFTString,
-            }[field["type"]]
-            definition = ogr.FieldDefn(field["name"], kind)
-            if field["type"] == "boolean":
-                definition.SetSubType(ogr.OFSTBoolean)
-            layer.CreateField(definition)
-        transformer = Transformer.from_crs(
-            4326, code, always_xy=True, allow_ballpark=False
-        )
-        layer.StartTransaction()
-        for f in features:
-            row = ogr.Feature(layer.GetLayerDefn())
-            row.SetField(identity_field, str(f["id"]))
-            for field in schema["fields"]:
-                value = f["properties"].get(field["name"])
-                if value is not None:
-                    row.SetField(
-                        field["name"], int(value) if isinstance(value, bool) else value
-                    )
-            if f.get("geometry"):
-                geom = transform(transformer.transform, shape(f["geometry"]))
-                row.SetGeometry(ogr.CreateGeometryFromJson(json.dumps(mapping(geom))))
-            layer.CreateFeature(row)
-        layer.CommitTransaction()
-        dataset.SetMetadata({"TURNRIGHT": json.dumps(metadata)})
-        dataset = None
-    metadata["outputCRS"] = (
-        params.get("crs", "EPSG:4326") if format == "gpkg" else "EPSG:4326"
-    )
-    metadata["nulls"] = (
-        "Empty cells represent null in CSV; GeoJSON and GeoPackage preserve null values."
-    )
-    with zipfile.ZipFile(output / "export.zip", "w", zipfile.ZIP_DEFLATED) as archive:
-        archive.write(target, target.name)
-        archive.writestr("metadata.json", json.dumps(metadata, indent=2))
-    if (output / "export.zip").stat().st_size > MAX_BYTES:
-        raise ValueError("Export exceeds 50 MiB")
 
 
 if __name__ == "__main__":

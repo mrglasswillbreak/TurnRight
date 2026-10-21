@@ -1,5 +1,7 @@
 # Repository readiness update
 
+This is the evidence record for the first remediation. The later **65.1-point reassessment** and additional implementation are documented in [Readiness follow-up](READINESS-FOLLOWUP.md). Preserve the dated baseline and measured revisions below.
+
 This work addresses the DataFactor assessment dated 19 October 2026. The
 baseline is `cb52b36371d2dc0baac012a9a072620dcae0b017`. The assessment missed
 existing coverage, lint, local-stack and protected CI gates. This update improves

@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Host worker plus network-disabled conversion entry point for campus imports."""
 
+from map_import.host_command import conversion_command as conversion_command
+
+from map_import.encoding import encoded as encoded
+
+from map_import.conversion import convert as convert
+
 import hashlib
 import json
 import os
@@ -8,176 +14,14 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-import re
 import time
 from diagnostics import emit_worker
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 
-from map_import.formats import inspect_file, check_expanded_batch
-from map_import.geometry import preview_features
 from map_import.network import MAX_BYTES, fetch_public
 from map_import.queue import queue_verified_import as queue_import
-
-
-def encoded(value):
-    return json.dumps(
-        value, ensure_ascii=False, separators=(",", ":"), allow_nan=False
-    ).encode()
-
-
-def conversion_command(folder, token):
-    # TemporaryDirectory is deliberately 0700. Dropping every capability means
-    # container root cannot bypass its runner-owned permissions. Match its owner
-    # instead of making private uploads world-readable or restoring DAC bypass.
-    return [
-        "docker",
-        "run",
-        "--name",
-        "campus-import-" + token,
-        "--rm",
-        "--user",
-        f"{os.getuid()}:{os.getgid()}",
-        "--network",
-        "none",
-        "--cap-drop",
-        "ALL",
-        "--security-opt",
-        "no-new-privileges",
-        "--read-only",
-        "--memory",
-        "2g",
-        "--cpus",
-        "2",
-        "--tmpfs",
-        "/tmp:rw,size=512m",
-        "-v",
-        f"{folder}:/work",
-        "-v",
-        f"{Path(__file__).resolve().parent}:/app:ro",
-        os.environ.get("GIS_IMPORT_IMAGE", "turnright-gis-import"),
-        "/work",
-    ]
-
-
-def convert(folder):
-    from map_import.normalise import normalise
-
-    folder = Path(folder)
-
-    def progress(message):
-        temporary = folder / "progress.tmp"
-        temporary.write_bytes(encoded({"message": message}))
-        temporary.replace(folder / "progress.json")
-
-    request = json.loads((folder / "request.json").read_text(encoding="utf-8"))
-    request["configuration"]["_campusId"] = request.get("campus", {}).get("id")
-    check_expanded_batch([folder / f["path"] for f in request["files"]])
-    layers, warnings = [], request.get("warnings", [])
-    for index, source_file in enumerate(request["files"]):
-        progress(
-            f"Inspecting file {index + 1} of {len(request['files'])}: {source_file.get('label', source_file['path'])}"
-        )
-        data = inspect_file(
-            folder / source_file["path"],
-            request["configuration"],
-            folder / "expanded",
-            source_file.get("label"),
-        )
-        for layer in data:
-            for key in (
-                "sourceUrl",
-                "layerIdentity",
-                "providerRevision",
-                "embedded",
-                "sourceCollection",
-                "snapshotHash",
-                "retrievalError",
-            ):
-                if source_file.get(key) is not None:
-                    layer[key] = source_file[key]
-            # Expose aliases and domain labels in the mapping UI without losing original values.
-            fields = {f["name"]: f for f in source_file.get("fields", [])}
-            for field in layer["fields"]:
-                meta = fields.get(field["name"], {})
-                if not field.get("values"):
-                    field["values"] = list(
-                        dict.fromkeys(
-                            str(f.get("properties", {}).get(field["name"], ""))[:120]
-                            for f in layer["features"][:100]
-                        )
-                    )[:8]
-                if meta.get("alias"):
-                    field["alias"] = meta["alias"]
-                codes = (
-                    meta.get("domain", {}).get("codedValues", [])
-                    if meta.get("domain")
-                    else []
-                )
-                if codes:
-                    field["values"] = [str(c["name"]) for c in codes]
-                    field["codedValues"] = {
-                        str(c["code"]): str(c["name"]) for c in codes
-                    }
-                if re.fullmatch(
-                    r"(?:id|objectid(?:_[0-9]+)?|fid|globalid)", field["name"], re.I
-                ):
-                    values = [
-                        f.get("properties", {}).get(field["name"])
-                        for f in layer["features"]
-                    ]
-                    field["unique"] = (
-                        bool(values)
-                        and all(v is not None and str(v).strip() for v in values)
-                        and len(set(map(str, values))) == len(values)
-                    )
-            layers.append(layer)
-    if len(layers) > 100 or sum(len(layer["features"]) for layer in layers) > 100000:
-        raise ValueError("Import exceeds the layer or feature limit.")
-    names = {}
-    for layer in layers:
-        original = layer["name"]
-        names[original] = names.get(original, 0) + 1
-        if names[original] > 1:
-            layer["name"] = original + " (" + str(names[original]) + ")"
-    if request["phase"] == "inspect":
-        preview, sampling = preview_features(layers)
-        summary = {
-            "layers": [
-                {
-                    k: v
-                    for k, v in layer.items()
-                    if k not in ("features", "osmNodes", "osmRelations")
-                }
-                | {"count": len(layer["features"])}
-                for layer in layers
-            ],
-            "counts": {"added": 0, "modified": 0, "removed": 0, "skipped": 0},
-            "warnings": warnings,
-            "errors": [],
-            "duplicates": [],
-            "features": preview,
-            "sampling": sampling,
-            "totalFeatures": sum(len(layer["features"]) for layer in layers),
-        }
-        output = {"summary": summary}
-    else:
-        progress(
-            f"Validating and comparing {sum(len(layer['features']) for layer in layers)} features"
-        )
-        output = normalise(
-            layers,
-            request["source"],
-            request["campus"],
-            request["previous"],
-            request["configuration"],
-            request["importId"],
-        )
-        output["summary"]["warnings"] = list(
-            dict.fromkeys(warnings + output["summary"]["warnings"])
-        )
-    (folder / "result.json").write_bytes(encoded(output))
 
 
 def remote(path, method="GET", body=None, raw=False):

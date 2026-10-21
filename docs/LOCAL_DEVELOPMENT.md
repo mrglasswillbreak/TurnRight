@@ -7,13 +7,20 @@ The fixtures are synthetic; they do not contain either published campus package.
 
 ## Prerequisites and fresh clone
 
+The root README and [quality map](QUALITY.md) expose the setup/check entry points.
+Portable Python quality dependencies are hash-locked through root `requirements.txt`.
+After initial dependencies/images are downloaded, `npm run test:python:isolated`
+runs native processing acceptance in a read-only, network-disabled container and
+rejects skipped native tests. The full local editor generates disposable credentials;
+its application owner can inspect synthetic failures in **Workspace â†’ System health**.
+
 Use Linux, or a Linux checkout inside Windows WSL2. Install Docker Engine and its
 CLI yourself, with permission to run containers, and allow enough disk space for
 Supabase and the pinned GDAL images. Native Windows can run the public Vite app
 but cannot run the isolated import workers. No Windows services or system settings
 are changed by the repository commands.
 
-The root `Dockerfile`, shared by `.devcontainer` and `compose.yaml`, defines Python
+The root `Dockerfile`, shared by `.devcontainer` and `docker-compose.yml`, defines Python
 3.12 and Node 22.23.3/npm 10.9.9. Open the Linux/WSL checkout
 with an editor supporting development containers. It uses the host Docker socket
 and a matching checkout path so isolated workers can mount their temporary files.
@@ -88,7 +95,7 @@ again, reopen the app and sign in with the newly generated account passwords.
 
 ## Troubleshooting and verification
 
-If startup fails, check Docker availability and that ports 5180, 54320–54322 are
+If startup fails, check Docker availability and that ports 5180, 54320â€“54322 are
 free. Restore a missing `accounts.json` from your own backup, or explicitly reset;
 the seed refuses to silently replace existing identities. An interrupted job may
 need cancellation/retry through Activity, preserving normal uncertain-completion
