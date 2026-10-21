@@ -1,4 +1,4 @@
-FROM ghcr.io/osgeo/gdal:ubuntu-full-3.11.4@sha256:ddf2d45467bc7d17172305e5f49fd4539dc5c62ffa512ae45c205f74f2f7de02 AS base
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.13.3@sha256:2dd0f81ef927ff4c3d4dbe4f73c029dc86d4073974c0564f8e196f6e1412e2e0 AS base
 # Only the signed Ubuntu repository is needed for pip. The pinned GDAL image's
 # optional Arrow repository has its own key lifecycle and is not a dependency.
 COPY requirements.lock /requirements.lock
