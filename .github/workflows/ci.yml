@@ -1,0 +1,232 @@
+name: CI
+on:
+  workflow_call:
+    inputs:
+      browser_grep:
+        required: false
+        default: ''
+        type: string
+  workflow_dispatch:
+    inputs:
+      browser_grep:
+        description: 'Optional Playwright title filter for focused repair verification (empty runs the full suite)'
+        required: false
+        default: ''
+        type: string
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ inputs.browser_grep || 'all' }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:coverage:unit
+        # Catch fixtures that accidentally inherit the release worker's campus.
+        env:
+          CAMPUS_ID: ci-non-default-campus
+      - run: npm run doctor
+      - run: npm run check:configuration
+      - run: npm run check:architecture
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm run check:docs
+      - run: npm run check:dependencies
+        working-directory: .
+      - run: npm run check:configured-build
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes -r scripts/requirements-quality.lock
+        working-directory: .
+      - run: npm run lint:python
+      - run: npm run test:python
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: success()
+        with:
+          name: unit-coverage
+          path: web/coverage/unit/
+          retention-days: 30
+  browsers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { browser: chromium, part: 1, total: 4 }
+          - { browser: chromium, part: 2, total: 4 }
+          - { browser: chromium, part: 3, total: 4 }
+          - { browser: chromium, part: 4, total: 4 }
+          - { browser: webkit, part: 1, total: 2 }
+          - { browser: webkit, part: 2, total: 2 }
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Chromium workflows
+        if: matrix.browser == 'chromium'
+        env:
+          AUDIT_GREP: ${{ inputs.browser_grep }}
+          TURNRIGHT_COVERAGE: '1'
+        run: |
+          args=()
+          if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
+          npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/chromium "${args[@]}"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.browser == 'chromium' && success()
+        with:
+          name: browser-coverage-${{ matrix.part }}
+          path: web/coverage/browser-raw/
+          retention-days: 30
+      - name: WebKit touch and responsive workflows
+        if: matrix.browser == 'webkit'
+        env:
+          AUDIT_GREP: ${{ inputs.browser_grep }}
+        run: |
+          args=()
+          if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
+          npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/webkit "${args[@]}"
+      - name: WebKit image editor
+        if: ${{ !cancelled() && matrix.browser == 'webkit' && matrix.part == 1 }}
+        run: npx playwright test --config playwright.photos.webkit.config.ts --reporter=line --output=../test-results/webkit-photos
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: regression-${{ matrix.browser }}-${{ matrix.part }}
+          path: test-results/
+          retention-days: 14
+  offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --config playwright.pwa.config.ts --reporter=line --output=../test-results/offline
+      - if: ${{ !cancelled() }}
+        run: npx playwright test --config playwright.photos.pwa.config.ts --reporter=line --output=../test-results/offline-photos
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: regression-offline
+          path: test-results/
+          retention-days: 14
+  coverage:
+    needs: [quality, browsers]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: unit-coverage
+          path: web/coverage/unit
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: browser-coverage-*
+          merge-multiple: true
+          path: web/coverage/browser-raw
+      - run: npm run test:coverage:check
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: application-coverage
+          path: web/coverage/combined
+          retention-days: 30
+  local-stack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install --require-hashes -r scripts/requirements-data.lock
+      - name: Build pinned editor container
+        run: |
+          docker build -t turnright-development .
+          docker run --rm turnright-development node --version
+          docker run --rm turnright-development python --version
+      - name: Start a fresh stack without hosted credentials
+        run: |
+          npm run local:up > /tmp/turnright-local.log 2>&1 &
+          for attempt in $(seq 1 240); do
+            if curl --fail --silent http://127.0.0.1:5180/packages/campuses.json > /dev/null; then exit 0; fi
+            sleep 5
+          done
+          cat /tmp/turnright-local.log
+          exit 1
+      - run: npm run local:test
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - run: node --import tsx scripts/local/browser.mts
+      - name: Verify restart persistence
+        run: |
+          npm run local:down
+          npm run local:up > /tmp/turnright-local.log 2>&1 &
+          for attempt in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:5180/packages/campuses.json > /dev/null; then break; fi
+            sleep 5
+          done
+          node --import tsx scripts/local/acceptance.mts --persistence
+      - name: Verify explicit local reset
+        run: |
+          npm run local:reset -- --confirm-local-reset
+          npm run local:up > /tmp/turnright-local.log 2>&1 &
+          for attempt in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:5180/packages/campuses.json > /dev/null; then break; fi
+            sleep 5
+          done
+          npm run local:test -- --after-reset
+      - name: Stop local services
+        if: always()
+        run: npm run local:down
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: success()
+        with:
+          name: local-stack-receipt
+          path: .local-runtime/acceptance-receipt.json
+          retention-days: 30

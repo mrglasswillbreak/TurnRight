@@ -81,9 +81,9 @@ function patch(input: SourceRecord[], edits: MapEdit[], forRelease: boolean) {
   const before = beforeResult.data;
   for (const change of changes.featureUpdates) {
     const record = index.get('feature:' + change.id);
-    if (!record)
+    if (!record || record.entity !== 'feature')
       throw Error('Reviewed source identity is missing: ' + change.id);
-    Object.assign(record.payload.properties, change.properties);
+    Object.assign((record.payload.properties ??= {}), change.properties);
   }
   for (const feature of changes.featureAdds) {
     const id = 'feature:' + feature.properties.id;
@@ -103,7 +103,8 @@ function patch(input: SourceRecord[], edits: MapEdit[], forRelease: boolean) {
   }
   meta.payload.sources = [
     ...meta.payload.sources.filter(
-      (s: any) => !changes.sources.some((n: any) => n.id === s.id),
+      (s: { id: string }) =>
+        !changes.sources.some((n: { id: string }) => n.id === s.id),
     ),
     ...changes.sources,
   ];
@@ -174,7 +175,11 @@ if (!response.ok) throw Error('Private rollback preservation failed');
 const restored = await fetch(url, { headers });
 if (!restored.ok || hash(await restored.json()) !== hash(JSON.parse(preserved)))
   throw Error('Private rollback verification failed');
-const report: any = {
+const report = {
+  patchCount: undefined as number | undefined,
+  reconciliationId: undefined as string | undefined,
+  workspaceHash: undefined as string | undefined,
+  releaseId: undefined as string | undefined,
   campus,
   slug,
   baselineVersion: published.version,
@@ -183,7 +188,7 @@ const report: any = {
   storagePath,
   excludedUnpublishedDrafts: excluded.length,
   excludedKinds: excluded.reduce(
-    (counts: any, e: any) => ({
+    (counts: Record<string, number>, e: MapEdit) => ({
       ...counts,
       [e.kind]: (counts[e.kind] || 0) + 1,
     }),
@@ -206,7 +211,9 @@ if (process.env.APPLY_LAYER_UPGRADE === 'true') {
   const [owner] = await db('admin_users?select=id&limit=1');
   if (!owner) throw Error('Campus owner missing');
   const oldIndex = new Map(previous.map((r) => [r.id, r]));
-  const patches = current.records.flatMap((record) => {
+  const patches = current.records.flatMap<
+    import('./source-patch-types.js').AdditiveSourcePatch
+  >((record) => {
     const old = oldIndex.get(record.id),
       base = {
         id: record.id,
@@ -220,7 +227,9 @@ if (process.env.APPLY_LAYER_UPGRADE === 'true') {
       Object.entries(record.payload).filter(
         ([key, value]) =>
           key !== 'properties' &&
-          JSON.stringify(old.payload[key]) !== JSON.stringify(value),
+          JSON.stringify(
+            Object.fromEntries(Object.entries(old.payload))[key],
+          ) !== JSON.stringify(value),
       ),
     );
     const properties_patch =
@@ -228,8 +237,11 @@ if (process.env.APPLY_LAYER_UPGRADE === 'true') {
         ? Object.fromEntries(
             Object.entries(record.payload.properties || {}).filter(
               ([key, value]) =>
-                JSON.stringify(old.payload.properties?.[key]) !==
-                JSON.stringify(value),
+                JSON.stringify(
+                  old.entity === 'feature'
+                    ? old.payload.properties?.[key]
+                    : undefined,
+                ) !== JSON.stringify(value),
             ),
           )
         : undefined;

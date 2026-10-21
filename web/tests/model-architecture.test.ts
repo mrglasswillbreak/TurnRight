@@ -83,7 +83,9 @@ it('retains the logical wall and facade identities when a curve changes', () => 
   });
   expect(second.properties.modelDocument!.curves[0].id).toBe('curve');
   expect(facadeWalls(modelFeature(second))[0].wallId).toBe(walls[0].wallId);
-  const feature = modelFeature(second),
+  const feature = modelFeature(second) as import('geojson').Feature<
+      import('geojson').Polygon | import('geojson').MultiPolygon
+    >,
     model = createBuildingModel(feature, resolveBuildingVisual(feature), {
       previewUnreviewed: true,
     });

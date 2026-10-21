@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './coverage-fixture';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import { campusFixture } from '../fixture';

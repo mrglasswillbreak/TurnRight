@@ -86,7 +86,7 @@ try {
       // Reuse the immutable reviewed package, but build a fresh site with the current other campuses.
       manifest = await withRetainedPackageAccess(
         historical,
-        (headers, retainedOrigin) =>
+        (headers: Record<string, string>, retainedOrigin: string) =>
           preservePublished(
             path.join(web, 'public'),
             retainedOrigin,
@@ -210,7 +210,7 @@ try {
           framework: 'vite',
           buildCommand: 'npm run build',
           outputDirectory: 'dist',
-          installCommand: 'npm ci',
+          installCommand: 'cd .. && npm ci',
         },
       }),
     });

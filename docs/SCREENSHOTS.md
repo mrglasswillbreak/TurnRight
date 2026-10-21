@@ -12,7 +12,7 @@ The current [LASU desktop](assets/screenshots/live-lasu-published-2026-10-18.png
 
 Three new direct Chromium captures show the [desktop precision panel](assets/screenshots/tour-precision-desktop-2026-10-18.png), [phone numeric controls](assets/screenshots/tour-precision-phone-2026-10-18.png) and [appearance preview](assets/screenshots/tour-palette-preview-2026-10-18.png). The actual application runs against isolated `browserCampus` geometry and owner API responses; the LASU label is fixture context, not a public map inventory. All three mouse/touch/appearance journeys pass, including measured rectangle dimensions, cancellation, undo/redo and reload recovery. Phone input is simulated. [Image hashes, dimensions, browser, source revision and driver identity](assets/screenshots/tour-2026-10-18.json).
 
-Reproduce from `web/` with `npx playwright test tests/browser/editor.spec.ts --grep "campus detail (palette preview cancels cleanly|precision rectangle)" --workers=1`. The three PNGs are written inside the matching test-output folders. Inspect them, copy to new dated filenames and record their source, dimensions and SHA-256 values before updating a guide. On this Windows worktree, a temporary loopback-only Vite configuration allowed its existing dependency junction and used a separate cache; production configuration was unchanged.
+Reproduce from `web/` with `npx playwright test tests/browser --grep "campus detail (palette preview cancels cleanly|precision rectangle)" --workers=1`. The three PNGs are written inside the matching test-output folders. Inspect them, copy to new dated filenames and record their source, dimensions and SHA-256 values before updating a guide. On this Windows worktree, a temporary loopback-only Vite configuration allowed its existing dependency junction and used a separate cache; production configuration was unchanged.
 
 ## Published campus detail · 17 October 2026
 
@@ -98,7 +98,7 @@ The current recorder expects all eighteen tour views. It derives the campus vers
 
 These direct WebKit captures use the local working tree and isolated owner/API fixtures: one blocked path, one incomplete check and one reversible decision. Counts and decisions are synthetic. No production data is changed. Phone uses a browser viewport, not a physical iPhone. [Capture provenance and hashes](assets/screenshots/source-reliability-2026-10-13.json).
 
-Run `npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source updates reliability" --output ../test-results/source-reliability-webkit` from `web/`. Run the same filter with `npm run test:browser` for Chromium. The journeys inspect exclusion of unverified removals, check receipts, a fresh verification request and a previewed private reversal. Broader `--grep "source updates"` journeys also cover frozen bulk decisions and read-only map comparisons.
+Run `npm run test:survey-webkit -- tests/browser --grep "source updates reliability" --output ../test-results/source-reliability-webkit` from `web/`. Run the same filter with `npm run test:browser` for Chromium. The journeys inspect exclusion of unverified removals, check receipts, a fresh verification request and a previewed private reversal. Broader `--grep "source updates"` journeys also cover frozen bulk decisions and read-only map comparisons.
 
 ## Map previews and adjustable phone panels · 11 October 2026
 
@@ -108,17 +108,17 @@ Run `npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source u
 
 The preview captures show 101 synthetic proposals over the checked-in LASU `lasu-4e4c8008b38b` seed. The panel capture uses the small `browserCampus` fixture and a synthetic Library edit. These are unaltered local Chromium captures, not production decisions. [Source and image digests](assets/screenshots/source-map-preview-2026-10-11.json).
 
-Reproduce with `npm run test:browser -- tests/browser/editor.spec.ts --grep "source updates map preview|workspace panes: mobile editing height" --output ../test-results/source-map-preview` from `web/`. Use `npm run test:survey-webkit` with the same arguments for WebKit. The independent preview journeys verify all pages, actual rendered source data, previous shapes and read-only closing; the resizing journey checks dragging, keyboard access, input preservation, reload and reset.
+Reproduce with `npm run test:browser -- tests/browser --grep "source updates map preview|workspace panes: mobile editing height" --output ../test-results/source-map-preview` from `web/`. Use `npm run test:survey-webkit` with the same arguments for WebKit. The independent preview journeys verify all pages, actual rendered source data, previous shapes and read-only closing; the resizing journey checks dragging, keyboard access, input preservation, reload and reset.
 
 ## Source updates capture workflow
 
-The new [Source updates workspace](SOURCE-UPDATES.md) has desktop and phone capture journeys in `web/tests/browser/editor.spec.ts`. They use the real React/MapLibre interface with isolated owner/API responses and 101 synthetic proposals. The names, proposal counts, removals, decisions, and progress are demonstration data; no production proposal is reviewed by these tests.
+The new [Source updates workspace](SOURCE-UPDATES.md) has desktop and phone capture journeys in `web/tests/browser/editor-source*.spec.ts`. They use the real React/MapLibre interface with isolated owner/API responses and 101 synthetic proposals. The names, proposal counts, removals, decisions, and progress are demonstration data; no production proposal is reviewed by these tests.
 
 Run sequentially from `web/` after installing the pinned dependencies and Playwright browsers:
 
 ```powershell
-npm run test:browser -- tests/browser/editor.spec.ts --grep "source updates bulk review" --output ../test-results/source-updates-chromium
-npm run test:survey-webkit -- tests/browser/editor.spec.ts --grep "source updates bulk review" --output ../test-results/source-updates-webkit
+npm run test:browser -- tests/browser --grep "source updates bulk review" --output ../test-results/source-updates-chromium
+npm run test:survey-webkit -- tests/browser --grep "source updates bulk review" --output ../test-results/source-updates-webkit
 ```
 
 Each engine writes `source-updates-desktop.png`, `source-updates-mobile.png`, `source-updates-confirm-desktop.png`, and `source-updates-confirm-mobile.png` inside its per-test output directories. Desktop uses 1440 × 1000 and phone uses 390 × 844. The application regression workflow also retains them in its browser artifacts when the journeys reach the capture steps.

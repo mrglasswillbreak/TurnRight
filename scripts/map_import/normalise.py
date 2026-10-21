@@ -1,4 +1,5 @@
 """Map selected GIS fields onto TurnRight's existing source records."""
+
 import copy
 import hashlib
 import json
@@ -6,279 +7,794 @@ import math
 import re
 
 from .formats import MAX_FEATURES
-from .geometry import components as geometry_components, prepare_geometry, preview_features
+from .geometry import (
+    components as geometry_components,
+    prepare_geometry,
+    preview_features,
+)
 from .semantics import mapped_properties, public_tags
 
 
 def digest(value, preserve_all_fields=False):
     def stable(v):
-        if isinstance(v, list): return [stable(x) for x in v]
-        if isinstance(v, dict): return {k:stable(x) for k,x in sorted(v.items()) if preserve_all_fields or k not in ('createdAt','retrievedAt','checkedAt')}
-        if isinstance(v, float) and v.is_integer(): return int(v)
+        if isinstance(v, list):
+            return [stable(x) for x in v]
+        if isinstance(v, dict):
+            return {
+                k: stable(x)
+                for k, x in sorted(v.items())
+                if preserve_all_fields
+                or k not in ("createdAt", "retrievedAt", "checkedAt")
+            }
+        if isinstance(v, float) and v.is_integer():
+            return int(v)
         return v
-    return hashlib.sha256(json.dumps(stable(value),separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+
+    return hashlib.sha256(
+        json.dumps(
+            stable(value), separators=(",", ":"), ensure_ascii=False, allow_nan=False
+        ).encode()
+    ).hexdigest()
 
 
-def distance(a,b):
-    lat1,lat2 = math.radians(a[1]),math.radians(b[1])
-    dlat,dlon = lat2-lat1,math.radians(b[0]-a[0])
-    h = math.sin(dlat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dlon/2)**2
-    return 6371000*2*math.atan2(math.sqrt(h),math.sqrt(max(0,1-h)))
+def distance(a, b):
+    lat1, lat2 = math.radians(a[1]), math.radians(b[1])
+    dlat, dlon = lat2 - lat1, math.radians(b[0] - a[0])
+    h = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    )
+    return 6371000 * 2 * math.atan2(math.sqrt(h), math.sqrt(max(0, 1 - h)))
 
 
 def normalise(layers, source, campus, previous, configuration, import_id):
     from shapely.geometry import shape, mapping
-    from shapely.validation import explain_validity
-    owner_source = 'import:' + source['id']
-    boundary = shape(campus['boundary']['geometry'])
-    if not boundary.is_valid or boundary.is_empty: raise ValueError('Repair the campus boundary before importing.')
+
+    owner_source = "import:" + source["id"]
+    boundary = shape(campus["boundary"]["geometry"])
+    if not boundary.is_valid or boundary.is_empty:
+        raise ValueError("Repair the campus boundary before importing.")
     # Keep complete intersecting buildings and paths: clipping can sever access topology.
     region = boundary.buffer(0.0001)
-    mappings = {m['layer']:m for m in configuration['layers']}
+    mappings = {m["layer"]: m for m in configuration["layers"]}
     records, warnings, errors, preview, duplicates = {}, [], [], [], []
     observations, observation_key, collections = {}, None, []
     repairs, diagnostics, mapped_layers = [], [], []
-    previous_by_id = {r['id']:r for r in previous}
+    previous_by_id = {r["id"]: r for r in previous}
     skipped, feature_count = 0, 0
-    large_import = sum(len(layer['features']) for layer in layers if mappings.get(layer['name'],{}).get('role','skip') != 'skip') > 10000
-    categories = {'academic','library','food','services','worship','residence','sports','gate','other'}
+    large_import = (
+        sum(
+            len(layer["features"])
+            for layer in layers
+            if mappings.get(layer["name"], {}).get("role", "skip") != "skip"
+        )
+        > 10000
+    )
+    categories = {
+        "academic",
+        "library",
+        "food",
+        "services",
+        "worship",
+        "residence",
+        "sports",
+        "gate",
+        "other",
+    }
+
     def add(entity, ident, payload, private_attributes=None):
-        key = entity + ':' + ident
+        key = entity + ":" + ident
         if large_import:
-            if entity == 'feature': payload.setdefault('properties',{})['gisManaged'] = True
-            elif entity in ('place','node','edge'): payload['gisManaged'] = True
-        metadata = {'sourceCRS':layer['crs'],'fields':layer.get('fields',[]),'layer':layer['name']} if private_attributes is not None else None
-        if metadata is not None and layer.get('exchange'):
-            metadata['exchange'] = layer['exchange']
-        record = {'id':key,'entity':entity,'source':owner_source,'payload':payload,'hash':digest({'payload':payload,'private_attributes':private_attributes,'gis_metadata':metadata}) if private_attributes is not None else digest(payload)}
-        if private_attributes is not None: record['private_attributes']=private_attributes
-        if metadata is not None: record['gis_metadata']=metadata
-        if key in records and records[key]['hash'] != record['hash']: raise ValueError('Duplicate source identity: ' + ident)
+            if entity == "feature":
+                payload.setdefault("properties", {})["gisManaged"] = True
+            elif entity in ("place", "node", "edge"):
+                payload["gisManaged"] = True
+        metadata = (
+            {
+                "sourceCRS": layer["crs"],
+                "fields": layer.get("fields", []),
+                "layer": layer["name"],
+            }
+            if private_attributes is not None
+            else None
+        )
+        if metadata is not None and layer.get("exchange"):
+            metadata["exchange"] = layer["exchange"]
+        record = {
+            "id": key,
+            "entity": entity,
+            "source": owner_source,
+            "payload": payload,
+            "hash": digest(
+                {
+                    "payload": payload,
+                    "private_attributes": private_attributes,
+                    "gis_metadata": metadata,
+                }
+            )
+            if private_attributes is not None
+            else digest(payload),
+        }
+        if private_attributes is not None:
+            record["private_attributes"] = private_attributes
+        if metadata is not None:
+            record["gis_metadata"] = metadata
+        if key in records and records[key]["hash"] != record["hash"]:
+            raise ValueError("Duplicate source identity: " + ident)
         records[key] = record
         if observation_key is not None:
-            observations[observation_key]['records'][key] = record
+            observations[observation_key]["records"][key] = record
+
     for layer in layers:
-        m = mappings.get(layer['name'])
-        if not m or m['role'] == 'skip':
-            skipped += len(layer['features']); continue
-        if not layer.get('crs'):
-            errors.append(layer['name'] + ': choose the source coordinate system.'); continue
-        role = m['role']
-        if layer.get('exchange'):
-            rights = layer['exchange']['rights']
-            if rights.get('redistributionConfirmed') is not True or not rights.get('license') or not rights.get('attribution'):
-                errors.append(layer['name'] + ': resolve exchange source rights and export again before preparing candidates.')
+        m = mappings.get(layer["name"])
+        if not m or m["role"] == "skip":
+            skipped += len(layer["features"])
+            continue
+        if not layer.get("crs"):
+            errors.append(layer["name"] + ": choose the source coordinate system.")
+            continue
+        role = m["role"]
+        if layer.get("exchange"):
+            rights = layer["exchange"]["rights"]
+            if (
+                rights.get("redistributionConfirmed") is not True
+                or not rights.get("license")
+                or not rights.get("attribution")
+            ):
+                errors.append(
+                    layer["name"]
+                    + ": resolve exchange source rights and export again before preparing candidates."
+                )
                 continue
-            if m.get('idField') != layer['exchange']['idField']:
-                errors.append(layer['name'] + ': retain the exchange stable ID field to preserve source identity.')
+            if m.get("idField") != layer["exchange"]["idField"]:
+                errors.append(
+                    layer["name"]
+                    + ": retain the exchange stable ID field to preserve source identity."
+                )
                 continue
-            m = {**m, 'identity': layer['sourceCollection']}
+            m = {**m, "identity": layer["sourceCollection"]}
         layer_error_start = len(errors)
-        collections.append({'identity':layer.get('sourceCollection') or layer.get('sourceUrl') or m.get('identity') or layer['name'],'count':len(layer['features']),'layer':layer['name'],'contentHash':layer.get('snapshotHash')})
-        is_osm = 'osmNodes' in layer
-        if not m.get('idField') and not is_osm:
-            warnings.append(layer['name'] + ': using feature IDs or content identities. Select a stable field to match records whose contents change.')
+        collections.append(
+            {
+                "identity": layer.get("sourceCollection")
+                or layer.get("sourceUrl")
+                or m.get("identity")
+                or layer["name"],
+                "count": len(layer["features"]),
+                "layer": layer["name"],
+                "contentHash": layer.get("snapshotHash"),
+            }
+        )
+        is_osm = "osmNodes" in layer
+        if not m.get("idField") and not is_osm:
+            warnings.append(
+                layer["name"]
+                + ": using feature IDs or content identities. Select a stable field to match records whose contents change."
+            )
         expanded = []
         seen_identities = set()
-        for feature in layer['features']:
-            for component, geometry in geometry_components(feature.get('geometry')):
-                if geometry and geometry.get('type')=='MultiPoint' and role in ('place','entrance'):
-                    for index, coordinates in enumerate(geometry['coordinates']):
-                        expanded.append({**feature,'geometry':{'type':'Point','coordinates':coordinates},'_component':component+':point:'+str(index), '_sourceContent':{'geometry':feature['geometry'],'properties':feature.get('properties',{})}})
+        for feature in layer["features"]:
+            for component, geometry in geometry_components(feature.get("geometry")):
+                if (
+                    geometry
+                    and geometry.get("type") == "MultiPoint"
+                    and role in ("place", "entrance")
+                ):
+                    for index, coordinates in enumerate(geometry["coordinates"]):
+                        expanded.append(
+                            {
+                                **feature,
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": coordinates,
+                                },
+                                "_component": component + ":point:" + str(index),
+                                "_sourceContent": {
+                                    "geometry": feature["geometry"],
+                                    "properties": feature.get("properties", {}),
+                                },
+                            }
+                        )
                 else:
-                    expanded.append({**feature, 'geometry':geometry, '_component':component, '_sourceContent':{'geometry':feature['geometry'],'properties':feature.get('properties',{})}})
-        mapped_layer = {**layer, 'features':[], 'suggestedRole':role, 'crs':'EPSG:4326'}
+                    expanded.append(
+                        {
+                            **feature,
+                            "geometry": geometry,
+                            "_component": component,
+                            "_sourceContent": {
+                                "geometry": feature["geometry"],
+                                "properties": feature.get("properties", {}),
+                            },
+                        }
+                    )
+        mapped_layer = {
+            **layer,
+            "features": [],
+            "suggestedRole": role,
+            "crs": "EPSG:4326",
+        }
         mapped_layers.append(mapped_layer)
         for feature in expanded:
             feature_count += 1
-            if feature_count > MAX_FEATURES: raise ValueError('Import exceeds the feature limit.')
-            attrs = feature.get('properties') or {}
-            receipt_id = str(attrs.get(m.get('idField')) if m.get('idField') else feature.get('id','')) + feature.get('_component','')
-            if feature.get('geometry') is None:
-                errors.append(layer['name'] + ': missing geometry or coordinate mapping.'); continue
-            try: geom = shape(feature['geometry'])
+            if feature_count > MAX_FEATURES:
+                raise ValueError("Import exceeds the feature limit.")
+            attrs = feature.get("properties") or {}
+            receipt_id = str(
+                attrs.get(m.get("idField"))
+                if m.get("idField")
+                else feature.get("id", "")
+            ) + feature.get("_component", "")
+            if feature.get("geometry") is None:
+                errors.append(
+                    layer["name"] + ": missing geometry or coordinate mapping."
+                )
+                continue
+            try:
+                geom = shape(feature["geometry"])
             except Exception as error:
-                errors.append(f"{layer['name']} {feature.get('id','')}: invalid geometry ({error})"); continue
-            if layer['crs'] != 'EPSG:4326':
+                errors.append(
+                    f"{layer['name']} {feature.get('id', '')}: invalid geometry ({error})"
+                )
+                continue
+            if layer["crs"] != "EPSG:4326":
                 from osgeo import osr
                 from shapely.ops import transform
-                src = osr.SpatialReference(); src.SetFromUserInput(layer['crs']); src.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-                dst = osr.SpatialReference(); dst.ImportFromEPSG(4326); dst.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-                operation = osr.CoordinateTransformation(src,dst)
-                geom = transform(lambda x,y,z=None:operation.TransformPoint(x,y)[:2],geom)
-            if not all(math.isfinite(x) for x in geom.bounds) or geom.bounds[0] < -180 or geom.bounds[2] > 180 or geom.bounds[1] < -90 or geom.bounds[3] > 90:
-                errors.append(layer['name'] + ': coordinates fall outside WGS84; check the projection.'); continue
-            try: geom, repair = prepare_geometry(feature['geometry'] if layer['crs']=='EPSG:4326' else mapping(geom))
+
+                src = osr.SpatialReference()
+                src.SetFromUserInput(layer["crs"])
+                src.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+                dst = osr.SpatialReference()
+                dst.ImportFromEPSG(4326)
+                dst.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+                operation = osr.CoordinateTransformation(src, dst)
+                geom = transform(
+                    lambda x, y, z=None: operation.TransformPoint(x, y)[:2], geom
+                )
+            if (
+                not all(math.isfinite(x) for x in geom.bounds)
+                or geom.bounds[0] < -180
+                or geom.bounds[2] > 180
+                or geom.bounds[1] < -90
+                or geom.bounds[3] > 90
+            ):
+                errors.append(
+                    layer["name"]
+                    + ": coordinates fall outside WGS84; check the projection."
+                )
+                continue
+            try:
+                geom, repair = prepare_geometry(
+                    feature["geometry"]
+                    if layer["crs"] == "EPSG:4326"
+                    else mapping(geom)
+                )
             except Exception as error:
-                errors.append(f"{layer['name']} {feature.get('id','')}: {error}"); continue
+                errors.append(f"{layer['name']} {feature.get('id', '')}: {error}")
+                continue
             if repair:
-                repairs.append({'layer':layer['name'],'sourceId':receipt_id,**repair})
-            attrs = feature.get('properties') or {}
+                repairs.append(
+                    {"layer": layer["name"], "sourceId": receipt_id, **repair}
+                )
+            attrs = feature.get("properties") or {}
+
             def mapped_value(field, fallback):
                 key = m.get(field) or fallback
                 value = attrs.get(key)
-                definition = next((f for f in layer.get('fields',[]) if f['name']==key),{})
-                return definition.get('codedValues',{}).get(str(value),value)
-            native = attrs.get(m.get('idField')) if m.get('idField') else feature.get('id')
-            stable_native = native is not None and str(native) != ''
-            if native is None and not m.get('idField'):
-                native = digest({'geometry':feature['geometry'],'properties':attrs})[:24]
-            if native is None or str(native) == '':
-                errors.append(layer['name'] + ': a feature is missing its selected identifier.'); continue
+                definition = next(
+                    (f for f in layer.get("fields", []) if f["name"] == key), {}
+                )
+                return definition.get("codedValues", {}).get(str(value), value)
+
+            native = (
+                attrs.get(m.get("idField")) if m.get("idField") else feature.get("id")
+            )
+            stable_native = native is not None and str(native) != ""
+            if native is None and not m.get("idField"):
+                native = digest({"geometry": feature["geometry"], "properties": attrs})[
+                    :24
+                ]
+            if native is None or str(native) == "":
+                errors.append(
+                    layer["name"] + ": a feature is missing its selected identifier."
+                )
+                continue
             upstream_native = str(native)
-            collection = layer.get('sourceCollection') or layer.get('sourceUrl') or m.get('identity') or layer['name']
+            collection = (
+                layer.get("sourceCollection")
+                or layer.get("sourceUrl")
+                or m.get("identity")
+                or layer["name"]
+            )
             observation_key = (collection, upstream_native)
             if observation_key not in observations:
-                observations[observation_key] = {'provider':source['kind'], 'collection':collection,
-                    'nativeId':upstream_native,'stable':stable_native,'featureType':role,
-                    'content':feature['_sourceContent'],'records':{},'providerVersion':feature.get('providerVersion'),
-                    'embedded':{**layer['embedded'],'nativeField':m.get('idField')} if layer.get('embedded') and m.get('idField') else None,
-                    'queryUrl':layer.get('sourceUrl'),'layerIdentity':layer.get('layerIdentity')}
-            native = str(native) + feature.get('_component','')
+                observations[observation_key] = {
+                    "provider": source["kind"],
+                    "collection": collection,
+                    "nativeId": upstream_native,
+                    "stable": stable_native,
+                    "featureType": role,
+                    "content": feature["_sourceContent"],
+                    "records": {},
+                    "providerVersion": feature.get("providerVersion"),
+                    "embedded": {**layer["embedded"], "nativeField": m.get("idField")}
+                    if layer.get("embedded") and m.get("idField")
+                    else None,
+                    "queryUrl": layer.get("sourceUrl"),
+                    "layerIdentity": layer.get("layerIdentity"),
+                }
+            native = str(native) + feature.get("_component", "")
             if native in seen_identities:
-                errors.append(f"{layer['name']}: duplicate source identity {native}; select a unique identifier or repair the source."); continue
+                errors.append(
+                    f"{layer['name']}: duplicate source identity {native}; select a unique identifier or repair the source."
+                )
+                continue
             seen_identities.add(native)
             # Presence outside the campus filter is still source evidence. It
             # cannot be mistaken for a deletion in a complete replacement file.
-            if not region.intersects(geom): skipped += 1; continue
-            layer_identity = m.get('identity') or layer['name']
+            if not region.intersects(geom):
+                skipped += 1
+                continue
+            layer_identity = m.get("identity") or layer["name"]
             ident = f"{owner_source}:{digest(layer_identity)[:8]}:{native}"
-            if len(ident) > 180: ident = f"{owner_source}:{digest([layer['name'],native])}"
-            name = str(mapped_value('nameField','name') or '').strip()[:200]
-            category = str(mapped_value('categoryField','category') or 'other').lower()
-            if category not in categories: category = 'other'
-            props = {'id':ident,'name':name,'source':owner_source,'sourceId':str(native),'importLayer':layer_identity,'kind': 'land' if role in ('landcover','road-surface') else role}
-            semantic_attrs = {key:next((f.get('codedValues',{}).get(str(value),value) for f in layer.get('fields',[]) if f['name']==key),value) for key,value in attrs.items()}
-            try: props.update(mapped_properties(semantic_attrs,{**m,'sourceLayerName':layer['name']},role))
+            if len(ident) > 180:
+                ident = f"{owner_source}:{digest([layer['name'], native])}"
+            name = str(mapped_value("nameField", "name") or "").strip()[:200]
+            category = str(mapped_value("categoryField", "category") or "other").lower()
+            if category not in categories:
+                category = "other"
+            props = {
+                "id": ident,
+                "name": name,
+                "source": owner_source,
+                "sourceId": str(native),
+                "importLayer": layer_identity,
+                "kind": "land" if role in ("landcover", "road-surface") else role,
+            }
+            semantic_attrs = {
+                key: next(
+                    (
+                        f.get("codedValues", {}).get(str(value), value)
+                        for f in layer.get("fields", [])
+                        if f["name"] == key
+                    ),
+                    value,
+                )
+                for key, value in attrs.items()
+            }
+            try:
+                props.update(
+                    mapped_properties(
+                        semantic_attrs, {**m, "sourceLayerName": layer["name"]}, role
+                    )
+                )
             except ValueError as error:
-                errors.append(f'{name or ident}: {error}'); continue
+                errors.append(f"{name or ident}: {error}")
+                continue
             geometry = mapping(geom)
-            if role == 'boundary':
-                warnings.append('Campus boundary layer is retained in the import preview; use it when creating a campus. Existing campus boundaries are not replaced by a source refresh.')
-                skipped += 1; continue
-            allowed = {'building':('Polygon','MultiPolygon'),'path':('LineString','MultiLineString'),'place':('Point','MultiPoint'),'entrance':('Point',),'barrier':('LineString','MultiLineString','Polygon','MultiPolygon'),'landcover':('Polygon','MultiPolygon'),'road-surface':('Polygon','MultiPolygon'),'overlay':('Point','MultiPoint','LineString','MultiLineString','Polygon','MultiPolygon')}
+            if role == "boundary":
+                warnings.append(
+                    "Campus boundary layer is retained in the import preview; use it when creating a campus. Existing campus boundaries are not replaced by a source refresh."
+                )
+                skipped += 1
+                continue
+            allowed = {
+                "building": ("Polygon", "MultiPolygon"),
+                "path": ("LineString", "MultiLineString"),
+                "place": ("Point", "MultiPoint"),
+                "entrance": ("Point",),
+                "barrier": ("LineString", "MultiLineString", "Polygon", "MultiPolygon"),
+                "landcover": ("Polygon", "MultiPolygon"),
+                "road-surface": ("Polygon", "MultiPolygon"),
+                "overlay": (
+                    "Point",
+                    "MultiPoint",
+                    "LineString",
+                    "MultiLineString",
+                    "Polygon",
+                    "MultiPolygon",
+                ),
+            }
             if geom.geom_type not in allowed[role]:
-                errors.append(f"{layer['name']}: {geom.geom_type} cannot be imported as {role}."); continue
-            for field,target in [('heightField','height'),('floorsField','floors')]:
-                value = attrs.get(m.get(field) or ('height' if target=='height' else 'building:levels'))
-                if value not in (None,''):
+                errors.append(
+                    f"{layer['name']}: {geom.geom_type} cannot be imported as {role}."
+                )
+                continue
+            for field, target in [("heightField", "height"), ("floorsField", "floors")]:
+                value = attrs.get(
+                    m.get(field)
+                    or ("height" if target == "height" else "building:levels")
+                )
+                if value not in (None, ""):
                     try:
-                        value = float(str(value).removesuffix(' m'))
-                        if target == 'height' and m.get('heightUnit') == 'ft': value *= 0.3048
-                        if not math.isfinite(value) or value <= 0 or value > (150 if target=='height' else 50): raise ValueError()
+                        value = float(str(value).removesuffix(" m"))
+                        if target == "height" and m.get("heightUnit") == "ft":
+                            value *= 0.3048
+                        if (
+                            not math.isfinite(value)
+                            or value <= 0
+                            or value > (150 if target == "height" else 50)
+                        ):
+                            raise ValueError()
                         props[target] = value
-                    except (ValueError,TypeError): errors.append(f'{name or ident}: invalid {target}.')
-            if 'height' in props: props['heightSource']='source'; props['heightEstimated']=False
-            if role == 'path':
-                lines = list(geom.geoms) if geom.geom_type == 'MultiLineString' else [geom]
-                access = m.get('walkingAccess') or str(mapped_value('accessField','access') or 'private').lower()
+                    except (ValueError, TypeError):
+                        errors.append(f"{name or ident}: invalid {target}.")
+            if "height" in props:
+                props["heightSource"] = "source"
+                props["heightEstimated"] = False
+            if role == "path":
+                lines = (
+                    list(geom.geoms) if geom.geom_type == "MultiLineString" else [geom]
+                )
+                access = (
+                    m.get("walkingAccess")
+                    or str(mapped_value("accessField", "access") or "private").lower()
+                )
                 if is_osm:
-                    access = 'yes' if attrs.get('highway') in ('footway','pedestrian','path','steps','residential','service','unclassified','living_street','tertiary','secondary','primary') else 'no'
-                    if attrs.get('access') in ('private','no') or attrs.get('foot') in ('private','no'): access='no'
-                    if attrs.get('foot') in ('yes','designated','permissive'): access='yes'
-                    if attrs.get('construction') or attrs.get('highway')=='construction' or attrs.get('access:conditional') or attrs.get('foot:conditional'): access='no'
-                if access not in ('yes','private','no'): access='private'
-                props.update({'walkingAccess':access,'autoConnectCrossings':False,'sourceTags':public_tags(attrs) if is_osm else {}})
-                if not is_osm: warnings.append('Imported line endpoints are separate until connected in the editor. Review path access and junctions before routing.')
-                for li,line in enumerate(lines):
+                    access = (
+                        "yes"
+                        if attrs.get("highway")
+                        in (
+                            "footway",
+                            "pedestrian",
+                            "path",
+                            "steps",
+                            "residential",
+                            "service",
+                            "unclassified",
+                            "living_street",
+                            "tertiary",
+                            "secondary",
+                            "primary",
+                        )
+                        else "no"
+                    )
+                    if attrs.get("access") in ("private", "no") or attrs.get(
+                        "foot"
+                    ) in ("private", "no"):
+                        access = "no"
+                    if attrs.get("foot") in ("yes", "designated", "permissive"):
+                        access = "yes"
+                    if (
+                        attrs.get("construction")
+                        or attrs.get("highway") == "construction"
+                        or attrs.get("access:conditional")
+                        or attrs.get("foot:conditional")
+                    ):
+                        access = "no"
+                if access not in ("yes", "private", "no"):
+                    access = "private"
+                props.update(
+                    {
+                        "walkingAccess": access,
+                        "autoConnectCrossings": False,
+                        "sourceTags": public_tags(attrs) if is_osm else {},
+                    }
+                )
+                if not is_osm:
+                    warnings.append(
+                        "Imported line endpoints are separate until connected in the editor. Review path access and junctions before routing."
+                    )
+                for li, line in enumerate(lines):
                     coordinates = list(line.coords)
                     ids = []
-                    for vi,point in enumerate(coordinates):
-                        node_ref = feature.get('osmNodes',[None]*len(coordinates))[vi] if is_osm else None
-                        node_id = f'{owner_source}:node:{node_ref}' if node_ref is not None else f'{ident}:line:{li}:vertex:{vi}'
-                        node = {'id':node_id,'coordinates':list(point)}
-                        node_data = layer.get('osmNodes',{}).get(str(node_ref),layer.get('osmNodes',{}).get(node_ref,{}))
-                        if node_data.get('tags'): node['sourceTags']=public_tags(node_data['tags'])
-                        add('node',node_id,node); ids.append(node_id)
-                    for vi in range(len(ids)-1):
-                        if distance(coordinates[vi],coordinates[vi+1]) < 0.01:
-                            errors.append(f'{name or ident}: path has a zero-length segment; repair the source geometry.')
+                    for vi, point in enumerate(coordinates):
+                        node_ref = (
+                            feature.get("osmNodes", [None] * len(coordinates))[vi]
+                            if is_osm
+                            else None
+                        )
+                        node_id = (
+                            f"{owner_source}:node:{node_ref}"
+                            if node_ref is not None
+                            else f"{ident}:line:{li}:vertex:{vi}"
+                        )
+                        node = {"id": node_id, "coordinates": list(point)}
+                        node_data = layer.get("osmNodes", {}).get(
+                            str(node_ref), layer.get("osmNodes", {}).get(node_ref, {})
+                        )
+                        if node_data.get("tags"):
+                            node["sourceTags"] = public_tags(node_data["tags"])
+                        add("node", node_id, node)
+                        ids.append(node_id)
+                    for vi in range(len(ids) - 1):
+                        if distance(coordinates[vi], coordinates[vi + 1]) < 0.01:
+                            errors.append(
+                                f"{name or ident}: path has a zero-length segment; repair the source geometry."
+                            )
                             continue
-                        for reverse in (False,True):
-                            a,b = (vi+1,vi) if reverse else (vi,vi+1)
-                            edge_id=f'{ident}:line:{li}:edge:{vi}:{int(reverse)}'
-                            blocked = any((layer.get('osmNodes',{}).get(str(n),layer.get('osmNodes',{}).get(n,{})).get('tags',{}).get('access') in ('private','no') or layer.get('osmNodes',{}).get(str(n),layer.get('osmNodes',{}).get(n,{})).get('tags',{}).get('barrier') in ('gate','fence','wall','turnstile')) for n in feature.get('osmNodes',[])[vi:vi+2])
-                            add('edge',edge_id,{'id':edge_id,'from':ids[a],'to':ids[b],'distance':distance(coordinates[a],coordinates[b]),'name':name or 'Imported path','accessible':attrs.get('highway')!='steps','steps':attrs.get('highway')=='steps','walkingAccess':'no' if blocked else access,'sourceId':ident})
-            old_feature = previous_by_id.get('feature:'+ident)
+                        for reverse in (False, True):
+                            a, b = (vi + 1, vi) if reverse else (vi, vi + 1)
+                            edge_id = f"{ident}:line:{li}:edge:{vi}:{int(reverse)}"
+                            blocked = any(
+                                (
+                                    layer.get("osmNodes", {})
+                                    .get(str(n), layer.get("osmNodes", {}).get(n, {}))
+                                    .get("tags", {})
+                                    .get("access")
+                                    in ("private", "no")
+                                    or layer.get("osmNodes", {})
+                                    .get(str(n), layer.get("osmNodes", {}).get(n, {}))
+                                    .get("tags", {})
+                                    .get("barrier")
+                                    in ("gate", "fence", "wall", "turnstile")
+                                )
+                                for n in feature.get("osmNodes", [])[vi : vi + 2]
+                            )
+                            add(
+                                "edge",
+                                edge_id,
+                                {
+                                    "id": edge_id,
+                                    "from": ids[a],
+                                    "to": ids[b],
+                                    "distance": distance(
+                                        coordinates[a], coordinates[b]
+                                    ),
+                                    "name": name or "Imported path",
+                                    "accessible": attrs.get("highway") != "steps",
+                                    "steps": attrs.get("highway") == "steps",
+                                    "walkingAccess": "no" if blocked else access,
+                                    "sourceId": ident,
+                                },
+                            )
+            old_feature = previous_by_id.get("feature:" + ident)
             if old_feature:
-                for key in ('appearance','buildingTopology','modelDocumentAsset','modelAuthoring','reviewedModelRevision','authoredModelRevision','surfaceCurves'):
-                    if key in old_feature['payload'].get('properties',{}): props[key]=copy.deepcopy(old_feature['payload']['properties'][key])
-            public_feature = {'type':'Feature','geometry':geometry,'properties':props}
-            if role == 'overlay': props['gisManaged'] = True
-            private_values = {key:value for key,value in attrs.items() if isinstance(key,str) and re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,62}',key) and key not in ('__proto__','prototype','constructor') and (value is None or isinstance(value,(str,int,float,bool))) and not (isinstance(value,float) and not math.isfinite(value))}
-            add('feature',ident,public_feature,private_values)
-            mapped_layer['features'].append(public_feature)
-            if role in ('place','building','entrance') and (name or role=='entrance'):
+                for key in (
+                    "appearance",
+                    "buildingTopology",
+                    "modelDocumentAsset",
+                    "modelAuthoring",
+                    "reviewedModelRevision",
+                    "authoredModelRevision",
+                    "surfaceCurves",
+                ):
+                    if key in old_feature["payload"].get("properties", {}):
+                        props[key] = copy.deepcopy(
+                            old_feature["payload"]["properties"][key]
+                        )
+            public_feature = {
+                "type": "Feature",
+                "geometry": geometry,
+                "properties": props,
+            }
+            if role == "overlay":
+                props["gisManaged"] = True
+            private_values = {
+                key: value
+                for key, value in attrs.items()
+                if isinstance(key, str)
+                and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,62}", key)
+                and key not in ("__proto__", "prototype", "constructor")
+                and (value is None or isinstance(value, (str, int, float, bool)))
+                and not (isinstance(value, float) and not math.isfinite(value))
+            }
+            add("feature", ident, public_feature, private_values)
+            mapped_layer["features"].append(public_feature)
+            if role in ("place", "building", "entrance") and (
+                name or role == "entrance"
+            ):
                 point = geom.representative_point()
-                place_id = ident + ':place'
-                place = {'id':place_id,'name':name or 'Unassigned entrance','category':'gate' if role=='entrance' else category,'coordinates':[point.x,point.y],'aliases':[],'source':owner_source,'sourceId':str(native),'arrivalKind':'unmapped'}
-                if role=='building': place['buildingId']=ident
-                add('place',place_id,place)
-            if role=='entrance': warnings.append('Imported entrance pins require an explicit building/place assignment and path connection in the editor.')
-        collections[-1]['complete'] = len(errors) == layer_error_start and not layer.get('retrievalError')
+                place_id = ident + ":place"
+                place = {
+                    "id": place_id,
+                    "name": name or "Unassigned entrance",
+                    "category": "gate" if role == "entrance" else category,
+                    "coordinates": [point.x, point.y],
+                    "aliases": [],
+                    "source": owner_source,
+                    "sourceId": str(native),
+                    "arrivalKind": "unmapped",
+                }
+                if role == "building":
+                    place["buildingId"] = ident
+                add("place", place_id, place)
+            if role == "entrance":
+                warnings.append(
+                    "Imported entrance pins require an explicit building/place assignment and path connection in the editor."
+                )
+        collections[-1]["complete"] = len(
+            errors
+        ) == layer_error_start and not layer.get("retrievalError")
     # Detect overlaps with other sources. They are review candidates, never auto-merged.
     from shapely.strtree import STRtree
-    incoming_buildings = [r for r in records.values() if r['entity']=='feature' and r['payload']['properties']['kind']=='building']
-    existing = [r for r in previous if r['entity']=='feature' and r['source']!=owner_source and r.get('payload',{}).get('properties',{}).get('kind')=='building'] + incoming_buildings
-    shapes = [shape(r['payload']['geometry']) for r in existing]
+
+    incoming_buildings = [
+        r
+        for r in records.values()
+        if r["entity"] == "feature" and r["payload"]["properties"]["kind"] == "building"
+    ]
+    existing = [
+        r
+        for r in previous
+        if r["entity"] == "feature"
+        and r["source"] != owner_source
+        and r.get("payload", {}).get("properties", {}).get("kind") == "building"
+    ] + incoming_buildings
+    shapes = [shape(r["payload"]["geometry"]) for r in existing]
     tree = STRtree(shapes)
     for record in records.values():
-        if record['entity'] != 'feature' or record['payload']['properties']['kind'] != 'building': continue
-        geom = shape(record['payload']['geometry'])
+        if (
+            record["entity"] != "feature"
+            or record["payload"]["properties"]["kind"] != "building"
+        ):
+            continue
+        geom = shape(record["payload"]["geometry"])
         for index in tree.query(geom):
-            if existing[index]['id'] == record['id']: continue
-            if existing[index]['source']==owner_source and existing[index]['id']>record['id']: continue
+            if existing[index]["id"] == record["id"]:
+                continue
+            if (
+                existing[index]["source"] == owner_source
+                and existing[index]["id"] > record["id"]
+            ):
+                continue
             candidate = shapes[index]
-            if candidate.is_valid and geom.intersection(candidate).area / max(geom.area,candidate.area,1e-20) > 0.6:
-                duplicates.append({'incomingId':record['payload']['properties']['id'],'existingId':existing[index]['payload']['properties']['id'],'name':record['payload']['properties']['name']})
-    old = {r['id']:r for r in previous if r['source']==owner_source or r['id'].startswith('feature:'+owner_source+':') or r['id'].startswith('place:'+owner_source+':')}
+            if (
+                candidate.is_valid
+                and geom.intersection(candidate).area
+                / max(geom.area, candidate.area, 1e-20)
+                > 0.6
+            ):
+                duplicates.append(
+                    {
+                        "incomingId": record["payload"]["properties"]["id"],
+                        "existingId": existing[index]["payload"]["properties"]["id"],
+                        "name": record["payload"]["properties"]["name"],
+                    }
+                )
+    old = {
+        r["id"]: r
+        for r in previous
+        if r["source"] == owner_source
+        or r["id"].startswith("feature:" + owner_source + ":")
+        or r["id"].startswith("place:" + owner_source + ":")
+    }
     # Owner reconciliations remain authoritative; source changes never erase them.
     for ident, record in old.items():
-        if record['source'] == 'campus-review' and ident in records:
-            if record['hash'] != records[ident]['hash']:
-                diagnostics.append({'sourceId':ident,'message':'Retained owner-reviewed record; compare source changes in the editor.'})
+        if record["source"] == "campus-review" and ident in records:
+            if record["hash"] != records[ident]["hash"]:
+                diagnostics.append(
+                    {
+                        "sourceId": ident,
+                        "message": "Retained owner-reviewed record; compare source changes in the editor.",
+                    }
+                )
             records[ident] = copy.deepcopy(record)
-    mode = configuration.get('refreshMode', 'merge')
-    selected_prefixes = [f"{owner_source}:{digest(m.get('identity') or m['layer'])[:8]}:" for m in configuration['layers'] if m['role']!='skip']
+    mode = configuration.get("refreshMode", "merge")
+    selected_prefixes = [
+        f"{owner_source}:{digest(m.get('identity') or m['layer'])[:8]}:"
+        for m in configuration["layers"]
+        if m["role"] != "skip"
+    ]
     for ident, record in old.items():
-        selected = any(ident.split(':',1)[-1].startswith(prefix) for prefix in selected_prefixes)
-        if ident not in records and (mode=='merge' or mode=='replace-layer' and not selected or record['source']=='campus-review'):
+        selected = any(
+            ident.split(":", 1)[-1].startswith(prefix) for prefix in selected_prefixes
+        )
+        if ident not in records and (
+            mode == "merge"
+            or mode == "replace-layer"
+            and not selected
+            or record["source"] == "campus-review"
+        ):
             records[ident] = copy.deepcopy(record)
-    parents={}
+    parents = {}
+
     def component(node):
-        parents.setdefault(node,node)
-        while parents[node]!=node:
-            parents[node]=parents[parents[node]]; node=parents[node]
+        parents.setdefault(node, node)
+        while parents[node] != node:
+            parents[node] = parents[parents[node]]
+            node = parents[node]
         return node
-    for r in [p for p in previous if p['source']!=owner_source]+list(records.values()):
-        if r['entity']=='edge' and r['payload'].get('walkingAccess') not in ('private','no'):
-            a,b=r['payload']['from'],r['payload']['to']; parents[component(a)]=component(b)
-    components=len({component(n) for n in parents})
-    if not components: warnings.append('Directions unavailable: there are no reviewed, permitted walking paths. A map-only campus can still be published.')
-    elif components>1: warnings.append(f'Routing gap: {components} disconnected walking networks. Review endpoint connections and entrances; bridges and tunnels are never joined by proximity.')
+
+    for r in [p for p in previous if p["source"] != owner_source] + list(
+        records.values()
+    ):
+        if r["entity"] == "edge" and r["payload"].get("walkingAccess") not in (
+            "private",
+            "no",
+        ):
+            a, b = r["payload"]["from"], r["payload"]["to"]
+            parents[component(a)] = component(b)
+    components = len({component(n) for n in parents})
+    if not components:
+        warnings.append(
+            "Directions unavailable: there are no reviewed, permitted walking paths. A map-only campus can still be published."
+        )
+    elif components > 1:
+        warnings.append(
+            f"Routing gap: {components} disconnected walking networks. Review endpoint connections and entrances; bridges and tunnels are never joined by proximity."
+        )
     # Shared campus metadata is updated from the complete accepted baseline, never from just this source.
-    meta_record = next((r for r in previous if r['entity']=='meta'),None)
-    if not meta_record: raise ValueError('Campus metadata is missing.')
+    meta_record = next((r for r in previous if r["entity"] == "meta"), None)
+    if not meta_record:
+        raise ValueError("Campus metadata is missing.")
     meta = copy.deepcopy(meta_record)
-    metadata = meta['payload']
-    metadata['sources'] = [s for s in metadata.get('sources',[]) if s['id']!=owner_source] + [{'id':owner_source,'name':source['name'],'url':source.get('url') or '','attribution':configuration['attribution'],'license':configuration['license'],'redistributionConfirmed':configuration['redistributionConfirmed']}]
-    meta['hash']=digest(metadata)
-    observations[('__attribution__',source['id'])] = {'provider':'configuration','collection':'__attribution__','nativeId':source['id'],'stable':True,'featureType':'attribution','content':next(s for s in metadata['sources'] if s['id']==owner_source),'records':{meta['id']:meta}}
-    collections.append({'identity':'__attribution__','count':1,'layer':'Source attribution','complete':True})
+    metadata = meta["payload"]
+    metadata["sources"] = [
+        s for s in metadata.get("sources", []) if s["id"] != owner_source
+    ] + [
+        {
+            "id": owner_source,
+            "name": source["name"],
+            "url": source.get("url") or "",
+            "attribution": configuration["attribution"],
+            "license": configuration["license"],
+            "redistributionConfirmed": configuration["redistributionConfirmed"],
+        }
+    ]
+    meta["hash"] = digest(metadata)
+    observations[("__attribution__", source["id"])] = {
+        "provider": "configuration",
+        "collection": "__attribution__",
+        "nativeId": source["id"],
+        "stable": True,
+        "featureType": "attribution",
+        "content": next(s for s in metadata["sources"] if s["id"] == owner_source),
+        "records": {meta["id"]: meta},
+    }
+    collections.append(
+        {
+            "identity": "__attribution__",
+            "count": 1,
+            "layer": "Source attribution",
+            "complete": True,
+        }
+    )
     preview, sampling = preview_features(mapped_layers)
-    summary={'layers':[{k:v for k,v in l.items() if k not in ('features','osmNodes','osmRelations')} | {'count':len(l['features'])} for l in layers], 'counts':{'added':0,'modified':0,'removed':0,'skipped':skipped},'warnings':list(dict.fromkeys(warnings)),'errors':list(dict.fromkeys(errors))[:500],'duplicates':duplicates[:500],'features':preview,'sampling':sampling,'repairs':repairs[:500],'diagnostics':diagnostics[:500],'totalFeatures':feature_count}
-    if duplicates: summary['warnings'].append('Overlapping buildings need a keep/merge decision in the existing duplicate review workflow.')
-    summary['reportCounts']={'repairs':len(repairs),'diagnostics':len(diagnostics),'errors':len(set(errors)),'duplicates':len(duplicates)}
+    summary = {
+        "layers": [
+            {
+                k: v
+                for k, v in layer.items()
+                if k not in ("features", "osmNodes", "osmRelations")
+            }
+            | {"count": len(layer["features"])}
+            for layer in layers
+        ],
+        "counts": {"added": 0, "modified": 0, "removed": 0, "skipped": skipped},
+        "warnings": list(dict.fromkeys(warnings)),
+        "errors": list(dict.fromkeys(errors))[:500],
+        "duplicates": duplicates[:500],
+        "features": preview,
+        "sampling": sampling,
+        "repairs": repairs[:500],
+        "diagnostics": diagnostics[:500],
+        "totalFeatures": feature_count,
+    }
+    if duplicates:
+        summary["warnings"].append(
+            "Overlapping buildings need a keep/merge decision in the existing duplicate review workflow."
+        )
+    summary["reportCounts"] = {
+        "repairs": len(repairs),
+        "diagnostics": len(diagnostics),
+        "errors": len(set(errors)),
+        "duplicates": len(duplicates),
+    }
     # Only the shared Node comparator may create review proposals. Raw upstream
     # content is separate from converted shapes, routing and owner corrections.
-    for observation in observations.values(): observation['records'] = list(observation['records'].values())
+    for observation in observations.values():
+        observation["records"] = list(observation["records"].values())
     # Display layers can change without changing the provider collection (OSM).
-    combined={}
+    combined = {}
     for collection in collections:
-        key=collection['identity']
-        if key not in combined: combined[key]=collection.copy()
+        key = collection["identity"]
+        if key not in combined:
+            combined[key] = collection.copy()
         else:
-            combined[key]['complete']=combined[key].get('complete',False) and collection.get('complete',False)
-            combined[key]['count']+=collection['count']
-    collections=list(combined.values())
-    return {'summary':summary,'proposals':[], 'convertedRecords':list(records.values())+[meta], 'collections':collections, 'observations':list(observations.values()),'expectedSources':previous,'repairReport':repairs,'diagnosticReport':diagnostics,'errorReport':list(dict.fromkeys(errors)),'duplicateReport':duplicates}
+            combined[key]["complete"] = combined[key].get(
+                "complete", False
+            ) and collection.get("complete", False)
+            combined[key]["count"] += collection["count"]
+    collections = list(combined.values())
+    return {
+        "summary": summary,
+        "proposals": [],
+        "convertedRecords": list(records.values()) + [meta],
+        "collections": collections,
+        "observations": list(observations.values()),
+        "expectedSources": previous,
+        "repairReport": repairs,
+        "diagnosticReport": diagnostics,
+        "errorReport": list(dict.fromkeys(errors)),
+        "duplicateReport": duplicates,
+    }

@@ -10,7 +10,6 @@ import {
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-// @ts-expect-error Node-only deployment module.
 import {
   preservePublished,
   requestPublishedAsset,

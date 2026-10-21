@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './coverage-fixture';
 import sharp from 'sharp';
 import { readFileSync } from 'node:fs';
 import type { LocalPhoto } from '../../src/photo-local';

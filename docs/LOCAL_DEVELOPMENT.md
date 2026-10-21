@@ -13,7 +13,8 @@ Supabase and the pinned GDAL images. Native Windows can run the public Vite app
 but cannot run the isolated import workers. No Windows services or system settings
 are changed by the repository commands.
 
-The `.devcontainer` defines Python 3.12 and Node 22.23.3. Open the Linux/WSL checkout
+The root `Dockerfile`, shared by `.devcontainer` and `compose.yaml`, defines Python
+3.12 and Node 22.23.3/npm 10.9.9. Open the Linux/WSL checkout
 with an editor supporting development containers. It uses the host Docker socket
 and a matching checkout path so isolated workers can mount their temporary files.
 Only use this development container with a trusted checkout and Docker host.
@@ -21,10 +22,15 @@ Alternatively, install those Node/Python versions in your Linux environment.
 
 ```sh
 npm ci
-npm run setup
+npm run doctor -- --full
 python -m pip install --require-hashes -r scripts/requirements-data.lock
 npm run local:up
 ```
+
+With Docker Compose installed, `npm run local:container` builds the same toolchain
+and starts the local editor inside it. Run this from a Linux/WSL checkout. The
+checkout must have the same absolute path on the Docker host; the development
+container shares the host Docker socket for the existing isolated workers.
 
 The first start downloads the official Supabase images and builds the existing
 GIS/import images. All canonical migrations in `supabase/migrations` run without
@@ -88,7 +94,7 @@ the seed refuses to silently replace existing identities. An interrupted job may
 need cancellation/retry through Activity, preserving normal uncertain-completion
 semantics. Restart does not interpret an uncertain worker result as success.
 
-The `Licensing readiness / local-stack` Linux CI job installs committed locks,
+The `CI / local-stack` Linux CI job installs committed locks,
 builds the development image, applies migrations to a clean Supabase stack and
 checks real sign-in, roles, campus denial, editing, idempotent saves, independent
 review (including denial when a contributor also holds the reviewer role), metric

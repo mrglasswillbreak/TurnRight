@@ -13,6 +13,7 @@ data/runtime-audit.json
 *.tsbuildinfo
 test-results/
 playwright-report/
+.vitest/
 __pycache__/
 .venv-voice/
 *.pyc

@@ -1,6 +1,6 @@
 import { currentCampusId, scopeDatabaseRequest } from './campus-scope.js';
 import { createHash } from 'node:crypto';
-import { emitEvent } from './diagnostics.mjs';
+import { emitEvent, diagnosticJobId } from './diagnostics.mjs';
 import {
   localDispatchConfiguration,
   validateLocalJob,
@@ -206,7 +206,11 @@ export function observeResponse(
       res.setHeader(name, value);
     },
     json(body) {
-      emitEvent('request-completed', { ...context, status });
+      emitEvent('request-completed', {
+        ...context,
+        status,
+        jobId: diagnosticJobId(context.action, body),
+      });
       res.json(body);
     },
   };

@@ -62,7 +62,8 @@ describe('roof release generation', () => {
       execFileSync(
         process.execPath,
         [
-          'node_modules/tsx/dist/cli.mjs',
+          '--import',
+          'tsx',
           'scripts/build-campus-visuals.ts',
           source,
           output,

@@ -29,7 +29,7 @@ export async function publishReviewedRelease(
     validateSnapshot,
     promote,
     verifyCurrent,
-    progress = async () => {},
+    progress = async (_message) => {},
   },
 ) {
   const mode = publicationMode(release, (await readCatalogue()).revision);

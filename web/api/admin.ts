@@ -28,13 +28,14 @@ import { catalogueErrors } from '../src/campus-layers.js';
 import type { CampusLayer } from '../src/campus-layer-types.js';
 import { surveyAction } from '../server/surveys.js';
 import { mediaAction, validateMediaEdits } from '../server/building-media.js';
-import { publishedCampus } from '../server/release-validation.js';
 import { publishedWorkspace } from '../server/published-workspace.js';
 import { modelAssetAction, hydrateModelEdits } from '../server/model-assets.js';
 import {
   sourceReviewQuery,
   SOURCE_REVIEW_PAGE_SIZE,
 } from '../server/source-review-query.js';
+import { editorSelection } from '../server/admin-selection.js';
+import { sendWorkspaceState } from '../server/admin-workspace-state.js';
 export default async function handler(req: RequestLike, res: ResponseLike) {
   privateHeaders(res);
   const requestId = randomUUID();
@@ -114,40 +115,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
           res.status(200).json(await surveyAction(user.id, action, payload));
           break;
         case 'state': {
-          const [edits, changes, reports, jobs, releases, published] =
-            await Promise.all([
-              allRows<MapEdit>('map_edits', '&gis_managed=eq.false'),
-              payload.sourceReviewVersion === 2
-                ? Promise.resolve([])
-                : db<unknown[]>(sourceReviewQuery()),
-              db('reports?status=eq.pending&order=created_at.desc&limit=200'),
-              db('jobs?order=created_at.desc&limit=20'),
-              db(
-                'releases?select=id,status,summary,created_at,preview_url,deployment_url,error,version,review_id&order=created_at.desc&limit=20',
-              ),
-              publishedWorkspace(),
-            ]);
-          const selected = await editorSelection(user.id, payload.gisKeys);
-          res.status(200).json({
-            campus,
-            capabilities,
-            base: campus.id === 'lasu' ? undefined : await publishedCampus(),
-            edits: [
-              ...edits,
-              ...selected.edits.filter(
-                (e: MapEdit) =>
-                  !edits.some(
-                    (old: MapEdit) => old.kind === e.kind && old.id === e.id,
-                  ),
-              ),
-            ],
-            changes: changes.slice(0, SOURCE_REVIEW_PAGE_SIZE),
-            hasMoreChanges: changes.length > SOURCE_REVIEW_PAGE_SIZE,
-            reports,
-            jobs,
-            releases,
-            published,
-          });
+          await sendWorkspaceState(user, payload, campus, capabilities, res);
           break;
         }
         case 'process-status': {
@@ -501,19 +469,4 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   } catch (error) {
     fail(res, error, context);
   }
-}
-
-async function editorSelection(actor: string, keys: unknown) {
-  if (keys === undefined) return { features: [], edits: [] };
-  if (
-    !Array.isArray(keys) ||
-    keys.length > 500 ||
-    keys.some((key) => typeof key !== 'string' || key.length > 500)
-  )
-    throw new HttpError(400, 'Load at most 500 selected GIS features.');
-  return db<{ features: SourceRecord[]; edits: MapEdit[] }>(
-    'rpc/gis_hydrate_editor',
-    'POST',
-    { actor, keys },
-  );
 }

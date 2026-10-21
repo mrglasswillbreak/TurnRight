@@ -31,12 +31,12 @@ jobs:
       CAMPUS_ID: campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a
       PUBLISHED_MAP_URL: https://turnright.vercel.app
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: web
       - if: github.event_name == 'push' || inputs.operation == 'audit'
@@ -56,7 +56,7 @@ jobs:
         working-directory: web
         env:
           SUPERSEDES_UNILAG_RELEASE: ${{ inputs.supersedes }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: unilag-baseline-receipt
           path: web/work/unilag-*.json

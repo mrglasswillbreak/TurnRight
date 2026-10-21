@@ -12,6 +12,24 @@ const dependencies = new Set([
   'worker',
 ]);
 const workers = new Set(['gis', 'map-import', 'source-review', 'source-check']);
+const uuid = (value) =>
+  typeof value === 'string' &&
+  /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+
+/** Read only the public job identity from known worker response contracts. */
+export function diagnosticJobId(action, body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return;
+  const id = action?.startsWith('import-')
+    ? body.job?.id
+    : [
+          'gis-job-start',
+          'source-updates-prepare',
+          'source-updates-control',
+        ].includes(action)
+      ? body.id
+      : undefined;
+  return uuid(id) ? id : undefined;
+}
 
 /** Whitelist operational metadata; never serialize an Error, request or payload. */
 export function eventRecord(event, context = {}, now = Date.now()) {
@@ -25,8 +43,9 @@ export function eventRecord(event, context = {}, now = Date.now()) {
     context.status <= 599
   )
     record.status = context.status;
-  if (/^(?:[a-f0-9-]{36}|ref-\d{1,12})$/i.test(context.requestId || ''))
+  if (uuid(context.requestId) || /^ref-\d{1,12}$/.test(context.requestId || ''))
     record.requestId = context.requestId;
+  if (uuid(context.jobId)) record.jobId = context.jobId;
   if (/^[a-z][a-z-]{0,63}$/.test(context.action || ''))
     record.action = context.action;
   if (dependencies.has(context.dependency))

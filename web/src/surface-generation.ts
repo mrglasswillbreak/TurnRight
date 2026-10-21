@@ -1,6 +1,6 @@
 import type { Feature } from 'geojson';
-import { pathDisplay } from './map-classification';
-import { layerIdentity } from './campus-layers';
+import { pathDisplay } from './map-classification.js';
+import { layerIdentity } from './campus-layers.js';
 export const SURFACE_GENERATOR = 'utm-buffer-v1';
 export interface DerivedSurface {
   sourceRoadId: string;

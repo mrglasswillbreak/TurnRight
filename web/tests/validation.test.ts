@@ -45,6 +45,8 @@ describe('release structural validation', () => {
             entity: 'edge',
             source: 'test',
             hash: 'bad',
+            // Deliberately malformed source must produce an actionable assembly issue.
+            // @ts-expect-error Missing edge endpoints are the subject of this test.
             payload: {},
           },
         ],

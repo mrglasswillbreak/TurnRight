@@ -1,24 +1,42 @@
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath, URL } from 'node:url';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
+import {
+  coverageIncludes,
+  coverageExcludes,
+} from '../scripts/coverage-scope.mjs';
 export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
     restoreMocks: true,
+    projects: [
+      {
+        extends: true,
+        test: { name: 'unit', include: ['tests/**/*.test.ts'] },
+      },
+      {
+        extends: true,
+        plugins: [react()],
+        test: {
+          name: 'components',
+          include: ['tests/components/**/*.test.tsx'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
     coverage: {
       provider: 'v8',
-      include: [
-        'src/**/*.{ts,tsx,mjs}',
-        'components/**/*.{ts,tsx}',
-        'lib/**/*.{ts,tsx,mjs}',
-        'hooks/**/*.{ts,tsx,mjs}',
-        'server/**/*.{ts,mjs}',
-        'api/**/*.ts',
-      ],
-      exclude: ['**/*.d.ts', '**/*.d.mts'],
-      reporter: ['text-summary', 'json-summary', 'lcov', 'html'],
-      reportsDirectory: 'coverage',
+      include: coverageIncludes,
+      exclude: coverageExcludes,
+      reporter: ['text-summary', 'json', 'json-summary', 'lcov', 'html'],
+      reportsDirectory: 'coverage/unit',
       thresholds: {
         statements: 38,
         lines: 38,

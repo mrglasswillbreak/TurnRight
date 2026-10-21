@@ -13,7 +13,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      'node node_modules/vite/bin/vite.js preview --config vite.performance.config.ts --host 127.0.0.1 --port 5195 --strictPort',
+      'npm exec -- vite preview --config vite.performance.config.ts --host 127.0.0.1 --port 5195 --strictPort',
     url: 'http://127.0.0.1:5195/tests/performance/index.html',
     reuseExistingServer: true,
   },

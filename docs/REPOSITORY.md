@@ -40,6 +40,6 @@ Existing local backup copies and unselected brand drafts are ignored, not produc
 
 ## Toolchain and checks
 
-Node is pinned in the root runtime files; `web/package-lock.json` is the dependency lock. Use `npm ci`, not a dependency upgrade, for routine setup. Python worker dependencies are pinned in `scripts/requirements-*.txt` and the container definitions. See [Contributing](../CONTRIBUTING.md) for checks and [Deployment](DEPLOYMENT.md) for production configuration.
+Node is pinned in the root runtime files; the root `package-lock.json` is the single dependency lock for the npm workspace. Use root `npm ci` for routine setup and `npm run doctor` to check the runtime. Python worker dependencies are pinned in `scripts/requirements-*.txt` and the container definitions. See [Contributing](../CONTRIBUTING.md) for checks and [Deployment](DEPLOYMENT.md) for production configuration.
 
-For files outside `web/`, run the formatter from the repository root: `node web/node_modules/oxfmt/bin/oxfmt --config web/.oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory.
+Run the formatter from the repository root: `npm exec -- oxfmt --config web/.oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory. `npm run format:check` checks the repository's authored files.

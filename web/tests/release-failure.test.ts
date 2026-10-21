@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-// @ts-expect-error Node-only workflow module.
 import { recordFailure } from '../../scripts/record-failure.mjs';
 
 describe('release workflow failure reporting', () => {

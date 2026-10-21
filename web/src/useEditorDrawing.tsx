@@ -214,7 +214,7 @@ export function useEditorDrawing({
     for (const edit of batch)
       if (edit.properties.derivedSurface)
         edit.properties.derivedSurface = {
-          ...(edit.properties.derivedSurface as Record<string, unknown>),
+          ...edit.properties.derivedSurface,
           manual: true,
         };
     if (repairFocus) stageRepair(batch);

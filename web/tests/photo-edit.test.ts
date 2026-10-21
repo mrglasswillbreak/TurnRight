@@ -137,9 +137,11 @@ describe('local image drafts', () => {
       ),
       associateLocalPhoto(owner, draft.id, 'published-id'),
     ]);
-    expect(put.mock.instances.every((store) => store.name === 'images')).toBe(
-      true,
-    );
+    expect(
+      put.mock.instances.every(
+        (store) => store instanceof IDBObjectStore && store.name === 'images',
+      ),
+    ).toBe(true);
     put.mockRestore();
     const rows = await localPhotos(owner, 'building:one');
     expect(rows).toHaveLength(1);

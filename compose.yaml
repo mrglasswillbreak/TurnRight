@@ -1,0 +1,13 @@
+services:
+  development:
+    build: .
+    network_mode: host
+    working_dir: ${TURNRIGHT_WORKSPACE:?Use npm run local:container from a Linux checkout}
+    volumes:
+      - ${TURNRIGHT_WORKSPACE}:${TURNRIGHT_WORKSPACE}
+      - /var/run/docker.sock:/var/run/docker.sock
+    init: true
+    stdin_open: true
+    tty: true
+    command: >-
+      bash -lc "npm ci && python -m pip install --require-hashes -r scripts/requirements-data.lock && npm run local:up"

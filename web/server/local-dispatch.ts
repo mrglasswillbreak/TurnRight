@@ -5,10 +5,7 @@ export const localWorkflows = {
   'source-review.yml': ['campus_id', 'operation_id', 'run_token'],
 } as const;
 
-export function validateLocalJob(
-  workflow: string,
-  inputs: Record<string, string>,
-) {
+export function validateLocalJob(workflow: string, inputs: unknown) {
   if (!Object.hasOwn(localWorkflows, workflow))
     throw Error(
       'Cloud publication and external source downloads are disabled in the local editor.',
@@ -23,7 +20,7 @@ export function validateLocalJob(
   )
     throw Error('Unexpected local job input.');
   for (const key of keys) {
-    const value = inputs[key];
+    const value = (inputs as Record<string, unknown>)[key];
     if (
       typeof value !== 'string' ||
       !(

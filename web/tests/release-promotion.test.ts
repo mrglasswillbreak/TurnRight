@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-// @ts-expect-error Node-only deployment module.
 import {
   publishDeployment,
   verifyPublishedDeployment,

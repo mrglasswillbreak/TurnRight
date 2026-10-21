@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './coverage-fixture';
 test('render failure offers recovery without clearing saved device data', async ({
   page,
 }) => {

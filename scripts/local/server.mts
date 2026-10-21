@@ -8,7 +8,7 @@ import { createWriteStream } from 'node:fs';
 import path from 'node:path';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { timingSafeEqual } from 'node:crypto';
-import { createServer as createViteServer } from '../../web/node_modules/vite/dist/node/index.js';
+import { createServer as createViteServer } from 'vite';
 import {
   root,
   runtime,

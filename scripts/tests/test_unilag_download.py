@@ -1,16 +1,23 @@
 """Offline completeness checks for the separate UNILAG research downloader."""
+
 import importlib.util
 from pathlib import Path
 import unittest
 
-spec = importlib.util.spec_from_file_location("unilag", Path(__file__).parents[1] / "download-unilag.py")
+spec = importlib.util.spec_from_file_location(
+    "unilag", Path(__file__).parents[1] / "download-unilag.py"
+)
 unilag = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(unilag)
 
 
 class DownloadTests(unittest.TestCase):
     def test_geojson_ids_and_projection(self):
-        f = {"type": "Feature", "properties": {"OBJECTID": 7}, "geometry": {"type": "Point", "coordinates": [3.39, 6.51]}}
+        f = {
+            "type": "Feature",
+            "properties": {"OBJECTID": 7},
+            "geometry": {"type": "Point", "coordinates": [3.39, 6.51]},
+        }
         data = {"type": "FeatureCollection", "features": [f]}
         unilag.validate_geojson(data, [7], "OBJECTID")
         for ids in ([7, 8], [8]):
@@ -29,7 +36,12 @@ class DownloadTests(unittest.TestCase):
         _, records = unilag.validate_osm(raw)
         self.assertEqual(len(records), 3)
         self.assertEqual(records[("way", "2")].find("tag").attrib["v"], "private")
-        for bad in (raw.replace(b'<nd ref="1"/>', b'<nd ref="9"/>'), raw.replace(b'ref="2"', b'ref="9"'), b'<osm><remark>timed out</remark></osm>', b'<osm><node id="1"/><node id="1"/></osm>'):
+        for bad in (
+            raw.replace(b'<nd ref="1"/>', b'<nd ref="9"/>'),
+            raw.replace(b'ref="2"', b'ref="9"'),
+            b"<osm><remark>timed out</remark></osm>",
+            b'<osm><node id="1"/><node id="1"/></osm>',
+        ):
             with self.assertRaises(ValueError):
                 unilag.validate_osm(bad)
 

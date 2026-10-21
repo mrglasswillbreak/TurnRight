@@ -63,13 +63,18 @@ for (const change of plan.changes) {
   }
   if (
     change.geometryHash &&
-    hash(record.payload.geometry) !== change.geometryHash
+    (record.entity !== 'feature' ||
+      hash(record.payload.geometry) !== change.geometryHash)
   ) {
     held.push({ id: change.id, reason: 'changed-footprint' });
     continue;
   }
-  const properties =
-    change.kind === 'place' ? record.payload : record.payload.properties;
+  if (record.entity !== 'place' && record.entity !== 'feature')
+    throw Error('Reviewed presentation source has an unexpected entity');
+  const properties: Record<string, unknown> =
+    record.entity === 'place'
+      ? (record.payload as unknown as Record<string, unknown>)
+      : (record.payload.properties ??= {});
   if (
     change.kind === 'building' &&
     (properties.modelDocument ||
@@ -122,7 +127,7 @@ const regions = plan.scenery.regions
     const f = green.get(r.featureId);
     return f && hash(f.geometry) === r.geometryHash;
   })
-  .map(({ geometryHash, ...r }: { geometryHash: string }) => r);
+  .map(({ geometryHash: _geometryHash, ...r }: { geometryHash: string }) => r);
 meta.payload.visuals = {
   ...(current.data.visuals || {
     schemaVersion: 1,
@@ -160,15 +165,23 @@ const patches = records.flatMap((record) => {
   const properties_patch =
     record.entity === 'feature'
       ? Object.fromEntries(
-          Object.entries(record.payload.properties).filter(
-            ([k, v]) => hash(v) !== hash(old.payload.properties?.[k] ?? null),
+          Object.entries(record.payload.properties || {}).filter(
+            ([k, v]) =>
+              hash(v) !==
+              hash(
+                old.entity === 'feature'
+                  ? (old.payload.properties?.[k] ?? null)
+                  : null,
+              ),
           ),
         )
       : undefined;
   const payload_patch = Object.fromEntries(
     Object.entries(record.payload).filter(
       ([k, v]) =>
-        k !== 'properties' && hash(v) !== hash(old.payload[k] ?? null),
+        k !== 'properties' &&
+        hash(v) !==
+          hash(Object.fromEntries(Object.entries(old.payload))[k] ?? null),
     ),
   );
   return [

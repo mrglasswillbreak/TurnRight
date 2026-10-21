@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './coverage-fixture';
 test('compact activity preserves background work, announces attention and supports keyboard dismissal', async ({
   page,
   context,

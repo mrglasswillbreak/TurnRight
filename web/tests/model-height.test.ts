@@ -40,7 +40,9 @@ const base: MapEdit = {
 const peak = (edit: MapEdit) =>
   Math.max(
     ...createBuildingModel(
-      modelFeature(edit),
+      modelFeature(edit) as import('geojson').Feature<
+        import('geojson').Polygon | import('geojson').MultiPolygon
+      >,
       resolveBuildingVisual(modelFeature(edit)),
     ).meshes.flatMap((m) => m.positions.filter((_, i) => i % 3 === 2)),
   );

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { photoDerivative } from '../web/server/photo-processing';
 import { validPhoto } from '../web/src/arrival';
+import type { CampusPhoto } from '../web/src/types';
 import {
   requirePhotographicSource,
   syntheticPhotoEvidence,
@@ -52,8 +53,8 @@ const clean = (s = '') =>
     .replaceAll('&quot;', '"')
     .trim();
 const sha = (b: Buffer) => createHash('sha256').update(b).digest('hex');
-const photos = [],
-  decisions = [];
+const photos: CampusPhoto[] = [];
+const decisions = [];
 const destination = path.join(root, 'data/photos');
 const audit = JSON.parse(
   await fs.readFile(
@@ -129,7 +130,7 @@ for (const page of inventory.pages) {
     inputSha256: sha(input),
     derivativeSha256: photo.sha256,
   });
-  if (!audit.pages.some((p: any) => p.pageid === page.pageid))
+  if (!audit.pages.some((p: { pageid: number }) => p.pageid === page.pageid))
     audit.pages.push(page);
 }
 const existing = JSON.parse(
@@ -139,7 +140,9 @@ await fs.writeFile(
   path.join(destination, 'catalogue.json'),
   JSON.stringify(
     [
-      ...existing.filter((p: any) => !photos.some((n) => n.id === p.id)),
+      ...existing.filter(
+        (p: { id: string }) => !photos.some((n) => n.id === p.id),
+      ),
       ...photos,
     ],
     null,

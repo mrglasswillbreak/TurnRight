@@ -4,7 +4,7 @@ TurnRight combines public campus navigation with an authenticated GIS editing an
 
 ## Local development
 
-Use Node **22.23.3**, pinned in `.node-version`, and run `npm ci` then `npm run setup` from the repository root. `npm run dev` serves the public seed. The [local editor guide](docs/LOCAL_DEVELOPMENT.md) provides the pinned Python 3.12 Linux/WSL2 environment, Supabase sessions, synthetic roles, storage and workers through `npm run local:up`. Hosted APIs use [deployment configuration](docs/DEPLOYMENT.md). Keep credentials and private acceptance artifacts outside Git.
+Use Node **22.23.3**, pinned in `.node-version`, and npm **10.9.9**. Run `npm ci` once from the repository root, then `npm run doctor`. The root npm workspace installs the application and tooling with one lockfile. `npm run dev` serves the public seed. The [local editor guide](docs/LOCAL_DEVELOPMENT.md) provides the pinned Python 3.12 Linux/WSL2 environment, Supabase sessions, synthetic roles, storage and workers through `npm run local:up`. Hosted APIs use [deployment configuration](docs/DEPLOYMENT.md). Keep credentials and private acceptance artifacts outside Git.
 
 Read [repository ownership and generated-file conventions](docs/REPOSITORY.md) before moving files. Keep the lockfile with dependency changes, append migrations without renumbering history, and retain source licences and compatibility fixtures. Private backups and local design drafts do not belong in the application tree committed to Git.
 
@@ -19,28 +19,29 @@ Read [repository ownership and generated-file conventions](docs/REPOSITORY.md) b
 ## Checks
 
 ```sh
-npm test
-npm run typecheck
-npm run lint
-npm run format:check
+npx playwright install chromium webkit
+npm run check
+npm test -- --maxWorkers=1
 npm run test:coverage
 npm run check:docs
 npm run check:dependencies
 npm run build
-cd web
 npm run check:configured-build
-npm run test:browser
-npm run test:survey-webkit
-npm run test:survey-pwa
+npm run test:survey-webkit --workspace web
+npm run test:survey-pwa --workspace web
 ```
 
 Install browser binaries with `npx playwright install chromium webkit` before running browser checks. `check:configured-build` uses isolated authentication placeholders and overwrites local build output; never deploy that fixture build. Produce a normal configured deployment build through the release workflow.
 
-Build scripts enforce map, globe, voice and JavaScript bundle budgets. Use Python 3.12, run `python -m pip install --require-hashes -r scripts/requirements-data.lock`, then `python -m unittest discover -s scripts/tests -v` from the repository root for importer checks. Native-driver and PostgreSQL/restore acceptance use `scripts/requirements-test.lock` and the pinned Linux environments; see [imports verification](docs/CAMPUS-IMPORTS.md#verification). Local skips do not satisfy those gates. Browser fixtures are not a substitute for physical-device or field validation.
+Build scripts enforce map, globe, voice and JavaScript bundle budgets. Use Python 3.12, run `python -m pip install --require-hashes -r scripts/requirements-quality.lock`, run `npm run lint:python`, then `python -m unittest discover -s scripts/tests -v` from the repository root for importer checks. Native-driver and PostgreSQL/restore acceptance use `scripts/requirements-test.lock` and the pinned Linux environments; see [imports verification](docs/CAMPUS-IMPORTS.md#verification). Local skips do not satisfy those gates. Browser fixtures are not a substitute for physical-device or field validation.
 
-V8 coverage includes unimported application, component, server and API modules. Whole-project floors are the pre-refactor baseline rounded down: statements/lines 38%, functions 32%, branches 35%. New domain logic requires 80% statements/lines/functions and 70% branches; focused browser journeys report UI behavior separately. Keep explicit per-module thresholds in `web/vitest.config.ts` when introducing domain logic.
+V8 coverage includes unimported application, component, server and API modules. `npm run test:coverage` collects passing unit/component tests and Chromium workflows, then enforces 80% statements/lines/functions and 70% branches across their combined application coverage. Unit-only baseline floors and critical API per-file floors remain additional checks. Reports carry a hash of the source, tests and dependency lock; stale or failed runs cannot satisfy the combined gate. Reports are in `web/coverage/combined`. Collection adds no instrumentation to production builds. A focused browser run helps debugging; release evidence requires the complete suite.
+
+`check:architecture` keeps authored JavaScript/TypeScript source, tests and tools below 500 formatted lines, enforces a single workspace lock and requires external CI actions to use immutable commits. Split by responsibility while retaining behavior and public contracts. `check:configuration` checks environment references against `scripts/configuration.json` and the generated [inventory](docs/ENVIRONMENT.md). Add a described entry when introducing a variable, then regenerate with `npm run check:configuration -- --write`.
 
 Reproduce Python locks with uv **0.12.5**: `uv pip compile scripts/requirements-data.txt --python-version 3.12 --python-platform linux --generate-hashes --output-file scripts/requirements-data.lock` and the same command with input `scripts/requirements-test.in` and output `scripts/requirements-test.lock`. Use `--upgrade` only for an intentional dependency update, review the lock diff and run normal CI. The separate voice environment and pinned native GIS images retain their existing toolchains.
+
+Python coverage reports retain all discoverable `scripts` modules. The enforced processing scope includes every module in `scripts/map_import`, the import host, GIS processor, source scheduler, retention cleaner, diagnostics and source-observation contracts. These are the live editor worker runtime; optional ArcGIS desktop studies, historical campus enrichment and voice-generation tools remain visible in the overall report. `python scripts/test_python.py` runs all tests, rejects native-driver skips, records the source/lock hash and enforces 80% lines and 70% branches for processing. Run it in the `test` target of `scripts/map_import/Dockerfile`; CI publishes both the complete report and `processing-summary.json`. Direct `python -m unittest discover -s scripts/tests -v` remains useful on Windows, but its native-driver skips do not satisfy acceptance.
 
 Weekly Python dependency updates cover the core import/GIS and test manifests.
 Regenerate both affected hash locks when reviewing a manifest update before
@@ -48,7 +49,7 @@ merging through normal protected CI. The voice `.in` and `.txt` manifests are
 excluded from this general scan: their pinned inference environment is maintained
 and validated separately, so its resolver constraints do not block core updates.
 
-Format changed files with `npx oxfmt <files>`. Documentation validation covers all tracked and new non-ignored Markdown files, local heading anchors, filename case, and current screenshot hashes/dimensions. For a fresh gallery, use `npm run docs:prepare`, an explicit new `TURNRIGHT_DOCS_DATE`, the documented capture journeys, then `npm run docs:record`. See [screenshot maintenance](docs/SCREENSHOTS.md#reproduce). Keep historical evidence intact and inspect every image.
+Format changed files with `npx oxfmt <files>`. Documentation validation covers all tracked and new non-ignored Markdown files, local heading anchors, filename case, and current screenshot hashes/dimensions. For a fresh gallery, use `npm run docs:prepare --workspace web`, an explicit new `TURNRIGHT_DOCS_DATE`, the documented capture journeys, then `npm run docs:record --workspace web`. See [screenshot maintenance](docs/SCREENSHOTS.md#reproduce). Keep historical evidence intact and inspect every image.
 
 ## Data and licensing
 

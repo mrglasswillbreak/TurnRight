@@ -8,7 +8,6 @@ import {
   readConfig,
   requireDevelopmentHost,
   requireLocalUrl,
-  root,
   runtime,
   savePrivate,
   supabaseCli,
@@ -18,10 +17,7 @@ requireDevelopmentHost();
 const operation = process.argv[2];
 if (!['up', 'down', 'reset', 'test'].includes(operation))
   throw Error('Use up, down, reset or test.');
-const nodeArgs = [
-  '--import',
-  path.join(root, 'web/node_modules/tsx/dist/loader.mjs'),
-];
+const nodeArgs = ['--import', 'tsx'];
 const excluded =
   'studio,imgproxy,realtime,edge-runtime,logflare,vector,supavisor,mailpit';
 

@@ -10,25 +10,28 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
       - name: Restore the unchanged pre-refactor source
         run: |
           git fetch --depth=1 origin 17f758277bda9d4c2e85658aa6858a2d24dc9b24
+          git fetch --depth=1 origin cb52b36371d2dc0baac012a9a072620dcae0b017
           mkdir baseline
           git archive 17f758277bda9d4c2e85658aa6858a2d24dc9b24 | tar -x -C baseline
           # Instrument the historical source with the release's locked tools
           # and complete include patterns. Do not modify historical tests.
-          cp web/package.json web/package-lock.json web/vitest.config.ts baseline/web/
+          git show cb52b36371d2dc0baac012a9a072620dcae0b017:web/package.json > baseline/web/package.json
+          git show cb52b36371d2dc0baac012a9a072620dcae0b017:web/package-lock.json > baseline/web/package-lock.json
+          git show cb52b36371d2dc0baac012a9a072620dcae0b017:web/vitest.config.ts > baseline/web/vitest.config.ts
       - run: npm ci
         working-directory: baseline/web
       - run: npm run test:coverage
         working-directory: baseline/web
         env:
           CAMPUS_ID: ci-non-default-campus
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: historical-unit-coverage

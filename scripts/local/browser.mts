@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import playwright from '../../web/node_modules/playwright/index.js';
+import { chromium } from '@playwright/test';
 import { runtime, origin } from './runtime.mjs';
 
 const accounts: Array<{ role: string; email: string; password: string }> =
   JSON.parse(await readFile(path.join(runtime, 'accounts.json'), 'utf8'));
 const account = accounts.find((item) => item.role === 'editor')!;
-const browser = await playwright.chromium.launch({
+const browser = await chromium.launch({
   headless: true,
   args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
 });

@@ -2,14 +2,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { packageBin } from '../toolchain.mjs';
 
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtime = path.join(root, '.local-runtime');
 export const origin = 'http://127.0.0.1:5180';
-export const supabaseCli = path.join(
-  root,
-  'node_modules/supabase/dist/supabase.js',
-);
+export const supabaseCli = packageBin('supabase');
 
 export function requireLocalUrl(value, name = 'Service URL') {
   const url = new URL(value);

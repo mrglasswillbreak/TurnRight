@@ -3,7 +3,6 @@ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-// @ts-expect-error Node-only deployment module.
 import { uploadSource } from '../../scripts/vercel-api.mjs';
 
 it('uploads the public reference catalogue with frozen assets while excluding raw and private data', async () => {
@@ -22,6 +21,9 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
     'web/src/building-references.ts':
       "import evidence from '../../data/building-evidence.json';",
     'web/public/packages/lasu-abc123/campus.json': 'frozen campus',
+    'package.json': '{"workspaces":["web"]}',
+    'package-lock.json': '{"lockfileVersion":3}',
+    '.node-version': '22.23.3',
     ...Object.fromEntries(
       [
         'package.json',
@@ -66,6 +68,17 @@ it('uploads the public reference catalogue with frozen assets while excluding ra
       'data/photo-models/inventory.json',
     ]);
     expect(files.some((file) => file.file.includes('.env'))).toBe(false);
+    expect(files.map((file) => file.file)).toEqual(
+      expect.arrayContaining([
+        'package.json',
+        'package-lock.json',
+        '.node-version',
+        'web/package.json',
+      ]),
+    );
+    expect(files.some((file) => file.file === 'web/package-lock.json')).toBe(
+      false,
+    );
     expect(
       files.some(
         (file) => file.file === 'scripts/map_import/capabilities.json',

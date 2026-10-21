@@ -37,7 +37,9 @@ export function packageInvariants(data) {
     closures: sorted(data.closures),
     driving: data.driving ?? null,
     accessPolicy: data.accessPolicy ?? null,
-    places: sorted(data.places).map(({ landmark, ...place }) => place),
+    places: sorted(data.places).map(
+      ({ landmark: _landmark, ...place }) => place,
+    ),
   };
   return Object.fromEntries(
     Object.entries(fields).map(([key, value]) => [

@@ -75,6 +75,7 @@ const description: FacadeDescription = {
 const feature = () => ({
   ...structuredClone(footprint),
   properties: {
+    name: 'Building',
     ...footprint.properties,
     appearance: { facades: { [wall.wallId]: structuredClone(description) } },
   },

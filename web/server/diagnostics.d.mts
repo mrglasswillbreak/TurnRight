@@ -7,6 +7,7 @@ export interface DiagnosticContext {
   startedAt?: number;
   status?: number;
   requestId?: string;
+  jobId?: string;
   action?: string;
   dependency?: string;
   upstreamStatus?: number;
@@ -21,3 +22,7 @@ export function emitEvent(
   event: DiagnosticEvent,
   context?: DiagnosticContext,
 ): void;
+export function diagnosticJobId(
+  action: string | undefined,
+  body: unknown,
+): string | undefined;

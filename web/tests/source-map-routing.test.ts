@@ -35,6 +35,13 @@ const shape = async (
     )
   ).rows[0].result;
 
+const requiredLine = async (...args: Parameters<typeof shape>) => {
+  const value = await shape(...args);
+  if (!value || value.geometry.type !== 'LineString')
+    throw Error('Expected a resolved routing line');
+  return { ...value, geometry: value.geometry };
+};
+
 it('resolves current and proposed link endpoints, including additions, removals and a fixed import cutoff', async () => {
   for (const record of [node('a', [3.2, 6.4]), node('b', [3.21, 6.41])])
     await db.query(
@@ -47,7 +54,7 @@ it('resolves current and proposed link endpoints, including additions, removals 
         record.hash,
       ],
     );
-  const original = await shape(edge());
+  const original = await requiredLine(edge());
   expect(original.geometry).toEqual({
     type: 'LineString',
     coordinates: [
@@ -74,25 +81,26 @@ it('resolves current and proposed link endpoints, including additions, removals 
     )
   ).rows[0].t;
   expect(await shape(edge(), 'after', cutoff)).toEqual(original);
-  expect((await shape(edge(), 'before', later)).geometry).toEqual(
+  expect((await requiredLine(edge(), 'before', later)).geometry).toEqual(
     original.geometry,
   );
-  expect((await shape(edge(), 'after', later)).geometry.coordinates[0]).toEqual(
-    [3.22, 6.42],
-  );
+  expect(
+    (await requiredLine(edge(), 'after', later)).geometry.coordinates[0],
+  ).toEqual([3.22, 6.42]);
   await db.query(
     `insert into map_changes(id,source_id,kind,after,summary) values('node-add','node:c','add',$1,'New node')`,
     [JSON.stringify(node('c', [3.23, 6.43]))],
   );
   expect(await shape(edge('b', 'c'), 'before', later)).toBeNull();
   expect(
-    (await shape(edge('b', 'c'), 'after', later)).geometry.coordinates[1],
+    (await requiredLine(edge('b', 'c'), 'after', later)).geometry
+      .coordinates[1],
   ).toEqual([3.23, 6.43]);
   await db.query(
     `insert into map_changes(id,source_id,kind,before,summary) values('node-remove','node:b','remove',$1,'Remove node')`,
     [JSON.stringify(node('b', [3.21, 6.41]))],
   );
-  expect((await shape(edge(), 'before', later)).geometry).toEqual(
+  expect((await requiredLine(edge(), 'before', later)).geometry).toEqual(
     original.geometry,
   );
   expect(await shape(edge(), 'after', later)).toBeNull();
@@ -104,7 +112,7 @@ it('resolves current and proposed link endpoints, including additions, removals 
     ...edge(),
     payload: { ...edge().payload, geometry: original.geometry },
   };
-  expect((await shape(direct)).geometry).toEqual(original.geometry);
+  expect((await requiredLine(direct)).geometry).toEqual(original.geometry);
 });
 
 it('keeps endpoint lookups private and scoped to the current campus', async () => {
@@ -143,7 +151,7 @@ it(
       asOf = null,
       pages = 0;
     do {
-      const page = (
+      const page: SourceMapPage = (
         await db.query<{ result: SourceMapPage }>(
           'select source_review_map($1,$2,$3,$4) result',
           [
@@ -159,7 +167,7 @@ it(
       for (const row of page.rows) {
         expect(ids.has(row.id)).toBe(false);
         ids.add(row.id);
-        expect(row.after.geometry).toEqual({
+        expect(row.after?.geometry).toEqual({
           type: 'LineString',
           coordinates: [
             [3.2, 6.4],

@@ -132,6 +132,9 @@ describe('campus scenery and visitor presentation', () => {
     data.places = [
       {
         id: 'selected',
+        aliases: [],
+        sourceId: 'selected',
+        arrivalKind: 'unmapped',
         name: 'Selected',
         coordinates: [3.2, 6.47],
         category: 'other',
@@ -139,6 +142,9 @@ describe('campus scenery and visitor presentation', () => {
       },
       {
         id: 'landmark',
+        aliases: [],
+        sourceId: 'landmark',
+        arrivalKind: 'unmapped',
         name: 'Library',
         landmark: true,
         coordinates: [3.2, 6.47],

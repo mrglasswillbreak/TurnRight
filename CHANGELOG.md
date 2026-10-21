@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Consolidate installation into a private root npm workspace with one dependency lock, root configuration checks, a pinned runtime doctor and a shared Docker/development-container entry.
+- Split large map, survey, import, layer, photo and model components into domain modules. Split the browser and database suites while preserving test assertions and shared setup. Add bounded, cancellable import polling and regression tests.
+- Check authored source, tests and tools with lint, types and formatting; enforce the 500-line boundary and immutable external CI action revisions.
+- Add combined unit/browser application coverage gates and native Python processing coverage, with receipts tied to source and dependency snapshots. Preserve complete application includes, native-driver acceptance, published fixtures and download budgets.
+- Add browser diagnostic downloads and API/worker correlation using validated request and job identifiers. Keep payloads, locations and claim tokens out of structured logs.
+- Enforce cached download limits and add importer integrity, cancellation, scheduling, redirect and source-receipt tests. Update Vite, certificate data and the native PyArrow dependency for reported vulnerabilities; retain locked GDAL compatibility.
+- Consolidate CI entry points and add dependency, secret and CodeQL security checks. Track verification and remaining release steps in [repository readiness](docs/READINESS-UPDATE.md).
+
 ## 0.2.0
 
 - Add a pinned Linux/WSL2 development container and an official local Supabase stack with synthetic campuses, real role-based sessions, persistent private storage and isolated import/GIS/review workers.

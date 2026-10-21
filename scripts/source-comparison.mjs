@@ -1,28 +1,37 @@
 import { hash, evidenceHash } from './cloud.mjs';
-
 export const COMPARATOR_VERSION = 'source-observations/1';
+
 export const MAX_GROUP_RECORDS = 1000;
+
 export const identityOf = ({ provider, collection, nativeId }) =>
   JSON.stringify([provider, collection, String(nativeId)]);
-const recordMap = (records = []) => new Map(records.map((r) => [r.id, r]));
-const routingDependencies = (record) =>
+
+export const recordMap = (records = []) =>
+  new Map(records.map((r) => [r.id, r]));
+
+export const routingDependencies = (record) =>
   record?.entity === 'edge'
     ? ['node:' + record.payload.from, 'node:' + record.payload.to]
     : record?.entity === 'place' && record.payload.graphNode
       ? ['node:' + record.payload.graphNode]
       : [];
+
 const partition = (o) =>
   JSON.stringify([o.provider, o.collection, o.featureType]);
+
 const upstreamHash = (o) => evidenceHash(o.content);
+
 const recordFingerprint = (records) =>
   hash(
     [...records].sort((a, b) => a.id.localeCompare(b.id)).map(semanticRecord),
   );
+
 const hasEndpoints = (r) =>
   r.entity === 'edge' &&
   ['id', 'sourceId', 'from', 'to'].every(
     (k) => typeof r.payload[k] === 'string' && r.payload[k].length > 0,
   );
+
 export function matchRoutingSegments(before, after) {
   const byAncestry = new Map();
   for (const record of after)
@@ -64,6 +73,7 @@ export function matchRoutingSegments(before, after) {
       };
     });
 }
+
 const semanticRecord = (r) =>
   r
     ? Object.fromEntries(
@@ -80,6 +90,7 @@ const semanticRecord = (r) =>
           .map((key) => [key, r[key]]),
       )
     : null;
+
 const recordChange = (before, after) => ({
   id: (after || before).id,
   before: semanticRecord(before),
@@ -89,6 +100,7 @@ const recordChange = (before, after) => ({
 
 // Receipts deliberately never participate in semantic comparisons. The caller
 // supplies accepted observations, not yesterday's transformed/published graph.
+/** @param {import('./source-observation-types').ObservationComparison} input */
 export function compareObservations({
   accepted = [],
   observations = [],
@@ -441,70 +453,7 @@ export function compareObservations({
       .map((c) => c.identity),
   };
 }
-
-// Conservative legacy adapter. Only source shapes establish feature identities;
-// graph IDs and proximity never invent upstream objects or deletion candidates.
-export function legacyObservations(records) {
-  const nodes = recordMap(records.filter((r) => r.entity === 'node'));
-  const edges = new Map();
-  for (const r of records)
-    if (r.entity === 'edge') {
-      const key = r.payload.sourceId;
-      edges.set(key, [...(edges.get(key) || []), r]);
-    }
-  return records
-    .filter(
-      (r) =>
-        r.entity === 'feature' &&
-        /^(osm|arcgis|overture):/.test(r.payload.properties?.id || ''),
-    )
-    .map((r) => {
-      const id = r.payload.properties.id,
-        provider = id.split(':')[0],
-        linked = edges.get(id) || [];
-      const dependencies = [
-        ...new Set(linked.flatMap((e) => [e.payload.from, e.payload.to])),
-      ]
-        .map((id) => nodes.get('node:' + id))
-        .filter(Boolean);
-      return {
-        provider,
-        collection: `${provider}:${r.payload.properties.kind || 'feature'}`,
-        nativeId: id.slice(provider.length + 1),
-        featureType: r.payload.properties.kind || 'feature',
-        stable: true,
-        content: r.payload,
-        records: [r, ...linked, ...dependencies],
-      };
-    });
-}
-
-export function attachDerivedRecords(upstream, records) {
-  const byRoot = new Map(),
-    nodes = recordMap(records.filter((r) => r.entity === 'node'));
-  for (const r of records) {
-    const root =
-      r.entity === 'feature'
-        ? r.payload.properties.id
-        : r.entity === 'edge'
-          ? r.payload.sourceId
-          : r.entity === 'place'
-            ? r.payload.buildingId || r.payload.id
-            : null;
-    if (root) byRoot.set(root, [...(byRoot.get(root) || []), r]);
-  }
-  return upstream.map((o) => {
-    const derived = byRoot.get(o.rootId) || [];
-    const dependencies = [...new Set(derived.flatMap(routingDependencies))]
-      .map((id) => nodes.get(id))
-      .filter(Boolean);
-    return {
-      ...o,
-      featureType:
-        derived.find((r) => r.entity === 'feature')?.payload.properties.kind ||
-        derived[0]?.entity ||
-        'unmapped',
-      records: [...derived, ...dependencies],
-    };
-  });
-}
+export {
+  legacyObservations,
+  attachDerivedRecords,
+} from './source-derived-records.mjs';

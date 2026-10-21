@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-// @ts-expect-error Shared Node pipeline module intentionally uses plain JavaScript.
 import {
   compareSources,
   flatten,

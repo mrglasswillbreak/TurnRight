@@ -204,7 +204,12 @@ await writeFile(
 );
 console.log(
   JSON.stringify(
-    { ...result, runs: runs.map(({ timings, tasks, clicks, ...r }) => r) },
+    {
+      ...result,
+      runs: runs.map(
+        ({ timings: _timings, tasks: _tasks, clicks: _clicks, ...r }) => r,
+      ),
+    },
     null,
     2,
   ),

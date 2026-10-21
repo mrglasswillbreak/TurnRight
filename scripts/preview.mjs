@@ -26,10 +26,11 @@ const created = await vercelApi('/v13/deployments', {
     meta: { turnrightVersion: manifest.version },
     projectSettings: {
       rootDirectory: 'web',
+      sourceFilesOutsideRootDirectory: true,
       framework: 'vite',
       buildCommand: 'npm run build',
       outputDirectory: 'dist',
-      installCommand: 'npm ci',
+      installCommand: 'cd .. && npm ci',
     },
   }),
 });

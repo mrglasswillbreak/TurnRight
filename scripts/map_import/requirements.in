@@ -1,0 +1,6 @@
+shapely==2.1.2
+# Match the GDAL image's NumPy ABI while locking the complete Python dependency tree.
+numpy==1.26.4
+osmium==4.1.1
+pyproj==3.7.2
+pyarrow==23.0.1

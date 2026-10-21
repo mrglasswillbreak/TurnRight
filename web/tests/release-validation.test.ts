@@ -129,7 +129,8 @@ describe('server release guards', () => {
     const features = publishedRecords(campusFixture());
     expect(snapshotHash(features)).toBe(snapshotHash([...features].reverse()));
     const changed = structuredClone(features);
-    changed[0].payload.version = 'changed';
+    const metadata = changed.find((record) => record.entity === 'meta')!;
+    metadata.payload.version = 'changed';
     expect(snapshotHash(features)).not.toBe(snapshotHash(changed));
     expect(
       snapshotHash(features, [

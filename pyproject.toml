@@ -1,0 +1,30 @@
+[tool.ruff]
+target-version = "py312"
+include = ["scripts/**/*.py"]
+extend-exclude = [".local-runtime", "node_modules"]
+
+[tool.ruff.lint]
+# Catch incorrect names, imports and control flow in tools as well as workers.
+# Python's compact legacy formatting is independent of correctness checking.
+select = ["F", "E4", "E7", "E9"]
+
+[tool.coverage.run]
+branch = true
+relative_files = true
+source = ["scripts"]
+omit = ["scripts/tests/*"]
+data_file = "coverage/python/.coverage"
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+precision = 2
+
+[tool.coverage.json]
+output = "coverage/python/coverage.json"
+
+[tool.coverage.html]
+directory = "coverage/python/html"
+
+[tool.coverage.xml]
+output = "coverage/python/coverage.xml"

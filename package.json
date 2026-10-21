@@ -3,26 +3,50 @@
   "version": "0.2.0",
   "private": true,
   "license": "UNLICENSED",
+  "workspaces": [
+    "web"
+  ],
+  "packageManager": "npm@10.9.9",
   "engines": {
     "node": ">=22.13.0 <23"
   },
   "scripts": {
-    "setup": "npm ci --prefix web",
-    "dev": "npm run dev --prefix web",
-    "test": "npm test --prefix web --",
-    "typecheck": "npm run typecheck --prefix web",
-    "lint": "npm run lint --prefix web",
+    "setup": "npm ci",
+    "doctor": "node scripts/doctor.mjs",
+    "dev": "npm run dev --workspace web",
+    "test": "npm test --workspace web --",
+    "typecheck": "npm run typecheck --workspace web",
+    "lint": "node scripts/lint.mjs",
     "format:check": "node scripts/format-check.mjs",
-    "test:coverage": "npm run test:coverage --prefix web",
-    "build": "npm run build --prefix web",
-    "check:docs": "npm run check:docs --prefix web",
-    "check:dependencies": "npm audit --audit-level=high && npm run check:dependencies --prefix web",
+    "test:coverage": "npm run test:coverage:unit && npm run test:coverage:browser && npm run test:coverage:check",
+    "build": "npm run build --workspace web",
+    "check:docs": "npm run check:docs --workspace web",
+    "check:dependencies": "npm audit --audit-level=high --workspaces --include-workspace-root",
     "local:up": "node scripts/local/control.mjs up",
+    "local:container": "node scripts/local/container.mjs",
     "local:down": "node scripts/local/control.mjs down",
     "local:reset": "node scripts/local/control.mjs reset",
-    "local:test": "node scripts/local/control.mjs test"
+    "local:test": "node scripts/local/control.mjs test",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "check:configuration": "node scripts/check-configuration.mjs",
+    "check:configured-build": "npm run check:configured-build --workspace web",
+    "test:coverage:unit": "node scripts/unit-coverage.mjs",
+    "test:coverage:browser": "node scripts/run-browser-coverage.mjs",
+    "test:coverage:check": "node scripts/browser-coverage.mjs && node scripts/check-coverage.mjs",
+    "check": "npm run doctor && npm run check:configuration && npm run check:architecture && npm run lint && npm run typecheck && npm run format:check && npm run check:docs",
+    "test:python": "python3 -m unittest discover -s scripts/tests -v",
+    "lint:python": "python3 -m ruff check scripts && python3 -m ruff format --check scripts"
   },
   "devDependencies": {
-    "supabase": "2.121.0"
+    "@playwright/test": "^1.63.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "@vitest/istanbul-lib-coverage": "1.0.2",
+    "@vitest/istanbul-lib-report": "1.0.2",
+    "ast-v8-to-istanbul": "1.0.7",
+    "sharp": "^0.35.5",
+    "supabase": "2.121.0",
+    "tsx": "^4.23.13",
+    "vite": "8.2.4",
+    "vitest": "5.0.0"
   }
 }

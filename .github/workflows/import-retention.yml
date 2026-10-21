@@ -28,7 +28,7 @@ jobs:
       APPLY_CLEANUP: ${{ vars.IMPORT_RETENTION_ENABLED == 'true' && (github.event_name != 'workflow_dispatch' || inputs.apply) }}
     steps:
       # workflow_run must never execute untrusted artifacts or a pull-request checkout.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
       - name: Clean only expired remote import files

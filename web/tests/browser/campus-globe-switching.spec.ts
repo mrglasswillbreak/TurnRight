@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './coverage-fixture';
 import { createHash } from 'node:crypto';
 import type { Map as MapInstance } from 'maplibre-gl';
 import { campusFixture } from '../fixture';
@@ -24,7 +24,10 @@ async function attach(page: Page) {
       let hook = fiber.memoizedState;
       while (hook) {
         const map = hook.memoizedState?.current;
-        if (map?.getCanvas && map?.project) {
+        if (
+          typeof map?.getCanvas === 'function' &&
+          typeof map?.project === 'function'
+        ) {
           window.editorTestMap = map;
           return map.loaded() && !!map.getSource('published-campuses');
         }
@@ -84,7 +87,7 @@ async function setup(page: Page, overlap = false) {
       bytes,
       campus,
       manifest: {
-        schemaVersion: 1,
+        schemaVersion: 1 as const,
         version: data.version,
         createdAt: data.createdAt,
         summary: 'Test campus',

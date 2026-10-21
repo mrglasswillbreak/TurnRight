@@ -159,7 +159,12 @@ try {
   });
   if (!finished)
     throw Error('Job was cancelled, expired, or its author lost access');
-  emitEvent('worker-completed', { worker: 'gis', startedAt, status: 200 });
+  emitEvent('worker-completed', {
+    worker: 'gis',
+    jobId: id,
+    startedAt,
+    status: 200,
+  });
 } catch (error) {
   if (!job)
     await db(`gis_jobs?id=eq.${id}&status=eq.queued`, 'PATCH', {
@@ -174,6 +179,7 @@ try {
       result: { error: String(error.message).slice(0, 12000) },
     }).catch(() => {});
   emitEvent('worker-failed', {
+    jobId: id,
     worker: 'gis',
     startedAt,
     status: 500,
