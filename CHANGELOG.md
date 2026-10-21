@@ -10,6 +10,7 @@
 - Preserve comment and evidence drafts after failed GIS saves. Add component and API regression coverage for bulk edits, publication, survey recovery, model assets and verified image codecs.
 - Remove hidden backdrop blurring from the full-screen photo editor to prevent desktop rendering stalls. Avoid transferring complete map instances from browser test camera commands, retaining all camera assertions and time limits.
 - Wait for the real map layout before projecting a polygon-editing test gesture after panel changes. Refresh workspace, coverage, deployment, screenshot and importer documentation while retaining dated evidence.
+- Use the bounded, same-origin asset request helper for application-preview package audits, allowing temporary protection propagation without forwarding credentials to sign-in redirects.
 - Reject XML entity expansion across source readers and require complete authentication tags when verifying encrypted backups. Add snapshot-preservation and truncated-tag regression tests.
 - Enforce cached download limits and add importer integrity, cancellation, scheduling, redirect and source-receipt tests. Update Vite, certificate data and the native PyArrow dependency for reported vulnerabilities; retain locked GDAL compatibility.
 - Consolidate CI entry points and add dependency, historical secret and pinned Semgrep security checks that work with the private repository. Track verification and remaining release steps in [repository readiness](docs/READINESS-UPDATE.md).

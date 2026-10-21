@@ -170,7 +170,12 @@ The polygon trace captured a drag projected before the canvas resized after
 closing the layer pane; the test now uses the existing map-layout wait before
 projecting the handle. The compact-roof WebKit case timed out during a pointer
 move and passed three unchanged focused repeats; its original cause remains
-unproven. The failed traces are retained as workflow artifacts. The current PR
+unproven. The failed traces are retained as workflow artifacts. A subsequent
+protected preview audit verified application health and anonymous denial, then
+encountered Vercel's protection redirect on a package path. The package auditor
+now uses the existing bounded asset-request helper, which retries temporary
+protection propagation and rejects credential forwarding to external origins.
+The current PR
 must pass the complete protected suite again before merge; the earlier passing
 code receipt above does not override a later failure. See [production tracking](PRODUCTION.md#repository-readiness-application-update--21-october-2026)
 for the package baseline and deployment procedure.

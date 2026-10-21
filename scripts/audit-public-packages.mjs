@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { requestPublishedAsset } from '../web/scripts/published-assets.mjs';
 
 const [output, previous] = process.argv.slice(2);
 assert(
@@ -13,13 +14,10 @@ const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 async function get(relative) {
   const url = new URL(relative, origin);
   assert.equal(url.origin, new URL(origin).origin);
-  const response = await fetch(url, {
-    cache: 'no-store',
-    redirect: 'manual',
+  const response = await requestPublishedAsset(origin, url.href, 45000, {
     headers: process.env.VERIFY_BYPASS
       ? { 'x-vercel-protection-bypass': process.env.VERIFY_BYPASS }
       : {},
-    signal: AbortSignal.timeout(45000),
   });
   const location = response.headers.get('location');
   // Report the public path, never redirect queries, bypass credentials or bodies.
