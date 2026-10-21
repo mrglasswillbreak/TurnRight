@@ -40,6 +40,8 @@ with psycopg.connect(url, autocommit=True) as database:
             "select * from operational_errors",
             "select operational_error_summary()",
             "select prune_operational_errors()",
+            "select record_operational_error('{}'::jsonb)",
+            "select resolve_operational_error('a',now())",
         ):
             try:
                 database.execute(query)
@@ -62,6 +64,26 @@ with psycopg.connect(url, autocommit=True) as database:
             pass
         else:
             raise AssertionError("Accepted unsafe monitoring input")
+    # Transaction-start timestamps must not let two occurrences share a revision.
+    # Roll back this fixture so the concurrent count below starts from zero.
+    database.execute("begin")
+    try:
+        identity = database.execute(
+            "select record_operational_error(%s)", (Jsonb(event),)
+        ).fetchone()[0]
+        seen = database.execute(
+            "select last_seen from operational_errors where fingerprint=%s", (identity,)
+        ).fetchone()[0]
+        database.execute("select record_operational_error(%s)", (Jsonb(event),))
+        assert database.execute(
+            "select last_seen>%s from operational_errors where fingerprint=%s",
+            (seen, identity),
+        ).fetchone()[0]
+        assert not database.execute(
+            "select resolve_operational_error(%s,%s)", (identity, seen)
+        ).fetchone()[0]
+    finally:
+        database.execute("rollback")
     with ThreadPoolExecutor(max_workers=4) as pool:
         identities = list(pool.map(record, [event] * 12))
     assert len(set(identities)) == 1

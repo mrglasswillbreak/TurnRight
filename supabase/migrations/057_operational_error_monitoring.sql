@@ -22,7 +22,7 @@ grant select,insert,update,delete on public.operational_errors to service_role;
 create function public.record_operational_error(p_event jsonb)
 returns text language plpgsql security definer set search_path=public set statement_timeout='2s' as $$
 declare identity text; kind text; component_name text; dependency_name text;
- code integer; revision_name text; reference_id uuid;
+ code integer; revision_name text; reference_id uuid; observed_at timestamptz;
 begin
  if jsonb_typeof(p_event) is distinct from 'object' or octet_length(p_event::text)>1024
    or exists(select 1 from jsonb_object_keys(p_event) k where k not in ('event','component','dependency','status','revision','reference'))
@@ -46,17 +46,20 @@ begin
  end if;
  identity:=md5(concat_ws(':',kind,component_name,dependency_name,code::text,revision_name));
  perform pg_advisory_xact_lock(hashtext('turnright-operational-errors'));
- delete from operational_errors where last_seen < now()-interval '30 days';
+ observed_at:=clock_timestamp();
+ delete from operational_errors where last_seen < observed_at-interval '30 days';
  if not exists(select 1 from operational_errors where fingerprint=identity)
    and (select count(*) from operational_errors)>=1000 then
    delete from operational_errors where fingerprint=(select fingerprint from operational_errors order by last_seen,fingerprint limit 1);
  end if;
- insert into operational_errors(fingerprint,event,component,dependency,status,revision,last_reference)
- values(identity,kind,component_name,dependency_name,code,revision_name,reference_id)
+ insert into operational_errors(fingerprint,event,component,dependency,status,revision,last_reference,first_seen,last_seen,window_started)
+ values(identity,kind,component_name,dependency_name,code,revision_name,reference_id,observed_at,observed_at,observed_at)
  on conflict(fingerprint) do update set
-   last_seen=now(), occurrences=least(operational_errors.occurrences+1,1000000),
-   window_started=case when operational_errors.window_started<now()-interval '5 minutes' then now() else operational_errors.window_started end,
-   window_count=case when operational_errors.window_started<now()-interval '5 minutes' then 1 else least(operational_errors.window_count+1,1000000) end,
+   -- Strictly advance even for repeated calls in one transaction or clock corrections.
+   last_seen=greatest(excluded.last_seen,operational_errors.last_seen+interval '1 microsecond'),
+   occurrences=least(operational_errors.occurrences+1,1000000),
+   window_started=case when operational_errors.window_started<observed_at-interval '5 minutes' then observed_at else operational_errors.window_started end,
+   window_count=case when operational_errors.window_started<observed_at-interval '5 minutes' then 1 else least(operational_errors.window_count+1,1000000) end,
    last_reference=coalesce(excluded.last_reference,operational_errors.last_reference), resolved_at=null;
  return identity;
 end $$;

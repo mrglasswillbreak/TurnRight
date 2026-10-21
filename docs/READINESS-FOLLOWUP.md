@@ -25,6 +25,8 @@ The reassessment's missing Compose and Python-lock claims did not reflect the re
 
 ## Verification contract
 
+Implementation and current validation/deployment status are tracked in [PR #58](https://github.com/mrglasswillbreak/TurnRight/pull/58). An open PR or a local passing test does not establish production deployment.
+
 The preceding [release PR #47](https://github.com/mrglasswillbreak/TurnRight/pull/47) preserves the 1,009-test and combined-coverage measurements for its own revision. They are not measurements of this follow-up. The follow-up must pass root quality, full unit/component coverage, all required Chromium/WebKit and offline journeys, native processing coverage, local-stack acceptance, PostgreSQL monitoring acceptance and security checks before merge. The final PR/deployment receipt must identify its exact revision and live monitoring probe.
 
 Production verification must preserve all 236 existing campus assets and verify both campuses and offline operation. Migration 057 is additive and operational only; deployment does not authorize new campus data publication. Keep historical evidence and original source/rights boundaries intact. Future external scores, sustained multi-author maintenance and independent review remain unclaimed.
