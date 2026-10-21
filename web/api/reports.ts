@@ -1,12 +1,11 @@
 import { lasuCampus } from '../src/campus-context.js';
-import { flushErrorMonitoring } from '../server/error-monitoring.mjs';
+import { monitoredFailure } from '../server/monitored-response.js';
 import { randomUUID } from 'node:crypto';
 import { resolveCampus } from '../server/campuses.js';
 import { withCampusId } from '../server/campus-scope.js';
 import {
   bodyOf,
   db,
-  fail,
   hash,
   HttpError,
   privateHeaders,
@@ -103,8 +102,6 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       res.status(201).json({ accepted: true });
     });
   } catch (error) {
-    fail(res, error, context);
-  } finally {
-    await flushErrorMonitoring();
+    await monitoredFailure(res, error, context);
   }
 }

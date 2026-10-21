@@ -1,6 +1,6 @@
 import { publicationAction } from '../server/publication.js';
 import { monitoringAction } from '../server/monitoring.js';
-import { flushErrorMonitoring } from '../server/error-monitoring.mjs';
+import { monitoredFailure } from '../server/monitored-response.js';
 import { adminEnvelope } from '../server/request-envelope.js';
 import { sourceUpdatesAction } from '../server/source-updates.js';
 import { processStatus } from '../server/process-status.js';
@@ -18,7 +18,6 @@ import {
   allRows,
   db,
   dispatch,
-  fail,
   HttpError,
   privateHeaders,
   observeResponse,
@@ -475,8 +474,6 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
       }
     });
   } catch (error) {
-    fail(res, error, context);
-  } finally {
-    await flushErrorMonitoring();
+    await monitoredFailure(res, error, context);
   }
 }

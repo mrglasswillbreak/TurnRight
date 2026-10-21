@@ -18,7 +18,7 @@ Storage retains at most 1,000 groups and 30 days of activity. The dashboard show
 
 ## Failure handling and privacy limits
 
-Node delivery allows at most 16 concurrent requests, refuses redirects and has a two-second timeout. API handlers and worker entry points flush bounded deliveries before returning/exiting. Python host workers use a two-second timeout and refuse redirects. Monitoring errors do not replace the original application error or print private upstream details. Provider logs retain the original redacted event and a bounded delivery-failure indication.
+Node delivery allows at most 16 concurrent requests, refuses redirects and has a two-second timeout. API failure responses wait for bounded delivery before sending their body, so serverless response completion cannot interrupt capture; this can add up to two seconds to a failed request. Worker entry points flush before exiting. Python host workers use a two-second timeout and refuse redirects. Monitoring errors do not replace the original application error or print private upstream details. Provider logs retain the original redacted event and a bounded delivery-failure indication.
 
 Monitoring shares the application's database, so a complete backend outage can prevent durable capture. Consult deployment/worker logs in that case; the dashboard displays refresh failures rather than claiming healthy operation. Raw browser diagnostics remain in memory and are shared only through the existing explicit download; public visitor errors are not automatically transmitted.
 
