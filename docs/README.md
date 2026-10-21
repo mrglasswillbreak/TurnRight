@@ -55,7 +55,7 @@ Start with [contributing](../CONTRIBUTING.md), [B2 brand assets and usage](BRAND
 | Screenshot files, fixture provenance and reproduction                  | [Screenshot inventory](assets/screenshots/README.md)                                       |
 | Source/data reuse and public credits                                   | [Attribution](../data/ATTRIBUTION.md) and [photo source records](../data/photos/README.md) |
 
-Start with Node 22.23.3 from `.node-version`, then root `npm ci` and `npm run setup`. [Local development](LOCAL_DEVELOPMENT.md) provides the complete synthetic editor with Supabase and isolated workers on Linux/WSL2; `npm run dev` serves only the public seed. Root `test`, `typecheck`, `lint`, `format:check`, `test:coverage` and `build` commands expose independent checks. The web package also provides `check:configured-build`. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
+Start with Node 22.23.3 from `.node-version` and npm 10.9.9, then root `npm ci` and `npm run doctor`. [Local development](LOCAL_DEVELOPMENT.md) provides the complete synthetic editor with Supabase and isolated workers on Linux/WSL2; `npm run dev` serves only the public seed. Root `test`, `typecheck`, `lint`, `format:check`, `test:coverage` and `build` commands expose independent checks. The web package also provides `check:configured-build`. Full GIS driver checks run in the pinned Linux container; [import verification](CAMPUS-IMPORTS.md#verification) provides the commands. App code deployment preserves published packages; map/model publication is a separate approved team action.
 
 ## Operate
 
@@ -64,6 +64,7 @@ Start with Node 22.23.3 from `.node-version`, then root `npm ci` and `npm run se
 | Install, migrate, configure credentials and run release jobs | [Deployment](DEPLOYMENT.md) and [GIS rollout](GIS-PLATFORM.md#additive-rollout-and-recovery)   |
 | Maintain operational settings                                | [Configuration](CONFIGURATION.md)                                                              |
 | Check deployed revisions and dated release receipts          | [Production](PRODUCTION.md)                                                                    |
+| Inspect current coverage, security and assessment evidence   | [Repository readiness](READINESS-UPDATE.md) and [diagnostics](DIAGNOSTICS.md)                    |
 | Recover private work and handle conflicts                    | [Editor reliability](EDITOR-RELIABILITY.md)                                                    |
 | Verify offline and release readiness                         | [Acceptance](ACCEPTANCE.md) and [15 October manual handover](RELEASE-ACCEPTANCE-2026-10-15.md) |
 

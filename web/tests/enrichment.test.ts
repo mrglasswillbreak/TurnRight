@@ -22,16 +22,13 @@ import {
   reviewUndo,
 } from '../src/survey-model';
 import type { MapChange } from '../src/types';
-// @ts-expect-error Shared Node pipeline module.
 import {
   flatten,
   compareSources,
   hash,
   preserveReviewedMetadata,
 } from '../../scripts/cloud.mjs';
-// @ts-expect-error Node public serialization.
 import { publicCampus } from '../../scripts/public-campus.mjs';
-// @ts-expect-error Node glyph packaging.
 import { glyphRanges } from '../../scripts/package-glyphs.mjs';
 
 const evidence = {
@@ -167,9 +164,10 @@ describe('campus enrichment', () => {
     };
     expect(selectableSourceFields(change)).not.toContain('coordinates');
     const result = selectSourceFields(change, ['website']);
+    if (result.entity !== 'place') throw Error('Expected place result');
     expect(result.payload.name).toBe('Library');
     expect(result.payload.coordinates).toEqual(before.payload.coordinates);
-    expect(result.payload.evidence.coordinates).toBeUndefined();
+    expect(result.payload.evidence?.coordinates).toBeUndefined();
     expect(result.payload.website).toBe('https://library.example/');
     expect(() => selectSourceFields(change, ['__proto__'])).toThrow();
   });
@@ -217,7 +215,7 @@ describe('campus enrichment', () => {
     expect(
       compareSources(old, candidate).find(
         (r: { kind: string }) => r.kind === 'remove',
-      ).status,
+      )!.status,
     ).toBe('pending');
     expect(hash({ evidence: { name: [evidence] } })).toBe(
       hash({ evidence: { name: [{ ...evidence, checkedAt: '2026-09-23' }] } }),

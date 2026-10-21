@@ -28,6 +28,11 @@ export async function confirmOverture(collection, receipt) {
       reason: 'The first collection was incomplete',
     };
   const directory = await mkdtemp(path.join(tmpdir(), 'turnright-confirm-'));
+  if (
+    path.dirname(path.resolve(directory)) !== path.resolve(tmpdir()) ||
+    !path.basename(directory).startsWith('turnright-confirm-')
+  )
+    throw new Error('Unexpected confirmation directory');
   try {
     const output = path.join(directory, kind + '.geojson');
     await execute(
@@ -75,11 +80,6 @@ export async function confirmOverture(collection, receipt) {
   } catch (error) {
     return { status: 'unverified', reason: error.message.slice(0, 500) };
   } finally {
-    if (
-      path.dirname(path.resolve(directory)) !== path.resolve(tmpdir()) ||
-      !path.basename(directory).startsWith('turnright-confirm-')
-    )
-      throw new Error('Unexpected confirmation directory');
     await rm(directory, { recursive: true, force: true });
   }
 }

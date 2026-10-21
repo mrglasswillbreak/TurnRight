@@ -1,4 +1,4 @@
-import { createClient } from '../../web/node_modules/@supabase/supabase-js/dist/index.mjs';
+import { createClient } from '@supabase/supabase-js';
 import { randomBytes, createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';

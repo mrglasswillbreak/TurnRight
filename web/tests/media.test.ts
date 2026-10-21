@@ -139,7 +139,8 @@ describe('private building photograph processing', () => {
     });
     expect(data.photos).toHaveLength(25);
     expect(emitted).toEqual([p.url]);
-    expect(manifest.bytes).toBe(p.bytes);
+    expect(manifest).toBeDefined();
+    expect(manifest!.bytes).toBe(p.bytes);
     await writeFile(path.join(root, `data/photos/${p.sha256}.webp`), 'corrupt');
     await expect(packagePhotos(data, root, async () => {})).rejects.toThrow(
       /failed integrity/,

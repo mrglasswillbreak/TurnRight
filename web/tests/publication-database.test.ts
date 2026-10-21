@@ -64,8 +64,12 @@ it('keeps the current-workspace hash check when completing a recovered publicati
     ]),
   ).rejects.toThrow('stale');
   expect(
-    (await db.query('select status from releases where id=$1', [release]))
-      .rows[0].status,
+    (
+      await db.query<{ status: string }>(
+        'select status from releases where id=$1',
+        [release],
+      )
+    ).rows[0].status,
   ).toBe('preview');
   await db.query('select gis_end_publication($1,$2)', [release, lease]);
 });

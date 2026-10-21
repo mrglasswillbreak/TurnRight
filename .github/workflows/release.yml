@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   regression-gate:
-    uses: ./.github/workflows/regression-audit.yml
+    uses: ./.github/workflows/ci.yml
   gis-gate:
     uses: ./.github/workflows/gis-acceptance.yml
   gate-failure:
@@ -29,8 +29,8 @@ jobs:
     if: ${{ always() && (needs.regression-gate.result != 'success' || needs.gis-gate.result != 'success') }}
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
       - run: node scripts/record-failure.mjs
@@ -55,12 +55,12 @@ jobs:
       RELEASE_OPERATION: ${{ inputs.operation }}
       PUBLISHED_MAP_URL: ${{ vars.PUBLISHED_MAP_URL || 'https://turnright.vercel.app' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: web
       - run: npm test

@@ -273,7 +273,7 @@ describe('reviewed geometry worker operations', () => {
     });
     expect(`${merged.edits[0].kind}:${merged.edits[0].id}`).toBe(keys[0]);
     expect(merged.edits[1].deleted).toBe(true);
-    expect(merged.edits[1].properties.geometryLineage.survivor).toBe(
+    expect(merged.edits[1].properties.geometryLineage!.survivor).toBe(
       merged.edits[0].id,
     );
     expect(merged.afterArea).toBeCloseTo(split.beforeArea, 2);
@@ -313,7 +313,7 @@ describe('reviewed geometry worker operations', () => {
       ...surface,
       properties: {
         ...surface.properties,
-        derivedSurface: { ...surface.properties.derivedSurface, manual: true },
+        derivedSurface: { ...surface.properties.derivedSurface!, manual: true },
       },
     };
     const corrected = applyEdits(data, [

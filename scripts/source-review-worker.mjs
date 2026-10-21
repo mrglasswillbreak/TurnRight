@@ -58,6 +58,7 @@ if (process.env.SOURCE_REVIEW_OPERATION_ID) {
       result.status === 'failed' ? 'worker-failed' : 'worker-completed',
       {
         worker: 'source-review',
+        jobId: operationId,
         startedAt,
         status: result.status === 'failed' ? 500 : 200,
       },
@@ -66,6 +67,7 @@ if (process.env.SOURCE_REVIEW_OPERATION_ID) {
   } catch {
     emitEvent('worker-failed', {
       worker: 'source-review',
+      jobId: operationId,
       startedAt,
       status: 500,
       dependency: 'database',

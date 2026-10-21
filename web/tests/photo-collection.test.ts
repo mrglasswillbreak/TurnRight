@@ -13,9 +13,22 @@ import {
 const root = path.resolve(import.meta.dirname, '../../data/photos');
 const hash = (bytes: Buffer | string) =>
   createHash('sha256').update(bytes).digest('hex');
+interface Inventory {
+  candidates: Array<{ id: string; status: string; reason: string }>;
+  excludedFormats: Inventory['candidates'];
+  buildings: Array<{ id: string; photoIds: string[] }>;
+  after: { photographedBuildings: number };
+  receipts: Array<{ file: string; sha256: string }>;
+}
 describe('reviewed campus photograph collection', () => {
   it('excludes synthetic source images and requires a current original metadata audit', async () => {
-    const audit = JSON.parse(
+    const audit: {
+      receipts: Array<{ body: string; sha256: string }>;
+      pages: Array<{
+        pageid: number;
+        imageinfo: Array<Record<string, unknown>>;
+      }>;
+    } = JSON.parse(
       await readFile(
         path.join(root, 'research/source-metadata-audit.json'),
         'utf8',
@@ -34,6 +47,7 @@ describe('reviewed campus photograph collection', () => {
       expect(() => requirePhotographicSource(source, source)).not.toThrow();
     }
     const synthetic = audit.pages.find((p) => p.pageid === 199191750);
+    if (!synthetic) throw Error('Synthetic-source regression fixture missing');
     expect(syntheticPhotoEvidence(synthetic.imageinfo[0])).toBe(true);
     expect(() => requirePhotographicSource(synthetic, synthetic)).toThrow(
       /Synthetic/,
@@ -58,13 +72,13 @@ describe('reviewed campus photograph collection', () => {
     ).toBe(true);
   });
   it('accounts for every selected snapshot candidate and all published buildings', async () => {
-    const commons = JSON.parse(
+    const commons: Inventory = JSON.parse(
       await readFile(
         path.join(root, 'research/commons-inventory.json'),
         'utf8',
       ),
     );
-    const publication = JSON.parse(
+    const publication: Inventory = JSON.parse(
       await readFile(
         path.join(root, 'research/publication-inventory.json'),
         'utf8',
@@ -73,7 +87,7 @@ describe('reviewed campus photograph collection', () => {
     const catalogue: CampusPhoto[] = JSON.parse(
       await readFile(path.join(root, 'catalogue.json'), 'utf8'),
     );
-    const unilag = JSON.parse(
+    const unilag: Pick<Inventory, 'candidates'> = JSON.parse(
       await readFile(
         path.join(root, '../unilag-enrichment/photo-review.json'),
         'utf8',

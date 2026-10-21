@@ -1,12 +1,13 @@
 import fs from 'node:fs/promises';
 import { buildingRevision } from '../web/src/building-visuals';
-const base = JSON.parse(
+import type { CampusData, CampusPhoto } from '../web/src/types';
+const base: CampusData = JSON.parse(
   await fs.readFile('../data/raw/unilag-upgrade/unilag-before.json', 'utf8'),
 );
 const evidence = JSON.parse(
   await fs.readFile('../data/building-evidence.json', 'utf8'),
 );
-const photos = JSON.parse(
+const photos: CampusPhoto[] = JSON.parse(
   await fs.readFile('../data/unilag-enrichment/photos.json', 'utf8'),
 );
 const prefix = 'import:4e362956-36db-49d4-884d-de4c7b933255:e5e49ffb:';
@@ -118,7 +119,7 @@ const definitions = [
 ];
 for (const photo of photos) {
   const id = 'unilag-' + photo.id;
-  if (!evidence.references.some((r: any) => r.id === id))
+  if (!evidence.references.some((r: { id: string }) => r.id === id))
     evidence.references.push({
       id,
       url: photo.sourceUrl,
@@ -136,12 +137,13 @@ const architect = {
   license: 'Factual architectural reference only; no photograph reproduced',
   date: '2026-09-30',
 };
-if (!evidence.references.some((r: any) => r.id === architect.id))
+if (!evidence.references.some((r: { id: string }) => r.id === architect.id))
   evidence.references.push(architect);
 for (const d of definitions) {
   const id = prefix + d.id,
-    feature = base.map.features.find((f: any) => f.properties.id === id),
-    refs = photos.filter((p: any) => p.buildingId === id);
+    feature = base.map.features.find((f) => f.properties?.id === id),
+    refs = photos.filter((p) => p.buildingId === id);
+  if (!feature) throw Error('Evidence footprint is missing: ' + id);
   const inferred = [
     'Colours are approximate matches to dated photographs; current finishes may differ.',
     'Window spacing, hidden elevations, trim thickness and roof geometry remain illustrative.',
@@ -160,7 +162,7 @@ for (const d of definitions) {
     confidence: 'observed',
     provenance: `Exterior references reviewed 2026-09-30. ${d.observed} ${d.needed}`,
     photoEvidence: {
-      photoIds: refs.map((p: any) => p.id),
+      photoIds: refs.map((p) => p.id),
       observed: [d.observed],
       estimated: inferred,
       needed: [d.needed],
@@ -174,7 +176,7 @@ for (const d of definitions) {
     wallColour: d.wall,
     roofColour: d.roof,
     sources: [
-      ...refs.map((p: any) => 'unilag-' + p.id),
+      ...refs.map((p) => 'unilag-' + p.id),
       ...(d.id === '89' ? [architect.id] : []),
     ],
     observed: [d.observed],
@@ -194,7 +196,7 @@ const changes = JSON.parse(
 for (const d of definitions) {
   const id = prefix + d.id,
     appearance = evidence.buildings[id].appearance;
-  let change = changes.featureUpdates.find((f: any) => f.id === id);
+  let change = changes.featureUpdates.find((f: { id: string }) => f.id === id);
   if (!change) {
     change = { id, properties: {} };
     changes.featureUpdates.push(change);

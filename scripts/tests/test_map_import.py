@@ -1,5 +1,4 @@
 import copy
-import io
 import json
 from pathlib import Path
 import socket
@@ -9,210 +8,511 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from map_import.arcgis import layer_features, discover
-from map_import.formats import unpack, safe_xml, check_expanded_batch, check_json_export, guess_role
+from map_import.formats import (
+    unpack,
+    safe_xml,
+    check_expanded_batch,
+    check_json_export,
+    guess_role,
+)
 from map_import.network import public_addresses
 from map_import.normalise import digest, normalise
 
-BOUNDARY={'type':'Feature','geometry':{'type':'Polygon','coordinates':[[[3.19,6.45],[3.22,6.45],[3.22,6.49],[3.19,6.49],[3.19,6.45]]]},'properties':{}}
-CAMPUS={'id':'test','boundary':BOUNDARY,'bounds':[[3.19,6.45],[3.22,6.49]]}
-SOURCE={'id':'one','name':'University buildings','kind':'file'}
-CONFIG={'layers':[{'layer':'Buildings','role':'building','idField':'id','nameField':'name'}],'attribution':'University GIS','license':'CC0','redistributionConfirmed':True}
-FEATURE={'type':'Feature','geometry':{'type':'Polygon','coordinates':[[[3.20,6.46],[3.201,6.46],[3.201,6.461],[3.20,6.461],[3.20,6.46]]]},'properties':{'id':'library','name':'Bibliothèque'}}
-LAYER={'name':'Buildings','features':[FEATURE],'fields':[{'name':'id'},{'name':'name'}],'crs':'EPSG:4326','geometryTypes':['Polygon'],'suggestedRole':'building'}
-META={'id':'meta:campus','entity':'meta','source':'combined','payload':{'sources':[],'version':'draft-test'},'hash':'initial'}
+BOUNDARY = {
+    "type": "Feature",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [[3.19, 6.45], [3.22, 6.45], [3.22, 6.49], [3.19, 6.49], [3.19, 6.45]]
+        ],
+    },
+    "properties": {},
+}
+CAMPUS = {"id": "test", "boundary": BOUNDARY, "bounds": [[3.19, 6.45], [3.22, 6.49]]}
+SOURCE = {"id": "one", "name": "University buildings", "kind": "file"}
+CONFIG = {
+    "layers": [
+        {"layer": "Buildings", "role": "building", "idField": "id", "nameField": "name"}
+    ],
+    "attribution": "University GIS",
+    "license": "CC0",
+    "redistributionConfirmed": True,
+}
+FEATURE = {
+    "type": "Feature",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [[3.20, 6.46], [3.201, 6.46], [3.201, 6.461], [3.20, 6.461], [3.20, 6.46]]
+        ],
+    },
+    "properties": {"id": "library", "name": "Bibliothèque"},
+}
+LAYER = {
+    "name": "Buildings",
+    "features": [FEATURE],
+    "fields": [{"name": "id"}, {"name": "name"}],
+    "crs": "EPSG:4326",
+    "geometryTypes": ["Polygon"],
+    "suggestedRole": "building",
+}
+META = {
+    "id": "meta:campus",
+    "entity": "meta",
+    "source": "combined",
+    "payload": {"sources": [], "version": "draft-test"},
+    "hash": "initial",
+}
 
 
 class MapImportTests(unittest.TestCase):
     def test_json_dialect_does_not_depend_on_header_order_or_size(self):
         with tempfile.TemporaryDirectory() as tmp:
-            file=Path(tmp)/'arcgis.json'
-            file.write_text(json.dumps({'features':[{'attributes':{'OBJECTID':7,'Description':'x'*12000},'geometry':{'x':3.2,'y':6.4}}],'geometryType':'esriGeometryPoint'}))
-            self.assertEqual(check_json_export(file),'ESRIJSON')
-            file.write_text(json.dumps({'type':'FeatureCollection','features':[FEATURE]}))
-            self.assertEqual(check_json_export(file),'GeoJSON')
-            file.write_text(json.dumps({'features':None}))
-            self.assertEqual(check_json_export(file),'GeoJSON')
+            file = Path(tmp) / "arcgis.json"
+            file.write_text(
+                json.dumps(
+                    {
+                        "features": [
+                            {
+                                "attributes": {
+                                    "OBJECTID": 7,
+                                    "Description": "x" * 12000,
+                                },
+                                "geometry": {"x": 3.2, "y": 6.4},
+                            }
+                        ],
+                        "geometryType": "esriGeometryPoint",
+                    }
+                )
+            )
+            self.assertEqual(check_json_export(file), "ESRIJSON")
+            file.write_text(
+                json.dumps({"type": "FeatureCollection", "features": [FEATURE]})
+            )
+            self.assertEqual(check_json_export(file), "GeoJSON")
+            file.write_text(json.dumps({"features": None}))
+            self.assertEqual(check_json_export(file), "GeoJSON")
 
     def test_downloaded_geojson_json_and_truncated_arcgis_exports(self):
         with tempfile.TemporaryDirectory() as tmp:
-            file=Path(tmp)/'Greenland.geojson.json'
-            for value in ({'type':'FeatureCollection','features':[FEATURE]}, {'features':[], 'geometryType':'esriGeometryPolygon'}):
-                file.write_text(json.dumps(value),encoding='utf-8-sig')
+            file = Path(tmp) / "Greenland.geojson.json"
+            for value in (
+                {"type": "FeatureCollection", "features": [FEATURE]},
+                {"features": [], "geometryType": "esriGeometryPolygon"},
+            ):
+                file.write_text(json.dumps(value), encoding="utf-8-sig")
                 check_json_export(file)
-            for value in ({'properties':{'exceededTransferLimit':True}}, {'exceededTransferLimit':True}, {'error':{'message':'Invalid query'}}):
-                file.write_text(json.dumps(value),encoding='utf-8')
-                with self.assertRaises(ValueError): check_json_export(file)
-        self.assertEqual(guess_role('Road width.geojson',['Polygon']),'road-surface')
-        self.assertEqual(guess_role('Roads.geojson',['LineString']),'path')
+            for value in (
+                {"properties": {"exceededTransferLimit": True}},
+                {"exceededTransferLimit": True},
+                {"error": {"message": "Invalid query"}},
+            ):
+                file.write_text(json.dumps(value), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    check_json_export(file)
+        self.assertEqual(guess_role("Road width.geojson", ["Polygon"]), "road-surface")
+        self.assertEqual(guess_role("Roads.geojson", ["LineString"]), "path")
 
     def test_query_export_url_resolves_to_layer_and_reports_ignored_filters(self):
-        calls=[]
-        def get(url,form=None):
-            calls.append((url,form))
+        calls = []
+
+        def get(url, form=None):
+            calls.append((url, form))
             if form is None:
-                self.assertEqual(url,'https://services.example/FeatureServer/2?f=json')
-                return {'name':'Buildings','capabilities':'Query','objectIdField':'OBJECTID','geometryType':'esriGeometryPolygon'}
-            if 'returnCountOnly' in form: return {'count':1}
-            if 'returnIdsOnly' in form: return {'objectIds':[7]}
-            return {'features':[{'attributes':{'OBJECTID':7},'geometry':{'rings':[]}}]}
-        layers,warnings=discover('https://services.example/FeatureServer/2/query?where=1%3D1&outSR=4326&f=geojson',CAMPUS['bounds'],get)
-        self.assertEqual(len(layers),1)
-        self.assertIn('query filters',warnings[0])
-        self.assertTrue(all('/query/query' not in url for url,_ in calls))
+                self.assertEqual(url, "https://services.example/FeatureServer/2?f=json")
+                return {
+                    "name": "Buildings",
+                    "capabilities": "Query",
+                    "objectIdField": "OBJECTID",
+                    "geometryType": "esriGeometryPolygon",
+                }
+            if "returnCountOnly" in form:
+                return {"count": 1}
+            if "returnIdsOnly" in form:
+                return {"objectIds": [7]}
+            return {
+                "features": [{"attributes": {"OBJECTID": 7}, "geometry": {"rings": []}}]
+            }
+
+        layers, warnings = discover(
+            "https://services.example/FeatureServer/2/query?where=1%3D1&outSR=4326&f=geojson",
+            CAMPUS["bounds"],
+            get,
+        )
+        self.assertEqual(len(layers), 1)
+        self.assertIn("query filters", warnings[0])
+        self.assertTrue(all("/query/query" not in url for url, _ in calls))
 
     def test_archive_and_xml_safety(self):
         with tempfile.TemporaryDirectory() as tmp:
-            archive=Path(tmp)/'unsafe.zip'
-            with zipfile.ZipFile(archive,'w') as f: f.writestr('../escape.shp',b'bad')
-            with self.assertRaisesRegex(ValueError,'unsafe'): unpack(archive,Path(tmp)/'out')
-            xml=Path(tmp)/'links.kml'
-            xml.write_bytes('<kml><NetworkLink/></kml>'.encode('utf-16'))
-            with self.assertRaisesRegex(ValueError,'network links'): safe_xml(xml)
+            archive = Path(tmp) / "unsafe.zip"
+            with zipfile.ZipFile(archive, "w") as f:
+                f.writestr("../escape.shp", b"bad")
+            with self.assertRaisesRegex(ValueError, "unsafe"):
+                unpack(archive, Path(tmp) / "out")
+            xml = Path(tmp) / "links.kml"
+            xml.write_bytes("<kml><NetworkLink/></kml>".encode("utf-16"))
+            with self.assertRaisesRegex(ValueError, "network links"):
+                safe_xml(xml)
 
     def test_private_dns_and_mixed_answers_rejected(self):
-        for addresses in [['127.0.0.1'],['10.1.2.3'],['::1'],['8.8.8.8','192.168.1.2']]:
-            with patch.object(socket,'getaddrinfo',return_value=[(0,0,0,'',(ip,443)) for ip in addresses]):
-                with self.assertRaises(ValueError): public_addresses('source.example')
+        for addresses in [
+            ["127.0.0.1"],
+            ["10.1.2.3"],
+            ["::1"],
+            ["8.8.8.8", "192.168.1.2"],
+        ]:
+            with patch.object(
+                socket,
+                "getaddrinfo",
+                return_value=[(0, 0, 0, "", (ip, 443)) for ip in addresses],
+            ):
+                with self.assertRaises(ValueError):
+                    public_addresses("source.example")
 
     def test_combined_archive_budget_and_external_kml_styles(self):
         with tempfile.TemporaryDirectory() as tmp:
-            paths = [Path(tmp)/'one.zip',Path(tmp)/'two.zip']
+            paths = [Path(tmp) / "one.zip", Path(tmp) / "two.zip"]
             for path in paths:
-                with zipfile.ZipFile(path,'w') as z: z.writestr('data.shp',b'123456')
-            check_expanded_batch(paths,12)
-            with self.assertRaisesRegex(ValueError,'combined expanded'): check_expanded_batch(paths,10)
-            kml=Path(tmp)/'styles.kml'
-            kml.write_text('<kml><Placemark><styleUrl>https://private.example/style.kml</styleUrl></Placemark></kml>')
-            with self.assertRaisesRegex(ValueError,'External KML'):safe_xml(kml)
-            kml.write_text('<kml><Placemark><styleUrl>#local-style</styleUrl></Placemark></kml>')
+                with zipfile.ZipFile(path, "w") as z:
+                    z.writestr("data.shp", b"123456")
+            check_expanded_batch(paths, 12)
+            with self.assertRaisesRegex(ValueError, "combined expanded"):
+                check_expanded_batch(paths, 10)
+            kml = Path(tmp) / "styles.kml"
+            kml.write_text(
+                "<kml><Placemark><styleUrl>https://private.example/style.kml</styleUrl></Placemark></kml>"
+            )
+            with self.assertRaisesRegex(ValueError, "External KML"):
+                safe_xml(kml)
+            kml.write_text(
+                "<kml><Placemark><styleUrl>#local-style</styleUrl></Placemark></kml>"
+            )
             safe_xml(kml)
 
-    def test_multipart_courtyards_are_preserved_without_exposing_original_attributes(self):
-        layer=copy.deepcopy(LAYER)
-        outer=layer['features'][0]['geometry']['coordinates'][0]
-        hole=[[3.2002,6.4602],[3.2004,6.4602],[3.2004,6.4604],[3.2002,6.4604],[3.2002,6.4602]]
-        second=[[x+0.002,y] for x,y in outer]
-        layer['features'][0]['geometry']={'type':'MultiPolygon','coordinates':[[outer,hole],[second]]}
-        layer['features'][0]['properties']['internal_note']='private source attribute'
-        result=normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')
-        self.assertFalse(result['summary']['errors'])
-        building=next(r for r in result['convertedRecords'] if r['entity']=='feature')
-        self.assertEqual(len(building['payload']['geometry']['coordinates']),2)
-        self.assertEqual(len(building['payload']['geometry']['coordinates'][0]),2)
-        self.assertNotIn('internal_note',building['payload']['properties'])
+    def test_multipart_courtyards_are_preserved_without_exposing_original_attributes(
+        self,
+    ):
+        layer = copy.deepcopy(LAYER)
+        outer = layer["features"][0]["geometry"]["coordinates"][0]
+        hole = [
+            [3.2002, 6.4602],
+            [3.2004, 6.4602],
+            [3.2004, 6.4604],
+            [3.2002, 6.4604],
+            [3.2002, 6.4602],
+        ]
+        second = [[x + 0.002, y] for x, y in outer]
+        layer["features"][0]["geometry"] = {
+            "type": "MultiPolygon",
+            "coordinates": [[outer, hole], [second]],
+        }
+        layer["features"][0]["properties"]["internal_note"] = "private source attribute"
+        result = normalise([layer], SOURCE, CAMPUS, [META], CONFIG, "one")
+        self.assertFalse(result["summary"]["errors"])
+        building = next(
+            r for r in result["convertedRecords"] if r["entity"] == "feature"
+        )
+        self.assertEqual(len(building["payload"]["geometry"]["coordinates"]), 2)
+        self.assertEqual(len(building["payload"]["geometry"]["coordinates"][0]), 2)
+        self.assertNotIn("internal_note", building["payload"]["properties"])
 
     def test_arcgis_checks_every_id_and_stops_incomplete_download(self):
-        calls=[]
-        def get(url,form=None):
-            calls.append((url,form))
-            if form is None: return {'name':'Buildings','capabilities':'Query','objectIdField':'OBJECTID','maxRecordCount':2,'geometryType':'esriGeometryPolygon'}
-            if 'returnCountOnly' in form: return {'count':3}
-            if 'returnIdsOnly' in form: return {'objectIds':[7,8,9]}
-            return {'features':[{'attributes':{'OBJECTID':int(i)},'geometry':{'x':3.2,'y':6.46}} for i in form['objectIds'].split(',')]}
-        result=layer_features('https://services.example/FeatureServer/0',CAMPUS['bounds'],get)
-        self.assertEqual(len(result['features']),3)
-        self.assertEqual([f['objectIds'] for _,f in calls if f and 'objectIds' in f],['7,8','9','7,8','9'])
-        def partial(url,form=None):
-            value=get(url,form)
-            if form and 'objectIds' in form: value['features']=[]
+        calls = []
+
+        def get(url, form=None):
+            calls.append((url, form))
+            if form is None:
+                return {
+                    "name": "Buildings",
+                    "capabilities": "Query",
+                    "objectIdField": "OBJECTID",
+                    "maxRecordCount": 2,
+                    "geometryType": "esriGeometryPolygon",
+                }
+            if "returnCountOnly" in form:
+                return {"count": 3}
+            if "returnIdsOnly" in form:
+                return {"objectIds": [7, 8, 9]}
+            return {
+                "features": [
+                    {
+                        "attributes": {"OBJECTID": int(i)},
+                        "geometry": {"x": 3.2, "y": 6.46},
+                    }
+                    for i in form["objectIds"].split(",")
+                ]
+            }
+
+        result = layer_features(
+            "https://services.example/FeatureServer/0", CAMPUS["bounds"], get
+        )
+        self.assertEqual(len(result["features"]), 3)
+        self.assertEqual(
+            [f["objectIds"] for _, f in calls if f and "objectIds" in f],
+            ["7,8", "9", "7,8", "9"],
+        )
+
+        def partial(url, form=None):
+            value = get(url, form)
+            if form and "objectIds" in form:
+                value["features"] = []
             return value
-        with self.assertRaisesRegex(ValueError,'incomplete'): layer_features('https://services.example/FeatureServer/0',CAMPUS['bounds'],partial)
+
+        with self.assertRaisesRegex(ValueError, "incomplete"):
+            layer_features(
+                "https://services.example/FeatureServer/0", CAMPUS["bounds"], partial
+            )
 
     def test_arcgis_rejects_same_count_identity_changes_and_reuses_layer_metadata(self):
-        ids_calls=0
-        metadata={'name':'Buildings','capabilities':'Query','objectIdField':'OBJECTID','maxRecordCount':2,'geometryType':'esriGeometryPolygon'}
-        def get(url,form=None):
+        ids_calls = 0
+        metadata = {
+            "name": "Buildings",
+            "capabilities": "Query",
+            "objectIdField": "OBJECTID",
+            "maxRecordCount": 2,
+            "geometryType": "esriGeometryPolygon",
+        }
+
+        def get(url, form=None):
             nonlocal ids_calls
-            self.assertIsNotNone(form, 'Known metadata must not be fetched again')
-            if 'returnCountOnly' in form: return {'count':2}
-            if 'returnIdsOnly' in form:
-                ids_calls+=1
-                return {'objectIds':[1,2] if ids_calls==1 else [1,3]}
-            return {'features':[{'attributes':{'OBJECTID':1}},{'attributes':{'OBJECTID':2}}]}
-        with self.assertRaisesRegex(ValueError,'identifiers changed'):
-            layer_features('https://example.org/FeatureServer/0',CAMPUS['bounds'],get,metadata=metadata)
+            self.assertIsNotNone(form, "Known metadata must not be fetched again")
+            if "returnCountOnly" in form:
+                return {"count": 2}
+            if "returnIdsOnly" in form:
+                ids_calls += 1
+                return {"objectIds": [1, 2] if ids_calls == 1 else [1, 3]}
+            return {
+                "features": [
+                    {"attributes": {"OBJECTID": 1}},
+                    {"attributes": {"OBJECTID": 2}},
+                ]
+            }
+
+        with self.assertRaisesRegex(ValueError, "identifiers changed"):
+            layer_features(
+                "https://example.org/FeatureServer/0",
+                CAMPUS["bounds"],
+                get,
+                metadata=metadata,
+            )
 
     def test_embedded_arcgis_layers_and_unsupported_tiles(self):
-        layers,warnings=discover('https://example.org/map',CAMPUS['bounds'],lambda *args: {'operationalLayers':[{'title':'Trees','featureCollection':{'layers':[{'layerDefinition':{'fields':[]},'featureSet':{'features':[]}}]}},{'title':'Imagery','url':'https://example.org/tiles','layerType':'ArcGISTiledMapServiceLayer'}]})
-        self.assertEqual(layers[0]['name'],'Trees')
-        self.assertIn('non-vector',warnings[0])
+        layers, warnings = discover(
+            "https://example.org/map",
+            CAMPUS["bounds"],
+            lambda *args: {
+                "operationalLayers": [
+                    {
+                        "title": "Trees",
+                        "featureCollection": {
+                            "layers": [
+                                {
+                                    "layerDefinition": {"fields": []},
+                                    "featureSet": {"features": []},
+                                }
+                            ]
+                        },
+                    },
+                    {
+                        "title": "Imagery",
+                        "url": "https://example.org/tiles",
+                        "layerType": "ArcGISTiledMapServiceLayer",
+                    },
+                ]
+            },
+        )
+        self.assertEqual(layers[0]["name"], "Trees")
+        self.assertIn("non-vector", warnings[0])
 
     def test_arcgis_cycle_is_bounded(self):
-        with self.assertRaisesRegex(ValueError,'cycle'):
-            discover('https://example.org/map',CAMPUS['bounds'],lambda *args: {'operationalLayers':[{'url':'https://example.org/map'}]})
+        with self.assertRaisesRegex(ValueError, "cycle"):
+            discover(
+                "https://example.org/map",
+                CAMPUS["bounds"],
+                lambda *args: {
+                    "operationalLayers": [{"url": "https://example.org/map"}]
+                },
+            )
 
     def test_arcgis_detects_content_churn_without_an_editing_revision(self):
-        pages=0
-        def get(url,form=None):
+        pages = 0
+
+        def get(url, form=None):
             nonlocal pages
-            if form is None: return {'id':0,'capabilities':'Query','objectIdField':'OBJECTID'}
-            if 'returnCountOnly' in form: return {'count':1}
-            if 'returnIdsOnly' in form: return {'objectIds':[7]}
-            pages+=1
-            return {'features':[{'attributes':{'OBJECTID':7,'name':str(pages)},'geometry':{'x':3,'y':6}}]}
-        with self.assertRaisesRegex(ValueError,'independent completeness'):
-            layer_features('https://example.org/FeatureServer/0',CAMPUS['bounds'],get)
+            if form is None:
+                return {"id": 0, "capabilities": "Query", "objectIdField": "OBJECTID"}
+            if "returnCountOnly" in form:
+                return {"count": 1}
+            if "returnIdsOnly" in form:
+                return {"objectIds": [7]}
+            pages += 1
+            return {
+                "features": [
+                    {
+                        "attributes": {"OBJECTID": 7, "name": str(pages)},
+                        "geometry": {"x": 3, "y": 6},
+                    }
+                ]
+            }
+
+        with self.assertRaisesRegex(ValueError, "independent completeness"):
+            layer_features("https://example.org/FeatureServer/0", CAMPUS["bounds"], get)
 
     def test_failed_arcgis_collection_does_not_discard_complete_collections(self):
-        def get(url,form=None):
-            if url.endswith('FeatureServer?f=json'): return {'layers':[{'id':0,'name':'Held'},{'id':1,'name':'Complete'}]}
-            if '/0?' in url: raise OSError('Unavailable layer')
-            if form is None: return {'id':1,'name':'Complete','geometryType':'esriGeometryPolygon','capabilities':'Query','objectIdField':'OBJECTID'}
-            if 'returnCountOnly' in form: return {'count':0}
-            return {'objectIds':[]}
-        layers,warnings=discover('https://example.org/FeatureServer',CAMPUS['bounds'],get)
-        self.assertEqual(len(layers),2)
-        self.assertEqual(layers[0]['retrievalError'],'Unavailable layer')
-        self.assertNotIn('retrievalError',layers[1])
+        def get(url, form=None):
+            if url.endswith("FeatureServer?f=json"):
+                return {
+                    "layers": [{"id": 0, "name": "Held"}, {"id": 1, "name": "Complete"}]
+                }
+            if "/0?" in url:
+                raise OSError("Unavailable layer")
+            if form is None:
+                return {
+                    "id": 1,
+                    "name": "Complete",
+                    "geometryType": "esriGeometryPolygon",
+                    "capabilities": "Query",
+                    "objectIdField": "OBJECTID",
+                }
+            if "returnCountOnly" in form:
+                return {"count": 0}
+            return {"objectIds": []}
+
+        layers, warnings = discover(
+            "https://example.org/FeatureServer", CAMPUS["bounds"], get
+        )
+        self.assertEqual(len(layers), 2)
+        self.assertEqual(layers[0]["retrievalError"], "Unavailable layer")
+        self.assertNotIn("retrievalError", layers[1])
         self.assertTrue(warnings)
 
     def test_source_refresh_preserves_authored_building_and_coded_labels(self):
-        initial=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'first')
-        previous=initial['convertedRecords']
-        building=next(r for r in previous if r['entity']=='feature')
-        building['payload']['properties']['appearance']={'walls':{'material':'brick'}}
-        building['payload']['properties']['modelDocumentAsset']={'id':'private-asset'}
-        building['hash']=digest(building['payload'])
-        layer=copy.deepcopy(LAYER);layer['features'][0]['properties']['name']='Refreshed name'
-        layer['features'][0]['properties']['category']=7
-        layer['fields'].append({'name':'category','codedValues':{'7':'Library'}})
-        refreshed=normalise([layer],SOURCE,CAMPUS,previous,CONFIG,'second')
-        changed=next(r for r in refreshed['convertedRecords'] if r['entity']=='feature')
-        self.assertEqual(changed['payload']['properties']['modelDocumentAsset'],{'id':'private-asset'})
-        self.assertEqual(changed['payload']['properties']['appearance'],{'walls':{'material':'brick'}})
-        self.assertEqual(next(r for r in refreshed['convertedRecords'] if r['entity']=='place')['payload']['category'],'library')
+        initial = normalise(
+            [copy.deepcopy(LAYER)], SOURCE, CAMPUS, [META], CONFIG, "first"
+        )
+        previous = initial["convertedRecords"]
+        building = next(r for r in previous if r["entity"] == "feature")
+        building["payload"]["properties"]["appearance"] = {
+            "walls": {"material": "brick"}
+        }
+        building["payload"]["properties"]["modelDocumentAsset"] = {
+            "id": "private-asset"
+        }
+        building["hash"] = digest(building["payload"])
+        layer = copy.deepcopy(LAYER)
+        layer["features"][0]["properties"]["name"] = "Refreshed name"
+        layer["features"][0]["properties"]["category"] = 7
+        layer["fields"].append({"name": "category", "codedValues": {"7": "Library"}})
+        refreshed = normalise([layer], SOURCE, CAMPUS, previous, CONFIG, "second")
+        changed = next(
+            r for r in refreshed["convertedRecords"] if r["entity"] == "feature"
+        )
+        self.assertEqual(
+            changed["payload"]["properties"]["modelDocumentAsset"],
+            {"id": "private-asset"},
+        )
+        self.assertEqual(
+            changed["payload"]["properties"]["appearance"],
+            {"walls": {"material": "brick"}},
+        )
+        self.assertEqual(
+            next(r for r in refreshed["convertedRecords"] if r["entity"] == "place")[
+                "payload"
+            ]["category"],
+            "library",
+        )
 
     def test_native_mapping_identity_and_repeat_import(self):
-        candidate=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,[META],CONFIG,'upload-one')
-        self.assertFalse(candidate['summary']['errors'])
-        self.assertEqual(len([r for r in candidate['convertedRecords'] if r['entity']!='meta']),2)
-        self.assertEqual(candidate['proposals'],[]) # Only the shared comparator creates decisions.
-        accepted=candidate['convertedRecords']
-        repeated=normalise([copy.deepcopy(LAYER)],SOURCE,CAMPUS,accepted,CONFIG,'upload-two')
-        self.assertEqual(repeated['proposals'],[])
-        self.assertEqual(next(r for r in accepted if r['entity']=='place')['payload']['name'],'Bibliothèque')
+        candidate = normalise(
+            [copy.deepcopy(LAYER)], SOURCE, CAMPUS, [META], CONFIG, "upload-one"
+        )
+        self.assertFalse(candidate["summary"]["errors"])
+        self.assertEqual(
+            len([r for r in candidate["convertedRecords"] if r["entity"] != "meta"]), 2
+        )
+        self.assertEqual(
+            candidate["proposals"], []
+        )  # Only the shared comparator creates decisions.
+        accepted = candidate["convertedRecords"]
+        repeated = normalise(
+            [copy.deepcopy(LAYER)], SOURCE, CAMPUS, accepted, CONFIG, "upload-two"
+        )
+        self.assertEqual(repeated["proposals"], [])
+        self.assertEqual(
+            next(r for r in accepted if r["entity"] == "place")["payload"]["name"],
+            "Bibliothèque",
+        )
 
     def test_missing_crs_invalid_geometry_and_replacement_identity(self):
-        layer=copy.deepcopy(LAYER); layer['crs']=None
-        self.assertIn('coordinate system',normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')['summary']['errors'][0])
-        layer=copy.deepcopy(LAYER); layer['features'][0]['geometry']['coordinates'][0]=[[3.2,6.46],[3.201,6.461],[3.201,6.46],[3.2,6.461],[3.2,6.46]]
-        self.assertTrue(normalise([layer],SOURCE,CAMPUS,[META],CONFIG,'one')['summary']['errors'])
-        config=copy.deepcopy(CONFIG); del config['layers'][0]['idField']
-        a=normalise([LAYER],SOURCE,CAMPUS,[META],config,'one')
-        b=normalise([LAYER],SOURCE,CAMPUS,[META],config,'two')
-        self.assertEqual(a['observations'][0]['nativeId'],b['observations'][0]['nativeId'])
+        layer = copy.deepcopy(LAYER)
+        layer["crs"] = None
+        self.assertIn(
+            "coordinate system",
+            normalise([layer], SOURCE, CAMPUS, [META], CONFIG, "one")["summary"][
+                "errors"
+            ][0],
+        )
+        layer = copy.deepcopy(LAYER)
+        layer["features"][0]["geometry"]["coordinates"][0] = [
+            [3.2, 6.46],
+            [3.201, 6.461],
+            [3.201, 6.46],
+            [3.2, 6.461],
+            [3.2, 6.46],
+        ]
+        self.assertTrue(
+            normalise([layer], SOURCE, CAMPUS, [META], CONFIG, "one")["summary"][
+                "errors"
+            ]
+        )
+        config = copy.deepcopy(CONFIG)
+        del config["layers"][0]["idField"]
+        a = normalise([LAYER], SOURCE, CAMPUS, [META], config, "one")
+        b = normalise([LAYER], SOURCE, CAMPUS, [META], config, "two")
+        self.assertEqual(
+            a["observations"][0]["nativeId"], b["observations"][0]["nativeId"]
+        )
 
     def test_generic_paths_keep_distinct_endpoints_and_restricted_access(self):
-        line={'type':'Feature','properties':{'id':'path'},'geometry':{'type':'LineString','coordinates':[[3.2,6.46],[3.201,6.46]]}}
-        layer={'name':'Paths','features':[line],'fields':[],'crs':'EPSG:4326','geometryTypes':['LineString'],'suggestedRole':'path'}
-        config={**CONFIG,'layers':[{'layer':'Paths','role':'path','idField':'id'}]}
-        result=normalise([layer],SOURCE,CAMPUS,[META],config,'one')
-        records=result['convertedRecords']
-        self.assertEqual(len([r for r in records if r['entity']=='edge']),2)
-        self.assertTrue(all(r['payload']['walkingAccess']=='private' for r in records if r['entity']=='edge'))
-        self.assertFalse(next(r for r in records if r['entity']=='feature')['payload']['properties']['autoConnectCrossings'])
+        line = {
+            "type": "Feature",
+            "properties": {"id": "path"},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[3.2, 6.46], [3.201, 6.46]],
+            },
+        }
+        layer = {
+            "name": "Paths",
+            "features": [line],
+            "fields": [],
+            "crs": "EPSG:4326",
+            "geometryTypes": ["LineString"],
+            "suggestedRole": "path",
+        }
+        config = {
+            **CONFIG,
+            "layers": [{"layer": "Paths", "role": "path", "idField": "id"}],
+        }
+        result = normalise([layer], SOURCE, CAMPUS, [META], config, "one")
+        records = result["convertedRecords"]
+        self.assertEqual(len([r for r in records if r["entity"] == "edge"]), 2)
+        self.assertTrue(
+            all(
+                r["payload"]["walkingAccess"] == "private"
+                for r in records
+                if r["entity"] == "edge"
+            )
+        )
+        self.assertFalse(
+            next(r for r in records if r["entity"] == "feature")["payload"][
+                "properties"
+            ]["autoConnectCrossings"]
+        )
 
 
-if __name__=='__main__': unittest.main()
+if __name__ == "__main__":
+    unittest.main()

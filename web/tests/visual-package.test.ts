@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { expect, it } from 'vitest';
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -6,7 +7,6 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { campusFixture } from './fixture';
-// @ts-expect-error Packaging is an executable ESM pipeline.
 import { packageVisuals } from '../../scripts/visual-package.mjs';
 it('retains the reviewed scenery recipe through the real visual builder and rejects surveyed classification', async () => {
   const temp = await mkdtemp(path.join(tmpdir(), 'turnright-visual-test-'));
@@ -56,6 +56,7 @@ it('retains the reviewed scenery recipe through the real visual builder and reje
       },
     );
     const result = await packageVisuals(output, async () => {});
+    assert(result, 'Expected verified visual package');
     expect(result.catalogue.scenery).toEqual(recipe);
     result.catalogue.scenery.classification = 'surveyed';
     await writeFile(
@@ -105,7 +106,9 @@ it('keeps textures separate from legacy sector declarations and rejects missing 
       JSON.stringify(catalogue),
     );
     const result = await packageVisuals(temp, async () => {});
+    assert(result, 'Expected verified visual package');
     expect(result.manifest.assetUrls).toEqual([]);
+    assert(result.textures, 'Expected texture manifest');
     expect(result.textures.assetUrls).toEqual([texture.url]);
     delete (texture as Partial<typeof texture>).attribution;
     await writeFile(
@@ -138,6 +141,7 @@ it('packages only verified catalogue sectors and remains optional for old packag
   const result = await packageVisuals(root, async (url: string) => {
     urls.push(url);
   });
+  assert(result, 'Expected verified visual package');
   expect(urls).toEqual(result.manifest.assetUrls);
   expect(result.catalogue.bytes).toBe(result.manifest.bytes);
   const temp = await mkdtemp(path.join(tmpdir(), 'turnright-visual-test-'));

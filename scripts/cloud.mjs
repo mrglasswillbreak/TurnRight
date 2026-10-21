@@ -44,6 +44,8 @@ export async function db(
   }
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error('Supabase job secrets are not configured');
+  if (body !== undefined && ['GET', 'HEAD'].includes(method))
+    throw new Error('Database reads cannot include a request body');
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${route}`, {
     method,
     headers: {
@@ -53,7 +55,7 @@ export async function db(
       Prefer: prefer,
       'X-TurnRight-Campus': campus,
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     signal: AbortSignal.timeout(timeoutMs),
   });
   const data = await response.json().catch(() => null);

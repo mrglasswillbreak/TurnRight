@@ -1,5 +1,6 @@
 import { requestedCampus } from './campus-context';
 import { measureOperation } from './performance';
+import { diagnosticRequestId, recordDiagnostic } from './diagnostics';
 export class AdminRequestError extends Error {
   constructor(
     public action: string,
@@ -11,6 +12,7 @@ export class AdminRequestError extends Error {
       | 'auth'
       | 'server'
       | 'response' = 'server',
+    public requestId?: string,
   ) {
     super(message);
   }
@@ -194,6 +196,9 @@ async function wireAdminRequest<T>(
         },
         body: JSON.stringify({ action, payload, campus }),
       });
+      const requestId = diagnosticRequestId(
+        response.headers.get('X-Request-ID'),
+      );
       if (response.status === 401 || response.status === 403)
         throw new AdminRequestError(
           action,
@@ -202,6 +207,7 @@ async function wireAdminRequest<T>(
             : 'Your campus role does not allow this action.',
           response.status,
           'auth',
+          requestId,
         );
       const body = await response.json().catch((error: unknown) => {
         if (controller.signal.aborted) throw error;
@@ -210,6 +216,7 @@ async function wireAdminRequest<T>(
           'The server returned an unexpected response. Your local work is retained.',
           response.status,
           'response',
+          requestId,
         );
       });
       if (body === null || typeof body !== 'object')
@@ -218,12 +225,15 @@ async function wireAdminRequest<T>(
           'The server returned an incomplete response. Your local work is retained.',
           response.status,
           'response',
+          requestId,
         );
       if (!response.ok || body?.error)
         throw new AdminRequestError(
           action,
           body?.error || 'The server could not complete this action.',
           response.status,
+          'server',
+          requestId || diagnosticRequestId(body.requestId),
         );
       return body;
     } catch (error) {
@@ -239,7 +249,10 @@ async function wireAdminRequest<T>(
               0,
               controller.signal.aborted ? 'timeout' : 'network',
             );
-      if (attempt >= retries || !isConnectionFailure(failure)) throw failure;
+      if (attempt >= retries || !isConnectionFailure(failure)) {
+        recordDiagnostic('admin-request-failed', failure);
+        throw failure;
+      }
     } finally {
       const phase = {
         'media-begin': 'upload-begin',

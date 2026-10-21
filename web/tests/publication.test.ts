@@ -3,9 +3,7 @@ import { mkdtempSync, mkdirSync, cpSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-// @ts-expect-error Node-only deployment module.
 import { waitForDeployment, vercelApi } from '../../scripts/vercel-api.mjs';
-// @ts-expect-error Node-only release asset validation.
 import { assetTarget } from '../scripts/published-assets.mjs';
 afterEach(() => vi.unstubAllGlobals());
 describe('deployment success gates', () => {

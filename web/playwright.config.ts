@@ -1,6 +1,13 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/browser',
+  // Offline journeys use a production service worker; documentation captures
+  // require their prepared fixtures. Their dedicated configurations select them.
+  grepInvert:
+    process.env.TURNRIGHT_DOCS_SCREENSHOTS ||
+    process.env.TURNRIGHT_GIS_SCREENSHOTS === '1'
+      ? /@offline/
+      : /@offline|@documentation/,
   timeout: 60000,
   expect: { timeout: 10000 },
   fullyParallel: false,
@@ -20,8 +27,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command:
-      'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5183 --strictPort',
+    command: 'npm exec -- vite --host 127.0.0.1 --port 5183 --strictPort',
     url: 'http://127.0.0.1:5183',
     reuseExistingServer: false,
     env: {

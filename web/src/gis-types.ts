@@ -1,4 +1,5 @@
 import type { Feature, Geometry } from 'geojson';
+import type { MapEdit } from './types.js';
 export type WorkspaceRole =
   | 'administrator'
   | 'editor'
@@ -192,7 +193,7 @@ export interface GisActionMap {
     request: { datasetId: string; key: string; revision: number };
     response: {
       source: import('./editor-model.js').SourceRecord | null;
-      edit: import('./types.js').MapEdit | null;
+      edit: MapEdit | null;
     };
   };
   'gis-statistics': {
@@ -250,7 +251,7 @@ export interface GisActionMap {
     request: { id: string };
     response: ReviewSubmission & {
       datasets?: Dataset[];
-      edits: import('./types.js').MapEdit[];
+      edits: MapEdit[];
       sourceCount: number;
       editCount: number;
       current: boolean;

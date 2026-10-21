@@ -103,7 +103,7 @@ function mockDirectory(changed = false) {
         );
       }
       if (manifests.has(p)) return Response.json(manifests.get(p));
-      if (content.has(p)) return new Response(content.get(p));
+      if (content.has(p)) return new Response(new Uint8Array(content.get(p)!));
       return new Response('missing', { status: 404 });
     }),
   );

@@ -8,7 +8,6 @@ import {
 } from '../server/release-validation';
 import { campusFixture } from './fixture';
 import type { MapEdit } from '../src/types';
-// @ts-expect-error Shared Node publication sanitiser.
 import { publicCampus } from '../../scripts/public-campus.mjs';
 
 it('requires the current authored revision to be reviewed before publication', () => {

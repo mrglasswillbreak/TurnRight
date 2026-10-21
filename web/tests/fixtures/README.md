@@ -54,7 +54,7 @@ Browser cases render the saved fingerprints on desktop and phone and assert
 actual WebGL draw calls, so regenerating both expected and actual identities
 cannot hide a published-model regression.
 
-The browser suite in `../browser/editor.spec.ts` supplies isolated owner, draft,
+The browser suite in the domain suites under `../browser/` supplies isolated owner, draft,
 publication and media responses. Its model fixture covers shared 3D/2D commands,
 wall and roof lettering, nested structure selection, individual generated and
 repeated windows, grouping, instance locks/visibility, recovery, bulk wall review

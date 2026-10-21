@@ -239,17 +239,18 @@ describe('duplicate review', () => {
     const data = duplicatePlaces(),
       edits = exactDuplicateEdits(data, [], findDuplicateCandidates(data));
     const { map, places, graph, ...meta } = data;
-    const record = (
+    const record = <Entity extends SourceRecord['entity']>(
       id: string,
-      entity: SourceRecord['entity'],
-      payload: unknown,
-    ): SourceRecord => ({
-      id,
-      entity,
-      payload,
-      source: 'test',
-      hash: 'refresh',
-    });
+      entity: Entity,
+      payload: Extract<SourceRecord, { entity: Entity }>['payload'],
+    ): SourceRecord =>
+      ({
+        id,
+        entity,
+        payload,
+        source: 'test',
+        hash: 'refresh',
+      }) as SourceRecord;
     const source = [
       record('meta', 'meta', meta),
       ...places.map((p) => record(p.id, 'place', p)),

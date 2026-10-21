@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { recordDiagnostic, downloadDiagnostics } from './diagnostics';
 
 export class ApplicationRecovery extends Component<
   { children: ReactNode },
@@ -7,6 +8,9 @@ export class ApplicationRecovery extends Component<
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+  componentDidCatch() {
+    recordDiagnostic('render-failed');
   }
   render() {
     if (!this.state.failed) return this.props.children;
@@ -19,6 +23,9 @@ export class ApplicationRecovery extends Component<
         </p>
         <button type="button" onClick={() => window.location.reload()}>
           Reload TurnRight
+        </button>
+        <button type="button" onClick={downloadDiagnostics}>
+          Download diagnostic report
         </button>
       </main>
     );

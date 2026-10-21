@@ -82,13 +82,16 @@ it('stages bounded requests and preserves atomic, scoped, stale-preview and retr
   await expect(finish()).rejects.toThrow('verified source comparison');
   expect((await db.query('select * from map_changes')).rows).toHaveLength(0);
   expect(
-    (await db.query('select accepted_import_id from campus_sources')).rows[0]
-      .accepted_import_id,
+    (
+      await db.query<{ accepted_import_id: string | null }>(
+        'select accepted_import_id from campus_sources',
+      )
+    ).rows[0].accepted_import_id,
   ).toBeNull();
   for (const role of ['anon', 'authenticated']) {
     expect(
       (
-        await db.query(
+        await db.query<{ allowed: boolean }>(
           "select has_function_privilege($1,'finish_campus_import_queue(uuid,uuid)','EXECUTE') allowed",
           [role],
         )

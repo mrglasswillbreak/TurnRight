@@ -280,7 +280,7 @@ const geometry = await api<Array<{ geometry: { type: string } }>>(
 );
 assert(
   geometry.length > 0 &&
-    geometry.every((feature) => /Polygon$/.test(feature.geometry.type)),
+    geometry.every((feature) => feature.geometry.type.endsWith('Polygon')),
   'Metric buffer produces polygon geometry',
 );
 const assets = await verifyPrivateAssets(api, config.API_URL);

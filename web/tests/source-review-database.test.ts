@@ -92,20 +92,24 @@ it(
     ).toEqual(operation);
     expect(
       (
-        await db.query(
+        await db.query<{ name: string }>(
           "select properties->>'name' name from map_edits where id='bulk-1'",
         )
       ).rows[0].name,
     ).toBe('Editor name');
     expect(
       (
-        await db.query(
+        await db.query<{ n: number }>(
           "select count(*)::integer n from workspace_audit where action='source-review'",
         )
       ).rows[0].n,
     ).toBe(9998);
     expect(
-      (await db.query('select count(*)::integer n from releases')).rows[0].n,
+      (
+        await db.query<{ n: number }>(
+          'select count(*)::integer n from releases',
+        )
+      ).rows[0].n,
     ).toBe(0);
     // This covers 400 separate bounded transactions in PostGIS WebAssembly. Windows
     // needs a larger overall test budget; database request deadlines remain 10 s.
@@ -156,7 +160,7 @@ it('requires removal acknowledgement, enforces one active job, and resumes only 
   for (const role of ['anon', 'authenticated'])
     expect(
       (
-        await db.query(
+        await db.query<{ allowed: boolean }>(
           "select has_function_privilege($1,'source_review_step(uuid,uuid)','EXECUTE') allowed",
           [role],
         )
@@ -196,7 +200,7 @@ it('expires temporary selection data while retaining operation receipts and audi
   ).toHaveLength(0);
   expect(
     (
-      await db.query(
+      await db.query<{ n: number }>(
         "select count(*)::integer n from workspace_audit where action='source-review'",
       )
     ).rows[0].n,

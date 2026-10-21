@@ -152,7 +152,7 @@ export function MotionStatus({
       )}
       {compact ? (
         <details>
-          <summary>Compass & motion controls</summary>
+          <summary>Compass &amp; motion controls</summary>
           {details}
         </details>
       ) : (

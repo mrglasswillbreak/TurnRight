@@ -40,6 +40,7 @@ const decipher = createDecipheriv(
   'aes-256-gcm',
   key,
   Buffer.from(receipt.iv, 'base64'),
+  { authTagLength: 16 },
 );
 decipher.setAuthTag(Buffer.from(receipt.tag, 'base64'));
 const unzip = createGunzip();

@@ -1,0 +1,106 @@
+name: Security
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  dependencies:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npm run check:dependencies
+      - run: python -m pip install --require-hashes -r scripts/requirements-quality.lock
+      - run: python -m pip_audit --strict --disable-pip --no-deps -r scripts/requirements-quality.lock
+      - run: python -m pip_audit --strict --disable-pip --no-deps -r scripts/map_import/requirements.lock -r scripts/map_import/requirements-test.lock -r scripts/gis/requirements.lock -r scripts/gis/requirements-test.lock
+      # GitHub's dependency comparison API is unavailable for this private
+      # repository. The mandatory full-lock npm/pip audits above cover every
+      # dependency on each PR, including unchanged vulnerable versions.
+      - name: Record dependency manifests reviewed by the full-lock audits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
+        run: git diff --stat "$BASE_REVISION" HEAD -- package.json package-lock.json web/package.json web/package-lock.json 'scripts/**/requirements*' scripts/requirements*
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      GOMEMLIMIT: 256MiB
+      GOMAXPROCS: '2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: 'false'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Scan every reachable commit, including merged branch history
+        run: |
+          node scripts/secret-history-self-test.mjs
+          node scripts/secret-history.mjs
+  static-analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Fetch pinned community security rules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: semgrep/semgrep-rules
+          ref: 17e31e11ebac99fb7dfe1cd288f7a32151b6f3f9
+          path: .local-runtime/semgrep-rules
+          persist-credentials: false
+      - name: Scan authored JavaScript, TypeScript, Python and Actions
+        run: |
+          mkdir -p .local-runtime/security
+          docker run --rm -v "$PWD:/src" -w /src \
+            semgrep/semgrep:1.182.0@sha256:4a34048c04fef049f71665047f074cffb00cc3d89482f965a5cd151d589237af \
+            semgrep scan --metrics=off --disable-version-check --strict --error \
+            --config .local-runtime/semgrep-rules/javascript/lang/security \
+            --config .local-runtime/semgrep-rules/javascript/browser/security \
+            --config .local-runtime/semgrep-rules/javascript/node-crypto/security \
+            --config .local-runtime/semgrep-rules/typescript/lang/security \
+            --config .local-runtime/semgrep-rules/typescript/react/security \
+            --config .local-runtime/semgrep-rules/python/lang/security \
+            --config .local-runtime/semgrep-rules/python/requests/security \
+            --config .local-runtime/semgrep-rules/yaml/github-actions/security \
+            --json-output .local-runtime/security/semgrep.json \
+            --sarif-output .local-runtime/security/semgrep.sarif \
+            web/src web/api web/server web/scripts web/hooks web/lib web/components scripts .github
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: static-security-analysis
+          path: .local-runtime/security/
+          retention-days: 30

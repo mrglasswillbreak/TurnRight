@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Consolidate installation into a private root npm workspace with one dependency lock, root configuration checks, a pinned runtime doctor and a shared Docker/development-container entry.
+- Split large map, survey, import, layer, photo and model components into domain modules. Split the browser and database suites while preserving test assertions and shared setup. Add bounded, cancellable import polling and regression tests.
+- Check authored source, tests and tools with lint, types and formatting; enforce the 500-line boundary and immutable external CI action revisions.
+- Add combined unit/browser application coverage gates and native Python processing coverage, with receipts tied to source and dependency snapshots. Preserve complete application includes, native-driver acceptance, published fixtures and download budgets.
+- Add browser diagnostic downloads and API/worker correlation using validated request and job identifiers. Keep payloads, locations and claim tokens out of structured logs.
+- Preserve comment and evidence drafts after failed GIS saves. Add component and API regression coverage for bulk edits, publication, survey recovery, model assets and verified image codecs.
+- Remove hidden backdrop blurring from the full-screen photo editor to prevent desktop rendering stalls. Avoid transferring complete map instances from browser test camera commands, retaining all camera assertions and time limits.
+- Wait for the real map layout before projecting a polygon-editing test gesture after panel changes. Refresh workspace, coverage, deployment, screenshot and importer documentation while retaining dated evidence.
+- Use the bounded, same-origin asset request helper for application-preview package audits, allowing temporary protection propagation without forwarding credentials to sign-in redirects.
+- Avoid unnecessary input pipes for local development commands and report early input closure without an unhandled process crash; retain failed-command diagnostics and credential redaction.
+- Reject XML entity expansion across source readers and require complete authentication tags when verifying encrypted backups. Add snapshot-preservation and truncated-tag regression tests.
+- Enforce cached download limits and add importer integrity, cancellation, scheduling, redirect and source-receipt tests. Update Vite, certificate data and the native PyArrow dependency for reported vulnerabilities; retain locked GDAL compatibility.
+- Consolidate CI entry points and add dependency, historical secret and pinned Semgrep security checks that work with the private repository. Track verification and remaining release steps in [repository readiness](docs/READINESS-UPDATE.md).
+
 ## 0.2.0
 
 - Add a pinned Linux/WSL2 development container and an official local Supabase stack with synthetic campuses, real role-based sessions, persistent private storage and isolated import/GIS/review workers.

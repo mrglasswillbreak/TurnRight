@@ -1,8 +1,4 @@
 import type { Geometry } from 'geojson';
-import proj4 from 'proj4';
-import GeoJSONReader from 'jsts/org/locationtech/jts/io/GeoJSONReader.js';
-import GeoJSONWriter from 'jsts/org/locationtech/jts/io/GeoJSONWriter.js';
-import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory.js';
 import OverlayOp from 'jsts/org/locationtech/jts/operation/overlay/OverlayOp.js';
 import BufferOp from 'jsts/org/locationtech/jts/operation/buffer/BufferOp.js';
 import Polygonizer from 'jsts/org/locationtech/jts/operation/polygonize/Polygonizer.js';
@@ -10,366 +6,27 @@ import IsValidOp from 'jsts/org/locationtech/jts/operation/valid/IsValidOp.js';
 import InteriorPointArea from 'jsts/org/locationtech/jts/algorithm/InteriorPointArea.js';
 import Centroid from 'jsts/org/locationtech/jts/algorithm/Centroid.js';
 import type { CampusData, MapEdit } from './types';
-import { vertexCount, polygonRings } from './geometry-window';
-import { featureEdit, geometryEdits } from './editor-features';
+import { polygonRings } from './geometry-window';
+import { geometryEdits } from './editor-features';
 import { squareRing } from './editor-precision';
-import { layerIdentity, newLayer, layerEdit, layerKey } from './campus-layers';
+import { layerIdentity, layerKey } from './campus-layers';
 import {
-  roadRevision,
-  surfaceWidth,
-  SURFACE_GENERATOR,
-  type DerivedSurface,
-} from './surface-generation';
-export interface GeometryRequest {
-  operation:
-    | 'merge'
-    | 'split'
-    | 'hole'
-    | 'regenerate'
-    | 'remove-hole'
-    | 'remove-part'
-    | 'square'
-    | 'straighten'
-    | 'align'
-    | 'offset';
-  distance?: number;
-  bearing?: number;
-  keys: string[];
-  cutter?: Geometry;
-  part?: number;
-  ring?: number;
-  replaceManual?: boolean;
-}
-export interface GeometryResult {
-  edits: MapEdit[];
-  report: string[];
-  beforeArea: number;
-  afterArea: number;
-  projection: string;
-  repairs: {
-    sourceId?: string;
-    original: Geometry;
-    precision: number;
-    areaChangePercent: number;
-    vertices: number;
-  }[];
-}
+  type GeometryRequest,
+  type GeometryResult,
+} from './layer-geometry-types.js';
+import { createGeometryContext } from './layer-geometry-context.js';
+import { regenerateRoadSurfaces } from './layer-road-surfaces.js';
 export function runGeometry(
   data: CampusData,
   edits: MapEdit[],
   request: GeometryRequest,
 ): GeometryResult {
-  const centre = [
-      (data.bounds[0][0] + data.bounds[1][0]) / 2,
-      (data.bounds[0][1] + data.bounds[1][1]) / 2,
-    ],
-    zone = Math.max(1, Math.min(60, Math.floor((centre[0] + 180) / 6) + 1));
-  const projection = `+proj=utm +zone=${zone}${centre[1] < 0 ? ' +south' : ''} +datum=WGS84 +units=m +no_defs`;
-  const project = proj4('EPSG:4326', projection),
-    reader = new GeoJSONReader(new GeometryFactory()),
-    writer = new GeoJSONWriter();
-  const transform = (g: Geometry, inverse = false): Geometry => {
-    const visit = (v: unknown): unknown =>
-      Array.isArray(v)
-        ? typeof v[0] === 'number'
-          ? inverse
-            ? project.inverse(v as number[])
-            : project.forward(v as number[])
-          : v.map(visit)
-        : v;
-    return g.type === 'GeometryCollection'
-      ? { ...g, geometries: g.geometries.map((x) => transform(x, inverse)) }
-      : ({ ...g, coordinates: visit(g.coordinates) } as Geometry);
-  };
-  const read = (g: Geometry) => reader.read(transform(g));
-  const output = (
-    value: ReturnType<typeof read>,
-    sourceId?: string,
-  ): Geometry => {
-    if (value.isEmpty() || !new IsValidOp(value).isValid())
-      throw new Error(
-        'The operation produced empty or invalid geometry. Nothing has been applied.',
-      );
-    let g = transform(writer.write(value) as Geometry, true);
-    // Nonlinear projection can turn projected tangencies into microscopic
-    // geographic crossings. Snap coordinates only when necessary, preserving
-    // every component, ring and vertex and verifying both coordinate systems.
-    if (!new IsValidOp(reader.read(g)).isValid()) {
-      const original = g;
-      let repaired = false;
-      for (const precision of [12, 11, 10, 9, 8]) {
-        const round = (v: unknown): unknown =>
-          Array.isArray(v)
-            ? v.map(round)
-            : typeof v === 'number'
-              ? Number(v.toFixed(precision))
-              : v;
-        if (original.type === 'GeometryCollection') break;
-        const candidate = {
-          ...original,
-          coordinates: round(original.coordinates),
-        } as Geometry;
-        const geographic = reader.read(candidate),
-          projected = read(candidate);
-        const areaChangePercent =
-          (Math.abs(projected.getArea() - value.getArea()) /
-            Math.max(value.getArea(), 1e-12)) *
-          100;
-        if (
-          !geographic.isEmpty() &&
-          new IsValidOp(geographic).isValid() &&
-          new IsValidOp(projected).isValid() &&
-          areaChangePercent <= 1
-        ) {
-          g = candidate;
-          repaired = true;
-          result.repairs.push({
-            sourceId,
-            original,
-            precision,
-            areaChangePercent,
-            vertices: vertexCount(g),
-          });
-          break;
-        }
-      }
-      if (!repaired)
-        throw new Error(
-          'Coordinate conversion requires a geometry repair beyond the automatic limits. Original surface retained for review.',
-        );
-    }
-    if (vertexCount(g) > 20000)
-      throw new Error(
-        'The result exceeds 20,000 vertices. Split it into smaller features before applying.',
-      );
-    return g;
-  };
-  const selected = request.keys
-    .map((key) => {
-      const i = key.indexOf(':');
-      return featureEdit(
-        data,
-        key.slice(0, i) as MapEdit['kind'],
-        key.slice(i + 1),
-        edits,
-      );
-    })
-    .filter((e): e is MapEdit => !!e && !e.deleted);
-  if (!selected.length) throw new Error('Select at least one feature.');
-  if (selected.length > 499)
-    throw new Error(
-      'Select up to 499 features per geometry operation so the layer and feature changes can save atomically.',
-    );
-  const result: GeometryResult = {
-    edits: [],
-    report: [],
-    beforeArea: 0,
-    afterArea: 0,
-    projection,
-    repairs: [],
-  };
-  const lineage = (
-    edit: MapEdit,
-    operation: string,
-    parents = selected.map((e) => layerKey(e.kind, e.id)),
-  ) => ({
-    ...edit.properties,
-    geometryLineage: { operation, parents },
-    ...(edit.properties.derivedSurface
-      ? {
-          derivedSurface: {
-            ...(edit.properties.derivedSurface as DerivedSurface),
-            manual: true,
-          },
-        }
-      : {}),
-  });
-  if (request.operation === 'regenerate') {
-    const sourceIds = new Set(
-      selected
-        .map((e) =>
-          e.kind === 'path'
-            ? e.id
-            : (e.properties.derivedSurface as DerivedSurface | undefined)
-                ?.sourceRoadId,
-        )
-        .filter(Boolean),
-    );
-    const roads = data.map.features.filter(
-      (f) =>
-        f.properties?.kind === 'path' && sourceIds.has(String(f.properties.id)),
-    );
-    const id = layerIdentity('derived-road-surfaces-v1'),
-      layer = newLayer(
-        'Estimated and source-width road surfaces',
-        'road-surface',
-        id,
-      );
-    const obstacles = data.map.features.filter(
-      (f) =>
-        ['Polygon', 'MultiPolygon'].includes(f.geometry.type) &&
-        (f.properties?.kind === 'building' ||
-          (f.properties?.kind === 'land' &&
-            (['water', 'wetland'].includes(String(f.properties.landClass)) ||
-              (['road', 'sidewalk', 'parking'].includes(
-                String(f.properties.landClass),
-              ) &&
-                !f.properties.derivedSurface)))),
-    );
-    const generated: ReturnType<typeof read>[] = [];
-    for (const f of data.map.features) {
-      const link = f.properties?.derivedSurface as DerivedSurface | undefined;
-      if (
-        link &&
-        (!sourceIds.has(link.sourceRoadId) ||
-          (link.manual && !request.replaceManual))
-      )
-        generated.push(read(f.geometry));
-    }
-    for (const road of roads) {
-      const roadId = String(road.properties?.id),
-        linked = data.map.features.filter(
-          (f) =>
-            (f.properties?.derivedSurface as DerivedSurface | undefined)
-              ?.sourceRoadId === roadId,
-        ),
-        old = linked[0];
-      const removed = edits.filter(
-        (e) =>
-          e.kind === 'land' &&
-          e.deleted &&
-          !e.properties.revertToSource &&
-          (e.properties.derivedSurface as DerivedSurface | undefined)
-            ?.sourceRoadId === roadId,
-      );
-      if (removed.length && !request.replaceManual) {
-        result.report.push(
-          `${roadId}: retained owner removal or superseded surface; replacement requires the explicit replace option.`,
-        );
-        continue;
-      }
-      if (
-        linked.some((f) => f.properties?.derivedSurface?.manual) &&
-        !request.replaceManual
-      ) {
-        result.report.push(
-          `${roadId}: retained manual shape; replacement requires the explicit replace option.`,
-        );
-        continue;
-      }
-      if (
-        !['LineString', 'MultiLineString'].includes(road.geometry.type) ||
-        ['steps', 'construction', 'proposed'].includes(
-          String(road.properties?.highway),
-        ) ||
-        road.properties?.bridge === 'yes' ||
-        Number(road.properties?.layer || 0) !== 0
-      ) {
-        result.report.push(
-          `${roadId}: held for review; stairs, grade separation or unsuitable geometry.`,
-        );
-        continue;
-      }
-      try {
-        const width = surfaceWidth(road.properties || {}),
-          source = read(road.geometry);
-        let shape = BufferOp.bufferOp(source, width.width / 2, 8);
-        const fullArea = shape.getArea();
-        shape = OverlayOp.intersection(shape, read(data.boundary.geometry));
-        for (const obstacle of obstacles) {
-          const o = read(obstacle.geometry);
-          if (shape.getEnvelopeInternal().intersects(o.getEnvelopeInternal()))
-            shape = OverlayOp.difference(shape, o);
-        }
-        for (const previous of generated)
-          if (
-            shape
-              .getEnvelopeInternal()
-              .intersects(previous.getEnvelopeInternal())
-          )
-            shape = OverlayOp.difference(shape, previous);
-        if (shape.isEmpty()) {
-          result.report.push(
-            `${roadId}: no surface remains after excluding buildings, water and surveyed surfaces.`,
-          );
-          continue;
-        }
-        const geometry = output(shape, roadId),
-          surfaceId = String(
-            old?.properties?.id ||
-              `derived-surface:${layerIdentity(roadId).slice(10)}`,
-          );
-        const finalShape = read(geometry);
-        generated.push(shape);
-        const previous = featureEdit(data, 'land', surfaceId, edits);
-        result.edits.push({
-          ...previous,
-          deleted: false,
-          id: surfaceId,
-          kind: 'land',
-          geometry,
-          properties: {
-            ...previous?.properties,
-            name: `${String(road.properties?.name || 'Campus path')} · ${width.evidence === 'illustrative' ? 'estimated' : 'recorded'} width`,
-            landClass: 'road',
-            mapLayerId: id,
-            mapLayerSource: 'derived',
-            width: width.width,
-            widthEvidence: width.evidence,
-            derivedSurface: {
-              sourceRoadId: roadId,
-              ...width,
-              generator: SURFACE_GENERATOR,
-              sourceRevision: roadRevision(road),
-            },
-            ...(road.properties?.surface
-              ? { surface: road.properties.surface }
-              : {}),
-          },
-        });
-        result.beforeArea += old ? read(old.geometry).getArea() : 0;
-        result.afterArea += finalShape.getArea();
-        for (const other of linked.slice(1)) {
-          const superseded = featureEdit(
-            data,
-            'land',
-            String(other.properties?.id),
-            edits,
-          );
-          if (superseded)
-            result.edits.push({
-              ...superseded,
-              deleted: true,
-              properties: {
-                ...superseded.properties,
-                geometryLineage: {
-                  operation: 'superseded',
-                  survivor: surfaceId,
-                },
-              },
-            });
-        }
-        result.report.push(
-          `${roadId}: ${width.width} m (${width.evidence}); ${shape.getArea().toFixed(1)} m²; ${(fullArea - shape.getArea()).toFixed(1)} m² excluded. Review intersections before applying.`,
-        );
-      } catch (error) {
-        result.report.push(
-          `${roadId}: held for review — ${(error as Error).message}`,
-        );
-      }
-    }
-    if (result.edits.length && !data.layers?.items.some((l) => l.id === id))
-      result.edits.unshift(layerEdit(layer));
-    if (!roads.length)
-      result.report.push(
-        'No linked source roads were found. Select routing paths or their derived surfaces.',
-      );
-    if (result.edits.length > 500)
-      throw new Error(
-        'This operation produces more than 500 changes. Select fewer source roads and preview again.',
-      );
-    return result;
-  }
+  const context = createGeometryContext(data, edits, request);
+  const { transform, reader, writer, read, output, selected, result, lineage } =
+    context;
+  if (request.operation === 'regenerate')
+    return regenerateRoadSurfaces(context);
+
   if (['square', 'straighten', 'align', 'offset'].includes(request.operation)) {
     const staged = new Map<string, MapEdit>();
     for (const original of selected) {
@@ -519,13 +176,17 @@ export function runGeometry(
     );
     return result;
   }
+
   if (selected.some((e) => !['land', 'overlay'].includes(e.kind)))
     throw new Error(
       'Use the topology-aware path tools for routing edits. These operations support landscape, road surfaces and overlays.',
     );
+
   const primary = selected[0],
     shapes = selected.map((e) => read(e.geometry));
+
   result.beforeArea = shapes.reduce((n, g) => n + g.getArea(), 0);
+
   if (request.operation === 'merge') {
     if (
       selected.length < 2 ||
@@ -655,11 +316,18 @@ export function runGeometry(
       },
     ];
   }
+
   result.afterArea = result.edits
     .filter((e) => !e.deleted)
     .reduce((n, e) => n + read(e.geometry).getArea(), 0);
+
   result.report.push(
     `${result.edits.filter((e) => !e.deleted).length} output features; ${result.beforeArea.toFixed(2)} → ${result.afterArea.toFixed(2)} m². Original identities and superseded pieces remain in undo history.`,
   );
+
   return result;
 }
+export {
+  type GeometryRequest,
+  type GeometryResult,
+} from './layer-geometry-types.js';

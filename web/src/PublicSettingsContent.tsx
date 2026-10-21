@@ -206,7 +206,7 @@ export function PublicSettingsContent(props: Props) {
         send the pin and description you submit. TurnRight is an independent
         personal project, not an official university service.
       </p>
-      <h3 className="subheading">Sources & attribution</h3>
+      <h3 className="subheading">Sources &amp; attribution</h3>
       {data.sources.map((source) => (
         <p key={source.id}>
           <a

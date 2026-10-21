@@ -1,7 +1,7 @@
 /** Campus-scoped production baseline audit. Private snapshots never become CI artifacts. */
 import fs from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
-import { db, allRows, hash } from './cloud.mjs';
+import { allRows, hash } from './cloud.mjs';
 import {
   publishedCampus,
   snapshotHash,

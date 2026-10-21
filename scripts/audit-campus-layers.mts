@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import { randomUUID, createHash } from 'node:crypto';
 import { allRows, db, hash } from './cloud.mjs';
+import type { MapEdit } from '../web/src/types';
 const sha = (bytes: string) => createHash('sha256').update(bytes).digest('hex');
 const receipts = [];
 for (const campus of ['lasu', 'campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a']) {
@@ -37,7 +38,7 @@ for (const campus of ['lasu', 'campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a']) {
     'releases?status=eq.published&order=created_at.desc&limit=1&select=id,version,snapshot',
   );
   const accepted = new Map(
-    (release?.snapshot?.edits || []).map((e: any) => [
+    (release?.snapshot?.edits || []).map((e: MapEdit) => [
       `${e.kind}:${e.id}`,
       hash(e),
     ]),
@@ -56,7 +57,7 @@ for (const campus of ['lasu', 'campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a']) {
     publishedVersion: release?.version,
     unpublishedDraftCount: unpublished.length,
     unpublishedKinds: unpublished.reduce(
-      (counts: any, e: any) => ({
+      (counts: Record<string, number>, e: MapEdit) => ({
         ...counts,
         [e.kind]: (counts[e.kind] || 0) + 1,
       }),

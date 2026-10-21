@@ -40,7 +40,7 @@ export function ArrivalEditor({
     <section className="arrival-editor">
       {edit.kind !== 'building' && (
         <details>
-          <summary>Entrance & arrival observations</summary>
+          <summary>Entrance &amp; arrival observations</summary>
           {(['description', 'restrictions', 'surface'] as const).map((key) => (
             <label className="field-label" key={key}>
               {key === 'description'

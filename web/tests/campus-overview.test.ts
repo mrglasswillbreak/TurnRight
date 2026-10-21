@@ -107,7 +107,7 @@ it.each([
 });
 
 it('retains the legacy revision algorithm and includes new outline coordinates', () => {
-  const directory = { schemaVersion: 1, campuses: [lasuCampus] };
+  const directory = { schemaVersion: 1 as const, campuses: [lasuCampus] };
   const legacy = createHash('sha256')
     .update(
       JSON.stringify({
@@ -129,7 +129,13 @@ it('retains the legacy revision algorithm and includes new outline coordinates',
   expect(
     catalogueRevision({
       ...directory,
-      campuses: [{ ...lasuCampus, outline: campusFixture().boundary.geometry }],
+      campuses: [
+        {
+          ...lasuCampus,
+          outline: campusFixture().boundary
+            .geometry as import('geojson').Polygon,
+        },
+      ],
     }),
   ).not.toBe(catalogueRevision({ ...directory, campuses: [campuses[0]] }));
 });
@@ -193,7 +199,7 @@ it.each([false, true])(
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     };
-    const query = vi.fn(() => [
+    const query = vi.fn((_bounds: unknown) => [
       { properties: { id: 'lasu', active: true } },
       { properties: { id: 'next', active: false } },
       { properties: { id: 'next', active: false } },

@@ -4,23 +4,27 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
-  - package-ecosystem: npm
-    directory: /web
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+    groups:
+      compatible-development-tools:
+        dependency-type: development
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
   - package-ecosystem: pip
     directory: /scripts
-    # The separately pinned voice environment has its own validation workflow.
-    exclude-paths:
-      - voice-requirements.in
-      - voice-requirements.txt
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /scripts/map_import
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /scripts/gis
+    schedule:
+      interval: weekly

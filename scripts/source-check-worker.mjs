@@ -453,6 +453,7 @@ if (
       await runSourceCheck(input);
       emitEvent('worker-completed', {
         worker: 'source-check',
+        jobId: input.importId,
         startedAt,
         status: 200,
       });
@@ -460,6 +461,7 @@ if (
   } catch {
     emitEvent('worker-failed', {
       worker: 'source-check',
+      jobId: input.importId,
       startedAt,
       status: 500,
       dependency: 'worker',

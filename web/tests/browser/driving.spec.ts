@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './coverage-fixture';
 import { createHash } from 'node:crypto';
 import { campusFixture } from '../fixture';
 
@@ -179,52 +179,55 @@ test('older campus package explains driving unavailability and still routes walk
   ).toBeVisible();
 });
 
-test('prepared offline driving survives a cold reload with bundled voice', async ({
-  page,
-  context,
-}, testInfo) => {
-  test.skip(
-    !testInfo.config.configFile?.includes('pwa.config'),
-    'Requires production service worker.',
-  );
-  await setup(page);
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Expand card', exact: true }).click();
-  await page.getByRole('button', { name: 'Offline', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Download campus map', exact: true })
-    .click();
-  await expect(
-    page.getByText('Ready offline', { exact: true }).first(),
-  ).toBeVisible();
-  await context.setOffline(true);
-  await page.goto('/?place=library');
-  await page.getByRole('button', { name: 'Directions', exact: true }).click();
-  await page.getByLabel('Starting place').selectOption('gate');
-  await expect(page.getByLabel('Travel mode', { exact: true })).toHaveValue(
-    'driving',
-  );
-  await expect(
-    page.getByRole('button', { name: 'Start driving', exact: true }),
-  ).toBeVisible();
-  expect(
-    await page.evaluate(async () => {
-      const response = await fetch('/voice/en-GB-v1/manifest.json');
-      if (!response.ok) return false;
-      const pack = await response.json();
-      return (
-        await Promise.all(
-          ['depart-driving', 'arrive-parking', 'roundabout'].map((key) =>
-            fetch(pack.clips[key].url).then(
-              async (response) =>
-                response.ok &&
-                (await response.arrayBuffer()).byteLength ===
-                  pack.clips[key].bytes,
+test(
+  'prepared offline driving survives a cold reload with bundled voice',
+  { tag: '@offline' },
+  async ({ page, context }, testInfo) => {
+    test.skip(
+      !testInfo.config.configFile?.includes('pwa.config'),
+      'Requires production service worker.',
+    );
+    await setup(page);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+    await page.goto('/');
+    await page
+      .getByRole('button', { name: 'Expand card', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Offline', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Download campus map', exact: true })
+      .click();
+    await expect(
+      page.getByText('Ready offline', { exact: true }).first(),
+    ).toBeVisible();
+    await context.setOffline(true);
+    await page.goto('/?place=library');
+    await page.getByRole('button', { name: 'Directions', exact: true }).click();
+    await page.getByLabel('Starting place').selectOption('gate');
+    await expect(page.getByLabel('Travel mode', { exact: true })).toHaveValue(
+      'driving',
+    );
+    await expect(
+      page.getByRole('button', { name: 'Start driving', exact: true }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(async () => {
+        const response = await fetch('/voice/en-GB-v1/manifest.json');
+        if (!response.ok) return false;
+        const pack = await response.json();
+        return (
+          await Promise.all(
+            ['depart-driving', 'arrive-parking', 'roundabout'].map((key) =>
+              fetch(pack.clips[key].url).then(
+                async (response) =>
+                  response.ok &&
+                  (await response.arrayBuffer()).byteLength ===
+                    pack.clips[key].bytes,
+              ),
             ),
-          ),
-        )
-      ).every(Boolean);
-    }),
-  ).toBe(true);
-});
+          )
+        ).every(Boolean);
+      }),
+    ).toBe(true);
+  },
+);

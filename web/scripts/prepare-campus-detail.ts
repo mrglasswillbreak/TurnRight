@@ -223,7 +223,6 @@ async function saveSector(sector: SectorModels, bounds: [Position, Position]) {
     sha256,
     bytes: Buffer.byteLength(body),
     url: `/packages/visual-${sha256.slice(0, 12)}/${filename}`,
-    contentType: 'application/json',
   });
 }
 for (const sector of catalogue.sectors) {

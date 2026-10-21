@@ -2,14 +2,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { packageBin } from '../toolchain.mjs';
 
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtime = path.join(root, '.local-runtime');
 export const origin = 'http://127.0.0.1:5180';
-export const supabaseCli = path.join(
-  root,
-  'node_modules/supabase/dist/supabase.js',
-);
+export const supabaseCli = packageBin('supabase');
 
 export function requireLocalUrl(value, name = 'Service URL') {
   const url = new URL(value);
@@ -47,19 +45,22 @@ export async function command(
     binary = process.execPath;
   }
   return new Promise((resolve, reject) => {
+    // Development-only callers supply fixed Docker/Git/Node binaries and separate argv; no shell or request-provided executable is used.
+    // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.detect-child-process
     const child = spawn(binary, args, {
       cwd: root,
       env,
       windowsHide: true,
       timeout,
       stdio: [
-        'pipe',
+        input.length ? 'pipe' : 'ignore',
         capture ? 'pipe' : 'inherit',
         capture ? 'pipe' : 'inherit',
       ],
     });
     let stdout = '',
       stderr = '';
+    let inputError;
     child.stdout?.on('data', (value) => {
       stdout += value;
     });
@@ -67,16 +68,23 @@ export async function command(
       stderr = (stderr + value).slice(-8000);
     });
     child.on('error', reject);
-    child.on('close', (code) =>
-      code === 0
-        ? resolve(stdout)
-        : reject(
-            Error(
-              `${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`,
-            ),
+    child.stdin?.on('error', (error) => {
+      inputError = error;
+    });
+    child.on('close', (code) => {
+      if (code !== 0)
+        reject(
+          Error(
+            `${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`,
           ),
-    );
-    child.stdin.end(input);
+        );
+      else if (inputError)
+        reject(
+          Error(`${path.basename(binary)} could not receive command input.`),
+        );
+      else resolve(stdout);
+    });
+    child.stdin?.end(input);
   });
 }
 

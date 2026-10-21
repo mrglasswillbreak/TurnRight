@@ -105,15 +105,18 @@ for (const place of changes.places) {
 }
 meta.payload.sources = [
   ...meta.payload.sources.filter(
-    (s: any) => !changes.sources.some((n: any) => n.id === s.id),
+    (s: { id: string }) =>
+      !changes.sources.some((n: { id: string }) => n.id === s.id),
   ),
   ...changes.sources,
 ];
 meta.payload.photos = [
   ...(meta.payload.photos || []),
   ...photos.filter(
-    (p: any) =>
-      !(meta.payload.photos || []).some((old: any) => old.id === p.id),
+    (p: { id: string }) =>
+      !(meta.payload.photos || []).some(
+        (old: { id: string }) => old.id === p.id,
+      ),
   ),
 ];
 for (const record of records) record.hash = hash(record.payload);
@@ -159,7 +162,9 @@ const response = await fetch(
   },
 );
 if (!response.ok) throw Error('Could not preserve private rollback snapshot');
-const report: any = {
+const report = {
+  reconciliationId: undefined as string | undefined,
+  releaseId: undefined as string | undefined,
   expectedHash,
   storagePath,
   graphHash: hash(data.graph),
@@ -185,7 +190,9 @@ if (process.env.APPLY_UNILAG === 'true') {
   // Transaction compares every source row and saves a rollback receipt. Existing
   // private drafts are not written, deleted, consumed or renumbered.
   const oldIndex = new Map(previous.map((r) => [r.id, r]));
-  const patches = records.flatMap((record) => {
+  const patches = records.flatMap<
+    import('./source-patch-types.js').AdditiveSourcePatch
+  >((record) => {
     const old = oldIndex.get(record.id),
       base = {
         id: record.id,

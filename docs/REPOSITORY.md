@@ -36,10 +36,10 @@ Existing local backup copies and unselected brand drafts are ignored, not produc
 - Store fresh screenshots under a new date and record source/package/browser identities and hashes. Follow [Screenshot maintenance](SCREENSHOTS.md).
 - Keep accepted source observations, licences, historical model fingerprints, migration files, deployment receipts, and test fixtures even when a newer version exists. They support attribution, compatibility, and recovery.
 - Preserve licence-dependent ArcGIS/REA research outside ignored work folders before cleanup. The [campus detail archive](CAMPUS-DETAIL-UPGRADE.md#time-limited-pro-access) contains portable exports, original identities, source dispositions, treatment ledgers and independent hash verifiers. Keep raw private evidence local; publish only sanitized reports and approved application assets.
-- Run `npm run check:docs` from `web/` for every documentation or file-location change. It checks all versioned and new non-ignored Markdown files and local links/assets.
+- Run `npm run check:docs` from the repository root for every documentation or file-location change. It checks all versioned and new non-ignored Markdown files and local links/assets.
 
 ## Toolchain and checks
 
-Node is pinned in the root runtime files; `web/package-lock.json` is the dependency lock. Use `npm ci`, not a dependency upgrade, for routine setup. Python worker dependencies are pinned in `scripts/requirements-*.txt` and the container definitions. See [Contributing](../CONTRIBUTING.md) for checks and [Deployment](DEPLOYMENT.md) for production configuration.
+Node is pinned in the root runtime files; the root `package-lock.json` is the single dependency lock for the npm workspace. Use root `npm ci` for routine setup and `npm run doctor` to check the runtime. Python manifests and their hash-locked `requirements*.lock` profiles live under `scripts/`; the converter and GIS worker have separate pinned container definitions. Root quality checks enforce four TypeScript projects and the formatted 500-line limit for authored JavaScript/TypeScript source, tests and tools. See [Contributing](../CONTRIBUTING.md) for checks and [Deployment](DEPLOYMENT.md) for production configuration.
 
-For files outside `web/`, run the formatter from the repository root: `node web/node_modules/oxfmt/bin/oxfmt --config web/.oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory.
+Run the formatter from the repository root: `npm exec -- oxfmt --config web/.oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory. `npm run format:check` checks the repository's authored files.

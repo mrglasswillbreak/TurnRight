@@ -1,6 +1,59 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { emitEvent, eventRecord } from '../server/diagnostics.mjs';
+import {
+  emitEvent,
+  eventRecord,
+  diagnosticJobId,
+} from '../server/diagnostics.mjs';
+import { observeResponse, type ResponseLike } from '../server/backend';
 afterEach(() => vi.restoreAllMocks());
+it('correlates known worker responses with API references without logging payloads or claim tokens', () => {
+  const jobId = '11111111-1111-4111-8111-111111111111';
+  const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+  const target = {
+    status: vi.fn(),
+    json: vi.fn(),
+    setHeader: vi.fn(),
+  } as unknown as ResponseLike;
+  const response = observeResponse(target, {
+    requestId: 'ref-1',
+    startedAt: 0,
+    action: 'import-run',
+  });
+  const body = { job: { id: jobId, run_token: 'secret', coordinates: [3, 6] } };
+  response.status(202).json(body);
+  expect(target.json).toHaveBeenCalledWith(body);
+  const record = JSON.parse(info.mock.calls[0][0]);
+  expect(record).toMatchObject({ requestId: 'ref-1', jobId, status: 202 });
+  expect(record).not.toHaveProperty('run_token');
+  expect(record).not.toHaveProperty('coordinates');
+  expect(
+    eventRecord('worker-completed', { worker: 'map-import', jobId }),
+  ).toHaveProperty('jobId', jobId);
+  for (const action of [
+    'gis-job-start',
+    'source-updates-prepare',
+    'source-updates-control',
+  ])
+    expect(diagnosticJobId(action, { id: jobId })).toBe(jobId);
+  for (const [action, value] of [
+    ['state', { id: jobId }],
+    ['gis-member-save', { id: jobId }],
+    ['import-run', { job: { id: 'secret' } }],
+    ['gis-job-start', null],
+    ['gis-job-start', []],
+    [undefined, { id: jobId }],
+  ] as const)
+    expect(diagnosticJobId(action, value)).toBeUndefined();
+  expect(
+    eventRecord('worker-failed', {
+      jobId: 'secret',
+      requestId: '-'.repeat(36),
+    }),
+  ).not.toHaveProperty('jobId');
+  expect(
+    eventRecord('worker-failed', { requestId: '-'.repeat(36) }),
+  ).not.toHaveProperty('requestId');
+});
 it('records operational metadata and discards secrets and error objects', () => {
   const context = {
     startedAt: 1000,

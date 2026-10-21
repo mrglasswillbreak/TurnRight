@@ -1,3 +1,4 @@
+import { packageBin } from '../../scripts/toolchain.mjs';
 import { chromium } from '@playwright/test';
 import { execFileSync, spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -18,14 +19,7 @@ await writeFile(
 );
 const server = spawn(
   process.execPath,
-  [
-    'node_modules/vite/bin/vite.js',
-    '--host',
-    '127.0.0.1',
-    '--port',
-    '5196',
-    '--strictPort',
-  ],
+  [packageBin('vite'), '--host', '127.0.0.1', '--port', '5196', '--strictPort'],
   { stdio: 'ignore', windowsHide: true },
 );
 let browser;
@@ -34,6 +28,8 @@ try {
   while (true) {
     try {
       if (
+        // Loopback-only readiness probe for the disposable benchmark server started above; no credentials or user content are transmitted.
+        // nosemgrep: local-runtime.semgrep-rules.typescript.react.security.react-insecure-request
         (await fetch('http://127.0.0.1:5196/work/image-storage-bench.html')).ok
       )
         break;

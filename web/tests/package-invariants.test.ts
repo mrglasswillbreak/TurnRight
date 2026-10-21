@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error Node-only release verification module.
 import { packageInvariants } from '../scripts/package-invariants.mjs';
 
 const fixture = () => ({

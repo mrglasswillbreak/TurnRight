@@ -38,7 +38,7 @@ b.properties.appearance = {
   facades: {
     ...b.properties.appearance?.facades,
     [wallId]: {
-      ...(existing || {}),
+      ...existing,
       wallId,
       partId: existing?.partId || `${buildingId}:wing:0`,
       wallCoordinates: existing?.wallCoordinates || coordinates.slice(0, 2),

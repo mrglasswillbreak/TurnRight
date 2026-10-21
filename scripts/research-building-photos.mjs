@@ -153,8 +153,8 @@ for (const b of buildings) {
     const search = `(LASU OR "Lagos State University") "${term}"`;
     let result = searchCache.get(search);
     if (!result) {
-      let next = {},
-        found = [];
+      let next = {};
+      const found = [];
       do {
         const page = await query({
           list: 'search',

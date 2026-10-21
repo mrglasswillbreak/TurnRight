@@ -101,8 +101,8 @@ The LASU/UNILAG campus images show the public packages published on 18 October. 
 Use **Node 22.23.3**, pinned in [.node-version](.node-version) and [.nvmrc](.nvmrc).
 
 ```sh
-cd web
 npm ci
+npm run doctor
 npm run dev
 ```
 
@@ -114,7 +114,7 @@ For a production build and local static preview:
 
 ```sh
 npm run build
-npm run preview
+npm run preview --workspace web
 ```
 
 Python **3.12** and the pinned Linux GIS containers are needed for importer/native processing work, not for starting the public web app. See [Contributing](CONTRIBUTING.md) for the complete development and verification workflow.
@@ -144,21 +144,23 @@ Visitors ← verified offline packages ← published campus release
 
 ## Quality and release readiness
 
-Run from `web/`:
+Run from the repository root:
 
 ```sh
-npm test -- --maxWorkers=2
-npm run lint
-npm run check:docs
+npx playwright install chromium webkit
+npm run check
+npm test -- --maxWorkers=1
+npm run test:coverage
 npm run check:dependencies
 npm run build
 npm run check:configured-build
-npm run test:browser
-npm run test:survey-webkit
-npm run test:survey-pwa
+npm run test:survey-webkit --workspace web
+npm run test:survey-pwa --workspace web
 ```
 
 Install Playwright browsers first with `npx playwright install chromium webkit`. CI also checks native PostGIS, importer isolation, backup restoration, photo workflows, offline behavior, and map/globe/voice/JavaScript budgets. The configured-build command uses test authentication placeholders; its output must not be deployed.
+
+The full-source application coverage gate combines passing unit/component tests with all required Chromium journeys and enforces 80% statements, lines and functions plus 70% branches. Native processing requires 80% lines and 70% branches. [Repository readiness](docs/READINESS-UPDATE.md) records exact-revision results and the assessment mapping; those results do not predict an external score.
 
 Physical Android/iPhone checks, campus field verification, live role acceptance, and a public rollback rehearsal remain outstanding acceptance checks. Exact-snapshot approvals and any explicitly authorized owner exception are recorded in the release evidence. [Acceptance checklist](docs/ACCEPTANCE.md) · [Readiness and deployment evidence](docs/PRODUCTION.md) · [Performance bounds](docs/PERFORMANCE.md).
 

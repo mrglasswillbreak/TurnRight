@@ -9,7 +9,7 @@ This is the current configuration guide. [Deployment](DEPLOYMENT.md) contains th
 | Service | Existing project and responsibility |
 | --- | --- |
 | Public app | [turnright.vercel.app](https://turnright.vercel.app/); [team workspace](https://turnright.vercel.app/admin) |
-| Vercel | `turnright`, frontend root `web`, Node 22, `npm ci`, `npm run build`, output `dist` |
+| Vercel | `turnright`, frontend root `web`, Node 22, root workspace install `cd .. && npm ci`, `npm run build`, output `dist`; include source outside the root directory |
 | Supabase | `TurnRight`, reference `mrmdfvcztzhypmlfblwh`, existing MRGLASS project |
 | GitHub | `mrglasswillbreak/TurnRight`; code deployment from `main`, private processing/release jobs through Actions |
 | Authentication | GitHub authentication with campus memberships/capabilities; original owner retained for bootstrap and audited override |
@@ -102,7 +102,8 @@ Set application variables in both Vercel Preview and Production. Publication bui
 | `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |
 | `gis-processing.yml` | Campus-scoped analysis/export worker; immutable inputs and staged results |
 | `gis-acceptance.yml` | Native PostGIS/engine and backup restoration gates |
-| `regression-audit.yml` | Required application, browser and offline checks |
+| `ci.yml` | Required root quality, combined coverage, browser, offline and local-stack checks |
+| `security.yml` | Full dependency audits, pinned static analysis and historical secret scanning |
 | `release.yml` | Gated approved `preview` or `publish`; explicit campus, legacy default LASU |
 | `bootstrap.yml`, `preview.yml` | Initial baseline and seed preview for new installations |
 
@@ -131,3 +132,7 @@ Migration 041 adds indexed proposal summaries, revisions, frozen selections, and
 `source-review-maintenance.yml` runs daily at 05:22 UTC and on manual dispatch. Prepared selections expire after 24 hours; completed/cancelled/failed per-item bookkeeping expires after 30 days. Summaries and decision audits remain. Existing import-file retention and the OSM scheduling permission gates are unchanged. [Source updates setup](SOURCE-UPDATES.md#deployment-and-maintenance).
 
 For the current worker, also apply migrations 045–048 and follow [source reliability deployment](DEPLOYMENT.md#source-reliability-upgrade-045048). New proposal generation stays disabled until each source passes its shadow/evidence checks. No additional browser secret or public bucket is required.
+
+## Complete inventory
+
+[ENVIRONMENT.md](ENVIRONMENT.md) lists every checked application, worker, local-development and verification variable, its scope and sensitivity. The root [.env.example](../.env.example) describes hosted setup; public Vite values belong in `web/.env.local`. The local stack generates its own credentials. Run `npm run check:configuration` to detect undocumented environment references.

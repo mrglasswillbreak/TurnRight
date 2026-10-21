@@ -73,8 +73,8 @@ it('publishes explicitly selected attributes and never promotes analysis to rout
     hash: 'h',
     private_attributes: { asset: '001', private_notes: 'Secret' },
     payload: {
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [3.2, 6.46] },
+      type: 'Feature' as const,
+      geometry: { type: 'Point' as const, coordinates: [3.2, 6.46] },
       properties: {
         id: 'tree',
         kind: 'overlay',

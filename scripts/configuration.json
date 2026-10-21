@@ -1,0 +1,385 @@
+{
+  "version": 1,
+  "variables": {
+    "ADMIN_USER_ID": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Original-owner Auth UUID used during local bootstrap and hosted setup."
+    },
+    "APPLICATION_DEPLOYMENT_ID": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Deployment identifier being verified, supplied to the verification tool."
+    },
+    "APPLY_LAYER_UPGRADE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit apply switch for a reviewed layer-upgrade snapshot."
+    },
+    "APPLY_UNILAG": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit apply switch for a reviewed UNILAG upgrade."
+    },
+    "BENCHMARK_OUTPUT": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Local model-editor benchmark report path."
+    },
+    "CAMPUS_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Campus identifier supplied per request or workflow; not a global campus restriction."
+    },
+    "CAMPUS_INPUT": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Reviewed input package path for the package builder."
+    },
+    "CAMPUS_NAME": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Display name for the package being built."
+    },
+    "CAMPUS_SLUG": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "URL slug for the package being built."
+    },
+    "CI_PRODUCTION": {
+      "scope": "local",
+      "sensitive": false,
+      "description": "Production marker that prevents local development commands from running."
+    },
+    "CLEANUP_RUN_ID": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Exact preview-access run selected for cleanup."
+    },
+    "DEV": {
+      "scope": "runtime",
+      "sensitive": false,
+      "description": "Vite-provided development boolean; not a user configuration variable."
+    },
+    "DOCS_PUBLIC_ORIGIN": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Public origin used while preparing documentation screenshots."
+    },
+    "EXPECTED_SNAPSHOT": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Required immutable layer-upgrade snapshot hash before applying."
+    },
+    "EXPECTED_UNILAG_SNAPSHOT": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Required immutable UNILAG snapshot hash before applying."
+    },
+    "GIS_BACKUP_EXCLUDED_TABLES": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit table exclusions recorded by the GIS backup tool."
+    },
+    "GIS_BACKUP_PUBLIC_KEY": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Public encryption key for a private GIS backup; the decryption key stays outside CI."
+    },
+    "GIS_DEPLOYMENT_MODE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit GIS deployment verification mode."
+    },
+    "GIS_IMAGE": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Pinned local container image for network-isolated GIS processing."
+    },
+    "GIS_IMPORT_IMAGE": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Pinned local container image for network-isolated format conversion."
+    },
+    "GIS_JOB_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Immutable processing-job identifier supplied by dispatch."
+    },
+    "GIS_TEST_DATABASE_URL": {
+      "scope": "tool",
+      "sensitive": true,
+      "description": "Disposable test database URL; acceptance tools reject production database names."
+    },
+    "GITHUB_ACTIONS": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided runner marker."
+    },
+    "GITHUB_REPOSITORY": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Owner/repository used for authorized worker dispatch."
+    },
+    "GITHUB_RUN_ID": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided run identifier used in verification and cleanup receipts."
+    },
+    "GITHUB_SHA": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided source revision used in health and verification receipts."
+    },
+    "GITHUB_STEP_SUMMARY": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided job-summary output path."
+    },
+    "GITHUB_TOKEN": {
+      "scope": "ci",
+      "sensitive": true,
+      "description": "GitHub-provided short-lived job credential; never a browser setting."
+    },
+    "GITHUB_WORKFLOW_TOKEN": {
+      "scope": "server",
+      "sensitive": true,
+      "description": "Repository-scoped credential with the Actions access required by worker dispatch."
+    },
+    "GITLEAKS_ENABLE_COMMENTS": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "CI disables automated pull-request comments."
+    },
+    "GITLEAKS_ENABLE_UPLOAD_ARTIFACT": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "CI disables upload of secret findings."
+    },
+    "GITLEAKS_VERSION": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "Pinned secret-scanner binary version."
+    },
+    "IMPORT_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Import-job identifier supplied by dispatch."
+    },
+    "IMPORT_RETENTION_ENABLED": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Explicit repository-variable opt-in to import retention maintenance."
+    },
+    "JOB_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Source-refresh job identifier supplied by dispatch."
+    },
+    "NODE_ENV": {
+      "scope": "runtime",
+      "sensitive": false,
+      "description": "Node runtime mode; local workers reject production."
+    },
+    "npm_config_user_agent": {
+      "scope": "runtime",
+      "sensitive": false,
+      "description": "npm-provided version information used by the runtime doctor."
+    },
+    "OVERPASS_SCHEDULE_ALLOWED": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Explicit endpoint permission gate for scheduled OSM requests; defaults disabled."
+    },
+    "OVERPASS_URL": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Authorized Overpass endpoint override for source acquisition."
+    },
+    "PUBLISHED_MAP_URL": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Stable HTTPS publication origin. The local stack supplies its own loopback URL."
+    },
+    "RELEASE_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Independently reviewed release identifier supplied by dispatch."
+    },
+    "RELEASE_OPERATION": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Authorized preview or publish operation supplied by dispatch."
+    },
+    "RELEASE_SUMMARY": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Review summary embedded in the generated package."
+    },
+    "REPORT_RATE_SALT": {
+      "scope": "server",
+      "sensitive": true,
+      "description": "Private salt for anonymous-report rate buckets."
+    },
+    "RUN_TOKEN": {
+      "scope": "worker",
+      "sensitive": true,
+      "description": "Per-attempt import claim token supplied by dispatch."
+    },
+    "SOURCE_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Source identifier supplied for a single scoped check."
+    },
+    "SOURCE_PYTHON": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Python executable override for independent source-snapshot verification."
+    },
+    "SOURCE_REDISTRIBUTION_APPROVED": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Build gate backed by the source owner’s permission record."
+    },
+    "SOURCE_REVIEW_OPERATION_ID": {
+      "scope": "worker",
+      "sensitive": false,
+      "description": "Durable source-review operation identifier supplied by dispatch."
+    },
+    "SOURCE_REVIEW_RUN_TOKEN": {
+      "scope": "worker",
+      "sensitive": true,
+      "description": "Per-attempt source-review claim token supplied by dispatch."
+    },
+    "SUPABASE_SERVICE_ROLE_KEY": {
+      "scope": "server",
+      "sensitive": true,
+      "description": "Private server service-role credential; never exposed to Vite."
+    },
+    "SUPABASE_URL": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Server Supabase origin for database, authentication and private storage."
+    },
+    "SUPERSEDES_UNILAG_RELEASE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Previous release identifier recorded by the snapshot tool."
+    },
+    "TURNRIGHT_COVERAGE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Opt-in collection of coverage from Chromium acceptance journeys."
+    },
+    "TURNRIGHT_DOCS_DATE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Deliberate evidence date for documentation capture."
+    },
+    "TURNRIGHT_DOCS_SCREENSHOTS": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicitly enables opt-in documentation capture journeys."
+    },
+    "TURNRIGHT_GIS_SCREENSHOTS": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Set to 1 to include opt-in GIS documentation captures."
+    },
+    "TURNRIGHT_LOCAL_DISPATCH_TOKEN": {
+      "scope": "local",
+      "sensitive": true,
+      "description": "Random local dispatch credential generated by local:up and kept in ignored runtime state."
+    },
+    "TURNRIGHT_LOCAL_DISPATCH_URL": {
+      "scope": "local",
+      "sensitive": false,
+      "description": "Generated loopback-only local worker-dispatch URL."
+    },
+    "TURNRIGHT_LOCAL_RUNTIME": {
+      "scope": "local",
+      "sensitive": false,
+      "description": "Enables the isolated local dispatch adapter; rejected on production hosts."
+    },
+    "VERCEL": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "Vercel-provided deployment marker."
+    },
+    "VERCEL_GIT_COMMIT_SHA": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "Vercel-provided source revision reported by health checks."
+    },
+    "VERCEL_ORG_ID": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "Deployment team/project owner identifier."
+    },
+    "VERCEL_PROJECT_ID": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "Deployment project identifier."
+    },
+    "VERCEL_TOKEN": {
+      "scope": "ci",
+      "sensitive": true,
+      "description": "Private deployment credential held in the GitHub secret store."
+    },
+    "VERIFY_BASELINE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Baseline evidence directory used by the globe verifier."
+    },
+    "VERIFY_BYPASS": {
+      "scope": "tool",
+      "sensitive": true,
+      "description": "Private deployment-protection bypass used only by verification tools."
+    },
+    "VERIFY_ENGINE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Browser engine selected by the globe verifier."
+    },
+    "VERIFY_ORIGIN": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit deployment origin being verified."
+    },
+    "VERIFY_OUTPUT": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Verification receipt and screenshot directory."
+    },
+    "VERIFY_SCOPE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Campus or verification scope selected by the caller."
+    },
+    "VERIFY_SKIP_OFFLINE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit focused-verification override; cannot count as complete offline acceptance."
+    },
+    "VISUALS_INPUT": {
+      "scope": "build",
+      "sensitive": false,
+      "description": "Reviewed visual asset input path for package generation."
+    },
+    "VITE_LOCAL_DEVELOPMENT": {
+      "scope": "public",
+      "sensitive": false,
+      "description": "Set only by the isolated local server and configured-build test."
+    },
+    "VITE_SUPABASE_ANON_KEY": {
+      "scope": "public",
+      "sensitive": false,
+      "description": "Public Supabase anonymous key, protected by server authorization and row policies."
+    },
+    "VITE_SUPABASE_URL": {
+      "scope": "public",
+      "sensitive": false,
+      "description": "Public Supabase project URL. Required only for hosted authentication and editing."
+    }
+  }
+}

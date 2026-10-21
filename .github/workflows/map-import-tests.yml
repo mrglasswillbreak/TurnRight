@@ -10,19 +10,34 @@ on:
       - 'supabase/migrations/**'
       - 'web/tests/source-reliability*.test.ts'
       - 'scripts/import_map.py'
-      - 'scripts/tests/test_map_import*.py'
+      - 'scripts/tests/**'
+      - 'scripts/test_python.py'
+      - 'scripts/check_python_coverage.py'
+      - 'pyproject.toml'
       - 'scripts/tests/check_map_import_worker.py'
       - '.github/workflows/map-import-tests.yml'
 permissions:
   contents: read
 jobs:
   gis:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: docker build -t turnright-gis-import -f scripts/map_import/Dockerfile scripts/map_import
       - name: Exercise every driver without network access
-        run: docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -v "${{ github.workspace }}/scripts:/app:ro" --entrypoint python3 turnright-gis-import -m unittest discover -s /app/tests -p 'test_map_import*.py' -v
+        run: docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -v "$GITHUB_WORKSPACE/scripts:/app:ro" --entrypoint python3 turnright-gis-import -m unittest discover -s /app/tests -p 'test_map_import*.py' -v
+      - name: Build locked native coverage environment
+        run: docker build --target test -t turnright-gis-import-test -f scripts/map_import/Dockerfile scripts/map_import
+      - name: Enforce Python processing coverage with every native test enabled
+        run: |
+          mkdir -p coverage/python
+          docker run --rm --user "$(id -u):$(id -g)" --network none --cap-drop ALL --security-opt no-new-privileges --read-only --tmpfs /tmp:rw,size=512m -e PYTHONDONTWRITEBYTECODE=1 -v "$GITHUB_WORKSPACE:/repo:ro" -v "$GITHUB_WORKSPACE/coverage/python:/repo/coverage/python:rw" -w /repo --entrypoint python3 turnright-gis-import-test scripts/test_python.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: python-processing-coverage
+          path: coverage/python/
+          retention-days: 30
       - name: Inspect uploads through the real private worker mount
         run: python3 scripts/tests/check_map_import_worker.py

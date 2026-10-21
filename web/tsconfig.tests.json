@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "allowImportingTsExtensions": true,
+    "paths": { "@/*": ["./*"], "/src/*": ["./src/*"] }
+  },
+  "include": [
+    "tests",
+    "src/**/*.d.ts",
+    "*.config.ts",
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "../scripts/**/*.mts"
+  ]
+}

@@ -374,6 +374,14 @@ export interface MapEdit {
     revertToSource?: boolean;
     mergedInto?: string;
     duplicateKeepSeparate?: string[];
+    layerDefinition?: import('./campus-layer-types.js').CampusLayer;
+    derivedSurface?: import('./surface-generation.js').DerivedSurface;
+    geometryLineage?: {
+      operation: string;
+      parents?: string[];
+      children?: string[];
+      survivor?: string;
+    };
     /** Private reference retained in corrections, omitted from public geometry. */
     surveyEvidence?: { surveyId: string; revisionId: string | null };
     surveyProvenance?: string;

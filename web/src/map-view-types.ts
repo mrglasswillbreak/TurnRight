@@ -1,0 +1,30 @@
+import type { BuildingSelection } from './visual-types';
+import type { Map as MapInstance } from 'maplibre-gl';
+import type { CampusData, GpsFix, Place, Route } from './types';
+import type { Feature } from 'geojson';
+import { type VisitorLayers } from './visitor-layers';
+export interface MapViewProps {
+  visitorLayers?: VisitorLayers;
+  animationPaused?: boolean;
+  selectedStreet?: string | null;
+  data: CampusData;
+  selected?: Place | null;
+  routes?: Route[];
+  activeRoute?: number;
+  fix?: GpsFix | null;
+  dark?: boolean;
+  threeD?: boolean;
+  simple?: boolean;
+  editor?: boolean;
+  buildingOpacity?: number;
+  editing?: boolean;
+  buildingSelection?: BuildingSelection;
+  follow?: boolean;
+  motionActive?: boolean;
+  panelBesideMap?: boolean;
+  onSelect: (place: Place) => void;
+  onBuildingSelect?: (feature: Feature, selection?: BuildingSelection) => void;
+  onManualPan?: () => void;
+  onWorldViewChange?: (world: boolean) => void;
+  onReady?: (map: MapInstance) => void | (() => void);
+}

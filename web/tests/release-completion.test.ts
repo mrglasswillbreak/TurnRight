@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-// @ts-expect-error Node-only release worker module.
 import {
   publicationMode,
   publishReviewedRelease,

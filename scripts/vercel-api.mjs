@@ -81,7 +81,7 @@ export async function withRetainedPackageAccess(historical, read) {
       historical.deployment_id,
     );
   } catch (error) {
-    if (!/^Vercel 404:/.test(error.message)) throw error;
+    if (!error.message.startsWith('Vercel 404:')) throw error;
     const project = await vercelApi(
       '/v9/projects/' + encodeURIComponent(process.env.VERCEL_PROJECT_ID),
     );
@@ -122,7 +122,9 @@ export async function uploadSource(root) {
     'scripts/map_import/capabilities.json',
     'data/photo-models/inventory.json',
     'web/package.json',
-    'web/package-lock.json',
+    'package.json',
+    'package-lock.json',
+    '.node-version',
     'web/index.html',
     'web/vite.config.ts',
     'web/vitest.config.ts',

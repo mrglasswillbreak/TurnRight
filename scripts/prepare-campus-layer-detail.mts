@@ -14,10 +14,10 @@ const raw = 'data/raw/lasu-layer-upgrade',
 const data: CampusData = await read(`${raw}/lasu-landscape-preview.json`),
   changes = await read(`${output}/lasu-changes.json`);
 changes.featureAdds = changes.featureAdds.filter(
-  (f: any) => !f.properties.derivedSurface,
+  (f: CampusData['map']['features'][number]) => !f.properties?.derivedSurface,
 );
 changes.sources = changes.sources.filter(
-  (s: any) => s.id !== 'derived-road-widths',
+  (s: { id: string }) => s.id !== 'derived-road-widths',
 );
 const paths = data.map.features.filter((f) => f.properties?.kind === 'path');
 const result = runGeometry(data, [], {
@@ -87,7 +87,9 @@ const report = {
   routingHash: sha(data.graph),
   roads: result.report,
   layers: data.layers?.items.length,
-  repairs: result.repairs.map(({ original, ...diagnostic }) => diagnostic),
+  repairs: result.repairs.map(
+    ({ original: _original, ...diagnostic }) => diagnostic,
+  ),
 };
 await write(`${output}/lasu-surface-repairs.json`, result.repairs);
 await write(`${output}/lasu-surface-coverage.json`, report);

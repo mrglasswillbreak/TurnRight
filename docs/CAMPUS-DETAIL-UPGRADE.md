@@ -161,7 +161,7 @@ From `web/`, with Node 22.23.3:
 ```powershell
 node --import tsx scripts/prepare-campus-detail.ts work/campus-upgrade-20261017/campuses/lasu/baseline.json NEW_LASU_PREVIEW_DIRECTORY
 node --import tsx scripts/prepare-campus-detail.ts work/campus-upgrade-20261017/campuses/unilag/baseline.json NEW_UNILAG_PREVIEW_DIRECTORY
-node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5185 --strictPort
+npx vite --host 127.0.0.1 --port 5185 --strictPort
 # A separate terminal, using the prepared detail-preview directories:
 node scripts/serve-campus-detail.mjs
 node scripts/review-campus-detail.mjs

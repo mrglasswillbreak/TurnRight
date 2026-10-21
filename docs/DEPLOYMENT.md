@@ -6,9 +6,9 @@ TurnRight deploys a public campus PWA, a private team GIS API and isolated proce
 
 1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–056**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
 2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
-3. Pass unit/database tests, both TypeScript projects, lint, configured build/budgets, Chromium/WebKit, offline, native PostGIS and isolated GIS/importer checks. Resolve failures before production migration.
+3. Pass unit/database tests, all four TypeScript projects, lint/formatting, architecture/configuration checks, combined application coverage, configured build/budgets, Chromium/WebKit, offline, native PostGIS, isolated GIS/importer and security checks. Resolve failures before deployment or production migration.
 4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
-5. Deploy matching API/UI and workers together. Production dispatch uses main, so a preview branch alone does not update workers. Keep PUBLISHED_MAP_URL enabled and verify public manifests/assets retain the pre-deployment hashes.
+5. Deploy matching API/UI and workers together. Production dispatch uses main, so a preview branch alone does not update workers. Rebuild the importer image and reinstall the hash-locked Python profiles when their locks change; the XML hardening requires `defusedxml` in both the source tools and isolated converter. Keep PUBLISHED_MAP_URL enabled and verify public manifests/assets retain the pre-deployment hashes.
 6. Check authenticated team capabilities, bounded dataset reads, denied anonymous requests, both campus maps and offline reopening. Pilot import/CSV join/edit/analysis/independent review/preview/publication with separate accounts before broad team adoption. Reload older editing clients after migration.
 
 The complete [GIS rollout checklist](GIS-PLATFORM.md#additive-rollout-and-recovery) includes the index comparison SQL and concurrency/asset cases. The production receipt records which checks actually ran. A successful application deployment alone is not a field/device or live multi-user acceptance result.
@@ -34,7 +34,7 @@ Use the existing bootstrap workflow only on an empty source baseline; it refuses
 | Framework / root            | Vite / web                           |
 | Include source outside root | Enabled for repository tooling       |
 | Node                        | 22.x; development and CI pin 22.23.3 |
-| Install / build / output    | npm ci / npm run build / dist        |
+| Install / build / output    | `cd .. && npm ci` / `npm run build` / `dist` |
 | Production branch           | main                                 |
 | Ignored Build Step          | Automatic                            |
 
@@ -63,7 +63,8 @@ Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN
 
 | Workflow                                          | Responsibility                                                                                                                   |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| regression-audit.yml                              | Unit/types/lint/configured build, Chromium/WebKit and prepared offline checks                                                    |
+| ci.yml                                           | Root quality, combined coverage, Chromium/WebKit, prepared offline and fresh local-stack checks; reusable regression entry point |
+| security.yml                                     | Full npm/Python audits, pinned static analysis and bounded historical secret scanning |
 | gis-acceptance.yml                                | Native PostGIS migrations, 100,000-feature queries/jobs, approval locks, pg_dump/pg_restore and isolated engine/GeoPackage tests |
 | map-import-tests.yml                              | Native import-format and private worker-mount regressions                                                                        |
 | gis-processing.yml                                | One campus-scoped analysis/export job with cancellation, leases and staged output                                                |
@@ -73,7 +74,7 @@ Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN
 | release.yml                                       | Gated preview or publication of an approved immutable submission                                                                 |
 | campus-detail-verification.yml                    | Served package hashes, real-campus browser views, offline reopening and retained restore assets                                  |
 
-Protect main with an up-to-date branch requirement and these GitHub Actions checks: `quality`, `offline`, `browsers (chromium, 1, 4)` through `browsers (chromium, 4, 4)`, `browsers (webkit, 1, 2)`, `browsers (webkit, 2, 2)`, `native-postgis`, `isolated-engine` and `gis`. Bind them to the GitHub Actions app and enforce them for administrators too. All three workflows run on every pull request, including documentation changes, so a required check cannot remain pending because of a path filter. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
+Protect main with an up-to-date branch requirement and these thirteen GitHub Actions checks: `quality`, `offline`, `browsers (chromium, 1, 4)` through `browsers (chromium, 4, 4)`, `browsers (webkit, 1, 2)`, `browsers (webkit, 2, 2)`, `native-postgis`, `isolated-engine`, `gis`, `coverage` and `local-stack`. Bind them to the GitHub Actions app and enforce them for administrators too. Their workflows run on every pull request, including documentation changes, so a required check cannot remain pending because of a path filter. The separate dependency, secret and static-analysis jobs must also pass. Workflow files cannot configure branch protection by themselves. Preserve artifacts containing useful receipts; private record data must stay in private storage or encrypted backups.
 
 ## Team publication
 
@@ -137,7 +138,7 @@ Earlier reader → migration → writer upgrades, migration timestamps, Vercel d
 
 Apply 041 after 040, then run **Maintain source review index and receipts** to backfill existing proposals in transactions of at most 100 rows. Deploy the `source-review.yml` worker and new UI after the schema is present; the UI explains when indexing is incomplete. No new credentials are required: reuse the existing workflow dispatch token and Supabase service secrets. Manual/daily source checks now share `queue_source_check`, so deploy migration 041 before the updated scheduler.
 
-Verify the 10,000-change fixture, both TypeScript projects, browser source-update tests in Chromium/WebKit, and production read-only inbox/login checks. Do not accept real pending proposals as a deployment test. Keep migrations 039–041 when rolling back the UI; never restore the unbounded import RPC. Details: [Source updates](SOURCE-UPDATES.md).
+Verify the 10,000-change fixture, all four TypeScript projects, browser source-update tests in Chromium/WebKit, and production read-only inbox/login checks. Do not accept real pending proposals as a deployment test. Keep migrations 039–041 when rolling back the UI; never restore the unbounded import RPC. Details: [Source updates](SOURCE-UPDATES.md).
 
 ## Editor availability upgrade (042)
 

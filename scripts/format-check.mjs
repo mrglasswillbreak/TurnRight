@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { packageBin } from './toolchain.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const listed = spawnSync(
@@ -27,7 +27,7 @@ for (let index = 0; index < paths.length; index += 60) {
   const result = spawnSync(
     process.execPath,
     [
-      path.join(root, 'web/node_modules/oxfmt/bin/oxfmt'),
+      packageBin('oxfmt'),
       '--config',
       'web/.oxfmtrc.json',
       write ? '--write' : '--check',

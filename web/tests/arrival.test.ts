@@ -182,7 +182,7 @@ describe('recorded arrivals and photographs', () => {
     const m = {
       assets: [p],
       photos: { bytes: p.bytes, assetUrls: [p.url] },
-    } as CampusPackage;
+    } as unknown as CampusPackage;
     expect(photoManifestMatches(d, m)).toBe(true);
     expect(photoManifestMatches(d, { ...m, photos: undefined })).toBe(false);
     expect(photoManifestMatches(d, { ...m, assets: [] })).toBe(false);

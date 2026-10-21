@@ -5,21 +5,16 @@ import {
   BufferGeometry,
   Camera,
   DirectionalLight,
-  DoubleSide,
   Float32BufferAttribute,
   Group,
   Matrix4,
   Mesh,
-  MeshLambertMaterial,
-  MeshStandardMaterial,
   Raycaster,
   Scene,
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { createModelRenderMaterial } from './model-render-material';
 import { createScenery } from './scenery-renderer';
-import type { ModelRenderMaterial } from './model-render-types';
 import {
   MercatorCoordinate,
   type CustomLayerInterface,
@@ -29,7 +24,6 @@ import {
 import type { CampusData, Position } from './types';
 import type {
   BuildingModel,
-  SectorModels,
   VisualSector,
   BuildingSelection,
 } from './visual-types';
@@ -38,16 +32,12 @@ import {
   detailAtZoom,
   visibleSectors,
   visualLookup,
-  validBuildingModel,
 } from './building-visuals';
-import { hashBytes, ASSET_CACHE } from './offline';
 import { buildingOutline } from './building-outline';
 import { CAMPUS_MIN_ZOOM } from './world-map';
-import { meshMaterialRole, type MaterialRole } from './map-palette';
-import { textureKey } from './building-facades';
 import { createFacadeTextures } from './facade-textures';
-import type { FacadeTextureRecipe, SurfaceTextRecipe } from './visual-types';
-
+import { createCampusModelMeshes } from './campus-model-meshes.js';
+import { loadCampusModelSector } from './campus-model-sectors.js';
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
 export interface ModelOptions {
@@ -66,6 +56,7 @@ export interface ModelOptions {
   onReady: (ids: string[]) => void;
   onStatus: (status: ModelStatus) => void;
 }
+
 /** A single shared WebGL context. Sector meshes are decoded only while in view. */
 export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   let options = initial,
@@ -85,19 +76,6 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   const loaded = new Map<string, Group>(),
     inflight = new Map<string, AbortController>(),
     failures = new Map<string, number>();
-  const materials = new Map<
-    string,
-    {
-      value: MeshLambertMaterial | MeshStandardMaterial;
-      authoredOpacity?: number;
-      users: number;
-      colour: string;
-      role: MaterialRole;
-      themeKey?: string;
-      releaseTexture?: () => void;
-      recipe?: FacadeTextureRecipe | SurfaceTextRecipe;
-    }
-  >();
   let renderer: WebGLRenderer | undefined;
   const textures = createFacadeTextures(() => map.triggerRepaint());
   let indexedData = initial.data,
@@ -114,6 +92,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   const world = new Matrix4()
     .makeTranslation(origin.x, origin.y, origin.z)
     .scale(new Vector3(scale, -scale, scale));
+  const { materials, release, building } = createCampusModelMeshes(
+    scene,
+    map,
+    origin,
+    scale,
+  );
   let readyKey = '';
   let indexedSceneryData = initial.sceneryData || initial.data;
   let scenery = createScenery(indexedSceneryData, origin, scale);
@@ -139,157 +123,21 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       options.onReady(ids);
     }
   };
-  function release(group: Group) {
-    scene.remove(group);
-    group.traverse((object) => {
-      if (object instanceof LineSegments) {
-        object.geometry.dispose();
-        (object.material as LineBasicMaterial).dispose();
-      }
-      if (object instanceof Mesh) {
-        object.geometry.dispose();
-        const entry = materials.get(object.userData.materialKey);
-        if (entry && --entry.users === 0) {
-          entry.releaseTexture?.();
-          entry.value.dispose();
-          materials.delete(object.userData.materialKey);
-        }
-      }
-    });
-  }
-  function material(
-    colour: string,
-    role: MaterialRole,
-    recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
-    authored?: ModelRenderMaterial,
-  ) {
-    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':' + JSON.stringify(authored) : ''}`;
-    let entry = materials.get(key);
-    if (!entry) {
-      const custom = authored
-        ? createModelRenderMaterial(authored, () => map.triggerRepaint())
-        : undefined;
-      entry = {
-        value:
-          custom?.material ||
-          new MeshLambertMaterial({
-            color: colour,
-            side: DoubleSide,
-            flatShading: true,
-          }),
-        users: 0,
-        colour,
-        role,
-        recipe,
-        releaseTexture: custom?.release,
-        authoredOpacity: authored?.opacity,
-      };
-      materials.set(key, entry);
-    }
-    entry.users++;
-    return entry.value;
-  }
-  function building(model: BuildingModel) {
-    if (!validBuildingModel(model))
-      throw new Error('Invalid campus model geometry.');
-    const group = new Group(),
-      at = MercatorCoordinate.fromLngLat(model.origin);
-    group.userData.buildingId = model.id;
-    group.userData.revision = `${model.geometryRevision}:${model.detailRevision || ''}`;
-    group.position.set(
-      (at.x - origin.x) / scale,
-      -(at.y - origin.y) / scale,
-      0,
+  function load(sector: VisualSector) {
+    return loadCampusModelSector(
+      {
+        inflight,
+        loaded,
+        failures,
+        scene,
+        building,
+        release,
+        refresh,
+        map,
+        isDisposed: () => disposed,
+      },
+      sector,
     );
-    group.scale.setScalar(at.meterInMercatorCoordinateUnits() / scale);
-    for (const part of model.meshes) {
-      const geometry = new BufferGeometry();
-      geometry.setAttribute(
-        'position',
-        new Float32BufferAttribute(part.positions, 3),
-      );
-      geometry.setIndex(part.indices);
-      if (part.uvs)
-        geometry.setAttribute('uv', new Float32BufferAttribute(part.uvs, 2));
-      if (part.normals)
-        geometry.setAttribute(
-          'normal',
-          new Float32BufferAttribute(part.normals, 3),
-        );
-      else geometry.computeVertexNormals();
-      geometry.computeBoundingSphere();
-      const role = meshMaterialRole(part.surfaces, part);
-      const mesh = new Mesh(
-        geometry,
-        material(part.colour, role, part.texture || part.text, part.material),
-      );
-      mesh.userData = {
-        buildingId: model.id,
-        detail: part.detail,
-        minZoom: part.minZoom,
-        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}${part.material ? ':' + JSON.stringify(part.material) : ''}`,
-        surfaces: part.surfaces,
-      };
-      group.add(mesh);
-    }
-    return group;
-  }
-  async function load(sector: VisualSector) {
-    const controller = new AbortController();
-    inflight.set(sector.id, controller);
-    let group: Group | undefined;
-    try {
-      if (
-        !/^\/packages\/visual-[a-f0-9]+\/[a-z0-9-]+\.json$/.test(sector.url) ||
-        sector.bytes > 12 * 1024 * 1024
-      )
-        throw new Error('Invalid visual sector.');
-      const cache = await caches.open(ASSET_CACHE).catch(() => null);
-      const response =
-        (await cache?.match(sector.url)) ||
-        (await fetch(sector.url, {
-          signal: AbortSignal.any([
-            controller.signal,
-            AbortSignal.timeout(15000),
-          ]),
-        }));
-      if (!response.ok) throw new Error('Model unavailable');
-      const bytes = await response.arrayBuffer();
-      if (
-        bytes.byteLength !== sector.bytes ||
-        (await hashBytes(bytes)) !== sector.sha256
-      )
-        throw new Error('Model integrity check failed');
-      const payload = JSON.parse(
-        new TextDecoder().decode(bytes),
-      ) as SectorModels;
-      if (
-        payload.schemaVersion !== 1 ||
-        payload.id !== sector.id ||
-        !Array.isArray(payload.models) ||
-        payload.models.length > 400
-      )
-        throw new Error('Invalid sector');
-      if (disposed || controller.signal.aborted) return;
-      group = new Group();
-      for (const model of payload.models) {
-        if (!sector.buildingIds.includes(model.id))
-          throw new Error('Unexpected building identity');
-        group.add(building(model));
-      }
-      loaded.set(sector.id, group);
-      scene.add(group);
-      failures.delete(sector.id);
-    } catch {
-      if (group) release(group);
-      if (!controller.signal.aborted) failures.set(sector.id, Date.now());
-    } finally {
-      inflight.delete(sector.id);
-      if (!disposed) {
-        refresh();
-        map.triggerRepaint();
-      }
-    }
   }
   function refresh() {
     if (disposed) return;

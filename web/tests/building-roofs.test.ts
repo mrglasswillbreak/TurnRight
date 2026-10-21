@@ -127,8 +127,8 @@ describe('reviewed roof batches', () => {
       {
         key: 'pair',
         kind: 'building' as const,
-        ids: ['a', 'c'],
-        names: ['a', 'c'],
+        ids: ['a', 'c'] as [string, string],
+        names: ['a', 'c'] as [string, string],
         exact: true,
         distance: 0,
         reason: 'overlap',
@@ -168,7 +168,7 @@ describe('reviewed roof batches', () => {
     const batch = buildingRoofProposals(data, []).map((p) => p.edit!);
     const workspace = new EditorWorkspace(
       [],
-      async (batch) => batch.edits,
+      async (batch) => batch.edits.map(({ edit }) => edit),
       async () => {},
     );
     workspace.commit(batch);

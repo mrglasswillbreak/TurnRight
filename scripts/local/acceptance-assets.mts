@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import type sharpType from '../../web/node_modules/sharp/lib/index.js';
+import type sharpType from 'sharp';
 import {
   newModelDocument,
   type ModelAssetReference,

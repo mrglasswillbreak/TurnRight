@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './coverage-fixture';
 import sharp from 'sharp';
 import { readFileSync } from 'node:fs';
 import type { LocalPhoto } from '../../src/photo-local';
@@ -318,6 +318,8 @@ for (const viewport of [
         .toBe(true);
       await page.screenshot({
         path: info.outputPath('photo-editor-390-controls.png'),
+        animations: 'disabled',
+        timeout: 20_000,
       });
       await settingsToggle.click();
       const dismiss = dialog.getByRole('button', {
@@ -364,6 +366,8 @@ for (const viewport of [
     }
     await page.screenshot({
       path: info.outputPath(`photo-editor-${viewport.width}.png`),
+      animations: 'disabled',
+      timeout: 20_000,
     });
     if (
       process.env.TURNRIGHT_REDESIGN_SCREENSHOTS === '1' &&
@@ -371,6 +375,8 @@ for (const viewport of [
       [1440, 390].includes(viewport.width)
     ) {
       await page.screenshot({
+        animations: 'disabled',
+        timeout: 20_000,
         path: (
           await import('./documentation-capture')
         ).documentationCapturePath(

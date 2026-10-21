@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 export default defineConfig({
   ...base,
+  grepInvert: undefined,
   grep: /documentation current gallery/,
   timeout: 300000,
   use: {
@@ -12,7 +13,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      'node node_modules/vite/bin/vite.js build --outDir work/docs-preview && node node_modules/vite/bin/vite.js preview --outDir work/docs-preview --host 127.0.0.1 --port 5198 --strictPort',
+      'npm exec -- vite build --outDir work/docs-preview && npm exec -- vite preview --outDir work/docs-preview --host 127.0.0.1 --port 5198 --strictPort',
     url: 'http://127.0.0.1:5198',
     reuseExistingServer: false,
     timeout: 120000,
