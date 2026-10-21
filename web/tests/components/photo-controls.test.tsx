@@ -189,19 +189,23 @@ it('keeps batch compression independent of crop and safely removes a persisted l
       (await localPhotos(first.owner, 'library')).map((p) => p.id),
     )
     .toEqual(['second']);
+  await expect
+    .element(page.getByRole('button', { name: /second\.png/ }))
+    .toHaveAttribute('aria-pressed', 'true');
   expect(abort).toHaveBeenCalledOnce();
   expect(setError).not.toHaveBeenCalled();
   await click('Remove local files');
   await expect
     .poll(async () => (await localPhotos(first.owner, 'library')).length)
     .toBe(0);
-  expect(
-    page.getByText('No local photos. Add photos from the gallery.').query(),
-  ).not.toBeNull();
+  // IndexedDB completion precedes the React render of the updated gallery.
+  await expect
+    .element(page.getByText('No local photos. Add photos from the gallery.'))
+    .toBeVisible();
   await click('Collapse local images');
-  expect(
-    page
-      .getByRole('region', { name: 'Local images and offline tools' })
-      .query(),
-  ).toBeNull();
+  await expect
+    .element(
+      page.getByRole('region', { name: 'Local images and offline tools' }),
+    )
+    .not.toBeInTheDocument();
 });

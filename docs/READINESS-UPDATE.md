@@ -175,6 +175,9 @@ protected preview audit verified application health and anonymous denial, then
 encountered Vercel's protection redirect on a package path. The package auditor
 now uses the existing bounded asset-request helper, which retries temporary
 protection propagation and rejects credential forwarding to external origins.
+The next unit run exposed a gallery assertion made after IndexedDB deletion but
+before React rendered the empty state. That test now awaits the selected remaining
+image and visible empty state while retaining both storage-deletion assertions.
 The current PR
 must pass the complete protected suite again before merge; the earlier passing
 code receipt above does not override a later failure. See [production tracking](PRODUCTION.md#repository-readiness-application-update--21-october-2026)
