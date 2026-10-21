@@ -12,6 +12,40 @@
   width: 100%;
   height: 100%;
 }
+.startup-screen {
+  width: calc(100% - 2rem);
+  max-width: 36rem;
+  margin: clamp(2rem, 12vh, 8rem) auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--background);
+}
+.startup-screen h1 {
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.startup-screen p {
+  margin: 1rem 0 1.5rem;
+  line-height: 1.6;
+}
+.startup-screen button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.startup-screen button + button {
+  margin-top: 0.75rem;
+}
+.startup-screen button:first-of-type {
+  background: var(--foreground);
+  color: var(--background);
+}
 .admin-shell {
   height: 100dvh;
   overflow: hidden;

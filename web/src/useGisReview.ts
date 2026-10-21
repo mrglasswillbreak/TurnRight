@@ -84,8 +84,10 @@ export function useGisReview({
     try {
       await work();
       await load();
+      return true;
     } catch (e) {
       setError((e as Error).message);
+      return false;
     } finally {
       setBusy(false);
     }

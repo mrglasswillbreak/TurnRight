@@ -6,6 +6,14 @@ to an external endpoint.
 
 ## Browser recovery
 
+The [desktop recovery panel](assets/screenshots/tour-recovery-desktop-2026-10-21.png)
+and [phone viewport](assets/screenshots/tour-recovery-mobile-2026-10-21.png)
+were captured directly on 21 October 2026 with a synthetic render failure.
+Both browser checks verified the diagnostic download and retention of saved
+device data after reload. [Capture provenance](assets/screenshots/tour-2026-10-21.json)
+records the source hashes and simulated viewport; no production incident or
+physical-device test is implied.
+
 The recovery screen offers an explicit diagnostic download. The browser retains
 at most 50 events in memory, combines repeated identical events within five
 seconds, and caps each occurrence count. Reloading clears this evidence.

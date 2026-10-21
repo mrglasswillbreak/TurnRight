@@ -7,6 +7,7 @@
 - Check authored source, tests and tools with lint, types and formatting; enforce the 500-line boundary and immutable external CI action revisions.
 - Add combined unit/browser application coverage gates and native Python processing coverage, with receipts tied to source and dependency snapshots. Preserve complete application includes, native-driver acceptance, published fixtures and download budgets.
 - Add browser diagnostic downloads and API/worker correlation using validated request and job identifiers. Keep payloads, locations and claim tokens out of structured logs.
+- Preserve comment and evidence drafts after failed GIS saves. Add component and API regression coverage for bulk edits, publication, survey recovery, model assets and verified image codecs.
 - Enforce cached download limits and add importer integrity, cancellation, scheduling, redirect and source-receipt tests. Update Vite, certificate data and the native PyArrow dependency for reported vulnerabilities; retain locked GDAL compatibility.
 - Consolidate CI entry points and add dependency, secret and CodeQL security checks. Track verification and remaining release steps in [repository readiness](docs/READINESS-UPDATE.md).
 

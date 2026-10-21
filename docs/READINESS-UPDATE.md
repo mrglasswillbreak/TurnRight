@@ -12,7 +12,7 @@ coverage and large modules still require substantial improvements.
 - [x] Authored source, test and tool lint/type checks; structural regression gate.
 - [x] Domain refactors, including the four named components and large browser suite.
 - [ ] Application coverage: 80% statements, lines and functions; 70% branches.
-- [ ] Python processing coverage: 80% lines and 70% branches.
+- [x] Python processing coverage: 80% lines and 70% branches.
 - [x] Correlated, privacy-safe client/API/worker diagnostics without a hosted service.
 - [ ] Secret-free fresh-clone and prepared offline acceptance.
 - [ ] Required CI, dependency/security checks and exact-revision verification receipts.
@@ -61,7 +61,7 @@ The root is now a private npm workspace with one lockfile and the supported
 Node 22.23.3/npm 10.9.9 toolchain. Root commands cover installation, development,
 the production build, quality checks and combined application coverage. Vercel,
 preview and release scripts resolve dependencies from that same workspace.
-The configuration inventory documents 74 settings and rejects undocumented
+The configuration inventory documents 76 settings and rejects undocumented
 environment references or server secrets exposed through public Vite settings.
 
 Large UI modules now separate views, state, lifecycle and domain operations.
@@ -96,6 +96,15 @@ secrets, and analyze JavaScript/TypeScript, Python and Actions with CodeQL.
 External actions use verified commit SHAs. Dependency updates are configured
 for the workspace, Python workers, Dockerfiles and Actions.
 
+The history secret scan enumerates every reachable Git blob, including deleted
+file versions, and scans each unique version with Gitleaks' bounded file reader.
+The original detection rules and recursive decoding remain enabled. Narrow
+exceptions match exact public walking-policy identifiers and integrity digests
+in their documented artifact fields; truncated reader-boundary fragments are
+limited to two immutable historical blob IDs. A temporary-repository self-test proves
+that a deleted credential in the same file still fails and that output omits
+secret values. Temporary historical contents and reports are removed after the run.
+
 ### Verification ledger
 
 The following results were obtained during implementation, not on a published
@@ -108,19 +117,19 @@ and [native database/engine run](https://github.com/mrglasswillbreak/TurnRight/a
 
 | Check | Observed result | Remaining verification |
 | --- | --- | --- |
-| Root quality | Doctor, configuration, architecture, lint, four type checks and formatting passed | Repeat after final changes |
-| Documentation | 1,009 links/assets in 82 Markdown files; 31 capture references passed | Repeat after this ledger is finalized |
-| Unit/component tests | Linux: 910 passed in 123 files; one optional private-export replay skipped, with the independent public archived replay passing | Repeat after final coverage-harness and API-boundary tests |
-| Unit coverage alone | Linux: 38.11% statements, 38.16% lines, 32.18% functions, 36.23% branches; 530 files represented | Complete browser collection and the combined gate |
+| Root quality | Doctor, all 76 configuration entries, 909 authored files below 500 lines, lint, four type checks and formatting passed | Repeat after final code changes |
+| Documentation | 1,013 links/assets in 82 Markdown files; 33 capture references passed, including inspected desktop/phone recovery views | Repeat after this ledger is finalized |
+| Unit/component tests | Windows pinned runtime: 994 passed in 152 files, followed by nine passing texture/source-review checks; Linux baseline: 910 passed and one optional private-export replay skipped | Repeat the full suite on the final revision |
+| Unit coverage alone | Windows: 47.37% statements, 47.68% lines, 46.45% functions, 44.02% branches; all 530 source files included | Complete final browser collection and the combined gate |
 | Production bundles | Public 433,436/435,200 bytes gzip; additional editor 186,350/189,440; photo 11,660/12,288 | Existing budgets remain unchanged |
-| Native Python | All 149 tests passed on Linux without skips; the earlier 140-test report measured processing 80.35% lines and 71.87% branches | Verify coverage output with the runner-owned report mount |
+| Native Python | All 149 tests passed on Linux without skips; processing coverage is 83.11% lines and 74.60% branches in [run 39531746245](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746245) | Repeat if Python processing code changes |
 | Dependency audits | npm and Python quality/native profiles passed in Linux CI; identified certifi and PyArrow advisories were fixed | Repeat if locks change |
 | Workflow syntax | All workflows passed actionlint | Repeat after the final security workflow edit |
-| Browser acceptance | Both WebKit shards, the WebKit image editor and offline suites passed on Linux; focused Chromium coverage/context/export checks passed locally | Complete full Chromium collection and combined coverage |
+| Browser acceptance | All 204 primary Chromium journeys, both WebKit shards, the WebKit image editor and separate offline suites passed in [run 39531746310](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746310) | Repeat on the final source snapshot and complete combined coverage |
 | Container/local stack | Linux fresh checkout passed root container build, real Auth, role/campus isolation, editing/review/import/export, private assets, cancellation, browser sign-in, restart persistence and explicit reset | Repeat if runtime or configuration changes |
 | Native database/engine | PostGIS spatial acceptance and restoration of 100,000 indexed features passed; isolated processing and private worker cleanup passed | Repeat if native runtime changes |
 | Code scanning | JavaScript/TypeScript, Python and Actions CodeQL checks passed | Repeat on final revision |
-| Secret scan | PR commit scan passed; local full-history scan exhausted available memory | Complete the explicit all-reachable-history CI scan |
+| Secret scan | Bounded full-history scan passed locally: 5,936 unique file versions across 836 reachable commits; deleted-credential self-test passed | Repeat on the final CI checkout |
 
 Generated coverage, traces and test output remain in ignored directories or CI
 artifacts. The independent public archived source replay fixture remains in the

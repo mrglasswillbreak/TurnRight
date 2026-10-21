@@ -1,0 +1,44 @@
+{
+  "capturedDate": "2026-10-21",
+  "browser": "Chromium 153.0.8010.12",
+  "applicationRevision": "6c6291991e46b6b978fbbcca3bca7b4ed23d8605",
+  "workingTreeChanges": "Recovery panel CSS and readiness tests; exact captured source file hashes recorded below.",
+  "sourceHashes": {
+    "web/src/ApplicationRecovery.tsx": "91f2c9d3a4e0be335b25ed2aa392e16505fc4c0e696f1a8438b007998a6c60ba",
+    "web/src/styles.css": "d1650ee1d6c13c0cf304ed1597abc8c3a8154be613bb884d5174e531f72957e0",
+    "web/src/main.tsx": "f6a9153d16a6d0896d8d412dd8bc901b12cfef707ae7b4b39c8ebbe7697963c3",
+    "web/tests/browser/error-recovery.spec.ts": "e75fdf57ad7fa15d6394a3d067090071ceb7d356ada3a952a21ce505f94d71ba"
+  },
+  "driver": "web/tests/browser/error-recovery.spec.ts",
+  "validation": {
+    "testsPassed": 2,
+    "desktop": true,
+    "phoneViewportSimulation": true,
+    "physicalDevice": false,
+    "diagnosticDownload": true,
+    "savedDeviceDataRetained": true
+  },
+  "runtime": "Node 22.23.3; local Vite server on loopback. Phone viewport uses the same driver with 390 × 844 dimensions.",
+  "captures": [
+    {
+      "file": "tour-recovery-desktop-2026-10-21.png",
+      "view": "Diagnostic recovery, desktop",
+      "capturedAt": "2026-10-21T03:47:37.730Z",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "1c20305c1dd419feef9fc47e8ae647c6941db5c3f875868d9c09f8f663b961d9",
+      "theme": "light",
+      "fixture": "Synthetic application render failure, isolated local storage; no real account or campus data."
+    },
+    {
+      "file": "tour-recovery-mobile-2026-10-21.png",
+      "view": "Diagnostic recovery, mobile",
+      "capturedAt": "2026-10-21T03:50:42.280Z",
+      "width": 390,
+      "height": 844,
+      "sha256": "38fd55845d928268a7de84b805ea3a1f5c4f4030ea78198719ca9df2b5c9e3c5",
+      "theme": "light",
+      "fixture": "Synthetic application render failure, isolated local storage; no real account or campus data."
+    }
+  ]
+}

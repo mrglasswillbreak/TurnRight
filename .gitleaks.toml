@@ -1,0 +1,43 @@
+title = "TurnRight secret detection"
+
+[extend]
+useDefault = true
+
+# This public policy identifier is documented in docs/CAMPUS-ACCESS.md and
+# emitted by scripts/import_campus.py. It is not an authentication credential.
+[[allowlists]]
+description = "Exact published walking-access review identity"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(?:^|/)(?:data/(?:seed|enrichment/2026-09-22)|web/public/packages/lasu-[a-f0-9]{12})/campus\.json$''']
+regexTarget = "match"
+regexes = ['''\baccessReviewId"\s*:\s*"lasu-student-roads-2026-09-09"''']
+
+# Gitleaks' bounded reader splits the same verified public ID at chunk edges.
+# These exact fragments apply only to two immutable historical blob versions;
+# neither new files nor any other field/value are exempted.
+[[allowlists]]
+description = "Verified public ID at one immutable seed blob's chunk boundary"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(?:^|/)ae062ef85ae827af99dcacba07c043be750d3466/data/seed/campus\.json$''']
+regexTarget = "match"
+regexes = ['''\baccessReviewId":"lasu-student-roads-2026-09-09\z''']
+
+[[allowlists]]
+description = "Verified public ID at one immutable published blob's chunk boundaries"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(?:^|/)a4439efa4a90d9ca5469d947886a193640929a81/web/public/packages/lasu-4e4c8008b38b/campus\.json$''']
+regexTarget = "match"
+regexes = ['''\baccessReviewId":"lasu-student-roads-(?:20|2026|2026-)\z''']
+
+# These dated reports hash public policy JSON (or null); only the two verified
+# digest values in this specific report field are excepted, never whole files.
+[[allowlists]]
+description = "Exact public access-policy integrity digests"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(?:^|/)docs/assets/(?:campus-browser-verification-2026-10-(?:17|18)-(?:unilag-preview|lasu-preview|published)|campus-detail-integrity-2026-10-17-(?:baseline|after-unilag))\.json$''']
+regexTarget = "match"
+regexes = ['''\baccessPolicy"\s*:\s*"(?:47326dea07f680d1245c5660d62dd033747d2e0b20b34ca3c5bee402efe434cb|74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b)"''']

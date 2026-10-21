@@ -36,13 +36,14 @@ export function IssueComment({
       <button
         disabled={!text.trim()}
         onClick={async () => {
-          await save({
+          const saved = await save({
             ...issue,
             comments: [...issue.comments, { actor: '', text, createdAt: '' }],
             evidence: url
               ? [...issue.evidence, { label: label || 'Evidence', url }]
               : issue.evidence,
           });
+          if (saved === false) return;
           setText('');
           setUrl('');
         }}

@@ -276,6 +276,16 @@
       "sensitive": false,
       "description": "Deliberate evidence date for documentation capture."
     },
+    "TURNRIGHT_DOCS_SCREENSHOTS": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicitly enables opt-in documentation capture journeys."
+    },
+    "TURNRIGHT_GIS_SCREENSHOTS": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Set to 1 to include opt-in GIS documentation captures."
+    },
     "TURNRIGHT_LOCAL_DISPATCH_TOKEN": {
       "scope": "local",
       "sensitive": true,
