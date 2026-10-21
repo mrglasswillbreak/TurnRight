@@ -1,4 +1,4 @@
 shapely==2.1.2
 # Match the GDAL image's NumPy ABI.
 numpy==1.26.4
-pyproj==3.7.2
+pyproj==3.8.0
