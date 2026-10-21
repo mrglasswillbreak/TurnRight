@@ -65,11 +65,13 @@ jobs:
         env:
           GIS_TEST_DATABASE_URL: postgresql://postgres:disposable-test-only@127.0.0.1:5432/turnright_gis_test
       - name: Exercise backup restoration
+        env:
+          DATABASE_CONTAINER: ${{ job.services.database.id }}
         run: |
-          docker exec "${{ job.services.database.id }}" pg_dump -U postgres -Fc turnright_gis_test > /tmp/gis-backup.dump
-          docker exec "${{ job.services.database.id }}" createdb -U postgres -T template0 turnright_restore_test
-          docker exec -i "${{ job.services.database.id }}" pg_restore -U postgres -d turnright_restore_test --exit-on-error < /tmp/gis-backup.dump
-          test "$(docker exec "${{ job.services.database.id }}" psql -U postgres -d turnright_restore_test -Atc 'select count(*) from public.gis_feature_index')" = 100000
+          docker exec "$DATABASE_CONTAINER" pg_dump -U postgres -Fc turnright_gis_test > /tmp/gis-backup.dump
+          docker exec "$DATABASE_CONTAINER" createdb -U postgres -T template0 turnright_restore_test
+          docker exec -i "$DATABASE_CONTAINER" pg_restore -U postgres -d turnright_restore_test --exit-on-error < /tmp/gis-backup.dump
+          test "$(docker exec "$DATABASE_CONTAINER" psql -U postgres -d turnright_restore_test -Atc 'select count(*) from public.gis_feature_index')" = 100000
   isolated-engine:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -80,6 +82,6 @@ jobs:
           node-version-file: .node-version
       - run: docker build -t turnright-gis scripts/gis
       - name: Verify vector operations and real GeoPackage round trip
-        run: docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,size=512m -v "${{ github.workspace }}/scripts:/app:ro" --entrypoint python3 turnright-gis -m unittest discover -s /app/tests -p 'test_gis_processing.py' -v
+        run: docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,size=512m -v "$GITHUB_WORKSPACE/scripts:/app:ro" --entrypoint python3 turnright-gis -m unittest discover -s /app/tests -p 'test_gis_processing.py' -v
       - name: Verify actual private export worker and host cleanup
         run: node scripts/gis/check_worker.mjs

@@ -104,6 +104,9 @@ Semgrep uses a pinned container digest and community-rule revision, runs inside
 the CI runner with metrics disabled, fails on findings or scan errors, and saves
 JSON/SARIF reports as private workflow artifacts. It requires no hosted scanner
 account and does not upload application source to the scanner provider.
+The initial scan prompted XML parser hardening and explicit backup authentication
+tag length, with regression tests. Audited false positives have local, rule-specific
+comments explaining their constrained inputs; no entire source file is exempted.
 
 The history secret scan enumerates every reachable Git blob, including deleted
 file versions, and scans each unique version with Gitleaks' bounded file reader.

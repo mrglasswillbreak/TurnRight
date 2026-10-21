@@ -140,6 +140,8 @@ try {
       const metadata = await sharp(image).metadata();
       const label = (text, w = 1200) =>
         Buffer.from(
+          // SVG label text passes escape(text); width is a fixed numeric layout argument in this offline benchmark renderer.
+          // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
           `<svg width="${w}" height="60"><rect width="100%" height="100%" fill="#f5f4ef"/><text x="18" y="38" font-size="22" fill="#253644" font-family="Arial">${escape(text)}</text></svg>`,
         );
       const filename = `${String(index + 1).padStart(2, '0')}-${record.name

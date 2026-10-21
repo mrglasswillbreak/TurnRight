@@ -89,7 +89,7 @@ export function PhotoGallery({
       )}
       {actions}
       <details>
-        <summary>Photo credits & license</summary>
+        <summary>Photo credits &amp; license</summary>
         <p>{photo.attribution}</p>
         <p>
           {photo.sourceUrl ? (

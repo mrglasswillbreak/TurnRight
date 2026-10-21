@@ -14,7 +14,7 @@ import json
 import math
 import pathlib
 import re
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 from shapely.affinity import affine_transform
 from shapely import make_valid

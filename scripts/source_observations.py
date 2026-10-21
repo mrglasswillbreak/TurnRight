@@ -2,7 +2,7 @@
 
 import json
 from collections import Counter
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 
 def collect(raw, overture, item_id, failed_collections=None):
@@ -11,7 +11,9 @@ def collect(raw, overture, item_id, failed_collections=None):
     observations, collections = [], []
     failed_collections = failed_collections or {}
     osm_failure = failed_collections.get("osm:objects")
-    tree = ET.Element("osm") if osm_failure else ET.parse(raw / "osm.xml").getroot()
+    tree = (
+        ET.fromstring("<osm/>") if osm_failure else ET.parse(raw / "osm.xml").getroot()
+    )
     if tree.find("remark") is not None:
         raise ValueError("Incomplete OSM extract: remark returned")
     source_objects = [e for e in tree if e.tag in ("node", "way", "relation")]

@@ -9,7 +9,7 @@ import copy
 import hashlib
 import json
 import re
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 from collections import Counter
 from pathlib import Path
 from shapely.geometry import shape, mapping, Point, Polygon, LineString

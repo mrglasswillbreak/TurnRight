@@ -200,6 +200,8 @@ def remote(path, method="GET", body=None, raw=False):
         },
     )
     try:
+        # Private backend origin is trusted deployment configuration; conversion_command uses fixed Docker argv with untrusted inputs in a request file, never a shell.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
         with urllib.request.urlopen(request, timeout=90) as response:
             content = response.read(250 * 1024 * 1024 + 1)
             if len(content) > 250 * 1024 * 1024:
@@ -471,8 +473,14 @@ def run_job():
             (folder / "request.json").write_bytes(encoded(request))
             container_name = "campus-import-" + token
             command = conversion_command(folder, token)
+            # Private backend origin is trusted deployment configuration; conversion_command uses fixed Docker argv with untrusted inputs in a request file, never a shell.
+            # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
             process = subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+                # Private backend origin is trusted deployment configuration; conversion_command uses fixed Docker argv with untrusted inputs in a request file, never a shell.
+                # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-tainted-env-args
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
             )
             progress(
                 "Inspecting formats and coordinate systems in the isolated converter"

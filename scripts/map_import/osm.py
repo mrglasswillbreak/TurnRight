@@ -9,7 +9,7 @@ def inspect_osm(path):
 
     if path.suffix.lower() != ".pbf":
         safe_xml(path)
-        import xml.etree.ElementTree as ET
+        from defusedxml import ElementTree as ET
 
         for _, element in ET.iterparse(path, events=("end",)):
             if element.tag == "remark" and "".join(element.itertext()).strip():

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { campusFacadeReviewIssues } from './building-facades';
 import type { Map as MapInstance } from 'maplibre-gl';
-import type { CampusData, MapChange } from './types';
+import type { CampusData, MapChange, MapEdit } from './types';
 import { api } from './supabase';
 import { AdminRequestError } from './admin-client';
 import { useReleaseImpact } from './useReleaseImpact';
@@ -28,7 +28,7 @@ export type EditorReviewProps = {
   setPreview: (value: boolean) => void;
   review: MapChange | null;
   setReview: (change: MapChange) => void;
-  onApplyAppearances: (batch: import('./types').MapEdit[]) => Promise<void>;
+  onApplyAppearances: (batch: MapEdit[]) => Promise<void>;
   onLocateBuilding: (id: string) => void;
   onPublishedWorkspace: (published: PublishedWorkspace | null) => void;
   draftCount: number;

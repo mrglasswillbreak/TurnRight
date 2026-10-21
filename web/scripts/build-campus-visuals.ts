@@ -190,6 +190,8 @@ for (const sourceFeature of buildings) {
     ),
   };
   const previous = data.visuals?.buildings.find((b) => b.id === id);
+  // resolveBuildingVisual constructs a typed allowlist of visual properties; this assigns no raw request fields or access-control attributes.
+  // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.insecure-object-assign
   Object.assign(
     visual,
     resolveBuildingVisual(feature, {

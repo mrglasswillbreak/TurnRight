@@ -13,6 +13,14 @@ paths = ['''(?:^|/)(?:data/(?:seed|enrichment/2026-09-22)|web/public/packages/la
 regexTarget = "match"
 regexes = ['''\baccessReviewId"\s*:\s*"lasu-student-roads-2026-09-09"''']
 
+[[allowlists]]
+description = "The same exact public policy ID in its scanner regression fixture"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(?:^|/)scripts/secret-history-self-test\.mjs$''']
+regexTarget = "match"
+regexes = ['''\baccessReviewId:\s*'lasu-student-roads-2026-09-09'\z''']
+
 # Gitleaks' bounded reader splits the same verified public ID at chunk edges.
 # These exact fragments apply only to two immutable historical blob versions;
 # neither new files nor any other field/value are exempted.

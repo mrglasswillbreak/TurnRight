@@ -377,6 +377,8 @@ export function ModelOutlineCanvas({
             const next = structuredClone(polygons),
               ring = next[p][r];
             ring.splice(v, 1);
+            // ring is a coordinate array and the target is its numeric last index; no string property name is accepted.
+            // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.audit.prototype-pollution.prototype-pollution-assignment
             if (v === 0) ring[ring.length - 1] = [...ring[0]];
             if (
               onCommit(

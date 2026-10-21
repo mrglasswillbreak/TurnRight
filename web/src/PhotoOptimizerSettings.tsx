@@ -40,7 +40,7 @@ export function PhotoOptimizerSettings({
                 aria-expanded={panel === 'edit'}
                 onClick={() => setPanel((p) => (p === 'edit' ? null : 'edit'))}
               >
-                Edit & compress{' '}
+                Edit &amp; compress{' '}
                 {panel === 'edit' ? <ChevronDown /> : <ChevronUp />}
               </button>
             </h3>

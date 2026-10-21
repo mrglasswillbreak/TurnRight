@@ -91,10 +91,12 @@ jobs:
         env:
           AUDIT_GREP: ${{ inputs.browser_grep }}
           TURNRIGHT_COVERAGE: '1'
+          SHARD_PART: ${{ matrix.part }}
+          SHARD_TOTAL: ${{ matrix.total }}
         run: |
           args=()
           if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
-          npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/chromium "${args[@]}"
+          npx playwright test --timeout=120000 --fully-parallel --workers=1 --shard="$SHARD_PART/$SHARD_TOTAL" --reporter=line --output=../test-results/chromium "${args[@]}"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: matrix.browser == 'chromium' && success()
         with:
@@ -105,10 +107,12 @@ jobs:
         if: matrix.browser == 'webkit'
         env:
           AUDIT_GREP: ${{ inputs.browser_grep }}
+          SHARD_PART: ${{ matrix.part }}
+          SHARD_TOTAL: ${{ matrix.total }}
         run: |
           args=()
           if [[ -n "$AUDIT_GREP" ]]; then args=(--grep "$AUDIT_GREP" --pass-with-no-tests); fi
-          npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard=${{ matrix.part }}/${{ matrix.total }} --reporter=line --output=../test-results/webkit "${args[@]}"
+          npx playwright test --config playwright.webkit.config.ts --fully-parallel --workers=1 --shard="$SHARD_PART/$SHARD_TOTAL" --reporter=line --output=../test-results/webkit "${args[@]}"
       - name: WebKit image editor
         if: ${{ !cancelled() && matrix.browser == 'webkit' && matrix.part == 1 }}
         run: npx playwright test --config playwright.photos.webkit.config.ts --reporter=line --output=../test-results/webkit-photos

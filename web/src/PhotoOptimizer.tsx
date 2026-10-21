@@ -57,7 +57,9 @@ export default function PhotoOptimizer(props: PhotoOptimizerProps) {
         className="photo-optimizer"
         data-wide={widePhoto}
       >
-        <DialogTitle className="sr-only">Edit & optimise photos</DialogTitle>
+        <DialogTitle className="sr-only">
+          Edit &amp; optimise photos
+        </DialogTitle>
         <DialogDescription className="sr-only">
           Compare the original with your edited image. Compression stays on this
           device. Upload and publication are separate.

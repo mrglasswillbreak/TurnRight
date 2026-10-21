@@ -29,6 +29,8 @@ class RangeFile(io.RawIOBase):
             else {}
         )
         self.cache_start, self.cache = 0, b""
+        # Operator-only bounded downloader; matching_assets validates STAC HTTPS hosts and release paths before RangeFile is constructed.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
         with urllib.request.urlopen(
             urllib.request.Request(
                 url, headers={**self.request_headers, "Range": "bytes=-8"}
@@ -77,6 +79,8 @@ class RangeFile(io.RawIOBase):
         if size > 32_000_000 or self.transferred + size > 200_000_000:
             raise ValueError("Campus source transfer budget exceeded")
         start = self.position
+        # Operator-only bounded downloader; matching_assets validates STAC HTTPS hosts and release paths before RangeFile is constructed.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
         with urllib.request.urlopen(
             urllib.request.Request(
                 self.url,
@@ -160,6 +164,8 @@ def main():
             if args.no_cache
             else {},
         )
+        # Operator-only bounded downloader; matching_assets validates STAC HTTPS hosts and release paths before RangeFile is constructed.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
         with urllib.request.urlopen(request, timeout=60) as response:
             content = response.read(30_000_001)
         if len(content) > 30_000_000:

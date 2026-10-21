@@ -11,6 +11,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { selectSourceFields } from '../src/source-field-review.js';
 import type { MapChange, MapEdit } from '../src/types.js';
 import type { SourceRecord } from '../src/editor-model.js';
+import type { CampusSource } from '../src/map-import-types.js';
 import {
   allRows,
   db,
@@ -402,7 +403,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         case 'check-sources': {
           if (campus.id !== 'lasu') {
             const listed = (await mapImportAction('import-list', {})) as {
-              sources: import('../src/map-import-types.js').CampusSource[];
+              sources: CampusSource[];
             };
             const online = listed.sources.filter((s) => s.kind !== 'file');
             if (!online.length)
@@ -450,11 +451,12 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
         }
         case 'prepare-release':
         case 'publish-release':
-        case 'rollback':
+        case 'rollback': {
           res
             .status(202)
             .json(await publicationAction(user.id, action, payload));
           break;
+        }
         case 'export':
           res.status(200).json({
             sources: await allRows('source_features'),

@@ -88,7 +88,8 @@ export function OfflinePanel({
           <div>
             <strong>{target.campus?.name || 'LASU · Ojo campus'}</strong>
             <span>
-              {(target.bytes / 1048576).toFixed(2)} MB · Map & voice directions
+              {(target.bytes / 1048576).toFixed(2)} MB · Map &amp; voice
+              directions
               {target.visuals ? ' + enhanced 3D' : ''}
               {target.photos?.assetUrls.length
                 ? ' + all approved photographs'

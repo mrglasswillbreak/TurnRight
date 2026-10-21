@@ -120,7 +120,7 @@ export function usePhotoReviewForm({
                 })
               }
             >
-              Edit & optimise
+              Edit &amp; optimise
             </button>
             <button
               disabled={queueOrder.indexOf(job.key) === 0}
@@ -176,7 +176,7 @@ export function usePhotoReviewForm({
             </label>
             <details open={!job.original}>
               <summary>
-                Source & credits{' '}
+                Source &amp; credits{' '}
                 {job.original && samePhotoRights(job.metadata, job.original)
                   ? '· previously reviewed'
                   : ''}
@@ -300,7 +300,7 @@ export function usePhotoReviewForm({
               </button>
             </details>
             <details>
-              <summary>Dates & historical view</summary>
+              <summary>Dates &amp; historical view</summary>
               {field('Capture date (if known)', 'capturedAt', 'date')}
               {field('Source checked', 'checkedAt', 'date')}
               <label>

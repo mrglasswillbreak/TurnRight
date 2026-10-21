@@ -4,3 +4,4 @@ numpy==1.26.4
 osmium==4.1.1
 pyproj==3.7.2
 pyarrow==23.0.1
+defusedxml==0.7.1

@@ -68,6 +68,8 @@ def check_sources():
                 },
             )
             try:
+                # The HTTPS host is fixed to api.github.com; the repository comes from trusted deployment configuration, never the import source.
+                # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
                 with urllib.request.urlopen(request, timeout=30) as response:
                     if response.status != 204:
                         raise ValueError("Could not start import workflow.")

@@ -507,6 +507,8 @@ def export_data(features, schema, params, output, metadata):
     elif format == "csv":
         fields = [f["name"] for f in schema["fields"]]
         with target.open("w", newline="", encoding="utf-8-sig") as stream:
+            # Every exported user cell passes cell() below, which prefixes spreadsheet formula markers; schema field names are validated identifiers.
+            # nosemgrep: local-runtime.semgrep-rules.python.lang.security.use-defusedcsv
             writer = csv.writer(stream)
             writer.writerow(["feature_id", *fields, "geometry_wkt"])
 

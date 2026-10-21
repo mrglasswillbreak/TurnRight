@@ -8,6 +8,8 @@ target = (
     Path(__file__).with_name(".deps")
     / f"cp{sys.version_info.major}{sys.version_info.minor}"
 )
+# Fixed pip argument vector uses the current trusted interpreter, isolated mode and pinned package names; no shell is invoked.
+# nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
 subprocess.run(
     [
         sys.executable,

@@ -11,7 +11,7 @@ export function PhotoEditControls({ state }: { state: PhotoOptimizerState }) {
   return (
     <div hidden={settingsTab !== 'edit'}>
       <details>
-        <summary>Crop & orientation</summary>{' '}
+        <summary>Crop &amp; orientation</summary>{' '}
         <select
           aria-label="Crop aspect ratio"
           defaultValue="free"
@@ -145,7 +145,7 @@ export function PhotoEditControls({ state }: { state: PhotoOptimizerState }) {
         }
       </details>
       <details>
-        <summary>Light & colour</summary>
+        <summary>Light &amp; colour</summary>
         {
           <PhotoRecipeSlider
             label={'Exposure'}

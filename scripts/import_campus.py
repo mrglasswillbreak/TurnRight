@@ -23,7 +23,7 @@ import json
 import math
 import pathlib
 import urllib.request
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 from place_enrichment import enrich_osm, classify, update_coverage, snapshot_manifest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -38,6 +38,8 @@ def fetch(url, destination):
             "User-Agent": "TurnRight-LASU/1.0 (https://github.com/mrglasswillbreak/TurnRight)"
         },
     )
+    # Operator-only legacy downloader; callers build fixed ArcGIS/Overpass HTTPS URLs and enforce a 35 MB response limit.
+    # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
     with urllib.request.urlopen(request, timeout=90) as response:
         data = response.read(35_000_001)
     if len(data) > 35_000_000:

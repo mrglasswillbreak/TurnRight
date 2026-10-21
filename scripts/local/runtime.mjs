@@ -45,6 +45,8 @@ export async function command(
     binary = process.execPath;
   }
   return new Promise((resolve, reject) => {
+    // Development-only callers supply fixed Docker/Git/Node binaries and separate argv; no shell or request-provided executable is used.
+    // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.detect-child-process
     const child = spawn(binary, args, {
       cwd: root,
       env,

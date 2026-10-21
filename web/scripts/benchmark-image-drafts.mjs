@@ -28,6 +28,8 @@ try {
   while (true) {
     try {
       if (
+        // Loopback-only readiness probe for the disposable benchmark server started above; no credentials or user content are transmitted.
+        // nosemgrep: local-runtime.semgrep-rules.typescript.react.security.react-insecure-request
         (await fetch('http://127.0.0.1:5196/work/image-storage-bench.html')).ok
       )
         break;

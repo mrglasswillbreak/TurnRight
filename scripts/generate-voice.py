@@ -37,6 +37,8 @@ for name, checksum in files.items():
     if not target.exists() or file_hash(target) != checksum:
         print(f"Downloading pinned {name}", flush=True)
         temporary = target.with_suffix(".download")
+        # HTTPS model origin is fixed; repository-owned catalogue pins revision and every downloaded file SHA-256 before inference.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
         urllib.request.urlretrieve(
             f"https://huggingface.co/{catalogue['model']}/resolve/{catalogue['revision']}/{name}",
             temporary,

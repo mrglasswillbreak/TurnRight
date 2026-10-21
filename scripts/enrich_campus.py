@@ -178,6 +178,8 @@ def download_extracts(directory, release, strict=True):
             "--output",
             str(tmp),
         ]
+        # Fixed local Python script and explicit argv; operator-supplied paths remain separate arguments and no shell is invoked.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
         process = subprocess.Popen(command)
         try:
             process.wait(timeout=300)
@@ -463,7 +465,11 @@ def main():
     if "osm:objects" not in failed_collections and all(
         kind in valid_kinds for kind in ("segment", "connector")
     ):
+        # Fixed local Python script and explicit argv; operator-supplied paths remain separate arguments and no shell is invoked.
+        # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
         subprocess.run(
+            # Fixed local Python script and explicit argv; operator-supplied paths remain separate arguments and no shell is invoked.
+            # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-tainted-env-args
             [
                 sys.executable,
                 str(ROOT / "scripts/compare_overture.py"),

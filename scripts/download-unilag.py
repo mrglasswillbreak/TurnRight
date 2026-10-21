@@ -13,7 +13,7 @@ from pathlib import Path
 import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 from pyproj import Transformer
 from shapely.geometry import shape, mapping, Polygon, LineString, box
@@ -52,6 +52,8 @@ def request(url, data=None):
             "Content-Type": "application/x-www-form-urlencoded",
         },
     )
+    # Operator-only research downloader; callers select fixed ArcGIS/Overpass HTTPS endpoints and responses are size bounded.
+    # nosemgrep: local-runtime.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
     with urlopen(req, timeout=240) as response:
         raw = response.read(100 * 1024 * 1024 + 1)
         if len(raw) > 100 * 1024 * 1024:

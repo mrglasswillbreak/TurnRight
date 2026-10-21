@@ -23,9 +23,10 @@ import {
 } from './building-presets';
 
 import { createLayerTreeRenderer } from './createLayerTreeRenderer';
+import type { ValidationIssue } from './validation';
 export type LayerWorkspaceProps = {
   data: CampusData;
-  issues: import('./validation').ValidationIssue[];
+  issues: ValidationIssue[];
   edits: MapEdit[];
   view: LayerViewState;
   onView: (value: LayerViewState) => void;
@@ -95,7 +96,7 @@ export function useLayerWorkspace({
   }, [features, membership]);
 
   const layerIssues = useMemo(() => {
-    const result = new Map<string, import('./validation').ValidationIssue[]>();
+    const result = new Map<string, ValidationIssue[]>();
     for (const issue of issues) {
       const id = membership.get(`${issue.featureKind}:${issue.featureId}`);
       if (id) result.set(id, [...(result.get(id) || []), issue]);

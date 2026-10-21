@@ -7,7 +7,7 @@ import stat
 import zipfile
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 MAX_EXPANDED = 250 * 1024 * 1024
 MAX_FEATURES = 100000
@@ -180,7 +180,7 @@ def inspect_file(path, configuration, work, label=None):
     if suffix in (".osm", ".xml"):
         safe_xml(path)
     if suffix == ".xml":
-        import xml.etree.ElementTree as ET
+        from defusedxml import ElementTree as ET
 
         with path.open("rb") as stream:
             root = next(ET.iterparse(stream, events=("start",)))[1]

@@ -6,10 +6,16 @@ const brandDir = new URL('../../docs/assets/brand/', import.meta.url);
 await mkdir(brandDir, { recursive: true });
 // Selected B2 geometry shared with BrandMark: the turning route and academic cap.
 const mark = (mono = '') =>
+  // Offline asset generator: every interpolated value comes from fixed geometry, numeric dimensions or literal colours in this file.
+  // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
   `<path d="M31.5 77V48A14 14 0 0 1 45.5 34H68" fill="none" stroke="${mono || '#72BAFF'}" stroke-width="12" stroke-linecap="round"/><path d="M84 34L60 20L66.5 34L60 48Z" fill="${mono || '#A4D5FF'}" stroke="${mono || '#A4D5FF'}" stroke-width=".8" stroke-linejoin="round"/><g fill="${mono || '#A4D5FF'}"><path d="M49.5 62L64.5 55L79.5 62L64.5 69Z"/><path d="M54.5 68.5L64.5 73.2L74.5 68.5V74.5Q64.5 80.5 54.5 74.5Z"/><path d="M78.8 65V75" fill="none" stroke="${mono || '#A4D5FF'}" stroke-width="2.6" stroke-linecap="round"/></g>`;
 const tile = (maskable = false) =>
+  // Offline asset generator: every interpolated value comes from fixed geometry, numeric dimensions or literal colours in this file.
+  // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
   `<rect width="100" height="100" rx="${maskable ? 0 : 22}" fill="#202A36"/>${mark()}`;
 const svg = (content) =>
+  // Offline asset generator: every interpolated value comes from fixed geometry, numeric dimensions or literal colours in this file.
+  // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
   `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100">${content}</svg>\n`;
 const icon = svg(tile());
 // The complete mark fits the central 40% radius. Platform masks only crop the
@@ -30,6 +36,8 @@ for (const [name, color, content] of [
 ]) {
   await writeFile(
     new URL(`${name}.svg`, brandDir),
+    // Offline asset generator: every interpolated value comes from fixed geometry, numeric dimensions or literal colours in this file.
+    // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 76" role="img" aria-label="TurnRight"><g transform="translate(4 6) scale(.64)">${content}</g><text x="84" y="51" fill="${color}" font-family="Inter,Arial,sans-serif" font-size="43" font-weight="700" letter-spacing="-1.8">TurnRight</text></svg>\n`,
   );
 }
