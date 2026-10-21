@@ -14,13 +14,15 @@ The collector accepts only known failure categories, component/dependency enums,
 
 Matching component/category/dependency/status/revision events share a group and occurrence count. Five failures in a current five-minute window display a repeated-failure alert. This is an alert in the private dashboard, not email/SMS delivery. Marking a group resolved uses its exact observed timestamp; if it changes concurrently, refresh is required. A later occurrence reopens it. Delivery probes are explicitly labeled and excluded from unresolved-failure counts.
 
-Storage retains at most 1,000 groups and 30 days of activity. The dashboard shows the latest 100, prioritizing unresolved groups, and refreshes every 30 seconds while open. Daily `monitoring-retention.yml` removes expired groups; incoming events also prune old groups. Counts saturate at one million. These bounded operational records are disposable; they are not publication, security-audit or source-review evidence.
+Storage holds at most 1,000 groups. The dashboard shows up to 100 groups seen within the last 30 days, prioritizes unresolved groups, and refreshes every 30 seconds while open. Daily `monitoring-retention.yml` removes expired groups; incoming events also prune old groups. If scheduled Actions cannot run and no events arrive, expired rows remain until the next successful cleanup, although the dashboard excludes them. Counts saturate at one million. These bounded operational records are disposable; they are not publication, security-audit or source-review evidence.
 
 ## Failure handling and privacy limits
 
 Node delivery allows at most 16 concurrent requests, refuses redirects and has a two-second timeout. API failure responses wait for bounded delivery before sending their body, so serverless response completion cannot interrupt capture; this can add up to two seconds to a failed request. Worker entry points flush before exiting. Python host workers use a two-second timeout and refuse redirects. Monitoring errors do not replace the original application error or print private upstream details. Provider logs retain the original redacted event and a bounded delivery-failure indication.
 
 Monitoring shares the application's database, so a complete backend outage can prevent durable capture. Consult deployment/worker logs in that case; the dashboard displays refresh failures rather than claiming healthy operation. Raw browser diagnostics remain in memory and are shared only through the existing explicit download; public visitor errors are not automatically transmitted.
+
+Scheduled cleanup and GitHub-hosted processing require available Actions capacity. Check failed retention runs and the account's included usage/budget when a job cannot start. Resolve the account restriction, then rerun retention; do not treat a job rejected before startup as a successful cleanup.
 
 ## Verification and rollback
 
