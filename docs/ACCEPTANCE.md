@@ -182,7 +182,7 @@ The following is the initial September 9 configuration evidence, retained for hi
 
 ## Local and desktop browser checks
 
-1. Run `npm ci`, `npm test`, `npm run build`, then `npm run preview` from `web/`.
+1. From the repository root with the pinned Node/npm versions, run `npm ci`, `npm run doctor`, `npm run check`, `npm test`, `npm run build`, then `npm run preview --workspace web`. Complete `npm run test:coverage` and the protected browser/native/security jobs before release; see the [readiness evidence](READINESS-UPDATE.md).
 2. Explore, filter and search places. Confirm ambiguous source records remain distinguishable using their coordinates/provenance. Save a place, reload and recover it.
 3. Choose a place with a mapped approach, open Directions, and select a manual origin. Confirm only connected routes appear. A useful connected source pair can be found in `data/seed/campus.json`; coverage will change as edits are approved.
 4. Check the selected route against buildings, gates, fences and each maneuver. Test another origin in a disconnected component; it must show a missing/closed-path message. Select an unsupported destination; it must not draw a shortcut.

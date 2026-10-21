@@ -1,7 +1,7 @@
 import { test, expect } from './coverage-fixture';
 import { readFileSync } from 'node:fs';
 import { setup } from './editor-fixture';
-import { position } from './editor-map-helpers';
+import { position, waitForMapLayout } from './editor-map-helpers';
 
 test.afterEach(async ({ context }) => {
   await context.setOffline(false);
@@ -206,6 +206,9 @@ test('campus layers polygon 96 preserves vertices and holes through property and
       }),
     point,
   );
+  // Closing the layer pane changes the canvas height on the next frame. A
+  // coordinate projected before MapLibre resizes misses the visible handle.
+  await waitForMapLayout(page);
   await expect
     .poll(() => page.evaluate(() => window.editorTestMap.areTilesLoaded()))
     .toBe(true);

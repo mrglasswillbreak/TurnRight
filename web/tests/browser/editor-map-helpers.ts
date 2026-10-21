@@ -68,7 +68,7 @@ export async function position(page: Page, coordinates: Position) {
   }, coordinates);
 }
 
-export async function clickMap(page: Page, coordinates: Position) {
+export async function waitForMapLayout(page: Page) {
   // React pane changes and MapLibre resizing both commit on animation frames.
   await page.evaluate(
     () =>
@@ -94,6 +94,10 @@ export async function clickMap(page: Page, coordinates: Position) {
       }),
     )
     .toBe(true);
+}
+
+export async function clickMap(page: Page, coordinates: Position) {
+  await waitForMapLayout(page);
   // Reframe fixture points that are outside the canvas or beneath a real
   // control (including the drawing guidance), just as a user would pan.
   await page.evaluate((coordinates) => {

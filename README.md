@@ -160,6 +160,8 @@ npm run test:survey-pwa --workspace web
 
 Install Playwright browsers first with `npx playwright install chromium webkit`. CI also checks native PostGIS, importer isolation, backup restoration, photo workflows, offline behavior, and map/globe/voice/JavaScript budgets. The configured-build command uses test authentication placeholders; its output must not be deployed.
 
+The full-source application coverage gate combines passing unit/component tests with all required Chromium journeys and enforces 80% statements, lines and functions plus 70% branches. Native processing requires 80% lines and 70% branches. [Repository readiness](docs/READINESS-UPDATE.md) records exact-revision results and the assessment mapping; those results do not predict an external score.
+
 Physical Android/iPhone checks, campus field verification, live role acceptance, and a public rollback rehearsal remain outstanding acceptance checks. Exact-snapshot approvals and any explicitly authorized owner exception are recorded in the release evidence. [Acceptance checklist](docs/ACCEPTANCE.md) · [Readiness and deployment evidence](docs/PRODUCTION.md) · [Performance bounds](docs/PERFORMANCE.md).
 
 ## Contributing, security, and rights

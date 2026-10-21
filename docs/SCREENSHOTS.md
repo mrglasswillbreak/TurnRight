@@ -59,18 +59,18 @@ Phone views are browser viewports, not photographs of physical devices. The offl
 
 ## Reproduce
 
-Use the pinned Node version, `npm ci` in `web/`, and installed Playwright Chromium/WebKit binaries. Run `npm run docs:prepare` to fetch and hash-check the public campus catalogue and packages into ignored `web/work/docs-fixture/public`. This reads public assets only. The preparation receipt records the origin, retrieval time and catalogue revision; no private account or production write is used. Run these commands sequentially from `web/` (PowerShell):
+Use the pinned Node version, root `npm ci`, and installed Playwright Chromium/WebKit binaries. Run `npm run docs:prepare --workspace web` to fetch and hash-check the public campus catalogue and packages into ignored `web/work/docs-fixture/public`. This reads public assets only. The preparation receipt records the origin, retrieval time and catalogue revision; no private account or production write is used. Run these package-specific commands sequentially from `web/` (PowerShell); `npx` resolves the root-installed Playwright binary:
 
 ```powershell
 npm run docs:prepare
 $env:TURNRIGHT_DOCS_DATE = '2026-10-15' # Replace with the new capture date.
-node node_modules/@playwright/test/cli.js test --config playwright.redesign-docs.config.ts --output work/capture-public-editor
+npx playwright test --config playwright.redesign-docs.config.ts --output work/capture-public-editor
 $env:TURNRIGHT_GIS_SCREENSHOTS = '1'
-node node_modules/@playwright/test/cli.js test --config playwright.gis-docs.config.ts --output work/capture-gis
+npx playwright test --config playwright.gis-docs.config.ts --output work/capture-gis
 Remove-Item Env:TURNRIGHT_GIS_SCREENSHOTS
 $env:TURNRIGHT_REDESIGN_SCREENSHOTS = '1'
-node node_modules/@playwright/test/cli.js test tests/browser/campus-imports.spec.ts --grep 'responsive screens' --output work/capture-imports
-node node_modules/@playwright/test/cli.js test tests/browser/photo-processing.spec.ts --grep 'photo comparison edits' --timeout=120000 --output work/capture-photos
+npx playwright test tests/browser/campus-imports.spec.ts --grep 'responsive screens' --output work/capture-imports
+npx playwright test tests/browser/photo-processing.spec.ts --grep 'photo comparison edits' --timeout=120000 --output work/capture-photos
 Remove-Item Env:TURNRIGHT_REDESIGN_SCREENSHOTS
 npm run docs:record
 npm run check:docs

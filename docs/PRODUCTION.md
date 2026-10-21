@@ -1,5 +1,13 @@
 # Production readiness and deployment records
 
+## Repository readiness application update · 21 October 2026
+
+[PR #47](https://github.com/mrglasswillbreak/TurnRight/pull/47) tracks the application/workflow update, protected checks and deployment receipt. The [readiness ledger](READINESS-UPDATE.md) records the verified code revision, coverage, security checks and operational limits. This update requires no database migration; migrations 001–056 remain the schema contract.
+
+The [before-deployment public readback](assets/readiness-public-baseline-2026-10-21.json) verified all **236 assets** and retained the catalogue and manifest hashes for **LASU `lasu-41ec73876464`** and **UNILAG `unilag-b7655a90045c`**. The health endpoint reported application revision `cb52b36371d2dc0baac012a9a072620dcae0b017` before the update. Compare the post-deployment result against this baseline; source drafts and campus publications remain separate from application deployment.
+
+Vercel builds the merged `main` revision with the root workspace lock and `web` application root. Import and GIS Actions build their pinned container images on each dispatch; source jobs install their hash-locked Python profiles. Merging the matching workflow code updates subsequent worker runs without processing a real campus job for deployment. After Vercel reports Ready, verify `/api/health` against the merge revision, anonymous administration denial, package hashes and the existing production campus-browser/offline audit. Keep the exact deployment and run identities in the linked PR receipt. Physical-device, field and live multi-user acceptance retain their separate scope.
+
 ## Release continuation · 18 October 2026
 
 Both campus updates are published independently: **LASU `lasu-41ec73876464`** and **UNILAG `unilag-b7655a90045c`**. The records below retain the exact approvals, failed attempts, recovery and final publication evidence.

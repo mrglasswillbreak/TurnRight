@@ -102,7 +102,8 @@ Set application variables in both Vercel Preview and Production. Publication bui
 | `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |
 | `gis-processing.yml` | Campus-scoped analysis/export worker; immutable inputs and staged results |
 | `gis-acceptance.yml` | Native PostGIS/engine and backup restoration gates |
-| `regression-audit.yml` | Required application, browser and offline checks |
+| `ci.yml` | Required root quality, combined coverage, browser, offline and local-stack checks |
+| `security.yml` | Full dependency audits, pinned static analysis and historical secret scanning |
 | `release.yml` | Gated approved `preview` or `publish`; explicit campus, legacy default LASU |
 | `bootstrap.yml`, `preview.yml` | Initial baseline and seed preview for new installations |
 
