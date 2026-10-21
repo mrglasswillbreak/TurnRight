@@ -47,7 +47,7 @@ This table maps its category scores to concrete changes, not predicted scores.
 | Dependencies | 45 | One root npm workspace lock, pinned supported toolchain, hash-locked native dependencies and advisory fixes |
 | Documentation | 60 | Complete configuration inventory, local setup, diagnostic recovery and an evidence ledger |
 | CI | 40 | Explicit root CI, preserved required contexts, reproducible containers, exact-source coverage receipts and pinned Actions |
-| Security | 65 | Dependency review/audits, CodeQL, secret scanning, and bounded diagnostics without private content |
+| Security | 65 | Full dependency audits, pinned static analysis, secret scanning, and bounded diagnostics without private content |
 | History | 45 | A reviewable change, factual changelog and links to actual checks; existing authorship and historical evidence are preserved |
 
 The evaluator must reassess the final reviewed revision. Authorship, elapsed
@@ -92,9 +92,18 @@ credentials or private content. See [diagnostic behavior](DIAGNOSTICS.md).
 The primary CI workflow exposes root quality, browser coverage and local-stack
 acceptance while preserving the thirteen required check names. Additional
 security jobs audit npm and locked Python dependencies, scan Git history for
-secrets, and analyze JavaScript/TypeScript, Python and Actions with CodeQL.
+secrets, and analyze JavaScript/TypeScript, Python and Actions with Semgrep.
 External actions use verified commit SHAs. Dependency updates are configured
 for the workspace, Python workers, Dockerfiles and Actions.
+GitHub's dependency-review comparison API is unavailable for this private
+repository; every pull request instead runs the mandatory audits of all npm
+and locked Python dependencies, including unchanged versions. Secret scanning
+has only read access to pull-request metadata and repository contents.
+Hosted CodeQL scanning is also unavailable for this private personal repository.
+Semgrep uses a pinned container digest and community-rule revision, runs inside
+the CI runner with metrics disabled, fails on findings or scan errors, and saves
+JSON/SARIF reports as private workflow artifacts. It requires no hosted scanner
+account and does not upload application source to the scanner provider.
 
 The history secret scan enumerates every reachable Git blob, including deleted
 file versions, and scans each unique version with Gitleaks' bounded file reader.
@@ -119,8 +128,8 @@ and [native database/engine run](https://github.com/mrglasswillbreak/TurnRight/a
 | --- | --- | --- |
 | Root quality | Doctor, all 76 configuration entries, 909 authored files below 500 lines, lint, four type checks and formatting passed | Repeat after final code changes |
 | Documentation | 1,013 links/assets in 82 Markdown files; 33 capture references passed, including inspected desktop/phone recovery views | Repeat after this ledger is finalized |
-| Unit/component tests | Windows pinned runtime: 994 passed in 152 files, followed by nine passing texture/source-review checks; Linux baseline: 910 passed and one optional private-export replay skipped | Repeat the full suite on the final revision |
-| Unit coverage alone | Windows: 47.37% statements, 47.68% lines, 46.45% functions, 44.02% branches; all 530 source files included | Complete final browser collection and the combined gate |
+| Unit/component tests | Windows pinned runtime: 1,003 passed in 154 files on `ed979f0`; Linux baseline: 910 passed and one optional private-export replay skipped | Complete the final Linux run |
+| Unit coverage alone | Windows: 47.72% statements, 48.04% lines, 46.77% functions, 44.33% branches; all 530 source files included | Complete final browser collection and the combined gate |
 | Production bundles | Public 433,436/435,200 bytes gzip; additional editor 186,350/189,440; photo 11,660/12,288 | Existing budgets remain unchanged |
 | Native Python | All 149 tests passed on Linux without skips; processing coverage is 83.11% lines and 74.60% branches in [run 39531746245](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746245) | Repeat if Python processing code changes |
 | Dependency audits | npm and Python quality/native profiles passed in Linux CI; identified certifi and PyArrow advisories were fixed | Repeat if locks change |
@@ -128,7 +137,7 @@ and [native database/engine run](https://github.com/mrglasswillbreak/TurnRight/a
 | Browser acceptance | All 204 primary Chromium journeys, both WebKit shards, the WebKit image editor and separate offline suites passed in [run 39531746310](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746310) | Repeat on the final source snapshot and complete combined coverage |
 | Container/local stack | Linux fresh checkout passed root container build, real Auth, role/campus isolation, editing/review/import/export, private assets, cancellation, browser sign-in, restart persistence and explicit reset | Repeat if runtime or configuration changes |
 | Native database/engine | PostGIS spatial acceptance and restoration of 100,000 indexed features passed; isolated processing and private worker cleanup passed | Repeat if native runtime changes |
-| Code scanning | JavaScript/TypeScript, Python and Actions CodeQL checks passed | Repeat on final revision |
+| Code scanning | The PR run confirmed hosted CodeQL scanning is unavailable; replaced with pinned Semgrep security rules for JavaScript/TypeScript, Python and Actions | Complete the mandatory static-analysis job |
 | Secret scan | Bounded full-history scan passed locally: 5,936 unique file versions across 836 reachable commits; deleted-credential self-test passed | Repeat on the final CI checkout |
 
 Generated coverage, traces and test output remain in ignored directories or CI
