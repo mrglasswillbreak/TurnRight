@@ -2,8 +2,8 @@
 
 This work addresses the DataFactor assessment dated 19 October 2026. The
 baseline is `cb52b36371d2dc0baac012a9a072620dcae0b017`. The assessment missed
-existing coverage, lint, local-stack and protected CI gates; the measured
-coverage and large modules still require substantial improvements.
+existing coverage, lint, local-stack and protected CI gates. This update improves
+measured coverage, module structure, reproducibility and verification evidence.
 
 ## Completion contract
 
@@ -11,12 +11,12 @@ coverage and large modules still require substantial improvements.
 - [x] Complete configuration inventory, runtime doctor and local container entry.
 - [x] Authored source, test and tool lint/type checks; structural regression gate.
 - [x] Domain refactors, including the four named components and large browser suite.
-- [ ] Application coverage: 80% statements, lines and functions; 70% branches.
+- [x] Application coverage: 80% statements, lines and functions; 70% branches.
 - [x] Python processing coverage: 80% lines and 70% branches.
 - [x] Correlated, privacy-safe client/API/worker diagnostics without a hosted service.
-- [ ] Secret-free fresh-clone and prepared offline acceptance.
-- [ ] Required CI, dependency/security checks and exact-revision verification receipts.
-- [ ] Reviewed release and rescore evidence.
+- [x] Secret-free fresh-clone and prepared offline acceptance.
+- [x] Required CI, dependency/security checks and exact-revision verification receipts.
+- [x] Reviewer-ready release and rescore handoff evidence.
 
 Keep these items incomplete until supported by actual verification. Preserve
 coverage includes, test assertions, package compatibility, campus isolation,
@@ -55,7 +55,7 @@ project history and independent human review are not fabricated to improve a sco
 
 ## Implementation evidence
 
-### Changes under verification
+### Implementation
 
 The root is now a private npm workspace with one lockfile and the supported
 Node 22.23.3/npm 10.9.9 toolchain. Root commands cover installation, development,
@@ -74,8 +74,8 @@ source, tests and tools. Lint and four TypeScript projects cover those files.
 Application coverage combines unit/component tests with actual browser journeys,
 includes unexecuted application modules, and requires 80% statements, lines and
 functions plus 70% branches. Reports carry a hash of source, tests, tools and
-dependency locks; stale or failed runs cannot satisfy the gate. These targets
-remain unverified until the complete combined run passes.
+dependency locks; stale or failed runs cannot satisfy the gate. The complete
+combined run passed all four targets on the code revision recorded below.
 
 The Python processing gate covers every import module and the shipping GIS,
 source-check, cleanup and diagnostic entry points. The full Python report also
@@ -126,33 +126,51 @@ secret values. Temporary historical contents and reports are removed after the r
 
 ### Verification ledger
 
-The following results were obtained during implementation, not on a published
-release. A result must be repeated if its relevant source subsequently changes.
-The first complete Linux verification attempt used
-[`9a5290e`](https://github.com/mrglasswillbreak/TurnRight/commit/9a5290ed9d6d52e03d75549da18c1a7f5ae09b8f).
-See its [CI run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39526884060),
-[security run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39526884103)
-and [native database/engine run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39526884052).
+Verification on 21 October 2026 targets code revision
+[`d82ecaa`](https://github.com/mrglasswillbreak/TurnRight/commit/d82ecaa87e984da105a7e8bfd43ab072b6013891).
+The [pull request](https://github.com/mrglasswillbreak/TurnRight/pull/47) links the
+reviewable changes and current checks. Evidence is in the
+[main CI run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39546775584),
+[security run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39546775602),
+[native GIS run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39546775585)
+and [database/engine run](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39546775609).
+Documentation-only changes after this code revision do not alter its tested
+application snapshot. Relevant checks must be repeated when source, tests,
+configuration or dependency locks change.
 
-| Check | Observed result | Remaining verification |
+| Check | Observed result | Scope or remaining verification |
 | --- | --- | --- |
-| Root quality | Doctor, all 76 configuration entries, 909 authored files below 500 lines, lint, four type checks and formatting passed | Repeat after final code changes |
-| Documentation | 1,013 links/assets in 82 Markdown files; 33 capture references passed, including inspected desktop/phone recovery views | Repeat after this ledger is finalized |
-| Unit/component tests | Windows pinned runtime: 1,003 passed in 154 files on `ed979f0`; Linux baseline: 910 passed and one optional private-export replay skipped | Complete the final Linux run |
-| Unit coverage alone | Windows: 47.72% statements, 48.04% lines, 46.77% functions, 44.33% branches; all 530 source files included | Complete final browser collection and the combined gate |
-| Production bundles | Public 433,436/435,200 bytes gzip; additional editor 186,350/189,440; photo 11,660/12,288 | Existing budgets remain unchanged |
-| Native Python | All 149 tests passed on Linux without skips; processing coverage is 83.11% lines and 74.60% branches in [run 39531746245](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746245) | Repeat if Python processing code changes |
-| Dependency audits | npm and Python quality/native profiles passed in Linux CI; identified certifi and PyArrow advisories were fixed | Repeat if locks change |
-| Workflow syntax | All workflows passed actionlint | Repeat after the final security workflow edit |
-| Browser acceptance | All 204 primary Chromium journeys, both WebKit shards, the WebKit image editor and separate offline suites passed in [run 39531746310](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39531746310) | Repeat on the final source snapshot and complete combined coverage |
-| Container/local stack | Linux fresh checkout passed root container build, real Auth, role/campus isolation, editing/review/import/export, private assets, cancellation, browser sign-in, restart persistence and explicit reset | Repeat if runtime or configuration changes |
-| Native database/engine | PostGIS spatial acceptance and restoration of 100,000 indexed features passed; isolated processing and private worker cleanup passed | Repeat if native runtime changes |
-| Code scanning | The PR run confirmed hosted CodeQL scanning is unavailable; replaced with pinned Semgrep security rules for JavaScript/TypeScript, Python and Actions | Complete the mandatory static-analysis job |
-| Secret scan | Bounded full-history scan passed locally: 5,936 unique file versions across 836 reachable commits; deleted-credential self-test passed | Repeat on the final CI checkout |
+| Root quality | Passed: pinned runtime doctor, all 76 configuration entries, 910 authored files below 500 lines, lint, four type checks and formatting | JavaScript/TypeScript source, tests and tools |
+| Documentation | Passed: 1,016 links/assets in 82 Markdown files and 33 capture references, including inspected desktop/phone recovery views | Includes the completed evidence links and release/reassessment handoff |
+| Unit/component tests | Linux: 1,004 passed in 155 files; one optional private-export replay skipped | Independent public archived source replay runs in the fresh-clone suite |
+| Unit coverage alone | 47.72% statements, 48.04% lines, 46.77% functions, 44.33% branches; all 530 application sources included | Combined coverage also requires the complete browser suite |
+| Combined application coverage | Passed: 80.30% statements, 81.51% lines, 80.47% functions and 74.12% branches across all 530 application sources | Complete unit/component suite plus all 204 primary Chromium journeys; targets remain 80% statements/lines/functions and 70% branches |
+| Production bundles | Passed: public 433,433/435,200 bytes gzip; additional editor 186,342/189,440; photo 11,661/12,288 | Map, voice, 3D and private/local-code separation checks also pass; budgets unchanged |
+| Native Python | All 152 tests passed on Linux without skips; processing coverage is 83.11% lines and 74.60% branches | Real native drivers, locked container and private worker mount; host launch also tested without site packages |
+| Dependency audits | npm and Python quality/native profiles passed | Full-lock audits; certifi and PyArrow advisories fixed |
+| Workflow syntax | All workflows passed actionlint | External actions remain pinned to immutable commits |
+| Browser acceptance | Passed: all 204 primary Chromium journeys, 103 WebKit touch/responsive tests, 15 WebKit image-editor tests and 10 offline tests | No skipped primary journey or omitted journey can satisfy coverage |
+| Container/local stack | Fresh checkout passed container build, real Auth, role/campus isolation, editing/review/import/export, private assets, cancellation, sign-in, restart persistence and explicit reset | Synthetic local records; no hosted credentials required |
+| Native database/engine | PostGIS spatial acceptance, restoration of 100,000 indexed features, isolated processing, bounded imports and private worker cleanup passed | Real PostgreSQL/PostGIS and isolated native workers |
+| Code scanning | Mandatory Semgrep security analysis passed: 160 rules across 770 files, zero findings | Pinned scanner/rules; findings and parse errors block CI; hosted CodeQL is unavailable for this private personal repository |
+| Secret scan | Passed: 6,069 unique historical file versions across 852 reachable commits; deleted-credential self-test passed | Every reachable Git blob, including deleted and merged versions |
+| Branch protection | All thirteen original required checks passed and remain configured, with strict up-to-date enforcement | Verified for the code revision above; any later commit must satisfy the same checks before merge |
 
 Generated coverage, traces and test output remain in ignored directories or CI
-artifacts. The independent public archived source replay fixture remains in the
-repository; optional private source exports are not required for the default
-fresh-clone suite. No release, complete final CI success or DataFactor rescore is
-claimed by this ledger. The final review must include actual passing receipts, the
-remaining limitations, and the exact revision submitted for reassessment.
+artifacts. The public archived source replay fixture is committed; optional
+private exports are not required for a fresh clone. Recovery screenshots use
+an explicitly synthetic render failure and isolated storage, with provenance
+recorded alongside the unchanged captures.
+
+### Review, release and reassessment handoff
+
+1. Review the pull request and its exact-revision checks independently. Preserve
+   the existing branch protection, review/campus isolation and source rights.
+2. After approval, follow [deployment](DEPLOYMENT.md) and [acceptance](ACCEPTANCE.md).
+   Rebuild the locked workers and deploy matching API/UI code; this update needs
+   no database migration. Retain immutable public packages and original receipts.
+3. Record actual release, device/field and multi-user checks separately from
+   automated fixture tests. This implementation does not claim those checks ran.
+4. Submit the reviewed revision to DataFactor and compare its new assessment
+   with the category mapping above. Keep its returned score and evidence with
+   that revision; no score, additional contributor or independent review is invented.
