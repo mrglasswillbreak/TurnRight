@@ -178,6 +178,11 @@ protection propagation and rejects credential forwarding to external origins.
 The next unit run exposed a gallery assertion made after IndexedDB deletion but
 before React rendered the empty state. That test now awaits the selected remaining
 image and visible empty state while retaining both storage-deletion assertions.
+The final local-stack reset run then exposed an unhandled closed input pipe in
+the development command helper. Commands without input now use a closed input
+stream; supplied-input failures are handled and still fail the command. Regression
+tests cover fast commands, complete input delivery, redacted exit failures and
+early pipe closure, including a child that otherwise exits successfully.
 The current PR
 must pass the complete protected suite again before merge; the earlier passing
 code receipt above does not override a later failure. See [production tracking](PRODUCTION.md#repository-readiness-application-update--21-october-2026)

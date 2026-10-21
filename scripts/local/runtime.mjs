@@ -53,13 +53,14 @@ export async function command(
       windowsHide: true,
       timeout,
       stdio: [
-        'pipe',
+        input.length ? 'pipe' : 'ignore',
         capture ? 'pipe' : 'inherit',
         capture ? 'pipe' : 'inherit',
       ],
     });
     let stdout = '',
       stderr = '';
+    let inputError;
     child.stdout?.on('data', (value) => {
       stdout += value;
     });
@@ -67,16 +68,23 @@ export async function command(
       stderr = (stderr + value).slice(-8000);
     });
     child.on('error', reject);
-    child.on('close', (code) =>
-      code === 0
-        ? resolve(stdout)
-        : reject(
-            Error(
-              `${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`,
-            ),
+    child.stdin?.on('error', (error) => {
+      inputError = error;
+    });
+    child.on('close', (code) => {
+      if (code !== 0)
+        reject(
+          Error(
+            `${path.basename(binary)} exited ${code}${capture ? ': ' + stderr.replace(/(?:eyJ[\w.-]+|sb_secret_[\w-]+)/g, '[redacted]') : ''}`,
           ),
-    );
-    child.stdin.end(input);
+        );
+      else if (inputError)
+        reject(
+          Error(`${path.basename(binary)} could not receive command input.`),
+        );
+      else resolve(stdout);
+    });
+    child.stdin?.end(input);
   });
 }
 
