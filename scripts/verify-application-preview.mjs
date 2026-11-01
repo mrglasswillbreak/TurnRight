@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { vercelApi, withDeploymentAccess } from './vercel-api.mjs';
+import { verifyDeploymentHealth } from './deployment-health.mjs';
 
 assert(
   !process.env.RELEASE_ID,
@@ -40,13 +41,7 @@ async function run(script, args, env, cwd = process.cwd()) {
 await withDeploymentAccess(
   origin,
   async (headers) => {
-    const health = await fetch(origin + '/api/health', {
-      headers,
-      redirect: 'error',
-      signal: AbortSignal.timeout(30000),
-    });
-    assert.equal(health.status, 200);
-    assert.deepEqual(await health.json(), { status: 'ok', revision });
+    await verifyDeploymentHealth(origin, revision, headers);
     const denied = await fetch(origin + '/api/admin', {
       method: 'POST',
       headers: { ...headers, 'Content-Type': 'application/json' },
