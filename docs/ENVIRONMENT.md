@@ -27,8 +27,10 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `CLEANUP_RUN_ID` | tool | No | Exact preview-access run selected for cleanup. |
 | `DEV` | runtime | No | Vite-provided development boolean; not a user configuration variable. |
 | `DOCS_PUBLIC_ORIGIN` | tool | No | Public origin used while preparing documentation screenshots. |
+| `EXPECTED_MODEL_PLAN` | tool | No | Reviewed model-import plan hash binding pinned assets and the explicit review decision before apply. |
 | `EXPECTED_SNAPSHOT` | tool | No | Required immutable layer-upgrade snapshot hash before applying. |
 | `EXPECTED_UNILAG_SNAPSHOT` | tool | No | Required immutable UNILAG snapshot hash before applying. |
+| `GH_TOKEN` | ci | Yes | GitHub workflow token used to download an explicitly pinned proposal release asset from this repository. |
 | `GIS_BACKUP_EXCLUDED_TABLES` | tool | No | Explicit table exclusions recorded by the GIS backup tool. |
 | `GIS_BACKUP_PUBLIC_KEY` | tool | No | Public encryption key for a private GIS backup; the decryption key stays outside CI. |
 | `GIS_DEPLOYMENT_MODE` | tool | No | Explicit GIS deployment verification mode. |
@@ -36,6 +38,7 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `GIS_IMPORT_IMAGE` | worker | No | Pinned local container image for network-isolated format conversion. |
 | `GIS_JOB_ID` | worker | No | Immutable processing-job identifier supplied by dispatch. |
 | `GIS_TEST_DATABASE_URL` | tool | Yes | Disposable test database URL; acceptance tools reject production database names. |
+| `GITHUB_ACTOR` | ci | No | GitHub-provided actor name recorded in the private model-import receipt; never used as a fabricated campus identity. |
 | `GITHUB_ACTIONS` | ci | No | GitHub-provided runner marker. |
 | `GITHUB_REPOSITORY` | server | No | Owner/repository used for authorized worker dispatch. |
 | `GITHUB_RUN_ID` | ci | No | GitHub-provided run identifier used in verification and cleanup receipts. |
@@ -49,6 +52,11 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `IMPORT_ID` | worker | No | Import-job identifier supplied by dispatch. |
 | `IMPORT_RETENTION_ENABLED` | worker | No | Explicit repository-variable opt-in to import retention maintenance. |
 | `JOB_ID` | worker | No | Source-refresh job identifier supplied by dispatch. |
+| `MODEL_ARCHIVE_SHA256` | tool | No | Reviewed portable model proposal ZIP SHA256; every archive entry also requires its manifest hash. |
+| `MODEL_INSPECT_ONLY` | tool | No | Read-only model workspace audit that requires no archive and performs no remote writes. |
+| `MODEL_OWNER_OVERRIDE` | tool | No | Explicit audited original-owner review override, disabled by default and bound to the preparation plan. |
+| `MODEL_OVERRIDE_REASON` | tool | No | Concrete original-owner review reason recorded by the normal GIS decision API; required for an override. |
+| `MODEL_RELEASE_ASSET_ID` | tool | No | Immutable numeric GitHub release asset ID for the pinned model proposal ZIP in this repository. |
 | `NODE_ENV` | runtime | No | Node runtime mode; local workers reject production. |
 | `npm_config_user_agent` | runtime | No | npm-provided version information used by the runtime doctor. |
 | `OVERPASS_SCHEDULE_ALLOWED` | server | No | Explicit endpoint permission gate for scheduled OSM requests; defaults disabled. |

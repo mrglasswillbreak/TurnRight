@@ -66,6 +66,11 @@
       "sensitive": false,
       "description": "Public origin used while preparing documentation screenshots."
     },
+    "EXPECTED_MODEL_PLAN": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Reviewed model-import plan hash binding pinned assets and the explicit review decision before apply."
+    },
     "EXPECTED_SNAPSHOT": {
       "scope": "tool",
       "sensitive": false,
@@ -75,6 +80,11 @@
       "scope": "tool",
       "sensitive": false,
       "description": "Required immutable UNILAG snapshot hash before applying."
+    },
+    "GH_TOKEN": {
+      "scope": "ci",
+      "sensitive": true,
+      "description": "GitHub workflow token used to download an explicitly pinned proposal release asset from this repository."
     },
     "GIS_BACKUP_EXCLUDED_TABLES": {
       "scope": "tool",
@@ -110,6 +120,11 @@
       "scope": "tool",
       "sensitive": true,
       "description": "Disposable test database URL; acceptance tools reject production database names."
+    },
+    "GITHUB_ACTOR": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided actor name recorded in the private model-import receipt; never used as a fabricated campus identity."
     },
     "GITHUB_ACTIONS": {
       "scope": "ci",
@@ -175,6 +190,31 @@
       "scope": "worker",
       "sensitive": false,
       "description": "Source-refresh job identifier supplied by dispatch."
+    },
+    "MODEL_ARCHIVE_SHA256": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Reviewed portable model proposal ZIP SHA256; every archive entry also requires its manifest hash."
+    },
+    "MODEL_INSPECT_ONLY": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Read-only model workspace audit that requires no archive and performs no remote writes."
+    },
+    "MODEL_OWNER_OVERRIDE": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Explicit audited original-owner review override, disabled by default and bound to the preparation plan."
+    },
+    "MODEL_OVERRIDE_REASON": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Concrete original-owner review reason recorded by the normal GIS decision API; required for an override."
+    },
+    "MODEL_RELEASE_ASSET_ID": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Immutable numeric GitHub release asset ID for the pinned model proposal ZIP in this repository."
     },
     "NODE_ENV": {
       "scope": "runtime",

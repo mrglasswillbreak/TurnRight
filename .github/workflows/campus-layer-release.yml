@@ -10,23 +10,40 @@ on:
         options: [lasu, campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a]
         required: true
       operation:
+        description: Inspect is a read-only model workspace audit; prepare validates the pinned inputs
         type: choice
-        options: [prepare, apply]
+        options: [prepare, apply, inspect]
         default: prepare
       expected_hash:
         description: Reviewed complete workspace hash; required for apply
         required: false
       upgrade:
         type: choice
-        options: [layers, detail]
+        options: [layers, detail, models]
         default: layers
+      model_asset_id:
+        description: Pinned proposal ZIP release asset ID from this repository (models only)
+        required: false
+      model_archive_sha256:
+        description: Reviewed proposal ZIP SHA256 (models only)
+        required: false
+      expected_model_plan:
+        description: Model preparation receipt planHash; required for apply
+        required: false
+      model_owner_override:
+        description: Explicit original-owner approval after applying models; records the reason below
+        type: boolean
+        default: false
+      model_override_reason:
+        description: Audited original-owner approval reason (5–1000 characters); no independent approval claimed
+        required: false
 permissions:
   contents: read
 jobs:
   prepare:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -34,7 +51,16 @@ jobs:
       CAMPUS_ID: ${{ inputs.campus_id }}
       APPLY_LAYER_UPGRADE: ${{ inputs.operation == 'apply' }}
       EXPECTED_SNAPSHOT: ${{ inputs.expected_hash }}
+      MODEL_RELEASE_ASSET_ID: ${{ inputs.model_asset_id }}
+      MODEL_ARCHIVE_SHA256: ${{ inputs.model_archive_sha256 }}
+      EXPECTED_MODEL_PLAN: ${{ inputs.expected_model_plan }}
+      MODEL_OWNER_OVERRIDE: ${{ inputs.model_owner_override }}
+      MODEL_OVERRIDE_REASON: ${{ inputs.model_override_reason }}
+      MODEL_INSPECT_ONLY: ${{ inputs.operation == 'inspect' }}
     steps:
+      - name: Inspect is available only for model workspaces
+        if: inputs.operation == 'inspect' && inputs.upgrade != 'models'
+        run: exit 1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -43,12 +69,17 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: web
-      - if: inputs.upgrade != 'detail'
+      - if: inputs.upgrade == 'layers'
         run: npx tsx ../scripts/prepare-campus-layer-release.mts
         working-directory: web
       - if: inputs.upgrade == 'detail'
         run: npx tsx ../scripts/prepare-campus-detail-release.mts
         working-directory: web
+      - if: inputs.upgrade == 'models'
+        run: npx tsx ../scripts/prepare-campus-model-release.mts
+        working-directory: web
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -57,4 +88,6 @@ jobs:
             web/work/*-layer-receipt.json
             web/work/*-layer-preview.json
             web/work/*-detail-receipt.json
+            web/work/lasu-model-receipt.json
+            web/work/lasu-model-inspection.json
           retention-days: 14
