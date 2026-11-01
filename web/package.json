@@ -48,7 +48,7 @@
     "react-dom": "19.2.6",
     "react-resizable-panels": "4.5.8",
     "sharp": "^0.35.5",
-    "tailwind-merge": "3.6.0",
+    "tailwind-merge": "3.7.0",
     "terra-draw": "^1.33.0",
     "terra-draw-maplibre-gl-adapter": "^1.4.1",
     "three": "^0.180.0",
