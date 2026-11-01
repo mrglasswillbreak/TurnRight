@@ -1,0 +1,260 @@
+{
+  "campus": "lasu",
+  "namespace": "arcgis:University_Property",
+  "baselineConfirmation": {
+    "date": "2026-11-01",
+    "statement": "The published release is current",
+    "source": "User confirmation in this chat"
+  },
+  "buildings": {
+    "2": {
+      "observed": "Cream faceted entrance panels, paired high glass-block strips, tall cream fins and a broad red-brown upper fascia; side gallery openings differ from the solid central entrance.",
+      "gaps": [
+        "The remaining exterior is small; roof junctions and exact storeys remain uncertain."
+      ]
+    },
+    "3": {
+      "visibleFloors": 5,
+      "observed": "Completed August 2026 exterior has five levels, red-brown fins, blue glazing and cream panels with diamond motifs.",
+      "gaps": [
+        "Unseen elevations and facade orientation remain estimates.",
+        "The legacy custom roof/eaves estimate conflicts with the 20 m main height.",
+        "The 2025 aerial supports the red wing roofs and central turquoise atrium roof; exact ridge heights, panel junctions and current rooftop equipment remain unmeasured."
+      ],
+      "additionalReferences": [
+        {
+          "sourceUrl": "https://www.tvcnews.tv/sanwo-olu-to-commission-350-seater-library-in-lasu-today/",
+          "imageUrl": "https://www.tvcnews.tv/wp-content/uploads/2025/10/LASU-Library.jpg",
+          "publicationDate": "2025-10-21",
+          "capturedAt": null,
+          "retrievedAt": "2026-11-01",
+          "rights": "Observation only; no redistribution or texture rights established.",
+          "privateFile": "research/library-aerial-2025.jpg",
+          "sha256": "7bdf07150869dbbd4eadf12109f7269f03bd422624c36c03eb3394d253028088",
+          "observed": "Aerial: five visible facade levels, red shallow pitched wing roof panels, central turquoise pyramidal atrium roof, stepped wings and cream diamond-motif entrance panels."
+        }
+      ]
+    },
+    "11": {
+      "hold": "The linked photograph is an interior and its Commons categories identify Epe; no usable identified Ojo exterior is established.",
+      "observed": "Interior reference only.",
+      "gaps": [
+        "Find an exterior photograph of the Ojo clinic and verify its mapped footprint."
+      ]
+    },
+    "22": {
+      "visibleFloors": 4,
+      "observed": "Four visible levels, paired rectangular windows, pale weathered panels and a red-brown central strip.",
+      "gaps": [
+        "Do not invent weathering or air-conditioning locations on unseen elevations."
+      ]
+    },
+    "25": {
+      "visibleFloors": 2,
+      "observed": "Yellow walls, red pitched roof, rounded end and recessed central entrance.",
+      "gaps": [
+        "The existing custom roof needs comparison against the observed roof before replacement."
+      ]
+    },
+    "28": {
+      "visibleOpeningRows": 4,
+      "observed": "Four rows of irregular narrow openings, grey screens, two blue-lined entrance portals, shallow staggered steps and lecture-theatre lettering.",
+      "gaps": [
+        "Architect photographs have unverified redistribution rights and are observation-only.",
+        "Opening widths, geographic elevation assignment and precise step spacing remain estimated.",
+        "Four rows of screen openings do not establish four occupied storeys.",
+        "The freestanding sign and paving are excluded without confirmed anchors."
+      ]
+    },
+    "31": {
+      "visibleFloors": 2,
+      "observed": "Yellow entrance between taller end blocks; trees and fencing obscure much of the facade.",
+      "gaps": [
+        "Roof and obscured elevations are not established by the available photograph."
+      ]
+    },
+    "32": {
+      "observed": "Yellow front panels, a brown entrance block, central glazing and recessed decorative panels.",
+      "gaps": [
+        "Exact motif geometry and facade-to-footprint orientation need further evidence."
+      ]
+    },
+    "33": {
+      "visibleFloors": 2,
+      "observed": "Cream walls, red-brown framing and canopy, blue and white window divisions.",
+      "gaps": [
+        "Strong colour grading in one photograph makes its palette unreliable; compare the second view."
+      ]
+    },
+    "39": {
+      "visibleFloors": 3,
+      "observed": "Yellow walls, red columns, inset windows and a white entrance portico.",
+      "gaps": [
+        "The source filename suggests another faculty; identification follows the visible FMS signage, not the filename."
+      ]
+    },
+    "43": {
+      "visibleFloors": 2,
+      "observed": "Cream walls, a tall rounded red tower, triangular entrance feature and small circular opening.",
+      "gaps": [
+        "The tower's location on the mapped polygon is not yet established.",
+        "The tower is included in the proposal at a tentative location; no surveyed anchor is claimed."
+      ]
+    },
+    "44": {
+      "visibleFloors": 2,
+      "observed": "Ochre walls, red-brown parapet, high upper louvres, recessed ground arcade and an opaque upper gallery wall. No continuous external balcony railing is established.",
+      "gaps": ["Exact arcade bay spacing and rear elevation are estimated."]
+    },
+    "47": {
+      "visibleFloors": 2,
+      "observed": "Yellow walls, brown vertical panels, dark flat eaves and three mapped blocks.",
+      "gaps": [
+        "The photograph does not establish every block's entrance or rear elevation."
+      ]
+    },
+    "54": {
+      "visibleFloors": 2,
+      "observed": "Cream infill, tall red-brown fins, multiple pitched roofs and an entrance portico.",
+      "gaps": [
+        "Two mapped courtyards and unseen roof junctions need conservative treatment."
+      ],
+      "additionalReferences": [
+        {
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lasu,_Ojo_Campus._July_2025.jpg",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Faculty_of_Education%2C_Lasu%2C_Ojo_Campus._July_2025.jpg",
+          "author": "Marvelous udoruisi",
+          "capturedAt": "2025-07-13",
+          "uploadedAt": "2026-10-11",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "retrievedAt": "2026-11-01",
+          "privateFile": "research/education-2025.jpg",
+          "sha256": "e28761cf6cea02967957cefc14dcb9abf95d389226f9bf47f2ab45a0bef56bd1",
+          "observed": "Courtyard with tall red-brown fins, cream walls, a low window band, covered sloping walkway roofs and slender posts. This view does not independently assign the photographed courtyard to one of the two mapped holes."
+        }
+      ]
+    },
+    "55": {
+      "visibleFloors": 1,
+      "observed": "Cream front, flat parapet, glazed doors and radio signage.",
+      "gaps": [
+        "Only one level is visible; the legacy two-floor estimate remains unresolved.",
+        "The separate mast has no confirmed anchor and must not be placed arbitrarily."
+      ]
+    },
+    "73": {
+      "visibleFloors": 1,
+      "observed": "Tall grey hall, stepped parapet, sparse high windows and light entrance surround.",
+      "gaps": [
+        "One visible hall level conflicts with the legacy two-floor estimate; the interior photograph does not resolve exterior storeys."
+      ]
+    },
+    "75": {
+      "visibleFloors": 2,
+      "observed": "Yellow walls, red-brown framing and a recessed entrance.",
+      "gaps": [
+        "Trees obscure the roof and some windows; unseen elevations remain estimates."
+      ]
+    },
+    "76": {
+      "visibleFloors": 3,
+      "observed": "Cream walls, red-brown pilasters, floor bands and Taslim Olawale Elias Library signage.",
+      "gaps": [
+        "The existing hip-roof shape is illustrative and is not confirmed by the ground-level view."
+      ]
+    },
+    "78": {
+      "visibleFloors": 2,
+      "observed": "Dated March 2022 cream facade, two glass-block entrance towers, small red gables and recessed side galleries. The undated dark-clad version has unresolved chronology.",
+      "gaps": [
+        "The dark-clad undated photograph conflicts with dated cream exteriors; retain the dated interpretation pending chronology evidence."
+      ],
+      "comparisonPhotoId": "commons:116180607"
+    },
+    "79": {
+      "visibleFloors": 2,
+      "observed": "Two levels, pale green-grey piers, an entrance canopy and main-library signage.",
+      "gaps": [
+        "The small mapped footprint and School Library label require confirmation against the photographed main-library frontage."
+      ],
+      "hold": "The photographed Main Library frontage is not yet securely matched to the small School Library footprint. Identification and scale must be resolved before modeling."
+    },
+    "92": {
+      "hold": "The mapped 65,219.65 square metre polygon covers the sports field/complex, not the photographed Hussam Okoya-Thomas hall.",
+      "observed": "Sports hall photograph; stable hall footprint unresolved.",
+      "gaps": [
+        "Locate the actual hall footprint and identity before reconstruction. Do not extrude the field."
+      ]
+    },
+    "103": {
+      "visibleFloors": 4,
+      "observed": "Four visible levels, cream and red pillars and multiple red pitched roofs.",
+      "gaps": [
+        "Observed floor count conflicts with the legacy three-floor, 9 m estimate."
+      ]
+    },
+    "120": {
+      "visibleFloors": 7,
+      "observed": "Seven levels, glazing bands and paired cream panels with three red-brown diamonds each; dated corner views show additional contrasting panels.",
+      "gaps": [
+        "Precise facade orientation, rear details and the auxiliary octagonal wing remain estimates.",
+        "The legacy roof model and present roof form require independent review."
+      ]
+    }
+  },
+  "additionalIdentificationGaps": [
+    "Abisogun Leigh Science Building photographs need a stable Ojo footprint match.",
+    "Enitan Bababunmi Laboratory photographs need a stable Ojo footprint match.",
+    "Bola Ahmed Tinubu Science Building photographs need a stable Ojo footprint match.",
+    "Main Printing Press photographs need a stable Ojo footprint match."
+  ],
+  "additionalResearchSource": "https://commons.wikimedia.org/wiki/Category:Lagos_State_University",
+  "additionalResearchRecords": [
+    {
+      "name": "Abisogun Leigh Science Building",
+      "status": "footprint-identification-gap",
+      "author": "Abiolakintrunde",
+      "capturedAt": "2021-12-22",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,Lasu.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "retrievedAt": "2026-11-01",
+      "limitation": "The file identifies the building but supplies no verified stable footprint association. No arbitrary map assignment was made."
+    },
+    {
+      "name": "Enitan Bababunmi Science Laboratory",
+      "status": "footprint-identification-gap",
+      "author": "Official alade",
+      "capturedAt": "2021-11-12",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Enitan_Bababunmi_Science_Laboratory,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "retrievedAt": "2026-11-01",
+      "limitation": "The file identifies the building but supplies no verified stable footprint association. No arbitrary map assignment was made."
+    },
+    {
+      "name": "Bola Ahmed Tinubu Science Complex",
+      "status": "footprint-identification-gap",
+      "author": "Official alade",
+      "capturedAt": "2021-11-12",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bola_Ahmed_Tinubu_Science_Complex,_Faculty_of_Science,_Lagos_State_University.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "retrievedAt": "2026-11-01",
+      "limitation": "The file identifies the building but supplies no verified stable footprint association. No arbitrary map assignment was made."
+    },
+    {
+      "name": "Main Printing Press",
+      "status": "footprint-identification-gap",
+      "author": "SIMIOFAFRICA",
+      "capturedAt": "2022-03-17",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building.jpg",
+      "additionalView": "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building,_Ojo.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "retrievedAt": "2026-11-01",
+      "limitation": "The file identifies the building but supplies no verified stable footprint association. No arbitrary map assignment was made."
+    }
+  ]
+}

@@ -1,0 +1,982 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "baselineVersion": "lasu-41ec73876464",
+  "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+  "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+  "checkedAt": "2026-11-01T01:30:15.140Z",
+  "buildingCount": 614,
+  "photoCount": 43,
+  "buildings": [
+    {
+      "id": "arcgis:University_Property:47",
+      "name": "C.P.S",
+      "slug": "c-p-s",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "a66a5d6991f70379-2033",
+      "photoIds": [
+        "owner:8bb5a23a-9716-4538-a250-2006585d9a74"
+      ],
+      "references": [
+        {
+          "id": "owner:8bb5a23a-9716-4538-a250-2006585d9a74",
+          "caption": "Centre for Planning Studies exterior · 2022",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_center_for_planning.jpg",
+          "author": "Justjin",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2022-03-11",
+          "historical": true,
+          "sha256": "ac08263911f0ebe40bad52ef4d98548df5bf101e8629974296b16e005ecb68b5",
+          "assetUrl": "/packages/photos/ac08263911f0ebe40bad52ef4d98548df5bf101e8629974296b16e005ecb68b5.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:44",
+      "name": "Department of Theartre Arts and Music",
+      "slug": "department-of-theartre-arts-and-music",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "681aec98161cf306-351",
+      "photoIds": [
+        "commons:112838171"
+      ],
+      "references": [
+        {
+          "id": "commons:112838171",
+          "caption": "Theatre Art and Music exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Department_of_Theater_Art_and_Music,_Lagos_State_University.jpg",
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-12",
+          "historical": true,
+          "sha256": "b54d46a6aecff2bd440ea31004ef73d1948d26860eed87085ddea593caa28bf5",
+          "assetUrl": "/packages/photos/b54d46a6aecff2bd440ea31004ef73d1948d26860eed87085ddea593caa28bf5.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:25",
+      "name": "Faculty of Art Language Lab",
+      "slug": "faculty-of-art-language-lab",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "642d086362326655-5248",
+      "photoIds": [
+        "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf"
+      ],
+      "references": [
+        {
+          "id": "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf",
+          "caption": "Faculty of Art Language Lab",
+          "sourceUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+          "author": "The Intellectual",
+          "license": "Public domain",
+          "licenseUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7",
+          "assetUrl": "/packages/photos/103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:54",
+      "name": "Faculty Of Education 3 In 1",
+      "slug": "faculty-of-education-3-in-1",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "beafe5d6b2a7d490-9665",
+      "photoIds": [
+        "commons:112834607",
+        "commons:115992650"
+      ],
+      "references": [
+        {
+          "id": "commons:112834607",
+          "caption": "Faculty of Education complex",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-12",
+          "historical": true,
+          "sha256": "2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078",
+          "assetUrl": "/packages/photos/2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:115992650",
+          "caption": "Faculty of Education entrance facade",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-02-21",
+          "historical": true,
+          "sha256": "edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef",
+          "assetUrl": "/packages/photos/edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:39",
+      "name": "FMS",
+      "slug": "fms",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "c4025d8398ab6723-3076",
+      "photoIds": [
+        "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+        "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9"
+      ],
+      "references": [
+        {
+          "id": "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+          "caption": "FMS",
+          "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3",
+          "assetUrl": "/packages/photos/feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9",
+          "caption": "FMS",
+          "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b",
+          "assetUrl": "/packages/photos/5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:31",
+      "name": "ICT",
+      "slug": "ict",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "e10eca06f590e936-7272",
+      "photoIds": [
+        "commons:116026274"
+      ],
+      "references": [
+        {
+          "id": "commons:116026274",
+          "caption": "ICT Centre exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0000.jpg",
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-13",
+          "historical": true,
+          "sha256": "28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f",
+          "assetUrl": "/packages/photos/28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:11",
+      "name": "LASU  Clinic",
+      "slug": "lasu-clinic",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "57ba53bbde4dd15b-1394",
+      "photoIds": [
+        "owner:8ec01755-d2a8-4d0c-b358-fcfbefe783c7"
+      ],
+      "references": [
+        {
+          "id": "owner:8ec01755-d2a8-4d0c-b358-fcfbefe783c7",
+          "caption": "LASU Health Centre reception · 2021",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Health_Centre.jpg",
+          "author": "Louiell1",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2021-03-20",
+          "historical": true,
+          "sha256": "0dd2a735184ee1112c0d360020e58b33aa5ce1e40daa51817e94b73cd6bb92d8",
+          "assetUrl": "/packages/photos/0dd2a735184ee1112c0d360020e58b33aa5ce1e40daa51817e94b73cd6bb92d8.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:73",
+      "name": "LASU CBT",
+      "slug": "lasu-cbt",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "5124dac54615b44-2650",
+      "photoIds": [
+        "owner:b4086f16-2907-435d-82ec-bed122723989",
+        "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+        "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8"
+      ],
+      "references": [
+        {
+          "id": "owner:b4086f16-2907-435d-82ec-bed122723989",
+          "caption": "LASU CBT",
+          "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11",
+          "assetUrl": "/packages/photos/1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+          "caption": "LASU CBT",
+          "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06",
+          "assetUrl": "/packages/photos/0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8",
+          "caption": "LASU CBT",
+          "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812",
+          "assetUrl": "/packages/photos/9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:3",
+      "name": "LASU International Library",
+      "slug": "lasu-international-library",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "e0a082e435328cd6-14255",
+      "photoIds": [
+        "commons:198256532",
+        "commons:198256515",
+        "owner:63948256-b781-4867-b28f-6d4666a1ff5d",
+        "owner:afd1095f-968f-4ceb-a7e7-8738f0cfadeb"
+      ],
+      "references": [
+        {
+          "id": "commons:198256532",
+          "caption": "International Library exterior, August 2026",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2026-08-27",
+          "historical": false,
+          "sha256": "a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8",
+          "assetUrl": "/packages/photos/a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:198256515",
+          "caption": "International Library atrium, August 2026",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg",
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2026-08-27",
+          "historical": false,
+          "sha256": "54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b",
+          "assetUrl": "/packages/photos/54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "owner:63948256-b781-4867-b28f-6d4666a1ff5d",
+          "caption": "International Library during construction · 2021",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Library_Under_Construction.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2021-05-06",
+          "historical": true,
+          "sha256": "289d768ff748092c3a4fc7da77f04dab31670dc8fc38bd432dd34cfc41edcd19",
+          "assetUrl": "/packages/photos/289d768ff748092c3a4fc7da77f04dab31670dc8fc38bd432dd34cfc41edcd19.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "owner:afd1095f-968f-4ceb-a7e7-8738f0cfadeb",
+          "caption": "International Library construction at sunset · 2023",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Central_library.jpg",
+          "author": "Explora20",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2023-12-02",
+          "historical": true,
+          "sha256": "e411bb7c6b76a66104a64597a66105244f7ad88ba448f8e4b6cfbf53567bc61d",
+          "assetUrl": "/packages/photos/e411bb7c6b76a66104a64597a66105244f7ad88ba448f8e4b6cfbf53567bc61d.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:2",
+      "name": "LASU Main Auditorium",
+      "slug": "lasu-main-auditorium",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "50d77fbe14d9949c-6828",
+      "photoIds": [
+        "owner:400af6a0-e542-45ca-a76f-c761ab38b4fc",
+        "owner:f4f817e8-8ee9-4870-9838-26c6b28ea1d2"
+      ],
+      "references": [
+        {
+          "id": "owner:400af6a0-e542-45ca-a76f-c761ab38b4fc",
+          "caption": "LASU Main Auditorium(BUBA MARWA HALL)",
+          "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+          "author": "LASU Admission facebook account",
+          "license": "Public domain",
+          "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "efb6c54c9dc54f2ff70fcc1c2e4be7416e87fb0607c6a5fe691d5c9c07fa3bde",
+          "assetUrl": "/packages/photos/efb6c54c9dc54f2ff70fcc1c2e4be7416e87fb0607c6a5fe691d5c9c07fa3bde.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:f4f817e8-8ee9-4870-9838-26c6b28ea1d2",
+          "caption": "LASU Main Auditorium(BUBA MARWA HALL)",
+          "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+          "author": "LASU Admission facebook account",
+          "license": "Public domain",
+          "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2Flasuadmission%2Fphotos%2F462968039196882%2F&ved=0CAMQjB1qFwoTCIC3_NCLhZcDFQAAAAAdAAAAABBq&opi=89978449",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "430e48c06de3d3b8e858c2c953ded9ebd50e2c29f20e811fbeb2f8f9ac3e82e5",
+          "assetUrl": "/packages/photos/430e48c06de3d3b8e858c2c953ded9ebd50e2c29f20e811fbeb2f8f9ac3e82e5.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:55",
+      "name": "LASU Radio",
+      "slug": "lasu-radio",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "bb4e28a4f256a73a-283",
+      "photoIds": [
+        "commons:115996430"
+      ],
+      "references": [
+        {
+          "id": "commons:115996430",
+          "caption": "LASU Radio exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_radio.jpg",
+          "author": "Justjin",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-11",
+          "historical": true,
+          "sha256": "48074f9ebaf007a50457ba458c8acc205356e134607218b1e661ea79d53cc043",
+          "assetUrl": "/packages/photos/48074f9ebaf007a50457ba458c8acc205356e134607218b1e661ea79d53cc043.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:120",
+      "name": "LASU Senate Building",
+      "slug": "lasu-senate-building",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "33d85064508318e0-2548",
+      "photoIds": [
+        "commons:138069484",
+        "commons:198256507",
+        "commons:116073984",
+        "commons:115987634"
+      ],
+      "references": [
+        {
+          "id": "commons:138069484",
+          "caption": "Senate building, front facade",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg",
+          "author": "Aimee.shot.it",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2023-07-07",
+          "historical": true,
+          "sha256": "ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba",
+          "assetUrl": "/packages/photos/ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:198256507",
+          "caption": "Senate building, August 2026",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2026-08-27",
+          "historical": false,
+          "sha256": "2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94",
+          "assetUrl": "/packages/photos/2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:116073984",
+          "caption": "Senate building, right section",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-11",
+          "historical": true,
+          "sha256": "108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7",
+          "assetUrl": "/packages/photos/108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:115987634",
+          "caption": "Senate building, oblique view",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg",
+          "author": "Ebubechukwu1",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-11",
+          "historical": true,
+          "sha256": "9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066",
+          "assetUrl": "/packages/photos/9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:78",
+      "name": "Law Clinic",
+      "slug": "law-clinic",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "f6f8700b5b91095f-5291",
+      "photoIds": [
+        "commons:116180607",
+        "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+        "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465"
+      ],
+      "references": [
+        {
+          "id": "commons:116180607",
+          "caption": "Law Clinic, wider approach view",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-17",
+          "historical": true,
+          "sha256": "47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58",
+          "assetUrl": "/packages/photos/47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+          "caption": "Law Clinic",
+          "sourceUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+          "author": "The Nation",
+          "license": "Public domain",
+          "licenseUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1",
+          "assetUrl": "/packages/photos/2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465",
+          "caption": " Law Clinic",
+          "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d",
+          "assetUrl": "/packages/photos/6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:76",
+      "name": "Law Library",
+      "slug": "law-library",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "4466c4fd25f31849-1506",
+      "photoIds": [
+        "commons:112835955"
+      ],
+      "references": [
+        {
+          "id": "commons:112835955",
+          "caption": "Taslim Olawale Elias Law Library",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-12",
+          "historical": true,
+          "sha256": "c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09",
+          "assetUrl": "/packages/photos/c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:75",
+      "name": "M.B.A",
+      "slug": "m-b-a",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "72749e96ab8724b6-1915",
+      "photoIds": [
+        "commons:113564415",
+        "commons:116026424"
+      ],
+      "references": [
+        {
+          "id": "commons:113564415",
+          "caption": "MBA complex exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-12-22",
+          "historical": true,
+          "sha256": "a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7",
+          "assetUrl": "/packages/photos/a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:116026424",
+          "caption": "MBA complex courtyard approach",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0007.jpg",
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-13",
+          "historical": true,
+          "sha256": "5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9",
+          "assetUrl": "/packages/photos/5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:28",
+      "name": "Makanjuola Lecture Theatre",
+      "slug": "makanjuola-lecture-theatre",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "83b411d2b976ba8c-978",
+      "photoIds": [
+        "owner:abf26605-dd82-479c-9d90-261cca7427da",
+        "owner:157703d4-eac0-43a7-aba5-49670c40241a",
+        "owner:2fc9a21f-f934-4ca5-ae5e-12427ba9f211"
+      ],
+      "references": [
+        {
+          "id": "owner:abf26605-dd82-479c-9d90-261cca7427da",
+          "caption": "500 seater Lecture Theatre of Lagos State University",
+          "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "author": "Patrickwaheed Design Consultancy",
+          "license": "Public domain",
+          "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "7a6bc36d2341d987394166116cc82a49c9e300fc65194b4de1a5511ea665f588",
+          "assetUrl": "/packages/photos/7a6bc36d2341d987394166116cc82a49c9e300fc65194b4de1a5511ea665f588.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:157703d4-eac0-43a7-aba5-49670c40241a",
+          "caption": "500 seater Lecture Theatre of Lagos State University",
+          "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "author": "Patrickwaheed Design Consultancy",
+          "license": "Public domain",
+          "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3",
+          "assetUrl": "/packages/photos/d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:2fc9a21f-f934-4ca5-ae5e-12427ba9f211",
+          "caption": "500 seater Lecture Theatre of Lagos State University",
+          "sourceUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "author": "Photo © PWDC",
+          "license": "Public domain",
+          "licenseUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "fdc6f7789a76575fd45c1aa4aa5bbe52541a48e6c189e38a1f3ac4144238ad76",
+          "assetUrl": "/packages/photos/fdc6f7789a76575fd45c1aa4aa5bbe52541a48e6c189e38a1f3ac4144238ad76.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:22",
+      "name": "Mass Communication",
+      "slug": "mass-communication",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "ee90973eb893c1-1436",
+      "photoIds": [
+        "commons:112540966",
+        "commons:116073666"
+      ],
+      "references": [
+        {
+          "id": "commons:112540966",
+          "caption": "School of Communication exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-15",
+          "historical": true,
+          "sha256": "2e9e5a353edc69d531c7249f76d10d721c73fe3324c19383f06a3dadd8ab0b69",
+          "assetUrl": "/packages/photos/2e9e5a353edc69d531c7249f76d10d721c73fe3324c19383f06a3dadd8ab0b69.webp",
+          "disposition": "verify-commons-metadata"
+        },
+        {
+          "id": "commons:116073666",
+          "caption": "School of Communication facade detail",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:School_of_Communication.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-02-21",
+          "historical": true,
+          "sha256": "45441f76b70faf3f121ddda9739e780faf8fd06464963294fdc87db6696a8d7c",
+          "assetUrl": "/packages/photos/45441f76b70faf3f121ddda9739e780faf8fd06464963294fdc87db6696a8d7c.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:43",
+      "name": "PG School",
+      "slug": "pg-school",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "42afd08f677663d-3868",
+      "photoIds": [
+        "commons:112834702"
+      ],
+      "references": [
+        {
+          "id": "commons:112834702",
+          "caption": "Postgraduate School exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-12",
+          "historical": true,
+          "sha256": "4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b",
+          "assetUrl": "/packages/photos/4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:79",
+      "name": "School Library",
+      "slug": "school-library",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "9a3bd17862b7e3ce-229",
+      "photoIds": [
+        "owner:8f800e74-e5c0-4b0f-9992-58ae705cc6d0"
+      ],
+      "references": [
+        {
+          "id": "owner:8f800e74-e5c0-4b0f-9992-58ae705cc6d0",
+          "caption": "Fatiu Ademola Akesode Library exterior · 2022",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Library_3.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2022-02-21",
+          "historical": true,
+          "sha256": "d934619adb87a8ff06443d95ee210f1e1a29ba3deb1572b8fb51729e621dc6d5",
+          "assetUrl": "/packages/photos/d934619adb87a8ff06443d95ee210f1e1a29ba3deb1572b8fb51729e621dc6d5.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:103",
+      "name": "School Of TransportC",
+      "slug": "school-of-transportc",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "fa1ddecc4f8e07c2-8627",
+      "photoIds": [
+        "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+        "commons:112540904"
+      ],
+      "references": [
+        {
+          "id": "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+          "caption": "School Of Transport",
+          "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323",
+          "assetUrl": "/packages/photos/58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "commons:112540904",
+          "caption": "School of Transport exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2021-11-15",
+          "historical": true,
+          "sha256": "d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7",
+          "assetUrl": "/packages/photos/d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:33",
+      "name": "SDG-PHC FACILITY",
+      "slug": "sdg-phc-facility",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "ec0490f3f86d7df5-3363",
+      "photoIds": [
+        "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+        "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+        "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555"
+      ],
+      "references": [
+        {
+          "id": "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+          "caption": "SDG-PHC FACILITY",
+          "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4",
+          "assetUrl": "/packages/photos/9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+          "caption": "SDG-PHC FACILITY",
+          "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58",
+          "assetUrl": "/packages/photos/fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58.webp",
+          "disposition": "observation-only-pending-rights"
+        },
+        {
+          "id": "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555",
+          "caption": "SDG-PHC FACILITY",
+          "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "author": "LASU",
+          "license": "Public domain",
+          "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+          "capturedAt": null,
+          "historical": false,
+          "sha256": "7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e",
+          "assetUrl": "/packages/photos/7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e.webp",
+          "disposition": "observation-only-pending-rights"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:92",
+      "name": "Sports Center",
+      "slug": "sports-center",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "4b2de680ae28b988-467",
+      "photoIds": [
+        "owner:ddd83d9e-73b0-4d19-9675-c79f83a43580"
+      ],
+      "references": [
+        {
+          "id": "owner:ddd83d9e-73b0-4d19-9675-c79f83a43580",
+          "caption": "Hussam Okoya-Thomas Sports Hall · 2022",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hussam_Okoya-Thomas_Sports_Hall,_LASU_Sports_Centre.jpg",
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "capturedAt": "2022-03-17",
+          "historical": true,
+          "sha256": "cbf806b51a7c876d539e1a29bfbc1a0cc804a36368e920e8707e36df3779f6b6",
+          "assetUrl": "/packages/photos/cbf806b51a7c876d539e1a29bfbc1a0cc804a36368e920e8707e36df3779f6b6.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    },
+    {
+      "id": "arcgis:University_Property:32",
+      "name": "Student Arcade",
+      "slug": "student-arcade",
+      "campus": "lasu",
+      "status": "reference-review",
+      "footprintRevision": "33c7058368b0762d-4117",
+      "photoIds": [
+        "commons:115984120"
+      ],
+      "references": [
+        {
+          "id": "commons:115984120",
+          "caption": "Students’ Arcade exterior",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+          "author": "Shedyflowz",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "capturedAt": "2022-03-11",
+          "historical": true,
+          "sha256": "dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010",
+          "assetUrl": "/packages/photos/dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010.webp",
+          "disposition": "verify-commons-metadata"
+        }
+      ],
+      "uncertainty": [
+        "Photo-to-elevation orientation and unseen elevations require evidence review.",
+        "Source dimensions are not a field survey."
+      ]
+    }
+  ]
+}

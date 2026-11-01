@@ -1,0 +1,1193 @@
+{
+  "version": 1,
+  "baseline": "lasu-41ec73876464",
+  "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+  "confirmation": "User confirmed the published release is current on 2026-11-01.",
+  "records": [
+    {
+      "buildingId": "arcgis:University_Property:47",
+      "name": "C.P.S",
+      "appearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "footprintSha256": "3dfc919fde8b01e5e3f43a97d871ce0633a113b89105a23d11bb4a8aa2e24ba2",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          1,
+          2
+        ],
+        "estimated": [
+          "The photograph does not establish every block's entrance or rear elevation.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:44",
+      "name": "Department of Theartre Arts and Music",
+      "appearanceSha256": "9e966ce8c1e30a8317cf78d502496ad4eb99d13e115bd67cd9706de09c039ef4",
+      "footprintSha256": "8f45af4dae004e3160c137c86da051f9b71c2043f7b7ffe2587df23cf96d2c18",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "Exact arcade bay spacing and rear elevation are estimated.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:25",
+      "name": "Faculty of Art Language Lab",
+      "appearanceSha256": "1ab6e3fc21c5709410c1c8112c74c86872cebbf2195a63a382ab7904fae0bb74",
+      "footprintSha256": "4eae467f312d6b705f002e6efcd2079d01957c082d9d96173c9d6453acc963b4",
+      "authoredRoofs": [
+        "arcgis:University_Property:25:wing:0"
+      ],
+      "roofTreatment": "Existing native roof triangulation is retained in SolidCraft, with estimated eaves raised to the proposal wall height.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          0
+        ],
+        "estimated": [
+          "The existing custom roof needs comparison against the observed roof before replacement.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:54",
+      "name": "Faculty Of Education 3 In 1",
+      "appearanceSha256": "b5dce0a517d3cdd18b915679a4b6f0907bd47e5d9f7ce156635d682ad0f6c8cd",
+      "footprintSha256": "a814fa0c1377dba7d096210255c23102ba946a40d0251de0be030465d8e91b98",
+      "authoredRoofs": [
+        "arcgis:University_Property:54:wing:0"
+      ],
+      "roofTreatment": "Existing native roof triangulation is retained in SolidCraft, with estimated eaves raised to the proposal wall height.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          1
+        ],
+        "estimated": [
+          "Two mapped courtyards and unseen roof junctions need conservative treatment.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+          "Courtyard walkway modules are extended conservatively around both mapped courts; the dated photograph does not identify which mapped court was photographed."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:39",
+      "name": "FMS",
+      "appearanceSha256": "db4c5d0f6d56daf236db2a82b5bf71b9094156aebb3193247a05a68240f87cdc",
+      "footprintSha256": "b00a6638cd6bc7f700ba61ea6c193d844891040b59e3cabd553292a9e52481d0",
+      "authoredRoofs": [
+        "arcgis:University_Property:39:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "The source filename suggests another faculty; identification follows the visible FMS signage, not the filename.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:31",
+      "name": "ICT",
+      "appearanceSha256": "dcdc3d9d946064669679995c99eacaa1a64b59d0293f420354f7640a16580428",
+      "footprintSha256": "2f83cfb688231e85699b8b24713f1855b923e31eddd69e25fb5feea36fe726df",
+      "authoredRoofs": [
+        "arcgis:University_Property:31:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:31:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          0
+        ],
+        "estimated": [
+          "Roof and obscured elevations are not established by the available photograph.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:11",
+      "name": "LASU  Clinic",
+      "appearanceSha256": "8f169ec06c5ec4854bba06f10264965e273c06c542299b3735fa0d44f490b787",
+      "footprintSha256": "7a3ab347965123628624c597adfb160b65b618117fa2733a0ba1cd5d3525bd90",
+      "authoredRoofs": [
+        "arcgis:University_Property:11:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": null,
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:73",
+      "name": "LASU CBT",
+      "appearanceSha256": "124e7c2667e8d2331fa8bbd95069e38a3f1dbc68754adcbd395817f30d2057ec",
+      "footprintSha256": "c0de33ffa12c4d8b70d2c18b1c0cd5a7c48e75b91f289b64fdb94600120211d1",
+      "authoredRoofs": [
+        "arcgis:University_Property:73:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:0",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:1",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:2",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:3",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:4",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:5",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": [
+            {
+              "id": "689e739f-6cda-4129-95ba-4693852bc511",
+              "kind": "door",
+              "x": 0.5,
+              "bottom": 0,
+              "width": 11.037237914037888,
+              "height": 3.8
+            },
+            {
+              "id": "39dc3766-2b4d-471d-b997-cec810e07d03",
+              "kind": "text",
+              "text": "C.B.T. Center",
+              "x": 0.4993847568518017,
+              "bottom": 4.4,
+              "width": 2.5529284355284165,
+              "height": 0.36000000000000076
+            },
+            {
+              "id": "f1e519bf-fcd1-4325-a3ac-9f784224925b",
+              "kind": "text",
+              "text": "LASU",
+              "x": 0.4993847568518017,
+              "bottom": 4,
+              "width": 1.9686189570189452,
+              "height": 0.28000000000000025
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:6",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:73:wall:0:0:7",
+          "photoIds": [
+            "owner:b4086f16-2907-435d-82ec-bed122723989"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          5
+        ],
+        "estimated": [
+          "One visible hall level conflicts with the legacy two-floor estimate; the interior photograph does not resolve exterior storeys.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "Entrance follows the published authored facade on outer wall 5; this preserves editor alignment, not a surveyed orientation."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:3",
+      "name": "LASU International Library",
+      "appearanceSha256": "02b7884512e7653b6b5e47b3bd158a3f30fe2c634dfe18220364d67b8537b2ac",
+      "footprintSha256": "4290f400ca0b0779d4c63631ac8d277d686caa44c8e8362059622a0e994081b5",
+      "authoredRoofs": [
+        "arcgis:University_Property:3:wing:0"
+      ],
+      "roofTreatment": "Dated aerial evidence replaces the illustrative flat cap only in the proposal.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:3:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:3:wall:0:0:10",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:3:wall:0:0:31",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          31
+        ],
+        "estimated": [
+          "The existing 20 m height is retained; dimensions and exact photographed facade orientation are estimates.",
+          "Unseen wing elevations use restrained repetitions of the observed material language.",
+          "Roof panel extents, ridges and the central atrium roof height are estimated from the October 2025 aerial; the geographic courtyard polygon remains unchanged. No newer aerial has been established.",
+          "The red core cap, broadened wing panels and comparison-camera bearing approximate the aerial view; exact roof panel junctions remain unresolved."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:2",
+      "name": "LASU Main Auditorium",
+      "appearanceSha256": "f3595d89a2068f29376aee24397440f0d54cbc5651e661cc3da1a0ed3b2473e8",
+      "footprintSha256": "c7bde0aba42336fa72fa92402e3dd4742cc42b2748a29fb334a3ec0372506d6b",
+      "authoredRoofs": [
+        "arcgis:University_Property:2:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:12",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:13",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:14",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:15",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:16",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "a8831525-5926-4ef5-b60b-9894b6779911",
+              "kind": "door",
+              "x": 0.5002158075245994,
+              "bottom": 0,
+              "width": 4.472476287318097,
+              "height": 1.8
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:17",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:18",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:2:wall:0:0:19",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          16
+        ],
+        "estimated": [
+          "The remaining exterior is small; roof junctions and exact storeys remain uncertain.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "Entrance follows the published authored facade on outer wall 16; this preserves editor alignment, not a surveyed orientation.",
+          "Three visible opening bands are modeled with a 9 m estimated envelope. They do not establish three occupied auditorium floors."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:55",
+      "name": "LASU Radio",
+      "appearanceSha256": "276b356074acd5d4281423fb31f384f6ba2a3294d9360ba4aa4c396060c2d168",
+      "footprintSha256": "78ec05bccbdc584292eed7238ff2f15cebff09df3cb6d9a7fa37bfb95c748985",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "Only one level is visible; the legacy two-floor estimate remains unresolved.",
+          "The separate mast has no confirmed anchor and must not be placed arbitrarily.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The proposal uses an estimated 4.2 m single-level envelope from facade proportions; the published 6 m estimate remains unchanged in geographic data."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:120",
+      "name": "LASU Senate Building",
+      "appearanceSha256": "fdc406eb33c31924859f5b72033f8261bd3f05da9cc8d76cb4b6547ae2099e42",
+      "footprintSha256": "c0098e5559488f3dce6e8d52d8a0d813b9912e11a82c9c204b281052e6238d8a",
+      "authoredRoofs": [
+        "arcgis:University_Property:120:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:120:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:120:wall:0:0:2",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:120:wall:0:0:3",
+          "photoIds": [
+            "commons:138069484",
+            "commons:116073984"
+          ],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "Metric heights retain the existing 21 m main-wing estimate.",
+          "Front follows the existing photo-associated south facade; other elevation assignments and module dimensions remain inferred.",
+          "The separate octagonal auxiliary wing retains its existing 6 m height and conservative appearance."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:78",
+      "name": "Law Clinic",
+      "appearanceSha256": "1fbd57bc98c58876bfae50fed75cdae3ffd34c77a60f10869b6120a0c76735f1",
+      "footprintSha256": "032a86a58f85eece42bad28c5feeb95b4331ace146162b7c7417f17dad123ec2",
+      "authoredRoofs": [
+        "arcgis:University_Property:78:wing:0",
+        "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wing:0"
+      ],
+      "roofTreatment": "Existing native roof triangulation is retained in SolidCraft, with estimated eaves raised to the proposal wall height.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:78:wall:0:0:4",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "7c799ef1-9564-4b40-8535-82a15259d807",
+              "kind": "door",
+              "x": 0.8172884934863223,
+              "bottom": 0,
+              "width": 1.5,
+              "height": 2
+            }
+          ]
+        },
+        {
+          "wallId": "bff5bd07-b9d7-4e11-a8a8-1bc12e323c9f:wall:0:0:4",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "f07cf619-4acf-4a3b-84e7-8e1a9ed638f3",
+              "kind": "door",
+              "x": 0.1984214084349658,
+              "bottom": 0,
+              "width": 1.5,
+              "height": 2
+            }
+          ]
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          4
+        ],
+        "fronts": [
+          [
+            0,
+            4
+          ],
+          [
+            1,
+            4
+          ]
+        ],
+        "doors": [
+          {
+            "part": 0,
+            "edge": 4,
+            "x": 0.8172884934863223,
+            "width": 1500,
+            "height": 2000
+          },
+          {
+            "part": 1,
+            "edge": 4,
+            "x": 0.1984214084349658,
+            "width": 1500,
+            "height": 2000
+          }
+        ],
+        "estimated": [
+          "The dark-clad undated photograph conflicts with dated cream exteriors; retain the dated interpretation pending chronology evidence.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+          "Side entrances retain the two published authored wall-4 door positions; courtyard galleries are interpreted from the dated cream exterior.",
+          "Cream glass-block entrance towers use the dated March 2022 view. Their small gable profiles and gallery depths are estimated within the retained mapped wings."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:76",
+      "name": "Law Library",
+      "appearanceSha256": "cc88f2de335cdee5215c42e26effd9de2ab4684926cadef77f891b46515d35f6",
+      "footprintSha256": "4c495640909d79cf1e8b4eabc893632072c6c2027809d34a6fc35e1a962dfd2d",
+      "authoredRoofs": [
+        "arcgis:University_Property:76:wing:0"
+      ],
+      "roofTreatment": "Existing native roof triangulation is retained in SolidCraft, with estimated eaves raised to the proposal wall height.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:76:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:76:wall:0:0:3",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "The existing hip-roof shape is illustrative and is not confirmed by the ground-level view.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:75",
+      "name": "M.B.A",
+      "appearanceSha256": "3077815945daa9130c44f585e185def6373c9bc9dc47f4caab9afcd96726ae67",
+      "footprintSha256": "c039b23ed5f537685121c8b79f5b4630417b3aae8c376ba5a39ed51ddd834d93",
+      "authoredRoofs": [
+        "arcgis:University_Property:75:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          4
+        ],
+        "estimated": [
+          "Trees obscure the roof and some windows; unseen elevations remain estimates.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:28",
+      "name": "Makanjuola Lecture Theatre",
+      "appearanceSha256": "6952cca7fd22cdf0566c2e095b9f672e7e3e3346ebdf43f3683851f8bef2523d",
+      "footprintSha256": "2d1763ac5eeef151e1c88735633404dab6ddda8c71b01ab6336af29b3d43365d",
+      "authoredRoofs": [
+        "arcgis:University_Property:28:wing:0"
+      ],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:28:wall:0:0:0",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:28:wall:0:0:1",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:28:wall:0:0:2",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "7a4435a3-96c5-450b-821b-ae1b15e6ef90",
+              "kind": "door",
+              "x": 0.08270674200390635,
+              "bottom": 0,
+              "width": 5,
+              "height": 2
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:28:wall:0:0:3",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "a17a29ac-f70a-4203-adde-6a2a3250e6c4",
+              "kind": "door",
+              "x": 0.5882983798568204,
+              "bottom": 0,
+              "width": 5.064379895486186,
+              "height": 1.8
+            }
+          ]
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          2
+        ],
+        "estimated": [
+          "The existing 12 m height is retained; slot dimensions and geographic elevation assignments remain estimated.",
+          "Architect photographs are observation-only until explicit reuse rights are established; no photograph is used as a texture.",
+          "The freestanding sign and paving are excluded until their geographic placement is supported.",
+          "Four screen-opening rows do not establish four occupied storeys.",
+          "Portal centres and widths follow the two published authored entrance positions on walls 2 and 3; portal height and blue lining remain reconstructed estimates."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:22",
+      "name": "Mass Communication",
+      "appearanceSha256": "a12e4321e3966338316093aefc3a5b28c0622cecf7fd36ce7258ae58583e0692",
+      "footprintSha256": "6c8d9210d26d753dad1236e1a5294fe7a6c3e572b81637f87c39f1b89d3a9442",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:22:wall:0:0:2",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:22:wall:0:0:3",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          2
+        ],
+        "estimated": [
+          "Do not invent weathering or air-conditioning locations on unseen elevations.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:43",
+      "name": "PG School",
+      "appearanceSha256": "c5cc99b2b331016b49e3e6c1341af474795f9a151fe6a7903fd0e5ba77403059",
+      "footprintSha256": "e7303d1c8c2dd966a0ceae73713a3ef80b18b525505ad1411fd5191117290559",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": {
+        "front": [
+          0,
+          20
+        ],
+        "estimated": [
+          "The tower's location on the mapped polygon is not yet established.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The distinctive rounded tower and triangular entrance are reconstructed on an explicitly tentative front. Their anchor remains unresolved and requires comparison review before publication.",
+          "The relative tower/triangular-panel arrangement follows the photograph; its geographic facade assignment remains estimated."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:79",
+      "name": "School Library",
+      "appearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "footprintSha256": "274e80d8411f46c3a567694b20132ce39bd3545567cca9aaf6a182ad0a114120",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": null,
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:103",
+      "name": "School Of TransportC",
+      "appearanceSha256": "221db34891a27d6d4afa7a6f04528fac292b3479c6115e600243b563a12c4b55",
+      "footprintSha256": "ae1c5d1c2d73f8bd4736175702dd78cbf0e33a6297f63923833cb32a6b6b3889",
+      "authoredRoofs": [
+        "arcgis:University_Property:103:wing:0"
+      ],
+      "roofTreatment": "Existing native roof triangulation is retained in SolidCraft, with estimated eaves raised to the proposal wall height.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:103:wall:0:0:18",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:103:wall:0:0:19",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "8dcc944f-9855-4c11-8a2c-29f06904162b",
+              "kind": "door",
+              "x": 0.5042003636088744,
+              "bottom": 0,
+              "width": 5.126702282380675,
+              "height": 1.9
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:103:wall:0:0:20",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          19
+        ],
+        "estimated": [
+          "Observed floor count conflicts with the legacy three-floor, 9 m estimate.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+          "Wall height is an estimated 12 m for four observed levels, replacing the three-level 9 m visual only in this proposal.",
+          "Entrance follows the published authored facade on outer wall 19; this preserves editor alignment, not a surveyed orientation."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:33",
+      "name": "SDG-PHC FACILITY",
+      "appearanceSha256": "538c6a1f4f15725fb33f95cc5fedb10b4b6a05a46cd32fefec963b86e1aa8e6b",
+      "footprintSha256": "faa72eb9fb9ad941939d4806c1279d8946f0aa55d4c1f062f634eaeee9c02a83",
+      "authoredRoofs": [
+        "arcgis:University_Property:33:wing:0"
+      ],
+      "roofTreatment": "Observed gable is reconstructed over the existing footprint; ridge dimensions remain estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:33:wall:0:0:1",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:33:wall:0:0:3",
+          "photoIds": [
+            "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555"
+          ],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": [
+            {
+              "id": "c2d03cb1-eda0-4706-998a-91a22e352a2d",
+              "kind": "door",
+              "x": 0.49649383089088617,
+              "bottom": 0,
+              "width": 7.093521923417014,
+              "height": 3.7
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:33:wall:0:0:5",
+          "photoIds": [],
+          "hasTextureCrop": false,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          3
+        ],
+        "estimated": [
+          "Strong colour grading in one photograph makes its palette unreliable; compare the second view.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "Entrance follows the published authored facade on outer wall 3; this preserves editor alignment, not a surveyed orientation."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:92",
+      "name": "Sports Center",
+      "appearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "footprintSha256": "2949d64d530c199037c573ee84bb13936b227edbf8450614fa6d28560a5a0ba3",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [],
+      "proposalEntrance": null,
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    },
+    {
+      "buildingId": "arcgis:University_Property:32",
+      "name": "Student Arcade",
+      "appearanceSha256": "c673524bf75877caf9eac202a592bcb6d47a1e2719a081790ab29bedc574f538",
+      "footprintSha256": "6e798a7ad9a38c97b229deb15a244cabab6f41ed103ab3ebc0d7e3f87c33200c",
+      "authoredRoofs": [],
+      "roofTreatment": "Published source appearance remains in the baseline; proposal roof is separately estimated.",
+      "authoredFacades": [
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:0",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:1",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:2",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:3",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:4",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:5",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:6",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:7",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:8",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:9",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:10",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:11",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:12",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:13",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:14",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:15",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:16",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:17",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:18",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:19",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:20",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:21",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:22",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:23",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:24",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:25",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": [
+            {
+              "id": "09748fa6-ae0d-45d0-be5c-72e256905445",
+              "kind": "door",
+              "x": 0.5106133357443023,
+              "bottom": 0,
+              "width": 5.246981127098504,
+              "height": 4.1
+            },
+            {
+              "id": "4468eb6b-5cff-4307-888f-3e2000dbecef",
+              "kind": "text",
+              "text": "LAGOS STATE UNIVERSITY",
+              "x": 0.5,
+              "bottom": 10,
+              "width": 4,
+              "height": 1
+            },
+            {
+              "id": "20022cbf-cfea-49ce-a6b1-5e46202fbd69",
+              "kind": "text",
+              "text": "STUDENT ARCADE",
+              "x": 0.5,
+              "bottom": 9.3,
+              "width": 4,
+              "height": 1
+            }
+          ]
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:26",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:27",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:28",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:29",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:30",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        },
+        {
+          "wallId": "arcgis:University_Property:32:wall:0:0:31",
+          "photoIds": [
+            "commons:115984120"
+          ],
+          "hasTextureCrop": true,
+          "entrancesAndSigns": []
+        }
+      ],
+      "proposalEntrance": {
+        "front": [
+          0,
+          25
+        ],
+        "estimated": [
+          "Exact motif geometry and facade-to-footprint orientation need further evidence.",
+          "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+          "Entrance follows the published authored facade on outer wall 25; this preserves editor alignment, not a surveyed orientation.",
+          "Front curtain walls bridge the mouths of the two mapped slots, as seen in the dated exterior; geographic footprint coordinates remain unchanged and the infill alignment needs review."
+        ]
+      },
+      "texturePolicy": "Published crops remain in the immutable baseline. New photographic textures require a reuse-verified audit entry and a named source crop.",
+      "geography": "Original footprints, routing and destinations remain unchanged; bundle.mts verifies this before writing a private integration fixture."
+    }
+  ]
+}
