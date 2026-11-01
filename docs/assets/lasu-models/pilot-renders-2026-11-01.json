@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-11-01T08:45:31.007Z",
+  "scope": "Unaltered TurnRight renders of three SolidCraft exterior proposals; estimated dimensions and unseen elevations, not independent approval or publication.",
+  "records": [
+    {
+      "file": "senate-proposal-2026-11-01.png",
+      "building": "lasu-senate-building",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "sha256": "aea7682b0c093d2a3211e30d1227b007330275b22a2a768521903ad5c6763d07",
+      "sourceDocumentSha256": "2c73c2d7cab958d15ebcf6423a40d4862a6f2593b4fa2063acb178ab38b4807b",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "credits": "LASU Senate Building\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nAimee.shot.it\nhttps://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg\nCC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0\nModifications: Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.\nDerivative texture retains the source share-alike licence when applicable.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release."
+    },
+    {
+      "file": "international-library-proposal-2026-11-01.png",
+      "building": "lasu-international-library",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "sha256": "c530072b52f882cfce3017086e58ec810a73b51818d423c73b134242e2b34d5d",
+      "sourceDocumentSha256": "dbe0895cc0130bb9da240ed57d20f6d2d2feb2e0773b89359eb99c4352e3413f",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "credits": "LASU International Library\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nFrankvEck\nhttps://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg\nCC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0\nModifications: Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.\nDerivative texture retains the source share-alike licence when applicable.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release."
+    },
+    {
+      "file": "makanjuola-theatre-proposal-2026-11-01.png",
+      "building": "makanjuola-lecture-theatre",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "sha256": "389542671a6a39a43a1a78cc52abcf429c494941efd7dd3ec986cd90171f2669",
+      "sourceDocumentSha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "credits": "Makanjuola Lecture Theatre\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nNo source photograph is embedded. Surface grain is original, deterministic material data.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release."
+    }
+  ]
+}
