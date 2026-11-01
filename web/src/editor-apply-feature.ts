@@ -102,6 +102,13 @@ export function applyBuildingEdit(
         appearance: props.appearance || original?.properties?.appearance,
         buildingTopology:
           props.buildingTopology || original?.properties?.buildingTopology,
+        modelDocument:
+          props.modelDocument ?? original?.properties?.modelDocument,
+        modelDocumentAsset:
+          props.modelDocumentAsset ?? original?.properties?.modelDocumentAsset,
+        reviewedModelRevision:
+          props.reviewedModelRevision ??
+          original?.properties?.reviewedModelRevision,
         heightEstimated:
           props.heightMode === 'floors' || !!props.heightEstimated,
         source: 'campus-review',

@@ -5,6 +5,7 @@ import type { Dataset, FieldValue } from '../src/gis-types.js';
 import { schemaErrors, valueErrors } from '../src/gis-contracts.js';
 import { gisStyle } from '../src/gis-style.js';
 import { HttpError } from './backend.js';
+import { publicCampus } from './public-campus.js';
 export interface GisSnapshot {
   features: (SourceRecord & {
     private_attributes?: Record<string, FieldValue>;
@@ -183,9 +184,12 @@ export function publicationInputs(snapshot: GisSnapshot) {
         },
         places: data.places.map((p) => decorate(p, 'place')),
       };
+      // Hydrated editable sources stay available to the visual compiler. Only
+      // the exact sanitized navigation payload counts against the public bound.
+      const publicOutput = publicCampus(output);
       if (
         output.map.features.length > 20000 ||
-        Buffer.byteLength(JSON.stringify(output)) > 25_000_000
+        Buffer.byteLength(JSON.stringify(publicOutput)) > 25_000_000
       )
         throw new HttpError(
           413,

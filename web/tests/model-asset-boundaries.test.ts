@@ -10,6 +10,15 @@ import {
 import { newModelDocument, type ModelDocument } from '../src/model-document';
 import type { MapEdit } from '../src/types';
 import { withCampusId } from '../server/campus-scope';
+import {
+  publishedRecords,
+  validateReleaseSnapshot,
+} from '../server/release-validation';
+import { publicCampus } from '../../scripts/public-campus.mjs';
+import { modelDocumentRevision } from '../src/model-document-revision';
+import { compileModelDocument } from '../src/model-document-compiler';
+import { campusFixture } from './fixture';
+import { detailFixture } from './model-detail-fixture';
 
 const id = 'b42efb5a-b4d3-43c0-9e41-732aca364f84';
 let document: ModelDocument, bytes: Buffer;
@@ -170,6 +179,65 @@ it('deduplicates a concurrent upload and never overwrites a ready asset', async 
   expect(calls.some((c) => c.url.pathname.startsWith('/storage/v1/'))).toBe(
     false,
   );
+});
+
+it('carries a newly hydrated building through release decoration and detail compilation', async () => {
+  const fixture = detailFixture(),
+    data = campusFixture();
+  document = fixture.document;
+  row.status = 'ready';
+  encode();
+  const edit: MapEdit = {
+    id: fixture.visual.id,
+    kind: 'building',
+    geometry: fixture.feature.geometry,
+    properties: {
+      name: 'New detailed building',
+      height: 6,
+      heightMode: 'metres',
+      modelDocumentAsset: reference(),
+      reviewedModelRevision: modelDocumentRevision(document),
+    },
+  };
+  const edits = await hydrateModelEdits([edit], 'owner');
+  const output = validateReleaseSnapshot(
+    { features: publishedRecords(data), edits },
+    data,
+  );
+  const feature = output.map.features.find(
+    (f) => f.properties?.id === edit.id,
+  )!;
+  const retained = feature.properties!.modelDocument as ModelDocument;
+  expect(modelDocumentRevision(retained)).toBe(
+    edit.properties.reviewedModelRevision,
+  );
+  expect(feature.properties!.modelDocumentAsset).toEqual(reference());
+  expect(feature.properties!.reviewedModelRevision).toBe(
+    edit.properties.reviewedModelRevision,
+  );
+  expect(
+    compileModelDocument(retained, retained.origin).reduce(
+      (n, mesh) => n + mesh.indices.length / 3,
+      0,
+    ),
+  ).toBe(36);
+  const metadataOnly = {
+    ...edit,
+    properties: { name: 'Renamed', height: 6, heightMode: 'metres' },
+  };
+  const unchanged = validateReleaseSnapshot(
+    { features: publishedRecords(output), edits: [metadataOnly] },
+    data,
+  );
+  expect(unchanged.map.features[0].properties!.modelDocument).toEqual(retained);
+  expect(unchanged.map.features[0].properties!.modelDocumentAsset).toEqual(
+    reference(),
+  );
+  const published = publicCampus(output).map.features[0].properties!;
+  expect(published.modelDocument).toBeUndefined();
+  expect(published.modelDocumentAsset).toBeUndefined();
+  expect(published.authoredModelRevision).toBe(modelDocumentRevision(document));
+  expect(edit.properties.modelDocument).toBeUndefined();
 });
 
 it('rejects invalid references, quota overflow, digest conflicts and unavailable storage', async () => {
