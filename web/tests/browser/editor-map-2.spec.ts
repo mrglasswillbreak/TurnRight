@@ -3,7 +3,7 @@ import { test, expect } from './coverage-fixture';
 import { browserRecovery, setup } from './editor-fixture';
 import {
   attachMap,
-  position,
+  waitForMapLayout,
   clickMap,
   focusCampus,
 } from './editor-map-helpers';
@@ -152,8 +152,19 @@ test('edits a path vertex in 3D with undo and redo across autosave', async ({
   const original = structuredClone(
     server.edits().find((e) => e.kind === 'path')!.geometry,
   );
-  const from = await position(page, [3.2006, 6.4601]),
-    to = await position(page, [3.20065, 6.46012]);
+  await waitForMapLayout(page);
+  // Finishing opens Properties; both points must use its settled map transform.
+  const [from, to] = await page.evaluate(() => {
+    const map = window.editorTestMap,
+      rect = map.getCanvas().getBoundingClientRect();
+    return [
+      [3.2006, 6.4601],
+      [3.20065, 6.46012],
+    ].map(([lng, lat]) => {
+      const point = map.project([lng, lat]);
+      return { x: rect.left + point.x, y: rect.top + point.y };
+    });
+  });
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps: 10 });

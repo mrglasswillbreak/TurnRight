@@ -1,0 +1,45 @@
+{
+  "createdAt": "2026-11-01T10:08:47.222081+00:00",
+  "scope": "Unaltered model-only renders for the current publication proposals; no independent approval or publication asserted. Historical PNGs and pilot manifest retained unchanged.",
+  "fixture": "lasu-model-campaign-81395b5c763616e0",
+  "records": [
+    {
+      "file": "senate-publication-proposal-2026-11-01.png",
+      "building": "lasu-senate-building",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "bytes": 1844519,
+      "sha256": "f7be1e805f0f8efb7af03f2fd5f6c9990a5443e1f7a741eb14d4c014b0254803",
+      "sourceDocumentSha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "maxCompactionPositionErrorMetres": 8.265114618639037e-7,
+      "credits": "LASU Senate Building\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nAimee.shot.it\nhttps://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg\nCC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0\nModifications: Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.\nDerivative texture retains the source share-alike licence when applicable.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release."
+    },
+    {
+      "file": "international-library-publication-proposal-2026-11-01.png",
+      "building": "lasu-international-library",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "bytes": 1193433,
+      "sha256": "f02fe6457687d71fcf192c4558d83faa4c872d6d1de284a98974a82094eefba6",
+      "sourceDocumentSha256": "44390ef8e26d78f1a1ffe99b3a3e1666770d3c7e73502e99dd5efc06be51b5c2",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "maxCompactionPositionErrorMetres": 7.40627247795109e-7,
+      "credits": "LASU International Library\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nFrankvEck\nhttps://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg\nCC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0\nModifications: Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.\nDerivative texture retains the source share-alike licence when applicable.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release."
+    },
+    {
+      "file": "makanjuola-theatre-proposal-2026-11-01.png",
+      "building": "makanjuola-lecture-theatre",
+      "width": 2400,
+      "height": 1800,
+      "view": "reference-front",
+      "sha256": "389542671a6a39a43a1a78cc52abcf429c494941efd7dd3ec986cd90171f2669",
+      "sourceDocumentSha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "credits": "Makanjuola Lecture Theatre\n\nPhotographic derivatives embedded in model.glb, the editable TurnRight model and map textures:\nNo source photograph is embedded. Surface grain is original, deterministic material data.\n\nSource photographs and comparison sheets are private observational evidence. Their individual reuse status is recorded in evidence.json. Do not redistribute observation-only photographs.\n\nArchitectural dimensions and unseen details remain estimates. These files are review proposals, not surveyed geometry or an approved public release.",
+      "reusedUnchangedFrom": "pilot-renders-2026-11-01.json"
+    }
+  ]
+}

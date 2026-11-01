@@ -23,6 +23,7 @@ import { createBuildingModel, footprintAssessment } from './building-model';
 import { repairArcGisParts } from '../src/arcgis-rings';
 import { detailRevision } from '../src/building-facades';
 import { buildFacadeTextures } from './build-facade-textures';
+import { buildDetailedModel } from './build-detailed-models';
 
 const input = process.argv[2] || '../data/seed/campus.json';
 const output = process.argv[3] || '../data/visuals';
@@ -278,7 +279,27 @@ for (const sourceFeature of buildings) {
     visual.sectorId = sectorId;
     if (!sectors.has(sectorId))
       sectors.set(sectorId, { schemaVersion: 1, id: sectorId, models: [] });
-    const model = createBuildingModel(feature, visual);
+    const detailed = await buildDetailedModel(
+      feature,
+      visual,
+      output,
+      data.photos,
+    );
+    if (detailed) (catalogue.detailedModels ||= []).push(detailed);
+    const model = createBuildingModel(
+      detailed
+        ? {
+            ...feature,
+            properties: { ...feature.properties, modelDocument: undefined },
+          }
+        : feature,
+      visual,
+      {},
+    );
+    // Legacy readers receive compact coloured massing. Full textures belong to the detail group.
+    if (detailed)
+      for (const mesh of model.meshes)
+        if (mesh.material) mesh.material.maps = {};
     if (!validBuildingModel(model))
       throw new Error(
         `${visual.name}: generated model failed integrity or mesh budget validation.`,

@@ -46,7 +46,7 @@ Start with the campus map or open **Choose a campus** to explore the globe. Sele
 
 Preview walking or driving routes from a selected origin. Foreground GPS, route instructions, spoken guidance, and deviation handling support a journey over the mapped network. Driving includes mapped vehicle restrictions, parking, and a walking handoff where available.
 
-Download each campus from **Offline** and wait for **Ready offline** before disconnecting. For an existing download, choose **Download update** after a campus release. Verified packages retain the map, search, routing, and recorded guidance; photo/model assets follow the package's download controls and verification. Updates preserve the active journey and the preceding valid package until a replacement is ready.
+Download each campus from **Offline** and wait for **Ready offline** before disconnecting. For an existing download, choose **Download update** after a campus release. Verified packages retain the map, search, routing, recorded guidance, and every published model detail level and texture. Updates preserve the active journey and the preceding valid package until a replacement is ready.
 
 | Place details on a phone                                                                                                                          | Offline preparation                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -73,6 +73,16 @@ The authenticated editor organizes work as **Data → Edit → Analyze → Revie
 ### Buildings, photographs, and field evidence
 
 The model workspace supports footprints, walls, roofs, façades, surface lettering, curves, mesh components, and photographic references. Supported static geometry and appearance can pass through GLB/glTF, OBJ, and STL; native parameters, review history, and recovery remain in TurnRight. Native surface editing has a 2D fallback; mesh editing requires WebGL.
+
+Imported mesh faces support planar photograph projection with crop preview, apply/cancel, source credits and undo. Structural, facade and fine-detail classifications produce three map variants, while GLB export and seven building views provide portable review material. Detailed models stream with bounded memory; campus downloads include every published detail level and texture before reporting **Ready offline**. The existing 12 MiB base-visual limit remains unchanged.
+
+The [LASU Ojo SolidCraft campaign](docs/LASU-MODELS.md) preserves the current 614-building release as its baseline. Its first batch contains 20 exterior model proposals with native masters, editable models, portable exports and photographic comparisons. The current offline fixture is 42.8 MiB; all editable sources fit the unchanged 25 MiB document limit. Three photo-linked buildings and four further researched buildings remain identification gaps. The owner has authorized publication through the [guarded model import and review workflow](docs/MODEL-CAMPAIGN-PUBLICATION.md), but these proposals have not yet been applied or released. A software release does not publish map models or establish independent architectural acceptance.
+
+| Photographic mesh finishing                                                                                                           | GLB and building renders                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| ![Crop preview and apply/cancel for one selected synthetic mesh face](docs/assets/screenshots/tour-mesh-photo-preview-2026-11-01.png) | ![Prepared GLB and PNG downloads in the model workspace](docs/assets/screenshots/tour-building-render-export-2026-11-01.png) |
+
+These are direct local captures using synthetic geometry and an attributed School of Communication photograph. [Fixture, photo credit and capture hashes](docs/SCREENSHOTS.md#model-finishing-and-export--1-november-2026).
 
 Photographs can be cropped, adjusted, redacted, resized, compressed, compared, and reordered locally before upload. Attribution, approval, private drafts, upload recovery, and arrival guides stay connected to campus work. Private walking surveys collect path and entrance evidence for review.
 

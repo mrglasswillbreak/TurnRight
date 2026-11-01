@@ -2,6 +2,7 @@
 export type Vec3 = [number, number, number];
 
 export type Vec2 = [number, number];
+export type ModelDetailTier = 'structure' | 'facade' | 'fine';
 
 export interface ModelCorner {
   vertex: string;
@@ -57,6 +58,12 @@ export interface ModelImage {
   mime: 'image/png' | 'image/jpeg' | 'image/webp';
   /** Normalized image bytes; the publisher extracts them into verified package assets. */
   data: string;
+  /** Photographic derivation stays attached to the immutable editable source. */
+  evidence?: {
+    photoId: string;
+    corners: [number, number][];
+    modifications: string;
+  };
 }
 
 export type ModelCurveSegment =
@@ -74,6 +81,8 @@ export interface ModelCurve {
 export interface ModelObject {
   id: string;
   name: string;
+  /** Omitted on older documents: structural geometry is retained at every distance. */
+  detailTier?: ModelDetailTier;
   parentId?: string;
   hidden: boolean;
   locked: boolean;

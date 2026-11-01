@@ -20,6 +20,8 @@ Search places or streets and browse available categories. Select a result or map
 
 Use 2D/3D, zoom, orientation, appearance, and rendering controls to suit the device. Unknown building heights are illustrative; floor-derived dimensions and authored models are not measured access evidence. **Settings → Appearance** supports Device, Light, and Dark. Motion preferences and reduced-motion behavior are described in [Motion](MOTION.md).
 
+When a campus release contains detailed exterior models, the 3D map loads buildings as they come into view and gives the selected building priority. Detail changes with screen size and available rendering capacity; the base model remains visible while a detailed model loads or if its files are unavailable. Authored material colours are preserved in Light and Dark appearance. Detailed geometry does not change the building's geographic footprint or establish a usable entrance. [LASU modeling records](LASU-MODELS.md) distinguish local proposals and evidence gaps from published content.
+
 ## Plan a journey
 
 Select a destination, open directions, and choose an origin. A manual origin supports planning without location permission. Walking and driving use mapped networks and restrictions; unavailable connections stay unavailable rather than inventing shortcuts. Driving can include parking and a walking handoff. See [Driving](DRIVING.md).
@@ -31,11 +33,11 @@ Keep the app in the foreground. Screen locking or backgrounding can pause tracki
 ## Download before disconnecting
 
 1. While online, select the campus and open **Offline**.
-2. Download it and wait for verification and **Ready offline**. Review photo/model download options where offered.
+2. Check the complete download size, download it and wait for verification and **Ready offline**. Every published detail level, model texture and approved photograph is included by default.
 3. Repeat for every campus needed. Seeing a campus in the directory does not download its package.
 4. Reopen the app offline and verify map, search, routes, and voice before relying on it on site.
 
-The app verifies package assets by size and hash. Interrupted downloads retain the previous usable package. Missing or evicted browser storage can require repair. An active journey stays on its current version while an update is prepared. Saved places, recents, reports, and downloads are campus-scoped. Removing one campus download leaves other campuses intact.
+The app verifies package assets by size and hash, then checks detailed geometry and texture dependencies before declaring the campus ready. **Cancel download** leaves verified files available for resumption; retry downloads missing or damaged files. Interrupted downloads and insufficient storage retain the previous usable package. Missing or evicted browser storage can require **Verify / repair download**. An active journey stays on its current version while an update is prepared. Saved places, recents, reports, and downloads are campus-scoped. Removing one campus download leaves other campuses intact.
 
 Team synchronization, source checks, analysis jobs, report submission, and publication require a connection. Offline browser storage is device-local and can be cleared by the browser or user; it is not a server backup. [Offline acceptance checks](ACCEPTANCE.md#local-and-desktop-browser-checks).
 

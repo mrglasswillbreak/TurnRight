@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:11",
+  "name": "LASU  Clinic",
+  "status": "identification-hold",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "7a3ab347965123628624c597adfb160b65b618117fa2733a0ba1cd5d3525bd90",
+    "preservedAppearanceSha256": "8f169ec06c5ec4854bba06f10264965e273c06c542299b3735fa0d44f490b787",
+    "mappedHeightMetres": 3,
+    "mappedFloors": 1,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "hold": "The linked photograph is an interior and its Commons categories identify Epe; no usable identified Ojo exterior is established.",
+    "observed": "Interior reference only.",
+    "gaps": [
+      "Find an exterior photograph of the Ojo clinic and verify its mapped footprint."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:8ec01755-d2a8-4d0c-b358-fcfbefe783c7",
+      "caption": "LASU Health Centre reception · 2021",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Health_Centre.jpg",
+      "author": "Louiell1",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2021-03-20",
+      "historical": true,
+      "sha256": "0dd2a735184ee1112c0d360020e58b33aa5ce1e40daa51817e94b73cd6bb92d8",
+      "assetUrl": "/packages/photos/0dd2a735184ee1112c0d360020e58b33aa5ce1e40daa51817e94b73cd6bb92d8.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:11",
+        "photoId": "owner:8ec01755-d2a8-4d0c-b358-fcfbefe783c7",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Health_Centre.jpg",
+        "checkedAt": "2026-11-01T02:24:04.237Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Louiell1",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-03-20"
+        },
+        "verifiedMetadata": {
+          "author": "Louiell1",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-03-20",
+          "description": "Health and awareness",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Epe, Nigeria",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Health_Centre.jpg"
+        },
+        "identificationIssue": "Source is categorized outside Ojo; hold pending footprint identification.",
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": null,
+  "verification": null,
+  "acceptance": {
+    "artifactsMatchCurrentMaster": false,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

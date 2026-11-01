@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:103",
+  "name": "School Of TransportC",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "ae1c5d1c2d73f8bd4736175702dd78cbf0e33a6297f63923833cb32a6b6b3889",
+    "preservedAppearanceSha256": "221db34891a27d6d4afa7a6f04528fac292b3479c6115e600243b563a12c4b55",
+    "mappedHeightMetres": 9,
+    "mappedFloors": 3,
+    "roofForm": "hip"
+  },
+  "observations": {
+    "visibleFloors": 4,
+    "observed": "Four visible levels, cream and red pillars and multiple red pitched roofs.",
+    "gaps": [
+      "Observed floor count conflicts with the legacy three-floor, 9 m estimate."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+      "caption": "School Of Transport",
+      "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323",
+      "assetUrl": "/packages/photos/58b9b3162b50299e14e406ec8bf21d9dc788bca04007bbb417dbabf2e2a7f323.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:103",
+        "photoId": "owner:08cac3ae-a759-47f9-a52c-5db81314683d",
+        "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+        "checkedAt": "2026-11-01T02:24:04.269Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "commons:112540904",
+      "caption": "School of Transport exterior",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2021-11-15",
+      "historical": true,
+      "sha256": "d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7",
+      "assetUrl": "/packages/photos/d4df48714249b0511677f62558274033cab281553c11e6b1a08b84a4564ebeb7.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:103",
+        "photoId": "commons:112540904",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg",
+        "checkedAt": "2026-11-01T02:24:04.270Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-11-15"
+        },
+        "verifiedMetadata": {
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-11-15",
+          "description": "Lagos state university school of transport building.",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lasu_School_of_transport.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.198001808000001,
+      6.474212720000001
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -19976.74480056562,
+        -18127.021979721438,
+        0
+      ],
+      "max": [
+        26968.738063664612,
+        21580.74117162368,
+        12000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      19
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Four visible levels, cream and red pillars and multiple red pitched roofs."
+    ],
+    "estimated": [
+      "Observed floor count conflicts with the legacy three-floor, 9 m estimate.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+      "Wall height is an estimated 12 m for four observed levels, replacing the three-level 9 m visual only in this proposal.",
+      "Entrance follows the published authored facade on outer wall 19; this preserves editor alignment, not a surveyed orientation."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 1379,
+    "nativePatterns": 295
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 41908,
+    "objSha256": "d146f8b5097a7ff8d88a7b7124e1cde10fe7ecff18467c104c51535e9fb8521c",
+    "documentSha256": "c1cd0ab4ff90226c789f47ebdca0d7f4f4dcfbd5511a16a0019e2a07ea6b158d",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 34026.5,
+      "glbConversionErrorMetres": 9.142177432863718e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "c1cd0ab4ff90226c789f47ebdca0d7f4f4dcfbd5511a16a0019e2a07ea6b158d"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

@@ -10,6 +10,7 @@ import { bakeNativeModelMeshes } from './model-native-export';
 import { useModelMesh, type ModelMeshProps } from './useModelMesh';
 import { MeshGeometryTools } from './MeshGeometryTools';
 import { MeshObjectSettings } from './MeshObjectSettings';
+import { MeshTextureTools } from './MeshTextureTools';
 
 export default function ModelMeshPanel(props: ModelMeshProps) {
   const state = useModelMesh(props);
@@ -121,6 +122,7 @@ export default function ModelMeshPanel(props: ModelMeshProps) {
         </select>
       </label>
       <MeshObjectSettings state={state} />
+      <MeshTextureTools key={object?.id || 'none'} state={state} />
       {!document.objects.length && (
         <p>
           <Box size={16} /> Add a primitive, copy the building, or import a

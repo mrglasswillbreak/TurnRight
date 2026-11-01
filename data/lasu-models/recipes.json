@@ -1,0 +1,547 @@
+{
+  "version": 1,
+  "buildings": {
+    "arcgis:University_Property:120": {
+      "style": "senate",
+      "floors": 7,
+      "front": [0, 3],
+      "wall": "#ded6bf",
+      "trim": "#f0e7cd",
+      "accent": "#885746",
+      "glass": "#91b1b9",
+      "roof": "#847e72",
+      "observed": [
+        "Seven visible levels, including the glazed ground floor.",
+        "Paired projecting cream facade panels with three red-brown diamonds each.",
+        "Horizontal glazing bands, cream mullions, red-brown spandrels and a recessed central entrance."
+      ],
+      "estimated": [
+        "Metric heights retain the existing 21 m main-wing estimate.",
+        "Front follows the existing photo-associated south facade; other elevation assignments and module dimensions remain inferred.",
+        "The separate octagonal auxiliary wing retains its existing 6 m height and conservative appearance."
+      ],
+      "windowDivisions": 4
+    },
+    "arcgis:University_Property:3": {
+      "style": "library",
+      "floors": 5,
+      "front": [0, 31],
+      "wall": "#dfd5b6",
+      "trim": "#eee4cf",
+      "accent": "#885d4e",
+      "glass": "#7797a3",
+      "roof": "#a94e50",
+      "observed": [
+        "The completed August 2026 exterior shows a ground level and four upper window bands.",
+        "Tall red-brown fins frame recessed blue glazing; cream stair panels carry diamond motifs.",
+        "The mapped wings and central courtyard are retained.",
+        "The October 2025 aerial shows shallow red pitched wing roofs and a turquoise central roof over the atrium.",
+        "Three stacked outlined diamond motifs with cream centres appear to the photo-left of the small-window column on the photographed cream entrance panel."
+      ],
+      "estimated": [
+        "The existing 20 m height is retained; dimensions and exact photographed facade orientation are estimates.",
+        "Unseen wing elevations use restrained repetitions of the observed material language.",
+        "Roof panel extents, ridges and the central atrium roof height are estimated from the October 2025 aerial; the geographic courtyard polygon remains unchanged. No newer aerial has been established.",
+        "The red core cap, broadened wing panels and comparison-camera bearing approximate the aerial view; exact roof panel junctions remain unresolved."
+      ],
+      "windowDivisions": 4,
+      "frame": "#4d5859"
+    },
+    "arcgis:University_Property:28": {
+      "style": "theatre",
+      "floors": 4,
+      "front": [0, 2],
+      "wall": "#a5aaa8",
+      "trim": "#b6bab6",
+      "accent": "#227f9b",
+      "glass": "#293c43",
+      "roof": "#969d9b",
+      "observed": [
+        "Four stacked rows of openings are visible in the elevated reference photograph.",
+        "Grey exterior screen with irregular narrow vertical openings, flat parapet and projecting blue entrance portals.",
+        "Broad shallow exterior steps and the prominent lecture-theatre lettering are visible."
+      ],
+      "estimated": [
+        "The existing 12 m height is retained; slot dimensions and geographic elevation assignments remain estimated.",
+        "Architect photographs are observation-only until explicit reuse rights are established; no photograph is used as a texture.",
+        "The freestanding sign and paving are excluded until their geographic placement is supported.",
+        "Four screen-opening rows do not establish four occupied storeys.",
+        "Portal centres and widths follow the two published authored entrance positions on walls 2 and 3; portal height and blue lining remain reconstructed estimates."
+      ]
+    },
+    "arcgis:University_Property:47": {
+      "style": "cps",
+      "floors": 2,
+      "front": [1, 2],
+      "wall": "#d7b96e",
+      "accent": "#624a3e",
+      "trim": "#ded7bf",
+      "frame": "#c2c4b7",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 5200,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Yellow walls, brown vertical panels, dark flat eaves and three mapped blocks."
+      ],
+      "estimated": [
+        "The photograph does not establish every block's entrance or rear elevation.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "entrance": false,
+      "parapetColour": "#414642"
+    },
+    "arcgis:University_Property:44": {
+      "style": "arts",
+      "floors": 2,
+      "front": [0, 3],
+      "wall": "#d3aa66",
+      "accent": "#844d3c",
+      "trim": "#ded7bf",
+      "frame": "#736b56",
+      "glass": "#424b48",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.66,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Ochre walls, red-brown parapet, high upper louvres, recessed ground arcade and an opaque upper gallery wall. The ground arcade has an opaque rear wall with smaller windows and a doorway, rather than fully glazed bays. No continuous external balcony railing is established."
+      ],
+      "estimated": [
+        "Exact arcade bay spacing, rear-wall opening positions, setback depth and rear elevation are estimated.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "referenceElevation": 0.1,
+      "arcadeDepth": 900
+    },
+    "arcgis:University_Property:25": {
+      "style": "language",
+      "floors": 2,
+      "front": [0, 0],
+      "wall": "#dbc77e",
+      "accent": "#854632",
+      "trim": "#ded7bf",
+      "frame": "#d5d4bd",
+      "glass": "#57777d",
+      "roof": "#984d43",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": true,
+      "observed": [
+        "Yellow walls, red pitched roof, rounded end and recessed central entrance."
+      ],
+      "estimated": [
+        "The existing custom roof needs comparison against the observed roof before replacement.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof."
+      ],
+      "parapetColour": "#dbc77e"
+    },
+    "arcgis:University_Property:54": {
+      "style": "education",
+      "floors": 2,
+      "front": [0, 1],
+      "wall": "#e0d3b0",
+      "accent": "#934d3b",
+      "trim": "#ded7bf",
+      "frame": "#d5d4bd",
+      "glass": "#57777d",
+      "roof": "#984d43",
+      "spacing": 2800,
+      "windowRatio": 0.47,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": true,
+      "observed": [
+        "Cream infill, tall red-brown fins and multiple pitched roofs. The entrance portico has a hipped roof, four front columns and blue FACULTY OF EDUCATION lettering on its cream front fascia.",
+        "The July 2025 courtyard view supports a covered sloping walkway and low window bands beneath tall cream-and-red walls."
+      ],
+      "estimated": [
+        "Two mapped courtyards and unseen roof junctions need conservative treatment.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+        "Courtyard walkway modules are extended conservatively around both mapped courts; the dated photograph does not identify which mapped court was photographed.",
+        "Entrance portico dimensions, roof pitch and column spacing are estimated from the dated front photographs."
+      ]
+    },
+    "arcgis:University_Property:39": {
+      "style": "management",
+      "floors": 3,
+      "front": [0, 3],
+      "wall": "#dfc76c",
+      "accent": "#954d39",
+      "trim": "#ded7bf",
+      "frame": "#b1ac8b",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.73,
+      "heightRatio": 0.54,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Yellow walls, red columns, inset windows and a white entrance portico."
+      ],
+      "estimated": [
+        "The source filename suggests another faculty; identification follows the visible FMS signage, not the filename.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "recessDepth": 650,
+      "bandColour": "#dfc76c",
+      "parapetColour": "#dfc76c"
+    },
+    "arcgis:University_Property:31": {
+      "style": "ict",
+      "floors": 2,
+      "front": [0, 0],
+      "wall": "#dac080",
+      "accent": "#6b5144",
+      "trim": "#ded7bf",
+      "frame": "#c6c6b4",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Yellow entrance between taller end blocks; trees and fencing obscure much of the facade."
+      ],
+      "estimated": [
+        "Roof and obscured elevations are not established by the available photograph.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "parapetColour": "#dac080"
+    },
+    "arcgis:University_Property:73": {
+      "style": "hall",
+      "floors": 1,
+      "front": [0, 5],
+      "wall": "#a6aaa9",
+      "accent": "#ded9cb",
+      "trim": "#ded7bf",
+      "frame": "#e1e1d7",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 6200,
+      "windowRatio": 0.38,
+      "heightRatio": 0.24,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Tall grey hall, stepped parapet, sparse high windows and light entrance surround."
+      ],
+      "estimated": [
+        "One visible hall level conflicts with the legacy two-floor estimate; the interior photograph does not resolve exterior storeys.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "Entrance follows the published authored facade on outer wall 5; this preserves editor alignment, not a surveyed orientation."
+      ],
+      "parapetColour": "#a6aaa9"
+    },
+    "arcgis:University_Property:2": {
+      "style": "auditorium",
+      "floors": 3,
+      "front": [0, 16],
+      "wall": "#ddd4b9",
+      "accent": "#8e4636",
+      "trim": "#ded7bf",
+      "frame": "#dfdfcc",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 4,
+      "preserveRoof": false,
+      "observed": [
+        "Cream faceted entrance panels, paired high glass-block strips, tall cream fins and a broad red-brown upper fascia; side gallery openings differ from the solid central entrance."
+      ],
+      "estimated": [
+        "The remaining exterior is small; roof junctions and exact storeys remain uncertain.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "Entrance follows the published authored facade on outer wall 16; this preserves editor alignment, not a surveyed orientation.",
+        "Three visible opening bands are modeled with a 9 m estimated envelope. They do not establish three occupied auditorium floors."
+      ],
+      "heights": [9],
+      "referenceElevation": 0.1,
+      "entryWidth": 4000
+    },
+    "arcgis:University_Property:55": {
+      "style": "radio",
+      "floors": 1,
+      "front": [0, 3],
+      "wall": "#e0d9c0",
+      "accent": "#80614c",
+      "trim": "#ded7bf",
+      "frame": "#d4d5c8",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Cream front, flat parapet, glazed doors and radio signage. Two small square windows sit above the photo-right main window, and a horizontal glazed transom sits above the entrance canopy."
+      ],
+      "estimated": [
+        "Only one level is visible; the legacy two-floor estimate remains unresolved.",
+        "The separate mast has no confirmed anchor and must not be placed arbitrarily.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The proposal uses an estimated 4.2 m single-level envelope from facade proportions; the published 6 m estimate remains unchanged in geographic data.",
+        "The upper front openings follow the visible arrangement; their sizes and offsets are estimated. Obscured facade portions do not establish a matching pair on the opposite side."
+      ],
+      "sign": "LASU RADIO",
+      "heights": [4.2],
+      "parapetColour": "#e0d9c0",
+      "referenceElevation": 0.1
+    },
+    "arcgis:University_Property:78": {
+      "style": "veranda",
+      "floors": 2,
+      "front": [0, 4],
+      "wall": "#ded4b9",
+      "accent": "#854b3a",
+      "trim": "#ded7bf",
+      "frame": "#5b6260",
+      "glass": "#57777d",
+      "roof": "#984d43",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": true,
+      "observed": [
+        "Cream two-storey wings, red pitched roofs, veranda columns and balcony rails."
+      ],
+      "estimated": [
+        "The dark-clad undated photograph conflicts with dated cream exteriors; retain the dated interpretation pending chronology evidence.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+        "Side entrances retain the two published authored wall-4 door positions; courtyard galleries are interpreted from the dated cream exterior.",
+        "Cream glass-block entrance towers use the dated March 2022 view. Their small gable profiles and gallery depths are estimated within the retained mapped wings."
+      ],
+      "fronts": [
+        [0, 4],
+        [1, 4]
+      ],
+      "entrance": false,
+      "doors": [
+        {
+          "part": 0,
+          "edge": 4,
+          "x": 0.8172884934863223,
+          "width": 1500,
+          "height": 2000
+        },
+        {
+          "part": 1,
+          "edge": 4,
+          "x": 0.1984214084349658,
+          "width": 1500,
+          "height": 2000
+        }
+      ],
+      "referenceElevation": 0.1,
+      "galleryEdges": [
+        [0, 5],
+        [1, 3]
+      ]
+    },
+    "arcgis:University_Property:76": {
+      "style": "lawlibrary",
+      "floors": 3,
+      "front": [0, 3],
+      "wall": "#d6cbb0",
+      "accent": "#964f3f",
+      "trim": "#ded7bf",
+      "frame": "#c4c2ae",
+      "glass": "#57777d",
+      "roof": "#984d43",
+      "spacing": 4700,
+      "windowRatio": 0.78,
+      "heightRatio": 0.48,
+      "windowDivisions": 4,
+      "preserveRoof": true,
+      "observed": [
+        "Cream walls, red-brown pilasters, floor bands and Taslim Olawale Elias Library signage. Two narrow cream-framed louver strips extend nearly the full facade height near its ends.",
+        "Two stacked glass-block panels sit to the photo-right of the entrance; their area is distinct from the neighboring ordinary window bays."
+      ],
+      "estimated": [
+        "The existing hip-roof shape is illustrative and is not confirmed by the ground-level view.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+        "Front louver-strip widths, spacing and blade pitch are estimated from the photograph; they are not repeated on unobserved elevations.",
+        "Glass-block panel sizes, adjacent bay gaps and lettering stand-off remain estimates; the special panels are confined to the observed front."
+      ],
+      "referenceElevation": 0.1
+    },
+    "arcgis:University_Property:75": {
+      "style": "mba",
+      "floors": 2,
+      "front": [0, 4],
+      "wall": "#d2b578",
+      "accent": "#8a4f3b",
+      "trim": "#ded7bf",
+      "frame": "#c6c2a9",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": ["Yellow walls, red-brown framing and a recessed entrance."],
+      "estimated": [
+        "Trees obscure the roof and some windows; unseen elevations remain estimates.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "louvres": true
+    },
+    "arcgis:University_Property:22": {
+      "style": "school",
+      "floors": 4,
+      "front": [0, 2],
+      "wall": "#d6d4c3",
+      "accent": "#8f4f3e",
+      "trim": "#ded7bf",
+      "frame": "#e0e1d7",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.5,
+      "heightRatio": 0.32,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Four visible levels, paired rectangular windows, pale weathered panels and a red-brown central strip."
+      ],
+      "estimated": [
+        "Do not invent weathering or air-conditioning locations on unseen elevations.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+      ],
+      "frontWindowCount": 4,
+      "bandColour": "#e3e3d9",
+      "bandHeight": 330,
+      "referenceElevation": 0.12
+    },
+    "arcgis:University_Property:43": {
+      "style": "postgrad",
+      "floors": 2,
+      "front": [0, 20],
+      "wall": "#dfd3b4",
+      "accent": "#984b3a",
+      "trim": "#ded7bf",
+      "frame": "#5b6260",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.3,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Cream walls, a tall rounded red tower and triangular entrance feature. Two circular windows are visible: one in the upper triangular panel and one in the lower brown panel beside the entrance.",
+        "The dated entrance photograph shows a pale metal grille over a dark recessed doorway."
+      ],
+      "estimated": [
+        "The tower's location on the mapped polygon is not yet established.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The distinctive rounded tower and triangular entrance are reconstructed on an explicitly tentative front. Their anchor remains unresolved and requires comparison review before publication.",
+        "The relative tower/triangular-panel arrangement follows the photograph; its geographic facade assignment remains estimated.",
+        "The two circular windows and lower brown panel use estimated dimensions and positions; the lower panel is partly hidden by vehicles in the dated reference.",
+        "Entrance grille pitch, bar thickness and door divisions are estimated from the dated photograph; no hidden interior detail is reconstructed."
+      ],
+      "parapetColour": "#dfd3b4"
+    },
+    "arcgis:University_Property:103": {
+      "style": "transport",
+      "floors": 4,
+      "front": [0, 19],
+      "wall": "#dbcfb0",
+      "accent": "#974c3d",
+      "trim": "#ded7bf",
+      "frame": "#d8d9c6",
+      "glass": "#57777d",
+      "roof": "#984d43",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 3,
+      "preserveRoof": true,
+      "observed": [
+        "Four visible levels, cream and red pillars and multiple red pitched roofs."
+      ],
+      "estimated": [
+        "Observed floor count conflicts with the legacy three-floor, 9 m estimate.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+        "Wall height is an estimated 12 m for four observed levels, replacing the three-level 9 m visual only in this proposal.",
+        "Entrance follows the published authored facade on outer wall 19; this preserves editor alignment, not a surveyed orientation."
+      ],
+      "heights": [12],
+      "bandColour": "#dbcfb0"
+    },
+    "arcgis:University_Property:33": {
+      "style": "sdg",
+      "floors": 2,
+      "front": [0, 3],
+      "wall": "#e0d3ae",
+      "accent": "#8c4f3d",
+      "trim": "#ded7bf",
+      "frame": "#e7e8dd",
+      "glass": "#57777d",
+      "roof": "#914b40",
+      "spacing": 3800,
+      "windowRatio": 0.43,
+      "heightRatio": 0.32,
+      "windowDivisions": 3,
+      "preserveRoof": false,
+      "observed": [
+        "Cream walls, red-brown framing and canopy, blue and white window divisions. The outer front red panels carry three stepped cream bars on photo-left and a cream C-shaped outline on photo-right."
+      ],
+      "estimated": [
+        "Strong colour grading in one photograph makes its palette unreliable; compare the second view.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "Entrance follows the published authored facade on outer wall 3; this preserves editor alignment, not a surveyed orientation.",
+        "The outer panel widths and cream motif dimensions are estimated; their left/right placement follows the photographed front within that tentative facade assignment."
+      ],
+      "bandColour": "#e0d3ae"
+    },
+    "arcgis:University_Property:32": {
+      "style": "student",
+      "floors": 3,
+      "front": [0, 25],
+      "wall": "#d2b45c",
+      "accent": "#775341",
+      "trim": "#ded7bf",
+      "frame": "#5b6260",
+      "glass": "#57777d",
+      "roof": "#8b877b",
+      "spacing": 3800,
+      "windowRatio": 0.58,
+      "heightRatio": 0.48,
+      "windowDivisions": 2,
+      "preserveRoof": false,
+      "observed": [
+        "Yellow front panels, a brown entrance block, central glazing and recessed decorative panels."
+      ],
+      "estimated": [
+        "Exact motif geometry and facade-to-footprint orientation need further evidence.",
+        "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+        "Entrance follows the published authored facade on outer wall 25; this preserves editor alignment, not a surveyed orientation.",
+        "Front curtain walls bridge the mouths of the two mapped slots, as seen in the dated exterior; geographic footprint coordinates remain unchanged and the infill alignment needs review."
+      ],
+      "parapetColour": "#d2b45c",
+      "referenceElevation": 0.1
+    }
+  }
+}

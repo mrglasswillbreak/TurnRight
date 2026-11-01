@@ -2,6 +2,7 @@ import { Group, Scene } from 'three';
 import { type Map as CampusMap } from 'maplibre-gl';
 import type { BuildingModel, SectorModels, VisualSector } from './visual-types';
 import { hashBytes, ASSET_CACHE } from './offline';
+import { modelAssetRequest } from './model-asset-requests';
 export async function loadCampusModelSector(
   {
     inflight,
@@ -35,17 +36,20 @@ export async function loadCampusModelSector(
       sector.bytes > 12 * 1024 * 1024
     )
       throw new Error('Invalid visual sector.');
-    const cache = await caches.open(ASSET_CACHE).catch(() => null);
-    const response =
-      (await cache?.match(sector.url)) ||
-      (await fetch(sector.url, {
-        signal: AbortSignal.any([
-          controller.signal,
-          AbortSignal.timeout(15000),
-        ]),
-      }));
-    if (!response.ok) throw new Error('Model unavailable');
-    const bytes = await response.arrayBuffer();
+    const bytes = await modelAssetRequest(async () => {
+      controller.signal.throwIfAborted();
+      const cache = await caches.open(ASSET_CACHE).catch(() => null);
+      const response =
+        (await cache?.match(sector.url)) ||
+        (await fetch(sector.url, {
+          signal: AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(15000),
+          ]),
+        }));
+      if (!response.ok) throw new Error('Model unavailable');
+      return response.arrayBuffer();
+    });
     if (
       bytes.byteLength !== sector.bytes ||
       (await hashBytes(bytes)) !== sector.sha256

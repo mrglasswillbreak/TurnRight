@@ -1,0 +1,11 @@
+{
+  "campus": "lasu",
+  "version": "lasu-41ec73876464",
+  "manifestHash": "d6c4325009892a3d6b434f3891f832c3033600b288883c24510a8388fa478a7c",
+  "manifestHashMethod": "SHA256 of recursively key-sorted JSON including every field, array order retained",
+  "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+  "assetCount": 147,
+  "photoAssets": 43,
+  "buildingCount": 614,
+  "source": "Audited local baseline manifest retained with the model campaign"
+}

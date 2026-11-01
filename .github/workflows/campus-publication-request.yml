@@ -1,0 +1,71 @@
+name: Request reviewed LASU model publication
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [inspect, prepare, publish]
+        default: inspect
+        required: true
+      review_id:
+        description: Exact approved review UUID from the successful model apply receipt
+        required: true
+      expected_review_hash:
+        description: Exact contentHash from that receipt, not a newly derived workspace hash
+        required: true
+      release_id:
+        description: Existing release UUID; required for publish, optional for inspection
+        required: false
+      expected_version:
+        description: Exact verified LASU preview package version; publish only
+        required: false
+      expected_deployment_id:
+        description: Exact verified canonical dpl_ preview identity; publish only
+        required: false
+      summary:
+        description: Concrete release summary of 5–500 characters; prepare only
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: lasu-publication-request
+  cancel-in-progress: false
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PUBLISHED_MAP_URL: https://turnright.vercel.app
+      CAMPUS_ID: lasu
+    steps:
+      - name: Require the compatible main-branch worker
+        if: github.ref != 'refs/heads/main'
+        run: exit 1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npx vitest run tests/campus-publication-request.test.ts
+        working-directory: web
+      - name: Request the existing guarded publication action
+        run: npx tsx ../scripts/request-campus-publication.mts "$GITHUB_EVENT_PATH"
+        working-directory: web
+        env:
+          GITHUB_WORKFLOW_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: lasu-publication-request
+          path: web/work/lasu-publication-request.json
+          retention-days: 14

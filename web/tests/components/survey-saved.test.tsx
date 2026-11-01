@@ -92,7 +92,9 @@ it('preserves local recovery copies when opening and continuing conflicting clou
   const cloudButton = page.getByRole('button', { name: /^Older cloud/ });
   await cloudButton.click();
   await expect.poll(() => open.mock.calls.length).toBe(2);
-  expect(document.body.textContent).toContain('Conflicting version opened');
+  await expect
+    .poll(() => document.body.textContent)
+    .toContain('Conflicting version opened');
   const copies = await listLocalSurveys(owner);
   expect(
     copies.some(

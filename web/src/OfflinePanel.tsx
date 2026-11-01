@@ -91,6 +91,7 @@ export function OfflinePanel({
               {(target.bytes / 1048576).toFixed(2)} MB · Map &amp; voice
               directions
               {target.visuals ? ' + enhanced 3D' : ''}
+              {target.detailedModels ? ' + all detailed buildings' : ''}
               {target.photos?.assetUrls.length
                 ? ' + all approved photographs'
                 : ''}
@@ -119,6 +120,14 @@ export function OfflinePanel({
           <p className="small-note">
             Building models: {(target.visuals.bytes / 1048576).toFixed(2)} MB.
             The basic map works while these download.
+          </p>
+        )}
+        {target.detailedModels && (
+          <p className="small-note">
+            Detailed buildings and textures:{' '}
+            {(target.detailedModels.bytes / 1048576).toFixed(2)} MB. Every
+            detail level is included and verified before this campus is ready
+            offline.
           </p>
         )}
         {!!manifest.visuals?.assetUrls.length && downloaded && swReady && (

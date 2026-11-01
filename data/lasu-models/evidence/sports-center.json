@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:92",
+  "name": "Sports Center",
+  "status": "identification-hold",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "2949d64d530c199037c573ee84bb13936b227edbf8450614fa6d28560a5a0ba3",
+    "preservedAppearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "mappedHeightMetres": 6,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "hold": "The mapped 65,219.65 square metre polygon covers the sports field/complex, not the photographed Hussam Okoya-Thomas hall.",
+    "observed": "Sports hall photograph; stable hall footprint unresolved.",
+    "gaps": [
+      "Locate the actual hall footprint and identity before reconstruction. Do not extrude the field."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:ddd83d9e-73b0-4d19-9675-c79f83a43580",
+      "caption": "Hussam Okoya-Thomas Sports Hall · 2022",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hussam_Okoya-Thomas_Sports_Hall,_LASU_Sports_Centre.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2022-03-17",
+      "historical": true,
+      "sha256": "cbf806b51a7c876d539e1a29bfbc1a0cc804a36368e920e8707e36df3779f6b6",
+      "assetUrl": "/packages/photos/cbf806b51a7c876d539e1a29bfbc1a0cc804a36368e920e8707e36df3779f6b6.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:92",
+        "photoId": "owner:ddd83d9e-73b0-4d19-9675-c79f83a43580",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hussam_Okoya-Thomas_Sports_Hall,_LASU_Sports_Centre.jpg",
+        "checkedAt": "2026-11-01T02:24:04.271Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-17"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-17 11:58:29",
+          "description": "Hussam Okoya-Thomas Sports Hall, LASU Sports Centre",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Hussam_Okoya-Thomas_Sports_Hall,_LASU_Sports_Centre.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": null,
+  "verification": null,
+  "acceptance": {
+    "artifactsMatchCurrentMaster": false,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

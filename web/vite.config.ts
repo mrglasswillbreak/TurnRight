@@ -62,6 +62,9 @@ export default defineConfig({
   ],
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   optimizeDeps: {
+    // Private archive copies under work/ can contain their own HTML and React.
+    // Discover dependencies from the application's entry point only.
+    entries: ['index.html'],
     exclude: ['maplibre-gl'],
     // Worker-only loaders are first reached during file import/export. Discover
     // them at startup so dependency optimization cannot reload an open draft.

@@ -2,6 +2,14 @@
 
 The main product tour was refreshed on **15 October 2026** from the current local application, including the public map/globe, editor, all GIS workspaces, building models, photographs and offline controls. Dated source-update and recovery captures remain below. Every image is a direct browser capture; no UI was painted over, assembled from separate screens, or generated. [Machine-readable capture records](assets/screenshots/tour-2026-10-15.json) provide dimensions, theme, revision, fixture and image hashes. [Historical captures](assets/screenshots/README.md) remain intact.
 
+## Model finishing and export · 1 November 2026
+
+Two direct Chromium captures show [selected-face photograph projection](assets/screenshots/tour-mesh-photo-preview-2026-11-01.png) and [prepared GLB/PNG exports](assets/screenshots/tour-building-render-export-2026-11-01.png). The 1440 × 1200 viewport keeps crop coordinates and Preview/Apply/Cancel visible. The passing journey verifies cancellation, a non-default crop retained in source evidence, undo/redo, GLB export, decoded 1024 × 768 PNG dimensions and invalidation after changing output size. [Source snapshot, driver, dimensions and image hashes](assets/screenshots/tour-2026-11-01.json).
+
+The synthetic Library box deliberately has one triangular face selected; the other face remains untextured. Its photograph is Abiolakintrunde's _School of Communication exterior_, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [original source](https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg). The view demonstrates authoring controls, not a reconstructed LASU Library or a published model. The photograph is rectified with top-left X = 0.1; the browser captures themselves are unchanged.
+
+Reproduce from `web/` with `npx playwright test tests/browser/editor-model-detail.spec.ts --workers=1 --output=work/release-final-capture`. Inspect both PNGs in the test output and record them under new dated names. These two images extend the historical tour; they do not replace its other views.
+
 ## Published campus detail · 18 October 2026
 
 The current [LASU desktop](assets/screenshots/live-lasu-published-2026-10-18.png), [UNILAG desktop](assets/screenshots/live-unilag-published-2026-10-18.png), [UNILAG phone viewport](assets/screenshots/live-unilag-phone-2026-10-18.png) and [LASU dark view](assets/screenshots/live-lasu-dark-2026-10-18.png) come from the actual public origin after both independent publications. They retain the released geometry, building treatments, illustrative greenery and historical-photo labels. Each image was visually inspected and copied unchanged from the successful [production verification](https://github.com/mrglasswillbreak/TurnRight/actions/runs/39103394177).

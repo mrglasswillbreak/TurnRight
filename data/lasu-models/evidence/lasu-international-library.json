@@ -1,0 +1,307 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:3",
+  "name": "LASU International Library",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "4290f400ca0b0779d4c63631ac8d277d686caa44c8e8362059622a0e994081b5",
+    "preservedAppearanceSha256": "02b7884512e7653b6b5e47b3bd158a3f30fe2c634dfe18220364d67b8537b2ac",
+    "mappedHeightMetres": 20,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 5,
+    "observed": "Completed August 2026 exterior has five levels, red-brown fins, blue glazing and cream panels with diamond motifs.",
+    "gaps": [
+      "Unseen elevations and facade orientation remain estimates.",
+      "The legacy custom roof/eaves estimate conflicts with the 20 m main height.",
+      "The 2025 aerial supports the red wing roofs and central turquoise atrium roof; exact ridge heights, panel junctions and current rooftop equipment remain unmeasured."
+    ],
+    "additionalReferences": [
+      {
+        "sourceUrl": "https://www.tvcnews.tv/sanwo-olu-to-commission-350-seater-library-in-lasu-today/",
+        "imageUrl": "https://www.tvcnews.tv/wp-content/uploads/2025/10/LASU-Library.jpg",
+        "publicationDate": "2025-10-21",
+        "capturedAt": null,
+        "retrievedAt": "2026-11-01",
+        "rights": "Observation only; no redistribution or texture rights established.",
+        "privateFile": "research/library-aerial-2025.jpg",
+        "sha256": "7bdf07150869dbbd4eadf12109f7269f03bd422624c36c03eb3394d253028088",
+        "observed": "Aerial: five visible facade levels, red shallow pitched wing roof panels, central turquoise pyramidal atrium roof, stepped wings and cream diamond-motif entrance panels."
+      }
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:198256532",
+      "caption": "International Library exterior, August 2026",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "sha256": "a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8",
+      "assetUrl": "/packages/photos/a31707f3f6993bc72f296d82b49c3576cd8d84dadecb5d6704ed93969e2318a8.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:3",
+        "photoId": "commons:198256532",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg",
+        "checkedAt": "2026-11-01T02:24:04.239Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "date": "2026-08-27"
+        },
+        "verifiedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2026-08-27",
+          "description": "Lagos State University Babajide Olusola Sanwo-Olu Library Complex",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5994b.jpg"
+        }
+      }
+    },
+    {
+      "id": "commons:198256515",
+      "caption": "International Library atrium, August 2026",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "sha256": "54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b",
+      "assetUrl": "/packages/photos/54c8659018b82a4ae3f213c3fc303cc9cf3c12c7a083055f89aa75d35343df5b.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:3",
+        "photoId": "commons:198256515",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg",
+        "checkedAt": "2026-11-01T02:24:04.242Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "date": "2026-08-27"
+        },
+        "verifiedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2026-08-27",
+          "description": "Lagos State University Babajide Olusola Sanwo-Olu Library Complex",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Babajide_Olusola_Sanwo-Olu_Library_Complex_aug_2026_IMG_5997b.jpg"
+        },
+        "exteriorUse": "Interior reference; does not independently locate the atrium roof on the mapped footprint."
+      }
+    },
+    {
+      "id": "owner:63948256-b781-4867-b28f-6d4666a1ff5d",
+      "caption": "International Library during construction · 2021",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Library_Under_Construction.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2021-05-06",
+      "historical": true,
+      "sha256": "289d768ff748092c3a4fc7da77f04dab31670dc8fc38bd432dd34cfc41edcd19",
+      "assetUrl": "/packages/photos/289d768ff748092c3a4fc7da77f04dab31670dc8fc38bd432dd34cfc41edcd19.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:3",
+        "photoId": "owner:63948256-b781-4867-b28f-6d4666a1ff5d",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Library_Under_Construction.jpg",
+        "checkedAt": "2026-11-01T02:24:04.245Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-05-06"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-05-06 16:41:57",
+          "description": "LASU Library Under Construction and Part of The Farmers' Vegetation",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:LASU_Library_Under_Construction.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "owner:afd1095f-968f-4ceb-a7e7-8738f0cfadeb",
+      "caption": "International Library construction at sunset · 2023",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Central_library.jpg",
+      "author": "Explora20",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2023-12-02",
+      "historical": true,
+      "sha256": "e411bb7c6b76a66104a64597a66105244f7ad88ba448f8e4b6cfbf53567bc61d",
+      "assetUrl": "/packages/photos/e411bb7c6b76a66104a64597a66105244f7ad88ba448f8e4b6cfbf53567bc61d.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:3",
+        "photoId": "owner:afd1095f-968f-4ceb-a7e7-8738f0cfadeb",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Central_library.jpg",
+        "checkedAt": "2026-11-01T02:24:04.247Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Explora20",
+          "license": "CC BY-SA 4.0",
+          "date": "2023-12-02"
+        },
+        "verifiedMetadata": {
+          "author": "Explora20",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2023-12-02 07:00:12",
+          "description": "This is a project(to the left)of over a billion naira under construction which will claim the spot of one of the biggest libraries in west Africa",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Cultural heritage monuments in Nigeria",
+            "Category:Files with coordinates missing SDC location of creation",
+            "Category:Images from Wiki Loves Monuments 2024",
+            "Category:Images from Wiki Loves Monuments 2024 in Nigeria",
+            "Category:Images from Wiki Loves Monuments missing SDC depicts",
+            "Category:Images from Wiki Loves Monuments missing SDC location of creation",
+            "Category:Self-published work",
+            "Category:Uploaded via Campaign:wlm-ng"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Central_library.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2016664175000003,
+      6.471877894999999
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -54858.46448259668,
+        -50003.87160546117,
+        0
+      ],
+      "max": [
+        55904.218894657155,
+        49749.23487199004,
+        20000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      31
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "The completed August 2026 exterior shows a ground level and four upper window bands.",
+      "Tall red-brown fins frame recessed blue glazing; cream stair panels carry diamond motifs.",
+      "The mapped wings and central courtyard are retained.",
+      "The October 2025 aerial shows shallow red pitched wing roofs and a turquoise central roof over the atrium.",
+      "Three stacked outlined diamond motifs with cream centres appear to the photo-left of the small-window column on the photographed cream entrance panel."
+    ],
+    "estimated": [
+      "The existing 20 m height is retained; dimensions and exact photographed facade orientation are estimates.",
+      "Unseen wing elevations use restrained repetitions of the observed material language.",
+      "Roof panel extents, ridges and the central atrium roof height are estimated from the October 2025 aerial; the geographic courtyard polygon remains unchanged. No newer aerial has been established.",
+      "The red core cap, broadened wing panels and comparison-camera bearing approximate the aerial view; exact roof panel junctions remain unresolved."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 4583,
+    "nativePatterns": 577
+  },
+  "verification": {
+    "conversionErrorMetres": 7.406272514330877e-7,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 62604,
+    "objSha256": "0d3f7b5424550de2beef0c9c5e3c2fce227921ac78c1bfe7b9ae3b796b641dfb",
+    "documentSha256": "44390ef8e26d78f1a1ffe99b3a3e1666770d3c7e73502e99dd5efc06be51b5c2",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      },
+      {
+        "kind": "photographic-glazing",
+        "photoId": "commons:198256532",
+        "details": "Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.",
+        "imageSha256": "30631f7c60f560ab6082c7bffbd68f1558620b17463dc07d202a08887169fc59"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 24425.39999999944,
+      "glbConversionErrorMetres": 9.487304666322416e-7,
+      "embeddedTextures": 3,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "44390ef8e26d78f1a1ffe99b3a3e1666770d3c7e73502e99dd5efc06be51b5c2"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

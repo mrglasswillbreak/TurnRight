@@ -15,6 +15,7 @@ import {
 } from '../web/scripts/published-campus-catalogue.mjs';
 import { activeCampus } from '../web/server/campuses';
 import { prepareReleasePhotos } from './photo-release.mjs';
+import { visualBuildTimeout } from './release-visual-timeout.mjs';
 import { arrivalIssues } from '../web/src/arrival';
 import { hydrateModelEdits } from '../web/server/model-assets';
 import { modelDocumentRevision } from '../web/src/model-document-revision';
@@ -145,7 +146,7 @@ try {
           cwd: web,
           env: process.env,
           stdio: 'inherit',
-          timeout: 120000,
+          timeout: visualBuildTimeout(data.map.features),
         },
       );
       await progress('Packaging map, routing graph and offline assets');

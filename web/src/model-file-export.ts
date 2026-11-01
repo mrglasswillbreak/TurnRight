@@ -15,6 +15,7 @@ import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import { compileModelDocument } from './model-document-compiler';
 import type { ModelMesh } from './visual-types';
 import type { ModelDocument } from './model-document';
+import { modelDocumentRevision } from './model-document-revision';
 import type { ModelExportOptions, ModelFile } from './model-file-types';
 const encoder = new TextEncoder();
 export function exportOBJ(
@@ -115,6 +116,15 @@ export async function exportModel(
   const root = new Group(),
     textures: Texture[] = [],
     bitmaps: ImageBitmap[] = [];
+  root.userData = {
+    sourceDocumentRevision: modelDocumentRevision(document),
+    geographicOrigin: document.origin,
+    units: 'metres',
+    sourceUp: 'z',
+    photographicDerivatives: document.images.flatMap((image) =>
+      image.evidence ? [{ name: image.name, ...image.evidence }] : [],
+    ),
+  };
   try {
     for (const part of meshes) {
       const geometry = new BufferGeometry();

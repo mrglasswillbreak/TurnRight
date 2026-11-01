@@ -6,6 +6,7 @@ import type { CampusPackage } from '../src/types';
 import { registerPackageIntegrity } from './offline-package-integrity';
 import { registerCacheRecovery } from './offline-cache-recovery';
 import { registerCampusIsolation } from './offline-campus-isolation';
+import { registerDetailedDownloads } from './offline-detailed-models';
 const saved = new Map<string, Response>();
 const cache = {
   delete: async (url: string) => saved.delete(url),
@@ -53,3 +54,4 @@ export type OfflineFixture = ReturnType<typeof fixture>;
 registerPackageIntegrity(fixture);
 registerCacheRecovery(fixture);
 registerCampusIsolation(fixture);
+registerDetailedDownloads(fixture);

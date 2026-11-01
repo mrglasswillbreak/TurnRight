@@ -1,0 +1,292 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:120",
+  "name": "LASU Senate Building",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "c0098e5559488f3dce6e8d52d8a0d813b9912e11a82c9c204b281052e6238d8a",
+    "preservedAppearanceSha256": "fdc406eb33c31924859f5b72033f8261bd3f05da9cc8d76cb4b6547ae2099e42",
+    "mappedHeightMetres": 21,
+    "mappedFloors": 7,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 7,
+    "observed": "Seven levels, glazing bands and paired cream panels with three red-brown diamonds each; dated corner views show additional contrasting panels.",
+    "gaps": [
+      "Precise facade orientation, rear details and the auxiliary octagonal wing remain estimates.",
+      "The legacy roof model and present roof form require independent review."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:138069484",
+      "caption": "Senate building, front facade",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg",
+      "author": "Aimee.shot.it",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2023-07-07",
+      "historical": true,
+      "sha256": "ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba",
+      "assetUrl": "/packages/photos/ada5a0066b87f8bc8b28b17bac015209b4cb100000c6661ae4a1e1572cd8a7ba.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:120",
+        "photoId": "commons:138069484",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg",
+        "checkedAt": "2026-11-01T02:24:04.251Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Aimee.shot.it",
+          "license": "CC BY-SA 4.0",
+          "date": "2023-07-07"
+        },
+        "verifiedMetadata": {
+          "author": "Aimee.shot.it",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2023-07-07 17:16:39",
+          "description": "The Senate Building at the Lagos State University is one of the most significant buildings on the campus. It is home to the university's senate, which is responsible for governing the university and making important decisions about its policies and direction. The Senate Building is also a landmark of the university, and its striking architecture is a familiar sight to students and visitors. The building is a symbol of the university's commitment to academic excellence, and it is a source of pride for the entire campus community.",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Files with coordinates missing SDC location of creation",
+            "Category:Images from Wiki Loves Monuments 2023",
+            "Category:Images from Wiki Loves Monuments 2023 in Nigeria",
+            "Category:Images from Wiki Loves Monuments missing SDC depicts",
+            "Category:Images from Wiki Loves Monuments missing SDC location of creation",
+            "Category:Self-published work",
+            "Category:University Senate Building",
+            "Category:Uploaded via Campaign:wlm-ng"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_Building.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "commons:198256507",
+      "caption": "Senate building, August 2026",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+      "author": "FrankvEck",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2026-08-27",
+      "historical": false,
+      "sha256": "2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94",
+      "assetUrl": "/packages/photos/2e46c4aaa14c3ed89c4b27de268213a90b2a5c87f26afafc9884c1ac26e9cb94.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:120",
+        "photoId": "commons:198256507",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg",
+        "checkedAt": "2026-11-01T02:24:04.252Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "date": "2026-08-27"
+        },
+        "verifiedMetadata": {
+          "author": "FrankvEck",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2026-08-27",
+          "description": "Lagos State University Senate building",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Senate_building_aug_2026_IMG_5989b.jpg"
+        }
+      }
+    },
+    {
+      "id": "commons:116073984",
+      "caption": "Senate building, right section",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "sha256": "108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7",
+      "assetUrl": "/packages/photos/108f9bf7877d46fbfad7e9478be959a9b121b0160bcf722e721926865044c8d7.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:120",
+        "photoId": "commons:116073984",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg",
+        "checkedAt": "2026-11-01T02:24:04.254Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-11"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-11 12:37:35",
+          "description": "The Lagos State University Senate Building Right Section",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:LASU_Senate_Building_Right_Section_1.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "commons:115987634",
+      "caption": "Senate building, oblique view",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg",
+      "author": "Ebubechukwu1",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "sha256": "9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066",
+      "assetUrl": "/packages/photos/9e577151cc8f7d64317ca8b1b99ee43f9716b624ee2eaed451326bf515cee066.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:120",
+        "photoId": "commons:115987634",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg",
+        "checkedAt": "2026-11-01T02:24:04.256Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Ebubechukwu1",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-11"
+        },
+        "verifiedMetadata": {
+          "author": "Ebubechukwu1",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-11 15:15:15",
+          "description": "Senate building of Lagos state university",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work",
+            "Category:Taken with LG K31"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Senate_building.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.199723278571429,
+      6.471364771428571
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -17034.66298171282,
+        -65301.693618870755,
+        0
+      ],
+      "max": [
+        29413.895019159954,
+        33350.58156434176,
+        21000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      3
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Seven visible levels, including the glazed ground floor.",
+      "Paired projecting cream facade panels with three red-brown diamonds each.",
+      "Horizontal glazing bands, cream mullions, red-brown spandrels and a recessed central entrance."
+    ],
+    "estimated": [
+      "Metric heights retain the existing 21 m main-wing estimate.",
+      "Front follows the existing photo-associated south facade; other elevation assignments and module dimensions remain inferred.",
+      "The separate octagonal auxiliary wing retains its existing 6 m height and conservative appearance."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 3132,
+    "nativePatterns": 157
+  },
+  "verification": {
+    "conversionErrorMetres": 8.265114691398614e-7,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 66852,
+    "objSha256": "d7201c0efcc71f65d3c503066953053c5bf6e96e1a41d8e951b06159f8a3563f",
+    "documentSha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      },
+      {
+        "kind": "photographic-glazing",
+        "photoId": "commons:138069484",
+        "details": "Small glazing sample, four-corner rectification, resampled to 128 px and repeated across estimated glazing modules; not a whole-facade photographic reconstruction.",
+        "imageSha256": "0f7e4baebc86f2a02f3c7718509857d03a7eb74a7aea9f00bd7b460bfd32d7a6"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 21985.599999999627,
+      "glbConversionErrorMetres": 0.0000013481445293450633,
+      "embeddedTextures": 3,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

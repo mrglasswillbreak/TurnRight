@@ -47,6 +47,26 @@ export function MeshObjectSettings({ state }: { state: ModelMeshState }) {
             </ModelButton>
           </div>
           <MeshTransformTools state={state} />
+          <label>
+            Distance detail
+            <select
+              value={object.detailTier || 'structure'}
+              disabled={disabled || object.locked}
+              onChange={(event) =>
+                changeObject({
+                  ...object,
+                  detailTier: event.target.value as
+                    | 'structure'
+                    | 'facade'
+                    | 'fine',
+                })
+              }
+            >
+              <option value="structure">Structure · all distances</option>
+              <option value="facade">Facade · medium and close views</option>
+              <option value="fine">Fine detail · close views</option>
+            </select>
+          </label>
           {material && (
             <fieldset disabled={disabled || object.locked}>
               <legend>Material</legend>

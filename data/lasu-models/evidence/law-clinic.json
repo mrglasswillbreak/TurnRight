@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:78",
+  "name": "Law Clinic",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "032a86a58f85eece42bad28c5feeb95b4331ace146162b7c7417f17dad123ec2",
+    "preservedAppearanceSha256": "1fbd57bc98c58876bfae50fed75cdae3ffd34c77a60f10869b6120a0c76735f1",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "hip"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Dated March 2022 cream facade, two glass-block entrance towers, small red gables and recessed side galleries. The undated dark-clad version has unresolved chronology.",
+    "gaps": [
+      "The dark-clad undated photograph conflicts with dated cream exteriors; retain the dated interpretation pending chronology evidence."
+    ],
+    "comparisonPhotoId": "commons:116180607"
+  },
+  "references": [
+    {
+      "id": "commons:116180607",
+      "caption": "Law Clinic, wider approach view",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-17",
+      "historical": true,
+      "sha256": "47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58",
+      "assetUrl": "/packages/photos/47b20271a0e7e566d7a47e0d5c4028f29c8b4e4a21dfbbc5e6b39b04fbac7f58.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:78",
+        "photoId": "commons:116180607",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg",
+        "checkedAt": "2026-11-01T02:24:04.258Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-17"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-17 18:36:15",
+          "description": "Front View Of The Lagos State University Law Clinic",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:LASU_Law_Clinic,_Ojo.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+      "caption": "Law Clinic",
+      "sourceUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+      "author": "The Nation",
+      "license": "Public domain",
+      "licenseUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1",
+      "assetUrl": "/packages/photos/2eed262219e1b558bf914b837a5d2c85c646436eb2f2dec22cfdf43213e51bd1.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:78",
+        "photoId": "owner:e65a2dc2-99f8-4113-a25d-4a749edc10b0",
+        "sourceUrl": "https://thenationonlineng.net/donors-renovate-lasu-law-clinic-in-honour-of-oguntade/",
+        "checkedAt": "2026-11-01T02:24:04.259Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "The Nation",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465",
+      "caption": " Law Clinic",
+      "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/faculties/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d",
+      "assetUrl": "/packages/photos/6b96c8a1877843bb73a953b4eda10ac64270cae7916d237a59f4ea16e6ae941d.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:78",
+        "photoId": "owner:5eb661a4-e64c-4ed6-94df-7682e42a8465",
+        "sourceUrl": "https://lasu.edu.ng/home/faculties/",
+        "checkedAt": "2026-11-01T02:24:04.259Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2022506833333333,
+      6.466867027777777
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -12030.254141550626,
+        -14491.807706558673,
+        0
+      ],
+      "max": [
+        10310.331078944864,
+        13495.99398819307,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      4
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Cream two-storey wings, red pitched roofs, veranda columns and balcony rails."
+    ],
+    "estimated": [
+      "The dark-clad undated photograph conflicts with dated cream exteriors; retain the dated interpretation pending chronology evidence.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+      "Side entrances retain the two published authored wall-4 door positions; courtyard galleries are interpreted from the dated cream exterior.",
+      "Cream glass-block entrance towers use the dated March 2022 view. Their small gable profiles and gallery depths are estimated within the retained mapped wings."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 714,
+    "nativePatterns": 117
+  },
+  "verification": {
+    "conversionErrorMetres": 9.094947017729283e-16,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 27254,
+    "objSha256": "9a756196c92a5b9fd84b2162b39b349f007187731c31f851a97c47e2ca36ee17",
+    "documentSha256": "f9fe0f7f3ce8f7ab1bb2f157943c7a2694c5f8208fe264d5fea3c32fd3df28ab",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 29893.700000001118,
+      "glbConversionErrorMetres": 4.280219325636381e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "f9fe0f7f3ce8f7ab1bb2f157943c7a2694c5f8208fe264d5fea3c32fd3df28ab"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

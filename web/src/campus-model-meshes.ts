@@ -12,6 +12,7 @@ import {
 } from 'three';
 import { createModelRenderMaterial } from './model-render-material';
 import type { ModelRenderMaterial } from './model-render-types';
+import type { DetailedBuildingModel } from './model-lod-types';
 import { MercatorCoordinate, type Map as CampusMap } from 'maplibre-gl';
 import type { BuildingModel } from './visual-types';
 import { validBuildingModel } from './building-visuals';
@@ -24,6 +25,21 @@ export function createCampusModelMeshes(
   origin: MercatorCoordinate,
   scale: number,
 ) {
+  const materialKey = (
+    colour: string,
+    role: MaterialRole,
+    recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
+    authored?: ModelRenderMaterial,
+    expectedImages: DetailedBuildingModel['textures'] = [],
+  ) => {
+    const images = Object.values(authored?.maps || {}).map((url) => {
+      const image = expectedImages.find((entry) => entry.url === url);
+      return image
+        ? [url, image.width, image.height, image.bytes, image.contentType]
+        : [url];
+    });
+    return `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':' + JSON.stringify(authored) + ':' + JSON.stringify(images) : ''}`;
+  };
   const materials = new Map<
     string,
     {
@@ -35,6 +51,7 @@ export function createCampusModelMeshes(
       themeKey?: string;
       releaseTexture?: () => void;
       recipe?: FacadeTextureRecipe | SurfaceTextRecipe;
+      ready?: Promise<boolean>;
     }
   >();
   function release(group: Group) {
@@ -60,12 +77,17 @@ export function createCampusModelMeshes(
     role: MaterialRole,
     recipe?: FacadeTextureRecipe | SurfaceTextRecipe,
     authored?: ModelRenderMaterial,
+    expectedImages: DetailedBuildingModel['textures'] = [],
   ) {
-    const key = `${colour}:${role}${recipe ? ':' + ('text' in recipe ? JSON.stringify(recipe) : textureKey(recipe)) : ''}${authored ? ':' + JSON.stringify(authored) : ''}`;
+    const key = materialKey(colour, role, recipe, authored, expectedImages);
     let entry = materials.get(key);
     if (!entry) {
       const custom = authored
-        ? createModelRenderMaterial(authored, () => map.triggerRepaint())
+        ? createModelRenderMaterial(
+            authored,
+            () => map.triggerRepaint(),
+            expectedImages,
+          )
         : undefined;
       entry = {
         value:
@@ -81,13 +103,17 @@ export function createCampusModelMeshes(
         recipe,
         releaseTexture: custom?.release,
         authoredOpacity: authored?.opacity,
+        ready: custom?.ready,
       };
       materials.set(key, entry);
     }
     entry.users++;
     return entry.value;
   }
-  function building(model: BuildingModel) {
+  function building(
+    model: BuildingModel,
+    expectedImages: DetailedBuildingModel['textures'] = [],
+  ) {
     if (!validBuildingModel(model))
       throw new Error('Invalid campus model geometry.');
     const group = new Group(),
@@ -119,17 +145,47 @@ export function createCampusModelMeshes(
       const role = meshMaterialRole(part.surfaces, part);
       const mesh = new Mesh(
         geometry,
-        material(part.colour, role, part.texture || part.text, part.material),
+        material(
+          part.colour,
+          role,
+          part.texture || part.text,
+          part.material,
+          expectedImages,
+        ),
       );
       mesh.userData = {
         buildingId: model.id,
         detail: part.detail,
         minZoom: part.minZoom,
-        materialKey: `${part.colour}:${role}${part.text ? ':' + JSON.stringify(part.text) : part.texture ? ':' + textureKey(part.texture) : ''}${part.material ? ':' + JSON.stringify(part.material) : ''}`,
+        materialKey: materialKey(
+          part.colour,
+          role,
+          part.texture || part.text,
+          part.material,
+          expectedImages,
+        ),
         surfaces: part.surfaces,
       };
       group.add(mesh);
     }
+    group.userData.ready = Promise.all(
+      group.children.map(
+        (mesh) => materials.get(mesh.userData.materialKey)?.ready ?? true,
+      ),
+    ).then((results) => results.every(Boolean));
+    group.userData.residentBytes = group.children.reduce((sum, child) => {
+      const mesh = child as Mesh;
+      const buffers =
+        Object.values(mesh.geometry.attributes).reduce(
+          (n, a) => n + a.array.byteLength,
+          0,
+        ) + (mesh.geometry.index?.array.byteLength || 0);
+      return (
+        sum +
+        buffers * 2 +
+        JSON.stringify(mesh.userData.surfaces || []).length * 2
+      );
+    }, 0);
     return group;
   }
   return { materials, release, building };

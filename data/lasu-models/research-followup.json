@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "checkedOn": "2026-11-01",
+  "purpose": "Additional identification research while the implementation checks run. These records do not establish new model-to-footprint associations.",
+  "checks": [
+    {
+      "building": "Abisogun Leigh Science Building",
+      "sources": [
+        "https://commons.wikimedia.org/wiki/File:Abisogun_Leigh_Science_Building,Lasu.jpg",
+        "https://lasu.edu.ng/home/academic-staff/profile/?name=OLOWU-RASAQ"
+      ],
+      "finding": "The Commons photograph names the Ojo science building. The university staff profile places a Chemistry office on its middle floor. Neither inspected page establishes a stable mapped footprint or geographic coordinate.",
+      "disposition": "Retain footprint-identification gap."
+    },
+    {
+      "building": "Enitan Bababunmi Science Laboratory",
+      "sources": [
+        "https://commons.wikimedia.org/wiki/File:Enitan_Bababunmi_Science_Laboratory,_Faculty_of_Science,_Lagos_State_University.jpg"
+      ],
+      "finding": "The file identifies the photographed laboratory and records 12 November 2021. The inspected page exposes no latitude or verified map association.",
+      "disposition": "Retain footprint-identification gap."
+    },
+    {
+      "building": "Bola Ahmed Tinubu Science Complex",
+      "sources": [
+        "https://commons.wikimedia.org/wiki/File:Bola_Ahmed_Tinubu_Science_Complex,_Faculty_of_Science,_Lagos_State_University.jpg",
+        "https://lasu.edu.ng/home/academic-staff/profile/?name=ADEWUSI-MUSTAPHA"
+      ],
+      "finding": "The photograph names the complex; the university staff profile associates it with the Physics department at Ojo. Neither inspected source verifies a particular mapped footprint.",
+      "disposition": "Retain footprint-identification gap."
+    },
+    {
+      "building": "Main Printing Press",
+      "sources": [
+        "https://commons.wikimedia.org/wiki/File:LASU_Main_Printing_Press_Building.jpg"
+      ],
+      "finding": "The file identifies the exterior and records 17 March 2022. Its inspected metadata supplies no latitude or stable footprint association.",
+      "disposition": "Retain footprint-identification gap."
+    },
+    {
+      "buildingId": "arcgis:University_Property:11",
+      "building": "LASU Clinic / Health Centre",
+      "sources": [
+        "https://healthcenter.lasu.edu.ng/",
+        "https://healthcenter.lasu.edu.ng/img/banner1.png",
+        "https://healthcenter.lasu.edu.ng/img/body_logo.png"
+      ],
+      "finding": "The official health-services page names the Ojo main campus. Visual inspection of its banner and body image found an indoor radiography scene and a stylized logo, respectively; neither supplies an exterior reconstruction view. Other listed images are staff portraits or the university badge.",
+      "rights": "Official site states all rights reserved; private observation only. No image is used as a model texture or redistributed reference.",
+      "disposition": "Retain exterior-evidence hold."
+    },
+    {
+      "building": "LASU Central Mosque",
+      "sources": [
+        "https://www.praysalat.com/mosque/lagos/8832-lasu-mosque-central-mosque-ojo",
+        "https://mssn2.pixeljet.com.ng/contact-us/"
+      ],
+      "finding": "The search listing suggested a mosque location, but opening the first URL returned an unrelated chat application. The second returned a verification page. Neither yielded an inspectable, attributed exterior photograph; cached search labels were not treated as verification.",
+      "disposition": "No eligible model added from these sources."
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { packageDetailedModels } from './detailed-package.mjs';
 
 /** Optional schema-v1 extension. Only catalogue-listed, verified sectors enter a release. */
 export async function packageVisuals(directory, writeAsset) {
@@ -133,6 +134,11 @@ export async function packageVisuals(directory, writeAsset) {
   if (bytes + textureBytes + sceneryBytes > 12 * 1024 * 1024)
     throw new Error('Campus geometry and textures exceed 12 MiB');
   return {
+    detailedModels: await packageDetailedModels(
+      catalogue,
+      directory,
+      writeAsset,
+    ),
     catalogue,
     manifest: { bytes, assetUrls: [...urls] },
     ...(textureUrls.size

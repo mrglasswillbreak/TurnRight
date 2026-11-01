@@ -7,7 +7,7 @@ import {
 import { customRoofSurface } from './custom-roof.js';
 import { detailRevision, facadeMatches } from './building-facades.js';
 import { compileModelDocument } from './model-document-compiler.js';
-import type { ModelDocument } from './model-document.js';
+import type { ModelDocument, ModelDetailTier } from './model-document.js';
 import { curvedWall, alongPath, pathDistances } from './building-curves.js';
 import { editableFacade } from './model-authoring.js';
 import { facadeMeshes } from './facade-mesh.js';
@@ -25,7 +25,7 @@ import { mergeModelMeshes } from './building-mesh-merge.js';
 export function createBuildingModel(
   feature: Feature<Polygon | MultiPolygon>,
   visual: BuildingVisual,
-  options: { previewUnreviewed?: boolean } = {},
+  options: { previewUnreviewed?: boolean; detail?: ModelDetailTier } = {},
 ): BuildingModel {
   const polygons =
     feature.geometry.type === 'Polygon'
@@ -423,7 +423,9 @@ export function createBuildingModel(
       ...(document?.replaceVisual
         ? []
         : mergeModelMeshes([...allMeshes.values(), ...detailedMeshes])),
-      ...(document ? compileModelDocument(document, origin) : []),
+      ...(document
+        ? compileModelDocument(document, origin, options.detail)
+        : []),
     ],
   };
 }

@@ -4,6 +4,10 @@ import { createCampusModels } from '../src/campus-model-layer';
 import { campusFixture } from './fixture';
 
 const draw = vi.hoisted(() => vi.fn());
+vi.mock('../src/model-environment', async (original) => ({
+  ...(await original<typeof import('../src/model-environment')>()),
+  modelEnvironment: () => vi.fn(),
+}));
 vi.mock('three', async (original) => ({
   ...(await original<typeof import('three')>()),
   WebGLRenderer: class {
@@ -19,6 +23,7 @@ it('never passes a globe matrix to the Mercator building renderer and resumes re
   let layer: CustomLayerInterface | undefined;
   const map = {
     getZoom: () => zoom,
+    getCenter: () => ({ lng: 3.2, lat: 6.46 }),
     getBounds: () => ({
       getWest: () => 3.19,
       getEast: () => 3.22,

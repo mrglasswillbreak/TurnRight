@@ -27,6 +27,12 @@ if (files.length < 15)
 const assets = [],
   audio = {};
 async function asset(url, bytes, contentType) {
+  const previous = assets.find((a) => a.url === url);
+  if (previous) {
+    if (previous.sha256 !== hash(bytes) || previous.bytes !== bytes.length)
+      throw new Error('Conflicting package asset.');
+    return;
+  }
   const target = path.join(publicDir, decodeURIComponent(url));
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.writeFile(target, bytes);
@@ -91,6 +97,9 @@ const manifest = {
   assets,
   ...(visuals ? { visuals: visuals.manifest } : {}),
   ...(visuals?.textures ? { textures: visuals.textures } : {}),
+  ...(visuals?.detailedModels
+    ? { detailedModels: visuals.detailedModels }
+    : {}),
   ...(photos ? { photos } : {}),
 };
 const manifestJson = JSON.stringify(manifest, null, 2);

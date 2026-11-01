@@ -11,6 +11,9 @@ on:
       campus_id:
         default: campus-eedb34e0-0310-47a0-afbf-2d2b7e8d9a2a
         required: false
+      expected_model_ids:
+        description: Optional JSON array of exact LASU detailed building IDs required by this release
+        required: false
       scope:
         type: choice
         options: [all, offline-webkit, production, rollback]
@@ -37,6 +40,7 @@ jobs:
       RELEASE_ID: ${{ inputs.release_id }}
       CAMPUS_ID: ${{ inputs.campus_id }}
       VERIFY_SCOPE: ${{ inputs.scope }}
+      VERIFY_EXPECTED_MODEL_IDS: ${{ inputs.expected_model_ids }}
       APPLICATION_DEPLOYMENT_ID: ${{ inputs.application_deployment_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -47,7 +51,7 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: web
-      - run: npx vitest run tests/release-promotion.test.ts tests/published-assets.test.ts
+      - run: npx vitest run tests/release-promotion.test.ts tests/published-assets.test.ts tests/verify-detailed-campus.test.ts
         working-directory: web
       - if: inputs.cleanup_run != ''
         run: node scripts/cleanup-preview-access.mjs

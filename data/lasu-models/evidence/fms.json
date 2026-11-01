@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:39",
+  "name": "FMS",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "b00a6638cd6bc7f700ba61ea6c193d844891040b59e3cabd553292a9e52481d0",
+    "preservedAppearanceSha256": "db4c5d0f6d56daf236db2a82b5bf71b9094156aebb3193247a05a68240f87cdc",
+    "mappedHeightMetres": 9,
+    "mappedFloors": 3,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 3,
+    "observed": "Yellow walls, red columns, inset windows and a white entrance portico.",
+    "gaps": [
+      "The source filename suggests another faculty; identification follows the visible FMS signage, not the filename."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+      "caption": "FMS",
+      "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3",
+      "assetUrl": "/packages/photos/feaa4d736850abe1c5631aa5f921273a291b47c0a014d21dfec282593c496bb3.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:39",
+        "photoId": "owner:159018c2-ccca-42ac-a968-5afde86e47af",
+        "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+        "checkedAt": "2026-11-01T02:24:04.233Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9",
+      "caption": "FMS",
+      "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://lasu.edu.ng/home/lasuss/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b",
+      "assetUrl": "/packages/photos/5b6d19fc425af4048ef79b0ff7dce2795be6f44978f6e116c9a55b8a0be4982b.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:39",
+        "photoId": "owner:855bc0a5-efd2-40c5-85ee-81206f2750e9",
+        "sourceUrl": "https://lasu.edu.ng/home/lasuss/",
+        "checkedAt": "2026-11-01T02:24:04.234Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.19991942,
+      6.475716090000001
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -29877.523350382056,
+        -47723.81648545114,
+        0
+      ],
+      "max": [
+        39894.15032669757,
+        37229.22481289247,
+        9000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      3
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow walls, red columns, inset windows and a white entrance portico."
+    ],
+    "estimated": [
+      "The source filename suggests another faculty; identification follows the visible FMS signage, not the filename.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 1645,
+    "nativePatterns": 77
+  },
+  "verification": {
+    "conversionErrorMetres": 3.637978807091713e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 36310,
+    "objSha256": "f0498f8d2467834bb0924e074919c4f437e1a0e82c1f1b421ee2569958746125",
+    "documentSha256": "558f9c4c2f905c3313e7e9035f5127653aa17aedb4a0fe55a4b2a297e37a0a84",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 17781.300000000745,
+      "glbConversionErrorMetres": 0.0000017924717496953235,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "558f9c4c2f905c3313e7e9035f5127653aa17aedb4a0fe55a4b2a297e37a0a84"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

@@ -6,18 +6,19 @@ import { root } from './toolchain.mjs';
 
 // Shared by Vitest's zero-hit inventory and the combined Node/browser gate.
 export const coverageIncludes = [
-  'src/**/*.{ts,tsx,mjs}',
+  'src/**/*.{ts,tsx,mjs,js}',
   'components/**/*.{ts,tsx}',
-  'lib/**/*.{ts,tsx,mjs}',
-  'hooks/**/*.{ts,tsx,mjs}',
-  'server/**/*.{ts,mjs}',
+  'lib/**/*.{ts,tsx,mjs,js}',
+  'hooks/**/*.{ts,tsx,mjs,js}',
+  'server/**/*.{ts,mjs,js}',
   'api/**/*.ts',
 ];
 export const coverageExcludes = ['**/*.d.ts', '**/*.d.mts'];
 export function coveredSource(file) {
   return (
-    /^(src|components|lib|hooks|server|api)\/.*\.(?:ts|tsx|mjs)$/.test(file) &&
-    !/\.d\.(?:ts|mts)$/.test(file)
+    /^(src|components|lib|hooks|server|api)\/.*\.(?:ts|tsx|mjs|js)$/.test(
+      file,
+    ) && !/\.d\.(?:ts|mts)$/.test(file)
   );
 }
 
