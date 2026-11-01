@@ -1,6 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
+import {
+  releaseSourceFields,
+  assertDeploymentSource,
+} from './release-source-revision.mjs';
+import {
+  temporaryAccessNote,
+  maskTemporaryAccessSecret,
+} from './preview-access.mjs';
 
 // Official API contracts: github.com/vercel/sdk/docs/sdks/{deployments,projects}.
 export async function vercelApi(endpoint, options = {}) {
@@ -34,6 +42,7 @@ export async function withDeploymentAccess(origin, read, deploymentId) {
     !url.hostname.endsWith('.vercel.app')
   )
     throw Error('Unexpected historical deployment origin');
+  const note = temporaryAccessNote();
   const deployment = await vercelApi(
     `/v13/deployments/${encodeURIComponent(deploymentId || url.hostname)}`,
   );
@@ -42,7 +51,7 @@ export async function withDeploymentAccess(origin, read, deploymentId) {
   if (deploymentId && deployment.url !== url.hostname)
     throw Error('Historical deployment URL does not match its stored ID');
   const secret = randomBytes(16).toString('hex');
-  if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${secret}`);
+  maskTemporaryAccessSecret(secret);
   const endpoint = `/v1/projects/${process.env.VERCEL_PROJECT_ID}/protection-bypass`;
   const update = (body) =>
     vercelApi(endpoint, {
@@ -53,7 +62,7 @@ export async function withDeploymentAccess(origin, read, deploymentId) {
   await update({
     generate: {
       secret,
-      note: `Temporary campus release check ${process.env.GITHUB_RUN_ID || 'local'}`,
+      note,
     },
   });
   try {
@@ -234,6 +243,9 @@ export async function publishDeployment(
   const deployment = await vercelApi(
     `/v13/deployments/${encodeURIComponent(id)}`,
   );
+  const sourceRevision = deployment.meta?.turnrightSourceRevision;
+  const sourceFields =
+    sourceRevision === undefined ? {} : releaseSourceFields(sourceRevision);
   if (deployment.target !== 'production') {
     if (operation === 'rollback')
       throw new Error(
@@ -273,6 +285,7 @@ export async function publishDeployment(
         'Multiple production builds exist for this release. Inspect Vercel before retrying.',
       );
     let created = candidates[0];
+    if (created) assertDeploymentSource(created, sourceRevision);
     if (!created) {
       created = await vercelApi('/v13/deployments', {
         method: 'POST',
@@ -282,7 +295,9 @@ export async function publishDeployment(
           name: project.name,
           project: project.id,
           target: 'production',
+          ...sourceFields,
           meta: {
+            ...sourceFields.meta,
             action: 'promote',
             turnrightPromotion: releaseId,
             turnrightPreview: id,
@@ -297,7 +312,13 @@ export async function publishDeployment(
       );
     // Persist before waiting, so retries inspect this production build.
     await onCreated(id);
-    return waitForDeployment(id, true, process.env.VERCEL_PROJECT_ID);
+    const ready = await waitForDeployment(
+      id,
+      true,
+      process.env.VERCEL_PROJECT_ID,
+    );
+    assertDeploymentSource(ready, sourceRevision);
+    return ready;
   }
 
   await waitForDeployment(id);

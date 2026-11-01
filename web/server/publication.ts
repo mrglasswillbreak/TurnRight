@@ -13,6 +13,7 @@ export async function publicationAction(
   actor: string,
   action: string,
   payload: Record<string, unknown>,
+  schedule: typeof dispatch = dispatch,
 ) {
   const { revision: catalogueHash } = await readPublishedCatalogue(
     process.env.PUBLISHED_MAP_URL!,
@@ -69,7 +70,7 @@ export async function publicationAction(
         await publishedCampus(),
         { restoring: !!release.restored_from },
       );
-      await dispatch('release.yml', {
+      await schedule('release.yml', {
         release_id: id,
         operation: 'preview',
         campus_id: currentCampusId(),
@@ -110,7 +111,7 @@ export async function publicationAction(
     action: 'publication-request',
     subject: release.id,
   });
-  await dispatch('release.yml', {
+  await schedule('release.yml', {
     release_id: release.id,
     operation: 'publish',
     campus_id: currentCampusId(),
