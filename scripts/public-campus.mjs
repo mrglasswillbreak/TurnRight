@@ -1,3 +1,4 @@
+import { modelDocumentFingerprint } from '../web/src/model-document-fingerprint.js';
 // Public downloads contain attribution and evidence references, not survey history.
 const privateKeys = new Set([
   'gisManaged',
@@ -74,6 +75,11 @@ export function publicCampus(value, field = '') {
     value = publishedLayers(value);
   if (Array.isArray(value)) return value.map((v) => publicCampus(v, field));
   if (!value || typeof value !== 'object') return value;
+  if (field === 'properties' && value.modelDocument?.version === 1)
+    value = {
+      ...value,
+      authoredModelRevision: modelDocumentFingerprint(value.modelDocument),
+    };
   if (field === 'photos')
     return Object.fromEntries(
       Object.entries(value).filter(([key]) => photoKeys.has(key)),
