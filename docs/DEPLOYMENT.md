@@ -4,6 +4,8 @@ TurnRight deploys a public campus PWA, a private team GIS API and isolated proce
 
 The [detailed model reader and LASU campaign](LASU-MODELS.md) add optional per-building render variants and a separate immutable detail asset group; no new database migration is required. Deploy the compatible reader and build workers before publishing detailed assets. Keep `PUBLISHED_MAP_URL` enabled so subsequent application builds verify and retain all published detail levels and textures. The compatible base limits remain unchanged. A software release does not approve or publish the campaign's model proposals; [PR #61](https://github.com/mrglasswillbreak/TurnRight/pull/61) tracks this reader upgrade and its hosted checks.
 
+For the explicitly authorized LASU campaign while Actions billing is blocked, use the [one-off manual release procedure](MANUAL-RELEASE.md). It requires equivalent local acceptance and verified restoration of temporary repository/workflow exceptions; the normal policy below remains unchanged.
+
 ## Existing-installation upgrade
 
 1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–056**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
@@ -31,14 +33,14 @@ Use the existing bootstrap workflow only on an empty source baseline; it refuses
 
 ### Vercel
 
-| Setting                     | Value                                |
-| --------------------------- | ------------------------------------ |
-| Framework / root            | Vite / web                           |
-| Include source outside root | Enabled for repository tooling       |
-| Node                        | 22.x; development and CI pin 22.23.3 |
+| Setting                     | Value                                        |
+| --------------------------- | -------------------------------------------- |
+| Framework / root            | Vite / web                                   |
+| Include source outside root | Enabled for repository tooling               |
+| Node                        | 22.x; development and CI pin 22.23.3         |
 | Install / build / output    | `cd .. && npm ci` / `npm run build` / `dist` |
-| Production branch           | main                                 |
-| Ignored Build Step          | Automatic                            |
+| Production branch           | main                                         |
+| Ignored Build Step          | Automatic                                    |
 
 Keep preview protection and existing project cost limits. Review a compatible preview before switching production. Do not promote an old whole-site deployment to restore only one campus.
 
@@ -65,8 +67,8 @@ Configure existing secrets SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VERCEL_TOKEN
 
 | Workflow                                          | Responsibility                                                                                                                   |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| ci.yml                                           | Root quality, combined coverage, Chromium/WebKit, prepared offline and fresh local-stack checks; reusable regression entry point |
-| security.yml                                     | Full npm/Python audits, pinned static analysis and bounded historical secret scanning |
+| ci.yml                                            | Root quality, combined coverage, Chromium/WebKit, prepared offline and fresh local-stack checks; reusable regression entry point |
+| security.yml                                      | Full npm/Python audits, pinned static analysis and bounded historical secret scanning                                            |
 | gis-acceptance.yml                                | Native PostGIS migrations, 100,000-feature queries/jobs, approval locks, pg_dump/pg_restore and isolated engine/GeoPackage tests |
 | map-import-tests.yml                              | Native import-format and private worker-mount regressions                                                                        |
 | gis-processing.yml                                | One campus-scoped analysis/export job with cancellation, leases and staged output                                                |

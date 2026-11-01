@@ -5,6 +5,8 @@ existence does not imply architectural approval. The bridge currently accepts th
 20 audited Ojo building IDs, preserving the published 614-building baseline,
 existing private corrections, photographs, routing and other campuses.
 
+The [one-off manual LASU release path](MANUAL-RELEASE.md) continues the already saved and reconciled batch when Actions cannot start. It does not repeat the import or imply publication.
+
 Use **Prepare reviewed campus layer release** (`campus-layer-release.yml`) with
 `campus_id=lasu` and `upgrade=models` on the reviewed reader/worker commit.
 

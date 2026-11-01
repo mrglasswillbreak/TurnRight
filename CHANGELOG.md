@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add an explicit one-off local LASU release operator with complete local validation, pinned recovery evidence, guarded scheduling and run-specific temporary access cleanup. Default Actions dispatch and public package formats remain unchanged.
 - Reconcile saved model batches against their verified backup and exact GIS dataset revision increments. Continue an interrupted original-owner review through pinned receipts and the existing review API without uploading or saving models again.
 - Add selected-face photographic texture projection, four-corner crop preview, source evidence and undo to imported meshes. Export textured GLB files and seven high-resolution exterior views.
 - Compile structural, facade and fine-detail geometry into three immutable map variants. Stream visible models with selection priority, cancellation, verified shared textures and bounded geometry/texture residency.

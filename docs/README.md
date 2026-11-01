@@ -8,6 +8,8 @@ Start precision work with the [numeric drawing and tracing instructions](EDITOR.
 
 [Model authoring](MODEL-AUTHORING.md) covers photographic projection onto mesh faces, distance-detail tiers, textured GLB exports and seven building-render views. The [detailed public model contract](ARCHITECTURE.md#detailed-public-model-contract) separates compatible base-visual limits from streamed detailed assets; [campus downloads](PUBLIC-MAP.md#download-before-disconnecting) include every published level and texture by default. [LASU Ojo modeling records](LASU-MODELS.md) track the current 20 proposals, 42.8 MiB fixture, evidence and measured limits. The [guarded model publication workflow](MODEL-CAMPAIGN-PUBLICATION.md) explains private inspection, pinned import and exact-snapshot review; publication authorization is not a completed release receipt.
 
+The [one-off manual release guide](MANUAL-RELEASE.md) documents local acceptance and guarded publication during the authorized Actions billing exception.
+
 ## Use TurnRight
 
 | Task                                                                                           | Guide                                                                                      |
