@@ -40,6 +40,7 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `GIS_TEST_DATABASE_URL` | tool | Yes | Disposable test database URL; acceptance tools reject production database names. |
 | `GITHUB_ACTOR` | ci | No | GitHub-provided actor name recorded in the private model-import receipt; never used as a fabricated campus identity. |
 | `GITHUB_ACTIONS` | ci | No | GitHub-provided runner marker. |
+| `GITHUB_REF` | ci | No | GitHub-provided branch or tag reference; review continuation requires refs/heads/main. |
 | `GITHUB_REPOSITORY` | server | No | Owner/repository used for authorized worker dispatch. |
 | `GITHUB_RUN_ID` | ci | No | GitHub-provided run identifier used in verification and cleanup receipts. |
 | `GITHUB_SHA` | ci | No | GitHub-provided source revision used in health and verification receipts. |

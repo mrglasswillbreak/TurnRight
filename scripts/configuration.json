@@ -131,6 +131,11 @@
       "sensitive": false,
       "description": "GitHub-provided runner marker."
     },
+    "GITHUB_REF": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided branch or tag reference; review continuation requires refs/heads/main."
+    },
     "GITHUB_REPOSITORY": {
       "scope": "server",
       "sensitive": false,
