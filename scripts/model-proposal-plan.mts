@@ -11,13 +11,13 @@ import {
 } from '../web/src/model-document';
 import type { CampusData, MapEdit } from '../web/src/types';
 import type { GisSnapshot } from '../web/server/gis-publication';
+import { proposalIds } from './model-proposal-inventory.mts';
+import {
+  reconcileModelBatchReadback,
+  type ModelDatasetMapping,
+} from './model-proposal-reconciliation.mts';
 
-export const proposalIds = [
-  47, 44, 25, 54, 39, 31, 73, 3, 2, 55, 120, 78, 76, 75, 28, 22, 43, 103, 33,
-  32,
-]
-  .map((id) => `arcgis:University_Property:${id}`)
-  .sort();
+export { proposalIds } from './model-proposal-inventory.mts';
 export const digest = (bytes: string | Uint8Array) =>
   createHash('sha256').update(bytes).digest('hex');
 export interface Proposal {
@@ -154,11 +154,31 @@ export function protectedCampusHash(campus: CampusData) {
     },
   });
 }
+export class ModelReadbackError extends Error {
+  constructor(
+    readonly reconciliation: ReturnType<typeof reconcileModelBatchReadback>,
+  ) {
+    super(
+      'Protected workspace content changed; retain receipt and reconcile before review',
+    );
+  }
+}
 export function assertReadback(
   before: GisSnapshot,
   after: GisSnapshot,
   items: { edit: MapEdit }[],
+  datasets?: ModelDatasetMapping[],
 ) {
+  if (datasets !== undefined) {
+    const reconciliation = reconcileModelBatchReadback({
+      before,
+      current: after,
+      items,
+      datasets,
+    });
+    if (!reconciliation.ok) throw new ModelReadbackError(reconciliation);
+    return reconciliation;
+  }
   const targets = new Map(
     items.map((item) => [`${item.edit.kind}:${item.edit.id}`, item.edit]),
   );

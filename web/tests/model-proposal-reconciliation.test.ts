@@ -3,7 +3,11 @@ import {
   reconcileModelBatchReadback,
   type ModelReadbackInput,
 } from '../../scripts/model-proposal-reconciliation.mts';
-import { proposalIds } from '../../scripts/model-proposal-plan.mts';
+import {
+  assertReadback,
+  ModelReadbackError,
+  proposalIds,
+} from '../../scripts/model-proposal-plan.mts';
 import { evidenceHash } from '../../scripts/cloud.mjs';
 import type { Dataset } from '../src/gis-types';
 import type { MapEdit } from '../src/types';
@@ -159,6 +163,31 @@ it('counts distinct per-building memberships across multiple existing datasets',
     { id: 'first', delta: 8 },
     { id: 'second', delta: 12 },
   ]);
+});
+
+it('the apply guard permits only proven increments and retains strict behavior without mappings', () => {
+  const input = fixture();
+  expect(() =>
+    assertReadback(input.before, input.current, input.items),
+  ).toThrow('Protected');
+  expect(
+    assertReadback(input.before, input.current, input.items, input.datasets)
+      ?.ok,
+  ).toBe(true);
+  input.current.datasets![0].revision++;
+  try {
+    assertReadback(input.before, input.current, input.items, input.datasets);
+    expect.fail('An extra concurrent revision must fail');
+  } catch (error) {
+    expect(error).toBeInstanceOf(ModelReadbackError);
+    const receipt = (error as ModelReadbackError).reconciliation;
+    expect(receipt.ok).toBe(false);
+    expect(receipt.expectedDatasetDeltas[0]).toMatchObject({
+      expectedRevision: 220,
+      currentRevision: 221,
+    });
+    expect(JSON.stringify(receipt)).not.toContain('Private');
+  }
 });
 
 it.each([0, 19, 21, -1])(

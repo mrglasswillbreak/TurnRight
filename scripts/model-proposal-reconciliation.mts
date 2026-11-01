@@ -1,6 +1,6 @@
 /** Read-only reconciliation of a saved LASU model batch, including GIS triggers. */
 import { evidenceHash } from './cloud.mjs';
-import { proposalIds } from './model-proposal-plan.mts';
+import { proposalIds } from './model-proposal-inventory.mts';
 import type { GisSnapshot } from '../web/server/gis-publication';
 import type { MapEdit } from '../web/src/types';
 
