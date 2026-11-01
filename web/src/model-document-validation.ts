@@ -3,6 +3,7 @@ import {
   curvePoint,
   curveProfile,
 } from './model-curves.js';
+import { validModelPhotoEvidence } from './model-photo-evidence.js';
 import {
   type Vec3,
   type ModelCurveSegment,
@@ -87,6 +88,7 @@ export function modelDocumentErrors(value: unknown): string[] {
         !['image/png', 'image/jpeg', 'image/webp'].includes(i.mime) ||
         typeof i.name !== 'string' ||
         typeof i.data !== 'string' ||
+        (i.evidence !== undefined && !validModelPhotoEvidence(i.evidence)) ||
         i.data.length > (MODEL_LIMITS.imageBytes * 4) / 3 + 4 ||
         !/^[a-z\d+/]*={0,2}$/i.test(i.data),
     )
@@ -132,6 +134,8 @@ export function modelDocumentErrors(value: unknown): string[] {
   for (const object of d.objects) {
     if (
       typeof object.name !== 'string' ||
+      (object.detailTier !== undefined &&
+        !['structure', 'facade', 'fine'].includes(object.detailTier)) ||
       object.name.length > 240 ||
       typeof object.hidden !== 'boolean' ||
       typeof object.locked !== 'boolean' ||

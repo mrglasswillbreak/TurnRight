@@ -10,6 +10,7 @@ import {
   sub3,
   transformPoint,
   type ModelDocument,
+  type ModelDetailTier,
   type Vec3,
 } from './model-document.js';
 import { curveMesh } from './model-primitives.js';
@@ -17,6 +18,7 @@ import { faceNormal } from './model-mesh-commands.js';
 export function compileModelDocument(
   document: ModelDocument,
   origin: [number, number],
+  detail: ModelDetailTier = 'fine',
 ): ModelMesh[] {
   const k = (Math.PI / 180) * 6371008.8;
   const offset: Vec3 = [
@@ -27,13 +29,17 @@ export function compileModelDocument(
     0,
   ];
   const meshes: ModelMesh[] = [];
+  const rank = { structure: 0, facade: 1, fine: 2 };
   for (const source of document.objects) {
     let parent = source.parentId,
-      visible = !source.hidden;
+      visible =
+        !source.hidden &&
+        rank[source.detailTier || 'structure'] <= rank[detail];
     while (parent) {
       const p = document.objects.find((o) => o.id === parent);
       if (!p) break;
-      visible &&= !p.hidden;
+      visible &&=
+        !p.hidden && rank[p.detailTier || 'structure'] <= rank[detail];
       parent = p.parentId;
     }
     if (!visible) continue;

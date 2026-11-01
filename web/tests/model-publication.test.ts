@@ -9,6 +9,19 @@ import {
 import { campusFixture } from './fixture';
 import type { MapEdit } from '../src/types';
 import { publicCampus } from '../../scripts/public-campus.mjs';
+import { buildingRevision } from '../src/building-visuals';
+import { detailFixture } from './model-detail-fixture';
+
+it('retains the rendered geometry fingerprint after stripping the editable source', () => {
+  const { feature, document } = detailFixture();
+  const data = publicCampus({ map: { features: [feature] } });
+  const published = data.map.features[0];
+  expect(published.properties.modelDocument).toBeUndefined();
+  expect(published.properties.authoredModelRevision).toBe(
+    modelDocumentRevision(document),
+  );
+  expect(buildingRevision(published)).toBe(buildingRevision(feature));
+});
 
 it('requires the current authored revision to be reviewed before publication', () => {
   const data = campusFixture(),
