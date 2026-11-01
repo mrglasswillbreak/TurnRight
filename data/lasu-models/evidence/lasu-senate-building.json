@@ -251,11 +251,11 @@
     "nativePatterns": 157
   },
   "verification": {
-    "conversionErrorMetres": 7.275957614183426e-15,
+    "conversionErrorMetres": 8.265114691398614e-7,
     "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
     "triangles": 66852,
     "objSha256": "d7201c0efcc71f65d3c503066953053c5bf6e96e1a41d8e951b06159f8a3563f",
-    "documentSha256": "2c73c2d7cab958d15ebcf6423a40d4862a6f2593b4fa2063acb178ab38b4807b",
+    "documentSha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2",
     "finishing": [
       {
         "kind": "original-material",
@@ -275,12 +275,12 @@
       }
     ],
     "rendering": {
-      "elapsedMs": 25424.199999999255,
-      "glbConversionErrorMetres": 0.0000012077911719643453,
+      "elapsedMs": 21985.599999999627,
+      "glbConversionErrorMetres": 0.0000013481445293450633,
       "embeddedTextures": 3,
       "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
       "renderer": "Chromium SwiftShader; not a physical-device benchmark",
-      "sourceDocumentSha256": "2c73c2d7cab958d15ebcf6423a40d4862a6f2593b4fa2063acb178ab38b4807b"
+      "sourceDocumentSha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2"
     }
   },
   "acceptance": {

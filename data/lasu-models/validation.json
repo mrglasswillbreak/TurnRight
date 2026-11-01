@@ -1,110 +1,98 @@
 {
-  "recordedAt": "2026-11-01T08:47:56.182Z",
-  "sourceSnapshot": "46c1518bff44755a7688aeddd97055eeca6549f62e08d0b029102a584b369a71",
+  "recordedAt": "2026-11-01T10:07:38.172Z",
+  "sourceSnapshot": "2aaccac986af4d7ef70ec8babec2389b0d8196a1a2a2fc56b69592c1885a3d5e",
   "applicationVersion": "0.3.0",
   "baseline": "lasu-41ec73876464",
   "integration": {
-    "version": "lasu-model-campaign-5ecef4f63b9efb2a",
-    "bytes": 46181851,
+    "version": "lasu-model-campaign-81395b5c763616e0",
+    "bytes": 44852467,
     "assets": 215,
-    "models": 20
+    "models": 20,
+    "baseBytes": 10784921,
+    "detailBytes": 21559764,
+    "hashesVerified": true,
+    "geographicGeometryUnchanged": true,
+    "routingUnchanged": true,
+    "destinationsUnchanged": true
   },
   "artifacts": {
     "models": 20,
     "files": 606,
-    "bytes": 981059783,
-    "maxConversionErrorMetres": 7.275957614183426e-15,
+    "bytes": 967197732,
+    "hashesAndBytesVerified": true,
+    "inventorySha256": "1f648ef442e1e2dcdef08a64b413b1397e690aaa2f2505ab70b809e53036a8e0",
+    "maxConversionErrorMetres": 8.265114691398614e-7,
     "maxGlbConversionErrorMetres": 0.0000027328146217087124,
+    "maxImportAndGlbErrorMetres": 0.00000273281462898467,
+    "conversionScope": "Import error includes unit conversion and optional submicrometre mesh quantization; GLB error is measured separately against the editable model.",
     "gallery": "C:/Users/user/Documents/TurnRight-Models/LASU-Ojo/review.html"
   },
   "localChecks": [
     {
-      "name": "npm run check",
+      "name": "publication hydration, fresh edit, sanitized core size and release validation regressions",
+      "testsPassed": 18,
+      "files": 4,
+      "scope": "Focused unit tests; all passed before publication fix commit 8f4b2bc."
+    },
+    {
+      "name": "all four TypeScript projects",
       "passed": true,
-      "log": "release-check-final.log"
+      "scope": "Full npm typecheck after publication and proposal helper changes."
     },
     {
-      "name": "normal production build preserving both live campuses",
+      "name": "coverage-instrumented model finishing PNG journey",
       "passed": true,
-      "log": "release-production-build-final.log",
-      "publicStartupGzipBytes": 434036,
-      "publicStartupLimit": 435200
-    },
-    {
-      "name": "focused model/texture/offline tests",
-      "testsPassed": 51,
-      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
-      "log": "release-focused-unit.log"
-    },
-    {
-      "name": "published package preservation regressions",
-      "testsPassed": 24
-    },
-    {
-      "name": "path vertex and model finishing browser journeys",
-      "testsPassed": 2,
-      "log": "release-focused-browser.log"
-    },
-    {
-      "name": "final non-default crop and complete controls capture",
       "testsPassed": 1,
-      "log": "release-final-capture.log"
+      "repairCommit": "6775d1b",
+      "scope": "Wait for the existing busy state to finish within 60 seconds, then check no alert, download URL, decoded 1024x768 image and stale export invalidation; no application timeout was raised."
     },
     {
-      "name": "dependency audit",
+      "name": "current bundle and integration integrity",
       "passed": true,
-      "high": 0,
-      "critical": 0,
-      "moderate": 8,
-      "low": 2,
-      "log": "release-dependencies.log"
+      "files": 606,
+      "packageAssets": 215
+    },
+    {
+      "name": "current 20-model local publication route",
+      "passed": true,
+      "models": 20
     }
   ],
-  "buildPreservation": {
-    "recordedAt": "2026-11-01T08:47:17.793Z",
-    "verified": true,
-    "assets": 236,
-    "campuses": [
-      {
-        "slug": "lasu",
-        "version": "lasu-41ec73876464"
-      },
-      {
-        "slug": "unilag",
-        "version": "unilag-b7655a90045c"
-      }
-    ],
-    "source": "Normal production build with PUBLISHED_MAP_URL=https://turnright.vercel.app; every prior published asset checked in web/dist."
-  },
-  "detailPreservation": {
-    "recordedAt": "2026-11-01T08:43:13.287Z",
-    "fixture": "lasu-model-campaign-5ecef4f63b9efb2a",
-    "assets": 215,
-    "bytes": 46181851,
-    "requests": 1,
-    "verified": true,
-    "method": "Existing preservePublished reader; only HTTPS transport substituted with immutable local fixture bytes; all copied assets verified."
-  },
   "hardware": [
     {
+      "fixture": "lasu-model-campaign-81395b5c763616e0",
       "viewport": {
         "width": 1280,
         "height": 800
       },
-      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+      "sourceSnapshot": "2aaccac986af4d7ef70ec8babec2389b0d8196a1a2a2fc56b69592c1885a3d5e",
       "browserVersion": "153.0.8010.12",
       "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
-      "capturedAt": "2026-11-01T08:28:12.370Z",
-      "averageFps": 49.962048861048395,
-      "p95FrameMs": 43.1999999997206,
-      "maxFrameMs": 131.89999999990687,
-      "visibleDetailedModels": 20,
+      "capturedAt": "2026-11-01T09:59:27.364Z",
+      "averageFps": 32.06195869420387,
+      "p50FrameMs": 20.90000000037253,
+      "p95FrameMs": 86.70000000111759,
+      "maxFrameMs": 170.09999999962747,
+      "durationMs": 12036.099999999627,
+      "samples": 385,
+      "visibleDetailedModels": 19,
+      "pendingRequests": 1,
+      "reservedDetailBytes": 72770939,
+      "geometries": 993,
+      "textures": 5,
+      "drawCalls": 805,
+      "visitedModels": 20,
       "offlineModels": 20,
       "download": {
-        "bytes": 46181851,
+        "bytes": 44852467,
         "assets": 215,
         "verified": true
       },
+      "resourceCycleIds": [
+        "arcgis:University_Property:3",
+        "arcgis:University_Property:120",
+        "arcgis:University_Property:28"
+      ],
       "released": [
         {
           "detailIds": [],
@@ -133,27 +121,63 @@
           "textures": 1,
           "drawCalls": 3
         }
-      ]
+      ],
+      "webglRecoveryPassed": true,
+      "webglRecovery": {
+        "detailIds": [
+          "arcgis:University_Property:47",
+          "arcgis:University_Property:25",
+          "arcgis:University_Property:32",
+          "arcgis:University_Property:33",
+          "arcgis:University_Property:28",
+          "arcgis:University_Property:78",
+          "arcgis:University_Property:76",
+          "arcgis:University_Property:31",
+          "arcgis:University_Property:43"
+        ],
+        "detailBuildings": 9,
+        "pendingRequests": 0,
+        "reservedDetailBytes": 65050286,
+        "geometries": 281,
+        "textures": 3,
+        "drawCalls": 281
+      },
+      "measurementScope": "Chromium on this Windows host; GPU identity recorded below. Phone viewport remains an emulation, not a physical phone."
     },
     {
+      "fixture": "lasu-model-campaign-81395b5c763616e0",
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+      "sourceSnapshot": "2aaccac986af4d7ef70ec8babec2389b0d8196a1a2a2fc56b69592c1885a3d5e",
       "browserVersion": "153.0.8010.12",
       "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
-      "capturedAt": "2026-11-01T08:28:53.931Z",
-      "averageFps": 60.059309609488146,
-      "p95FrameMs": 19.299999999813735,
-      "maxFrameMs": 25.899999999906868,
+      "capturedAt": "2026-11-01T10:00:36.214Z",
+      "averageFps": 50.52859402314159,
+      "p50FrameMs": 16.600000001490116,
+      "p95FrameMs": 39.59999999962747,
+      "maxFrameMs": 418.40000000037253,
+      "durationMs": 12023.300000000745,
+      "samples": 607,
       "visibleDetailedModels": 17,
+      "pendingRequests": 0,
+      "reservedDetailBytes": 60357296,
+      "geometries": 141,
+      "textures": 5,
+      "drawCalls": 133,
+      "visitedModels": 20,
       "offlineModels": 20,
       "download": {
-        "bytes": 46181851,
+        "bytes": 44852467,
         "assets": 215,
         "verified": true
       },
+      "resourceCycleIds": [
+        "arcgis:University_Property:3",
+        "arcgis:University_Property:120",
+        "arcgis:University_Property:28"
+      ],
       "released": [
         {
           "detailIds": [],
@@ -182,14 +206,118 @@
           "textures": 1,
           "drawCalls": 3
         }
-      ]
+      ],
+      "webglRecoveryPassed": true,
+      "webglRecovery": {
+        "detailIds": [
+          "arcgis:University_Property:47",
+          "arcgis:University_Property:25",
+          "arcgis:University_Property:33",
+          "arcgis:University_Property:32",
+          "arcgis:University_Property:78",
+          "arcgis:University_Property:76"
+        ],
+        "detailBuildings": 6,
+        "pendingRequests": 0,
+        "reservedDetailBytes": 53196746,
+        "geometries": 84,
+        "textures": 3,
+        "drawCalls": 84
+      },
+      "measurementScope": "Chromium on this Windows host; GPU identity recorded below. Phone viewport remains an emulation, not a physical phone."
     }
   ],
-  "browserRuntimeMatchesBenchmarkRevision": "2ce656d126e1c88cf3a6eb75dde07ae73d568ec2",
+  "performanceScope": "Latest measurements are from the actual Windows Intel Iris Xe GPU, including the 390px phone viewport on that same desktop GPU. Desktop ended with one pending request and 19 detailed models visible. Average FPS does not establish sustained 30 FPS, and frame-time spikes remain recorded. No physical phone was measured.",
+  "publicationRoute": {
+    "recordedAt": "2026-11-01T09:50:33.238Z",
+    "passed": true,
+    "models": 20,
+    "tiersPerModel": 3,
+    "privateBytes": 219235420,
+    "publicBytes": 4551071,
+    "publicSha256": "795933c7ca67e7bbab814f5b19b0e742ed9b107c04f8b88982336d674bcd85d7",
+    "protectedHash": "2966d0cfe3dd70f1ef581491e05cca08ca5ca6066582399c3076f32ba78e2564",
+    "sourceHashesRetained": true,
+    "fullTriangleCountsMatchImports": true,
+    "footprintsUnchanged": true,
+    "protectedCampusUnchanged": true,
+    "routingUnchangedAgainstControl": true,
+    "storageRequests": 40,
+    "sourcePreparation": "Published baseline with editable layer defaults reconstructed by campusLayers()",
+    "scope": "Local edit → mocked immutable storage hydration → release validation → public sanitizer → all three compiler tiers; no remote writes or approvals",
+    "receipt": "verification/publication-route.json"
+  },
+  "routingDiagnostic": {
+    "recordedAt": "2026-11-01T09:52:12.142Z",
+    "rawArchivedGraphEqual": false,
+    "nodes": 1382,
+    "edges": 2830,
+    "nodeAndEdgeOrderUnchanged": true,
+    "nodeValuesUnchanged": true,
+    "changedEdgeFields": {
+      "crossingEndpoints": 28
+    },
+    "removedCrossingEndpointMetadata": 28,
+    "removedEndpointMetadataExactlyMatchesActiveNodes": true,
+    "routingPayloadEqual": true,
+    "routingPayloadSha256": "1723f3958d1b86e2785464c2c69910cd458f56d42b20e0a5968c98b9aee7edd3",
+    "interpretation": "Only 28 redundant crossingEndpoints editor-history values are removed by restoreCrossingPaths; both endpoint identities and complete node values already equal active graph nodes. Node/edge order, identifiers, coordinates, distances and every other graph property remain equal. Routing code does not consume crossingEndpoints.",
+    "receipt": "verification/publication-graph-diagnostic.json"
+  },
   "hostedChecks": {
     "authority": "https://github.com/mrglasswillbreak/TurnRight/pull/61",
     "requirePassingChecksOnCurrentHead": true,
-    "note": "Current-head CI, security and preview verification are separate gates; this local receipt does not assert their completion."
+    "lastFullCI": {
+      "revision": "7ad7cfb4c7024b582c99025b19b299089a828dca",
+      "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41291188161",
+      "conclusion": "failure",
+      "passed": [
+        "quality",
+        "local-stack",
+        "offline",
+        "chromium-2",
+        "chromium-3",
+        "chromium-4",
+        "webkit-1",
+        "webkit-2"
+      ],
+      "failed": "chromium-1: one PNG download assertion timed out while rendering; 51 passed and 1 failed in that shard.",
+      "combinedCoverage": "skipped after the failed browser shard",
+      "repair": "Local coverage-instrumented journey passed with bounded busy-state waiting in commit 6775d1b; current-head full hosted CI is still required."
+    },
+    "previewVerification": {
+      "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41292413024",
+      "revision": "7ad7cfb4c7024b582c99025b19b299089a828dca",
+      "verifierRevision": "d50bb00f86cf9b908aedc9d8f7031e8e1720db5e",
+      "status": "success",
+      "checkedAt": "2026-11-01T09:31:33.766Z",
+      "views": 32,
+      "offlineChecks": 4,
+      "preservedAssets": 236,
+      "packagesMatchBaseline": true,
+      "health": "ok",
+      "anonymousAdminStatus": 401,
+      "campusPublicationPerformed": false,
+      "receipt": "validation-attempts/preview-verification-7ad-41292413024/application-preview.json"
+    },
+    "note": "Hosted results above identify their exact earlier revisions; they do not assert passing current-head CI, deployment or campus publication."
+  },
+  "livePublicationInspection": {
+    "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41295020645",
+    "operation": "inspect",
+    "status": "passed",
+    "publishedVersion": "lasu-41ec73876464",
+    "publishedBuildings": 614,
+    "sourceRecords": 6047,
+    "savedCorrections": 158,
+    "existingAuthoredDrafts": 3,
+    "existingPrivateModelAssets": 17,
+    "existingPrivateModelAssetBytes": 64542481,
+    "pendingPrivateModelAssets": 1,
+    "activeReleases": 5,
+    "noRemoteWrites": true,
+    "modelCampaignApplied": false,
+    "note": "Read-only inspection passed. Existing private editor drafts remain subject to reconciliation before application; no owner identity is included here."
   },
   "acceptance": {
     "independentArchitecturalReview": false,
@@ -197,8 +325,202 @@
     "newModelsPublished": false,
     "identificationHolds": 3,
     "additionalFootprintGaps": 4,
-    "dimensions": "Estimated unless explicitly supported by evidence; conversion tolerance is not survey accuracy."
+    "dimensions": "Estimated unless explicitly supported by evidence; conversion tolerance is not survey accuracy.",
+    "currentHeadHostedChecksComplete": false,
+    "currentHeadPreviewVerified": false,
+    "sustained30FpsEstablished": false
   },
+  "history": [
+    {
+      "recordedAt": "2026-11-01T08:47:56.182Z",
+      "sourceSnapshot": "46c1518bff44755a7688aeddd97055eeca6549f62e08d0b029102a584b369a71",
+      "integration": {
+        "version": "lasu-model-campaign-5ecef4f63b9efb2a",
+        "bytes": 46181851,
+        "assets": 215,
+        "models": 20
+      },
+      "artifacts": {
+        "models": 20,
+        "files": 606,
+        "bytes": 981059783,
+        "maxConversionErrorMetres": 7.275957614183426e-15,
+        "maxGlbConversionErrorMetres": 0.0000027328146217087124,
+        "gallery": "C:/Users/user/Documents/TurnRight-Models/LASU-Ojo/review.html"
+      },
+      "localChecks": [
+        {
+          "name": "npm run check",
+          "passed": true,
+          "log": "release-check-final.log"
+        },
+        {
+          "name": "normal production build preserving both live campuses",
+          "passed": true,
+          "log": "release-production-build-final.log",
+          "publicStartupGzipBytes": 434036,
+          "publicStartupLimit": 435200
+        },
+        {
+          "name": "focused model/texture/offline tests",
+          "testsPassed": 51,
+          "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+          "log": "release-focused-unit.log"
+        },
+        {
+          "name": "published package preservation regressions",
+          "testsPassed": 24
+        },
+        {
+          "name": "path vertex and model finishing browser journeys",
+          "testsPassed": 2,
+          "log": "release-focused-browser.log"
+        },
+        {
+          "name": "final non-default crop and complete controls capture",
+          "testsPassed": 1,
+          "log": "release-final-capture.log"
+        },
+        {
+          "name": "dependency audit",
+          "passed": true,
+          "high": 0,
+          "critical": 0,
+          "moderate": 8,
+          "low": 2,
+          "log": "release-dependencies.log"
+        }
+      ],
+      "buildPreservation": {
+        "recordedAt": "2026-11-01T08:47:17.793Z",
+        "verified": true,
+        "assets": 236,
+        "campuses": [
+          {
+            "slug": "lasu",
+            "version": "lasu-41ec73876464"
+          },
+          {
+            "slug": "unilag",
+            "version": "unilag-b7655a90045c"
+          }
+        ],
+        "source": "Normal production build with PUBLISHED_MAP_URL=https://turnright.vercel.app; every prior published asset checked in web/dist."
+      },
+      "detailPreservation": {
+        "recordedAt": "2026-11-01T08:43:13.287Z",
+        "fixture": "lasu-model-campaign-5ecef4f63b9efb2a",
+        "assets": 215,
+        "bytes": 46181851,
+        "requests": 1,
+        "verified": true,
+        "method": "Existing preservePublished reader; only HTTPS transport substituted with immutable local fixture bytes; all copied assets verified."
+      },
+      "hardware": [
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+          "browserVersion": "153.0.8010.12",
+          "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "capturedAt": "2026-11-01T08:28:12.370Z",
+          "averageFps": 49.962048861048395,
+          "p95FrameMs": 43.1999999997206,
+          "maxFrameMs": 131.89999999990687,
+          "visibleDetailedModels": 20,
+          "offlineModels": 20,
+          "download": {
+            "bytes": 46181851,
+            "assets": 215,
+            "verified": true
+          },
+          "released": [
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            },
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            },
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            }
+          ]
+        },
+        {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+          "browserVersion": "153.0.8010.12",
+          "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+          "capturedAt": "2026-11-01T08:28:53.931Z",
+          "averageFps": 60.059309609488146,
+          "p95FrameMs": 19.299999999813735,
+          "maxFrameMs": 25.899999999906868,
+          "visibleDetailedModels": 17,
+          "offlineModels": 20,
+          "download": {
+            "bytes": 46181851,
+            "assets": 215,
+            "verified": true
+          },
+          "released": [
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            },
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            },
+            {
+              "detailIds": [],
+              "detailBuildings": 0,
+              "pendingRequests": 0,
+              "reservedDetailBytes": 0,
+              "geometries": 3,
+              "textures": 1,
+              "drawCalls": 3
+            }
+          ]
+        }
+      ],
+      "browserRuntimeMatchesBenchmarkRevision": "2ce656d126e1c88cf3a6eb75dde07ae73d568ec2",
+      "archiveReceipt": "validation-attempts/pre-upload-compaction-2026-11-01/VALIDATION.json",
+      "note": "Earlier fixture and source revision; retained as historical evidence. Its approximately 50/60 FPS values are not current measurements."
+    }
+  ],
   "models": [
     {
       "id": "arcgis:University_Property:47",
@@ -208,6 +530,11 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 8.14946272242878e-7,
       "files": 30,
+      "tierTriangles": [
+        26624,
+        3652,
+        3064
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1435302,
@@ -243,6 +570,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 3.336498117789688e-7,
       "files": 30,
+      "tierTriangles": [
+        22532,
+        1868,
+        1856
+      ],
       "masters": {
         "master.sc": {
           "bytes": 966345,
@@ -278,6 +610,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 6.594275454574472e-7,
       "files": 30,
+      "tierTriangles": [
+        17254,
+        2504,
+        2492
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1505677,
@@ -313,6 +650,11 @@
       "conversionErrorMetres": 7.275957614183426e-15,
       "glbConversionErrorMetres": 0.0000027328146217087124,
       "files": 30,
+      "tierTriangles": [
+        33782,
+        10358,
+        10358
+      ],
       "masters": {
         "master.sc": {
           "bytes": 5706696,
@@ -348,6 +690,11 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 0.0000017924717496953235,
       "files": 31,
+      "tierTriangles": [
+        36310,
+        8964,
+        6504
+      ],
       "masters": {
         "master.sc": {
           "bytes": 2572975,
@@ -383,6 +730,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 8.853217536852753e-7,
       "files": 29,
+      "tierTriangles": [
+        6360,
+        2136,
+        2136
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1095185,
@@ -418,6 +770,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 0.0000018749073902313285,
       "files": 30,
+      "tierTriangles": [
+        12026,
+        820,
+        808
+      ],
       "masters": {
         "master.sc": {
           "bytes": 475439,
@@ -450,9 +807,14 @@
       "slug": "lasu-international-library",
       "componentCount": 4583,
       "triangles": 62604,
-      "conversionErrorMetres": 3.637978807091713e-15,
-      "glbConversionErrorMetres": 0.0000014009752860033586,
+      "conversionErrorMetres": 7.406272514330877e-7,
+      "glbConversionErrorMetres": 9.487304666322416e-7,
       "files": 33,
+      "tierTriangles": [
+        62604,
+        18060,
+        16020
+      ],
       "masters": {
         "master.sc": {
           "bytes": 12403546,
@@ -471,12 +833,12 @@
           "sha256": "07034494d43fdfc849a622bf58e6539e562bb7c7e55c9d31aa4bb9f67e592919"
         },
         "turnright.model.json": {
-          "bytes": 26467701,
-          "sha256": "dbe0895cc0130bb9da240ed57d20f6d2d2feb2e0773b89359eb99c4352e3413f"
+          "bytes": 21083740,
+          "sha256": "44390ef8e26d78f1a1ffe99b3a3e1666770d3c7e73502e99dd5efc06be51b5c2"
         },
         "model.glb": {
           "bytes": 9392524,
-          "sha256": "748abdafa0f22c22968ca5153d80570c24c40b0654d69ecabf9be21bba447c37"
+          "sha256": "0735c1c60cc6fb09afc1218baa6af6461d11a654f12176eb8532e64969cf7bf2"
         }
       }
     },
@@ -488,6 +850,11 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 9.761262163010542e-7,
       "files": 30,
+      "tierTriangles": [
+        18180,
+        5700,
+        5160
+      ],
       "masters": {
         "master.sc": {
           "bytes": 2871078,
@@ -523,6 +890,11 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 4.384591800743465e-7,
       "files": 30,
+      "tierTriangles": [
+        8556,
+        772,
+        700
+      ],
       "masters": {
         "master.sc": {
           "bytes": 349524,
@@ -555,9 +927,14 @@
       "slug": "lasu-senate-building",
       "componentCount": 3132,
       "triangles": 66852,
-      "conversionErrorMetres": 7.275957614183426e-15,
-      "glbConversionErrorMetres": 0.0000012077911719643453,
+      "conversionErrorMetres": 8.265114691398614e-7,
+      "glbConversionErrorMetres": 0.0000013481445293450633,
       "files": 33,
+      "tierTriangles": [
+        66852,
+        10328,
+        9800
+      ],
       "masters": {
         "master.sc": {
           "bytes": 4360055,
@@ -576,12 +953,12 @@
           "sha256": "e6b5fc1cca4d8cc4bba92654878da111a40c1577eb102ce0524934e4ee0a6c35"
         },
         "turnright.model.json": {
-          "bytes": 30727170,
-          "sha256": "2c73c2d7cab958d15ebcf6423a40d4862a6f2593b4fa2063acb178ab38b4807b"
+          "bytes": 23576481,
+          "sha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2"
         },
         "model.glb": {
-          "bytes": 8969872,
-          "sha256": "c03273f0c6299a61098afc750c443b941c6800dd64c670d36824841a16ee6934"
+          "bytes": 8969876,
+          "sha256": "b54b69159cbe8e29af075c789189d4f46fc6e899f45433580fae71a8c2d5644a"
         }
       }
     },
@@ -593,6 +970,11 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 4.280219325636381e-7,
       "files": 30,
+      "tierTriangles": [
+        27254,
+        3076,
+        2716
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1402310,
@@ -628,6 +1010,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 6.02225107115828e-7,
       "files": 30,
+      "tierTriangles": [
+        25636,
+        2758,
+        2482
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1380682,
@@ -663,6 +1050,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 5.319268083781026e-7,
       "files": 30,
+      "tierTriangles": [
+        10504,
+        2176,
+        2032
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1091722,
@@ -698,6 +1090,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 9.520678752039657e-7,
       "files": 29,
+      "tierTriangles": [
+        11280,
+        7402,
+        7402
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1339772,
@@ -733,6 +1130,11 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 3.8146973047048505e-7,
       "files": 30,
+      "tierTriangles": [
+        23862,
+        2476,
+        2080
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1264417,
@@ -768,6 +1170,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 3.018029310908332e-7,
       "files": 30,
+      "tierTriangles": [
+        20936,
+        1920,
+        1648
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1019757,
@@ -803,6 +1210,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 9.142177432863718e-7,
       "files": 31,
+      "tierTriangles": [
+        41908,
+        6728,
+        5756
+      ],
       "masters": {
         "master.sc": {
           "bytes": 3434266,
@@ -838,6 +1250,11 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 8.602352892239651e-7,
       "files": 30,
+      "tierTriangles": [
+        7748,
+        2744,
+        2480
+      ],
       "masters": {
         "master.sc": {
           "bytes": 981274,
@@ -873,6 +1290,11 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 0.0000011634142467187303,
       "files": 30,
+      "tierTriangles": [
+        19666,
+        1004,
+        956
+      ],
       "masters": {
         "master.sc": {
           "bytes": 1013906,
