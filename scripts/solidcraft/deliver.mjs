@@ -36,6 +36,11 @@ const files = [
   ].map((view) => `renders/${view}.png`),
 ];
 for (const building of inventory.buildings) {
+  if (
+    typeof building.slug !== 'string' ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(building.slug)
+  )
+    throw Error('Building slug must contain only lowercase words and digits.');
   const notes = observations.buildings[building.id.split(':').at(-1)];
   if (notes.hold) {
     records.push({
@@ -52,6 +57,10 @@ for (const building of inventory.buildings) {
     path.join(directory, 'solidcraft-verification.json'),
   );
   const imported = await read(path.join(directory, 'import-verification.json'));
+  if (!Number.isSafeInteger(imported.triangles) || imported.triangles < 0)
+    throw Error(
+      `${building.slug}: triangle count must be a nonnegative integer.`,
+    );
   const rendered = await read(path.join(directory, 'render-verification.json'));
   const evidence = await read(path.join(directory, 'evidence.json'));
   const document = await read(path.join(directory, 'turnright.model.json'));
@@ -154,6 +163,8 @@ const escape = (s) =>
     .replaceAll('"', '&quot;');
 await fs.writeFile(
   path.join(archive, 'review.html'),
+  // Text is escaped; path slugs and triangle counts are validated above. Views and remaining counts are fixed or computed locally.
+  // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
   `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LASU Ojo model review</title><style>body{font:16px system-ui;max-width:1200px;margin:40px auto;padding:0 20px;background:#f6f4ee;color:#202c31}article{margin:30px 0;background:white;padding:24px;border-radius:12px}img{max-width:100%;height:auto}nav{display:flex;gap:18px;flex-wrap:wrap}a{color:#145875}p{line-height:1.6}small{color:#59635f}</style><h1>LASU Ojo exterior models</h1><p>${manifest.proposalCount} artifact proposals · ${manifest.identificationHolds} identification holds · baseline ${escape(manifest.baseline)}.</p><p>Compare the dated reference with each model, then inspect all elevations and the roof. Dimensions, hidden elevations and some facade assignments remain estimates. Independent review and integration acceptance precede publication.</p><nav><a href="CAMPAIGN.json">Complete inventory and hashes</a><a href="integration/CURRENT.json">Private integration fixture</a></nav>${records.map((r) => `<article><h2>${escape(r.name)}</h2>${r.assets ? `<img loading="lazy" src="${r.slug}/comparison.jpg" alt="Reference and model comparison for ${escape(r.name)}"><nav><a href="${r.slug}/master.sc">SolidCraft master</a><a href="${r.slug}/master.step">STEP</a><a href="${r.slug}/master.obj">OBJ</a><a href="${r.slug}/model.glb">Textured GLB</a><a href="${r.slug}/turnright.model.json">Editable TurnRight model</a><a href="${r.slug}/evidence.json">Evidence and uncertainty</a><a href="${r.slug}/CREDITS.txt">Credits</a></nav><p>${['north', 'east', 'south', 'west', 'roof', 'oblique-ne', 'oblique-sw'].map((v) => `<a href="${r.slug}/renders/${v}.png">${v}</a>`).join(' · ')}</p><small>${r.triangles.toLocaleString()} triangles · model conversion within 1 cm · not independently approved</small>` : `<p>${escape(r.reason)}</p>`}</article>`).join('')}<p>Additional unmatched references are listed in CAMPAIGN.json. Physical-phone validation remains separate from browser viewport measurements.</p></html>`,
 );
 console.log(

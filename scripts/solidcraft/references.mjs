@@ -33,6 +33,8 @@ for (const building of inventory.buildings) {
   const layers = [
     {
       input: Buffer.from(
+        // Reference text passes XML escaping; every SVG attribute is a fixed layout value.
+        // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
         `<svg width="1280" height="64"><text x="24" y="40" font-family="Arial" font-size="28">${escape(building.name)} — reference review</text></svg>`,
       ),
       top: 0,
@@ -53,6 +55,8 @@ for (const building of inventory.buildings) {
     });
     layers.push({
       input: Buffer.from(
+        // Photo identifiers and credit text pass XML escaping; every SVG attribute is a fixed layout value.
+        // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
         `<svg width="630" height="54"><text x="12" y="22" font-family="Arial" font-size="15">${escape(photo.id)}</text><text x="12" y="44" font-family="Arial" font-size="13">${escape(`${photo.capturedAt || 'Date unknown'} · ${photo.author} · ${rights?.status === 'reuse-verified' ? rights.verifiedMetadata.license : 'Observation only; rights unverified'}`).slice(0, 102)}</text></svg>`,
       ),
       left,

@@ -139,6 +139,8 @@ for (const building of inventory.buildings) {
   const layers = [
     {
       input: Buffer.from(
+        // Reference text passes XML escaping; every SVG attribute is a fixed layout value.
+        // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
         `<svg width="1600" height="100"><text x="30" y="40" font-family="Arial" font-size="28">${escape(building.name)} — comparison proposal</text><text x="30" y="76" font-family="Arial" font-size="20">Reference left; model right. Orientation and dimensions remain estimated.</text></svg>`,
       ),
       left: 0,
@@ -169,6 +171,8 @@ for (const building of inventory.buildings) {
     },
     {
       input: Buffer.from(
+        // Each footer line passes XML escaping; dimensions and positions are numeric layout calculations.
+        // nosemgrep: local-runtime.semgrep-rules.javascript.lang.security.html-in-template-string
         `<svg width="1600" height="${footerHeight}">${footer.map((line, i) => `<text x="30" y="${26 + i * 26}" font-family="Arial" font-size="18">${escape(line)}</text>`).join('')}</svg>`,
       ),
       left: 0,
