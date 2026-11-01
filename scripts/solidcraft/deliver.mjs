@@ -38,7 +38,7 @@ const files = [
 for (const building of inventory.buildings) {
   if (
     typeof building.slug !== 'string' ||
-    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(building.slug)
+    !building.slug.split('-').every((part) => /^[a-z0-9]+$/.test(part))
   )
     throw Error('Building slug must contain only lowercase words and digits.');
   const notes = observations.buildings[building.id.split(':').at(-1)];
