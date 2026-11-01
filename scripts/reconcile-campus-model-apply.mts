@@ -1,8 +1,8 @@
 /** Read-only inspection of one pinned saved model operation. Never resumes it. */
 import fs from 'node:fs/promises';
-import { db } from '../web/server/backend';
+import { db, HttpError } from '../web/server/backend';
 import { withCampusId } from '../web/server/campus-scope';
-import { readModelAsset } from '../web/server/model-assets';
+import { hydrateModelEdits, readModelAsset } from '../web/server/model-assets';
 import {
   publishedCampus,
   validateReleaseSnapshot,
@@ -332,7 +332,7 @@ async function inspect() {
     record.sources = sources;
     await save();
   }
-  stage = 'publication-validation';
+  stage = 'published-baseline-validation';
   const publication = await verifiedPublicationBaseline();
   record.publishedCatalogueMatchesApply =
     evidenceHash(publication) === evidenceHash(receipt.publication);
@@ -342,7 +342,15 @@ async function inspect() {
     sources.every((source) => source.currentAttachmentMatches) &&
     published.version === receipt.baseline
   ) {
-    const before = validateReleaseSnapshot(backup.snapshot, published);
+    stage = 'before-publication-validation';
+    const before = validateReleaseSnapshot(
+      {
+        ...backup.snapshot,
+        edits: await hydrateModelEdits(backup.snapshot.edits, receipt.owner),
+      },
+      published,
+    );
+    stage = 'current-publication-validation';
     const candidate = validateReleaseSnapshot(
       {
         ...current,
@@ -432,6 +440,12 @@ try {
       error instanceof Error && /^DIAGNOSTIC_[A-Z_]+$/.test(error.message)
         ? error.message
         : 'DEPENDENCY_OR_VALIDATION_FAILURE',
+    ...(error instanceof HttpError &&
+    Number.isInteger(error.status) &&
+    error.status >= 400 &&
+    error.status <= 599
+      ? { status: error.status }
+      : {}),
   };
   process.exitCode = 1;
 } finally {
