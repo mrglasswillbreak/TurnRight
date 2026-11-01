@@ -58,8 +58,15 @@ export async function downloadProposalInputs() {
       signal: AbortSignal.timeout(180000),
     },
   );
-  if (!response.ok || !response.body)
-    throw Error('Pinned release asset cannot be downloaded');
+  if (!response.ok || !response.body) {
+    const requestId = response.headers.get('x-github-request-id') || '';
+    const safeRequestId = /^[a-z\d:-]{1,128}$/i.test(requestId)
+      ? requestId
+      : 'unavailable';
+    throw Error(
+      `Pinned release asset cannot be downloaded (HTTP ${response.status}; GitHub request ID ${safeRequestId}).`,
+    );
+  }
   const output = await fs.open(archive, 'wx');
   let bytes = 0;
   try {

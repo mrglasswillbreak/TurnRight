@@ -41,7 +41,7 @@ permissions:
   contents: read
 jobs:
   prepare:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.upgrade != 'models'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -51,12 +51,6 @@ jobs:
       CAMPUS_ID: ${{ inputs.campus_id }}
       APPLY_LAYER_UPGRADE: ${{ inputs.operation == 'apply' }}
       EXPECTED_SNAPSHOT: ${{ inputs.expected_hash }}
-      MODEL_RELEASE_ASSET_ID: ${{ inputs.model_asset_id }}
-      MODEL_ARCHIVE_SHA256: ${{ inputs.model_archive_sha256 }}
-      EXPECTED_MODEL_PLAN: ${{ inputs.expected_model_plan }}
-      MODEL_OWNER_OVERRIDE: ${{ inputs.model_owner_override }}
-      MODEL_OVERRIDE_REASON: ${{ inputs.model_override_reason }}
-      MODEL_INSPECT_ONLY: ${{ inputs.operation == 'inspect' }}
     steps:
       - name: Inspect is available only for model workspaces
         if: inputs.operation == 'inspect' && inputs.upgrade != 'models'
@@ -75,11 +69,6 @@ jobs:
       - if: inputs.upgrade == 'detail'
         run: npx tsx ../scripts/prepare-campus-detail-release.mts
         working-directory: web
-      - if: inputs.upgrade == 'models'
-        run: npx tsx ../scripts/prepare-campus-model-release.mts
-        working-directory: web
-        env:
-          GH_TOKEN: ${{ github.token }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -88,6 +77,47 @@ jobs:
             web/work/*-layer-receipt.json
             web/work/*-layer-preview.json
             web/work/*-detail-receipt.json
+          retention-days: 14
+  models:
+    if: github.event_name == 'workflow_dispatch' && inputs.upgrade == 'models'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # GitHub requires push access to read assets attached to draft releases.
+    permissions:
+      contents: write
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PUBLISHED_MAP_URL: https://turnright.vercel.app
+      CAMPUS_ID: ${{ inputs.campus_id }}
+      APPLY_LAYER_UPGRADE: ${{ inputs.operation == 'apply' }}
+      EXPECTED_SNAPSHOT: ${{ inputs.expected_hash }}
+      MODEL_RELEASE_ASSET_ID: ${{ inputs.model_asset_id }}
+      MODEL_ARCHIVE_SHA256: ${{ inputs.model_archive_sha256 }}
+      EXPECTED_MODEL_PLAN: ${{ inputs.expected_model_plan }}
+      MODEL_OWNER_OVERRIDE: ${{ inputs.model_owner_override }}
+      MODEL_OVERRIDE_REASON: ${{ inputs.model_override_reason }}
+      MODEL_INSPECT_ONLY: ${{ inputs.operation == 'inspect' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npx tsx ../scripts/prepare-campus-model-release.mts
+        working-directory: web
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: campus-layer-release
+          path: |
             web/work/lasu-model-receipt.json
             web/work/lasu-model-inspection.json
           retention-days: 14
