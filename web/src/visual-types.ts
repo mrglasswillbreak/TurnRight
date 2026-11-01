@@ -1,4 +1,5 @@
 import type { Position, PackageAsset } from './types.js';
+import type { DetailedBuildingModel } from './model-lod-types.js';
 import type { MultiPolygon } from 'geojson';
 export type RoofForm = 'flat' | 'hip' | 'gable';
 export interface SurfaceStyle {
@@ -227,7 +228,7 @@ export interface VisualSector extends PackageAsset {
   buildingIds: string[];
 }
 export interface VisualCatalogue {
-  detailedModels?: import('./model-lod-types.js').DetailedBuildingModel[];
+  detailedModels?: DetailedBuildingModel[];
   /** Deterministic decorative planting; never survey or routing data. */
   scenery?: SceneryRecipe;
   modelTextures?: PackageAsset[];
