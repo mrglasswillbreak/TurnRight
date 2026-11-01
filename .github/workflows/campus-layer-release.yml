@@ -37,11 +37,14 @@ on:
       model_override_reason:
         description: Audited original-owner approval reason (5–1000 characters); no independent approval claimed
         required: false
+      reconciliation_pin:
+        description: Read-only models inspection JSON with apply_run_id, apply_artifact_id and receipt_sha256; skips normal preparation/application
+        required: false
 permissions:
   contents: read
 jobs:
   prepare:
-    if: github.event_name == 'workflow_dispatch' && inputs.upgrade != 'models'
+    if: github.event_name == 'workflow_dispatch' && inputs.upgrade != 'models' && !inputs.reconciliation_pin
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -79,7 +82,7 @@ jobs:
             web/work/*-detail-receipt.json
           retention-days: 14
   models:
-    if: github.event_name == 'workflow_dispatch' && inputs.upgrade == 'models'
+    if: github.event_name == 'workflow_dispatch' && inputs.upgrade == 'models' && !inputs.reconciliation_pin
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # GitHub requires push access to read assets attached to draft releases.
@@ -120,4 +123,46 @@ jobs:
           path: |
             web/work/lasu-model-receipt.json
             web/work/lasu-model-inspection.json
+          retention-days: 14
+  reconcile:
+    if: github.event_name == 'workflow_dispatch' && inputs.reconciliation_pin != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PUBLISHED_MAP_URL: https://turnright.vercel.app
+      CAMPUS_ID: lasu
+    steps:
+      - name: Require read-only LASU model inspection
+        if: inputs.operation != 'inspect' || inputs.upgrade != 'models' || inputs.campus_id != 'lasu'
+        run: exit 1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ fromJSON(inputs.reconciliation_pin).apply_artifact_id }}
+          run-id: ${{ fromJSON(inputs.reconciliation_pin).apply_run_id }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: web/work/model-apply-input
+      - run: npm ci
+        working-directory: web
+      - name: Inspect the pinned saved operation without remote writes
+        run: npx tsx ../scripts/reconcile-campus-model-apply.mts "$GITHUB_EVENT_PATH"
+        working-directory: web
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: lasu-model-reconciliation
+          path: web/work/lasu-model-reconciliation.json
           retention-days: 14
