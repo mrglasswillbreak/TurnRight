@@ -5,26 +5,30 @@ python scripts/import_campus.py              (builds from existing snapshots)
 python scripts/import_campus.py --output data/candidates  (review candidate)
 """
 
-import argparse
-import re
-from spatial import blocker
-from campus_access import (
-    vehicle_rules,
-    node_blocks_vehicle,
-    walking_access,
-    node_blocks_walking,
-    connection_review,
-    access_review_id,
+from campus_import_routing import prepare_routing
+
+from campus_import_sources import read_osm
+
+from campus_import_sources import read_arcgis
+
+from campus_import_geometry import (
+    distance as distance,
+    inside as inside,
+    project as project,
+    arc_geometry as arc_geometry,
+    feature as feature,
+    category as category,
+    components as components,
 )
-import collections
+
+import argparse
 import datetime as dt
 import hashlib
 import json
-import math
 import pathlib
 import urllib.request
 from defusedxml import ElementTree as ET
-from place_enrichment import enrich_osm, classify, update_coverage, snapshot_manifest
+from place_enrichment import enrich_osm, update_coverage, snapshot_manifest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RAW = ROOT / "data/raw"
@@ -61,466 +65,19 @@ def fetch(url, destination):
     )
 
 
-def distance(a, b):
-    x = math.radians(b[0] - a[0]) * math.cos(math.radians((a[1] + b[1]) / 2))
-    y = math.radians(b[1] - a[1])
-    return math.hypot(x, y) * 6371000
-
-
-def inside(p, ring):
-    x, y = p
-    result = False
-    for a, b in zip(ring, ring[1:] + ring[:1]):
-        if (a[1] > y) != (b[1] > y) and x < (b[0] - a[0]) * (y - a[1]) / (
-            b[1] - a[1]
-        ) + a[0]:
-            result = not result
-    return result
-
-
-def project(p, sr):
-    if sr in (3857, 102100, 102113):
-        return [
-            round(p[0] / 6378137 * 180 / math.pi, 7),
-            round(
-                (2 * math.atan(math.exp(p[1] / 6378137)) - math.pi / 2) * 180 / math.pi,
-                7,
-            ),
-        ]
-    if sr not in (4326, None):
-        raise ValueError(f"Unsupported CRS: {sr}")
-    return [round(p[0], 7), round(p[1], 7)]
-
-
-def arc_geometry(geometry, default_sr=None):
-    sr = geometry.get("spatialReference", {}).get(
-        "latestWkid", geometry.get("spatialReference", {}).get("wkid", default_sr)
-    )
-    if "rings" in geometry:
-        rings = [[project(p, sr) for p in ring] for ring in geometry["rings"]]
-
-        # Esri rings can contain multiple exterior parts. GeoJSON's later rings
-        # are holes, so independent wings must be emitted as a MultiPolygon.
-        def area(ring):
-            return abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(ring, ring[1:])))
-
-        polygons = []
-        for ring in sorted(rings, key=area, reverse=True):
-            parents = [
-                p for p in polygons if all(inside(point, p[0]) for point in ring[:-1])
-            ]
-            if parents:
-                min(parents, key=lambda p: area(p[0])).append(ring)
-            else:
-                polygons.append([ring])
-        polygons.sort(key=lambda polygon: rings.index(polygon[0]))
-        if len(polygons) == 1:
-            return {"type": "Polygon", "coordinates": polygons[0]}
-        return {"type": "MultiPolygon", "coordinates": polygons}
-    return {"type": "Point", "coordinates": project([geometry["x"], geometry["y"]], sr)}
-
-
-def feature(identifier, geometry, **properties):
-    return {
-        "type": "Feature",
-        "id": identifier,
-        "geometry": geometry,
-        "properties": {"id": identifier, **properties},
-    }
-
-
-def category(name, tags=None):
-    if tags:
-        mapped, _ = classify(tags)
-        if mapped != "other":
-            return mapped
-    text = (name + " " + json.dumps(tags or {})).lower()
-    for key, terms in [
-        ("library", ["library"]),
-        ("worship", ["mosque", "church", "chapel", "worship"]),
-        ("food", ["restaurant", "cafeteria", "canteen", "food", "cafe"]),
-        ("gate", ["gate", "entrance"]),
-        ("sports", ["sport", "stadium", "football", "basketball"]),
-        ("residence", ["hostel", "quarters", "residence"]),
-        (
-            "academic",
-            [
-                "faculty",
-                "department",
-                "lecture",
-                "science",
-                "school",
-                "laborator",
-                "classroom",
-                "education",
-                "college",
-                "theatre",
-            ],
-        ),
-        (
-            "services",
-            [
-                "bank",
-                "atm",
-                "health",
-                "clinic",
-                "admin",
-                "senate",
-                "bookshop",
-                "security",
-                "centre",
-                "center",
-            ],
-        ),
-    ]:
-        if any(re.search(r"\b" + re.escape(word), text) for word in terms):
-            return key
-    return "other"
-
-
-def components(nodes, edges):
-    links = collections.defaultdict(set)
-    for edge in edges:
-        if edge["accessible"]:
-            links[edge["from"]].add(edge["to"])
-            links[edge["to"]].add(edge["from"])
-    seen, groups = set(), []
-    for node in nodes:
-        if node not in seen:
-            group, stack = set(), [node]
-            while stack:
-                current = stack.pop()
-                if current in seen:
-                    continue
-                seen.add(current)
-                group.add(current)
-                stack.extend(links[current] - seen)
-            groups.append(group)
-    return sorted(groups, key=len, reverse=True)
-
-
 def build(access_policy=None):
     if access_policy is None:
         access_policy = json.loads(
             (ROOT / "data/campus-access.json").read_text(encoding="utf-8")
         )
-    arc = json.loads((RAW / "arcgis.json").read_text(encoding="utf-8-sig"))
-    layers = {
-        x["title"]: x["featureCollection"]["layers"][0]["featureSet"]
-        for x in arc["operationalLayers"]
-    }
-    boundary_geom = arc_geometry(layers["Boundary"]["features"][0]["geometry"])
-    ring = boundary_geom["coordinates"][0]
-    bounds = [
-        [min(p[0] for p in ring), min(p[1] for p in ring)],
-        [max(p[0] for p in ring), max(p[1] for p in ring)],
-    ]
-    boundary = feature(
-        "lasu-boundary",
-        boundary_geom,
-        kind="boundary",
-        name="Lagos State University · Ojo",
+    boundary, ring, bounds, features, places = read_arcgis(RAW=RAW)
+    tree, osm_nodes, graph_nodes, edges, campus_ways = read_osm(
+        RAW=RAW,
+        access_policy=access_policy,
+        features=features,
+        places=places,
+        ring=ring,
     )
-    features, places = [], []
-    for layer_name, kind in [
-        ("Land Use Land Cover", "land"),
-        ("University_Property", "building"),
-        ("Infrastructure", "place"),
-    ]:
-        layer = layers[layer_name]
-        for index, item in enumerate(layer["features"]):
-            attrs = item["attributes"]
-            geom = arc_geometry(
-                item["geometry"], layer.get("spatialReference", {}).get("wkid")
-            )
-            identifier = f"arcgis:{layer_name}:{attrs.get('FID', index)}"
-            name = str(
-                attrs.get("Build_name")
-                or attrs.get("DESC_")
-                or attrs.get("LU_Type")
-                or ""
-            ).strip()
-            props = {
-                "kind": kind,
-                "name": name,
-                "source": "arcgis",
-                "height": 0,
-                "heightEstimated": False,
-            }
-            # Storey is descriptive source data, not a surveyed height.
-            storey = str(attrs.get("Build_Type", attrs.get("STOREY", ""))).upper()
-            floors = {"BUNGALOW": 1, "ISTO": 2, "1STO": 2, "2STO": 3, "3STO": 4}.get(
-                storey
-            )
-            if floors and kind == "building":
-                props.update(height=floors * 3, heightEstimated=True)
-            if kind != "place":
-                features.append(feature(identifier, geom, **props))
-            if kind != "land" and name:
-                if geom["type"] == "Point":
-                    coords = geom["coordinates"]
-                else:
-                    # Keep the place on its first mapped part; a multi-wing mean
-                    # could land between buildings and change arrival semantics.
-                    first_ring = (
-                        geom["coordinates"][0]
-                        if geom["type"] == "Polygon"
-                        else geom["coordinates"][0][0]
-                    )
-                    coords = [
-                        sum(p[i] for p in first_ring[:-1]) / len(first_ring[:-1])
-                        for i in (0, 1)
-                    ]
-                if not inside(coords, ring):
-                    continue
-                aliases = [
-                    str(attrs.get(k, "")).strip()
-                    for k in ("Abbreviati", "Name_of_De", "Name_of_Fa")
-                    if str(attrs.get(k, "")).strip()
-                ]
-                # Never fuzzy-merge distinct nearby buildings solely on proximity.
-                places.append(
-                    {
-                        "id": identifier,
-                        "name": name,
-                        "category": category(name),
-                        "coordinates": coords,
-                        "aliases": aliases,
-                        "department": str(attrs.get("Name_of_De") or "").strip(),
-                        "faculty": str(attrs.get("Name_of_Fa") or "").strip(),
-                        "source": "arcgis",
-                        "sourceId": identifier,
-                        "arrivalKind": "unmapped",
-                        "height": props["height"],
-                        "heightEstimated": props["heightEstimated"],
-                    }
-                )
-    tree = ET.parse(RAW / "osm.xml").getroot()
-    osm_nodes = {}
-    for node in tree.findall("node"):
-        osm_nodes[node.attrib["id"]] = {
-            "coordinates": [float(node.attrib["lon"]), float(node.attrib["lat"])],
-            "tags": {t.attrib["k"]: t.attrib["v"] for t in node.findall("tag")},
-        }
-    graph_nodes, edges = {}, []
-    campus_ways = []
-    for way in tree.findall("way"):
-        tags = {t.attrib["k"]: t.attrib["v"] for t in way.findall("tag")}
-        refs = [x.attrib["ref"] for x in way.findall("nd")]
-        if not all(r in osm_nodes for r in refs):
-            raise ValueError(
-                "OSM way has missing nodes; this extract cannot establish source removals"
-            )
-        coords = [osm_nodes[r]["coordinates"] for r in refs]
-        if not any(inside(p, ring) for p in coords):
-            continue
-        identifier = "osm:way:" + way.attrib["id"]
-        if tags.get("highway"):
-            access = walking_access(identifier, tags, access_policy)
-            rules = vehicle_rules(tags)
-            access_props = {
-                "walkingAccess": access,
-                "sourceTags": tags,
-                "vehicle": rules,
-            }
-            if access == "campus":
-                access_props["accessReviewId"] = access_review_id(
-                    identifier, tags, access_policy
-                )
-                campus_ways.append(identifier)
-            features.append(
-                feature(
-                    identifier,
-                    {"type": "LineString", "coordinates": coords},
-                    kind="path",
-                    name=tags.get("name", ""),
-                    highway=tags["highway"],
-                    footDirection={"yes": "forward", "-1": "reverse"}.get(
-                        tags.get("oneway:foot"), "both"
-                    ),
-                    source="osm",
-                    **access_props,
-                )
-            )
-            for i, (a, b) in enumerate(zip(refs, refs[1:])):
-                # Restrict routes to campus. Do not create junctions at visual crossings.
-                if not inside(osm_nodes[a]["coordinates"], ring) or not inside(
-                    osm_nodes[b]["coordinates"], ring
-                ):
-                    continue
-                walkable = access in {"yes", "campus"} and not any(
-                    node_blocks_walking(
-                        osm_nodes[r]["tags"], "osm:node:" + r, access_policy
-                    )
-                    for r in (a, b)
-                )
-                vehicle_blocked = any(
-                    node_blocks_vehicle(osm_nodes[r]["tags"]) for r in (a, b)
-                )
-                gate_reviews = []
-                for r in (a, b):
-                    node_key = "osm:node:" + r
-                    node = {
-                        "id": node_key,
-                        "coordinates": osm_nodes[r]["coordinates"],
-                        "sourceTags": osm_nodes[r]["tags"],
-                    }
-                    review = connection_review(
-                        node_key, osm_nodes[r]["tags"], access_policy
-                    )
-                    if review and osm_nodes[r]["tags"].get("barrier") == "gate":
-                        node.update(
-                            sourceTags=osm_nodes[r]["tags"], accessReviewId=review["id"]
-                        )
-                        gate_reviews.append(review["id"])
-                    graph_nodes[node_key] = node
-                review_ids = (
-                    [access_props["accessReviewId"]] if access == "campus" else []
-                ) + gate_reviews
-                walking_directions = (
-                    [(a, b)]
-                    if tags.get("oneway:foot") == "yes"
-                    else (
-                        [(b, a)]
-                        if tags.get("oneway:foot") == "-1"
-                        else [(a, b), (b, a)]
-                    )
-                )
-                directions = [(a, b), (b, a)]
-                for start, end in directions:
-                    edges.append(
-                        {
-                            "id": f"{identifier}:{start}:{end}",
-                            "from": "osm:node:" + start,
-                            "to": "osm:node:" + end,
-                            "distance": round(
-                                distance(
-                                    osm_nodes[start]["coordinates"],
-                                    osm_nodes[end]["coordinates"],
-                                ),
-                                2,
-                            ),
-                            "name": tags.get(
-                                "name",
-                                "Campus path"
-                                if tags["highway"] in ("path", "footway", "steps")
-                                else "Campus road",
-                            ),
-                            "vehicle": rules.copy(),
-                            "vehicleAllowed": not vehicle_blocked
-                            and (
-                                rules["direction"] == "both"
-                                or (rules["direction"] == "forward") == (start == a)
-                            ),
-                            "accessible": walkable
-                            and (start, end) in walking_directions,
-                            "walkingAccess": "campus" if gate_reviews else access,
-                            **({"accessReviewId": review_ids[0]} if review_ids else {}),
-                            **(
-                                {"accessReviewIds": list(dict.fromkeys(review_ids))}
-                                if gate_reviews
-                                else {}
-                            ),
-                            "steps": tags["highway"] == "steps",
-                            "sourceId": identifier,
-                        }
-                    )
-        elif tags.get("barrier"):
-            features.append(
-                feature(
-                    identifier,
-                    {"type": "LineString", "coordinates": coords},
-                    kind="barrier",
-                    name=tags.get("barrier"),
-                    source="osm",
-                )
-            )
-        elif tags.get("building") and coords[0] == coords[-1]:
-            # Retain separate source layers; OSM supplements ArcGIS rather than overwriting it.
-            centroid = [
-                sum(p[i] for p in coords[:-1]) / (len(coords) - 1) for i in (0, 1)
-            ]
-            if not inside(centroid, ring):
-                continue
-            overlap = any(
-                f["properties"]["kind"] == "building"
-                and any(
-                    inside(centroid, polygon[0])
-                    and not any(inside(centroid, hole) for hole in polygon[1:])
-                    for polygon in (
-                        [f["geometry"]["coordinates"]]
-                        if f["geometry"]["type"] == "Polygon"
-                        else f["geometry"]["coordinates"]
-                    )
-                )
-                for f in features
-            )
-            if not overlap:
-                try:
-                    height = float(tags.get("height", "0").replace(" m", ""))
-                    estimated = False
-                except ValueError:
-                    height = 0
-                    estimated = False
-                if not height and tags.get("building:levels", "").isdigit():
-                    height = int(tags["building:levels"]) * 3
-                    estimated = True
-                features.append(
-                    feature(
-                        identifier,
-                        {"type": "Polygon", "coordinates": [coords]},
-                        kind="building",
-                        name=tags.get("name", ""),
-                        height=height,
-                        heightEstimated=estimated,
-                        source="osm",
-                    )
-                )
-        if (
-            tags.get("name")
-            and tags.get("highway") is None
-            and (tags.get("building") or tags.get("amenity"))
-        ):
-            centroid = [
-                sum(p[i] for p in coords[:-1]) / max(1, len(coords) - 1) for i in (0, 1)
-            ]
-            if inside(centroid, ring) and not any(
-                p["name"].lower() == tags["name"].lower()
-                and distance(p["coordinates"], centroid) < 50
-                for p in places
-            ):
-                places.append(
-                    {
-                        "id": identifier,
-                        "name": tags["name"],
-                        "category": category(tags["name"], tags),
-                        "coordinates": centroid,
-                        "aliases": [tags["alt_name"]] if tags.get("alt_name") else [],
-                        "source": "osm",
-                        "sourceId": identifier,
-                        "arrivalKind": "unmapped",
-                    }
-                )
-    for identifier, node in osm_nodes.items():
-        tags, coords = node["tags"], node["coordinates"]
-        if (
-            inside(coords, ring)
-            and tags.get("name")
-            and ("amenity" in tags or tags.get("barrier") == "gate")
-        ):
-            key = "osm:node:" + identifier
-            places.append(
-                {
-                    "id": key,
-                    "name": tags["name"],
-                    "category": category(tags["name"], tags),
-                    "coordinates": coords,
-                    "aliases": [],
-                    "source": "osm",
-                    "sourceId": key,
-                    "arrivalKind": "unmapped",
-                }
-            )
     # Add points along the existing polylines so a long straight road can be
     # selected near its midpoint. This changes sampling, not walkable geometry.
     enriched = {
@@ -534,87 +91,13 @@ def build(access_policy=None):
     ).isoformat()
     enrichment_issues = enrich_osm(enriched, tree, checked)
     places, features = enriched["places"], enriched["map"]["features"]
-    for node in graph_nodes.values():
-        if node.get("sourceTags", {}).get("barrier") in {
-            "gate",
-            "lift_gate",
-            "swing_gate",
-        }:
-            features.append(
-                feature(
-                    node["id"],
-                    {"type": "Point", "coordinates": node["coordinates"]},
-                    kind="barrier",
-                    name=node["sourceTags"].get("name", "Vehicle gate"),
-                    source="osm",
-                    sourceTags=node["sourceTags"],
-                )
-            )
-    dense_edges = []
-    for edge in edges:
-        a, b = edge["from"], edge["to"]
-        pa, pb = graph_nodes[a]["coordinates"], graph_nodes[b]["coordinates"]
-        steps = max(1, math.ceil(edge["distance"] / 12))
-        first, last = sorted((a, b))
-        sequence = [a]
-        for i in range(1, steps):
-            key = f"{edge['sourceId']}:sample:{first}:{last}:{i if a == first else steps - i}"
-            graph_nodes[key] = {
-                "id": key,
-                "coordinates": [
-                    round(pa[j] + (pb[j] - pa[j]) * i / steps, 7) for j in (0, 1)
-                ],
-            }
-            sequence.append(key)
-        sequence.append(b)
-        for i, (start, end) in enumerate(zip(sequence, sequence[1:])):
-            dense_edges.append(
-                {
-                    **edge,
-                    "id": f"{edge['id']}:{i}",
-                    "from": start,
-                    "to": end,
-                    "distance": edge["distance"] / steps,
-                }
-            )
-    edges = dense_edges
-    for edge in edges:
-        conflict = blocker(
-            graph_nodes[edge["from"]]["coordinates"],
-            graph_nodes[edge["to"]]["coordinates"],
-            features,
-        )
-        if conflict:
-            edge["geometryBlocked"] = conflict
-    allowed_edges = [
-        edge for edge in edges if edge["accessible"] and not edge.get("geometryBlocked")
-    ]
-    usable_ids = {key for edge in allowed_edges for key in (edge["from"], edge["to"])}
-    groups = components(
-        {key: value for key, value in graph_nodes.items() if key in usable_ids},
-        allowed_edges,
+    edges, groups = prepare_routing(
+        edges=edges,
+        features=features,
+        graph_nodes=graph_nodes,
+        osm_nodes=osm_nodes,
+        places=places,
     )
-    for place in places:
-        # Approach routing explicitly ends on the actual mapped path. No connector
-        # across an unmapped courtyard, wall, or building is inserted into the graph.
-        options = sorted(
-            (
-                (distance(place["coordinates"], graph_nodes[k]["coordinates"]), k)
-                for k in usable_ids
-            )
-        )
-        if options and options[0][0] <= 90:
-            meters, key = options[0]
-            place.update(
-                graphNode=key,
-                approachDistance=round(meters),
-                arrivalKind="mapped-approach",
-            )
-            osm_id = key.removeprefix("osm:node:")
-            if meters <= 15 and osm_nodes.get(osm_id, {}).get("tags", {}).get(
-                "entrance"
-            ) not in (None, "no"):
-                place["arrivalKind"] = "entrance"
     now = dt.datetime.now(dt.timezone.utc).isoformat()
     restrictions = []
     for relation in tree.findall("relation"):

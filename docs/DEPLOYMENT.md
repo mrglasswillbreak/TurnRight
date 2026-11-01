@@ -1,10 +1,17 @@
 # Deploying TurnRight
 
+The operational-monitoring release requires additive migration **057** before the
+updated API/workers. It creates private error groups and service-role RPCs only.
+Existing backend credentials configure capture; `ERROR_MONITORING_ENABLED=false`
+disables it. The configured application owner can use **Workspace → System health**.
+Verify a labeled synthetic delivery probe at the deployed revision, resolve it and
+check retention. [Setup, verification and rollback](ERROR-MONITORING.md).
+
 TurnRight deploys a public campus PWA, a private team GIS API and isolated processing/release workers. Application deployment preserves the already published campus packages. Publishing changed campus data is a separate, independently approved operation. [Current account settings](CONFIGURATION.md) · [Actual production receipts](PRODUCTION.md) · [Team workflow](GIS-PLATFORM.md).
 
 ## Existing-installation upgrade
 
-1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–056**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
+1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–057**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.
 2. Preserve source records, corrections, source configurations, release snapshots and referenced private assets. Verify backup read-back and retain recovery receipts outside public application assets. Run the native database restoration exercise against a disposable database.
 3. Pass unit/database tests, all four TypeScript projects, lint/formatting, architecture/configuration checks, combined application coverage, configured build/budgets, Chromium/WebKit, offline, native PostGIS, isolated GIS/importer and security checks. Resolve failures before deployment or production migration.
 4. Stop source imports/reconciliation, editing and content publication during the database update. Apply missing migrations in order in a transaction where the deployment transport permits. Backfill memberships and effective spatial indexes; verify source/correction counts, original content fingerprints, owner membership, campus isolation and index rebuild equivalence.
@@ -21,7 +28,7 @@ Resolve redistribution permission for every source before packaging it for publi
 
 ### Supabase and authentication
 
-Create the project, retain the database credentials privately, and apply **all migrations 001–056 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
+Create the project, retain the database credentials privately, and apply **all migrations 001–057 in numeric order**. PostGIS, private tables, explicit grants/RLS, transactional saves, personal surveys/media, campus imports, datasets, spatial indexes, jobs and review guards are part of the schema. [Migration responsibilities](CONFIGURATION.md#database-and-private-storage).
 
 Enable GitHub sign-in with the exact Supabase callback and exact application /admin redirect URLs. Keep anonymous sign-in disabled. Register the original owner in admin_users and set ADMIN_USER_ID to that Auth UUID. The original-owner row bootstraps campus administrators; ordinary access then comes from campus_memberships. Signing in alone grants no campus access. An administrator can assign existing Auth users by UUID in Settings → Campus memberships. Invitation email and SSO are not included.
 

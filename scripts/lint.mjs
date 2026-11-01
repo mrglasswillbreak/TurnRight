@@ -9,7 +9,7 @@ for (let index = 0; index < files.length; index += 60) {
       packageBin('oxlint'),
       '--deny-warnings',
       '--config',
-      'web/.oxlintrc.json',
+      '.oxlintrc.json',
       ...files.slice(index, index + 60),
     ],
     { cwd: root, stdio: 'inherit', windowsHide: true },

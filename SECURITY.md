@@ -8,6 +8,13 @@ Include the affected revision, a minimal reproduction using synthetic data, the 
 
 ## Operational boundaries
 
+[Private error monitoring](docs/ERROR-MONITORING.md) stores allowlisted categories,
+status, revision and UUID references only. The server checks the application owner
+before returning global monitoring data; campus administrator membership alone is
+insufficient. Migration 057 denies anonymous/authenticated database access and
+bounds retained data. Browser diagnostic buffers remain local until explicitly
+downloaded. Delivery refuses redirects and cannot replace the original error.
+
 - Keep service-role credentials, workflow tokens, deployment credentials, private backups, and signing material out of Git and browser bundles. Only public client configuration belongs in `VITE_*` variables.
 - Campus membership, capability checks, database grants, and row-level security must agree. Authentication alone grants no campus membership.
 - Imports and processing use bounded, isolated workers. Preserve their network, filesystem, upload, and execution limits.

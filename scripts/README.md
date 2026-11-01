@@ -1,5 +1,7 @@
 # Data, processing, and release tooling
 
+Python entry points retain their CLI contracts while domain helpers live in `campus_import_*`, `campus_enrichment_records.py`, `map_import/normalise_*`, `map_import/conversion.py`, `gis/{fields,export,limits}.py`, `arcgis_review*` and `unilag_*`. Authored Python, including tests/tools, is included in the fewer-than-500-lines gate. Install portable checks with `python -m pip install --require-hashes -r requirements.txt`; use `npm run test:python:isolated` for the actual no-network/no-skips Linux gate. `diagnostics.py` and `error_monitoring.py` provide standard logging and private bounded failure capture. [Operational monitoring](../docs/ERROR-MONITORING.md).
+
 These programs run from the repository root unless a guide or workflow specifies otherwise. They are distinct from [web-specific tooling](../web/README.md) in `web/scripts/`.
 
 | Area                                | Entry points                                                                                                                                                              |
@@ -16,7 +18,7 @@ These programs run from the repository root unless a guide or workflow specifies
 Use Python **3.12** and the pinned requirement files. Native GDAL/PostGIS/GeoPackage checks run in the pinned Linux environments used by `.github/workflows/map-import-tests.yml` and `gis-acceptance.yml`. A local run with skipped native-driver tests is not equivalent to those gates.
 
 ```sh
-python -m pip install -r scripts/requirements-data.txt
+python -m pip install --require-hashes -r requirements.txt
 python -m unittest discover -s scripts/tests -v
 ```
 

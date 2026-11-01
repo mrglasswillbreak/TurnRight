@@ -1,5 +1,9 @@
 # TurnRight architecture
 
+Operational error monitoring is a separate private subsystem: the API and host workers emit allowlisted categories/status/revision/UUID references, migration 057 groups them atomically, and the configured application owner reads the bounded System health view. It has no browser telemetry ingestion or third-party destination. [Monitoring boundaries](ERROR-MONITORING.md) explain retention and the shared-backend outage limit.
+
+Python CLI entry points now delegate to geometry/source/routing helpers, normalized path/result modules and GIS field/export helpers. Domain extraction preserves native network isolation and includes all live processing helpers in coverage. The architecture gate includes authored Python as well as JavaScript/TypeScript.
+
 ## Campus detail extension
 
 The [ArcGIS bridge](../scripts/arcgis/bridge.py) produces a versioned exchange manifest and hash-verified GeoJSON/GeoPackage evidence. The existing file-import reader checks identities, campus/baseline, CRS, units, permissions and transformation history. Pro tokens remain local; third-party service requests never receive the portal credential.

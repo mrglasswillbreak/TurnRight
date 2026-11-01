@@ -1,3 +1,4 @@
+import { captureOperationalError } from './error-monitoring.mjs';
 const events = new Set([
   'admin-request-failed',
   'request-completed',
@@ -65,4 +66,5 @@ export function emitEvent(event, context = {}) {
   (event.endsWith('failed') ? console.error : console.info)(
     JSON.stringify(record),
   );
+  captureOperationalError(record);
 }

@@ -1,9 +1,12 @@
 """Worker log envelopes. Payloads, errors and credentials are never accepted."""
 
 import json
+import logging
 import re
+import sys
 import time
 from datetime import datetime, timezone
+from error_monitoring import capture_worker_failure
 
 
 def worker_event(worker, started, succeeded, job_id=None):
@@ -25,4 +28,13 @@ def worker_event(worker, started, succeeded, job_id=None):
 
 
 def emit_worker(worker, started, succeeded, job_id=None):
-    print(json.dumps(worker_event(worker, started, succeeded, job_id)), flush=True)
+    event = worker_event(worker, started, succeeded, job_id)
+    logger = logging.getLogger("turnright.worker")
+    logger.propagate = False
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    logger.log(logging.INFO if succeeded else logging.ERROR, json.dumps(event))
+    capture_worker_failure(event)

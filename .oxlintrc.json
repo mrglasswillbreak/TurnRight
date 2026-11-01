@@ -17,11 +17,7 @@
     "browser": true,
     "node": true
   },
-  "ignorePatterns": [
-    "dist/**",
-    "coverage/**",
-    "node_modules/**"
-  ],
+  "ignorePatterns": ["dist/**", "coverage/**", "node_modules/**"],
   "rules": {
     "no-array-constructor": "error",
     "no-var": "error",

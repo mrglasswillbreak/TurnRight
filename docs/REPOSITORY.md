@@ -1,5 +1,7 @@
 # Repository structure and maintenance
 
+The enforced Oxlint/Oxfmt configs live at root (`.oxlintrc.json`, `.oxfmtrc.json`), alongside `pyproject.toml`, the hash-locked Python install entry `requirements.txt`, `Dockerfile` and `docker-compose.yml`. [Quality](QUALITY.md) maps actual dependencies, commands and evidence. `.env.example` is generated from `scripts/configuration.json`; edit the inventory and regenerate rather than maintaining separate variable lists.
+
 TurnRight is one deployable web application with separate data-processing workers. The repository keeps runtime code, source evidence, migrations, and user documentation distinct. [Architecture](ARCHITECTURE.md) describes the data and security boundaries.
 
 ## Directory ownership
@@ -42,4 +44,4 @@ Existing local backup copies and unselected brand drafts are ignored, not produc
 
 Node is pinned in the root runtime files; the root `package-lock.json` is the single dependency lock for the npm workspace. Use root `npm ci` for routine setup and `npm run doctor` to check the runtime. Python manifests and their hash-locked `requirements*.lock` profiles live under `scripts/`; the converter and GIS worker have separate pinned container definitions. Root quality checks enforce four TypeScript projects and the formatted 500-line limit for authored JavaScript/TypeScript source, tests and tools. See [Contributing](../CONTRIBUTING.md) for checks and [Deployment](DEPLOYMENT.md) for production configuration.
 
-Run the formatter from the repository root: `npm exec -- oxfmt --config web/.oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory. `npm run format:check` checks the repository's authored files.
+Run the formatter from the repository root: `npm exec -- oxfmt --config .oxfmtrc.json <files>`. The formatter rejects parent-directory (`..`) paths; use paths relative to the working directory. `npm run format:check` checks the repository's authored files.

@@ -15,6 +15,7 @@ import urllib.error
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import import_map as worker
+from map_import import conversion
 from test_map_import import CAMPUS, CONFIG, FEATURE, LAYER, META, SOURCE
 
 
@@ -38,7 +39,9 @@ class ImportConversionTests(unittest.TestCase):
             }
             (folder / "request.json").write_bytes(worker.encoded(request))
             with patch.object(
-                worker, "inspect_file", return_value=copy.deepcopy(layers or [LAYER])
+                conversion,
+                "inspect_file",
+                return_value=copy.deepcopy(layers or [LAYER]),
             ):
                 worker.convert(folder)
             self.assertTrue((folder / "progress.json").exists())
@@ -232,7 +235,9 @@ class ImportWorkerTests(unittest.TestCase):
             patch.object(worker, "db", side_effect=self.database),
             patch.object(worker, "remote", side_effect=self.remote),
             patch.object(
-                worker, "inspect_file", side_effect=lambda *args: copy.deepcopy([LAYER])
+                conversion,
+                "inspect_file",
+                side_effect=lambda *args: copy.deepcopy([LAYER]),
             ),
             patch.object(worker.os, "getuid", return_value=1000, create=True),
             patch.object(worker.os, "getgid", return_value=1000, create=True),

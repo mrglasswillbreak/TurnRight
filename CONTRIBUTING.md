@@ -1,5 +1,18 @@
 # Contributing to TurnRight
 
+Start with the [quality map](docs/QUALITY.md). Root `.oxlintrc.json` and `.oxfmtrc.json`
+configure enforced JS/TS checks; Python uses `pyproject.toml`. Install portable
+quality dependencies with `python -m pip install --require-hashes -r requirements.txt`.
+Authored JS/TS/Python source, tests and tools must stay below 500 formatted lines.
+Preserve CLI entry points when extracting helpers and include live worker modules
+in processing coverage. `npm run test:python:isolated` is the Linux/WSL2 native gate.
+
+Edit `scripts/configuration.json`, then run `npm run check:configuration -- --write`
+to regenerate `.env.example` and `docs/ENVIRONMENT.md`. Commented provider/per-job
+entries document supplied context; they are not global deployment settings.
+[Monitoring tests and privacy](docs/ERROR-MONITORING.md) cover operational storage,
+including permissions, recurrence and concurrent resolution.
+
 TurnRight combines public campus navigation with an authenticated GIS editing and publication workflow. Start with the [project overview](README.md), [architecture](docs/ARCHITECTURE.md), and [editor layout contract](docs/EDITOR-LAYOUT.md).
 
 ## Local development

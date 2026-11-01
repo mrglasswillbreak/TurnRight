@@ -380,6 +380,11 @@
       "scope": "public",
       "sensitive": false,
       "description": "Public Supabase project URL. Required only for hosted authentication and editing."
+    },
+    "ERROR_MONITORING_ENABLED": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Private operational error tracking is enabled when server credentials exist; set false to disable capture. Apply migration 057 first."
     }
   }
 }

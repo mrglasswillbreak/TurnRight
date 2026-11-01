@@ -353,6 +353,12 @@ test('public Editor opens the selected building card and consumes the handoff on
     page.getByRole('group', { name: 'Place actions' }),
   ).toBeVisible();
   await link.click();
+  await attachMap(page);
+  await expect(
+    page
+      .getByRole('complementary', { name: 'Feature properties', exact: true })
+      .getByRole('heading', { name: 'Library', exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Edit model', exact: true }),
   ).toBeVisible();
@@ -404,10 +410,14 @@ test('public footprint dialog opens its unlinked building in the editor', async 
     '/admin?building=unlinked-library',
   );
   await link.click();
+  // The new editor map must load before the handoff and lazy property tools.
+  await attachMap(page);
   await expect(
-    page.getByRole('button', { name: 'Edit model', exact: true }),
+    page
+      .getByRole('complementary', { name: 'Feature properties', exact: true })
+      .getByRole('heading', { name: 'Unlinked library', exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText('Unlinked library', { exact: true }).first(),
+    page.getByRole('button', { name: 'Edit model', exact: true }),
   ).toBeVisible();
 });

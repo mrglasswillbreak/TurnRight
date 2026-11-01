@@ -90,6 +90,7 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `VITE_LOCAL_DEVELOPMENT` | public | No | Set only by the isolated local server and configured-build test. |
 | `VITE_SUPABASE_ANON_KEY` | public | No | Public Supabase anonymous key, protected by server authorization and row policies. |
 | `VITE_SUPABASE_URL` | public | No | Public Supabase project URL. Required only for hosted authentication and editing. |
+| `ERROR_MONITORING_ENABLED` | server | No | Private operational error tracking is enabled when server credentials exist; set false to disable capture. Apply migration 057 first. |
 
 CI-only scanner switches and `TURNRIGHT_COVERAGE` are set by their workflow/test harness.
 Vite, Node, npm, GitHub and Vercel supply the entries marked as runtime/provider context.

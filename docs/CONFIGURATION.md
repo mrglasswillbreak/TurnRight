@@ -1,5 +1,7 @@
 # TurnRight account configuration
 
+The root [.env.example](../.env.example) and [complete inventory](ENVIRONMENT.md) are generated together and checked in CI. Automatic/provider/per-job variables remain commented examples, not global settings. Private [error monitoring](ERROR-MONITORING.md) uses existing backend credentials and optional server-only `ERROR_MONITORING_ENABLED`; apply migration 057 before deploying its collectors.
+
 ArcGIS Pro is optional for local discovery and native analysis. Its active portal session remains on the workstation; no Pro token or credential belongs in Vercel, GitHub or browser configuration. Portable GeoJSON/GeoPackage evidence and GLB exports remain usable after the licence expires, subject to their source terms. [Toolbox setup and trial-window priorities](CAMPUS-DETAIL-UPGRADE.md).
 
 This is the current configuration guide. [Deployment](DEPLOYMENT.md) contains the setup sequence; [Production](PRODUCTION.md) records dated changes and live verification. Credentials belong in service secret stores, never in this repository or browser screenshots.
@@ -18,7 +20,7 @@ Visitors do not need accounts. Signing in grants no campus access until an admin
 
 ## Database and private storage
 
-The current application requires migrations **001–056**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
+The current application requires migrations **001–057**. Consult [Production](PRODUCTION.md) for the installed migration receipt. Compatible readers preceded model-asset and campus migrations; dependent writers followed verification. Migrations 016–017 repair large import review transactions; 018 adds land/overlay edit kinds, 019 adds guarded, additive source patching with complete revision checks and rollback receipts; 020 adds atomic layer membership saves and older-writer guards; 021 bounds reviewed release snapshot creation; 022 prevents draft revision timestamp collisions. Migration 038 replaces the import queue's whole-campus JSON aggregate with a row-by-row comparison and rejects overlapping source-review requests promptly. Their application is recorded in [Production](PRODUCTION.md). For a new installation, apply the full sequence. For an existing installation, inspect its schema and apply only missing migrations.
 
 | Migrations | Responsibility |
 | --- | --- |
@@ -50,6 +52,9 @@ The current application requires migrations **001–056**. Consult [Production](
 | 049–050 | Qualified decision-history reads and compressed, reusable source evidence with protected recovery |
 | 051–055 | Preserve inferred import types, bound review requests and serialize equivalent hashes and compare immutable review fields without repeated snapshot copies |
 | 056 | Bounded publication completion with an exact lease and the existing approval guard; small completion receipts |
+| 057 | Private operational error groups, service-role capture/summary/resolution RPCs and bounded retention |
+
+Apply migration 057 before the monitoring API and workers. It uses the existing private backend credentials; only the configured owner can open System health. [Monitoring setup and verification](ERROR-MONITORING.md) describe the synthetic probe, access checks and retention.
 
 Migrations 045–048 require [shadow comparisons and per-source enablement](SOURCE-UPDATES.md#staged-reliability-rollout). Their presence in Git is not an installed-schema receipt. The [local reliability record](assets/source-reliability-2026-10-13.json) explicitly reports them as undeployed at its checkpoint.
 

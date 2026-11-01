@@ -1,10 +1,14 @@
 import { readFile, access } from 'node:fs/promises';
 import path from 'node:path';
-import { authoredCode, repositoryFiles } from './source-files.mjs';
+import {
+  authoredCode,
+  authoredPython,
+  repositoryFiles,
+} from './source-files.mjs';
 import { root } from './toolchain.mjs';
 
 const failures = [];
-const code = authoredCode();
+const code = [...authoredCode(), ...authoredPython()];
 for (const file of code) {
   const source = await readFile(path.join(root, file), 'utf8');
   const lines = source.trimEnd().split('\n').length;

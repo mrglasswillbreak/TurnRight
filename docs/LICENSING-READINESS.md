@@ -1,5 +1,7 @@
 # Licensing readiness and reassessment evidence
 
+The [21 October reassessment and follow-up](READINESS-FOLLOWUP.md) records the external change from 46 to 65.1 and the remaining work. [Quality](QUALITY.md) exposes the actual workspace, hash locks, setup and coverage evidence; [monitoring](ERROR-MONITORING.md) describes the new private backend implementation. No subsequent external score or licensing offer is claimed.
+
 This document maps the agreed engineering criticisms to implementation and checks. It is a reassessment preparation document, not a claimed DataFactor score or licensing offer. No code, credentials or message has been submitted to DataFactor as part of this work. Original software remains proprietary; licensing terms and any payment require a separate agreement.
 
 ## Implementation map

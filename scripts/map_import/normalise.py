@@ -1,8 +1,12 @@
 """Map selected GIS fields onto TurnRight's existing source records."""
 
+from .normalise_result import finish_normalisation
+
+from .normalise_paths import add_paths
+
+from .normalise_values import digest as digest, distance as distance
+
 import copy
-import hashlib
-import json
 import math
 import re
 
@@ -10,41 +14,8 @@ from .formats import MAX_FEATURES
 from .geometry import (
     components as geometry_components,
     prepare_geometry,
-    preview_features,
 )
-from .semantics import mapped_properties, public_tags
-
-
-def digest(value, preserve_all_fields=False):
-    def stable(v):
-        if isinstance(v, list):
-            return [stable(x) for x in v]
-        if isinstance(v, dict):
-            return {
-                k: stable(x)
-                for k, x in sorted(v.items())
-                if preserve_all_fields
-                or k not in ("createdAt", "retrievedAt", "checkedAt")
-            }
-        if isinstance(v, float) and v.is_integer():
-            return int(v)
-        return v
-
-    return hashlib.sha256(
-        json.dumps(
-            stable(value), separators=(",", ":"), ensure_ascii=False, allow_nan=False
-        ).encode()
-    ).hexdigest()
-
-
-def distance(a, b):
-    lat1, lat2 = math.radians(a[1]), math.radians(b[1])
-    dlat, dlon = lat2 - lat1, math.radians(b[0] - a[0])
-    h = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    )
-    return 6371000 * 2 * math.atan2(math.sqrt(h), math.sqrt(max(0, 1 - h)))
+from .semantics import mapped_properties
 
 
 def normalise(layers, source, campus, previous, configuration, import_id):
@@ -57,7 +28,7 @@ def normalise(layers, source, campus, previous, configuration, import_id):
     # Keep complete intersecting buildings and paths: clipping can sever access topology.
     region = boundary.buffer(0.0001)
     mappings = {m["layer"]: m for m in configuration["layers"]}
-    records, warnings, errors, preview, duplicates = {}, [], [], [], []
+    records, warnings, errors, duplicates = {}, [], [], []
     observations, observation_key, collections = {}, None, []
     repairs, diagnostics, mapped_layers = [], [], []
     previous_by_id = {r["id"]: r for r in previous}
@@ -421,122 +392,23 @@ def normalise(layers, source, campus, previous, configuration, import_id):
             if "height" in props:
                 props["heightSource"] = "source"
                 props["heightEstimated"] = False
-            if role == "path":
-                lines = (
-                    list(geom.geoms) if geom.geom_type == "MultiLineString" else [geom]
-                )
-                access = (
-                    m.get("walkingAccess")
-                    or str(mapped_value("accessField", "access") or "private").lower()
-                )
-                if is_osm:
-                    access = (
-                        "yes"
-                        if attrs.get("highway")
-                        in (
-                            "footway",
-                            "pedestrian",
-                            "path",
-                            "steps",
-                            "residential",
-                            "service",
-                            "unclassified",
-                            "living_street",
-                            "tertiary",
-                            "secondary",
-                            "primary",
-                        )
-                        else "no"
-                    )
-                    if attrs.get("access") in ("private", "no") or attrs.get(
-                        "foot"
-                    ) in ("private", "no"):
-                        access = "no"
-                    if attrs.get("foot") in ("yes", "designated", "permissive"):
-                        access = "yes"
-                    if (
-                        attrs.get("construction")
-                        or attrs.get("highway") == "construction"
-                        or attrs.get("access:conditional")
-                        or attrs.get("foot:conditional")
-                    ):
-                        access = "no"
-                if access not in ("yes", "private", "no"):
-                    access = "private"
-                props.update(
-                    {
-                        "walkingAccess": access,
-                        "autoConnectCrossings": False,
-                        "sourceTags": public_tags(attrs) if is_osm else {},
-                    }
-                )
-                if not is_osm:
-                    warnings.append(
-                        "Imported line endpoints are separate until connected in the editor. Review path access and junctions before routing."
-                    )
-                for li, line in enumerate(lines):
-                    coordinates = list(line.coords)
-                    ids = []
-                    for vi, point in enumerate(coordinates):
-                        node_ref = (
-                            feature.get("osmNodes", [None] * len(coordinates))[vi]
-                            if is_osm
-                            else None
-                        )
-                        node_id = (
-                            f"{owner_source}:node:{node_ref}"
-                            if node_ref is not None
-                            else f"{ident}:line:{li}:vertex:{vi}"
-                        )
-                        node = {"id": node_id, "coordinates": list(point)}
-                        node_data = layer.get("osmNodes", {}).get(
-                            str(node_ref), layer.get("osmNodes", {}).get(node_ref, {})
-                        )
-                        if node_data.get("tags"):
-                            node["sourceTags"] = public_tags(node_data["tags"])
-                        add("node", node_id, node)
-                        ids.append(node_id)
-                    for vi in range(len(ids) - 1):
-                        if distance(coordinates[vi], coordinates[vi + 1]) < 0.01:
-                            errors.append(
-                                f"{name or ident}: path has a zero-length segment; repair the source geometry."
-                            )
-                            continue
-                        for reverse in (False, True):
-                            a, b = (vi + 1, vi) if reverse else (vi, vi + 1)
-                            edge_id = f"{ident}:line:{li}:edge:{vi}:{int(reverse)}"
-                            blocked = any(
-                                (
-                                    layer.get("osmNodes", {})
-                                    .get(str(n), layer.get("osmNodes", {}).get(n, {}))
-                                    .get("tags", {})
-                                    .get("access")
-                                    in ("private", "no")
-                                    or layer.get("osmNodes", {})
-                                    .get(str(n), layer.get("osmNodes", {}).get(n, {}))
-                                    .get("tags", {})
-                                    .get("barrier")
-                                    in ("gate", "fence", "wall", "turnstile")
-                                )
-                                for n in feature.get("osmNodes", [])[vi : vi + 2]
-                            )
-                            add(
-                                "edge",
-                                edge_id,
-                                {
-                                    "id": edge_id,
-                                    "from": ids[a],
-                                    "to": ids[b],
-                                    "distance": distance(
-                                        coordinates[a], coordinates[b]
-                                    ),
-                                    "name": name or "Imported path",
-                                    "accessible": attrs.get("highway") != "steps",
-                                    "steps": attrs.get("highway") == "steps",
-                                    "walkingAccess": "no" if blocked else access,
-                                    "sourceId": ident,
-                                },
-                            )
+            add_paths(
+                add=add,
+                attrs=attrs,
+                errors=errors,
+                feature=feature,
+                geom=geom,
+                ident=ident,
+                is_osm=is_osm,
+                layer=layer,
+                m=m,
+                mapped_value=mapped_value,
+                name=name,
+                owner_source=owner_source,
+                props=props,
+                role=role,
+                warnings=warnings,
+            )
             old_feature = previous_by_id.get("feature:" + ident)
             if old_feature:
                 for key in (
@@ -595,206 +467,21 @@ def normalise(layers, source, campus, previous, configuration, import_id):
         collections[-1]["complete"] = len(
             errors
         ) == layer_error_start and not layer.get("retrievalError")
-    # Detect overlaps with other sources. They are review candidates, never auto-merged.
-    from shapely.strtree import STRtree
-
-    incoming_buildings = [
-        r
-        for r in records.values()
-        if r["entity"] == "feature" and r["payload"]["properties"]["kind"] == "building"
-    ]
-    existing = [
-        r
-        for r in previous
-        if r["entity"] == "feature"
-        and r["source"] != owner_source
-        and r.get("payload", {}).get("properties", {}).get("kind") == "building"
-    ] + incoming_buildings
-    shapes = [shape(r["payload"]["geometry"]) for r in existing]
-    tree = STRtree(shapes)
-    for record in records.values():
-        if (
-            record["entity"] != "feature"
-            or record["payload"]["properties"]["kind"] != "building"
-        ):
-            continue
-        geom = shape(record["payload"]["geometry"])
-        for index in tree.query(geom):
-            if existing[index]["id"] == record["id"]:
-                continue
-            if (
-                existing[index]["source"] == owner_source
-                and existing[index]["id"] > record["id"]
-            ):
-                continue
-            candidate = shapes[index]
-            if (
-                candidate.is_valid
-                and geom.intersection(candidate).area
-                / max(geom.area, candidate.area, 1e-20)
-                > 0.6
-            ):
-                duplicates.append(
-                    {
-                        "incomingId": record["payload"]["properties"]["id"],
-                        "existingId": existing[index]["payload"]["properties"]["id"],
-                        "name": record["payload"]["properties"]["name"],
-                    }
-                )
-    old = {
-        r["id"]: r
-        for r in previous
-        if r["source"] == owner_source
-        or r["id"].startswith("feature:" + owner_source + ":")
-        or r["id"].startswith("place:" + owner_source + ":")
-    }
-    # Owner reconciliations remain authoritative; source changes never erase them.
-    for ident, record in old.items():
-        if record["source"] == "campus-review" and ident in records:
-            if record["hash"] != records[ident]["hash"]:
-                diagnostics.append(
-                    {
-                        "sourceId": ident,
-                        "message": "Retained owner-reviewed record; compare source changes in the editor.",
-                    }
-                )
-            records[ident] = copy.deepcopy(record)
-    mode = configuration.get("refreshMode", "merge")
-    selected_prefixes = [
-        f"{owner_source}:{digest(m.get('identity') or m['layer'])[:8]}:"
-        for m in configuration["layers"]
-        if m["role"] != "skip"
-    ]
-    for ident, record in old.items():
-        selected = any(
-            ident.split(":", 1)[-1].startswith(prefix) for prefix in selected_prefixes
-        )
-        if ident not in records and (
-            mode == "merge"
-            or mode == "replace-layer"
-            and not selected
-            or record["source"] == "campus-review"
-        ):
-            records[ident] = copy.deepcopy(record)
-    parents = {}
-
-    def component(node):
-        parents.setdefault(node, node)
-        while parents[node] != node:
-            parents[node] = parents[parents[node]]
-            node = parents[node]
-        return node
-
-    for r in [p for p in previous if p["source"] != owner_source] + list(
-        records.values()
-    ):
-        if r["entity"] == "edge" and r["payload"].get("walkingAccess") not in (
-            "private",
-            "no",
-        ):
-            a, b = r["payload"]["from"], r["payload"]["to"]
-            parents[component(a)] = component(b)
-    components = len({component(n) for n in parents})
-    if not components:
-        warnings.append(
-            "Directions unavailable: there are no reviewed, permitted walking paths. A map-only campus can still be published."
-        )
-    elif components > 1:
-        warnings.append(
-            f"Routing gap: {components} disconnected walking networks. Review endpoint connections and entrances; bridges and tunnels are never joined by proximity."
-        )
-    # Shared campus metadata is updated from the complete accepted baseline, never from just this source.
-    meta_record = next((r for r in previous if r["entity"] == "meta"), None)
-    if not meta_record:
-        raise ValueError("Campus metadata is missing.")
-    meta = copy.deepcopy(meta_record)
-    metadata = meta["payload"]
-    metadata["sources"] = [
-        s for s in metadata.get("sources", []) if s["id"] != owner_source
-    ] + [
-        {
-            "id": owner_source,
-            "name": source["name"],
-            "url": source.get("url") or "",
-            "attribution": configuration["attribution"],
-            "license": configuration["license"],
-            "redistributionConfirmed": configuration["redistributionConfirmed"],
-        }
-    ]
-    meta["hash"] = digest(metadata)
-    observations[("__attribution__", source["id"])] = {
-        "provider": "configuration",
-        "collection": "__attribution__",
-        "nativeId": source["id"],
-        "stable": True,
-        "featureType": "attribution",
-        "content": next(s for s in metadata["sources"] if s["id"] == owner_source),
-        "records": {meta["id"]: meta},
-    }
-    collections.append(
-        {
-            "identity": "__attribution__",
-            "count": 1,
-            "layer": "Source attribution",
-            "complete": True,
-        }
+    return finish_normalisation(
+        collections=collections,
+        configuration=configuration,
+        diagnostics=diagnostics,
+        duplicates=duplicates,
+        errors=errors,
+        feature_count=feature_count,
+        layers=layers,
+        mapped_layers=mapped_layers,
+        observations=observations,
+        owner_source=owner_source,
+        previous=previous,
+        records=records,
+        repairs=repairs,
+        skipped=skipped,
+        source=source,
+        warnings=warnings,
     )
-    preview, sampling = preview_features(mapped_layers)
-    summary = {
-        "layers": [
-            {
-                k: v
-                for k, v in layer.items()
-                if k not in ("features", "osmNodes", "osmRelations")
-            }
-            | {"count": len(layer["features"])}
-            for layer in layers
-        ],
-        "counts": {"added": 0, "modified": 0, "removed": 0, "skipped": skipped},
-        "warnings": list(dict.fromkeys(warnings)),
-        "errors": list(dict.fromkeys(errors))[:500],
-        "duplicates": duplicates[:500],
-        "features": preview,
-        "sampling": sampling,
-        "repairs": repairs[:500],
-        "diagnostics": diagnostics[:500],
-        "totalFeatures": feature_count,
-    }
-    if duplicates:
-        summary["warnings"].append(
-            "Overlapping buildings need a keep/merge decision in the existing duplicate review workflow."
-        )
-    summary["reportCounts"] = {
-        "repairs": len(repairs),
-        "diagnostics": len(diagnostics),
-        "errors": len(set(errors)),
-        "duplicates": len(duplicates),
-    }
-    # Only the shared Node comparator may create review proposals. Raw upstream
-    # content is separate from converted shapes, routing and owner corrections.
-    for observation in observations.values():
-        observation["records"] = list(observation["records"].values())
-    # Display layers can change without changing the provider collection (OSM).
-    combined = {}
-    for collection in collections:
-        key = collection["identity"]
-        if key not in combined:
-            combined[key] = collection.copy()
-        else:
-            combined[key]["complete"] = combined[key].get(
-                "complete", False
-            ) and collection.get("complete", False)
-            combined[key]["count"] += collection["count"]
-    collections = list(combined.values())
-    return {
-        "summary": summary,
-        "proposals": [],
-        "convertedRecords": list(records.values()) + [meta],
-        "collections": collections,
-        "observations": list(observations.values()),
-        "expectedSources": previous,
-        "repairReport": repairs,
-        "diagnosticReport": diagnostics,
-        "errorReport": list(dict.fromkeys(errors)),
-        "duplicateReport": duplicates,
-    }

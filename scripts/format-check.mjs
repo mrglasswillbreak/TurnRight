@@ -18,7 +18,8 @@ const paths = [...new Set(listed.stdout.split('\0'))].filter(
       file,
     ) ||
       /^(?:web\/)?(?:package|tsconfig(?:\.[\w-]+)?)\.json$/.test(file) ||
-      /^web\/[^/]+\.config\.ts$/.test(file)) &&
+      /^web\/[^/]+\.config\.ts$/.test(file) ||
+      /^(?:\.ox(?:fmt|lint)rc\.json|docker-compose\.yml)$/.test(file)) &&
     !/(?:^|\/)(?:fixtures|vendor|generated|work|node_modules)\//.test(file) &&
     !file.endsWith('package-lock.json'),
 );
@@ -29,7 +30,7 @@ for (let index = 0; index < paths.length; index += 60) {
     [
       packageBin('oxfmt'),
       '--config',
-      'web/.oxfmtrc.json',
+      '.oxfmtrc.json',
       write ? '--write' : '--check',
       ...paths.slice(index, index + 60),
     ],
