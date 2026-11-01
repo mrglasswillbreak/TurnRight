@@ -8,7 +8,7 @@ export const manualValidationGates = Object.freeze(
       ['bash', 'scripts/manual-validation-linux.sh', 'setup'],
       30,
     ],
-    ['unit-coverage', ['npm', 'run', 'test:coverage:unit'], 35],
+    ['unit-coverage', ['npm', 'run', 'test:coverage:unit'], 90],
     ['quality', ['npm', 'run', 'check'], 20],
     ['dependency-audit', ['npm', 'run', 'check:dependencies'], 10],
     ['configured-build', ['npm', 'run', 'check:configured-build'], 10],

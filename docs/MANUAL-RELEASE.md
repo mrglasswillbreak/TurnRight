@@ -10,6 +10,8 @@ Use an isolated, full-history Linux checkout with the pinned Node/npm versions, 
 
 The fixed gates cover quality, application coverage, Chromium/WebKit, offline behavior, native database restoration, GIS/import workers, the complete local stack, security and the production build. Coverage retains the 80% statements/lines/functions and 70% branches floors. Each receipt binds the commit, tree, tracked-source and dependency hashes, coverage snapshot, gate policy, commands, results and log hashes. Failed or interrupted evidence cannot authorize publication.
 
+Unit tests finish before browser-component tests begin, preventing both workloads from competing during coverage collection. The complete unit/component coverage gate has a 90-minute outer limit; individual test and hook timeouts, assertions and coverage thresholds remain unchanged. Partial diagnostic runs cannot replace the complete validation receipt.
+
 The committed-fixture build is followed by a separate real-public-package preservation check before deployment. Do not substitute previous hosted results or partially downloaded artifacts for complete current validation.
 
 ## Explicit operator commands
