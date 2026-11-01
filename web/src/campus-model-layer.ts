@@ -1,11 +1,7 @@
 import {
   AmbientLight,
-  LineSegments,
-  LineBasicMaterial,
-  BufferGeometry,
   Camera,
   DirectionalLight,
-  Float32BufferAttribute,
   Group,
   Matrix4,
   Mesh,
@@ -33,11 +29,14 @@ import {
   visibleSectors,
   visualLookup,
 } from './building-visuals';
-import { buildingOutline } from './building-outline';
+import { updateModelSelection } from './campus-model-selection';
+import { modelEnvironment, applyModelLighting } from './model-environment';
 import { CAMPUS_MIN_ZOOM } from './world-map';
-import { createFacadeTextures } from './facade-textures';
+import { createFacadeTextures, TEXTURE_MEMORY_LIMIT } from './facade-textures';
 import { createCampusModelMeshes } from './campus-model-meshes.js';
 import { loadCampusModelSector } from './campus-model-sectors.js';
+import { createCampusModelDetails } from './campus-model-details';
+import { modelContextRecovery } from './model-context-recovery';
 export type ModelStatus = 'ready' | 'reduced' | 'unavailable';
 
 export interface ModelOptions {
@@ -63,6 +62,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     disposed = false,
     reduced = false,
     fallback = false,
+    waitingForStyle = false,
     lastFrame = 0,
     slowFrames = 0;
   const scene = new Scene(),
@@ -76,7 +76,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
   const loaded = new Map<string, Group>(),
     inflight = new Map<string, AbortController>(),
     failures = new Map<string, number>();
-  let renderer: WebGLRenderer | undefined;
+  let renderer: WebGLRenderer | undefined,
+    releaseEnvironment: (() => void) | undefined;
   const textures = createFacadeTextures(() => map.triggerRepaint());
   let indexedData = initial.data,
     visuals = visualLookup(initial.data.visuals),
@@ -99,12 +100,26 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     scale,
   );
   let readyKey = '';
+  const details = createCampusModelDetails({
+    map,
+    scene,
+    building,
+    release,
+    changed: () => {
+      refresh();
+      map.triggerRepaint();
+    },
+  });
   let indexedSceneryData = initial.sceneryData || initial.data;
   let scenery = createScenery(indexedSceneryData, origin, scale);
   scene.add(scenery.group);
   const publish = () => {
     const ids = [
       ...loaded.values(),
+      ...[...details.groups.values()].map((g) => ({
+        visible: g.visible,
+        children: [g],
+      })),
       ...[...drafts.values()].map((g) => ({
         visible: g.visible,
         children: [g],
@@ -140,7 +155,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     );
   }
   function refresh() {
-    if (disposed) return;
+    if (disposed || waitingForStyle) return;
     const mode = detailAtZoom(map.getZoom(), reduced);
     const active =
       options.enabled && !fallback && map.getZoom() >= CAMPUS_MIN_ZOOM;
@@ -181,6 +196,32 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       options.dark,
     );
     const draftIds = new Set(options.overrides?.map((o) => o.model.id) || []);
+    details.update(
+      active
+        ? (catalogue?.detailedModels || []).filter(
+            (m) =>
+              !draftIds.has(m.id) &&
+              features.get(m.id)?.properties?.visible !== false &&
+              !!features.get(m.id) &&
+              compatibleVisual(features.get(m.id)!, visuals.get(m.id)) &&
+              visuals.get(m.id)?.geometryRevision === m.geometryRevision &&
+              visuals.get(m.id)?.detailRevision === m.detailRevision,
+          )
+        : [],
+      options.selectedId,
+      reduced,
+      [...loaded.values()]
+        .flatMap((g) => g.children)
+        .reduce(
+          (n, g) => n + (g.userData.residentBytes || 0),
+          (TEXTURE_MEMORY_LIMIT * 7) / 4 + 16 * 1024 * 1024,
+        ) +
+        [...inflight.keys()].reduce(
+          (n, id) =>
+            n + (catalogue?.sectors.find((s) => s.id === id)?.bytes || 0) * 4,
+          0,
+        ),
+    );
     for (const [id, group] of drafts)
       if (!draftIds.has(id)) {
         release(group);
@@ -207,6 +248,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
           visual = visuals.get(id);
         child.visible =
           !draftIds.has(id) &&
+          !details.groups.has(id) &&
           !!feature &&
           feature.properties?.visible !== false &&
           compatibleVisual(feature, visual) &&
@@ -214,92 +256,19 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
             `${visual?.geometryRevision}:${visual?.detailRevision || ''}`;
       }
     }
-    ambient.intensity = options.dark ? 1.25 : 1.6;
-    sun.intensity = options.dark ? 0.85 : 1.8;
-    // Detailed architecture retains its authored colours, including legacy
-    // packages and draft surfaces. Only illustrative map blocks use slate grading.
-    ambient.color.set(options.dark ? '#ffffff' : '#fff1d5');
-    sun.color.set('#ffffff');
-    const themeKey = `${options.dark}:${options.opacity ?? 1}`;
-    for (const entry of materials.values()) {
-      if (entry.themeKey === themeKey) continue;
-      entry.themeKey = themeKey;
-      entry.value.color.set(
-        entry.value.map && entry.authoredOpacity === undefined
-          ? '#ffffff'
-          : entry.colour,
-      );
-      entry.value.opacity =
-        (options.opacity ?? 1) * (entry.authoredOpacity ?? 1);
-      entry.value.transparent = entry.value.opacity < 1;
-      entry.value.depthWrite = entry.value.opacity >= 0.7;
-    }
-    for (const group of [
-      ...[...loaded.values()].flatMap((s) => s.children as Group[]),
-      ...drafts.values(),
-    ]) {
-      const selection = options.selection;
-      const key = JSON.stringify([selection, group.userData.revision]);
-      for (const child of group.children)
-        if (child instanceof LineSegments)
-          (child.material as LineBasicMaterial).color.set(
-            options.dark ? '#89c6ff' : '#1764ed',
-          );
-      for (const mesh of group.children)
-        if (mesh instanceof Mesh)
-          mesh.visible = !(
-            ((mesh.userData.detail && mode !== 'detailed') ||
-              map.getZoom() < (mesh.userData.minZoom || 0)) &&
-            group.userData.buildingId !== options.selectedId
-          );
-      if (group.userData.selectionKey === key) continue;
-      group.userData.selectionKey = key;
-      for (const child of group.children.slice())
-        if (child instanceof LineSegments) {
-          group.remove(child);
-          child.geometry.dispose();
-          (child.material as LineBasicMaterial).dispose();
-        }
-      if (!selection || selection.buildingId !== group.userData.buildingId)
-        continue;
-      const positions: number[] = [];
-      for (const mesh of group.children)
-        if (mesh instanceof Mesh && mesh.geometry.index)
-          for (const coordinate of buildingOutline(
-            {
-              positions: mesh.geometry.getAttribute('position').array,
-              indices: mesh.geometry.index.array,
-              surfaces: mesh.userData.surfaces,
-            },
-            selection,
-          ))
-            positions.push(coordinate);
-      if (positions.length) {
-        const geometry = new BufferGeometry();
-        geometry.setAttribute(
-          'position',
-          new Float32BufferAttribute(positions, 3),
-        );
-        const line = new LineSegments(
-          geometry,
-          new LineBasicMaterial({
-            color: options.dark ? '#89c6ff' : '#1764ed',
-            depthTest: false,
-            transparent: true,
-            opacity: 0.75,
-          }),
-        );
-        line.renderOrder = 5;
-        group.add(line);
-      }
-    }
-    for (const sector of loaded.values())
-      for (const child of sector.children)
-        for (const object of child.children)
-          if (object instanceof Mesh) {
-            // A shared material cannot carry per-building selection; selection stays in the map's marker and outline layers.
-            object.renderOrder = object.userData.detail ? 1 : 0;
-          }
+    applyModelLighting(materials.values(), ambient, sun, options);
+    updateModelSelection(
+      [
+        ...[...loaded.values()].flatMap((s) => s.children as Group[]),
+        ...[...details.groups.values()].flatMap((s) => s.children as Group[]),
+        ...drafts.values(),
+      ],
+      options.selection,
+      options.dark,
+      mode,
+      map.getZoom(),
+      options.selectedId,
+    );
     const visibleMaterials = new Set<string>();
     scene.traverseVisible((object) => {
       if (object instanceof Mesh)
@@ -318,7 +287,11 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
             entry.value.needsUpdate = true;
           },
         );
-      } else if (entry.releaseTexture && !visibleMaterials.has(key)) {
+      } else if (
+        entry.recipe &&
+        entry.releaseTexture &&
+        !visibleMaterials.has(key)
+      ) {
         entry.releaseTexture();
         entry.releaseTexture = undefined;
         entry.value.map = null;
@@ -350,16 +323,26 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
     refresh();
     map.triggerRepaint();
   }
+  let lastMovementUpdate = 0;
+  function moving() {
+    const now = performance.now();
+    if (now - lastMovementUpdate < 100) return;
+    lastMovementUpdate = now;
+    refresh();
+  }
   const layer: CustomLayerInterface = {
     id: 'campus-models',
     type: 'custom',
     renderingMode: '3d',
     onAdd(_map, gl) {
+      releaseEnvironment?.();
+      renderer?.dispose();
       renderer = new WebGLRenderer({
         canvas: map.getCanvas(),
         context: gl as WebGL2RenderingContext,
       });
       renderer.autoClear = false;
+      releaseEnvironment = modelEnvironment(renderer, scene);
       refresh();
     },
     render(_gl, args) {
@@ -411,13 +394,40 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       }
     },
     onRemove() {
+      releaseEnvironment?.();
       renderer?.dispose();
+      releaseEnvironment = undefined;
+      renderer = undefined;
     },
   };
   map.addLayer(layer, 'barriers');
   map.on('moveend', movementEnded);
   map.on('zoom', refresh);
+  map.on('move', moving);
+  const releaseRecovery = modelContextRecovery(
+    map,
+    layer,
+    () => {
+      fallback = waitingForStyle = true;
+      readyKey = '';
+      options.onStatus('unavailable');
+    },
+    () => {
+      waitingForStyle = fallback = reduced = false;
+      options.onStatus('ready');
+      movementEnded();
+    },
+  );
   return {
+    statistics: () => ({
+      detailIds: [...details.groups.keys()],
+      detailBuildings: details.groups.size,
+      pendingRequests: inflight.size + details.pendingCount(),
+      reservedDetailBytes: details.memoryBytes(),
+      geometries: renderer?.info.memory.geometries || 0,
+      textures: renderer?.info.memory.textures || 0,
+      drawCalls: renderer?.info.render.calls || 0,
+    }),
     update(next: ModelOptions) {
       options = next;
       refresh();
@@ -443,6 +453,7 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         .filter((s) => s.visible)
         .flatMap((s) => s.children.filter((c) => c.visible));
       objects.push(...[...drafts.values()].filter((g) => g.visible));
+      objects.push(...details.groups.values());
       const hit = raycaster
         .intersectObjects(objects, true)
         .find((hit) => hit.object instanceof Mesh && hit.object.visible);
@@ -457,6 +468,8 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
         wallId: surface?.wallId,
         role: surface?.role,
         face: hit.faceIndex ?? undefined,
+        objectId: surface?.objectId,
+        faceId: surface?.faceId,
         roofTriangle:
           surface?.role === 'roof' ? hit.faceIndex! - surface.start : undefined,
       };
@@ -466,9 +479,12 @@ export function createCampusModels(map: CampusMap, initial: ModelOptions) {
       disposed = true;
       map.off('moveend', movementEnded);
       map.off('zoom', refresh);
+      map.off('move', moving);
+      releaseRecovery();
       for (const c of inflight.values()) c.abort();
       for (const group of loaded.values()) release(group);
       loaded.clear();
+      details.dispose();
       for (const group of drafts.values()) release(group);
       drafts.clear();
       textures.dispose();

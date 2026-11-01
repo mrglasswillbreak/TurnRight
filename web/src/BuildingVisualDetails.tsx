@@ -85,6 +85,19 @@ export function BuildingVisualDetails({
               <strong>Still needed:</strong> {needed.join(' ')}
             </p>
           )}
+          {data.visuals?.detailedModels
+            ?.find((m) => m.id === record.id)
+            ?.textures.flatMap((t) =>
+              (t.credits || []).map((credit) => (
+                <p key={`${t.sha256}:${credit.photoId}`}>
+                  {credit.attribution} ·{' '}
+                  <a href={credit.licenseUrl} target="_blank" rel="noreferrer">
+                    {credit.license}
+                  </a>{' '}
+                  · {credit.modifications}
+                </p>
+              )),
+            )}
           {record.sources
             .map((id) => data.visuals?.references.find((r) => r.id === id))
             .filter((r) => r && r.url.startsWith('https://'))

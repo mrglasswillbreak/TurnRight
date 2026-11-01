@@ -10,6 +10,10 @@ import { campusFixture } from './fixture';
 import { ALL_VISITOR_LAYERS, visitorPresentation } from '../src/visitor-layers';
 
 vi.mock('../src/scenery-renderer', () => ({ createScenery: vi.fn() }));
+vi.mock('../src/model-environment', async (original) => ({
+  ...(await original<typeof import('../src/model-environment')>()),
+  modelEnvironment: () => vi.fn(),
+}));
 vi.mock('three', async (original) => ({
   ...(await original<typeof import('three')>()),
   WebGLRenderer: class {
@@ -34,6 +38,7 @@ function fixture() {
   let layer: CustomLayerInterface | undefined;
   const map = {
     getZoom: () => 16,
+    getCenter: () => ({ lng: 3.2, lat: 6.46 }),
     getBounds: () => ({
       getWest: () => 3.19,
       getEast: () => 3.22,
