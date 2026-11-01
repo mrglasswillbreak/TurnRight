@@ -58,7 +58,23 @@ Object transforms include imported descendants. Locked objects or children must 
 
 Each gesture previews transiently and commits once. Escape, pointer cancellation or viewport resizing cancels its preview. Undo restores prior geometry and component identities. Deleting an object includes its descendants. Imported UV seams and material assignments remain per face corner; new extrusion sides receive metre-based UVs. Mesh editing requires WebGL. If rendering becomes unavailable, drafts remain recoverable and native surface editing retains its 2D fallback.
 
+### Photographs on mesh faces
+
+Under **Photograph on selected faces**, choose an associated building photograph and select unlocked, coplanar mesh faces with the same outward direction. Align the four crop corners by dragging the handles or entering normalized X/Y values. **Preview texture** rectifies the photograph to a 1024 px image and projects planar UVs across the selected surface. Preview leaves the saved document unchanged; **Apply texture** assigns a separate material to those faces as one undoable command. **Cancel texture** clears the preview and retained crop input. Changes to the selection or document invalidate a pending preview.
+
+The editable image retains its source photo ID, crop corners and modification description. Crop input uses the existing recovery store; applied geometry, materials and image evidence use normal save/undo and invalidate model review. Publication resolves the approved building photograph and its credits. A reference photograph still needs permission for redistribution or derivative texturing; its presence as visual evidence alone does not establish that permission.
+
+### Detail at different distances
+
+Set **Distance detail** on each object: **Structure** remains at every distance, **Facade** appears in medium and close views, and **Fine detail** appears in close views. Untagged objects in older documents default to Structure. A parent's tier also controls its descendants. Keep distinctive silhouettes, major openings and identifying features in Structure; tiers omit objects rather than simplify their geometry.
+
+Documents with an explicit tier compile three published render levels: full exterior, structure plus facade, and structure only. The compiler preserves the editable source and splits render geometry into bounded immutable chunks. Review each level against the references before publishing; the renderer's projected-error and memory limits can retain a coarser level or the compatible base visual.
+
 ## Import and export
+
+![Selected-face photograph crop with explicit preview, apply and cancel controls](assets/screenshots/tour-mesh-photo-preview-2026-11-01.png)
+
+This isolated fixture textures one triangular face of a synthetic box. [Capture provenance and photograph credit](SCREENSHOTS.md#model-finishing-and-export--1-november-2026).
 
 Choose **Mesh → Import model**, supply the main file and its companion files, then inspect the preview before adding it. The worker resolves dependencies only from the supplied files and embedded data. It does not download remote model dependencies. **Cancel** terminates parsing or export work. On browsers without worker Canvas2D, a bounded image-encoding bridge handles textures; geometry parsing and packing remain in the worker.
 
@@ -76,6 +92,8 @@ Export the whole building or selected objects with their descendants. Curves are
 
 ![Exporting the building with explicit format and units](assets/screenshots/model-export-2026-09-26.png)
 
+Under **Building render**, choose north, east, south, west, roof, northeast oblique or southwest oblique, then **Prepare PNG**. Widths of 1024, 2400 and 4096 px produce 4:3 images using the authored geometry, physical materials and neutral environment reflections. Changing the document, view or width invalidates the prepared download. Textures must verify and decode before a render is offered. GLB export and building renders run in TurnRight without Blender; native SolidCraft masters and STEP exports remain separate campaign artifacts. See [LASU modeling records](LASU-MODELS.md) for evidence and proposal status.
+
 ## Save, review and publish
 
 Version-1 model documents contain curves, explicit topology, transforms, materials, images and stable IDs. Authenticated saves upload immutable private JSON assets, verify SHA-256 and content limits, then store a small reference in the existing optimistic save transaction. Textures travel inside the private document; publication extracts them into independently hashed package assets. Local recovery remains owner- and campus-scoped, including unfinished imports and rejected candidates.
@@ -91,9 +109,13 @@ The current authored revision must be marked reviewed in Mesh tools. Any subsequ
 | Textures                  | 32 images, 4 MiB each, 4096 px per side, 16 megapixels combined |
 | Curve profiles            | 4096 generated points per profile                               |
 | Owner model asset storage | 500 MiB                                                         |
-| Published model package   | Existing 12 MiB combined geometry and texture budget            |
-| Decoded authored textures | Shared, reference-counted 32-megapixel renderer budget          |
+| Compatible base visuals   | Existing 12 MiB combined base geometry and texture budget       |
+| Detailed render assets    | Separate manifest group; each geometry chunk at most 16 MiB encoded/decoded; at most 200,000 triangles and 100 chunks per level |
+| Detailed map residency    | 256 MiB accounting budget including base reservation, geometry, decoded textures and mipmaps; four concurrent asset requests |
+| Decoded authored textures | Separate shared, reference-counted 32-megapixel decode cap; detailed residency also accounts for texture sampler instances |
 
-Oversized or unsupported content stays private and recoverable. Reduce geometry/texture complexity before saving or publishing. Imported objects can cover a large footprint visually, but they never silently alter routing geometry. Interior layouts, sculpting and advanced modifiers are outside this release.
+Every published detail level and texture is included in the campus download by default. Shared immutable files count once in the manifest total; all occurrences of one texture URL must agree on bytes, hash, dimensions and content type. Per-building sampler counts remain separate. Downloads can resume from verified cached files and become ready only after all assets and detail dependencies validate. Older readers retain compatible base visuals; deploy compatible readers before publishing detailed assets.
+
+Oversized or unsupported content stays private and recoverable. Reduce geometry/texture complexity before saving or publishing. The residency budget is accounting for rendering resources, not a bound on total browser-process memory. Imported objects can cover a large footprint visually, but they never silently alter routing geometry. Interior layouts, sculpting and advanced modifiers are outside this release.
 
 See [verification](MODEL-EDITOR-VERIFICATION.md), [deployment](DEPLOYMENT.md), [architecture](ARCHITECTURE.md) and [capture provenance](assets/screenshots/README.md).

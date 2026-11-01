@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add selected-face photographic texture projection, four-corner crop preview, source evidence and undo to imported meshes. Export textured GLB files and seven high-resolution exterior views.
+- Compile structural, facade and fine-detail geometry into three immutable map variants. Stream visible models with selection priority, cancellation, verified shared textures and bounded geometry/texture residency.
+- Include every published detail level and texture in verified, resumable campus downloads. Keep the 12 MiB compatible base-visual limit and preserve the previous valid package after failures.
+- Record the LASU Ojo SolidCraft inventory, reproducible geometry scripts and evidence dossiers. The private batch contains 20 exterior proposals; identification gaps and architectural approval remain explicit. No new campus model is published by the software release.
+- Update Vitest and matching packages to 5.0.5, repair shared-texture metadata validation and stabilize the path-edit browser gesture after map layout changes.
 - Consolidate installation into a private root npm workspace with one dependency lock, root configuration checks, a pinned runtime doctor and a shared Docker/development-container entry.
 - Split large map, survey, import, layer, photo and model components into domain modules. Split the browser and database suites while preserving test assertions and shared setup. Add bounded, cancellable import polling and regression tests.
 - Check authored source, tests and tools with lint, types and formatting; enforce the 500-line boundary and immutable external CI action revisions.

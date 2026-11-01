@@ -2,6 +2,8 @@
 
 TurnRight deploys a public campus PWA, a private team GIS API and isolated processing/release workers. Application deployment preserves the already published campus packages. Publishing changed campus data is a separate, independently approved operation. [Current account settings](CONFIGURATION.md) · [Actual production receipts](PRODUCTION.md) · [Team workflow](GIS-PLATFORM.md).
 
+The [detailed model reader and LASU campaign](LASU-MODELS.md) add optional per-building render variants and a separate immutable detail asset group; no new database migration is required. Deploy the compatible reader and build workers before publishing detailed assets. Keep `PUBLISHED_MAP_URL` enabled so subsequent application builds verify and retain all published detail levels and textures. The compatible base limits remain unchanged. A software release does not approve or publish the campaign's model proposals; [PR #61](https://github.com/mrglasswillbreak/TurnRight/pull/61) tracks this reader upgrade and its hosted checks.
+
 ## Existing-installation upgrade
 
 1. Read the current production receipt and inspect the database. Do not infer installed migrations from filenames or rerun initialized schema migrations. The current source requires **001–056**; the original GIS milestone was 023–037. Follow the feature-specific backfills and staged rollout below for later migrations.

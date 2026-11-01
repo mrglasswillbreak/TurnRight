@@ -6,6 +6,8 @@ The [October 18 continuation receipt](assets/campus-detail-release-2026-10-18.js
 
 Start precision work with the [numeric drawing and tracing instructions](EDITOR.md#draw-and-refine-precisely), then use [building appearance previews](MODEL-AUTHORING.md) for a selected set. The [18 October control captures](SCREENSHOTS.md#precision-and-appearance-controls--18-october-2026) show the actual controls with isolated fixtures. All 1,337 initial building treatment/evidence records now have [verified portable copies](assets/measurements/building-treatment-archive-2026-10-18.json), alongside the source-review archives.
 
+[Model authoring](MODEL-AUTHORING.md) covers photographic projection onto mesh faces, distance-detail tiers, textured GLB exports and seven building-render views. The [detailed public model contract](ARCHITECTURE.md#detailed-public-model-contract) separates compatible base-visual limits from streamed detailed assets; [campus downloads](PUBLIC-MAP.md#download-before-disconnecting) include every published level and texture by default. [LASU Ojo modeling records](LASU-MODELS.md) track evidence, local proposals and remaining acceptance work without implying publication.
+
 ## Use TurnRight
 
 | Task                                                                                         | Guide                                                                                      |
@@ -23,7 +25,8 @@ Start precision work with the [numeric drawing and tracing instructions](EDITOR.
 | Check connected sources, compare evidence, review bulk changes and preview private undo      | [Source updates](SOURCE-UPDATES.md)                                                        |
 | Recover availability failures and understand the accepted-source baseline                    | [Editor availability](EDITOR-AVAILABILITY.md)                                              |
 | Edit windows, walls, roofs, footprints, text and model review                                | [Unified model editor](UNIFIED-MODEL-EDITOR.md) and [building editing](BUILDING-EDITOR.md) |
-| Use photo reference split, curves, mesh components and GLB/glTF/OBJ/STL                      | [Model authoring](MODEL-AUTHORING.md)                                                      |
+| Use photo projection, distance-detail tiers, mesh tools, GLB/glTF/OBJ/STL and building renders | [Model authoring](MODEL-AUTHORING.md)                                                      |
+| Inspect LASU Ojo exterior evidence, SolidCraft bundles and proposal status                    | [LASU modeling campaign](LASU-MODELS.md)                                                   |
 | Edit standard and custom roof plans                                                          | [Building roofs](BUILDING-ROOFS.md)                                                        |
 | Upload, credit, recover and approve photographs; edit arrival guides                         | [Arrival guides and photos](ARRIVAL-GUIDES.md)                                             |
 | Automatically compress added photos, compare and edit offline; drag gallery order            | [Photo editing and compression](PHOTO-EDITING.md)                                          |
