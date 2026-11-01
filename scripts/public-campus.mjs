@@ -1,1 +1,1 @@
-export { publicCampus } from "../web/server/public-campus.js";
+export { publicCampus } from '../web/server/public-campus.js';
