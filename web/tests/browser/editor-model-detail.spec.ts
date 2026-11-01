@@ -7,7 +7,7 @@ test('model file workers photographic projection and building renders preserve u
   page,
 }, info) => {
   test.setTimeout(180000);
-  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.setViewportSize({ width: 1440, height: 1200 });
   const photo = JSON.parse(
     readFileSync(
       new URL('../../../data/photos/catalogue.json', import.meta.url),
@@ -56,6 +56,7 @@ test('model file workers photographic projection and building renders preserve u
     .getByRole('button', { name: 'Cancel texture', exact: true })
     .click();
   expect(JSON.stringify(doc())).toBe(before);
+  await dialog.getByLabel('Top left X', { exact: true }).fill('0.1');
   await dialog
     .getByRole('button', { name: 'Preview texture', exact: true })
     .click();
@@ -72,6 +73,7 @@ test('model file workers photographic projection and building renders preserve u
     .getByRole('button', { name: 'Apply texture', exact: true })
     .click();
   await expect.poll(() => doc()?.images[0]?.evidence?.photoId).toBe(photo.id);
+  expect(doc()!.images[0].evidence?.corners[0]).toEqual([0.1, 0]);
   expect(
     doc()!.objects[0].faces.some((f) => f.corners.every((c) => c.uv)),
   ).toBe(true);
