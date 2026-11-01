@@ -3,6 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   identityTransform,
+  MODEL_LIMITS,
   newModelDocument,
   modelDocumentErrors,
   type ModelDetailTier,
@@ -15,6 +16,7 @@ import { buildingRevision } from '../../web/src/building-visuals';
 import { detailRevision } from '../../web/src/building-facades';
 import { archive, repository, sha256 } from './inventory.mjs';
 import { finishModel } from './finish.mts';
+import { compactImportedModel } from './import-compaction.mts';
 
 type Recipe = {
   id: string;
@@ -209,13 +211,23 @@ async function main() {
       await fs.readFile(path.join(directory, 'recipe.json'), 'utf8'),
     ) as Recipe;
     const obj = await fs.readFile(path.join(directory, 'master.obj'), 'utf8');
-    const { document, verification } = importSolidCraftOBJ(obj, recipe);
+    const { document: importedDocument, verification } = importSolidCraftOBJ(
+      obj,
+      recipe,
+    );
     const finishing = await finishModel(
-      document,
+      importedDocument,
       building.id,
       inventory.baselineVersion,
       source.photos,
     );
+    const { document, quantization } = compactImportedModel(importedDocument);
+    if (quantization) {
+      verification.conversionErrorMetres += quantization.maxPositionErrorMetres;
+      verification.boundsMetres = quantization.boundsAfterMetres;
+    }
+    if (verification.conversionErrorMetres > 0.01)
+      throw Error('Export/import conversion exceeded 1 cm after compaction.');
     const feature = structuredClone(
       source.map.features.find(
         (f: { properties?: { id: string } }) =>
@@ -237,9 +249,12 @@ async function main() {
       output,
       source.photos,
     );
+    const documentJSON = JSON.stringify(document);
+    if (Buffer.byteLength(documentJSON) > MODEL_LIMITS.documentBytes)
+      throw Error('Editable model exceeds the 25 MiB upload limit.');
     await fs.writeFile(
       path.join(directory, 'turnright.model.json'),
-      JSON.stringify(document),
+      documentJSON,
     );
     await fs.writeFile(
       path.join(directory, 'detail-descriptor.json'),
@@ -250,8 +265,9 @@ async function main() {
       JSON.stringify(
         {
           ...verification,
+          ...(quantization ? { quantization } : {}),
           objSha256: sha256(obj),
-          documentSha256: sha256(JSON.stringify(document)),
+          documentSha256: sha256(documentJSON),
           finishing,
         },
         null,
