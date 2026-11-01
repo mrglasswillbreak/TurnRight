@@ -99,6 +99,7 @@ Set application variables in both Vercel Preview and Production. Publication bui
 | `map-import-tests.yml` | Full pinned Linux GIS regressions |
 | `campus-layer-baselines.yml` | Preserve both campuses’ published, source and private draft baselines |
 | `campus-layer-release.yml` | Prepare a reviewed enrichment snapshot; apply only the matching complete workspace hash |
+| `campus-publication-request.yml` | Guarded LASU preview/publication requests bound to the exact approved model receipt |
 | `campus-detail-verification.yml` | Actual package hashes, browser views, offline reopening and historical restore transport |
 | `gis-processing.yml` | Campus-scoped analysis/export worker; immutable inputs and staged results |
 | `gis-acceptance.yml` | Native PostGIS/engine and backup restoration gates |

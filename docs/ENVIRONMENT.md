@@ -90,6 +90,7 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `VERIFY_BASELINE` | tool | No | Baseline evidence directory used by the globe verifier. |
 | `VERIFY_BYPASS` | tool | Yes | Private deployment-protection bypass used only by verification tools. |
 | `VERIFY_ENGINE` | tool | No | Browser engine selected by the globe verifier. |
+| `VERIFY_EXPECTED_MODEL_IDS` | tool | No | Optional JSON array of exact LASU detailed building IDs required by campus verification; omission permits older releases without detail models. |
 | `VERIFY_ORIGIN` | tool | No | Explicit deployment origin being verified. |
 | `VERIFY_OUTPUT` | tool | No | Verification receipt and screenshot directory. |
 | `VERIFY_SCOPE` | tool | No | Campus or verification scope selected by the caller. |

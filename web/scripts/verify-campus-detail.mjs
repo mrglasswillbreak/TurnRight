@@ -7,6 +7,10 @@ import { chromium, webkit, expect } from '@playwright/test';
 import { createServer } from 'node:http';
 import { requestPublishedAsset } from './published-assets.mjs';
 import { packageInvariants } from './package-invariants.mjs';
+import {
+  inspectDetailedCampus,
+  visitDetailedCampus,
+} from './verify-detailed-campus.mjs';
 const origin = process.env.VERIFY_ORIGIN || 'https://turnright.vercel.app';
 const output = path.resolve(
   process.env.VERIFY_OUTPUT || 'work/campus-detail-verification',
@@ -103,7 +107,19 @@ for (const slug of ['lasu', 'unilag']) {
       ),
   );
   assert(photographedPlace, `${slug}: missing photographed Senate destination`);
-  campuses.push({ slug, entry, manifest, data, photographedPlace });
+  const detailedModels = inspectDetailedCampus(
+    data,
+    manifest,
+    slug === 'lasu' ? process.env.VERIFY_EXPECTED_MODEL_IDS : undefined,
+  );
+  campuses.push({
+    slug,
+    entry,
+    manifest,
+    data,
+    photographedPlace,
+    detailedModels,
+  });
   console.log(
     `${slug}: verified ${manifest.assets.length} assets for ${manifest.version}`,
   );
@@ -127,6 +143,7 @@ const report = {
       buildings: data.visuals?.buildings?.length,
       sceneryRegions: data.visuals?.scenery?.regions?.length || 0,
       maxInstances: data.visuals?.scenery?.maxInstances || 0,
+      detailedModels: data.visuals?.detailedModels || [],
     },
     invariants: packageInvariants(data),
     inspectedPlaceId: photographedPlace.id,
@@ -354,12 +371,20 @@ for (const [engine, launcher] of [
             ),
         )
         .toBeGreaterThan(0);
+      const detailedModels = await visitDetailedCampus(
+        page,
+        campus.detailedModels,
+        output,
+        engine,
+        campus.slug,
+      );
       report.offline.push({
         engine,
         campus: campus.slug,
         version: campus.manifest.version,
         passed: true,
         disruption: outageOrigin ? 'origin-stopped' : 'browser-offline',
+        detailedModels,
       });
       console.log(
         `${engine} ${campus.slug}: offline destination, photo and model package passed`,

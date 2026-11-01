@@ -381,6 +381,11 @@
       "sensitive": false,
       "description": "Browser engine selected by the globe verifier."
     },
+    "VERIFY_EXPECTED_MODEL_IDS": {
+      "scope": "tool",
+      "sensitive": false,
+      "description": "Optional JSON array of exact LASU detailed building IDs required by campus verification; omission permits older releases without detail models."
+    },
     "VERIFY_ORIGIN": {
       "scope": "tool",
       "sensitive": false,
