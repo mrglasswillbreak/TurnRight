@@ -101,6 +101,18 @@ test('model file workers photographic projection and building renders preserve u
     name: 'Download building render',
     exact: true,
   });
+  // The retained CI trace was still rendering after the generic 10-second
+  // assertion budget. Software WebGL under V8 coverage needs an export budget.
+  await expect(
+    dialog
+      .getByRole('group', { name: 'Building render', exact: true })
+      .getByRole('button', { name: 'Prepare PNG', exact: true }),
+  ).toBeEnabled({ timeout: 60000 });
+  await expect(
+    dialog
+      .getByRole('group', { name: 'Building render', exact: true })
+      .getByRole('alert'),
+  ).toHaveCount(0);
   await expect(download).toBeVisible();
   const dimensions = await download.evaluate(async (link) => {
     const image = await createImageBitmap(
