@@ -1,3 +1,5 @@
+import { visualManifestMatches } from './offline-manifest';
+export { photoManifestMatches } from './offline-manifest';
 import {
   campusKey,
   requestedCampus,
@@ -139,11 +141,16 @@ export async function getActivePackage(campus = requestedCampus()): Promise<{
   const visualUrls = new Set<string>([
     ...(record.manifest.visuals?.assetUrls || []),
     ...(record.manifest.textures?.assetUrls || []),
+    ...(record.manifest.detailedModels?.assetUrls || []),
   ]);
   const present = await auditAssets(record.manifest);
+  const catalogueMatches = await visualManifestMatches(
+    record.data,
+    record.manifest,
+  );
   const visualsComplete =
     visualUrls.size > 0 &&
-    visualManifestMatches(record.data, record.manifest) &&
+    catalogueMatches &&
     [...visualUrls].every((url) => {
       const index = record.manifest.assets.findIndex(
         (a: PackageAsset) => a.url === url,
@@ -155,97 +162,9 @@ export async function getActivePackage(campus = requestedCampus()): Promise<{
     complete:
       present.every(Boolean) &&
       (!visualUrls.size || visualsComplete) &&
-      visualManifestMatches(record.data, record.manifest),
+      catalogueMatches,
     visualsComplete,
   };
-}
-function visualManifestMatches(data: CampusData, manifest: CampusPackage) {
-  const sectors = data.visuals?.sectors || [],
-    urls = manifest.visuals?.assetUrls || [];
-  const textures = data.visuals?.textures || [],
-    textureUrls = manifest.textures?.assetUrls || [];
-  if (
-    new Set(textureUrls).size !== textureUrls.length ||
-    new Set(
-      [...textures, ...(data.visuals?.modelTextures || [])].map((t) => t.url),
-    ).size !== textureUrls.length ||
-    new Set(textures.map((t) => t.id)).size !== textures.length ||
-    !textures.every(
-      (t) =>
-        textureUrls.includes(t.url) &&
-        /^\/packages\/texture-[a-f0-9]+\/[a-f0-9]+\.webp$/.test(t.url) &&
-        t.bytes <= 250 * 1024 &&
-        t.width > 0 &&
-        t.width <= 1024 &&
-        t.height > 0 &&
-        t.height <= 1024 &&
-        !!t.author &&
-        !!t.license &&
-        !!t.attribution &&
-        data.photos?.some((p) => p.id === t.photoId) &&
-        manifest.assets.some(
-          (a) =>
-            a.url === t.url && a.bytes === t.bytes && a.sha256 === t.sha256,
-        ),
-    ) ||
-    !(data.visuals?.modelTextures || []).every(
-      (t) =>
-        textureUrls.includes(t.url) &&
-        /^\/packages\/model-texture-[a-f0-9]{64}\.(png|jpg|webp)$/.test(
-          t.url,
-        ) &&
-        t.bytes > 0 &&
-        t.bytes <= 4 * 1024 * 1024 &&
-        manifest.assets.some(
-          (a) =>
-            a.url === t.url && a.bytes === t.bytes && a.sha256 === t.sha256,
-        ),
-    ) ||
-    (manifest.textures?.bytes || 0) !==
-      manifest.assets
-        .filter((a) => textureUrls.includes(a.url))
-        .reduce((n, a) => n + a.bytes, 0) ||
-    (manifest.textures?.bytes || 0) + (manifest.visuals?.bytes || 0) >
-      12 * 1024 * 1024
-  )
-    return false;
-  return (
-    photoManifestMatches(data, manifest) &&
-    sectors.length === urls.length &&
-    new Set(urls).size === urls.length &&
-    sectors.every(
-      (sector) =>
-        urls.includes(sector.url) &&
-        manifest.assets.some(
-          (a) =>
-            a.url === sector.url &&
-            a.bytes === sector.bytes &&
-            a.sha256 === sector.sha256,
-        ),
-    )
-  );
-}
-export function photoManifestMatches(
-  data: CampusData,
-  manifest: CampusPackage,
-) {
-  const photos = data.photos || [],
-    urls = [...new Set(photos.map((p) => p.url))];
-  const declared = manifest.photos?.assetUrls || [];
-  return (
-    urls.length === declared.length &&
-    new Set(declared).size === declared.length &&
-    urls.every((url) => declared.includes(url)) &&
-    photos.every((p) =>
-      manifest.assets.some(
-        (a) => a.url === p.url && a.bytes === p.bytes && a.sha256 === p.sha256,
-      ),
-    ) &&
-    (manifest.photos?.bytes || 0) ===
-      manifest.assets
-        .filter((a) => urls.includes(a.url))
-        .reduce((n, a) => n + a.bytes, 0)
-  );
 }
 async function verifiedAsset(response: Response, asset: PackageAsset) {
   const bytes = await response.arrayBuffer();
@@ -372,16 +291,9 @@ export async function installPackage(
     throw new Error(
       'Invalid download manifest. Your previous map is unchanged.',
     );
-  const estimate = await navigator.storage?.estimate();
-  if (
-    estimate?.quota &&
-    estimate.usage &&
-    estimate.quota - estimate.usage < manifest.bytes * 1.15
-  )
-    throw new Error(
-      'Not enough storage. Free some space on this device and retry.',
-    );
   const cache = await caches.open(ASSET_CACHE);
+  const { assertPackageStorage } = await import('./offline-space');
+  await assertPackageStorage(manifest, cache, verifiedAsset, signal);
   let loaded = 0;
   let data: CampusData | undefined;
   await boundedMap(manifest.assets, async (asset) => {
@@ -431,10 +343,16 @@ export async function installPackage(
     structuralIssues(data).length
   )
     throw new Error('Incomplete campus package');
-  if (!visualManifestMatches(data, manifest))
+  if (!(await visualManifestMatches(data, manifest)))
     throw new Error(
       'The model catalogue does not match the verified download manifest.',
     );
+  if (data.visuals?.detailedModels?.length) {
+    const { verifyOfflineModels } =
+      await import('./model-offline-verification');
+    await verifyOfflineModels(data, cache, signal);
+  }
+  signal?.throwIfAborted();
   const db = await database();
   // The sole active pointer is committed after every file has been verified.
   const tx = db.transaction(['packages', 'meta'], 'readwrite');
@@ -457,7 +375,7 @@ export async function activatePending(campus = requestedCampus()) {
   if (
     !record ||
     packageCampus(record.manifest) !== campus ||
-    !visualManifestMatches(record.data, record.manifest) ||
+    !(await visualManifestMatches(record.data, record.manifest)) ||
     (await auditAssets(record.manifest)).some((present) => !present)
   )
     return false;
