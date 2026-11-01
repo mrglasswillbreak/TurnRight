@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:73",
+  "name": "LASU CBT",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "c0de33ffa12c4d8b70d2c18b1c0cd5a7c48e75b91f289b64fdb94600120211d1",
+    "preservedAppearanceSha256": "124e7c2667e8d2331fa8bbd95069e38a3f1dbc68754adcbd395817f30d2057ec",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 1,
+    "observed": "Tall grey hall, stepped parapet, sparse high windows and light entrance surround.",
+    "gaps": [
+      "One visible hall level conflicts with the legacy two-floor estimate; the interior photograph does not resolve exterior storeys."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:b4086f16-2907-435d-82ec-bed122723989",
+      "caption": "LASU CBT",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11",
+      "assetUrl": "/packages/photos/1cf6069ff54d41866ca5fb6821759a0e52105418d8d7839a4fd237cb172d7f11.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:73",
+        "photoId": "owner:b4086f16-2907-435d-82ec-bed122723989",
+        "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+        "checkedAt": "2026-11-01T02:24:04.239Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+      "caption": "LASU CBT",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06",
+      "assetUrl": "/packages/photos/0f878bdd6f5fdbc040e4db4cdca071fe5abe8f70421caaa7080f867181eecf06.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:73",
+        "photoId": "owner:1e00f010-dda4-4a21-848b-bbd83f90d334",
+        "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+        "checkedAt": "2026-11-01T02:24:04.239Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8",
+      "caption": "LASU CBT",
+      "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "author": "LASU Ventures limited",
+      "license": "Public domain",
+      "licenseUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812",
+      "assetUrl": "/packages/photos/9b8a2fe6472bbbe8d760649db1eed6f4427e46ded73ab8588353d2cf936eb812.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:73",
+        "photoId": "owner:7ca67767-8c67-4376-9a27-ca9c4f7cb3b8",
+        "sourceUrl": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.facebook.com%2FLASUVenturesLtd%2Fposts%2Fthe-lagos-state-university-computer-based-test-centre-ojo-is-unarguably-the-best%2F120812789452891%2F&ved=0CAMQjB1qFwoTCLDajf6UhZcDFQAAAAAdAAAAABA4&opi=89978449",
+        "checkedAt": "2026-11-01T02:24:04.239Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU Ventures limited",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2012452222222225,
+      6.475290111111111
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -15967.641864009132,
+        -33515.43268324553,
+        0
+      ],
+      "max": [
+        23928.751842272482,
+        14620.917549833881,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      5
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Tall grey hall, stepped parapet, sparse high windows and light entrance surround."
+    ],
+    "estimated": [
+      "One visible hall level conflicts with the legacy two-floor estimate; the interior photograph does not resolve exterior storeys.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "Entrance follows the published authored facade on outer wall 5; this preserves editor alignment, not a surveyed orientation."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 169,
+    "nativePatterns": 34
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 12026,
+    "objSha256": "be28d63237a1a213cabe0b6b4f36ec1ff85405c77927620f79119865ad5a2983",
+    "documentSha256": "462f4c81fdde1a6f7db0eb4b94e3f1754bafb0bb72669ef0ff4ca2c0952048e0",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 13421.700000001118,
+      "glbConversionErrorMetres": 0.0000018749073902313285,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "462f4c81fdde1a6f7db0eb4b94e3f1754bafb0bb72669ef0ff4ca2c0952048e0"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

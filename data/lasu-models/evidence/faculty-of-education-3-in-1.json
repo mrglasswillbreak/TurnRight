@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:54",
+  "name": "Faculty Of Education 3 In 1",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "a814fa0c1377dba7d096210255c23102ba946a40d0251de0be030465d8e91b98",
+    "preservedAppearanceSha256": "b5dce0a517d3cdd18b915679a4b6f0907bd47e5d9f7ce156635d682ad0f6c8cd",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "hip"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Cream infill, tall red-brown fins, multiple pitched roofs and an entrance portico.",
+    "gaps": [
+      "Two mapped courtyards and unseen roof junctions need conservative treatment."
+    ],
+    "additionalReferences": [
+      {
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lasu,_Ojo_Campus._July_2025.jpg",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Faculty_of_Education%2C_Lasu%2C_Ojo_Campus._July_2025.jpg",
+        "author": "Marvelous udoruisi",
+        "capturedAt": "2025-07-13",
+        "uploadedAt": "2026-10-11",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "retrievedAt": "2026-11-01",
+        "privateFile": "research/education-2025.jpg",
+        "sha256": "e28761cf6cea02967957cefc14dcb9abf95d389226f9bf47f2ab45a0bef56bd1",
+        "observed": "Courtyard with tall red-brown fins, cream walls, a low window band, covered sloping walkway roofs and slender posts. This view does not independently assign the photographed courtyard to one of the two mapped holes."
+      }
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:112834607",
+      "caption": "Faculty of Education complex",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "sha256": "2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078",
+      "assetUrl": "/packages/photos/2dc801bdf6fdc13c2abe46e59a0726c187571dd86b57e6584a4bdf3ed5414078.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:54",
+        "photoId": "commons:112834607",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg",
+        "checkedAt": "2026-11-01T02:24:04.229Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-11-12"
+        },
+        "verifiedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-11-12 11:29:24",
+          "description": "Faculty of Education, Lagos State University (LASU)",
+          "categories": [
+            "Category:2021 in Lagos, Nigeria",
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Nigeria photographs taken on 2021-11-12",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University(LASU).jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "commons:115992650",
+      "caption": "Faculty of Education entrance facade",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-02-21",
+      "historical": true,
+      "sha256": "edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef",
+      "assetUrl": "/packages/photos/edb8e5959ba5c4147e24a556c5e0a6763c598ce479345eab9f97da0dd7a147ef.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:54",
+        "photoId": "commons:115992650",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg",
+        "checkedAt": "2026-11-01T02:24:04.231Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-02-21"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-02-21",
+          "description": "The faculty of Education entrance. This is the faculty with the largest population of students.",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Faculty_of_Education,_Lagos_State_University_(LASU)_Ojo.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.199436688888889,
+      6.472883959259259
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -39365.022222581945,
+        -28672.681022242523,
+        0
+      ],
+      "max": [
+        78148.15021033846,
+        57570.22320687185,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      1
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Cream infill, tall red-brown fins and multiple pitched roofs. The entrance portico has a hipped roof, four front columns and blue FACULTY OF EDUCATION lettering on its cream front fascia.",
+      "The July 2025 courtyard view supports a covered sloping walkway and low window bands beneath tall cream-and-red walls."
+    ],
+    "estimated": [
+      "Two mapped courtyards and unseen roof junctions need conservative treatment.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+      "Courtyard walkway modules are extended conservatively around both mapped courts; the dated photograph does not identify which mapped court was photographed.",
+      "Entrance portico dimensions, roof pitch and column spacing are estimated from the dated front photographs."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 1785,
+    "nativePatterns": 210
+  },
+  "verification": {
+    "conversionErrorMetres": 7.275957614183426e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 33782,
+    "objSha256": "9d8bfaa442275c3028b0109c7d80d2de04df04d0df01aa4d760b81f96cc57d69",
+    "documentSha256": "41cce694af39663921585854f3341c7b28b76c724d35ea87f09b6996d793820b",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 13381,
+      "glbConversionErrorMetres": 0.0000027328146217087124,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "41cce694af39663921585854f3341c7b28b76c724d35ea87f09b6996d793820b"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

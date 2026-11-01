@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:47",
+  "name": "C.P.S",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "3dfc919fde8b01e5e3f43a97d871ce0633a113b89105a23d11bb4a8aa2e24ba2",
+    "preservedAppearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "mappedHeightMetres": 6,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Yellow walls, brown vertical panels, dark flat eaves and three mapped blocks.",
+    "gaps": [
+      "The photograph does not establish every block's entrance or rear elevation."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:8bb5a23a-9716-4538-a250-2006585d9a74",
+      "caption": "Centre for Planning Studies exterior · 2022",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_center_for_planning.jpg",
+      "author": "Justjin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "sha256": "ac08263911f0ebe40bad52ef4d98548df5bf101e8629974296b16e005ecb68b5",
+      "assetUrl": "/packages/photos/ac08263911f0ebe40bad52ef4d98548df5bf101e8629974296b16e005ecb68b5.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:47",
+        "photoId": "owner:8bb5a23a-9716-4538-a250-2006585d9a74",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_center_for_planning.jpg",
+        "checkedAt": "2026-11-01T02:24:04.211Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Justjin",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-11"
+        },
+        "verifiedMetadata": {
+          "author": "Justjin",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-11 15:08:06",
+          "description": "Lagos state university center for planning",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work",
+            "Category:Taken with Tecno Spark 8"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lasu_center_for_planning.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.202691086666667,
+      6.464440786666667
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -20085.26215845681,
+        -23305.006215833673,
+        0
+      ],
+      "max": [
+        22286.921561042924,
+        35750.70089618404,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      1,
+      2
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow walls, brown vertical panels, dark flat eaves and three mapped blocks."
+    ],
+    "estimated": [
+      "The photograph does not establish every block's entrance or rear elevation.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 775,
+    "nativePatterns": 130
+  },
+  "verification": {
+    "conversionErrorMetres": 3.637978807091713e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 26624,
+    "objSha256": "d27d0a5fe07124f7b73443ad2d17cbcb066cf70eaba79f3d4fd497c7d3183e61",
+    "documentSha256": "fb674dc42f9f223f64d6d919568492b5de72d60d28df93abfd65c517c7c57df8",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 15000.39999999851,
+      "glbConversionErrorMetres": 8.14946272242878e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "fb674dc42f9f223f64d6d919568492b5de72d60d28df93abfd65c517c7c57df8"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

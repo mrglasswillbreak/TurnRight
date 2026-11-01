@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:43",
+  "name": "PG School",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "e7303d1c8c2dd966a0ceae73713a3ef80b18b525505ad1411fd5191117290559",
+    "preservedAppearanceSha256": "c5cc99b2b331016b49e3e6c1341af474795f9a151fe6a7903fd0e5ba77403059",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Cream walls, a tall rounded red tower, triangular entrance feature and small circular opening.",
+    "gaps": [
+      "The tower's location on the mapped polygon is not yet established.",
+      "The tower is included in the proposal at a tentative location; no surveyed anchor is claimed."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:112834702",
+      "caption": "Postgraduate School exterior",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "sha256": "4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b",
+      "assetUrl": "/packages/photos/4b30f34404f772baeaa50a4380175941d6236cd21686b9790a5c7e3e7df9d81b.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:43",
+        "photoId": "commons:112834702",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg",
+        "checkedAt": "2026-11-01T02:24:04.266Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-11-12"
+        },
+        "verifiedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-11-12 11:40:13",
+          "description": "Post-graduate school of the Lagos State University, for both Msc and Ph.D.",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Post-graduate_school,_LASU.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2013211952730263,
+      6.46835337497234
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -19798.790776928017,
+        -8622.722511343229,
+        0
+      ],
+      "max": [
+        17822.11375750355,
+        22119.484411105488,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      20
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Cream walls, a tall rounded red tower and triangular entrance feature. Two circular windows are visible: one in the upper triangular panel and one in the lower brown panel beside the entrance.",
+      "The dated entrance photograph shows a pale metal grille over a dark recessed doorway."
+    ],
+    "estimated": [
+      "The tower's location on the mapped polygon is not yet established.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The distinctive rounded tower and triangular entrance are reconstructed on an explicitly tentative front. Their anchor remains unresolved and requires comparison review before publication.",
+      "The relative tower/triangular-panel arrangement follows the photograph; its geographic facade assignment remains estimated.",
+      "The two circular windows and lower brown panel use estimated dimensions and positions; the lower panel is partly hidden by vehicles in the dated reference.",
+      "Entrance grille pitch, bar thickness and door divisions are estimated from the dated photograph; no hidden interior detail is reconstructed."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 402,
+    "nativePatterns": 64
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 20936,
+    "objSha256": "0ccb2d5e4cc53ae091335ad5652668f007dd08df291c0d7e41f1e2daf9dc7016",
+    "documentSha256": "abefa4e060dc908a87814d8e3c053c84136011737e421b9d749860174c0b6c03",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 11611.099999999627,
+      "glbConversionErrorMetres": 3.018029310908332e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "abefa4e060dc908a87814d8e3c053c84136011737e421b9d749860174c0b6c03"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

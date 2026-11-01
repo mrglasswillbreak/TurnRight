@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:28",
+  "name": "Makanjuola Lecture Theatre",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "2d1763ac5eeef151e1c88735633404dab6ddda8c71b01ab6336af29b3d43365d",
+    "preservedAppearanceSha256": "6952cca7fd22cdf0566c2e095b9f672e7e3e3346ebdf43f3683851f8bef2523d",
+    "mappedHeightMetres": 12,
+    "mappedFloors": 4,
+    "roofForm": "hip"
+  },
+  "observations": {
+    "visibleOpeningRows": 4,
+    "observed": "Four rows of irregular narrow openings, grey screens, two blue-lined entrance portals, shallow staggered steps and lecture-theatre lettering.",
+    "gaps": [
+      "Architect photographs have unverified redistribution rights and are observation-only.",
+      "Opening widths, geographic elevation assignment and precise step spacing remain estimated.",
+      "Four rows of screen openings do not establish four occupied storeys.",
+      "The freestanding sign and paving are excluded without confirmed anchors."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:abf26605-dd82-479c-9d90-261cca7427da",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "author": "Patrickwaheed Design Consultancy",
+      "license": "Public domain",
+      "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "7a6bc36d2341d987394166116cc82a49c9e300fc65194b4de1a5511ea665f588",
+      "assetUrl": "/packages/photos/7a6bc36d2341d987394166116cc82a49c9e300fc65194b4de1a5511ea665f588.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:28",
+        "photoId": "owner:abf26605-dd82-479c-9d90-261cca7427da",
+        "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+        "checkedAt": "2026-11-01T02:24:04.263Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "Patrickwaheed Design Consultancy",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:157703d4-eac0-43a7-aba5-49670c40241a",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "author": "Patrickwaheed Design Consultancy",
+      "license": "Public domain",
+      "licenseUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3",
+      "assetUrl": "/packages/photos/d991f24365f1fae8bb672db89ceee71cb9de8e230742dc87110cc4c917d37dc3.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:28",
+        "photoId": "owner:157703d4-eac0-43a7-aba5-49670c40241a",
+        "sourceUrl": "https://world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+        "checkedAt": "2026-11-01T02:24:04.263Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "Patrickwaheed Design Consultancy",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:2fc9a21f-f934-4ca5-ae5e-12427ba9f211",
+      "caption": "500 seater Lecture Theatre of Lagos State University",
+      "sourceUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "author": "Photo © PWDC",
+      "license": "Public domain",
+      "licenseUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "fdc6f7789a76575fd45c1aa4aa5bbe52541a48e6c189e38a1f3ac4144238ad76",
+      "assetUrl": "/packages/photos/fdc6f7789a76575fd45c1aa4aa5bbe52541a48e6c189e38a1f3ac4144238ad76.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:28",
+        "photoId": "owner:2fc9a21f-f934-4ca5-ae5e-12427ba9f211",
+        "sourceUrl": "https://www.world-architects.com/en/pwdc-patrickwaheed-design-consultancy-lagos/project/aderemi-makanjuola-lecture-theatre",
+        "checkedAt": "2026-11-01T02:24:04.264Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "Photo © PWDC",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2013081999999997,
+      6.4663663
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -13899.349182316675,
+        -14688.870098858522,
+        0
+      ],
+      "max": [
+        20550.70705818579,
+        9729.569520460835,
+        12000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      2
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Four stacked rows of openings are visible in the elevated reference photograph.",
+      "Grey exterior screen with irregular narrow vertical openings, flat parapet and projecting blue entrance portals.",
+      "Broad shallow exterior steps and the prominent lecture-theatre lettering are visible."
+    ],
+    "estimated": [
+      "The existing 12 m height is retained; slot dimensions and geographic elevation assignments remain estimated.",
+      "Architect photographs are observation-only until explicit reuse rights are established; no photograph is used as a texture.",
+      "The freestanding sign and paving are excluded until their geographic placement is supported.",
+      "Four screen-opening rows do not establish four occupied storeys.",
+      "Portal centres and widths follow the two published authored entrance positions on walls 2 and 3; portal height and blue lining remain reconstructed estimates."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 316,
+    "nativePatterns": 27
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 11280,
+    "objSha256": "90bdb6208f980aaf497674254fec0aab98f7e6b437735ef1e284826404e6fde3",
+    "documentSha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 14397.799999999814,
+      "glbConversionErrorMetres": 9.520678752039657e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

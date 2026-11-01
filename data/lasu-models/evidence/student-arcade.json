@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:32",
+  "name": "Student Arcade",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "6e798a7ad9a38c97b229deb15a244cabab6f41ed103ab3ebc0d7e3f87c33200c",
+    "preservedAppearanceSha256": "c673524bf75877caf9eac202a592bcb6d47a1e2719a081790ab29bedc574f538",
+    "mappedHeightMetres": 12,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "observed": "Yellow front panels, a brown entrance block, central glazing and recessed decorative panels.",
+    "gaps": [
+      "Exact motif geometry and facade-to-footprint orientation need further evidence."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:115984120",
+      "caption": "Students’ Arcade exterior",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+      "author": "Shedyflowz",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-11",
+      "historical": true,
+      "sha256": "dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010",
+      "assetUrl": "/packages/photos/dfb5c7f9c6431190b8072f52b008761466ace834c240133fe8d2fca82afbb010.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:32",
+        "photoId": "commons:115984120",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg",
+        "checkedAt": "2026-11-01T02:24:04.272Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Shedyflowz",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-11"
+        },
+        "verifiedMetadata": {
+          "author": "Shedyflowz",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-11 14:36:28",
+          "description": "Lagos State University Students’ Arcade",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lagos_State_University_Students%E2%80%99_Arcade.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2031015606060618,
+      6.465867003030305
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -32291.225977671063,
+        -41053.56057728583,
+        0
+      ],
+      "max": [
+        34509.68670498101,
+        24051.15889951125,
+        12000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      25
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow front panels, a brown entrance block, central glazing and recessed decorative panels."
+    ],
+    "estimated": [
+      "Exact motif geometry and facade-to-footprint orientation need further evidence.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "Entrance follows the published authored facade on outer wall 25; this preserves editor alignment, not a surveyed orientation.",
+      "Front curtain walls bridge the mouths of the two mapped slots, as seen in the dated exterior; geographic footprint coordinates remain unchanged and the infill alignment needs review."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 934,
+    "nativePatterns": 11
+  },
+  "verification": {
+    "conversionErrorMetres": 3.637978807091713e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 19666,
+    "objSha256": "b35700b6984f22f00661cf6ee8848ece565945d1029080b4ba65df6d2661218d",
+    "documentSha256": "222594696c1f91ff43edafea22a555ae39a5785bfb69cf90098369fa2028db8e",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 14654.900000000373,
+      "glbConversionErrorMetres": 0.0000011634142467187303,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "222594696c1f91ff43edafea22a555ae39a5785bfb69cf90098369fa2028db8e"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

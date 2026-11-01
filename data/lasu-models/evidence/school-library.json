@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:79",
+  "name": "School Library",
+  "status": "identification-hold",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "274e80d8411f46c3a567694b20132ce39bd3545567cca9aaf6a182ad0a114120",
+    "preservedAppearanceSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "mappedHeightMetres": 6,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Two levels, pale green-grey piers, an entrance canopy and main-library signage.",
+    "gaps": [
+      "The small mapped footprint and School Library label require confirmation against the photographed main-library frontage."
+    ],
+    "hold": "The photographed Main Library frontage is not yet securely matched to the small School Library footprint. Identification and scale must be resolved before modeling."
+  },
+  "references": [
+    {
+      "id": "owner:8f800e74-e5c0-4b0f-9992-58ae705cc6d0",
+      "caption": "Fatiu Ademola Akesode Library exterior · 2022",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Library_3.jpg",
+      "author": "SIMIOFAFRICA",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2022-02-21",
+      "historical": true,
+      "sha256": "d934619adb87a8ff06443d95ee210f1e1a29ba3deb1572b8fb51729e621dc6d5",
+      "assetUrl": "/packages/photos/d934619adb87a8ff06443d95ee210f1e1a29ba3deb1572b8fb51729e621dc6d5.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:79",
+        "photoId": "owner:8f800e74-e5c0-4b0f-9992-58ae705cc6d0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Library_3.jpg",
+        "checkedAt": "2026-11-01T02:24:04.268Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-02-21"
+        },
+        "verifiedMetadata": {
+          "author": "SIMIOFAFRICA",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-02-21 14:45:52",
+          "description": "The main entrance of the Lagos State University Main Library Fatiu Ademola Akesode Library",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:LASU_Main_Library_3.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": null,
+  "verification": null,
+  "acceptance": {
+    "artifactsMatchCurrentMaster": false,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

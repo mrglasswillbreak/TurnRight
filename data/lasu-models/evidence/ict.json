@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:31",
+  "name": "ICT",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "2f83cfb688231e85699b8b24713f1855b923e31eddd69e25fb5feea36fe726df",
+    "preservedAppearanceSha256": "dcdc3d9d946064669679995c99eacaa1a64b59d0293f420354f7640a16580428",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Yellow entrance between taller end blocks; trees and fencing obscure much of the facade.",
+    "gaps": [
+      "Roof and obscured elevations are not established by the available photograph."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:116026274",
+      "caption": "ICT Centre exterior",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0000.jpg",
+      "author": "Ajokeoba",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-13",
+      "historical": true,
+      "sha256": "28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f",
+      "assetUrl": "/packages/photos/28b3a1009c25582ea0d04257a6c7cb4f1ae42b42bdc248f4031488d3ec44986f.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:31",
+        "photoId": "commons:116026274",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0000.jpg",
+        "checkedAt": "2026-11-01T02:24:04.234Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-13"
+        },
+        "verifiedMetadata": {
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-13",
+          "description": "This is the information communication technology centre located in Lagos state university",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Files that likely originated from WhatsApp with bad file names",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0000.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2012262500000004,
+      6.468794
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -16655.93660365368,
+        -22416.92817503352,
+        0
+      ],
+      "max": [
+        19672.23557059621,
+        19170.031832293826,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      0
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow entrance between taller end blocks; trees and fencing obscure much of the facade."
+    ],
+    "estimated": [
+      "Roof and obscured elevations are not established by the available photograph.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 437,
+    "nativePatterns": 85
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 6360,
+    "objSha256": "39d882e1e84716e596eb8e94f022a5a236512841b072ba4c59a8c374e2f82c2f",
+    "documentSha256": "6a462178bd8a1b8dc75a903b9a86dc588eee1c638bb7ad7554b9c4c9a32fd523",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 14556.299999998882,
+      "glbConversionErrorMetres": 8.853217536852753e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "6a462178bd8a1b8dc75a903b9a86dc588eee1c638bb7ad7554b9c4c9a32fd523"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

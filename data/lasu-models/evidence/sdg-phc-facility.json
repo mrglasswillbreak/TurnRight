@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:33",
+  "name": "SDG-PHC FACILITY",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "faa72eb9fb9ad941939d4806c1279d8946f0aa55d4c1f062f634eaeee9c02a83",
+    "preservedAppearanceSha256": "538c6a1f4f15725fb33f95cc5fedb10b4b6a05a46cd32fefec963b86e1aa8e6b",
+    "mappedHeightMetres": 9,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Cream walls, red-brown framing and canopy, blue and white window divisions.",
+    "gaps": [
+      "Strong colour grading in one photograph makes its palette unreliable; compare the second view."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+      "caption": "SDG-PHC FACILITY",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4",
+      "assetUrl": "/packages/photos/9c20aa343f91a132d2c42acd8f56396255fb4bde9b301ec84d0f78973a50b2a4.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:33",
+        "photoId": "owner:0ba05a1b-e039-43d1-8535-135e1e459aac",
+        "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+        "checkedAt": "2026-11-01T02:24:04.271Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+      "caption": "SDG-PHC FACILITY",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58",
+      "assetUrl": "/packages/photos/fbc355d7d0c297cd75cace99b1db348a13a12ad907a994a5e2769251f5136b58.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:33",
+        "photoId": "owner:73efc2f9-7739-4745-a2c4-5f7f7505805d",
+        "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+        "checkedAt": "2026-11-01T02:24:04.271Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    },
+    {
+      "id": "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555",
+      "caption": "SDG-PHC FACILITY",
+      "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "author": "LASU",
+      "license": "Public domain",
+      "licenseUrl": "https://csc.lasu.edu.ng/lasu_library/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e",
+      "assetUrl": "/packages/photos/7b745831c3f9c476f381ce8a4999d770f199a5b428dcb4d87c7719e122808b9e.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:33",
+        "photoId": "owner:09ebfc32-c724-4d9e-b4dd-5e40ca72b555",
+        "sourceUrl": "https://csc.lasu.edu.ng/lasu_library/",
+        "checkedAt": "2026-11-01T02:24:04.271Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "LASU",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2020468111111113,
+      6.466021655555554
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -17093.682207861533,
+        -19142.850812506196,
+        0
+      ],
+      "max": [
+        11588.937090011581,
+        14404.704893909233,
+        9000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      3
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Cream walls, red-brown framing and canopy, blue and white window divisions. The outer front red panels carry three stepped cream bars on photo-left and a cream C-shaped outline on photo-right."
+    ],
+    "estimated": [
+      "Strong colour grading in one photograph makes its palette unreliable; compare the second view.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "Entrance follows the published authored facade on outer wall 3; this preserves editor alignment, not a surveyed orientation.",
+      "The outer panel widths and cream motif dimensions are estimated; their left/right placement follows the photographed front within that tentative facade assignment."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 542,
+    "nativePatterns": 79
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 7748,
+    "objSha256": "ee4a93bbd8035ee1353647ca9bb7233c50d50c840ee5b1e762db2f063b0a132a",
+    "documentSha256": "51a02c422d6cf37ad6a58bb8878455b6535cde56bbdc101ee33e7c0b7fdec965",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 12983.099999999627,
+      "glbConversionErrorMetres": 8.602352892239651e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "51a02c422d6cf37ad6a58bb8878455b6535cde56bbdc101ee33e7c0b7fdec965"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

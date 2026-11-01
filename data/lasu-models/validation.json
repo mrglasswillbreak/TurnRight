@@ -1,0 +1,904 @@
+{
+  "recordedAt": "2026-11-01T08:47:56.182Z",
+  "sourceSnapshot": "46c1518bff44755a7688aeddd97055eeca6549f62e08d0b029102a584b369a71",
+  "applicationVersion": "0.3.0",
+  "baseline": "lasu-41ec73876464",
+  "integration": {
+    "version": "lasu-model-campaign-5ecef4f63b9efb2a",
+    "bytes": 46181851,
+    "assets": 215,
+    "models": 20
+  },
+  "artifacts": {
+    "models": 20,
+    "files": 606,
+    "bytes": 981059783,
+    "maxConversionErrorMetres": 7.275957614183426e-15,
+    "maxGlbConversionErrorMetres": 0.0000027328146217087124,
+    "gallery": "C:/Users/user/Documents/TurnRight-Models/LASU-Ojo/review.html"
+  },
+  "localChecks": [
+    {
+      "name": "npm run check",
+      "passed": true,
+      "log": "release-check-final.log"
+    },
+    {
+      "name": "normal production build preserving both live campuses",
+      "passed": true,
+      "log": "release-production-build-final.log",
+      "publicStartupGzipBytes": 434036,
+      "publicStartupLimit": 435200
+    },
+    {
+      "name": "focused model/texture/offline tests",
+      "testsPassed": 51,
+      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+      "log": "release-focused-unit.log"
+    },
+    {
+      "name": "published package preservation regressions",
+      "testsPassed": 24
+    },
+    {
+      "name": "path vertex and model finishing browser journeys",
+      "testsPassed": 2,
+      "log": "release-focused-browser.log"
+    },
+    {
+      "name": "final non-default crop and complete controls capture",
+      "testsPassed": 1,
+      "log": "release-final-capture.log"
+    },
+    {
+      "name": "dependency audit",
+      "passed": true,
+      "high": 0,
+      "critical": 0,
+      "moderate": 8,
+      "low": 2,
+      "log": "release-dependencies.log"
+    }
+  ],
+  "buildPreservation": {
+    "recordedAt": "2026-11-01T08:47:17.793Z",
+    "verified": true,
+    "assets": 236,
+    "campuses": [
+      {
+        "slug": "lasu",
+        "version": "lasu-41ec73876464"
+      },
+      {
+        "slug": "unilag",
+        "version": "unilag-b7655a90045c"
+      }
+    ],
+    "source": "Normal production build with PUBLISHED_MAP_URL=https://turnright.vercel.app; every prior published asset checked in web/dist."
+  },
+  "detailPreservation": {
+    "recordedAt": "2026-11-01T08:43:13.287Z",
+    "fixture": "lasu-model-campaign-5ecef4f63b9efb2a",
+    "assets": 215,
+    "bytes": 46181851,
+    "requests": 1,
+    "verified": true,
+    "method": "Existing preservePublished reader; only HTTPS transport substituted with immutable local fixture bytes; all copied assets verified."
+  },
+  "hardware": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+      "browserVersion": "153.0.8010.12",
+      "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "capturedAt": "2026-11-01T08:28:12.370Z",
+      "averageFps": 49.962048861048395,
+      "p95FrameMs": 43.1999999997206,
+      "maxFrameMs": 131.89999999990687,
+      "visibleDetailedModels": 20,
+      "offlineModels": 20,
+      "download": {
+        "bytes": 46181851,
+        "assets": 215,
+        "verified": true
+      },
+      "released": [
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        },
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        },
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sourceSnapshot": "d64c5f7c7e66fed7a0e6c6053b4076dbdcb1cf3c178747a984911fefb8bd5e43",
+      "browserVersion": "153.0.8010.12",
+      "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x00009A49) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "capturedAt": "2026-11-01T08:28:53.931Z",
+      "averageFps": 60.059309609488146,
+      "p95FrameMs": 19.299999999813735,
+      "maxFrameMs": 25.899999999906868,
+      "visibleDetailedModels": 17,
+      "offlineModels": 20,
+      "download": {
+        "bytes": 46181851,
+        "assets": 215,
+        "verified": true
+      },
+      "released": [
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        },
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        },
+        {
+          "detailIds": [],
+          "detailBuildings": 0,
+          "pendingRequests": 0,
+          "reservedDetailBytes": 0,
+          "geometries": 3,
+          "textures": 1,
+          "drawCalls": 3
+        }
+      ]
+    }
+  ],
+  "browserRuntimeMatchesBenchmarkRevision": "2ce656d126e1c88cf3a6eb75dde07ae73d568ec2",
+  "hostedChecks": {
+    "authority": "https://github.com/mrglasswillbreak/TurnRight/pull/61",
+    "requirePassingChecksOnCurrentHead": true,
+    "note": "Current-head CI, security and preview verification are separate gates; this local receipt does not assert their completion."
+  },
+  "acceptance": {
+    "independentArchitecturalReview": false,
+    "physicalPhone": false,
+    "newModelsPublished": false,
+    "identificationHolds": 3,
+    "additionalFootprintGaps": 4,
+    "dimensions": "Estimated unless explicitly supported by evidence; conversion tolerance is not survey accuracy."
+  },
+  "models": [
+    {
+      "id": "arcgis:University_Property:47",
+      "slug": "c-p-s",
+      "componentCount": 775,
+      "triangles": 26624,
+      "conversionErrorMetres": 3.637978807091713e-15,
+      "glbConversionErrorMetres": 8.14946272242878e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1435302,
+          "sha256": "57258c87773ffb07ed94e9846d5696fa65ba166ac9122bab5380fe65d4c27087"
+        },
+        "master.obj": {
+          "bytes": 2819237,
+          "sha256": "d27d0a5fe07124f7b73443ad2d17cbcb066cf70eaba79f3d4fd497c7d3183e61"
+        },
+        "master.mtl": {
+          "bytes": 36919,
+          "sha256": "82054c5177c366e2929d04ad7b502d6b5eace2914b328a1e24a277d4dbde0444"
+        },
+        "master.step": {
+          "bytes": 4353132,
+          "sha256": "4a295d4cb2df4426598ec05db1e357b0c8ce9ede07fc0a78e3c3fa1ccfed5cc8"
+        },
+        "turnright.model.json": {
+          "bytes": 12735838,
+          "sha256": "fb674dc42f9f223f64d6d919568492b5de72d60d28df93abfd65c517c7c57df8"
+        },
+        "model.glb": {
+          "bytes": 4168176,
+          "sha256": "8a356b6d133f1cb63b548761ea756ebff425d46d17adc8c14e97e9cae6abf390"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:44",
+      "slug": "department-of-theartre-arts-and-music",
+      "componentCount": 507,
+      "triangles": 22532,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 3.336498117789688e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 966345,
+          "sha256": "b6b3de8573c5b970b05af89967d73f5e8f00cc6b6d44f854e3208da080347063"
+        },
+        "master.obj": {
+          "bytes": 2445962,
+          "sha256": "719b23739ee8174fa80f0cd71164a28cec3203711169cd34a2a788caa15693ab"
+        },
+        "master.mtl": {
+          "bytes": 24223,
+          "sha256": "32baf33d7f94fffe8fb28b7f00d72ce1175af82ed346faafea0b94e421b5878a"
+        },
+        "master.step": {
+          "bytes": 3037848,
+          "sha256": "d9639b438a0e531f88585dec90f51ae05de501415776debf91cf49f610f0081e"
+        },
+        "turnright.model.json": {
+          "bytes": 11145497,
+          "sha256": "ddbfc38d1af1c0da0afd2bc6907f80f4b558449181577bdf220f9b3d30455fee"
+        },
+        "model.glb": {
+          "bytes": 4113072,
+          "sha256": "aa16e9aa2099fb580baea2e342fb9fe4d78b6debf3d110cc7a71604ccf8c670a"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:25",
+      "slug": "faculty-of-art-language-lab",
+      "componentCount": 528,
+      "triangles": 17254,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 6.594275454574472e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1505677,
+          "sha256": "0d6b0b1f84632c16671f894fa1045e52d3a6b4bfc196d3fdc795fe3499acf320"
+        },
+        "master.obj": {
+          "bytes": 1905389,
+          "sha256": "1413e59762a7b27d56a7fe9f141e8e9d3675056097e88d5c429ef9e6e973d29e"
+        },
+        "master.mtl": {
+          "bytes": 25214,
+          "sha256": "59a8896fcab04f100ecfd06f02e56e0265627ea7fa67f5548dcbf12a50a10503"
+        },
+        "master.step": {
+          "bytes": 3123028,
+          "sha256": "f9c6b1b6bbb790043ec1099926ff3c3b3702d6ea412f0b1b6406233c169120e8"
+        },
+        "turnright.model.json": {
+          "bytes": 8442544,
+          "sha256": "e20778199993d20b09fe7c320fb7c36a2e4c894dd7ec341815f7541605b4f1fd"
+        },
+        "model.glb": {
+          "bytes": 3938124,
+          "sha256": "12c1bf88dbc8ddb9c6b2a4e83bd2dda634782ebfcee03bd8cd27b558cc13a506"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:54",
+      "slug": "faculty-of-education-3-in-1",
+      "componentCount": 1785,
+      "triangles": 33782,
+      "conversionErrorMetres": 7.275957614183426e-15,
+      "glbConversionErrorMetres": 0.0000027328146217087124,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 5706696,
+          "sha256": "c854c1dfb10fc44ebc0c9145d6a6c97b94408e1638f691a6632ffd1f418b13b6"
+        },
+        "master.obj": {
+          "bytes": 3662102,
+          "sha256": "9d8bfaa442275c3028b0109c7d80d2de04df04d0df01aa4d760b81f96cc57d69"
+        },
+        "master.mtl": {
+          "bytes": 89234,
+          "sha256": "01afed832e0912b514a70cbf0ce40bc7d4fbfc711506aff1c558ad4b53e76267"
+        },
+        "master.step": {
+          "bytes": 9532376,
+          "sha256": "b66dcbafdc44b47b7ae59f0f5ba2126a31fac6ea4e1f5a2fc8b79ebf313cea57"
+        },
+        "turnright.model.json": {
+          "bytes": 15644809,
+          "sha256": "41cce694af39663921585854f3341c7b28b76c724d35ea87f09b6996d793820b"
+        },
+        "model.glb": {
+          "bytes": 5804168,
+          "sha256": "0cd932a27667cb9a377717d85372623a1b1b6352fd86d4d2f5f0863920395767"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:39",
+      "slug": "fms",
+      "componentCount": 1645,
+      "triangles": 36310,
+      "conversionErrorMetres": 3.637978807091713e-15,
+      "glbConversionErrorMetres": 0.0000017924717496953235,
+      "files": 31,
+      "masters": {
+        "master.sc": {
+          "bytes": 2572975,
+          "sha256": "176691c3e83b6ea332a1554183e83b20d31895e1d16298fa18044ac1cfebd77d"
+        },
+        "master.obj": {
+          "bytes": 3777795,
+          "sha256": "f0498f8d2467834bb0924e074919c4f437e1a0e82c1f1b421ee2569958746125"
+        },
+        "master.mtl": {
+          "bytes": 81509,
+          "sha256": "bd93b1f81a96033f05e0dfb97c2f36e36fbc5c1c40520125c6be274bb077ca9d"
+        },
+        "master.step": {
+          "bytes": 8673428,
+          "sha256": "7ae2b0787ce18feef3a00a2855fbf8b0bea62ba8b199add2b2245cec1127ad9a"
+        },
+        "turnright.model.json": {
+          "bytes": 16703775,
+          "sha256": "558f9c4c2f905c3313e7e9035f5127653aa17aedb4a0fe55a4b2a297e37a0a84"
+        },
+        "model.glb": {
+          "bytes": 6424452,
+          "sha256": "735aa056381014a7f12176eb0c5ac81a207a0fd4dddc381e6c5103002625842c"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:31",
+      "slug": "ict",
+      "componentCount": 437,
+      "triangles": 6360,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 8.853217536852753e-7,
+      "files": 29,
+      "masters": {
+        "master.sc": {
+          "bytes": 1095185,
+          "sha256": "d9a9ca4beb9d24413078e81d9fb91e9ea7604543685d8470530aae601df790c9"
+        },
+        "master.obj": {
+          "bytes": 621249,
+          "sha256": "39d882e1e84716e596eb8e94f022a5a236512841b072ba4c59a8c374e2f82c2f"
+        },
+        "master.mtl": {
+          "bytes": 20569,
+          "sha256": "9b0cc29ed56fa4880a83d0bdd4b58682bc8a782f32805b8d53b3519bb757d66f"
+        },
+        "master.step": {
+          "bytes": 2268293,
+          "sha256": "9bc9525da6ca3a7ad9da943fe41d3e3281da08705f1d6c0f13bb47ee9d9dbbbb"
+        },
+        "turnright.model.json": {
+          "bytes": 2856174,
+          "sha256": "6a462178bd8a1b8dc75a903b9a86dc588eee1c638bb7ad7554b9c4c9a32fd523"
+        },
+        "model.glb": {
+          "bytes": 2643128,
+          "sha256": "0dd87003875135204d43b505ee1ff530a077c2bf54bd43fb06b0e65705fe2f22"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:73",
+      "slug": "lasu-cbt",
+      "componentCount": 169,
+      "triangles": 12026,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 0.0000018749073902313285,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 475439,
+          "sha256": "126e7bb93056b66a2663e9edf5d534f74bdd86d61717735439824d9f6237446b"
+        },
+        "master.obj": {
+          "bytes": 1277495,
+          "sha256": "be28d63237a1a213cabe0b6b4f36ec1ff85405c77927620f79119865ad5a2983"
+        },
+        "master.mtl": {
+          "bytes": 7862,
+          "sha256": "16b713ebe96e8225652255c7762a31bc346cbec61cdb6197e26c70639375685d"
+        },
+        "master.step": {
+          "bytes": 1163768,
+          "sha256": "c54543d5a29b9c0ab2aa72d924a2d7c69785912118db295977b5033640005cf6"
+        },
+        "turnright.model.json": {
+          "bytes": 6053119,
+          "sha256": "462f4c81fdde1a6f7db0eb4b94e3f1754bafb0bb72669ef0ff4ca2c0952048e0"
+        },
+        "model.glb": {
+          "bytes": 2860288,
+          "sha256": "7b3bffd7195e7044de3a43feae9ca1a7b6f86f81da3cc5495c2c02106908b6e9"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:3",
+      "slug": "lasu-international-library",
+      "componentCount": 4583,
+      "triangles": 62604,
+      "conversionErrorMetres": 3.637978807091713e-15,
+      "glbConversionErrorMetres": 0.0000014009752860033586,
+      "files": 33,
+      "masters": {
+        "master.sc": {
+          "bytes": 12403546,
+          "sha256": "40da68a26d00b05567c8f1cf6c37118946cf3eebea730841863ec6b6e80bc5f0"
+        },
+        "master.obj": {
+          "bytes": 6116752,
+          "sha256": "0d3f7b5424550de2beef0c9c5e3c2fce227921ac78c1bfe7b9ae3b796b641dfb"
+        },
+        "master.mtl": {
+          "bytes": 223273,
+          "sha256": "03a15337bd33c4682397aa968701210afe0f34a8ea4667c2dc749e16c797d076"
+        },
+        "master.step": {
+          "bytes": 23095771,
+          "sha256": "07034494d43fdfc849a622bf58e6539e562bb7c7e55c9d31aa4bb9f67e592919"
+        },
+        "turnright.model.json": {
+          "bytes": 26467701,
+          "sha256": "dbe0895cc0130bb9da240ed57d20f6d2d2feb2e0773b89359eb99c4352e3413f"
+        },
+        "model.glb": {
+          "bytes": 9392524,
+          "sha256": "748abdafa0f22c22968ca5153d80570c24c40b0654d69ecabf9be21bba447c37"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:2",
+      "slug": "lasu-main-auditorium",
+      "componentCount": 1335,
+      "triangles": 18180,
+      "conversionErrorMetres": 3.637978807091713e-15,
+      "glbConversionErrorMetres": 9.761262163010542e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 2871078,
+          "sha256": "5c038761553cc47f4c7ab555116cf935487b5e09f3687d0da0e6a4c651683051"
+        },
+        "master.obj": {
+          "bytes": 1743785,
+          "sha256": "ea87952adfb98991eb911c8eace6ba9e993f64fc395782b49afde1121c22fe0f"
+        },
+        "master.mtl": {
+          "bytes": 64721,
+          "sha256": "7ab1c62b1030b57e59583a449da9d4741d1548cb34ca849a8eaa631f858d21b6"
+        },
+        "master.step": {
+          "bytes": 6591892,
+          "sha256": "3d7b9cd5e25b369b1b1fdf5ad25b8fd3d1a95da7160650e583bbafb51cc95647"
+        },
+        "turnright.model.json": {
+          "bytes": 7770374,
+          "sha256": "9022751363d4e40717c69aac2a5ac0507251375fb539b6df52bfda37adef6632"
+        },
+        "model.glb": {
+          "bytes": 4393444,
+          "sha256": "fe83da720839a125a7cefedfda9c9cf4e616b5d4aaa31004046e5bb0280e7a22"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:55",
+      "slug": "lasu-radio",
+      "componentCount": 138,
+      "triangles": 8556,
+      "conversionErrorMetres": 9.094947017729283e-16,
+      "glbConversionErrorMetres": 4.384591800743465e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 349524,
+          "sha256": "decccc8f1c84f68fc3f16480feb84589985f84d0625d1d300944535f4b955fe9"
+        },
+        "master.obj": {
+          "bytes": 942278,
+          "sha256": "d314f2750c7e34767555bed93d32e512fd203b8c170b0ca1b6f55ea5061ffded"
+        },
+        "master.mtl": {
+          "bytes": 6419,
+          "sha256": "dab8b01cd1ea5cff5967873a1988d51c41e334414429f71625be296546327bfa"
+        },
+        "master.step": {
+          "bytes": 911465,
+          "sha256": "996267f17010526a95e967bb460c5caeb687c6dea01a939265ca5c38a215c4ea"
+        },
+        "turnright.model.json": {
+          "bytes": 4392453,
+          "sha256": "3cd7dbc9a87733e044044cf1e2d99fa3ab4343481730cc17c7b8f948ba7e8d29"
+        },
+        "model.glb": {
+          "bytes": 3412328,
+          "sha256": "2f879e9c54e43ac848ae30888603e565c3a4d9d197d52091a82fa65d307c1f40"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:120",
+      "slug": "lasu-senate-building",
+      "componentCount": 3132,
+      "triangles": 66852,
+      "conversionErrorMetres": 7.275957614183426e-15,
+      "glbConversionErrorMetres": 0.0000012077911719643453,
+      "files": 33,
+      "masters": {
+        "master.sc": {
+          "bytes": 4360055,
+          "sha256": "087e51eb37817fc244e98625deb8b3d8be0801c850640eeda78c79d252313144"
+        },
+        "master.obj": {
+          "bytes": 6824859,
+          "sha256": "d7201c0efcc71f65d3c503066953053c5bf6e96e1a41d8e951b06159f8a3563f"
+        },
+        "master.mtl": {
+          "bytes": 154060,
+          "sha256": "7df4fb82ceec9d9e5fbb29bb6c4eff9d6de709642f84950dfdbb1fa8a14305b5"
+        },
+        "master.step": {
+          "bytes": 16401811,
+          "sha256": "e6b5fc1cca4d8cc4bba92654878da111a40c1577eb102ce0524934e4ee0a6c35"
+        },
+        "turnright.model.json": {
+          "bytes": 30727170,
+          "sha256": "2c73c2d7cab958d15ebcf6423a40d4862a6f2593b4fa2063acb178ab38b4807b"
+        },
+        "model.glb": {
+          "bytes": 8969872,
+          "sha256": "c03273f0c6299a61098afc750c443b941c6800dd64c670d36824841a16ee6934"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:78",
+      "slug": "law-clinic",
+      "componentCount": 714,
+      "triangles": 27254,
+      "conversionErrorMetres": 9.094947017729283e-16,
+      "glbConversionErrorMetres": 4.280219325636381e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1402310,
+          "sha256": "aff9b67031798dc5d96ecbcd39dcd18273f64f9deabe94bc1330306e3d37857f"
+        },
+        "master.obj": {
+          "bytes": 2899173,
+          "sha256": "9a756196c92a5b9fd84b2162b39b349f007187731c31f851a97c47e2ca36ee17"
+        },
+        "master.mtl": {
+          "bytes": 35381,
+          "sha256": "126fc3635ab43fc766e9fcc7fe5430c0773eacf5b70f7e1761c24e695f49ddcb"
+        },
+        "master.step": {
+          "bytes": 3941505,
+          "sha256": "6f8a70dce04b2ab91d0b24663fed2b62052affef99b1a8dfdd55ef372fc8ebe0"
+        },
+        "turnright.model.json": {
+          "bytes": 13060104,
+          "sha256": "f9fe0f7f3ce8f7ab1bb2f157943c7a2694c5f8208fe264d5fea3c32fd3df28ab"
+        },
+        "model.glb": {
+          "bytes": 6409016,
+          "sha256": "bc124b04d38cd0cc89c79096692cc0a59099aa52bb36830a5e1980b718f51779"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:76",
+      "slug": "law-library",
+      "componentCount": 865,
+      "triangles": 25636,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 6.02225107115828e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1380682,
+          "sha256": "906e2a3dd840b226b33fa2d6d1b7381ced4f31c8d0c456eae605b385f68c449f"
+        },
+        "master.obj": {
+          "bytes": 2753268,
+          "sha256": "6fc1e49db03d2e5dca35a01352906c2be3eb87c9108bbff980b834ce4d159b48"
+        },
+        "master.mtl": {
+          "bytes": 43683,
+          "sha256": "ea701a9c7787e66a67b51507ae6e6f1d709f6a1e1bf7eada77f7223d1292e8a8"
+        },
+        "master.step": {
+          "bytes": 4697343,
+          "sha256": "6003ad531dbef51adb929baade4cd0d1866530343df361fb5351785fca15607f"
+        },
+        "turnright.model.json": {
+          "bytes": 12294168,
+          "sha256": "e9a88e0c8d79704f9761b23a87dfe89ac78c417a2af84a38393ca9fb3fbfa307"
+        },
+        "model.glb": {
+          "bytes": 5880528,
+          "sha256": "04d141440b212b63c03a8521de51029f3625fac50ad9cb5974ed06de7a36710a"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:75",
+      "slug": "m-b-a",
+      "componentCount": 809,
+      "triangles": 10504,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 5.319268083781026e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1091722,
+          "sha256": "1fd731b4263e9211522da2c590a78e423b4ee7a30f66f49d5c8964e263b762a8"
+        },
+        "master.obj": {
+          "bytes": 961606,
+          "sha256": "86e33839e02cb21d2ce60f7fd50fff143553bcc2fff592d4a9f55d83985763c6"
+        },
+        "master.mtl": {
+          "bytes": 39050,
+          "sha256": "cc9df6e504b6a582a278f86b8f23910c674e506001ae78ca741674ddda0767e3"
+        },
+        "master.step": {
+          "bytes": 3710135,
+          "sha256": "8a65e959a9379a7e3a0e745ca271035803bcaae590cd26d808f3ebf2bc917255"
+        },
+        "turnright.model.json": {
+          "bytes": 4447528,
+          "sha256": "8ea04f31ad6f0d570bca8bfb377d9f2cce9e14a394cf2dca5fa1c62e1552b92a"
+        },
+        "model.glb": {
+          "bytes": 3428608,
+          "sha256": "928ab9e3fca6d55538e31f6140693163a75f825c4a516c9eb16389b7c625bad7"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:28",
+      "slug": "makanjuola-lecture-theatre",
+      "componentCount": 316,
+      "triangles": 11280,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 9.520678752039657e-7,
+      "files": 29,
+      "masters": {
+        "master.sc": {
+          "bytes": 1339772,
+          "sha256": "668913bc2b5252f307b6b30650cdd984845601333a301a4c7e9e18cbc0224ba3"
+        },
+        "master.obj": {
+          "bytes": 1196981,
+          "sha256": "90bdb6208f980aaf497674254fec0aab98f7e6b437735ef1e284826404e6fde3"
+        },
+        "master.mtl": {
+          "bytes": 14629,
+          "sha256": "5ff0c3b5225bcbc5b242fcd3382a8e51a6ac1319755fcc494bbbef12d6ae5e7b"
+        },
+        "master.step": {
+          "bytes": 2810427,
+          "sha256": "a11057c93dff94b72d97dc058f4ef23d93878952b783dba713cd6b14cf20a940"
+        },
+        "turnright.model.json": {
+          "bytes": 5200002,
+          "sha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329"
+        },
+        "model.glb": {
+          "bytes": 2421560,
+          "sha256": "e58e06b75456aa519b712a16c3194a311b3894dc1d17e789d63f0dc02ba70423"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:22",
+      "slug": "mass-communication",
+      "componentCount": 656,
+      "triangles": 23862,
+      "conversionErrorMetres": 9.094947017729283e-16,
+      "glbConversionErrorMetres": 3.8146973047048505e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1264417,
+          "sha256": "0f0347c62ff02538176e5f501c58cf3a163de0ff0ad11b7aac500d3e7a855c61"
+        },
+        "master.obj": {
+          "bytes": 2599109,
+          "sha256": "364bb38e40613d7b704854750c9f5f2958e23557560523690685fb836b857e72"
+        },
+        "master.mtl": {
+          "bytes": 31188,
+          "sha256": "663f70ad137811aebc18aa27d7823caba4818ca0c4d495ca71aad0302b538a9c"
+        },
+        "master.step": {
+          "bytes": 3564660,
+          "sha256": "d17a107602b35668da17f074d0c310ffad0ca673bc3abeccedf46289ae6cb1d6"
+        },
+        "turnright.model.json": {
+          "bytes": 11523494,
+          "sha256": "32006fd5a925fad22ecde97525827b04269ee11c87a2c17af5847e781968c574"
+        },
+        "model.glb": {
+          "bytes": 4067504,
+          "sha256": "181cbfbd3cf581c0821deda6e92ca2d085480ead23101b7cd85596d2e7eebdc2"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:43",
+      "slug": "pg-school",
+      "componentCount": 402,
+      "triangles": 20936,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 3.018029310908332e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1019757,
+          "sha256": "5c04bf6b97c3ea2f714d3b3889f84fa8f0671b4efd136515a02deeb5adbb7da9"
+        },
+        "master.obj": {
+          "bytes": 2343244,
+          "sha256": "0ccb2d5e4cc53ae091335ad5652668f007dd08df291c0d7e41f1e2daf9dc7016"
+        },
+        "master.mtl": {
+          "bytes": 19671,
+          "sha256": "917252577d38698a7b5364cc2fdb8fe14013507acc260678d274bdc082875c8a"
+        },
+        "master.step": {
+          "bytes": 2577066,
+          "sha256": "6807e2417a3bfb5a23c04869604f6d05dda75f80f59f345e6f0e0540302a83ee"
+        },
+        "turnright.model.json": {
+          "bytes": 10454234,
+          "sha256": "abefa4e060dc908a87814d8e3c053c84136011737e421b9d749860174c0b6c03"
+        },
+        "model.glb": {
+          "bytes": 5580820,
+          "sha256": "31aefb93e2c6e6c14460eeb2399758a60fc187ec3aa7651ace1512b4d5de6b4f"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:103",
+      "slug": "school-of-transportc",
+      "componentCount": 1379,
+      "triangles": 41908,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 9.142177432863718e-7,
+      "files": 31,
+      "masters": {
+        "master.sc": {
+          "bytes": 3434266,
+          "sha256": "c4b7e2b8381fe082859e1db65fd7562c075784097b2a8d1582226a940693a34b"
+        },
+        "master.obj": {
+          "bytes": 4373035,
+          "sha256": "d146f8b5097a7ff8d88a7b7124e1cde10fe7ecff18467c104c51535e9fb8521c"
+        },
+        "master.mtl": {
+          "bytes": 66455,
+          "sha256": "2fd94979c524427037526a3abb0086b6fcf917336039cb18a89a976bdbc53232"
+        },
+        "master.step": {
+          "bytes": 7402813,
+          "sha256": "365322fb6b6db9c90ab4488be92b792ba545869efd4a40fc95b5f186a57903e4"
+        },
+        "turnright.model.json": {
+          "bytes": 20034003,
+          "sha256": "c1cd0ab4ff90226c789f47ebdca0d7f4f4dcfbd5511a16a0019e2a07ea6b158d"
+        },
+        "model.glb": {
+          "bytes": 7136248,
+          "sha256": "12372b0c4bc179c62de1d4833cdb4363159220c9c4a35b27b27bbfb4b01089bd"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:33",
+      "slug": "sdg-phc-facility",
+      "componentCount": 542,
+      "triangles": 7748,
+      "conversionErrorMetres": 1.8189894035458565e-15,
+      "glbConversionErrorMetres": 8.602352892239651e-7,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 981274,
+          "sha256": "10486c4c2a9b3e5b6a76621e9bd241037a30ea1d7e850066a48db26a230f7983"
+        },
+        "master.obj": {
+          "bytes": 718066,
+          "sha256": "ee4a93bbd8035ee1353647ca9bb7233c50d50c840ee5b1e762db2f063b0a132a"
+        },
+        "master.mtl": {
+          "bytes": 26103,
+          "sha256": "25a88346ef643dd62ee19d1ab7ac79909a39fac77188e974b9e417ef20b82f31"
+        },
+        "master.step": {
+          "bytes": 2659208,
+          "sha256": "ef55821fc8a122f5c02537b3964aa67e75cd7a7b3a1a47863e8aa6555800bb74"
+        },
+        "turnright.model.json": {
+          "bytes": 3363200,
+          "sha256": "51a02c422d6cf37ad6a58bb8878455b6535cde56bbdc101ee33e7c0b7fdec965"
+        },
+        "model.glb": {
+          "bytes": 3871716,
+          "sha256": "416ad53ccbc92fc8e85ec3ef21d24b1e0c533672ab336c939ad44fb4f972a15e"
+        }
+      }
+    },
+    {
+      "id": "arcgis:University_Property:32",
+      "slug": "student-arcade",
+      "componentCount": 934,
+      "triangles": 19666,
+      "conversionErrorMetres": 3.637978807091713e-15,
+      "glbConversionErrorMetres": 0.0000011634142467187303,
+      "files": 30,
+      "masters": {
+        "master.sc": {
+          "bytes": 1013906,
+          "sha256": "a81397c3a68ce33c0d27c5e1cbb17fe14de2585c4698dfd06233d462902553db"
+        },
+        "master.obj": {
+          "bytes": 1831724,
+          "sha256": "b35700b6984f22f00661cf6ee8848ece565945d1029080b4ba65df6d2661218d"
+        },
+        "master.mtl": {
+          "bytes": 51205,
+          "sha256": "7e48319b8526214c46cabc634208774f4fd47ac45f85ef483cc45f798127596a"
+        },
+        "master.step": {
+          "bytes": 4280282,
+          "sha256": "95221305e0ff87e27fc950fba5ca8873c681dac79fd483852b33a933e510a17f"
+        },
+        "turnright.model.json": {
+          "bytes": 8453883,
+          "sha256": "222594696c1f91ff43edafea22a555ae39a5785bfb69cf90098369fa2028db8e"
+        },
+        "model.glb": {
+          "bytes": 4545964,
+          "sha256": "65a5b608ab8cd1eb8d4d0882ccc80febb13e0ffd3616748501664ffeb70abfaf"
+        }
+      }
+    }
+  ]
+}

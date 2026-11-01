@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:76",
+  "name": "Law Library",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "4c495640909d79cf1e8b4eabc893632072c6c2027809d34a6fc35e1a962dfd2d",
+    "preservedAppearanceSha256": "cc88f2de335cdee5215c42e26effd9de2ab4684926cadef77f891b46515d35f6",
+    "mappedHeightMetres": 9,
+    "mappedFloors": 3,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 3,
+    "observed": "Cream walls, red-brown pilasters, floor bands and Taslim Olawale Elias Library signage.",
+    "gaps": [
+      "The existing hip-roof shape is illustrative and is not confirmed by the ground-level view."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:112835955",
+      "caption": "Taslim Olawale Elias Law Library",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+      "author": "Official alade",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2021-11-12",
+      "historical": true,
+      "sha256": "c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09",
+      "assetUrl": "/packages/photos/c843261f91de93775d417bf8c722de6c30f6205fb9e500f549c89944e6d54b09.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:76",
+        "photoId": "commons:112835955",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg",
+        "checkedAt": "2026-11-01T02:24:04.259Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-11-12"
+        },
+        "verifiedMetadata": {
+          "author": "Official alade",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-11-12 11:42:29",
+          "description": "Taslim Olawale Elias Law Library, Faculty of Law, Lagos State University.",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Law_library,_LASU.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.20188118,
+      6.468079900000001
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -14372.187694605305,
+        -26386.592539540346,
+        0
+      ],
+      "max": [
+        21657.720109939273,
+        20760.121479450685,
+        9000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      3
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Cream walls, red-brown pilasters, floor bands and Taslim Olawale Elias Library signage. Two narrow cream-framed louver strips extend nearly the full facade height near its ends.",
+      "Two stacked glass-block panels sit to the photo-right of the entrance; their area is distinct from the neighboring ordinary window bays."
+    ],
+    "estimated": [
+      "The existing hip-roof shape is illustrative and is not confirmed by the ground-level view.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof.",
+      "Front louver-strip widths, spacing and blade pitch are estimated from the photograph; they are not repeated on unobserved elevations.",
+      "Glass-block panel sizes, adjacent bay gaps and lettering stand-off remain estimates; the special panels are confined to the observed front."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 865,
+    "nativePatterns": 79
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 25636,
+    "objSha256": "6fc1e49db03d2e5dca35a01352906c2be3eb87c9108bbff980b834ce4d159b48",
+    "documentSha256": "e9a88e0c8d79704f9761b23a87dfe89ac78c417a2af84a38393ca9fb3fbfa307",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 15570.299999999814,
+      "glbConversionErrorMetres": 6.02225107115828e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "e9a88e0c8d79704f9761b23a87dfe89ac78c417a2af84a38393ca9fb3fbfa307"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

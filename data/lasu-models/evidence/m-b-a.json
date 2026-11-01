@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:75",
+  "name": "M.B.A",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "c039b23ed5f537685121c8b79f5b4630417b3aae8c376ba5a39ed51ddd834d93",
+    "preservedAppearanceSha256": "3077815945daa9130c44f585e185def6373c9bc9dc47f4caab9afcd96726ae67",
+    "mappedHeightMetres": 7,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Yellow walls, red-brown framing and a recessed entrance.",
+    "gaps": [
+      "Trees obscure the roof and some windows; unseen elevations remain estimates."
+    ]
+  },
+  "references": [
+    {
+      "id": "commons:113564415",
+      "caption": "MBA complex exterior",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+      "author": "Abiolakintrunde",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2021-12-22",
+      "historical": true,
+      "sha256": "a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7",
+      "assetUrl": "/packages/photos/a4c7519cf541e8bafad67511e259ac7dec778aad05de8c7e0ecc0c6fe4a053c7.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:75",
+        "photoId": "commons:113564415",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg",
+        "checkedAt": "2026-11-01T02:24:04.261Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "date": "2021-12-22"
+        },
+        "verifiedMetadata": {
+          "author": "Abiolakintrunde",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2021-12-22",
+          "description": "Master of Business administration complex (MBA, Lasu Ojo.",
+          "categories": [
+            "Category:Business schools",
+            "Category:CC-BY-SA-4.0",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:Lasu_master_of_Business_Administration_complex.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    },
+    {
+      "id": "commons:116026424",
+      "caption": "MBA complex courtyard approach",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0007.jpg",
+      "author": "Ajokeoba",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "capturedAt": "2022-03-13",
+      "historical": true,
+      "sha256": "5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9",
+      "assetUrl": "/packages/photos/5b77e7cdade54c395397ccf5d2c1731018c7bd5adcadd10c108172f887a5fdb9.webp",
+      "disposition": "verify-commons-metadata",
+      "audit": {
+        "buildingId": "arcgis:University_Property:75",
+        "photoId": "commons:116026424",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0007.jpg",
+        "checkedAt": "2026-11-01T02:24:04.262Z",
+        "status": "reuse-verified",
+        "permittedUses": [
+          "observational reference",
+          "redistributed reference with attribution",
+          "texture derivative under source licence"
+        ],
+        "publishedMetadata": {
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "date": "2022-03-13"
+        },
+        "verifiedMetadata": {
+          "author": "Ajokeoba",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "date": "2022-03-13",
+          "description": "This hall is located in Lagos state university",
+          "categories": [
+            "Category:CC-BY-SA-4.0",
+            "Category:Files that likely originated from WhatsApp with bad file names",
+            "Category:Lagos State University",
+            "Category:Self-published work"
+          ],
+          "canonicalUrl": "https://commons.wikimedia.org/wiki/File:IMG-20220313-WA0007.jpg"
+        },
+        "temporalUse": "Dated historical evidence; does not establish the present appearance. Check the image before treating it as construction-era evidence."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.2002337142857145,
+      6.4685895
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -13182.699721325127,
+        -20815.719019723365,
+        0
+      ],
+      "max": [
+        30979.028667343217,
+        20170.78755433798,
+        7000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      4
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow walls, red-brown framing and a recessed entrance."
+    ],
+    "estimated": [
+      "Trees obscure the roof and some windows; unseen elevations remain estimates.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 809,
+    "nativePatterns": 70
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 10504,
+    "objSha256": "86e33839e02cb21d2ce60f7fd50fff143553bcc2fff592d4a9f55d83985763c6",
+    "documentSha256": "8ea04f31ad6f0d570bca8bfb377d9f2cce9e14a394cf2dca5fa1c62e1552b92a",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 19197.200000001118,
+      "glbConversionErrorMetres": 5.319268083781026e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "8ea04f31ad6f0d570bca8bfb377d9f2cce9e14a394cf2dca5fa1c62e1552b92a"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}

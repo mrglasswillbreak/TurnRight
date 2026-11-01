@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "campus": "lasu",
+  "buildingId": "arcgis:University_Property:25",
+  "name": "Faculty of Art Language Lab",
+  "status": "model-awaiting-fidelity-and-integration-review",
+  "baseline": {
+    "release": "lasu-41ec73876464",
+    "sourceUrl": "https://turnright.vercel.app/packages/lasu-41ec73876464/manifest.json",
+    "campusSha256": "7aa0ac99e4141394acce1652eed260fe604618b66f20dad027728b03c9f556d1",
+    "confirmation": {
+      "date": "2026-11-01",
+      "statement": "The published release is current",
+      "source": "User confirmation in this chat"
+    },
+    "footprintSha256": "4eae467f312d6b705f002e6efcd2079d01957c082d9d96173c9d6453acc963b4",
+    "preservedAppearanceSha256": "1ab6e3fc21c5709410c1c8112c74c86872cebbf2195a63a382ab7904fae0bb74",
+    "mappedHeightMetres": 6,
+    "mappedFloors": 2,
+    "roofForm": "flat"
+  },
+  "observations": {
+    "visibleFloors": 2,
+    "observed": "Yellow walls, red pitched roof, rounded end and recessed central entrance.",
+    "gaps": [
+      "The existing custom roof needs comparison against the observed roof before replacement."
+    ]
+  },
+  "references": [
+    {
+      "id": "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf",
+      "caption": "Faculty of Art Language Lab",
+      "sourceUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+      "author": "The Intellectual",
+      "license": "Public domain",
+      "licenseUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+      "capturedAt": null,
+      "historical": false,
+      "sha256": "103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7",
+      "assetUrl": "/packages/photos/103c22d02dd70b94b5073c8775caf14dab70354714b44a124e72c7975a9302c7.webp",
+      "disposition": "observation-only-pending-rights",
+      "audit": {
+        "buildingId": "arcgis:University_Property:25",
+        "photoId": "owner:120ff88a-b28c-45b9-95d4-4d1ada0c6faf",
+        "sourceUrl": "https://theintellectualmag.com/excitement-as-lasu-begins-new-phase/",
+        "checkedAt": "2026-11-01T02:24:04.228Z",
+        "status": "observation-only",
+        "permittedUses": [
+          "private observational reference"
+        ],
+        "publishedMetadata": {
+          "author": "The Intellectual",
+          "license": "Public domain",
+          "date": null
+        },
+        "rightsGap": "Public accessibility and a legacy Public domain tag do not establish permission for redistribution or photographic textures."
+      }
+    }
+  ],
+  "reconstruction": {
+    "units": "mm",
+    "up": "z",
+    "geographicAnchor": [
+      3.202673864705883,
+      6.463973623529411
+    ],
+    "geographicAxes": "X east, Y north; no additional yaw. Footprint vertices are transformed into this local frame.",
+    "boundsMillimetres": {
+      "min": [
+        -11044.919937875064,
+        -21485.50585589732,
+        0
+      ],
+      "max": [
+        16853.349353141824,
+        17721.879434475097,
+        6000
+      ]
+    },
+    "frontPartAndEdge": [
+      0,
+      0
+    ],
+    "frontOrientationStatus": "Estimated from existing associations; not surveyed.",
+    "observed": [
+      "Yellow walls, red pitched roof, rounded end and recessed central entrance."
+    ],
+    "estimated": [
+      "The existing custom roof needs comparison against the observed roof before replacement.",
+      "Facade assignment, heights, module spacing and unseen elevations are estimates. Footprint and routing remain those of the current published release.",
+      "The existing approximate roof ridge layout is retained as SolidCraft panels and raised to sit above the model wall height; it is not a measured roof."
+    ],
+    "sourceSettings": "data/lasu-models/recipes.json",
+    "componentCount": 528,
+    "nativePatterns": 113
+  },
+  "verification": {
+    "conversionErrorMetres": 1.8189894035458565e-15,
+    "conversionMeaning": "Export/import tolerance only, not survey accuracy.",
+    "triangles": 17254,
+    "objSha256": "1413e59762a7b27d56a7fe9f141e8e9d3675056097e88d5c429ef9e6e973d29e",
+    "documentSha256": "e20778199993d20b09fe7c320fb7c36a2e4c894dd7ec341815f7541605b4f1fd",
+    "finishing": [
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "07632cdea6701198a658e87fdcd62e1ab9b906845a3c46d12150e93dc27de7c5"
+      },
+      {
+        "kind": "original-material",
+        "details": "Deterministic subtle mineral surface microtexture; no photograph or claimed weathering.",
+        "imageSha256": "6a82d67df815ac22f701de166d4f981e642482f892b6db9ce0b5ae2600142892"
+      }
+    ],
+    "rendering": {
+      "elapsedMs": 19059.400000000373,
+      "glbConversionErrorMetres": 6.594275454574472e-7,
+      "embeddedTextures": 2,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "renderer": "Chromium SwiftShader; not a physical-device benchmark",
+      "sourceDocumentSha256": "e20778199993d20b09fe7c320fb7c36a2e4c894dd7ec341815f7541605b4f1fd"
+    }
+  },
+  "acceptance": {
+    "artifactsMatchCurrentMaster": true,
+    "architecturalFidelity": "Pending independent comparison review.",
+    "publication": "Not approved or published.",
+    "physicalDevice": "Not measured."
+  }
+}
