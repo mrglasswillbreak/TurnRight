@@ -1322,5 +1322,211 @@
         }
       }
     }
-  ]
+  ],
+  "publicationPreflight": {
+    "recordedAt": "2026-11-01T10:33:52.886Z",
+    "actualPackageDryRun": {
+      "at": "2026-11-01T10:17:14.906Z",
+      "passed": true,
+      "scope": "Exact visual builder and byte-identical package writer in isolated output; baseline layer defaults reconstructed; private storage mocked; no remote writes, no prebuilt base geometry reused",
+      "base": {
+        "geometryBytes": 10788557,
+        "textureBytes": 48320,
+        "sceneryBytes": 1080,
+        "totalBytes": 10837957,
+        "limit": 12582912,
+        "sectors": 42,
+        "buildings": 614
+      },
+      "models": 20,
+      "levelsPerModel": 3,
+      "version": "lasu-0226a3e76bd0",
+      "bytes": 44849096,
+      "assets": 215,
+      "coreBytes": 4590781,
+      "detailBytes": 21559764,
+      "detailAssets": 68,
+      "photoBytes": 5975860,
+      "photoAssets": 43,
+      "hashSumVerified": true,
+      "eachUrlOnce": true,
+      "all20ModelsThreeLevels": true,
+      "protectedNavigationGeometryPhotosUnchangedAgainstControl": true,
+      "footprintGeometryHash": "b218c79e4818bf49f4b62042d94c9c52bba101d9758a5fd7be87a9aa0a905e6f",
+      "baselineFootprintGeometryHash": "b218c79e4818bf49f4b62042d94c9c52bba101d9758a5fd7be87a9aa0a905e6f",
+      "detailGeometryComparison": {
+        "models": 20,
+        "against": "Current per-building detail-descriptor.json files",
+        "results": [
+          {
+            "id": "arcgis:University_Property:103",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:120",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:2",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:22",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:25",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:28",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:3",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:31",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:32",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:33",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:39",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:43",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:44",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:47",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:54",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:55",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:73",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:75",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:76",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          },
+          {
+            "id": "arcgis:University_Property:78",
+            "originIdentical": true,
+            "boundsIdentical": true,
+            "allLevelTrianglesIdentical": true
+          }
+        ]
+      },
+      "builderElapsedMs": 106322.5475,
+      "workerTimeoutMs": 120000,
+      "receipt": "verification/publication-package-2026-11-01-attempt1/receipt.json",
+      "note": "The first local loader invocation failed before building because Windows required a file URL; the corrected invocation passed. This is a dry run, not a published version."
+    },
+    "normalBuild": {
+      "at": "2026-11-01T10:29:36.270976+00:00",
+      "revision": "7f6225c691ad1d7e88501c3f72d22ec1d55fd34d",
+      "node": "22.23.3",
+      "normalCheckPassed": true,
+      "normalProductionBuildPassed": true,
+      "fixtureInputs": false,
+      "preservation": {
+        "at": "2026-11-01T10:29:06.899Z",
+        "origin": "https://turnright.vercel.app",
+        "assetsVerified": 236,
+        "uniqueAssetsVerified": 216,
+        "campuses": [
+          {
+            "slug": "lasu",
+            "version": "lasu-41ec73876464",
+            "assets": 147
+          },
+          {
+            "slug": "unilag",
+            "version": "unilag-b7655a90045c",
+            "assets": 89
+          }
+        ],
+        "publishedCatalogueAndManifestsUnchanged": true,
+        "buildAssetHashesVerified": true
+      },
+      "originalPublicFileTreeVerified": true,
+      "receipt": "verification/production-check-build-2026-11-01-final/receipt.json"
+    },
+    "livePreparation": {
+      "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41296700684",
+      "revision": "8d9a618e1e321e271e48d708e43240bc3fe9bcdb",
+      "status": "passed",
+      "operation": "prepare",
+      "baseline": "lasu-41ec73876464",
+      "models": 20,
+      "archiveSha256": "775892ae62dc5a8ff857d7439108873a3794241b2f0850be87f23e77ae2e84fd",
+      "releaseAssetId": "697954048",
+      "originalOwnerOverrideExplicit": true,
+      "noRemoteWrites": true,
+      "note": "The pinned archive and live workspace passed read-only preparation. Owner identity, private model asset IDs and full workspace receipts remain private. No model apply or map publication is asserted."
+    }
+  }
 }
