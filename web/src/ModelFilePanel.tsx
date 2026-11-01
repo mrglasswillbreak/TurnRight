@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, Upload, X, Check } from 'lucide-react';
 import { ModelButton } from './ModelButton';
+import { ModelRenderPanel } from './ModelRenderPanel';
 import { modelFileTask } from './model-file-client';
 import { placeImportedModel } from './model-import-placement';
 import { modelFileZip } from './model-file-zip';
@@ -368,6 +369,7 @@ export default function ModelFilePanel({
           </a>
         )}
       </fieldset>
+      <ModelRenderPanel document={document} native={native} />
       {busy && (
         <ModelButton icon={<X />} onClick={() => task.current?.abort()}>
           Cancel file operation
