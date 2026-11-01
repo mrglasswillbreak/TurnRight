@@ -1,0 +1,55 @@
+{
+  "capturedDate": "2026-11-01",
+  "scope": "Model finishing and export controls; two captures, not a replacement for the complete historical tour",
+  "browser": "Chromium 153.0.8010.12",
+  "applicationRevision": "2ce656d126e1c88cf3a6eb75dde07ae73d568ec2",
+  "sourceSnapshot": "e94dbaaf2017f9e5fce4649f8a82f1238cd321bcf26a5053a5f0d8218ebb26f3",
+  "driver": "web/tests/browser/editor-model-detail.spec.ts",
+  "driverSha256": "01bf1f54307efc6b9c8840a87c73bce85a451a20798b42227551325c184144c8",
+  "workingTreeChanges": "Artifact-template validation and a taller capture viewport with a non-default crop assertion. Application runtime matches the cited base revision.",
+  "validation": {
+    "testsPassed": 1,
+    "durationSeconds": 60,
+    "previewCancel": true,
+    "nonDefaultCropEvidence": true,
+    "undoRedo": true,
+    "glbExport": true,
+    "pngDecodedDimensions": [
+      1024,
+      768
+    ],
+    "staleDownloadInvalidation": true,
+    "physicalDevice": false
+  },
+  "fixture": "Isolated browserCampus owner API responses and synthetic Library box. One selected triangular mesh face receives the attributed School of Communication photograph; this is a tool demonstration, not a LASU building reconstruction.",
+  "photo": {
+    "id": "commons:112540966",
+    "author": "Abiolakintrunde",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lagos_state_university_school_of_communication.jpg",
+    "modifications": "Displayed in the application and rectified onto one synthetic triangle with top-left X=0.1; screenshots copied unchanged."
+  },
+  "captures": [
+    {
+      "file": "tour-mesh-photo-preview-2026-11-01.png",
+      "view": "Selected-face crop with preview, Apply texture and Cancel texture visible",
+      "capturedAt": "2026-11-01T08:33:29.583Z",
+      "width": 1440,
+      "height": 1200,
+      "sha256": "1062e47ae9b13666483e09c3d4252d72c326431105f7ed902889a4acff66011f",
+      "theme": "light",
+      "fixture": "Isolated browserCampus owner API responses and synthetic Library box. One selected triangular mesh face receives the attributed School of Communication photograph; this is a tool demonstration, not a LASU building reconstruction."
+    },
+    {
+      "file": "tour-building-render-export-2026-11-01.png",
+      "view": "Prepared GLB and PNG downloads in the building editor",
+      "capturedAt": "2026-11-01T08:33:52.649Z",
+      "width": 1440,
+      "height": 1200,
+      "sha256": "65ac19f63bbfd095eb40c9c46fb7cd521c888ade9d1c1727fe6e0e49f3ce003d",
+      "theme": "light",
+      "fixture": "Isolated browserCampus owner API responses and synthetic Library box. One selected triangular mesh face receives the attributed School of Communication photograph; this is a tool demonstration, not a LASU building reconstruction."
+    }
+  ]
+}
