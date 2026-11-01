@@ -46,6 +46,43 @@ Use **Prepare reviewed campus layer release** (`campus-layer-release.yml`) with
    publish that exact preview through the normal publication action. This helper
    never prepares a public release, promotes a deployment or bypasses CI gates.
 
+When the signed-in editor is unavailable, **Request reviewed LASU model
+publication** (`campus-publication-request.yml`) invokes the same publication
+action from `main`. Use `review_id` and `expected_review_hash` from the successful
+apply receipt, never a newly derived workspace hash. `operation=prepare` also
+requires a 5–500 character `summary`; `operation=inspect` performs no remote
+writes and optionally accepts `release_id` to report progress. The wrapper reads
+the actual original owner, checks current LASU capabilities, the approved hash,
+the complete workspace hash and all 20 immutable reviewed model references.
+Verify the resulting preview with `campus-detail-verification.yml`, using its
+release ID, `campus_id=lasu`, `scope=all` and no application deployment input.
+For this 20-model campaign, also pass `expected_model_ids` as a JSON array of
+building IDs from the successful apply receipt's `changes`, not from the candidate
+package being checked. The verifier requires that exact set, then reopens and
+performs renderer hit tests on every detailed model offline in Chromium and
+WebKit, saving screenshots and the verification report. Omitting this input is
+only appropriate for compatible-reader or legacy-package checks.
+
+After accepting that report, request `operation=publish` with the same review
+and release IDs/hash, plus its exact `expected_version` and canonical
+`expected_deployment_id`. The release must still be that ready preview with the
+same model references. Normal catalogue, approval, CI and publication guards
+remain in force. Inspect the private `lasu-publication-request` artifact after
+each request; an uncertain dispatch must be inspected before retrying. A
+confirmed dispatch is not a completed publication. The job uses the existing
+Supabase secrets and a step-scoped GitHub token with job-level `actions: write`;
+workflow inputs arrive through the event-file CLI argument, with no new secret
+or application environment setting.
+
+Release timing remains bounded: base visual compilation has a two-minute limit;
+validated buildings with structural, facade or fine detail receive five minutes.
+The complete 614-building/20-detailed-model local compilation measured 106.3
+seconds, leaving only 13.7 seconds under the preceding two-minute limit; that is
+a local measurement, not a hosted-runner benchmark. The release job allows 25
+minutes for installation, tests, private asset hydration, compilation, uploads
+and deployment. Vercel's nine-minute deployment wait, the 25-minute publication
+lease, the 12 MiB base-visual limit and editable-document bounds are unchanged.
+
 The model review mark represents review of the pinned proposed source, including
 its estimates. The three identification holds and four further evidence gaps
 remain excluded. Native masters are in millimetres with Z up; imported editable

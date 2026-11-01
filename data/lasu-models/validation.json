@@ -1324,7 +1324,24 @@
     }
   ],
   "publicationPreflight": {
-    "recordedAt": "2026-11-01T10:33:52.886Z",
+    "recordedAt": "2026-11-01T10:37:31.668Z",
+    "deployedApplicationPreview": {
+      "checkedAt": "2026-11-01T10:35:04.149Z",
+      "deploymentId": "dpl_Dy8gjQibyYBmrSEXa6XHVaHZToDq",
+      "origin": "https://turnright-5insfhh3j-muhammed-abdulhadi-s-projects.vercel.app",
+      "revision": "7f6225c691ad1d7e88501c3f72d22ec1d55fd34d",
+      "verifierRevision": "7f6225c691ad1d7e88501c3f72d22ec1d55fd34d",
+      "anonymousAdmin": 401,
+      "health": "ok",
+      "publishedPackagesPreserved": true,
+      "campusPublicationPerformed": false,
+      "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41297192566",
+      "status": "passed",
+      "views": 32,
+      "offlineChecks": 4,
+      "receipt": "verification/preview-7f6225c-41297192566/campus-detail-verification/application-preview.json",
+      "scope": "Compatible application preview retaining the existing public packages; this is not verification of a newly published 20-model campus."
+    },
     "actualPackageDryRun": {
       "at": "2026-11-01T10:17:14.906Z",
       "passed": true,
