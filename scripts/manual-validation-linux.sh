@@ -6,6 +6,10 @@ trap 'exit 130' INT
 cd "$(dirname "$0")/.."
 mode="${1:?Choose a fixed validation gate}"
 test "$(uname -s)" = Linux
+if (( UID == 0 || EUID == 0 )); then
+  printf '%s\n' 'Local validation gates require an ordinary host UID with Docker access.' >&2
+  exit 1
+fi
 
 require_fresh_stack() {
   # Refuse existing TurnRight state, without touching unrelated Docker workloads.
@@ -24,7 +28,15 @@ case "$mode" in
     test "$(gitleaks version)" = 8.30.1
     python3 -m venv .local-runtime/manual-python
     .local-runtime/manual-python/bin/python -m pip install --require-hashes -r scripts/requirements-quality.lock -r scripts/requirements-test.lock -r scripts/requirements-data.lock
-    npm exec -- playwright install --with-deps chromium webkit
+    npm exec -- playwright install chromium webkit
+    node --input-type=module <<'NODE'
+import { chromium, webkit } from '@playwright/test';
+for (const type of [chromium, webkit]) {
+  const browser = await type.launch();
+  await browser.close();
+  console.log(`${type.name()} startup passed.`);
+}
+NODE
     ;;
   bounded-import|native-postgis)
     database=turnright_gis_test

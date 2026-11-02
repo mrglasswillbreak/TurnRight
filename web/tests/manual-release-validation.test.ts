@@ -1,6 +1,7 @@
 import { expect, it, vi } from 'vitest';
 import path from 'node:path';
 import {
+  assertManualValidationHost,
   assertManualValidationReceipt,
   manualValidationArguments,
   runManualValidation,
@@ -44,6 +45,34 @@ function harness() {
   };
   return { dependencies, receipts };
 }
+
+it('accepts an ordinary Linux host UID for native worker ownership checks', () => {
+  expect(() => assertManualValidationHost('linux', 1000, 1000)).not.toThrow();
+});
+
+it.each([
+  [0, 0],
+  [0, 1000],
+  [1000, 0],
+  [undefined, 1000],
+  [1000, undefined],
+])(
+  'rejects root or unavailable host identities (%s, %s)',
+  (uid, effectiveUid) => {
+    expect(() =>
+      assertManualValidationHost('linux', uid, effectiveUid),
+    ).toThrow('ordinary host UID');
+  },
+);
+
+it.each(['win32', 'darwin'])(
+  'rejects unsupported validation hosts even with an ordinary UID: %s',
+  (platform) => {
+    expect(() => assertManualValidationHost(platform, 1000, 1000)).toThrow(
+      'Linux/WSL2',
+    );
+  },
+);
 
 it('executes every fixed gate sequentially and saves pending evidence before execution', async () => {
   const { dependencies, receipts } = harness();

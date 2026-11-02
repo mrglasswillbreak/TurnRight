@@ -184,6 +184,19 @@ export function manualValidationArguments(args) {
   return { expectedCommit: args[1], output: path.resolve(args[3]) };
 }
 
+export function assertManualValidationHost(platform, uid, effectiveUid) {
+  if (platform !== 'linux')
+    throw Error('Local release validation requires Linux/WSL2.');
+  if (
+    [uid, effectiveUid].some(
+      (value) => !Number.isSafeInteger(value) || value <= 0,
+    )
+  )
+    throw Error(
+      'Local release validation requires an ordinary host UID with Docker access.',
+    );
+}
+
 const git = (...args) =>
   execFileSync('git', args, {
     cwd: root,
@@ -308,8 +321,11 @@ async function executeGate(gate, output, environment) {
 }
 
 async function main() {
-  if (process.platform !== 'linux')
-    throw Error('Local release validation requires Linux/WSL2.');
+  assertManualValidationHost(
+    process.platform,
+    process.getuid?.(),
+    process.geteuid?.(),
+  );
   const { expectedCommit, output } = manualValidationArguments(
     process.argv.slice(2),
   );
