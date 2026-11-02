@@ -49,7 +49,7 @@ NODE
     container_created=false
     scratch="$(mktemp -d)"
     cleanup() {
-      if [[ "$container_created" = true ]]; then docker rm -f "$container" >/dev/null; fi
+      if [[ "$container_created" = true ]]; then docker rm -f -v "$container" >/dev/null; fi
       rm -f "$scratch/gis-backup.dump"
       rmdir "$scratch"
     }
