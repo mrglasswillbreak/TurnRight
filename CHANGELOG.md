@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow 180 seconds for the complete offline roof recovery journey after a recorded whole-test timeout during input confirmation. Preserve both chronological offline reloads, all functional assertions and helper limits.
+- Use the existing 30-second place-panel readiness check before initial and offline-reload arrival photo assertions. A later DOM snapshot in the failure trace showed the panel and photograph 11.543 seconds after the image assertion began; retain all functional assertions and the 90-second whole-test limit.
 - Separate slate-map scale checks by renderer and retain a dedicated renderer/theme continuity journey, all nine named views and the 210-second whole-test limit. Allow 30 seconds for camera-change map readiness while preserving theme assertion deadlines.
 - Separate photographic projection/cancellation from model exports, retaining the restored-image undo/redo path through GLB and PNG generation. Allow 30 seconds for the GLB download after lazy worker startup and retain each journey's whole-test limit.
 - Wait up to 30 seconds for the unified model fixture's lazy editor dialog before running its unchanged controls and functional assertions.
