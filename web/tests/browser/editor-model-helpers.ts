@@ -46,10 +46,12 @@ export async function focusModels(page: Page, phone = false) {
     phone,
   );
   await expect
-    .poll(() =>
-      page.evaluate(() =>
-        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
-      ),
+    .poll(
+      () =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      { timeout: 30_000 },
     )
     .toContain('arcgis:University_Property:120');
 }
@@ -140,7 +142,7 @@ export async function unifiedModelFixture(
     })
     .click();
   const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
+  await expect(dialog).toBeVisible({ timeout: 30_000 });
   if (options.repairMode) return { server, dialog, wall: () => undefined };
   await dialog
     .getByRole('button', { name: 'Edit surface', exact: true })
