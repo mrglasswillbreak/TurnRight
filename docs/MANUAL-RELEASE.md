@@ -4,13 +4,15 @@ This operator path supports the authorized LASU release while GitHub Actions can
 
 ## Local validation
 
-Use an isolated, full-history Linux checkout with the pinned Node/npm versions, Python 3.12, Docker and gitleaks 8.30.1. Run as an ordinary Linux user with Docker access and a user-owned checkout, private HOME and receipt directory; real and effective root UIDs are rejected before validation creates output. This preserves the native workers' bind-mount ownership and cleanup checks. Keep private receipts outside the source checkout. The validator rejects cloud credentials, test filters, stale coverage, synthetic service state and frozen release markers.
+Use an isolated, full-history Linux checkout with the pinned Node/npm versions, Python 3.12, Docker and gitleaks 8.30.1. Run as an ordinary Linux user with Docker access and a user-owned checkout, private HOME and receipt directory; real and effective root UIDs are rejected before validation creates output. This preserves the native workers' bind-mount ownership and cleanup checks. Give tracked code files normal checkout modes: `0644` for files and `0755` for directories and executable files, so containers with dropped capabilities can read their bind mounts. Apply these modes only to tracked code; keep the surrounding private run, HOME and receipt directories at `0700` and secret files private. Keep private receipts outside the source checkout. The validator rejects cloud credentials, test filters, stale coverage, synthetic service state and frozen release markers.
 
 Provision Chromium and WebKit system libraries with administrator access before validation, using `npm exec -- playwright install-deps chromium webkit` from a checkout installed with the pinned lockfile. The recorded setup gate installs the matching browser binaries without elevating privileges, then launches and closes both browsers to detect missing libraries before the test suites. All 24 gates and coverage thresholds remain required.
 
     npm run release:manual:validate -- --expected-commit FULL_COMMIT_SHA --output /absolute/new/private/validation
 
 The fixed gates cover quality, application coverage, Chromium/WebKit, offline behavior, native database restoration, GIS/import workers, the complete local stack, security and the production build. Coverage retains the 80% statements/lines/functions and 70% branches floors. Each receipt binds the commit, tree, tracked-source and dependency hashes, coverage snapshot, gate policy, commands, results and log hashes. Failed or interrupted evidence cannot authorize publication.
+
+The two disposable PostGIS gates explicitly remove their anonymous database volumes with their containers after each run. Cleanup remains scoped to the test container successfully created by that gate.
 
 Unit tests run before browser-component tests, and the complete coverage gate has a 90-minute outer limit. Embedded database setup has a shared 180-second allowance for WebAssembly startup and migration loading under coverage. The full-size compaction case allows 15 seconds; hydrated-publication and 100,000-feature archive cases allow 30 seconds each. All fixture sizes and assertions still run, with the existing SQL deadlines and coverage thresholds. Partial diagnostic runs cannot replace the complete validation receipt.
 

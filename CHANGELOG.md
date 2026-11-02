@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove anonymous database volumes when explicitly cleaning up disposable native-acceptance PostGIS containers.
 - Allow 180 seconds for the complete offline roof recovery journey after a recorded whole-test timeout during input confirmation. Preserve both chronological offline reloads, all functional assertions and helper limits.
 - Use the existing 30-second place-panel readiness check before initial and offline-reload arrival photo assertions. A later DOM snapshot in the failure trace showed the panel and photograph 11.543 seconds after the image assertion began; retain all functional assertions and the 90-second whole-test limit.
 - Separate slate-map scale checks by renderer and retain a dedicated renderer/theme continuity journey, all nine named views and the 210-second whole-test limit. Allow 30 seconds for camera-change map readiness while preserving theme assertion deadlines.
