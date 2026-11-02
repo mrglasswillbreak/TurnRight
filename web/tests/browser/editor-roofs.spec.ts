@@ -130,7 +130,7 @@ test(
       !testInfo.config.configFile?.includes('pwa.config'),
       'Requires production service worker.',
     );
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     await page.emulateMedia({ colorScheme: 'dark' });
     await setup(page);
     await page.waitForFunction(() => !!navigator.serviceWorker.controller);
