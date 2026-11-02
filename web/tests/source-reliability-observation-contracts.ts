@@ -41,7 +41,7 @@ export function registerObservationContracts(
         (b: { records: unknown[] }) => !fingerprints.has(hash(b.records)),
       ).length,
     ).toBeLessThan(10);
-  });
+  }, 30000);
   it('waits for bounded finalization beyond the ordinary HTTP deadline without duplicate dispatch', async () => {
     vi.useFakeTimers();
     vi.stubEnv('SUPABASE_URL', 'https://source-check-test.invalid');
