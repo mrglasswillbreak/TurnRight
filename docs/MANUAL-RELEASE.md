@@ -12,6 +12,8 @@ The fixed gates cover quality, application coverage, Chromium/WebKit, offline be
 
 Unit tests run before browser-component tests, and the complete coverage gate has a 90-minute outer limit. Embedded database setup has a shared 180-second allowance for WebAssembly startup and migration loading under coverage. The full-size compaction case allows 15 seconds; hydrated-publication and 100,000-feature archive cases allow 30 seconds each. All fixture sizes and assertions still run, with the existing SQL deadlines and coverage thresholds. Partial diagnostic runs cannot replace the complete validation receipt.
 
+Arrival browser journeys wait up to 30 seconds for the lazy place panel after each full navigation, then retain the ordinary image, entrance and route assertions. The campus-load error journey waits up to 30 seconds for its mocked 503 response before checking the error UI. The multi-viewport import journey has a 180-second whole-test limit under Chromium coverage and retains 120 seconds otherwise; its seven viewports, two zoom levels and assertions are unchanged. Global assertion timeouts remain unchanged.
+
 The committed-fixture build is followed by a separate real-public-package preservation check before deployment. Do not substitute previous hosted results or partially downloaded artifacts for complete current validation.
 
 ## Explicit operator commands

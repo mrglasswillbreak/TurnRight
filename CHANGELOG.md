@@ -5,6 +5,7 @@
 - Add an explicit one-off local LASU release operator with complete local validation, pinned recovery evidence, guarded scheduling and run-specific temporary access cleanup. Default Actions dispatch and public package formats remain unchanged.
 - Run unit and browser-component coverage in separate ordered groups, retaining every assertion and coverage threshold while giving the complete local gate a bounded 90-minute window.
 - Allow up to 180 seconds for embedded database setup and explicit 15/30-second limits for three large-data cases under coverage; preserve their complete fixtures and assertions.
+- Wait for lazy place-panel and mocked campus-response readiness in browser journeys, and bound the multi-viewport import journey at 180 seconds under coverage while retaining every viewport and assertion.
 - Reconcile saved model batches against their verified backup and exact GIS dataset revision increments. Continue an interrupted original-owner review through pinned receipts and the existing review API without uploading or saving models again.
 - Add selected-face photographic texture projection, four-corner crop preview, source evidence and undo to imported meshes. Export textured GLB files and seven high-resolution exterior views.
 - Compile structural, facade and fine-detail geometry into three immutable map variants. Stream visible models with selection priority, cancellation, verified shared textures and bounded geometry/texture residency.

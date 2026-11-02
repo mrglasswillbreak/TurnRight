@@ -112,11 +112,12 @@ for (const width of [1440, 390])
     await page.setViewportSize({ width, height: 900 });
     await prepare(page);
     await page.goto('/?place=library&entrance=door-c');
-    await expect(
-      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-    ).toBeVisible();
+    // Full navigations mount the lazy place panel after the document loads.
     await expect(
       page.getByRole('group', { name: 'Place actions' }),
+    ).toBeVisible({ timeout: 30000 });
+    await expect(
+      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
     ).toBeVisible();
     expect(
       await page.locator('.place-detail').evaluate((el) => {
@@ -168,6 +169,9 @@ for (const width of [1440, 390])
       page.getByRole('heading', { name: 'Library courtyard entrance' }),
     ).toHaveCount(0);
     await page.goto('/?place=library&entrance=missing');
+    await expect(
+      page.getByRole('group', { name: 'Place actions' }),
+    ).toBeVisible({ timeout: 30000 });
     await expect(
       page.getByText('The selected entrance is no longer available.', {
         exact: false,

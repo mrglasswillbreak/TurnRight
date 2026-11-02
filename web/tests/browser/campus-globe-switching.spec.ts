@@ -363,7 +363,18 @@ test('campus globe failed and superseded loads keep the last successful selectio
   await page.route('**/packages/globe-north/campus.json', (r) =>
     r.fulfill({ status: 503 }),
   );
-  await choose(page, 'north campus');
+  // Local package checks precede the request whose error UI we exercise.
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname ===
+          '/packages/globe-north/campus.json' &&
+        response.request().method() === 'GET' &&
+        response.status() === 503,
+      { timeout: 30000 },
+    ),
+    choose(page, 'north campus'),
+  ]);
   await expect(page.getByText(/Could not open north campus/)).toBeVisible();
   await selected(page, 'lasu');
   await page.unroute('**/packages/globe-north/campus.json');

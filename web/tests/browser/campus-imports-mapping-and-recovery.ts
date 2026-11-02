@@ -201,7 +201,7 @@ export function registerMappingAndRecovery(
   test('campus imports responsive screens and documentation captures', async ({
     page,
   }) => {
-    test.setTimeout(120000);
+    test.setTimeout(process.env.TURNRIGHT_COVERAGE === '1' ? 180000 : 120000);
     await fixture().setup(page, { photo: true });
     await fixture().workspace(page);
     const capture = async (name: string) => {
