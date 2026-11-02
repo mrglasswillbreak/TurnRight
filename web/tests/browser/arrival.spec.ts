@@ -201,6 +201,9 @@ for (const schema of [1, 3] as const)
       await prepare(page, schema);
       await page.goto('/?place=library&entrance=door-c');
       await expect(
+        page.getByRole('group', { name: 'Place actions' }),
+      ).toBeVisible({ timeout: 30000 });
+      await expect(
         page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
       ).toBeVisible();
       await page.getByRole('button', { name: 'Offline', exact: true }).click();
@@ -213,6 +216,9 @@ for (const schema of [1, 3] as const)
       ).toBeVisible();
       await context.setOffline(true);
       await page.reload();
+      await expect(
+        page.getByRole('group', { name: 'Place actions' }),
+      ).toBeVisible({ timeout: 30000 });
       await expect(
         page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
       ).toBeVisible();
