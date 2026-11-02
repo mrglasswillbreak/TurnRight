@@ -2,10 +2,17 @@
 
 ## Unreleased
 
+- Separate slate-map scale checks by renderer and retain a dedicated renderer/theme continuity journey, all nine named views and the 210-second whole-test limit. Allow 30 seconds for camera-change map readiness while preserving theme assertion deadlines.
+- Separate photographic projection/cancellation from model exports, retaining the restored-image undo/redo path through GLB and PNG generation. Allow 30 seconds for the GLB download after lazy worker startup and retain each journey's whole-test limit.
+- Wait up to 30 seconds for the unified model fixture's lazy editor dialog before running its unchanged controls and functional assertions.
+- Allow 30 seconds for enhanced-model readiness after a recorded successful completion beyond the prior deadline; preserve the extrusion-filter predicate, subsequent interactions and whole-test limits.
+- Require an ordinary Linux user for local validation and direct native gates, preserving real host/container ownership checks. Provision browser system libraries separately and verify Chromium/WebKit startup during setup; retain all 24 gates and coverage thresholds.
+- Allow up to 30 seconds for shared editor startup readiness while map initialization completes, preserving explicit startup overrides, feature assertions and whole-test limits.
+- Verify remembered-campus restoration, explicit-link override and unavailable-campus recovery in independent browser journeys, each seeded by an actual successful load. Allow 30 seconds for lazy chooser readiness while preserving URL, preference, error and recovery assertions and the existing whole-test limits.
 - Add an explicit one-off local LASU release operator with complete local validation, pinned recovery evidence, guarded scheduling and run-specific temporary access cleanup. Default Actions dispatch and public package formats remain unchanged.
 - Run unit and browser-component coverage in separate ordered groups, retaining every assertion and coverage threshold while giving the complete local gate a bounded 90-minute window.
 - Allow up to 180 seconds for embedded database setup and explicit 15/30-second limits for three large-data cases under coverage; preserve their complete fixtures and assertions.
-- Wait for lazy place-panel and mocked campus-response readiness in browser journeys, and bound the multi-viewport import journey at 180 seconds under coverage while retaining every viewport and assertion.
+- Wait for lazy place-panel and mocked campus-response readiness in browser journeys. Run the responsive editor import and public campus/Offline capture flows independently, and isolate each public chooser viewport case, retaining every viewport, assertion and capture; keep the editor journey bounded at 180 seconds under coverage.
 - Reconcile saved model batches against their verified backup and exact GIS dataset revision increments. Continue an interrupted original-owner review through pinned receipts and the existing review API without uploading or saving models again.
 - Add selected-face photographic texture projection, four-corner crop preview, source evidence and undo to imported meshes. Export textured GLB files and seven high-resolution exterior views.
 - Compile structural, facade and fine-detail geometry into three immutable map variants. Stream visible models with selection priority, cancellation, verified shared textures and bounded geometry/texture residency.
