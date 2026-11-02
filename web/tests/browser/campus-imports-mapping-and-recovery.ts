@@ -1,5 +1,19 @@
-import { expect, test } from './coverage-fixture';
+import { expect, test, type Page } from './coverage-fixture';
 import type { CampusImportsFixture } from './campus-imports.spec';
+
+async function capture(page: Page, name: string) {
+  if (process.env.TURNRIGHT_REDESIGN_SCREENSHOTS === '1' && name === 'mapping')
+    await page.screenshot({
+      path: (await import('./documentation-capture')).documentationCapturePath(
+        'imports',
+      ),
+    });
+  if (process.env.UPDATE_CAMPUS_SCREENSHOTS === 'true')
+    await page.screenshot({
+      path: `../docs/assets/screenshots/campus-${name}-2026-09-26.png`,
+    });
+}
+
 export function registerMappingAndRecovery(
   fixture: () => CampusImportsFixture,
 ): void {
@@ -204,23 +218,8 @@ export function registerMappingAndRecovery(
     test.setTimeout(process.env.TURNRIGHT_COVERAGE === '1' ? 180000 : 120000);
     await fixture().setup(page, { photo: true });
     await fixture().workspace(page);
-    const capture = async (name: string) => {
-      if (
-        process.env.TURNRIGHT_REDESIGN_SCREENSHOTS === '1' &&
-        name === 'mapping'
-      )
-        await page.screenshot({
-          path: (
-            await import('./documentation-capture')
-          ).documentationCapturePath('imports'),
-        });
-      if (process.env.UPDATE_CAMPUS_SCREENSHOTS === 'true')
-        await page.screenshot({
-          path: `../docs/assets/screenshots/campus-${name}-2026-09-26.png`,
-        });
-    };
     await page.setViewportSize({ width: 1440, height: 900 });
-    await capture('workspace');
+    await capture(page, 'workspace');
     await page.getByRole('button', { name: 'New campus' }).click();
     await page
       .getByLabel('Campus name', { exact: true })
@@ -229,7 +228,7 @@ export function registerMappingAndRecovery(
       .getByLabel('Boundary GeoJSON', { exact: true })
       .fill(JSON.stringify(fixture().boundary));
     await page.locator('.campus-content').evaluate((e) => (e.scrollTop = 0));
-    await capture('creation');
+    await capture(page, 'creation');
     await page.getByRole('button', { name: 'Cancel', exact: true }).click();
     await page
       .getByRole('button', { name: 'Import data', exact: true })
@@ -243,13 +242,13 @@ export function registerMappingAndRecovery(
       .fill(
         'https://services.arcgis.com/example/arcgis/rest/services/Campus/FeatureServer',
       );
-    await capture('sources');
+    await capture(page, 'sources');
     await page
       .getByRole('button', { name: 'Import data', exact: true })
       .click();
     await fixture().fileImport(page);
     await page.locator('.campus-content').evaluate((e) => (e.scrollTop = 0));
-    await capture('mapping');
+    await capture(page, 'mapping');
     await page
       .getByRole('button', { name: 'Build preview', exact: true })
       .click();
@@ -280,7 +279,7 @@ export function registerMappingAndRecovery(
       await expect(
         page.getByRole('button', { name: 'Queue for review', exact: true }),
       ).toBeInViewport();
-      if (size.width === 844) await capture('landscape');
+      if (size.width === 844) await capture(page, 'landscape');
     }
     await page.setViewportSize({ width: 1440, height: 900 });
     for (const zoom of [1.25, 1.5]) {
@@ -300,17 +299,23 @@ export function registerMappingAndRecovery(
     await page
       .getByRole('button', { name: 'Queue for review', exact: true })
       .scrollIntoViewIfNeeded();
-    await capture('review');
+    await capture(page, 'review');
+  });
+  test('campus imports public switcher and offline documentation captures', async ({
+    page,
+  }) => {
+    await fixture().setup(page, { photo: true });
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await page
       .getByRole('button', { name: 'Choose a campus', exact: true })
       .click();
-    await capture('switcher');
+    await capture(page, 'switcher');
     await page.keyboard.press('Escape');
     await page
       .getByRole('button', { name: 'Expand card', exact: true })
       .click();
     await page.getByRole('button', { name: 'Offline', exact: true }).click();
-    await capture('offline');
+    await capture(page, 'offline');
   });
 }
