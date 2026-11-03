@@ -12,7 +12,7 @@ Provision Chromium and WebKit system libraries with administrator access before 
 
 The fixed gates cover quality, application coverage, Chromium/WebKit, offline behavior, native database restoration, GIS/import workers, the complete local stack, security and the production build. Coverage retains the 80% statements/lines/functions and 70% branches floors. Each receipt binds the commit, tree, tracked-source and dependency hashes, coverage snapshot, gate policy, commands, results and log hashes. Failed or interrupted evidence cannot authorize publication.
 
-The two disposable PostGIS gates explicitly remove their anonymous database volumes with their containers after each run. Cleanup remains scoped to the test container successfully created by that gate.
+The two disposable PostGIS gates explicitly remove their anonymous database volumes with their containers after each run. Cleanup remains scoped to the test container successfully created by that gate. Native GIS worker acceptance also runs with `umask 077`, verifying that its newly created job file remains readable by the unprivileged processing container.
 
 Unit tests run before browser-component tests, and the complete coverage gate has a 90-minute outer limit. Embedded database setup has a shared 180-second allowance for WebAssembly startup and migration loading under coverage. The full-size compaction case allows 15 seconds; hydrated-publication and 100,000-feature archive cases allow 30 seconds each. All fixture sizes and assertions still run, with the existing SQL deadlines and coverage thresholds. Partial diagnostic runs cannot replace the complete validation receipt.
 

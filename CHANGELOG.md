@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Preserve GIS job-file readability under restrictive host umasks and exercise the real unprivileged worker with `umask 077`.
 - Remove anonymous database volumes when explicitly cleaning up disposable native-acceptance PostGIS containers.
 - Allow 180 seconds for the complete offline roof recovery journey after a recorded whole-test timeout during input confirmation. Preserve both chronological offline reloads, all functional assertions and helper limits.
 - Use the existing 30-second place-panel readiness check before initial and offline-reload arrival photo assertions. A later DOM snapshot in the failure trace showed the panel and photograph 11.543 seconds after the image assertion began; retain all functional assertions and the 90-second whole-test limit.
