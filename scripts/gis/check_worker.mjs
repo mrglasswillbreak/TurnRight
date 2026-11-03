@@ -90,22 +90,29 @@ const server = createServer(async (request, response) => {
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 try {
-  const executed = await promisify(execFile)(
-    process.execPath,
-    ['scripts/gis-worker.mjs'],
-    {
-      cwd: root,
-      env: {
-        ...process.env,
-        TMPDIR: temporary,
-        CAMPUS_ID: 'fixture',
-        GIS_JOB_ID: id,
-        SUPABASE_URL: 'http://127.0.0.1:' + server.address().port,
-        SUPABASE_SERVICE_ROLE_KEY: 'disposable-test-fixture',
+  const previousUmask = process.umask(0o077);
+  let execution;
+  try {
+    execution = promisify(execFile)(
+      process.execPath,
+      ['scripts/gis-worker.mjs'],
+      {
+        cwd: root,
+        env: {
+          ...process.env,
+          TMPDIR: temporary,
+          CAMPUS_ID: 'fixture',
+          GIS_JOB_ID: id,
+          SUPABASE_URL: 'http://127.0.0.1:' + server.address().port,
+          SUPABASE_SERVICE_ROLE_KEY: 'disposable-test-fixture',
+        },
+        timeout: 120000,
       },
-      timeout: 120000,
-    },
-  );
+    );
+  } finally {
+    process.umask(previousUmask);
+  }
+  const executed = await execution;
   const event = JSON.parse(executed.stdout.trim());
   assert.equal(event.event, 'worker-completed');
   assert.equal(event.worker, 'gis');

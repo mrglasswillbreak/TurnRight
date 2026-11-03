@@ -33,6 +33,7 @@ try {
   await fs.writeFile(path.join(directory, 'job.json'), JSON.stringify(job), {
     mode: 0o644,
   });
+  await fs.chmod(path.join(directory, 'job.json'), 0o644);
   let cancelled = false;
   const stillActive = async () => {
     const [current] = await db(`gis_jobs?id=eq.${id}&select=status,run_token`);
