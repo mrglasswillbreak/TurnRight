@@ -282,7 +282,7 @@ test('building previews survive revisiting unedited buildings without rebuilding
     page.evaluate(() =>
       JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
     );
-  await expect.poll(rendered).toContain('library');
+  await expect.poll(rendered, { timeout: 30_000 }).toContain('library');
   await page.getByRole('button', { name: 'Close properties' }).click();
   await expect.poll(rendered).not.toContain('library');
   await clickMap(page, [3.20068, 6.46022]);

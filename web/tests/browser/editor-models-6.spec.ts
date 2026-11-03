@@ -2,7 +2,11 @@ import { test, expect } from './coverage-fixture';
 import { facadeWalls } from '../../src/building-facades';
 import { browserCampus, setup } from './editor-fixture';
 import { attachMap, clickMap } from './editor-map-helpers';
-import { modelAction, unifiedModelFixture } from './editor-model-helpers';
+import {
+  modelAction,
+  unifiedModelFixture,
+  waitForBuildingHandoffReady,
+} from './editor-model-helpers';
 
 test.afterEach(async ({ context }) => {
   await context.setOffline(false);
@@ -353,6 +357,7 @@ test('public Editor opens the selected building card and consumes the handoff on
     page.getByRole('group', { name: 'Place actions' }),
   ).toBeVisible();
   await link.click();
+  await waitForBuildingHandoffReady(page);
   await expect(
     page.getByRole('button', { name: 'Edit model', exact: true }),
   ).toBeVisible();
@@ -404,6 +409,7 @@ test('public footprint dialog opens its unlinked building in the editor', async 
     '/admin?building=unlinked-library',
   );
   await link.click();
+  await waitForBuildingHandoffReady(page);
   await expect(
     page.getByRole('button', { name: 'Edit model', exact: true }),
   ).toBeVisible();
