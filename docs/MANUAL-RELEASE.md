@@ -28,6 +28,14 @@ The unified model fixture waits up to 30 seconds for its lazy model-editor dialo
 
 The shared model-focus helper waits up to 30 seconds for enhanced models to replace their base extrusions. In one recorded coverage run, the unchanged Senate filter predicate completed successfully at 11.296 seconds, after its previous 10-second deadline. The filter predicate, subsequent picking/drawing/fallback assertions and whole-test limits remain unchanged; this timing does not establish a hardware cause or performance result.
 
+Initial enhanced-model waits in the editor zoom and cached-preview journeys allow 30 seconds for their unchanged rendered-ID predicate. Building-handoff journeys wait up to 30 seconds for the editor control, selected-feature panel and lazy building tools before asserting the handoff result. Later rendering, picking, cache reuse and handoff assertions retain their existing limits; the global assertion timeout is unchanged.
+
+The complete 3D entrance journey and both desktop/phone miniature-model journeys allow 180 seconds. The separate-wings repair/edit/save/two-undo journey and desktop shared-view-settings journey allow 120 seconds. Recorded whole-test deadlines interrupted these multi-step flows; the second undo's correct revert-to-source save completed after its failed test deadline. These diagnostic observations are not passing acceptance results. Every gesture, chronological reload, screenshot, geometry/identity check and functional assertion remains, as do other variants and helper deadlines.
+
+Allow 150 seconds each for roof-proposal recovery, integrated building-appearance recovery and undo, and roof view settings with unfinished drawing; allow 180 seconds for the surface-text save, reopen and invalid-placement journey, preserving all interactions, chronological reloads, functional assertions and helper deadlines.
+
+The two-entrance phone survey allows 120 seconds; dark and light desktop readability journeys allow 180 seconds, with the phone variant retaining 120 seconds. Globe journeys for focus on the current campus, landscape resizing, and star orientation, persistence and WebGL recovery each allow 180 seconds; the theme and horizon journey allows 300 seconds for its nine captures, and the idle repaint journey allows 150 seconds for its 30 render frames. All captures, gestures, viewports, pixel audits, assertion and helper deadlines, and case order remain unchanged; these budget changes are not acceptance results.
+
 Slate-map scale checks run separately for each renderer, retaining all three zoom levels and their original screenshot names. A separate continuity journey exercises enhanced, simple and 2D transitions before checking light/dark paints and camera preservation at the original final view. Every case retains canvas, control, edit and error checks, with the existing 210-second whole-test limit. Camera-change `map.loaded()` polls allow 30 seconds; theme assertions retain their ordinary deadlines. A recorded combined journey completed its nine screenshots only after exhausting its whole-test budget, and its pending light-paint query later returned the expected colour. These observations are separate from complete validation and make no hardware or frame-rate claim.
 
 Photographic projection/cancellation and model export run as separate journeys, each creating and texturing its mesh through the real UI. The export journey retains undo/redo before GLB and PNG generation so restored image resources are exercised. It waits up to 30 seconds for its prepared GLB download link. In a recorded failure, the exporter's lazy dependencies finished 7.776 seconds into the previous 10-second wait, and the later failure snapshot contained the completed download. All source-evidence, UV, undo/redo and PNG-render assertions remain, with the 180-second limit for each journey and the existing 60-second PNG preparation allowance.
@@ -35,6 +43,12 @@ Photographic projection/cancellation and model export run as separate journeys, 
 Precision mouse and touch journeys use scoped Playwright context options and the runner's page fixture. Coverage collection and context closure run in fixture teardown, separate from the geometry test body. Viewports, gesture types, geometry checks, undo/redo and reload recovery are unchanged; this lifecycle change does not establish the cause of an earlier timeout.
 
 The committed-fixture build is followed by a separate real-public-package preservation check before deployment. Do not substitute previous hosted results or partially downloaded artifacts for complete current validation.
+
+## Documentation and evidence boundaries
+
+Finish the tracked guides, release notes and honestly dated candidate illustrations before freezing the candidate for the complete 24-gate run. Include documentation in the same source/tree identity as the application and tests. Any subsequent tracked change requires a new complete receipt; a documentation-only edit is not exempt. Do not predict the final candidate hash, merge, deployment, package version or publication date in those guides.
+
+The [versioned release evidence index](PRODUCTION.md#lasu-detailed-model-release-evidence) defines four public completion assets. Fill them only from completed validation, merge, review, publication, production/offline verification and restoration receipts. Keep the six actual production captures and their sanitized provenance in the named release bundle; dated candidate renders and synthetic UI captures remain labelled in the repository. This separates stable instructions from later operational facts without relabelling earlier checks or requiring a commit solely to record its own future identity.
 
 ## Explicit operator commands
 
@@ -62,7 +76,7 @@ Temporary preview access is scoped to the recorded local UUID and revoked in out
 
 ## Temporary merge exception
 
-The original owner authorized a temporary exception for this campaign's validated PR and final documentation follow-up. It does not replace normal repository policy.
+The original owner authorized a temporary exception for this campaign's validated PR and, if needed, a separately validated documentation follow-up. The release plan freezes the guides with the candidate before complete validation. The exception does not replace normal repository policy or exempt later tracked changes from validation.
 
 1. Save the current protection settings and verify the exact PR head/base and complete local validation receipt. Retain the required-check definitions.
 2. Temporarily remove administrator enforcement, merge only the verified revision using the owner account, and immediately restore the prior enforcement state on success or failure.
@@ -75,8 +89,8 @@ Verify the compatible merged reader and preservation of the existing campus cata
 
 Full preview verification visits all 20 models in Chromium and WebKit, includes every detail level and texture offline, and retains photographs and historical restoration assets. Frozen controls and comparator bytes remain immutable. Local comparisons receive distinct local receipts, not fabricated hosted artifact identities.
 
-Publish only the verified preview through the existing approval, lease, catalogue and promotion guards. Confirm the completion audit, published database state, exact deployment/catalogue, every asset hash and unchanged UNILAG. Run production offline verification and capture actual production screenshots before updating documentation or publishing the GitHub release.
+Publish only the verified preview through the existing approval, lease, catalogue and promotion guards. Confirm the completion audit, published database state, exact deployment/catalogue, every asset hash and unchanged UNILAG. Run production offline verification and capture all six actual production screenshots before finalizing the release evidence or publishing the GitHub release. Preserve and verify restoration of branch protection and the normal release workflow. Upload the four assets named in the [evidence index](PRODUCTION.md#lasu-detailed-model-release-evidence), then verify their anonymous URLs and checksums before declaring release completion. The already validated guides remain unchanged; any necessary tracked correction still requires a new complete validation.
 
-Local checks do not establish physical-phone performance or independent architectural approval. Retain estimated dimensions and unseen elevations, three identification holds and four additional footprint gaps. Keep private logs, reference photographs and comparison sheets outside public assets.
+Local checks do not establish physical-phone performance or independent architectural approval. Retain estimated dimensions and unseen elevations, three identification holds and four additional footprint gaps. Keep private verification logs, owner identities, storage paths, reference photographs and comparison sheets outside public completion assets. The immutable public proposal archive intentionally includes the 20 reproducible MCP transcripts; preserve its original proposal-era status and bytes.
 
 [Normal deployment policy](DEPLOYMENT.md) · [Model publication](MODEL-CAMPAIGN-PUBLICATION.md) · [Production evidence](PRODUCTION.md)

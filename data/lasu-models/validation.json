@@ -1475,5 +1475,18 @@
     "reviewSubmitted": false,
     "newModelsPublished": false,
     "note": "The saved model batch was reconciled against its verified private backup; reviewed continuation and public release are still pending at this checkpoint."
+  },
+  "recordScope": {
+    "kind": "historical-model-preparation-and-reconciliation-evidence",
+    "timeBasis": "Each original section retains the timestamp and source revision it assessed. The top-level acceptance flags belong to this historical checkpoint, not current deployment or publication.",
+    "originalReceiptAndStatusValuesPreserved": true
+  },
+  "releaseEvidence": {
+    "releaseUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/tag/v0.3.0",
+    "publicationEvidenceUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-evidence-v0.3.0.json",
+    "productionVerificationUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-verification-v0.3.0.json",
+    "productionCapturesUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-captures-v0.3.0.zip",
+    "checksumsUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-SHA256SUMS-v0.3.0.txt",
+    "completionRule": "Completed versioned release assets establish actual validation, review, publication, offline verification and restoration. A link or software tag alone does not establish these outcomes."
   }
 }

@@ -1,7 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
+Software changes are listed below. The [versioned release evidence](https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-evidence-v0.3.0.json) identifies the actual map publication, validation and deployment revisions; the software version alone does not publish campus models.
+
+- Document the LASU batch with dated model illustrations, preserved proposal evidence and versioned publication, offline-verification and production-capture assets.
+- Allow 30 seconds for initial enhanced-model readiness and completed building-handoff bootstrap, retaining subsequent rendering, selection and handoff assertions.
+- Give the complete 3D entrance journey and desktop/phone miniature-model journeys 180 seconds; give the two-undo repair and desktop shared-view-settings journeys 120 seconds. Retain all interactions, reloads, screenshots and functional assertions; other variants and helper deadlines keep their existing limits.
+- Allow 150 seconds each for roof-proposal recovery, integrated building-appearance recovery and undo, and roof view settings with unfinished drawing; allow 180 seconds for the surface-text save, reopen and invalid-placement journey, preserving all interactions, chronological reloads, functional assertions and helper deadlines.
+- The two-entrance phone survey allows 120 seconds; dark and light desktop readability journeys allow 180 seconds, with the phone variant retaining 120 seconds. Globe journeys for focus on the current campus, landscape resizing, and star orientation, persistence and WebGL recovery each allow 180 seconds; the theme and horizon journey allows 300 seconds for its nine captures, and the idle repaint journey allows 150 seconds for its 30 render frames. All captures, gestures, viewports, pixel audits, assertion and helper deadlines, and case order remain unchanged; these budget changes are not acceptance results.
 - Preserve GIS job-file readability under restrictive host umasks and exercise the real unprivileged worker with `umask 077`.
 - Remove anonymous database volumes when explicitly cleaning up disposable native-acceptance PostGIS containers.
 - Allow 180 seconds for the complete offline roof recovery journey after a recorded whole-test timeout during input confirmation. Preserve both chronological offline reloads, all functional assertions and helper limits.
@@ -21,7 +28,7 @@
 - Add selected-face photographic texture projection, four-corner crop preview, source evidence and undo to imported meshes. Export textured GLB files and seven high-resolution exterior views.
 - Compile structural, facade and fine-detail geometry into three immutable map variants. Stream visible models with selection priority, cancellation, verified shared textures and bounded geometry/texture residency.
 - Include every published detail level and texture in verified, resumable campus downloads. Keep the 12 MiB compatible base-visual limit and preserve the previous valid package after failures.
-- Record the LASU Ojo SolidCraft inventory, reproducible geometry scripts and evidence dossiers. The private batch contains 20 exterior proposals; identification gaps and architectural approval remain explicit. No new campus model is published by the software release.
+- Record the LASU Ojo SolidCraft inventory, reproducible geometry scripts and evidence dossiers for the 20-model batch. Preserve the dated proposal archive and explicit identification gaps; actual review and map publication are established separately by release evidence.
 - Add read-only model workspace inspection and guarded import of a pinned proposal archive, preserving private corrections and the public campus baseline. Require reviewed workspace/plan hashes, immutable model verification, a private rollback copy and exact-snapshot review; original-owner overrides are explicit and audited.
 - Keep the 25 MiB editable-document limit with measured sub-micrometre Senate/Library mesh compaction. Verify all 20 hydrated models through public sanitization and three detail tiers; refresh proposal renders, the 42.8 MiB offline fixture and hardware measurements while retaining earlier evidence and physical-device limits.
 - Update Vitest and matching packages to 5.0.5, repair shared-texture metadata validation and stabilize the path-edit browser gesture after map layout changes.

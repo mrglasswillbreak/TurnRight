@@ -7,6 +7,8 @@ existing private corrections, photographs, routing and other campuses.
 
 The [one-off manual LASU release path](MANUAL-RELEASE.md) continues the already saved and reconciled batch when Actions cannot start. It does not repeat the import or imply publication.
 
+The [versioned release evidence index](PRODUCTION.md#lasu-detailed-model-release-evidence) identifies the actual review, package, preservation and offline-verification records. Its production capture bundle is separate from the dated proposal renders. Keep the original proposal archive and receipt unchanged; later completion evidence binds their exact source hashes to the published package.
+
 Use **Prepare reviewed campus layer release** (`campus-layer-release.yml`) with
 `campus_id=lasu` and `upgrade=models` on the reviewed reader/worker commit.
 
