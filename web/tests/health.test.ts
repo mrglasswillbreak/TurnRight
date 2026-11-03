@@ -1,5 +1,6 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import health from '../api/health';
+beforeEach(() => vi.stubEnv('TURNRIGHT_RELEASE_SOURCE_SHA', ''));
 afterEach(() => vi.unstubAllEnvs());
 function invoke(method: string) {
   const result = {
@@ -48,3 +49,21 @@ it('rejects mutations without querying dependencies', () => {
   expect(result.code).toBe(405);
   expect(result.headers.get('Allow')).toBe('GET, HEAD');
 });
+
+it('reports an explicit uploaded-release source before inherited provider metadata', () => {
+  vi.stubEnv('TURNRIGHT_RELEASE_SOURCE_SHA', 'C'.repeat(40));
+  vi.stubEnv('VERCEL_GIT_COMMIT_SHA', 'a'.repeat(40));
+  vi.stubEnv('GITHUB_SHA', 'b'.repeat(40));
+  expect(invoke('GET').body).toEqual({
+    status: 'ok',
+    revision: 'c'.repeat(40),
+  });
+});
+it.each(['private-malformed-value', 'a'.repeat(39), 'a'.repeat(41)])(
+  'does not substitute stale provider metadata for malformed explicit release source: %s',
+  (revision) => {
+    vi.stubEnv('TURNRIGHT_RELEASE_SOURCE_SHA', revision);
+    vi.stubEnv('VERCEL_GIT_COMMIT_SHA', 'b'.repeat(40));
+    expect(invoke('GET').body).toEqual({ status: 'ok', revision: 'unknown' });
+  },
+);

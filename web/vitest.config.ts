@@ -15,7 +15,11 @@ export default defineConfig({
     projects: [
       {
         extends: true,
-        test: { name: 'unit', include: ['tests/**/*.test.ts'] },
+        test: {
+          name: 'unit',
+          include: ['tests/**/*.test.ts'],
+          sequence: { groupOrder: 1 },
+        },
       },
       {
         extends: true,
@@ -76,6 +80,7 @@ export default defineConfig({
         test: {
           name: 'components',
           include: ['tests/components/**/*.test.tsx'],
+          sequence: { groupOrder: 2 },
           browser: {
             enabled: true,
             headless: true,

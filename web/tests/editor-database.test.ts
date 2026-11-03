@@ -1,4 +1,5 @@
 import { beforeAll, afterAll } from 'vitest';
+import { DATABASE_SETUP_TIMEOUT_MS } from './database-test-timeouts';
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
 import type { MapEdit } from '../src/types';
@@ -84,7 +85,7 @@ beforeAll(async () => {
   }
   await database.query('insert into auth.users(id) values($1);', [owner]);
   await database.query('insert into admin_users(id) values($1);', [owner]);
-}, 30000);
+}, DATABASE_SETUP_TIMEOUT_MS);
 afterAll(async () => {
   await database?.close();
 });

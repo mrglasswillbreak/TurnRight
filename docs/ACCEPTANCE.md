@@ -1,5 +1,13 @@
 # TurnRight verification and release checklist
 
+## Detailed LASU model release evidence
+
+Use the [versioned evidence index](PRODUCTION.md#lasu-detailed-model-release-evidence) for the exact candidate, complete 24-gate acceptance, equivalent merge, restored protection/workflow, review policy, publication audit and live package. Require the [production verification report](https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-verification-v0.3.0.json) to identify every immutable asset and independently pinned model ID, all detail levels/textures offline in Chromium and WebKit, and preservation of UNILAG. A fixture result, saved source, software tag or production screenshot alone does not satisfy these checks.
+
+Complete the tracked guides and candidate illustrations before the final full validation. After actual publication, inspect all six production captures, sanitize and hash the four named release assets, and verify their public download URLs before completing the release. Keep the original proposal ZIP and its receipt immutable. The completed assets record actual dates and revisions; historical preparation flags do not report live status.
+
+The **12 MiB** limit continues to apply to compatible base visuals, with detailed assets validated separately and every published level/texture included in the offline download. Retain unresolved identification gaps, estimated dimensions, independent architectural review, physical-device, field, live-role and public rollback-rehearsal limits. An audited original-owner override has its own recorded policy and does not establish independent architectural review.
+
 ## Campus detail release
 
 The October 18 releases are published and pass the [production browser and offline matrix](assets/campus-browser-verification-2026-10-18-published.json). [Publication receipts](PRODUCTION.md) retain approval hashes, preservation checks and failed-attempt history. These results do not close the physical-device, field, live-role or public rollback-rehearsal items below.
@@ -14,7 +22,7 @@ The [October 18 duplicate diagnostic](assets/measurements/campus-duplicate-geome
 
 The [attribute continuation](assets/measurements/campus-duplicate-attributes-2026-10-18.json) verifies all 16 original-ID mappings and finds only one pair with identical original attributes apart from `OBJECTID`. Seven pairs differ. Its five-file archive passes independent hash and attribute-comparison checks without ArcPy; no finding changes source acceptance.
 
-The 300 KiB compressed lazy-renderer and 12 MiB per-campus visual budgets remain unchanged. The target of 30 fps on representative physical Android/iPhone interaction remains a hardware check; software WebGL, viewport simulations and WebKit automation cannot establish it. Record the actual device and fallback behaviour separately.
+The 300 KiB compressed lazy-renderer and 12 MiB compatible base-visual budgets remain unchanged. The target of 30 fps on representative physical Android/iPhone interaction remains a hardware check; software WebGL, viewport simulations and WebKit automation cannot establish it. Record the actual device and fallback behaviour separately.
 
 Use this checklist against an identified source revision and package version. Local browser fixtures, native CI, live account checks, physical devices, and campus field work establish different things; record each separately. Dated sections retain historical results. The [current readiness summary](PRODUCTION.md#remaining-acceptance-and-owner-decisions) identifies outstanding rollout and operational gates.
 

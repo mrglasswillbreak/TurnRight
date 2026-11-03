@@ -40,6 +40,7 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `GIS_TEST_DATABASE_URL` | tool | Yes | Disposable test database URL; acceptance tools reject production database names. |
 | `GITHUB_ACTOR` | ci | No | GitHub-provided actor name recorded in the private model-import receipt; never used as a fabricated campus identity. |
 | `GITHUB_ACTIONS` | ci | No | GitHub-provided runner marker. |
+| `GITHUB_REF` | ci | No | GitHub-provided branch or tag reference; review continuation requires refs/heads/main. |
 | `GITHUB_REPOSITORY` | server | No | Owner/repository used for authorized worker dispatch. |
 | `GITHUB_RUN_ID` | ci | No | GitHub-provided run identifier used in verification and cleanup receipts. |
 | `GITHUB_SHA` | ci | No | GitHub-provided source revision used in health and verification receipts. |
@@ -99,6 +100,9 @@ secret store. Public keys and deployment IDs are configuration, not secret crede
 | `VITE_LOCAL_DEVELOPMENT` | public | No | Set only by the isolated local server and configured-build test. |
 | `VITE_SUPABASE_ANON_KEY` | public | No | Public Supabase anonymous key, protected by server authorization and row policies. |
 | `VITE_SUPABASE_URL` | public | No | Public Supabase project URL. Required only for hosted authentication and editing. |
+| `TURNRIGHT_LOCAL_RUN_ID` | local | No | Explicit UUID recorded by a manual release operation; identifies only its temporary deployment access and cleanup. |
+| `PATH` | runtime | No | Operating-system executable search path; the isolated manual validator prepends its own Python environment. |
+| `TURNRIGHT_RELEASE_SOURCE_SHA` | server | No | Verified full Git commit of an immutable campus source deployment; recorded by the release worker and preserved during production promotion. |
 
 CI-only scanner switches and `TURNRIGHT_COVERAGE` are set by their workflow/test harness.
 Vite, Node, npm, GitHub and Vercel supply the entries marked as runtime/provider context.

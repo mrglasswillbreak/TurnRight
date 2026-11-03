@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, expect } from 'vitest';
 import { gisDatabase } from './gis-database-fixture';
+import { DATABASE_SETUP_TIMEOUT_MS } from './database-test-timeouts';
 import type { PGlite } from '@electric-sql/pglite';
 import { registerMembershipAndReview } from './gis-database-membership-and-review';
 import { registerDatasetIntegrity } from './gis-database-dataset-integrity';
@@ -15,7 +16,7 @@ async function expectIdenticalWorkspaceHashes() {
 }
 beforeAll(async () => {
   db = await gisDatabase();
-}, 120000);
+}, DATABASE_SETUP_TIMEOUT_MS);
 afterAll(async () => {
   await db?.close();
 });

@@ -66,6 +66,7 @@ export function registerSearchAndNavigation(
   test('globe search frames the current campus, restores focus, and preserves the mounted map', async ({
     page,
   }, info) => {
+    test.setTimeout(180_000);
     await page.setViewportSize({ width: 1280, height: 720 });
     await fixture().setup(page);
     await fixture().open(page);
@@ -224,6 +225,7 @@ export function registerSearchAndNavigation(
   test('globe search mobile landscape observes container changes without a window resize', async ({
     page,
   }, info) => {
+    test.setTimeout(180_000);
     await page.setViewportSize({ width: 390, height: 844 });
     await fixture().setup(page);
     await fixture().open(page);

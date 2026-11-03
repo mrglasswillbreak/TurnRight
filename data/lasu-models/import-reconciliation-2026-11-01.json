@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-01T12:10:59.643Z",
+  "scope": "Historical reader deployment and saved-model reconciliation before review; not a campus publication receipt.",
+  "baseline": "lasu-41ec73876464",
+  "reader": {
+    "reviewedHead": "fa4a6fe91af56b8319c97d50a6904f552e0d9ff9",
+    "requiredChecks": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41298462870",
+    "requiredChecksAttempt": 2,
+    "requiredChecksConclusion": "success",
+    "mergeRevision": "61456a16b8e855f65d251324c41360a3575ac3d5",
+    "deploymentId": "dpl_2KTioDgWAdJPWYRMoJuuHPxhdNUA",
+    "health": "ok",
+    "anonymousAdminStatus": 401,
+    "preservedAssetReferences": 236
+  },
+  "application": {
+    "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41303133195",
+    "workflowConclusion": "failure",
+    "receiptSha256": "68c97cc0cfb8e5eee97d738e7866cfcdcf36724876027e1e291358c7de3f0394",
+    "backupVerified": true,
+    "verifiedModels": 20,
+    "verifiedModelBytes": 219235420,
+    "batchSaved": true,
+    "stoppedBeforeReview": true,
+    "reason": "The readback guard compared dataset revision counters unchanged, although each model save increments the affected dataset revision through the existing GIS trigger."
+  },
+  "reconciliation": {
+    "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41305137953",
+    "revision": "e3be87d33dc998a247b30c79b7c8d860c8af682c",
+    "receiptSha256": "9a500700cd9b410469747e434cad256f4dd38d7a69128941f4a079722f77f1ca",
+    "status": "inspected-exact-derived-revisions",
+    "noRemoteWrites": true,
+    "stableRead": true,
+    "unexpectedWorkspaceDifferences": 0,
+    "datasetRevisionDeltas": [
+      {
+        "id": "dataset:8b6b7e202d40e205a3098d99de90c12f",
+        "delta": 3,
+        "beforeRevision": 173,
+        "expectedRevision": 176,
+        "currentRevision": 176
+      },
+      {
+        "id": "map-layer:aa0fe3610e445987",
+        "delta": 16,
+        "beforeRevision": 97,
+        "expectedRevision": 113,
+        "currentRevision": 113
+      },
+      {
+        "id": "map-layer:d4e4e392d06695c4",
+        "delta": 1,
+        "beforeRevision": 3,
+        "expectedRevision": 4,
+        "currentRevision": 4
+      }
+    ],
+    "allSavedResultsMatchCurrent": true,
+    "allSourcesAndAttachmentsVerified": true,
+    "publishedCatalogueMatchesApply": true,
+    "publicationValidation": {
+      "passed": true,
+      "modelCount": 20,
+      "geometryUnchanged": true,
+      "graphUnchanged": true,
+      "photosUnchanged": true,
+      "placesUnchanged": true
+    },
+    "publicProjectionDifferences": 0,
+    "beforeProtectedHash": "e2394adadc008a104a8ca7c797f0b5a28e18eed58e35d3c66d6049d963975b80",
+    "currentProtectedHash": "e2394adadc008a104a8ca7c797f0b5a28e18eed58e35d3c66d6049d963975b80"
+  },
+  "modelSources": [
+    {
+      "id": "arcgis:University_Property:47",
+      "bytes": 12735838,
+      "sha256": "fb674dc42f9f223f64d6d919568492b5de72d60d28df93abfd65c517c7c57df8",
+      "revision": "model1-d0936c5acfd2bfc8-12735838"
+    },
+    {
+      "id": "arcgis:University_Property:44",
+      "bytes": 11145497,
+      "sha256": "ddbfc38d1af1c0da0afd2bc6907f80f4b558449181577bdf220f9b3d30455fee",
+      "revision": "model1-f789b38ed48671ec-11145497"
+    },
+    {
+      "id": "arcgis:University_Property:25",
+      "bytes": 8442544,
+      "sha256": "e20778199993d20b09fe7c320fb7c36a2e4c894dd7ec341815f7541605b4f1fd",
+      "revision": "model1-2c6267409f29d2ca-8442544"
+    },
+    {
+      "id": "arcgis:University_Property:54",
+      "bytes": 15644809,
+      "sha256": "41cce694af39663921585854f3341c7b28b76c724d35ea87f09b6996d793820b",
+      "revision": "model1-30330caf399538e3-15644809"
+    },
+    {
+      "id": "arcgis:University_Property:39",
+      "bytes": 16703775,
+      "sha256": "558f9c4c2f905c3313e7e9035f5127653aa17aedb4a0fe55a4b2a297e37a0a84",
+      "revision": "model1-690d82ed2b00dffb-16703775"
+    },
+    {
+      "id": "arcgis:University_Property:31",
+      "bytes": 2856174,
+      "sha256": "6a462178bd8a1b8dc75a903b9a86dc588eee1c638bb7ad7554b9c4c9a32fd523",
+      "revision": "model1-38fee1854ec4651-2856174"
+    },
+    {
+      "id": "arcgis:University_Property:73",
+      "bytes": 6053119,
+      "sha256": "462f4c81fdde1a6f7db0eb4b94e3f1754bafb0bb72669ef0ff4ca2c0952048e0",
+      "revision": "model1-80c2dc1db50fdbe7-6053119"
+    },
+    {
+      "id": "arcgis:University_Property:3",
+      "bytes": 21083740,
+      "sha256": "44390ef8e26d78f1a1ffe99b3a3e1666770d3c7e73502e99dd5efc06be51b5c2",
+      "revision": "model1-5e142c04fdabe2aa-21083740"
+    },
+    {
+      "id": "arcgis:University_Property:2",
+      "bytes": 7770374,
+      "sha256": "9022751363d4e40717c69aac2a5ac0507251375fb539b6df52bfda37adef6632",
+      "revision": "model1-9b9b7790f76a6cec-7770374"
+    },
+    {
+      "id": "arcgis:University_Property:55",
+      "bytes": 4392453,
+      "sha256": "3cd7dbc9a87733e044044cf1e2d99fa3ab4343481730cc17c7b8f948ba7e8d29",
+      "revision": "model1-f779ae818d37af81-4392453"
+    },
+    {
+      "id": "arcgis:University_Property:120",
+      "bytes": 23576481,
+      "sha256": "83f287fb1e5c8a08877b1f6fab6827160a0d26385e7303d3299d4ec46a1459b2",
+      "revision": "model1-e7f0bc1c39bd2116-23576481"
+    },
+    {
+      "id": "arcgis:University_Property:78",
+      "bytes": 13060104,
+      "sha256": "f9fe0f7f3ce8f7ab1bb2f157943c7a2694c5f8208fe264d5fea3c32fd3df28ab",
+      "revision": "model1-fffa1753f11401a1-13060104"
+    },
+    {
+      "id": "arcgis:University_Property:76",
+      "bytes": 12294168,
+      "sha256": "e9a88e0c8d79704f9761b23a87dfe89ac78c417a2af84a38393ca9fb3fbfa307",
+      "revision": "model1-2f243b638de61419-12294168"
+    },
+    {
+      "id": "arcgis:University_Property:75",
+      "bytes": 4447528,
+      "sha256": "8ea04f31ad6f0d570bca8bfb377d9f2cce9e14a394cf2dca5fa1c62e1552b92a",
+      "revision": "model1-3fd753b461abbab0-4447528"
+    },
+    {
+      "id": "arcgis:University_Property:28",
+      "bytes": 5200002,
+      "sha256": "63d6cc5d70fb9483ea9eab85c73fd1a2940bc00b5b7d7291ffb7879562944329",
+      "revision": "model1-580f24bfd4f3d6b-5200002"
+    },
+    {
+      "id": "arcgis:University_Property:22",
+      "bytes": 11523494,
+      "sha256": "32006fd5a925fad22ecde97525827b04269ee11c87a2c17af5847e781968c574",
+      "revision": "model1-cfe4b1a29f7e60c2-11523494"
+    },
+    {
+      "id": "arcgis:University_Property:43",
+      "bytes": 10454234,
+      "sha256": "abefa4e060dc908a87814d8e3c053c84136011737e421b9d749860174c0b6c03",
+      "revision": "model1-754cb98bd86385a5-10454234"
+    },
+    {
+      "id": "arcgis:University_Property:103",
+      "bytes": 20034003,
+      "sha256": "c1cd0ab4ff90226c789f47ebdca0d7f4f4dcfbd5511a16a0019e2a07ea6b158d",
+      "revision": "model1-3c7cfb121d11405c-20034003"
+    },
+    {
+      "id": "arcgis:University_Property:33",
+      "bytes": 3363200,
+      "sha256": "51a02c422d6cf37ad6a58bb8878455b6535cde56bbdc101ee33e7c0b7fdec965",
+      "revision": "model1-3ee25e0872a5d568-3363200"
+    },
+    {
+      "id": "arcgis:University_Property:32",
+      "bytes": 8453883,
+      "sha256": "222594696c1f91ff43edafea22a555ae39a5785bfb69cf90098369fa2028db8e",
+      "revision": "model1-45506a6a53360806-8453883"
+    }
+  ],
+  "atThisCheckpoint": {
+    "reviewSubmitted": false,
+    "approvalRecorded": false,
+    "campusPublished": false
+  },
+  "retainedAttempts": [
+    {
+      "run": "https://github.com/mrglasswillbreak/TurnRight/actions/runs/41304719141",
+      "conclusion": "failure",
+      "reason": "The first read-only diagnostic completed its raw comparison but failed publication comparison because the three retained private model references were not hydrated. The corrected diagnostic passed."
+    }
+  ],
+  "recoveryRule": "Do not replay the successful model batch. Any review continuation must pin the successful reconciliation, exact current workspace hash, source assets and original owner decision, then use the existing review API."
+}

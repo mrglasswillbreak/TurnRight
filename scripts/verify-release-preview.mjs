@@ -1,7 +1,12 @@
-/** Authenticated preview acceptance. The temporary automation credential never leaves CI. */
+/** Authenticated preview acceptance with execution-scoped temporary access. */
 import { randomBytes } from 'node:crypto';
 import { db } from './cloud.mjs';
 import { vercelApi, withRetainedPackageAccess } from './vercel-api.mjs';
+import {
+  temporaryAccessNote,
+  maskTemporaryAccessSecret,
+} from './preview-access.mjs';
+const note = temporaryAccessNote();
 const [release] = await db(
   `releases?id=eq.${process.env.RELEASE_ID}&select=preview_url,status,campus_id`,
 );
@@ -13,7 +18,7 @@ const url = new URL(release.preview_url);
 if (url.protocol !== 'https:' || !url.hostname.endsWith('.vercel.app'))
   throw Error('Unexpected preview origin');
 const secret = randomBytes(16).toString('hex');
-console.log(`::add-mask::${secret}`);
+maskTemporaryAccessSecret(secret);
 const endpoint = `/v1/projects/${process.env.VERCEL_PROJECT_ID}/protection-bypass`;
 const update = (body) =>
   vercelApi(endpoint, {
@@ -24,7 +29,7 @@ const update = (body) =>
 await update({
   generate: {
     secret,
-    note: `Temporary campus release check ${process.env.GITHUB_RUN_ID || 'local'}`,
+    note,
   },
 });
 try {

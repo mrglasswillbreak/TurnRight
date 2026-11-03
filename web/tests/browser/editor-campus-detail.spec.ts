@@ -84,10 +84,8 @@ test('campus detail palette preview cancels cleanly and commits as one undo step
 });
 
 for (const touch of [false, true])
-  test(`campus detail precision rectangle, recovery and undo with ${touch ? 'touch' : 'mouse'}`, async ({
-    browser,
-  }, testInfo) => {
-    const context = await browser.newContext({
+  test.describe(() => {
+    test.use({
       baseURL: 'http://127.0.0.1:5183',
       viewport: touch
         ? { width: 390, height: 844 }
@@ -95,8 +93,9 @@ for (const touch of [false, true])
       hasTouch: touch,
       isMobile: touch,
     });
-    const page = await context.newPage();
-    try {
+    test(`campus detail precision rectangle, recovery and undo with ${touch ? 'touch' : 'mouse'}`, async ({
+      page,
+    }, testInfo) => {
       const state = await setup(page, false, false, { startupTimeout: 30000 });
       await focusCampus(page);
       await page
@@ -165,9 +164,7 @@ for (const touch of [false, true])
       expect(state.edits().find((e) => e.id === created.id)?.geometry).toEqual(
         created.geometry,
       );
-    } finally {
-      await context.close();
-    }
+    });
   });
 
 test('campus detail landmark points offer a 3D area view without a building association', async ({

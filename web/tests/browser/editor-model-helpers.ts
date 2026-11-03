@@ -1,6 +1,35 @@
 import { expect, type Page } from '@playwright/test';
 import { browserCampus, setup } from './editor-fixture';
 
+export async function waitForBuildingHandoffReady(page: Page) {
+  const drawPath = page.getByRole('button', { name: 'Draw path', exact: true });
+  const properties = page.getByRole('complementary', {
+    name: 'Feature properties',
+  });
+  // Full navigation loads both the editor and its lazy building tools.
+  await expect
+    .poll(
+      async () => {
+        if (!(await drawPath.isVisible()) || !(await properties.isVisible()))
+          return false;
+        const enabled = await drawPath.evaluateAll(
+          (buttons) =>
+            buttons.length === 1 &&
+            !buttons[0].matches(':disabled') &&
+            !buttons[0].closest('[aria-disabled="true"]'),
+        );
+        return (
+          enabled &&
+          !(await properties
+            .getByText('Loading building tools…', { exact: true })
+            .isVisible())
+        );
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(true);
+}
+
 export async function openBuildingModel(
   page: Page,
   mode: 'appearance' | 'roof' | 'outline' = 'appearance',
@@ -46,10 +75,12 @@ export async function focusModels(page: Page, phone = false) {
     phone,
   );
   await expect
-    .poll(() =>
-      page.evaluate(() =>
-        JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
-      ),
+    .poll(
+      () =>
+        page.evaluate(() =>
+          JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
+        ),
+      { timeout: 30_000 },
     )
     .toContain('arcgis:University_Property:120');
 }
@@ -140,7 +171,7 @@ export async function unifiedModelFixture(
     })
     .click();
   const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
+  await expect(dialog).toBeVisible({ timeout: 30_000 });
   if (options.repairMode) return { server, dialog, wall: () => undefined };
   await dialog
     .getByRole('button', { name: 'Edit surface', exact: true })

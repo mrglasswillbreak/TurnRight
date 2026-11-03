@@ -3,22 +3,23 @@ import type { CampusImportsFixture } from './campus-imports.spec';
 export function registerIsolationAndReview(
   fixture: () => CampusImportsFixture,
 ): void {
-  test('campus imports public chooser stays in the search row without covering navigation', async ({
-    page,
-  }) => {
-    await fixture().setup(page);
-    await page.goto('/');
-    const chooser = page.getByRole('button', {
-      name: 'Choose a campus',
-      exact: true,
-    });
-    for (const size of [
-      { width: 1440, height: 900 },
-      { width: 1024, height: 768 },
-      { width: 844, height: 390 },
-      { width: 390, height: 844 },
-      { width: 320, height: 568 },
-    ]) {
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+    { width: 844, height: 390 },
+    { width: 390, height: 844 },
+    { width: 320, height: 568 },
+  ]) {
+    test(`campus imports public chooser stays in the search row without covering navigation at ${size.width}x${size.height}`, async ({
+      page,
+    }) => {
+      await fixture().setup(page);
+      await page.goto('/');
+      const chooser = page.getByRole('button', {
+        name: 'Choose a campus',
+        exact: true,
+      });
+      await expect(chooser).toBeVisible({ timeout: 30_000 });
       await page.setViewportSize(size);
       for (const expanded of [false, true]) {
         if (expanded)
@@ -53,8 +54,8 @@ export function registerIsolationAndReview(
       await page
         .getByRole('button', { name: 'Collapse card', exact: true })
         .click();
-    }
-  });
+    });
+  }
   test('campus imports retain readable headers and fields in light and dark themes', async ({
     page,
   }) => {

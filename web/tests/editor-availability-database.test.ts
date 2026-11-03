@@ -1,13 +1,10 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { gisDatabase, owner } from './gis-database-fixture';
+import { DATABASE_SETUP_TIMEOUT_MS } from './database-test-timeouts';
 let db: Awaited<ReturnType<typeof gisDatabase>>;
-beforeAll(
-  async () => {
-    db = await gisDatabase();
-    // PostGIS WebAssembly startup is slower on Windows; SQL time limits stay unchanged.
-  },
-  process.platform === 'win32' ? 180000 : 60000,
-);
+beforeAll(async () => {
+  db = await gisDatabase();
+}, DATABASE_SETUP_TIMEOUT_MS);
 afterAll(async () => {
   await db?.close();
 });

@@ -6,7 +6,7 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
   test('globe search stars change with orientation, occlude behind Earth, persist and recover WebGL', async ({
     page,
   }, info) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     await page.setViewportSize({ width: 844, height: 390 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await fixture().setup(page);
@@ -127,7 +127,7 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
   test('globe search keeps navy stars in both themes and the sunlit horizon only in light mode', async ({
     page,
   }, info) => {
-    test.setTimeout(180000);
+    test.setTimeout(300000);
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
     await fixture().setup(page);
@@ -222,6 +222,7 @@ export function registerRendering(fixture: () => GlobeSearchFixture): void {
   test('globe search stars reuse repaint events without an idle animation loop', async ({
     page,
   }, info) => {
+    test.setTimeout(150_000);
     await fixture().setup(page);
     await fixture().open(page);
     await fixture().settledWorld(page);

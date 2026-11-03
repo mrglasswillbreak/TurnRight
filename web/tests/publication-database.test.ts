@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import { DATABASE_SETUP_TIMEOUT_MS } from './database-test-timeouts';
 import type { PGlite } from '@electric-sql/pglite';
 import {
   gisDatabase,
@@ -10,7 +11,7 @@ import {
 let db: PGlite;
 beforeAll(async () => {
   db = await gisDatabase();
-}, 120000);
+}, DATABASE_SETUP_TIMEOUT_MS);
 afterAll(async () => {
   await db?.close();
 });

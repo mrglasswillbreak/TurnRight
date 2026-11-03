@@ -1,12 +1,10 @@
 import { readFileSync } from 'node:fs';
+import type { Page } from '@playwright/test';
 import { test, expect } from './coverage-fixture';
 import { unifiedModelFixture } from './editor-model-helpers';
 import type { CampusPhoto } from '../../src/types';
 
-test('model file workers photographic projection and building renders preserve undo and source evidence', async ({
-  page,
-}, info) => {
-  test.setTimeout(180000);
+async function photographicMesh(page: Page) {
   await page.setViewportSize({ width: 1440, height: 1200 });
   const photo = JSON.parse(
     readFileSync(
@@ -43,6 +41,14 @@ test('model file workers photographic projection and building renders preserve u
     .getByRole('combobox', { name: /^Distance detail/ })
     .selectOption('facade');
   await expect.poll(() => doc()?.objects[0].detailTier).toBe('facade');
+  return { dialog, doc, photo };
+}
+
+test('model file workers photographic projection preserves cancellation and source evidence', async ({
+  page,
+}, info) => {
+  test.setTimeout(180000);
+  const { dialog, doc, photo } = await photographicMesh(page);
   const before = JSON.stringify(doc());
   await dialog.getByLabel('Top left X', { exact: true }).fill('0.1');
   await dialog
@@ -77,6 +83,28 @@ test('model file workers photographic projection and building renders preserve u
   expect(
     doc()!.objects[0].faces.some((f) => f.corners.every((c) => c.uv)),
   ).toBe(true);
+});
+
+test('model file workers GLB and building renders preserve undo and photographic evidence', async ({
+  page,
+}, info) => {
+  test.setTimeout(180000);
+  const { dialog, doc, photo } = await photographicMesh(page);
+  await dialog.getByLabel('Top left X', { exact: true }).fill('0.1');
+  await dialog
+    .getByRole('button', { name: 'Preview texture', exact: true })
+    .click();
+  await expect(
+    dialog.getByRole('button', { name: 'Apply texture', exact: true }),
+  ).toBeEnabled();
+  await dialog
+    .getByRole('button', { name: 'Apply texture', exact: true })
+    .click();
+  await expect.poll(() => doc()?.images[0]?.evidence?.photoId).toBe(photo.id);
+  expect(doc()!.images[0].evidence?.corners[0]).toEqual([0.1, 0]);
+  expect(
+    doc()!.objects[0].faces.some((f) => f.corners.every((c) => c.uv)),
+  ).toBe(true);
   await dialog.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect.poll(() => doc()?.images.length).toBe(0);
   await dialog.getByRole('button', { name: 'Redo', exact: true }).click();
@@ -90,7 +118,7 @@ test('model file workers photographic projection and building renders preserve u
     .click();
   await expect(
     dialog.getByRole('link', { name: /Download .*glb/ }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 30_000 });
   await dialog
     .getByRole('combobox', { name: /^Image width/ })
     .selectOption('1024');

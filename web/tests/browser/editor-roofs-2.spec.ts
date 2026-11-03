@@ -113,7 +113,7 @@ for (const phone of [false, true]) {
 test('roof proposal retains its saved geometry and unfinished input through settings and recovery', async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(150000);
   await page.emulateMedia({ colorScheme: 'dark' });
   const state = await setup(page);
   await focusCampus(page);

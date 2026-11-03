@@ -530,11 +530,7 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 8.14946272242878e-7,
       "files": 30,
-      "tierTriangles": [
-        26624,
-        3652,
-        3064
-      ],
+      "tierTriangles": [26624, 3652, 3064],
       "masters": {
         "master.sc": {
           "bytes": 1435302,
@@ -570,11 +566,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 3.336498117789688e-7,
       "files": 30,
-      "tierTriangles": [
-        22532,
-        1868,
-        1856
-      ],
+      "tierTriangles": [22532, 1868, 1856],
       "masters": {
         "master.sc": {
           "bytes": 966345,
@@ -610,11 +602,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 6.594275454574472e-7,
       "files": 30,
-      "tierTriangles": [
-        17254,
-        2504,
-        2492
-      ],
+      "tierTriangles": [17254, 2504, 2492],
       "masters": {
         "master.sc": {
           "bytes": 1505677,
@@ -650,11 +638,7 @@
       "conversionErrorMetres": 7.275957614183426e-15,
       "glbConversionErrorMetres": 0.0000027328146217087124,
       "files": 30,
-      "tierTriangles": [
-        33782,
-        10358,
-        10358
-      ],
+      "tierTriangles": [33782, 10358, 10358],
       "masters": {
         "master.sc": {
           "bytes": 5706696,
@@ -690,11 +674,7 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 0.0000017924717496953235,
       "files": 31,
-      "tierTriangles": [
-        36310,
-        8964,
-        6504
-      ],
+      "tierTriangles": [36310, 8964, 6504],
       "masters": {
         "master.sc": {
           "bytes": 2572975,
@@ -730,11 +710,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 8.853217536852753e-7,
       "files": 29,
-      "tierTriangles": [
-        6360,
-        2136,
-        2136
-      ],
+      "tierTriangles": [6360, 2136, 2136],
       "masters": {
         "master.sc": {
           "bytes": 1095185,
@@ -770,11 +746,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 0.0000018749073902313285,
       "files": 30,
-      "tierTriangles": [
-        12026,
-        820,
-        808
-      ],
+      "tierTriangles": [12026, 820, 808],
       "masters": {
         "master.sc": {
           "bytes": 475439,
@@ -810,11 +782,7 @@
       "conversionErrorMetres": 7.406272514330877e-7,
       "glbConversionErrorMetres": 9.487304666322416e-7,
       "files": 33,
-      "tierTriangles": [
-        62604,
-        18060,
-        16020
-      ],
+      "tierTriangles": [62604, 18060, 16020],
       "masters": {
         "master.sc": {
           "bytes": 12403546,
@@ -850,11 +818,7 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 9.761262163010542e-7,
       "files": 30,
-      "tierTriangles": [
-        18180,
-        5700,
-        5160
-      ],
+      "tierTriangles": [18180, 5700, 5160],
       "masters": {
         "master.sc": {
           "bytes": 2871078,
@@ -890,11 +854,7 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 4.384591800743465e-7,
       "files": 30,
-      "tierTriangles": [
-        8556,
-        772,
-        700
-      ],
+      "tierTriangles": [8556, 772, 700],
       "masters": {
         "master.sc": {
           "bytes": 349524,
@@ -930,11 +890,7 @@
       "conversionErrorMetres": 8.265114691398614e-7,
       "glbConversionErrorMetres": 0.0000013481445293450633,
       "files": 33,
-      "tierTriangles": [
-        66852,
-        10328,
-        9800
-      ],
+      "tierTriangles": [66852, 10328, 9800],
       "masters": {
         "master.sc": {
           "bytes": 4360055,
@@ -970,11 +926,7 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 4.280219325636381e-7,
       "files": 30,
-      "tierTriangles": [
-        27254,
-        3076,
-        2716
-      ],
+      "tierTriangles": [27254, 3076, 2716],
       "masters": {
         "master.sc": {
           "bytes": 1402310,
@@ -1010,11 +962,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 6.02225107115828e-7,
       "files": 30,
-      "tierTriangles": [
-        25636,
-        2758,
-        2482
-      ],
+      "tierTriangles": [25636, 2758, 2482],
       "masters": {
         "master.sc": {
           "bytes": 1380682,
@@ -1050,11 +998,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 5.319268083781026e-7,
       "files": 30,
-      "tierTriangles": [
-        10504,
-        2176,
-        2032
-      ],
+      "tierTriangles": [10504, 2176, 2032],
       "masters": {
         "master.sc": {
           "bytes": 1091722,
@@ -1090,11 +1034,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 9.520678752039657e-7,
       "files": 29,
-      "tierTriangles": [
-        11280,
-        7402,
-        7402
-      ],
+      "tierTriangles": [11280, 7402, 7402],
       "masters": {
         "master.sc": {
           "bytes": 1339772,
@@ -1130,11 +1070,7 @@
       "conversionErrorMetres": 9.094947017729283e-16,
       "glbConversionErrorMetres": 3.8146973047048505e-7,
       "files": 30,
-      "tierTriangles": [
-        23862,
-        2476,
-        2080
-      ],
+      "tierTriangles": [23862, 2476, 2080],
       "masters": {
         "master.sc": {
           "bytes": 1264417,
@@ -1170,11 +1106,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 3.018029310908332e-7,
       "files": 30,
-      "tierTriangles": [
-        20936,
-        1920,
-        1648
-      ],
+      "tierTriangles": [20936, 1920, 1648],
       "masters": {
         "master.sc": {
           "bytes": 1019757,
@@ -1210,11 +1142,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 9.142177432863718e-7,
       "files": 31,
-      "tierTriangles": [
-        41908,
-        6728,
-        5756
-      ],
+      "tierTriangles": [41908, 6728, 5756],
       "masters": {
         "master.sc": {
           "bytes": 3434266,
@@ -1250,11 +1178,7 @@
       "conversionErrorMetres": 1.8189894035458565e-15,
       "glbConversionErrorMetres": 8.602352892239651e-7,
       "files": 30,
-      "tierTriangles": [
-        7748,
-        2744,
-        2480
-      ],
+      "tierTriangles": [7748, 2744, 2480],
       "masters": {
         "master.sc": {
           "bytes": 981274,
@@ -1290,11 +1214,7 @@
       "conversionErrorMetres": 3.637978807091713e-15,
       "glbConversionErrorMetres": 0.0000011634142467187303,
       "files": 30,
-      "tierTriangles": [
-        19666,
-        1004,
-        956
-      ],
+      "tierTriangles": [19666, 1004, 956],
       "masters": {
         "master.sc": {
           "bytes": 1013906,
@@ -1545,5 +1465,28 @@
       "noRemoteWrites": true,
       "note": "The pinned archive and live workspace passed read-only preparation. Owner identity, private model asset IDs and full workspace receipts remain private. No model apply or map publication is asserted."
     }
+  },
+  "savedModelReconciliation": {
+    "recordedAt": "2026-11-01T12:10:59.643Z",
+    "evidence": "data/lasu-models/import-reconciliation-2026-11-01.json",
+    "modelsSaved": 20,
+    "unexplainedDifferences": 0,
+    "protectedPublicProjectionUnchanged": true,
+    "reviewSubmitted": false,
+    "newModelsPublished": false,
+    "note": "The saved model batch was reconciled against its verified private backup; reviewed continuation and public release are still pending at this checkpoint."
+  },
+  "recordScope": {
+    "kind": "historical-model-preparation-and-reconciliation-evidence",
+    "timeBasis": "Each original section retains the timestamp and source revision it assessed. The top-level acceptance flags belong to this historical checkpoint, not current deployment or publication.",
+    "originalReceiptAndStatusValuesPreserved": true
+  },
+  "releaseEvidence": {
+    "releaseUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/tag/v0.3.0",
+    "publicationEvidenceUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-evidence-v0.3.0.json",
+    "productionVerificationUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-verification-v0.3.0.json",
+    "productionCapturesUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-captures-v0.3.0.zip",
+    "checksumsUrl": "https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-SHA256SUMS-v0.3.0.txt",
+    "completionRule": "Completed versioned release assets establish actual validation, review, publication, offline verification and restoration. A link or software tag alone does not establish these outcomes."
   }
 }

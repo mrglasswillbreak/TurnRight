@@ -112,11 +112,12 @@ for (const width of [1440, 390])
     await page.setViewportSize({ width, height: 900 });
     await prepare(page);
     await page.goto('/?place=library&entrance=door-c');
-    await expect(
-      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
-    ).toBeVisible();
+    // Full navigations mount the lazy place panel after the document loads.
     await expect(
       page.getByRole('group', { name: 'Place actions' }),
+    ).toBeVisible({ timeout: 30000 });
+    await expect(
+      page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
     ).toBeVisible();
     expect(
       await page.locator('.place-detail').evaluate((el) => {
@@ -169,6 +170,9 @@ for (const width of [1440, 390])
     ).toHaveCount(0);
     await page.goto('/?place=library&entrance=missing');
     await expect(
+      page.getByRole('group', { name: 'Place actions' }),
+    ).toBeVisible({ timeout: 30000 });
+    await expect(
       page.getByText('The selected entrance is no longer available.', {
         exact: false,
       }),
@@ -197,6 +201,9 @@ for (const schema of [1, 3] as const)
       await prepare(page, schema);
       await page.goto('/?place=library&entrance=door-c');
       await expect(
+        page.getByRole('group', { name: 'Place actions' }),
+      ).toBeVisible({ timeout: 30000 });
+      await expect(
         page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
       ).toBeVisible();
       await page.getByRole('button', { name: 'Offline', exact: true }).click();
@@ -209,6 +216,9 @@ for (const schema of [1, 3] as const)
       ).toBeVisible();
       await context.setOffline(true);
       await page.reload();
+      await expect(
+        page.getByRole('group', { name: 'Place actions' }),
+      ).toBeVisible({ timeout: 30000 });
       await expect(
         page.getByRole('img', { name: 'Library exterior view 1', exact: true }),
       ).toBeVisible();

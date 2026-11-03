@@ -398,7 +398,7 @@ export async function setup(
   if (!options.publicEntry)
     await expect(
       page.getByRole('button', { name: 'Draw path', exact: true }),
-    ).toBeEnabled({ timeout: options.startupTimeout });
+    ).toBeEnabled({ timeout: options.startupTimeout ?? 30000 });
   await attachMap(page);
   return {
     edits: (): MapEdit[] =>

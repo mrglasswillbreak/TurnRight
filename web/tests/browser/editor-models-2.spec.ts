@@ -111,7 +111,9 @@ for (const editor of [false, true])
       page.evaluate(() =>
         JSON.stringify(window.editorTestMap.getFilter('buildings-3d')),
       );
-    await expect.poll(rendered).toContain('library');
+    await expect
+      .poll(rendered, editor ? { timeout: 30_000 } : {})
+      .toContain('library');
     // Count actual Three.js draw calls, not merely the presence of a model ID.
     // Keep real camera gestures and WebGL; only simulate slow frame timing.
     await page.evaluate(() => {

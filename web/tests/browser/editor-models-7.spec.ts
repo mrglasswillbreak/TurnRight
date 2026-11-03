@@ -1,7 +1,10 @@
 import { test, expect } from './coverage-fixture';
 import { setup } from './editor-fixture';
 import { clickMap } from './editor-map-helpers';
-import { unifiedModelFixture } from './editor-model-helpers';
+import {
+  unifiedModelFixture,
+  waitForBuildingHandoffReady,
+} from './editor-model-helpers';
 
 test.afterEach(async ({ context }) => {
   await context.setOffline(false);
@@ -42,6 +45,7 @@ test('editor handoff survives a sign-in return and reports unavailable buildings
     sessionStorage.setItem('turnright:editor-building-handoff', 'library'),
   );
   await page.goto('/admin');
+  await waitForBuildingHandoffReady(page);
   await expect(
     page.getByRole('button', { name: 'Edit model', exact: true }),
   ).toBeVisible();

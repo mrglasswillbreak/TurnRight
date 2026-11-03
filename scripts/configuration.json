@@ -131,6 +131,11 @@
       "sensitive": false,
       "description": "GitHub-provided runner marker."
     },
+    "GITHUB_REF": {
+      "scope": "ci",
+      "sensitive": false,
+      "description": "GitHub-provided branch or tag reference; review continuation requires refs/heads/main."
+    },
     "GITHUB_REPOSITORY": {
       "scope": "server",
       "sensitive": false,
@@ -425,6 +430,21 @@
       "scope": "public",
       "sensitive": false,
       "description": "Public Supabase project URL. Required only for hosted authentication and editing."
+    },
+    "TURNRIGHT_LOCAL_RUN_ID": {
+      "scope": "local",
+      "sensitive": false,
+      "description": "Explicit UUID recorded by a manual release operation; identifies only its temporary deployment access and cleanup."
+    },
+    "PATH": {
+      "scope": "runtime",
+      "sensitive": false,
+      "description": "Operating-system executable search path; the isolated manual validator prepends its own Python environment."
+    },
+    "TURNRIGHT_RELEASE_SOURCE_SHA": {
+      "scope": "server",
+      "sensitive": false,
+      "description": "Verified full Git commit of an immutable campus source deployment; recorded by the release worker and preserved during production promotion."
     }
   }
 }

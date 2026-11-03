@@ -5,6 +5,10 @@ existence does not imply architectural approval. The bridge currently accepts th
 20 audited Ojo building IDs, preserving the published 614-building baseline,
 existing private corrections, photographs, routing and other campuses.
 
+The [one-off manual LASU release path](MANUAL-RELEASE.md) continues the already saved and reconciled batch when Actions cannot start. It does not repeat the import or imply publication.
+
+The [versioned release evidence index](PRODUCTION.md#lasu-detailed-model-release-evidence) identifies the actual review, package, preservation and offline-verification records. Its production capture bundle is separate from the dated proposal renders. Keep the original proposal archive and receipt unchanged; later completion evidence binds their exact source hashes to the published package.
+
 Use **Prepare reviewed campus layer release** (`campus-layer-release.yml`) with
 `campus_id=lasu` and `upgrade=models` on the reviewed reader/worker commit.
 
@@ -32,6 +36,10 @@ Use **Prepare reviewed campus layer release** (`campus-layer-release.yml`) with
    the normal begin/upload/confirm asset validation. One atomic model edit batch
    uses each existing edit's `expectedUpdatedAt`. It changes only model asset
    references and exact model review revisions. Source records are never replaced.
+   Dataset membership is checked before writes and again before the atomic save.
+   Readback permits only the exact dataset revision increments produced by those
+   building edits; dataset fields, other edits and the rest of the snapshot stay
+   protected. The accepted workspace hash is saved before readback validation.
    Readback must preserve all unrelated workspace content before submission.
 5. By default, apply creates an unapproved GIS review. An eligible independent
    reviewer approves through the normal editor. If the actual original owner
@@ -73,6 +81,34 @@ confirmed dispatch is not a completed publication. The job uses the existing
 Supabase secrets and a step-scoped GitHub token with job-level `actions: write`;
 workflow inputs arrive through the event-file CLI argument, with no new secret
 or application environment setting.
+
+If a batch was saved but its review was not completed, retain the original apply
+receipt and do not replay `apply`. Run `operation=inspect`, `upgrade=models` with
+`reconciliation_pin` containing `apply_run_id`, `apply_artifact_id` and
+`receipt_sha256`. These identify the original private Actions artifact and exact
+raw receipt bytes. This routes exclusively to the read-only diagnostic. It
+verifies the backup, operation results, every stored model, dataset counters,
+publication projection and stable workspace hash. Only the sanitized diagnostic
+receipt is uploaded; full private snapshots remain in memory.
+
+After accepting a complete, successful diagnostic, `operation=resume-review`
+runs only from `main`. Its `reconciliation_pin` retains those three fields and
+adds `reconciliation_run_id`, `reconciliation_artifact_id`,
+`reconciliation_sha256`, `expected_workspace_hash` and `review_operation_id`.
+Copy the hash from the verified diagnostic and choose one new review UUID before
+dispatch. The continuation rechecks the pinned sources, operation, original
+owner, capabilities, public baseline and current workspace. It only submits and
+records the previously authorized original-owner decision through the existing
+review API; it never saves models or requests publication. Intent receipts are
+saved before each mutation. If the review UUID already exists or a response is
+uncertain, inspect that exact review before continuing.
+
+Use the successful continuation receipt's `review.id` and `review.contentHash`
+for the normal publication request. Keep the original failed apply receipt and
+the later continuation receipt as separate records. The [November 1 saved-model
+reconciliation](../data/lasu-models/import-reconciliation-2026-11-01.json) records
+the initial guard failure, exact increments of 3, 16 and 1, and successful
+read-only confirmation of all 20 model files and unchanged public content.
 
 Release timing remains bounded: base visual compilation has a two-minute limit;
 validated buildings with structural, facade or fine detail receive five minutes.

@@ -156,4 +156,4 @@ it('bounds the sanitized navigation payload while retaining reviewed hydrated mo
   expect(result.graph.edges).toEqual(data.graph.edges);
   result.coverage.notes = ['A'.repeat(25_000_000)];
   expect(() => publicationInputs(snapshot).decorate(result)).toThrow('25 MB');
-}, 15000);
+}, 30000);

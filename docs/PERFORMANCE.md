@@ -1,5 +1,11 @@
 # Responsiveness and recovery
 
+## Detailed-building delivery
+
+The [LASU model campaign](LASU-MODELS.md) uses separately bounded detailed assets alongside the compatible base visuals. The unchanged **12 MiB** compatible base-visual limit is not a limit on the complete download containing every published detail level and texture. Editable sources retain the **25 MiB** document limit. Shared assets appear once in the manifest's total download size; rendering requests and residency remain bounded independently of the offline package.
+
+The [versioned release evidence](https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-release-evidence-v0.3.0.json) records actual package bytes and validation scope, while the [production verification report](https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-verification-v0.3.0.json) records completed browser/offline checks. The November 1 fixture measurements in the [modeling record](LASU-MODELS.md#verification-and-release) remain dated hardware/viewport observations. Neither publication, software-rendered screenshots nor passing byte budgets establish sustained 30 FPS or physical-phone performance.
+
 ## Campus detail renderer
 
 The upgrade shares instanced tree/shrub geometry and materials inside the existing Three.js context. It keeps sector loading, reduces decoration at lower zoom and during slow rendering, and fades distant decoration. Geometry revisions invalidate stale region placement. Scenery is presentation data and does not participate in routing obstacles.

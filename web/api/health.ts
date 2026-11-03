@@ -13,7 +13,10 @@ export default function handler(req: RequestLike, res: ResponseLike) {
     return;
   }
   const candidate =
-    process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || '';
+    process.env.TURNRIGHT_RELEASE_SOURCE_SHA ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA ||
+    '';
   res.status(200).json({
     status: 'ok',
     revision: /^[a-f0-9]{40}$/i.test(candidate)

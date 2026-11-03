@@ -1,8 +1,14 @@
 # Application screenshots
 
+## Model illustrations and versioned production captures
+
+The [November 1 synthetic finishing/export demonstrations](../../SCREENSHOTS.md#model-finishing-and-export--1-november-2026) and [three dated LASU model renders](../../SCREENSHOTS.md#lasu-model-illustrations-and-release-captures) retain their original bytes, source identities and credits. They are illustrations of prepared models and authoring controls; they do not establish a public map release.
+
+The six actual production images must be delivered separately as [`LASU-Ojo-production-captures-v0.3.0.zip`](https://github.com/mrglasswillbreak/TurnRight/releases/download/v0.3.0/LASU-Ojo-production-captures-v0.3.0.zip), with a sanitized capture manifest and captions/credits. The [release evidence index](../../PRODUCTION.md#lasu-detailed-model-release-evidence) specifies the completed publication, offline verification and checksums that must accompany them. The offline-ready status view is captured online; phone views are simulations. Historical captions below describe the application and package at their stated capture date.
+
 ## Published campus detail · 18 October 2026
 
-The current [LASU](live-lasu-published-2026-10-18.png), [UNILAG](live-unilag-published-2026-10-18.png), [UNILAG phone](live-unilag-phone-2026-10-18.png) and [LASU dark](live-lasu-dark-2026-10-18.png) images are unaltered public production captures. [Provenance](live-publication-2026-10-18.json) records exact source files, application and package identities, dimensions and hashes. They come from the successful 32-view Chromium/WebKit production audit; the phone is a viewport simulation. Historical photographs retain their visible dates and source labels. [Full gallery and verification](../../SCREENSHOTS.md#published-campus-detail--18-october-2026).
+The [LASU](live-lasu-published-2026-10-18.png), [UNILAG](live-unilag-published-2026-10-18.png), [UNILAG phone](live-unilag-phone-2026-10-18.png) and [LASU dark](live-lasu-dark-2026-10-18.png) images are unaltered historical production captures from 18 October 2026. [Provenance](live-publication-2026-10-18.json) records exact source files, application and package identities, dimensions and hashes. They come from that successful 32-view Chromium/WebKit production audit; the phone is a viewport simulation. Historical photographs retain their visible dates and source labels. [Dated gallery and verification](../../SCREENSHOTS.md#published-campus-detail--18-october-2026).
 
 ## Precision and appearance controls · 18 October 2026
 

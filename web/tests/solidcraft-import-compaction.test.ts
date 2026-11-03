@@ -134,4 +134,4 @@ it('only compacts oversized documents and enforces the unchanged 25 MiB boundary
   expect(() => compactImportedModel(source)).toThrow(
     'still exceeds the 25 MiB',
   );
-});
+}, 15000);

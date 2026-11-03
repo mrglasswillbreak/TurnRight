@@ -16,6 +16,11 @@ import {
 import { activeCampus } from '../web/server/campuses';
 import { prepareReleasePhotos } from './photo-release.mjs';
 import { visualBuildTimeout } from './release-visual-timeout.mjs';
+import {
+  releaseSourceRevision,
+  releaseSourceFields,
+  assertDeploymentSource,
+} from './release-source-revision.mjs';
 import { arrivalIssues } from '../web/src/arrival';
 import { hydrateModelEdits } from '../web/server/model-assets';
 import { modelDocumentRevision } from '../web/src/model-document-revision';
@@ -195,6 +200,8 @@ try {
       `/v9/projects/${encodeURIComponent(process.env.VERCEL_PROJECT_ID!)}`,
     );
     await progress('Uploading release source for deployment');
+    const sourceRevision = releaseSourceRevision(root);
+    const sourceFields = releaseSourceFields(sourceRevision);
     const files = await uploadSource(root);
     const created = await vercelApi('/v13/deployments', {
       method: 'POST',
@@ -203,7 +210,12 @@ try {
         name: project.name,
         project: project.id,
         files,
-        meta: { turnrightRelease: id, turnrightVersion: manifest.version },
+        ...sourceFields,
+        meta: {
+          ...sourceFields.meta,
+          turnrightRelease: id,
+          turnrightVersion: manifest.version,
+        },
         projectSettings: {
           rootDirectory: 'web',
           // The reviewed reference catalogue is uploaded under data/.
@@ -223,6 +235,7 @@ try {
     });
     await progress('Building deployment and checking asset budgets');
     const deployment = await waitForDeployment(created.id);
+    assertDeploymentSource(deployment, sourceRevision);
     const url = `https://${deployment.url}`;
     await db(`releases?id=eq.${id}`, 'PATCH', {
       status: 'preview',

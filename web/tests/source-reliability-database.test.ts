@@ -1,6 +1,7 @@
 import { afterAll, beforeAll } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { gisDatabase, owner } from './gis-database-fixture';
+import { DATABASE_SETUP_TIMEOUT_MS } from './database-test-timeouts';
 import type { SourceOperation } from '../src/source-updates';
 import type {
   SourceFixtureRecord,
@@ -31,7 +32,7 @@ export type RpcResult<Name extends string> = Name extends keyof RpcResults
 let db: Awaited<ReturnType<typeof gisDatabase>>;
 beforeAll(async () => {
   db = await gisDatabase();
-}, 180000);
+}, DATABASE_SETUP_TIMEOUT_MS);
 afterAll(async () => {
   await db?.close();
 });

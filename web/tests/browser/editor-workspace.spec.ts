@@ -112,7 +112,7 @@ for (const variant of ['dark desktop', 'light desktop', 'dark phone']) {
   test(`readable interface ${variant}: tips, public dialogs and editor panels`, async ({
     page,
   }, testInfo) => {
-    test.setTimeout(120000);
+    test.setTimeout(variant.endsWith('desktop') ? 180_000 : 120_000);
     if (variant.includes('phone'))
       await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({

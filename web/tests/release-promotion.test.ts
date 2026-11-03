@@ -7,6 +7,8 @@ import {
 } from '../../scripts/vercel-api.mjs';
 
 beforeEach(() => {
+  vi.stubEnv('GITHUB_ACTIONS', '');
+  vi.stubEnv('TURNRIGHT_LOCAL_RUN_ID', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
   vi.stubEnv('VERCEL_TOKEN', 'test-token');
   vi.stubEnv('VERCEL_PROJECT_ID', 'prj_test');
 });

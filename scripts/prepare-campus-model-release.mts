@@ -19,10 +19,15 @@ import { verifiedPublicationBaseline } from './model-proposal-baseline.mts';
 import {
   assetEdit,
   assertReadback,
+  ModelReadbackError,
   modelChanges,
   protectedCampusHash,
   requireApplyGuards,
 } from './model-proposal-plan.mts';
+import {
+  modelDatasetMappings,
+  readModelDatasetMembership,
+} from './model-proposal-datasets.mts';
 
 if (process.env.CAMPUS_ID !== 'lasu')
   throw Error('Model campaign import is explicitly LASU only');
@@ -262,6 +267,10 @@ if (apply) {
       throw Error('Complete the active campus release before applying models');
   };
   await assertCurrent();
+  const beforeMembership = await readModelDatasetMembership(previous);
+  await assertCurrent();
+  report.beforeDatasetMembership = beforeMembership;
+  await saveReport();
   report.backup = await backupWorkspace(previous, expectedHash, planHash);
   await saveReport();
   const items = [];
@@ -276,6 +285,10 @@ if (apply) {
     await saveReport();
   }
   await assertCurrent();
+  const preSaveMembership = await readModelDatasetMembership(previous);
+  if (evidenceHash(preSaveMembership) !== evidenceHash(beforeMembership))
+    throw Error('GIS index membership changed before saving models');
+  await assertCurrent();
   const operationId = randomUUID();
   report.operationId = operationId;
   await saveReport();
@@ -289,12 +302,28 @@ if (apply) {
   report.batchSaved = true;
   await saveReport();
   const { snapshot: accepted, contentHash: acceptedHash } = await workspace();
-  assertReadback(previous, accepted, items);
+  report.workspaceHash = acceptedHash;
+  await saveReport();
+  const currentMembership = await readModelDatasetMembership(accepted);
+  const mappings = modelDatasetMappings(beforeMembership, currentMembership);
+  report.datasetMappings = mappings;
+  if ((await db('rpc/gis_workspace_content_hash', 'POST', {})) !== acceptedHash)
+    throw Error(
+      'Workspace changed during model readback; reconcile before review',
+    );
+  try {
+    report.readback = assertReadback(previous, accepted, items, mappings);
+  } catch (error) {
+    if (error instanceof ModelReadbackError)
+      report.readback = error.reconciliation;
+    await saveReport();
+    throw error;
+  }
+  await saveReport();
   validateReleaseSnapshot(
     { ...accepted, edits: await hydrateModelEdits(accepted.edits, owner) },
     published,
   );
-  report.workspaceHash = acceptedHash;
   await saveReport();
   const review = (await reviewAction(owner, 'gis-review-submit', {
     operationId: randomUUID(),
