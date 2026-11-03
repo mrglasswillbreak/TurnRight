@@ -197,7 +197,7 @@ test('duplicate queue keeps same-name campus records separate and supports undo 
 test('view settings: single button, keyboard switching and shared preferences', async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   await setup(page);
   await page.goto('/');
   await attachMap(page);

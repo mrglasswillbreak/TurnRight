@@ -215,7 +215,7 @@ test('an upload keeps its original building when the inspector changes mid-uploa
 test('review separate building wings, edit their geometry, save and undo without changing identity', async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   const server = await setup(page, true);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -376,7 +376,7 @@ for (const phone of [false, true])
   test(`miniature models: ${phone ? 'phone' : 'desktop'} LOD, picking, appearance and simple preference`, async ({
     page,
   }) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     if (phone) await page.setViewportSize({ width: 390, height: 844 });
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));

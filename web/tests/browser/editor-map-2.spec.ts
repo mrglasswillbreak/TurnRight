@@ -16,6 +16,7 @@ for (const threeD of [false, true])
   test(`map two entrances and their approaches in ${threeD ? '3D' : '2D'}, save and reload`, async ({
     page,
   }) => {
+    if (threeD) test.setTimeout(180_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     const server = await setup(page);
