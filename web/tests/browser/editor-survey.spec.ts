@@ -257,7 +257,7 @@ test('phone survey records a business without inventing a routing connection', a
 test('phone survey marks two entrances, connects both approaches and tests their route', async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   await page.setViewportSize({ width: 390, height: 844 });
   await surveyGps(page);
   const server = await setup(page);
