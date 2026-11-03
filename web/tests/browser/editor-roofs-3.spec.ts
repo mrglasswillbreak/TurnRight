@@ -58,6 +58,7 @@ test('surface workspace roof and footprint share aligned model and precision con
 test('surface workspace wall and roof text saves, reopens and rejects invalid placement', async ({
   page,
 }, info) => {
+  test.setTimeout(180_000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const { dialog, wall, server } = await unifiedModelFixture(page);

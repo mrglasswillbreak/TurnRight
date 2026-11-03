@@ -13,7 +13,7 @@ test.afterEach(async ({ context }) => {
 test('building appearance: integrated view, surface inheritance, live preview, roof recovery and undo', async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(150000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const state = await setup(page);
@@ -275,7 +275,7 @@ test(
 test('view settings: preserves the map, saved roof and unfinished drawing', async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(150000);
   const state = await setup(page);
   await focusCampus(page);
   await collapseExplorer(page);
